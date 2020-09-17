@@ -1,5 +1,5 @@
+import { ApplicationIdentifier } from './types';
 import { getGlobalScope } from '@Lib/utils';
-import { SNNamespace } from '@Services/namespace_service';
 
 /**
  * Platforms must override this class to provide platform specific utilities
@@ -9,9 +9,8 @@ import { SNNamespace } from '@Services/namespace_service';
  */
 export abstract class DeviceInterface {
 
-  public timeout: any
   public interval: any
-  protected namespace?: SNNamespace
+  public timeout: any
 
   /**
     * @param {function} timeout
@@ -43,7 +42,7 @@ export abstract class DeviceInterface {
    * This is most likely the case for legacy values.
    * So we return the value as-is if JSON.parse throws an exception.
    */
-  public async getJsonParsedStorageValue(key: string) {
+  public async getJsonParsedRawStorageValue(key: string) {
     const value = await this.getRawStorageValue(key);
     try {
       return JSON.parse(value);
@@ -67,31 +66,27 @@ export abstract class DeviceInterface {
    * from scratch.
    * @returns { isNewDatabase } - True if the database was newly created
    */
-  abstract async openDatabase() : Promise<{ isNewDatabase?: boolean } | undefined>
+  abstract async openDatabase(identifier: ApplicationIdentifier) : Promise<{ isNewDatabase?: boolean } | undefined>
 
-  abstract async getAllRawDatabasePayloads() : Promise<unknown[]>;
+  abstract async getAllRawDatabasePayloads(identifier: ApplicationIdentifier) : Promise<unknown[]>;
 
-  abstract async saveRawDatabasePayload(payload: any) : Promise<void>;
+  abstract async saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier) : Promise<void>;
 
-  abstract async saveRawDatabasePayloads(payloads: any[]) : Promise<void>;
+  abstract async saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier) : Promise<void>;
 
-  abstract async removeRawDatabasePayloadWithId(id: string) : Promise<void>;
+  abstract async removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier) : Promise<void>;
 
-  abstract async removeAllRawDatabasePayloads() : Promise<void>;
+  abstract async removeAllRawDatabasePayloads(identifier: ApplicationIdentifier) : Promise<void>;
 
-  abstract async getNamespacedKeychainValue() : Promise<any>;
+  abstract async getNamespacedKeychainValue(identifier: ApplicationIdentifier) : Promise<any>;
 
-  abstract async setNamespacedKeychainValue(value: any) : Promise<void>;
+  abstract async setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier) : Promise<void>;
 
-  abstract async clearNamespacedKeychainValue() : Promise<void>;
+  abstract async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) : Promise<void>;
 
   abstract async getRawKeychainValue() : Promise<any>;
 
   abstract async clearRawKeychainValue() : Promise<void>;
-
-  public setNamespace(namespace: SNNamespace) {
-    this.namespace = namespace;
-  }
 
   abstract openUrl(url: string): void;
 

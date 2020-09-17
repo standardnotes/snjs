@@ -9229,6 +9229,8 @@ process.umask = function () {
 __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
+__webpack_require__.d(__webpack_exports__, "SNApplicationGroup", function() { return /* reexport */ application_group_SNApplicationGroup; });
+__webpack_require__.d(__webpack_exports__, "DeinitSource", function() { return /* reexport */ DeinitSource; });
 __webpack_require__.d(__webpack_exports__, "SNApplication", function() { return /* reexport */ application_SNApplication; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return /* reexport */ protocol_service_SNProtocolService; });
 __webpack_require__.d(__webpack_exports__, "KeyMode", function() { return /* reexport */ KeyMode; });
@@ -9350,6 +9352,7 @@ __webpack_require__.d(__webpack_exports__, "PayloadFormat", function() { return 
 __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return /* reexport */ pure_payload["a" /* PurePayload */]; });
 __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return /* reexport */ fields["a" /* PayloadField */]; });
 __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return /* reexport */ StorageKey; });
+__webpack_require__.d(__webpack_exports__, "RawStorageKey", function() { return /* reexport */ RawStorageKey; });
 __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return /* reexport */ _2020_01_01_base_BaseMigration; });
 __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return /* reexport */ PrivilegeSessionLength; });
 
@@ -9358,29 +9361,69 @@ var migrations_namespaceObject = {};
 __webpack_require__.r(migrations_namespaceObject);
 __webpack_require__.d(migrations_namespaceObject, "Migration20200115", function() { return _2020_01_15_Migration20200115; });
 
-// EXTERNAL MODULE: ./lib/models/functions.ts
-var functions = __webpack_require__(10);
+// CONCATENATED MODULE: ./lib/storage_keys.ts
+/**
+ * Unmanaged keys stored in root storage
+ */
+var RawStorageKey;
 
-// CONCATENATED MODULE: ./lib/stages.ts
-var ApplicationStage;
+(function (RawStorageKey) {
+  RawStorageKey["StorageObject"] = "storage";
+  /** Raw storage keys exist outside of StorageManager domain */
 
-(function (ApplicationStage) {
-  ApplicationStage[ApplicationStage["PreparingForLaunch_0"] = 0] = "PreparingForLaunch_0";
-  ApplicationStage[ApplicationStage["ReadyForLaunch_05"] = 0.5] = "ReadyForLaunch_05";
-  ApplicationStage[ApplicationStage["StorageDecrypted_09"] = 0.9] = "StorageDecrypted_09";
-  ApplicationStage[ApplicationStage["Launched_10"] = 1] = "Launched_10";
-  ApplicationStage[ApplicationStage["LoadingDatabase_11"] = 1.1] = "LoadingDatabase_11";
-  ApplicationStage[ApplicationStage["LoadedDatabase_12"] = 1.2] = "LoadedDatabase_12";
-  ApplicationStage[ApplicationStage["FullSyncCompleted_13"] = 1.3] = "FullSyncCompleted_13";
-  ApplicationStage[ApplicationStage["SignedIn_30"] = 3] = "SignedIn_30";
-})(ApplicationStage || (ApplicationStage = {}));
+  RawStorageKey["LastMigrationTimestamp"] = "last_migration_timestamp";
+  RawStorageKey["DescriptorRecord"] = "descriptors";
+})(RawStorageKey || (RawStorageKey = {}));
 
 ;
-// EXTERNAL MODULE: ./lib/events.ts
-var events = __webpack_require__(12);
+/**
+ * Keys used for retrieving and saving simple key/value pairs.
+ * These keys are managed and are embedded inside RawStorageKey.StorageObject
+ */
 
+var StorageKey;
+
+(function (StorageKey) {
+  StorageKey["RootKeyParams"] = "ROOT_KEY_PARAMS";
+  StorageKey["WrappedRootKey"] = "WRAPPED_ROOT_KEY";
+  StorageKey["RootKeyWrapperKeyParams"] = "ROOT_KEY_WRAPPER_KEY_PARAMS";
+  StorageKey["Session"] = "session";
+  StorageKey["User"] = "user";
+  StorageKey["ServerHost"] = "server";
+  StorageKey["LegacyUuid"] = "uuid";
+  StorageKey["LastSyncToken"] = "syncToken";
+  StorageKey["PaginationToken"] = "cursorToken";
+  StorageKey["BiometricsState"] = "biometrics_state";
+  StorageKey["MobilePasscodeTiming"] = "passcode_timing";
+  StorageKey["MobileBiometricsTiming"] = "biometrics_timing";
+  StorageKey["PrivilegesExpirey"] = "SessionExpiresAtKey";
+  StorageKey["PrivilegesSessionLength"] = "SessionLengthKey";
+  StorageKey["SessionHistoryPersistable"] = "sessionHistory_persist";
+  StorageKey["SessionHistoryRevisions"] = "sessionHistory_revisions";
+  StorageKey["SessionHistoryOptimize"] = "sessionHistory_autoOptimize";
+})(StorageKey || (StorageKey = {}));
+
+;
+function namespacedKey(namespace, key) {
+  if (namespace) {
+    return "".concat(namespace, "-").concat(key);
+  } else {
+    return key;
+  }
+}
 // EXTERNAL MODULE: ./lib/utils.ts
 var utils = __webpack_require__(0);
+
+// CONCATENATED MODULE: ./lib/types.ts
+var DeinitSource;
+
+(function (DeinitSource) {
+  DeinitSource[DeinitSource["SignOut"] = 1] = "SignOut";
+  DeinitSource[DeinitSource["Lock"] = 2] = "Lock";
+  DeinitSource[DeinitSource["AppGroupUnload"] = 3] = "AppGroupUnload";
+})(DeinitSource || (DeinitSource = {}));
+// EXTERNAL MODULE: ./lib/services/pure_service.ts
+var pure_service = __webpack_require__(11);
 
 // CONCATENATED MODULE: ./lib/uuid.ts
 
@@ -9431,6 +9474,241 @@ class uuid_Uuid {
   }
 
 }
+// CONCATENATED MODULE: ./lib/application_group.ts
+
+
+
+
+
+class application_group_SNApplicationGroup extends pure_service["a" /* PureService */] {
+  constructor(deviceInterface) {
+    super();
+    this.deviceInterface = deviceInterface;
+    this.changeObservers = [];
+    this.applications = [];
+    /** @callback */
+
+    this.onApplicationDeinit = (application, source) => {
+      /** If we are initiaitng this unloading via function below,
+       * we don't want any side-effects */
+      const sideffects = source !== DeinitSource.AppGroupUnload;
+
+      if (this.primaryApplication === application) {
+        this.primaryApplication = undefined;
+      }
+
+      Object(utils["B" /* removeFromArray */])(this.applications, application);
+
+      if (source === DeinitSource.SignOut) {
+        this.removeDescriptor(this.descriptorForApplication(application));
+
+        if (sideffects) {
+          /** If there are no more descriptors (all accounts have been signed out),
+             * create a new blank slate app */
+          const descriptors = this.getDescriptors();
+
+          if (descriptors.length === 0) {
+            return this.addNewApplication();
+          } else {
+            return this.loadApplicationForDescriptor(descriptors[0]);
+          }
+        }
+      } else if (source === DeinitSource.Lock && sideffects) {
+        /** Recreate the same application from scratch */
+        const descriptor = this.descriptorForApplication(application);
+        return this.loadApplicationForDescriptor(descriptor);
+      }
+    };
+  }
+
+  deinit() {
+    super.deinit();
+    this.deviceInterface.deinit();
+    this.deviceInterface = undefined;
+  }
+
+  async initialize(callback) {
+    this.callback = callback;
+    this.descriptorRecord = await this.deviceInterface.getJsonParsedRawStorageValue(RawStorageKey.DescriptorRecord);
+
+    if (!this.descriptorRecord) {
+      await this.createDescriptorRecord();
+    }
+
+    const primaryDescriptor = this.findPrimaryDescriptor();
+
+    if (!primaryDescriptor) {
+      throw Error('No primary application descriptor found. Ensure migrations have been run.');
+    }
+
+    const application = this.buildApplication(primaryDescriptor);
+    this.applications.push(application);
+    this.setPrimaryApplication(application, false);
+  }
+
+  async createDescriptorRecord() {
+    /** The identifier 'standardnotes' is used because this was the
+     * database name of Standard Notes web/desktop */
+    const identifier = 'standardnotes';
+    const descriptorRecord = {
+      [identifier]: {
+        identifier: identifier,
+        label: 'Main Application',
+        primary: true
+      }
+    };
+    this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(descriptorRecord));
+    this.descriptorRecord = descriptorRecord;
+    this.persistDescriptors();
+  }
+
+  getApplications() {
+    return this.applications;
+  }
+
+  getDescriptors() {
+    return Object.values(this.descriptorRecord);
+  }
+
+  findPrimaryDescriptor() {
+    for (const descriptor of this.getDescriptors()) {
+      if (descriptor.primary) {
+        return descriptor;
+      }
+    }
+  }
+  /**
+   * Notifies observer when the primary application has changed.
+   * Any application which is no longer active is destroyed, and
+   * must be removed from the interface.
+   */
+
+
+  addApplicationChangeObserver(callback) {
+    this.changeObservers.push(callback);
+
+    if (this.primaryApplication) {
+      callback();
+    }
+
+    return () => {
+      Object(utils["B" /* removeFromArray */])(this.changeObservers, callback);
+    };
+  }
+
+  notifyObserversOfAppChange() {
+    for (const observer of this.changeObservers) {
+      observer();
+    }
+  }
+
+  async setPrimaryApplication(application) {
+    let persist = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    if (this.primaryApplication === application) {
+      return;
+    }
+
+    if (!this.applications.includes(application)) {
+      throw Error('Application must be inserted before attempting to switch to it');
+    }
+
+    if (this.primaryApplication) {
+      this.primaryApplication.deinit(DeinitSource.AppGroupUnload);
+    }
+
+    this.primaryApplication = application;
+    const descriptor = this.descriptorForApplication(application);
+    this.setDescriptorAsPrimary(descriptor);
+    this.notifyObserversOfAppChange();
+
+    if (persist) {
+      await this.persistDescriptors();
+    }
+  }
+
+  setDescriptorAsPrimary(primaryDescriptor) {
+    for (const descriptor of this.getDescriptors()) {
+      descriptor.primary = descriptor === primaryDescriptor;
+    }
+  }
+
+  async persistDescriptors() {
+    this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(this.descriptorRecord));
+  }
+
+  async renameDescriptor(descriptor, label) {
+    descriptor.label = label;
+    await this.persistDescriptors();
+  }
+
+  removeDescriptor(descriptor) {
+    delete this.descriptorRecord[descriptor.identifier];
+    return this.persistDescriptors();
+  }
+
+  descriptorForApplication(application) {
+    return this.descriptorRecord[application.identifier];
+  }
+
+  async addNewApplication(label) {
+    const identifier = await uuid_Uuid.GenerateUuid();
+    const index = this.getDescriptors().length + 1;
+    const descriptor = {
+      identifier: identifier,
+      label: label || "Application ".concat(index),
+      primary: false
+    };
+    const application = this.buildApplication(descriptor);
+    this.applications.push(application);
+    this.descriptorRecord[identifier] = descriptor;
+    await this.setPrimaryApplication(application);
+    await this.persistDescriptors();
+  }
+
+  applicationForDescriptor(descriptor) {
+    return this.applications.find(app => app.identifier === descriptor.identifier);
+  }
+
+  async loadApplicationForDescriptor(descriptor) {
+    let application = this.applicationForDescriptor(descriptor);
+
+    if (!application) {
+      application = this.buildApplication(descriptor);
+      this.applications.push(application);
+    }
+
+    await this.setPrimaryApplication(application);
+  }
+
+  buildApplication(descriptor) {
+    const application = this.callback.applicationCreator(descriptor, this.deviceInterface);
+    application.setOnDeinit(this.onApplicationDeinit);
+    return application;
+  }
+
+}
+// EXTERNAL MODULE: ./lib/models/functions.ts
+var functions = __webpack_require__(10);
+
+// CONCATENATED MODULE: ./lib/stages.ts
+var ApplicationStage;
+
+(function (ApplicationStage) {
+  ApplicationStage[ApplicationStage["PreparingForLaunch_0"] = 0] = "PreparingForLaunch_0";
+  ApplicationStage[ApplicationStage["ReadyForLaunch_05"] = 0.5] = "ReadyForLaunch_05";
+  ApplicationStage[ApplicationStage["StorageDecrypted_09"] = 0.9] = "StorageDecrypted_09";
+  ApplicationStage[ApplicationStage["Launched_10"] = 1] = "Launched_10";
+  ApplicationStage[ApplicationStage["LoadingDatabase_11"] = 1.1] = "LoadingDatabase_11";
+  ApplicationStage[ApplicationStage["LoadedDatabase_12"] = 1.2] = "LoadedDatabase_12";
+  ApplicationStage[ApplicationStage["FullSyncCompleted_13"] = 1.3] = "FullSyncCompleted_13";
+  ApplicationStage[ApplicationStage["SignedIn_30"] = 3] = "SignedIn_30";
+})(ApplicationStage || (ApplicationStage = {}));
+
+;
+// EXTERNAL MODULE: ./lib/events.ts
+var events = __webpack_require__(12);
+
 // EXTERNAL MODULE: ./lib/models/core/item.ts
 var core_item = __webpack_require__(5);
 
@@ -10292,60 +10570,8 @@ function CreateItemFromPayload(payload) {
   const item = new itemClass(payload);
   return item;
 }
-// CONCATENATED MODULE: ./lib/storage_keys.ts
-/**
- * Unmanaged keys stored in root storage
- */
-var RawStorageKey;
-
-(function (RawStorageKey) {
-  RawStorageKey["StorageObject"] = "storage";
-  /** Raw storage keys exist outside of StorageManager domain */
-
-  RawStorageKey["LastMigrationTimestamp"] = "last_migration_timestamp";
-})(RawStorageKey || (RawStorageKey = {}));
-
-;
-/**
- * Keys used for retrieving and saving simple key/value pairs.
- * These keys are managed and are embedded inside RawStorageKey.StorageObject
- */
-
-var StorageKey;
-
-(function (StorageKey) {
-  StorageKey["RootKeyParams"] = "ROOT_KEY_PARAMS";
-  StorageKey["WrappedRootKey"] = "WRAPPED_ROOT_KEY";
-  StorageKey["RootKeyWrapperKeyParams"] = "ROOT_KEY_WRAPPER_KEY_PARAMS";
-  StorageKey["Session"] = "session";
-  StorageKey["User"] = "user";
-  StorageKey["ServerHost"] = "server";
-  StorageKey["LegacyUuid"] = "uuid";
-  StorageKey["LastSyncToken"] = "syncToken";
-  StorageKey["PaginationToken"] = "cursorToken";
-  StorageKey["BiometricsState"] = "biometrics_state";
-  StorageKey["MobilePasscodeTiming"] = "passcode_timing";
-  StorageKey["MobileBiometricsTiming"] = "biometrics_timing";
-  StorageKey["PrivilegesExpirey"] = "SessionExpiresAtKey";
-  StorageKey["PrivilegesSessionLength"] = "SessionLengthKey";
-  StorageKey["SessionHistoryPersistable"] = "sessionHistory_persist";
-  StorageKey["SessionHistoryRevisions"] = "sessionHistory_revisions";
-  StorageKey["SessionHistoryOptimize"] = "sessionHistory_autoOptimize";
-})(StorageKey || (StorageKey = {}));
-
-;
-function namespacedKey(namespace, key) {
-  if (namespace) {
-    return "".concat(namespace, "-").concat(key);
-  } else {
-    return key;
-  }
-}
 // EXTERNAL MODULE: ./lib/protocol/intents.ts
 var intents = __webpack_require__(8);
-
-// EXTERNAL MODULE: ./lib/services/pure_service.ts
-var pure_service = __webpack_require__(11);
 
 // CONCATENATED MODULE: ./lib/services/storage_service.ts
 
@@ -10409,13 +10635,13 @@ var ValueModesKeys;
  */
 
 class storage_service_SNStorageService extends pure_service["a" /* PureService */] {
-  constructor(deviceInterface, namespaceService) {
+  constructor(deviceInterface, identifier) {
     super();
     /** Wait until application has been unlocked before trying to persist */
 
     this.storagePersistable = false;
     this.deviceInterface = deviceInterface;
-    this.namespaceService = namespaceService;
+    this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default);
   }
@@ -10423,7 +10649,6 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
   deinit() {
     this.deviceInterface = undefined;
     this.encryptionDelegate = undefined;
-    this.namespaceService = undefined;
     super.deinit();
   }
 
@@ -10607,8 +10832,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
 
 
   getPersistenceKey() {
-    const namespace = this.namespaceService.getCurrentNamespace();
-    return namespacedKey(namespace.identifier, RawStorageKey.StorageObject);
+    return namespacedKey(this.identifier, RawStorageKey.StorageObject);
   }
 
   defaultValuesObject(wrapped, unwrapped, nonwrapped) {
@@ -10646,7 +10870,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
   }
 
   async getAllRawPayloads() {
-    return this.deviceInterface.getAllRawDatabasePayloads();
+    return this.deviceInterface.getAllRawDatabasePayloads(this.identifier);
   }
 
   async savePayload(payload) {
@@ -10675,7 +10899,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     }
 
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface.saveRawDatabasePayloads(nondeleted);
+      return this.deviceInterface.saveRawDatabasePayloads(nondeleted, this.identifier);
     });
   }
 
@@ -10687,13 +10911,13 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
 
   async deletePayloadWithId(id) {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface.removeRawDatabasePayloadWithId(id);
+      return this.deviceInterface.removeRawDatabasePayloadWithId(id, this.identifier);
     });
   }
 
   async clearAllPayloads() {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface.removeAllRawDatabasePayloads();
+      return this.deviceInterface.removeAllRawDatabasePayloads(this.identifier);
     });
   }
 
@@ -10715,40 +10939,65 @@ var ButtonType;
 })(ButtonType || (ButtonType = {}));
 // CONCATENATED MODULE: ./lib/services/api/session.ts
 class Session {
-  constructor(accessToken, expireAt, refreshToken, validUntil) {
-    this.accessToken = accessToken;
-    this.expireAt = expireAt;
-    this.refreshToken = refreshToken;
-    this.validUntil = validUntil;
+  static FromRawStorageValue(raw) {
+    if (raw.jwt) {
+      return new JwtSession(raw.jwt);
+    } else {
+      const rawSession = raw;
+      return new TokenSession(rawSession.accessToken, rawSession.accessExpiration, rawSession.refreshToken, rawSession.refreshExpiration);
+    }
   }
 
-  static FromRaw(raw) {
-    return new Session(raw.accessToken, raw.expireAt, raw.refreshToken, raw.validUntil);
+}
+/** Legacy, for protocol versions <= 003 */
+
+class JwtSession extends Session {
+  constructor(jwt) {
+    super();
+    this.jwt = jwt;
   }
 
-  static FromResponse(response) {
-    var _response$session, _response$session2, _response$session3;
-
-    const accessToken = response.token;
-    const expireAt = (_response$session = response.session) === null || _response$session === void 0 ? void 0 : _response$session.expire_at;
-    const refreshToken = (_response$session2 = response.session) === null || _response$session2 === void 0 ? void 0 : _response$session2.refresh_token;
-    const validUntil = (_response$session3 = response.session) === null || _response$session3 === void 0 ? void 0 : _response$session3.valid_until;
-    return new Session(accessToken, expireAt, refreshToken, validUntil);
-  }
-
-  getExpireAt() {
-    return this.expireAt || 0;
+  get authorizationValue() {
+    return this.jwt;
   }
 
   canExpire() {
-    return this.getExpireAt() > 0;
+    return false;
+  }
+
+}
+/** For protocol versions >= 004 */
+
+class TokenSession extends Session {
+  constructor(accessToken, accessExpiration, refreshToken, refreshExpiration) {
+    super();
+    this.accessToken = accessToken;
+    this.accessExpiration = accessExpiration;
+    this.refreshToken = refreshToken;
+    this.refreshExpiration = refreshExpiration;
+  }
+
+  static FromApiResponse(response) {
+    const accessToken = response.session.access_token;
+    const refreshToken = response.session.refresh_token;
+    const accessExpiration = response.session.access_expiration;
+    const refreshExpiration = response.session.refresh_expiration;
+    return new TokenSession(accessToken, accessExpiration, refreshToken, refreshExpiration);
+  }
+
+  getExpireAt() {
+    return this.accessExpiration || 0;
+  }
+
+  get authorizationValue() {
+    return this.accessToken;
+  }
+
+  canExpire() {
+    return true;
   }
 
   isExpired() {
-    if (!this.canExpire()) {
-      return false;
-    }
-
     return this.getExpireAt() < Date.now();
   }
 
@@ -10778,6 +11027,7 @@ const SETTING_PASSCODE = "Setting passcode\u2026";
 const CHANGING_PASSCODE = "Changing passcode\u2026";
 const REMOVING_PASSCODE = "Removing passcode\u2026";
 const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this process completes.';
+const UNKNOWN_ERROR = 'Unknown error.';
 function InsufficientPasswordMessage(minimum) {
   return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
 }
@@ -10787,6 +11037,7 @@ function StrictSignInFailed(current, latest) {
 const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
 const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
+
 
 
 
@@ -10834,7 +11085,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const rawSession = await this.storageService.getValue(StorageKey.Session);
 
     if (rawSession) {
-      await this.setSession(Session.FromRaw(rawSession), false);
+      await this.setSession(Session.FromRawStorageValue(rawSession), false);
     }
   }
 
@@ -10857,10 +11108,10 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
 
   async signOut() {
     this.user = undefined;
-    const session = await this.apiService.getSession();
+    const session = this.apiService.getSession();
 
     if (session && session.canExpire()) {
-      this.apiService.signOut();
+      await this.apiService.signOut();
     }
   }
 
@@ -10995,19 +11246,21 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const user = response.user;
     this.user = user;
     await this.storageService.setValue(StorageKey.User, user);
-    /*
-      The token from response can be undefined if the user is using session tokens (protocol version >= 004).
-      We should call setSession only if the session is updated with a new token.
-    */
 
     if (response.token) {
-      const session = Session.FromResponse(response);
+      /** Legacy JWT response */
+      const session = new JwtSession(response.token);
+      await this.setSession(session);
+    } else {
+      /** Non-legacy expirable sessions */
+      const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
     }
   }
 
 }
 // CONCATENATED MODULE: ./lib/services/api/http_service.ts
+
 
 var HttpVerb;
 
@@ -11110,6 +11363,7 @@ class http_service_SNHttpService extends pure_service["a" /* PureService */] {
     } else {
       if (!response.error) {
         response.error = {
+          message: UNKNOWN_ERROR,
           status: httpStatus
         };
       }
@@ -11326,7 +11580,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
   async signOut() {
     const url = await this.path(REQUEST_PATH_LOGOUT);
-    return this.httpService.postAbsolute(url, undefined, this.session.accessToken);
+    return this.httpService.postAbsolute(url, undefined, this.session.authorizationValue);
   }
 
   async changePassword(currentServerPassword, newServerPassword, newKeyParams) {
@@ -11346,7 +11600,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       current_password: currentServerPassword,
       new_password: newServerPassword
     }, newKeyParams.getPortableValue()));
-    const response = await this.httpService.postAbsolute(url, params, this.session.accessToken).catch(async errorResponse => {
+    const response = await this.httpService.postAbsolute(url, params, this.session.authorizationValue).catch(async errorResponse => {
       if (this.httpService.isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
@@ -11381,7 +11635,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       content_type: contentType,
       event: customEvent
     });
-    const response = await this.httpService.postAbsolute(url, params, this.session.accessToken).catch(async errorResponse => {
+    const response = await this.httpService.postAbsolute(url, params, this.session.authorizationValue).catch(async errorResponse => {
       if (this.httpService.isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
@@ -11401,7 +11655,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
         return sessionResponse;
       } else {
         return this.httpService.runHttp(_objectSpread(_objectSpread({}, httpRequest), {}, {
-          authentication: this.session.accessToken
+          authentication: this.session.authorizationValue
         }));
       }
     });
@@ -11416,12 +11670,13 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     this.refreshingSession = true;
     const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
+    const session = this.session;
     const params = this.params({
-      access_token: this.session.accessToken,
-      refresh_token: this.session.refreshToken
+      access_token: session.accessToken,
+      refresh_token: session.refreshToken
     });
     const result = await this.httpService.postAbsolute(url, params).then(async response => {
-      const session = Session.FromResponse(response);
+      const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
       return response;
     }).catch(errorResponse => {
@@ -11440,7 +11695,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
     const url = await this.path(path);
-    const response = await this.httpService.getAbsolute(url, undefined, this.session.accessToken).catch(errorResponse => {
+    const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
@@ -11455,7 +11710,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, revisionId);
     const url = await this.path(path);
-    const response = await this.httpService.getAbsolute(url, undefined, this.session.accessToken).catch(errorResponse => {
+    const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
@@ -14599,7 +14854,6 @@ class Migration {
     this.services = services;
     this.stageHandlers = {};
     this.registerStageHandlers();
-    this.namespace = services.namespaceService.getCurrentNamespace();
   }
 
   static timestamp() {
@@ -14666,9 +14920,9 @@ class _2020_01_15_Migration20200115 extends Migration {
   registerStageHandlers() {
     this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
       if (isEnvironmentWebOrDesktop(this.services.environment)) {
-        return this.migrateStorageStructureForWebDesktop();
+        await this.migrateStorageStructureForWebDesktop();
       } else if (isEnvironmentMobile(this.services.environment)) {
-        return this.migrateStorageStructureForMobile();
+        await this.migrateStorageStructureForMobile();
       }
     });
     this.registerStageHandler(ApplicationStage.StorageDecrypted_09, async () => {
@@ -14700,14 +14954,14 @@ class _2020_01_15_Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Nonwrapped]: {}
     };
-    const rawAccountKeyParams = await deviceInterface.getJsonParsedStorageValue(LegacyKeys.AllAccountKeyParamsKey);
+    const rawAccountKeyParams = await deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.AllAccountKeyParamsKey);
     /** Could be null if no account, or if account and storage is encrypted */
 
     if (rawAccountKeyParams) {
       newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = rawAccountKeyParams;
     }
 
-    const encryptedStorage = await deviceInterface.getJsonParsedStorageValue(LegacyKeys.WebEncryptedStorageKey);
+    const encryptedStorage = await deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.WebEncryptedStorageKey);
 
     if (encryptedStorage) {
       const encryptedStoragePayload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(encryptedStorage);
@@ -14750,7 +15004,7 @@ class _2020_01_15_Migration20200115 extends Migration {
         dataAuthenticationKey: ak,
         version: version
       });
-      await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue());
+      await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue(), this.services.identifier);
     }
     /** Persist storage under new key and structure */
 
@@ -14766,7 +15020,7 @@ class _2020_01_15_Migration20200115 extends Migration {
   async allPlatformHelperSetStorageStructure(rawStructure) {
     const newStructure = storage_service_SNStorageService.defaultValuesObject(rawStructure.wrapped, rawStructure.unwrapped, rawStructure.nonwrapped);
     newStructure[ValueModesKeys.Unwrapped] = undefined;
-    await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.namespace.identifier, RawStorageKey.StorageObject), JSON.stringify(newStructure));
+    await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.services.identifier, RawStorageKey.StorageObject), JSON.stringify(newStructure));
   }
   /**
    * Helper
@@ -14775,7 +15029,7 @@ class _2020_01_15_Migration20200115 extends Migration {
 
 
   async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedPayload) {
-    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.WebPasscodeParamsKey);
+    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.WebPasscodeParamsKey);
     const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
     /** Decrypt it with the passcode */
 
@@ -14867,9 +15121,9 @@ class _2020_01_15_Migration20200115 extends Migration {
 
 
   async migrateStorageStructureForMobile() {
-    const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobileWrappedRootKeyKey);
-    const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.AllAccountKeyParamsKey);
-    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobilePasscodeParamsKey);
+    const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileWrappedRootKeyKey);
+    const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.AllAccountKeyParamsKey);
+    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobilePasscodeParamsKey);
     const rawStructure = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
@@ -14880,7 +15134,7 @@ class _2020_01_15_Migration20200115 extends Migration {
       [ValueModesKeys.Wrapped]: {}
     };
     const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
-    const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(LegacyKeys.MobileBiometricsPrefs);
+    const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileBiometricsPrefs);
 
     if (biometricPrefs) {
       rawStructure.nonwrapped[StorageKey.BiometricsState] = biometricPrefs.enabled;
@@ -14957,7 +15211,7 @@ class _2020_01_15_Migration20200115 extends Migration {
           dataAuthenticationKey: keychainValue.ak,
           version: keychainValue.version || defaultVersion
         });
-        await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue());
+        await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue(), this.services.identifier);
       }
     }
     /** Move encrypted account key into place where it is now expected */
@@ -14985,12 +15239,12 @@ class _2020_01_15_Migration20200115 extends Migration {
       }
     };
 
-    const namespaceIdentifier = this.namespace.identifier;
+    const applicationIdentifier = this.services.identifier;
 
     for (const keyValuePair of allKeyValues) {
       const key = keyValuePair.key;
       const value = keyValuePair.value;
-      const isNameSpacedKey = namespaceIdentifier && namespaceIdentifier.length > 0 && key.startsWith(namespaceIdentifier);
+      const isNameSpacedKey = applicationIdentifier && applicationIdentifier.length > 0 && key.startsWith(applicationIdentifier);
 
       if (legacyKeys.includes(key) || isNameSpacedKey) {
         continue;
@@ -15036,7 +15290,7 @@ class _2020_01_15_Migration20200115 extends Migration {
       return;
     }
 
-    const session = new Session(currentToken);
+    const session = new JwtSession(currentToken);
     await this.services.storageService.setValue(StorageKey.Session, session);
   }
   /**
@@ -15121,7 +15375,7 @@ class _2020_01_01_base_BaseMigration extends Migration {
       }
     }
 
-    const newKey = namespacedKey(this.namespace.identifier, RawStorageKey.LastMigrationTimestamp);
+    const newKey = namespacedKey(this.services.identifier, RawStorageKey.LastMigrationTimestamp);
     const lastDate = await this.services.deviceInterface.getRawStorageValue(newKey);
     const hasNewStructure = !Object(utils["p" /* isNullOrUndefined */])(lastDate);
 
@@ -15153,10 +15407,10 @@ class _2020_01_01_base_BaseMigration extends Migration {
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
  * Migrations are registered during initial application launch, and listen for application
- * life-cycle events, and act accordingly. For example, a single migration may perform
- * a unique set of steps when the application first launches, and also other steps after the
- * application is unlocked, or after the first sync completes. Migrations live under /migrations
- * and inherit from the base Migration class.
+ * life-cycle events, and act accordingly. Migrations operate on the app-level, and not global level.
+ * For example, a single migration may perform a unique set of steps when the application
+ * first launches, and also other steps after the application is unlocked, or after the
+ * first sync completes. Migrations live under /migrations and inherit from the base Migration class.
  */
 
 class migration_service_SNMigrationService extends pure_service["a" /* PureService */] {
@@ -15247,16 +15501,13 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
 
     return activeMigrations;
   }
-  /** @access private */
 
-
-  getTimeStampKey() {
-    const namespace = this.services.namespaceService.getCurrentNamespace();
-    return namespacedKey(namespace.identifier, RawStorageKey.LastMigrationTimestamp);
+  getNamespacedTimeStampKey() {
+    return namespacedKey(this.services.identifier, RawStorageKey.LastMigrationTimestamp);
   }
 
   async getLastMigrationTimestamp() {
-    const timestamp = await this.services.deviceInterface.getRawStorageValue(this.getTimeStampKey());
+    const timestamp = await this.services.deviceInterface.getRawStorageValue(this.getNamespacedTimeStampKey());
 
     if (Object(utils["p" /* isNullOrUndefined */])(timestamp)) {
       throw 'Timestamp should not be null. Be sure to run base migration first.';
@@ -15266,7 +15517,7 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
   }
 
   async saveLastMigrationTimestamp(timestamp) {
-    await this.services.deviceInterface.setRawStorageValue(this.getTimeStampKey(), JSON.stringify(timestamp));
+    await this.services.deviceInterface.setRawStorageValue(this.getNamespacedTimeStampKey(), JSON.stringify(timestamp));
   }
 
   async handleStage(stage) {
@@ -16258,8 +16509,9 @@ const LAST_NONROOT_ITEMS_KEY_VERSION = versions["a" /* ProtocolVersion */].V003;
 */
 
 class protocol_service_SNProtocolService extends pure_service["a" /* PureService */] {
-  constructor(itemManager, modelManager, deviceInterface, storageService, crypto) {
+  constructor(itemManager, modelManager, deviceInterface, storageService, identifier, crypto) {
     super();
+    this.identifier = identifier;
     this.operators = {};
     this.keyMode = KeyMode.RootKeyNone;
     this.keyObservers = [];
@@ -16893,7 +17145,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   }
 
   async getRootKeyFromKeychain() {
-    const rawKey = await this.deviceInterface.getNamespacedKeychainValue();
+    const rawKey = await this.deviceInterface.getNamespacedKeychainValue(this.identifier);
 
     if (Object(utils["p" /* isNullOrUndefined */])(rawKey)) {
       return undefined;
@@ -16914,7 +17166,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
     const rawKey = this.rootKey.getPersistableValue();
     return this.executeCriticalFunction(() => {
-      return this.deviceInterface.setNamespacedKeychainValue(rawKey);
+      return this.deviceInterface.setNamespacedKeychainValue(rawKey, this.identifier);
     });
   }
   /**
@@ -17078,7 +17330,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       throw Error('Attempting to set wrapper on already wrapped key.');
     }
 
-    await this.deviceInterface.clearNamespacedKeychainValue();
+    await this.deviceInterface.clearNamespacedKeychainValue(this.identifier);
 
     if (this.keyMode === KeyMode.WrapperOnly || this.keyMode === KeyMode.RootKeyPlusWrapper) {
       if (this.keyMode === KeyMode.WrapperOnly) {
@@ -17193,7 +17445,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async clearLocalKeyState() {
-    await this.deviceInterface.clearNamespacedKeychainValue();
+    await this.deviceInterface.clearNamespacedKeychainValue(this.identifier);
     await this.storageService.removeValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped);
     await this.storageService.removeValue(StorageKey.RootKeyWrapperKeyParams, StorageValueModes.Nonwrapped);
     await this.storageService.removeValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped);
@@ -21437,139 +21689,6 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
 
 
 
-// CONCATENATED MODULE: ./lib/services/namespace_service.ts
-
-
-const NAMESPACES_STORAGE_KEY = 'namespaces';
-/**
- * The namespace service is responsible of setting the namespace to be used by
- * the DeviceInterface.
- */
-
-class namespace_service_SNNamespaceService extends pure_service["a" /* PureService */] {
-  constructor(deviceInterface, namespaceIdentifier) {
-    super();
-    this.deviceInterface = deviceInterface;
-
-    if (namespaceIdentifier) {
-      const namespace = {
-        identifier: namespaceIdentifier,
-        label: namespaceIdentifier,
-        isDefault: true
-      };
-      this.namespace = namespace;
-      this.deviceInterface.setNamespace(namespace);
-    }
-  }
-
-  async getNamespaces() {
-    const namespaces = await this.deviceInterface.getRawStorageValue(NAMESPACES_STORAGE_KEY);
-
-    if (!namespaces) {
-      return [];
-    }
-
-    return JSON.parse(namespaces);
-  }
-
-  async setNamespaces(namespaces) {
-    this.deviceInterface.setRawStorageValue(NAMESPACES_STORAGE_KEY, JSON.stringify(namespaces));
-  }
-
-  async getDefaultNamespace() {
-    const namespaces = await this.getNamespaces();
-    return namespaces.find(namespace => namespace.isDefault === true);
-  }
-
-  async pushNamespace(namespace) {
-    const namespaces = await this.getNamespaces();
-    const namespaceIndex = namespaces.findIndex(n => n.identifier === namespace.identifier);
-
-    if (namespaceIndex === -1) {
-      namespaces.push(namespace);
-    } else {
-      namespaces[namespaceIndex] = namespace;
-    }
-
-    await this.setNamespaces(namespaces);
-  }
-
-  async switchToNamespace(namespace) {
-    this.namespace = namespace;
-    this.deviceInterface.setNamespace(namespace);
-    await this.pushNamespace(namespace);
-  }
-  /**
-   * Creates a new namespace if necessary. If not, use an existing one.
-   */
-
-
-  async initialize() {
-    const defaultNamespace = await this.getDefaultNamespace();
-
-    if (defaultNamespace) {
-      await this.switchToNamespace(defaultNamespace);
-      return;
-    }
-
-    const namespaces = await this.getNamespaces();
-    /** If no namespaces exist, then we should create a new one. */
-
-    if (namespaces.length === 0) {
-      await this.createNamespace(true);
-    }
-    /**
-     * If one (1) namespace exist, then it means it is not the default one at this point.
-     * Let's set it as the default namespace and return it.
-     */
-    else if (namespaces.length === 1) {
-        const namespace = namespaces[0];
-        namespace.isDefault = true;
-        namespace.label = 'Default application';
-        await this.switchToNamespace(namespace);
-      }
-      /**
-       * In the future, if a user has multiple accounts signed into a client, each account
-       * will use its own keychain/storage namespace. This service will be in charge of displaying
-       * a UI for selecting which namespace to sign into (if no default namespace is set).
-       */
-      else {
-          throw Error('Multiple namespaces not supported yet ;)');
-        }
-  }
-
-  async createNamespace() {
-    let isDefault = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    let identifier = arguments.length > 1 ? arguments[1] : undefined;
-    let label = arguments.length > 2 ? arguments[2] : undefined;
-
-    if (isDefault && (await this.getDefaultNamespace())) {
-      throw Error('Can not create default namespace: a default namespace already exists.');
-    }
-
-    const uuid = await uuid_Uuid.GenerateUuid();
-    const namespace = {
-      identifier: identifier || uuid,
-      userUuid: undefined,
-      label: isDefault ? 'Default application' : label || identifier || uuid,
-      isDefault
-    };
-    await this.switchToNamespace(namespace);
-  }
-  /**
-   * Gets the current namespace in use.
-   */
-
-
-  getCurrentNamespace() {
-    if (!this.namespace) {
-      throw Error('No namespace set, please initialize first.');
-    }
-
-    return this.namespace;
-  }
-
-}
 // CONCATENATED MODULE: ./lib/application.ts
 function application_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -21608,7 +21727,7 @@ class application_SNApplication {
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param alertService The platform-dependent implementation of alert service.
-   * @param namespaceIdentifier A unique identifier to namespace storage and other
+   * @param identifier A unique identifier to namespace storage and other
    * persistent properties. This parameter is kept for backward compatibility and/or in case
    * you don't want SNNamespaceService to assign a dynamic namespace for you.
    * @param swapClasses Gives consumers the ability to provide their own custom
@@ -21618,7 +21737,7 @@ class application_SNApplication {
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
    */
-  constructor(environment, platform, deviceInterface, crypto, alertService, namespaceIdentifier, swapClasses, skipClasses, defaultHost) {
+  constructor(environment, platform, deviceInterface, crypto, alertService, identifier, swapClasses, skipClasses, defaultHost) {
     this.eventHandlers = [];
     this.services = [];
     this.streamRemovers = [];
@@ -21659,7 +21778,7 @@ class application_SNApplication {
 
     this.environment = environment;
     this.platform = platform;
-    this.namespaceIdentifier = namespaceIdentifier;
+    this.identifier = identifier;
     this.deviceInterface = deviceInterface;
     this.crypto = crypto;
     this.alertService = alertService;
@@ -21675,12 +21794,8 @@ class application_SNApplication {
 
 
   async prepareForLaunch(callback) {
-    if (!this.namespaceIdentifier) {
-      await this.namespaceService.initialize();
-    }
-
     this.setLaunchCallback(callback);
-    const databaseResult = await this.deviceInterface.openDatabase().catch(error => {
+    const databaseResult = await this.deviceInterface.openDatabase(this.identifier).catch(error => {
       this.notifyEvent(events["a" /* ApplicationEvent */].LocalDatabaseReadError, error);
       return undefined;
     });
@@ -22444,12 +22559,18 @@ class application_SNApplication {
   cancelChallenge(challenge) {
     this.challengeService.cancelChallenge(challenge);
   }
+  /** Set a function to be called when this application deinits */
+
+
+  setOnDeinit(onDeinit) {
+    this.onDeinit = onDeinit;
+  }
   /**
    * Destroys the application instance.
    */
 
 
-  deinit() {
+  deinit(source) {
     clearInterval(this.autoSyncInterval);
 
     for (const uninstallObserver of this.serviceObservers) {
@@ -22464,8 +22585,8 @@ class application_SNApplication {
       service.deinit();
     }
 
-    this.deviceInterface.deinit();
-    this.deviceInterface = undefined;
+    this.onDeinit && this.onDeinit(this, source);
+    this.onDeinit = undefined;
     this.crypto = undefined;
     this.createdNewDatabase = false;
     this.services.length = 0;
@@ -22667,7 +22788,9 @@ class application_SNApplication {
       await this.syncService.sync({
         awaitAll: true
       });
-      return this.apiService.createErrorResponse(API_MESSAGE_GENERIC_SYNC_FAIL);
+      return {
+        error: Error(API_MESSAGE_GENERIC_SYNC_FAIL)
+      };
     }
 
     this.lockSyncing();
@@ -22692,7 +22815,7 @@ class application_SNApplication {
     await this.storageService.clearAllData();
     await this.notifyEvent(events["a" /* ApplicationEvent */].SignedOut);
     await this.prepareForDeinit();
-    this.deinit();
+    this.deinit(DeinitSource.SignOut);
   }
 
   async validateAccountPassword(password) {
@@ -22739,7 +22862,7 @@ class application_SNApplication {
      * but only up to a certain limit. */
     const MaximumWaitTime = 500;
     await this.prepareForDeinit(MaximumWaitTime);
-    return this.deinit();
+    return this.deinit(DeinitSource.Lock);
   }
 
   async setPasscode(passcode) {
@@ -22818,7 +22941,6 @@ class application_SNApplication {
   }
 
   constructServices() {
-    this.createNamespaceService();
     this.createModelManager();
     this.createItemManager();
     this.createStorageManager();
@@ -22858,7 +22980,6 @@ class application_SNApplication {
     this.actionsManager = undefined;
     this.historyManager = undefined;
     this.itemManager = undefined;
-    this.namespaceService = undefined;
     this.services = [];
   }
 
@@ -22870,7 +22991,7 @@ class application_SNApplication {
       challengeService: this.challengeService,
       itemManager: this.itemManager,
       environment: this.environment,
-      namespaceService: this.namespaceService
+      identifier: this.identifier
     });
     this.services.push(this.migrationService);
   }
@@ -22911,12 +23032,12 @@ class application_SNApplication {
   }
 
   createStorageManager() {
-    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.namespaceService);
+    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.identifier);
     this.services.push(this.storageService);
   }
 
   createProtocolService() {
-    this.protocolService = new protocol_service_SNProtocolService(this.itemManager, this.modelManager, this.deviceInterface, this.storageService, this.crypto);
+    this.protocolService = new protocol_service_SNProtocolService(this.itemManager, this.modelManager, this.deviceInterface, this.storageService, this.identifier, this.crypto);
     this.protocolService.onKeyStatusChange(async () => {
       await this.notifyEvent(events["a" /* ApplicationEvent */].KeyStatusChanged);
     });
@@ -22964,11 +23085,6 @@ class application_SNApplication {
   createActionsManager() {
     this.actionsManager = new actions_service_SNActionsService(this.itemManager, this.alertService, this.deviceInterface, this.httpService, this.modelManager, this.protocolService, this.syncService);
     this.services.push(this.actionsManager);
-  }
-
-  createNamespaceService() {
-    this.namespaceService = new namespace_service_SNNamespaceService(this.deviceInterface, this.namespaceIdentifier);
-    this.services.push(this.namespaceService);
   }
 
   shouldSkipClass(classCandidate) {
@@ -23022,7 +23138,7 @@ class device_interface_DeviceInterface {
    */
 
 
-  async getJsonParsedStorageValue(key) {
+  async getJsonParsedRawStorageValue(key) {
     const value = await this.getRawStorageValue(key);
 
     try {
@@ -23030,10 +23146,6 @@ class device_interface_DeviceInterface {
     } catch (e) {
       return value;
     }
-  }
-
-  setNamespace(namespace) {
-    this.namespace = namespace;
   }
 
 }
@@ -23068,6 +23180,8 @@ var application_service = __webpack_require__(77);
 var pure_payload = __webpack_require__(27);
 
 // CONCATENATED MODULE: ./lib/index.ts
+
+
 
 
 

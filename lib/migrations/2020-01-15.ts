@@ -1,3 +1,4 @@
+import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
 import { SNRootKey } from './../protocol/root_key';
@@ -40,9 +41,9 @@ export class Migration20200115 extends Migration {
   protected registerStageHandlers() {
     this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
       if (isEnvironmentWebOrDesktop(this.services.environment)) {
-        return this.migrateStorageStructureForWebDesktop();
+        await this.migrateStorageStructureForWebDesktop();
       } else if (isEnvironmentMobile(this.services.environment)) {
-        return this.migrateStorageStructureForMobile();
+        await this.migrateStorageStructureForMobile();
       }
     });
     this.registerStageHandler(ApplicationStage.StorageDecrypted_09, async () => {
@@ -73,14 +74,14 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Nonwrapped]: {}
     };
-    const rawAccountKeyParams = await deviceInterface.getJsonParsedStorageValue(
+    const rawAccountKeyParams = await deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.AllAccountKeyParamsKey
     );
     /** Could be null if no account, or if account and storage is encrypted */
     if (rawAccountKeyParams) {
       newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = rawAccountKeyParams;
     }
-    const encryptedStorage = await deviceInterface.getJsonParsedStorageValue(
+    const encryptedStorage = await deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.WebEncryptedStorageKey
     );
     if (encryptedStorage) {
@@ -137,7 +138,8 @@ export class Migration20200115 extends Migration {
         }
       );
       await this.services.deviceInterface.setNamespacedKeychainValue(
-        accountKey.getPersistableValue()
+        accountKey.getPersistableValue(),
+        this.services.identifier
       );
     }
 
@@ -157,7 +159,7 @@ export class Migration20200115 extends Migration {
     );
     newStructure[ValueModesKeys.Unwrapped] = undefined;
     await this.services.deviceInterface.setRawStorageValue(
-      namespacedKey(this.namespace.identifier, RawStorageKey.StorageObject),
+      namespacedKey(this.services.identifier, RawStorageKey.StorageObject),
       JSON.stringify(newStructure)
     );
   }
@@ -168,7 +170,7 @@ export class Migration20200115 extends Migration {
    */
   private async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedPayload: PurePayload) {
     const rawPasscodeParams = await this.services.deviceInterface
-      .getJsonParsedStorageValue(
+      .getJsonParsedRawStorageValue(
         LegacyKeys.WebPasscodeParamsKey
       );
     const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
@@ -290,13 +292,13 @@ export class Migration20200115 extends Migration {
    * @access private
    */
   async migrateStorageStructureForMobile() {
-    const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedStorageValue(
+    const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileWrappedRootKeyKey
     );
-    const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedStorageValue(
+    const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.AllAccountKeyParamsKey
     );
-    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedStorageValue(
+    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobilePasscodeParamsKey
     );
     const rawStructure: StorageValuesObject = {
@@ -309,7 +311,7 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Wrapped]: {},
     };
     const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
-    const biometricPrefs = await this.services.deviceInterface.getJsonParsedStorageValue(
+    const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileBiometricsPrefs
     );
     if (biometricPrefs) {
@@ -410,7 +412,8 @@ export class Migration20200115 extends Migration {
           }
         );
         await this.services.deviceInterface.setNamespacedKeychainValue(
-          accountKey.getPersistableValue()
+          accountKey.getPersistableValue(),
+          this.services.identifier
         );
       }
     }
@@ -433,11 +436,11 @@ export class Migration20200115 extends Migration {
       try { return JSON.parse(value); }
       catch (e) { return value; }
     };
-    const namespaceIdentifier = this.namespace!.identifier;
+    const applicationIdentifier = this.services.identifier;
     for (const keyValuePair of allKeyValues) {
       const key = keyValuePair.key;
       const value = keyValuePair.value;
-      const isNameSpacedKey = namespaceIdentifier && namespaceIdentifier.length > 0 && key.startsWith(namespaceIdentifier);
+      const isNameSpacedKey = applicationIdentifier && applicationIdentifier.length > 0 && key.startsWith(applicationIdentifier);
       if (legacyKeys.includes(key) || isNameSpacedKey) {
         continue;
       }
@@ -488,7 +491,7 @@ export class Migration20200115 extends Migration {
     if (!currentToken) {
       return;
     }
-    const session = new Session(currentToken);
+    const session = new JwtSession(currentToken);
     await this.services.storageService.setValue(StorageKey.Session, session);
   }
 

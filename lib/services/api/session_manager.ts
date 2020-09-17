@@ -1,3 +1,5 @@
+import { JwtSession, TokenSession } from './session';
+import { RegistrationResponse, SignInResponse, ChangePasswordResponse } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
@@ -72,7 +74,7 @@ export class SNSessionManager extends PureService {
 
     const rawSession = await this.storageService!.getValue(StorageKey.Session);
     if (rawSession) {
-      await this.setSession(Session.FromRaw(rawSession), false);
+      await this.setSession(Session.FromRawStorageValue(rawSession), false);
     }
   }
 
@@ -94,9 +96,9 @@ export class SNSessionManager extends PureService {
 
   public async signOut() {
     this.user = undefined;
-    const session = await this.apiService!.getSession();
+    const session = this.apiService!.getSession();
     if (session && session.canExpire()) {
-      this.apiService!.signOut();
+      await this.apiService!.signOut();
     }
   }
 
@@ -149,11 +151,11 @@ export class SNSessionManager extends PureService {
     }
     const rawKeyParams: KeyParamsContent = {
       pw_cost: paramsResponse.pw_cost,
-      pw_nonce: paramsResponse.pw_nonce,
+      pw_nonce: paramsResponse.pw_nonce!,
       identifier: paramsResponse.identifier,
       email: paramsResponse.email,
       pw_salt: paramsResponse.pw_salt,
-      version: paramsResponse.version
+      version: paramsResponse.version!
     }
     const keyParams = this.protocolService!.createKeyParams(rawKeyParams);
     if (!keyParams || !keyParams.version) {
@@ -175,7 +177,7 @@ export class SNSessionManager extends PureService {
     if (this.protocolService!.isProtocolVersionOutdated(keyParams.version)) {
       /* Cost minimums only apply to now outdated versions (001 and 002) */
       const minimum = this.protocolService!.costMinimumForVersion(keyParams.version);
-      if (keyParams.kdfIterations < minimum) {
+      if (keyParams.kdfIterations! < minimum) {
         return {
           response: this.apiService!.createErrorResponse(messages.INVALID_PASSWORD_COST)
         } as SessionManagerResponse;
@@ -245,19 +247,21 @@ export class SNSessionManager extends PureService {
     return response;
   }
 
-  private async handleAuthResponse(response: HttpResponse) {
+  private async handleAuthResponse(response: RegistrationResponse | SignInResponse | ChangePasswordResponse) {
     if (response.error) {
       return;
     }
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
-    /*
-      The token from response can be undefined if the user is using session tokens (protocol version >= 004).
-      We should call setSession only if the session is updated with a new token.
-    */
+
     if (response.token) {
-      const session = Session.FromResponse(response);
+      /** Legacy JWT response */
+      const session = new JwtSession(response.token);
+      await this.setSession(session);
+    } else {
+      /** Non-legacy expirable sessions */
+      const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
     }
   }
