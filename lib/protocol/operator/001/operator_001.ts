@@ -1,5 +1,5 @@
 import { SNItemsKey } from '@Models/app/items_key';
-import { Create001KeyParams, SNRootKeyParams } from './../../key_params';
+import { Create001KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
 import { PayloadFormat } from '@Payloads/formats';
@@ -35,7 +35,11 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     return response;
   }
 
-  public async createRootKey(identifier: string, password: string) {
+  public async createRootKey(
+    identifier: string,
+    password: string,
+    origination: KeyParamsOrigination
+  ) {
     const pwCost = V001Algorithm.PbkdfMinCost as number;
     const pwNonce = await this.crypto.generateRandomKey(V001Algorithm.SaltSeedLength);
     const pwSalt = await this.crypto.unsafeSha1(identifier + 'SN' + pwNonce);
@@ -43,7 +47,9 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
       email: identifier,
       pw_cost: pwCost,
       pw_salt: pwSalt,
-      version: ProtocolVersion.V001
+      version: ProtocolVersion.V001,
+      origination,
+      created: `${Date.now()}`
     });
     return this.deriveKey(
       password,
@@ -199,7 +205,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
         serverPassword: partitions[0],
         masterKey: partitions[1],
         version: ProtocolVersion.V001,
-        keyParams: keyParams
+        keyParams: keyParams.getPortableValue()
       }
     );
     return key;

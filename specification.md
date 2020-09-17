@@ -292,7 +292,7 @@ Given a `string_to_encrypt`, an `encryption_key`, `attached_data`, and an item's
 
 1. Generate a random 192-bit string called `nonce`.
 
-2. Encode `attached_data` as a base64 encoded json string. i.e `base64(json(attached_data))`, to get `encoded_attached_data`.
+2. Encode `attached_data` as a base64 encoded json string (`base64(json(attached_data))`) where the embedded data is recursively sorted by key for stringification (i.e `{v: '2', 'u': '1'}` should be stringified as `{u: '1', 'v': '2'}`), to get `encoded_attached_data`.
 
 3. Encrypt `string_to_encrypt` using `XChaCha20+Poly1305:Base64`, `encryption_key`, `nonce`, and `encoded_attached_data`:
   ```

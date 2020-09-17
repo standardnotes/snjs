@@ -10,9 +10,19 @@ import { ProtocolVersion } from './versions';
  *  - Cost/iteration count is determined locally by the protocol version
  *  - Account identifier is returned as 'identifier'
  */
+export declare enum KeyParamsOrigination {
+    Registration = "registration",
+    EmailChange = "email-change",
+    PasswordChange = "password-change",
+    ProtocolUpgrade = "protocol-upgrade",
+    Passcode = "passcode",
+    PasscodeChange = "passcode-change"
+}
 declare type BaseKeyParams = {
-    created_at?: Date;
-    origination?: string;
+    /** Seconds since creation date */
+    created?: string;
+    /** The event that lead to the creation of these params */
+    origination?: KeyParamsOrigination;
     version: ProtocolVersion;
 };
 export declare type KeyParamsContent001 = BaseKeyParams & {
@@ -29,7 +39,7 @@ export declare type KeyParamsContent003 = BaseKeyParams & {
     identifier: string;
     pw_nonce: string;
 };
-export declare type KeyParamsContent004 = BaseKeyParams & {
+export declare type KeyParamsContent004 = Required<BaseKeyParams> & {
     identifier: string;
     pw_nonce: string;
 };

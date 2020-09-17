@@ -12,13 +12,24 @@ import { ProtocolVersion, compareVersions } from '@Protocol/versions';
  *  - Account identifier is returned as 'identifier'
  */
 
+export enum KeyParamsOrigination {
+  Registration = 'registration',
+  EmailChange = 'email-change',
+  PasswordChange = 'password-change',
+  ProtocolUpgrade = 'protocol-upgrade',
+  Passcode = 'passcode',
+  PasscodeChange = 'passcode-change'
+}
+
 type BaseKeyParams = {
-  created_at?: Date
-  origination?: string
+  /** Seconds since creation date */
+  created?: string
+  /** The event that lead to the creation of these params */
+  origination?: KeyParamsOrigination
   version: ProtocolVersion
 }
 
- export type KeyParamsContent001 = BaseKeyParams & {
+export type KeyParamsContent001 = BaseKeyParams & {
   email: string
   pw_cost: number
   pw_salt: string
@@ -35,7 +46,7 @@ export type KeyParamsContent003 = BaseKeyParams & {
   pw_nonce: string
 }
 
-export type KeyParamsContent004 = BaseKeyParams & {
+export type KeyParamsContent004 = Required<BaseKeyParams> & {
   identifier: string
   pw_nonce: string
 }
@@ -76,7 +87,10 @@ export class SNRootKeyParams {
   public readonly content: AnyKeyParamsContent
 
   constructor(content: AnyKeyParamsContent) {
-    this.content = content;
+    this.content = {
+      ...content,
+      origination: content.origination || KeyParamsOrigination.Registration
+    };
   }
 
   /**

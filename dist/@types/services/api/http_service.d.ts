@@ -17,7 +17,6 @@ export declare type HttpResponse = {
         };
     };
     object?: any;
-    [key: string]: any;
 };
 declare type HttpParams = Record<string, any>;
 export declare type HttpRequest = {

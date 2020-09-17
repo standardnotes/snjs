@@ -199,13 +199,13 @@ export class SNApiService extends PureService {
     currentServerPassword: string,
     newServerPassword: string,
     newKeyParams: SNRootKeyParams
-  ) {
+  ): Promise<ChangePasswordResponse> {
     if (this.changing) {
-      return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS) as ChangePasswordResponse;
+      return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS);
     }
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
-      return preprocessingError as ChangePasswordResponse;
+      return preprocessingError;
     }
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
@@ -233,7 +233,7 @@ export class SNApiService extends PureService {
     });
 
     this.changing = false;
-    return response as ChangePasswordResponse;
+    return response;
   }
 
   async sync(

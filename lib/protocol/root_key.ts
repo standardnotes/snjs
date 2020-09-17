@@ -13,7 +13,7 @@ export type RootKeyContent = {
   masterKey: string;
   serverPassword: string;
   dataAuthenticationKey?: string;
-  keyParams: SNRootKeyParams | AnyKeyParamsContent
+  keyParams: AnyKeyParamsContent
 }
 
 /**
@@ -48,16 +48,36 @@ export class SNRootKey extends SNItem {
       }
     )
     const keyParamsInput = content.keyParams;
+    if (!keyParamsInput) {
+      throw Error('Attempting to create root key without key params');
+    }
     const keyParams = keyParamsInput instanceof SNRootKeyParams
       ? keyParamsInput
       : new SNRootKeyParams(keyParamsInput);
 
-      return new SNRootKey(payload, keyParams);
+    return new SNRootKey(payload, keyParams);
+  }
+
+  /**
+   * Given a root key, expands its key params by making a copy which includes
+   * the inputted key params. Used to expand locally created key params after signing in
+   */
+  static async ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent) {
+    const content = key.typedContent as RootKeyContent;
+    const copiedKey = await this.Create({
+      ...content,
+      keyParams: keyParams ? keyParams : content.keyParams
+    })
+    return copiedKey;
   }
 
   constructor(payload: PurePayload, keyParams: SNRootKeyParams) {
     super(payload);
     this.keyParams = keyParams;
+  }
+
+  private get typedContent() {
+    return this.safeContent as Partial<RootKeyContent>;
   }
 
   public get version() {
@@ -106,9 +126,18 @@ export class SNRootKey extends SNItem {
   }
 
   /**
-   * @returns Object containg key/values that should be extracted from key for local saving.
+   * @returns Object suitable for persist in storage when wrapped
    */
-  public getPersistableValue() {
+  public persistableValueWhenWrapping() {
+    const keychainValue = this.getKeychainValue();
+    keychainValue.keyParams = this.keyParams.getPortableValue();
+    return keychainValue;
+  }
+
+  /**
+ * @returns Object that is suitable for persisting in a keychain
+ */
+  public getKeychainValue() {
     const values: Partial<RootKeyContent> = {
       version: this.version
     };

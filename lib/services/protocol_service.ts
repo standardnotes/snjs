@@ -22,7 +22,7 @@ import { CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItemsKey, ItemsKeyMutator } from '@Models/app/items_key';
-import { SNRootKeyParams, AnyKeyParamsContent, CreateAnyKeyParams } from './../protocol/key_params';
+import { SNRootKeyParams, AnyKeyParamsContent, CreateAnyKeyParams, KeyParamsOrigination } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
@@ -383,9 +383,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * Creates a root key using the latest protocol version
   */
-  public async createRootKey(identifier: string, password: string) {
+  public async createRootKey(
+    identifier: string,
+    password: string,
+    origination: KeyParamsOrigination
+  ) {
     const operator = this.defaultOperator();
-    return operator.createRootKey(identifier, password);
+    return operator.createRootKey(identifier, password, origination);
   }
 
   /**
@@ -695,9 +699,16 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @param keyParams - The raw key params object to create a KeyParams object from
    */
   public createKeyParams(keyParams: AnyKeyParamsContent) {
+    if((keyParams as any).content) {
+      console.trace();
+      throw Error('Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.');
+    }
     /* 002 doesn't have version automatically, newer versions do. */
     if (!keyParams.version) {
-      keyParams.version = ProtocolVersion.V002;
+      keyParams = {
+        ...keyParams,
+        version: ProtocolVersion.V002
+      }
     }
     return CreateAnyKeyParams(keyParams);
   }
@@ -771,9 +782,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (isNullOrUndefined(rawKey)) {
       return undefined;
     }
-    const rootKey = await SNRootKey.Create(
-      rawKey
-    );
+    const rootKey = await SNRootKey.Create({
+      ...rawKey,
+      keyParams: await this.getRootKeyParams()
+    });
     return rootKey;
   }
 
@@ -784,7 +796,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (this.keyMode !== KeyMode.RootKeyOnly) {
       throw 'Should not be persisting wrapped key to keychain.';
     }
-    const rawKey = this.rootKey!.getPersistableValue();
+    const rawKey = this.rootKey!.getKeychainValue();
     return this.executeCriticalFunction(() => {
       return this.deviceInterface!.setNamespacedKeychainValue(rawKey, this.identifier);
     })
@@ -994,7 +1006,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const payload = CreateMaxPayloadFromAnyObject(
       this.rootKey!,
       {
-        content: this.rootKey!.getPersistableValue()
+        content: this.rootKey!.persistableValueWhenWrapping()
       }
     );
     const wrappedKey = await this.payloadByEncryptingPayload(
@@ -1074,7 +1086,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       StorageKey.RootKeyParams,
       key.keyParams.getPortableValue(),
       StorageValueModes.Nonwrapped
-    );
+      );
     if (this.keyMode === KeyMode.RootKeyOnly) {
       await this.saveRootKeyToKeychain();
     } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
@@ -1420,7 +1432,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       return [Error(INVALID_PASSWORD)];
     }
 
-    const newRootKey = await this.createRootKey(email, newPassword);
+    const newRootKey = await this.createRootKey(email, newPassword, KeyParamsOrigination.PasswordChange);
 
     await this.setNewRootKey(newRootKey, wrappingKey);
     const newDefaultItemsKey = await this.createNewDefaultItemsKey();

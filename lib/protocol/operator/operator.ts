@@ -2,7 +2,7 @@ import { FillItemContent } from '@Models/functions';
 import { Uuid } from './../../uuid';
 import { CreateItemFromPayload } from '@Models/generator';
 import { SNRootKey } from './../root_key';
-import { SNRootKeyParams } from './../key_params';
+import { SNRootKeyParams, KeyParamsOrigination } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PayloadFormat } from '@Payloads/formats';
@@ -53,7 +53,11 @@ export abstract class SNProtocolOperator {
    *    for the user
    * @param password - Plain string representing raw user password
    */
-  public abstract async createRootKey(identifier: string, password: string): Promise<SNRootKey>;
+  public abstract async createRootKey(
+    identifier: string,
+    password: string,
+    origination: KeyParamsOrigination
+  ): Promise<SNRootKey>;
 
   protected abstract async generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
 

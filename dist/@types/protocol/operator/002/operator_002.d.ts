@@ -1,7 +1,7 @@
 import { ItemsKeyContent } from './../operator';
 import { SNItemsKey } from '../../../models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
-import { SNRootKeyParams } from './../../key_params';
+import { SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { SNProtocolOperator001 } from '../001/operator_001';
 import { PayloadFormat } from '../../payloads/formats';
 import { ProtocolVersion } from '../../versions';
@@ -13,7 +13,7 @@ import { SNRootKey } from '../../root_key';
 export declare class SNProtocolOperator002 extends SNProtocolOperator001 {
     get version(): ProtocolVersion;
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
-    createRootKey(identifier: string, password: string): Promise<SNRootKey>;
+    createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
     /**
      * Note that version 002 supported "dynamic" iteration counts. Some accounts
      * may have had costs of 5000, and others of 101000. Therefore, when computing

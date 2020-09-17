@@ -1,5 +1,5 @@
 import { SNRootKey } from './../root_key';
-import { SNRootKeyParams } from './../key_params';
+import { SNRootKeyParams, KeyParamsOrigination } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '../../models/app/items_key';
 import { PayloadFormat } from '../payloads/formats';
@@ -35,7 +35,7 @@ export declare abstract class SNProtocolOperator {
      *    for the user
      * @param password - Plain string representing raw user password
      */
-    abstract createRootKey(identifier: string, password: string): Promise<SNRootKey>;
+    abstract createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
     protected abstract generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     protected firstHalfOfKey(key: string): Promise<string>;
     protected secondHalfOfKey(key: string): Promise<string>;

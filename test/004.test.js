@@ -17,7 +17,8 @@ describe('004 protocol operations', () => {
     await Factory.initializeApplication(application);
     _key = await protocol004.createRootKey(
       _identifier,
-      _password
+      _password,
+      KeyParamsOrigination.Registration
     );
     _keyParams = _key.keyParams;
   });
@@ -34,7 +35,8 @@ describe('004 protocol operations', () => {
   it('generates valid keys for registration', async () => {
     const key = await application.protocolService.createRootKey(
       _identifier,
-      _password
+      _password,
+      KeyParamsOrigination.Registration
     );
 
     expect(key.masterKey).to.be.ok;

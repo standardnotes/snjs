@@ -8,7 +8,7 @@ import {
 import { UuidString } from './../../../types';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
-import { Create004KeyParams, SNRootKeyParams } from './../../key_params';
+import { Create004KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { V004Algorithm } from './../algorithms';
 import { ItemsKeyContent } from './../operator';
 import { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003';
@@ -54,7 +54,8 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   }
 
   /**
-   * Computes a root key given a password and previous keyParams
+   * Computes a root key given a passworf
+   * qwd and previous keyParams
    * @param password - Plain string representing raw user password
    * @param keyParams - KeyParams object
    */
@@ -67,13 +68,19 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
    * @param identifier - Plain string representing a unique identifier
    * @param password - Plain string representing raw user password
    */
-  public async createRootKey(identifier: string, password: string) {
+  public async createRootKey(
+    identifier: string,
+    password: string,
+    origination: KeyParamsOrigination
+  ) {
     const version = ProtocolVersion.V004;
     const seed = await this.crypto.generateRandomKey(V004Algorithm.ArgonSaltSeedLength);
     const keyParams = Create004KeyParams({
       identifier: identifier,
       pw_nonce: seed,
       version: version,
+      origination: origination,
+      created: `${Date.now()}`
     });
     return this.deriveKey(
       password,
@@ -144,7 +151,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     if (ContentTypeUsesRootKeyEncryption(contentType)) {
       const itemsKeyData: ItemsKeyAttachedData = {
         ...baseData,
-        kp: (key as SNRootKey).keyParams.content
+        kp: sortedCopy((key as SNRootKey).keyParams.content)
       };
       return itemsKeyData;
     } else {
@@ -322,7 +329,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
         masterKey,
         serverPassword,
         version: ProtocolVersion.V004,
-        keyParams: keyParams
+        keyParams: keyParams.getPortableValue()
       }
     );
   }

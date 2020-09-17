@@ -1,7 +1,7 @@
 import { ItemsKeyContent } from './../operator';
 import { SNRootKey } from './../../root_key';
 import { V003Algorithm } from './../algorithms';
-import { Create003KeyParams, SNRootKeyParams } from './../../key_params';
+import { Create003KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002';
 import { ProtocolVersion } from '@Protocol/versions';
 
@@ -28,7 +28,6 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     }
     return response;
   }
-
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
     return this.deriveKey(password, keyParams);
@@ -57,20 +56,26 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
         masterKey: partitions[1],
         dataAuthenticationKey: partitions[2],
         version: ProtocolVersion.V003,
-        keyParams: keyParams
+        keyParams: keyParams.getPortableValue()
       }
     );
     return key;
   }
 
-  public async createRootKey(identifier: string, password: string) {
+  public async createRootKey(
+    identifier: string,
+    password: string,
+    origination: KeyParamsOrigination
+  ) {
     const version = ProtocolVersion.V003;
     const pwNonce = await this.crypto.generateRandomKey(V003Algorithm.SaltSeedLength);
     const keyParams = Create003KeyParams(
       {
         identifier: identifier,
         pw_nonce: pwNonce,
-        version: version
+        version: version,
+        origination: origination,
+        created: `${Date.now()}`
       }
     );
     return this.deriveKey(

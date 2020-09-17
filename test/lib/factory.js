@@ -68,7 +68,8 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
   const operator = application.protocolService.operatorForVersion(version);
   const key = await operator.createRootKey(
     identifier,
-    passcode
+    passcode,
+    KeyParamsOrigination.Passcode
   );
   await application.protocolService.setNewRootKeyWrapper(
     key
@@ -87,7 +88,8 @@ export async function registerOldUser({ application, email, password, version })
   const operator = application.protocolService.operatorForVersion(version);
   const accountKey = await operator.createRootKey(
     email,
-    password
+    password,
+    KeyParamsOrigination.Registration
   );
 
   const response = await application.apiService.register(

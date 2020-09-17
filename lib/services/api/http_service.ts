@@ -20,7 +20,6 @@ export type HttpResponse = {
     }
   }
   object?: any
-  [key: string]: any
 }
 
 const REQUEST_READY_STATE_COMPLETED = 4;

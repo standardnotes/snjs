@@ -1,6 +1,6 @@
 import { SNItemsKey } from '../../../models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
-import { SNRootKeyParams } from './../../key_params';
+import { SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
 import { SNProtocolOperator003 } from '../003/operator_003';
 import { PayloadFormat } from '../../payloads/formats';
@@ -20,7 +20,8 @@ export declare class SNProtocolOperator004 extends SNProtocolOperator003 {
     */
     private generateSalt004;
     /**
-     * Computes a root key given a password and previous keyParams
+     * Computes a root key given a passworf
+     * qwd and previous keyParams
      * @param password - Plain string representing raw user password
      * @param keyParams - KeyParams object
      */
@@ -30,7 +31,7 @@ export declare class SNProtocolOperator004 extends SNProtocolOperator003 {
      * @param identifier - Plain string representing a unique identifier
      * @param password - Plain string representing raw user password
      */
-    createRootKey(identifier: string, password: string): Promise<SNRootKey>;
+    createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
     /**
      * @param plaintext - The plaintext to encrypt.
      * @param rawKey - The key to use to encrypt the plaintext.

@@ -7,9 +7,9 @@ const expect = chai.expect;
 describe('actions service', () => {
   const errorProcessingActionMessage = 'An issue occurred while processing this action. Please try again.';
   const errorDecryptingRevisionMessage = 'We were unable to decrypt this revision using your current keys, ' +
-                                        'and this revision is missing metadata that would allow us to try different ' +
-                                        'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
-                                        'Please email hello@standardnotes.org for assistance.';
+    'and this revision is missing metadata that would allow us to try different ' +
+    'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
+    'Please email hello@standardnotes.org for assistance.';
 
   before(async function () {
     // Set timeout for all tests.
@@ -29,7 +29,11 @@ describe('actions service', () => {
       password: this.password
     });
 
-    const rootKey = await this.application.protocolService.createRootKey(this.email, this.password);
+    const rootKey = await this.application.protocolService.createRootKey(
+      this.email,
+      this.password,
+      KeyParamsOrigination.Registration
+    );
     this.authParams = rootKey.keyParams.content;
 
     this.fakeServer = sinon.fakeServer.create();
@@ -251,7 +255,7 @@ describe('actions service', () => {
   describe('get action', async function () {
     const sandbox = sinon.createSandbox();
     const confirmMessage = 'Are you sure you want to replace the current note ' +
-                          'contents with this action\'s results?';
+      'contents with this action\'s results?';
 
     before(async function () {
       this.noteItem = await this.itemManager.createItem(
@@ -294,7 +298,7 @@ describe('actions service', () => {
     it('should return response and item keys', async function () {
       const actionResponse = await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
 
-      expect(Object.keys(actionResponse)).to.have.members(['response', 'item']);
+      expect(Object.keys(actionResponse)).to.have.members(['item', 'status', 'object', 'auth_params']);
     });
 
     it('should perform a sync request', async function () {
@@ -350,7 +354,6 @@ describe('actions service', () => {
     it('should return a response if payload is valid', async function () {
       const actionResponse = await this.actionsManager.runAction(this.renderAction, this.noteItem, this.passwordRequestHandler);
 
-      expect(actionResponse).to.have.property('response');
       expect(actionResponse).to.have.property('item');
       expect(actionResponse.item.payload.content.title).to.eq('Testing');
     });
@@ -416,10 +419,10 @@ describe('actions service', () => {
     });
 
     it('should open the action url', async function () {
-      const { response } = await this.actionsManager.runAction(this.showAction);
+      const response = await this.actionsManager.runAction(this.showAction);
 
       sandbox.assert.calledOnceWithExactly(this.deviceInterfaceOpenUrl, this.showAction.url);
-      expect(response).to.be.undefined;
+      expect(response).to.eql({});
     });
   });
 
@@ -456,7 +459,7 @@ describe('actions service', () => {
     });
 
     it('should include generic encrypted payload within request body', async function () {
-      const { response } = await this.actionsManager.runAction(this.encryptedPostAction, this.noteItem);
+      const response = await this.actionsManager.runAction(this.encryptedPostAction, this.noteItem);
 
       expect(response.items[0].enc_item_key).to.satisfy((string) => {
         return string.startsWith(this.application.protocolService.getLatestVersion());
@@ -471,7 +474,7 @@ describe('actions service', () => {
     });
 
     it('should include generic decrypted payload within request body', async function () {
-      const { response } = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
+      const response = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
 
       expect(response.items[0].uuid).to.eq(this.noteItem.uuid);
       expect(response.items[0].enc_item_key).to.not.be.ok;
@@ -484,7 +487,7 @@ describe('actions service', () => {
 
     it('should post to the action url', async function () {
       this.httpServicePostAbsolute.restore();
-      const { response } = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
+      const response = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
 
       expect(response).to.be.ok;
       expect(response.uuid).to.eq(this.noteItem.uuid);
@@ -498,7 +501,7 @@ describe('actions service', () => {
       sandbox.stub(this.actionsManager.httpService, 'postAbsolute')
         .callsFake((url, params) => Promise.reject(dummyError));
 
-      const { response } = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
+      const response = await this.actionsManager.runAction(this.decryptedPostAction, this.noteItem);
 
       sinon.assert.calledOnceWithExactly(this.alertServiceAlert, errorProcessingActionMessage);
       expect(response).to.be.eq(dummyError);

@@ -9,14 +9,15 @@ import { SNHttpService, HttpResponse } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PureService } from './pure_service';
 import { DeviceInterface } from '../device_interface';
-declare type PasswordRequestHandler = () => Promise<string>;
-export declare type ActionResponse = {
-    response?: HttpResponse;
-    error?: {
-        message: string;
-    };
+declare type ActionResponse = HttpResponse & {
+    description: string;
+    supported_types: string[];
+    actions: any[];
     item?: any;
+    keyParams?: any;
+    auth_params?: any;
 };
+declare type PasswordRequestHandler = () => Promise<string>;
 /**
  * The Actions Service allows clients to interact with action-based extensions.
  * Action-based extensions are mostly RESTful actions that can push a local value or

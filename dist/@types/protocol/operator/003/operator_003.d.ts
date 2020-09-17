@@ -1,6 +1,6 @@
 import { ItemsKeyContent } from './../operator';
 import { SNRootKey } from './../../root_key';
-import { SNRootKeyParams } from './../../key_params';
+import { SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { SNProtocolOperator002 } from '../002/operator_002';
 import { ProtocolVersion } from '../../versions';
 /**
@@ -14,6 +14,6 @@ export declare class SNProtocolOperator003 extends SNProtocolOperator002 {
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
     protected deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
-    createRootKey(identifier: string, password: string): Promise<SNRootKey>;
+    createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
     private generateSalt;
 }

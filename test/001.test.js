@@ -17,7 +17,7 @@ describe('001 protocol operations', () => {
   before(async () => {
     localStorage.clear();
     await Factory.initializeApplication(application);
-    _key = await protocol001.createRootKey(_identifier, _password);
+    _key = await protocol001.createRootKey(_identifier, _password, KeyParamsOrigination.Registration);
     _keyParams = _key.keyParams;
   });
 
@@ -36,7 +36,7 @@ describe('001 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const key = await protocol001.createRootKey(_identifier, _password);
+    const key = await protocol001.createRootKey(_identifier, _password, KeyParamsOrigination.Registration);
     expect(key.serverPassword).to.be.ok;
     expect(key.masterKey).to.be.ok;
 

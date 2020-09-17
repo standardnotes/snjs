@@ -1,7 +1,7 @@
 import { ItemsKeyContent } from './../operator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
-import { Create002KeyParams, SNRootKeyParams } from './../../key_params';
+import { Create002KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { V002Algorithm } from './../algorithms';
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';
 import { PayloadFormat } from '@Payloads/formats';
@@ -31,7 +31,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return response;
   }
 
-  public async createRootKey(identifier: string, password: string) {
+  public async createRootKey(identifier: string, password: string, origination: KeyParamsOrigination) {
     const pwCost = V002Algorithm.PbkdfMinCost;
     const pwNonce = await this.crypto.generateRandomKey(V002Algorithm.SaltSeedLength);
     const pwSalt = await this.crypto.unsafeSha1(identifier + ':' + pwNonce);
@@ -39,7 +39,9 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       email: identifier,
       pw_cost: pwCost,
       pw_salt: pwSalt,
-      version: ProtocolVersion.V002
+      version: ProtocolVersion.V002,
+      origination,
+      created: `${Date.now()}`
     });
     return this.deriveKey(
       password,
@@ -254,7 +256,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
         masterKey: partitions[1],
         dataAuthenticationKey: partitions[2],
         version: ProtocolVersion.V002,
-        keyParams: keyParams
+        keyParams: keyParams.getPortableValue()
       }
     );
     return key;

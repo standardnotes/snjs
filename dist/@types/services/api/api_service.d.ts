@@ -1,4 +1,4 @@
-import { SessionRenewalResponse, RegistrationResponse, KeyParamsResponse } from './responses';
+import { SessionRenewalResponse, RegistrationResponse, SignInResponse, ChangePasswordResponse, KeyParamsResponse } from './responses';
 import { Session } from './session';
 import { ContentType } from '../../models/content_types';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
@@ -35,9 +35,9 @@ export declare class SNApiService extends PureService {
      */
     getAccountKeyParams(email: string, mfaKeyPath?: string, mfaCode?: string): Promise<KeyParamsResponse>;
     register(email: string, serverPassword: string, keyParams: SNRootKeyParams): Promise<RegistrationResponse>;
-    signIn(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<RegistrationResponse>;
+    signIn(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<SignInResponse>;
     signOut(): Promise<HttpResponse>;
-    changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<RegistrationResponse>;
+    changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<ChangePasswordResponse>;
     sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
     private refreshSessionThenRetryRequest;
     refreshSession(): Promise<SessionRenewalResponse>;

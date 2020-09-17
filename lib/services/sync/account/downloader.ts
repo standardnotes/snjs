@@ -4,6 +4,7 @@ import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { SNApiService } from '../../api/api_service';
 import { SNProtocolService } from '../../protocol_service';
+import { RawSyncResponse } from '@Lib/services/api/responses';
 
 type Progress = {
   retrievedPayloads: PurePayload[]
@@ -48,8 +49,8 @@ export class AccountDownloader {
       false,
       this.contentType,
       this.customEvent,
-    );
-    const encryptedPayloads = response.retrieved_items.map((rawPayload: any) => {
+    ) as RawSyncResponse;
+    const encryptedPayloads = response.retrieved_items!.map((rawPayload: any) => {
       return CreateSourcedPayloadFromObject(
         rawPayload,
         PayloadSource.RemoteRetrieved

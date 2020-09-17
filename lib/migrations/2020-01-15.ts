@@ -1,7 +1,7 @@
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
-import { SNRootKey } from './../protocol/root_key';
+import { SNRootKey, RootKeyContent } from './../protocol/root_key';
 import { EncryptionIntent } from './../protocol/intents';
 import { ProtocolVersion } from './../protocol/versions';
 import { ApplicationStage } from '@Lib/stages';
@@ -124,25 +124,27 @@ export class Migration20200115 extends Migration {
       );
     } else {
       /**
-       * No encrypted storage, take account keys out of raw storage
+       * No encrypted storage, take account keys (if they exist) out of raw storage
        * and place them in the keychain. */
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
-      const version = !isNullOrUndefined(ak)
-        ? ProtocolVersion.V003
-        : ProtocolVersion.V002;
-      const accountKey = await SNRootKey.Create(
-        {
-          masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
-          serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
-          dataAuthenticationKey: ak,
-          version: version,
-          keyParams: rawAccountKeyParams
-        }
-      );
-      await this.services.deviceInterface.setNamespacedKeychainValue(
-        accountKey.getPersistableValue(),
-        this.services.identifier
-      );
+      if (ak) {
+        const version = !isNullOrUndefined(ak)
+          ? ProtocolVersion.V003
+          : ProtocolVersion.V002;
+        const accountKey = await SNRootKey.Create(
+          {
+            masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
+            serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
+            dataAuthenticationKey: ak,
+            version: version,
+            keyParams: rawAccountKeyParams
+          }
+        );
+        await this.services.deviceInterface.setNamespacedKeychainValue(
+          accountKey.getKeychainValue(),
+          this.services.identifier
+        );
+      }
     }
 
     /** Persist storage under new key and structure */
@@ -370,8 +372,9 @@ export class Migration20200115 extends Migration {
               serverPassword: accountKeyContent.pw,
               dataAuthenticationKey: accountKeyContent.ak,
               version: accountKeyContent.version || defaultVersion,
+              keyParams: rawAccountKeyParams,
               accountKeys: null
-            }
+            } as RootKeyContent
           }
         );
         const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(
@@ -417,7 +420,7 @@ export class Migration20200115 extends Migration {
           }
         );
         await this.services.deviceInterface.setNamespacedKeychainValue(
-          accountKey.getPersistableValue(),
+          accountKey.getKeychainValue(),
           this.services.identifier
         );
       }

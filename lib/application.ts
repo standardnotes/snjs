@@ -1,3 +1,4 @@
+import { SNRootKey } from '@Protocol/root_key';
 import { CollectionSort, SortDirection } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
@@ -58,6 +59,7 @@ import {
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
+import { KeyParamsOrigination } from './protocol/key_params';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -1052,7 +1054,7 @@ export class SNApplication {
     const result = await this.sessionManager!.register(email, password);
     if (!result.response.error) {
       await this.protocolService!.setNewRootKey(
-        result.rootKey,
+        result.rootKey!,
         wrappingKey
       );
       this.syncService!.resetSyncState();
@@ -1102,7 +1104,7 @@ export class SNApplication {
     );
     if (!result.response.error) {
       await this.protocolService!.setNewRootKey(
-        result.rootKey,
+        result.rootKey!,
         wrappingKey
       );
       this.syncService!.resetSyncState();
@@ -1187,18 +1189,21 @@ export class SNApplication {
     this.lockSyncing();
 
     /** Now, change the password on the server. Roll back on failure */
-    const response = await this.sessionManager!.changePassword(
+    const result = await this.sessionManager!.changePassword(
       currentServerPassword,
       newRootKey.serverPassword,
       newKeyParams
     );
-    if (response.error) {
+    if (result.response.error) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });
+    } else {
+      const expandedRootKey = await SNRootKey.ExpandedCopy(newRootKey, result.keyParams);
+      await this.protocolService.setNewRootKey(expandedRootKey, wrappingKey);
     }
 
     this.unlockSyncing();
-    return response;
+    return result.response;
   }
 
   public async signOut() {
@@ -1260,7 +1265,7 @@ export class SNApplication {
       SETTING_PASSCODE,
     );
     try {
-      await this.setPasscodeWithoutWarning(passcode);
+      await this.setPasscodeWithoutWarning(passcode, false);
     } finally {
       dismissBlockingDialog();
     }
@@ -1285,17 +1290,18 @@ export class SNApplication {
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(passcode);
+      await this.setPasscodeWithoutWarning(passcode, true);
     } finally {
       dismissBlockingDialog();
     }
   }
 
-  private async setPasscodeWithoutWarning(passcode: string) {
+  private async setPasscodeWithoutWarning(passcode: string, changing: boolean) {
     const identifier = await this.generateUuid();
     const key = await this.protocolService!.createRootKey(
       identifier,
-      passcode
+      passcode,
+      changing ? KeyParamsOrigination.PasscodeChange : KeyParamsOrigination.Passcode
     );
     await this.protocolService!.setNewRootKeyWrapper(key);
     await this.rewriteItemsKeys();

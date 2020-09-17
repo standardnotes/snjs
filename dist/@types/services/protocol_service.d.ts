@@ -7,7 +7,7 @@ import { SyncEvent } from '../events';
 import { SNItem } from '../models/core/item';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { SNItemsKey } from '../models/app/items_key';
-import { SNRootKeyParams, AnyKeyParamsContent } from './../protocol/key_params';
+import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '../protocol/root_key';
 import { PayloadManager } from './model_manager';
@@ -137,7 +137,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     /**
      * Creates a root key using the latest protocol version
     */
-    createRootKey(identifier: string, password: string): Promise<SNRootKey>;
+    createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
     /**
      * Given a key and intent, returns the proper PayloadFormat,
      * or throws an exception if unsupported configuration of parameters.

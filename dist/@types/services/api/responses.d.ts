@@ -1,3 +1,6 @@
+import { RawPayload } from '../../protocol/payloads/generator';
+import { ApiEndpointParam } from './keys';
+import { KeyParamsOrigination, AnyKeyParamsContent } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 import { HttpResponse } from './http_service';
 declare type SessionBody = {
@@ -17,6 +20,8 @@ export declare type KeyParamsResponse = HttpResponse & {
     pw_func?: string;
     pw_alg?: string;
     pw_key_size?: number;
+    origination?: KeyParamsOrigination;
+    created?: string;
 };
 export declare type RegistrationResponse = HttpResponse & {
     session?: SessionBody;
@@ -27,10 +32,34 @@ export declare type RegistrationResponse = HttpResponse & {
         uuid: string;
     };
 };
-export declare type SignInResponse = RegistrationResponse;
-export declare type ChangePasswordResponse = RegistrationResponse;
+export declare type SignInResponse = RegistrationResponse & {
+    key_params?: AnyKeyParamsContent;
+};
+export declare type ChangePasswordResponse = SignInResponse;
 export declare type SignOutResponse = HttpResponse & {};
 export declare type SessionRenewalResponse = HttpResponse & {
     session?: SessionBody;
+};
+export declare enum ConflictType {
+    ConflictingData = "sync_conflict",
+    UuidConflict = "uuid_conflict"
+}
+export declare type ConflictParams = {
+    type: ConflictType;
+    server_item?: RawPayload;
+    unsaved_item?: RawPayload;
+    /** @legacay */
+    item?: RawPayload;
+};
+export declare type RawSyncResponse = {
+    error?: any;
+    [ApiEndpointParam.LastSyncToken]?: string;
+    [ApiEndpointParam.PaginationToken]?: string;
+    [ApiEndpointParam.IntegrityResult]?: string;
+    retrieved_items?: RawPayload[];
+    saved_items?: RawPayload[];
+    conflicts?: ConflictParams[];
+    unsaved?: ConflictParams[];
+    status?: number;
 };
 export {};

@@ -1,10 +1,11 @@
+import { RootKeyContent } from './../../protocol/root_key';
 import { JwtSession, TokenSession } from './session';
 import { RegistrationResponse, SignInResponse, ChangePasswordResponse } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNRootKeyParams, AnyKeyParamsContent } from './../../protocol/key_params';
+import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination } from './../../protocol/key_params';
 import { HttpResponse } from './http_service';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
@@ -17,7 +18,8 @@ export const MINIMUM_PASSWORD_LENGTH = 8;
 
 type SessionManagerResponse = {
   response: HttpResponse;
-  rootKey: SNRootKey;
+  rootKey?: SNRootKey;
+  keyParams?: AnyKeyParamsContent
 }
 
 type User = {
@@ -101,32 +103,32 @@ export class SNSessionManager extends PureService {
     }
   }
 
-  async register(email: string, password: string) {
+  async register(email: string, password: string): Promise<SessionManagerResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
         response: this.apiService!.createErrorResponse(
           messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)
         )
-      } as SessionManagerResponse;
+      };
     }
     const rootKey = await this.protocolService!.createRootKey(
       email,
-      password
+      password,
+      KeyParamsOrigination.Registration
     );
     const serverPassword = rootKey.serverPassword;
     const keyParams = rootKey.keyParams;
 
-    return this.apiService!.register(
+    const registerResponse = await this.apiService!.register(
       email,
       serverPassword,
       keyParams
-    ).then(async (response) => {
-      await this.handleAuthResponse(response);
-      return {
-        response: response,
-        rootKey: rootKey
-      } as SessionManagerResponse;
-    });
+    );
+    await this.handleAuthResponse(registerResponse);
+    return {
+      response: registerResponse,
+      rootKey: rootKey
+    };
   }
 
   public async signIn(
@@ -135,7 +137,7 @@ export class SNSessionManager extends PureService {
     strict = false,
     mfaKeyPath?: string,
     mfaCode?: string
-  ) {
+  ): Promise<SessionManagerResponse> {
     const paramsResponse = await this.apiService!.getAccountKeyParams(
       email,
       mfaKeyPath,
@@ -144,23 +146,32 @@ export class SNSessionManager extends PureService {
     if (paramsResponse.error) {
       return {
         response: paramsResponse
-      } as SessionManagerResponse;
+      };
     }
-    const keyParams = this.protocolService!.createKeyParams(paramsResponse as AnyKeyParamsContent);
+    const rawKeyParams: AnyKeyParamsContent = {
+      identifier: paramsResponse.identifier!,
+      pw_cost: paramsResponse.pw_cost!,
+      pw_nonce: paramsResponse.pw_nonce!,
+      pw_salt: paramsResponse.pw_salt!,
+      version: paramsResponse.version!,
+      origination: paramsResponse.origination,
+      created: paramsResponse.created,
+    }
+    const keyParams = this.protocolService!.createKeyParams(rawKeyParams);
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
-      } as SessionManagerResponse;
+      };
     }
     if (!this.protocolService!.supportedVersions().includes(keyParams.version)) {
       if (this.protocolService!.isVersionNewerThanLibraryVersion(keyParams.version)) {
         return {
           response: this.apiService!.createErrorResponse(messages.UNSUPPORTED_PROTOCOL_VERSION)
-        } as SessionManagerResponse;
+        };
       } else {
         return {
           response: this.apiService!.createErrorResponse(messages.EXPIRED_PROTOCOL_VERSION)
-        } as SessionManagerResponse;
+        };
       }
     }
     if (this.protocolService!.isProtocolVersionOutdated(keyParams.version)) {
@@ -169,7 +180,7 @@ export class SNSessionManager extends PureService {
       if (keyParams.content002.pw_cost < minimum) {
         return {
           response: this.apiService!.createErrorResponse(messages.INVALID_PASSWORD_COST)
-        } as SessionManagerResponse;
+        };
       };
       const message = messages.OUTDATED_PROTOCOL_VERSION;
       const confirmed = await this.alertService!.confirm(
@@ -180,13 +191,13 @@ export class SNSessionManager extends PureService {
       if (!confirmed) {
         return {
           response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
-        } as SessionManagerResponse;
+        };
       }
     }
     if (!this.protocolService!.platformSupportsKeyDerivation(keyParams)) {
       return {
         response: this.apiService!.createErrorResponse(messages.UNSUPPORTED_KEY_DERIVATION)
-      } as SessionManagerResponse;
+      };
     }
     if (strict) {
       const latest = this.protocolService!.getLatestVersion();
@@ -195,7 +206,7 @@ export class SNSessionManager extends PureService {
           response: this.apiService!.createErrorResponse(
             messages.StrictSignInFailed(keyParams.version, latest)
           )
-        } as SessionManagerResponse;
+        };
       }
     }
     const { rootKey, serverPassword } = await this.protocolService!.computeRootKey(
@@ -207,35 +218,39 @@ export class SNSessionManager extends PureService {
         serverPassword: rootKey.serverPassword
       };
     });
-    return this.apiService!.signIn(
+    const signInResponse = await this.apiService!.signIn(
       email,
       serverPassword,
       mfaKeyPath,
       mfaCode
-    ).then(async (response) => {
-      await this.handleAuthResponse(response);
-      return {
-        response: response,
-        rootKey: rootKey
-      } as SessionManagerResponse;
-    });
+    )
+    await this.handleAuthResponse(signInResponse);
+    return {
+      response: signInResponse,
+      rootKey: await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params),
+    };
   }
 
   public async changePassword(
     currentServerPassword: string,
     newServerPassword: string,
     newKeyParams: SNRootKeyParams
-  ) {
+  ): Promise<SessionManagerResponse> {
     const response = await this.apiService!.changePassword(
       currentServerPassword,
       newServerPassword,
       newKeyParams
     );
     await this.handleAuthResponse(response);
-    return response;
+    return {
+      response: response,
+      keyParams: response.key_params
+    };
   }
 
-  private async handleAuthResponse(response: RegistrationResponse | SignInResponse | ChangePasswordResponse) {
+  private async handleAuthResponse(
+    response: RegistrationResponse | SignInResponse | ChangePasswordResponse
+  ) {
     if (response.error) {
       return;
     }

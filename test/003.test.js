@@ -24,7 +24,7 @@ describe('003 protocol operations', () => {
   // runs once before all tests in this block
   before(async () => {
     await Factory.initializeApplication(sharedApplication);
-    _key = await protocol003.createRootKey(_identifier, _password);
+    _key = await protocol003.createRootKey(_identifier, _password, KeyParamsOrigination.Registration);
     _keyParams = _key.keyParams;
   });
 
@@ -44,7 +44,7 @@ describe('003 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const key = await protocol003.createRootKey(_identifier, _password);
+    const key = await protocol003.createRootKey(_identifier, _password, KeyParamsOrigination.Registration);
 
     expect(key.dataAuthenticationKey).to.be.ok;
     expect(key.serverPassword).to.be.ok;
