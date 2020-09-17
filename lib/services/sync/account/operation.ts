@@ -40,7 +40,7 @@ export class AccountSyncOperation {
     this.checkIntegrity = checkIntegrity;
     this.apiService = apiService;
     this.receiver = receiver;
-    this.pendingPayloads = payloads;
+    this.pendingPayloads = payloads.slice();
   }
 
   /**

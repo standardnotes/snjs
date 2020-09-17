@@ -20387,7 +20387,7 @@ class operation_AccountSyncOperation {
     this.checkIntegrity = checkIntegrity;
     this.apiService = apiService;
     this.receiver = receiver;
-    this.pendingPayloads = payloads;
+    this.pendingPayloads = payloads.slice();
   }
   /**
    * Read the payloads that have been saved, or are currently in flight.
