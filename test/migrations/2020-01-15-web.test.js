@@ -154,7 +154,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
     /** Expect note is decrypted */
@@ -291,7 +291,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
     /** Expect note is decrypted */
@@ -417,7 +417,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     /** Expect note is decrypted */

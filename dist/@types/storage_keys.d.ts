@@ -1,9 +1,9 @@
 /**
- * Unmanaged keys stored in root storage
+ * Unmanaged keys stored in root storage.
+ * Raw storage keys exist outside of StorageManager domain
  */
 export declare enum RawStorageKey {
     StorageObject = "storage",
-    /** Raw storage keys exist outside of StorageManager domain */
     LastMigrationTimestamp = "last_migration_timestamp",
     DescriptorRecord = "descriptors"
 }
@@ -28,6 +28,7 @@ export declare enum StorageKey {
     PrivilegesSessionLength = "SessionLengthKey",
     SessionHistoryPersistable = "sessionHistory_persist",
     SessionHistoryRevisions = "sessionHistory_revisions",
-    SessionHistoryOptimize = "sessionHistory_autoOptimize"
+    SessionHistoryOptimize = "sessionHistory_autoOptimize",
+    KeyRecoveryUndecryptableItems = "key_recovery_undecryptable"
 }
 export declare function namespacedKey(namespace: string, key: string): string;

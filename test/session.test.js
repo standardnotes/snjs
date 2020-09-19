@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('server session', function() {
+describe.only('server session', function() {
   this.timeout(Factory.TestTimeout);
 
   const BASE_ITEM_COUNT = 1; /** Default items key */
@@ -238,7 +238,7 @@ describe('server session', function() {
     expect(currentSession.accessExpiration).to.be.greaterThan(Date.now());
   });
 
-  it('should fail when renewing a session with an expired refresh token', async function () {
+  it.only('should fail when renewing a session with an expired refresh token', async function () {
     await sleepUntilSessionExpires(this.application, false);
 
     const refreshSessionResponse = await this.application.apiService.refreshSession();
@@ -351,4 +351,7 @@ describe('server session', function() {
     appB.deinit();
   });
 
+  it.only('should prompt user for account password and sign back in on invalid session', async function () {
+    expect(false).to.equal(true);
+  });
 });

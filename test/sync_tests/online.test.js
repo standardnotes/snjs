@@ -1250,7 +1250,7 @@ describe('online syncing', function() {
     let note = await Factory.createMappedNote(this.application);
     this.application.itemManager.addObserver(
       ContentType.Note,
-      (changed, inserted, discarded, source) => {
+      (changed, inserted, discarded, ignored, source) => {
         if (source === PayloadSource.RemoteSaved) {
           actualSaveCount++;
         }

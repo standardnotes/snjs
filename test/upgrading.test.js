@@ -99,7 +99,7 @@ describe('upgrading', () => {
       (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(oldVersion);
     expect(
-      (await this.application.protocolService.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).keyVersion
     ).to.equal(oldVersion);
 
     this.application.setLaunchCallback({
@@ -119,7 +119,7 @@ describe('upgrading', () => {
       (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(newVersion);
     expect(
-      (await this.application.protocolService.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).keyVersion
     ).to.equal(newVersion);
 
     /**
@@ -182,10 +182,10 @@ describe('upgrading', () => {
         (await this.application.protocolService.getRootKeyParams()).version
       ).to.equal(oldVersion);
       expect(
-        (await this.application.protocolService.getRootKey()).version
+        (await this.application.protocolService.getRootKey()).keyVersion
       ).to.equal(oldVersion);
       expect(
-        (await this.application.protocolService.getDefaultItemsKey()).version
+        (await this.application.protocolService.getDefaultItemsKey()).keyVersion
       ).to.equal(oldVersion);
     });
 
@@ -209,10 +209,10 @@ describe('upgrading', () => {
         (await this.application.protocolService.getRootKeyParams()).version
       ).to.equal(oldVersion);
       expect(
-        (await this.application.protocolService.getRootKey()).version
+        (await this.application.protocolService.getRootKey()).keyVersion
       ).to.equal(oldVersion);
       expect(
-        (await this.application.protocolService.getDefaultItemsKey()).version
+        (await this.application.protocolService.getDefaultItemsKey()).keyVersion
       ).to.equal(oldVersion);
     });
   });
@@ -239,7 +239,7 @@ describe('upgrading', () => {
       (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(ProtocolVersion.V003);
     expect(
-      (await this.application.protocolService.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).keyVersion
     ).to.equal(ProtocolVersion.V003);
 
     /** Ensure note is encrypted with 003 */
@@ -261,11 +261,11 @@ describe('upgrading', () => {
       (await this.application.protocolService.getRootKeyParams()).version
     ).to.equal(latestVersion);
     expect(
-      (await this.application.protocolService.getRootKey()).version
+      (await this.application.protocolService.getRootKey()).keyVersion
     ).to.equal(latestVersion);
 
     const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
-    expect(defaultItemsKey.version).to.equal(latestVersion);
+    expect(defaultItemsKey.keyVersion).to.equal(latestVersion);
 
     /** After change, note should now be encrypted with latest protocol version */
 

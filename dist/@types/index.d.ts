@@ -3,6 +3,7 @@ export type { ApplicationDescriptor } from './application_group';
 export type { UuidString, ApplicationIdentifier } from './types';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
+export { KeyRecoveryStrings } from './services/api/messages';
 export { SNApplication } from './application';
 export { SNProtocolService, KeyMode } from './services/protocol_service';
 export { SNProtocolOperator001 } from './protocol/operator/001/operator_001';

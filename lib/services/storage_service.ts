@@ -234,14 +234,15 @@ export class SNStorageService extends PureService {
     return this.persistValuesToDisk();
   }
 
-  public async getValue(key: string, mode = StorageValueModes.Default) {
+  public async getValue(key: string, mode = StorageValueModes.Default, defaultValue?: any) {
     if (!this.values) {
       throw Error(`Attempting to get storage key ${key} before loading local storage.`);
     }
     if (!this.values[this.domainKeyForMode(mode)]) {
       throw Error(`Storage domain mode not available ${mode} for key ${key}`);
     }
-    return this.values[this.domainKeyForMode(mode)]![key];
+    const value = this.values[this.domainKeyForMode(mode)]![key];
+    return !isNullOrUndefined(value) ? value : defaultValue;
   }
 
   public async removeValue(key: string, mode = StorageValueModes.Default) {

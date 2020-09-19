@@ -1,4 +1,10 @@
-import { SNStorageService } from './storage_service';
+import { CreateItemFromPayload } from '@Models/generator';
+import { ApplicationStage } from './../stages';
+import { PayloadField } from './../protocol/payloads/fields';
+import { StorageKey } from '@Lib/storage_keys';
+import { RawPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { KeyRecoveryStrings } from './api/messages';
+import { SNStorageService, StorageValueModes } from './storage_service';
 import { SNRootKeyParams } from './../protocol/key_params';
 import { SNSessionManager } from './api/session_manager';
 import { PayloadManager } from './model_manager';
@@ -12,11 +18,12 @@ import { SNItemsKey } from './../models/app/items_key';
 import { ContentType } from './../models/content_types';
 import { ItemManager } from './item_manager';
 import { PureService } from '@Services/pure_service';
-import { dateSorted } from '@Lib/utils';
+import { dateSorted, findInArray } from '@Lib/utils';
 import { isNull } from 'lodash';
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { PayloadSource } from '@Lib/protocol/payloads';
+import { UuidString } from '@Lib/types';
 
 /**
  * The key recovery service listens to items key changes to detect any that cannot be decrypted.
@@ -47,7 +54,15 @@ import { PayloadSource } from '@Lib/protocol/payloads';
  *
  * When an items key is emitted, protocol service will automatically try to decrypt any
  * related items that are in an errored state.
+ *
+ * In the item observer, `ignored` items represent items who have encrypted overwrite
+ * protection enabled (only items keys). This means that if the incoming payload is errored,
+ * but our current copy is not, we will ignore the incoming value until we can properly
+ * decrypt it.
  */
+
+type UndecryptableItemsStorage = Record<UuidString, RawPayload>;
+
 export class SNKeyRecoveryService extends PureService {
   private removeItemObserver: any
 
@@ -89,6 +104,13 @@ export class SNKeyRecoveryService extends PureService {
     super.deinit();
   }
 
+  async handleApplicationStage(stage: ApplicationStage) {
+    super.handleApplicationStage(stage);
+    if (stage === ApplicationStage.LoadedDatabase_12) {
+      this.processPersistedUndecryptables();
+    }
+  }
+
   /**
    * Ignored items keys are items keys which arrived from a remote source, which we were
    * not able to decrypt, and for which we already had an existing items key that was
@@ -104,21 +126,69 @@ export class SNKeyRecoveryService extends PureService {
    * When the app first launches, we will query the isolated storage to see if there are any
    * keys we need to decrypt.
    */
-  async handleIgnoredItemsKeys(keys: SNItemsKey[]) {
+  async handleIgnoredItemsKeys(keys: SNItemsKey[], persistIncoming = true) {
     /**
      * Persist the keys locally in isolated storage, so that if we don't properly decrypt
      * them in this app session, the user has a chance to later. If there already exists
      * the same items key in this storage, replace it with this latest incoming value.
      */
+    if (persistIncoming) {
+      await this.saveToUndecryptables(keys);
+    }
 
-    /** Try decrypting the key now */
+    /** Try decrypting the keys now */
     for (const key of keys) {
       const result = await this.tryDecryptingKey(key);
       if (result.success) {
-        /** If it succeeds, remove the key from isolated storage. It will be emitted and saved
-         * as part of `tryDecryptingKey` */
+        /** If it succeeds, remove the key from isolated storage. */
+        await this.removeFromUndecryptables(key);
       }
     }
+  }
+
+  private async processPersistedUndecryptables() {
+    const record = await this.getUndecryptables();
+    const rawPayloads = Object.values(record);
+    if (rawPayloads.length === 0) {
+      return;
+    }
+    const keys = rawPayloads
+      .map(raw => CreateMaxPayloadFromAnyObject(raw))
+      .map(p => CreateItemFromPayload(p)) as SNItemsKey[];
+
+    return this.handleIgnoredItemsKeys(keys, false);
+  }
+
+  private async getUndecryptables() {
+    return this.storageService.getValue(
+      StorageKey.KeyRecoveryUndecryptableItems,
+      StorageValueModes.Default,
+      {}
+    ) as Promise<UndecryptableItemsStorage>;
+  }
+
+  private async persistUndecryptables(record: UndecryptableItemsStorage) {
+    await this.storageService.setValue(
+      StorageKey.KeyRecoveryUndecryptableItems,
+      record
+    );
+  }
+
+  private async saveToUndecryptables(keys: SNItemsKey[]) {
+    /** Get the current persisted value */
+    const record = await this.getUndecryptables();
+    /** Persist incoming keys */
+    for (const key of keys) {
+      record[key.uuid] = key.payload.ejected();
+    }
+    await this.persistUndecryptables(record);
+  }
+
+  private async removeFromUndecryptables(key: SNItemsKey) {
+    /** Get the current persisted value */
+    const record = await this.getUndecryptables();
+    delete record[key.uuid];
+    await this.persistUndecryptables(record);
   }
 
   async handleUndecryptableItemsKeys(keys: SNItemsKey[]) {
@@ -196,8 +266,8 @@ export class SNKeyRecoveryService extends PureService {
     const challenge = new Challenge(
       [ChallengeType.Custom],
       ChallengeReason.Custom,
-      `Enter your account password as it was on ${keyParams?.createdDate}.`,
-      `Your account password is required to revalidate your session.`
+      KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
+      KeyRecoveryStrings.KeyRecoveryLoginFlowReason,
     );
     const challengeResponse = await this.challengeService
       .promptForChallengeResponseWithCustomValidation(challenge);
@@ -218,7 +288,7 @@ export class SNKeyRecoveryService extends PureService {
       await this.replaceClientRootKey(rootKey);
     } else {
       await this.alertService.alert(
-        'Incorrect credentials entered. Please try again.'
+        KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword
       );
       return this.performServerSignIn(keyParams);
     }
@@ -235,7 +305,7 @@ export class SNKeyRecoveryService extends PureService {
       wrappingKey
     )
     this.alertService.alert(
-      'Your credentials have successfully been updated.'
+      KeyRecoveryStrings.KeyRecoveryRootKeyReplaced
     );
   }
 
@@ -248,8 +318,8 @@ export class SNKeyRecoveryService extends PureService {
       /** Show an alert saying they must enter the correct passcode to update
        * their root key, and try again */
       await this.alertService.alert(
-        'You must enter your passcode in order to save your new credentials.',
-        'Passcode Required'
+        KeyRecoveryStrings.KeyRecoveryPasscodeRequiredText,
+        KeyRecoveryStrings.KeyRecoveryPasscodeRequiredTitle
       );
       return this.getWrappingKeyIfApplicable();
     }
@@ -280,8 +350,8 @@ export class SNKeyRecoveryService extends PureService {
     const challenge = new Challenge(
       [ChallengeType.Custom],
       ChallengeReason.Custom,
-      `Enter your account password as it was on ${keyParams?.createdDate}.`,
-      `Your account password is required to recover an encryption key.`
+      KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
+      KeyRecoveryStrings.KeyRecoveryPasswordRequired
     );
     const response = await this.challengeService
       .promptForChallengeResponseWithCustomValidation(challenge);
@@ -307,12 +377,12 @@ export class SNKeyRecoveryService extends PureService {
       );
       await this.storageService.savePayload(decryptedPayload);
       this.alertService.alert(
-        'Your key has successfully been recovered.'
+        KeyRecoveryStrings.KeyRecoveryKeyRecovered
       );
       return { success: true, rootKey }
     } else {
       this.alertService.alert(
-        'Unable to recover your key with the attempted password. Please try again.'
+        KeyRecoveryStrings.KeyRecoveryUnableToRecover
       );
       /** If it fails, try again */
       return this.tryDecryptingKey(key);

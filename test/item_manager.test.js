@@ -168,7 +168,7 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded, source, sourceKey) => {
+      (changed, inserted, discarded, ignored, source, sourceKey) => {
         observed.push({ changed, inserted, discarded, source, sourceKey });
       },
     );
@@ -362,8 +362,8 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded) => {
-        observed.push({ changed, inserted, discarded });
+      (changed, inserted, discarded, ignored) => {
+        observed.push({ changed, inserted, discarded, ignored });
       },
     );
     await this.createNote();
@@ -378,8 +378,8 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded) => {
-        observed.push({ changed, inserted, discarded });
+      (changed, inserted, discarded, ignored) => {
+        observed.push({ changed, inserted, discarded, ignored });
       },
     );
     const note = await this.createNote();
@@ -404,7 +404,7 @@ describe('item manager', () => {
     let latestVersion;
     this.itemManager.addObserver(
       ContentType.Note,
-      (changed, inserted, discarded) => {
+      (changed, inserted, _discarded, _ignored) => {
         const all = changed.concat(inserted);
         if (!didEmit) {
           didEmit = true;

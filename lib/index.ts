@@ -3,6 +3,7 @@ export type { ApplicationDescriptor } from './application_group';
 export type { UuidString, ApplicationIdentifier } from './types';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
+export { KeyRecoveryStrings } from './services/api/messages';
 
 export { SNApplication } from '@Lib/application';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';
@@ -30,6 +31,7 @@ export {
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export { LiveItem } from './models/live_item';
+
 
 export { SNComponentManager } from './services/component_manager';
 export { SessionHistoryMap } from './services/history/session/session_history_map';

@@ -72,7 +72,7 @@ export declare class SNStorageService extends PureService {
      */
     private generatePersistableValues;
     setValue(key: string, value: any, mode?: StorageValueModes): Promise<void>;
-    getValue(key: string, mode?: StorageValueModes): Promise<any>;
+    getValue(key: string, mode?: StorageValueModes, defaultValue?: any): Promise<any>;
     removeValue(key: string, mode?: StorageValueModes): Promise<void>;
     getStorageEncryptionPolicy(): StorageEncryptionPolicies;
     /**

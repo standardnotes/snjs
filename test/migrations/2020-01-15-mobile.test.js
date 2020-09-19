@@ -156,7 +156,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
@@ -276,7 +276,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
@@ -324,7 +324,7 @@ describe('2020-01-15 mobile migration', () => {
       'user',
       JSON.stringify({ email: identifier })
     );
-    expect(accountKey.version).to.equal(ProtocolVersion.V003);
+    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V003);
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -399,7 +399,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     const keyParams = await application.storageService.getValue(
