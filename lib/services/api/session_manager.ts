@@ -1,3 +1,6 @@
+import { Challenge } from '@Lib/challenges';
+import { ChallengeType, ChallengeReason } from './../../challenges';
+import { ChallengeService } from './../challenge/challenge_service';
 import { RootKeyContent } from './../../protocol/root_key';
 import { JwtSession, TokenSession } from './session';
 import { RegistrationResponse, SignInResponse, ChangePasswordResponse } from './responses';
@@ -5,7 +8,7 @@ import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination } from './../../protocol/key_params';
+import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination, KeyParamsFromApiResponse } from './../../protocol/key_params';
 import { HttpResponse } from './http_service';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
@@ -13,6 +16,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
+import { sign } from 'crypto';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -46,6 +50,7 @@ export class SNSessionManager extends PureService {
     apiService: SNApiService,
     alertService: SNAlertService,
     protocolService: SNProtocolService,
+    private challengeService: ChallengeService,
   ) {
     super();
     this.protocolService = protocolService;
@@ -103,6 +108,17 @@ export class SNSessionManager extends PureService {
     }
   }
 
+  async promptForMfaValue(): Promise<string | undefined> {
+    const challenge = new Challenge(
+      [ChallengeType.Custom],
+      ChallengeReason.Custom,
+      `Please enter your two-factor authentication code.`
+    );
+    const response = await this.challengeService
+      .promptForChallengeResponseWithCustomValidation(challenge);
+    return response[0]?.value as string;
+  }
+
   async register(email: string, password: string): Promise<SessionManagerResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
@@ -124,7 +140,9 @@ export class SNSessionManager extends PureService {
       serverPassword,
       keyParams
     );
-    await this.handleAuthResponse(registerResponse);
+    if (!registerResponse.error) {
+      await this.handleSuccessAuthResponse(registerResponse);
+    }
     return {
       response: registerResponse,
       rootKey: rootKey
@@ -134,30 +152,17 @@ export class SNSessionManager extends PureService {
   public async signIn(
     email: string,
     password: string,
-    strict = false,
-    mfaKeyPath?: string,
-    mfaCode?: string
+    strict = false
   ): Promise<SessionManagerResponse> {
     const paramsResponse = await this.apiService!.getAccountKeyParams(
-      email,
-      mfaKeyPath,
-      mfaCode
+      email
     );
     if (paramsResponse.error) {
       return {
         response: paramsResponse
       };
     }
-    const rawKeyParams: AnyKeyParamsContent = {
-      identifier: paramsResponse.identifier!,
-      pw_cost: paramsResponse.pw_cost!,
-      pw_nonce: paramsResponse.pw_nonce!,
-      pw_salt: paramsResponse.pw_salt!,
-      version: paramsResponse.version!,
-      origination: paramsResponse.origination,
-      created: paramsResponse.created,
-    }
-    const keyParams = this.protocolService!.createKeyParams(rawKeyParams);
+    const keyParams = KeyParamsFromApiResponse(paramsResponse);
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
@@ -218,17 +223,50 @@ export class SNSessionManager extends PureService {
         serverPassword: rootKey.serverPassword
       };
     });
+    const signInResponse = await this.signInWithServerPassword(
+      email,
+      serverPassword,
+    )
+    return {
+      response: signInResponse,
+      rootKey: await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params),
+    };
+  }
+
+  public async signInWithServerPassword(
+    email: string,
+    serverPassword: string,
+    mfaKeyPath?: string,
+    mfaCode?: string,
+  ): Promise<SignInResponse> {
     const signInResponse = await this.apiService!.signIn(
       email,
       serverPassword,
       mfaKeyPath,
       mfaCode
     )
-    await this.handleAuthResponse(signInResponse);
-    return {
-      response: signInResponse,
-      rootKey: await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params),
-    };
+    if (!signInResponse.error) {
+      await this.handleSuccessAuthResponse(signInResponse);
+      return signInResponse;
+    } else {
+      if (signInResponse.error.payload?.mfa_key) {
+        /** Prompt for MFA code and try again */
+        const mfaCode = await this.promptForMfaValue();
+        if (!mfaCode) {
+          /** User dismissed window without input */
+          return signInResponse;
+        }
+        return this.signInWithServerPassword(
+          email,
+          serverPassword,
+          signInResponse.error.payload.mfa_key,
+          mfaCode
+        )
+      } else {
+        /** Some other error, return to caller */
+        return signInResponse;
+      }
+    }
   }
 
   public async changePassword(
@@ -241,19 +279,18 @@ export class SNSessionManager extends PureService {
       newServerPassword,
       newKeyParams
     );
-    await this.handleAuthResponse(response);
+    if (!response.error) {
+      await this.handleSuccessAuthResponse(response);
+    }
     return {
       response: response,
       keyParams: response.key_params
     };
   }
 
-  private async handleAuthResponse(
+  private async handleSuccessAuthResponse(
     response: RegistrationResponse | SignInResponse | ChangePasswordResponse
   ) {
-    if (response.error) {
-      return;
-    }
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);

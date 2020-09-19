@@ -205,7 +205,7 @@ export class SNComponentManager extends PureService {
   configureForGeneralUsage() {
     this.removeItemObserver = this.itemManager!.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded, source, sourceKey) => {
+      (changed, inserted, discarded, _ignored, source, sourceKey) => {
         const items = concatArrays(changed, inserted, discarded) as SNItem[];
         const syncedComponents = items.filter((item) => {
           return (

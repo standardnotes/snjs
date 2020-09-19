@@ -1,3 +1,4 @@
+import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../../payloads/generator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { Create001KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
@@ -57,6 +58,10 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     );
   }
 
+  public async getPayloadAuthenticatedData(_payload: PurePayload) {
+    return undefined;
+  }
+
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
     return this.deriveKey(password, keyParams);
   }
@@ -102,7 +107,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
       JSON.stringify(payload.content),
       ek
     );
-    const ciphertext = key.version + contentCiphertext;
+    const ciphertext = key.keyVersion + contentCiphertext;
     const authHash = await this.crypto.hmac256(ciphertext, ak);
     return CreateEncryptionParameters(
       {

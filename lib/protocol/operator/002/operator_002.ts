@@ -1,3 +1,4 @@
+import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../../payloads/generator';
 import { ItemsKeyContent } from './../operator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
@@ -100,6 +101,14 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return this.decryptString002(contentCiphertext, encryptionKey, iv);
   }
 
+  public async getPayloadAuthenticatedData(payload: PurePayload) {
+    const itemKeyComponents = this.encryptionComponentsFromString002(
+      payload.enc_item_key!
+    );
+    const authenticatedData = itemKeyComponents.authParams;
+    return JSON.parse(await this.crypto.base64Decode(authenticatedData));
+  }
+
   public async generateEncryptedParameters(
     payload: PurePayload,
     format: PayloadFormat,
@@ -129,7 +138,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       key.itemsKey,
       key.dataAuthenticationKey,
       payload.uuid!,
-      key.version
+      key.keyVersion
     );
     /** Encrypt content */
     const ek = await this.firstHalfOfKey(itemKey);
@@ -139,7 +148,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       ek,
       ak,
       payload.uuid!,
-      key.version
+      key.keyVersion
     );
     return CreateEncryptionParameters(
       {
@@ -179,10 +188,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const itemKey = await this.decryptTextParams(
       itemKeyComponents.ciphertextToAuth,
       itemKeyComponents.contentCiphertext,
-      itemKeyComponents.encryptionKey,
+      itemKeyComponents.encryptionKey!,
       itemKeyComponents.iv,
       itemKeyComponents.authHash,
-      itemKeyComponents.authKey,
+      itemKeyComponents.authKey!,
     );
     if (!itemKey) {
       console.error('Error decrypting item_key parameters', encryptedParameters);
@@ -205,10 +214,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const content = await this.decryptTextParams(
       itemParams.ciphertextToAuth,
       itemParams.contentCiphertext,
-      itemParams.encryptionKey,
+      itemParams.encryptionKey!,
       itemParams.iv,
       itemParams.authHash,
-      itemParams.authKey,
+      itemParams.authKey!,
     );
     if (!content) {
       return CopyEncryptionParameters(
@@ -264,8 +273,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   encryptionComponentsFromString002(
     string: string,
-    encryptionKey: string,
-    authKey: string
+    encryptionKey?: string,
+    authKey?: string
   ) {
     const components = string.split(':');
     return {

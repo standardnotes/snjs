@@ -29,6 +29,13 @@ export declare class ChallengeService extends PureService {
     promptForChallengeResponseWithCustomValidation(challenge: Challenge): Promise<ChallengeValue[]>;
     validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse>;
     getLaunchChallenge(): Promise<Challenge | null>;
+    promptForPasscode(): Promise<{
+        canceled: boolean;
+        passcode: undefined;
+    } | {
+        passcode: string;
+        canceled: boolean;
+    }>;
     isPasscodeLocked(): Promise<boolean>;
     hasBiometricsEnabled(): Promise<boolean>;
     enableBiometrics(): Promise<void>;

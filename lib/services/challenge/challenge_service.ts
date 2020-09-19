@@ -52,6 +52,7 @@ export class ChallengeService extends PureService {
   public promptForChallengeResponse(challenge: Challenge) {
     return new Promise<ChallengeResponse | null>((resolve) => {
       this.createOrGetChallengeOperation(challenge, resolve);
+      this.sendChallenge!(challenge);
     });
   }
 
@@ -65,6 +66,7 @@ export class ChallengeService extends PureService {
     );
     return new Promise<ChallengeValue[]>((resolve) => {
       operation.customValidator = resolve;
+      this.sendChallenge!(challenge);
     });
   }
 
@@ -80,6 +82,8 @@ export class ChallengeService extends PureService {
         );
       case ChallengeType.Biometric:
         return Promise.resolve({ valid: value.value === true });
+      default:
+        return Promise.resolve({ valid: false });
     }
   }
 
@@ -98,6 +102,16 @@ export class ChallengeService extends PureService {
     } else {
       return null;
     }
+  }
+
+  public async promptForPasscode() {
+    const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.ResaveRootKey);
+    const response = await this.promptForChallengeResponse(challenge);
+    if (!response) {
+      return { canceled: true, passcode: undefined };
+    }
+    const value = response.getValueForType(ChallengeType.LocalPasscode);
+    return { passcode: value.value as string, canceled: false }
   }
 
   public isPasscodeLocked() {
@@ -150,7 +164,6 @@ export class ChallengeService extends PureService {
     if (!operation) {
       operation = new ChallengeOperation(challenge, resolve);
       this.challengeOperations[challenge.id] = operation;
-      this.sendChallenge!(challenge);
     }
     operation.resolve = resolve;
     return operation;
@@ -173,7 +186,7 @@ export class ChallengeService extends PureService {
   public async submitValuesForChallenge(
     challenge: Challenge,
     values: ChallengeValue[]
-  ) {
+    ) {
     if (values.length === 0) {
       throw Error("Attempting to submit 0 values for challenge");
     }

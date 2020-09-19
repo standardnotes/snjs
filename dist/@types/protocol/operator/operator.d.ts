@@ -1,3 +1,4 @@
+import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../payloads/generator';
 import { SNRootKey } from './../root_key';
 import { SNRootKeyParams, KeyParamsOrigination } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';
@@ -36,6 +37,11 @@ export declare abstract class SNProtocolOperator {
      * @param password - Plain string representing raw user password
      */
     abstract createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
+    /**
+     * Returns the payload's authenticated data. The passed payload must be in a
+     * non-decrypted, ciphertext state.
+     */
+    abstract getPayloadAuthenticatedData(payload: PurePayload): Promise<RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | undefined>;
     protected abstract generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     protected firstHalfOfKey(key: string): Promise<string>;
     protected secondHalfOfKey(key: string): Promise<string>;

@@ -50,7 +50,7 @@ describe('singletons', function() {
       await this.application.signIn(
         this.email,
         this.password,
-        undefined, undefined, undefined, undefined, undefined,
+        undefined, undefined, undefined,
         true
       );
     };

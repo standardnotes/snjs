@@ -156,6 +156,17 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     return components.join(PARTITION_CHARACTER);
   }
 
+  public async getPayloadAuthenticatedData(payload: PurePayload) {
+    if (payload.format !== PayloadFormat.EncryptedString) {
+      throw Error('Attempting to get embedded key params of already decrypted item');
+    }
+    const itemKeyComponents = this.deconstructEncryptedPayloadString(
+      payload.enc_item_key!
+    );
+    const authenticatedData = itemKeyComponents.rawAuthenticatedData;
+    return this.stringToAuthenticatedData(authenticatedData);
+  }
+
   /**
    * For items that are encrypted with a root key, we append the root key's key params, so
    * that in the event the client/user loses a reference to their root key, they may still

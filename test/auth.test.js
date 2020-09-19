@@ -73,7 +73,7 @@ describe('basic auth', () => {
     const response = await this.application.signIn(
       this.email,
       this.password,
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
     expect(response).to.be.ok;
@@ -90,7 +90,7 @@ describe('basic auth', () => {
     const response = await this.application.signIn(
       this.email,
       'wrongpassword',
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
     expect(response).to.be.ok;
@@ -177,7 +177,7 @@ describe('basic auth', () => {
     const signinResponse = await this.application.signIn(
       this.email,
       newPassword,
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
 
@@ -259,7 +259,7 @@ describe('basic auth', () => {
       const signinResponse = await this.application.signIn(
         this.email,
         currentPassword,
-        undefined, undefined, undefined, undefined, undefined,
+        undefined, undefined, undefined,
         true
       );
       expect(signinResponse).to.be.ok;

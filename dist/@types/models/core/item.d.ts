@@ -1,3 +1,4 @@
+import { ProtocolVersion } from '../../protocol/versions';
 import { ConflictStrategy } from '../../protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
 import { PayloadContent } from './../../protocol/payloads/generator';
@@ -58,6 +59,11 @@ export declare class SNItem {
     static DefaultAppDomain(): string;
     get uuid(): string;
     get content(): string | PayloadContent | undefined;
+    /**
+     * This value only exists on payloads that are encrypted, as version pertains to the
+     * encrypted string protocol version.
+     */
+    get version(): ProtocolVersion;
     get safeContent(): PayloadContent;
     get references(): import("../../protocol/payloads/generator").ContentReference[];
     get deleted(): boolean | undefined;

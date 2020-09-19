@@ -1,3 +1,4 @@
+import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../payloads/generator';
 import { FillItemContent } from '@Models/functions';
 import { Uuid } from './../../uuid';
 import { CreateItemFromPayload } from '@Models/generator';
@@ -45,7 +46,10 @@ export abstract class SNProtocolOperator {
    * Computes a root key given a password and previous keyParams
    * @param password - Plain string representing raw user password
    */
-  public abstract async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
+  public abstract async computeRootKey(
+    password: string,
+    keyParams: SNRootKeyParams
+  ): Promise<SNRootKey>;
 
   /**
    * Creates a new root key given an identifier and a user password
@@ -58,6 +62,14 @@ export abstract class SNProtocolOperator {
     password: string,
     origination: KeyParamsOrigination
   ): Promise<SNRootKey>;
+
+  /**
+   * Returns the payload's authenticated data. The passed payload must be in a
+   * non-decrypted, ciphertext state.
+   */
+  public abstract async getPayloadAuthenticatedData(
+    payload: PurePayload
+  ): Promise<RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | undefined>;
 
   protected abstract async generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
 

@@ -48,6 +48,26 @@ describe('utils', () => {
     expect(typeof parsed.b).to.equal('object');
   });
 
+  it('dateSorted', () => {
+    const objects = [
+      { date: new Date(10) },
+      { date: new Date(5) },
+      { date: new Date(7) },
+    ];
+
+    /** ascending */
+    const ascending = dateSorted(objects, 'date', true);
+    expect(ascending[0].date.getTime()).to.equal(5);
+    expect(ascending[1].date.getTime()).to.equal(7);
+    expect(ascending[2].date.getTime()).to.equal(10);
+
+    /** descending */
+    const descending = dateSorted(objects, 'date', false);
+    expect(descending[0].date.getTime()).to.equal(10);
+    expect(descending[1].date.getTime()).to.equal(7);
+    expect(descending[2].date.getTime()).to.equal(5);
+  });
+
   describe('subtractFromArray', () => {
     it('Removes all items appearing in the array', () => {
       const array = [1, 2, 3, 4, 5];

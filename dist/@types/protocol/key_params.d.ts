@@ -1,3 +1,4 @@
+import { KeyParamsResponse } from './../services/api/responses';
 import { ProtocolVersion } from './versions';
 /**
  *  001, 002:
@@ -49,6 +50,7 @@ export declare function Create002KeyParams(keyParams: KeyParamsContent002): SNRo
 export declare function Create003KeyParams(keyParams: KeyParamsContent003): SNRootKeyParams;
 export declare function Create004KeyParams(keyParams: KeyParamsContent004): SNRootKeyParams;
 export declare function CreateAnyKeyParams(keyParams: AnyKeyParamsContent): SNRootKeyParams;
+export declare function KeyParamsFromApiResponse(response: KeyParamsResponse): SNRootKeyParams;
 /**
  * Key params are public data that contain information about how a root key was created.
  * Given a keyParams object and a password, clients can compute a root key that was created
@@ -62,11 +64,14 @@ export declare class SNRootKeyParams {
      * working with is a proper RootKeyParams object.
      */
     get isKeyParamsObject(): boolean;
+    get identifier(): string;
     get version(): ProtocolVersion;
     get content001(): KeyParamsContent001;
     get content002(): KeyParamsContent002;
     get content003(): KeyParamsContent003;
     get content004(): KeyParamsContent004;
+    get createdDate(): Date | undefined;
+    compare(other: SNRootKeyParams): boolean;
     /**
      * @access public
      * When saving in a file or communicating with server,

@@ -131,8 +131,6 @@ describe('upgrading', () => {
       undefined,
       undefined,
       undefined,
-      undefined,
-      undefined,
       true
     );
     expect(this.application.itemManager.notes.length).to.equal(1);

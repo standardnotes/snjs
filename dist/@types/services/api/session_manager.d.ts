@@ -1,3 +1,5 @@
+import { ChallengeService } from './../challenge/challenge_service';
+import { SignInResponse } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
@@ -22,12 +24,13 @@ declare type User = {
  * for a new account, signing into an existing one, or changing an account password.
  */
 export declare class SNSessionManager extends PureService {
+    private challengeService;
     private storageService?;
     private apiService?;
     private alertService?;
     private protocolService?;
     private user?;
-    constructor(storageService: SNStorageService, apiService: SNApiService, alertService: SNAlertService, protocolService: SNProtocolService);
+    constructor(storageService: SNStorageService, apiService: SNApiService, alertService: SNAlertService, protocolService: SNProtocolService, challengeService: ChallengeService);
     deinit(): void;
     initializeFromDisk(): Promise<void>;
     private setSession;
@@ -35,9 +38,11 @@ export declare class SNSessionManager extends PureService {
     offline(): boolean;
     getUser(): User | undefined;
     signOut(): Promise<void>;
+    promptForMfaValue(): Promise<string | undefined>;
     register(email: string, password: string): Promise<SessionManagerResponse>;
-    signIn(email: string, password: string, strict?: boolean, mfaKeyPath?: string, mfaCode?: string): Promise<SessionManagerResponse>;
+    signIn(email: string, password: string, strict?: boolean): Promise<SessionManagerResponse>;
+    signInWithServerPassword(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<SignInResponse>;
     changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<SessionManagerResponse>;
-    private handleAuthResponse;
+    private handleSuccessAuthResponse;
 }
 export {};

@@ -1,3 +1,4 @@
+import { RootKeyEncryptedAuthenticatedData } from './../protocol/payloads/generator';
 import { ApplicationIdentifier } from './../types';
 import { Uuids, FillItemContent } from '@Models/functions';
 import { ContentTypeUsesRootKeyEncryption, EncryptionIntent } from './../protocol/intents';
@@ -10,7 +11,6 @@ import { SNProtocolOperator001 } from './../protocol/operator/001/operator_001';
 import { PayloadFormat } from './../protocol/payloads/formats';
 import { PayloadSource } from './../protocol/payloads/sources';
 import {
-  CreateEncryptionParameters,
   CreateIntentPayloadFromObject,
   CreateSourcedPayloadFromObject,
   CreateMaxPayloadFromAnyObject
@@ -22,7 +22,9 @@ import { CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItemsKey, ItemsKeyMutator } from '@Models/app/items_key';
-import { SNRootKeyParams, AnyKeyParamsContent, CreateAnyKeyParams, KeyParamsOrigination } from './../protocol/key_params';
+import {
+  SNRootKeyParams, AnyKeyParamsContent, CreateAnyKeyParams, KeyParamsOrigination
+} from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
@@ -349,6 +351,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else if (version === ProtocolVersion.V000Base64Decrypted) {
       return this.createOperatorForLatestVersion();
     } else {
+      debugger;
       throw `Unable to find operator for version ${version}`;
     }
   }
@@ -472,7 +475,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (!payload.uuid) {
       throw 'Attempting to encrypt payload with no uuid.';
     }
-    const version = key ? key.version : this.getLatestVersion();
+    const version = key ? key.keyVersion : this.getLatestVersion();
     const format = this.payloadContentFormatForIntent(intent, key);
     const operator = this.operatorForVersion(version);
     const encryptionParameters = await operator.generateEncryptedParameters(
@@ -699,17 +702,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @param keyParams - The raw key params object to create a KeyParams object from
    */
   public createKeyParams(keyParams: AnyKeyParamsContent) {
-    if((keyParams as any).content) {
-      console.trace();
-      throw Error('Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.');
-    }
-    /* 002 doesn't have version automatically, newer versions do. */
-    if (!keyParams.version) {
-      keyParams = {
-        ...keyParams,
-        version: ProtocolVersion.V002
-      }
-    }
     return CreateAnyKeyParams(keyParams);
   }
 
@@ -1086,7 +1078,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       StorageKey.RootKeyParams,
       key.keyParams.getPortableValue(),
       StorageValueModes.Nonwrapped
-      );
+    );
     if (this.keyMode === KeyMode.RootKeyOnly) {
       await this.saveRootKeyToKeychain();
     } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
@@ -1183,7 +1175,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else {
       const defaultKey = this.getDefaultItemsKey();
       const userVersion = await this.getUserVersion();
-      if (userVersion && userVersion !== defaultKey?.version) {
+      if (userVersion && userVersion !== defaultKey?.keyVersion) {
         /**
          * The default key appears to be either newer or older than the user's account version
          * We could throw an exception here, but will instead fall back to a corrective action:
@@ -1191,7 +1183,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
          */
         console.warn("The user's default items key version is not equal to the account version.");
         const itemsKeys = this.latestItemsKeys();
-        return itemsKeys.find((key) => key.version === userVersion);
+        return itemsKeys.find((key) => key.keyVersion === userVersion);
       } else {
         return defaultKey;
       }
@@ -1269,7 +1261,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
         const toDelete = neverSyncedKeys.filter((itemsKey) => {
-          return itemsKey.version !== rootKey.version;
+          return itemsKey.keyVersion !== rootKey.keyVersion;
         });
         if (toDelete.length > 0) {
           await this.itemManager!.setItemsToBeDeleted(Uuids(toDelete));
@@ -1331,6 +1323,21 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     });
   }
 
+  /** Returns the key params attached to this key's encrypted payload */
+  public async getKeyEmbeddedKeyParams(key: SNItemsKey) {
+    /** We can only look up key params for keys that are encrypted (as strings) */
+    if(key.payload.format === PayloadFormat.DecryptedBareObject) {
+      return undefined;
+    }
+    const operator = this.operatorForVersion(key.version);
+    const authenticatedData = await operator.getPayloadAuthenticatedData(key.payload);
+    if (!authenticatedData) {
+      return undefined;
+    }
+    const rawKeyParams = (authenticatedData as RootKeyEncryptedAuthenticatedData).kp;
+    return this.createKeyParams(rawKeyParams);
+  }
+
   /**
    * When the root key changes (non-null only), we must re-encrypt all items
    * keys with this new root key (by simply re-syncing).
@@ -1356,7 +1363,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async defaultItemsKeyForItemVersion(version: ProtocolVersion) {
     return this.latestItemsKeys().find((key) => {
-      return key.version === version;
+      return key.keyVersion === version;
     });
   }
 
@@ -1365,10 +1372,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
-  public async createNewDefaultItemsKey() {
+  private async createNewDefaultItemsKey() {
     const rootKey = (await this.getRootKey())!;
     const operatorVersion = rootKey
-      ? rootKey.version
+      ? rootKey.keyVersion
       : this.getLatestVersion();
     let itemTemplate: SNItemsKey;
     if (compareVersions(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0) {

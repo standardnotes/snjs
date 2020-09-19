@@ -1,3 +1,4 @@
+import { ItemAuthenticatedData } from './../../payloads/generator';
 import { SNItemsKey } from '../../../models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
 import { SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
@@ -54,6 +55,7 @@ export declare class SNProtocolOperator004 extends SNProtocolOperator003 {
      * @param itemUuid  The uuid of the item being encrypted
      */
     private generateEncryptedProtocolString;
+    getPayloadAuthenticatedData(payload: PurePayload): Promise<ItemAuthenticatedData>;
     /**
      * For items that are encrypted with a root key, we append the root key's key params, so
      * that in the event the client/user loses a reference to their root key, they may still

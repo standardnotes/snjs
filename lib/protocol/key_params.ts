@@ -1,3 +1,4 @@
+import { KeyParamsResponse } from './../services/api/responses';
 import { ProtocolVersion, compareVersions } from '@Protocol/versions';
 
 /**
@@ -58,24 +59,42 @@ export type AnyKeyParamsContent =
   KeyParamsContent004;
 
 export function Create001KeyParams(keyParams: KeyParamsContent001) {
-  return new SNRootKeyParams(keyParams);
+  return CreateAnyKeyParams(keyParams);
 }
 
 export function Create002KeyParams(keyParams: KeyParamsContent002) {
-  return new SNRootKeyParams(keyParams);
+  return CreateAnyKeyParams(keyParams);
 }
 
 export function Create003KeyParams(keyParams: KeyParamsContent003) {
-  return new SNRootKeyParams(keyParams);
+  return CreateAnyKeyParams(keyParams);
 }
 
 export function Create004KeyParams(keyParams: KeyParamsContent004) {
-  return new SNRootKeyParams(keyParams);
+  return CreateAnyKeyParams(keyParams);
 }
 
 export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
+  if ((keyParams as any).content) {
+    throw Error('Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.');
+  }
   return new SNRootKeyParams(keyParams);
 }
+
+export function KeyParamsFromApiResponse(response: KeyParamsResponse) {
+  const rawKeyParams: AnyKeyParamsContent = {
+    identifier: response.identifier!,
+    pw_cost: response.pw_cost!,
+    pw_nonce: response.pw_nonce!,
+    pw_salt: response.pw_salt!,
+    /* 002 doesn't have version automatically, newer versions do. */
+    version: response.version! || ProtocolVersion.V002,
+    origination: response.origination,
+    created: response.created,
+  }
+  return CreateAnyKeyParams(rawKeyParams);
+}
+
 
 /**
  * Key params are public data that contain information about how a root key was created.
@@ -101,6 +120,10 @@ export class SNRootKeyParams {
     return true;
   }
 
+  get identifier() {
+    return this.content004.identifier || this.content002.email;
+  }
+
   get version() {
     return this.content.version;
   }
@@ -119,6 +142,33 @@ export class SNRootKeyParams {
 
   get content004() {
     return this.content as KeyParamsContent004;
+  }
+
+  get createdDate() {
+    if (!this.content004.created) {
+      return undefined;
+    }
+    return new Date(this.content004.created);
+  }
+
+  compare(other: SNRootKeyParams) {
+    if (this.version !== other.version) {
+      return false;
+    }
+
+    if ([ProtocolVersion.V004, ProtocolVersion.V003].includes(this.version)) {
+      return (
+        this.identifier === other.identifier &&
+        this.content004.pw_nonce === other.content003.pw_nonce
+      );
+    } else if ([ProtocolVersion.V002, ProtocolVersion.V001].includes(this.version)) {
+      return (
+        this.identifier === other.identifier &&
+        this.content002.pw_salt === other.content001.pw_salt
+      );
+    } else {
+      throw Error('Unhandled version in KeyParams.compare');
+    }
   }
 
   /**

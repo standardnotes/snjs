@@ -272,6 +272,25 @@ export function sortedCopy(object: any) {
   return Copy(result);
 }
 
+/**
+ * Returns a new array by sorting an array of elements based on a date property,
+ * as indicated by the input key value.
+ */
+export function dateSorted<T>(elements: T[], key: keyof T, ascending = true) {
+  return elements.sort((a, b) => {
+    const aTimestamp = (a[key] as unknown as Date).getTime();
+    const bTimestamp = (b[key] as unknown as Date).getTime();
+    const vector = ascending ? 1 : -1;
+    if (aTimestamp < bTimestamp) {
+      return -1 * vector;
+    } else if (aTimestamp > bTimestamp) {
+      return 1 * vector;
+    } else {
+      return 0;
+    }
+  })
+}
+
 /** Compares for equality by comparing top-level keys value equality (===) */
 export function topLevelCompare<T>(left: T, right: T) {
   if (!left && !right) {

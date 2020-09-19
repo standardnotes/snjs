@@ -1,3 +1,4 @@
+import { SNKeyRecoveryService } from './services/key_recovery_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { CollectionSort, SortDirection } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
@@ -111,6 +112,7 @@ export class SNApplication {
   public actionsManager!: SNActionsService
   public historyManager!: SNHistoryManager
   private itemManager!: ItemManager
+  private keyRecoveryService!: SNKeyRecoveryService
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService[] = [];
@@ -658,7 +660,7 @@ export class SNApplication {
   ) {
     const observer = this.itemManager!.addObserver(
       contentType,
-      (changed, inserted, discarded, source) => {
+      (changed, inserted, discarded, _ignored, source) => {
         const all = changed.concat(inserted).concat(discarded);
         stream(all, source);
       }
@@ -1024,13 +1026,11 @@ export class SNApplication {
       return {};
     }
     if (!passcode) {
-      const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.ResaveRootKey);
-      const response = await this.challengeService!.promptForChallengeResponse(challenge);
-      if (!response) {
+      const result = await this.challengeService.promptForPasscode();
+      if (result.canceled) {
         return { canceled: true };
       }
-      const value = response.getValueForType(ChallengeType.LocalPasscode);
-      passcode = value.value as string;
+      passcode = result.passcode!;
     }
     const wrappingKey = await this.protocolService!.computeWrappingKey(passcode);
     return { wrappingKey };
@@ -1088,8 +1088,6 @@ export class SNApplication {
     password: string,
     strict = false,
     ephemeral = false,
-    mfaKeyPath?: string,
-    mfaCode?: string,
     mergeLocal = true,
     awaitSync = false
   ) {
@@ -1100,7 +1098,7 @@ export class SNApplication {
     /** Prevent a timed sync from occuring while signing in. */
     this.lockSyncing();
     const result = await this.sessionManager!.signIn(
-      email, password, strict, mfaKeyPath, mfaCode
+      email, password, strict
     );
     if (!result.response.error) {
       await this.protocolService!.setNewRootKey(
@@ -1167,7 +1165,7 @@ export class SNApplication {
       currentPassword,
       newPassword,
       wrappingKey
-    );
+      );
     if (error) return { error };
 
     const {
@@ -1357,6 +1355,7 @@ export class SNApplication {
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
+    this.createKeyRecoveryService();
     this.createSyncManager();
     this.createSingletonManager();
     this.createComponentManager();
@@ -1382,6 +1381,7 @@ export class SNApplication {
     (this.actionsManager as any) = undefined;
     (this.historyManager as any) = undefined;
     (this.itemManager as any) = undefined;
+    (this.keyRecoveryService as any) = undefined;
 
     this.services = [];
   }
@@ -1472,12 +1472,27 @@ export class SNApplication {
     this.services.push(this.protocolService!);
   }
 
+  private createKeyRecoveryService() {
+    this.keyRecoveryService = new SNKeyRecoveryService(
+      this.itemManager,
+      this.modelManager,
+      this.apiService,
+      this.sessionManager,
+      this.protocolService,
+      this.challengeService,
+      this.alertService,
+      this.storageService
+    );
+    this.services.push(this.keyRecoveryService!);
+  }
+
   private createSessionManager() {
     this.sessionManager = new SNSessionManager(
-      this.storageService!,
-      this.apiService!,
-      this.alertService!,
-      this.protocolService!
+      this.storageService,
+      this.apiService,
+      this.alertService,
+      this.protocolService,
+      this.challengeService
     );
     this.services.push(this.sessionManager!);
   }

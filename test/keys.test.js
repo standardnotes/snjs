@@ -277,6 +277,28 @@ describe('keys', function () {
     expect(updatedNote.content.title).to.equal(title);
   });
 
+  it('attempting to emit errored items key for which there exists a non errored master copy should ignore it', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
+    const itemsKey = await this.application.protocolService.getDefaultItemsKey();
+    expect(itemsKey.errorDecrypting).to.not.be.ok;
+
+    const errored = CopyPayload(
+      itemsKey.payload,
+      {
+        content: {
+          foo: 'bar'
+        },
+        errorDecrypting: true
+      }
+    );
+
+    await this.application.modelManager.emitPayload(errored, PayloadSource.Constructor);
+
+    const refreshedKey = this.application.findItem(itemsKey.uuid);
+    expect(refreshedKey.errorDecrypting).to.not.be.ok;
+    expect(refreshedKey.content.foo).to.not.be.ok;
+  });
+
   it('generating export params with logged in account should produce encrypted payload', async function () {
     await Factory.registerUserToApplication({ application: this.application });
     const payload = Factory.createNotePayload();
@@ -335,7 +357,7 @@ describe('keys', function () {
        */
       const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
       const latestVersion = this.application.protocolService.getLatestVersion();
-      expect(defaultItemsKey.version).to.equal(latestVersion);
+      expect(defaultItemsKey.keyVersion).to.equal(latestVersion);
 
       /** Register with 003 version */
       await Factory.registerOldUser({
@@ -348,7 +370,7 @@ describe('keys', function () {
       const itemsKeys = this.application.itemManager.itemsKeys();
       expect(itemsKeys.length).to.equal(1);
       const newestItemsKey = itemsKeys[0];
-      expect(newestItemsKey.version).to.equal(ProtocolVersion.V003);
+      expect(newestItemsKey.keyVersion).to.equal(ProtocolVersion.V003);
       const rootKey = await this.application.protocolService.getRootKey();
       expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
@@ -374,8 +396,6 @@ describe('keys', function () {
     await this.application.signIn(
       this.email,
       this.password,
-      undefined,
-      undefined,
       undefined,
       undefined,
       undefined,

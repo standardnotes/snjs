@@ -80,7 +80,7 @@ export class SNRootKey extends SNItem {
     return this.safeContent as Partial<RootKeyContent>;
   }
 
-  public get version() {
+  public get keyVersion() {
     if (!this.payload.safeContent.version) {
       throw 'Attempting to create key without version.';
     }
@@ -115,7 +115,7 @@ export class SNRootKey extends SNItem {
    * Compares two keys for equality
    */
   public compare(otherKey: SNRootKey) {
-    if (this.version !== otherKey.version) {
+    if (this.keyVersion !== otherKey.keyVersion) {
       return false;
     }
     const hasServerPassword = this.serverPassword && otherKey.serverPassword;
@@ -139,7 +139,7 @@ export class SNRootKey extends SNItem {
  */
   public getKeychainValue() {
     const values: Partial<RootKeyContent> = {
-      version: this.version
+      version: this.keyVersion
     };
     if (this.masterKey) {
       values.masterKey = this.masterKey;

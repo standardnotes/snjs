@@ -50,7 +50,7 @@ export async function PayloadsByDuplicating(
   payload: PurePayload,
   baseCollection: ImmutablePayloadCollection,
   isConflict: boolean
-) {
+  ) {
   const results = [];
   const override: PayloadOverride = {
     uuid: await Uuid.GenerateUuid(),

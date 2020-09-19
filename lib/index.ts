@@ -94,7 +94,8 @@ export {
   dictToArray,
   truncateHexString,
   jsonParseEmbeddedKeys,
-  topLevelCompare
+  topLevelCompare,
+  dateSorted
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

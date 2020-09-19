@@ -24,10 +24,11 @@ export declare class SNProtocolOperator002 extends SNProtocolOperator001 {
     private encryptString002;
     encryptTextParams(string: string, encryptionKey: string, authKey: string, uuid: string, version: ProtocolVersion): Promise<string>;
     decryptTextParams(ciphertextToAuth: string, contentCiphertext: string, encryptionKey: string, iv: string, authHash: string, authKey: string): Promise<string | null>;
+    getPayloadAuthenticatedData(payload: PurePayload): Promise<any>;
     generateEncryptedParameters(payload: PurePayload, format: PayloadFormat, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     generateDecryptedParameters(encryptedParameters: PurePayload, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     protected deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
-    encryptionComponentsFromString002(string: string, encryptionKey: string, authKey: string): {
+    encryptionComponentsFromString002(string: string, encryptionKey?: string, authKey?: string): {
         encryptionVersion: string;
         authHash: string;
         uuid: string;
@@ -35,7 +36,7 @@ export declare class SNProtocolOperator002 extends SNProtocolOperator001 {
         contentCiphertext: string;
         authParams: string;
         ciphertextToAuth: string;
-        encryptionKey: string;
-        authKey: string;
+        encryptionKey: string | undefined;
+        authKey: string | undefined;
     };
 }

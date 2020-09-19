@@ -8,14 +8,16 @@ export type ChallengeArtifacts = {
 export enum ChallengeType {
   LocalPasscode = 1,
   AccountPassword = 2,
-  Biometric = 3
+  Biometric = 3,
+  Custom = 4
 };
 /** The source of the challenge */
 export enum ChallengeReason {
   ApplicationUnlock = 1,
   ResaveRootKey = 2,
   ProtocolUpgrade = 3,
-  Migration = 4
+  Migration = 4,
+  Custom = 5
 };
 
 /**
@@ -28,6 +30,8 @@ export class Challenge {
   constructor(
     public readonly types: ChallengeType[],
     public readonly reason: ChallengeReason,
+    public readonly customPrompt?: string,
+    public readonly customReason?: string
   ) {
     Object.freeze(this);
   }
@@ -54,6 +58,13 @@ export class ChallengeResponse {
   getValueForType(type: ChallengeType) {
     return this.values.find((value) => value.type === type)!;
   }
+
+  getDefaultValue() {
+    if (this.values.length > 1) {
+      throw Error('Attempting to retrieve default response value when more than one value exists');
+    }
+    return this.values[0];
+  }
 }
 
 /**
@@ -64,6 +75,7 @@ export function challengeTypeToString(type: ChallengeType) {
     [ChallengeType.LocalPasscode]: 'application passcode',
     [ChallengeType.AccountPassword]: 'account password',
     [ChallengeType.Biometric]: 'biometrics',
+    [ChallengeType.Custom]: 'custom',
   };
   return mapping[type];
 }

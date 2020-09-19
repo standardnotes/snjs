@@ -97,7 +97,7 @@ export async function registerOldUser({ application, email, password, version })
     accountKey.serverPassword,
     accountKey.keyParams
   );
-  await application.sessionManager.handleAuthResponse(response);
+  await application.sessionManager.handleSuccessAuthResponse(response);
   await application.protocolService.setNewRootKey(
     accountKey
   );
@@ -180,8 +180,6 @@ export async function loginToApplication({ application, email, password, ephemer
     password,
     undefined,
     ephemeral,
-    undefined,
-    undefined,
     mergeLocal,
     true
   );

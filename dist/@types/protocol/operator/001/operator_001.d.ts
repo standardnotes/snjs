@@ -15,6 +15,7 @@ export declare class SNProtocolOperator001 extends SNProtocolOperator {
     get version(): ProtocolVersion;
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
+    getPayloadAuthenticatedData(_payload: PurePayload): Promise<undefined>;
     computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
     private decryptString;
     private encryptString;

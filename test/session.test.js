@@ -297,7 +297,7 @@ describe('server session', function() {
     await this.application.signIn(
       this.email,
       this.password,
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
 
@@ -311,4 +311,44 @@ describe('server session', function() {
       expect(aNoteBeforeSync.isItemContentEqualWith(noteResult)).to.equal(true);
     }
   });
+
+  it('changing password on one client should not invalidate other sessions', async function () {
+    const appA = await Factory.createApplication(Factory.randomString());
+    await appA.prepareForLaunch({ });
+    await appA.launch(true);
+
+    const email = `${Math.random()}`;
+    const password = `${Math.random()}`;
+
+    await Factory.registerUserToApplication({
+      application: appA,
+      email: email,
+      password: password
+    });
+
+    /** Create simultaneous appB signed into same account */
+    const appB = await Factory.createApplication('another-namespace');
+    await appB.prepareForLaunch({});
+    await appB.launch(true);
+    await Factory.loginToApplication({
+      application: appB,
+      email: email,
+      password: password
+    });
+
+    /** Change password on appB */
+    const newPassword = 'random';
+    await appB.changePassword(password, newPassword);
+
+    /** Create an item and sync it */
+    const note = await Factory.createSyncedNote(appB);
+
+    /** Expect appA session to still be valid */
+    await appA.sync();
+    expect(appA.findItem(note.uuid)).to.be.ok;
+
+    appA.deinit();
+    appB.deinit();
+  });
+
 });

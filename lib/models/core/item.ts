@@ -1,3 +1,4 @@
+import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
@@ -41,10 +42,6 @@ export enum AppDataField {
   LastSize = 'lastSize',
   PrefersPlainEditor = 'prefersPlainEditor',
   ComponentInstallError = 'installError'
-}
-
-type AppData = {
-  [key in AppDataField]?: any
 }
 
 export enum SingletonStrategy {
@@ -110,6 +107,17 @@ export class SNItem {
 
   get content() {
     return this.payload.content;
+  }
+
+  /**
+   * This value only exists on payloads that are encrypted, as version pertains to the
+   * encrypted string protocol version.
+   */
+  get version() {
+    if(this.payload.format === PayloadFormat.DecryptedBareObject) {
+      throw Error('Attempting to access version of decrypted payload');
+    }
+    return this.payload.version as ProtocolVersion;
   }
 
   get safeContent() {
@@ -203,7 +211,7 @@ export class SNItem {
    * Currently appData['org.standardnotes.sn'] returns an object of type AppData.
    * And appData['org.standardnotes.sn.components] returns an object of type ComponentData
    */
-  public getDomainData(domain: string) : undefined | Record<string, any> {
+  public getDomainData(domain: string): undefined | Record<string, any> {
     const domainData = this.payload.safeContent.appData;
     if (!domainData) {
       return undefined;

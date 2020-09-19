@@ -6,7 +6,7 @@ import { SNItem, ItemMutator } from '../core/item';
 export declare class SNItemsKey extends SNItem {
     /** Do not duplicate items keys. Always keep original */
     strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy;
-    get version(): any;
+    get keyVersion(): any;
     get isItemsKey(): boolean;
     get isDefault(): any;
     get itemsKey(): any;

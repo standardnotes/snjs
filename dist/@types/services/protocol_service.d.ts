@@ -355,6 +355,8 @@ export declare class SNProtocolService extends PureService implements Encryption
      * @returns The SNItemsKey object to use to encrypt new or updated items.
      */
     getDefaultItemsKey(): SNItemsKey | undefined;
+    /** Returns the key params attached to this key's encrypted payload */
+    getKeyEmbeddedKeyParams(key: SNItemsKey): Promise<SNRootKeyParams | undefined>;
     /**
      * When the root key changes (non-null only), we must re-encrypt all items
      * keys with this new root key (by simply re-syncing).
@@ -373,7 +375,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
      * and its .itemsKey value should be equal to the root key masterKey value.
      */
-    createNewDefaultItemsKey(): Promise<SNItem>;
+    private createNewDefaultItemsKey;
     changePassword(email: string, currentPassword: string, newPassword: string, wrappingKey?: SNRootKey): Promise<[Error | null, {
         currentServerPassword: string;
         newRootKey: SNRootKey;

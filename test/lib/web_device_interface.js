@@ -31,7 +31,7 @@ export default class WebDeviceInterface extends DeviceInterface {
     localStorage.clear();
   }
 
-  async openDatabase(identifier) {
+  async openDatabase(_identifier) {
     return {};
   }
 

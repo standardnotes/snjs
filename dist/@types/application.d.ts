@@ -54,6 +54,7 @@ export declare class SNApplication {
     actionsManager: SNActionsService;
     historyManager: SNHistoryManager;
     private itemManager;
+    private keyRecoveryService;
     private eventHandlers;
     private services;
     private streamRemovers;
@@ -329,7 +330,7 @@ export declare class SNApplication {
      * @param mergeLocal  Whether to merge existing offline data into account.
      * If false, any pre-existing data will be fully deleted upon success.
      */
-    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mfaKeyPath?: string, mfaCode?: string, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/http_service").HttpResponse | undefined>;
     /**
      * @param passcode - Changing the account password requires the local
      * passcode if configured (to rewrap the account key with passcode). If the passcode
@@ -378,6 +379,7 @@ export declare class SNApplication {
     private createSingletonManager;
     private createStorageManager;
     private createProtocolService;
+    private createKeyRecoveryService;
     private createSessionManager;
     private createSyncManager;
     private createChallengeService;

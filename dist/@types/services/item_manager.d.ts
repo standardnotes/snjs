@@ -22,7 +22,9 @@ changed: SNItem[],
 /** The items have been newly inserted */
 inserted: SNItem[], 
 /** The items have been deleted from local state (and remote state if applicable) */
-discarded: SNItem[], source?: PayloadSource, sourceKey?: string) => void;
+discarded: SNItem[], 
+/** Items for which encrypted overwrite protection is enabled and enacted */
+ignored: SNItem[], source?: PayloadSource, sourceKey?: string) => void;
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
  * more user-friendly or item-specific interface to creating and updating data.

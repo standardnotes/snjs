@@ -122,13 +122,17 @@ export class SNApiService extends PureService {
     if (mfaKeyPath) {
       params[mfaKeyPath] = mfaCode;
     }
-    const response = await this.httpService!.getAbsolute(url, params)
-      .catch((errorResponse: HttpResponse) => {
-        return this.errorResponseWithFallbackMessage(
-          errorResponse,
-          messages.API_MESSAGE_GENERIC_INVALID_LOGIN
-        );
-      });
+    const response = await this.httpService!.getAbsolute(
+      url,
+      params,
+      /** A session is optional here, if valid, endpoint returns extra params */
+      this.session?.authorizationValue
+    ).catch((errorResponse: HttpResponse) => {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_INVALID_LOGIN
+      );
+    });
     return response as KeyParamsResponse;
   }
 
@@ -148,8 +152,8 @@ export class SNApiService extends PureService {
         return this.errorResponseWithFallbackMessage(
           errorResponse,
           messages.API_MESSAGE_GENERIC_REGISTRATION_FAIL
-          );
-        });
+        );
+      });
     this.registering = false;
     return response as RegistrationResponse;
   }
@@ -281,16 +285,15 @@ export class SNApiService extends PureService {
   }
 
   private async refreshSessionThenRetryRequest(httpRequest: HttpRequest) {
-    return this.refreshSession().then((sessionResponse) => {
-      if (sessionResponse?.error) {
-        return sessionResponse;
-      } else {
-        return this.httpService!.runHttp({
-          ...httpRequest,
-          authentication: this.session!.authorizationValue
-        });
-      }
-    });
+    const sessionResponse = await this.refreshSession();
+    if (sessionResponse?.error) {
+      return sessionResponse;
+    } else {
+      return this.httpService!.runHttp({
+        ...httpRequest,
+        authentication: this.session!.authorizationValue
+      });
+    }
   }
 
   async refreshSession() {

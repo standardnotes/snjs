@@ -38,7 +38,7 @@ describe('online syncing', function() {
       await this.application.signIn(
         this.email,
         this.password,
-        undefined, undefined, undefined, undefined, undefined,
+        undefined, undefined, undefined,
         true
       );
     };
@@ -230,7 +230,7 @@ describe('online syncing', function() {
     await this.application.signIn(
       this.email,
       this.password,
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
   });
@@ -425,7 +425,7 @@ describe('online syncing', function() {
     await this.application.signIn(
       this.email,
       this.password,
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
 
@@ -1085,7 +1085,7 @@ describe('online syncing', function() {
     await this.application.signIn(
       this.email,
       this.password,
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
 

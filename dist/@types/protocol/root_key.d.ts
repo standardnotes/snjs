@@ -24,7 +24,7 @@ export declare class SNRootKey extends SNItem {
     static ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent): Promise<SNRootKey>;
     constructor(payload: PurePayload, keyParams: SNRootKeyParams);
     private get typedContent();
-    get version(): any;
+    get keyVersion(): any;
     get isRootKey(): boolean;
     /**
      * When the root key is used to encrypt items, we use the masterKey directly.
