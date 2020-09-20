@@ -2,7 +2,29 @@ import { RawPayload } from '../../protocol/payloads/generator';
 import { ApiEndpointParam } from './keys';
 import { KeyParamsOrigination, AnyKeyParamsContent } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-import { HttpResponse } from './http_service';
+export declare enum HttpStatusCode {
+    HttpStatusMinSuccess = 200,
+    HttpStatusMaxSuccess = 299,
+    /** The session's access token is expired, but the refresh token is valid */
+    HttpStatusExpiredAccessToken = 498,
+    /** The session's access token and refresh token are expired, user must reauthenticate */
+    HttpStatusInvalidSession = 401
+}
+export declare type HttpResponse = {
+    status: HttpStatusCode;
+    error?: {
+        message: string;
+        status: number;
+        tag?: string;
+        /** In the case of MFA required responses,
+         * the required prompt is returned as part of the error */
+        payload?: {
+            mfa_key?: string;
+        };
+    };
+    object?: any;
+};
+export declare function isErrorResponseExpiredToken(errorResponse: HttpResponse): boolean;
 declare type SessionBody = {
     access_token: string;
     refresh_token: string;

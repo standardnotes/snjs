@@ -1,5 +1,6 @@
 import { UNKNOWN_ERROR } from './messages';
 import { PureService } from '@Lib/services/pure_service';
+import { HttpResponse, HttpStatusCode } from './responses';
 
 export enum HttpVerb {
   Get = 'get',
@@ -7,25 +8,7 @@ export enum HttpVerb {
   Patch = 'patch'
 }
 
-export type HttpResponse = {
-  status: number
-  error?: {
-    message: string,
-    status: number,
-    tag?: string,
-    /** In the case of MFA required responses,
-     * the required prompt is returned as part of the error */
-    payload?: {
-      mfa_key?: string
-    }
-  }
-  object?: any
-}
-
 const REQUEST_READY_STATE_COMPLETED = 4;
-const HTTP_STATUS_MIN_SUCCESS = 200;
-const HTTP_STATUS_MAX_SUCCESS = 299;
-const HTTP_STATUS_EXPIRED_ACCESS_TOKEN = 498;
 
 type HttpParams = Record<string, any>
 
@@ -121,8 +104,8 @@ export class SNHttpService extends PureService {
       response.object = body;
       Object.assign(response, body);
     } catch (error) { }
-    if ((httpStatus >= HTTP_STATUS_MIN_SUCCESS
-      && httpStatus <= HTTP_STATUS_MAX_SUCCESS)) {
+    if ((httpStatus >= HttpStatusCode.HttpStatusMinSuccess
+      && httpStatus <= HttpStatusCode.HttpStatusMaxSuccess)) {
       resolve(response);
     } else {
       if (!response.error) {
@@ -143,9 +126,4 @@ export class SNHttpService extends PureService {
       return url + '?' + keyValueString;
     }
   }
-
-  public isErrorResponseExpiredToken(errorResponse: HttpResponse) {
-    return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
-  }
-
 }

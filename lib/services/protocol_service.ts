@@ -351,7 +351,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else if (version === ProtocolVersion.V000Base64Decrypted) {
       return this.createOperatorForLatestVersion();
     } else {
-      debugger;
       throw `Unable to find operator for version ${version}`;
     }
   }

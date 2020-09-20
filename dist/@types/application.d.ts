@@ -325,12 +325,12 @@ export declare class SNApplication {
      *  @param mergeLocal  Whether to merge existing offline data into account. If false,
      *                     any pre-existing data will be fully deleted upon success.
      */
-    register(email: string, password: string, ephemeral?: boolean, mergeLocal?: boolean): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    register(email: string, password: string, ephemeral?: boolean, mergeLocal?: boolean): Promise<import("./services/api/responses").HttpResponse | undefined>;
     /**
      * @param mergeLocal  Whether to merge existing offline data into account.
      * If false, any pre-existing data will be fully deleted upon success.
      */
-    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/responses").HttpResponse | undefined>;
     /**
      * @param passcode - Changing the account password requires the local
      * passcode if configured (to rewrap the account key with passcode). If the passcode

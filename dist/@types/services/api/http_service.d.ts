@@ -1,23 +1,10 @@
 import { PureService } from '../pure_service';
+import { HttpResponse } from './responses';
 export declare enum HttpVerb {
     Get = "get",
     Post = "post",
     Patch = "patch"
 }
-export declare type HttpResponse = {
-    status: number;
-    error?: {
-        message: string;
-        status: number;
-        tag?: string;
-        /** In the case of MFA required responses,
-         * the required prompt is returned as part of the error */
-        payload?: {
-            mfa_key?: string;
-        };
-    };
-    object?: any;
-};
 declare type HttpParams = Record<string, any>;
 export declare type HttpRequest = {
     url: string;
@@ -37,6 +24,5 @@ export declare class SNHttpService extends PureService {
     private runRequest;
     private stateChangeHandlerForRequest;
     private urlForUrlAndParams;
-    isErrorResponseExpiredToken(errorResponse: HttpResponse): boolean;
 }
 export {};

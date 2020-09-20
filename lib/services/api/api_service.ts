@@ -1,10 +1,10 @@
-import { SessionRenewalResponse, RegistrationResponse, SignInResponse, SignOutResponse, ChangePasswordResponse, KeyParamsResponse } from './responses';
+import { SessionRenewalResponse, RegistrationResponse, SignInResponse, SignOutResponse, ChangePasswordResponse, KeyParamsResponse, isErrorResponseExpiredToken, HttpResponse, HttpStatusCode } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
-import { SNHttpService, HttpResponse, HttpVerb, HttpRequest } from './http_service';
+import { SNHttpService, HttpVerb, HttpRequest } from './http_service';
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
@@ -24,9 +24,9 @@ const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 
 const API_VERSION = '20200115';
 
+type InvalidSessionObserver = () => void;
+
 export class SNApiService extends PureService {
-  private httpService: SNHttpService
-  private storageService: SNStorageService
   private host?: string
   private session?: Session
 
@@ -35,10 +35,14 @@ export class SNApiService extends PureService {
   private changing = false
   private refreshingSession = false
 
-  constructor(httpService: SNHttpService, storageService: SNStorageService, defaultHost?: string) {
+  private invalidSessionObserver?: InvalidSessionObserver;
+
+  constructor(
+    private httpService: SNHttpService,
+    private storageService: SNStorageService,
+    defaultHost?: string
+  ) {
     super();
-    this.httpService = httpService;
-    this.storageService = storageService;
     this.host = defaultHost;
   }
 
@@ -46,9 +50,20 @@ export class SNApiService extends PureService {
   deinit() {
     (this.httpService as any) = undefined;
     (this.storageService as any) = undefined;
+    this.invalidSessionObserver = undefined;
     this.host = undefined;
     this.session = undefined;
     super.deinit();
+  }
+
+  /**
+   * When a we receive a 401 error from the server, we'll notify the observer.
+   * Note that this applies only to sessions that are totally invalid. Sessions that
+   * are expired but can be renewed are still considered to be valid. In those cases,
+   * the server response is 498.
+   */
+  public setInvalidSessionObserver(observer: InvalidSessionObserver) {
+    this.invalidSessionObserver = observer;
   }
 
   public async loadHost() {
@@ -223,7 +238,7 @@ export class SNApiService extends PureService {
       params,
       this.session!.authorizationValue
     ).catch(async (errorResponse) => {
-      if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
+      if (isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
           url,
@@ -268,7 +283,8 @@ export class SNApiService extends PureService {
       params,
       this.session!.authorizationValue
     ).catch(async (errorResponse) => {
-      if (this.httpService!.isErrorResponseExpiredToken(errorResponse)) {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
+      if (isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
           url,
@@ -316,6 +332,7 @@ export class SNApiService extends PureService {
       await this.setSession(session);
       return response;
     }).catch((errorResponse) => {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL
@@ -337,6 +354,7 @@ export class SNApiService extends PureService {
       undefined,
       this.session!.authorizationValue
     ).catch((errorResponse: HttpResponse) => {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_SYNC_FAIL
@@ -357,6 +375,7 @@ export class SNApiService extends PureService {
       undefined,
       this.session!.authorizationValue
     ).catch((errorResponse: HttpResponse) => {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
       return this.errorResponseWithFallbackMessage(
         errorResponse,
         messages.API_MESSAGE_GENERIC_SYNC_FAIL
@@ -373,6 +392,13 @@ export class SNApiService extends PureService {
       return this.createErrorResponse(messages.API_MESSAGE_INVALID_SESSION);
     }
     return undefined;
+  }
+
+  /** Handle errored responses to authenticated requests */
+  private preprocessAuthenticatedErrorResponse(response: HttpResponse) {
+    if (response.status === HttpStatusCode.HttpStatusInvalidSession && this.session) {
+      this.invalidSessionObserver?.();
+    }
   }
 
 }

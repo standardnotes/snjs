@@ -280,7 +280,7 @@ export class SNKeyRecoveryService extends PureService {
       password,
       keyParams
     );
-    const signInResponse = await this.sessionManager.signInWithServerPassword(
+    const signInResponse = await this.sessionManager.bypassChecksAndSignInWithServerPassword(
       keyParams.identifier,
       rootKey.serverPassword
     );

@@ -1,3 +1,4 @@
+import { HttpResponse } from './api/responses';
 import { Action, ActionAccessType } from './../models/app/action';
 import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
@@ -8,7 +9,7 @@ import { SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
 import { PayloadManager } from './model_manager';
-import { SNHttpService, HttpResponse } from './api/http_service';
+import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PayloadSource } from '@Payloads/sources';
 import { EncryptionIntent } from '@Protocol/intents';

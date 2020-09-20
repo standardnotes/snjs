@@ -1,3 +1,4 @@
+import { HttpResponse } from './api/responses';
 import { Action } from './../models/app/action';
 import { ItemManager } from './item_manager';
 import { SNActionsExtension } from './../models/app/extension';
@@ -5,7 +6,7 @@ import { SNItem } from '../models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
 import { PayloadManager } from './model_manager';
-import { SNHttpService, HttpResponse } from './api/http_service';
+import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PureService } from './pure_service';
 import { DeviceInterface } from '../device_interface';

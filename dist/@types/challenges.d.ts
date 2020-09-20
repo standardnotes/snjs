@@ -24,10 +24,20 @@ export declare enum ChallengeReason {
 export declare class Challenge {
     readonly types: ChallengeType[];
     readonly reason: ChallengeReason;
+    /** A prompt is akin to the modal title */
     readonly customPrompt?: string | undefined;
+    /** A reason is akin to the modal subtitle */
     readonly customReason?: string | undefined;
+    /** The name of the input fields to correspond with `types`, if using custom prompts */
+    readonly customInputNames?: string[] | undefined;
     readonly id: number;
-    constructor(types: ChallengeType[], reason: ChallengeReason, customPrompt?: string | undefined, customReason?: string | undefined);
+    constructor(types: ChallengeType[], reason: ChallengeReason, 
+    /** A prompt is akin to the modal title */
+    customPrompt?: string | undefined, 
+    /** A reason is akin to the modal subtitle */
+    customReason?: string | undefined, 
+    /** The name of the input fields to correspond with `types`, if using custom prompts */
+    customInputNames?: string[] | undefined);
 }
 export declare class ChallengeValue {
     readonly type: ChallengeType;

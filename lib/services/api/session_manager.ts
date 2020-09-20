@@ -1,22 +1,21 @@
+import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
 import { Challenge } from '@Lib/challenges';
 import { ChallengeType, ChallengeReason } from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
-import { RootKeyContent } from './../../protocol/root_key';
 import { JwtSession, TokenSession } from './session';
-import { RegistrationResponse, SignInResponse, ChangePasswordResponse } from './responses';
+import { RegistrationResponse, SignInResponse, ChangePasswordResponse, HttpResponse } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination, KeyParamsFromApiResponse } from './../../protocol/key_params';
-import { HttpResponse } from './http_service';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
 import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { sign } from 'crypto';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -38,32 +37,26 @@ type User = {
  */
 export class SNSessionManager extends PureService {
 
-  private storageService?: SNStorageService
-  private apiService?: SNApiService
-  private alertService?: SNAlertService
-  private protocolService?: SNProtocolService
-
   private user?: User
 
   constructor(
-    storageService: SNStorageService,
-    apiService: SNApiService,
-    alertService: SNAlertService,
-    protocolService: SNProtocolService,
+    private storageService: SNStorageService,
+    private apiService: SNApiService,
+    private alertService: SNAlertService,
+    private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
   ) {
     super();
-    this.protocolService = protocolService;
-    this.storageService = storageService;
-    this.apiService = apiService;
-    this.alertService = alertService;
+    apiService.setInvalidSessionObserver(() => {
+      this.reauthenticateInvalidSession();
+    });
   }
 
   deinit() {
-    this.protocolService = undefined;
-    this.storageService = undefined;
-    this.apiService = undefined;
-    this.alertService = undefined;
+    (this.protocolService as any) = undefined;
+    (this.storageService as any) = undefined;
+    (this.apiService as any) = undefined;
+    (this.alertService as any) = undefined;
     this.user = undefined;
     super.deinit();
   }
@@ -106,6 +99,25 @@ export class SNSessionManager extends PureService {
     if (session && session.canExpire()) {
       await this.apiService!.signOut();
     }
+  }
+
+  private async reauthenticateInvalidSession() {
+    const challenge = new Challenge(
+      [ChallengeType.Custom, ChallengeType.Custom],
+      ChallengeReason.Custom,
+      `Please enter your account email and password.`,
+      `Your credentials are needed to refresh your session with the server.`,
+      [`Email`, `Password`]
+    );
+    const response = await this.challengeService
+      .promptForChallengeResponseWithCustomValidation(challenge);
+    const email = response[0]?.value as string;
+    const password = response[1]?.value as string;
+    if (!email || !password) {
+      return;
+    }
+    const currentKeyParams = await this.protocolService.getAccountKeyParams();
+    await this.signIn(email, password, false, currentKeyParams!.version);
   }
 
   async promptForMfaValue(): Promise<string | undefined> {
@@ -152,7 +164,8 @@ export class SNSessionManager extends PureService {
   public async signIn(
     email: string,
     password: string,
-    strict = false
+    strict = false,
+    minAllowedVersion?: ProtocolVersion
   ): Promise<SessionManagerResponse> {
     const paramsResponse = await this.apiService!.getAccountKeyParams(
       email
@@ -205,11 +218,13 @@ export class SNSessionManager extends PureService {
       };
     }
     if (strict) {
-      const latest = this.protocolService!.getLatestVersion();
-      if (keyParams.version !== latest) {
+      minAllowedVersion = this.protocolService!.getLatestVersion();
+    }
+    if (!isNullOrUndefined(minAllowedVersion)) {
+      if (!leftVersionGreaterThanOrEqualToRight(keyParams.version, minAllowedVersion)) {
         return {
           response: this.apiService!.createErrorResponse(
-            messages.StrictSignInFailed(keyParams.version, latest)
+            messages.StrictSignInFailed(keyParams.version, minAllowedVersion)
           )
         };
       }
@@ -223,7 +238,7 @@ export class SNSessionManager extends PureService {
         serverPassword: rootKey.serverPassword
       };
     });
-    const signInResponse = await this.signInWithServerPassword(
+    const signInResponse = await this.bypassChecksAndSignInWithServerPassword(
       email,
       serverPassword,
     )
@@ -233,7 +248,7 @@ export class SNSessionManager extends PureService {
     };
   }
 
-  public async signInWithServerPassword(
+  public async bypassChecksAndSignInWithServerPassword(
     email: string,
     serverPassword: string,
     mfaKeyPath?: string,
@@ -256,7 +271,7 @@ export class SNSessionManager extends PureService {
           /** User dismissed window without input */
           return signInResponse;
         }
-        return this.signInWithServerPassword(
+        return this.bypassChecksAndSignInWithServerPassword(
           email,
           serverPassword,
           signInResponse.error.payload.mfa_key,
@@ -290,7 +305,7 @@ export class SNSessionManager extends PureService {
 
   private async handleSuccessAuthResponse(
     response: RegistrationResponse | SignInResponse | ChangePasswordResponse
-  ) {
+    ) {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);

@@ -30,8 +30,12 @@ export class Challenge {
   constructor(
     public readonly types: ChallengeType[],
     public readonly reason: ChallengeReason,
+    /** A prompt is akin to the modal title */
     public readonly customPrompt?: string,
-    public readonly customReason?: string
+    /** A reason is akin to the modal subtitle */
+    public readonly customReason?: string,
+    /** The name of the input fields to correspond with `types`, if using custom prompts */
+    public readonly customInputNames?: string[],
   ) {
     Object.freeze(this);
   }
