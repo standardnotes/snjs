@@ -11,16 +11,20 @@ export enum ApplicationEvent {
   EnteredOutOfSync = 8,
   ExitedOutOfSync = 9,
 
-  /** 
-   * The application has finished it `prepareForLaunch` state and is now ready for unlock 
+  /**
+   * The application has finished it `prepareForLaunch` state and is now ready for unlock
    * Called when the application has initialized and is ready for launch, but before
    * the application has been unlocked, if applicable. Use this to do pre-launch
    * configuration, but do not attempt to access user data like notes or tags.
    */
   Started = 10,
 
-  /** 
-   * The applicaiton is fully unlocked and ready for i/o 
+  /**
+   * The application has started `prepareForLaunch` and completed base migration.
+   */
+  PreparingForLaunch = 23,
+  /**
+   * The applicaiton is fully unlocked and ready for i/o
    * Called when the application has been fully decrypted and unlocked. Use this to
    * to begin streaming data like notes and tags.
    */

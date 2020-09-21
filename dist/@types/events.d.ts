@@ -17,6 +17,10 @@ export declare enum ApplicationEvent {
      */
     Started = 10,
     /**
+     * The application has started `prepareForLaunch` and completed base migration.
+     */
+    PreparingForLaunch = 23,
+    /**
      * The applicaiton is fully unlocked and ready for i/o
      * Called when the application has been fully decrypted and unlocked. Use this to
      * to begin streaming data like notes and tags.

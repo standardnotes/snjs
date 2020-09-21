@@ -1865,6 +1865,11 @@ var ApplicationEvent;
 
   ApplicationEvent[ApplicationEvent["Started"] = 10] = "Started";
   /**
+   * The application has started `prepareForLaunch` and completed base migration.
+   */
+
+  ApplicationEvent[ApplicationEvent["PreparingForLaunch"] = 23] = "PreparingForLaunch";
+  /**
    * The applicaiton is fully unlocked and ready for i/o
    * Called when the application has been fully decrypted and unlocked. Use this to
    * to begin streaming data like notes and tags.
@@ -21815,6 +21820,7 @@ class application_SNApplication {
     this.createdNewDatabase = (databaseResult === null || databaseResult === void 0 ? void 0 : databaseResult.isNewDatabase) || false;
     await this.migrationService.initialize();
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
+    await this.notifyEvent(events["a" /* ApplicationEvent */].PreparingForLaunch);
     await this.storageService.initializeFromDisk();
     await this.protocolService.initialize();
     await this.handleStage(ApplicationStage.ReadyForLaunch_05);
