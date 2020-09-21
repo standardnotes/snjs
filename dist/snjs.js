@@ -12508,6 +12508,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       const uuids = Object(functions["b" /* Uuids */])(responsePayloads);
       const items = this.itemManager.findItems(uuids, true);
       let lockedCount = 0;
+      let lockedNoteCount = 0;
       items.forEach((item, index) => {
         if (!item) {
           const responseItem = responsePayloads[index]; // An item this extension is trying to save was possibly removed locally, notify user
@@ -12521,11 +12522,18 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
             uuid: item.uuid
           });
           lockedCount++;
+
+          if (item.content_type === content_types["a" /* ContentType */].Note) {
+            lockedNoteCount++;
+          }
         }
       });
 
-      if (lockedCount > 0) {
-        const itemNoun = lockedCount === 1 ? 'item' : 'items';
+      if (lockedNoteCount === 1) {
+        this.alertService.alert("The note you are attempting to save is locked and cannot be edited.", 'Note Locked');
+        return;
+      } else if (lockedCount > 0) {
+        const itemNoun = lockedCount === 1 ? 'item' : lockedNoteCount === lockedCount ? 'notes' : 'items';
         const auxVerb = lockedCount === 1 ? 'is' : 'are';
         this.alertService.alert("".concat(lockedCount, " ").concat(itemNoun, " you are attempting to save ").concat(auxVerb, " locked and cannot be edited."), 'Items Locked');
         return;
