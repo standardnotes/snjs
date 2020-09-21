@@ -79,6 +79,10 @@ export class SNMigrationService extends PureService {
     );
   }
 
+  public async hasPendingMigrations() {
+    return (await this.getRequiredMigrations()).length > 0;
+  }
+
   private async getRequiredMigrations() {
     const lastMigrationTimestamp = await this.getLastMigrationTimestamp();
     const activeMigrations = [];

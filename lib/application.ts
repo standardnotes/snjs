@@ -1319,6 +1319,10 @@ export class SNApplication {
   }
 
 
+  public hasPendingMigrations() {
+    return this.migrationService.hasPendingMigrations();
+  }
+
   public generateUuid() {
     return Uuid.GenerateUuid();
   }

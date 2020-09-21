@@ -361,6 +361,7 @@ export declare class SNApplication {
     private removePasscodeWithoutWarning;
     getStorageEncryptionPolicy(): StorageEncryptionPolicies;
     setStorageEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies): Promise<void>;
+    hasPendingMigrations(): Promise<boolean>;
     generateUuid(): Promise<string>;
     /**
      * Dynamically change the device interface, i.e when Desktop wants to override

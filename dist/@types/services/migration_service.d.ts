@@ -27,6 +27,7 @@ export declare class SNMigrationService extends PureService {
      */
     handleApplicationEvent(event: ApplicationEvent): Promise<void>;
     private runBaseMigration;
+    hasPendingMigrations(): Promise<boolean>;
     private getRequiredMigrations;
     private getNamespacedTimeStampKey;
     private getLastMigrationTimestamp;

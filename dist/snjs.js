@@ -15480,6 +15480,10 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
     await baseMigration.handleStage(ApplicationStage.PreparingForLaunch_0);
   }
 
+  async hasPendingMigrations() {
+    return (await this.getRequiredMigrations()).length > 0;
+  }
+
   async getRequiredMigrations() {
     const lastMigrationTimestamp = await this.getLastMigrationTimestamp();
     const activeMigrations = [];
@@ -22928,6 +22932,10 @@ class application_SNApplication {
   async setStorageEncryptionPolicy(encryptionPolicy) {
     await this.storageService.setEncryptionPolicy(encryptionPolicy);
     return this.protocolService.repersistAllItems();
+  }
+
+  hasPendingMigrations() {
+    return this.migrationService.hasPendingMigrations();
   }
 
   generateUuid() {
