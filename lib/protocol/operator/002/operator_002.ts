@@ -113,7 +113,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     payload: PurePayload,
     format: PayloadFormat,
     key?: SNItemsKey | SNRootKey,
-  ) {
+    ) {
     if ((
       format === PayloadFormat.DecryptedBareObject ||
       format === PayloadFormat.DecryptedBase64String

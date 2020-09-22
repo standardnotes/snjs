@@ -40,8 +40,9 @@ export declare class SNSessionManager extends PureService {
     getUser(): User | undefined;
     signOut(): Promise<void>;
     private reauthenticateInvalidSession;
-    promptForMfaValue(): Promise<string | undefined>;
+    private promptForMfaValue;
     register(email: string, password: string): Promise<SessionManagerResponse>;
+    private retrieveKeyParams;
     signIn(email: string, password: string, strict?: boolean, minAllowedVersion?: ProtocolVersion): Promise<SessionManagerResponse>;
     bypassChecksAndSignInWithServerPassword(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<SignInResponse>;
     changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<SessionManagerResponse>;

@@ -4,7 +4,7 @@ import { Challenge, ChallengePrompt } from '@Lib/challenges';
 import { ChallengeValidation, ChallengeReason } from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, TokenSession } from './session';
-import { RegistrationResponse, SignInResponse, ChangePasswordResponse, HttpResponse } from './responses';
+import { RegistrationResponse, SignInResponse, ChangePasswordResponse, HttpResponse, KeyParamsResponse } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
@@ -16,7 +16,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { SessionStrings } from './messages';
+import { SessionStrings, SignInStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -147,7 +147,7 @@ export class SNSessionManager extends PureService {
     }
   }
 
-  async promptForMfaValue(): Promise<string | undefined> {
+  private async promptForMfaValue() {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.None)],
       ChallengeReason.Custom,
@@ -155,7 +155,10 @@ export class SNSessionManager extends PureService {
     );
     const response = await this.challengeService
       .promptForChallengeResponse(challenge);
-    return response?.values[0]?.value as string;
+    if (response) {
+      this.challengeService.cancelChallenge(challenge);
+      return response.values[0].value as string;
+    }
   }
 
   async register(email: string, password: string): Promise<SessionManagerResponse> {
@@ -188,26 +191,65 @@ export class SNSessionManager extends PureService {
     };
   }
 
+  private async retrieveKeyParams(
+    email: string,
+    mfaKeyPath?: string,
+    mfaCode?: string
+  ): Promise<{
+    keyParams?: SNRootKeyParams,
+    response: KeyParamsResponse,
+    mfaKeyPath?: string,
+    mfaCode?: string
+  }> {
+    const response = await this.apiService!.getAccountKeyParams(
+      email,
+      mfaKeyPath,
+      mfaCode
+    );
+    if (response.error) {
+      if (mfaCode) {
+        await this.alertService.alert(SignInStrings.IncorrectMfa);
+      }
+      if (response.error.payload?.mfa_key) {
+        /** Prompt for MFA code and try again */
+        const inputtedCode = await this.promptForMfaValue();
+        if (!inputtedCode) {
+          /** User dismissed window without input */
+          return {
+            response: this.apiService!.createErrorResponse(SignInStrings.SignInCanceledMissingMfa)
+          };
+        }
+        return this.retrieveKeyParams(
+          email,
+          response.error.payload.mfa_key,
+          inputtedCode
+        );
+      } else {
+        return { response };
+      }
+    }
+    const keyParams = KeyParamsFromApiResponse(response);
+    if (!keyParams || !keyParams.version) {
+      return {
+        response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
+      };
+    }
+    return { keyParams, response, mfaKeyPath, mfaCode };
+  }
+
   public async signIn(
     email: string,
     password: string,
     strict = false,
     minAllowedVersion?: ProtocolVersion
   ): Promise<SessionManagerResponse> {
-    const paramsResponse = await this.apiService!.getAccountKeyParams(
-      email
-    );
-    if (paramsResponse.error) {
+    const paramsResult = await this.retrieveKeyParams(email);
+    if (paramsResult.response.error) {
       return {
-        response: paramsResponse
+        response: paramsResult.response
       };
     }
-    const keyParams = KeyParamsFromApiResponse(paramsResponse);
-    if (!keyParams || !keyParams.version) {
-      return {
-        response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
-      };
-    }
+    const keyParams = paramsResult.keyParams!;
     if (!this.protocolService!.supportedVersions().includes(keyParams.version)) {
       if (this.protocolService!.isVersionNewerThanLibraryVersion(keyParams.version)) {
         return {
@@ -268,6 +310,8 @@ export class SNSessionManager extends PureService {
     const signInResponse = await this.bypassChecksAndSignInWithServerPassword(
       email,
       serverPassword,
+      paramsResult.mfaKeyPath,
+      paramsResult.mfaCode
     )
     return {
       response: signInResponse,
@@ -292,17 +336,20 @@ export class SNSessionManager extends PureService {
       return signInResponse;
     } else {
       if (signInResponse.error.payload?.mfa_key) {
+        if (mfaCode) {
+          await this.alertService.alert(SignInStrings.IncorrectMfa);
+        }
         /** Prompt for MFA code and try again */
-        const mfaCode = await this.promptForMfaValue();
-        if (!mfaCode) {
+        const inputtedCode = await this.promptForMfaValue();
+        if (!inputtedCode) {
           /** User dismissed window without input */
-          return signInResponse;
+          return this.apiService!.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
         }
         return this.bypassChecksAndSignInWithServerPassword(
           email,
           serverPassword,
           signInResponse.error.payload.mfa_key,
-          mfaCode
+          inputtedCode
         )
       } else {
         /** Some other error, return to caller */

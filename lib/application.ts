@@ -55,7 +55,7 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION
+  UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
@@ -1038,7 +1038,7 @@ export class SNApplication {
   ) {
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary();
     if (canceled) {
-      return;
+      return { error: Error(SignInStrings.PasscodeRequired) };
     }
     this.lockSyncing();
     const result = await this.sessionManager!.register(email, password);
@@ -1083,7 +1083,7 @@ export class SNApplication {
   ) {
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary();
     if (canceled) {
-      return;
+      return { error: Error(SignInStrings.PasscodeRequired) };
     }
     /** Prevent a timed sync from occuring while signing in. */
     this.lockSyncing();

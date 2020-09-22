@@ -51,6 +51,11 @@ export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVer
 export const UNSUPPORTED_BACKUP_FILE_VERSION = `This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.`;
 export const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = `This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.`;
 
+export const SignInStrings = {
+  PasscodeRequired: 'Your passcode is required in order to sign in to your account.',
+  IncorrectMfa: 'Incorrect two-factor authentication code. Please try again.',
+  SignInCanceledMissingMfa: 'Your sign in request has been canceled.'
+}
 
 export const KeyRecoveryStrings = {
   KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => {

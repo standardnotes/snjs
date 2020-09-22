@@ -29,6 +29,11 @@ export declare function InsufficientPasswordMessage(minimum: number): string;
 export declare function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion): string;
 export declare const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
 export declare const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
+export declare const SignInStrings: {
+    PasscodeRequired: string;
+    IncorrectMfa: string;
+    SignInCanceledMissingMfa: string;
+};
 export declare const KeyRecoveryStrings: {
     KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => string;
     KeyRecoveryLoginFlowReason: string;
