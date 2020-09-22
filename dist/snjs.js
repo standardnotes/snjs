@@ -1865,6 +1865,12 @@ var ApplicationEvent;
 
   ApplicationEvent[ApplicationEvent["Started"] = 10] = "Started";
   /**
+   * The application has loaded all pending migrations (but not run any, except for the base one),
+   * and consumers may now call `hasPendingMigrations`
+   */
+
+  ApplicationEvent[ApplicationEvent["MigrationsLoaded"] = 23] = "MigrationsLoaded";
+  /**
    * The applicaiton is fully unlocked and ready for i/o
    * Called when the application has been fully decrypted and unlocked. Use this to
    * to begin streaming data like notes and tags.
@@ -15480,6 +15486,10 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
     await baseMigration.handleStage(ApplicationStage.PreparingForLaunch_0);
   }
 
+  async hasPendingMigrations() {
+    return (await this.getRequiredMigrations()).length > 0;
+  }
+
   async getRequiredMigrations() {
     const lastMigrationTimestamp = await this.getLastMigrationTimestamp();
     const activeMigrations = [];
@@ -21810,6 +21820,7 @@ class application_SNApplication {
     });
     this.createdNewDatabase = (databaseResult === null || databaseResult === void 0 ? void 0 : databaseResult.isNewDatabase) || false;
     await this.migrationService.initialize();
+    await this.notifyEvent(events["a" /* ApplicationEvent */].MigrationsLoaded);
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService.initializeFromDisk();
     await this.protocolService.initialize();
@@ -22928,6 +22939,10 @@ class application_SNApplication {
   async setStorageEncryptionPolicy(encryptionPolicy) {
     await this.storageService.setEncryptionPolicy(encryptionPolicy);
     return this.protocolService.repersistAllItems();
+  }
+
+  hasPendingMigrations() {
+    return this.migrationService.hasPendingMigrations();
   }
 
   generateUuid() {
