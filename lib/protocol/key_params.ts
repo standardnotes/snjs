@@ -148,7 +148,7 @@ export class SNRootKeyParams {
     if (!this.content004.created) {
       return undefined;
     }
-    return new Date(this.content004.created);
+    return new Date(Number(this.content004.created));
   }
 
   compare(other: SNRootKeyParams) {

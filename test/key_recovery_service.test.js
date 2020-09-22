@@ -76,18 +76,84 @@ describe('key recovery service', function () {
     application.deinit();
   });
 
+  it('when encountering many undecryptable items key with same key params, should only prompt once', async function () {
+    const namespace = Factory.randomString();
+    const unassociatedPassword = 'randfoo';
+    const unassociatedIdentifier = 'foorand';
+    let totalPromptCount = 0;
+
+    const application = await Factory.createApplication(namespace);
+    const receiveChallenge = async (challenge) => {
+      totalPromptCount++;
+      /** Give unassociated password when prompted */
+      application.submitValuesForChallenge(
+        challenge,
+        [new ChallengeValue(challenge.prompts[0], unassociatedPassword)]
+      );
+    };
+    await application.prepareForLaunch({ receiveChallenge });
+    await application.launch(true);
+
+    await Factory.registerUserToApplication({
+      application: application,
+      email: this.email,
+      password: this.password
+    });
+
+    /** Create items key associated with a random root key */
+    const randomRootKey = await application.protocolService.createRootKey(
+      unassociatedIdentifier,
+      unassociatedPassword,
+      KeyParamsOrigination.Registration
+    );
+    const randomItemsKey = await application.protocolService.defaultOperator().createItemsKey();
+    const randomItemsKey2 = await application.protocolService.defaultOperator().createItemsKey();
+    const encrypted = await application.protocolService.payloadsByEncryptingPayloads(
+      [randomItemsKey.payload, randomItemsKey2.payload],
+      EncryptionIntent.Sync,
+      randomRootKey
+    );
+
+    /** Attempt decryption and insert into rotation in errored state  */
+    const decrypted = await application.protocolService.payloadsByDecryptingPayloads(encrypted);
+
+    await application.modelManager.emitPayloads(decrypted, PayloadSource.Constructor);
+
+    /** Wait and allow recovery wizard to complete */
+    await Factory.sleep(1.5);
+
+    /** Should be decrypted now */
+    expect(application.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(false);
+    expect(application.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(false);
+
+    expect(totalPromptCount).to.equal(1);
+
+    application.deinit();
+  });
+
   it('when changing password on another client, it should prompt us for new account password', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
+    const passcode = 'mypasscode';
     let didPromptForNewPassword = false;
 
+    let didPromptForPasscode = false;
     const appA = await Factory.createApplication(namespace);
     const receiveChallenge = async (challenge) => {
-      didPromptForNewPassword = true;
+      const prompt = challenge.prompts[0];
+      if (prompt.validation === ChallengeValidation.LocalPasscode) {
+        didPromptForPasscode = true;
+      } else {
+        didPromptForNewPassword = true;
+      }
       /** Give newPassword when prompted */
       appA.submitValuesForChallenge(
         challenge,
-        [new ChallengeValue(challenge.prompts[0], newPassword)]
+        [new ChallengeValue(
+          prompt,
+          prompt.validation === ChallengeValidation.LocalPasscode
+            ? passcode
+            : newPassword)]
       );
     };
     await appA.prepareForLaunch({ receiveChallenge });
@@ -98,6 +164,9 @@ describe('key recovery service', function () {
       email: this.email,
       password: this.password
     });
+
+    /** Set a passcode to expect it to be validated later */
+    await appA.setPasscode(passcode);
 
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
 
@@ -128,6 +197,7 @@ describe('key recovery service', function () {
     /** Allow key recovery service ample time to do its thing */
     await Factory.sleep(5.0);
 
+    expect(didPromptForPasscode).to.equal(true);
     expect(didPromptForNewPassword).to.equal(true);
 
     /** Same previously errored key should now no longer be errored, */
@@ -338,68 +408,5 @@ describe('key recovery service', function () {
     expect(latestItemsKey.updated_at.getTime()).to.equal(newUpdated.getTime());
 
     recreatedApp.deinit();
-  });
-
-  it('root key replacing recovery should prompt for app passcode if enabled', async function () {
-    const namespace = Factory.randomString();
-    const application = await Factory.createApplication(namespace);
-    const passcode = 'mypasscode';
-    let didPromptForPasscode = false;
-    let didPromptForAccountPassword = false;
-    const receiveChallenge = async (challenge) => {
-      const prompt = challenge.prompts[0];
-      if (prompt.validation === ChallengeValidation.LocalPasscode) {
-        didPromptForPasscode = true;
-      } else {
-        didPromptForAccountPassword = true;
-      }
-      application.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(prompt, prompt.validation === ChallengeValidation.LocalPasscode ? passcode : this.password)]
-      );
-    };
-    await application.prepareForLaunch({ receiveChallenge });
-    await application.launch(true);
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: this.email,
-      password: this.password
-    });
-
-    /** Set a passcode */
-    await application.setPasscode(passcode);
-
-    /**
-     * Create a new items key that we manually set as errored
-     * Because it is newer than we we have, key recovery service will perform
-     * local root key change, and prompt for passcode.
-     */
-    const itemsKey = await application.protocolService.defaultOperator().createItemsKey();
-    const encrypted = await application.protocolService.payloadByEncryptingPayload(
-      itemsKey.payload,
-      EncryptionIntent.Sync,
-    );
-    await application.modelManager.emitPayload(
-      CopyPayload(
-        encrypted,
-        {
-          errorDecrypting: true,
-
-        }
-      ),
-      PayloadSource.Constructor
-    );
-
-    await Factory.sleep(2.5);
-
-    expect(didPromptForPasscode).to.equal(true);
-    expect(didPromptForAccountPassword).to.equal(true);
-
-    const latestItemsKey = application.findItem(itemsKey.uuid);
-    expect(latestItemsKey.errorDecrypting).to.not.be.ok;
-    expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
-
-    application.deinit();
   });
 });

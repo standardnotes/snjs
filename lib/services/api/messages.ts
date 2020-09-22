@@ -61,7 +61,7 @@ export const KeyRecoveryStrings = {
   KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => {
     return `Enter your account password as it was on ${keyParams?.createdDate}.`
   },
-  KeyRecoveryLoginFlowReason: `Your account password is required to revalidate your session.`,
+  KeyRecoveryLoginFlowReason: 'Your account password is required to revalidate your session.',
   KeyRecoveryLoginFlowInvalidPassword: 'Incorrect credentials entered. Please try again.',
   KeyRecoveryRootKeyReplaced: 'Your credentials have successfully been updated.',
   KeyRecoveryPasscodeRequiredTitle: 'Passcode Required',

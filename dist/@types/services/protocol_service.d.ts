@@ -159,7 +159,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * Similar to `payloadByEncryptingPayload`, but operates on an array of payloads.
      * `intent` can also be a function of the current iteration payload.
      */
-    payloadsByEncryptingPayloads(payloads: PurePayload[], intent: EncryptionIntent | ((payload: PurePayload) => EncryptionIntent)): Promise<PurePayload[]>;
+    payloadsByEncryptingPayloads(payloads: PurePayload[], intent: EncryptionIntent | ((payload: PurePayload) => EncryptionIntent), key?: SNRootKey | SNItemsKey): Promise<PurePayload[]>;
     /**
      * Generates a new payload by decrypting the input payload.
      * If the input payload is already decrypted, it will be returned as-is.

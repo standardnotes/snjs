@@ -10,6 +10,7 @@ export declare type ValueCallback = (value: ChallengeValue) => void;
 export declare type ChallengeObserver = {
     onValidValue?: ValueCallback;
     onInvalidValue?: ValueCallback;
+    onNonvalidatedSubmit?: (response: ChallengeResponse) => void;
     onComplete?: (response: ChallengeResponse) => void;
     onCancel?: () => void;
 };

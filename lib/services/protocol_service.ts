@@ -499,14 +499,16 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async payloadsByEncryptingPayloads(
     payloads: PurePayload[],
-    intent: EncryptionIntent | ((payload: PurePayload) => EncryptionIntent)
+    intent: EncryptionIntent | ((payload: PurePayload) => EncryptionIntent),
+    key?: SNRootKey | SNItemsKey
   ) {
     const results = [];
     for (const payload of payloads) {
       const useIntent = isFunction(intent) ? (intent as any)(payload) : intent;
       const encryptedPayload = await this.payloadByEncryptingPayload(
         payload,
-        useIntent
+        useIntent,
+        key
       );
       results.push(encryptedPayload);
     }
@@ -604,7 +606,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Here we find such items, and attempt to decrypt them again.
    */
   public async decryptErroredItems() {
-    const items = this.itemManager!.invalidItems;
+    const items = this.itemManager!.invalidItems
+      .filter(i => i.content_type !== ContentType.ItemsKey);
     if (items.length === 0) {
       return;
     }
@@ -1325,7 +1328,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /** Returns the key params attached to this key's encrypted payload */
   public async getKeyEmbeddedKeyParams(key: SNItemsKey) {
     /** We can only look up key params for keys that are encrypted (as strings) */
-    if(key.payload.format === PayloadFormat.DecryptedBareObject) {
+    if (key.payload.format === PayloadFormat.DecryptedBareObject) {
       return undefined;
     }
     const operator = this.operatorForVersion(key.version);
