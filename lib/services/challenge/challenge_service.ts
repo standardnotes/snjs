@@ -24,6 +24,7 @@ export type ValueCallback = (value: ChallengeValue) => void;
 export type ChallengeObserver = {
   onValidValue?: ValueCallback,
   onInvalidValue?: ValueCallback,
+  onNonvalidatedSubmit?: (response: ChallengeResponse) => void,
   onComplete?: (response: ChallengeResponse) => void,
   onCancel?: () => void
 };
@@ -199,7 +200,10 @@ export class ChallengeService extends PureService {
     })
   }
 
-  private onChallengeNonvalidatedSubmit(_challenge: Challenge, _response: ChallengeResponse) {
+  private onChallengeNonvalidatedSubmit(challenge: Challenge, response: ChallengeResponse) {
+    this.performOnObservers(challenge, (observer) => {
+      observer.onNonvalidatedSubmit?.(response);
+    })
   }
 
   private onChallengeComplete(challenge: Challenge, response: ChallengeResponse) {

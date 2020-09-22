@@ -48,10 +48,12 @@ export class ChallengeOperation {
   public nonvalidatedSubmit() {
     const response = new ChallengeResponse(
       this.challenge,
-      this.nonvalidatedValues,
+      this.nonvalidatedValues.slice(),
       this.artifacts
     );
     this.onNonvalidatedSubmit?.(response);
+    /** Reset values */
+    this.nonvalidatedValues = [];
   }
 
   public cancel() {
@@ -70,7 +72,12 @@ export class ChallengeOperation {
   }
 
   public addNonvalidatedValue(value: ChallengeValue) {
-    this.nonvalidatedValues.push(value);
+    const valuesArray = this.nonvalidatedValues;
+    const matching = valuesArray.find((v) => v.prompt.id === value.prompt.id);
+    if (matching) {
+      removeFromArray(valuesArray, matching);
+    }
+    valuesArray.push(value);
     if (this.nonvalidatedValues.length === this.nonvalidatedPrompts().length) {
       this.nonvalidatedSubmit();
     }

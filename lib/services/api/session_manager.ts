@@ -122,29 +122,28 @@ export class SNSessionManager extends PureService {
       {
         onCancel: () => {
           this.isSessionRenewChallengePresented = false;
+        },
+        onNonvalidatedSubmit: async (challengeResponse) => {
+          const email = challengeResponse.values[0].value as string;
+          const password = challengeResponse.values[1].value as string;
+          const currentKeyParams = await this.protocolService.getAccountKeyParams();
+          const signInResult = await this.signIn(email, password, false, currentKeyParams!.version);
+          if (signInResult.response.error) {
+            this.challengeService.setValidationStatusForChallenge(
+              challenge,
+              challengeResponse!.values[1],
+              false
+            );
+          } else {
+            this.challengeService.cancelChallenge(challenge);
+            this.alertService!.alert(
+              SessionStrings.SessionRestored
+            );
+          }
         }
       })
-    const challengeResponse = await this.challengeService
-      .promptForChallengeResponse(challenge);
-    const email = challengeResponse?.values[0]?.value as string;
-    const password = challengeResponse?.values[1]?.value as string;
-    if (!email || !password) {
-      return;
-    }
-    const currentKeyParams = await this.protocolService.getAccountKeyParams();
-    const signInResult = await this.signIn(email, password, false, currentKeyParams!.version);
-    if (signInResult.response.error) {
-      this.challengeService.setValidationStatusForChallenge(
-        challenge,
-        challengeResponse!.values[1],
-        false
-      );
-    } else {
-      this.challengeService.cancelChallenge(challenge);
-      this.alertService!.alert(
-        SessionStrings.SessionRestored
-      );
-    }
+
+    this.challengeService.promptForChallengeResponse(challenge);
   }
 
   private async promptForMfaValue() {
