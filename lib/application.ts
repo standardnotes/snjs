@@ -15,8 +15,8 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
-import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason, ChallengeValue } from './challenges';
-import { ValueCallback } from './services/challenge/challenge_service';
+import { Challenge, ChallengeResponse, ChallengeValidation, ChallengeReason, ChallengeValue, ChallengePrompt } from './challenges';
+import { ValueCallback, ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
@@ -269,10 +269,10 @@ export class SNApplication {
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
-    if (response.challenge.types.includes(ChallengeType.LocalPasscode)) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts!.wrappingKey;
       if (!wrappingKey) {
-        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
         wrappingKey = await this.protocolService!.computeWrappingKey(value.value as string);
       }
       await this.protocolService!.unwrapRootKey(wrappingKey);
@@ -733,14 +733,14 @@ export class SNApplication {
   }> {
     const hasPasscode = this.hasPasscode();
     const hasAccount = this.hasAccount();
-    const types = [];
+    const prompts = [];
     if (hasPasscode) {
-      types.push(ChallengeType.LocalPasscode);
+      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
     }
     if (hasAccount) {
-      types.push(ChallengeType.AccountPassword);
+      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
     }
-    const challenge = new Challenge(types, ChallengeReason.ProtocolUpgrade);
+    const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade);
     const response = await this.challengeService!.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true };
@@ -753,12 +753,12 @@ export class SNApplication {
       let passcode: string | undefined;
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
         passcode = value.value as string;
       }
       if (hasAccount) {
         /* Upgrade account version */
-        const value = response.getValueForType(ChallengeType.AccountPassword);
+        const value = response.getValueForType(ChallengeValidation.AccountPassword);
         const password = value.value as string;
         const changeResponse = await this.changePassword(
           password,
@@ -955,21 +955,11 @@ export class SNApplication {
     return this.challengeService?.promptForChallengeResponse(challenge);
   }
 
-  public setChallengeCallbacks({
-    challenge,
-    onValidValue,
-    onInvalidValue,
-    onComplete,
-    onCancel
-  }: {
-    challenge: Challenge;
-    onValidValue?: ValueCallback;
-    onInvalidValue?: ValueCallback;
-    onComplete?: () => void;
-    onCancel?: () => void;
-  }) {
-    return this.challengeService!.setChallengeCallbacks(
-      challenge, onValidValue, onInvalidValue, onComplete, onCancel);
+  public addChallengeObserver(
+    challenge: Challenge,
+    observer: ChallengeObserver
+  ) {
+    return this.challengeService!.addChallengeObserver(challenge, observer);
   }
 
   public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]) {
@@ -1165,7 +1155,7 @@ export class SNApplication {
       currentPassword,
       newPassword,
       wrappingKey
-      );
+    );
     if (error) return { error };
 
     const {

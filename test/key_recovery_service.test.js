@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('key recovery service', function () {
-  this.timeout(Factory.TestTimeout);
+  this.timeout(Factory.LongTestTimeout);
 
   before(async function () {
     localStorage.clear();
@@ -34,7 +34,7 @@ describe('key recovery service', function () {
       /** Give unassociated password when prompted */
       application.submitValuesForChallenge(
         challenge,
-        [new ChallengeValue(challenge.types[0], unassociatedPassword)]
+        [new ChallengeValue(challenge.prompts[0], unassociatedPassword)]
       );
     };
     await application.prepareForLaunch({ receiveChallenge });
@@ -87,7 +87,7 @@ describe('key recovery service', function () {
       /** Give newPassword when prompted */
       appA.submitValuesForChallenge(
         challenge,
-        [new ChallengeValue(challenge.types[0], newPassword)]
+        [new ChallengeValue(challenge.prompts[0], newPassword)]
       );
     };
     await appA.prepareForLaunch({ receiveChallenge });
@@ -141,7 +141,7 @@ describe('key recovery service', function () {
 
     appA.deinit();
     appB.deinit();
-  }).timeout(20000);
+  });
 
   it('when client key params differ from server, and no matching items key exists, should perform sign in flow', async function () {
     /**
@@ -149,22 +149,19 @@ describe('key recovery service', function () {
      * and the server's key params do not match our own, we have no way to validate a new
      * root key other than by signing in.
      */
-
+    const unassociatedPassword = 'randfoo';
     const application = await Factory.createApplication('some-namespace');
     const receiveChallenge = async (challenge) => {
-      if (challenge.customReason.includes(KeyRecoveryStrings.KeyRecoveryLoginFlowReason)) {
-        /** This is the sign in prompt, return proper value */
-        application.submitValuesForChallenge(
-          challenge,
-          [new ChallengeValue(challenge.types[0], this.password)]
-        );
-      } else {
-        /** Not the sign in prompt, return null value as a signal to abort */
-        application.submitValuesForChallenge(
-          challenge,
-          [new ChallengeValue(challenge.types[0], undefined)]
-        );
-      }
+      /** This is the sign in prompt, return proper value */
+      application.submitValuesForChallenge(
+        challenge,
+        [new ChallengeValue(
+          challenge.prompts[0],
+          challenge.subtitle.includes(KeyRecoveryStrings.KeyRecoveryLoginFlowReason)
+            ? this.password
+            : unassociatedPassword
+        )]
+      );
     };
     await application.prepareForLaunch({ receiveChallenge });
     await application.launch(true);
@@ -183,7 +180,6 @@ describe('key recovery service', function () {
      *    with the incorrect root key, so that it cannot be used to validate the user's password
      */
 
-    const unassociatedPassword = 'randfoo';
     const unassociatedIdentifier = 'foorand';
     /** Create items key associated with a random root key */
     const randomRootKey = await application.protocolService.createRootKey(
@@ -209,8 +205,9 @@ describe('key recovery service', function () {
     );
 
     /** At this point key recovery wizard will encounter an undecryptable items key,
-     * whose key params do not match the server's. Key recovery wizard should prompt for sign in */
-    await Factory.sleep(2.0);
+     * whose key params do not match the server's. Key recovery wizard should prompt for sign in,
+     * but will also prompt for detached recovery of this key, so we must await both */
+    await Factory.sleep(5.0);
 
     const clientRootKey = await application.protocolService.getRootKey();
     expect(clientRootKey.compare(correctRootKey)).to.equal(true);
@@ -223,7 +220,7 @@ describe('key recovery service', function () {
     const receiveChallenge = async (challenge) => {
       application.submitValuesForChallenge(
         challenge,
-        [new ChallengeValue(challenge.types[0], this.password)]
+        [new ChallengeValue(challenge.prompts[0], this.password)]
       );
     };
     await application.prepareForLaunch({ receiveChallenge });
@@ -277,7 +274,7 @@ describe('key recovery service', function () {
     expect(latestItemsKey.updated_at.getTime()).to.equal(newUpdated.getTime());
 
     application.deinit();
-  }).timeout(20000);
+  });
 
   it('application should prompt to recover undecryptables on launch', async function () {
     const namespace = Factory.randomString();
@@ -320,7 +317,7 @@ describe('key recovery service', function () {
       didReceivePasswordPrompt = true;
       recreatedApp.submitValuesForChallenge(
         challenge,
-        [new ChallengeValue(challenge.types[0], this.password)]
+        [new ChallengeValue(challenge.prompts[0], this.password)]
       );
     };
     await recreatedApp.prepareForLaunch({ receiveChallenge });
@@ -341,7 +338,7 @@ describe('key recovery service', function () {
     expect(latestItemsKey.updated_at.getTime()).to.equal(newUpdated.getTime());
 
     recreatedApp.deinit();
-  }).timeout(20000);
+  });
 
   it('root key replacing recovery should prompt for app passcode if enabled', async function () {
     const namespace = Factory.randomString();
@@ -350,15 +347,15 @@ describe('key recovery service', function () {
     let didPromptForPasscode = false;
     let didPromptForAccountPassword = false;
     const receiveChallenge = async (challenge) => {
-      const type = challenge.types[0];
-      if(type === ChallengeType.LocalPasscode) {
+      const prompt = challenge.prompts[0];
+      if (prompt.validation === ChallengeValidation.LocalPasscode) {
         didPromptForPasscode = true;
       } else {
         didPromptForAccountPassword = true;
       }
       application.submitValuesForChallenge(
         challenge,
-        [new ChallengeValue(type, type === ChallengeType.LocalPasscode ? passcode : this.password)]
+        [new ChallengeValue(prompt, prompt.validation === ChallengeValidation.LocalPasscode ? passcode : this.password)]
       );
     };
     await application.prepareForLaunch({ receiveChallenge });

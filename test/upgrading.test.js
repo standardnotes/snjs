@@ -7,27 +7,26 @@ const expect = chai.expect;
 describe('upgrading', () => {
 
   before(async function () {
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, this.passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, this.passcode));
         } else {
-          values.push(new ChallengeValue(type, this.password));
+          values.push(new ChallengeValue(prompt, this.password));
         }
       }
       return values;
     };
     this.receiveChallenge = async (challenge) => {
-      this.application.setChallengeCallbacks({
-        challenge,
+      this.application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           this.application.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
       });
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       this.application.submitValuesForChallenge(challenge, initialValues);
     };
     localStorage.clear();

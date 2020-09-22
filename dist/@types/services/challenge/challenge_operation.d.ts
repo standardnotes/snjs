@@ -6,30 +6,33 @@ import { ValueCallback } from "./challenge_service";
  */
 export declare class ChallengeOperation {
     challenge: Challenge;
-    resolve?: ((response: ChallengeResponse | null) => void) | undefined;
+    onValidValue: ValueCallback;
+    onInvalidValue: ValueCallback;
+    onNonvalidatedSubmit: (response: ChallengeResponse) => void;
+    onComplete: (response: ChallengeResponse) => void;
+    onCancel: () => void;
+    private nonvalidatedValues;
     private validValues;
     private invalidValues;
     private artifacts;
-    customValidator?: (values: ChallengeValue[]) => void;
-    onValidValue?: ValueCallback;
-    onInvalidValue?: ValueCallback;
-    onComplete?: () => void;
-    onCancel?: () => void;
     /**
      * @param resolve the promise resolve function to be called
      * when this challenge completes or cancels
      */
-    constructor(challenge: Challenge, resolve?: ((response: ChallengeResponse | null) => void) | undefined);
+    constructor(challenge: Challenge, onValidValue: ValueCallback, onInvalidValue: ValueCallback, onNonvalidatedSubmit: (response: ChallengeResponse) => void, onComplete: (response: ChallengeResponse) => void, onCancel: () => void);
     /**
      * Mark this challenge as complete, triggering the resolve function,
      * as well as notifying the client
      */
     complete(response?: ChallengeResponse): void;
+    nonvalidatedSubmit(): void;
     cancel(): void;
     /**
      * @returns Returns true if the challenge has received all valid responses
      */
     isFinished(): boolean;
+    private nonvalidatedPrompts;
+    addNonvalidatedValue(value: ChallengeValue): void;
     /**
      * Sets the values validation status, as well as handles subsequent actions,
      * such as completing the operation if all valid values are supplied, as well as

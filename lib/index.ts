@@ -59,9 +59,10 @@ export {
   Challenge,
   ChallengeReason,
   ChallengeResponse,
-  ChallengeType,
+  ChallengeValidation,
   challengeTypeToString,
   ChallengeValue,
+  ChallengePrompt
 } from '@Lib/challenges';
 
 export {

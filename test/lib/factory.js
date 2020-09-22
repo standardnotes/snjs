@@ -3,6 +3,7 @@
 import WebDeviceInterface from './web_device_interface.js';
 
 export const TestTimeout = 10000;
+export const LongTestTimeout = 20000;
 
 const syncOptions = {
   checkIntegrity: true,

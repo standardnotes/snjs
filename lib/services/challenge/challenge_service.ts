@@ -1,3 +1,4 @@
+import { ChallengePrompt } from './../../challenges';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
 import { PureService } from "@Lib/services/pure_service";
@@ -6,7 +7,7 @@ import { StorageValueModes } from "@Services/storage_service";
 import {
   Challenge,
   ChallengeResponse,
-  ChallengeType,
+  ChallengeValidation,
   ChallengeReason,
   ChallengeValue,
   ChallengeArtifacts,
@@ -20,6 +21,13 @@ type ChallengeValidationResponse = {
 
 export type ValueCallback = (value: ChallengeValue) => void;
 
+export type ChallengeObserver = {
+  onValidValue?: ValueCallback,
+  onInvalidValue?: ValueCallback,
+  onComplete?: (response: ChallengeResponse) => void,
+  onCancel?: () => void
+};
+
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
@@ -28,6 +36,7 @@ export class ChallengeService extends PureService {
   private protocolService?: SNProtocolService;
   private challengeOperations: Record<string, ChallengeOperation> = {};
   public sendChallenge?: (challenge: Challenge) => void;
+  private challengeObservers: Record<string, ChallengeObserver[]> = {}
 
   constructor(
     storageService: SNStorageService,
@@ -50,22 +59,8 @@ export class ChallengeService extends PureService {
    * Resolves when the challenge has been completed.
    */
   public promptForChallengeResponse(challenge: Challenge) {
-    return new Promise<ChallengeResponse | null>((resolve) => {
+    return new Promise<ChallengeResponse | undefined>((resolve) => {
       this.createOrGetChallengeOperation(challenge, resolve);
-      this.sendChallenge!(challenge);
-    });
-  }
-
-  /**
-   * Resolves when the user has submitted values which the caller can use
-   * to run custom validations.
-   */
-  public promptForChallengeResponseWithCustomValidation(challenge: Challenge) {
-    const operation: ChallengeOperation = this.createOrGetChallengeOperation(
-      challenge
-    );
-    return new Promise<ChallengeValue[]>((resolve) => {
-      operation.customValidator = resolve;
       this.sendChallenge!(challenge);
     });
   }
@@ -73,44 +68,46 @@ export class ChallengeService extends PureService {
   public validateChallengeValue(
     value: ChallengeValue
   ): Promise<ChallengeValidationResponse> {
-    switch (value.type) {
-      case ChallengeType.LocalPasscode:
+    switch (value.prompt.validation) {
+      case ChallengeValidation.LocalPasscode:
         return this.protocolService!.validatePasscode(value.value as string);
-      case ChallengeType.AccountPassword:
+      case ChallengeValidation.AccountPassword:
         return this.protocolService!.validateAccountPassword(
           value.value as string
         );
-      case ChallengeType.Biometric:
+      case ChallengeValidation.Biometric:
         return Promise.resolve({ valid: value.value === true });
       default:
-        return Promise.resolve({ valid: false });
+        throw Error(`Unhandled validation mode ${value.prompt.validation}`)
     }
   }
 
   public async getLaunchChallenge() {
-    const types = [];
+    const prompts = [];
     const hasPasscode = this.protocolService!.hasPasscode();
     if (hasPasscode) {
-      types.push(ChallengeType.LocalPasscode);
+      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
     }
     const biometricEnabled = await this.hasBiometricsEnabled()
     if (biometricEnabled) {
-      types.push(ChallengeType.Biometric);
+      prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
     }
-    if (types.length > 0) {
-      return new Challenge(types, ChallengeReason.ApplicationUnlock);
+    if (prompts.length > 0) {
+      return new Challenge(prompts, ChallengeReason.ApplicationUnlock);
     } else {
       return null;
     }
   }
 
   public async promptForPasscode() {
-    const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.ResaveRootKey);
+    const challenge = new Challenge(
+      [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
+      ChallengeReason.ResaveRootKey);
     const response = await this.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true, passcode: undefined };
     }
-    const value = response.getValueForType(ChallengeType.LocalPasscode);
+    const value = response.getValueForType(ChallengeValidation.LocalPasscode);
     return { passcode: value.value as string, canceled: false }
   }
 
@@ -142,31 +139,79 @@ export class ChallengeService extends PureService {
     );
   }
 
-  public setChallengeCallbacks(
+  public addChallengeObserver(
     challenge: Challenge,
-    onValidValue?: ValueCallback,
-    onInvalidValue?: ValueCallback,
-    onComplete?: () => void,
-    onCancel?: () => void
+    observer: ChallengeObserver
   ) {
-    const operation = this.getChallengeOperation(challenge);
-    operation.onValidValue = onValidValue;
-    operation.onInvalidValue = onInvalidValue;
-    operation.onComplete = onComplete;
-    operation.onCancel = onCancel;
+    const observers = this.challengeObservers[challenge.id] || [];
+    observers.push(observer);
+    this.challengeObservers[challenge.id] = observers;
   }
 
   private createOrGetChallengeOperation(
     challenge: Challenge,
-    resolve?: (response: ChallengeResponse | null) => void
+    resolve: (response: ChallengeResponse | undefined) => void
   ): ChallengeOperation {
     let operation = this.getChallengeOperation(challenge);
     if (!operation) {
-      operation = new ChallengeOperation(challenge, resolve);
+      operation = new ChallengeOperation(
+        challenge,
+        (value: ChallengeValue) => {
+          this.onChallengeValidValue(challenge, value);
+        },
+        (value: ChallengeValue) => {
+          this.onChallengeInvalidValue(challenge, value);
+        },
+        (response: ChallengeResponse) => {
+          this.onChallengeNonvalidatedSubmit(challenge, response);
+          resolve(response);
+        },
+        (response: ChallengeResponse) => {
+          this.onChallengeComplete(challenge, response);
+          resolve(response);
+        },
+        () => {
+          this.onChallengeCancel(challenge);
+          resolve(undefined);
+        }
+      );
       this.challengeOperations[challenge.id] = operation;
     }
-    operation.resolve = resolve;
     return operation;
+  }
+
+  private performOnObservers(challenge: Challenge, perform: (observer: ChallengeObserver) => void) {
+    const observers = this.challengeObservers[challenge.id] || [];
+    for (const observer of observers) {
+      perform(observer);
+    }
+  }
+
+  private onChallengeValidValue(challenge: Challenge, value: ChallengeValue) {
+    this.performOnObservers(challenge, (observer) => {
+      observer.onValidValue?.(value);
+    })
+  }
+
+  private onChallengeInvalidValue(challenge: Challenge, value: ChallengeValue) {
+    this.performOnObservers(challenge, (observer) => {
+      observer.onInvalidValue?.(value);
+    })
+  }
+
+  private onChallengeNonvalidatedSubmit(_challenge: Challenge, _response: ChallengeResponse) {
+  }
+
+  private onChallengeComplete(challenge: Challenge, response: ChallengeResponse) {
+    this.performOnObservers(challenge, (observer) => {
+      observer.onComplete?.(response);
+    })
+  }
+
+  private onChallengeCancel(challenge: Challenge) {
+    this.performOnObservers(challenge, (observer) => {
+      observer.onCancel?.();
+    })
   }
 
   private getChallengeOperation(challenge: Challenge) {
@@ -190,11 +235,11 @@ export class ChallengeService extends PureService {
     if (values.length === 0) {
       throw Error("Attempting to submit 0 values for challenge");
     }
-    const operation = this.getChallengeOperation(challenge);
-    if (operation.customValidator) {
-      operation.customValidator(values);
-    } else {
-      for (const value of values) {
+    for (const value of values) {
+      if (!value.prompt.validates) {
+        const operation = this.getChallengeOperation(challenge);
+        operation.addNonvalidatedValue(value);
+      } else {
         const { valid, artifacts } = await this.validateChallengeValue(value);
         this.setValidationStatusForChallenge(
           challenge,
@@ -216,6 +261,7 @@ export class ChallengeService extends PureService {
     operation.setValueStatus(value, valid, artifacts);
     if (operation.isFinished()) {
       this.deleteChallengeOperation(operation);
+      delete this.challengeObservers[operation.challenge.id];
     }
   }
 }

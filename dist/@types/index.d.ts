@@ -28,7 +28,7 @@ export { ChallengeService } from './services/challenge/challenge_service';
 export { PureService } from './services/pure_service';
 export { ApplicationService } from './services/application_service';
 export { SNStorageService, StoragePersistencePolicies, StorageEncryptionPolicies, StorageValueModes, ValueModesKeys } from './services/storage_service';
-export { Challenge, ChallengeReason, ChallengeResponse, ChallengeType, challengeTypeToString, ChallengeValue, } from './challenges';
+export { Challenge, ChallengeReason, ChallengeResponse, ChallengeValidation, challengeTypeToString, ChallengeValue, ChallengePrompt } from './challenges';
 export { SNSyncService, SyncSources, SyncModes, SyncQueueStrategy, } from './services/sync/sync_service';
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
 export { SNSessionManager } from './services/api/session_manager';

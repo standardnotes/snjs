@@ -1,9 +1,9 @@
-import { removeFromArray } from "@Lib/utils";
+import { isNullOrUndefined, removeFromArray } from "@Lib/utils";
 import {
   Challenge,
   ChallengeResponse,
   ChallengeValue,
-  ChallengeArtifacts,
+  ChallengeArtifacts
 } from "@Lib/challenges";
 import { ValueCallback } from "./challenge_service";
 
@@ -12,16 +12,10 @@ import { ValueCallback } from "./challenge_service";
  * When its values are updated, it will trigger the associated callbacks (valid/invalid/complete)
  */
 export class ChallengeOperation {
+  private nonvalidatedValues: ChallengeValue[] = [];
   private validValues: ChallengeValue[] = [];
   private invalidValues: ChallengeValue[] = [];
   private artifacts: ChallengeArtifacts = {};
-
-  public customValidator?: (values: ChallengeValue[]) => void;
-
-  public onValidValue?: ValueCallback;
-  public onInvalidValue?: ValueCallback;
-  public onComplete?: () => void;
-  public onCancel?: () => void;
 
   /**
    * @param resolve the promise resolve function to be called
@@ -29,8 +23,12 @@ export class ChallengeOperation {
    */
   constructor(
     public challenge: Challenge,
-    public resolve?: (response: ChallengeResponse | null) => void
-  ) {}
+    public onValidValue: ValueCallback,
+    public onInvalidValue: ValueCallback,
+    public onNonvalidatedSubmit: (response: ChallengeResponse) => void,
+    public onComplete: (response: ChallengeResponse) => void,
+    public onCancel: () => void,
+  ) { }
 
   /**
    * Mark this challenge as complete, triggering the resolve function,
@@ -44,12 +42,19 @@ export class ChallengeOperation {
         this.artifacts
       );
     }
-    this.resolve?.(response);
-    this.onComplete?.();
+    this.onComplete?.(response);
+  }
+
+  public nonvalidatedSubmit() {
+    const response = new ChallengeResponse(
+      this.challenge,
+      this.nonvalidatedValues,
+      this.artifacts
+    );
+    this.onNonvalidatedSubmit?.(response);
   }
 
   public cancel() {
-    this.resolve?.(null);
     this.onCancel?.();
   }
 
@@ -57,7 +62,18 @@ export class ChallengeOperation {
    * @returns Returns true if the challenge has received all valid responses
    */
   public isFinished() {
-    return this.validValues.length === this.challenge.types.length;
+    return this.validValues.length === this.challenge.prompts.length;
+  }
+
+  private nonvalidatedPrompts() {
+    return this.challenge.prompts.filter(p => !p.validates);
+  }
+
+  public addNonvalidatedValue(value: ChallengeValue) {
+    this.nonvalidatedValues.push(value);
+    if (this.nonvalidatedValues.length === this.nonvalidatedPrompts().length) {
+      this.nonvalidatedSubmit();
+    }
   }
 
   /**
@@ -71,7 +87,7 @@ export class ChallengeOperation {
     artifacts?: ChallengeArtifacts
   ) {
     const valuesArray = valid ? this.validValues : this.invalidValues;
-    const matching = valuesArray.find((v) => v.type === value.type);
+    const matching = valuesArray.find((v) => v.prompt.validation === value.prompt.validation);
     if (matching) {
       removeFromArray(valuesArray, matching);
     }

@@ -3,11 +3,11 @@ export declare type ChallengeArtifacts = {
     wrappingKey?: SNRootKey;
     rootKey?: SNRootKey;
 };
-export declare enum ChallengeType {
+export declare enum ChallengeValidation {
+    None = 0,
     LocalPasscode = 1,
     AccountPassword = 2,
-    Biometric = 3,
-    Custom = 4
+    Biometric = 3
 }
 /** The source of the challenge */
 export declare enum ChallengeReason {
@@ -22,37 +22,43 @@ export declare enum ChallengeReason {
  * in order to proceed.
  */
 export declare class Challenge {
-    readonly types: ChallengeType[];
+    readonly prompts: ChallengePrompt[];
     readonly reason: ChallengeReason;
-    /** A prompt is akin to the modal title */
-    readonly customPrompt?: string | undefined;
-    /** A reason is akin to the modal subtitle */
-    readonly customReason?: string | undefined;
-    /** The name of the input fields to correspond with `types`, if using custom prompts */
-    readonly customInputNames?: string[] | undefined;
+    readonly _title?: string | undefined;
+    readonly _subtitle?: string | undefined;
     readonly id: number;
-    constructor(types: ChallengeType[], reason: ChallengeReason, 
-    /** A prompt is akin to the modal title */
-    customPrompt?: string | undefined, 
-    /** A reason is akin to the modal subtitle */
-    customReason?: string | undefined, 
-    /** The name of the input fields to correspond with `types`, if using custom prompts */
-    customInputNames?: string[] | undefined);
+    constructor(prompts: ChallengePrompt[], reason: ChallengeReason, _title?: string | undefined, _subtitle?: string | undefined);
+    get title(): string;
+    get subtitle(): string | undefined;
+    hasPromptForValidationType(type: ChallengeValidation): boolean;
+}
+/**
+ * A Challenge can have many prompts. Each prompt represents a unique input,
+ * such as a text field, or biometric scanner.
+ */
+export declare class ChallengePrompt {
+    readonly validation: ChallengeValidation;
+    readonly title?: string | undefined;
+    readonly placeholder?: string | undefined;
+    readonly secureTextEntry: boolean;
+    readonly id: number;
+    constructor(validation: ChallengeValidation, title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean);
+    get validates(): boolean;
 }
 export declare class ChallengeValue {
-    readonly type: ChallengeType;
+    readonly prompt: ChallengePrompt;
     readonly value: string | boolean;
-    constructor(type: ChallengeType, value: string | boolean);
+    constructor(prompt: ChallengePrompt, value: string | boolean);
 }
 export declare class ChallengeResponse {
     readonly challenge: Challenge;
     readonly values: ChallengeValue[];
     readonly artifacts?: ChallengeArtifacts | undefined;
     constructor(challenge: Challenge, values: ChallengeValue[], artifacts?: ChallengeArtifacts | undefined);
-    getValueForType(type: ChallengeType): ChallengeValue;
+    getValueForType(type: ChallengeValidation): ChallengeValue;
     getDefaultValue(): ChallengeValue;
 }
 /**
  * @returns The UI-friendly title for this challenge
  */
-export declare function challengeTypeToString(type: ChallengeType): string;
+export declare function challengeTypeToString(type: ChallengeValidation): string;

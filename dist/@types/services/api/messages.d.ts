@@ -40,3 +40,18 @@ export declare const KeyRecoveryStrings: {
     KeyRecoveryKeyRecovered: string;
     KeyRecoveryUnableToRecover: string;
 };
+export declare const SessionStrings: {
+    EnterEmailAndPassword: string;
+    RecoverSession: string;
+    SessionRestored: string;
+    EnterMfa: string;
+    EmailInputPlaceholder: string;
+    PasswordInputPlaceholder: string;
+};
+export declare const ChallengeStrings: {
+    UnlockApplication: string;
+    EnterAccountPassword: string;
+    EnterLocalPasscode: string;
+    EnterPasscodeForMigration: string;
+    EnterPasscodeForLoginRegister: string;
+};

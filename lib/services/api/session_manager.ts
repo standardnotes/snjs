@@ -1,7 +1,7 @@
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { ProtocolVersion } from '@Protocol/versions';
-import { Challenge } from '@Lib/challenges';
-import { ChallengeType, ChallengeReason } from './../../challenges';
+import { Challenge, ChallengePrompt } from '@Lib/challenges';
+import { ChallengeValidation, ChallengeReason } from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, TokenSession } from './session';
 import { RegistrationResponse, SignInResponse, ChangePasswordResponse, HttpResponse } from './responses';
@@ -16,6 +16,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
+import { SessionStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -38,6 +39,7 @@ type User = {
 export class SNSessionManager extends PureService {
 
   private user?: User
+  private isSessionRenewChallengePresented = false;
 
   constructor(
     private storageService: SNStorageService,
@@ -102,33 +104,58 @@ export class SNSessionManager extends PureService {
   }
 
   private async reauthenticateInvalidSession() {
+    if (this.isSessionRenewChallengePresented) {
+      return;
+    }
+    this.isSessionRenewChallengePresented = true;
     const challenge = new Challenge(
-      [ChallengeType.Custom, ChallengeType.Custom],
+      [
+        new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false),
+        new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)
+      ],
       ChallengeReason.Custom,
-      `Please enter your account email and password.`,
-      `Your credentials are needed to refresh your session with the server.`,
-      [`Email`, `Password`]
+      SessionStrings.EnterEmailAndPassword,
+      SessionStrings.RecoverSession
     );
-    const response = await this.challengeService
-      .promptForChallengeResponseWithCustomValidation(challenge);
-    const email = response[0]?.value as string;
-    const password = response[1]?.value as string;
+    this.challengeService.addChallengeObserver(
+      challenge,
+      {
+        onCancel: () => {
+          this.isSessionRenewChallengePresented = false;
+        }
+      })
+    const challengeResponse = await this.challengeService
+      .promptForChallengeResponse(challenge);
+    const email = challengeResponse?.values[0]?.value as string;
+    const password = challengeResponse?.values[1]?.value as string;
     if (!email || !password) {
       return;
     }
     const currentKeyParams = await this.protocolService.getAccountKeyParams();
-    await this.signIn(email, password, false, currentKeyParams!.version);
+    const signInResult = await this.signIn(email, password, false, currentKeyParams!.version);
+    if (signInResult.response.error) {
+      this.challengeService.setValidationStatusForChallenge(
+        challenge,
+        challengeResponse!.values[1],
+        false
+      );
+    } else {
+      this.challengeService.cancelChallenge(challenge);
+      this.alertService!.alert(
+        SessionStrings.SessionRestored
+      );
+    }
   }
 
   async promptForMfaValue(): Promise<string | undefined> {
     const challenge = new Challenge(
-      [ChallengeType.Custom],
+      [new ChallengePrompt(ChallengeValidation.None)],
       ChallengeReason.Custom,
-      `Please enter your two-factor authentication code.`
+      SessionStrings.EnterMfa
     );
     const response = await this.challengeService
-      .promptForChallengeResponseWithCustomValidation(challenge);
-    return response[0]?.value as string;
+      .promptForChallengeResponse(challenge);
+    return response?.values[0]?.value as string;
   }
 
   async register(email: string, password: string): Promise<SessionManagerResponse> {
@@ -305,7 +332,7 @@ export class SNSessionManager extends PureService {
 
   private async handleSuccessAuthResponse(
     response: RegistrationResponse | SignInResponse | ChangePasswordResponse
-    ) {
+  ) {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);

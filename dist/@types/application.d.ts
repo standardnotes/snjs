@@ -11,7 +11,7 @@ import { SNItem, ItemMutator } from './models/core/item';
 import { SNPredicate } from './models/core/predicate';
 import { PurePayload } from './protocol/payloads/pure_payload';
 import { Challenge, ChallengeResponse, ChallengeValue } from './challenges';
-import { ValueCallback } from './services/challenge/challenge_service';
+import { ChallengeObserver } from './services/challenge/challenge_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { ContentType } from './models/content_types';
@@ -295,14 +295,8 @@ export declare class SNApplication {
      * to finish tasks. 0 means no limit.
      */
     prepareForDeinit(maxWait?: number): Promise<void>;
-    promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | null>;
-    setChallengeCallbacks({ challenge, onValidValue, onInvalidValue, onComplete, onCancel }: {
-        challenge: Challenge;
-        onValidValue?: ValueCallback;
-        onInvalidValue?: ValueCallback;
-        onComplete?: () => void;
-        onCancel?: () => void;
-    }): void;
+    promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | undefined>;
+    addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): void;
     submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
     cancelChallenge(challenge: Challenge): void;
     /** Set a function to be called when this application deinits */

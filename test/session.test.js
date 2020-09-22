@@ -373,8 +373,8 @@ describe('server session', function () {
       appA.submitValuesForChallenge(
         challenge,
         [
-          new ChallengeValue(challenge.types[0], email),
-          new ChallengeValue(challenge.types[1], password),
+          new ChallengeValue(challenge.prompts[0], email),
+          new ChallengeValue(challenge.prompts[1], password),
         ]
       );
     };

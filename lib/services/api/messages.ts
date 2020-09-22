@@ -61,8 +61,25 @@ export const KeyRecoveryStrings = {
   KeyRecoveryRootKeyReplaced: 'Your credentials have successfully been updated.',
   KeyRecoveryPasscodeRequiredTitle: 'Passcode Required',
   KeyRecoveryPasscodeRequiredText: 'You must enter your passcode in order to save your new credentials.',
-  KeyRecoveryPasswordRequired: `Your account password is required to recover an encryption key.`,
+  KeyRecoveryPasswordRequired: 'Your account password is required to recover an encryption key.',
   KeyRecoveryKeyRecovered: 'Your key has successfully been recovered.',
   KeyRecoveryUnableToRecover: 'Unable to recover your key with the attempted password. Please try again.',
+}
+
+export const SessionStrings = {
+  EnterEmailAndPassword: 'Please enter your account email and password.',
+  RecoverSession: 'Your credentials are needed to refresh your session with the server.',
+  SessionRestored: 'Your session has been succesfully restored.',
+  EnterMfa: 'Please enter your two-factor authentication code.',
+  EmailInputPlaceholder: 'Email',
+  PasswordInputPlaceholder: 'Email',
+}
+
+export const ChallengeStrings = {
+ UnlockApplication: 'Enter your application passcode to unlock the application',
+ EnterAccountPassword: 'Enter your account password',
+ EnterLocalPasscode: 'Enter your application passcode',
+ EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
+ EnterPasscodeForLoginRegister: 'Enter your application passcode before signing in or registering',
 }
 

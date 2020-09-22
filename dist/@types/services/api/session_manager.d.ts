@@ -30,6 +30,7 @@ export declare class SNSessionManager extends PureService {
     private protocolService;
     private challengeService;
     private user?;
+    private isSessionRenewChallengePresented;
     constructor(storageService: SNStorageService, apiService: SNApiService, alertService: SNAlertService, protocolService: SNProtocolService, challengeService: ChallengeService);
     deinit(): void;
     initializeFromDisk(): Promise<void>;

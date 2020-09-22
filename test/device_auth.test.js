@@ -29,26 +29,24 @@ describe('device authentication', () => {
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
     let numPasscodeAttempts = 0;
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      tmpApplication.setChallengeCallbacks({
-        challenge,
+      tmpApplication.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           tmpApplication.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
       });
-      await Factory.sleep(0);
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       tmpApplication.submitValuesForChallenge(challenge, initialValues);
     };
     await tmpApplication.prepareForLaunch({ receiveChallenge });
@@ -67,41 +65,39 @@ describe('device authentication', () => {
     await application.setPasscode(passcode);
     await application.challengeService.enableBiometrics();
     expect(await application.hasPasscode()).to.equal(true);
-    expect(((await application.challengeService.getLaunchChallenge()).types.length)).to.equal(2);
+    expect(((await application.challengeService.getLaunchChallenge()).prompts.length)).to.equal(2);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.deinit();
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
     let numPasscodeAttempts = 1;
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          const response = new ChallengeValue(type, numPasscodeAttempts < 2 ? wrongPasscode : passcode);
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.LocalPasscode) {
+          const response = new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode);
           values.push(response);
-        } else if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        } else if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      tmpApplication.setChallengeCallbacks({
-        challenge,
+      tmpApplication.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           tmpApplication.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
       });
-      await Factory.sleep(0);
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       tmpApplication.submitValuesForChallenge(challenge, initialValues);
     };
     await tmpApplication.prepareForLaunch({ receiveChallenge });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
-    expect(((await tmpApplication.challengeService.getLaunchChallenge()).types.length)).to.equal(2);
+    expect(((await tmpApplication.challengeService.getLaunchChallenge()).prompts.length)).to.equal(2);
     await tmpApplication.launch(true);
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
     expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
@@ -133,26 +129,24 @@ describe('device authentication', () => {
     let numPasscodeAttempts = 1;
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      tmpApplication.setChallengeCallbacks({
-        challenge,
+      tmpApplication.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           tmpApplication.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
       });
-      await Factory.sleep(0);
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       tmpApplication.submitValuesForChallenge(challenge, initialValues);
     };
     await tmpApplication.prepareForLaunch({

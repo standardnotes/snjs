@@ -7,6 +7,12 @@ declare type ChallengeValidationResponse = {
     artifacts?: ChallengeArtifacts;
 };
 export declare type ValueCallback = (value: ChallengeValue) => void;
+export declare type ChallengeObserver = {
+    onValidValue?: ValueCallback;
+    onInvalidValue?: ValueCallback;
+    onComplete?: (response: ChallengeResponse) => void;
+    onCancel?: () => void;
+};
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
@@ -15,18 +21,14 @@ export declare class ChallengeService extends PureService {
     private protocolService?;
     private challengeOperations;
     sendChallenge?: (challenge: Challenge) => void;
+    private challengeObservers;
     constructor(storageService: SNStorageService, protocolService: SNProtocolService);
     /** @override */
     deinit(): void;
     /**
      * Resolves when the challenge has been completed.
      */
-    promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | null>;
-    /**
-     * Resolves when the user has submitted values which the caller can use
-     * to run custom validations.
-     */
-    promptForChallengeResponseWithCustomValidation(challenge: Challenge): Promise<ChallengeValue[]>;
+    promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined>;
     validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse>;
     getLaunchChallenge(): Promise<Challenge | null>;
     promptForPasscode(): Promise<{
@@ -40,8 +42,14 @@ export declare class ChallengeService extends PureService {
     hasBiometricsEnabled(): Promise<boolean>;
     enableBiometrics(): Promise<void>;
     disableBiometrics(): Promise<void>;
-    setChallengeCallbacks(challenge: Challenge, onValidValue?: ValueCallback, onInvalidValue?: ValueCallback, onComplete?: () => void, onCancel?: () => void): void;
+    addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): void;
     private createOrGetChallengeOperation;
+    private performOnObservers;
+    private onChallengeValidValue;
+    private onChallengeInvalidValue;
+    private onChallengeNonvalidatedSubmit;
+    private onChallengeComplete;
+    private onChallengeCancel;
     private getChallengeOperation;
     private deleteChallengeOperation;
     cancelChallenge(challenge: Challenge): void;

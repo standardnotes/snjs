@@ -8,7 +8,7 @@ import { SNStorageService, StorageValueModes } from './storage_service';
 import { SNRootKeyParams } from './../protocol/key_params';
 import { SNSessionManager } from './api/session_manager';
 import { PayloadManager } from './model_manager';
-import { Challenge, ChallengeType, ChallengeReason } from './../challenges';
+import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from './../challenges';
 import { SNAlertService } from './alert_service';
 import { ChallengeService } from './challenge/challenge_service';
 import { SNRootKey } from '@Protocol/root_key';
@@ -264,14 +264,24 @@ export class SNKeyRecoveryService extends PureService {
   async performServerSignIn(keyParams: SNRootKeyParams): Promise<void> {
     /** Get the user's account password */
     const challenge = new Challenge(
-      [ChallengeType.Custom],
+      [
+        new ChallengePrompt(
+          ChallengeValidation.None,
+          undefined,
+          undefined,
+          true
+        )
+      ],
       ChallengeReason.Custom,
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
       KeyRecoveryStrings.KeyRecoveryLoginFlowReason,
     );
     const challengeResponse = await this.challengeService
-      .promptForChallengeResponseWithCustomValidation(challenge);
-    const password = challengeResponse[0]?.value as string;
+      .promptForChallengeResponse(challenge);
+    if (!challengeResponse) {
+      return;
+    }
+    const password = challengeResponse.values[0].value as string;
     if (!password) {
       return;
     }
@@ -348,17 +358,24 @@ export class SNKeyRecoveryService extends PureService {
       return { success: false };
     }
     const challenge = new Challenge(
-      [ChallengeType.Custom],
+      [
+        new ChallengePrompt(
+          ChallengeValidation.None,
+          undefined,
+          undefined,
+          true
+        )
+      ],
       ChallengeReason.Custom,
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
       KeyRecoveryStrings.KeyRecoveryPasswordRequired
     );
     const response = await this.challengeService
-      .promptForChallengeResponseWithCustomValidation(challenge);
-    const password = response[0]?.value as string;
-    if (!password) {
+      .promptForChallengeResponse(challenge);
+    if (!response) {
       return { success: false };
     }
+    const password = response.values[0].value as string;
     /** Generate a root key using the input */
     const rootKey = await this.protocolService.computeRootKey(
       password,

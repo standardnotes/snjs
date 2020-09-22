@@ -114,22 +114,21 @@ describe('2020-01-15 mobile migration', () => {
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      const initialValues = promptForValuesForTypes(challenge.types);
-      await Factory.sleep(0);
-      application.submitValuesForChallenge(challenge, initialValues);
+      const values = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, values);
     };
     await application.prepareForLaunch({
       receiveChallenge
@@ -233,29 +232,28 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
 
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      application.setChallengeCallbacks({
-        challenge,
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           application.submitValuesForChallenge(challenge, values);
         },
       });
       await Factory.sleep(0);
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
@@ -358,27 +356,26 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      application.setChallengeCallbacks({
-        challenge,
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           application.submitValuesForChallenge(challenge, values);
         },
       });
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
@@ -460,27 +457,26 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      application.setChallengeCallbacks({
-        challenge,
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           application.submitValuesForChallenge(challenge, values);
         },
       });
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({

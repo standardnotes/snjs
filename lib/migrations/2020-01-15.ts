@@ -1,3 +1,4 @@
+import { ChallengeStrings } from './../services/api/messages';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
@@ -6,7 +7,7 @@ import { EncryptionIntent } from './../protocol/intents';
 import { ProtocolVersion } from './../protocol/versions';
 import { ApplicationStage } from '@Lib/stages';
 import { StorageKey, RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { Challenge, ChallengeType, ChallengeReason } from './../challenges';
+import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from './../challenges';
 import { FillItemContent } from '@Models/functions';
 import { PurePayload } from '@Payloads/pure_payload';
 import { StorageValuesObject, SNStorageService } from './../services/storage_service';
@@ -182,10 +183,18 @@ export class Migration20200115 extends Migration {
     let decryptedStoragePayload: PurePayload | undefined;
     let errorDecrypting = true;
     let passcodeKey: SNRootKey;
-    const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
+    const challenge = new Challenge(
+      [new ChallengePrompt(ChallengeValidation.None)],
+      ChallengeReason.Migration,
+      ChallengeStrings.EnterLocalPasscode
+    );
     while (errorDecrypting) {
-      const [value] = await this.services.challengeService
-        .promptForChallengeResponseWithCustomValidation!(challenge);
+      const response = await this.services.challengeService.promptForChallengeResponse(challenge);
+      if (!response) {
+        /** Prompt again if canceled */
+        continue;
+      }
+      const value = response.values[0];
       const passcode = value.value as string;
       passcodeKey = await this.services.protocolService.computeRootKey(
         passcode,
@@ -330,10 +339,19 @@ export class Migration20200115 extends Migration {
         /** Validate current passcode by comparing against keychain offline.pw value */
         const pwHash = keychainValue.offline.pw;
         let passcodeKey: SNRootKey;
-        const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
+        const challenge = new Challenge(
+          [new ChallengePrompt(ChallengeValidation.None)],
+          ChallengeReason.Migration,
+          ChallengeStrings.EnterLocalPasscode
+        );
         while (!passcodeKey! || passcodeKey!.serverPassword !== pwHash) {
-          const [value] = await this.services.challengeService
-            .promptForChallengeResponseWithCustomValidation!(challenge);
+          const response = await this.services.challengeService
+            .promptForChallengeResponse!(challenge);
+          if (!response) {
+            /** Prompt again if canceled */
+            continue;
+          }
+          const value = response.values[0];
           const passcode = value.value as string;
           passcodeKey = await this.services.protocolService.computeRootKey(
             passcode,

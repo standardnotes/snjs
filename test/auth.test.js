@@ -192,28 +192,30 @@ describe('basic auth', () => {
 
   it('successfully changes password when passcode is set', async function () {
     const passcode = 'passcode';
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         } else {
-          values.push(new ChallengeValue(type, this.password));
+          values.push(new ChallengeValue(prompt, this.password));
         }
       }
       return values;
     };
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
-        this.application.setChallengeCallbacks({
+        this.application.addChallengeObserver(
           challenge,
-          onInvalidValue: (value) => {
-            const values = promptForValuesForTypes([value.type]);
-            this.application.submitValuesForChallenge(challenge, values);
-            numPasscodeAttempts++;
-          },
-        });
-        const initialValues = promptForValuesForTypes(challenge.types);
+          {
+            onInvalidValue: (value) => {
+              const values = promptValueReply([value.prompt]);
+              this.application.submitValuesForChallenge(challenge, values);
+              numPasscodeAttempts++;
+            },
+          }
+        );
+        const initialValues = promptValueReply(challenge.prompts);
         this.application.submitValuesForChallenge(challenge, initialValues);
       }
     });
