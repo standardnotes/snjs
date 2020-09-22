@@ -17,7 +17,8 @@ export declare enum ApplicationEvent {
      */
     Started = 10,
     /**
-     * The application has started `prepareForLaunch` and completed base migration.
+     * The application has loaded all pending migrations (but not run any, except for the base one),
+     * and consumers may now call `hasPendingMigrations`
      */
     MigrationsLoaded = 23,
     /**
