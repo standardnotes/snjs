@@ -72,7 +72,7 @@ export const SessionStrings = {
   SessionRestored: 'Your session has been succesfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
   EmailInputPlaceholder: 'Email',
-  PasswordInputPlaceholder: 'Email',
+  PasswordInputPlaceholder: 'Password',
 }
 
 export const ChallengeStrings = {

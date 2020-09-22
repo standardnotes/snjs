@@ -19402,7 +19402,7 @@ const SessionStrings = {
   SessionRestored: 'Your session has been succesfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
   EmailInputPlaceholder: 'Email',
-  PasswordInputPlaceholder: 'Email'
+  PasswordInputPlaceholder: 'Password'
 };
 const ChallengeStrings = {
   UnlockApplication: 'Enter your application passcode to unlock the application',
