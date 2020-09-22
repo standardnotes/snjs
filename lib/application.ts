@@ -1250,7 +1250,7 @@ export class SNApplication {
       SETTING_PASSCODE,
     );
     try {
-      await this.setPasscodeWithoutWarning(passcode, false);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.Passcode);
     } finally {
       dismissBlockingDialog();
     }
@@ -1275,18 +1275,18 @@ export class SNApplication {
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(passcode, true);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeChange);
     } finally {
       dismissBlockingDialog();
     }
   }
 
-  private async setPasscodeWithoutWarning(passcode: string, changing: boolean) {
+  private async setPasscodeWithoutWarning(passcode: string, origination: KeyParamsOrigination) {
     const identifier = await this.generateUuid();
     const key = await this.protocolService!.createRootKey(
       identifier,
       passcode,
-      changing ? KeyParamsOrigination.PasscodeChange : KeyParamsOrigination.Passcode
+      origination
     );
     await this.protocolService!.setNewRootKeyWrapper(key);
     await this.rewriteItemsKeys();
