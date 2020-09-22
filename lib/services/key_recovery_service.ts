@@ -282,9 +282,6 @@ export class SNKeyRecoveryService extends PureService {
       return;
     }
     const password = challengeResponse.values[0].value as string;
-    if (!password) {
-      return;
-    }
     /** Generate a root key using the input */
     const rootKey = await this.protocolService.computeRootKey(
       password,
