@@ -195,8 +195,8 @@ export class SNApplication {
       });
     this.createdNewDatabase = databaseResult?.isNewDatabase || false;
     await this.migrationService!.initialize();
+    await this.notifyEvent(ApplicationEvent.MigrationsLoaded);
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
-    await this.notifyEvent(ApplicationEvent.PreparingForLaunch);
     await this.storageService!.initializeFromDisk();
     await this.protocolService!.initialize();
     await this.handleStage(ApplicationStage.ReadyForLaunch_05);

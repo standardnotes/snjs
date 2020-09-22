@@ -22,7 +22,7 @@ export enum ApplicationEvent {
   /**
    * The application has started `prepareForLaunch` and completed base migration.
    */
-  PreparingForLaunch = 23,
+  MigrationsLoaded = 23,
   /**
    * The applicaiton is fully unlocked and ready for i/o
    * Called when the application has been fully decrypted and unlocked. Use this to
