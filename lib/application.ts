@@ -1185,9 +1185,6 @@ export class SNApplication {
     if (result.response.error) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });
-    } else {
-      const expandedRootKey = await SNRootKey.ExpandedCopy(newRootKey, result.keyParams);
-      await this.protocolService.setNewRootKey(expandedRootKey, wrappingKey);
     }
 
     this.unlockSyncing();
