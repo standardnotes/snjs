@@ -1250,7 +1250,7 @@ export class SNApplication {
       SETTING_PASSCODE,
     );
     try {
-      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.Passcode);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeCreate);
     } finally {
       dismissBlockingDialog();
     }

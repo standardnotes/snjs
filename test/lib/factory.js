@@ -70,7 +70,7 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
   const key = await operator.createRootKey(
     identifier,
     passcode,
-    KeyParamsOrigination.Passcode
+    KeyParamsOrigination.PasscodeCreate
   );
   await application.protocolService.setNewRootKeyWrapper(
     key

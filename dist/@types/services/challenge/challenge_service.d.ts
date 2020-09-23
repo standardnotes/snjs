@@ -54,6 +54,7 @@ export declare class ChallengeService extends PureService {
     private getChallengeOperation;
     private deleteChallengeOperation;
     cancelChallenge(challenge: Challenge): void;
+    completeChallenge(challenge: Challenge): void;
     submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
     setValidationStatusForChallenge(challenge: Challenge, value: ChallengeValue, valid: boolean, artifacts?: ChallengeArtifacts): void;
 }

@@ -9775,7 +9775,7 @@ var KeyParamsOrigination;
   KeyParamsOrigination["EmailChange"] = "email-change";
   KeyParamsOrigination["PasswordChange"] = "password-change";
   KeyParamsOrigination["ProtocolUpgrade"] = "protocol-upgrade";
-  KeyParamsOrigination["Passcode"] = "passcode";
+  KeyParamsOrigination["PasscodeCreate"] = "passcode-create";
   KeyParamsOrigination["PasscodeChange"] = "passcode-change";
 })(KeyParamsOrigination || (KeyParamsOrigination = {}));
 
@@ -12571,7 +12571,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
     /** Dismiss challenge */
 
 
-    this.challengeService.cancelChallenge(challenge);
+    this.challengeService.completeChallenge(challenge);
     const password = response.values[0].value;
     /** Generate a root key using the input */
 
@@ -12988,7 +12988,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
         if (signInResult.response.error) {
           this.challengeService.setValidationStatusForChallenge(challenge, challengeResponse.values[1], false);
         } else {
-          this.challengeService.cancelChallenge(challenge);
+          this.challengeService.completeChallenge(challenge);
           this.alertService.alert(SessionStrings.SessionRestored);
         }
       }
@@ -13001,7 +13001,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (response) {
-      this.challengeService.cancelChallenge(challenge);
+      this.challengeService.completeChallenge(challenge);
       return response.values[0].value;
     }
   }
@@ -22685,6 +22685,12 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     this.deleteChallengeOperation(operation);
   }
 
+  completeChallenge(challenge) {
+    const operation = this.challengeOperations[challenge.id];
+    operation.complete();
+    this.deleteChallengeOperation(operation);
+  }
+
   async submitValuesForChallenge(challenge, values) {
     if (values.length === 0) {
       throw Error("Attempting to submit 0 values for challenge");
@@ -23908,7 +23914,7 @@ class application_SNApplication {
     const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, SETTING_PASSCODE);
 
     try {
-      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.Passcode);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeCreate);
     } finally {
       dismissBlockingDialog();
     }

@@ -16,7 +16,7 @@ export declare enum KeyParamsOrigination {
     EmailChange = "email-change",
     PasswordChange = "password-change",
     ProtocolUpgrade = "protocol-upgrade",
-    Passcode = "passcode",
+    PasscodeCreate = "passcode-create",
     PasscodeChange = "passcode-change"
 }
 declare type BaseKeyParams = {

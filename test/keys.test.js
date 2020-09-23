@@ -338,7 +338,7 @@ describe('keys', function () {
 
     expect(authenticatedData.kp).to.be.ok;
     expect(authenticatedData.kp).to.eql(rootKeyParams.getPortableValue());
-    expect(authenticatedData.kp.origination).to.equal(KeyParamsOrigination.Passcode);
+    expect(authenticatedData.kp.origination).to.equal(KeyParamsOrigination.PasscodeCreate);
   });
 
   it('correctly validates local passcode', async function () {

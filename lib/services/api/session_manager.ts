@@ -135,7 +135,7 @@ export class SNSessionManager extends PureService {
               false
             );
           } else {
-            this.challengeService.cancelChallenge(challenge);
+            this.challengeService.completeChallenge(challenge);
             this.alertService!.alert(
               SessionStrings.SessionRestored
             );
@@ -155,7 +155,7 @@ export class SNSessionManager extends PureService {
     const response = await this.challengeService
       .promptForChallengeResponse(challenge);
     if (response) {
-      this.challengeService.cancelChallenge(challenge);
+      this.challengeService.completeChallenge(challenge);
       return response.values[0].value as string;
     }
   }

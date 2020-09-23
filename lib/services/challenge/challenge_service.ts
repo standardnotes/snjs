@@ -232,6 +232,12 @@ export class ChallengeService extends PureService {
     this.deleteChallengeOperation(operation);
   }
 
+  public completeChallenge(challenge: Challenge) {
+    const operation = this.challengeOperations[challenge.id];
+    operation.complete();
+    this.deleteChallengeOperation(operation);
+  }
+
   public async submitValuesForChallenge(
     challenge: Challenge,
     values: ChallengeValue[]

@@ -426,7 +426,7 @@ export class SNKeyRecoveryService extends PureService {
     }
 
     /** Dismiss challenge */
-    this.challengeService.cancelChallenge(challenge);
+    this.challengeService.completeChallenge(challenge);
 
     const password = response!.values[0].value as string;
     /** Generate a root key using the input */
