@@ -9826,11 +9826,9 @@ var MobilePrefKey;
 (function (MobilePrefKey) {
   MobilePrefKey["SortNotesBy"] = "mobileSortBy";
   MobilePrefKey["SortNotesReverse"] = "mobileSortReverse";
-  MobilePrefKey["NotesHideTags"] = "mobileHideTags";
   MobilePrefKey["NotesHideNotePreview"] = "mobileHideNotePreview";
   MobilePrefKey["NotesHideDate"] = "mobileHideDate";
-  MobilePrefKey["DarkTheme"] = "mobileDarkTheme";
-  MobilePrefKey["LightTgeme"] = "mobileLightTheme";
+  MobilePrefKey["LastExportDate"] = "mobileLastExportDate";
   MobilePrefKey["DoNotWarnUnsupportedEditors"] = "mobileDoNotShowAgainUnsupportedEditors";
 })(MobilePrefKey || (MobilePrefKey = {}));
 

@@ -20,11 +20,9 @@ export enum WebPrefKey {
 export enum MobilePrefKey {
   SortNotesBy = 'mobileSortBy',
   SortNotesReverse = 'mobileSortReverse',
-  NotesHideTags = 'mobileHideTags',
   NotesHideNotePreview = 'mobileHideNotePreview',
   NotesHideDate = 'mobileHideDate',
-  DarkTheme = 'mobileDarkTheme',
-  LightTgeme = 'mobileLightTheme',
+  LastExportDate = 'mobileLastExportDate',
   DoNotWarnUnsupportedEditors = 'mobileDoNotShowAgainUnsupportedEditors'
 }
 
