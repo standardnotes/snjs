@@ -18,11 +18,9 @@ export declare enum WebPrefKey {
 export declare enum MobilePrefKey {
     SortNotesBy = "mobileSortBy",
     SortNotesReverse = "mobileSortReverse",
-    NotesHideTags = "mobileHideTags",
     NotesHideNotePreview = "mobileHideNotePreview",
     NotesHideDate = "mobileHideDate",
-    DarkTheme = "mobileDarkTheme",
-    LightTgeme = "mobileLightTheme",
+    LastExportDate = "mobileLastExportDate",
     DoNotWarnUnsupportedEditors = "mobileDoNotShowAgainUnsupportedEditors"
 }
 export declare type PrefKey = WebPrefKey | MobilePrefKey;
