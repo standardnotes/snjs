@@ -247,7 +247,7 @@ export class SNSessionManager extends PureService {
     password: string,
     strict = false,
     minAllowedVersion?: ProtocolVersion
-    ): Promise<SessionManagerResponse> {
+  ): Promise<SessionManagerResponse> {
     const result = await this.performSignIn(
       email,
       password,
@@ -267,7 +267,7 @@ export class SNSessionManager extends PureService {
         minAllowedVersion
       );
       return secondResult;
-    } {
+    } else {
       return result;
     }
   }

@@ -13209,9 +13209,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       const cleanedEmail = cleanedEmailString(email);
       const secondResult = await this.performSignIn(cleanedEmail, password, strict, minAllowedVersion);
       return secondResult;
-    }
-
-    {
+    } else {
       return result;
     }
   }
