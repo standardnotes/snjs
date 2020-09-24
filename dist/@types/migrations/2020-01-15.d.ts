@@ -20,6 +20,7 @@ export declare class Migration20200115 extends Migration {
      * All platforms
      */
     private allPlatformHelperSetStorageStructure;
+    private promptForPasscodeUntilCorrect;
     /**
      * Helper
      * Web/desktop only

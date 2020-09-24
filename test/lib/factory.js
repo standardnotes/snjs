@@ -3,6 +3,7 @@
 import WebDeviceInterface from './web_device_interface.js';
 
 export const TestTimeout = 10000;
+export const LongTestTimeout = 20000;
 
 const syncOptions = {
   checkIntegrity: true,
@@ -66,13 +67,13 @@ export async function registerUserToApplication(
 export async function setOldVersionPasscode({ application, passcode, version }) {
   const identifier = await application.protocolService.crypto.generateUUID();
   const operator = application.protocolService.operatorForVersion(version);
-  const { key, keyParams } = await operator.createRootKey(
+  const key = await operator.createRootKey(
     identifier,
-    passcode
+    passcode,
+    KeyParamsOrigination.PasscodeCreate
   );
   await application.protocolService.setNewRootKeyWrapper(
-    key,
-    keyParams
+    key
   );
   await application.rewriteItemsKeys();
   await application.syncService.sync(syncOptions);
@@ -86,22 +87,20 @@ export async function registerOldUser({ application, email, password, version })
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   const operator = application.protocolService.operatorForVersion(version);
-  const result = await operator.createRootKey(
+  const accountKey = await operator.createRootKey(
     email,
-    password
+    password,
+    KeyParamsOrigination.Registration
   );
-  const accountKey = result.key;
-  const accountKeyParams = result.keyParams;
 
   const response = await application.apiService.register(
     email,
     accountKey.serverPassword,
-    accountKeyParams
+    accountKey.keyParams
   );
-  await application.sessionManager.handleAuthResponse(response);
+  await application.sessionManager.handleSuccessAuthResponse(response);
   await application.protocolService.setNewRootKey(
-    accountKey,
-    accountKeyParams
+    accountKey
   );
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
@@ -182,8 +181,6 @@ export async function loginToApplication({ application, email, password, ephemer
     password,
     undefined,
     ephemeral,
-    undefined,
-    undefined,
     mergeLocal,
     true
   );
@@ -309,3 +306,18 @@ export function generateUuidish() {
 export function randomArrayValue(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
+
+export async function expectThrowsAsync(method, errorMessage) {
+  let error = null;
+  try {
+    await method();
+  }
+  catch (err) {
+    error = err;
+  }
+  const expect = chai.expect;
+  expect(error).to.be.an('Error');
+  if (errorMessage) {
+    expect(error.message).to.be.a('string').and.satisfy(msg => msg.startsWith(errorMessage));
+  }
+};

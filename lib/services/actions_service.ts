@@ -1,3 +1,4 @@
+import { HttpResponse } from './api/responses';
 import { Action, ActionAccessType } from './../models/app/action';
 import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
@@ -8,7 +9,7 @@ import { SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
 import { PayloadManager } from './model_manager';
-import { SNHttpService, HttpResponse } from './api/http_service';
+import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PayloadSource } from '@Payloads/sources';
 import { EncryptionIntent } from '@Protocol/intents';
@@ -16,13 +17,16 @@ import { PureService } from '@Lib/services/pure_service';
 import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { DeviceInterface } from '../device_interface';
 
-type PasswordRequestHandler = () => Promise<string>
-
-export type ActionResponse = {
-  response?: HttpResponse
-  error?: { message: string }
+export type ActionResponse = HttpResponse & {
+  description: string
+  supported_types: string[]
+  actions: any[]
   item?: any
+  keyParams?: any
+  auth_params?: any
 }
+
+type PasswordRequestHandler = () => Promise<string>
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -110,7 +114,7 @@ export class SNActionsService extends PureService {
     ).catch((response) => {
       console.error('Error loading extension', response);
       return null;
-    });
+    }) as ActionResponse;
     if (!response) {
       return;
     }
@@ -171,9 +175,10 @@ export class SNActionsService extends PureService {
     } else {
       return {
         error: {
+          status: 1,
           message: 'Action canceled by user.'
         }
-      }
+      } as ActionResponse;
     }
   }
 
@@ -187,9 +192,9 @@ export class SNActionsService extends PureService {
           || { message: 'An issue occurred while processing this action. Please try again.' };
         this.alertService!.alert(error.message);
         return { error } as HttpResponse;
-      });
+      }) as ActionResponse;
     if (response.error) {
-      return { response } as ActionResponse;
+      return response;
     }
     const payload = await this.payloadByDecryptingResponse(
       response,
@@ -207,7 +212,7 @@ export class SNActionsService extends PureService {
     );
     this.syncService!.sync();
     return {
-      response,
+      ...response,
       item: response.item
     } as ActionResponse;
   }
@@ -215,7 +220,7 @@ export class SNActionsService extends PureService {
   private async handleRenderAction(action: Action, passwordRequestHandler: PasswordRequestHandler) {
     const response = await this.httpService!.getAbsolute(action.url).then(async (response) => {
       const payload = await this.payloadByDecryptingResponse(
-        response,
+        response as ActionResponse,
         passwordRequestHandler
       );
       if (payload) {
@@ -224,7 +229,7 @@ export class SNActionsService extends PureService {
           payload.contentObject
         );
         return {
-          response,
+          ...response,
           item
         } as ActionResponse;
       }
@@ -239,7 +244,7 @@ export class SNActionsService extends PureService {
   }
 
   private async payloadByDecryptingResponse(
-    response: HttpResponse,
+    response: ActionResponse,
     passwordRequestHandler: PasswordRequestHandler,
     key?: SNRootKey,
     triedPasswords: string[] = []
@@ -310,19 +315,19 @@ export class SNActionsService extends PureService {
       items: [itemParams]
     };
     return this.httpService!.postAbsolute(action.url, params).then((response) => {
-      return { response } as ActionResponse;
+      return response as ActionResponse;
     }).catch((response) => {
       console.error('Action error response:', response);
       this.alertService!.alert(
         'An issue occurred while processing this action. Please try again.'
       );
-      return { response } as ActionResponse;
+      return response as ActionResponse;
     });
   }
 
   private async handleShowAction(action: Action) {
     this.deviceInterface!.openUrl(action.url);
-    return { response: undefined } as ActionResponse;
+    return { } as ActionResponse;
   }
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {

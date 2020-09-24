@@ -16,7 +16,7 @@ export class SNItemsKey extends SNItem {
     return ConflictStrategy.KeepLeft;
   }
 
-  get version() {
+  get keyVersion() {
     return this.payload.safeContent.version;
   }
 
@@ -33,7 +33,7 @@ export class SNItemsKey extends SNItem {
   }
 
   get dataAuthenticationKey() {
-    if (this.version === ProtocolVersion.V004) {
+    if (this.keyVersion === ProtocolVersion.V004) {
       throw 'Attempting to access legacy data authentication key.';
     }
     return this.payload.safeContent.dataAuthenticationKey;

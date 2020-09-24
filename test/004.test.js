@@ -15,12 +15,12 @@ describe('004 protocol operations', () => {
 
   before(async () => {
     await Factory.initializeApplication(application);
-    const result = await protocol004.createRootKey(
+    _key = await protocol004.createRootKey(
       _identifier,
-      _password
+      _password,
+      KeyParamsOrigination.Registration
     );
-    _keyParams = result.keyParams;
-    _key = result.key;
+    _keyParams = _key.keyParams;
   });
 
   after(() => {
@@ -28,29 +28,27 @@ describe('004 protocol operations', () => {
   });
 
   it('cost minimum should throw', () => {
-    expect(() => {application.protocolService.costMinimumForVersion('004')})
+    expect(() => { application.protocolService.costMinimumForVersion('004') })
       .to.throw('Cost minimums only apply to versions <= 002');
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await application.protocolService.createRootKey(
+    const key = await application.protocolService.createRootKey(
       _identifier,
-      _password
+      _password,
+      KeyParamsOrigination.Registration
     );
 
-    expect(result).to.have.property('key');
-    expect(result).to.have.property('keyParams');
+    expect(key.masterKey).to.be.ok;
 
-    expect(result.key.masterKey).to.be.ok;
+    expect(key.serverPassword).to.be.ok;
+    expect(key.mk).to.not.be.ok;
+    expect(key.dataAuthenticationKey).to.not.be.ok;
 
-    expect(result.key.serverPassword).to.not.be.null;
-    expect(result.key.mk).to.not.be.ok;
-    expect(result.key.dataAuthenticationKey).to.not.be.ok;
-
-    expect(result.keyParams.seed).to.not.be.null;
-    expect(result.keyParams.kdfIterations).to.not.be.null;
-    expect(result.keyParams.salt).to.not.be.ok;
-    expect(result.keyParams.identifier).to.be.ok;
+    expect(key.keyParams.content004.pw_nonce).to.be.ok;
+    expect(key.keyParams.content004.pw_cost).to.not.be.ok;
+    expect(key.keyParams.content004.salt).to.not.be.ok;
+    expect(key.keyParams.content004.identifier).to.be.ok;
   });
 
   it('computes proper keys for sign in', async () => {
@@ -73,25 +71,26 @@ describe('004 protocol operations', () => {
   it('generates random key', async () => {
     const length = 96;
     const key = await application.protocolService.crypto.generateRandomKey(length);
-    expect(key.length).to.equal(length/4);
+    expect(key.length).to.equal(length / 4);
   });
 
   it('properly encrypts and decrypts', async () => {
     const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
-    const additionalData = {foo: 'bar'};
-    const encString = await application.protocolService.defaultOperator().encryptString004(
+    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
+    const authenticatedData = { foo: 'bar' };
+    const encString = await operator.encryptString004(
       text,
       rawKey,
       nonce,
-      additionalData
+      authenticatedData
     );
-    const decString = await application.protocolService.defaultOperator().decryptString004(
+    const decString = await operator.decryptString004(
       encString,
       rawKey,
       nonce,
-      additionalData
+      await operator.authenticatedDataToString(authenticatedData)
     );
     expect(decString).to.equal(text);
   });
@@ -100,15 +99,16 @@ describe('004 protocol operations', () => {
     const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(192);
-    const aad = {foo: 'bar'};
-    const nonmatchingAad = {foo: 'rab'};
-    const encString = await application.protocolService.defaultOperator().encryptString004(
+    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
+    const aad = { foo: 'bar' };
+    const nonmatchingAad = { foo: 'rab' };
+    const encString = await operator.encryptString004(
       text,
       rawKey,
       nonce,
       aad
     );
-    const decString = await application.protocolService.defaultOperator().decryptString004(
+    const decString = await operator.decryptString004(
       encString,
       rawKey,
       nonce,
@@ -137,7 +137,22 @@ describe('004 protocol operations', () => {
       params,
       key
     );
-    expect(decrypted.errorDecrypted).to.not.be.ok;
+    expect(decrypted.errorDecrypting).to.not.be.ok;
     expect(decrypted.content).to.eql(payload.content);
+  });
+
+  it('modifying the uuid of the payload should fail to decrypt', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol004.createItemsKey();
+    const params = await protocol004.generateEncryptedParameters(
+      payload,
+      PayloadFormat.EncryptedString,
+      key,
+    );
+    const modifiedParams = CopyPayload(params, { uuid: 'foo' });
+    await Factory.expectThrowsAsync(() => protocol004.generateDecryptedParameters(
+      modifiedParams,
+      key
+    ), 'The uuid/version in authenticated data');
   });
 });

@@ -1,10 +1,12 @@
+import { AnyKeyParamsContent } from './../key_params';
+import { ProtocolVersion } from './../versions';
+import { UuidString } from './../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@Models/content_types';
 import { EncryptionIntent } from '@Protocol/intents';
 import {
   Copy,
-  isNullOrUndefined,
   pickByCopy,
   uniqueArray,
 } from '@Lib/utils';
@@ -55,6 +57,18 @@ export type RawEncryptionParameters = {
   errorDecryptingValueChanged?: boolean
   auth_hash?: string
   auth_params?: any
+}
+
+export type ItemAuthenticatedData = {
+  /** The UUID of the item */
+  u: UuidString
+  /** The encryption version of the item */
+  v: ProtocolVersion
+}
+/** Data that is attached to items that are encrypted with a root key */
+export type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
+  /** The key params used to generate the root key that encrypts this item key */
+  kp: AnyKeyParamsContent
 }
 
 /** The MaxItemPayload represents a payload with all possible fields */
@@ -188,7 +202,7 @@ export function CreateMaxPayloadFromAnyObject(
 }
 
 /**
- * Makes a new payload by starting with input payload, then overriding values of all 
+ * Makes a new payload by starting with input payload, then overriding values of all
  * keys of mergeWith.fields. If wanting to merge only specific fields, pass an array of
  * fields. If override value is passed, values in here take final precedence, including
  * above both payload and mergeWith values.
@@ -292,7 +306,7 @@ export function CreateEncryptionParameters(
 
 export function CopyEncryptionParameters(
   raw: RawEncryptionParameters,
-  override?: PayloadOverride
+  override?: RawEncryptionParameters
 ): PurePayload {
   return CreatePayload(
     raw,

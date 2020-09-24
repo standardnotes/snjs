@@ -62,14 +62,14 @@ By default, upgrading an account's protocol version will create a new `itemsKey`
 
 _For each_ item (such as a note) the client wants to encrypt:
 1. Client generates random `item_key` (note: singular. Not related to `itemsKey`).
-2. Client encrypts note content with `item_key`.
+2. Client encrypts note content with `item_key` to form `content`.
 3. Client encrypts `item_key` with default `itemsKey` as `enc_item_key`.
 4. Client notes `itemsKey` UUID and associates it with encrypted item payload as `items_key_id`, and uploads payload to server.
 
 To decrypt an item payload:
 1. Client retrieves `itemsKey` matching `items_key_id` of payload.
-2. Client decrypts item's `enc_item_key` as `item_key` using `itemsKey`.
-3. Client decrypts item's content using `item_key`.
+2. Client decrypts item's `enc_item_key` with `itemsKey` to form `item_key`.
+3. Client decrypts item's `content` using `item_key`.
 
 ## Authentication
 
@@ -112,6 +112,51 @@ Root key wrapping allows the client to encrypt the `rootKey` before storing it t
 4. To allow applications to introduce cryptographically-backed UI-level app locking.
 
 When a root key is wrapped, no information about the wrapper is persisted locally or in memory beyond the `keyParams` for the wrapper. This includes any sort of hash for verification of the correctness of the entered local passcode. That is, when a user enters a local passcode, we know it is correct not because we compare one hash to another, but by whether it succeeds in decrypting some encrypted payload.
+
+## Multi-Client Root Key Changes
+
+Because account password changes (or, in general, root key changes) require all existing items keys to be re-encrypted with the new root key, it is possible that items keys eventually fall into an inconsistent state, such that some are encrypted with a newer root key, while others are encrypted with the new root key. Clients encountering an items key they cannot encrypt with the current account root key parameters would then reach a dead end, and users would see undecryptable data.
+
+To recover the ability to decrypt an items key, clients can use the `kp` (key params) included the items key's authenticated_data payload. These parameters represent the the key params of the root key used to encrypt this items key.
+
+For example, when the account password changes, and thus the root key changes, all items keys are re-encrypted with the new root key on client A. Another client (client B) who may have a valid API session, but an outdated root key, will be able to download these new items keys. However, when client B attempts to decrypt these keys using its root key, the decryption will fail. Client B enters a state where it can save items to the server (wherein those items are encrypted using its existing default readable items key), but cannot read new data encrypted with items keys encrypted with client A's root key.
+
+When client B connects to the API with a valid session token, but an outdated root key, it will be able to download new items keys, but not yet decrypt them. However, since the key parameters for the root key underlying the items key is included in the encrypted payload, the client will be able to prompt the user for their new password.
+
+**In general,**
+
+A. When a client encounters an items key it cannot decrypt, whose created date is greater than any existing items key it has, it will:
+
+1. Make an authenticated request to the server to retrieve the account's current key parameters (because we suspect that they may have changed, due to the above fact). Authenticated requests to the GET key_params endpoint bypasses the MFA requirement.
+2. Verify that the incoming key params version is greater than or equal to the client's current key params version. For example, if the client's key params version is 004, but the incoming key params version is 003, the client will reject these parameters as insecure and abort this process.
+3. Prompt the user for their account password, including in the prompt its reason. i.e _"Your account password was changed 3 days ago. Enter your new account password."_
+4. Validate the account password based on its root key's ability to decrypt the aforementioned items key. If it succeeds, replace the client's current root key with this new root key.
+
+At this point, this client is now in sync. It does not need to communicate with the server to handle updating its state after a password change.
+
+If the aforementioned items key's key params are not exactly equal to the server's key params (not a logical outcome, but assuming arbitrary desync), and no items keys exists with the same key params as the server key params, it must fallback to performing the regular sign in flow to authenticate its root key (based on its `serverPassword` field).
+
+B. When a client encounters an items key it cannot decrypt, regardless of its created date, and the server key parameters are equal to the ones the client has on hand, this indicates that the items key may be encrypted with an older root key (for whatever reason).
+
+In such cases, the client will present a "key recovery wizard", which all attempt to decrypt the stale items key:
+
+1. Retrieve the key parameters associated with the authenticated_data of the items key's payload.
+2. Prompt the user for their account password as it was on the date the key parameters were created. For example, _"Enter your account password as it was on Oct 20, 2019, 6:15AM."_
+3. Generate a root key from the account password using the relevant key params, and use that root key to decrypt the stale items key. If the decryption is successful, the client will then decrypt any items associated with that items key. It will then mark the key as needing sync.
+4. When the key subsequently runs through normal syncing logic, it will then proceed to be encrypted by the account's current root key, and synced to the account.
+
+The above procedure represents a "corrective" course of action in the case that the sync following a root key change, where all items keys must be re-encrypted with the new root key, fails silently and results in inconsistent data.
+
+Note that the difference between case A and case B is that in case A, we prompt the user for their account password and **update our client's root key** with the generated root key, if it is valid. In case B, we generate a temporary root key for decryption purposes only, but discard of the root key after our decryption. This distinction is important because in case A, the server will be required to return key parameters with version greater than or equal to the user's current version, but in case B, key parameters can be arbitrarily old. However, because in this case the root key is not used for anything other than transient read operations, we can accept protocol versions no matter how outdated they are.
+
+### Expired Sessions
+
+When a client encounters an invalid session network response (typically status code 498), it will:
+
+1. Retrieve the latest key parameters from the server. (Note that because GETting key parameters may require MFA authentication, clients must be prepared to handle an "mfa-required" error response.)
+2. Ensure the key parameter version is greater than or equal to the version the client currently has on hand.
+3. Prompt the user for their account password, indicating the reason. i.e _"Your session has expired. Please re-enter your account password to restore access to your account."_
+4. Proceed with normal sign in flow.
 
 ## Storage
 
@@ -220,36 +265,40 @@ An encrypted payload consists of:
   - protocol version
   - encryption nonce
   - ciphertext
+  - authenticated_data
 - `content`: An encrypted protocol string joined by colons `:` of the following components:
   - protocol version
   - encryption nonce
   - ciphertext
+  - authenticated_data
 
 **Procedure to encrypt an item (such as a note):**
 
 1. Generate a random 256-bit key `item_key` (in `hex` format).
-2. Encrypt `item.content` as `content` using `item_key` following the instructions _"Encrypting a string using the 004 scheme"_ below.
-3. Encrypt `item_key` as `enc_item_key` using the the default `itemsKey.itemsKey` following the instructions _"Encrypting a string using the 004 scheme"_ below.
-4. Generate an encrypted payload as:
+2. Encrypt `item.content` using `item_key` to form `content`, and `{ u: item.uuid, v: '004', kp: rootKey.key_params IF item.type == ItemsKey }` as `authenticated_data`, following the instructions _"Encrypting a string using the 004 scheme"_ below.
+3. Encrypt `item_key` using the the default `itemsKey.itemsKey` to form `enc_item_key`, and `{ u: item.uuid, v: '004', kp: rootKey.key_params IF item.type == ItemsKey }` as `authenticated_data`, following the instructions _"Encrypting a string using the 004 scheme"_ below.
+5. Generate an encrypted payload as:
     ```
     {
         items_key_id: itemsKey.uuid,
         enc_item_key: enc_item_key,
-        content: content
+        content: content,
     }
     ```
 
 ### Encrypting a string using the 004 scheme:
 
-Given a `string_to_encrypt`, an `encryption_key`, and an item's `uuid`:
+Given a `string_to_encrypt`, an `encryption_key`, `authenticated_data`, and an item's `uuid`:
 
-1.  Generate a random 192-bit string called `nonce`.
-2.  Generate additional authenticated data as `aad = JSON.stringify({ u: uuid, v: '004' })`
-3.  Encrypt `string_to_encrypt` using `XChaCha20+Poly1305:Base64`, `encryption_key`, `nonce`, and `aad`:
+1. Generate a random 192-bit string called `nonce`.
+
+2. Encode `authenticated_data` as a base64 encoded json string (`base64(json(authenticated_data))`) where the embedded data is recursively sorted by key for stringification (i.e `{v: '2', 'u': '1'}` should be stringified as `{u: '1', 'v': '2'}`), to get `encoded_authenticated_data`.
+
+3. Encrypt `string_to_encrypt` using `XChaCha20+Poly1305:Base64`, `encryption_key`, `nonce`, and `encoded_authenticated_data`:
   ```
-  ciphertext = XChaCha20Poly1305(string_to_encrypt, encryption_key, nonce, aad)
+  ciphertext = XChaCha20Poly1305(string_to_encrypt, encryption_key, nonce, encoded_authenticated_data)
   ```
-4.  Generate the final result by combining components into a `:` separated string:
+4. Generate the final result by combining components into a `:` separated string:
   ```
-  result = ['004', nonce, ciphertext].join(':')
+  result = ['004', nonce, ciphertext, encoded_authenticated_data].join(':')
   ```

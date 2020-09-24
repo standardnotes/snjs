@@ -1,7 +1,11 @@
-export { SNApplicationGroup } from './application_group';
 export type { ApplicationDescriptor } from './application_group';
+export type { ActionResponse } from './services/actions_service';
 export type { UuidString, ApplicationIdentifier } from './types';
+
+export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
+export { KeyParamsOrigination } from './protocol/key_params';
+export { KeyRecoveryStrings } from './services/api/messages';
 
 export { SNApplication } from '@Lib/application';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';
@@ -30,6 +34,7 @@ export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export { LiveItem } from './models/live_item';
 
+
 export { SNComponentManager } from './services/component_manager';
 export { SessionHistoryMap } from './services/history/session/session_history_map';
 export { ItemSessionHistory } from './services/history/session/item_session_history';
@@ -56,9 +61,10 @@ export {
   Challenge,
   ChallengeReason,
   ChallengeResponse,
-  ChallengeType,
+  ChallengeValidation,
   challengeTypeToString,
   ChallengeValue,
+  ChallengePrompt
 } from '@Lib/challenges';
 
 export {
@@ -93,7 +99,8 @@ export {
   dictToArray,
   truncateHexString,
   jsonParseEmbeddedKeys,
-  topLevelCompare
+  topLevelCompare,
+  dateSorted
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {
@@ -101,7 +108,8 @@ export {
   isLocalStorageIntent,
   isFileIntent,
   isDecryptedIntent,
-  intentRequiresEncryption
+  intentRequiresEncryption,
+  ContentTypeUsesRootKeyEncryption
 } from '@Protocol/intents';
 export { ContentType } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';

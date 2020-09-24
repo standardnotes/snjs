@@ -67,10 +67,10 @@ describe('keys', function () {
   });
 
   it('validates content types requiring root encryption', async function () {
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.ItemsKey)).to.equal(true);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.EncryptedStorage)).to.equal(true);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.Item)).to.equal(false);
-    expect(this.application.protocolService.contentTypeUsesRootKeyEncryption(ContentType.Note)).to.equal(false);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.ItemsKey)).to.equal(true);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.EncryptedStorage)).to.equal(true);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.Item)).to.equal(false);
+    expect(ContentTypeUsesRootKeyEncryption(ContentType.Note)).to.equal(false);
   });
 
   it('generating export params with no account or passcode should produce encrypted payload',
@@ -94,8 +94,8 @@ describe('keys', function () {
   it('should use root key for encryption of storage', async function () {
     const email = 'foo';
     const password = 'bar';
-    const result = await this.application.protocolService.createRootKey(email, password);
-    this.application.protocolService.setNewRootKey(result.key, result.keyParams);
+    const key = await this.application.protocolService.createRootKey(email, password, KeyParamsOrigination.Registration);
+    this.application.protocolService.setNewRootKey(key);
 
     const payload = CreateMaxPayloadFromAnyObject(
       {
@@ -112,11 +112,15 @@ describe('keys', function () {
     expect(keyToUse).to.equal(await this.application.protocolService.getRootKey());
   });
 
-  it('changing root key should with passcode should re-wrap root key', async function () {
+  it('changing root key with passcode should re-wrap root key', async function () {
     const email = 'foo';
     const password = 'bar';
-    const result = await this.application.protocolService.createRootKey(email, password);
-    await this.application.protocolService.setNewRootKey(result.key, result.keyParams);
+    const key = await this.application.protocolService.createRootKey(
+      email,
+      password,
+      KeyParamsOrigination.Registration
+    );
+    await this.application.protocolService.setNewRootKey(key);
     await this.application.setPasscode(password);
 
     /** We should be able to decrypt wrapped root key with passcode */
@@ -124,25 +128,25 @@ describe('keys', function () {
     const wrappingKey = await this.application.protocolService.computeRootKey(
       password,
       wrappingKeyParams
-    );
-    await this.application.protocolService.unwrapRootKey(wrappingKey).catch((error) => {
-      expect(error).to.not.be.ok;
-    });
+      );
+      await this.application.protocolService.unwrapRootKey(wrappingKey).catch((error) => {
+        expect(error).to.not.be.ok;
+      });
 
-    const newPassword = 'bar';
-    const newResult = await this.application.protocolService.createRootKey(
-      email,
-      newPassword
-    );
+      const newPassword = 'bar';
+      const newKey = await this.application.protocolService.createRootKey(
+        email,
+        newPassword,
+        KeyParamsOrigination.Registration
+        );
     await this.application.protocolService.setNewRootKey(
-      newResult.key,
-      newResult.keyParams,
+      newKey,
       wrappingKey
     );
     await this.application.protocolService.unwrapRootKey(wrappingKey).catch((error) => {
       expect(error).to.not.be.ok;
     });
-  })
+  });
 
   it('items key should be encrypted with root key', async function () {
     await Factory.registerUserToApplication({ application: this.application });
@@ -273,6 +277,28 @@ describe('keys', function () {
     expect(updatedNote.content.title).to.equal(title);
   });
 
+  it('attempting to emit errored items key for which there exists a non errored master copy should ignore it', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
+    const itemsKey = await this.application.protocolService.getDefaultItemsKey();
+    expect(itemsKey.errorDecrypting).to.not.be.ok;
+
+    const errored = CopyPayload(
+      itemsKey.payload,
+      {
+        content: {
+          foo: 'bar'
+        },
+        errorDecrypting: true
+      }
+    );
+
+    await this.application.modelManager.emitPayload(errored, PayloadSource.Constructor);
+
+    const refreshedKey = this.application.findItem(itemsKey.uuid);
+    expect(refreshedKey.errorDecrypting).to.not.be.ok;
+    expect(refreshedKey.content.foo).to.not.be.ok;
+  });
+
   it('generating export params with logged in account should produce encrypted payload', async function () {
     await Factory.registerUserToApplication({ application: this.application });
     const payload = Factory.createNotePayload();
@@ -298,6 +324,23 @@ describe('keys', function () {
     expect(itemsKeyPayload.format).to.equal(PayloadFormat.EncryptedString);
   });
 
+  it('items key encrypted payload should contain root key params', async function () {
+    await this.application.setPasscode('foo');
+    const itemsKey = this.application.itemManager.itemsKeys()[0];
+    const rawPayloads = await this.application.storageService.getAllRawPayloads();
+    const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid);
+    const itemsKeyPayload = CreateMaxPayloadFromAnyObject(itemsKeyRawPayload);
+    const operator = this.application.protocolService.operatorForVersion(ProtocolVersion.V004);
+    const comps = operator.deconstructEncryptedPayloadString(itemsKeyPayload.content);
+    const rawAuthenticatedData = comps.rawAuthenticatedData;
+    const authenticatedData = await operator.stringToAuthenticatedData(rawAuthenticatedData);
+    const rootKeyParams = await this.application.protocolService.getRootKeyParams();
+
+    expect(authenticatedData.kp).to.be.ok;
+    expect(authenticatedData.kp).to.eql(rootKeyParams.getPortableValue());
+    expect(authenticatedData.kp.origination).to.equal(KeyParamsOrigination.PasscodeCreate);
+  });
+
   it('correctly validates local passcode', async function () {
     const passcode = 'foo';
     await this.application.setPasscode('foo');
@@ -314,7 +357,7 @@ describe('keys', function () {
        */
       const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
       const latestVersion = this.application.protocolService.getLatestVersion();
-      expect(defaultItemsKey.version).to.equal(latestVersion);
+      expect(defaultItemsKey.keyVersion).to.equal(latestVersion);
 
       /** Register with 003 version */
       await Factory.registerOldUser({
@@ -327,11 +370,11 @@ describe('keys', function () {
       const itemsKeys = this.application.itemManager.itemsKeys();
       expect(itemsKeys.length).to.equal(1);
       const newestItemsKey = itemsKeys[0];
-      expect(newestItemsKey.version).to.equal(ProtocolVersion.V003);
+      expect(newestItemsKey.keyVersion).to.equal(ProtocolVersion.V003);
       const rootKey = await this.application.protocolService.getRootKey();
       expect(newestItemsKey.itemsKey).to.equal(rootKey.masterKey);
       expect(newestItemsKey.dataAuthenticationKey).to.equal(rootKey.dataAuthenticationKey);
-  });
+    });
 
   it('reencrypts existing notes when logging into an 003 account', async function () {
     await Factory.createManyMappedNotes(this.application, 10);
@@ -353,8 +396,6 @@ describe('keys', function () {
     await this.application.signIn(
       this.email,
       this.password,
-      undefined,
-      undefined,
       undefined,
       undefined,
       undefined,
@@ -439,20 +480,24 @@ describe('keys', function () {
   });
 
   it('compares root keys', async function () {
+    const keyParams = {};
     const a1 = await SNRootKey.Create({
       version: ProtocolVersion.V004,
       masterKey: '2C26B46B68FFC68FF99B453C1D30413413422D706483BFA0F98A5E886266E7AE',
-      serverPassword: 'FCDE2B2EDBA56BF408601FB721FE9B5C338D10EE429EA04FAE5511B68FBF8FB9'
+      serverPassword: 'FCDE2B2EDBA56BF408601FB721FE9B5C338D10EE429EA04FAE5511B68FBF8FB9',
+      keyParams
     });
     const a2 = await SNRootKey.Create({
       version: ProtocolVersion.V004,
       masterKey: '2C26B46B68FFC68FF99B453C1D30413413422D706483BFA0F98A5E886266E7AE',
-      serverPassword: 'FCDE2B2EDBA56BF408601FB721FE9B5C338D10EE429EA04FAE5511B68FBF8FB9'
+      serverPassword: 'FCDE2B2EDBA56BF408601FB721FE9B5C338D10EE429EA04FAE5511B68FBF8FB9',
+      keyParams
     });
     const b = await SNRootKey.Create({
       version: ProtocolVersion.V004,
       masterKey: '2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824',
-      serverPassword: '486EA46224D1BB4FB680F34F7C9AD96A8F24EC88BE73EA8E5A6C65260E9CB8A7'
+      serverPassword: '486EA46224D1BB4FB680F34F7C9AD96A8F24EC88BE73EA8E5A6C65260E9CB8A7',
+      keyParams
     });
 
     expect(a1.compare(a2)).to.equal(true);
@@ -460,4 +505,78 @@ describe('keys', function () {
     expect(a1.compare(b)).to.equal(false);
     expect(b.compare(a1)).to.equal(false);
   });
+
+  it('loading the keychain root key should also load its key params', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
+    const rootKey = await this.application.protocolService.getRootKeyFromKeychain();
+    expect(rootKey.keyParams).to.be.ok;
+  });
+
+  it('key params should be persisted separately and not as part of root key', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
+    const rawKey = await this.application.deviceInterface.getNamespacedKeychainValue(
+      this.application.identifier
+    );
+    expect(rawKey.keyParams).to.not.be.ok;
+    const rawKeyParams = await this.application.storageService.getValue(
+      StorageKey.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(rawKeyParams).to.be.ok;
+  });
+
+  it('persisted key params should exactly equal in memory rootKey.keyParams', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
+    const rootKey = await this.application.protocolService.getRootKey();
+    const rawKeyParams = await this.application.storageService.getValue(
+      StorageKey.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(rootKey.keyParams.content).to.eql(rawKeyParams);
+  });
+
+  it('key params should have expected values', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
+    const keyParamsObject = await this.application.protocolService.getRootKeyParams();
+    const keyParams = keyParamsObject.content;
+    expect(keyParams.identifier).to.be.ok;
+    expect(keyParams.pw_nonce).to.be.ok;
+    expect(keyParams.version).to.equal(ProtocolVersion.V004);
+    expect(keyParams.created).to.be.ok;
+    expect(keyParams.origination).to.equal(KeyParamsOrigination.Registration);
+    expect(keyParams.email).to.not.be.ok;
+    expect(keyParams.pw_cost).to.not.be.ok;
+    expect(keyParams.pw_salt).to.not.be.ok;
+  });
+
+  it('key params obtained when signing in should have created and origination', async function () {
+    const email = this.email;
+    const password = this.password;
+    await Factory.registerUserToApplication({ application: this.application, email, password });
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    await Factory.loginToApplication({ application: this.application, email, password });
+    const keyParamsObject = await this.application.protocolService.getRootKeyParams();
+    const keyParams = keyParamsObject.content;
+
+    expect(keyParams.created).to.be.ok;
+    expect(keyParams.origination).to.equal(KeyParamsOrigination.Registration);
+  });
+
+  it('key params for 003 account should still have origination and created', async function () {
+    /** origination and created are new properties since 004, but they can be added retroactively
+     * to previous versions. They are not essential to <= 003, but are for >= 004 */
+    /** Register with 003 version */
+    await Factory.registerOldUser({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      version: ProtocolVersion.V003
+    });
+    const keyParamsObject = await this.application.protocolService.getRootKeyParams();
+    const keyParams = keyParamsObject.content;
+
+    expect(keyParams.created).to.be.ok;
+    expect(keyParams.origination).to.equal(KeyParamsOrigination.Registration);
+  });
+
 });

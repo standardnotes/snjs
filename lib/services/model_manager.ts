@@ -14,6 +14,7 @@ type ChangeCallback = (
   changed: PurePayload[],
   inserted: PurePayload[],
   discarded: PurePayload[],
+  ignored: PurePayload[],
   source?: PayloadSource,
   sourceKey?: string
 ) => void
@@ -46,6 +47,14 @@ export class PayloadManager extends PureService {
   private changeObservers: ChangeObserver[] = []
   public collection: MutableCollection<PurePayload>
   private emitQueue: QueueElement[] = []
+  /**
+   * An array of content types for which we enable encrypted overwrite protection.
+   * If a payload attempting to be emitted is errored, yet our current local version
+   * is not errored, and the payload's content type is in this array, we do not overwrite
+   * our local version. We instead notify observers of this interaction for them to handle
+   * as needed
+  */
+  private overwriteProtection: ContentType[] = [ContentType.ItemsKey]
 
   constructor() {
     super();
@@ -137,8 +146,8 @@ export class PayloadManager extends PureService {
 
   private async popQueue() {
     const first = this.emitQueue[0];
-    const { changed, inserted, discarded } = this.mergePayloadsOntoMaster(first.payloads);
-    this.notifyChangeObservers(changed, inserted, discarded, first.source, first.sourceKey);
+    const { changed, inserted, discarded, ignored } = this.mergePayloadsOntoMaster(first.payloads);
+    this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey);
     removeFromArray(this.emitQueue, first);
     first.resolve(changed.concat(inserted, discarded));
     if (this.emitQueue.length > 0) {
@@ -150,16 +159,27 @@ export class PayloadManager extends PureService {
     const changed: PurePayload[] = [];
     const inserted: PurePayload[] = [];
     const discarded: PurePayload[] = [];
+    const ignored: PurePayload[] = [];
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
         console.error('Payload is corrupt:', payload);
         continue;
       }
       const masterPayload = this.collection.find(payload.uuid!);
-      const newPayload = masterPayload ? PayloadByMerging(masterPayload, payload) : payload;
-      /** The item has been deleted and synced,
-       * and can thus be removed from our local record */
+      if (
+        payload.errorDecrypting &&
+        masterPayload && !masterPayload.errorDecrypting &&
+        this.overwriteProtection.includes(payload.content_type)
+      ) {
+        ignored.push(payload);
+        continue;
+      }
+      const newPayload = masterPayload
+        ? PayloadByMerging(masterPayload, payload)
+        : payload;
       if (newPayload.discardable) {
+        /** The item has been deleted and synced,
+         * and can thus be removed from our local record */
         this.collection.discard(newPayload);
         discarded.push(newPayload);
       } else {
@@ -171,7 +191,7 @@ export class PayloadManager extends PureService {
         }
       }
     }
-    return { changed, inserted, discarded };
+    return { changed, inserted, discarded, ignored };
   }
 
   /**
@@ -207,6 +227,7 @@ export class PayloadManager extends PureService {
     changed: PurePayload[],
     inserted: PurePayload[],
     discarded: PurePayload[],
+    ignored: PurePayload[],
     source: PayloadSource,
     sourceKey?: string
   ) {
@@ -226,6 +247,7 @@ export class PayloadManager extends PureService {
         filter(changed, observer.types),
         filter(inserted, observer.types),
         filter(discarded, observer.types),
+        filter(ignored, observer.types),
         source,
         sourceKey
       );

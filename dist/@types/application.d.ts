@@ -11,7 +11,7 @@ import { SNItem, ItemMutator } from './models/core/item';
 import { SNPredicate } from './models/core/predicate';
 import { PurePayload } from './protocol/payloads/pure_payload';
 import { Challenge, ChallengeResponse, ChallengeValue } from './challenges';
-import { ValueCallback } from './services/challenge/challenge_service';
+import { ChallengeObserver } from './services/challenge/challenge_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
 import { ContentType } from './models/content_types';
@@ -22,6 +22,7 @@ import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryMana
 import { DeviceInterface } from './device_interface';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion } from './protocol/versions';
+import { KeyParamsOrigination } from './protocol/key_params';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge) => void;
 };
@@ -54,6 +55,7 @@ export declare class SNApplication {
     actionsManager: SNActionsService;
     historyManager: SNHistoryManager;
     private itemManager;
+    private keyRecoveryService;
     private eventHandlers;
     private services;
     private streamRemovers;
@@ -241,12 +243,13 @@ export declare class SNApplication {
      * Returns true if there is an encryption source available
      */
     isEncryptionAvailable(): boolean;
+    private performProtocolUpgrade;
     upgradeProtocolVersion(): Promise<{
-        success?: true;
-        canceled?: true;
+        success?: true | undefined;
+        canceled?: true | undefined;
         error?: {
             message: string;
-        };
+        } | undefined;
     }>;
     noAccount(): boolean;
     hasAccount(): boolean;
@@ -294,14 +297,8 @@ export declare class SNApplication {
      * to finish tasks. 0 means no limit.
      */
     prepareForDeinit(maxWait?: number): Promise<void>;
-    promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | null>;
-    setChallengeCallbacks({ challenge, onValidValue, onInvalidValue, onComplete, onCancel }: {
-        challenge: Challenge;
-        onValidValue?: ValueCallback;
-        onInvalidValue?: ValueCallback;
-        onComplete?: () => void;
-        onCancel?: () => void;
-    }): void;
+    promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | undefined>;
+    addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): void;
     submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
     cancelChallenge(challenge: Challenge): void;
     /** Set a function to be called when this application deinits */
@@ -324,12 +321,16 @@ export declare class SNApplication {
      *  @param mergeLocal  Whether to merge existing offline data into account. If false,
      *                     any pre-existing data will be fully deleted upon success.
      */
-    register(email: string, password: string, ephemeral?: boolean, mergeLocal?: boolean): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    register(email: string, password: string, ephemeral?: boolean, mergeLocal?: boolean): Promise<import("./services/api/responses").HttpResponse | {
+        error: Error;
+    }>;
     /**
      * @param mergeLocal  Whether to merge existing offline data into account.
      * If false, any pre-existing data will be fully deleted upon success.
      */
-    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mfaKeyPath?: string, mfaCode?: string, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/http_service").HttpResponse | undefined>;
+    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/responses").HttpResponse | {
+        error: Error;
+    }>;
     /**
      * @param passcode - Changing the account password requires the local
      * passcode if configured (to rewrap the account key with passcode). If the passcode
@@ -337,13 +338,14 @@ export declare class SNApplication {
      * already has referene to the passcode, they can pass it in here so that the user
      * is not prompted again.
      */
-    changePassword(currentPassword: string, newPassword: string, passcode?: string, { validatePasswordStrength }?: {
+    changePassword(currentPassword: string, newPassword: string, passcode?: string, origination?: KeyParamsOrigination, { validatePasswordStrength }?: {
         validatePasswordStrength?: boolean | undefined;
     }): Promise<{
         error?: {
             message: string;
-        };
+        } | undefined;
     }>;
+    private performPasswordChange;
     signOut(): Promise<void>;
     validateAccountPassword(password: string): Promise<boolean>;
     isStarted(): boolean;
@@ -356,7 +358,7 @@ export declare class SNApplication {
     lock(): Promise<void>;
     setPasscode(passcode: string): Promise<void>;
     removePasscode(): Promise<void>;
-    changePasscode(passcode: string): Promise<void>;
+    changePasscode(passcode: string, origination?: KeyParamsOrigination): Promise<void>;
     private setPasscodeWithoutWarning;
     private removePasscodeWithoutWarning;
     getStorageEncryptionPolicy(): StorageEncryptionPolicies;
@@ -379,6 +381,7 @@ export declare class SNApplication {
     private createSingletonManager;
     private createStorageManager;
     private createProtocolService;
+    private createKeyRecoveryService;
     private createSessionManager;
     private createSyncManager;
     private createChallengeService;

@@ -1,24 +1,29 @@
+import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
+import { ProtocolVersion } from '@Protocol/versions';
+import { Challenge, ChallengePrompt } from '@Lib/challenges';
+import { ChallengeValidation, ChallengeReason } from './../../challenges';
+import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, TokenSession } from './session';
-import { RegistrationResponse, SignInResponse, ChangePasswordResponse } from './responses';
+import { RegistrationResponse, SignInResponse, ChangePasswordResponse, HttpResponse, KeyParamsResponse } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNRootKeyParams, KeyParamsContent } from './../../protocol/key_params';
-import { HttpResponse } from './http_service';
+import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination, KeyParamsFromApiResponse } from './../../protocol/key_params';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
 import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
+import { SessionStrings, SignInStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
 type SessionManagerResponse = {
   response: HttpResponse;
-  keyParams: SNRootKeyParams;
-  rootKey: SNRootKey;
+  rootKey?: SNRootKey;
+  keyParams?: AnyKeyParamsContent
 }
 
 type User = {
@@ -33,31 +38,27 @@ type User = {
  */
 export class SNSessionManager extends PureService {
 
-  private storageService?: SNStorageService
-  private apiService?: SNApiService
-  private alertService?: SNAlertService
-  private protocolService?: SNProtocolService
-
   private user?: User
+  private isSessionRenewChallengePresented = false;
 
   constructor(
-    storageService: SNStorageService,
-    apiService: SNApiService,
-    alertService: SNAlertService,
-    protocolService: SNProtocolService,
+    private storageService: SNStorageService,
+    private apiService: SNApiService,
+    private alertService: SNAlertService,
+    private protocolService: SNProtocolService,
+    private challengeService: ChallengeService,
   ) {
     super();
-    this.protocolService = protocolService;
-    this.storageService = storageService;
-    this.apiService = apiService;
-    this.alertService = alertService;
+    apiService.setInvalidSessionObserver(() => {
+      this.reauthenticateInvalidSession();
+    });
   }
 
   deinit() {
-    this.protocolService = undefined;
-    this.storageService = undefined;
-    this.apiService = undefined;
-    this.alertService = undefined;
+    (this.protocolService as any) = undefined;
+    (this.storageService as any) = undefined;
+    (this.apiService as any) = undefined;
+    (this.alertService as any) = undefined;
     this.user = undefined;
     super.deinit();
   }
@@ -102,85 +103,170 @@ export class SNSessionManager extends PureService {
     }
   }
 
-  async register(email: string, password: string) {
+  private async reauthenticateInvalidSession() {
+    if (this.isSessionRenewChallengePresented) {
+      return;
+    }
+    this.isSessionRenewChallengePresented = true;
+    const challenge = new Challenge(
+      [
+        new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false),
+        new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)
+      ],
+      ChallengeReason.Custom,
+      SessionStrings.EnterEmailAndPassword,
+      SessionStrings.RecoverSession
+    );
+    this.challengeService.addChallengeObserver(
+      challenge,
+      {
+        onCancel: () => {
+          this.isSessionRenewChallengePresented = false;
+        },
+        onNonvalidatedSubmit: async (challengeResponse) => {
+          const email = challengeResponse.values[0].value as string;
+          const password = challengeResponse.values[1].value as string;
+          const currentKeyParams = await this.protocolService.getAccountKeyParams();
+          const signInResult = await this.signIn(email, password, false, currentKeyParams!.version);
+          if (signInResult.response.error) {
+            this.challengeService.setValidationStatusForChallenge(
+              challenge,
+              challengeResponse!.values[1],
+              false
+            );
+          } else {
+            this.challengeService.completeChallenge(challenge);
+            this.alertService!.alert(
+              SessionStrings.SessionRestored
+            );
+          }
+        }
+      })
+
+    this.challengeService.promptForChallengeResponse(challenge);
+  }
+
+  private async promptForMfaValue() {
+    const challenge = new Challenge(
+      [new ChallengePrompt(ChallengeValidation.None)],
+      ChallengeReason.Custom,
+      SessionStrings.EnterMfa
+    );
+    const response = await this.challengeService
+      .promptForChallengeResponse(challenge);
+    if (response) {
+      this.challengeService.completeChallenge(challenge);
+      return response.values[0].value as string;
+    }
+  }
+
+  async register(email: string, password: string): Promise<SessionManagerResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
         response: this.apiService!.createErrorResponse(
           messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)
         )
-      } as SessionManagerResponse;
+      };
     }
-    const result = await this.protocolService!.createRootKey(
+    const rootKey = await this.protocolService!.createRootKey(
       email,
-      password
+      password,
+      KeyParamsOrigination.Registration
     );
-    const serverPassword = result.key.serverPassword;
-    const keyParams = result.keyParams;
-    const rootKey = result.key;
+    const serverPassword = rootKey.serverPassword;
+    const keyParams = rootKey.keyParams;
 
-    return this.apiService!.register(
+    const registerResponse = await this.apiService!.register(
       email,
       serverPassword,
       keyParams
-    ).then(async (response) => {
-      await this.handleAuthResponse(response);
+    );
+    if (!registerResponse.error) {
+      await this.handleSuccessAuthResponse(registerResponse);
+    }
+    return {
+      response: registerResponse,
+      rootKey: rootKey
+    };
+  }
+
+  private async retrieveKeyParams(
+    email: string,
+    mfaKeyPath?: string,
+    mfaCode?: string
+  ): Promise<{
+    keyParams?: SNRootKeyParams,
+    response: KeyParamsResponse,
+    mfaKeyPath?: string,
+    mfaCode?: string
+  }> {
+    const response = await this.apiService!.getAccountKeyParams(
+      email,
+      mfaKeyPath,
+      mfaCode
+    );
+    if (response.error) {
+      if (mfaCode) {
+        await this.alertService.alert(SignInStrings.IncorrectMfa);
+      }
+      if (response.error.payload?.mfa_key) {
+        /** Prompt for MFA code and try again */
+        const inputtedCode = await this.promptForMfaValue();
+        if (!inputtedCode) {
+          /** User dismissed window without input */
+          return {
+            response: this.apiService!.createErrorResponse(SignInStrings.SignInCanceledMissingMfa)
+          };
+        }
+        return this.retrieveKeyParams(
+          email,
+          response.error.payload.mfa_key,
+          inputtedCode
+        );
+      } else {
+        return { response };
+      }
+    }
+    const keyParams = KeyParamsFromApiResponse(response);
+    if (!keyParams || !keyParams.version) {
       return {
-        response: response,
-        keyParams: keyParams,
-        rootKey: rootKey
-      } as SessionManagerResponse;
-    });
+        response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
+      };
+    }
+    return { keyParams, response, mfaKeyPath, mfaCode };
   }
 
   public async signIn(
     email: string,
     password: string,
     strict = false,
-    mfaKeyPath?: string,
-    mfaCode?: string
-  ) {
-    const paramsResponse = await this.apiService!.getAccountKeyParams(
-      email,
-      mfaKeyPath,
-      mfaCode
-    );
-    if (paramsResponse.error) {
+    minAllowedVersion?: ProtocolVersion
+  ): Promise<SessionManagerResponse> {
+    const paramsResult = await this.retrieveKeyParams(email);
+    if (paramsResult.response.error) {
       return {
-        response: paramsResponse
-      } as SessionManagerResponse;
+        response: paramsResult.response
+      };
     }
-    const rawKeyParams: KeyParamsContent = {
-      pw_cost: paramsResponse.pw_cost,
-      pw_nonce: paramsResponse.pw_nonce!,
-      identifier: paramsResponse.identifier,
-      email: paramsResponse.email,
-      pw_salt: paramsResponse.pw_salt,
-      version: paramsResponse.version!
-    }
-    const keyParams = this.protocolService!.createKeyParams(rawKeyParams);
-    if (!keyParams || !keyParams.version) {
-      return {
-        response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
-      } as SessionManagerResponse;
-    }
+    const keyParams = paramsResult.keyParams!;
     if (!this.protocolService!.supportedVersions().includes(keyParams.version)) {
       if (this.protocolService!.isVersionNewerThanLibraryVersion(keyParams.version)) {
         return {
           response: this.apiService!.createErrorResponse(messages.UNSUPPORTED_PROTOCOL_VERSION)
-        } as SessionManagerResponse;
+        };
       } else {
         return {
           response: this.apiService!.createErrorResponse(messages.EXPIRED_PROTOCOL_VERSION)
-        } as SessionManagerResponse;
+        };
       }
     }
     if (this.protocolService!.isProtocolVersionOutdated(keyParams.version)) {
       /* Cost minimums only apply to now outdated versions (001 and 002) */
       const minimum = this.protocolService!.costMinimumForVersion(keyParams.version);
-      if (keyParams.kdfIterations! < minimum) {
+      if (keyParams.content002.pw_cost < minimum) {
         return {
           response: this.apiService!.createErrorResponse(messages.INVALID_PASSWORD_COST)
-        } as SessionManagerResponse;
+        };
       };
       const message = messages.OUTDATED_PROTOCOL_VERSION;
       const confirmed = await this.alertService!.confirm(
@@ -191,22 +277,24 @@ export class SNSessionManager extends PureService {
       if (!confirmed) {
         return {
           response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
-        } as SessionManagerResponse;
+        };
       }
     }
     if (!this.protocolService!.platformSupportsKeyDerivation(keyParams)) {
       return {
         response: this.apiService!.createErrorResponse(messages.UNSUPPORTED_KEY_DERIVATION)
-      } as SessionManagerResponse;
+      };
     }
     if (strict) {
-      const latest = this.protocolService!.getLatestVersion();
-      if (keyParams.version !== latest) {
+      minAllowedVersion = this.protocolService!.getLatestVersion();
+    }
+    if (!isNullOrUndefined(minAllowedVersion)) {
+      if (!leftVersionGreaterThanOrEqualToRight(keyParams.version, minAllowedVersion)) {
         return {
           response: this.apiService!.createErrorResponse(
-            messages.StrictSignInFailed(keyParams.version, latest)
+            messages.StrictSignInFailed(keyParams.version, minAllowedVersion)
           )
-        } as SessionManagerResponse;
+        };
       }
     }
     const { rootKey, serverPassword } = await this.protocolService!.computeRootKey(
@@ -218,39 +306,79 @@ export class SNSessionManager extends PureService {
         serverPassword: rootKey.serverPassword
       };
     });
-    return this.apiService!.signIn(
+    const signInResponse = await this.bypassChecksAndSignInWithServerPassword(
+      email,
+      serverPassword,
+      paramsResult.mfaKeyPath,
+      paramsResult.mfaCode
+    )
+    return {
+      response: signInResponse,
+      rootKey: await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params),
+    };
+  }
+
+  public async bypassChecksAndSignInWithServerPassword(
+    email: string,
+    serverPassword: string,
+    mfaKeyPath?: string,
+    mfaCode?: string,
+  ): Promise<SignInResponse> {
+    const signInResponse = await this.apiService!.signIn(
       email,
       serverPassword,
       mfaKeyPath,
       mfaCode
-    ).then(async (response) => {
-      await this.handleAuthResponse(response);
-      return {
-        response: response,
-        keyParams: keyParams,
-        rootKey: rootKey
-      } as SessionManagerResponse;
-    });
+    )
+    if (!signInResponse.error) {
+      await this.handleSuccessAuthResponse(signInResponse);
+      return signInResponse;
+    } else {
+      if (signInResponse.error.payload?.mfa_key) {
+        if (mfaCode) {
+          await this.alertService.alert(SignInStrings.IncorrectMfa);
+        }
+        /** Prompt for MFA code and try again */
+        const inputtedCode = await this.promptForMfaValue();
+        if (!inputtedCode) {
+          /** User dismissed window without input */
+          return this.apiService!.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
+        }
+        return this.bypassChecksAndSignInWithServerPassword(
+          email,
+          serverPassword,
+          signInResponse.error.payload.mfa_key,
+          inputtedCode
+        )
+      } else {
+        /** Some other error, return to caller */
+        return signInResponse;
+      }
+    }
   }
 
   public async changePassword(
     currentServerPassword: string,
     newServerPassword: string,
     newKeyParams: SNRootKeyParams
-  ) {
+  ): Promise<SessionManagerResponse> {
     const response = await this.apiService!.changePassword(
       currentServerPassword,
       newServerPassword,
       newKeyParams
     );
-    await this.handleAuthResponse(response);
-    return response;
+    if (!response.error) {
+      await this.handleSuccessAuthResponse(response);
+    }
+    return {
+      response: response,
+      keyParams: response.key_params
+    };
   }
 
-  private async handleAuthResponse(response: RegistrationResponse | SignInResponse | ChangePasswordResponse) {
-    if (response.error) {
-      return;
-    }
+  private async handleSuccessAuthResponse(
+    response: RegistrationResponse | SignInResponse | ChangePasswordResponse
+  ) {
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);

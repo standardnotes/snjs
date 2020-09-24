@@ -14,6 +14,10 @@ describe('2020-01-15 web migration', () => {
     localStorage.clear();
   });
 
+  /**
+   * This test will pass but sync afterwards will not be successful
+   * as we are using a random value for the legacy session token
+   */
   it('2020-01-15 migration with passcode and account', async function () {
     const application = await Factory.createAppWithRandNamespace();
     /** Create legacy migrations value so that base migration detects old app */
@@ -25,13 +29,13 @@ describe('2020-01-15 web migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'offlineParams',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
 
     /** Create arbitrary storage values and make sure they're migrated */
@@ -48,20 +52,19 @@ describe('2020-01-15 web migration', () => {
     }
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
 
     /** Create legacy storage and encrypt it with passcode */
-    const accountKey = accountResult.key;
     const embeddedStorage = {
       mk: accountKey.masterKey,
       ak: accountKey.dataAuthenticationKey,
       pw: accountKey.serverPassword,
       jwt: 'anything',
       /** Legacy versions would store json strings inside of embedded storage */
-      auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
+      auth_params: JSON.stringify(accountKey.keyParams.getPortableValue())
     };
     const storagePayload = CreateMaxPayloadFromAnyObject(
       {
@@ -75,7 +78,7 @@ describe('2020-01-15 web migration', () => {
     const encryptionParams = await operator003.generateEncryptedParameters(
       storagePayload,
       PayloadFormat.EncryptedString,
-      passcodeResult.key,
+      passcodeKey,
     );
     const persistPayload = CreateMaxPayloadFromAnyObject(
       storagePayload,
@@ -100,28 +103,12 @@ describe('2020-01-15 web migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
-      const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
-        }
-      }
-      return values;
-    };
-
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.setChallengeCallbacks({
+        application.submitValuesForChallenge(
           challenge,
-          onInvalidValue: (value) => {
-            const values = promptForValuesForTypes([value.type]);
-            application.submitValuesForChallenge(challenge, values);
-          },
-        });
-        await Factory.sleep(0);
-        const initialValues = promptForValuesForTypes(challenge.types);
-        application.submitValuesForChallenge(challenge, initialValues);
+          [new ChallengeValue(challenge.prompts[0], passcode)]
+        );
       },
     });
 
@@ -155,7 +142,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
     /** Expect note is decrypted */
@@ -170,6 +157,7 @@ describe('2020-01-15 web migration', () => {
       expect(arbitraryValues[key]).to.equal(value);
     }
 
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
     await application.deinit();
   }).timeout(15000);
 
@@ -184,15 +172,14 @@ describe('2020-01-15 web migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'offlineParams',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
-    const passcodeKey = passcodeResult.key;
 
     /** Create arbitrary storage values and make sure they're migrated */
     const arbitraryValues = {
@@ -222,7 +209,7 @@ describe('2020-01-15 web migration', () => {
     const encryptionParams = await operator003.generateEncryptedParameters(
       storagePayload,
       PayloadFormat.EncryptedString,
-      passcodeResult.key,
+      passcodeKey,
     );
     const persistPayload = CreateMaxPayloadFromAnyObject(
       storagePayload,
@@ -246,28 +233,9 @@ describe('2020-01-15 web migration', () => {
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
-    /** Run migration */
-    const promptForValuesForTypes = (types) => {
-      const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
-        }
-      }
-      return values;
-    };
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.setChallengeCallbacks({
-          challenge,
-          onInvalidValue: (value) => {
-            const values = promptForValuesForTypes([value.type]);
-            application.submitValuesForChallenge(challenge, values);
-          },
-        });
-        await Factory.sleep(0);
-        const initialValues = promptForValuesForTypes(challenge.types);
-        application.submitValuesForChallenge(challenge, initialValues);
+        application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], passcode)]);
       },
     });
     await application.launch(true);
@@ -293,7 +261,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
     /** Expect note is decrypted */
@@ -326,11 +294,11 @@ describe('2020-01-15 web migration', () => {
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
-    const accountKey = accountResult.key;
+
     /** Create arbitrary storage values and make sure they're migrated */
     const storage = {
       foo: 'bar',
@@ -341,7 +309,7 @@ describe('2020-01-15 web migration', () => {
       pw: accountKey.serverPassword,
       jwt: 'anything',
       /** Legacy versions would store json strings inside of embedded storage */
-      auth_params: JSON.stringify(accountResult.keyParams.getPortableValue())
+      auth_params: JSON.stringify(accountKey.keyParams.getPortableValue())
     };
     for (const key of Object.keys(storage)) {
       await application.deviceInterface.setRawStorageValue(
@@ -363,24 +331,28 @@ describe('2020-01-15 web migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
+        } else {
+          /** We will be prompted to reauthetnicate our session, not relevant to this test
+           * but pass any value to avoid exception
+           */
+          values.push(new ChallengeValue(prompt, 'foo'));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      application.setChallengeCallbacks({
-        challenge,
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           application.submitValuesForChallenge(challenge, values);
         },
       });
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
@@ -402,7 +374,7 @@ describe('2020-01-15 web migration', () => {
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
-    expect(migratedKeyParams).to.eql(accountResult.keyParams.getPortableValue());
+    expect(migratedKeyParams).to.eql(accountKey.keyParams.getPortableValue());
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey).to.be.ok;
 
@@ -419,7 +391,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     /** Expect note is decrypted */
@@ -438,6 +410,7 @@ describe('2020-01-15 web migration', () => {
       expect(storage[key]).to.equal(value);
     }
 
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
     await application.deinit();
   });
 

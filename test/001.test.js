@@ -17,9 +17,8 @@ describe('001 protocol operations', () => {
   before(async () => {
     localStorage.clear();
     await Factory.initializeApplication(application);
-    const result = await protocol001.createRootKey(_identifier, _password);
-    _keyParams = result.keyParams;
-    _key = result.key;
+    _key = await protocol001.createRootKey(_identifier, _password, KeyParamsOrigination.Registration);
+    _keyParams = _key.keyParams;
   });
 
   after(() => {
@@ -37,16 +36,13 @@ describe('001 protocol operations', () => {
   });
 
   it('generates valid keys for registration', async () => {
-    const result = await protocol001.createRootKey(_identifier, _password);
-    expect(result).to.have.property('key');
-    expect(result).to.have.property('keyParams');
+    const key = await protocol001.createRootKey(_identifier, _password, KeyParamsOrigination.Registration);
+    expect(key.serverPassword).to.be.ok;
+    expect(key.masterKey).to.be.ok;
 
-    expect(result.key.serverPassword).to.not.be.null;
-    expect(result.key.masterKey).to.not.be.null;
-
-    expect(result.keyParams.seed).to.not.be.null;
-    expect(result.keyParams.kdfIterations).to.not.be.null;
-    expect(result.keyParams.salt).to.not.be.null;
+    expect(key.keyParams.content.pw_nonce).to.not.be.ok;
+    expect(key.keyParams.content.pw_cost).to.be.ok;
+    expect(key.keyParams.content.pw_salt).to.be.ok;
   });
 
   it('properly encrypts and decrypts', async () => {

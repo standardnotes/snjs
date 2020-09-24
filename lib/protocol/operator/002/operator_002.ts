@@ -1,9 +1,9 @@
+import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../../payloads/generator';
 import { ItemsKeyContent } from './../operator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
-import { SNRootKeyParams } from './../../key_params';
+import { Create002KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { V002Algorithm } from './../algorithms';
-import { CreateKeyParams } from '@Protocol/key_params';
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';
 import { PayloadFormat } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
@@ -27,28 +27,27 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const response: ItemsKeyContent = {
       itemsKey: itemsKey,
       dataAuthenticationKey: authKey,
-      version: this.version
+      version: ProtocolVersion.V002
     }
     return response;
   }
 
-  public async createRootKey(identifier: string, password: string) {
+  public async createRootKey(identifier: string, password: string, origination: KeyParamsOrigination) {
     const pwCost = V002Algorithm.PbkdfMinCost;
     const pwNonce = await this.crypto.generateRandomKey(V002Algorithm.SaltSeedLength);
     const pwSalt = await this.crypto.unsafeSha1(identifier + ':' + pwNonce);
-    const key = await this.deriveKey(
-      password,
-      pwSalt,
-      pwCost
-    );
-    const keyParams = CreateKeyParams({
+    const keyParams = Create002KeyParams({
       email: identifier,
       pw_cost: pwCost,
-      pw_nonce: pwNonce,
       pw_salt: pwSalt,
-      version: this.version
+      version: ProtocolVersion.V002,
+      origination,
+      created: `${Date.now()}`
     });
-    return { key, keyParams };
+    return this.deriveKey(
+      password,
+      keyParams
+    );
   }
 
   /**
@@ -57,13 +56,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
    * the root key, we must use the value returned by the server.
    */
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
-    /* Salt is returned from server */
-    const key = await this.deriveKey(
-      password,
-      keyParams.salt!,
-      keyParams.kdfIterations!
-    );
-    return key;
+    return this.deriveKey(password, keyParams);
   }
 
   private async decryptString002(text: string, key: string, iv: string) {
@@ -108,11 +101,19 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return this.decryptString002(contentCiphertext, encryptionKey, iv);
   }
 
+  public async getPayloadAuthenticatedData(payload: PurePayload) {
+    const itemKeyComponents = this.encryptionComponentsFromString002(
+      payload.enc_item_key!
+    );
+    const authenticatedData = itemKeyComponents.authParams;
+    return JSON.parse(await this.crypto.base64Decode(authenticatedData));
+  }
+
   public async generateEncryptedParameters(
     payload: PurePayload,
     format: PayloadFormat,
     key?: SNItemsKey | SNRootKey,
-  ) {
+    ) {
     if ((
       format === PayloadFormat.DecryptedBareObject ||
       format === PayloadFormat.DecryptedBase64String
@@ -137,7 +138,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       key.itemsKey,
       key.dataAuthenticationKey,
       payload.uuid!,
-      key.version
+      key.keyVersion
     );
     /** Encrypt content */
     const ek = await this.firstHalfOfKey(itemKey);
@@ -147,7 +148,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       ek,
       ak,
       payload.uuid!,
-      key.version
+      key.keyVersion
     );
     return CreateEncryptionParameters(
       {
@@ -187,10 +188,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const itemKey = await this.decryptTextParams(
       itemKeyComponents.ciphertextToAuth,
       itemKeyComponents.contentCiphertext,
-      itemKeyComponents.encryptionKey,
+      itemKeyComponents.encryptionKey!,
       itemKeyComponents.iv,
       itemKeyComponents.authHash,
-      itemKeyComponents.authKey,
+      itemKeyComponents.authKey!,
     );
     if (!itemKey) {
       console.error('Error decrypting item_key parameters', encryptedParameters);
@@ -213,10 +214,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const content = await this.decryptTextParams(
       itemParams.ciphertextToAuth,
       itemParams.contentCiphertext,
-      itemParams.encryptionKey,
+      itemParams.encryptionKey!,
       itemParams.iv,
       itemParams.authHash,
-      itemParams.authKey,
+      itemParams.authKey!,
     );
     if (!content) {
       return CopyEncryptionParameters(
@@ -249,22 +250,22 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   protected async deriveKey(
     password: string,
-    pwSalt: string,
-    pwCost: number
+    keyParams: SNRootKeyParams
   ) {
     const derivedKey = await this.crypto.pbkdf2(
       password,
-      pwSalt,
-      pwCost,
+      keyParams.content002.pw_salt,
+      keyParams.content002.pw_cost,
       V002Algorithm.PbkdfOutputLength
     );
-    const partitions = await this.splitKey(derivedKey!, 3);
+    const partitions = this.splitKey(derivedKey!, 3);
     const key = await SNRootKey.Create(
       {
         serverPassword: partitions[0],
         masterKey: partitions[1],
         dataAuthenticationKey: partitions[2],
-        version: this.version
+        version: ProtocolVersion.V002,
+        keyParams: keyParams.getPortableValue()
       }
     );
     return key;
@@ -272,8 +273,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   encryptionComponentsFromString002(
     string: string,
-    encryptionKey: string,
-    authKey: string
+    encryptionKey?: string,
+    authKey?: string
   ) {
     const components = string.split(':');
     return {

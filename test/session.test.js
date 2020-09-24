@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('server session', function() {
+describe('server session', function () {
   this.timeout(Factory.TestTimeout);
 
   const BASE_ITEM_COUNT = 1; /** Default items key */
@@ -17,6 +17,13 @@ describe('server session', function() {
   before(async function () {
     localStorage.clear();
   });
+
+  /** We expect to see many "Error: Factory application shouldn't have challenges" in the
+   * console as part of these tests, since the application will attempt to revalidate sessions
+   * via issuing a challenge, but not all tests are necessarily interested in that. */
+  function expectFactoryException() {
+    console.warn("Expecting 'Error: Factory application shouldnt have challenges' below");
+  }
 
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -110,6 +117,7 @@ describe('server session', function() {
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
+    expectFactoryException();
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -123,6 +131,7 @@ describe('server session', function() {
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
+    expectFactoryException();
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -173,13 +182,14 @@ describe('server session', function() {
   it('change password request should fail with an invalid access token', async function () {
     const fakeSession = this.application.apiService.getSession();
     fakeSession.accessToken = 'this-is-a-fake-token-1234';
-
+    expectFactoryException();
     const changePasswordResponse = await this.application.changePassword(
       this.password,
       this.newPassword
     );
     expect(changePasswordResponse.error.message).to.equal('Could not connect to server.');
 
+    expectFactoryException();
     const loginResponse = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
@@ -194,6 +204,7 @@ describe('server session', function() {
     /** Waiting for the refresh token to expire. */
     await sleepUntilSessionExpires(this.application, false);
 
+    expectFactoryException();
     const changePasswordResponse = await this.application.changePassword(
       this.password,
       this.newPassword
@@ -202,6 +213,7 @@ describe('server session', function() {
     expect(changePasswordResponse).to.be.ok;
     expect(changePasswordResponse.error.message).to.equal('Could not connect to server.');
 
+    expectFactoryException();
     const loginResponseWithNewPassword = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
@@ -251,6 +263,7 @@ describe('server session', function() {
       The access token and refresh token should be expired up to this point.
       Here we make sure that any subsequent requests will fail.
     */
+    expectFactoryException();
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -297,7 +310,7 @@ describe('server session', function() {
     await this.application.signIn(
       this.email,
       this.password,
-      undefined, undefined, undefined, undefined, undefined,
+      undefined, undefined, undefined,
       true
     );
 
@@ -310,5 +323,85 @@ describe('server session', function() {
       const noteResult = await this.application.itemManager.findItem(aNoteBeforeSync.uuid);
       expect(aNoteBeforeSync.isItemContentEqualWith(noteResult)).to.equal(true);
     }
+  });
+
+  it('changing password on one client should not invalidate other sessions', async function () {
+    const appA = await Factory.createApplication(Factory.randomString());
+    await appA.prepareForLaunch({});
+    await appA.launch(true);
+
+    const email = `${Math.random()}`;
+    const password = `${Math.random()}`;
+
+    await Factory.registerUserToApplication({
+      application: appA,
+      email: email,
+      password: password
+    });
+
+    /** Create simultaneous appB signed into same account */
+    const appB = await Factory.createApplication('another-namespace');
+    await appB.prepareForLaunch({});
+    await appB.launch(true);
+    await Factory.loginToApplication({
+      application: appB,
+      email: email,
+      password: password
+    });
+
+    /** Change password on appB */
+    const newPassword = 'random';
+    await appB.changePassword(password, newPassword);
+
+    /** Create an item and sync it */
+    const note = await Factory.createSyncedNote(appB);
+
+    /** Expect appA session to still be valid */
+    await appA.sync();
+    expect(appA.findItem(note.uuid)).to.be.ok;
+
+    appA.deinit();
+    appB.deinit();
+  });
+
+  it('should prompt user for account password and sign back in on invalid session', async function () {
+    const email = `${Math.random()}`;
+    const password = `${Math.random()}`;
+    let didPromptForSignIn = false;
+    const receiveChallenge = async (challenge) => {
+      didPromptForSignIn = true;
+      appA.submitValuesForChallenge(
+        challenge,
+        [
+          new ChallengeValue(challenge.prompts[0], email),
+          new ChallengeValue(challenge.prompts[1], password),
+        ]
+      );
+    };
+    const appA = await Factory.createApplication(Factory.randomString());
+    await appA.prepareForLaunch({ receiveChallenge });
+    await appA.launch(true);
+
+    await Factory.registerUserToApplication({
+      application: appA,
+      email: email,
+      password: password
+    });
+
+    /** Set the session as nonsense */
+    appA.apiService.session.accessToken = 'foo';
+    appA.apiService.session.refreshToken = 'bar';
+
+    /** Perform an authenticated network request */
+    await appA.sync();
+
+    /** Allow session recovery to do its thing */
+    await Factory.sleep(2.0);
+
+    expect(didPromptForSignIn).to.equal(true);
+    expect(appA.apiService.session.accessToken).to.not.equal('foo');
+    expect(appA.apiService.session.refreshToken).to.not.equal('bar');
+
+    appA.deinit();
   });
 });

@@ -1,8 +1,8 @@
+import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../../payloads/generator';
 import { SNItemsKey } from '@Models/app/items_key';
-import { SNRootKeyParams } from './../../key_params';
+import { Create001KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
-import { CreateKeyParams } from '@Protocol/key_params';
 import { PayloadFormat } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
@@ -31,37 +31,39 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     const itemsKey = await this.crypto.generateRandomKey(keyLength);
     const response: ItemsKeyContent = {
       itemsKey: itemsKey,
-      version: this.version
+      version: ProtocolVersion.V001
     }
     return response;
   }
 
-  public async createRootKey(identifier: string, password: string) {
+  public async createRootKey(
+    identifier: string,
+    password: string,
+    origination: KeyParamsOrigination
+  ) {
     const pwCost = V001Algorithm.PbkdfMinCost as number;
     const pwNonce = await this.crypto.generateRandomKey(V001Algorithm.SaltSeedLength);
     const pwSalt = await this.crypto.unsafeSha1(identifier + 'SN' + pwNonce);
-    const key = await this.deriveKey(
-      password,
-      pwSalt,
-      pwCost
-    );
-    const keyParams = CreateKeyParams({
+    const keyParams = Create001KeyParams({
       email: identifier,
       pw_cost: pwCost,
-      pw_nonce: pwNonce,
       pw_salt: pwSalt,
-      version: this.version
+      version: ProtocolVersion.V001,
+      origination,
+      created: `${Date.now()}`
     });
-    return { key: key, keyParams: keyParams };
+    return this.deriveKey(
+      password,
+      keyParams
+    );
+  }
+
+  public async getPayloadAuthenticatedData(_payload: PurePayload) {
+    return undefined;
   }
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
-    const key = await this.deriveKey(
-      password,
-      keyParams.salt!,
-      keyParams.kdfIterations!
-    );
-    return key;
+    return this.deriveKey(password, keyParams);
   }
 
   private async decryptString(ciphertext: string, key: string) {
@@ -105,7 +107,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
       JSON.stringify(payload.content),
       ek
     );
-    const ciphertext = key.version + contentCiphertext;
+    const ciphertext = key.keyVersion + contentCiphertext;
     const authHash = await this.crypto.hmac256(ciphertext, ak);
     return CreateEncryptionParameters(
       {
@@ -195,19 +197,20 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     };
   }
 
-  protected async deriveKey(password: string, pwSalt: string, pwCost: number) {
+  protected async deriveKey(password: string, keyParams: SNRootKeyParams) {
     const derivedKey = await this.crypto.pbkdf2(
       password,
-      pwSalt,
-      pwCost,
+      keyParams.content001.pw_salt,
+      keyParams.content001.pw_cost,
       V001Algorithm.PbkdfOutputLength
     );
-    const partitions = await this.splitKey(derivedKey!, 2);
+    const partitions = this.splitKey(derivedKey!, 2);
     const key = await SNRootKey.Create(
       {
         serverPassword: partitions[0],
         masterKey: partitions[1],
-        version: this.version
+        version: ProtocolVersion.V001,
+        keyParams: keyParams.getPortableValue()
       }
     );
     return key;

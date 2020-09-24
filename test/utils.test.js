@@ -5,7 +5,7 @@ const expect = chai.expect;
 
 describe('utils', () => {
   it('findInArray', async () => {
-    expect(findInArray).to.not.be.null;
+    expect(findInArray).to.be.ok;
     const array = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
     expect(findInArray(array, 'id', 1)).to.be.ok;
     expect(findInArray(array, 'id', 'foo')).to.not.be.ok;
@@ -46,6 +46,26 @@ describe('utils', () => {
     const parsed = jsonParseEmbeddedKeys(object);
     expect(typeof parsed.a).to.equal('object');
     expect(typeof parsed.b).to.equal('object');
+  });
+
+  it('dateSorted', () => {
+    const objects = [
+      { date: new Date(10) },
+      { date: new Date(5) },
+      { date: new Date(7) },
+    ];
+
+    /** ascending */
+    const ascending = dateSorted(objects, 'date', true);
+    expect(ascending[0].date.getTime()).to.equal(5);
+    expect(ascending[1].date.getTime()).to.equal(7);
+    expect(ascending[2].date.getTime()).to.equal(10);
+
+    /** descending */
+    const descending = dateSorted(objects, 'date', false);
+    expect(descending[0].date.getTime()).to.equal(10);
+    expect(descending[1].date.getTime()).to.equal(7);
+    expect(descending[2].date.getTime()).to.equal(5);
   });
 
   describe('subtractFromArray', () => {

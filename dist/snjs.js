@@ -99,43 +99,44 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return getGlobalScope; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return dictToArray; });
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return getGlobalScope; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return dictToArray; });
 /* unused harmony export isWebEnvironment */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "t", function() { return isWebCryptoAvailable; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return isReactNativeEnvironment; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return findInArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "u", function() { return isWebCryptoAvailable; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "s", function() { return isReactNativeEnvironment; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return findInArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "D", function() { return searchArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return concatArrays; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return isObject; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return isFunction; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return isNullOrUndefined; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "s", function() { return isString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return greaterOfTwoDates; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return isObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return isFunction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return isNullOrUndefined; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "t", function() { return isString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return greaterOfTwoDates; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "J", function() { return uniqCombineObjArrays; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "K", function() { return uniqueArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return lastElement; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return extendArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "x", function() { return lastElement; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return extendArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "G", function() { return subtractFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "B", function() { return removeFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return addIfUnique; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return filterFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return filterFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return arrayByDifference; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return compareValues; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "C", function() { return removeFromIndex; });
 /* unused harmony export addAtIndex */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return arrayByRemovingFromIndex; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "x", function() { return objectToValueArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "y", function() { return objectToValueArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "F", function() { return sortedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return dateSorted; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "H", function() { return topLevelCompare; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "v", function() { return jsonParseEmbeddedKeys; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return jsonParseEmbeddedKeys; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "z", function() { return omitInPlace; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "y", function() { return omitByCopy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "u", function() { return joinPaths; });
+/* unused harmony export omitByCopy */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "v", function() { return joinPaths; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Copy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return deepMerge; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return deepMerge; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "A", function() { return pickByCopy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return deepFreeze; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return deepFreeze; });
 /* unused harmony export hasGetter */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "I", function() { return truncateHexString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "E", function() { return sleep; });
@@ -149,7 +150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony import */ var lodash_mergeWith__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_mergeWith__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(79);
 /* harmony import */ var lodash_uniqWith__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqWith__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(22);
+/* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(23);
 /* harmony import */ var lodash_uniq__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_uniq__WEBPACK_IMPORTED_MODULE_5__);
 
 
@@ -430,6 +431,27 @@ function sortedCopy(object) {
 
   return Copy(result);
 }
+/**
+ * Returns a new array by sorting an array of elements based on a date property,
+ * as indicated by the input key value.
+ */
+
+function dateSorted(elements, key) {
+  let ascending = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  return elements.sort((a, b) => {
+    const aTimestamp = a[key].getTime();
+    const bTimestamp = b[key].getTime();
+    const vector = ascending ? 1 : -1;
+
+    if (aTimestamp < bTimestamp) {
+      return -1 * vector;
+    } else if (aTimestamp > bTimestamp) {
+      return 1 * vector;
+    } else {
+      return 0;
+    }
+  });
+}
 /** Compares for equality by comparing top-level keys value equality (===) */
 
 function topLevelCompare(left, right) {
@@ -621,7 +643,7 @@ function truncateHexString(string, desiredBits) {
 
 async function sleep(milliseconds) {
   console.warn("Sleeping for ".concat(milliseconds, "ms"));
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     setTimeout(function () {
       resolve();
     }, milliseconds);
@@ -642,9 +664,9 @@ async function sleep(milliseconds) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return CreateEncryptionParameters; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CopyEncryptionParameters; });
 /* unused harmony export payloadFieldsForSource */
-/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
+/* harmony import */ var _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(22);
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
+/* harmony import */ var _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(0);
 /* harmony import */ var _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
 
@@ -739,15 +761,15 @@ function CopyEncryptionParameters(raw, override) {
 }
 
 function payloadFieldsForIntent(intent) {
-  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].FileEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].FileDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].FilePreferEncrypted) {
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].FileEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].FileDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].FilePreferEncrypted) {
     return FilePayloadFields.slice();
   }
 
-  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].LocalStoragePreferEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].LocalStorageDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].LocalStorageEncrypted) {
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].LocalStoragePreferEncrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].LocalStorageDecrypted || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].LocalStorageEncrypted) {
     return StoragePayloadFields.slice();
   }
 
-  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].Sync || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "a"].SyncDecrypted) {
+  if (intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].Sync || intent === _Protocol_intents__WEBPACK_IMPORTED_MODULE_2__[/* EncryptionIntent */ "b"].SyncDecrypted) {
     return ServerPayloadFields.slice();
   } else {
     throw "No payload fields found for intent ".concat(intent);
@@ -947,12 +969,47 @@ var PayloadField;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ProtocolVersion; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return compareVersions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return leftVersionGreaterThanOrEqualToRight; });
+var ProtocolVersion;
+
+(function (ProtocolVersion) {
+  ProtocolVersion["V000Base64Decrypted"] = "000";
+  ProtocolVersion["V001"] = "001";
+  ProtocolVersion["V002"] = "002";
+  ProtocolVersion["V003"] = "003";
+  ProtocolVersion["V004"] = "004";
+  ProtocolVersion[ProtocolVersion["VersionLength"] = 3] = "VersionLength";
+})(ProtocolVersion || (ProtocolVersion = {}));
+
+;
+/**
+ *  -1 if a < b
+ *  0 if a == b
+ *  1 if a > b
+ */
+
+function compareVersions(a, b) {
+  const aNum = Number(a);
+  const bNum = Number(b);
+  return aNum - bNum;
+}
+function leftVersionGreaterThanOrEqualToRight(a, b) {
+  return compareVersions(a, b) >= 0;
+}
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(setImmediate) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return MutationType; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppDataField; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return SingletonStrategy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return SNItem; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ItemMutator; });
-/* harmony import */ var _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
 /* harmony import */ var _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(0);
@@ -1053,7 +1110,7 @@ class SNItem {
 
 
     setImmediate(() => {
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* deepFreeze */ "g"])(this);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* deepFreeze */ "h"])(this);
     });
   }
 
@@ -1067,6 +1124,19 @@ class SNItem {
 
   get content() {
     return this.payload.content;
+  }
+  /**
+   * This value only exists on payloads that are encrypted, as version pertains to the
+   * encrypted string protocol version.
+   */
+
+
+  get version() {
+    if (this.payload.format === _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_0__[/* PayloadFormat */ "a"].DecryptedBareObject) {
+      throw Error('Attempting to access version of decrypted payload');
+    }
+
+    return this.payload.version;
   }
 
   get safeContent() {
@@ -1575,77 +1645,28 @@ function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysT
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(76).setImmediate))
 
 /***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ProtocolVersion; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return compareVersions; });
-var ProtocolVersion;
-
-(function (ProtocolVersion) {
-  ProtocolVersion["V000Base64Decrypted"] = "000";
-  ProtocolVersion["V001"] = "001";
-  ProtocolVersion["V002"] = "002";
-  ProtocolVersion["V003"] = "003";
-  ProtocolVersion["V004"] = "004";
-  ProtocolVersion[ProtocolVersion["VersionLength"] = 3] = "VersionLength";
-})(ProtocolVersion || (ProtocolVersion = {}));
-
-;
-/**
- *  -1 if a < b
- *  0 if a == b
- *  1 if a > b
- */
-
-function compareVersions(a, b) {
-  const aNum = Number(a);
-  const bNum = Number(b);
-  return aNum - bNum;
-}
-
-/***/ }),
 /* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SyncEvent; });
-var SyncEvent;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ContentTypeUsesRootKeyEncryption; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return EncryptionIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return isLocalStorageIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isFileIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isDecryptedIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return intentRequiresEncryption; });
+/* harmony import */ var _models_content_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 
-(function (SyncEvent) {
-  /** A full sync can consist of many round-trips to the server */
-  SyncEvent["FullSyncCompleted"] = "sync =full-completed";
-  /** A single sync is just one round-trip to the server completion */
+/**
+ * Only three types of items should be encrypted with a root key:
+ * - A root key is encrypted with another root key in the case of root key wrapping
+ * - An SNItemsKey object
+ * - An encrypted storage object (local)
+ */
 
-  SyncEvent["SingleSyncCompleted"] = "sync =single-completed";
-  SyncEvent["SyncWillBegin"] = "sync =will-begin";
-  SyncEvent["DownloadFirstSyncCompleted"] = "sync =download-first-completed";
-  SyncEvent["SyncTakingTooLong"] = "sync =taking-too-long";
-  SyncEvent["SyncError"] = "sync =error";
-  SyncEvent["InvalidSession"] = "sync =invalid-session";
-  SyncEvent["MajorDataChange"] = "major-data-change";
-  SyncEvent["LocalDataIncrementalLoad"] = "local-data-incremental-load";
-  SyncEvent["LocalDataLoaded"] = "local-data-loaded";
-  SyncEvent["EnterOutOfSync"] = "enter-out-of-sync";
-  SyncEvent["ExitOutOfSync"] = "exit-out-of-sync";
-  SyncEvent["StatusChanged"] = "status-changed";
-  SyncEvent["DatabaseWriteError"] = "database-write-error";
-  SyncEvent["DatabaseReadError"] = "database-read-error";
-})(SyncEvent || (SyncEvent = {}));
-
-;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return EncryptionIntent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isLocalStorageIntent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isFileIntent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isDecryptedIntent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return intentRequiresEncryption; });
+function ContentTypeUsesRootKeyEncryption(contentType) {
+  return contentType === _models_content_types__WEBPACK_IMPORTED_MODULE_0__[/* ContentType */ "a"].RootKey || contentType === _models_content_types__WEBPACK_IMPORTED_MODULE_0__[/* ContentType */ "a"].ItemsKey || contentType === _models_content_types__WEBPACK_IMPORTED_MODULE_0__[/* ContentType */ "a"].EncryptedStorage;
+}
 var EncryptionIntent;
 
 (function (EncryptionIntent) {
@@ -1682,7 +1703,7 @@ function intentRequiresEncryption(intent) {
 }
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1695,6 +1716,37 @@ var PayloadFormat;
   PayloadFormat[PayloadFormat["DecryptedBase64String"] = 2] = "DecryptedBase64String";
   PayloadFormat[PayloadFormat["Deleted"] = 3] = "Deleted";
 })(PayloadFormat || (PayloadFormat = {}));
+
+;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SyncEvent; });
+var SyncEvent;
+
+(function (SyncEvent) {
+  /** A full sync can consist of many round-trips to the server */
+  SyncEvent["FullSyncCompleted"] = "sync =full-completed";
+  /** A single sync is just one round-trip to the server completion */
+
+  SyncEvent["SingleSyncCompleted"] = "sync =single-completed";
+  SyncEvent["SyncWillBegin"] = "sync =will-begin";
+  SyncEvent["DownloadFirstSyncCompleted"] = "sync =download-first-completed";
+  SyncEvent["SyncTakingTooLong"] = "sync =taking-too-long";
+  SyncEvent["SyncError"] = "sync =error";
+  SyncEvent["InvalidSession"] = "sync =invalid-session";
+  SyncEvent["MajorDataChange"] = "major-data-change";
+  SyncEvent["LocalDataIncrementalLoad"] = "local-data-incremental-load";
+  SyncEvent["LocalDataLoaded"] = "local-data-loaded";
+  SyncEvent["EnterOutOfSync"] = "enter-out-of-sync";
+  SyncEvent["ExitOutOfSync"] = "exit-out-of-sync";
+  SyncEvent["StatusChanged"] = "status-changed";
+  SyncEvent["DatabaseWriteError"] = "database-write-error";
+  SyncEvent["DatabaseReadError"] = "database-read-error";
+})(SyncEvent || (SyncEvent = {}));
 
 ;
 
@@ -1803,7 +1855,7 @@ class PureService {
   */
 
 
-  async handleApplicationStage(stage) {}
+  async handleApplicationStage(_stage) {}
 
   log(message) {
     for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -1839,7 +1891,7 @@ class PureService {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ApplicationEvent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return applicationEventForSyncEvent; });
-/* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* harmony import */ var _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "b", function() { return _Services_sync_events__WEBPACK_IMPORTED_MODULE_0__["a"]; });
 
 
@@ -2114,7 +2166,7 @@ class SNPredicate {
 
   static resolveIncludesPredicate(itemValueArray, containsValue) {
     // includes can be a string or a predicate (in array form)
-    if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* isString */ "s"])(containsValue)) {
+    if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* isString */ "t"])(containsValue)) {
       // if string, simply check if the itemValueArray includes the predicate value
       return itemValueArray.includes(containsValue);
     } else {
@@ -2442,194 +2494,6 @@ module.exports = isObjectLike;
 
 /***/ }),
 /* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var baseUniq = __webpack_require__(75);
-/**
- * Creates a duplicate-free version of an array, using
- * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * for equality comparisons, in which only the first occurrence of each element
- * is kept. The order of result values is determined by the order they occur
- * in the array.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Array
- * @param {Array} array The array to inspect.
- * @returns {Array} Returns the new duplicate free array.
- * @example
- *
- * _.uniq([2, 1, 2]);
- * // => [2, 1]
- */
-
-
-function uniq(array) {
-  return array && array.length ? baseUniq(array) : [];
-}
-
-module.exports = uniq;
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Symbol = __webpack_require__(31),
-    getRawTag = __webpack_require__(93),
-    objectToString = __webpack_require__(94);
-/** `Object#toString` result references. */
-
-
-var nullTag = '[object Null]',
-    undefinedTag = '[object Undefined]';
-/** Built-in value references. */
-
-var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
-/**
- * The base implementation of `getTag` without fallbacks for buggy environments.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the `toStringTag`.
- */
-
-function baseGetTag(value) {
-  if (value == null) {
-    return value === undefined ? undefinedTag : nullTag;
-  }
-
-  return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
-}
-
-module.exports = baseGetTag;
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * Performs a
- * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * comparison between two values to determine if they are equivalent.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
- * @example
- *
- * var object = { 'a': 1 };
- * var other = { 'a': 1 };
- *
- * _.eq(object, object);
- * // => true
- *
- * _.eq(object, other);
- * // => false
- *
- * _.eq('a', 'a');
- * // => true
- *
- * _.eq('a', Object('a'));
- * // => false
- *
- * _.eq(NaN, NaN);
- * // => true
- */
-
-function eq(value, other) {
-  return value === other || value !== value && other !== other;
-}
-
-module.exports = eq;
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isFunction = __webpack_require__(40),
-    isLength = __webpack_require__(48);
-/**
- * Checks if `value` is array-like. A value is considered array-like if it's
- * not a function and has a `value.length` that's an integer greater than or
- * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- * @example
- *
- * _.isArrayLike([1, 2, 3]);
- * // => true
- *
- * _.isArrayLike(document.body.children);
- * // => true
- *
- * _.isArrayLike('abc');
- * // => true
- *
- * _.isArrayLike(_.noop);
- * // => false
- */
-
-
-function isArrayLike(value) {
-  return value != null && isLength(value.length) && !isFunction(value);
-}
-
-module.exports = isArrayLike;
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isSymbol = __webpack_require__(35);
-/** Used as references for various `Number` constants. */
-
-
-var INFINITY = 1 / 0;
-/**
- * Converts `value` to a string key if it's not a string or symbol.
- *
- * @private
- * @param {*} value The value to inspect.
- * @returns {string|symbol} Returns the key.
- */
-
-function toKey(value) {
-  if (typeof value == 'string' || isSymbol(value)) {
-    return value;
-  }
-
-  var result = value + '';
-  return result == '0' && 1 / value == -INFINITY ? '-0' : result;
-}
-
-module.exports = toKey;
-
-/***/ }),
-/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2637,9 +2501,9 @@ module.exports = toKey;
 /* harmony import */ var _Models_functions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var _fields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 /* harmony import */ var _Payloads_sources__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
-/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(0);
-/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
+/* harmony import */ var _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 
 
 
@@ -2686,7 +2550,7 @@ class PurePayload {
     this.content_type = rawPayload.content_type;
 
     if (rawPayload.content) {
-      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isObject */ "q"])(rawPayload.content)) {
+      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isObject */ "r"])(rawPayload.content)) {
         this.content = Object(_Models_functions__WEBPACK_IMPORTED_MODULE_0__[/* FillItemContent */ "a"])(rawPayload.content);
       } else {
         this.content = rawPayload.content;
@@ -2713,25 +2577,25 @@ class PurePayload {
     this.auth_params = rawPayload.auth_params;
     this.duplicate_of = rawPayload.duplicate_of;
 
-    if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isString */ "s"])(this.content)) {
+    if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isString */ "t"])(this.content)) {
       if (this.content.startsWith(_Protocol_versions__WEBPACK_IMPORTED_MODULE_3__[/* ProtocolVersion */ "a"].V000Base64Decrypted)) {
         this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__[/* PayloadFormat */ "a"].DecryptedBase64String;
       } else {
         this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__[/* PayloadFormat */ "a"].EncryptedString;
       }
-    } else if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isObject */ "q"])(this.content)) {
+    } else if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isObject */ "r"])(this.content)) {
       this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__[/* PayloadFormat */ "a"].DecryptedBareObject;
     } else {
       this.format = _Payloads_formats__WEBPACK_IMPORTED_MODULE_5__[/* PayloadFormat */ "a"].Deleted;
     }
 
-    if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isString */ "s"])(this.content)) {
+    if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isString */ "t"])(this.content)) {
       this.version = this.content.substring(0, _Protocol_versions__WEBPACK_IMPORTED_MODULE_3__[/* ProtocolVersion */ "a"].VersionLength);
     } else if (this.content) {
       this.version = this.content.version;
     }
 
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* deepFreeze */ "g"])(this);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* deepFreeze */ "h"])(this);
   }
   /**
    * Returns a generic object with all payload fields except any that are meta-data
@@ -2753,7 +2617,7 @@ class PurePayload {
 
       const value = this[field];
 
-      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isNullOrUndefined */ "p"])(value) && optionalFields.includes(field)) {
+      if (Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* isNullOrUndefined */ "q"])(value) && optionalFields.includes(field)) {
         continue;
       }
 
@@ -2807,6 +2671,194 @@ class PurePayload {
   }
 
 }
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var baseUniq = __webpack_require__(75);
+/**
+ * Creates a duplicate-free version of an array, using
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons, in which only the first occurrence of each element
+ * is kept. The order of result values is determined by the order they occur
+ * in the array.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Array
+ * @param {Array} array The array to inspect.
+ * @returns {Array} Returns the new duplicate free array.
+ * @example
+ *
+ * _.uniq([2, 1, 2]);
+ * // => [2, 1]
+ */
+
+
+function uniq(array) {
+  return array && array.length ? baseUniq(array) : [];
+}
+
+module.exports = uniq;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Symbol = __webpack_require__(31),
+    getRawTag = __webpack_require__(93),
+    objectToString = __webpack_require__(94);
+/** `Object#toString` result references. */
+
+
+var nullTag = '[object Null]',
+    undefinedTag = '[object Undefined]';
+/** Built-in value references. */
+
+var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+/**
+ * The base implementation of `getTag` without fallbacks for buggy environments.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+
+function baseGetTag(value) {
+  if (value == null) {
+    return value === undefined ? undefinedTag : nullTag;
+  }
+
+  return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
+}
+
+module.exports = baseGetTag;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+
+function eq(value, other) {
+  return value === other || value !== value && other !== other;
+}
+
+module.exports = eq;
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isFunction = __webpack_require__(40),
+    isLength = __webpack_require__(48);
+/**
+ * Checks if `value` is array-like. A value is considered array-like if it's
+ * not a function and has a `value.length` that's an integer greater than or
+ * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+ * @example
+ *
+ * _.isArrayLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLike(document.body.children);
+ * // => true
+ *
+ * _.isArrayLike('abc');
+ * // => true
+ *
+ * _.isArrayLike(_.noop);
+ * // => false
+ */
+
+
+function isArrayLike(value) {
+  return value != null && isLength(value.length) && !isFunction(value);
+}
+
+module.exports = isArrayLike;
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isSymbol = __webpack_require__(35);
+/** Used as references for various `Number` constants. */
+
+
+var INFINITY = 1 / 0;
+/**
+ * Converts `value` to a string key if it's not a string or symbol.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {string|symbol} Returns the key.
+ */
+
+function toKey(value) {
+  if (typeof value == 'string' || isSymbol(value)) {
+    return value;
+  }
+
+  var result = value + '';
+  return result == '0' && 1 / value == -INFINITY ? '-0' : result;
+}
+
+module.exports = toKey;
 
 /***/ }),
 /* 28 */
@@ -2881,7 +2933,7 @@ module.exports = ListCache;
 "use strict";
 
 
-var eq = __webpack_require__(24);
+var eq = __webpack_require__(25);
 /**
  * Gets the index at which the `key` is found in `array` of key-value pairs.
  *
@@ -2995,7 +3047,7 @@ module.exports = isIndex;
 "use strict";
 
 
-var baseGetTag = __webpack_require__(23),
+var baseGetTag = __webpack_require__(24),
     isObjectLike = __webpack_require__(21);
 /** `Object#toString` result references. */
 
@@ -3170,7 +3222,7 @@ module.exports = Map;
 "use strict";
 
 
-var baseGetTag = __webpack_require__(23),
+var baseGetTag = __webpack_require__(24),
     isObject = __webpack_require__(18);
 /** `Object#toString` result references. */
 
@@ -3284,7 +3336,7 @@ module.exports = setToArray;
 
 var arrayLikeKeys = __webpack_require__(62),
     baseKeys = __webpack_require__(129),
-    isArrayLike = __webpack_require__(25);
+    isArrayLike = __webpack_require__(26);
 /**
  * Creates an array of the own enumerable property names of `object`.
  *
@@ -3555,7 +3607,7 @@ module.exports = isPrototype;
 
 
 var castPath = __webpack_require__(51),
-    toKey = __webpack_require__(26);
+    toKey = __webpack_require__(27);
 /**
  * The base implementation of `_.get` without support for default values.
  *
@@ -4196,7 +4248,7 @@ module.exports = baseMerge;
 
 
 var baseAssignValue = __webpack_require__(54),
-    eq = __webpack_require__(24);
+    eq = __webpack_require__(25);
 /**
  * This function is like `assignValue` except that it doesn't assign
  * `undefined` values.
@@ -4287,7 +4339,7 @@ module.exports = safeGet;
 
 var arrayLikeKeys = __webpack_require__(62),
     baseKeysIn = __webpack_require__(174),
-    isArrayLike = __webpack_require__(25);
+    isArrayLike = __webpack_require__(26);
 /**
  * Creates an array of the own and inherited enumerable property names of `object`.
  *
@@ -4572,7 +4624,7 @@ class ApplicationService extends _Services_pure_service__WEBPACK_IMPORTED_MODULE
     });
   }
 
-  onAppEvent(event) {
+  onAppEvent(_event) {
     /** Optional override */
   }
 
@@ -5825,7 +5877,7 @@ module.exports = arraySome;
 
 var Symbol = __webpack_require__(31),
     Uint8Array = __webpack_require__(61),
-    eq = __webpack_require__(24),
+    eq = __webpack_require__(25),
     equalArrays = __webpack_require__(58),
     mapToArray = __webpack_require__(115),
     setToArray = __webpack_require__(42);
@@ -6288,7 +6340,7 @@ module.exports = baseTimes;
 "use strict";
 
 
-var baseGetTag = __webpack_require__(23),
+var baseGetTag = __webpack_require__(24),
     isObjectLike = __webpack_require__(21);
 /** `Object#toString` result references. */
 
@@ -6341,7 +6393,7 @@ module.exports = stubFalse;
 "use strict";
 
 
-var baseGetTag = __webpack_require__(23),
+var baseGetTag = __webpack_require__(24),
     isLength = __webpack_require__(48),
     isObjectLike = __webpack_require__(21);
 /** `Object#toString` result references. */
@@ -6520,7 +6572,7 @@ var DataView = __webpack_require__(132),
     Promise = __webpack_require__(133),
     Set = __webpack_require__(64),
     WeakMap = __webpack_require__(134),
-    baseGetTag = __webpack_require__(23),
+    baseGetTag = __webpack_require__(24),
     toSource = __webpack_require__(56);
 /** `Object#toString` result references. */
 
@@ -6670,7 +6722,7 @@ var baseIsEqual = __webpack_require__(57),
     isKey = __webpack_require__(52),
     isStrictComparable = __webpack_require__(65),
     matchesStrictComparable = __webpack_require__(66),
-    toKey = __webpack_require__(26);
+    toKey = __webpack_require__(27);
 /** Used to compose bitmasks for value comparisons. */
 
 
@@ -7090,7 +7142,7 @@ var castPath = __webpack_require__(51),
     isArray = __webpack_require__(15),
     isIndex = __webpack_require__(34),
     isLength = __webpack_require__(48),
-    toKey = __webpack_require__(26);
+    toKey = __webpack_require__(27);
 /**
  * Checks if `path` exists on `object`.
  *
@@ -7138,7 +7190,7 @@ module.exports = hasPath;
 var baseProperty = __webpack_require__(148),
     basePropertyDeep = __webpack_require__(149),
     isKey = __webpack_require__(52),
-    toKey = __webpack_require__(26);
+    toKey = __webpack_require__(27);
 /**
  * Creates a function that returns the value at `path` of a given object.
  *
@@ -7275,7 +7327,7 @@ module.exports = basePullAt;
 var castPath = __webpack_require__(51),
     last = __webpack_require__(152),
     parent = __webpack_require__(153),
-    toKey = __webpack_require__(26);
+    toKey = __webpack_require__(27);
 /**
  * The base implementation of `_.unset`.
  *
@@ -7398,7 +7450,7 @@ module.exports = baseSlice;
 
 
 var baseIteratee = __webpack_require__(37),
-    isArrayLike = __webpack_require__(25),
+    isArrayLike = __webpack_require__(26),
     keys = __webpack_require__(43);
 /**
  * Creates a `_.find` or `_.findLast` function.
@@ -8026,7 +8078,7 @@ module.exports = baseCreate;
 "use strict";
 
 
-var isArrayLike = __webpack_require__(25),
+var isArrayLike = __webpack_require__(26),
     isObjectLike = __webpack_require__(21);
 /**
  * This method is like `_.isArrayLike` except that it also checks if `value`
@@ -8068,7 +8120,7 @@ module.exports = isArrayLikeObject;
 "use strict";
 
 
-var baseGetTag = __webpack_require__(23),
+var baseGetTag = __webpack_require__(24),
     getPrototype = __webpack_require__(71),
     isObjectLike = __webpack_require__(21);
 /** `Object#toString` result references. */
@@ -8230,7 +8282,7 @@ module.exports = copyObject;
 
 
 var baseAssignValue = __webpack_require__(54),
-    eq = __webpack_require__(24);
+    eq = __webpack_require__(25);
 /** Used for built-in method references. */
 
 
@@ -8582,8 +8634,8 @@ module.exports = shortOut;
 "use strict";
 
 
-var eq = __webpack_require__(24),
-    isArrayLike = __webpack_require__(25),
+var eq = __webpack_require__(25),
+    isArrayLike = __webpack_require__(26),
     isIndex = __webpack_require__(34),
     isObject = __webpack_require__(18);
 /**
@@ -9237,6 +9289,8 @@ __webpack_require__.r(__webpack_exports__);
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, "SNApplicationGroup", function() { return /* reexport */ application_group_SNApplicationGroup; });
 __webpack_require__.d(__webpack_exports__, "DeinitSource", function() { return /* reexport */ DeinitSource; });
+__webpack_require__.d(__webpack_exports__, "KeyParamsOrigination", function() { return /* reexport */ KeyParamsOrigination; });
+__webpack_require__.d(__webpack_exports__, "KeyRecoveryStrings", function() { return /* reexport */ KeyRecoveryStrings; });
 __webpack_require__.d(__webpack_exports__, "SNApplication", function() { return /* reexport */ application_SNApplication; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return /* reexport */ protocol_service_SNProtocolService; });
 __webpack_require__.d(__webpack_exports__, "KeyMode", function() { return /* reexport */ KeyMode; });
@@ -9289,12 +9343,13 @@ __webpack_require__.d(__webpack_exports__, "StoragePersistencePolicies", functio
 __webpack_require__.d(__webpack_exports__, "StorageEncryptionPolicies", function() { return /* reexport */ StorageEncryptionPolicies; });
 __webpack_require__.d(__webpack_exports__, "StorageValueModes", function() { return /* reexport */ StorageValueModes; });
 __webpack_require__.d(__webpack_exports__, "ValueModesKeys", function() { return /* reexport */ ValueModesKeys; });
-__webpack_require__.d(__webpack_exports__, "Challenge", function() { return /* reexport */ Challenge; });
+__webpack_require__.d(__webpack_exports__, "Challenge", function() { return /* reexport */ challenges_Challenge; });
 __webpack_require__.d(__webpack_exports__, "ChallengeReason", function() { return /* reexport */ ChallengeReason; });
 __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return /* reexport */ ChallengeResponse; });
-__webpack_require__.d(__webpack_exports__, "ChallengeType", function() { return /* reexport */ ChallengeType; });
+__webpack_require__.d(__webpack_exports__, "ChallengeValidation", function() { return /* reexport */ ChallengeValidation; });
 __webpack_require__.d(__webpack_exports__, "challengeTypeToString", function() { return /* reexport */ challengeTypeToString; });
 __webpack_require__.d(__webpack_exports__, "ChallengeValue", function() { return /* reexport */ ChallengeValue; });
+__webpack_require__.d(__webpack_exports__, "ChallengePrompt", function() { return /* reexport */ ChallengePrompt; });
 __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return /* reexport */ sync_service_SNSyncService; });
 __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return /* reexport */ SyncSources; });
 __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return /* reexport */ SyncModes; });
@@ -9308,28 +9363,30 @@ __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { r
 __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return /* reexport */ singleton_manager_SNSingletonManager; });
 __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return /* reexport */ api_service_SNApiService; });
 __webpack_require__.d(__webpack_exports__, "Copy", function() { return /* reexport */ utils["a" /* Copy */]; });
-__webpack_require__.d(__webpack_exports__, "findInArray", function() { return /* reexport */ utils["l" /* findInArray */]; });
-__webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return /* reexport */ utils["p" /* isNullOrUndefined */]; });
-__webpack_require__.d(__webpack_exports__, "deepMerge", function() { return /* reexport */ utils["h" /* deepMerge */]; });
-__webpack_require__.d(__webpack_exports__, "extendArray", function() { return /* reexport */ utils["j" /* extendArray */]; });
+__webpack_require__.d(__webpack_exports__, "findInArray", function() { return /* reexport */ utils["m" /* findInArray */]; });
+__webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return /* reexport */ utils["q" /* isNullOrUndefined */]; });
+__webpack_require__.d(__webpack_exports__, "deepMerge", function() { return /* reexport */ utils["i" /* deepMerge */]; });
+__webpack_require__.d(__webpack_exports__, "extendArray", function() { return /* reexport */ utils["k" /* extendArray */]; });
 __webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return /* reexport */ utils["C" /* removeFromIndex */]; });
 __webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return /* reexport */ utils["G" /* subtractFromArray */]; });
 __webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return /* reexport */ utils["c" /* arrayByDifference */]; });
 __webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return /* reexport */ utils["J" /* uniqCombineObjArrays */]; });
-__webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return /* reexport */ utils["n" /* greaterOfTwoDates */]; });
-__webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return /* reexport */ utils["m" /* getGlobalScope */]; });
+__webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return /* reexport */ utils["o" /* greaterOfTwoDates */]; });
+__webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return /* reexport */ utils["n" /* getGlobalScope */]; });
 __webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return /* reexport */ utils["B" /* removeFromArray */]; });
 __webpack_require__.d(__webpack_exports__, "addIfUnique", function() { return /* reexport */ utils["b" /* addIfUnique */]; });
-__webpack_require__.d(__webpack_exports__, "dictToArray", function() { return /* reexport */ utils["i" /* dictToArray */]; });
+__webpack_require__.d(__webpack_exports__, "dictToArray", function() { return /* reexport */ utils["j" /* dictToArray */]; });
 __webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return /* reexport */ utils["I" /* truncateHexString */]; });
-__webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return /* reexport */ utils["v" /* jsonParseEmbeddedKeys */]; });
+__webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return /* reexport */ utils["w" /* jsonParseEmbeddedKeys */]; });
 __webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return /* reexport */ utils["H" /* topLevelCompare */]; });
+__webpack_require__.d(__webpack_exports__, "dateSorted", function() { return /* reexport */ utils["g" /* dateSorted */]; });
 __webpack_require__.d(__webpack_exports__, "Uuid", function() { return /* reexport */ uuid_Uuid; });
-__webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return /* reexport */ intents["a" /* EncryptionIntent */]; });
-__webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return /* reexport */ intents["e" /* isLocalStorageIntent */]; });
-__webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return /* reexport */ intents["d" /* isFileIntent */]; });
-__webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return /* reexport */ intents["c" /* isDecryptedIntent */]; });
-__webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return /* reexport */ intents["b" /* intentRequiresEncryption */]; });
+__webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return /* reexport */ intents["b" /* EncryptionIntent */]; });
+__webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return /* reexport */ intents["f" /* isLocalStorageIntent */]; });
+__webpack_require__.d(__webpack_exports__, "isFileIntent", function() { return /* reexport */ intents["e" /* isFileIntent */]; });
+__webpack_require__.d(__webpack_exports__, "isDecryptedIntent", function() { return /* reexport */ intents["d" /* isDecryptedIntent */]; });
+__webpack_require__.d(__webpack_exports__, "intentRequiresEncryption", function() { return /* reexport */ intents["c" /* intentRequiresEncryption */]; });
+__webpack_require__.d(__webpack_exports__, "ContentTypeUsesRootKeyEncryption", function() { return /* reexport */ intents["a" /* ContentTypeUsesRootKeyEncryption */]; });
 __webpack_require__.d(__webpack_exports__, "ContentType", function() { return /* reexport */ content_types["a" /* ContentType */]; });
 __webpack_require__.d(__webpack_exports__, "CreateItemFromPayload", function() { return /* reexport */ CreateItemFromPayload; });
 __webpack_require__.d(__webpack_exports__, "Uuids", function() { return /* reexport */ functions["b" /* Uuids */]; });
@@ -9369,14 +9426,13 @@ __webpack_require__.d(migrations_namespaceObject, "Migration20200115", function(
 
 // CONCATENATED MODULE: ./lib/storage_keys.ts
 /**
- * Unmanaged keys stored in root storage
+ * Unmanaged keys stored in root storage.
+ * Raw storage keys exist outside of StorageManager domain
  */
 var RawStorageKey;
 
 (function (RawStorageKey) {
   RawStorageKey["StorageObject"] = "storage";
-  /** Raw storage keys exist outside of StorageManager domain */
-
   RawStorageKey["LastMigrationTimestamp"] = "last_migration_timestamp";
   RawStorageKey["DescriptorRecord"] = "descriptors";
 })(RawStorageKey || (RawStorageKey = {}));
@@ -9407,6 +9463,7 @@ var StorageKey;
   StorageKey["SessionHistoryPersistable"] = "sessionHistory_persist";
   StorageKey["SessionHistoryRevisions"] = "sessionHistory_revisions";
   StorageKey["SessionHistoryOptimize"] = "sessionHistory_autoOptimize";
+  StorageKey["KeyRecoveryUndecryptableItems"] = "key_recovery_undecryptable";
 })(StorageKey || (StorageKey = {}));
 
 ;
@@ -9456,7 +9513,7 @@ class uuid_Uuid {
 
 
   static canGenSync() {
-    return !Object(utils["p" /* isNullOrUndefined */])(this.syncUuidFunc);
+    return !Object(utils["q" /* isNullOrUndefined */])(this.syncUuidFunc);
   }
   /**
    * Generates a UUID string asyncronously.
@@ -9694,107 +9751,240 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
   }
 
 }
-// EXTERNAL MODULE: ./lib/models/functions.ts
-var functions = __webpack_require__(10);
+// EXTERNAL MODULE: ./lib/protocol/versions.ts
+var versions = __webpack_require__(5);
 
-// CONCATENATED MODULE: ./lib/stages.ts
-var ApplicationStage;
+// CONCATENATED MODULE: ./lib/protocol/key_params.ts
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-(function (ApplicationStage) {
-  ApplicationStage[ApplicationStage["PreparingForLaunch_0"] = 0] = "PreparingForLaunch_0";
-  ApplicationStage[ApplicationStage["ReadyForLaunch_05"] = 0.5] = "ReadyForLaunch_05";
-  ApplicationStage[ApplicationStage["StorageDecrypted_09"] = 0.9] = "StorageDecrypted_09";
-  ApplicationStage[ApplicationStage["Launched_10"] = 1] = "Launched_10";
-  ApplicationStage[ApplicationStage["LoadingDatabase_11"] = 1.1] = "LoadingDatabase_11";
-  ApplicationStage[ApplicationStage["LoadedDatabase_12"] = 1.2] = "LoadedDatabase_12";
-  ApplicationStage[ApplicationStage["FullSyncCompleted_13"] = 1.3] = "FullSyncCompleted_13";
-  ApplicationStage[ApplicationStage["SignedIn_30"] = 3] = "SignedIn_30";
-})(ApplicationStage || (ApplicationStage = {}));
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-;
-// EXTERNAL MODULE: ./lib/events.ts
-var events = __webpack_require__(12);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+/**
+ *  001, 002:
+ *  - Nonce is not uploaded to server, instead used to compute salt locally and send to server
+ *  - Salt is returned from server
+ *  - Cost/iteration count is returned from the server
+ *  - Account identifier is returned as 'email'
+ *  003, 004:
+ *  - Salt is computed locally via the seed (pw_nonce) returned from the server
+ *  - Cost/iteration count is determined locally by the protocol version
+ *  - Account identifier is returned as 'identifier'
+ */
+
+var KeyParamsOrigination;
+
+(function (KeyParamsOrigination) {
+  KeyParamsOrigination["Registration"] = "registration";
+  KeyParamsOrigination["EmailChange"] = "email-change";
+  KeyParamsOrigination["PasswordChange"] = "password-change";
+  KeyParamsOrigination["ProtocolUpgrade"] = "protocol-upgrade";
+  KeyParamsOrigination["PasscodeCreate"] = "passcode-create";
+  KeyParamsOrigination["PasscodeChange"] = "passcode-change";
+})(KeyParamsOrigination || (KeyParamsOrigination = {}));
+
+function Create001KeyParams(keyParams) {
+  return CreateAnyKeyParams(keyParams);
+}
+function Create002KeyParams(keyParams) {
+  return CreateAnyKeyParams(keyParams);
+}
+function Create003KeyParams(keyParams) {
+  return CreateAnyKeyParams(keyParams);
+}
+function Create004KeyParams(keyParams) {
+  return CreateAnyKeyParams(keyParams);
+}
+function CreateAnyKeyParams(keyParams) {
+  if (keyParams.content) {
+    throw Error('Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.');
+  }
+
+  return new key_params_SNRootKeyParams(keyParams);
+}
+function KeyParamsFromApiResponse(response) {
+  const rawKeyParams = {
+    identifier: response.identifier,
+    pw_cost: response.pw_cost,
+    pw_nonce: response.pw_nonce,
+    pw_salt: response.pw_salt,
+
+    /* 002 doesn't have version automatically, newer versions do. */
+    version: response.version || versions["a" /* ProtocolVersion */].V002,
+    origination: response.origination,
+    created: response.created
+  };
+  return CreateAnyKeyParams(rawKeyParams);
+}
+/**
+ * Key params are public data that contain information about how a root key was created.
+ * Given a keyParams object and a password, clients can compute a root key that was created
+ * previously.
+ */
+
+class key_params_SNRootKeyParams {
+  constructor(content) {
+    this.content = _objectSpread(_objectSpread({}, content), {}, {
+      origination: content.origination || KeyParamsOrigination.Registration
+    });
+  }
+  /**
+   * For consumers to determine whether the object they are
+   * working with is a proper RootKeyParams object.
+   */
+
+
+  get isKeyParamsObject() {
+    return true;
+  }
+
+  get identifier() {
+    return this.content004.identifier || this.content002.email;
+  }
+
+  get version() {
+    return this.content.version;
+  }
+
+  get content001() {
+    return this.content;
+  }
+
+  get content002() {
+    return this.content;
+  }
+
+  get content003() {
+    return this.content;
+  }
+
+  get content004() {
+    return this.content;
+  }
+
+  get createdDate() {
+    if (!this.content004.created) {
+      return undefined;
+    }
+
+    return new Date(Number(this.content004.created));
+  }
+
+  compare(other) {
+    if (this.version !== other.version) {
+      return false;
+    }
+
+    if ([versions["a" /* ProtocolVersion */].V004, versions["a" /* ProtocolVersion */].V003].includes(this.version)) {
+      return this.identifier === other.identifier && this.content004.pw_nonce === other.content003.pw_nonce;
+    } else if ([versions["a" /* ProtocolVersion */].V002, versions["a" /* ProtocolVersion */].V001].includes(this.version)) {
+      return this.identifier === other.identifier && this.content002.pw_salt === other.content001.pw_salt;
+    } else {
+      throw Error('Unhandled version in KeyParams.compare');
+    }
+  }
+  /**
+   * @access public
+   * When saving in a file or communicating with server,
+   * use the original values.
+   */
+
+
+  getPortableValue() {
+    return this.content;
+  }
+
+}
+// CONCATENATED MODULE: ./lib/services/api/messages.ts
+const API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.';
+const API_MESSAGE_GENERIC_REGISTRATION_FAIL = 'A server error occurred while trying to register. Please try again.';
+const API_MESSAGE_GENERIC_CHANGE_PW_FAIL = "Something went wrong while changing your password. Your password was not changed. Please try again.";
+const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.';
+const API_MESSAGE_REGISTRATION_IN_PROGRESS = 'An existing registration request is already in progress.';
+const API_MESSAGE_LOGIN_IN_PROGRESS = 'An existing sign in request is already in progress.';
+const API_MESSAGE_CHANGE_PW_IN_PROGRESS = 'An existing change password request is already in progress.';
+const API_MESSAGE_FALLBACK_LOGIN_FAIL = 'Invalid email or password.';
+const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL = "A server error occurred while trying to refresh your session. Please try again.";
+const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = "Your account session is being renewed with the server. Please try your request again.";
+const API_MESSAGE_INVALID_SESSION = 'Please sign in to an account in order to continue with your request.';
+const UNSUPPORTED_PROTOCOL_VERSION = "This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.";
+const EXPIRED_PROTOCOL_VERSION = "The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security for more information.";
+const OUTDATED_PROTOCOL_VERSION = "The encryption version for your account is outdated and requires upgrade. You may proceed with login, but areadvised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.";
+const UNSUPPORTED_KEY_DERIVATION = "Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.";
+const INVALID_PASSWORD_COST = "Unable to login due to insecure password parameters. Please visit standardnotes.org/help/security for more information.";
+const INVALID_PASSWORD = "Invalid password.";
+const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
+const OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In';
+const UPGRADING_ENCRYPTION = "Upgrading your account's encryption version\u2026";
+const SETTING_PASSCODE = "Setting passcode\u2026";
+const CHANGING_PASSCODE = "Changing passcode\u2026";
+const REMOVING_PASSCODE = "Removing passcode\u2026";
+const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this process completes.';
+const UNKNOWN_ERROR = 'Unknown error.';
+function InsufficientPasswordMessage(minimum) {
+  return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
+}
+function StrictSignInFailed(current, latest) {
+  return "Strict Sign In has refused the server's sign-in parameters. The latest account version is ".concat(latest, ", but the server is reporting a version of ").concat(current, " for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.");
+}
+const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
+const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
+const PasswordChangeStrings = {
+  PasscodeRequired: 'Your passcode is required to process your password change.'
+};
+const SignInStrings = {
+  PasscodeRequired: 'Your passcode is required in order to sign in to your account.',
+  IncorrectMfa: 'Incorrect two-factor authentication code. Please try again.',
+  SignInCanceledMissingMfa: 'Your sign in request has been canceled.'
+};
+const ProtocolUpgradeStrings = {
+  SuccessAccount: "Your encryption version has been successfully upgraded. You may be asked to enter your credentials again on other devices you're signed into.",
+  SuccessPasscodeOnly: "Your encryption version has been successfully upgraded.",
+  Fail: "Unable to upgrade encryption version. Please try again.",
+  UpgradingPasscode: 'Upgrading local encryption...'
+};
+const KeyRecoveryStrings = {
+  KeyRecoveryLoginFlowPrompt: keyParams => {
+    return "Enter your account password as it was on ".concat(keyParams === null || keyParams === void 0 ? void 0 : keyParams.createdDate, ".");
+  },
+  KeyRecoveryLoginFlowReason: 'Your account password is required to revalidate your session.',
+  KeyRecoveryLoginFlowInvalidPassword: 'Incorrect credentials entered. Please try again.',
+  KeyRecoveryRootKeyReplaced: 'Your credentials have successfully been updated.',
+  KeyRecoveryPasscodeRequiredTitle: 'Passcode Required',
+  KeyRecoveryPasscodeRequiredText: 'You must enter your passcode in order to save your new credentials.',
+  KeyRecoveryPasswordRequired: 'Your account password is required to recover an encryption key.',
+  KeyRecoveryKeyRecovered: 'Your key has successfully been recovered.',
+  KeyRecoveryUnableToRecover: 'Unable to recover your key with the attempted password. Please try again.'
+};
+const ChallengeModalTitle = {
+  Generic: 'Authentication Required',
+  Migration: 'Storage Update'
+};
+const SessionStrings = {
+  EnterEmailAndPassword: 'Please enter your account email and password.',
+  RecoverSession: 'Your credentials are needed to refresh your session with the server.',
+  SessionRestored: 'Your session has been succesfully restored.',
+  EnterMfa: 'Please enter your two-factor authentication code.',
+  EmailInputPlaceholder: 'Email',
+  PasswordInputPlaceholder: 'Password'
+};
+const ChallengeStrings = {
+  UnlockApplication: 'Enter your application passcode to unlock the application',
+  EnterAccountPassword: 'Enter your account password',
+  EnterLocalPasscode: 'Enter your application passcode',
+  EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
+  EnterPasscodeForRootResave: 'Enter your application passcode to continue',
+  EnterCredentialsForProtocolUpgrade: 'Enter your credentials to perform encryption upgrade',
+  AccountPasswordPlaceholder: 'Account Password',
+  LocalPasscodePlaceholder: 'Application Passcode'
+};
+// EXTERNAL MODULE: ./lib/protocol/payloads/fields.ts
+var fields = __webpack_require__(4);
 
 // EXTERNAL MODULE: ./lib/models/core/item.ts
-var core_item = __webpack_require__(5);
-
-// CONCATENATED MODULE: ./lib/challenges.ts
-var ChallengeType;
-
-(function (ChallengeType) {
-  ChallengeType[ChallengeType["LocalPasscode"] = 1] = "LocalPasscode";
-  ChallengeType[ChallengeType["AccountPassword"] = 2] = "AccountPassword";
-  ChallengeType[ChallengeType["Biometric"] = 3] = "Biometric";
-})(ChallengeType || (ChallengeType = {}));
-
-;
-/** The source of the challenge */
-
-var ChallengeReason;
-
-(function (ChallengeReason) {
-  ChallengeReason[ChallengeReason["ApplicationUnlock"] = 1] = "ApplicationUnlock";
-  ChallengeReason[ChallengeReason["ResaveRootKey"] = 2] = "ResaveRootKey";
-  ChallengeReason[ChallengeReason["ProtocolUpgrade"] = 3] = "ProtocolUpgrade";
-  ChallengeReason[ChallengeReason["Migration"] = 4] = "Migration";
-})(ChallengeReason || (ChallengeReason = {}));
-
-;
-/**
- * A challenge is a stateless description of what the client needs to provide
- * in order to proceed.
- */
-
-class Challenge {
-  constructor(types, reason) {
-    this.types = types;
-    this.reason = reason;
-    this.id = new Date().getTime();
-    Object.freeze(this);
-  }
-
-}
-class ChallengeValue {
-  constructor(type, value) {
-    this.type = type;
-    this.value = value;
-    Object.freeze(this);
-  }
-
-}
-class ChallengeResponse {
-  constructor(challenge, values, artifacts) {
-    this.challenge = challenge;
-    this.values = values;
-    this.artifacts = artifacts;
-    Object.freeze(this);
-  }
-
-  getValueForType(type) {
-    return this.values.find(value => value.type === type);
-  }
-
-}
-/**
- * @returns The UI-friendly title for this challenge
- */
-
-function challengeTypeToString(type) {
-  const mapping = {
-    [ChallengeType.LocalPasscode]: 'application passcode',
-    [ChallengeType.AccountPassword]: 'account password',
-    [ChallengeType.Biometric]: 'biometrics'
-  };
-  return mapping[type];
-}
-// EXTERNAL MODULE: ./lib/models/content_types.ts
-var content_types = __webpack_require__(3);
-
-// EXTERNAL MODULE: ./lib/protocol/payloads/generator.ts
-var generator = __webpack_require__(1);
-
-// EXTERNAL MODULE: ./lib/protocol/payloads/sources.ts
-var sources = __webpack_require__(2);
+var core_item = __webpack_require__(6);
 
 // EXTERNAL MODULE: ./lib/models/core/predicate.ts
 var core_predicate = __webpack_require__(14);
@@ -9951,6 +10141,9 @@ class privileges_PrivilegeMutator extends core_item["b" /* ItemMutator */] {
 }
 // EXTERNAL MODULE: ./lib/protocol/payloads/deltas/strategies.ts
 var strategies = __webpack_require__(13);
+
+// EXTERNAL MODULE: ./lib/models/content_types.ts
+var content_types = __webpack_require__(3);
 
 // CONCATENATED MODULE: ./lib/models/app/component.ts
 
@@ -10420,7 +10613,7 @@ class smartTag_SNSmartTag extends tag_SNTag {
 
 }
 // EXTERNAL MODULE: ./lib/protocol/payloads/formats.ts
-var formats = __webpack_require__(9);
+var formats = __webpack_require__(8);
 
 // CONCATENATED MODULE: ./lib/models/app/note.ts
 
@@ -10447,7 +10640,7 @@ class note_SNNote extends core_item["d" /* SNItem */] {
       this.prefersPlainEditor = this.getAppDomainValue(core_item["a" /* AppDataField */].PrefersPlainEditor);
     }
 
-    if (!Object(utils["p" /* isNullOrUndefined */])(this.payload.safeContent.mobilePrefersPlainEditor)) {
+    if (!Object(utils["q" /* isNullOrUndefined */])(this.payload.safeContent.mobilePrefersPlainEditor)) {
       this.mobilePrefersPlainEditor = this.payload.safeContent.mobilePrefersPlainEditor;
     }
   }
@@ -10491,9 +10684,6 @@ class note_NoteMutator extends core_item["b" /* ItemMutator */] {
   }
 
 }
-// EXTERNAL MODULE: ./lib/protocol/versions.ts
-var versions = __webpack_require__(6);
-
 // CONCATENATED MODULE: ./lib/models/app/items_key.ts
 
 
@@ -10512,7 +10702,7 @@ class items_key_SNItemsKey extends core_item["d" /* SNItem */] {
     return strategies["a" /* ConflictStrategy */].KeepLeft;
   }
 
-  get version() {
+  get keyVersion() {
     return this.payload.safeContent.version;
   }
 
@@ -10529,7 +10719,7 @@ class items_key_SNItemsKey extends core_item["d" /* SNItem */] {
   }
 
   get dataAuthenticationKey() {
-    if (this.version === versions["a" /* ProtocolVersion */].V004) {
+    if (this.keyVersion === versions["a" /* ProtocolVersion */].V004) {
       throw 'Attempting to access legacy data authentication key.';
     }
 
@@ -10574,8 +10764,26 @@ function CreateItemFromPayload(payload) {
   const item = new itemClass(payload);
   return item;
 }
+// CONCATENATED MODULE: ./lib/stages.ts
+var ApplicationStage;
+
+(function (ApplicationStage) {
+  ApplicationStage[ApplicationStage["PreparingForLaunch_0"] = 0] = "PreparingForLaunch_0";
+  ApplicationStage[ApplicationStage["ReadyForLaunch_05"] = 0.5] = "ReadyForLaunch_05";
+  ApplicationStage[ApplicationStage["StorageDecrypted_09"] = 0.9] = "StorageDecrypted_09";
+  ApplicationStage[ApplicationStage["Launched_10"] = 1] = "Launched_10";
+  ApplicationStage[ApplicationStage["LoadingDatabase_11"] = 1.1] = "LoadingDatabase_11";
+  ApplicationStage[ApplicationStage["LoadedDatabase_12"] = 1.2] = "LoadedDatabase_12";
+  ApplicationStage[ApplicationStage["FullSyncCompleted_13"] = 1.3] = "FullSyncCompleted_13";
+  ApplicationStage[ApplicationStage["SignedIn_30"] = 3] = "SignedIn_30";
+})(ApplicationStage || (ApplicationStage = {}));
+
+;
+// EXTERNAL MODULE: ./lib/protocol/payloads/generator.ts
+var generator = __webpack_require__(1);
+
 // EXTERNAL MODULE: ./lib/protocol/intents.ts
-var intents = __webpack_require__(8);
+var intents = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./lib/services/storage_service.ts
 
@@ -10706,7 +10914,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
 
   isStorageWrapped() {
     const wrappedValue = this.values[ValueModesKeys.Wrapped];
-    return !Object(utils["p" /* isNullOrUndefined */])(wrappedValue) && Object.keys(wrappedValue).length > 0;
+    return !Object(utils["q" /* isNullOrUndefined */])(wrappedValue) && Object.keys(wrappedValue).length > 0;
   }
 
   async canDecryptWithKey(key) {
@@ -10781,7 +10989,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
       content: valuesToWrap,
       content_type: content_types["a" /* ContentType */].EncryptedStorage
     });
-    const encryptedPayload = await this.encryptionDelegate.payloadByEncryptingPayload(payload, intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted);
+    const encryptedPayload = await this.encryptionDelegate.payloadByEncryptingPayload(payload, intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted);
     rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected();
     rawContent[ValueModesKeys.Unwrapped] = undefined;
     return rawContent;
@@ -10800,6 +11008,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
 
   async getValue(key) {
     let mode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : StorageValueModes.Default;
+    let defaultValue = arguments.length > 2 ? arguments[2] : undefined;
 
     if (!this.values) {
       throw Error("Attempting to get storage key ".concat(key, " before loading local storage."));
@@ -10809,7 +11018,8 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
       throw Error("Storage domain mode not available ".concat(mode, " for key ").concat(key));
     }
 
-    return this.values[this.domainKeyForMode(mode)][key];
+    const value = this.values[this.domainKeyForMode(mode)][key];
+    return !Object(utils["q" /* isNullOrUndefined */])(value) ? value : defaultValue;
   }
 
   async removeValue(key) {
@@ -10897,7 +11107,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
           throw Error('Attempting to persist payload with no uuid');
         }
 
-        const encrypted = await this.encryptionDelegate.payloadByEncryptingPayload(payload, this.encryptionPolicy === StorageEncryptionPolicies.Default ? intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted : intents["a" /* EncryptionIntent */].LocalStorageDecrypted);
+        const encrypted = await this.encryptionDelegate.payloadByEncryptingPayload(payload, this.encryptionPolicy === StorageEncryptionPolicies.Default ? intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted : intents["b" /* EncryptionIntent */].LocalStorageDecrypted);
         nondeleted.push(encrypted.ejected());
       }
     }
@@ -10934,6 +11144,1535 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
   }
 
 }
+// CONCATENATED MODULE: ./lib/challenges.ts
+
+var ChallengeValidation;
+
+(function (ChallengeValidation) {
+  ChallengeValidation[ChallengeValidation["None"] = 0] = "None";
+  ChallengeValidation[ChallengeValidation["LocalPasscode"] = 1] = "LocalPasscode";
+  ChallengeValidation[ChallengeValidation["AccountPassword"] = 2] = "AccountPassword";
+  ChallengeValidation[ChallengeValidation["Biometric"] = 3] = "Biometric";
+})(ChallengeValidation || (ChallengeValidation = {}));
+
+;
+/** The source of the challenge */
+
+var ChallengeReason;
+
+(function (ChallengeReason) {
+  ChallengeReason[ChallengeReason["ApplicationUnlock"] = 1] = "ApplicationUnlock";
+  ChallengeReason[ChallengeReason["ResaveRootKey"] = 2] = "ResaveRootKey";
+  ChallengeReason[ChallengeReason["ProtocolUpgrade"] = 3] = "ProtocolUpgrade";
+  ChallengeReason[ChallengeReason["Migration"] = 4] = "Migration";
+  ChallengeReason[ChallengeReason["Custom"] = 5] = "Custom";
+})(ChallengeReason || (ChallengeReason = {}));
+
+;
+/**
+ * A challenge is a stateless description of what the client needs to provide
+ * in order to proceed.
+ */
+
+class challenges_Challenge {
+  constructor(prompts, reason, _heading, _subheading) {
+    this.prompts = prompts;
+    this.reason = reason;
+    this._heading = _heading;
+    this._subheading = _subheading;
+    this.id = Math.random();
+    Object.freeze(this);
+  }
+  /** Outside of the modal, this is the title of the modal itself */
+
+
+  get modalTitle() {
+    switch (this.reason) {
+      case ChallengeReason.Migration:
+        return ChallengeModalTitle.Migration;
+
+      default:
+        return ChallengeModalTitle.Generic;
+    }
+  }
+  /** Inside of the modal, this is the H1 */
+
+
+  get heading() {
+    if (this._heading) {
+      return this._heading;
+    } else {
+      switch (this.reason) {
+        case ChallengeReason.ApplicationUnlock:
+          return ChallengeStrings.UnlockApplication;
+
+        case ChallengeReason.Migration:
+          return ChallengeStrings.EnterLocalPasscode;
+
+        case ChallengeReason.ResaveRootKey:
+          return ChallengeStrings.EnterPasscodeForRootResave;
+
+        case ChallengeReason.ProtocolUpgrade:
+          return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
+      }
+    }
+  }
+  /** Inside of the modal, this is the H2 */
+
+
+  get subheading() {
+    if (this._subheading) {
+      return this._subheading;
+    }
+
+    switch (this.reason) {
+      case ChallengeReason.Migration:
+        return ChallengeStrings.EnterPasscodeForMigration;
+    }
+  }
+
+  hasPromptForValidationType(type) {
+    for (const prompt of this.prompts) {
+      if (prompt.validation === type) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+}
+/**
+ * A Challenge can have many prompts. Each prompt represents a unique input,
+ * such as a text field, or biometric scanner.
+ */
+
+class ChallengePrompt {
+  constructor(validation, title, placeholder) {
+    let secureTextEntry = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+    this.validation = validation;
+    this.title = title;
+    this.placeholder = placeholder;
+    this.secureTextEntry = secureTextEntry;
+    this.id = Math.random();
+    Object.freeze(this);
+  }
+
+  get validates() {
+    return this.validation !== ChallengeValidation.None;
+  }
+
+}
+class ChallengeValue {
+  constructor(prompt, value) {
+    this.prompt = prompt;
+    this.value = value;
+    Object.freeze(this);
+  }
+
+}
+class ChallengeResponse {
+  constructor(challenge, values, artifacts) {
+    this.challenge = challenge;
+    this.values = values;
+    this.artifacts = artifacts;
+    Object.freeze(this);
+  }
+
+  getValueForType(type) {
+    return this.values.find(value => value.prompt.validation === type);
+  }
+
+  getDefaultValue() {
+    if (this.values.length > 1) {
+      throw Error('Attempting to retrieve default response value when more than one value exists');
+    }
+
+    return this.values[0];
+  }
+
+}
+/**
+ * @returns The UI-friendly title for this challenge
+ */
+
+function challengeTypeToString(type) {
+  const mapping = {
+    [ChallengeValidation.LocalPasscode]: 'application passcode',
+    [ChallengeValidation.AccountPassword]: 'account password',
+    [ChallengeValidation.Biometric]: 'biometrics',
+    [ChallengeValidation.None]: 'custom'
+  };
+  return mapping[type];
+}
+// EXTERNAL MODULE: ./node_modules/lodash/remove.js
+var remove = __webpack_require__(19);
+var remove_default = /*#__PURE__*/__webpack_require__.n(remove);
+
+// CONCATENATED MODULE: ./lib/models/index.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// CONCATENATED MODULE: ./lib/protocol/payloads/functions.ts
+function functions_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function functions_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { functions_ownKeys(Object(source), true).forEach(function (key) { functions_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { functions_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function functions_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+
+
+
+
+
+
+
+function NoteDuplicationAffectedPayloads(basePayload, duplicatePayload, baseCollection) {
+  /** If note has editor, maintain editor relationship in duplicate note */
+  const components = baseCollection.all(content_types["a" /* ContentType */].Component).map(payload => {
+    return CreateItemFromPayload(payload);
+  });
+  const editor = components.filter(c => c.area === ComponentArea.Editor).find(e => {
+    return e.isExplicitlyEnabledForItem(basePayload.uuid);
+  });
+
+  if (!editor) {
+    return undefined;
+  }
+  /** Modify the editor to include new note */
+
+
+  const mutator = new component_ComponentMutator(editor, core_item["c" /* MutationType */].Internal);
+  mutator.associateWithItem(duplicatePayload.uuid);
+  const result = mutator.getResult();
+  return [result];
+}
+
+const AffectorMapping = {
+  [content_types["a" /* ContentType */].Note]: NoteDuplicationAffectedPayloads
+};
+/**
+ * Copies payload and assigns it a new uuid.
+ * @returns An array of payloads that have changed as a result of copying.
+ */
+
+async function PayloadsByDuplicating(payload, baseCollection, isConflict) {
+  const results = [];
+  const override = {
+    uuid: await uuid_Uuid.GenerateUuid(),
+    dirty: true,
+    dirtiedDate: new Date(),
+    lastSyncBegan: null,
+    lastSyncEnd: null,
+    duplicate_of: payload.uuid
+  };
+
+  if (isConflict) {
+    override.content = functions_objectSpread(functions_objectSpread({}, payload.safeContent), {}, {
+      conflict_of: payload.uuid
+    });
+  }
+
+  const copy = Object(generator["b" /* CopyPayload */])(payload, override);
+  results.push(copy);
+  /**
+   * Get the payloads that make reference to payload and add the copy.
+   */
+
+  const referencing = baseCollection.elementsReferencingElement(payload);
+  const updatedReferencing = await PayloadsByUpdatingReferences(referencing, [{
+    uuid: copy.uuid,
+    content_type: copy.content_type
+  }]);
+  Object(utils["k" /* extendArray */])(results, updatedReferencing);
+  const affector = AffectorMapping[payload.content_type];
+
+  if (affector) {
+    const affected = affector(payload, copy, baseCollection);
+
+    if (affected) {
+      Object(utils["k" /* extendArray */])(results, affected);
+    }
+  }
+
+  return results;
+}
+/**
+ * Return the payloads that result if you alternated the uuid for the payload.
+ * Alternating a UUID involves instructing related items to drop old references of a uuid
+ * for the new one.
+ * @returns An array of payloads that have changed as a result of copying.
+ */
+
+async function PayloadsByAlternatingUuid(payload, baseCollection) {
+  const results = [];
+  /**
+  * We need to clone payload and give it a new uuid,
+  * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
+  */
+
+  const copy = Object(generator["b" /* CopyPayload */])(payload, {
+    uuid: await uuid_Uuid.GenerateUuid(),
+    dirty: true,
+    dirtiedDate: new Date(),
+    lastSyncBegan: null,
+    lastSyncEnd: null
+  });
+  results.push(copy);
+  /**
+   * Get the payloads that make reference to payload and remove
+   * payload as a relationship, instead adding the new copy.
+   */
+
+  const referencing = baseCollection.elementsReferencingElement(payload);
+  const updatedReferencing = await PayloadsByUpdatingReferences(referencing, [{
+    uuid: copy.uuid,
+    content_type: copy.content_type
+  }], [payload.uuid]);
+  Object(utils["k" /* extendArray */])(results, updatedReferencing);
+  const updatedSelf = Object(generator["b" /* CopyPayload */])(payload, {
+    deleted: true,
+
+    /** Do not set as dirty; this item is non-syncable
+      and should be immediately discarded */
+    dirty: false,
+    content: undefined
+  });
+  results.push(updatedSelf);
+  return results;
+}
+
+async function PayloadsByUpdatingReferences(payloads, add, removeIds) {
+  const results = [];
+
+  for (const payload of payloads) {
+    const references = payload.contentObject.references.slice();
+
+    if (add) {
+      for (const reference of add) {
+        references.push(reference);
+      }
+    }
+
+    if (removeIds) {
+      for (const id of removeIds) {
+        remove_default()(references, {
+          uuid: id
+        });
+      }
+    }
+
+    const result = Object(generator["b" /* CopyPayload */])(payload, {
+      dirty: true,
+      dirtiedDate: new Date(),
+      content: functions_objectSpread(functions_objectSpread({}, payload.safeContent), {}, {
+        references: references
+      })
+    });
+    results.push(result);
+  }
+
+  return results;
+}
+/**
+ * Compares the .content fields for equality, creating new SNItem objects
+ * to properly handle .content intricacies.
+ */
+
+
+function PayloadContentsEqual(payloadA, payloadB) {
+  const itemA = CreateItemFromPayload(payloadA);
+  const itemB = CreateItemFromPayload(payloadB);
+  return itemA.isItemContentEqualWith(itemB);
+}
+// EXTERNAL MODULE: ./lib/protocol/payloads/sources.ts
+var sources = __webpack_require__(2);
+
+// EXTERNAL MODULE: ./lib/protocol/payloads/pure_payload.ts
+var pure_payload = __webpack_require__(22);
+
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/delta.ts
+/**
+ * A payload delta is a class that defines instructions that process an incoming collection
+ * of payloads, applies some set of operations on those payloads wrt to the current base state,
+ * and returns the resulting collection. Deltas are purely functional and do not modify
+ * input data, instead returning what the collection would look like after its been
+ * transformed. The consumer may choose to act as they wish with this end result.
+ *
+ * A delta object takes a baseCollection (the current state of the data) and an applyCollection
+ * (the data another source is attempting to merge on top of our base data). The delta will
+ * then iterate over this data and return a `resultingCollection` object that includes the final
+ * state of the data after the class-specific operations have been applied.
+ *
+ * For example, the RemoteRetrieved delta will take the current state of local data as
+ * baseCollection, the data the server is sending as applyCollection, and determine what
+ * the end state of the data should look like.
+ */
+class PayloadsDelta {
+  /**
+   * @param baseCollection The authoratitive collection on top of which to compute changes.
+   * @param applyCollection The collection of payloads to apply, from one given source only.
+   * @param relatedCollectionSet A collection set (many collections) that contain payloads
+   *                             that may be neccessary to carry out computation.
+   */
+  constructor(baseCollection, applyCollection, relatedCollectionSet) {
+    this.baseCollection = baseCollection;
+    this.applyCollection = applyCollection;
+    this.relatedCollectionSet = relatedCollectionSet;
+  }
+
+  async resultingCollection() {
+    throw 'Must override PayloadDelta.resultingCollection.';
+  }
+  /**
+   * @param {string} id  - The uuid of the payload to find
+   */
+
+
+  findBasePayload(id) {
+    return this.baseCollection.find(id);
+  }
+
+  findRelatedPayload(id, source) {
+    var _this$relatedCollecti;
+
+    const collection = (_this$relatedCollecti = this.relatedCollectionSet) === null || _this$relatedCollecti === void 0 ? void 0 : _this$relatedCollecti.collectionForSource(source);
+    return collection === null || collection === void 0 ? void 0 : collection.find(id);
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/collection/uuid_map.ts
+
+class uuid_map_UuidMap {
+  constructor() {
+    /** uuid to uuids that we have a relationship with */
+    this.directMap = {};
+    /** uuid to uuids that have a relationship with us */
+
+    this.inverseMap = {};
+  }
+
+  makeCopy() {
+    const copy = new uuid_map_UuidMap();
+    copy.directMap = Object.assign({}, this.directMap);
+    copy.inverseMap = Object.assign({}, this.inverseMap);
+    return copy;
+  }
+
+  getDirectRelationships(uuid) {
+    return this.directMap[uuid] || [];
+  }
+
+  getInverseRelationships(uuid) {
+    return this.inverseMap[uuid] || [];
+  }
+
+  establishRelationship(uuidA, uuidB) {
+    this.establishDirectRelationship(uuidA, uuidB);
+    this.establishInverseRelationship(uuidA, uuidB);
+  }
+
+  deestablishRelationship(uuidA, uuidB) {
+    this.deestablishDirectRelationship(uuidA, uuidB);
+    this.deestablishInverseRelationship(uuidA, uuidB);
+  }
+
+  setAllRelationships(uuid, relationships) {
+    const previousDirect = this.directMap[uuid] || [];
+    this.directMap[uuid] = relationships;
+    /** Remove all previous values in case relationships have changed
+     * The updated references will be added afterwards.
+    */
+
+    for (const previousRelationship of previousDirect) {
+      this.deestablishInverseRelationship(uuid, previousRelationship);
+    }
+    /** Now map current relationships */
+
+
+    for (const newRelationship of relationships) {
+      this.establishInverseRelationship(uuid, newRelationship);
+    }
+  }
+
+  removeFromMap(uuid) {
+    /** Items that we reference */
+    const directReferences = this.directMap[uuid] || [];
+
+    for (const directReference of directReferences) {
+      Object(utils["B" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
+    }
+
+    delete this.directMap[uuid];
+    /** Items that are referencing us */
+
+    const inverseReferences = this.inverseMap[uuid] || [];
+
+    for (const inverseReference of inverseReferences) {
+      Object(utils["B" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
+    }
+
+    delete this.inverseMap[uuid];
+  }
+
+  establishDirectRelationship(uuidA, uuidB) {
+    const index = this.directMap[uuidA] || [];
+    Object(utils["b" /* addIfUnique */])(index, uuidB);
+    this.directMap[uuidA] = index;
+  }
+
+  establishInverseRelationship(uuidA, uuidB) {
+    const inverseIndex = this.inverseMap[uuidB] || [];
+    Object(utils["b" /* addIfUnique */])(inverseIndex, uuidA);
+    this.inverseMap[uuidB] = inverseIndex;
+  }
+
+  deestablishDirectRelationship(uuidA, uuidB) {
+    const index = this.directMap[uuidA] || [];
+    Object(utils["B" /* removeFromArray */])(index, uuidB);
+    this.directMap[uuidA] = index;
+  }
+
+  deestablishInverseRelationship(uuidA, uuidB) {
+    const inverseIndex = this.inverseMap[uuidB] || [];
+    Object(utils["B" /* removeFromArray */])(inverseIndex, uuidA);
+    this.inverseMap[uuidB] = inverseIndex;
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/collection/collection.ts
+
+
+
+class collection_MutableCollection {
+  constructor() {
+    let copy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    let mapCopy = arguments.length > 1 ? arguments[1] : undefined;
+    let typedMapCopy = arguments.length > 2 ? arguments[2] : undefined;
+    let referenceMapCopy = arguments.length > 3 ? arguments[3] : undefined;
+    let conflictMapCopy = arguments.length > 4 ? arguments[4] : undefined;
+    this.map = {};
+    this.typedMap = ({} = {});
+    /** An array of uuids of items that are dirty */
+
+    this.dirtyIndex = new Set();
+    /** An array of uuids of items that are errorDecrypting or waitingForKey */
+
+    this.invalidsIndex = new Set();
+    /** An array of uuids of items that are not marked as deleted */
+
+    this.nondeletedIndex = new Set();
+
+    if (copy) {
+      this.map = mapCopy;
+      this.typedMap = typedMapCopy;
+      this.referenceMap = referenceMapCopy;
+      this.conflictMap = conflictMapCopy;
+    } else {
+      this.referenceMap = new uuid_map_UuidMap();
+      this.conflictMap = new uuid_map_UuidMap();
+    }
+  }
+
+  uuids() {
+    return Object.keys(this.map);
+  }
+
+  all(contentType) {
+    if (contentType) {
+      if (Array.isArray(contentType)) {
+        const elements = [];
+
+        for (const type of contentType) {
+          Object(utils["k" /* extendArray */])(elements, this.typedMap[type] || []);
+        }
+
+        return elements;
+      } else {
+        var _this$typedMap$conten;
+
+        return ((_this$typedMap$conten = this.typedMap[contentType]) === null || _this$typedMap$conten === void 0 ? void 0 : _this$typedMap$conten.slice()) || [];
+      }
+    } else {
+      return Object.keys(this.map).map(uuid => {
+        return this.map[uuid];
+      });
+    }
+  }
+
+  find(uuid) {
+    return this.map[uuid];
+  }
+  /** Returns all elements that are marked as dirty */
+
+
+  dirtyElements() {
+    const uuids = Array.from(this.dirtyIndex);
+    return this.findAll(uuids);
+  }
+  /** Returns all elements that are errorDecrypting or waitingForKey */
+
+
+  invalidElements() {
+    const uuids = Array.from(this.invalidsIndex);
+    return this.findAll(uuids);
+  }
+  /** Returns all elements that are not marked as deleted */
+
+
+  nondeletedElements() {
+    const uuids = Array.from(this.nondeletedIndex);
+    return this.findAll(uuids);
+  }
+  /**
+   * @param includeBlanks If true and an item is not found, an `undefined` element
+   * will be inserted into the array.
+   */
+
+
+  findAll(uuids) {
+    let includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    const results = [];
+
+    for (const id of uuids) {
+      const element = this.map[id];
+
+      if (element || includeBlanks) {
+        results.push(element);
+      }
+    }
+
+    return results;
+  }
+
+  set(elements) {
+    elements = Array.isArray(elements) ? elements : [elements];
+
+    if (elements.length === 0) {
+      console.warn('Attempting to set 0 elements onto collection');
+      return;
+    }
+
+    for (const element of elements) {
+      this.map[element.uuid] = element;
+      this.setToTypedMap(element);
+      /** Dirty index */
+
+      if (element.dirty) {
+        this.dirtyIndex.add(element.uuid);
+      } else {
+        this.dirtyIndex.delete(element.uuid);
+      }
+      /** Invalids index */
+
+
+      if (element.errorDecrypting || element.waitingForKey) {
+        this.invalidsIndex.add(element.uuid);
+      } else {
+        this.invalidsIndex.delete(element.uuid);
+      }
+
+      if (element.deleted) {
+        this.referenceMap.removeFromMap(element.uuid);
+        this.nondeletedIndex.delete(element.uuid);
+      } else {
+        this.nondeletedIndex.add(element.uuid);
+        const conflictOf = element.safeContent.conflict_of;
+
+        if (conflictOf) {
+          this.conflictMap.establishRelationship(conflictOf, element.uuid);
+        }
+
+        this.referenceMap.setAllRelationships(element.uuid, element.references.map(r => r.uuid));
+      }
+    }
+  }
+
+  discard(elements) {
+    elements = Array.isArray(elements) ? elements : [elements];
+
+    for (const element of elements) {
+      this.conflictMap.removeFromMap(element.uuid);
+      this.referenceMap.removeFromMap(element.uuid);
+      this.deleteFromTypedMap(element);
+      delete this.map[element.uuid];
+    }
+  }
+
+  setToTypedMap(element) {
+    const array = this.typedMap[element.content_type] || [];
+    remove_default()(array, {
+      uuid: element.uuid
+    });
+    array.push(element);
+    this.typedMap[element.content_type] = array;
+  }
+
+  deleteFromTypedMap(element) {
+    const array = this.typedMap[element.content_type] || [];
+    remove_default()(array, {
+      uuid: element.uuid
+    });
+    this.typedMap[element.content_type] = array;
+  }
+
+  uuidsThatReferenceUuid(uuid) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
+      throw Error('Must use uuid string');
+    }
+
+    return this.referenceMap.getInverseRelationships(uuid);
+  }
+
+  elementsReferencingElement(element) {
+    const uuids = this.uuidsThatReferenceUuid(element.uuid);
+    return this.findAll(uuids);
+  }
+
+  referencesForElement(element) {
+    const uuids = this.referenceMap.getDirectRelationships(element.uuid);
+    return this.findAll(uuids);
+  }
+
+  conflictsOf(uuid) {
+    const uuids = this.conflictMap.getDirectRelationships(uuid);
+    return this.findAll(uuids);
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/collection/payload_collection.ts
+
+/**
+ * A collection of payloads coming from a single source.
+ */
+
+class payload_collection_ImmutablePayloadCollection extends collection_MutableCollection {
+  /** We don't use a constructor for this because we don't want the constructor to have
+   * side-effects, such as calling collection.set(). */
+  static WithPayloads() {
+    let payloads = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    let source = arguments.length > 1 ? arguments[1] : undefined;
+    const collection = new payload_collection_ImmutablePayloadCollection();
+    collection.source = source;
+
+    if (payloads.length > 0) {
+      collection.set(payloads);
+    }
+
+    Object.freeze(collection);
+    return collection;
+  }
+
+  static FromCollection(collection) {
+    const mapCopy = Object.freeze(Object.assign({}, collection.map));
+    const typedMapCopy = Object.freeze(Object.assign({}, collection.typedMap));
+    const referenceMapCopy = Object.freeze(collection.referenceMap.makeCopy());
+    const conflictMapCopy = Object.freeze(collection.conflictMap.makeCopy());
+    const result = new payload_collection_ImmutablePayloadCollection(true, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy);
+    Object.freeze(result);
+    return result;
+  }
+
+  get payloads() {
+    return this.all();
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/conflict.ts
+function conflict_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function conflict_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { conflict_ownKeys(Object(source), true).forEach(function (key) { conflict_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { conflict_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function conflict_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+
+
+
+
+
+
+class conflict_ConflictDelta {
+  constructor(baseCollection, basePayload, applyPayload, source) {
+    this.baseCollection = baseCollection;
+    this.basePayload = basePayload;
+    this.applyPayload = applyPayload;
+    this.source = source;
+  }
+
+  async resultingCollection() {
+    const tmpBaseItem = CreateItemFromPayload(this.basePayload);
+    const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
+    const strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem);
+    const results = await this.payloadsByHandlingStrategy(strategy);
+    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, this.source);
+  }
+
+  async payloadsByHandlingStrategy(strategy) {
+    /** Ensure no conflict has already been created with the incoming content.
+     * This can occur in a multi-page sync request where in the middle of the request,
+     * we make changes to many items, including duplicating, but since we are still not
+     * uploading the changes until after the multi-page request completes, we may have
+     * already conflicted this item. */
+    const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0];
+
+    if (existingConflict && PayloadContentsEqual(existingConflict, this.applyPayload)) {
+      /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
+      return [];
+    }
+
+    if (strategy === strategies["a" /* ConflictStrategy */].KeepLeft) {
+      const updatedAt = Object(utils["o" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
+      const leftPayload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
+        updated_at: updatedAt,
+        dirty: true,
+        dirtiedDate: new Date()
+      });
+      return [leftPayload];
+    }
+
+    if (strategy === strategies["a" /* ConflictStrategy */].KeepRight) {
+      const result = Object(generator["g" /* PayloadByMerging */])(this.applyPayload, this.basePayload, [fields["a" /* PayloadField */].LastSyncBegan], {
+        lastSyncEnd: new Date()
+      });
+      return [result];
+    }
+
+    if (strategy === strategies["a" /* ConflictStrategy */].KeepLeftDuplicateRight) {
+      const updatedAt = Object(utils["o" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
+      const leftPayload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
+        updated_at: updatedAt,
+        dirty: true,
+        dirtiedDate: new Date()
+      });
+      const rightPayloads = await PayloadsByDuplicating(this.applyPayload, this.baseCollection, true);
+      return [leftPayload].concat(rightPayloads);
+    }
+
+    if (strategy === strategies["a" /* ConflictStrategy */].DuplicateLeftKeepRight) {
+      const leftPayloads = await PayloadsByDuplicating(this.basePayload, this.baseCollection, true);
+      const rightPayload = Object(generator["g" /* PayloadByMerging */])(this.applyPayload, this.basePayload, [fields["a" /* PayloadField */].LastSyncBegan], {
+        lastSyncEnd: new Date()
+      });
+      return leftPayloads.concat([rightPayload]);
+    }
+
+    if (strategy === strategies["a" /* ConflictStrategy */].KeepLeftMergeRefs) {
+      const refs = Object(utils["J" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
+      const updatedAt = Object(utils["o" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
+      const payload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
+        updated_at: updatedAt,
+        dirty: true,
+        dirtiedDate: new Date(),
+        content: conflict_objectSpread(conflict_objectSpread({}, this.basePayload.safeContent), {}, {
+          references: refs
+        })
+      });
+      return [payload];
+    }
+
+    throw 'Unhandled strategy';
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/file_import.ts
+
+
+
+
+
+
+class file_import_DeltaFileImport extends PayloadsDelta {
+  async resultingCollection() {
+    const results = [];
+
+    for (const payload of this.applyCollection.all()) {
+      const handled = await this.payloadsByHandlingPayload(payload, results);
+      const payloads = handled.map(result => {
+        return Object(generator["b" /* CopyPayload */])(result, {
+          dirty: true,
+          dirtiedDate: new Date(),
+          deleted: false
+        });
+      });
+      Object(utils["k" /* extendArray */])(results, payloads);
+    }
+
+    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].FileImport);
+  }
+
+  async payloadsByHandlingPayload(payload, currentResults) {
+    /**
+     * Check to see if we've already processed a payload for this id.
+     * If so, that would be the latest value, and not what's in the base collection.
+     */
+
+    /*
+     * Find the most recently created conflict if available, as that
+     * would contain the most recent value.
+     */
+    let current = currentResults.find(candidate => {
+      return candidate.contentObject.conflict_of === payload.uuid;
+    });
+    /**
+     * If no latest conflict, find by uuid directly.
+     */
+
+    if (!current) {
+      current = currentResults.find(candidate => {
+        return candidate.uuid === payload.uuid;
+      });
+    }
+    /**
+     * If not found in current results, use the base value.
+     */
+
+
+    if (!current) {
+      current = this.findBasePayload(payload.uuid);
+    }
+    /**
+     * If the current doesn't exist, we're creating a new item from payload.
+     */
+
+
+    if (!current) {
+      return [payload];
+    }
+
+    const delta = new conflict_ConflictDelta(this.baseCollection, current, payload, sources["a" /* PayloadSource */].FileImport);
+    const deltaCollection = await delta.resultingCollection();
+    return deltaCollection.all();
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/out_of_sync.ts
+
+
+
+
+
+class out_of_sync_DeltaOutOfSync extends PayloadsDelta {
+  async resultingCollection() {
+    const results = [];
+
+    for (const payload of this.applyCollection.all()) {
+      /**
+       * Map the server payload as authoritive content. If client copy differs,
+       * we will create a duplicate of it below.
+       * This is also neccessary to map the updated_at value from the server
+       */
+      results.push(payload);
+      const current = this.findBasePayload(payload.uuid);
+
+      if (!current) {
+        continue;
+      }
+
+      const equal = PayloadContentsEqual(payload, current);
+
+      if (equal) {
+        continue;
+      }
+      /**
+       * We create a copy of the local existing item and sync that up.
+       * It will be a 'conflict' of itself
+       */
+
+
+      const copyResults = await PayloadsByDuplicating(current, this.baseCollection, true);
+      Object(utils["k" /* extendArray */])(results, copyResults);
+    }
+
+    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].RemoteRetrieved);
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/remote_conflicts.ts
+
+
+
+
+
+
+class remote_conflicts_DeltaRemoteConflicts extends PayloadsDelta {
+  async resultingCollection() {
+    if (this.applyCollection.source === sources["a" /* PayloadSource */].ConflictUuid) {
+      return this.collectionsByHandlingUuidConflicts();
+    } else if (this.applyCollection.source === sources["a" /* PayloadSource */].ConflictData) {
+      return this.collectionsByHandlingDataConflicts();
+    } else {
+      throw "Unhandled conflict type ".concat(this.applyCollection.source);
+    }
+  }
+
+  async collectionsByHandlingDataConflicts() {
+    const results = [];
+
+    for (const payload of this.applyCollection.all()) {
+      const current = this.findBasePayload(payload.uuid);
+      /** Could be deleted */
+
+      if (!current) {
+        results.push(payload);
+        continue;
+      }
+
+      const decrypted = this.findRelatedPayload(payload.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
+
+      if (!decrypted && !payload.deleted) {
+        /** Decrypted should only be missing in case of deleted payload */
+        throw 'Unable to find decrypted counterpart for data conflict.';
+      }
+
+      const delta = new conflict_ConflictDelta(this.baseCollection, current, decrypted || payload, sources["a" /* PayloadSource */].ConflictData);
+      const deltaCollection = await delta.resultingCollection();
+      const payloads = deltaCollection.all();
+      Object(utils["k" /* extendArray */])(results, payloads);
+    }
+
+    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].RemoteRetrieved);
+  }
+  /**
+   * UUID conflicts can occur if a user attmpts to import an old data
+   * backup with uuids from the old account into a new account.
+   * In uuid_conflict, we receive the value we attmpted to save.
+   */
+
+
+  async collectionsByHandlingUuidConflicts() {
+    const results = [];
+
+    for (const payload of this.applyCollection.all()) {
+      const decrypted = this.findRelatedPayload(payload.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
+      const alternateResults = await PayloadsByAlternatingUuid(decrypted, this.baseCollection);
+      Object(utils["k" /* extendArray */])(results, alternateResults);
+    }
+
+    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].RemoteRetrieved);
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/remote_retrieved.ts
+
+
+
+
+
+class remote_retrieved_DeltaRemoteRetrieved extends PayloadsDelta {
+  async resultingCollection() {
+    const filtered = [];
+    const conflicted = [];
+    /**
+    * If we have retrieved an item that was saved as part of this ongoing sync operation,
+    * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
+    */
+
+    for (const received of this.applyCollection.all()) {
+      const savedOrSaving = this.findRelatedPayload(received.uuid, sources["a" /* PayloadSource */].SavedOrSaving);
+      const decrypted = this.findRelatedPayload(received.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
+
+      if (!decrypted) {
+        /** Decrypted should only be missing in case of deleted retrieved item */
+        if (!received.deleted) {
+          throw 'Cannot find decrypted for non-deleted payload.';
+        }
+
+        filtered.push(received);
+        continue;
+      }
+
+      if (savedOrSaving) {
+        conflicted.push(decrypted);
+        continue;
+      }
+
+      const base = this.findBasePayload(received.uuid);
+
+      if (base && base.dirty) {
+        conflicted.push(decrypted);
+        continue;
+      }
+
+      filtered.push(decrypted);
+    }
+    /**
+     * For any potential conflict above, we compare the values with current
+     * local values, and if they differ, we create a new payload that is a copy
+     * of the server payload.
+     */
+
+
+    const conflictResults = [];
+
+    for (const conflict of conflicted) {
+      const decrypted = this.findRelatedPayload(conflict.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
+
+      if (!decrypted) {
+        continue;
+      }
+
+      const current = this.findBasePayload(conflict.uuid);
+
+      if (!current) {
+        continue;
+      }
+
+      const delta = new conflict_ConflictDelta(this.baseCollection, current, decrypted, sources["a" /* PayloadSource */].ConflictData);
+      const deltaCollection = await delta.resultingCollection();
+      const payloads = deltaCollection.all();
+      Object(utils["k" /* extendArray */])(conflictResults, payloads);
+    }
+
+    return payload_collection_ImmutablePayloadCollection.WithPayloads(filtered.concat(conflictResults), sources["a" /* PayloadSource */].RemoteRetrieved);
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/remote_saved.ts
+
+
+
+
+class remote_saved_DeltaRemoteSaved extends PayloadsDelta {
+  async resultingCollection() {
+    const processed = [];
+
+    for (const payload of this.applyCollection.all()) {
+      const current = this.findBasePayload(payload.uuid);
+      /** If we save an item, but while in transit it is deleted locally, we want to keep
+       * local deletion status, and not old deleted value that was sent to server. */
+
+      const deletedState = current ? current.deleted : payload.deleted;
+      const result = Object(generator["f" /* CreateSourcedPayloadFromObject */])(payload, sources["a" /* PayloadSource */].RemoteSaved, {
+        lastSyncEnd: new Date(),
+        deleted: deletedState
+      });
+      processed.push(result);
+    }
+
+    return payload_collection_ImmutablePayloadCollection.WithPayloads(processed, sources["a" /* PayloadSource */].RemoteSaved);
+  }
+
+}
+// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/index.ts
+
+
+
+
+
+
+
+// CONCATENATED MODULE: ./lib/protocol/payloads/index.ts
+
+
+
+
+
+
+
+// CONCATENATED MODULE: ./lib/services/key_recovery_service.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* PureService */] {
+  constructor(itemManager, modelManager, apiService, sessionManager, protocolService, challengeService, alertService, storageService) {
+    super();
+    this.itemManager = itemManager;
+    this.modelManager = modelManager;
+    this.apiService = apiService;
+    this.sessionManager = sessionManager;
+    this.protocolService = protocolService;
+    this.challengeService = challengeService;
+    this.alertService = alertService;
+    this.storageService = storageService;
+    this.decryptionQueue = [];
+    this.removeItemObserver = this.itemManager.addObserver([content_types["a" /* ContentType */].ItemsKey], (changed, inserted, _discarded, ignored, source) => {
+      if (source === sources["a" /* PayloadSource */].LocalChanged) {
+        return;
+      }
+
+      const changedOrInserted = changed.concat(inserted).filter(k => k.errorDecrypting);
+
+      if (changedOrInserted.length > 0) {
+        this.handleUndecryptableItemsKeys(changedOrInserted);
+      }
+
+      if (ignored.length > 0) {
+        this.handleIgnoredItemsKeys(ignored);
+      }
+    });
+  }
+
+  deinit() {
+    this.itemManager = undefined;
+    this.modelManager = undefined;
+    this.apiService = undefined;
+    this.sessionManager = undefined;
+    this.protocolService = undefined;
+    this.challengeService = undefined;
+    this.alertService = undefined;
+    this.removeItemObserver();
+    this.removeItemObserver = undefined;
+    super.deinit();
+  }
+
+  async handleApplicationStage(stage) {
+    super.handleApplicationStage(stage);
+
+    if (stage === ApplicationStage.LoadedDatabase_12) {
+      this.processPersistedUndecryptables();
+    }
+  }
+  /**
+   * Ignored items keys are items keys which arrived from a remote source, which we were
+   * not able to decrypt, and for which we already had an existing items key that was
+   * properly decrypted. Since items keys key contents are immutable, if we already have a
+   * successfully decrypted version, yet we can't decrypt the new version, we should should
+   * temporarily ignore the new version until we can properly decrypt it (through the recovery flow),
+   * and not overwrite the local copy.
+   *
+   * Ignored items are persisted to disk in isolated storage so that they may be decrypted
+   * whenever. When they are finally decryptable, we will emit them and update our database
+   * with the new decrypted value.
+   *
+   * When the app first launches, we will query the isolated storage to see if there are any
+   * keys we need to decrypt.
+   */
+
+
+  async handleIgnoredItemsKeys(keys) {
+    let persistIncoming = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    /**
+     * Persist the keys locally in isolated storage, so that if we don't properly decrypt
+     * them in this app session, the user has a chance to later. If there already exists
+     * the same items key in this storage, replace it with this latest incoming value.
+     */
+    if (persistIncoming) {
+      await this.saveToUndecryptables(keys);
+    }
+
+    await this.addKeysToQueue(keys);
+    /** Try decrypting the keys now */
+
+    for (const key of keys) {
+      const result = await this.tryDecryptingKey(key);
+
+      if (result.success) {
+        /** If it succeeds, remove the key from isolated storage. */
+        await this.removeFromUndecryptables(key);
+      }
+    }
+  }
+
+  async processPersistedUndecryptables() {
+    const record = await this.getUndecryptables();
+    const rawPayloads = Object.values(record);
+
+    if (rawPayloads.length === 0) {
+      return;
+    }
+
+    const keys = rawPayloads.map(raw => Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(raw)).map(p => CreateItemFromPayload(p));
+    return this.handleIgnoredItemsKeys(keys, false);
+  }
+
+  async getUndecryptables() {
+    return this.storageService.getValue(StorageKey.KeyRecoveryUndecryptableItems, StorageValueModes.Default, {});
+  }
+
+  async persistUndecryptables(record) {
+    await this.storageService.setValue(StorageKey.KeyRecoveryUndecryptableItems, record);
+  }
+
+  async saveToUndecryptables(keys) {
+    /** Get the current persisted value */
+    const record = await this.getUndecryptables();
+    /** Persist incoming keys */
+
+    for (const key of keys) {
+      record[key.uuid] = key.payload.ejected();
+    }
+
+    await this.persistUndecryptables(record);
+  }
+
+  async removeFromUndecryptables(key) {
+    /** Get the current persisted value */
+    const record = await this.getUndecryptables();
+    delete record[key.uuid];
+    await this.persistUndecryptables(record);
+  }
+
+  async handleUndecryptableItemsKeys(keys) {
+    await this.addKeysToQueue(keys);
+    const clientParams = await this.getClientKeyParams();
+    /** Get our own account params */
+
+    if (!clientParams) {
+      /** The user is not signed in. Present a detached recovery wizard per key and return */
+      await this.tryDecryptingKeys(keys);
+      return;
+    }
+    /** Get the user's latest key params from the server */
+
+
+    const paramsResponse = await this.apiService.getAccountKeyParams(clientParams.identifier);
+    /**
+     * If we do not get a response here, it means we can't authenticate with the server
+     * and have no way of knowing if any key's key params are the latest. We can only
+     * perform detached decryption.
+     */
+
+    if (paramsResponse.error) {
+      await this.tryDecryptingKeys(keys);
+      return;
+    }
+
+    this.serverParams = KeyParamsFromApiResponse(paramsResponse);
+    await this.tryDecryptingKeys(keys);
+    const latestClientParams = await this.getClientKeyParams();
+    const serverParamsDifferFromClients = latestClientParams && !this.serverParams.compare(latestClientParams);
+
+    if (this.serverKeyParamsAreSafe(clientParams) && serverParamsDifferFromClients) {
+      /**
+       * The only way left to validate our password is to sign in with the server,
+       * creating an all new session.
+       */
+      this.performServerSignIn(this.serverParams);
+    }
+  }
+
+  async getClientKeyParams() {
+    return this.protocolService.getAccountKeyParams();
+  }
+
+  serverKeyParamsAreSafe(clientParams) {
+    return Object(versions["c" /* leftVersionGreaterThanOrEqualToRight */])(this.serverParams.version, clientParams.version);
+  }
+
+  async performServerSignIn(keyParams) {
+    /** Get the user's account password */
+    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryLoginFlowReason);
+    const challengeResponse = await this.challengeService.promptForChallengeResponse(challenge);
+
+    if (!challengeResponse) {
+      return;
+    }
+
+    const password = challengeResponse.values[0].value;
+    /** Generate a root key using the input */
+
+    const rootKey = await this.protocolService.computeRootKey(password, keyParams);
+    const signInResponse = await this.sessionManager.bypassChecksAndSignInWithServerPassword(keyParams.identifier, rootKey.serverPassword);
+
+    if (!signInResponse.error) {
+      await this.replaceClientRootKey(rootKey);
+    } else {
+      await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword);
+      return this.performServerSignIn(keyParams);
+    }
+  }
+  /**
+   * When we've successfully validated a root key that matches server params,
+   * we replace our current client root key with the newly generated key
+   */
+
+
+  async replaceClientRootKey(rootKey) {
+    const wrappingKey = await this.getWrappingKeyIfApplicable();
+    await this.protocolService.setNewRootKey(rootKey, wrappingKey);
+    this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
+  }
+
+  async getWrappingKeyIfApplicable() {
+    if (!this.protocolService.hasPasscode()) {
+      return undefined;
+    }
+
+    const result = await this.challengeService.promptForPasscode();
+
+    if (result.canceled) {
+      /** Show an alert saying they must enter the correct passcode to update
+       * their root key, and try again */
+      await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryPasscodeRequiredText, KeyRecoveryStrings.KeyRecoveryPasscodeRequiredTitle);
+      return this.getWrappingKeyIfApplicable();
+    }
+
+    return this.protocolService.computeWrappingKey(result.passcode);
+  }
+
+  async addKeysToQueue(keys) {
+    for (const key of keys) {
+      const keyParams = await this.protocolService.getKeyEmbeddedKeyParams(key);
+
+      if (!keyParams) {
+        continue;
+      }
+
+      this.decryptionQueue.push({
+        key,
+        keyParams
+      });
+    }
+  }
+  /** A detached recovery does not affect our local items key */
+
+
+  async tryDecryptingKeys(keys) {
+    for (const key of keys) {
+      await this.tryDecryptingKey(key);
+    }
+  }
+  /**
+   * If this function succeeds, it will emit the items key, and
+   * return the decrypted key payload, as well as the root key used to decrypt the key.
+   * If it fails, it will keep trying until the user aborts.
+   */
+
+
+  async tryDecryptingKey(key) {
+    return new Promise(resolve => {
+      const queueItem = this.decryptionQueue.find(q => q.key === key);
+
+      if (!queueItem) {
+        /** The task may already have been resolved via key params matching */
+        resolve({
+          success: true
+        });
+        return;
+      }
+
+      queueItem.resolve = resolve;
+      this.popQueueItem(queueItem);
+    });
+  }
+
+  async popQueueItem(queueItem) {
+    if (!queueItem.resolve) {
+      throw Error('Attempting to pop queue element with no resolve function');
+    }
+
+    Object(utils["B" /* removeFromArray */])(this.decryptionQueue, queueItem);
+    const keyParams = queueItem.keyParams;
+    const key = queueItem.key;
+    /**
+     * We replace our current root key if the server params differ from our own params,
+     * and if we can validate the params based on this items key's params.
+     * */
+
+    let replacesRootKey = false;
+    const clientParams = await this.getClientKeyParams();
+
+    if (this.serverParams && clientParams && !clientParams.compare(this.serverParams) && keyParams.compare(this.serverParams) && this.serverKeyParamsAreSafe(this.serverParams)) {
+      /** Get the latest items key we _can_ decrypt */
+      const latest = Object(utils["g" /* dateSorted */])(this.itemManager.nonErroredItemsForContentType(content_types["a" /* ContentType */].ItemsKey), fields["a" /* PayloadField */].CreatedAt, false)[0];
+
+      if ((latest === null || latest === void 0 ? void 0 : latest.uuid) === key.uuid) {
+        throw Error('Key recovery attempting to decrypt already decrypted key');
+      }
+
+      const hasLocalItemsKey = !Object(utils["q" /* isNullOrUndefined */])(latest);
+      const isNewerThanLatest = key.created_at > (latest === null || latest === void 0 ? void 0 : latest.created_at);
+      replacesRootKey = !hasLocalItemsKey || isNewerThanLatest;
+    }
+
+    const resolve = queueItem.resolve;
+    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryPasswordRequired);
+    const response = await this.challengeService.promptForChallengeResponse(challenge);
+
+    if (!response) {
+      resolve({
+        success: false
+      });
+    }
+    /** Dismiss challenge */
+
+
+    this.challengeService.completeChallenge(challenge);
+    const password = response.values[0].value;
+    /** Generate a root key using the input */
+
+    const rootKey = await this.protocolService.computeRootKey(password, keyParams);
+    /** Attempt to decrypt this items key using the root key */
+
+    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(key.payload, rootKey);
+    /** If it succeeds, re-emit this items key */
+
+    if (!decryptedPayload.errorDecrypting) {
+      /** Decrypt and remove from queue any other items keys who share these key params */
+      const matching = this.popQueueForKeyParams(keyParams);
+      const decryptedMatching = await this.protocolService.payloadsByDecryptingPayloads(matching.map(m => m.key.payload), rootKey);
+      const allRelevantKeyPayloads = [decryptedPayload].concat(decryptedMatching);
+      this.modelManager.emitPayloads(allRelevantKeyPayloads, sources["a" /* PayloadSource */].DecryptedTransient);
+      await this.storageService.savePayloads(allRelevantKeyPayloads);
+      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);
+
+      if (replacesRootKey) {
+        /** Replace our root key with the generated root key */
+        await this.replaceClientRootKey(rootKey);
+      }
+
+      resolve({
+        success: true
+      });
+    } else {
+      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryUnableToRecover);
+      /** If it fails, try again */
+
+      resolve(await this.tryDecryptingKey(key));
+    }
+  }
+
+  popQueueForKeyParams(keyParams) {
+    const matching = [];
+    const nonmatching = [];
+
+    for (const queueItem of this.decryptionQueue) {
+      if (queueItem.keyParams.compare(keyParams)) {
+        matching.push(queueItem);
+      } else {
+        nonmatching.push(queueItem);
+      }
+    }
+
+    this.decryptionQueue = nonmatching;
+    return matching;
+  }
+
+}
+// EXTERNAL MODULE: ./lib/models/functions.ts
+var functions = __webpack_require__(10);
+
+// EXTERNAL MODULE: ./lib/events.ts
+var events = __webpack_require__(12);
+
 // CONCATENATED MODULE: ./lib/services/alert_service.ts
 var ButtonType;
 
@@ -11006,41 +12745,190 @@ class TokenSession extends Session {
   }
 
 }
-// CONCATENATED MODULE: ./lib/services/api/messages.ts
-const API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.';
-const API_MESSAGE_GENERIC_REGISTRATION_FAIL = 'A server error occurred while trying to register. Please try again.';
-const API_MESSAGE_GENERIC_CHANGE_PW_FAIL = "Something went wrong while changing your password. Your password was not changed. Please try again.";
-const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.';
-const API_MESSAGE_REGISTRATION_IN_PROGRESS = 'An existing registration request is already in progress.';
-const API_MESSAGE_LOGIN_IN_PROGRESS = 'An existing sign in request is already in progress.';
-const API_MESSAGE_CHANGE_PW_IN_PROGRESS = 'An existing change password request is already in progress.';
-const API_MESSAGE_FALLBACK_LOGIN_FAIL = 'Invalid email or password.';
-const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL = "A server error occurred while trying to refresh your session. Please try again.";
-const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = "Your account session is being renewed with the server. Please try your request again.";
-const API_MESSAGE_INVALID_SESSION = 'Please sign in to an account in order to continue with your request.';
-const UNSUPPORTED_PROTOCOL_VERSION = "This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.";
-const EXPIRED_PROTOCOL_VERSION = "The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security for more information.";
-const OUTDATED_PROTOCOL_VERSION = "The encryption version for your account is outdated and requires upgrade. You may proceed with login, but areadvised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.";
-const UNSUPPORTED_KEY_DERIVATION = "Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.";
-const INVALID_PASSWORD_COST = "Unable to login due to insecure password parameters. Please visit standardnotes.org/help/security for more information.";
-const INVALID_PASSWORD = "Invalid password.";
-const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
-const OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In';
-const UPGRADING_ENCRYPTION = "Upgrading your account's encryption version\u2026";
-const SETTING_PASSCODE = "Setting passcode\u2026";
-const CHANGING_PASSCODE = "Changing passcode\u2026";
-const REMOVING_PASSCODE = "Removing passcode\u2026";
-const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this process completes.';
-const UNKNOWN_ERROR = 'Unknown error.';
-function InsufficientPasswordMessage(minimum) {
-  return "Your password must be at least ".concat(minimum, " characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.");
+// CONCATENATED MODULE: ./node_modules/sncrypto/lib/common/utils.ts
+/**
+ * Constant-time string comparison
+ * @param a
+ * @param b
+ */
+function timingSafeEqual(a, b) {
+  const strA = String(a);
+  let strB = String(b);
+  const lenA = strA.length;
+  let result = 0;
+
+  if (lenA !== strB.length) {
+    strB = strA;
+    result = 1;
+  }
+
+  for (let i = 0; i < lenA; i++) {
+    result |= strA.charCodeAt(i) ^ strB.charCodeAt(i);
+  }
+
+  return result === 0;
 }
-function StrictSignInFailed(current, latest) {
-  return "Strict Sign In has refused the server's sign-in parameters. The latest account version is ".concat(latest, ", but the server is reporting a version of ").concat(current, " for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.");
+// CONCATENATED MODULE: ./lib/protocol/root_key.ts
+function root_key_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function root_key_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { root_key_ownKeys(Object(source), true).forEach(function (key) { root_key_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { root_key_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function root_key_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+
+
+
+
+
+
+/**
+ * A root key is a local only construct that houses the key used for the encryption
+ * and decryption of items keys. A root key extends SNItem for local convenience, but is
+ * not part of the syncing or storage ecosystem—root keys are managed independently.
+ */
+
+class root_key_SNRootKey extends core_item["d" /* SNItem */] {
+  constructor(payload, keyParams) {
+    super(payload);
+    this.keyParams = keyParams;
+  }
+
+  static async Create(content, uuid) {
+    if (!uuid) {
+      uuid = await uuid_Uuid.GenerateUuid();
+    }
+
+    if (!content.version) {
+      if (content.dataAuthenticationKey) {
+        /**
+         * If there's no version stored, it must be either 001 or 002.
+         * If there's a dataAuthenticationKey, it has to be 002. Otherwise it's 001.
+         */
+        content.version = versions["a" /* ProtocolVersion */].V002;
+      } else {
+        content.version = versions["a" /* ProtocolVersion */].V001;
+      }
+    }
+
+    const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])({
+      uuid: uuid,
+      content_type: content_types["a" /* ContentType */].RootKey,
+      content: Object(functions["a" /* FillItemContent */])(content)
+    });
+    const keyParamsInput = content.keyParams;
+
+    if (!keyParamsInput) {
+      throw Error('Attempting to create root key without key params');
+    }
+
+    const keyParams = keyParamsInput instanceof key_params_SNRootKeyParams ? keyParamsInput : new key_params_SNRootKeyParams(keyParamsInput);
+    return new root_key_SNRootKey(payload, keyParams);
+  }
+  /**
+   * Given a root key, expands its key params by making a copy which includes
+   * the inputted key params. Used to expand locally created key params after signing in
+   */
+
+
+  static async ExpandedCopy(key, keyParams) {
+    const content = key.typedContent;
+    const copiedKey = await this.Create(root_key_objectSpread(root_key_objectSpread({}, content), {}, {
+      keyParams: keyParams ? keyParams : content.keyParams
+    }));
+    return copiedKey;
+  }
+
+  get typedContent() {
+    return this.safeContent;
+  }
+
+  get keyVersion() {
+    if (!this.payload.safeContent.version) {
+      throw 'Attempting to create key without version.';
+    }
+
+    return this.payload.safeContent.version;
+  }
+
+  get isRootKey() {
+    return true;
+  }
+  /**
+   * When the root key is used to encrypt items, we use the masterKey directly.
+   */
+
+
+  get itemsKey() {
+    return this.masterKey;
+  }
+
+  get masterKey() {
+    return this.payload.safeContent.masterKey;
+  }
+
+  get serverPassword() {
+    return this.payload.safeContent.serverPassword;
+  }
+  /** 003 and below only. */
+
+
+  get dataAuthenticationKey() {
+    return this.payload.safeContent.dataAuthenticationKey;
+  }
+  /**
+   * Compares two keys for equality
+   */
+
+
+  compare(otherKey) {
+    if (this.keyVersion !== otherKey.keyVersion) {
+      return false;
+    }
+
+    const hasServerPassword = this.serverPassword && otherKey.serverPassword;
+    return timingSafeEqual(this.masterKey, otherKey.masterKey) && (!hasServerPassword || timingSafeEqual(this.serverPassword, otherKey.serverPassword));
+  }
+  /**
+   * @returns Object suitable for persist in storage when wrapped
+   */
+
+
+  persistableValueWhenWrapping() {
+    const keychainValue = this.getKeychainValue();
+    keychainValue.keyParams = this.keyParams.getPortableValue();
+    return keychainValue;
+  }
+  /**
+  * @returns Object that is suitable for persisting in a keychain
+  */
+
+
+  getKeychainValue() {
+    const values = {
+      version: this.keyVersion
+    };
+
+    if (this.masterKey) {
+      values.masterKey = this.masterKey;
+    }
+
+    if (this.dataAuthenticationKey) {
+      values.dataAuthenticationKey = this.dataAuthenticationKey;
+    }
+
+    return values;
+  }
+
 }
-const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
-const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
+
+
+
+
+
+
 
 
 
@@ -11055,12 +12943,17 @@ const MINIMUM_PASSWORD_LENGTH = 8;
  */
 
 class session_manager_SNSessionManager extends pure_service["a" /* PureService */] {
-  constructor(storageService, apiService, alertService, protocolService) {
+  constructor(storageService, apiService, alertService, protocolService, challengeService) {
     super();
-    this.protocolService = protocolService;
     this.storageService = storageService;
     this.apiService = apiService;
     this.alertService = alertService;
+    this.protocolService = protocolService;
+    this.challengeService = challengeService;
+    this.isSessionRenewChallengePresented = false;
+    apiService.setInvalidSessionObserver(() => {
+      this.reauthenticateInvalidSession();
+    });
   }
 
   deinit() {
@@ -11103,7 +12996,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   offline() {
-    return Object(utils["p" /* isNullOrUndefined */])(this.apiService.getSession());
+    return Object(utils["q" /* isNullOrUndefined */])(this.apiService.getSession());
   }
 
   getUser() {
@@ -11119,6 +13012,44 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     }
   }
 
+  async reauthenticateInvalidSession() {
+    if (this.isSessionRenewChallengePresented) {
+      return;
+    }
+
+    this.isSessionRenewChallengePresented = true;
+    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession);
+    this.challengeService.addChallengeObserver(challenge, {
+      onCancel: () => {
+        this.isSessionRenewChallengePresented = false;
+      },
+      onNonvalidatedSubmit: async challengeResponse => {
+        const email = challengeResponse.values[0].value;
+        const password = challengeResponse.values[1].value;
+        const currentKeyParams = await this.protocolService.getAccountKeyParams();
+        const signInResult = await this.signIn(email, password, false, currentKeyParams.version);
+
+        if (signInResult.response.error) {
+          this.challengeService.setValidationStatusForChallenge(challenge, challengeResponse.values[1], false);
+        } else {
+          this.challengeService.completeChallenge(challenge);
+          this.alertService.alert(SessionStrings.SessionRestored);
+        }
+      }
+    });
+    this.challengeService.promptForChallengeResponse(challenge);
+  }
+
+  async promptForMfaValue() {
+    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Custom, SessionStrings.EnterMfa);
+    const response = await this.challengeService.promptForChallengeResponse(challenge);
+
+    if (response) {
+      this.challengeService.completeChallenge(challenge);
+      return response.values[0].value;
+    }
+  }
+
   async register(email, password) {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
@@ -11126,47 +13057,78 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       };
     }
 
-    const result = await this.protocolService.createRootKey(email, password);
-    const serverPassword = result.key.serverPassword;
-    const keyParams = result.keyParams;
-    const rootKey = result.key;
-    return this.apiService.register(email, serverPassword, keyParams).then(async response => {
-      await this.handleAuthResponse(response);
-      return {
-        response: response,
-        keyParams: keyParams,
-        rootKey: rootKey
-      };
-    });
-  }
+    const rootKey = await this.protocolService.createRootKey(email, password, KeyParamsOrigination.Registration);
+    const serverPassword = rootKey.serverPassword;
+    const keyParams = rootKey.keyParams;
+    const registerResponse = await this.apiService.register(email, serverPassword, keyParams);
 
-  async signIn(email, password) {
-    let strict = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    let mfaKeyPath = arguments.length > 3 ? arguments[3] : undefined;
-    let mfaCode = arguments.length > 4 ? arguments[4] : undefined;
-    const paramsResponse = await this.apiService.getAccountKeyParams(email, mfaKeyPath, mfaCode);
-
-    if (paramsResponse.error) {
-      return {
-        response: paramsResponse
-      };
+    if (!registerResponse.error) {
+      await this.handleSuccessAuthResponse(registerResponse);
     }
 
-    const rawKeyParams = {
-      pw_cost: paramsResponse.pw_cost,
-      pw_nonce: paramsResponse.pw_nonce,
-      identifier: paramsResponse.identifier,
-      email: paramsResponse.email,
-      pw_salt: paramsResponse.pw_salt,
-      version: paramsResponse.version
+    return {
+      response: registerResponse,
+      rootKey: rootKey
     };
-    const keyParams = this.protocolService.createKeyParams(rawKeyParams);
+  }
+
+  async retrieveKeyParams(email, mfaKeyPath, mfaCode) {
+    const response = await this.apiService.getAccountKeyParams(email, mfaKeyPath, mfaCode);
+
+    if (response.error) {
+      var _response$error$paylo;
+
+      if (mfaCode) {
+        await this.alertService.alert(SignInStrings.IncorrectMfa);
+      }
+
+      if ((_response$error$paylo = response.error.payload) === null || _response$error$paylo === void 0 ? void 0 : _response$error$paylo.mfa_key) {
+        /** Prompt for MFA code and try again */
+        const inputtedCode = await this.promptForMfaValue();
+
+        if (!inputtedCode) {
+          /** User dismissed window without input */
+          return {
+            response: this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa)
+          };
+        }
+
+        return this.retrieveKeyParams(email, response.error.payload.mfa_key, inputtedCode);
+      } else {
+        return {
+          response
+        };
+      }
+    }
+
+    const keyParams = KeyParamsFromApiResponse(response);
 
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService.createErrorResponse(API_MESSAGE_FALLBACK_LOGIN_FAIL)
       };
     }
+
+    return {
+      keyParams,
+      response,
+      mfaKeyPath,
+      mfaCode
+    };
+  }
+
+  async signIn(email, password) {
+    let strict = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    let minAllowedVersion = arguments.length > 3 ? arguments[3] : undefined;
+    const paramsResult = await this.retrieveKeyParams(email);
+
+    if (paramsResult.response.error) {
+      return {
+        response: paramsResult.response
+      };
+    }
+
+    const keyParams = paramsResult.keyParams;
 
     if (!this.protocolService.supportedVersions().includes(keyParams.version)) {
       if (this.protocolService.isVersionNewerThanLibraryVersion(keyParams.version)) {
@@ -11184,7 +13146,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       /* Cost minimums only apply to now outdated versions (001 and 002) */
       const minimum = this.protocolService.costMinimumForVersion(keyParams.version);
 
-      if (keyParams.kdfIterations < minimum) {
+      if (keyParams.content002.pw_cost < minimum) {
         return {
           response: this.apiService.createErrorResponse(INVALID_PASSWORD_COST)
         };
@@ -11208,11 +13170,13 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     }
 
     if (strict) {
-      const latest = this.protocolService.getLatestVersion();
+      minAllowedVersion = this.protocolService.getLatestVersion();
+    }
 
-      if (keyParams.version !== latest) {
+    if (!Object(utils["q" /* isNullOrUndefined */])(minAllowedVersion)) {
+      if (!Object(versions["c" /* leftVersionGreaterThanOrEqualToRight */])(keyParams.version, minAllowedVersion)) {
         return {
-          response: this.apiService.createErrorResponse(StrictSignInFailed(keyParams.version, latest))
+          response: this.apiService.createErrorResponse(StrictSignInFailed(keyParams.version, minAllowedVersion))
         };
       }
     }
@@ -11226,27 +13190,58 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
         serverPassword: rootKey.serverPassword
       };
     });
-    return this.apiService.signIn(email, serverPassword, mfaKeyPath, mfaCode).then(async response => {
-      await this.handleAuthResponse(response);
-      return {
-        response: response,
-        keyParams: keyParams,
-        rootKey: rootKey
-      };
-    });
+    const signInResponse = await this.bypassChecksAndSignInWithServerPassword(email, serverPassword, paramsResult.mfaKeyPath, paramsResult.mfaCode);
+    return {
+      response: signInResponse,
+      rootKey: await root_key_SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params)
+    };
+  }
+
+  async bypassChecksAndSignInWithServerPassword(email, serverPassword, mfaKeyPath, mfaCode) {
+    const signInResponse = await this.apiService.signIn(email, serverPassword, mfaKeyPath, mfaCode);
+
+    if (!signInResponse.error) {
+      await this.handleSuccessAuthResponse(signInResponse);
+      return signInResponse;
+    } else {
+      var _signInResponse$error;
+
+      if ((_signInResponse$error = signInResponse.error.payload) === null || _signInResponse$error === void 0 ? void 0 : _signInResponse$error.mfa_key) {
+        if (mfaCode) {
+          await this.alertService.alert(SignInStrings.IncorrectMfa);
+        }
+        /** Prompt for MFA code and try again */
+
+
+        const inputtedCode = await this.promptForMfaValue();
+
+        if (!inputtedCode) {
+          /** User dismissed window without input */
+          return this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
+        }
+
+        return this.bypassChecksAndSignInWithServerPassword(email, serverPassword, signInResponse.error.payload.mfa_key, inputtedCode);
+      } else {
+        /** Some other error, return to caller */
+        return signInResponse;
+      }
+    }
   }
 
   async changePassword(currentServerPassword, newServerPassword, newKeyParams) {
     const response = await this.apiService.changePassword(currentServerPassword, newServerPassword, newKeyParams);
-    await this.handleAuthResponse(response);
-    return response;
-  }
 
-  async handleAuthResponse(response) {
-    if (response.error) {
-      return;
+    if (!response.error) {
+      await this.handleSuccessAuthResponse(response);
     }
 
+    return {
+      response: response,
+      keyParams: response.key_params
+    };
+  }
+
+  async handleSuccessAuthResponse(response) {
     const user = response.user;
     this.user = user;
     await this.storageService.setValue(StorageKey.User, user);
@@ -11263,7 +13258,46 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
 }
+// CONCATENATED MODULE: ./lib/services/api/keys.ts
+var ApiEndpointParam;
+
+(function (ApiEndpointParam) {
+  ApiEndpointParam["LastSyncToken"] = "sync_token";
+  ApiEndpointParam["PaginationToken"] = "cursor_token";
+  ApiEndpointParam["IntegrityCheck"] = "compute_integrity";
+  ApiEndpointParam["IntegrityResult"] = "integrity_hash";
+  ApiEndpointParam["SyncDlLimit"] = "limit";
+  ApiEndpointParam["SyncPayloads"] = "items";
+  ApiEndpointParam["ApiVersion"] = "api";
+})(ApiEndpointParam || (ApiEndpointParam = {}));
+
+;
+// CONCATENATED MODULE: ./lib/services/api/responses.ts
+
+var HttpStatusCode;
+
+(function (HttpStatusCode) {
+  HttpStatusCode[HttpStatusCode["HttpStatusMinSuccess"] = 200] = "HttpStatusMinSuccess";
+  HttpStatusCode[HttpStatusCode["HttpStatusMaxSuccess"] = 299] = "HttpStatusMaxSuccess";
+  /** The session's access token is expired, but the refresh token is valid */
+
+  HttpStatusCode[HttpStatusCode["HttpStatusExpiredAccessToken"] = 498] = "HttpStatusExpiredAccessToken";
+  /** The session's access token and refresh token are expired, user must reauthenticate */
+
+  HttpStatusCode[HttpStatusCode["HttpStatusInvalidSession"] = 401] = "HttpStatusInvalidSession";
+})(HttpStatusCode || (HttpStatusCode = {}));
+
+function isErrorResponseExpiredToken(errorResponse) {
+  return errorResponse.status === HttpStatusCode.HttpStatusExpiredAccessToken;
+}
+var ConflictType;
+
+(function (ConflictType) {
+  ConflictType["ConflictingData"] = "sync_conflict";
+  ConflictType["UuidConflict"] = "uuid_conflict";
+})(ConflictType || (ConflictType = {}));
 // CONCATENATED MODULE: ./lib/services/api/http_service.ts
+
 
 
 var HttpVerb;
@@ -11275,9 +13309,6 @@ var HttpVerb;
 })(HttpVerb || (HttpVerb = {}));
 
 const REQUEST_READY_STATE_COMPLETED = 4;
-const HTTP_STATUS_MIN_SUCCESS = 200;
-const HTTP_STATUS_MAX_SUCCESS = 299;
-const HTTP_STATUS_EXPIRED_ACCESS_TOKEN = 498;
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
@@ -11362,7 +13393,7 @@ class http_service_SNHttpService extends pure_service["a" /* PureService */] {
       Object.assign(response, body);
     } catch (error) {}
 
-    if (httpStatus >= HTTP_STATUS_MIN_SUCCESS && httpStatus <= HTTP_STATUS_MAX_SUCCESS) {
+    if (httpStatus >= HttpStatusCode.HttpStatusMinSuccess && httpStatus <= HttpStatusCode.HttpStatusMaxSuccess) {
       resolve(response);
     } else {
       if (!response.error) {
@@ -11388,31 +13419,14 @@ class http_service_SNHttpService extends pure_service["a" /* PureService */] {
     }
   }
 
-  isErrorResponseExpiredToken(errorResponse) {
-    return errorResponse.status === HTTP_STATUS_EXPIRED_ACCESS_TOKEN;
-  }
-
 }
-// CONCATENATED MODULE: ./lib/services/api/keys.ts
-var ApiEndpointParam;
-
-(function (ApiEndpointParam) {
-  ApiEndpointParam["LastSyncToken"] = "sync_token";
-  ApiEndpointParam["PaginationToken"] = "cursor_token";
-  ApiEndpointParam["IntegrityCheck"] = "compute_integrity";
-  ApiEndpointParam["IntegrityResult"] = "integrity_hash";
-  ApiEndpointParam["SyncDlLimit"] = "limit";
-  ApiEndpointParam["SyncPayloads"] = "items";
-  ApiEndpointParam["ApiVersion"] = "api";
-})(ApiEndpointParam || (ApiEndpointParam = {}));
-
-;
 // CONCATENATED MODULE: ./lib/services/api/api_service.ts
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+function api_service_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function api_service_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { api_service_ownKeys(Object(source), true).forEach(function (key) { api_service_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { api_service_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function api_service_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -11435,12 +13449,12 @@ const API_VERSION = '20200115';
 class api_service_SNApiService extends pure_service["a" /* PureService */] {
   constructor(httpService, storageService, defaultHost) {
     super();
+    this.httpService = httpService;
+    this.storageService = storageService;
     this.registering = false;
     this.authenticating = false;
     this.changing = false;
     this.refreshingSession = false;
-    this.httpService = httpService;
-    this.storageService = storageService;
     this.host = defaultHost;
   }
   /** @override */
@@ -11449,9 +13463,21 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
   deinit() {
     this.httpService = undefined;
     this.storageService = undefined;
+    this.invalidSessionObserver = undefined;
     this.host = undefined;
     this.session = undefined;
     super.deinit();
+  }
+  /**
+   * When a we receive a 401 error from the server, we'll notify the observer.
+   * Note that this applies only to sessions that are totally invalid. Sessions that
+   * are expired but can be renewed are still considered to be valid. In those cases,
+   * the server response is 498.
+   */
+
+
+  setInvalidSessionObserver(observer) {
+    this.invalidSessionObserver = observer;
   }
 
   async loadHost() {
@@ -11492,7 +13518,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       throw 'Attempting to build path with null path.';
     }
 
-    return Object(utils["u" /* joinPaths */])(host, path);
+    return Object(utils["v" /* joinPaths */])(host, path);
   }
 
   params(inParams) {
@@ -11526,6 +13552,8 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
 
   async getAccountKeyParams(email, mfaKeyPath, mfaCode) {
+    var _this$session;
+
     const url = await this.path(REQUEST_PATH_KEY_PARAMS);
     const params = this.params({
       email: email
@@ -11535,7 +13563,9 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       params[mfaKeyPath] = mfaCode;
     }
 
-    const response = await this.httpService.getAbsolute(url, params).catch(errorResponse => {
+    const response = await this.httpService.getAbsolute(url, params,
+    /** A session is optional here, if valid, endpoint returns extra params */
+    (_this$session = this.session) === null || _this$session === void 0 ? void 0 : _this$session.authorizationValue).catch(errorResponse => {
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_INVALID_LOGIN);
     });
     return response;
@@ -11548,7 +13578,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     this.registering = true;
     const url = await this.path(REQUEST_PATH_REGISTER);
-    const params = this.params(_objectSpread({
+    const params = this.params(api_service_objectSpread({
       password: serverPassword,
       email: email
     }, keyParams.getPortableValue()));
@@ -11600,12 +13630,12 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     this.changing = true;
     const url = await this.path(REQUEST_PATH_CHANGE_PW);
-    const params = this.params(_objectSpread({
+    const params = this.params(api_service_objectSpread({
       current_password: currentServerPassword,
       new_password: newServerPassword
     }, newKeyParams.getPortableValue()));
     const response = await this.httpService.postAbsolute(url, params, this.session.authorizationValue).catch(async errorResponse => {
-      if (this.httpService.isErrorResponseExpiredToken(errorResponse)) {
+      if (isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
           url,
@@ -11640,7 +13670,9 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       event: customEvent
     });
     const response = await this.httpService.postAbsolute(url, params, this.session.authorizationValue).catch(async errorResponse => {
-      if (this.httpService.isErrorResponseExpiredToken(errorResponse)) {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
+
+      if (isErrorResponseExpiredToken(errorResponse)) {
         return this.refreshSessionThenRetryRequest({
           verb: HttpVerb.Post,
           url,
@@ -11654,15 +13686,15 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
   }
 
   async refreshSessionThenRetryRequest(httpRequest) {
-    return this.refreshSession().then(sessionResponse => {
-      if (sessionResponse === null || sessionResponse === void 0 ? void 0 : sessionResponse.error) {
-        return sessionResponse;
-      } else {
-        return this.httpService.runHttp(_objectSpread(_objectSpread({}, httpRequest), {}, {
-          authentication: this.session.authorizationValue
-        }));
-      }
-    });
+    const sessionResponse = await this.refreshSession();
+
+    if (sessionResponse === null || sessionResponse === void 0 ? void 0 : sessionResponse.error) {
+      return sessionResponse;
+    } else {
+      return this.httpService.runHttp(api_service_objectSpread(api_service_objectSpread({}, httpRequest), {}, {
+        authentication: this.session.authorizationValue
+      }));
+    }
   }
 
   async refreshSession() {
@@ -11684,6 +13716,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
       await this.setSession(session);
       return response;
     }).catch(errorResponse => {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL);
     });
     this.refreshingSession = false;
@@ -11700,6 +13733,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
     const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
     const url = await this.path(path);
     const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
@@ -11715,6 +13749,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
     const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, revisionId);
     const url = await this.path(path);
     const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
@@ -11731,6 +13766,16 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
     return undefined;
   }
+  /** Handle errored responses to authenticated requests */
+
+
+  preprocessAuthenticatedErrorResponse(response) {
+    if (response.status === HttpStatusCode.HttpStatusInvalidSession && this.session) {
+      var _this$invalidSessionO;
+
+      (_this$invalidSessionO = this.invalidSessionObserver) === null || _this$invalidSessionO === void 0 ? void 0 : _this$invalidSessionO.call(this);
+    }
+  }
 
 }
 // EXTERNAL MODULE: ./node_modules/lodash/find.js
@@ -11738,12 +13783,8 @@ var find = __webpack_require__(17);
 var find_default = /*#__PURE__*/__webpack_require__.n(find);
 
 // EXTERNAL MODULE: ./node_modules/lodash/uniq.js
-var uniq = __webpack_require__(22);
+var uniq = __webpack_require__(23);
 var uniq_default = /*#__PURE__*/__webpack_require__.n(uniq);
-
-// EXTERNAL MODULE: ./node_modules/lodash/remove.js
-var remove = __webpack_require__(19);
-var remove_default = /*#__PURE__*/__webpack_require__.n(remove);
 
 // CONCATENATED MODULE: ./lib/platforms.ts
 var Environment;
@@ -11933,7 +13974,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
   }
 
   configureForGeneralUsage() {
-    this.removeItemObserver = this.itemManager.addObserver(content_types["a" /* ContentType */].Any, (changed, inserted, discarded, source, sourceKey) => {
+    this.removeItemObserver = this.itemManager.addObserver(content_types["a" /* ContentType */].Any, (changed, inserted, discarded, _ignored, source, sourceKey) => {
       const items = Object(utils["f" /* concatArrays */])(changed, inserted, discarded);
       const syncedComponents = items.filter(item => {
         return item.content_type === content_types["a" /* ContentType */].Component || item.content_type === content_types["a" /* ContentType */].Theme;
@@ -12331,7 +14372,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       this.handleSaveItemsMessage(component, message);
     } else if (message.action === ComponentAction.ToggleActivateComponent) {
       const componentToToggle = this.itemManager.findItem(message.data.uuid);
-      this.handleToggleComponentMessage(componentToToggle, message);
+      this.handleToggleComponentMessage(componentToToggle);
     } else if (message.action === ComponentAction.RequestPermissions) {
       this.handleRequestPermissionsMessage(component, message);
     } else if (message.action === ComponentAction.InstallLocalComponent) {
@@ -12409,7 +14450,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       const items = [];
 
       for (const contentType of message.data.content_types) {
-        Object(utils["j" /* extendArray */])(items, this.itemManager.nonErroredItemsForContentType(contentType));
+        Object(utils["k" /* extendArray */])(items, this.itemManager.nonErroredItemsForContentType(contentType));
       }
 
       this.sendItemsInReply(component.uuid, items, message);
@@ -12701,7 +14742,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     });
   }
 
-  async handleToggleComponentMessage(targetComponent, message) {
+  async handleToggleComponentMessage(targetComponent) {
     await this.toggleComponent(targetComponent);
     this.syncService.sync();
   }
@@ -12770,7 +14811,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       if (!requiredContentTypes) {
         /* If this permission does not require any content types (i.e stream-context-item)
           then we can remove this from required since we match by name (respectiveAcquired.name === required.name) */
-        Object(utils["k" /* filterFromArray */])(requiredPermissions, required);
+        Object(utils["l" /* filterFromArray */])(requiredPermissions, required);
         continue;
       }
 
@@ -12780,7 +14821,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
 
       if (requiredContentTypes.length === 0) {
         /* We've removed all acquired and end up with zero, means we already have all these permissions */
-        Object(utils["k" /* filterFromArray */])(requiredPermissions, required);
+        Object(utils["l" /* filterFromArray */])(requiredPermissions, required);
       }
     }
 
@@ -12874,11 +14915,11 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     }
   }
 
-  presentPermissionsDialog(dialog) {
+  presentPermissionsDialog(_dialog) {
     throw 'Must override SNComponentManager.presentPermissionsDialog';
   }
 
-  openModalComponent(component) {
+  openModalComponent(_component) {
     throw 'Must override SNComponentManager.presentPermissionsDialog';
   }
 
@@ -13087,8 +15128,8 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
 
   handleSetSizeEvent(component, data) {
     const setSize = (element, size) => {
-      const widthString = Object(utils["s" /* isString */])(size.width) ? size.width : "".concat(data.width, "px");
-      const heightString = Object(utils["s" /* isString */])(size.height) ? size.height : "".concat(data.height, "px");
+      const widthString = Object(utils["t" /* isString */])(size.width) ? size.width : "".concat(data.width, "px");
+      const heightString = Object(utils["t" /* isString */])(size.height) ? size.height : "".concat(data.height, "px");
 
       if (element) {
         element.setAttribute('style', "width:".concat(widthString, "; height:").concat(heightString, ";"));
@@ -13229,755 +15270,6 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
   }
 
 }
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/delta.ts
-/**
- * A payload delta is a class that defines instructions that process an incoming collection
- * of payloads, applies some set of operations on those payloads wrt to the current base state,
- * and returns the resulting collection. Deltas are purely functional and do not modify
- * input data, instead returning what the collection would look like after its been
- * transformed. The consumer may choose to act as they wish with this end result.
- *
- * A delta object takes a baseCollection (the current state of the data) and an applyCollection
- * (the data another source is attempting to merge on top of our base data). The delta will
- * then iterate over this data and return a `resultingCollection` object that includes the final
- * state of the data after the class-specific operations have been applied.
- *
- * For example, the RemoteRetrieved delta will take the current state of local data as
- * baseCollection, the data the server is sending as applyCollection, and determine what
- * the end state of the data should look like.
- */
-class PayloadsDelta {
-  /**
-   * @param baseCollection The authoratitive collection on top of which to compute changes.
-   * @param applyCollection The collection of payloads to apply, from one given source only.
-   * @param relatedCollectionSet A collection set (many collections) that contain payloads
-   *                             that may be neccessary to carry out computation.
-   */
-  constructor(baseCollection, applyCollection, relatedCollectionSet) {
-    this.baseCollection = baseCollection;
-    this.applyCollection = applyCollection;
-    this.relatedCollectionSet = relatedCollectionSet;
-  }
-
-  async resultingCollection() {
-    throw 'Must override PayloadDelta.resultingCollection.';
-  }
-  /**
-   * @param {string} id  - The uuid of the payload to find
-   */
-
-
-  findBasePayload(id) {
-    return this.baseCollection.find(id);
-  }
-
-  findRelatedPayload(id, source) {
-    var _this$relatedCollecti;
-
-    const collection = (_this$relatedCollecti = this.relatedCollectionSet) === null || _this$relatedCollecti === void 0 ? void 0 : _this$relatedCollecti.collectionForSource(source);
-    return collection === null || collection === void 0 ? void 0 : collection.find(id);
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/collection/uuid_map.ts
-
-class uuid_map_UuidMap {
-  constructor() {
-    /** uuid to uuids that we have a relationship with */
-    this.directMap = {};
-    /** uuid to uuids that have a relationship with us */
-
-    this.inverseMap = {};
-  }
-
-  makeCopy() {
-    const copy = new uuid_map_UuidMap();
-    copy.directMap = Object.assign({}, this.directMap);
-    copy.inverseMap = Object.assign({}, this.inverseMap);
-    return copy;
-  }
-
-  getDirectRelationships(uuid) {
-    return this.directMap[uuid] || [];
-  }
-
-  getInverseRelationships(uuid) {
-    return this.inverseMap[uuid] || [];
-  }
-
-  establishRelationship(uuidA, uuidB) {
-    this.establishDirectRelationship(uuidA, uuidB);
-    this.establishInverseRelationship(uuidA, uuidB);
-  }
-
-  deestablishRelationship(uuidA, uuidB) {
-    this.deestablishDirectRelationship(uuidA, uuidB);
-    this.deestablishInverseRelationship(uuidA, uuidB);
-  }
-
-  setAllRelationships(uuid, relationships) {
-    const previousDirect = this.directMap[uuid] || [];
-    this.directMap[uuid] = relationships;
-    /** Remove all previous values in case relationships have changed
-     * The updated references will be added afterwards.
-    */
-
-    for (const previousRelationship of previousDirect) {
-      this.deestablishInverseRelationship(uuid, previousRelationship);
-    }
-    /** Now map current relationships */
-
-
-    for (const newRelationship of relationships) {
-      this.establishInverseRelationship(uuid, newRelationship);
-    }
-  }
-
-  removeFromMap(uuid) {
-    /** Items that we reference */
-    const directReferences = this.directMap[uuid] || [];
-
-    for (const directReference of directReferences) {
-      Object(utils["B" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
-    }
-
-    delete this.directMap[uuid];
-    /** Items that are referencing us */
-
-    const inverseReferences = this.inverseMap[uuid] || [];
-
-    for (const inverseReference of inverseReferences) {
-      Object(utils["B" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
-    }
-
-    delete this.inverseMap[uuid];
-  }
-
-  establishDirectRelationship(uuidA, uuidB) {
-    const index = this.directMap[uuidA] || [];
-    Object(utils["b" /* addIfUnique */])(index, uuidB);
-    this.directMap[uuidA] = index;
-  }
-
-  establishInverseRelationship(uuidA, uuidB) {
-    const inverseIndex = this.inverseMap[uuidB] || [];
-    Object(utils["b" /* addIfUnique */])(inverseIndex, uuidA);
-    this.inverseMap[uuidB] = inverseIndex;
-  }
-
-  deestablishDirectRelationship(uuidA, uuidB) {
-    const index = this.directMap[uuidA] || [];
-    Object(utils["B" /* removeFromArray */])(index, uuidB);
-    this.directMap[uuidA] = index;
-  }
-
-  deestablishInverseRelationship(uuidA, uuidB) {
-    const inverseIndex = this.inverseMap[uuidB] || [];
-    Object(utils["B" /* removeFromArray */])(inverseIndex, uuidA);
-    this.inverseMap[uuidB] = inverseIndex;
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/collection/collection.ts
-
-
-
-class collection_MutableCollection {
-  constructor() {
-    let copy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    let mapCopy = arguments.length > 1 ? arguments[1] : undefined;
-    let typedMapCopy = arguments.length > 2 ? arguments[2] : undefined;
-    let referenceMapCopy = arguments.length > 3 ? arguments[3] : undefined;
-    let conflictMapCopy = arguments.length > 4 ? arguments[4] : undefined;
-    this.map = {};
-    this.typedMap = ({} = {});
-    /** An array of uuids of items that are dirty */
-
-    this.dirtyIndex = new Set();
-    /** An array of uuids of items that are errorDecrypting or waitingForKey */
-
-    this.invalidsIndex = new Set();
-    /** An array of uuids of items that are not marked as deleted */
-
-    this.nondeletedIndex = new Set();
-
-    if (copy) {
-      this.map = mapCopy;
-      this.typedMap = typedMapCopy;
-      this.referenceMap = referenceMapCopy;
-      this.conflictMap = conflictMapCopy;
-    } else {
-      this.referenceMap = new uuid_map_UuidMap();
-      this.conflictMap = new uuid_map_UuidMap();
-    }
-  }
-
-  uuids() {
-    return Object.keys(this.map);
-  }
-
-  all(contentType) {
-    if (contentType) {
-      if (Array.isArray(contentType)) {
-        const elements = [];
-
-        for (const type of contentType) {
-          Object(utils["j" /* extendArray */])(elements, this.typedMap[type] || []);
-        }
-
-        return elements;
-      } else {
-        var _this$typedMap$conten;
-
-        return ((_this$typedMap$conten = this.typedMap[contentType]) === null || _this$typedMap$conten === void 0 ? void 0 : _this$typedMap$conten.slice()) || [];
-      }
-    } else {
-      return Object.keys(this.map).map(uuid => {
-        return this.map[uuid];
-      });
-    }
-  }
-
-  find(uuid) {
-    return this.map[uuid];
-  }
-  /** Returns all elements that are marked as dirty */
-
-
-  dirtyElements() {
-    const uuids = Array.from(this.dirtyIndex);
-    return this.findAll(uuids);
-  }
-  /** Returns all elements that are errorDecrypting or waitingForKey */
-
-
-  invalidElements() {
-    const uuids = Array.from(this.invalidsIndex);
-    return this.findAll(uuids);
-  }
-  /** Returns all elements that are not marked as deleted */
-
-
-  nondeletedElements() {
-    const uuids = Array.from(this.nondeletedIndex);
-    return this.findAll(uuids);
-  }
-  /**
-   * @param includeBlanks If true and an item is not found, an `undefined` element
-   * will be inserted into the array.
-   */
-
-
-  findAll(uuids) {
-    let includeBlanks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    const results = [];
-
-    for (const id of uuids) {
-      const element = this.map[id];
-
-      if (element || includeBlanks) {
-        results.push(element);
-      }
-    }
-
-    return results;
-  }
-
-  set(elements) {
-    elements = Array.isArray(elements) ? elements : [elements];
-
-    if (elements.length === 0) {
-      console.warn('Attempting to set 0 elements onto collection');
-      return;
-    }
-
-    for (const element of elements) {
-      this.map[element.uuid] = element;
-      this.setToTypedMap(element);
-      /** Dirty index */
-
-      if (element.dirty) {
-        this.dirtyIndex.add(element.uuid);
-      } else {
-        this.dirtyIndex.delete(element.uuid);
-      }
-      /** Invalids index */
-
-
-      if (element.errorDecrypting || element.waitingForKey) {
-        this.invalidsIndex.add(element.uuid);
-      } else {
-        this.invalidsIndex.delete(element.uuid);
-      }
-
-      if (element.deleted) {
-        this.referenceMap.removeFromMap(element.uuid);
-        this.nondeletedIndex.delete(element.uuid);
-      } else {
-        this.nondeletedIndex.add(element.uuid);
-        const conflictOf = element.safeContent.conflict_of;
-
-        if (conflictOf) {
-          this.conflictMap.establishRelationship(conflictOf, element.uuid);
-        }
-
-        this.referenceMap.setAllRelationships(element.uuid, element.references.map(r => r.uuid));
-      }
-    }
-  }
-
-  discard(elements) {
-    elements = Array.isArray(elements) ? elements : [elements];
-
-    for (const element of elements) {
-      this.conflictMap.removeFromMap(element.uuid);
-      this.referenceMap.removeFromMap(element.uuid);
-      this.deleteFromTypedMap(element);
-      delete this.map[element.uuid];
-    }
-  }
-
-  setToTypedMap(element) {
-    const array = this.typedMap[element.content_type] || [];
-    remove_default()(array, {
-      uuid: element.uuid
-    });
-    array.push(element);
-    this.typedMap[element.content_type] = array;
-  }
-
-  deleteFromTypedMap(element) {
-    const array = this.typedMap[element.content_type] || [];
-    remove_default()(array, {
-      uuid: element.uuid
-    });
-    this.typedMap[element.content_type] = array;
-  }
-
-  uuidsThatReferenceUuid(uuid) {
-    if (!Object(utils["s" /* isString */])(uuid)) {
-      throw Error('Must use uuid string');
-    }
-
-    return this.referenceMap.getInverseRelationships(uuid);
-  }
-
-  elementsReferencingElement(element) {
-    const uuids = this.uuidsThatReferenceUuid(element.uuid);
-    return this.findAll(uuids);
-  }
-
-  referencesForElement(element) {
-    const uuids = this.referenceMap.getDirectRelationships(element.uuid);
-    return this.findAll(uuids);
-  }
-
-  conflictsOf(uuid) {
-    const uuids = this.conflictMap.getDirectRelationships(uuid);
-    return this.findAll(uuids);
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/collection/payload_collection.ts
-
-/**
- * A collection of payloads coming from a single source.
- */
-
-class payload_collection_ImmutablePayloadCollection extends collection_MutableCollection {
-  /** We don't use a constructor for this because we don't want the constructor to have
-   * side-effects, such as calling collection.set(). */
-  static WithPayloads() {
-    let payloads = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    let source = arguments.length > 1 ? arguments[1] : undefined;
-    const collection = new payload_collection_ImmutablePayloadCollection();
-    collection.source = source;
-
-    if (payloads.length > 0) {
-      collection.set(payloads);
-    }
-
-    Object.freeze(collection);
-    return collection;
-  }
-
-  static FromCollection(collection) {
-    const mapCopy = Object.freeze(Object.assign({}, collection.map));
-    const typedMapCopy = Object.freeze(Object.assign({}, collection.typedMap));
-    const referenceMapCopy = Object.freeze(collection.referenceMap.makeCopy());
-    const conflictMapCopy = Object.freeze(collection.conflictMap.makeCopy());
-    const result = new payload_collection_ImmutablePayloadCollection(true, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy);
-    Object.freeze(result);
-    return result;
-  }
-
-  get payloads() {
-    return this.all();
-  }
-
-}
-// CONCATENATED MODULE: ./lib/models/index.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// CONCATENATED MODULE: ./lib/protocol/payloads/functions.ts
-function functions_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function functions_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { functions_ownKeys(Object(source), true).forEach(function (key) { functions_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { functions_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function functions_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-
-
-
-
-
-
-
-
-
-function NoteDuplicationAffectedPayloads(basePayload, duplicatePayload, baseCollection) {
-  /** If note has editor, maintain editor relationship in duplicate note */
-  const components = baseCollection.all(content_types["a" /* ContentType */].Component).map(payload => {
-    return CreateItemFromPayload(payload);
-  });
-  const editor = components.filter(c => c.area === ComponentArea.Editor).find(e => {
-    return e.isExplicitlyEnabledForItem(basePayload.uuid);
-  });
-
-  if (!editor) {
-    return undefined;
-  }
-  /** Modify the editor to include new note */
-
-
-  const mutator = new component_ComponentMutator(editor, core_item["c" /* MutationType */].Internal);
-  mutator.associateWithItem(duplicatePayload.uuid);
-  const result = mutator.getResult();
-  return [result];
-}
-
-const AffectorMapping = {
-  [content_types["a" /* ContentType */].Note]: NoteDuplicationAffectedPayloads
-};
-/**
- * Copies payload and assigns it a new uuid.
- * @returns An array of payloads that have changed as a result of copying.
- */
-
-async function PayloadsByDuplicating(payload, baseCollection, isConflict) {
-  const results = [];
-  const override = {
-    uuid: await uuid_Uuid.GenerateUuid(),
-    dirty: true,
-    dirtiedDate: new Date(),
-    lastSyncBegan: null,
-    lastSyncEnd: null,
-    duplicate_of: payload.uuid
-  };
-
-  if (isConflict) {
-    override.content = functions_objectSpread(functions_objectSpread({}, payload.safeContent), {}, {
-      conflict_of: payload.uuid
-    });
-  }
-
-  const copy = Object(generator["b" /* CopyPayload */])(payload, override);
-  results.push(copy);
-  /**
-   * Get the payloads that make reference to payload and add the copy.
-   */
-
-  const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = await PayloadsByUpdatingReferences(referencing, [{
-    uuid: copy.uuid,
-    content_type: copy.content_type
-  }]);
-  Object(utils["j" /* extendArray */])(results, updatedReferencing);
-  const affector = AffectorMapping[payload.content_type];
-
-  if (affector) {
-    const affected = affector(payload, copy, baseCollection);
-
-    if (affected) {
-      Object(utils["j" /* extendArray */])(results, affected);
-    }
-  }
-
-  return results;
-}
-/**
- * Return the payloads that result if you alternated the uuid for the payload.
- * Alternating a UUID involves instructing related items to drop old references of a uuid
- * for the new one.
- * @returns An array of payloads that have changed as a result of copying.
- */
-
-async function PayloadsByAlternatingUuid(payload, baseCollection) {
-  const results = [];
-  /**
-  * We need to clone payload and give it a new uuid,
-  * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
-  */
-
-  const copy = Object(generator["b" /* CopyPayload */])(payload, {
-    uuid: await uuid_Uuid.GenerateUuid(),
-    dirty: true,
-    dirtiedDate: new Date(),
-    lastSyncBegan: null,
-    lastSyncEnd: null
-  });
-  results.push(copy);
-  /**
-   * Get the payloads that make reference to payload and remove
-   * payload as a relationship, instead adding the new copy.
-   */
-
-  const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = await PayloadsByUpdatingReferences(referencing, [{
-    uuid: copy.uuid,
-    content_type: copy.content_type
-  }], [payload.uuid]);
-  Object(utils["j" /* extendArray */])(results, updatedReferencing);
-  const updatedSelf = Object(generator["b" /* CopyPayload */])(payload, {
-    deleted: true,
-
-    /** Do not set as dirty; this item is non-syncable
-      and should be immediately discarded */
-    dirty: false,
-    content: undefined
-  });
-  results.push(updatedSelf);
-  return results;
-}
-
-async function PayloadsByUpdatingReferences(payloads, add, removeIds) {
-  const results = [];
-
-  for (const payload of payloads) {
-    const references = payload.contentObject.references.slice();
-
-    if (add) {
-      for (const reference of add) {
-        references.push(reference);
-      }
-    }
-
-    if (removeIds) {
-      for (const id of removeIds) {
-        remove_default()(references, {
-          uuid: id
-        });
-      }
-    }
-
-    const result = Object(generator["b" /* CopyPayload */])(payload, {
-      dirty: true,
-      dirtiedDate: new Date(),
-      content: functions_objectSpread(functions_objectSpread({}, payload.safeContent), {}, {
-        references: references
-      })
-    });
-    results.push(result);
-  }
-
-  return results;
-}
-/**
- * Compares the .content fields for equality, creating new SNItem objects
- * to properly handle .content intricacies.
- */
-
-
-function PayloadContentsEqual(payloadA, payloadB) {
-  const itemA = CreateItemFromPayload(payloadA);
-  const itemB = CreateItemFromPayload(payloadB);
-  return itemA.isItemContentEqualWith(itemB);
-}
-// EXTERNAL MODULE: ./lib/protocol/payloads/fields.ts
-var fields = __webpack_require__(4);
-
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/conflict.ts
-function conflict_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function conflict_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { conflict_ownKeys(Object(source), true).forEach(function (key) { conflict_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { conflict_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function conflict_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-
-
-
-
-
-
-
-
-class conflict_ConflictDelta {
-  constructor(baseCollection, basePayload, applyPayload, source) {
-    this.baseCollection = baseCollection;
-    this.basePayload = basePayload;
-    this.applyPayload = applyPayload;
-    this.source = source;
-  }
-
-  async resultingCollection() {
-    const tmpBaseItem = CreateItemFromPayload(this.basePayload);
-    const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
-    const strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem);
-    const results = await this.payloadsByHandlingStrategy(strategy);
-    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, this.source);
-  }
-
-  async payloadsByHandlingStrategy(strategy) {
-    /** Ensure no conflict has already been created with the incoming content.
-     * This can occur in a multi-page sync request where in the middle of the request,
-     * we make changes to many items, including duplicating, but since we are still not
-     * uploading the changes until after the multi-page request completes, we may have
-     * already conflicted this item. */
-    const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0];
-
-    if (existingConflict && PayloadContentsEqual(existingConflict, this.applyPayload)) {
-      /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
-      return [];
-    }
-
-    if (strategy === strategies["a" /* ConflictStrategy */].KeepLeft) {
-      const updatedAt = Object(utils["n" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
-      const leftPayload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
-        updated_at: updatedAt,
-        dirty: true,
-        dirtiedDate: new Date()
-      });
-      return [leftPayload];
-    }
-
-    if (strategy === strategies["a" /* ConflictStrategy */].KeepRight) {
-      const result = Object(generator["g" /* PayloadByMerging */])(this.applyPayload, this.basePayload, [fields["a" /* PayloadField */].LastSyncBegan], {
-        lastSyncEnd: new Date()
-      });
-      return [result];
-    }
-
-    if (strategy === strategies["a" /* ConflictStrategy */].KeepLeftDuplicateRight) {
-      const updatedAt = Object(utils["n" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
-      const leftPayload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
-        updated_at: updatedAt,
-        dirty: true,
-        dirtiedDate: new Date()
-      });
-      const rightPayloads = await PayloadsByDuplicating(this.applyPayload, this.baseCollection, true);
-      return [leftPayload].concat(rightPayloads);
-    }
-
-    if (strategy === strategies["a" /* ConflictStrategy */].DuplicateLeftKeepRight) {
-      const leftPayloads = await PayloadsByDuplicating(this.basePayload, this.baseCollection, true);
-      const rightPayload = Object(generator["g" /* PayloadByMerging */])(this.applyPayload, this.basePayload, [fields["a" /* PayloadField */].LastSyncBegan], {
-        lastSyncEnd: new Date()
-      });
-      return leftPayloads.concat([rightPayload]);
-    }
-
-    if (strategy === strategies["a" /* ConflictStrategy */].KeepLeftMergeRefs) {
-      const refs = Object(utils["J" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
-      const updatedAt = Object(utils["n" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
-      const payload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
-        updated_at: updatedAt,
-        dirty: true,
-        dirtiedDate: new Date(),
-        content: conflict_objectSpread(conflict_objectSpread({}, this.basePayload.safeContent), {}, {
-          references: refs
-        })
-      });
-      return [payload];
-    }
-
-    throw 'Unhandled strategy';
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/file_import.ts
-
-
-
-
-
-
-class file_import_DeltaFileImport extends PayloadsDelta {
-  async resultingCollection() {
-    const results = [];
-
-    for (const payload of this.applyCollection.all()) {
-      const handled = await this.payloadsByHandlingPayload(payload, results);
-      const payloads = handled.map(result => {
-        return Object(generator["b" /* CopyPayload */])(result, {
-          dirty: true,
-          dirtiedDate: new Date(),
-          deleted: false
-        });
-      });
-      Object(utils["j" /* extendArray */])(results, payloads);
-    }
-
-    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].FileImport);
-  }
-
-  async payloadsByHandlingPayload(payload, currentResults) {
-    /**
-     * Check to see if we've already processed a payload for this id.
-     * If so, that would be the latest value, and not what's in the base collection.
-     */
-
-    /*
-     * Find the most recently created conflict if available, as that
-     * would contain the most recent value.
-     */
-    let current = currentResults.find(candidate => {
-      return candidate.contentObject.conflict_of === payload.uuid;
-    });
-    /**
-     * If no latest conflict, find by uuid directly.
-     */
-
-    if (!current) {
-      current = currentResults.find(candidate => {
-        return candidate.uuid === payload.uuid;
-      });
-    }
-    /**
-     * If not found in current results, use the base value.
-     */
-
-
-    if (!current) {
-      current = this.findBasePayload(payload.uuid);
-    }
-    /**
-     * If the current doesn't exist, we're creating a new item from payload.
-     */
-
-
-    if (!current) {
-      return [payload];
-    }
-
-    const delta = new conflict_ConflictDelta(this.baseCollection, current, payload, sources["a" /* PayloadSource */].FileImport);
-    const deltaCollection = await delta.resultingCollection();
-    return deltaCollection.all();
-  }
-
-}
 // CONCATENATED MODULE: ./lib/services/model_manager.ts
 
 
@@ -14004,6 +15296,15 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     super();
     this.changeObservers = [];
     this.emitQueue = [];
+    /**
+     * An array of content types for which we enable encrypted overwrite protection.
+     * If a payload attempting to be emitted is errored, yet our current local version
+     * is not errored, and the payload's content type is in this array, we do not overwrite
+     * our local version. We instead notify observers of this interaction for them to handle
+     * as needed
+    */
+
+    this.overwriteProtection = [content_types["a" /* ContentType */].ItemsKey];
     this.collection = new collection_MutableCollection();
   }
   /**
@@ -14082,9 +15383,10 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     const {
       changed,
       inserted,
-      discarded
+      discarded,
+      ignored
     } = this.mergePayloadsOntoMaster(first.payloads);
-    this.notifyChangeObservers(changed, inserted, discarded, first.source, first.sourceKey);
+    this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey);
     Object(utils["B" /* removeFromArray */])(this.emitQueue, first);
     first.resolve(changed.concat(inserted, discarded));
 
@@ -14097,6 +15399,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     const changed = [];
     const inserted = [];
     const discarded = [];
+    const ignored = [];
 
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
@@ -14105,11 +15408,17 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
       }
 
       const masterPayload = this.collection.find(payload.uuid);
+
+      if (payload.errorDecrypting && masterPayload && !masterPayload.errorDecrypting && this.overwriteProtection.includes(payload.content_type)) {
+        ignored.push(payload);
+        continue;
+      }
+
       const newPayload = masterPayload ? Object(generator["g" /* PayloadByMerging */])(masterPayload, payload) : payload;
-      /** The item has been deleted and synced,
-       * and can thus be removed from our local record */
 
       if (newPayload.discardable) {
+        /** The item has been deleted and synced,
+         * and can thus be removed from our local record */
         this.collection.discard(newPayload);
         discarded.push(newPayload);
       } else {
@@ -14126,7 +15435,8 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     return {
       changed,
       inserted,
-      discarded
+      discarded,
+      ignored
     };
   }
   /**
@@ -14160,7 +15470,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
    */
 
 
-  notifyChangeObservers(changed, inserted, discarded, source, sourceKey) {
+  notifyChangeObservers(changed, inserted, discarded, ignored, source, sourceKey) {
     /** Slice the observers array as sort modifies in-place */
     const observers = this.changeObservers.slice().sort((a, b) => {
       return a.priority < b.priority ? -1 : 1;
@@ -14173,7 +15483,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     };
 
     for (const observer of observers) {
-      observer.callback(filter(changed, observer.types), filter(inserted, observer.types), filter(discarded, observer.types), source, sourceKey);
+      observer.callback(filter(changed, observer.types), filter(inserted, observer.types), filter(discarded, observer.types), filter(ignored, observer.types), source, sourceKey);
     }
   }
   /**
@@ -14196,7 +15506,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
 
 }
 // EXTERNAL MODULE: ./lib/services/sync/events.ts
-var sync_events = __webpack_require__(7);
+var sync_events = __webpack_require__(9);
 
 // CONCATENATED MODULE: ./lib/services/singleton_manager.ts
 
@@ -14338,7 +15648,7 @@ class singleton_manager_SNSingletonManager extends pure_service["a" /* PureServi
       }
 
       const matchingItems = matches(item);
-      Object(utils["j" /* extendArray */])(handled, matchingItems || []);
+      Object(utils["k" /* extendArray */])(handled, matchingItems || []);
 
       if (!matchingItems || matchingItems.length <= 1) {
         continue;
@@ -14455,6 +15765,12 @@ class singleton_manager_SNSingletonManager extends pure_service["a" /* PureServi
 
 }
 // CONCATENATED MODULE: ./lib/services/actions_service.ts
+function actions_service_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function actions_service_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { actions_service_ownKeys(Object(source), true).forEach(function (key) { actions_service_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { actions_service_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function actions_service_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -14583,6 +15899,7 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
     } else {
       return {
         error: {
+          status: 1,
           message: 'Action canceled by user.'
         }
       };
@@ -14601,9 +15918,7 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
     });
 
     if (response.error) {
-      return {
-        response
-      };
+      return response;
     }
 
     const payload = await this.payloadByDecryptingResponse(response, passwordRequestHandler);
@@ -14612,10 +15927,9 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
       dirtiedDate: new Date()
     }), sources["a" /* PayloadSource */].RemoteActionRetrieved);
     this.syncService.sync();
-    return {
-      response,
+    return actions_service_objectSpread(actions_service_objectSpread({}, response), {}, {
       item: response.item
-    };
+    });
   }
 
   async handleRenderAction(action, passwordRequestHandler) {
@@ -14624,10 +15938,9 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
 
       if (payload) {
         const item = await this.itemManager.createItem(payload.content_type, payload.contentObject);
-        return {
-          response,
+        return actions_service_objectSpread(actions_service_objectSpread({}, response), {}, {
           item
-        };
+        });
       }
     }).catch(response => {
       const error = response && response.error || {
@@ -14702,161 +16015,24 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
       items: [itemParams]
     };
     return this.httpService.postAbsolute(action.url, params).then(response => {
-      return {
-        response
-      };
+      return response;
     }).catch(response => {
       console.error('Action error response:', response);
       this.alertService.alert('An issue occurred while processing this action. Please try again.');
-      return {
-        response
-      };
+      return response;
     });
   }
 
   async handleShowAction(action) {
     this.deviceInterface.openUrl(action.url);
-    return {
-      response: undefined
-    };
+    return {};
   }
 
   async outgoingPayloadForItem(item) {
     let decrypted = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    const intent = decrypted ? intents["a" /* EncryptionIntent */].FileDecrypted : intents["a" /* EncryptionIntent */].FileEncrypted;
+    const intent = decrypted ? intents["b" /* EncryptionIntent */].FileDecrypted : intents["b" /* EncryptionIntent */].FileEncrypted;
     const encrypted = await this.protocolService.payloadByEncryptingPayload(item.payloadRepresentation(), intent);
     return encrypted.ejected();
-  }
-
-}
-// CONCATENATED MODULE: ./node_modules/sncrypto/lib/common/utils.ts
-/**
- * Constant-time string comparison
- * @param a
- * @param b
- */
-function timingSafeEqual(a, b) {
-  const strA = String(a);
-  let strB = String(b);
-  const lenA = strA.length;
-  let result = 0;
-
-  if (lenA !== strB.length) {
-    strB = strA;
-    result = 1;
-  }
-
-  for (let i = 0; i < lenA; i++) {
-    result |= strA.charCodeAt(i) ^ strB.charCodeAt(i);
-  }
-
-  return result === 0;
-}
-// CONCATENATED MODULE: ./lib/protocol/root_key.ts
-
-
-
-
-
-
-
-/**
- * A root key is a local only construct that houses the key used for the encryption
- * and decryption of items keys. A root key extends SNItem for local convenience, but is
- * not part of the syncing or storage ecosystem—root keys are managed independently.
- */
-
-class root_key_SNRootKey extends core_item["d" /* SNItem */] {
-  static async Create(content, uuid) {
-    if (!uuid) {
-      uuid = await uuid_Uuid.GenerateUuid();
-    }
-
-    if (!content.version) {
-      if (content.dataAuthenticationKey) {
-        /**
-         * If there's no version stored, it must be either 001 or 002.
-         * If there's a dataAuthenticationKey, it has to be 002. Otherwise it's 001.
-         */
-        content.version = versions["a" /* ProtocolVersion */].V002;
-      } else {
-        content.version = versions["a" /* ProtocolVersion */].V001;
-      }
-    }
-
-    const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])({
-      uuid: uuid,
-      content_type: content_types["a" /* ContentType */].RootKey,
-      content: Object(functions["a" /* FillItemContent */])(content)
-    });
-    return new root_key_SNRootKey(payload);
-  }
-
-  get version() {
-    if (!this.payload.safeContent.version) {
-      throw 'Attempting to create key without version.';
-    }
-
-    return this.payload.safeContent.version;
-  }
-
-  get isRootKey() {
-    return true;
-  }
-  /**
-   * When the root key is used to encrypt items, we use the masterKey directly.
-   */
-
-
-  get itemsKey() {
-    return this.masterKey;
-  }
-
-  get masterKey() {
-    return this.payload.safeContent.masterKey;
-  }
-
-  get serverPassword() {
-    return this.payload.safeContent.serverPassword;
-  }
-  /** 003 and below only. */
-
-
-  get dataAuthenticationKey() {
-    return this.payload.safeContent.dataAuthenticationKey;
-  }
-  /**
-   * Compares two keys for equality
-   */
-
-
-  compare(otherKey) {
-    if (this.version !== otherKey.version) {
-      return false;
-    }
-
-    const hasServerPassword = this.serverPassword && otherKey.serverPassword;
-    return timingSafeEqual(this.masterKey, otherKey.masterKey) && (!hasServerPassword || timingSafeEqual(this.serverPassword, otherKey.serverPassword));
-  }
-  /**
-   * @returns Object containg key/values that should be extracted from key for local saving.
-   */
-
-
-  getPersistableValue() {
-    const values = {
-      version: this.version
-    };
-
-    if (this.masterKey) {
-      values.masterKey = this.masterKey;
-    }
-
-    if (this.dataAuthenticationKey) {
-      values.dataAuthenticationKey = this.dataAuthenticationKey;
-    }
-
-    return values;
   }
 
 }
@@ -14983,20 +16159,21 @@ class _2020_01_15_Migration20200115 extends Migration {
       const passcodeParams = passcodeResult.keyParams;
       newStorageRawStructure.nonwrapped[StorageKey.RootKeyWrapperKeyParams] = passcodeParams.getPortableValue();
       const rawStorageValueStore = Object(utils["a" /* Copy */])(decryptedStoragePayload.contentObject.storage);
-      const storageValueStore = Object(utils["v" /* jsonParseEmbeddedKeys */])(rawStorageValueStore);
+      const storageValueStore = Object(utils["w" /* jsonParseEmbeddedKeys */])(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      const accountKeyParams = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = accountKeyParams;
       let keyToEncryptStorageWith = passcodeKey;
       /** Extract account key (mk, pw, ak) if it exists */
 
-      const hasAccountKeys = !Object(utils["p" /* isNullOrUndefined */])(storageValueStore.mk);
+      const hasAccountKeys = !Object(utils["q" /* isNullOrUndefined */])(storageValueStore.mk);
 
       if (hasAccountKeys) {
         const {
           accountKey,
           wrappedKey
-        } = await this.webDesktopHelperExtractAndWrapAccountKeysFromValueStore(passcodeKey, storageValueStore);
+        } = await this.webDesktopHelperExtractAndWrapAccountKeysFromValueStore(passcodeKey, accountKeyParams, storageValueStore);
         keyToEncryptStorageWith = accountKey;
         newStorageRawStructure.nonwrapped[StorageKey.WrappedRootKey] = wrappedKey;
       }
@@ -15006,17 +16183,21 @@ class _2020_01_15_Migration20200115 extends Migration {
       newStorageRawStructure.wrapped = await this.webDesktopHelperEncryptStorage(keyToEncryptStorageWith, decryptedStoragePayload, storageValueStore);
     } else {
       /**
-       * No encrypted storage, take account keys out of raw storage
+       * No encrypted storage, take account keys (if they exist) out of raw storage
        * and place them in the keychain. */
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
-      const version = !Object(utils["p" /* isNullOrUndefined */])(ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
-      const accountKey = await root_key_SNRootKey.Create({
-        masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
-        serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
-        dataAuthenticationKey: ak,
-        version: version
-      });
-      await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue(), this.services.identifier);
+
+      if (ak) {
+        const version = !Object(utils["q" /* isNullOrUndefined */])(ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const accountKey = await root_key_SNRootKey.Create({
+          masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
+          serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
+          dataAuthenticationKey: ak,
+          version: version,
+          keyParams: rawAccountKeyParams
+        });
+        await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getKeychainValue(), this.services.identifier);
+      }
     }
     /** Persist storage under new key and structure */
 
@@ -15034,6 +16215,27 @@ class _2020_01_15_Migration20200115 extends Migration {
     newStructure[ValueModesKeys.Unwrapped] = undefined;
     await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.services.identifier, RawStorageKey.StorageObject), JSON.stringify(newStructure));
   }
+
+  async promptForPasscodeUntilCorrect(validationCallback) {
+    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration);
+    return new Promise(resolve => {
+      this.services.challengeService.addChallengeObserver(challenge, {
+        onNonvalidatedSubmit: async challengeResponse => {
+          const value = challengeResponse.values[0];
+          const passcode = value.value;
+          const valid = await validationCallback(passcode);
+
+          if (valid) {
+            this.services.challengeService.completeChallenge(challenge);
+            resolve(passcode);
+          } else {
+            this.services.challengeService.setValidationStatusForChallenge(challenge, value, false);
+          }
+        }
+      });
+      this.services.challengeService.promptForChallengeResponse(challenge);
+    });
+  }
   /**
    * Helper
    * Web/desktop only
@@ -15048,17 +16250,11 @@ class _2020_01_15_Migration20200115 extends Migration {
     let decryptedStoragePayload;
     let errorDecrypting = true;
     let passcodeKey;
-    const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
-
-    while (errorDecrypting) {
-      const [value] = await this.services.challengeService.promptForChallengeResponseWithCustomValidation(challenge);
-      const passcode = value.value;
-      passcodeKey = await this.services.protocolService.computeRootKey(passcode, passcodeParams);
+    await this.promptForPasscodeUntilCorrect(async candidate => {
+      passcodeKey = await this.services.protocolService.computeRootKey(candidate, passcodeParams);
       decryptedStoragePayload = await this.services.protocolService.payloadByDecryptingPayload(encryptedPayload, passcodeKey);
-      errorDecrypting = decryptedStoragePayload.errorDecrypting;
-      this.services.challengeService.setValidationStatusForChallenge(challenge, value, !decryptedStoragePayload.errorDecrypting);
-    }
-
+      return !decryptedStoragePayload.errorDecrypting;
+    });
     return {
       decryptedStoragePayload,
       key: passcodeKey,
@@ -15071,7 +16267,7 @@ class _2020_01_15_Migration20200115 extends Migration {
    */
 
 
-  async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(passcodeKey, storageValueStore) {
+  async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(passcodeKey, accountKeyParams, storageValueStore) {
     var _encryptedAccountKey;
 
     const version = storageValueStore.ak ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
@@ -15079,7 +16275,8 @@ class _2020_01_15_Migration20200115 extends Migration {
       masterKey: storageValueStore.mk,
       serverPassword: storageValueStore.pw,
       dataAuthenticationKey: storageValueStore.ak,
-      version: version
+      version: version,
+      keyParams: accountKeyParams
     });
     delete storageValueStore.mk;
     delete storageValueStore.pw;
@@ -15089,7 +16286,7 @@ class _2020_01_15_Migration20200115 extends Migration {
 
     if (passcodeKey) {
       /** Encrypt account key with passcode */
-      encryptedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(accountKeyPayload, intents["a" /* EncryptionIntent */].LocalStorageEncrypted, passcodeKey);
+      encryptedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(accountKeyPayload, intents["b" /* EncryptionIntent */].LocalStorageEncrypted, passcodeKey);
     }
 
     return {
@@ -15108,7 +16305,7 @@ class _2020_01_15_Migration20200115 extends Migration {
     const wrapped = await this.services.protocolService.payloadByEncryptingPayload(Object(generator["b" /* CopyPayload */])(decryptedStoragePayload, {
       content_type: content_types["a" /* ContentType */].EncryptedStorage,
       content: storageValueStore
-    }), intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted, key);
+    }), intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted, key);
     return wrapped.ejected();
   }
   /**
@@ -15160,15 +16357,10 @@ class _2020_01_15_Migration20200115 extends Migration {
         /** Validate current passcode by comparing against keychain offline.pw value */
         const pwHash = keychainValue.offline.pw;
         let passcodeKey;
-        const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
-
-        while (!passcodeKey || passcodeKey.serverPassword !== pwHash) {
-          const [value] = await this.services.challengeService.promptForChallengeResponseWithCustomValidation(challenge);
-          const passcode = value.value;
-          passcodeKey = await this.services.protocolService.computeRootKey(passcode, passcodeParams);
-          this.services.challengeService.setValidationStatusForChallenge(challenge, value, passcodeKey.serverPassword === pwHash);
-        }
-
+        await this.promptForPasscodeUntilCorrect(async candidate => {
+          passcodeKey = await this.services.protocolService.computeRootKey(candidate, passcodeParams);
+          return passcodeKey.serverPassword === pwHash;
+        });
         return passcodeKey;
       };
 
@@ -15184,17 +16376,18 @@ class _2020_01_15_Migration20200115 extends Migration {
         const passcodeKey = await getPasscodeKey();
         const unwrappedAccountKey = await this.services.protocolService.payloadByDecryptingPayload(Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(wrappedAccountKey), passcodeKey);
         const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
-        const defaultVersion = !Object(utils["p" /* isNullOrUndefined */])(accountKeyContent.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const defaultVersion = !Object(utils["q" /* isNullOrUndefined */])(accountKeyContent.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
         const newAccountKey = Object(generator["b" /* CopyPayload */])(unwrappedAccountKey, {
           content: {
             masterKey: accountKeyContent.mk,
             serverPassword: accountKeyContent.pw,
             dataAuthenticationKey: accountKeyContent.ak,
             version: accountKeyContent.version || defaultVersion,
+            keyParams: rawAccountKeyParams,
             accountKeys: null
           }
         });
-        const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(newAccountKey, intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
+        const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(newAccountKey, intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
         rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected();
         await this.services.deviceInterface.clearRawKeychainValue();
       } else if (!wrappedAccountKey) {
@@ -15207,7 +16400,7 @@ class _2020_01_15_Migration20200115 extends Migration {
         });
         /** Encrypt new storage.unwrapped structure with passcode */
 
-        const wrapped = await this.services.protocolService.payloadByEncryptingPayload(payload, intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
+        const wrapped = await this.services.protocolService.payloadByEncryptingPayload(payload, intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
         rawStructure.wrapped = wrapped.ejected();
         await this.services.deviceInterface.clearRawKeychainValue();
       }
@@ -15216,14 +16409,15 @@ class _2020_01_15_Migration20200115 extends Migration {
       const hasAccount = keychainValue && keychainValue.mk;
 
       if (hasAccount) {
-        const defaultVersion = !Object(utils["p" /* isNullOrUndefined */])(keychainValue.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const defaultVersion = !Object(utils["q" /* isNullOrUndefined */])(keychainValue.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: keychainValue.mk,
           serverPassword: keychainValue.pw,
           dataAuthenticationKey: keychainValue.ak,
-          version: keychainValue.version || defaultVersion
+          version: keychainValue.version || defaultVersion,
+          keyParams: rawAccountKeyParams
         });
-        await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getPersistableValue(), this.services.identifier);
+        await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getKeychainValue(), this.services.identifier);
       }
     }
     /** Move encrypted account key into place where it is now expected */
@@ -15241,7 +16435,7 @@ class _2020_01_15_Migration20200115 extends Migration {
 
   async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
     const allKeyValues = await this.services.deviceInterface.getAllRawStorageKeyValues();
-    const legacyKeys = Object(utils["x" /* objectToValueArray */])(LegacyKeys);
+    const legacyKeys = Object(utils["y" /* objectToValueArray */])(LegacyKeys);
 
     const tryJsonParse = value => {
       try {
@@ -15262,7 +16456,7 @@ class _2020_01_15_Migration20200115 extends Migration {
         continue;
       }
 
-      if (!Object(utils["p" /* isNullOrUndefined */])(value)) {
+      if (!Object(utils["q" /* isNullOrUndefined */])(value)) {
         /**
          * Raw values should always have been json stringified.
          * New values should always be objects/parsed.
@@ -15281,7 +16475,7 @@ class _2020_01_15_Migration20200115 extends Migration {
 
   async deleteLegacyStorageValues() {
     const miscKeys = ['mk', 'ak', 'jwt', 'ephemeral', 'cachedThemes'];
-    const managedKeys = [...Object(utils["x" /* objectToValueArray */])(StorageKey), ...Object(utils["x" /* objectToValueArray */])(LegacyKeys), ...miscKeys];
+    const managedKeys = [...Object(utils["y" /* objectToValueArray */])(StorageKey), ...Object(utils["y" /* objectToValueArray */])(LegacyKeys), ...miscKeys];
 
     for (const key of managedKeys) {
       await this.services.deviceInterface.removeRawStorageValue(key);
@@ -15389,7 +16583,7 @@ class _2020_01_01_base_BaseMigration extends Migration {
 
     const newKey = namespacedKey(this.services.identifier, RawStorageKey.LastMigrationTimestamp);
     const lastDate = await this.services.deviceInterface.getRawStorageValue(newKey);
-    const hasNewStructure = !Object(utils["p" /* isNullOrUndefined */])(lastDate);
+    const hasNewStructure = !Object(utils["q" /* isNullOrUndefined */])(lastDate);
 
     if (!hasNewStructure && hasLegacyValue) {
       /**
@@ -15447,7 +16641,7 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
     this.activeMigrations = await this.getRequiredMigrations();
 
     if (this.activeMigrations.length > 0) {
-      const lastMigration = Object(utils["w" /* lastElement */])(this.activeMigrations);
+      const lastMigration = Object(utils["x" /* lastElement */])(this.activeMigrations);
       lastMigration.onDone(async () => {
         await this.saveLastMigrationTimestamp(lastMigration.constructor.timestamp());
       });
@@ -15525,7 +16719,7 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
   async getLastMigrationTimestamp() {
     const timestamp = await this.services.deviceInterface.getRawStorageValue(this.getNamespacedTimeStampKey());
 
-    if (Object(utils["p" /* isNullOrUndefined */])(timestamp)) {
+    if (Object(utils["q" /* isNullOrUndefined */])(timestamp)) {
       throw 'Timestamp should not be null. Be sure to run base migration first.';
     }
 
@@ -15539,72 +16733,6 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
   async handleStage(stage) {
     for (const migration of this.activeMigrations) {
       await migration.handleStage(stage);
-    }
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/key_params.ts
-
-
-function CreateKeyParams(keyParams) {
-  return new key_params_SNRootKeyParams(keyParams);
-}
-/**
- * Key params are public data that contain information about how a root key was created.
- * Given a keyParams object and a password, clients can compute a root key that was created
- * previously.
- */
-
-class key_params_SNRootKeyParams {
-  constructor(content) {
-    this.content = content;
-  }
-  /**
-   * For consumers to determine whether the object they are
-   * working with is a proper RootKeyParams object.
-   */
-
-
-  get isKeyParamsObject() {
-    return true;
-  }
-
-  get kdfIterations() {
-    return this.content.pw_cost;
-  }
-
-  get seed() {
-    return this.content.pw_nonce;
-  }
-
-  get identifier() {
-    return this.content.identifier || this.content.email;
-  }
-
-  get salt() {
-    return this.content.pw_salt;
-  }
-
-  get version() {
-    return this.content.version;
-  }
-  /**
-   * @access public
-   * When saving in a file or communicating with server,
-   * use the original values.
-   */
-
-
-  getPortableValue() {
-    /**
-     * For version >= 003, do not send kdfIterations, as this value is always deduced
-     * locally depending on the version.
-     * Versions <= 002 had dynamic kdfIterations, so these values must be transfered.
-     */
-    if (Object(versions["b" /* compareVersions */])(this.version, versions["a" /* ProtocolVersion */].V003) >= 0) {
-      return Object(utils["y" /* omitByCopy */])(this.content, ['pw_cost']);
-    } else {
-      return this.content;
     }
   }
 
@@ -15716,7 +16844,7 @@ class operator_SNProtocolOperator {
   */
 
 
-  async generateEncryptedParameters(payload, format, key) {
+  async generateEncryptedParameters(payload, format, _key) {
     if (format === formats["a" /* PayloadFormat */].DecryptedBareObject) {
       return Object(generator["c" /* CreateEncryptionParameters */])({
         content: payload.content
@@ -15741,7 +16869,7 @@ class operator_SNProtocolOperator {
   */
 
 
-  async generateDecryptedParameters(encryptedParameters, key) {
+  async generateDecryptedParameters(encryptedParameters, _key) {
     const format = encryptedParameters.format;
 
     if (format === formats["a" /* PayloadFormat */].DecryptedBareObject) {
@@ -15796,32 +16924,32 @@ class operator_001_SNProtocolOperator001 extends operator_SNProtocolOperator {
     const itemsKey = await this.crypto.generateRandomKey(keyLength);
     const response = {
       itemsKey: itemsKey,
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V001
     };
     return response;
   }
 
-  async createRootKey(identifier, password) {
+  async createRootKey(identifier, password, origination) {
     const pwCost = V001Algorithm.PbkdfMinCost;
     const pwNonce = await this.crypto.generateRandomKey(V001Algorithm.SaltSeedLength);
     const pwSalt = await this.crypto.unsafeSha1(identifier + 'SN' + pwNonce);
-    const key = await this.deriveKey(password, pwSalt, pwCost);
-    const keyParams = CreateKeyParams({
+    const keyParams = Create001KeyParams({
       email: identifier,
       pw_cost: pwCost,
-      pw_nonce: pwNonce,
       pw_salt: pwSalt,
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V001,
+      origination,
+      created: "".concat(Date.now())
     });
-    return {
-      key: key,
-      keyParams: keyParams
-    };
+    return this.deriveKey(password, keyParams);
+  }
+
+  async getPayloadAuthenticatedData(_payload) {
+    return undefined;
   }
 
   async computeRootKey(password, keyParams) {
-    const key = await this.deriveKey(password, keyParams.salt, keyParams.kdfIterations);
-    return key;
+    return this.deriveKey(password, keyParams);
   }
 
   async decryptString(ciphertext, key) {
@@ -15857,7 +16985,7 @@ class operator_001_SNProtocolOperator001 extends operator_SNProtocolOperator {
     const ek = await this.firstHalfOfKey(itemKey);
     const ak = await this.secondHalfOfKey(itemKey);
     const contentCiphertext = await this.encryptString(JSON.stringify(payload.content), ek);
-    const ciphertext = key.version + contentCiphertext;
+    const ciphertext = key.keyVersion + contentCiphertext;
     const authHash = await this.crypto.hmac256(ciphertext, ak);
     return Object(generator["c" /* CreateEncryptionParameters */])({
       uuid: payload.uuid,
@@ -15925,13 +17053,14 @@ class operator_001_SNProtocolOperator001 extends operator_SNProtocolOperator {
     };
   }
 
-  async deriveKey(password, pwSalt, pwCost) {
-    const derivedKey = await this.crypto.pbkdf2(password, pwSalt, pwCost, V001Algorithm.PbkdfOutputLength);
-    const partitions = await this.splitKey(derivedKey, 2);
+  async deriveKey(password, keyParams) {
+    const derivedKey = await this.crypto.pbkdf2(password, keyParams.content001.pw_salt, keyParams.content001.pw_cost, V001Algorithm.PbkdfOutputLength);
+    const partitions = this.splitKey(derivedKey, 2);
     const key = await root_key_SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V001,
+      keyParams: keyParams.getPortableValue()
     });
     return key;
   }
@@ -15963,27 +17092,24 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
     const response = {
       itemsKey: itemsKey,
       dataAuthenticationKey: authKey,
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V002
     };
     return response;
   }
 
-  async createRootKey(identifier, password) {
+  async createRootKey(identifier, password, origination) {
     const pwCost = V002Algorithm.PbkdfMinCost;
     const pwNonce = await this.crypto.generateRandomKey(V002Algorithm.SaltSeedLength);
     const pwSalt = await this.crypto.unsafeSha1(identifier + ':' + pwNonce);
-    const key = await this.deriveKey(password, pwSalt, pwCost);
-    const keyParams = CreateKeyParams({
+    const keyParams = Create002KeyParams({
       email: identifier,
       pw_cost: pwCost,
-      pw_nonce: pwNonce,
       pw_salt: pwSalt,
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V002,
+      origination,
+      created: "".concat(Date.now())
     });
-    return {
-      key,
-      keyParams
-    };
+    return this.deriveKey(password, keyParams);
   }
   /**
    * Note that version 002 supported "dynamic" iteration counts. Some accounts
@@ -15993,9 +17119,7 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
 
 
   async computeRootKey(password, keyParams) {
-    /* Salt is returned from server */
-    const key = await this.deriveKey(password, keyParams.salt, keyParams.kdfIterations);
-    return key;
+    return this.deriveKey(password, keyParams);
   }
 
   async decryptString002(text, key, iv) {
@@ -16030,6 +17154,12 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
     return this.decryptString002(contentCiphertext, encryptionKey, iv);
   }
 
+  async getPayloadAuthenticatedData(payload) {
+    const itemKeyComponents = this.encryptionComponentsFromString002(payload.enc_item_key);
+    const authenticatedData = itemKeyComponents.authParams;
+    return JSON.parse(await this.crypto.base64Decode(authenticatedData));
+  }
+
   async generateEncryptedParameters(payload, format, key) {
     if (format === formats["a" /* PayloadFormat */].DecryptedBareObject || format === formats["a" /* PayloadFormat */].DecryptedBase64String) {
       return super.generateEncryptedParameters(payload, format, key);
@@ -16049,12 +17179,12 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
 
 
     const itemKey = await this.crypto.generateRandomKey(V002Algorithm.EncryptionKeyLength * 2);
-    const encItemKey = await this.encryptTextParams(itemKey, key.itemsKey, key.dataAuthenticationKey, payload.uuid, key.version);
+    const encItemKey = await this.encryptTextParams(itemKey, key.itemsKey, key.dataAuthenticationKey, payload.uuid, key.keyVersion);
     /** Encrypt content */
 
     const ek = await this.firstHalfOfKey(itemKey);
     const ak = await this.secondHalfOfKey(itemKey);
-    const ciphertext = await this.encryptTextParams(JSON.stringify(payload.content), ek, ak, payload.uuid, key.version);
+    const ciphertext = await this.encryptTextParams(JSON.stringify(payload.content), ek, ak, payload.uuid, key.keyVersion);
     return Object(generator["c" /* CreateEncryptionParameters */])({
       uuid: payload.uuid,
       items_key_id: key instanceof items_key_SNItemsKey ? key.uuid : undefined,
@@ -16124,14 +17254,15 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
     }
   }
 
-  async deriveKey(password, pwSalt, pwCost) {
-    const derivedKey = await this.crypto.pbkdf2(password, pwSalt, pwCost, V002Algorithm.PbkdfOutputLength);
-    const partitions = await this.splitKey(derivedKey, 3);
+  async deriveKey(password, keyParams) {
+    const derivedKey = await this.crypto.pbkdf2(password, keyParams.content002.pw_salt, keyParams.content002.pw_cost, V002Algorithm.PbkdfOutputLength);
+    const partitions = this.splitKey(derivedKey, 3);
     const key = await root_key_SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       dataAuthenticationKey: partitions[2],
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V002,
+      keyParams: keyParams.getPortableValue()
     });
     return key;
   }
@@ -16157,8 +17288,9 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
 
 
 
+
 /**
- * @deprecated
+ * @legacy
  * Non-expired operator but no longer used for generating new accounts.
  * This operator subclasses the 002 operator to share functionality that has not
  * changed, and overrides functions where behavior may differ.
@@ -16169,33 +17301,47 @@ class operator_003_SNProtocolOperator003 extends operator_002_SNProtocolOperator
     return versions["a" /* ProtocolVersion */].V003;
   }
 
+  async generateNewItemsKeyContent() {
+    const keyLength = V003Algorithm.EncryptionKeyLength;
+    const itemsKey = await this.crypto.generateRandomKey(keyLength);
+    const authKey = await this.crypto.generateRandomKey(keyLength);
+    const response = {
+      itemsKey: itemsKey,
+      dataAuthenticationKey: authKey,
+      version: versions["a" /* ProtocolVersion */].V003
+    };
+    return response;
+  }
+
   async computeRootKey(password, keyParams) {
-    /** Unlike 002, 003 uses a hardcoded cost and not a variable one.
-     * Therefore, we always use our own hardcoded value and not what is offered by
-     * input keyParams. */
-    const pwCost = V003Algorithm.PbkdfCost;
-    const version = this.version;
-    const salt = await this.generateSalt(keyParams.identifier, version, pwCost, keyParams.seed);
-    const key = await this.deriveKey(password, salt, pwCost);
+    return this.deriveKey(password, keyParams);
+  }
+
+  async deriveKey(password, keyParams) {
+    const salt = await this.generateSalt(keyParams.content003.identifier, versions["a" /* ProtocolVersion */].V003, V003Algorithm.PbkdfCost, keyParams.content003.pw_nonce);
+    const derivedKey = await this.crypto.pbkdf2(password, salt, V003Algorithm.PbkdfCost, V003Algorithm.PbkdfOutputLength);
+    const partitions = this.splitKey(derivedKey, 3);
+    const key = await root_key_SNRootKey.Create({
+      serverPassword: partitions[0],
+      masterKey: partitions[1],
+      dataAuthenticationKey: partitions[2],
+      version: versions["a" /* ProtocolVersion */].V003,
+      keyParams: keyParams.getPortableValue()
+    });
     return key;
   }
 
-  async createRootKey(identifier, password) {
-    const version = this.version;
-    const pwCost = V003Algorithm.PbkdfCost;
+  async createRootKey(identifier, password, origination) {
+    const version = versions["a" /* ProtocolVersion */].V003;
     const pwNonce = await this.crypto.generateRandomKey(V003Algorithm.SaltSeedLength);
-    const pwSalt = await this.generateSalt(identifier, version, pwCost, pwNonce);
-    const key = await this.deriveKey(password, pwSalt, pwCost);
-    const keyParams = CreateKeyParams({
+    const keyParams = Create003KeyParams({
       identifier: identifier,
-      pw_cost: pwCost,
       pw_nonce: pwNonce,
-      version: version
+      version: version,
+      origination: origination,
+      created: "".concat(Date.now())
     });
-    return {
-      key: key,
-      keyParams: keyParams
-    };
+    return this.deriveKey(password, keyParams);
   }
 
   async generateSalt(identifier, version, cost, nonce) {
@@ -16205,6 +17351,13 @@ class operator_003_SNProtocolOperator003 extends operator_002_SNProtocolOperator
 
 }
 // CONCATENATED MODULE: ./lib/protocol/operator/004/operator_004.ts
+function operator_004_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function operator_004_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { operator_004_ownKeys(Object(source), true).forEach(function (key) { operator_004_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { operator_004_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function operator_004_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -16228,7 +17381,7 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
     const itemsKey = await this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength);
     const response = {
       itemsKey: itemsKey,
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V004
     };
     return response;
   }
@@ -16247,16 +17400,15 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
     return Object(utils["I" /* truncateHexString */])(hash, V004Algorithm.ArgonSaltLength);
   }
   /**
-   * Computes a root key given a password and previous keyParams
+   * Computes a root key given a passworf
+   * qwd and previous keyParams
    * @param password - Plain string representing raw user password
    * @param keyParams - KeyParams object
    */
 
 
   async computeRootKey(password, keyParams) {
-    const salt = await this.generateSalt004(keyParams.identifier, keyParams.seed);
-    const key = await this.deriveKey(password, salt, V004Algorithm.ArgonIterations);
-    return key;
+    return this.deriveKey(password, keyParams);
   }
   /**
    * Creates a new root key given an identifier and a user password
@@ -16265,33 +17417,28 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
    */
 
 
-  async createRootKey(identifier, password) {
-    const version = this.version;
-    const iterations = V004Algorithm.ArgonIterations;
+  async createRootKey(identifier, password, origination) {
+    const version = versions["a" /* ProtocolVersion */].V004;
     const seed = await this.crypto.generateRandomKey(V004Algorithm.ArgonSaltSeedLength);
-    const salt = await this.generateSalt004(identifier, seed);
-    const key = await this.deriveKey(password, salt, iterations);
-    const keyParams = CreateKeyParams({
+    const keyParams = Create004KeyParams({
       identifier: identifier,
-      pw_cost: iterations,
       pw_nonce: seed,
-      version: version
+      version: version,
+      origination: origination,
+      created: "".concat(Date.now())
     });
-    return {
-      key: key,
-      keyParams: keyParams
-    };
+    return this.deriveKey(password, keyParams);
   }
   /**
    * @param plaintext - The plaintext to encrypt.
    * @param rawKey - The key to use to encrypt the plaintext.
    * @param nonce - The nonce for encryption.
-   * @param aad - JavaScript object (will be stringified) representing
+   * @param authenticatedData - JavaScript object (will be stringified) representing
                 'Additional authenticated data': data you want to be included in authentication.
    */
 
 
-  async encryptString004(plaintext, rawKey, nonce, aad) {
+  async encryptString004(plaintext, rawKey, nonce, authenticatedData) {
     if (!nonce) {
       throw 'encryptString null nonce';
     }
@@ -16300,19 +17447,19 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
       throw 'encryptString null rawKey';
     }
 
-    return this.crypto.xchacha20Encrypt(plaintext, nonce, rawKey, JSON.stringify(aad));
+    return this.crypto.xchacha20Encrypt(plaintext, nonce, rawKey, await this.authenticatedDataToString(authenticatedData));
   }
   /**
-   * @param {string} ciphertext  The encrypted text to decrypt.
-   * @param {string} rawKey  The key to use to decrypt the ciphertext.
-   * @param {string} nonce  The nonce for decryption.
-   * @param {object} aad  JavaScript object (will be stringified) representing
+   * @param ciphertext  The encrypted text to decrypt.
+   * @param rawKey  The key to use to decrypt the ciphertext.
+   * @param nonce  The nonce for decryption.
+   * @param rawAuthenticatedData String representing
                 'Additional authenticated data' - data you want to be included in authentication.
    */
 
 
-  async decryptString004(ciphertext, rawKey, nonce, aad) {
-    return this.crypto.xchacha20Decrypt(ciphertext, nonce, rawKey, JSON.stringify(aad));
+  async decryptString004(ciphertext, rawKey, nonce, rawAuthenticatedData) {
+    return this.crypto.xchacha20Decrypt(ciphertext, nonce, rawKey, rawAuthenticatedData);
   }
   /**
    * @param plaintext  The plaintext text to decrypt.
@@ -16321,15 +17468,55 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
    */
 
 
-  async generateEncryptedProtocolString(plaintext, rawKey, itemUuid) {
+  async generateEncryptedProtocolString(plaintext, rawKey, authenticatedData) {
     const nonce = await this.crypto.generateRandomKey(V004Algorithm.EncryptionNonceLength);
-    const version = this.version;
-    const ciphertext = await this.encryptString004(plaintext, rawKey, nonce, {
-      u: itemUuid,
-      v: version
-    });
-    const payload = [version, nonce, ciphertext].join(PARTITION_CHARACTER);
-    return payload;
+    const version = versions["a" /* ProtocolVersion */].V004;
+    const ciphertext = await this.encryptString004(plaintext, rawKey, nonce, authenticatedData);
+    const components = [version, nonce, ciphertext, await this.authenticatedDataToString(authenticatedData)];
+    return components.join(PARTITION_CHARACTER);
+  }
+
+  async getPayloadAuthenticatedData(payload) {
+    if (payload.format !== formats["a" /* PayloadFormat */].EncryptedString) {
+      throw Error('Attempting to get embedded key params of already decrypted item');
+    }
+
+    const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key);
+    const authenticatedData = itemKeyComponents.rawAuthenticatedData;
+    return this.stringToAuthenticatedData(authenticatedData);
+  }
+  /**
+   * For items that are encrypted with a root key, we append the root key's key params, so
+   * that in the event the client/user loses a reference to their root key, they may still
+   * decrypt data by regenerating the key based on the attached key params.
+   */
+
+
+  generateAuthenticatedDataForPayload(payload, key) {
+    const baseData = {
+      u: payload.uuid,
+      v: versions["a" /* ProtocolVersion */].V004
+    };
+
+    if (Object(intents["a" /* ContentTypeUsesRootKeyEncryption */])(payload.content_type)) {
+      return operator_004_objectSpread(operator_004_objectSpread({}, baseData), {}, {
+        kp: key.keyParams.content
+      });
+    } else {
+      if (!(key instanceof items_key_SNItemsKey)) {
+        throw Error('Attempting to use non-items key for regular item.');
+      }
+
+      return baseData;
+    }
+  }
+
+  async authenticatedDataToString(attachedData) {
+    return this.crypto.base64Encode(JSON.stringify(Object(utils["F" /* sortedCopy */])(attachedData)));
+  }
+
+  async stringToAuthenticatedData(rawAuthenticatedData) {
+    return JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
   }
 
   async generateEncryptedParameters(payload, format, key) {
@@ -16353,10 +17540,11 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
     /** Encrypt content with item_key */
 
     const contentPlaintext = JSON.stringify(payload.content);
-    const encryptedContentString = await this.generateEncryptedProtocolString(contentPlaintext, itemKey, payload.uuid);
+    const authenticatedData = this.generateAuthenticatedDataForPayload(payload, key);
+    const encryptedContentString = await this.generateEncryptedProtocolString(contentPlaintext, itemKey, authenticatedData);
     /** Encrypt item_key with master itemEncryptionKey */
 
-    const encryptedItemKey = await this.generateEncryptedProtocolString(itemKey, key.itemsKey, payload.uuid);
+    const encryptedItemKey = await this.generateEncryptedProtocolString(itemKey, key.itemsKey, authenticatedData);
     return Object(generator["c" /* CreateEncryptionParameters */])({
       uuid: payload.uuid,
       items_key_id: key instanceof items_key_SNItemsKey ? key.uuid : undefined,
@@ -16365,14 +17553,14 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
     });
   }
 
-  async generateDecryptedParameters(encryptedParameters, key) {
-    const format = encryptedParameters.format;
+  async generateDecryptedParameters(payload, key) {
+    const format = payload.format;
 
     if (format === formats["a" /* PayloadFormat */].DecryptedBareObject || format === formats["a" /* PayloadFormat */].DecryptedBase64String) {
-      return super.generateDecryptedParameters(encryptedParameters, key);
+      return super.generateDecryptedParameters(payload, key);
     }
 
-    if (!encryptedParameters.uuid) {
+    if (!payload.uuid) {
       throw 'encryptedParameters.uuid cannot be null';
     }
 
@@ -16382,40 +17570,41 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
     /** Decrypt item_key payload. */
 
 
-    const itemKeyComponents = this.deconstructEncryptedPayloadString(encryptedParameters.enc_item_key);
-    const itemKey = await this.decryptString004(itemKeyComponents.ciphertext, key.itemsKey, itemKeyComponents.nonce, {
-      u: encryptedParameters.uuid,
-      v: itemKeyComponents.version
-    });
+    const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key);
+    const rawAuthenticatedData = itemKeyComponents.rawAuthenticatedData;
+    const authenticatedData = await this.stringToAuthenticatedData(rawAuthenticatedData);
+
+    if (authenticatedData.u !== payload.uuid || authenticatedData.v !== payload.version) {
+      throw Error("The uuid/version in authenticated data doesn't match payload's.");
+    }
+
+    const itemKey = await this.decryptString004(itemKeyComponents.ciphertext, key.itemsKey, itemKeyComponents.nonce, rawAuthenticatedData);
 
     if (!itemKey) {
-      console.error('Error decrypting itemKey parameters', encryptedParameters);
-      return Object(generator["a" /* CopyEncryptionParameters */])(encryptedParameters, {
+      console.error('Error decrypting itemKey parameters', payload);
+      return Object(generator["a" /* CopyEncryptionParameters */])(payload, {
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
+        errorDecryptingValueChanged: !payload.errorDecrypting
       });
     }
     /** Decrypt content payload. */
 
 
-    const contentComponents = this.deconstructEncryptedPayloadString(encryptedParameters.contentString);
-    const content = await this.decryptString004(contentComponents.ciphertext, itemKey, contentComponents.nonce, {
-      u: encryptedParameters.uuid,
-      v: contentComponents.version
-    });
+    const contentComponents = this.deconstructEncryptedPayloadString(payload.contentString);
+    const content = await this.decryptString004(contentComponents.ciphertext, itemKey, contentComponents.nonce, rawAuthenticatedData);
 
     if (!content) {
-      return Object(generator["a" /* CopyEncryptionParameters */])(encryptedParameters, {
+      return Object(generator["a" /* CopyEncryptionParameters */])(payload, {
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
+        errorDecryptingValueChanged: !payload.errorDecrypting
       });
     } else {
-      return Object(generator["a" /* CopyEncryptionParameters */])(encryptedParameters, {
+      return Object(generator["a" /* CopyEncryptionParameters */])(payload, {
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
         errorDecrypting: false,
-        errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
+        errorDecryptingValueChanged: payload.errorDecrypting === true,
         waitingForKey: false
       });
     }
@@ -16426,19 +17615,22 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
     return {
       version: components[0],
       nonce: components[1],
-      ciphertext: components[2]
+      ciphertext: components[2],
+      rawAuthenticatedData: components[3]
     };
   }
 
-  async deriveKey(password, salt, iterations) {
-    const derivedKey = await this.crypto.argon2(password, salt, iterations, V004Algorithm.ArgonMemLimit, V004Algorithm.ArgonOutputKeyBytes);
+  async deriveKey(password, keyParams) {
+    const salt = await this.generateSalt004(keyParams.content004.identifier, keyParams.content004.pw_nonce);
+    const derivedKey = await this.crypto.argon2(password, salt, V004Algorithm.ArgonIterations, V004Algorithm.ArgonMemLimit, V004Algorithm.ArgonOutputKeyBytes);
     const partitions = this.splitKey(derivedKey, 2);
     const masterKey = partitions[0];
     const serverPassword = partitions[1];
     return root_key_SNRootKey.Create({
       masterKey,
       serverPassword,
-      version: this.version
+      version: versions["a" /* ProtocolVersion */].V004,
+      keyParams: keyParams.getPortableValue()
     });
   }
 
@@ -16451,8 +17643,13 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
 
 
 
-
 // CONCATENATED MODULE: ./lib/services/protocol_service.ts
+function protocol_service_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function protocol_service_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { protocol_service_ownKeys(Object(source), true).forEach(function (key) { protocol_service_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { protocol_service_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function protocol_service_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -16537,7 +17734,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     this.storageService = storageService;
     this.crypto = crypto;
 
-    if (Object(utils["r" /* isReactNativeEnvironment */])()) {
+    if (Object(utils["s" /* isReactNativeEnvironment */])()) {
       uuid_Uuid.SetGenerators(this.crypto.generateUUID, undefined // no sync implementation on React Native
       );
     } else {
@@ -16578,7 +17775,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     const wrappedRootKey = await this.getWrappedRootKey();
     const accountKeyParams = await this.getAccountKeyParams();
     const hasWrapper = await this.hasRootKeyWrapper();
-    const hasRootKey = !Object(utils["p" /* isNullOrUndefined */])(wrappedRootKey) || !Object(utils["p" /* isNullOrUndefined */])(accountKeyParams);
+    const hasRootKey = !Object(utils["q" /* isNullOrUndefined */])(wrappedRootKey) || !Object(utils["q" /* isNullOrUndefined */])(accountKeyParams);
 
     if (hasWrapper && hasRootKey) {
       this.keyMode = KeyMode.RootKeyPlusWrapper;
@@ -16692,7 +17889,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       /* keyParams.version >= 004 */
       return true;
     } else {
-      return !!Object(utils["t" /* isWebCryptoAvailable */])() || Object(utils["r" /* isReactNativeEnvironment */])();
+      return !!Object(utils["u" /* isWebCryptoAvailable */])() || Object(utils["s" /* isReactNativeEnvironment */])();
     }
   }
   /**
@@ -16808,9 +18005,9 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   */
 
 
-  async createRootKey(identifier, password) {
+  async createRootKey(identifier, password, origination) {
     const operator = this.defaultOperator();
-    return operator.createRootKey(identifier, password);
+    return operator.createRootKey(identifier, password, origination);
   }
   /**
    * Given a key and intent, returns the proper PayloadFormat,
@@ -16821,16 +18018,16 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   payloadContentFormatForIntent(intent, key) {
     if (!key) {
       /** Decrypted */
-      if (intent === intents["a" /* EncryptionIntent */].LocalStorageDecrypted || intent === intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted || intent === intents["a" /* EncryptionIntent */].FileDecrypted || intent === intents["a" /* EncryptionIntent */].FilePreferEncrypted) {
+      if (intent === intents["b" /* EncryptionIntent */].LocalStorageDecrypted || intent === intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted || intent === intents["b" /* EncryptionIntent */].FileDecrypted || intent === intents["b" /* EncryptionIntent */].FilePreferEncrypted) {
         return formats["a" /* PayloadFormat */].DecryptedBareObject;
-      } else if (intent === intents["a" /* EncryptionIntent */].SyncDecrypted) {
+      } else if (intent === intents["b" /* EncryptionIntent */].SyncDecrypted) {
         return formats["a" /* PayloadFormat */].DecryptedBase64String;
       } else {
         throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.';
       }
     } else {
       /** Encrypted */
-      if (intent === intents["a" /* EncryptionIntent */].Sync || intent === intents["a" /* EncryptionIntent */].FileEncrypted || intent === intents["a" /* EncryptionIntent */].FilePreferEncrypted || intent === intents["a" /* EncryptionIntent */].LocalStorageEncrypted || intent === intents["a" /* EncryptionIntent */].LocalStoragePreferEncrypted) {
+      if (intent === intents["b" /* EncryptionIntent */].Sync || intent === intents["b" /* EncryptionIntent */].FileEncrypted || intent === intents["b" /* EncryptionIntent */].FilePreferEncrypted || intent === intents["b" /* EncryptionIntent */].LocalStorageEncrypted || intent === intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted) {
         return formats["a" /* PayloadFormat */].EncryptedString;
       } else {
         throw 'Unhandled encrypted case in protocolService.payloadContentFormatForIntent.';
@@ -16859,15 +18056,15 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       return payload;
     }
 
-    if (Object(utils["p" /* isNullOrUndefined */])(intent)) {
+    if (Object(utils["q" /* isNullOrUndefined */])(intent)) {
       throw 'Attempting to encrypt payload with null intent';
     }
 
-    if (!key && !Object(intents["c" /* isDecryptedIntent */])(intent)) {
+    if (!key && !Object(intents["d" /* isDecryptedIntent */])(intent)) {
       key = await this.keyToUseForEncryptionOfPayload(payload, intent);
     }
 
-    if (!key && Object(intents["b" /* intentRequiresEncryption */])(intent)) {
+    if (!key && Object(intents["c" /* intentRequiresEncryption */])(intent)) {
       throw Error('Attempting to generate encrypted payload with no key.');
     }
 
@@ -16883,7 +18080,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       throw 'Attempting to encrypt payload with no uuid.';
     }
 
-    const version = key ? key.version : this.getLatestVersion();
+    const version = key ? key.keyVersion : this.getLatestVersion();
     const format = this.payloadContentFormatForIntent(intent, key);
     const operator = this.operatorForVersion(version);
     const encryptionParameters = await operator.generateEncryptedParameters(payload, format, key);
@@ -16901,12 +18098,12 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
    */
 
 
-  async payloadsByEncryptingPayloads(payloads, intent) {
+  async payloadsByEncryptingPayloads(payloads, intent, key) {
     const results = [];
 
     for (const payload of payloads) {
-      const useIntent = Object(utils["o" /* isFunction */])(intent) ? intent(payload) : intent;
-      const encryptedPayload = await this.payloadByEncryptingPayload(payload, useIntent);
+      const useIntent = Object(utils["p" /* isFunction */])(intent) ? intent(payload) : intent;
+      const encryptedPayload = await this.payloadByEncryptingPayload(payload, useIntent, key);
       results.push(encryptedPayload);
     }
 
@@ -16946,10 +18143,9 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     const version = payload.version;
     const source = payload.source;
     const operator = this.operatorForVersion(version);
-    const encryptionParameters = Object(generator["c" /* CreateEncryptionParameters */])(payload, source);
 
     try {
-      const decryptedParameters = await operator.generateDecryptedParameters(encryptionParameters, key);
+      const decryptedParameters = await operator.generateDecryptedParameters(payload, key);
       return Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(payload, decryptedParameters, source);
     } catch (e) {
       console.error('Error decrypting payload', payload, e);
@@ -16976,11 +18172,11 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
        */
 
 
-      if (encryptedPayload.deleted === true && Object(utils["p" /* isNullOrUndefined */])(encryptedPayload.content)) {
+      if (encryptedPayload.deleted === true && Object(utils["q" /* isNullOrUndefined */])(encryptedPayload.content)) {
         return encryptedPayload;
       }
 
-      const isDecryptable = Object(utils["s" /* isString */])(encryptedPayload.content);
+      const isDecryptable = Object(utils["t" /* isString */])(encryptedPayload.content);
 
       if (!isDecryptable) {
         return encryptedPayload;
@@ -17000,7 +18196,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async decryptErroredItems() {
-    const items = this.itemManager.invalidItems;
+    const items = this.itemManager.invalidItems.filter(i => i.content_type !== content_types["a" /* ContentType */].ItemsKey);
 
     if (items.length === 0) {
       return;
@@ -17038,7 +18234,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
        */
 
       const decryptedItemsKeysPayloads = await this.payloadsByDecryptingPayloads(itemsKeysPayloads, key);
-      Object(utils["j" /* extendArray */])(decryptedPayloads, decryptedItemsKeysPayloads);
+      Object(utils["k" /* extendArray */])(decryptedPayloads, decryptedItemsKeysPayloads);
 
       for (const encryptedPayload of encryptedPayloads) {
         if (encryptedPayload.content_type === content_types["a" /* ContentType */].ItemsKey) {
@@ -17088,12 +18284,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   createKeyParams(keyParams) {
-    /* 002 doesn't have version automatically, newer versions do. */
-    if (!keyParams.version) {
-      keyParams.version = versions["a" /* ProtocolVersion */].V002;
-    }
-
-    return CreateKeyParams(keyParams);
+    return CreateAnyKeyParams(keyParams);
   }
   /**
    * Creates a JSON string representing the backup format of all items, or just subitems
@@ -17106,7 +18297,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async createBackupFile(subItems) {
-    let intent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : intents["a" /* EncryptionIntent */].FilePreferEncrypted;
+    let intent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : intents["b" /* EncryptionIntent */].FilePreferEncrypted;
     let returnIfEmpty = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     const items = subItems || this.itemManager.items;
 
@@ -17133,7 +18324,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     };
     const keyParams = await this.getRootKeyParams();
 
-    if (keyParams && intent !== intents["a" /* EncryptionIntent */].FileDecrypted) {
+    if (keyParams && intent !== intents["b" /* EncryptionIntent */].FileDecrypted) {
       data.keyParams = keyParams.getPortableValue();
     }
 
@@ -17163,16 +18354,18 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   async getRootKeyFromKeychain() {
     const rawKey = await this.deviceInterface.getNamespacedKeychainValue(this.identifier);
 
-    if (Object(utils["p" /* isNullOrUndefined */])(rawKey)) {
+    if (Object(utils["q" /* isNullOrUndefined */])(rawKey)) {
       return undefined;
     }
 
-    const rootKey = await root_key_SNRootKey.Create(rawKey);
+    const rootKey = await root_key_SNRootKey.Create(protocol_service_objectSpread(protocol_service_objectSpread({}, rawKey), {}, {
+      keyParams: await this.getRootKeyParams()
+    }));
     return rootKey;
   }
 
   async saveRootKeyToKeychain() {
-    if (Object(utils["p" /* isNullOrUndefined */])(this.rootKey)) {
+    if (Object(utils["q" /* isNullOrUndefined */])(this.rootKey)) {
       throw 'Attempting to non-existent root key to the keychain.';
     }
 
@@ -17180,7 +18373,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       throw 'Should not be persisting wrapped key to keychain.';
     }
 
-    const rawKey = this.rootKey.getPersistableValue();
+    const rawKey = this.rootKey.getKeychainValue();
     return this.executeCriticalFunction(() => {
       return this.deviceInterface.setNamespacedKeychainValue(rawKey, this.identifier);
     });
@@ -17192,7 +18385,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async hasRootKeyWrapper() {
     const wrapper = await this.getRootKeyWrapperKeyParams();
-    return !Object(utils["p" /* isNullOrUndefined */])(wrapper);
+    return !Object(utils["q" /* isNullOrUndefined */])(wrapper);
   }
   /**
    * A non-async alternative to `hasRootKeyWrapper` which uses pre-loaded state
@@ -17209,7 +18402,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async rootKeyNeedsUnwrapping() {
-    return (await this.hasRootKeyWrapper()) && Object(utils["p" /* isNullOrUndefined */])(this.rootKey);
+    return (await this.hasRootKeyWrapper()) && Object(utils["q" /* isNullOrUndefined */])(this.rootKey);
   }
   /**
    * @returns Key params object containing root key wrapper key params
@@ -17337,7 +18530,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   */
 
 
-  async setNewRootKeyWrapper(wrappingKey, keyParams) {
+  async setNewRootKeyWrapper(wrappingKey) {
     if (this.keyMode === KeyMode.RootKeyNone) {
       this.keyMode = KeyMode.WrapperOnly;
     } else if (this.keyMode === KeyMode.RootKeyOnly) {
@@ -17356,7 +18549,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
         await this.wrapAndPersistRootKey(wrappingKey);
       }
 
-      await this.storageService.setValue(StorageKey.RootKeyWrapperKeyParams, keyParams.getPortableValue(), StorageValueModes.Nonwrapped);
+      await this.storageService.setValue(StorageKey.RootKeyWrapperKeyParams, wrappingKey.keyParams.getPortableValue(), StorageValueModes.Nonwrapped);
       await this.notifyObserversOfKeyChange();
     } else {
       throw Error('Invalid keyMode on setNewRootKeyWrapper');
@@ -17370,9 +18563,9 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async wrapAndPersistRootKey(wrappingKey) {
     const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(this.rootKey, {
-      content: this.rootKey.getPersistableValue()
+      content: this.rootKey.persistableValueWhenWrapping()
     });
-    const wrappedKey = await this.payloadByEncryptingPayload(payload, intents["a" /* EncryptionIntent */].LocalStorageEncrypted, wrappingKey);
+    const wrappedKey = await this.payloadByEncryptingPayload(payload, intents["b" /* EncryptionIntent */].LocalStorageEncrypted, wrappingKey);
     await this.storageService.setValue(StorageKey.WrappedRootKey, wrappedKey.ejected(), StorageValueModes.Nonwrapped);
   }
   /**
@@ -17410,8 +18603,8 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
    */
 
 
-  async setNewRootKey(key, keyParams, wrappingKey) {
-    if (!keyParams) {
+  async setNewRootKey(key, wrappingKey) {
+    if (!key.keyParams) {
       throw Error('keyParams must be supplied if setting root key.');
     }
 
@@ -17432,7 +18625,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     }
 
     this.rootKey = key;
-    await this.storageService.setValue(StorageKey.RootKeyParams, keyParams.getPortableValue(), StorageValueModes.Nonwrapped);
+    await this.storageService.setValue(StorageKey.RootKeyParams, key.keyParams.getPortableValue(), StorageValueModes.Nonwrapped);
 
     if (this.keyMode === KeyMode.RootKeyOnly) {
       await this.saveRootKeyToKeychain();
@@ -17516,31 +18709,21 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     }
   }
   /**
-   * Only two types of items should be encrypted with a root key:
-   * - An SNItemsKey object
-   * - An encrypted storage object (local)
-   */
-
-
-  contentTypeUsesRootKeyEncryption(contentType) {
-    return contentType === content_types["a" /* ContentType */].ItemsKey || contentType === content_types["a" /* ContentType */].EncryptedStorage;
-  }
-  /**
    * Determines which key to use for encryption of the payload
    * The key object to use for encrypting the payload.
   */
 
 
   async keyToUseForEncryptionOfPayload(payload, intent) {
-    if (Object(utils["p" /* isNullOrUndefined */])(intent)) {
+    if (Object(utils["q" /* isNullOrUndefined */])(intent)) {
       throw 'Intent must be supplied when looking up key for encryption of item.';
     }
 
-    if (this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
+    if (Object(intents["a" /* ContentTypeUsesRootKeyEncryption */])(payload.content_type)) {
       const rootKey = await this.getRootKey();
 
       if (!rootKey) {
-        if (Object(intents["b" /* intentRequiresEncryption */])(intent)) {
+        if (Object(intents["c" /* intentRequiresEncryption */])(intent)) {
           throw 'Root key encryption is required but no root key is available.';
         } else {
           return undefined;
@@ -17552,7 +18735,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       const defaultKey = this.getDefaultItemsKey();
       const userVersion = await this.getUserVersion();
 
-      if (userVersion && userVersion !== (defaultKey === null || defaultKey === void 0 ? void 0 : defaultKey.version)) {
+      if (userVersion && userVersion !== (defaultKey === null || defaultKey === void 0 ? void 0 : defaultKey.keyVersion)) {
         /**
          * The default key appears to be either newer or older than the user's account version
          * We could throw an exception here, but will instead fall back to a corrective action:
@@ -17560,7 +18743,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
          */
         console.warn("The user's default items key version is not equal to the account version.");
         const itemsKeys = this.latestItemsKeys();
-        return itemsKeys.find(key => key.version === userVersion);
+        return itemsKeys.find(key => key.keyVersion === userVersion);
       } else {
         return defaultKey;
       }
@@ -17578,7 +18761,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async keyToUseForDecryptionOfPayload(payload) {
-    if (this.contentTypeUsesRootKeyEncryption(payload.content_type)) {
+    if (Object(intents["a" /* ContentTypeUsesRootKeyEncryption */])(payload.content_type)) {
       return this.getRootKey();
     }
 
@@ -17616,10 +18799,16 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async handleDownloadFirstSyncCompletion() {
+    /** The below logic only pertains to account setups */
+    if (!this.hasAccount()) {
+      return;
+    }
     /**
     * Find items keys with null or epoch updated_at value, indicating
     * that they haven't been synced yet.
     */
+
+
     const itemsKeys = this.latestItemsKeys();
     const neverSyncedKeys = itemsKeys.filter(key => {
       return key.neverSynced;
@@ -17632,7 +18821,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     const defaultSyncedKey = itemsKeys.find(key => {
       return !key.neverSynced && key.isDefault;
     });
-    const hasSyncedItemsKey = !Object(utils["p" /* isNullOrUndefined */])(defaultSyncedKey);
+    const hasSyncedItemsKey = !Object(utils["q" /* isNullOrUndefined */])(defaultSyncedKey);
 
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
@@ -17648,7 +18837,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
         const toDelete = neverSyncedKeys.filter(itemsKey => {
-          return itemsKey.version !== rootKey.version;
+          return itemsKey.keyVersion !== rootKey.keyVersion;
         });
 
         if (toDelete.length > 0) {
@@ -17719,6 +18908,25 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       return key.isDefault;
     });
   }
+  /** Returns the key params attached to this key's encrypted payload */
+
+
+  async getKeyEmbeddedKeyParams(key) {
+    /** We can only look up key params for keys that are encrypted (as strings) */
+    if (key.payload.format === formats["a" /* PayloadFormat */].DecryptedBareObject) {
+      return undefined;
+    }
+
+    const operator = this.operatorForVersion(key.version);
+    const authenticatedData = await operator.getPayloadAuthenticatedData(key.payload);
+
+    if (!authenticatedData) {
+      return undefined;
+    }
+
+    const rawKeyParams = authenticatedData.kp;
+    return this.createKeyParams(rawKeyParams);
+  }
   /**
    * When the root key changes (non-null only), we must re-encrypt all items
    * keys with this new root key (by simply re-syncing).
@@ -17748,7 +18956,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async defaultItemsKeyForItemVersion(version) {
     return this.latestItemsKeys().find(key => {
-      return key.version === version;
+      return key.keyVersion === version;
     });
   }
   /**
@@ -17760,7 +18968,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
   async createNewDefaultItemsKey() {
     const rootKey = await this.getRootKey();
-    const operatorVersion = rootKey ? rootKey.version : this.getLatestVersion();
+    const operatorVersion = rootKey ? rootKey.keyVersion : this.getLatestVersion();
     let itemTemplate;
 
     if (Object(versions["b" /* compareVersions */])(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0) {
@@ -17796,6 +19004,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   }
 
   async changePassword(email, currentPassword, newPassword, wrappingKey) {
+    let origination = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : KeyParamsOrigination.PasswordChange;
     const [currentRootKey, currentKeyParams] = await Promise.all([this.getRootKey(), this.getRootKeyParams()]);
     const currentDefaultItemsKey = this.getDefaultItemsKey();
     const computedRootKey = await this.computeRootKey(currentPassword, currentKeyParams);
@@ -17805,18 +19014,15 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       return [Error(INVALID_PASSWORD)];
     }
 
-    const {
-      key: newRootKey,
-      keyParams: newKeyParams
-    } = await this.createRootKey(email, newPassword);
-    await this.setNewRootKey(newRootKey, newKeyParams, wrappingKey);
+    const newRootKey = await this.createRootKey(email, newPassword, origination);
+    await this.setNewRootKey(newRootKey, wrappingKey);
     const newDefaultItemsKey = await this.createNewDefaultItemsKey();
     return [null, {
       currentServerPassword: computedRootKey.serverPassword,
-      newRootKey,
-      newKeyParams,
+      newRootKey: newRootKey,
+      newKeyParams: newRootKey.keyParams,
       rollback: async () => {
-        await this.setNewRootKey(currentRootKey, currentKeyParams, wrappingKey);
+        await this.setNewRootKey(currentRootKey, wrappingKey);
         await Promise.all([this.itemManager.setItemToBeDeleted(newDefaultItemsKey.uuid), this.itemManager.changeItem(currentDefaultItemsKey.uuid, mutator => {
           mutator.isDefault = true;
         })]);
@@ -17845,7 +19051,7 @@ class item_history_entry_ItemHistoryEntry {
     this.hasPreviousEntry = false;
     let updated_at = payload.updated_at;
 
-    if (Object(utils["s" /* isString */])(updated_at)) {
+    if (Object(utils["t" /* isString */])(updated_at)) {
       updated_at = new Date(updated_at);
     }
 
@@ -18063,7 +19269,7 @@ class item_session_history_ItemSessionHistory {
       }
     }
 
-    this.entries = this.entries.filter((entry, index) => {
+    this.entries = this.entries.filter((entry, _index) => {
       return keepEntries.indexOf(entry) !== -1;
     });
   }
@@ -18202,7 +19408,7 @@ class history_manager_SNHistoryManager extends pure_service["a" /* PureService *
     });
     const autoOptimize = await this.storageService.getValue(StorageKey.SessionHistoryOptimize);
 
-    if (Object(utils["p" /* isNullOrUndefined */])(autoOptimize)) {
+    if (Object(utils["q" /* isNullOrUndefined */])(autoOptimize)) {
       /** Default to true */
       this.autoOptimize = true;
     } else {
@@ -18213,7 +19419,7 @@ class history_manager_SNHistoryManager extends pure_service["a" /* PureService *
   }
 
   addChangeObserver() {
-    this.removeChangeObserver = this.itemManager.addObserver(this.contentTypes, (changed, inserted, discarded, source) => {
+    this.removeChangeObserver = this.itemManager.addObserver(this.contentTypes, (changed, inserted, discarded, _ignored, source) => {
       const items = Object(utils["f" /* concatArrays */])(changed, inserted, discarded);
 
       if (source === sources["a" /* PayloadSource */].LocalChanged) {
@@ -18735,7 +19941,7 @@ class item_collection_ItemCollection extends collection_MutableCollection {
       const filteredCTMap = this.filteredMap[contentType];
       const sortedElements = this.sortedMap[contentType];
       const previousIndex = filteredCTMap[element.uuid];
-      const previousElement = !Object(utils["p" /* isNullOrUndefined */])(previousIndex) ? sortedElements[previousIndex] : undefined;
+      const previousElement = !Object(utils["q" /* isNullOrUndefined */])(previousIndex) ? sortedElements[previousIndex] : undefined;
       /** If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default. */
@@ -18743,7 +19949,7 @@ class item_collection_ItemCollection extends collection_MutableCollection {
       const passes = element.deleted || !this.map[element.uuid] ? false : filter ? filter(element) : true;
 
       if (passes) {
-        if (!Object(utils["p" /* isNullOrUndefined */])(previousElement)) {
+        if (!Object(utils["q" /* isNullOrUndefined */])(previousElement)) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort.
            * Previous element might be encrypted.
            */
@@ -18770,7 +19976,7 @@ class item_collection_ItemCollection extends collection_MutableCollection {
         }
       } else {
         /** Doesn't pass filter, remove from sorted and filtered */
-        if (!Object(utils["p" /* isNullOrUndefined */])(previousIndex)) {
+        if (!Object(utils["q" /* isNullOrUndefined */])(previousIndex)) {
           delete filteredCTMap[element.uuid];
           /** We don't yet remove the element directly from the array, since mutating
            * the array inside a loop could render all other upcoming indexes invalid */
@@ -19150,7 +20356,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   itemsReferencingItem(uuid) {
-    if (!Object(utils["s" /* isString */])(uuid)) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
       throw Error('Must use uuid string');
     }
 
@@ -19163,7 +20369,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   referencesForItem(uuid) {
-    if (!Object(utils["s" /* isString */])(uuid)) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
       throw Error('Must use uuid string');
     }
 
@@ -19172,9 +20378,10 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     return this.findItems(uuids);
   }
 
-  async setPayloads(changed, inserted, discarded, source, sourceKey) {
+  async setPayloads(changed, inserted, discarded, ignored, source, sourceKey) {
     const changedItems = changed.map(p => CreateItemFromPayload(p));
     const insertedItems = inserted.map(p => CreateItemFromPayload(p));
+    const ignoredItems = ignored.map(p => CreateItemFromPayload(p));
     const changedOrInserted = changedItems.concat(insertedItems);
 
     if (changedOrInserted.length > 0) {
@@ -19188,10 +20395,10 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     }
 
     this.notesView.setNeedsRebuilding();
-    await this.notifyObservers(changedItems, insertedItems, discardedItems, source, sourceKey);
+    await this.notifyObservers(changedItems, insertedItems, discardedItems, ignoredItems, source, sourceKey);
   }
 
-  async notifyObservers(changed, inserted, discarded, source, sourceKey) {
+  async notifyObservers(changed, inserted, discarded, ignored, source, sourceKey) {
     const filter = (items, types) => {
       return items.filter(item => {
         return types.includes(content_types["a" /* ContentType */].Any) || types.includes(item.content_type);
@@ -19204,12 +20411,13 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
       const filteredChanged = filter(changed, observer.contentType);
       const filteredInserted = filter(inserted, observer.contentType);
       const filteredDiscarded = filter(discarded, observer.contentType);
+      const filteredIgnored = filter(ignored, observer.contentType);
 
-      if (filteredChanged.length === 0 && filteredInserted.length === 0 && filteredDiscarded.length === 0) {
+      if (filteredChanged.length === 0 && filteredInserted.length === 0 && filteredDiscarded.length === 0 && filteredIgnored.length === 0) {
         continue;
       }
 
-      observer.callback(filteredChanged, filteredInserted, filteredDiscarded, source, sourceKey);
+      observer.callback(filteredChanged, filteredInserted, filteredDiscarded, filteredIgnored, source, sourceKey);
     }
   }
   /**
@@ -19228,7 +20436,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     let payloadSource = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : sources["a" /* PayloadSource */].LocalChanged;
     let payloadSourceKey = arguments.length > 4 ? arguments[4] : undefined;
 
-    if (!Object(utils["s" /* isString */])(uuid)) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
       throw Error('Invalid uuid for changeItem');
     }
 
@@ -19362,7 +20570,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
   async setItemDirty(uuid) {
     let isUserModified = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-    if (!Object(utils["s" /* isString */])(uuid)) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
       throw Error('Must use uuid when setting item dirty');
     }
 
@@ -19377,7 +20585,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
   async setItemsDirty(uuids) {
     let isUserModified = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-    if (!Object(utils["s" /* isString */])(uuids[0])) {
+    if (!Object(utils["t" /* isString */])(uuids[0])) {
       throw Error('Must use uuid when setting item dirty');
     }
 
@@ -19760,7 +20968,7 @@ class sync_op_status_SyncOpStatus {
     this.stopTimingMonitor();
   }
 
-  setSyncInProgress(inProgress) {
+  setSyncInProgress() {
     this.inProgress = true;
   }
 
@@ -19963,172 +21171,6 @@ class downloader_AccountDownloader {
   }
 
 }
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/remote_conflicts.ts
-
-
-
-
-
-
-class remote_conflicts_DeltaRemoteConflicts extends PayloadsDelta {
-  async resultingCollection() {
-    if (this.applyCollection.source === sources["a" /* PayloadSource */].ConflictUuid) {
-      return this.collectionsByHandlingUuidConflicts();
-    } else if (this.applyCollection.source === sources["a" /* PayloadSource */].ConflictData) {
-      return this.collectionsByHandlingDataConflicts();
-    } else {
-      throw "Unhandled conflict type ".concat(this.applyCollection.source);
-    }
-  }
-
-  async collectionsByHandlingDataConflicts() {
-    const results = [];
-
-    for (const payload of this.applyCollection.all()) {
-      const current = this.findBasePayload(payload.uuid);
-      /** Could be deleted */
-
-      if (!current) {
-        results.push(payload);
-        continue;
-      }
-
-      const decrypted = this.findRelatedPayload(payload.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
-
-      if (!decrypted && !payload.deleted) {
-        /** Decrypted should only be missing in case of deleted payload */
-        throw 'Unable to find decrypted counterpart for data conflict.';
-      }
-
-      const delta = new conflict_ConflictDelta(this.baseCollection, current, decrypted || payload, sources["a" /* PayloadSource */].ConflictData);
-      const deltaCollection = await delta.resultingCollection();
-      const payloads = deltaCollection.all();
-      Object(utils["j" /* extendArray */])(results, payloads);
-    }
-
-    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].RemoteRetrieved);
-  }
-  /**
-   * UUID conflicts can occur if a user attmpts to import an old data
-   * backup with uuids from the old account into a new account.
-   * In uuid_conflict, we receive the value we attmpted to save.
-   */
-
-
-  async collectionsByHandlingUuidConflicts() {
-    const results = [];
-
-    for (const payload of this.applyCollection.all()) {
-      const decrypted = this.findRelatedPayload(payload.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
-      const alternateResults = await PayloadsByAlternatingUuid(decrypted, this.baseCollection);
-      Object(utils["j" /* extendArray */])(results, alternateResults);
-    }
-
-    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].RemoteRetrieved);
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/remote_saved.ts
-
-
-
-
-class remote_saved_DeltaRemoteSaved extends PayloadsDelta {
-  async resultingCollection() {
-    const processed = [];
-
-    for (const payload of this.applyCollection.all()) {
-      const current = this.findBasePayload(payload.uuid);
-      /** If we save an item, but while in transit it is deleted locally, we want to keep
-       * local deletion status, and not old deleted value that was sent to server. */
-
-      const deletedState = current ? current.deleted : payload.deleted;
-      const result = Object(generator["f" /* CreateSourcedPayloadFromObject */])(payload, sources["a" /* PayloadSource */].RemoteSaved, {
-        lastSyncEnd: new Date(),
-        deleted: deletedState
-      });
-      processed.push(result);
-    }
-
-    return payload_collection_ImmutablePayloadCollection.WithPayloads(processed, sources["a" /* PayloadSource */].RemoteSaved);
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/remote_retrieved.ts
-
-
-
-
-
-class remote_retrieved_DeltaRemoteRetrieved extends PayloadsDelta {
-  async resultingCollection() {
-    const filtered = [];
-    const conflicted = [];
-    /**
-    * If we have retrieved an item that was saved as part of this ongoing sync operation,
-    * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
-    */
-
-    for (const received of this.applyCollection.all()) {
-      const savedOrSaving = this.findRelatedPayload(received.uuid, sources["a" /* PayloadSource */].SavedOrSaving);
-      const decrypted = this.findRelatedPayload(received.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
-
-      if (!decrypted) {
-        /** Decrypted should only be missing in case of deleted retrieved item */
-        if (!received.deleted) {
-          throw 'Cannot find decrypted for non-deleted payload.';
-        }
-
-        filtered.push(received);
-        continue;
-      }
-
-      if (savedOrSaving) {
-        conflicted.push(decrypted);
-        continue;
-      }
-
-      const base = this.findBasePayload(received.uuid);
-
-      if (base && base.dirty) {
-        conflicted.push(decrypted);
-        continue;
-      }
-
-      filtered.push(decrypted);
-    }
-    /**
-     * For any potential conflict above, we compare the values with current
-     * local values, and if they differ, we create a new payload that is a copy
-     * of the server payload.
-     */
-
-
-    const conflictResults = [];
-
-    for (const conflict of conflicted) {
-      const decrypted = this.findRelatedPayload(conflict.uuid, sources["a" /* PayloadSource */].DecryptedTransient);
-
-      if (!decrypted) {
-        continue;
-      }
-
-      const current = this.findBasePayload(conflict.uuid);
-
-      if (!current) {
-        continue;
-      }
-
-      const delta = new conflict_ConflictDelta(this.baseCollection, current, decrypted, sources["a" /* PayloadSource */].ConflictData);
-      const deltaCollection = await delta.resultingCollection();
-      const payloads = deltaCollection.all();
-      Object(utils["j" /* extendArray */])(conflictResults, payloads);
-    }
-
-    return payload_collection_ImmutablePayloadCollection.WithPayloads(filtered.concat(conflictResults), sources["a" /* PayloadSource */].RemoteRetrieved);
-  }
-
-}
 // CONCATENATED MODULE: ./lib/protocol/payloads/deltas/generator.ts
 
 
@@ -20261,12 +21303,6 @@ class response_resolver_SyncResponseResolver {
 
 
 
-var ConflictType;
-
-(function (ConflictType) {
-  ConflictType["ConflictingData"] = "sync_conflict";
-  ConflictType["UuidConflict"] = "uuid_conflict";
-})(ConflictType || (ConflictType = {}));
 
 class response_SyncResponse {
   constructor(rawResponse) {
@@ -20291,7 +21327,7 @@ class response_SyncResponse {
     this.deletedPayloads = this.allProcessedPayloads.filter(payload => {
       return payload.discardable;
     });
-    Object(utils["g" /* deepFreeze */])(this);
+    Object(utils["h" /* deepFreeze */])(this);
   }
   /**
    * Filter out and exclude any items that do not have a uuid. These are useless to us.
@@ -20369,7 +21405,7 @@ class response_SyncResponse {
   }
 
   get hasError() {
-    return !Object(utils["p" /* isNullOrUndefined */])(this.rawResponse.error);
+    return !Object(utils["q" /* isNullOrUndefined */])(this.rawResponse.error);
   }
 
 }
@@ -20502,56 +21538,6 @@ class operation_OfflineSyncOperation {
   }
 
 }
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/out_of_sync.ts
-
-
-
-
-
-class out_of_sync_DeltaOutOfSync extends PayloadsDelta {
-  async resultingCollection() {
-    const results = [];
-
-    for (const payload of this.applyCollection.all()) {
-      /**
-       * Map the server payload as authoritive content. If client copy differs,
-       * we will create a duplicate of it below.
-       * This is also neccessary to map the updated_at value from the server
-       */
-      results.push(payload);
-      const current = this.findBasePayload(payload.uuid);
-
-      if (!current) {
-        continue;
-      }
-
-      const equal = PayloadContentsEqual(payload, current);
-
-      if (equal) {
-        continue;
-      }
-      /**
-       * We create a copy of the local existing item and sync that up.
-       * It will be a 'conflict' of itself
-       */
-
-
-      const copyResults = await PayloadsByDuplicating(current, this.baseCollection, true);
-      Object(utils["j" /* extendArray */])(results, copyResults);
-    }
-
-    return payload_collection_ImmutablePayloadCollection.WithPayloads(results, sources["a" /* PayloadSource */].RemoteRetrieved);
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/payloads/deltas/index.ts
-
-
-
-
-
-
-
 // CONCATENATED MODULE: ./lib/services/sync/sync_service.ts
 function sync_service_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -20967,7 +21953,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
 
   async payloadsByPreparingForServer(payloads) {
     return this.protocolService.payloadsByEncryptingPayloads(payloads, payload => {
-      return this.nonEncryptedTypes.includes(payload.content_type) ? intents["a" /* EncryptionIntent */].SyncDecrypted : intents["a" /* EncryptionIntent */].Sync;
+      return this.nonEncryptedTypes.includes(payload.content_type) ? intents["b" /* EncryptionIntent */].SyncDecrypted : intents["b" /* EncryptionIntent */].Sync;
     });
   }
 
@@ -21051,7 +22037,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
      * _after_ in-time will schedule a new sync request. */
 
     const inTimeResolveQueue = this.resolveQueue.slice();
-    const useStrategy = !Object(utils["p" /* isNullOrUndefined */])(options.queueStrategy) ? options.queueStrategy : SyncQueueStrategy.ResolveOnNext;
+    const useStrategy = !Object(utils["q" /* isNullOrUndefined */])(options.queueStrategy) ? options.queueStrategy : SyncQueueStrategy.ResolveOnNext;
 
     if (syncInProgress || !databaseLoaded || !canExecuteSync) {
       this.log(!canExecuteSync ? 'Another function call has begun preparing for sync.' : syncInProgress ? 'Attempting to sync while existing sync in progress.' : 'Attempting to sync before local database has loaded.');
@@ -21093,7 +22079,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const useMode = (tryMode => {
       if (online && !this.completedOnlineDownloadFirstSync) {
         return SyncModes.DownloadFirst;
-      } else if (!Object(utils["p" /* isNullOrUndefined */])(tryMode)) {
+      } else if (!Object(utils["q" /* isNullOrUndefined */])(tryMode)) {
         return tryMode;
       } else {
         return SyncModes.Default;
@@ -21449,9 +22435,14 @@ class challenge_operation_ChallengeOperation {
    * @param resolve the promise resolve function to be called
    * when this challenge completes or cancels
    */
-  constructor(challenge, resolve) {
+  constructor(challenge, onValidValue, onInvalidValue, onNonvalidatedSubmit, onComplete, onCancel) {
     this.challenge = challenge;
-    this.resolve = resolve;
+    this.onValidValue = onValidValue;
+    this.onInvalidValue = onInvalidValue;
+    this.onNonvalidatedSubmit = onNonvalidatedSubmit;
+    this.onComplete = onComplete;
+    this.onCancel = onCancel;
+    this.nonvalidatedValues = [];
     this.validValues = [];
     this.invalidValues = [];
     this.artifacts = {};
@@ -21463,20 +22454,28 @@ class challenge_operation_ChallengeOperation {
 
 
   complete(response) {
-    var _this$resolve, _this$onComplete;
+    var _this$onComplete;
 
     if (!response) {
       response = new ChallengeResponse(this.challenge, this.validValues, this.artifacts);
     }
 
-    (_this$resolve = this.resolve) === null || _this$resolve === void 0 ? void 0 : _this$resolve.call(this, response);
-    (_this$onComplete = this.onComplete) === null || _this$onComplete === void 0 ? void 0 : _this$onComplete.call(this);
+    (_this$onComplete = this.onComplete) === null || _this$onComplete === void 0 ? void 0 : _this$onComplete.call(this, response);
+  }
+
+  nonvalidatedSubmit() {
+    var _this$onNonvalidatedS;
+
+    const response = new ChallengeResponse(this.challenge, this.nonvalidatedValues.slice(), this.artifacts);
+    (_this$onNonvalidatedS = this.onNonvalidatedSubmit) === null || _this$onNonvalidatedS === void 0 ? void 0 : _this$onNonvalidatedS.call(this, response);
+    /** Reset values */
+
+    this.nonvalidatedValues = [];
   }
 
   cancel() {
-    var _this$resolve2, _this$onCancel;
+    var _this$onCancel;
 
-    (_this$resolve2 = this.resolve) === null || _this$resolve2 === void 0 ? void 0 : _this$resolve2.call(this, null);
     (_this$onCancel = this.onCancel) === null || _this$onCancel === void 0 ? void 0 : _this$onCancel.call(this);
   }
   /**
@@ -21485,7 +22484,26 @@ class challenge_operation_ChallengeOperation {
 
 
   isFinished() {
-    return this.validValues.length === this.challenge.types.length;
+    return this.validValues.length === this.challenge.prompts.length;
+  }
+
+  nonvalidatedPrompts() {
+    return this.challenge.prompts.filter(p => !p.validates);
+  }
+
+  addNonvalidatedValue(value) {
+    const valuesArray = this.nonvalidatedValues;
+    const matching = valuesArray.find(v => v.prompt.id === value.prompt.id);
+
+    if (matching) {
+      Object(utils["B" /* removeFromArray */])(valuesArray, matching);
+    }
+
+    valuesArray.push(value);
+
+    if (this.nonvalidatedValues.length === this.nonvalidatedPrompts().length) {
+      this.nonvalidatedSubmit();
+    }
   }
   /**
    * Sets the values validation status, as well as handles subsequent actions,
@@ -21496,7 +22514,7 @@ class challenge_operation_ChallengeOperation {
 
   setValueStatus(value, valid, artifacts) {
     const valuesArray = valid ? this.validValues : this.invalidValues;
-    const matching = valuesArray.find(v => v.type === value.type);
+    const matching = valuesArray.find(v => v.prompt.validation === value.prompt.validation);
 
     if (matching) {
       Object(utils["B" /* removeFromArray */])(valuesArray, matching);
@@ -21527,6 +22545,7 @@ class challenge_operation_ChallengeOperation {
 
 
 
+
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
@@ -21535,6 +22554,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
   constructor(storageService, protocolService) {
     super();
     this.challengeOperations = {};
+    this.challengeObservers = {};
     this.storageService = storageService;
     this.protocolService = protocolService;
   }
@@ -21555,55 +22575,65 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
   promptForChallengeResponse(challenge) {
     return new Promise(resolve => {
       this.createOrGetChallengeOperation(challenge, resolve);
-    });
-  }
-  /**
-   * Resolves when the user has submitted values which the caller can use
-   * to run custom validations.
-   */
-
-
-  promptForChallengeResponseWithCustomValidation(challenge) {
-    const operation = this.createOrGetChallengeOperation(challenge);
-    return new Promise(resolve => {
-      operation.customValidator = resolve;
+      this.sendChallenge(challenge);
     });
   }
 
   validateChallengeValue(value) {
-    switch (value.type) {
-      case ChallengeType.LocalPasscode:
+    switch (value.prompt.validation) {
+      case ChallengeValidation.LocalPasscode:
         return this.protocolService.validatePasscode(value.value);
 
-      case ChallengeType.AccountPassword:
+      case ChallengeValidation.AccountPassword:
         return this.protocolService.validateAccountPassword(value.value);
 
-      case ChallengeType.Biometric:
+      case ChallengeValidation.Biometric:
         return Promise.resolve({
           valid: value.value === true
         });
+
+      default:
+        throw Error("Unhandled validation mode ".concat(value.prompt.validation));
     }
   }
 
   async getLaunchChallenge() {
-    const types = [];
+    const prompts = [];
     const hasPasscode = this.protocolService.hasPasscode();
 
     if (hasPasscode) {
-      types.push(ChallengeType.LocalPasscode);
+      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
     }
 
     const biometricEnabled = await this.hasBiometricsEnabled();
 
     if (biometricEnabled) {
-      types.push(ChallengeType.Biometric);
+      prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
     }
 
-    if (types.length > 0) {
-      return new Challenge(types, ChallengeReason.ApplicationUnlock);
+    if (prompts.length > 0) {
+      return new challenges_Challenge(prompts, ChallengeReason.ApplicationUnlock);
     } else {
       return null;
     }
+  }
+
+  async promptForPasscode() {
+    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.LocalPasscode)], ChallengeReason.ResaveRootKey);
+    const response = await this.promptForChallengeResponse(challenge);
+
+    if (!response) {
+      return {
+        canceled: true,
+        passcode: undefined
+      };
+    }
+
+    const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+    return {
+      passcode: value.value,
+      canceled: false
+    };
   }
 
   isPasscodeLocked() {
@@ -21623,25 +22653,82 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     await this.storageService.setValue(StorageKey.BiometricsState, false, StorageValueModes.Nonwrapped);
   }
 
-  setChallengeCallbacks(challenge, onValidValue, onInvalidValue, onComplete, onCancel) {
-    const operation = this.getChallengeOperation(challenge);
-    operation.onValidValue = onValidValue;
-    operation.onInvalidValue = onInvalidValue;
-    operation.onComplete = onComplete;
-    operation.onCancel = onCancel;
+  addChallengeObserver(challenge, observer) {
+    const observers = this.challengeObservers[challenge.id] || [];
+    observers.push(observer);
+    this.challengeObservers[challenge.id] = observers;
   }
 
   createOrGetChallengeOperation(challenge, resolve) {
     let operation = this.getChallengeOperation(challenge);
 
     if (!operation) {
-      operation = new challenge_operation_ChallengeOperation(challenge, resolve);
+      operation = new challenge_operation_ChallengeOperation(challenge, value => {
+        this.onChallengeValidValue(challenge, value);
+      }, value => {
+        this.onChallengeInvalidValue(challenge, value);
+      }, response => {
+        this.onChallengeNonvalidatedSubmit(challenge, response);
+        resolve(response);
+      }, response => {
+        this.onChallengeComplete(challenge, response);
+        resolve(response);
+      }, () => {
+        this.onChallengeCancel(challenge);
+        resolve(undefined);
+      });
       this.challengeOperations[challenge.id] = operation;
-      this.sendChallenge(challenge);
     }
 
-    operation.resolve = resolve;
     return operation;
+  }
+
+  performOnObservers(challenge, perform) {
+    const observers = this.challengeObservers[challenge.id] || [];
+
+    for (const observer of observers) {
+      perform(observer);
+    }
+  }
+
+  onChallengeValidValue(challenge, value) {
+    this.performOnObservers(challenge, observer => {
+      var _observer$onValidValu;
+
+      (_observer$onValidValu = observer.onValidValue) === null || _observer$onValidValu === void 0 ? void 0 : _observer$onValidValu.call(observer, value);
+    });
+  }
+
+  onChallengeInvalidValue(challenge, value) {
+    this.performOnObservers(challenge, observer => {
+      var _observer$onInvalidVa;
+
+      (_observer$onInvalidVa = observer.onInvalidValue) === null || _observer$onInvalidVa === void 0 ? void 0 : _observer$onInvalidVa.call(observer, value);
+    });
+  }
+
+  onChallengeNonvalidatedSubmit(challenge, response) {
+    this.performOnObservers(challenge, observer => {
+      var _observer$onNonvalida;
+
+      (_observer$onNonvalida = observer.onNonvalidatedSubmit) === null || _observer$onNonvalida === void 0 ? void 0 : _observer$onNonvalida.call(observer, response);
+    });
+  }
+
+  onChallengeComplete(challenge, response) {
+    this.performOnObservers(challenge, observer => {
+      var _observer$onComplete;
+
+      (_observer$onComplete = observer.onComplete) === null || _observer$onComplete === void 0 ? void 0 : _observer$onComplete.call(observer, response);
+    });
+  }
+
+  onChallengeCancel(challenge) {
+    this.performOnObservers(challenge, observer => {
+      var _observer$onCancel;
+
+      (_observer$onCancel = observer.onCancel) === null || _observer$onCancel === void 0 ? void 0 : _observer$onCancel.call(observer);
+    });
   }
 
   getChallengeOperation(challenge) {
@@ -21658,17 +22745,22 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     this.deleteChallengeOperation(operation);
   }
 
+  completeChallenge(challenge) {
+    const operation = this.challengeOperations[challenge.id];
+    operation.complete();
+    this.deleteChallengeOperation(operation);
+  }
+
   async submitValuesForChallenge(challenge, values) {
     if (values.length === 0) {
       throw Error("Attempting to submit 0 values for challenge");
     }
 
-    const operation = this.getChallengeOperation(challenge);
-
-    if (operation.customValidator) {
-      operation.customValidator(values);
-    } else {
-      for (const value of values) {
+    for (const value of values) {
+      if (!value.prompt.validates) {
+        const operation = this.getChallengeOperation(challenge);
+        operation.addNonvalidatedValue(value);
+      } else {
         const {
           valid,
           artifacts
@@ -21684,6 +22776,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
 
     if (operation.isFinished()) {
       this.deleteChallengeOperation(operation);
+      delete this.challengeObservers[operation.challenge.id];
     }
   }
 
@@ -21712,6 +22805,8 @@ function application_ownKeys(object, enumerableOnly) { var keys = Object.keys(ob
 function application_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { application_ownKeys(Object(source), true).forEach(function (key) { application_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { application_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function application_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -21896,11 +22991,11 @@ class application_SNApplication {
   }
 
   async handleLaunchChallengeResponse(response) {
-    if (response.challenge.types.includes(ChallengeType.LocalPasscode)) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts.wrappingKey;
 
       if (!wrappingKey) {
-        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
         wrappingKey = await this.protocolService.computeWrappingKey(value.value);
       }
 
@@ -22152,7 +23247,7 @@ class application_SNApplication {
     let payloadSource = arguments.length > 3 ? arguments[3] : undefined;
     let syncOptions = arguments.length > 4 ? arguments[4] : undefined;
 
-    if (!Object(utils["s" /* isString */])(uuid)) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
       throw Error('Must use uuid to change item');
     }
 
@@ -22180,7 +23275,7 @@ class application_SNApplication {
   async changeItem(uuid, mutate) {
     let isUserModified = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-    if (!Object(utils["s" /* isString */])(uuid)) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
       throw Error('Must use uuid to change item');
     }
 
@@ -22256,7 +23351,7 @@ class application_SNApplication {
 
 
   streamItems(contentType, stream) {
-    const observer = this.itemManager.addObserver(contentType, (changed, inserted, discarded, source) => {
+    const observer = this.itemManager.addObserver(contentType, (changed, inserted, discarded, _ignored, source) => {
       const all = changed.concat(inserted).concat(discarded);
       stream(all, source);
     });
@@ -22329,20 +23424,20 @@ class application_SNApplication {
     return this.hasAccount() || this.hasPasscode();
   }
 
-  async upgradeProtocolVersion() {
+  async performProtocolUpgrade() {
     const hasPasscode = this.hasPasscode();
     const hasAccount = this.hasAccount();
-    const types = [];
+    const prompts = [];
 
     if (hasPasscode) {
-      types.push(ChallengeType.LocalPasscode);
+      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
     }
 
     if (hasAccount) {
-      types.push(ChallengeType.AccountPassword);
+      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword, undefined, ChallengeStrings.AccountPasswordPlaceholder));
     }
 
-    const challenge = new Challenge(types, ChallengeReason.ProtocolUpgrade);
+    const challenge = new challenges_Challenge(prompts, ChallengeReason.ProtocolUpgrade);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (!response) {
@@ -22358,15 +23453,15 @@ class application_SNApplication {
 
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
         passcode = value.value;
       }
 
       if (hasAccount) {
         /* Upgrade account version */
-        const value = response.getValueForType(ChallengeType.AccountPassword);
+        const value = response.getValueForType(ChallengeValidation.AccountPassword);
         const password = value.value;
-        const changeResponse = await this.changePassword(password, password, passcode, {
+        const changeResponse = await this.changePassword(password, password, passcode, KeyParamsOrigination.ProtocolUpgrade, {
           validatePasswordStrength: false
         });
 
@@ -22378,7 +23473,7 @@ class application_SNApplication {
       }
 
       if (passcode) {
-        await this.changePasscode(passcode);
+        await this.changePasscode(passcode, KeyParamsOrigination.ProtocolUpgrade);
       }
 
       return {
@@ -22391,6 +23486,22 @@ class application_SNApplication {
     } finally {
       dismissBlockingDialog();
     }
+  }
+
+  async upgradeProtocolVersion() {
+    const result = await this.performProtocolUpgrade();
+
+    if (result.success) {
+      if (this.hasAccount()) {
+        this.alertService.alert(ProtocolUpgradeStrings.SuccessAccount);
+      } else {
+        this.alertService.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
+      }
+    } else if (result.error) {
+      this.alertService.alert(ProtocolUpgradeStrings.Fail);
+    }
+
+    return result;
   }
 
   noAccount() {
@@ -22559,15 +23670,8 @@ class application_SNApplication {
     return (_this$challengeServic = this.challengeService) === null || _this$challengeServic === void 0 ? void 0 : _this$challengeServic.promptForChallengeResponse(challenge);
   }
 
-  setChallengeCallbacks(_ref) {
-    let {
-      challenge,
-      onValidValue,
-      onInvalidValue,
-      onComplete,
-      onCancel
-    } = _ref;
-    return this.challengeService.setChallengeCallbacks(challenge, onValidValue, onInvalidValue, onComplete, onCancel);
+  addChallengeObserver(challenge, observer) {
+    return this.challengeService.addChallengeObserver(challenge, observer);
   }
 
   submitValuesForChallenge(challenge, values) {
@@ -22632,17 +23736,15 @@ class application_SNApplication {
     }
 
     if (!passcode) {
-      const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.ResaveRootKey);
-      const response = await this.challengeService.promptForChallengeResponse(challenge);
+      const result = await this.challengeService.promptForPasscode();
 
-      if (!response) {
+      if (result.canceled) {
         return {
           canceled: true
         };
       }
 
-      const value = response.getValueForType(ChallengeType.LocalPasscode);
-      passcode = value.value;
+      passcode = result.passcode;
     }
 
     const wrappingKey = await this.protocolService.computeWrappingKey(passcode);
@@ -22665,14 +23767,16 @@ class application_SNApplication {
     } = await this.getWrappingKeyIfNecessary();
 
     if (canceled) {
-      return;
+      return {
+        error: Error(SignInStrings.PasscodeRequired)
+      };
     }
 
     this.lockSyncing();
     const result = await this.sessionManager.register(email, password);
 
     if (!result.response.error) {
-      await this.protocolService.setNewRootKey(result.rootKey, result.keyParams, wrappingKey);
+      await this.protocolService.setNewRootKey(result.rootKey, wrappingKey);
       this.syncService.resetSyncState();
       await this.storageService.setPersistencePolicy(ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default);
 
@@ -22702,26 +23806,26 @@ class application_SNApplication {
   async signIn(email, password) {
     let strict = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     let ephemeral = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    let mfaKeyPath = arguments.length > 4 ? arguments[4] : undefined;
-    let mfaCode = arguments.length > 5 ? arguments[5] : undefined;
-    let mergeLocal = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : true;
-    let awaitSync = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : false;
+    let mergeLocal = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+    let awaitSync = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
     const {
       wrappingKey,
       canceled
     } = await this.getWrappingKeyIfNecessary();
 
     if (canceled) {
-      return;
+      return {
+        error: Error(SignInStrings.PasscodeRequired)
+      };
     }
     /** Prevent a timed sync from occuring while signing in. */
 
 
     this.lockSyncing();
-    const result = await this.sessionManager.signIn(email, password, strict, mfaKeyPath, mfaCode);
+    const result = await this.sessionManager.signIn(email, password, strict);
 
     if (!result.response.error) {
-      await this.protocolService.setNewRootKey(result.rootKey, result.keyParams, wrappingKey);
+      await this.protocolService.setNewRootKey(result.rootKey, wrappingKey);
       this.syncService.resetSyncState();
       await this.storageService.setPersistencePolicy(ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default);
 
@@ -22761,9 +23865,26 @@ class application_SNApplication {
 
 
   async changePassword(currentPassword, newPassword, passcode) {
+    let origination = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : KeyParamsOrigination.PasswordChange;
     let {
       validatePasswordStrength = true
-    } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    const result = await this.performPasswordChange(currentPassword, newPassword, passcode, origination, {
+      validatePasswordStrength
+    });
+
+    if (result.error) {
+      this.alertService.alert(result.error.message);
+    }
+
+    return result;
+  }
+
+  async performPasswordChange(currentPassword, newPassword, passcode) {
+    let origination = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : KeyParamsOrigination.PasswordChange;
+    let {
+      validatePasswordStrength = true
+    } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
     if (validatePasswordStrength) {
       if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
@@ -22779,12 +23900,14 @@ class application_SNApplication {
     } = await this.getWrappingKeyIfNecessary(passcode);
 
     if (canceled) {
-      return {};
+      return {
+        error: Error(PasswordChangeStrings.PasscodeRequired)
+      };
     }
     /** Change the password locally */
 
 
-    const [error, changePasswordResult] = await this.protocolService.changePassword(this.getUser().email, currentPassword, newPassword, wrappingKey);
+    const [error, changePasswordResult] = await this.protocolService.changePassword(this.getUser().email, currentPassword, newPassword, wrappingKey, origination);
     if (error) return {
       error
     };
@@ -22814,9 +23937,9 @@ class application_SNApplication {
     this.lockSyncing();
     /** Now, change the password on the server. Roll back on failure */
 
-    const response = await this.sessionManager.changePassword(currentServerPassword, newRootKey.serverPassword, newKeyParams);
+    const result = await this.sessionManager.changePassword(currentServerPassword, newRootKey.serverPassword, newKeyParams);
 
-    if (response.error) {
+    if (result.response.error) {
       await rollbackPasswordChange();
       await this.syncService.sync({
         awaitAll: true
@@ -22824,7 +23947,7 @@ class application_SNApplication {
     }
 
     this.unlockSyncing();
-    return response;
+    return result.response;
   }
 
   async signOut() {
@@ -22887,7 +24010,7 @@ class application_SNApplication {
     const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, SETTING_PASSCODE);
 
     try {
-      await this.setPasscodeWithoutWarning(passcode);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeCreate);
     } finally {
       dismissBlockingDialog();
     }
@@ -22904,23 +24027,21 @@ class application_SNApplication {
   }
 
   async changePasscode(passcode) {
-    const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, CHANGING_PASSCODE);
+    let origination = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : KeyParamsOrigination.PasscodeChange;
+    const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, origination === KeyParamsOrigination.ProtocolUpgrade ? ProtocolUpgradeStrings.UpgradingPasscode : CHANGING_PASSCODE);
 
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(passcode);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeChange);
     } finally {
       dismissBlockingDialog();
     }
   }
 
-  async setPasscodeWithoutWarning(passcode) {
+  async setPasscodeWithoutWarning(passcode, origination) {
     const identifier = await this.generateUuid();
-    const {
-      key,
-      keyParams
-    } = await this.protocolService.createRootKey(identifier, passcode);
-    await this.protocolService.setNewRootKeyWrapper(key, keyParams);
+    const key = await this.protocolService.createRootKey(identifier, passcode, origination);
+    await this.protocolService.setNewRootKeyWrapper(key);
     await this.rewriteItemsKeys();
     await this.syncService.sync();
   }
@@ -22977,6 +24098,7 @@ class application_SNApplication {
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
+    this.createKeyRecoveryService();
     this.createSyncManager();
     this.createSingletonManager();
     this.createComponentManager();
@@ -23002,6 +24124,7 @@ class application_SNApplication {
     this.actionsManager = undefined;
     this.historyManager = undefined;
     this.itemManager = undefined;
+    this.keyRecoveryService = undefined;
     this.services = [];
   }
 
@@ -23066,8 +24189,13 @@ class application_SNApplication {
     this.services.push(this.protocolService);
   }
 
+  createKeyRecoveryService() {
+    this.keyRecoveryService = new key_recovery_service_SNKeyRecoveryService(this.itemManager, this.modelManager, this.apiService, this.sessionManager, this.protocolService, this.challengeService, this.alertService, this.storageService);
+    this.services.push(this.keyRecoveryService);
+  }
+
   createSessionManager() {
-    this.sessionManager = new session_manager_SNSessionManager(this.storageService, this.apiService, this.alertService, this.protocolService);
+    this.sessionManager = new session_manager_SNSessionManager(this.storageService, this.apiService, this.alertService, this.protocolService, this.challengeService);
     this.services.push(this.sessionManager);
   }
 
@@ -23144,8 +24272,8 @@ class device_interface_DeviceInterface {
        perform repeatedly. Similar to setInterval.
   */
   constructor(timeout, interval) {
-    this.timeout = timeout || setTimeout.bind(Object(utils["m" /* getGlobalScope */])());
-    this.interval = interval || setInterval.bind(Object(utils["m" /* getGlobalScope */])());
+    this.timeout = timeout || setTimeout.bind(Object(utils["n" /* getGlobalScope */])());
+    this.interval = interval || setInterval.bind(Object(utils["n" /* getGlobalScope */])());
   }
 
   deinit() {
@@ -23198,10 +24326,9 @@ class LiveItem {
 // EXTERNAL MODULE: ./lib/services/application_service.ts
 var application_service = __webpack_require__(77);
 
-// EXTERNAL MODULE: ./lib/protocol/payloads/pure_payload.ts
-var pure_payload = __webpack_require__(27);
-
 // CONCATENATED MODULE: ./lib/index.ts
+
+
 
 
 

@@ -131,7 +131,7 @@ Tests must be run in the browser due to WebCrypto dependency.
 1. `npm test`
 2. Open browser to `http://localhost:9001/test/test.html`.
 
-Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000 (branch `develop` of the server repository). This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as necessary.
+Tests depend on a [syncing-server](https://github.com/standardnotes/syncing-server) instance running locally on port 3000 and using the `test` environment (`rails s -e test`) (Use branch `develop` of the server repository for latest). This port can be [configured](https://github.com/standardnotes/snjs/blob/004/test/lib/factory.js#L247) as necessary.
 
 _Note:_ Many tests involve registering for a new account as part of the `beforeEach` block for that test suite. Each account registration call takes close to 1 second, as key generation with Argon2 is tuned to take close to 1 second. However, this will depend on machine performance. If a test fails due to timeout being exceeded, please increase the timeout for that test. Note that the browser tab which runs the tests must remain in the foreground while the tests are running due to browsers de-optimizing inactive tabs.
 

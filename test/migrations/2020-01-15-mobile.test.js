@@ -28,32 +28,30 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
-    const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
-      JSON.stringify(accountResult.keyParams.getPortableValue())
+      JSON.stringify(accountKey.keyParams.getPortableValue())
     );
     await application.deviceInterface.setRawStorageValue(
       'user',
       JSON.stringify({ email: identifier })
     );
-    const accountKey = accountResult.key;
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -116,22 +114,21 @@ describe('2020-01-15 mobile migration', () => {
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      const initialValues = promptForValuesForTypes(challenge.types);
-      await Factory.sleep(0);
-      application.submitValuesForChallenge(challenge, initialValues);
+      const values = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, values);
     };
     await application.prepareForLaunch({
       receiveChallenge
@@ -158,7 +155,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
@@ -195,15 +192,14 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeResult = await operator003.createRootKey(
+    const passcodeKey = await operator003.createRootKey(
       identifier,
       passcode
     );
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
-      JSON.stringify(passcodeResult.keyParams.getPortableValue())
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
-    const passcodeKey = passcodeResult.key;
     const passcodeTiming = 'immediately';
     await application.deviceInterface.legacy_setRawKeychainValue({
       offline: {
@@ -236,29 +232,28 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
 
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      application.setChallengeCallbacks({
-        challenge,
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           application.submitValuesForChallenge(challenge, values);
         },
       });
       await Factory.sleep(0);
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
@@ -279,7 +274,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
@@ -315,20 +310,19 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
-    const accountResult = await operator003.createRootKey(
+    const accountKey = await operator003.createRootKey(
       identifier,
       password
     );
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
-      JSON.stringify(accountResult.keyParams.getPortableValue())
+      JSON.stringify(accountKey.keyParams.getPortableValue())
     );
     await application.deviceInterface.setRawStorageValue(
       'user',
       JSON.stringify({ email: identifier })
     );
-    const accountKey = accountResult.key;
-    expect(accountKey.version).to.equal(ProtocolVersion.V003);
+    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V003);
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -362,27 +356,26 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      application.setChallengeCallbacks({
-        challenge,
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           application.submitValuesForChallenge(challenge, values);
         },
       });
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({
@@ -403,7 +396,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
     expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.version).to.equal(ProtocolVersion.V003);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
     const keyParams = await application.storageService.getValue(
@@ -464,27 +457,26 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload, application.identifier);
 
     /** Run migration */
-    const promptForValuesForTypes = (types) => {
+    const promptValueReply = (prompts) => {
       const values = [];
-      for (const type of types) {
-        if (type === ChallengeType.LocalPasscode) {
-          values.push(new ChallengeValue(type, passcode));
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
         }
-        if (type === ChallengeType.Biometric) {
-          values.push(new ChallengeValue(type, true));
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
         }
       }
       return values;
     };
     const receiveChallenge = async (challenge) => {
-      application.setChallengeCallbacks({
-        challenge,
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptForValuesForTypes([value.type]);
+          const values = promptValueReply([value.prompt]);
           application.submitValuesForChallenge(challenge, values);
         },
       });
-      const initialValues = promptForValuesForTypes(challenge.types);
+      const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
     await application.prepareForLaunch({

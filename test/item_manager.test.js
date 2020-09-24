@@ -4,20 +4,6 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-const expectThrowsAsync = async (method, errorMessage) => {
-  let error = null;
-  try {
-    await method();
-  }
-  catch (err) {
-    error = err;
-  }
-  expect(error).to.be.an('Error');
-  if (errorMessage) {
-    expect(error.message).to.equal(errorMessage);
-  }
-};
-
 describe('item manager', () => {
 
   before(async function () {
@@ -182,7 +168,7 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded, source, sourceKey) => {
+      (changed, inserted, discarded, ignored, source, sourceKey) => {
         observed.push({ changed, inserted, discarded, source, sourceKey });
       },
     );
@@ -229,7 +215,7 @@ describe('item manager', () => {
         }
       );
     };
-    await expectThrowsAsync(() => changeFn(), 'Attempting to change non-existant item');
+    await Factory.expectThrowsAsync(() => changeFn(), 'Attempting to change non-existant item');
   });
 
   it('set items dirty', async function () {
@@ -269,14 +255,14 @@ describe('item manager', () => {
       expect(duplicatedNote.conflictOf).to.be.undefined;
       expect(duplicatedNote.payload.content.conflict_of).to.be.undefined;
     });
-    
+
     it('should duplicate the item and set the duplicate_of and conflict_of properties', async function () {
       await this.itemManager.duplicateItem(this.note.uuid, true);
       sinon.assert.calledOnce(this.emitPayloads);
-  
+
       const originalNote = this.itemManager.notes[0];
       const duplicatedNote = this.itemManager.notes[1];
-  
+
       expect(this.itemManager.items.length).to.equal(2);
       expect(this.itemManager.notes.length).to.equal(2);
       expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid);
@@ -376,8 +362,8 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded) => {
-        observed.push({ changed, inserted, discarded });
+      (changed, inserted, discarded, ignored) => {
+        observed.push({ changed, inserted, discarded, ignored });
       },
     );
     await this.createNote();
@@ -392,8 +378,8 @@ describe('item manager', () => {
     const observed = [];
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded) => {
-        observed.push({ changed, inserted, discarded });
+      (changed, inserted, discarded, ignored) => {
+        observed.push({ changed, inserted, discarded, ignored });
       },
     );
     const note = await this.createNote();
@@ -418,7 +404,7 @@ describe('item manager', () => {
     let latestVersion;
     this.itemManager.addObserver(
       ContentType.Note,
-      (changed, inserted, discarded) => {
+      (changed, inserted, _discarded, _ignored) => {
         const all = changed.concat(inserted);
         if (!didEmit) {
           didEmit = true;

@@ -121,6 +121,11 @@ export declare function objectToValueArray(object: AnyRecord): any[];
  * For example, sortedCopy({b: '1', a: '2'}) returns {a: '2', b: '1'}
  */
 export declare function sortedCopy(object: any): any;
+/**
+ * Returns a new array by sorting an array of elements based on a date property,
+ * as indicated by the input key value.
+ */
+export declare function dateSorted<T>(elements: T[], key: keyof T, ascending?: boolean): T[];
 /** Compares for equality by comparing top-level keys value equality (===) */
 export declare function topLevelCompare<T>(left: T, right: T): boolean;
 /**

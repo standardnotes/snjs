@@ -89,7 +89,7 @@ export class ItemSessionHistory {
         processEntry(entry, index, significant);
       }
     }
-    this.entries = this.entries.filter((entry, index) => {
+    this.entries = this.entries.filter((entry, _index) => {
       return keepEntries.indexOf(entry) !== -1;
     });
   }

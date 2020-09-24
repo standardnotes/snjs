@@ -35,6 +35,8 @@ type ObserverCallback = (
   inserted: SNItem[],
   /** The items have been deleted from local state (and remote state if applicable) */
   discarded: SNItem[],
+  /** Items for which encrypted overwrite protection is enabled and enacted */
+  ignored: SNItem[],
   source?: PayloadSource,
   sourceKey?: string
 ) => void
@@ -234,11 +236,13 @@ export class ItemManager extends PureService {
     changed: PurePayload[],
     inserted: PurePayload[],
     discarded: PurePayload[],
+    ignored: PurePayload[],
     source?: PayloadSource,
     sourceKey?: string,
   ) {
     const changedItems = changed.map((p) => CreateItemFromPayload(p));
     const insertedItems = inserted.map((p) => CreateItemFromPayload(p));
+    const ignoredItems = ignored.map((p) => CreateItemFromPayload(p));
     const changedOrInserted = changedItems.concat(insertedItems);
     if (changedOrInserted.length > 0) {
       this.collection.set(changedOrInserted)
@@ -252,6 +256,7 @@ export class ItemManager extends PureService {
       changedItems,
       insertedItems,
       discardedItems,
+      ignoredItems,
       source,
       sourceKey
     );
@@ -261,6 +266,7 @@ export class ItemManager extends PureService {
     changed: SNItem[],
     inserted: SNItem[],
     discarded: SNItem[],
+    ignored: SNItem[],
     source?: PayloadSource,
     sourceKey?: string
   ) {
@@ -277,10 +283,12 @@ export class ItemManager extends PureService {
       const filteredChanged = filter(changed, observer.contentType);
       const filteredInserted = filter(inserted, observer.contentType);
       const filteredDiscarded = filter(discarded, observer.contentType);
+      const filteredIgnored = filter(ignored, observer.contentType);
       if (
         filteredChanged.length === 0 &&
         filteredInserted.length === 0 &&
-        filteredDiscarded.length === 0
+        filteredDiscarded.length === 0 &&
+        filteredIgnored.length === 0
       ) {
         continue;
       }
@@ -288,6 +296,7 @@ export class ItemManager extends PureService {
         filteredChanged,
         filteredInserted,
         filteredDiscarded,
+        filteredIgnored,
         source,
         sourceKey
       );

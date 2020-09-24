@@ -2,12 +2,12 @@ import { PureService } from './pure_service';
 import { ApplicationEvent } from '../events';
 import { SNApplication } from '../application';
 export declare class ApplicationService extends PureService {
-    protected application?: SNApplication;
+    protected application: SNApplication;
     private unsubApp;
     constructor(application: SNApplication);
     deinit(): void;
     addAppEventObserver(): void;
-    onAppEvent(event: ApplicationEvent): void;
+    onAppEvent(_event: ApplicationEvent): void;
     onAppStart(): Promise<void>;
     onAppLaunch(): Promise<void>;
     onAppKeyChange(): Promise<void>;

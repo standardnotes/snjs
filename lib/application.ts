@@ -1,3 +1,5 @@
+import { SNKeyRecoveryService } from './services/key_recovery_service';
+import { SNRootKey } from '@Protocol/root_key';
 import { CollectionSort, SortDirection } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
@@ -13,8 +15,8 @@ import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
-import { Challenge, ChallengeResponse, ChallengeType, ChallengeReason, ChallengeValue } from './challenges';
-import { ValueCallback } from './services/challenge/challenge_service';
+import { Challenge, ChallengeResponse, ChallengeValidation, ChallengeReason, ChallengeValue, ChallengePrompt } from './challenges';
+import { ValueCallback, ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
@@ -53,11 +55,12 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION
+  UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings, ChallengeStrings, ProtocolUpgradeStrings, PasswordChangeStrings
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
+import { KeyParamsOrigination } from './protocol/key_params';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -109,6 +112,7 @@ export class SNApplication {
   public actionsManager!: SNActionsService
   public historyManager!: SNHistoryManager
   private itemManager!: ItemManager
+  private keyRecoveryService!: SNKeyRecoveryService
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService[] = [];
@@ -266,10 +270,10 @@ export class SNApplication {
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
-    if (response.challenge.types.includes(ChallengeType.LocalPasscode)) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts!.wrappingKey;
       if (!wrappingKey) {
-        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
         wrappingKey = await this.protocolService!.computeWrappingKey(value.value as string);
       }
       await this.protocolService!.unwrapRootKey(wrappingKey);
@@ -657,7 +661,7 @@ export class SNApplication {
   ) {
     const observer = this.itemManager!.addObserver(
       contentType,
-      (changed, inserted, discarded, source) => {
+      (changed, inserted, discarded, _ignored, source) => {
         const all = changed.concat(inserted).concat(discarded);
         stream(all, source);
       }
@@ -723,21 +727,29 @@ export class SNApplication {
     return this.hasAccount() || this.hasPasscode();
   }
 
-  public async upgradeProtocolVersion(): Promise<{
+  private async performProtocolUpgrade(): Promise<{
     success?: true,
     canceled?: true,
     error?: { message: string }
   }> {
     const hasPasscode = this.hasPasscode();
     const hasAccount = this.hasAccount();
-    const types = [];
+    const prompts = [];
     if (hasPasscode) {
-      types.push(ChallengeType.LocalPasscode);
+      prompts.push(new ChallengePrompt(
+        ChallengeValidation.LocalPasscode,
+        undefined,
+        ChallengeStrings.LocalPasscodePlaceholder
+      ));
     }
     if (hasAccount) {
-      types.push(ChallengeType.AccountPassword);
+      prompts.push(new ChallengePrompt(
+        ChallengeValidation.AccountPassword,
+        undefined,
+        ChallengeStrings.AccountPasswordPlaceholder
+      ));
     }
-    const challenge = new Challenge(types, ChallengeReason.ProtocolUpgrade);
+    const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade);
     const response = await this.challengeService!.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true };
@@ -750,17 +762,18 @@ export class SNApplication {
       let passcode: string | undefined;
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeType.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
         passcode = value.value as string;
       }
       if (hasAccount) {
         /* Upgrade account version */
-        const value = response.getValueForType(ChallengeType.AccountPassword);
+        const value = response.getValueForType(ChallengeValidation.AccountPassword);
         const password = value.value as string;
         const changeResponse = await this.changePassword(
           password,
           password,
           passcode,
+          KeyParamsOrigination.ProtocolUpgrade,
           { validatePasswordStrength: false }
         );
         if (changeResponse?.error) {
@@ -768,7 +781,7 @@ export class SNApplication {
         }
       }
       if (passcode) {
-        await this.changePasscode(passcode);
+        await this.changePasscode(passcode, KeyParamsOrigination.ProtocolUpgrade);
       }
 
       return { success: true };
@@ -777,6 +790,20 @@ export class SNApplication {
     } finally {
       dismissBlockingDialog();
     }
+  }
+
+  public async upgradeProtocolVersion() {
+    const result = await this.performProtocolUpgrade();
+    if (result.success) {
+      if (this.hasAccount()) {
+        this.alertService!.alert(ProtocolUpgradeStrings.SuccessAccount);
+      } else {
+        this.alertService!.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
+      }
+    } else if (result.error) {
+      this.alertService!.alert(ProtocolUpgradeStrings.Fail);
+    }
+    return result;
   }
 
   public noAccount() {
@@ -952,21 +979,11 @@ export class SNApplication {
     return this.challengeService?.promptForChallengeResponse(challenge);
   }
 
-  public setChallengeCallbacks({
-    challenge,
-    onValidValue,
-    onInvalidValue,
-    onComplete,
-    onCancel
-  }: {
-    challenge: Challenge;
-    onValidValue?: ValueCallback;
-    onInvalidValue?: ValueCallback;
-    onComplete?: () => void;
-    onCancel?: () => void;
-  }) {
-    return this.challengeService!.setChallengeCallbacks(
-      challenge, onValidValue, onInvalidValue, onComplete, onCancel);
+  public addChallengeObserver(
+    challenge: Challenge,
+    observer: ChallengeObserver
+  ) {
+    return this.challengeService!.addChallengeObserver(challenge, observer);
   }
 
   public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]) {
@@ -1023,13 +1040,11 @@ export class SNApplication {
       return {};
     }
     if (!passcode) {
-      const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.ResaveRootKey);
-      const response = await this.challengeService!.promptForChallengeResponse(challenge);
-      if (!response) {
+      const result = await this.challengeService.promptForPasscode();
+      if (result.canceled) {
         return { canceled: true };
       }
-      const value = response.getValueForType(ChallengeType.LocalPasscode);
-      passcode = value.value as string;
+      passcode = result.passcode!;
     }
     const wrappingKey = await this.protocolService!.computeWrappingKey(passcode);
     return { wrappingKey };
@@ -1047,14 +1062,13 @@ export class SNApplication {
   ) {
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary();
     if (canceled) {
-      return;
+      return { error: Error(SignInStrings.PasscodeRequired) };
     }
     this.lockSyncing();
     const result = await this.sessionManager!.register(email, password);
     if (!result.response.error) {
       await this.protocolService!.setNewRootKey(
-        result.rootKey,
-        result.keyParams,
+        result.rootKey!,
         wrappingKey
       );
       this.syncService!.resetSyncState();
@@ -1088,24 +1102,21 @@ export class SNApplication {
     password: string,
     strict = false,
     ephemeral = false,
-    mfaKeyPath?: string,
-    mfaCode?: string,
     mergeLocal = true,
     awaitSync = false
   ) {
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary();
     if (canceled) {
-      return;
+      return { error: Error(SignInStrings.PasscodeRequired) };
     }
     /** Prevent a timed sync from occuring while signing in. */
     this.lockSyncing();
     const result = await this.sessionManager!.signIn(
-      email, password, strict, mfaKeyPath, mfaCode
+      email, password, strict
     );
     if (!result.response.error) {
       await this.protocolService!.setNewRootKey(
-        result.rootKey,
-        result.keyParams,
+        result.rootKey!,
         wrappingKey
       );
       this.syncService!.resetSyncState();
@@ -1149,6 +1160,27 @@ export class SNApplication {
     currentPassword: string,
     newPassword: string,
     passcode?: string,
+    origination = KeyParamsOrigination.PasswordChange,
+    { validatePasswordStrength = true } = {}
+  ) {
+    const result = await this.performPasswordChange(
+      currentPassword,
+      newPassword,
+      passcode,
+      origination,
+      { validatePasswordStrength }
+    );
+    if (result.error) {
+      this.alertService.alert(result.error.message);
+    }
+    return result;
+  }
+
+  private async performPasswordChange(
+    currentPassword: string,
+    newPassword: string,
+    passcode?: string,
+    origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
   ): Promise<{ error?: { message: string } }> {
     if (validatePasswordStrength) {
@@ -1159,7 +1191,7 @@ export class SNApplication {
 
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary(passcode);
     if (canceled) {
-      return {};
+      return { error: Error(PasswordChangeStrings.PasscodeRequired) };
     }
 
     /** Change the password locally */
@@ -1167,7 +1199,8 @@ export class SNApplication {
       this.getUser()!.email!,
       currentPassword,
       newPassword,
-      wrappingKey
+      wrappingKey,
+      origination
     );
     if (error) return { error };
 
@@ -1190,18 +1223,18 @@ export class SNApplication {
     this.lockSyncing();
 
     /** Now, change the password on the server. Roll back on failure */
-    const response = await this.sessionManager!.changePassword(
+    const result = await this.sessionManager!.changePassword(
       currentServerPassword,
       newRootKey.serverPassword,
       newKeyParams
     );
-    if (response.error) {
+    if (result.response.error) {
       await rollbackPasswordChange();
       await this.syncService!.sync({ awaitAll: true });
     }
 
     this.unlockSyncing();
-    return response;
+    return result.response;
   }
 
   public async signOut() {
@@ -1263,7 +1296,7 @@ export class SNApplication {
       SETTING_PASSCODE,
     );
     try {
-      await this.setPasscodeWithoutWarning(passcode);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeCreate);
     } finally {
       dismissBlockingDialog();
     }
@@ -1281,26 +1314,29 @@ export class SNApplication {
     }
   }
 
-  public async changePasscode(passcode: string) {
+  public async changePasscode(passcode: string, origination = KeyParamsOrigination.PasscodeChange) {
     const dismissBlockingDialog = await this.alertService!.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
-      CHANGING_PASSCODE,
+      origination === KeyParamsOrigination.ProtocolUpgrade
+        ? ProtocolUpgradeStrings.UpgradingPasscode
+        : CHANGING_PASSCODE,
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(passcode);
+      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeChange);
     } finally {
       dismissBlockingDialog();
     }
   }
 
-  private async setPasscodeWithoutWarning(passcode: string) {
+  private async setPasscodeWithoutWarning(passcode: string, origination: KeyParamsOrigination) {
     const identifier = await this.generateUuid();
-    const { key, keyParams } = await this.protocolService!.createRootKey(
+    const key = await this.protocolService!.createRootKey(
       identifier,
-      passcode
+      passcode,
+      origination
     );
-    await this.protocolService!.setNewRootKeyWrapper(key, keyParams);
+    await this.protocolService!.setNewRootKeyWrapper(key);
     await this.rewriteItemsKeys();
     await this.syncService!.sync();
   }
@@ -1358,6 +1394,7 @@ export class SNApplication {
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
+    this.createKeyRecoveryService();
     this.createSyncManager();
     this.createSingletonManager();
     this.createComponentManager();
@@ -1383,6 +1420,7 @@ export class SNApplication {
     (this.actionsManager as any) = undefined;
     (this.historyManager as any) = undefined;
     (this.itemManager as any) = undefined;
+    (this.keyRecoveryService as any) = undefined;
 
     this.services = [];
   }
@@ -1473,12 +1511,27 @@ export class SNApplication {
     this.services.push(this.protocolService!);
   }
 
+  private createKeyRecoveryService() {
+    this.keyRecoveryService = new SNKeyRecoveryService(
+      this.itemManager,
+      this.modelManager,
+      this.apiService,
+      this.sessionManager,
+      this.protocolService,
+      this.challengeService,
+      this.alertService,
+      this.storageService
+    );
+    this.services.push(this.keyRecoveryService!);
+  }
+
   private createSessionManager() {
     this.sessionManager = new SNSessionManager(
-      this.storageService!,
-      this.apiService!,
-      this.alertService!,
-      this.protocolService!
+      this.storageService,
+      this.apiService,
+      this.alertService,
+      this.protocolService,
+      this.challengeService
     );
     this.services.push(this.sessionManager!);
   }

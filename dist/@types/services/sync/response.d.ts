@@ -1,28 +1,5 @@
+import { RawSyncResponse } from '../api/responses';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
-import { ApiEndpointParam } from '../api/keys';
-import { RawPayload } from '../../protocol/payloads/generator';
-declare enum ConflictType {
-    ConflictingData = "sync_conflict",
-    UuidConflict = "uuid_conflict"
-}
-declare type ConflictParams = {
-    type: ConflictType;
-    server_item?: RawPayload;
-    unsaved_item?: RawPayload;
-    /** @legacay */
-    item?: RawPayload;
-};
-declare type RawSyncResponse = {
-    error?: any;
-    [ApiEndpointParam.LastSyncToken]?: string;
-    [ApiEndpointParam.PaginationToken]?: string;
-    [ApiEndpointParam.IntegrityResult]?: string;
-    retrieved_items?: RawPayload[];
-    saved_items?: RawPayload[];
-    conflicts?: ConflictParams[];
-    unsaved?: ConflictParams[];
-    status?: number;
-};
 export declare class SyncResponse {
     readonly rawResponse: RawSyncResponse;
     readonly savedPayloads: PurePayload[];
@@ -51,4 +28,3 @@ export declare class SyncResponse {
     private get rawConflictObjects();
     get hasError(): boolean;
 }
-export {};

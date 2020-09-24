@@ -4,13 +4,10 @@ import { SNApplication } from '../application';
 
 export class ApplicationService extends PureService {
 
-  protected application?: SNApplication
   private unsubApp: any
 
-  constructor(application: SNApplication) {
+  constructor(protected application: SNApplication) {
     super();
-    this.application = application;
-    
     /* Allow caller constructor to finish setting instance variables before triggering callbacks */
     setImmediate(() => {
       this.addAppEventObserver();
@@ -18,7 +15,7 @@ export class ApplicationService extends PureService {
   }
 
   deinit() {
-    this.application = undefined;
+    (this.application as any) = undefined;
     this.unsubApp();
     this.unsubApp = undefined;
     super.deinit();
@@ -47,7 +44,7 @@ export class ApplicationService extends PureService {
     });
   }
 
-  onAppEvent(event: ApplicationEvent) {
+  onAppEvent(_event: ApplicationEvent) {
     /** Optional override */
   }
 

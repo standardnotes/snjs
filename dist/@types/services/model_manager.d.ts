@@ -5,7 +5,7 @@ import { PurePayload } from '../protocol/payloads/pure_payload';
 import { PureService } from './pure_service';
 import { MutableCollection } from '../protocol/collection/collection';
 import { ImmutablePayloadCollection } from '../protocol/collection/payload_collection';
-declare type ChangeCallback = (changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], source?: PayloadSource, sourceKey?: string) => void;
+declare type ChangeCallback = (changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], ignored: PurePayload[], source?: PayloadSource, sourceKey?: string) => void;
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
  * global application state. It does so by exposing functions that allow consumers to 'map'
@@ -20,6 +20,14 @@ export declare class PayloadManager extends PureService {
     private changeObservers;
     collection: MutableCollection<PurePayload>;
     private emitQueue;
+    /**
+     * An array of content types for which we enable encrypted overwrite protection.
+     * If a payload attempting to be emitted is errored, yet our current local version
+     * is not errored, and the payload's content type is in this array, we do not overwrite
+     * our local version. We instead notify observers of this interaction for them to handle
+     * as needed
+    */
+    private overwriteProtection;
     constructor();
     /**
      * Our payload collection keeps the latest mapped payload for every payload
@@ -62,7 +70,7 @@ export declare class PayloadManager extends PureService {
      * This function is mostly for internal use, but can be used externally by consumers who
      * explicitely understand what they are doing (want to propagate model state without mapping)
      */
-    notifyChangeObservers(changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], source: PayloadSource, sourceKey?: string): void;
+    notifyChangeObservers(changed: PurePayload[], inserted: PurePayload[], discarded: PurePayload[], ignored: PurePayload[], source: PayloadSource, sourceKey?: string): void;
     /**
      * Imports an array of payloads from an external source (such as a backup file)
      * and marks the items as dirty.

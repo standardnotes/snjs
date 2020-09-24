@@ -1,3 +1,4 @@
+import { SNRootKeyParams } from './../../protocol/key_params';
 import { ProtocolVersion } from '../../protocol/versions';
 export declare const API_MESSAGE_GENERIC_INVALID_LOGIN = "A server error occurred while trying to sign in. Please try again.";
 export declare const API_MESSAGE_GENERIC_REGISTRATION_FAIL = "A server error occurred while trying to register. Please try again.";
@@ -28,3 +29,50 @@ export declare function InsufficientPasswordMessage(minimum: number): string;
 export declare function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion): string;
 export declare const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
 export declare const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
+export declare const PasswordChangeStrings: {
+    PasscodeRequired: string;
+};
+export declare const SignInStrings: {
+    PasscodeRequired: string;
+    IncorrectMfa: string;
+    SignInCanceledMissingMfa: string;
+};
+export declare const ProtocolUpgradeStrings: {
+    SuccessAccount: string;
+    SuccessPasscodeOnly: string;
+    Fail: string;
+    UpgradingPasscode: string;
+};
+export declare const KeyRecoveryStrings: {
+    KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => string;
+    KeyRecoveryLoginFlowReason: string;
+    KeyRecoveryLoginFlowInvalidPassword: string;
+    KeyRecoveryRootKeyReplaced: string;
+    KeyRecoveryPasscodeRequiredTitle: string;
+    KeyRecoveryPasscodeRequiredText: string;
+    KeyRecoveryPasswordRequired: string;
+    KeyRecoveryKeyRecovered: string;
+    KeyRecoveryUnableToRecover: string;
+};
+export declare const ChallengeModalTitle: {
+    Generic: string;
+    Migration: string;
+};
+export declare const SessionStrings: {
+    EnterEmailAndPassword: string;
+    RecoverSession: string;
+    SessionRestored: string;
+    EnterMfa: string;
+    EmailInputPlaceholder: string;
+    PasswordInputPlaceholder: string;
+};
+export declare const ChallengeStrings: {
+    UnlockApplication: string;
+    EnterAccountPassword: string;
+    EnterLocalPasscode: string;
+    EnterPasscodeForMigration: string;
+    EnterPasscodeForRootResave: string;
+    EnterCredentialsForProtocolUpgrade: string;
+    AccountPasswordPlaceholder: string;
+    LocalPasscodePlaceholder: string;
+};

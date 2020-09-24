@@ -17,3 +17,10 @@ export function compareVersions(a: ProtocolVersion, b: ProtocolVersion) {
   const bNum = Number(b);
   return aNum - bNum;
 }
+
+export function leftVersionGreaterThanOrEqualToRight(
+  a: ProtocolVersion,
+  b: ProtocolVersion
+) {
+  return compareVersions(a, b) >= 0;
+}

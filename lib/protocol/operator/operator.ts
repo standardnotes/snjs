@@ -1,8 +1,9 @@
+import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../payloads/generator';
 import { FillItemContent } from '@Models/functions';
 import { Uuid } from './../../uuid';
 import { CreateItemFromPayload } from '@Models/generator';
 import { SNRootKey } from './../root_key';
-import { SNRootKeyParams } from './../key_params';
+import { SNRootKeyParams, KeyParamsOrigination } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PayloadFormat } from '@Payloads/formats';
@@ -14,11 +15,6 @@ import {
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { ContentType } from '@Lib/models';
-
-export type RootKeyResponse = {
-  key: SNRootKey,
-  keyParams: SNRootKeyParams
-}
 
 export type ItemsKeyContent = {
   itemsKey: string,
@@ -50,7 +46,10 @@ export abstract class SNProtocolOperator {
    * Computes a root key given a password and previous keyParams
    * @param password - Plain string representing raw user password
    */
-  public abstract async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
+  public abstract async computeRootKey(
+    password: string,
+    keyParams: SNRootKeyParams
+  ): Promise<SNRootKey>;
 
   /**
    * Creates a new root key given an identifier and a user password
@@ -58,7 +57,19 @@ export abstract class SNProtocolOperator {
    *    for the user
    * @param password - Plain string representing raw user password
    */
-  public abstract async createRootKey(identifier: string, password: string): Promise<RootKeyResponse>;
+  public abstract async createRootKey(
+    identifier: string,
+    password: string,
+    origination: KeyParamsOrigination
+  ): Promise<SNRootKey>;
+
+  /**
+   * Returns the payload's authenticated data. The passed payload must be in a
+   * non-decrypted, ciphertext state.
+   */
+  public abstract async getPayloadAuthenticatedData(
+    payload: PurePayload
+  ): Promise<RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | undefined>;
 
   protected abstract async generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
 
@@ -114,7 +125,7 @@ export abstract class SNProtocolOperator {
   public async generateEncryptedParameters(
     payload: PurePayload,
     format: PayloadFormat,
-    key?: SNItemsKey | SNRootKey,
+    _key?: SNItemsKey | SNRootKey,
   ) {
     if (format === PayloadFormat.DecryptedBareObject) {
       return CreateEncryptionParameters(
@@ -145,7 +156,7 @@ export abstract class SNProtocolOperator {
   */
   public async generateDecryptedParameters(
     encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey,
+    _key?: SNItemsKey | SNRootKey,
   ) {
     const format = encryptedParameters.format;
     if (format === PayloadFormat.DecryptedBareObject) {

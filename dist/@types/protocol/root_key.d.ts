@@ -1,3 +1,5 @@
+import { PurePayload } from './payloads/pure_payload';
+import { AnyKeyParamsContent, SNRootKeyParams } from './key_params';
 import { SNItem } from '../models/core/item';
 import { ProtocolVersion } from './versions';
 export declare type RootKeyContent = {
@@ -5,6 +7,7 @@ export declare type RootKeyContent = {
     masterKey: string;
     serverPassword: string;
     dataAuthenticationKey?: string;
+    keyParams: AnyKeyParamsContent;
 };
 /**
  * A root key is a local only construct that houses the key used for the encryption
@@ -12,8 +15,16 @@ export declare type RootKeyContent = {
  * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
 export declare class SNRootKey extends SNItem {
+    readonly keyParams: SNRootKeyParams;
     static Create(content: RootKeyContent, uuid?: string): Promise<SNRootKey>;
-    get version(): any;
+    /**
+     * Given a root key, expands its key params by making a copy which includes
+     * the inputted key params. Used to expand locally created key params after signing in
+     */
+    static ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent): Promise<SNRootKey>;
+    constructor(payload: PurePayload, keyParams: SNRootKeyParams);
+    private get typedContent();
+    get keyVersion(): any;
     get isRootKey(): boolean;
     /**
      * When the root key is used to encrypt items, we use the masterKey directly.
@@ -28,7 +39,11 @@ export declare class SNRootKey extends SNItem {
      */
     compare(otherKey: SNRootKey): boolean;
     /**
-     * @returns Object containg key/values that should be extracted from key for local saving.
+     * @returns Object suitable for persist in storage when wrapped
      */
-    getPersistableValue(): any;
+    persistableValueWhenWrapping(): Partial<RootKeyContent>;
+    /**
+   * @returns Object that is suitable for persisting in a keychain
+   */
+    getKeychainValue(): Partial<RootKeyContent>;
 }

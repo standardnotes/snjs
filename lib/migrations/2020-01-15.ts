@@ -1,12 +1,13 @@
+import { ChallengeStrings } from './../services/api/messages';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
-import { SNRootKey } from './../protocol/root_key';
+import { SNRootKey, RootKeyContent } from './../protocol/root_key';
 import { EncryptionIntent } from './../protocol/intents';
 import { ProtocolVersion } from './../protocol/versions';
 import { ApplicationStage } from '@Lib/stages';
 import { StorageKey, RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { Challenge, ChallengeType, ChallengeReason } from './../challenges';
+import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from './../challenges';
 import { FillItemContent } from '@Models/functions';
 import { PurePayload } from '@Payloads/pure_payload';
 import { StorageValuesObject, SNStorageService } from './../services/storage_service';
@@ -101,8 +102,8 @@ export class Migration20200115 extends Migration {
       const storageValueStore: Record<string, any> = jsonParseEmbeddedKeys(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams]
-        = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      const accountKeyParams = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = accountKeyParams;
 
       let keyToEncryptStorageWith = passcodeKey;
       /** Extract account key (mk, pw, ak) if it exists */
@@ -110,6 +111,7 @@ export class Migration20200115 extends Migration {
       if (hasAccountKeys) {
         const { accountKey, wrappedKey } = await this.webDesktopHelperExtractAndWrapAccountKeysFromValueStore(
           passcodeKey,
+          accountKeyParams,
           storageValueStore
         );
         keyToEncryptStorageWith = accountKey;
@@ -123,24 +125,27 @@ export class Migration20200115 extends Migration {
       );
     } else {
       /**
-       * No encrypted storage, take account keys out of raw storage
+       * No encrypted storage, take account keys (if they exist) out of raw storage
        * and place them in the keychain. */
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
-      const version = !isNullOrUndefined(ak)
-        ? ProtocolVersion.V003
-        : ProtocolVersion.V002;
-      const accountKey = await SNRootKey.Create(
-        {
-          masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
-          serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
-          dataAuthenticationKey: ak,
-          version: version
-        }
-      );
-      await this.services.deviceInterface.setNamespacedKeychainValue(
-        accountKey.getPersistableValue(),
-        this.services.identifier
-      );
+      if (ak) {
+        const version = !isNullOrUndefined(ak)
+          ? ProtocolVersion.V003
+          : ProtocolVersion.V002;
+        const accountKey = await SNRootKey.Create(
+          {
+            masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
+            serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
+            dataAuthenticationKey: ak,
+            version: version,
+            keyParams: rawAccountKeyParams
+          }
+        );
+        await this.services.deviceInterface.setNamespacedKeychainValue(
+          accountKey.getKeychainValue(),
+          this.services.identifier
+        );
+      }
     }
 
     /** Persist storage under new key and structure */
@@ -164,6 +169,37 @@ export class Migration20200115 extends Migration {
     );
   }
 
+  private async promptForPasscodeUntilCorrect(
+    validationCallback: (passcode: string) => Promise<boolean>
+  ) {
+    const challenge = new Challenge(
+      [new ChallengePrompt(ChallengeValidation.None)],
+      ChallengeReason.Migration
+    );
+    return new Promise((resolve) => {
+      this.services.challengeService.addChallengeObserver(
+        challenge,
+        {
+          onNonvalidatedSubmit: async (challengeResponse) => {
+            const value = challengeResponse.values[0];
+            const passcode = value.value as string;
+            const valid = await validationCallback(passcode);
+            if (valid) {
+              this.services.challengeService.completeChallenge(challenge);
+              resolve(passcode);
+            } else {
+              this.services.challengeService.setValidationStatusForChallenge(
+                challenge,
+                value,
+                false
+              );
+            }
+          }
+        });
+      this.services.challengeService.promptForChallengeResponse(challenge);
+    })
+  }
+
   /**
    * Helper
    * Web/desktop only
@@ -178,26 +214,17 @@ export class Migration20200115 extends Migration {
     let decryptedStoragePayload: PurePayload | undefined;
     let errorDecrypting = true;
     let passcodeKey: SNRootKey;
-    const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
-    while (errorDecrypting) {
-      const [value] = await this.services.challengeService
-        .promptForChallengeResponseWithCustomValidation!(challenge);
-      const passcode = value.value as string;
+    await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
       passcodeKey = await this.services.protocolService.computeRootKey(
-        passcode,
+        candidate,
         passcodeParams
       );
       decryptedStoragePayload = await this.services.protocolService.payloadByDecryptingPayload(
         encryptedPayload,
         passcodeKey
       );
-      errorDecrypting = decryptedStoragePayload.errorDecrypting!;
-      this.services.challengeService.setValidationStatusForChallenge(
-        challenge,
-        value,
-        !decryptedStoragePayload.errorDecrypting
-      );
-    }
+      return !decryptedStoragePayload.errorDecrypting!;
+    });
     return {
       decryptedStoragePayload,
       key: passcodeKey!,
@@ -211,6 +238,7 @@ export class Migration20200115 extends Migration {
    */
   private async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(
     passcodeKey: SNRootKey,
+    accountKeyParams: any,
     storageValueStore: Record<string, any>
   ) {
     const version = storageValueStore.ak
@@ -221,7 +249,8 @@ export class Migration20200115 extends Migration {
         masterKey: storageValueStore.mk,
         serverPassword: storageValueStore.pw,
         dataAuthenticationKey: storageValueStore.ak,
-        version: version
+        version: version,
+        keyParams: accountKeyParams
       }
     );
     delete storageValueStore.mk;
@@ -324,21 +353,14 @@ export class Migration20200115 extends Migration {
         /** Validate current passcode by comparing against keychain offline.pw value */
         const pwHash = keychainValue.offline.pw;
         let passcodeKey: SNRootKey;
-        const challenge = new Challenge([ChallengeType.LocalPasscode], ChallengeReason.Migration);
-        while (!passcodeKey! || passcodeKey!.serverPassword !== pwHash) {
-          const [value] = await this.services.challengeService
-            .promptForChallengeResponseWithCustomValidation!(challenge);
-          const passcode = value.value as string;
+        await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
           passcodeKey = await this.services.protocolService.computeRootKey(
-            passcode,
+            candidate,
             passcodeParams
           );
-          this.services.challengeService.setValidationStatusForChallenge(
-            challenge,
-            value,
-            passcodeKey.serverPassword === pwHash
-          );
-        }
+          return passcodeKey.serverPassword === pwHash;
+
+        });
         return passcodeKey!;
       };
       const timing = keychainValue.offline.timing;
@@ -366,8 +388,9 @@ export class Migration20200115 extends Migration {
               serverPassword: accountKeyContent.pw,
               dataAuthenticationKey: accountKeyContent.ak,
               version: accountKeyContent.version || defaultVersion,
+              keyParams: rawAccountKeyParams,
               accountKeys: null
-            }
+            } as RootKeyContent
           }
         );
         const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(
@@ -408,11 +431,12 @@ export class Migration20200115 extends Migration {
             masterKey: keychainValue.mk,
             serverPassword: keychainValue.pw,
             dataAuthenticationKey: keychainValue.ak,
-            version: keychainValue.version || defaultVersion
+            version: keychainValue.version || defaultVersion,
+            keyParams: rawAccountKeyParams
           }
         );
         await this.services.deviceInterface.setNamespacedKeychainValue(
-          accountKey.getPersistableValue(),
+          accountKey.getKeychainValue(),
           this.services.identifier
         );
       }

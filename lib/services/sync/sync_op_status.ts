@@ -29,7 +29,7 @@ export class SyncOpStatus {
     this.stopTimingMonitor();
   }
 
-  setSyncInProgress(inProgress: boolean) {
+  setSyncInProgress() {
     this.inProgress = true;
   }
 
