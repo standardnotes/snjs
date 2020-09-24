@@ -169,6 +169,37 @@ export class Migration20200115 extends Migration {
     );
   }
 
+  private async promptForPasscodeUntilCorrect(
+    validationCallback: (passcode: string) => Promise<boolean>
+  ) {
+    const challenge = new Challenge(
+      [new ChallengePrompt(ChallengeValidation.None)],
+      ChallengeReason.Migration
+    );
+    return new Promise((resolve) => {
+      this.services.challengeService.addChallengeObserver(
+        challenge,
+        {
+          onNonvalidatedSubmit: async (challengeResponse) => {
+            const value = challengeResponse.values[0];
+            const passcode = value.value as string;
+            const valid = await validationCallback(passcode);
+            if (valid) {
+              this.services.challengeService.completeChallenge(challenge);
+              resolve(passcode);
+            } else {
+              this.services.challengeService.setValidationStatusForChallenge(
+                challenge,
+                value,
+                false
+              );
+            }
+          }
+        });
+      this.services.challengeService.promptForChallengeResponse(challenge);
+    })
+  }
+
   /**
    * Helper
    * Web/desktop only
@@ -183,34 +214,17 @@ export class Migration20200115 extends Migration {
     let decryptedStoragePayload: PurePayload | undefined;
     let errorDecrypting = true;
     let passcodeKey: SNRootKey;
-    const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.None)],
-      ChallengeReason.Migration,
-      ChallengeStrings.EnterLocalPasscode
-    );
-    while (errorDecrypting) {
-      const response = await this.services.challengeService.promptForChallengeResponse(challenge);
-      if (!response) {
-        /** Prompt again if canceled */
-        continue;
-      }
-      const value = response.values[0];
-      const passcode = value.value as string;
+    await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
       passcodeKey = await this.services.protocolService.computeRootKey(
-        passcode,
+        candidate,
         passcodeParams
       );
       decryptedStoragePayload = await this.services.protocolService.payloadByDecryptingPayload(
         encryptedPayload,
         passcodeKey
       );
-      errorDecrypting = decryptedStoragePayload.errorDecrypting!;
-      this.services.challengeService.setValidationStatusForChallenge(
-        challenge,
-        value,
-        !decryptedStoragePayload.errorDecrypting
-      );
-    }
+      return !decryptedStoragePayload.errorDecrypting!;
+    });
     return {
       decryptedStoragePayload,
       key: passcodeKey!,
@@ -339,30 +353,14 @@ export class Migration20200115 extends Migration {
         /** Validate current passcode by comparing against keychain offline.pw value */
         const pwHash = keychainValue.offline.pw;
         let passcodeKey: SNRootKey;
-        const challenge = new Challenge(
-          [new ChallengePrompt(ChallengeValidation.None)],
-          ChallengeReason.Migration,
-          ChallengeStrings.EnterLocalPasscode
-        );
-        while (!passcodeKey! || passcodeKey!.serverPassword !== pwHash) {
-          const response = await this.services.challengeService
-            .promptForChallengeResponse!(challenge);
-          if (!response) {
-            /** Prompt again if canceled */
-            continue;
-          }
-          const value = response.values[0];
-          const passcode = value.value as string;
+        await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
           passcodeKey = await this.services.protocolService.computeRootKey(
-            passcode,
+            candidate,
             passcodeParams
           );
-          this.services.challengeService.setValidationStatusForChallenge(
-            challenge,
-            value,
-            passcodeKey.serverPassword === pwHash
-          );
-        }
+          return passcodeKey.serverPassword === pwHash;
+
+        });
         return passcodeKey!;
       };
       const timing = keychainValue.offline.timing;

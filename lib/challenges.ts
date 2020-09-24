@@ -1,4 +1,5 @@
-import { ChallengeStrings } from './services/api/messages';
+import { Migration } from '@Lib/migrations/migration';
+import { ChallengeModalTitle, ChallengeStrings } from './services/api/messages';
 import { SNRootKey } from '@Protocol/root_key';
 
 export type ChallengeArtifacts = {
@@ -31,36 +32,55 @@ export class Challenge {
   constructor(
     public readonly prompts: ChallengePrompt[],
     public readonly reason: ChallengeReason,
-    public readonly _title?: string,
-    public readonly _subtitle?: string
+    public readonly _heading?: string,
+    public readonly _subheading?: string
   ) {
     Object.freeze(this);
   }
 
-  get title() {
-    if(this._title) {
-      return this._title;
+  /** Outside of the modal, this is the title of the modal itself */
+  get modalTitle() {
+    switch (this.reason) {
+      case ChallengeReason.Migration:
+        return ChallengeModalTitle.Migration;
+      default:
+        return ChallengeModalTitle.Generic;
+    }
+  }
+
+  /** Inside of the modal, this is the H1 */
+  get heading() {
+    if (this._heading) {
+      return this._heading;
     } else {
       switch (this.reason) {
         case ChallengeReason.ApplicationUnlock:
           return ChallengeStrings.UnlockApplication;
         case ChallengeReason.Migration:
-          return ChallengeStrings.EnterPasscodeForMigration;
+          return ChallengeStrings.EnterLocalPasscode;
         case ChallengeReason.ResaveRootKey:
           return ChallengeStrings.EnterPasscodeForLoginRegister;
-        default:
-          return ChallengeStrings.EnterAccountPassword;
+        case ChallengeReason.ProtocolUpgrade:
+          return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
       }
     }
   }
 
-  get subtitle() {
-    return this._subtitle;
+  /** Inside of the modal, this is the H2 */
+  get subheading() {
+    if(this._subheading) {
+      return this._subheading;
+    }
+
+    switch(this.reason) {
+      case ChallengeReason.Migration:
+        return ChallengeStrings.EnterPasscodeForMigration;
+    }
   }
 
   hasPromptForValidationType(type: ChallengeValidation) {
     for (const prompt of this.prompts) {
-      if(prompt.validation === type) {
+      if (prompt.validation === type) {
         return true;
       }
     }
@@ -92,7 +112,7 @@ export class ChallengeValue {
   constructor(
     public readonly prompt: ChallengePrompt,
     public readonly value: string | boolean,
-    ) {
+  ) {
     Object.freeze(this);
   }
 }

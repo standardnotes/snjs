@@ -55,7 +55,7 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings
+  UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings, ChallengeStrings, ProtocolUpgradeStrings
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
@@ -726,7 +726,7 @@ export class SNApplication {
     return this.hasAccount() || this.hasPasscode();
   }
 
-  public async upgradeProtocolVersion(): Promise<{
+  private async performProtocolUpgrade(): Promise<{
     success?: true,
     canceled?: true,
     error?: { message: string }
@@ -735,10 +735,18 @@ export class SNApplication {
     const hasAccount = this.hasAccount();
     const prompts = [];
     if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
+      prompts.push(new ChallengePrompt(
+        ChallengeValidation.LocalPasscode,
+        undefined,
+        ChallengeStrings.LocalPasscodePlaceholder
+      ));
     }
     if (hasAccount) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
+      prompts.push(new ChallengePrompt(
+        ChallengeValidation.AccountPassword,
+        undefined,
+        ChallengeStrings.AccountPasswordPlaceholder
+      ));
     }
     const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade);
     const response = await this.challengeService!.promptForChallengeResponse(challenge);
@@ -764,6 +772,7 @@ export class SNApplication {
           password,
           password,
           passcode,
+          KeyParamsOrigination.ProtocolUpgrade,
           { validatePasswordStrength: false }
         );
         if (changeResponse?.error) {
@@ -771,7 +780,7 @@ export class SNApplication {
         }
       }
       if (passcode) {
-        await this.changePasscode(passcode);
+        await this.changePasscode(passcode, KeyParamsOrigination.ProtocolUpgrade);
       }
 
       return { success: true };
@@ -779,6 +788,19 @@ export class SNApplication {
       return { error };
     } finally {
       dismissBlockingDialog();
+    }
+  }
+
+  public async upgradeProtocolVersion() {
+    const result = await this.performProtocolUpgrade();
+    if (result.success) {
+      if(this.hasAccount()) {
+        this.alertService!.alert(ProtocolUpgradeStrings.SuccessAccount);
+      } else {
+        this.alertService!.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
+      }
+    } else if (result.error) {
+      this.alertService!.alert(ProtocolUpgradeStrings.Fail);
     }
   }
 
@@ -1136,6 +1158,7 @@ export class SNApplication {
     currentPassword: string,
     newPassword: string,
     passcode?: string,
+    origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
   ): Promise<{ error?: { message: string } }> {
     if (validatePasswordStrength) {
@@ -1154,7 +1177,8 @@ export class SNApplication {
       this.getUser()!.email!,
       currentPassword,
       newPassword,
-      wrappingKey
+      wrappingKey,
+      origination
     );
     if (error) return { error };
 
@@ -1268,10 +1292,12 @@ export class SNApplication {
     }
   }
 
-  public async changePasscode(passcode: string) {
+  public async changePasscode(passcode: string, origination = KeyParamsOrigination.PasscodeChange) {
     const dismissBlockingDialog = await this.alertService!.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
-      CHANGING_PASSCODE,
+      origination === KeyParamsOrigination.ProtocolUpgrade
+        ? ProtocolUpgradeStrings.UpgradingPasscode
+        : CHANGING_PASSCODE,
     );
     try {
       await this.removePasscodeWithoutWarning();

@@ -1419,7 +1419,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     email: string,
     currentPassword: string,
     newPassword: string,
-    wrappingKey?: SNRootKey
+    wrappingKey?: SNRootKey,
+    origination = KeyParamsOrigination.PasswordChange
   ): Promise<[Error | null, {
     currentServerPassword: string,
     newRootKey: SNRootKey,
@@ -1441,7 +1442,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       return [Error(INVALID_PASSWORD)];
     }
 
-    const newRootKey = await this.createRootKey(email, newPassword, KeyParamsOrigination.PasswordChange);
+    const newRootKey = await this.createRootKey(email, newPassword, origination);
 
     await this.setNewRootKey(newRootKey, wrappingKey);
     const newDefaultItemsKey = await this.createNewDefaultItemsKey();

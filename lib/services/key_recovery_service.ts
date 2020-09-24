@@ -237,7 +237,8 @@ export class SNKeyRecoveryService extends PureService {
 
     await this.tryDecryptingKeys(keys);
 
-    const serverParamsDifferFromClients = !this.serverParams.compare(clientParams);
+    const latestClientParams = await this.getClientKeyParams();
+    const serverParamsDifferFromClients = latestClientParams && !this.serverParams.compare(latestClientParams);
     if (this.serverKeyParamsAreSafe(clientParams) && serverParamsDifferFromClients) {
       /**
        * The only way left to validate our password is to sign in with the server,
@@ -376,7 +377,6 @@ export class SNKeyRecoveryService extends PureService {
     const keyParams = queueItem.keyParams;
     const key = queueItem.key;
 
-
     /**
      * We replace our current root key if the server params differ from our own params,
      * and if we can validate the params based on this items key's params.
@@ -403,7 +403,6 @@ export class SNKeyRecoveryService extends PureService {
       const isNewerThanLatest = key.created_at > latest?.created_at;
       replacesRootKey = !hasLocalItemsKey || isNewerThanLatest;
     }
-
     const resolve = queueItem.resolve!;
     const challenge = new Challenge(
       [
@@ -418,13 +417,11 @@ export class SNKeyRecoveryService extends PureService {
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
       KeyRecoveryStrings.KeyRecoveryPasswordRequired
     );
-
     const response = await this.challengeService
       .promptForChallengeResponse(challenge);
     if (!response) {
       resolve({ success: false });
     }
-
     /** Dismiss challenge */
     this.challengeService.completeChallenge(challenge);
 

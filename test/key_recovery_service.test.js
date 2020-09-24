@@ -73,6 +73,7 @@ describe('key recovery service', function () {
     /** Should be decrypted now */
     expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(false);
 
+    expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
   });
 
@@ -128,6 +129,7 @@ describe('key recovery service', function () {
 
     expect(totalPromptCount).to.equal(1);
 
+    expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
   });
 
@@ -209,6 +211,9 @@ describe('key recovery service', function () {
     const bKey = await appB.protocolService.getRootKey();
     expect(aKey.compare(bKey)).to.equal(true);
 
+    expect(appA.syncService.isOutOfSync()).to.equal(false);
+    expect(appB.syncService.isOutOfSync()).to.equal(false);
+
     appA.deinit();
     appB.deinit();
   });
@@ -281,6 +286,8 @@ describe('key recovery service', function () {
 
     const clientRootKey = await application.protocolService.getRootKey();
     expect(clientRootKey.compare(correctRootKey)).to.equal(true);
+
+    expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
   });
 
@@ -343,10 +350,11 @@ describe('key recovery service', function () {
     expect(latestItemsKey.updated_at.getTime()).to.not.equal(currentItemsKey.updated_at.getTime());
     expect(latestItemsKey.updated_at.getTime()).to.equal(newUpdated.getTime());
 
+      expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
   });
 
-  it('application should prompt to recover undecryptables on launch', async function () {
+  it.only('application should prompt to recover undecryptables on launch', async function () {
     const namespace = Factory.randomString();
     const application = await Factory.createApplication(namespace);
     await application.prepareForLaunch({});
@@ -364,13 +372,12 @@ describe('key recovery service', function () {
       itemsKey.payload,
       EncryptionIntent.Sync,
     );
-    const newUpdated = new Date();
+
     await application.modelManager.emitPayload(
       CopyPayload(
         encrypted,
         {
           errorDecrypting: true,
-          updated_at: newUpdated
         }
       ),
       PayloadSource.Constructor
@@ -378,6 +385,7 @@ describe('key recovery service', function () {
     /** Allow enough time to persist to disk, but not enough to complete recovery wizard */
     console.warn('Expecting some error below because we are destroying app in the middle of processing.');
     await Factory.sleep(0.1);
+    expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
 
     /** Recreate application, and expect key recovery wizard to complete */
@@ -404,9 +412,8 @@ describe('key recovery service', function () {
     const latestItemsKey = recreatedApp.findItem(itemsKey.uuid);
     expect(latestItemsKey.errorDecrypting).to.not.be.ok;
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
-    expect(latestItemsKey.updated_at.getTime()).to.not.equal(itemsKey.updated_at.getTime());
-    expect(latestItemsKey.updated_at.getTime()).to.equal(newUpdated.getTime());
 
+    expect(recreatedApp.syncService.isOutOfSync()).to.equal(false);
     recreatedApp.deinit();
   });
 });
