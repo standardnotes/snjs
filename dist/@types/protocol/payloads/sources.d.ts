@@ -37,4 +37,9 @@ export declare enum PayloadSource {
     PreSyncSave = 19,
     RemoteHistory = 20
 }
+/**
+ * Whether the changed payload represents only an internal change that shouldn't
+ * require a UI refresh
+ */
+export declare function isPayloadSourceInternalChange(source: PayloadSource): boolean;
 export declare function isPayloadSourceRetrieved(source: PayloadSource): boolean;

@@ -4,7 +4,7 @@ export enum PayloadSource {
   /* The payload returned by offline sync operation */
   LocalSaved = 3,
   LocalRetrieved = 4,
-  /* Payload when a client modifies item property then maps it to update UI. 
+  /* Payload when a client modifies item property then maps it to update UI.
   This also indicates that the item was dirtied*/
   LocalChanged = 5,
   /** Payloads retrieved from an external
@@ -40,6 +40,17 @@ export enum PayloadSource {
   PreSyncSave = 19,
   RemoteHistory = 20,
 };
+
+/**
+ * Whether the changed payload represents only an internal change that shouldn't
+ * require a UI refresh
+ */
+export function isPayloadSourceInternalChange(source: PayloadSource) {
+  return [
+    PayloadSource.RemoteSaved,
+    PayloadSource.PreSyncSave,
+  ].includes(source);
+}
 
 export function isPayloadSourceRetrieved(source: PayloadSource) {
   return [

@@ -202,6 +202,7 @@ export class SNApplication {
     await this.notifyEvent(ApplicationEvent.MigrationsLoaded);
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService!.initializeFromDisk();
+    await this.notifyEvent(ApplicationEvent.StorageReady);
     await this.protocolService!.initialize();
     await this.handleStage(ApplicationStage.ReadyForLaunch_05);
     this.started = true;

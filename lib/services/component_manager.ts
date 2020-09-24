@@ -52,7 +52,6 @@ type StreamObserver = {
 type ComponentHandler = {
   identifier: string
   areas: ComponentArea[]
-  activationHandler?: (uuid: UuidString, component?: SNComponent) => void
   actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void
   contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined
   componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined
@@ -131,7 +130,6 @@ export class SNComponentManager extends PureService {
   private removeItemObserver?: any
   private streamObservers: StreamObserver[] = [];
   private contextStreamObservers: StreamObserver[] = [];
-  private activeComponents: Partial<Record<UuidString, ComponentArea>> = {};
   private permissionDialogs: PermissionDialog[] = [];
   private handlers: ComponentHandler[] = [];
 
@@ -184,7 +182,6 @@ export class SNComponentManager extends PureService {
     super.deinit();
     this.streamObservers.length = 0;
     this.contextStreamObservers.length = 0;
-    (this.activeComponents as any) = undefined;
     this.permissionDialogs.length = 0;
     this.templateComponents.length = 0;
     this.handlers.length = 0;
@@ -225,15 +222,21 @@ export class SNComponentManager extends PureService {
             this.desktopManager.syncComponentsInstallation(syncedComponents);
           }
         }
+
+        const themes = syncedComponents.filter(c => c.isTheme());
+        if (themes.length > 0) {
+          this.postActiveThemesToAllComponents();
+        }
+
         for (const component of syncedComponents) {
           if (component.isEditor()) {
             /** Editors shouldn't get activated or deactivated */
             continue;
           }
-          const isInActive = this.activeComponents[component.uuid];
-          if (component.active && !component.deleted && !isInActive) {
+          const isActive = !!this.iframeForComponent(component.uuid);
+          if (component.active && !component.deleted && !isActive) {
             this.activateComponent(component.uuid);
-          } else if (!component.active && isInActive) {
+          } else if (!component.active && isActive) {
             this.deactivateComponent(component.uuid);
           }
         }
@@ -319,12 +322,15 @@ export class SNComponentManager extends PureService {
   }
 
   detectFocusChange = () => {
-    const activeComponents =
-      this.itemManager.findItems(Object.keys(this.activeComponents)) as SNComponent[];
-    for (const component of activeComponents) {
-      if (document.activeElement === this.iframeForComponent(component.uuid)) {
+    const activeIframes = this.allComponentIframes();
+    for (const iframe of activeIframes) {
+      if (document.activeElement === iframe) {
         this.timeout(() => {
-          this.focusChangedForComponent(component);
+          const component = this.findComponent(iframe.dataset.componentId!);
+          for (const handler of this.handlers) {
+            /* Notify all handlers, and not just ones that match this component type */
+            handler.focusHandler && handler.focusHandler(component, true);
+          }
         });
         break;
       }
@@ -366,9 +372,7 @@ export class SNComponentManager extends PureService {
   postActiveThemesToAllComponents() {
     for (const component of this.components) {
       const componentState = this.findOrCreateDataForComponent(component.uuid);
-      /* Skip over components that are themes themselves,
-        or components that are not active, or components that don't have a window */
-      if (component.isTheme() || !component.active || !componentState.window) {
+      if (!componentState.window) {
         continue;
       }
       this.postActiveThemesToComponent(component);
@@ -1295,23 +1299,6 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  registerComponent(uuid: UuidString) {
-    this.log('Registering component', uuid);
-    const component = this.findComponent(uuid);
-    this.activeComponents[uuid] = component.area;
-    for (const handler of this.handlers) {
-      if (
-        handler.areas.includes(component.area) ||
-        handler.areas.includes(ComponentArea.Any)
-      ) {
-        handler.activationHandler?.(uuid, component);
-      }
-    }
-    if (component.area === ComponentArea.Themes) {
-      this.postActiveThemesToAllComponents();
-    }
-  }
-
   async activateComponent(uuid: UuidString) {
     this.log('Activating component', uuid);
     const component = this.findComponent(uuid);
@@ -1320,25 +1307,23 @@ export class SNComponentManager extends PureService {
         mutator.active = true;
       });
     }
-    this.registerComponent(uuid);
   }
 
-  deregisterComponent(uuid: UuidString) {
+  /** Clients should call this function whenever a component iframe is destroyed */
+  public async onComponentIframeDestroyed(uuid: UuidString) {
+    this.deregisterComponent(uuid);
+  }
+
+  /**
+   * Deregistering means that our local state for this component will be wiped.
+   * No synced data will be affected. This differs from `activating` in that activating
+   * will mutate the component to change its synced property .active to true.
+   */
+  private deregisterComponent(uuid: UuidString) {
     this.log('Degregistering component', uuid);
     const component = this.findComponent(uuid);
     delete this.componentState[uuid];
-    const area = this.activeComponents[uuid];
-    delete this.activeComponents[uuid];
-    if (area) {
-      for (const handler of this.handlers) {
-        if (
-          handler.areas.includes(area) ||
-          handler.areas.includes(ComponentArea.Any)
-        ) {
-          handler.activationHandler?.(uuid, component);
-        }
-      }
-    }
+    const area = component.area;
     this.streamObservers = this.streamObservers.filter((o) => {
       return o.componentUuid !== uuid;
     });
@@ -1362,27 +1347,6 @@ export class SNComponentManager extends PureService {
     this.deregisterComponent(uuid);
   }
 
-  async reloadComponent(uuid: UuidString) {
-    this.log('Reloading component', uuid);
-    /* Do soft deactivate */
-    const component = this.findComponent(uuid);
-    await this.itemManager!.changeComponent(component.uuid, (mutator) => {
-      mutator.active = false;
-    });
-    this.deregisterComponent(component.uuid);
-
-    /* Do soft activate */
-    return new Promise((resolve) => {
-      this.timeout(async () => {
-        await this.itemManager!.changeComponent(component.uuid, (mutator) => {
-          mutator.active = true;
-        });
-        this.registerComponent(component.uuid);
-        resolve();
-      });
-    });
-  }
-
   async deleteComponent(uuid: UuidString) {
     await this.itemManager!.setItemToBeDeleted(uuid);
     this.syncService!.sync();
@@ -1392,21 +1356,17 @@ export class SNComponentManager extends PureService {
     return component.active;
   }
 
+  allComponentIframes() {
+    return Array.from(document.getElementsByTagName('iframe'));
+  }
+
   iframeForComponent(uuid: UuidString) {
-    const iframes = Array.from(document.getElementsByTagName('iframe'));
+    const iframes = this.allComponentIframes();
     for (const frame of iframes) {
       const componentId = frame.dataset.componentId;
       if (componentId === uuid) {
         return frame;
       }
-    }
-  }
-
-  private focusChangedForComponent(component: SNComponent) {
-    const focused = document.activeElement === this.iframeForComponent(component.uuid);
-    for (const handler of this.handlers) {
-      /* Notify all handlers, and not just ones that match this component type */
-      handler.focusHandler && handler.focusHandler(component, focused);
     }
   }
 

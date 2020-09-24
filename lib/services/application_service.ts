@@ -29,11 +29,11 @@ export class ApplicationService extends PureService {
       this.onAppLaunch();
     }
     this.unsubApp = this.application!.addEventObserver(async (event: ApplicationEvent) => {
-      this.onAppEvent(event);
+      await this.onAppEvent(event);
       if (event === ApplicationEvent.Started) {
-        await this.onAppStart();
+        this.onAppStart();
       } else if (event === ApplicationEvent.Launched) {
-        await this.onAppLaunch();
+        this.onAppLaunch();
       } else if (event === ApplicationEvent.CompletedFullSync) {
         this.onAppFullSync();
       } else if (event === ApplicationEvent.CompletedIncrementalSync) {
@@ -44,7 +44,7 @@ export class ApplicationService extends PureService {
     });
   }
 
-  onAppEvent(_event: ApplicationEvent) {
+  async onAppEvent(_event: ApplicationEvent) {
     /** Optional override */
   }
 

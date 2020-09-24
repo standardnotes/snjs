@@ -9,6 +9,8 @@ export declare enum ApplicationEvent {
     HighLatencySync = 7,
     EnteredOutOfSync = 8,
     ExitedOutOfSync = 9,
+    /** When StorageService is ready to start servicing read/write requests */
+    StorageReady = 24,
     /**
      * The application has finished it `prepareForLaunch` state and is now ready for unlock
      * Called when the application has initialized and is ready for launch, but before

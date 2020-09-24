@@ -818,7 +818,8 @@ function payloadFieldsForSource(source) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PayloadSource; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return isPayloadSourceRetrieved; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return isPayloadSourceInternalChange; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isPayloadSourceRetrieved; });
 var PayloadSource;
 
 (function (PayloadSource) {
@@ -875,6 +876,14 @@ var PayloadSource;
 })(PayloadSource || (PayloadSource = {}));
 
 ;
+/**
+ * Whether the changed payload represents only an internal change that shouldn't
+ * require a UI refresh
+ */
+
+function isPayloadSourceInternalChange(source) {
+  return [PayloadSource.RemoteSaved, PayloadSource.PreSyncSave].includes(source);
+}
 function isPayloadSourceRetrieved(source) {
   return [PayloadSource.RemoteRetrieved, PayloadSource.ComponentRetrieved, PayloadSource.RemoteActionRetrieved].includes(source);
 }
@@ -1908,6 +1917,9 @@ var ApplicationEvent;
   ApplicationEvent[ApplicationEvent["HighLatencySync"] = 7] = "HighLatencySync";
   ApplicationEvent[ApplicationEvent["EnteredOutOfSync"] = 8] = "EnteredOutOfSync";
   ApplicationEvent[ApplicationEvent["ExitedOutOfSync"] = 9] = "ExitedOutOfSync";
+  /** When StorageService is ready to start servicing read/write requests */
+
+  ApplicationEvent[ApplicationEvent["StorageReady"] = 24] = "StorageReady";
   /**
    * The application has finished it `prepareForLaunch` state and is now ready for unlock
    * Called when the application has initialized and is ready for launch, but before
@@ -4608,12 +4620,12 @@ class ApplicationService extends _Services_pure_service__WEBPACK_IMPORTED_MODULE
     }
 
     this.unsubApp = this.application.addEventObserver(async event => {
-      this.onAppEvent(event);
+      await this.onAppEvent(event);
 
       if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_1__[/* ApplicationEvent */ "a"].Started) {
-        await this.onAppStart();
+        this.onAppStart();
       } else if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_1__[/* ApplicationEvent */ "a"].Launched) {
-        await this.onAppLaunch();
+        this.onAppLaunch();
       } else if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_1__[/* ApplicationEvent */ "a"].CompletedFullSync) {
         this.onAppFullSync();
       } else if (event === _Lib_events__WEBPACK_IMPORTED_MODULE_1__[/* ApplicationEvent */ "a"].CompletedIncrementalSync) {
@@ -4624,7 +4636,7 @@ class ApplicationService extends _Services_pure_service__WEBPACK_IMPORTED_MODULE
     });
   }
 
-  onAppEvent(_event) {
+  async onAppEvent(_event) {
     /** Optional override */
   }
 
@@ -9409,7 +9421,8 @@ __webpack_require__.d(__webpack_exports__, "CreateEncryptionParameters", functio
 __webpack_require__.d(__webpack_exports__, "PayloadByMerging", function() { return /* reexport */ generator["g" /* PayloadByMerging */]; });
 __webpack_require__.d(__webpack_exports__, "CopyPayload", function() { return /* reexport */ generator["b" /* CopyPayload */]; });
 __webpack_require__.d(__webpack_exports__, "PayloadSource", function() { return /* reexport */ sources["a" /* PayloadSource */]; });
-__webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return /* reexport */ sources["b" /* isPayloadSourceRetrieved */]; });
+__webpack_require__.d(__webpack_exports__, "isPayloadSourceRetrieved", function() { return /* reexport */ sources["c" /* isPayloadSourceRetrieved */]; });
+__webpack_require__.d(__webpack_exports__, "isPayloadSourceInternalChange", function() { return /* reexport */ sources["b" /* isPayloadSourceInternalChange */]; });
 __webpack_require__.d(__webpack_exports__, "ProtocolVersion", function() { return /* reexport */ versions["a" /* ProtocolVersion */]; });
 __webpack_require__.d(__webpack_exports__, "PayloadFormat", function() { return /* reexport */ formats["a" /* PayloadFormat */]; });
 __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return /* reexport */ pure_payload["a" /* PurePayload */]; });
@@ -13987,18 +14000,22 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     this.componentState = {};
     this.streamObservers = [];
     this.contextStreamObservers = [];
-    this.activeComponents = {};
     this.permissionDialogs = [];
     this.handlers = [];
     this.templateComponents = [];
 
     this.detectFocusChange = () => {
-      const activeComponents = this.itemManager.findItems(Object.keys(this.activeComponents));
+      const activeIframes = this.allComponentIframes();
 
-      for (const component of activeComponents) {
-        if (document.activeElement === this.iframeForComponent(component.uuid)) {
+      for (const iframe of activeIframes) {
+        if (document.activeElement === iframe) {
           this.timeout(() => {
-            this.focusChangedForComponent(component);
+            const component = this.findComponent(iframe.dataset.componentId);
+
+            for (const handler of this.handlers) {
+              /* Notify all handlers, and not just ones that match this component type */
+              handler.focusHandler && handler.focusHandler(component, true);
+            }
           });
           break;
         }
@@ -14050,7 +14067,6 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     super.deinit();
     this.streamObservers.length = 0;
     this.contextStreamObservers.length = 0;
-    this.activeComponents = undefined;
     this.permissionDialogs.length = 0;
     this.templateComponents.length = 0;
     this.handlers.length = 0;
@@ -14090,17 +14106,23 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         }
       }
 
+      const themes = syncedComponents.filter(c => c.isTheme());
+
+      if (themes.length > 0) {
+        this.postActiveThemesToAllComponents();
+      }
+
       for (const component of syncedComponents) {
         if (component.isEditor()) {
           /** Editors shouldn't get activated or deactivated */
           continue;
         }
 
-        const isInActive = this.activeComponents[component.uuid];
+        const isActive = !!this.iframeForComponent(component.uuid);
 
-        if (component.active && !component.deleted && !isInActive) {
+        if (component.active && !component.deleted && !isActive) {
           this.activateComponent(component.uuid);
-        } else if (!component.active && isInActive) {
+        } else if (!component.active && isActive) {
           this.deactivateComponent(component.uuid);
         }
       }
@@ -14204,10 +14226,8 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
   postActiveThemesToAllComponents() {
     for (const component of this.components) {
       const componentState = this.findOrCreateDataForComponent(component.uuid);
-      /* Skip over components that are themes themselves,
-        or components that are not active, or components that don't have a window */
 
-      if (component.isTheme() || !component.active || !componentState.window) {
+      if (!componentState.window) {
         continue;
       }
 
@@ -15107,24 +15127,6 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     }
   }
 
-  registerComponent(uuid) {
-    this.log('Registering component', uuid);
-    const component = this.findComponent(uuid);
-    this.activeComponents[uuid] = component.area;
-
-    for (const handler of this.handlers) {
-      if (handler.areas.includes(component.area) || handler.areas.includes(ComponentArea.Any)) {
-        var _handler$activationHa;
-
-        (_handler$activationHa = handler.activationHandler) === null || _handler$activationHa === void 0 ? void 0 : _handler$activationHa.call(handler, uuid, component);
-      }
-    }
-
-    if (component.area === ComponentArea.Themes) {
-      this.postActiveThemesToAllComponents();
-    }
-  }
-
   async activateComponent(uuid) {
     this.log('Activating component', uuid);
     const component = this.findComponent(uuid);
@@ -15134,27 +15136,25 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         mutator.active = true;
       });
     }
-
-    this.registerComponent(uuid);
   }
+  /** Clients should call this function whenever a component iframe is destroyed */
+
+
+  async onComponentIframeDestroyed(uuid) {
+    this.deregisterComponent(uuid);
+  }
+  /**
+   * Deregistering means that our local state for this component will be wiped.
+   * No synced data will be affected. This differs from `activating` in that activating
+   * will mutate the component to change its synced property .active to true.
+   */
+
 
   deregisterComponent(uuid) {
     this.log('Degregistering component', uuid);
     const component = this.findComponent(uuid);
     delete this.componentState[uuid];
-    const area = this.activeComponents[uuid];
-    delete this.activeComponents[uuid];
-
-    if (area) {
-      for (const handler of this.handlers) {
-        if (handler.areas.includes(area) || handler.areas.includes(ComponentArea.Any)) {
-          var _handler$activationHa2;
-
-          (_handler$activationHa2 = handler.activationHandler) === null || _handler$activationHa2 === void 0 ? void 0 : _handler$activationHa2.call(handler, uuid, component);
-        }
-      }
-    }
-
+    const area = component.area;
     this.streamObservers = this.streamObservers.filter(o => {
       return o.componentUuid !== uuid;
     });
@@ -15181,28 +15181,6 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     this.deregisterComponent(uuid);
   }
 
-  async reloadComponent(uuid) {
-    this.log('Reloading component', uuid);
-    /* Do soft deactivate */
-
-    const component = this.findComponent(uuid);
-    await this.itemManager.changeComponent(component.uuid, mutator => {
-      mutator.active = false;
-    });
-    this.deregisterComponent(component.uuid);
-    /* Do soft activate */
-
-    return new Promise(resolve => {
-      this.timeout(async () => {
-        await this.itemManager.changeComponent(component.uuid, mutator => {
-          mutator.active = true;
-        });
-        this.registerComponent(component.uuid);
-        resolve();
-      });
-    });
-  }
-
   async deleteComponent(uuid) {
     await this.itemManager.setItemToBeDeleted(uuid);
     this.syncService.sync();
@@ -15212,8 +15190,12 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     return component.active;
   }
 
+  allComponentIframes() {
+    return Array.from(document.getElementsByTagName('iframe'));
+  }
+
   iframeForComponent(uuid) {
-    const iframes = Array.from(document.getElementsByTagName('iframe'));
+    const iframes = this.allComponentIframes();
 
     for (const frame of iframes) {
       const componentId = frame.dataset.componentId;
@@ -15221,15 +15203,6 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       if (componentId === uuid) {
         return frame;
       }
-    }
-  }
-
-  focusChangedForComponent(component) {
-    const focused = document.activeElement === this.iframeForComponent(component.uuid);
-
-    for (const handler of this.handlers) {
-      /* Notify all handlers, and not just ones that match this component type */
-      handler.focusHandler && handler.focusHandler(component, focused);
     }
   }
 
@@ -23023,6 +22996,7 @@ class application_SNApplication {
     await this.notifyEvent(events["a" /* ApplicationEvent */].MigrationsLoaded);
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService.initializeFromDisk();
+    await this.notifyEvent(events["a" /* ApplicationEvent */].StorageReady);
     await this.protocolService.initialize();
     await this.handleStage(ApplicationStage.ReadyForLaunch_05);
     this.started = true;

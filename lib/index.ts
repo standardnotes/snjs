@@ -143,7 +143,8 @@ export {
 } from '@Payloads/generator';
 export {
   PayloadSource,
-  isPayloadSourceRetrieved
+  isPayloadSourceRetrieved,
+  isPayloadSourceInternalChange
 } from '@Lib/protocol/payloads/sources';
 export { ProtocolVersion } from '@Lib/protocol/versions';
 export { PayloadFormat } from '@Payloads/formats';

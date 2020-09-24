@@ -54,7 +54,7 @@ export { MutableCollection } from './protocol/collection/collection';
 export { ImmutablePayloadCollection } from './protocol/collection/payload_collection';
 export { ItemCollection, CollectionSort } from './protocol/collection/item_collection';
 export { CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject, CreateIntentPayloadFromObject, CreateEncryptionParameters, PayloadByMerging, CopyPayload } from './protocol/payloads/generator';
-export { PayloadSource, isPayloadSourceRetrieved } from './protocol/payloads/sources';
+export { PayloadSource, isPayloadSourceRetrieved, isPayloadSourceInternalChange } from './protocol/payloads/sources';
 export { ProtocolVersion } from './protocol/versions';
 export { PayloadFormat } from './protocol/payloads/formats';
 export { PurePayload } from './protocol/payloads/pure_payload';

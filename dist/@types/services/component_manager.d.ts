@@ -14,7 +14,6 @@ import { UuidString } from '../types';
 declare type ComponentHandler = {
     identifier: string;
     areas: ComponentArea[];
-    activationHandler?: (uuid: UuidString, component?: SNComponent) => void;
     actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void;
     contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined;
     componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined;
@@ -84,7 +83,6 @@ export declare class SNComponentManager extends PureService {
     private removeItemObserver?;
     private streamObservers;
     private contextStreamObservers;
-    private activeComponents;
     private permissionDialogs;
     private handlers;
     private templateComponents;
@@ -148,15 +146,20 @@ export declare class SNComponentManager extends PureService {
     getReadonlyStateForComponent(component: SNComponent): ComponentState;
     /** Called by other views when the iframe is ready */
     registerComponentWindow(component: SNComponent, componentWindow: Window): Promise<void>;
-    registerComponent(uuid: UuidString): void;
     activateComponent(uuid: UuidString): Promise<void>;
-    deregisterComponent(uuid: UuidString): void;
+    /** Clients should call this function whenever a component iframe is destroyed */
+    onComponentIframeDestroyed(uuid: UuidString): Promise<void>;
+    /**
+     * Deregistering means that our local state for this component will be wiped.
+     * No synced data will be affected. This differs from `activating` in that activating
+     * will mutate the component to change its synced property .active to true.
+     */
+    private deregisterComponent;
     deactivateComponent(uuid: UuidString): Promise<void>;
-    reloadComponent(uuid: UuidString): Promise<unknown>;
     deleteComponent(uuid: UuidString): Promise<void>;
     isComponentActive(component: SNComponent): boolean;
+    allComponentIframes(): HTMLIFrameElement[];
     iframeForComponent(uuid: UuidString): HTMLIFrameElement | undefined;
-    private focusChangedForComponent;
     handleSetSizeEvent(component: SNComponent, data: any): void;
     editorForNote(note: SNNote): SNComponent | undefined;
     getDefaultEditor(): SNComponent;
