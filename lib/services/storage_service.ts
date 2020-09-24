@@ -64,6 +64,7 @@ export class SNStorageService extends PureService {
   private persistencePolicy!: StoragePersistencePolicies
   private encryptionPolicy!: StorageEncryptionPolicies
   private identifier: string
+  private needsPersist = false
 
   private values!: StorageValuesObject
 
@@ -88,6 +89,9 @@ export class SNStorageService extends PureService {
     await super.handleApplicationStage(stage);
     if (stage === ApplicationStage.Launched_10) {
       this.storagePersistable = true;
+      if (this.needsPersist) {
+        this.persistValuesToDisk();
+      }
     }
   }
 
@@ -179,11 +183,13 @@ export class SNStorageService extends PureService {
   /** @todo This function should be debounced. */
   private async persistValuesToDisk() {
     if (!this.storagePersistable) {
+      this.needsPersist = true;
       return;
     }
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       return;
     }
+    this.needsPersist = false;
     const values = await this.immediatelyPersistValuesToDisk();
     /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
     this.values[ValueModesKeys.Wrapped] = values[ValueModesKeys.Wrapped];

@@ -46,6 +46,7 @@ export declare class SNStorageService extends PureService {
     private persistencePolicy;
     private encryptionPolicy;
     private identifier;
+    private needsPersist;
     private values;
     constructor(deviceInterface: DeviceInterface, identifier: string);
     deinit(): void;

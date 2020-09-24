@@ -10900,6 +10900,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     /** Wait until application has been unlocked before trying to persist */
 
     this.storagePersistable = false;
+    this.needsPersist = false;
     this.deviceInterface = deviceInterface;
     this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
@@ -10917,6 +10918,10 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
 
     if (stage === ApplicationStage.Launched_10) {
       this.storagePersistable = true;
+
+      if (this.needsPersist) {
+        this.persistValuesToDisk();
+      }
     }
   }
 
@@ -11003,6 +11008,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
 
   async persistValuesToDisk() {
     if (!this.storagePersistable) {
+      this.needsPersist = true;
       return;
     }
 
@@ -11010,6 +11016,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
       return;
     }
 
+    this.needsPersist = false;
     const values = await this.immediatelyPersistValuesToDisk();
     /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
 

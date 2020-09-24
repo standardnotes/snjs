@@ -14,8 +14,8 @@ describe('2020-01-15 mobile migration', () => {
     localStorage.clear();
   });
 
-  it('2020-01-15 migration with passcode and account', async function () {
-    const application = await Factory.createAppWithRandNamespace(
+  it.only('2020-01-15 migration with passcode and account', async function () {
+    let application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,
       Platform.Ios
     );
@@ -174,7 +174,16 @@ describe('2020-01-15 mobile migration', () => {
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
     expect(await application.getUser().email).to.equal(identifier);
 
+    const appId = application.identifier;
     await application.deinit();
+
+    /** Recreate application and ensure storage values are consistent */
+    application = Factory.createApplication(appId);
+    await application.prepareForLaunch({
+      receiveChallenge
+    });
+    await application.launch(true);
+    expect(await application.getUser().email).to.equal(identifier);
   });
 
 
