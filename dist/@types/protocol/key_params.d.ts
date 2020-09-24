@@ -50,7 +50,7 @@ export declare function Create002KeyParams(keyParams: KeyParamsContent002): SNRo
 export declare function Create003KeyParams(keyParams: KeyParamsContent003): SNRootKeyParams;
 export declare function Create004KeyParams(keyParams: KeyParamsContent004): SNRootKeyParams;
 export declare function CreateAnyKeyParams(keyParams: AnyKeyParamsContent): SNRootKeyParams;
-export declare function KeyParamsFromApiResponse(response: KeyParamsResponse): SNRootKeyParams;
+export declare function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier?: string): SNRootKeyParams;
 /**
  * Key params are public data that contain information about how a root key was created.
  * Given a keyParams object and a password, clients can compute a root key that was created

@@ -9804,9 +9804,9 @@ function CreateAnyKeyParams(keyParams) {
 
   return new key_params_SNRootKeyParams(keyParams);
 }
-function KeyParamsFromApiResponse(response) {
+function KeyParamsFromApiResponse(response, identifier) {
   const rawKeyParams = {
-    identifier: response.identifier,
+    identifier: identifier || response.identifier,
     pw_cost: response.pw_cost,
     pw_nonce: response.pw_nonce,
     pw_salt: response.pw_salt,
@@ -13008,11 +13008,16 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
 
 
 const MINIMUM_PASSWORD_LENGTH = 8;
+
+const cleanedEmailString = email => {
+  return email.trim().toLowerCase();
+};
 /**
  * The session manager is responsible for loading initial user state, and any relevant
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
+
 
 class session_manager_SNSessionManager extends pure_service["a" /* PureService */] {
   constructor(storageService, apiService, alertService, protocolService, challengeService) {
@@ -13129,6 +13134,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       };
     }
 
+    email = cleanedEmailString(email);
     const rootKey = await this.protocolService.createRootKey(email, password, KeyParamsOrigination.Registration);
     const serverPassword = rootKey.serverPassword;
     const keyParams = rootKey.keyParams;
@@ -13172,8 +13178,10 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
         };
       }
     }
+    /** Make sure to use client value for identifier/email */
 
-    const keyParams = KeyParamsFromApiResponse(response);
+
+    const keyParams = KeyParamsFromApiResponse(response, email);
 
     if (!keyParams || !keyParams.version) {
       return {
@@ -13190,6 +13198,23 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async signIn(email, password) {
+    let strict = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    let minAllowedVersion = arguments.length > 3 ? arguments[3] : undefined;
+    const result = await this.performSignIn(email, password, strict, minAllowedVersion);
+
+    if (result.response.error) {
+      /**
+       * Try signing in with trimmed + lowercase version of email
+       */
+      const cleanedEmail = cleanedEmailString(email);
+      const secondResult = await this.performSignIn(cleanedEmail, password, strict, minAllowedVersion);
+      return secondResult;
+    } else {
+      return result;
+    }
+  }
+
+  async performSignIn(email, password) {
     let strict = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     let minAllowedVersion = arguments.length > 3 ? arguments[3] : undefined;
     const paramsResult = await this.retrieveKeyParams(email);

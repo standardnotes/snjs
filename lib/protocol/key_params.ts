@@ -81,9 +81,9 @@ export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
   return new SNRootKeyParams(keyParams);
 }
 
-export function KeyParamsFromApiResponse(response: KeyParamsResponse) {
+export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier?: string) {
   const rawKeyParams: AnyKeyParamsContent = {
-    identifier: response.identifier!,
+    identifier: identifier || response.identifier!,
     pw_cost: response.pw_cost!,
     pw_nonce: response.pw_nonce!,
     pw_salt: response.pw_salt!,

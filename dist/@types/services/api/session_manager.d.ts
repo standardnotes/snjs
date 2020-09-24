@@ -44,6 +44,7 @@ export declare class SNSessionManager extends PureService {
     register(email: string, password: string): Promise<SessionManagerResponse>;
     private retrieveKeyParams;
     signIn(email: string, password: string, strict?: boolean, minAllowedVersion?: ProtocolVersion): Promise<SessionManagerResponse>;
+    private performSignIn;
     bypassChecksAndSignInWithServerPassword(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<SignInResponse>;
     changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<SessionManagerResponse>;
     private handleSuccessAuthResponse;
