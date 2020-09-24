@@ -22,6 +22,7 @@ import { SNActionsService, SNProtocolService, SNPrivilegesService, SNHistoryMana
 import { DeviceInterface } from './device_interface';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion } from './protocol/versions';
+import { KeyParamsOrigination } from './protocol/key_params';
 declare type LaunchCallback = {
     receiveChallenge: (challenge: Challenge) => void;
 };
@@ -242,12 +243,13 @@ export declare class SNApplication {
      * Returns true if there is an encryption source available
      */
     isEncryptionAvailable(): boolean;
+    private performProtocolUpgrade;
     upgradeProtocolVersion(): Promise<{
-        success?: true;
-        canceled?: true;
+        success?: true | undefined;
+        canceled?: true | undefined;
         error?: {
             message: string;
-        };
+        } | undefined;
     }>;
     noAccount(): boolean;
     hasAccount(): boolean;
@@ -336,7 +338,7 @@ export declare class SNApplication {
      * already has referene to the passcode, they can pass it in here so that the user
      * is not prompted again.
      */
-    changePassword(currentPassword: string, newPassword: string, passcode?: string, { validatePasswordStrength }?: {
+    changePassword(currentPassword: string, newPassword: string, passcode?: string, origination?: KeyParamsOrigination, { validatePasswordStrength }?: {
         validatePasswordStrength?: boolean | undefined;
     }): Promise<{
         error?: {
@@ -355,7 +357,7 @@ export declare class SNApplication {
     lock(): Promise<void>;
     setPasscode(passcode: string): Promise<void>;
     removePasscode(): Promise<void>;
-    changePasscode(passcode: string): Promise<void>;
+    changePasscode(passcode: string, origination?: KeyParamsOrigination): Promise<void>;
     private setPasscodeWithoutWarning;
     private removePasscodeWithoutWarning;
     getStorageEncryptionPolicy(): StorageEncryptionPolicies;

@@ -232,7 +232,7 @@ describe('key recovery service', function () {
         challenge,
         [new ChallengeValue(
           challenge.prompts[0],
-          challenge.subtitle.includes(KeyRecoveryStrings.KeyRecoveryLoginFlowReason)
+          challenge.subheading.includes(KeyRecoveryStrings.KeyRecoveryLoginFlowReason)
             ? this.password
             : unassociatedPassword
         )]
@@ -354,7 +354,7 @@ describe('key recovery service', function () {
     application.deinit();
   });
 
-  it.only('application should prompt to recover undecryptables on launch', async function () {
+  it('application should prompt to recover undecryptables on launch', async function () {
     const namespace = Factory.randomString();
     const application = await Factory.createApplication(namespace);
     await application.prepareForLaunch({});

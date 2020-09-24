@@ -376,7 +376,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * and its .itemsKey value should be equal to the root key masterKey value.
      */
     private createNewDefaultItemsKey;
-    changePassword(email: string, currentPassword: string, newPassword: string, wrappingKey?: SNRootKey): Promise<[Error | null, {
+    changePassword(email: string, currentPassword: string, newPassword: string, wrappingKey?: SNRootKey, origination?: KeyParamsOrigination): Promise<[Error | null, {
         currentServerPassword: string;
         newRootKey: SNRootKey;
         newKeyParams: SNRootKeyParams;

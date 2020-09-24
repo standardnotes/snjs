@@ -1,3 +1,3 @@
-import { DeltaRemoteRetrieved } from './remote_retrieved';
+import { DeltaRemoteSaved } from './remote_saved';
 import { PayloadSource } from '../sources';
-export declare function DeltaClassForSource(source: PayloadSource): typeof DeltaRemoteRetrieved | undefined;
+export declare function DeltaClassForSource(source: PayloadSource): typeof DeltaRemoteSaved | undefined;

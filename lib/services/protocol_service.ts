@@ -1234,6 +1234,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * delete any never-synced items keys we have here locally.
    */
   private async handleDownloadFirstSyncCompletion() {
+    /** The below logic only pertains to account setups */
+    if (!this.hasAccount()) {
+      return;
+    }
     /**
     * Find items keys with null or epoch updated_at value, indicating
     * that they haven't been synced yet.

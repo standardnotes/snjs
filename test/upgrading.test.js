@@ -19,15 +19,18 @@ describe('upgrading', () => {
       return values;
     };
     this.receiveChallenge = async (challenge) => {
-      this.application.addChallengeObserver(challenge, {
+      this.receiveChallengeWithApp(this.application, challenge);
+    };
+    this.receiveChallengeWithApp = async (application, challenge) => {
+      application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
           const values = promptValueReply([value.prompt]);
-          this.application.submitValuesForChallenge(challenge, values);
+          application.submitValuesForChallenge(challenge, values);
           numPasscodeAttempts++;
         },
       });
       const initialValues = promptValueReply(challenge.prompts);
-      this.application.submitValuesForChallenge(challenge, initialValues);
+      application.submitValuesForChallenge(challenge, initialValues);
     };
     localStorage.clear();
   });
@@ -134,6 +137,53 @@ describe('upgrading', () => {
     );
     expect(this.application.itemManager.notes.length).to.equal(1);
     expect(this.application.itemManager.invalidItems).to.be.empty;
+  }).timeout(15000);
+
+  it('upgrading from 003 to 004 with passcode only then reiniting app should create valid state', async function () {
+    /**
+     * There was an issue where having the old app set up with passcode,
+     * then refreshing with new app, performing upgrade, then refreshing the app
+     * resulted in note data being errored.
+     */
+    const oldVersion = ProtocolVersion.V003;
+
+    await Factory.setOldVersionPasscode({
+      application: this.application,
+      passcode: this.passcode,
+      version: oldVersion
+    });
+    await Factory.createSyncedNote(this.application);
+
+    this.application.setLaunchCallback({
+      receiveChallenge: this.receiveChallenge
+    });
+
+    const identifier = this.application.identifier;
+    this.application.deinit();
+
+    /** Recreate the app once */
+    const appFirst = Factory.createApplication(identifier);
+    await appFirst.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        this.receiveChallengeWithApp(appFirst, challenge);
+      }
+    });
+    await appFirst.launch(true);
+    const result = await appFirst.upgradeProtocolVersion();
+    expect(result).to.deep.equal({ success: true });
+    expect(appFirst.itemManager.invalidItems).to.be.empty;
+    appFirst.deinit();
+
+    /** Recreate the once more */
+    const appSecond = Factory.createApplication(identifier);
+    await appSecond.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        this.receiveChallengeWithApp(appSecond, challenge);
+      }
+    });
+    await appSecond.launch(true);
+    expect(appSecond.itemManager.invalidItems).to.be.empty;
+    appSecond.deinit();
   }).timeout(15000);
 
   describe('upgrade failure', function () {

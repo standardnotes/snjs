@@ -802,6 +802,7 @@ export class SNApplication {
     } else if (result.error) {
       this.alertService!.alert(ProtocolUpgradeStrings.Fail);
     }
+    return result;
   }
 
   public noAccount() {

@@ -34,6 +34,12 @@ export declare const SignInStrings: {
     IncorrectMfa: string;
     SignInCanceledMissingMfa: string;
 };
+export declare const ProtocolUpgradeStrings: {
+    SuccessAccount: string;
+    SuccessPasscodeOnly: string;
+    Fail: string;
+    UpgradingPasscode: string;
+};
 export declare const KeyRecoveryStrings: {
     KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => string;
     KeyRecoveryLoginFlowReason: string;
@@ -44,6 +50,10 @@ export declare const KeyRecoveryStrings: {
     KeyRecoveryPasswordRequired: string;
     KeyRecoveryKeyRecovered: string;
     KeyRecoveryUnableToRecover: string;
+};
+export declare const ChallengeModalTitle: {
+    Generic: string;
+    Migration: string;
 };
 export declare const SessionStrings: {
     EnterEmailAndPassword: string;
@@ -59,4 +69,7 @@ export declare const ChallengeStrings: {
     EnterLocalPasscode: string;
     EnterPasscodeForMigration: string;
     EnterPasscodeForLoginRegister: string;
+    EnterCredentialsForProtocolUpgrade: string;
+    AccountPasswordPlaceholder: string;
+    LocalPasscodePlaceholder: string;
 };
