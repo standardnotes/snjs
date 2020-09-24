@@ -103,7 +103,8 @@ export class ChallengeService extends PureService {
   public async promptForPasscode() {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
-      ChallengeReason.ResaveRootKey);
+      ChallengeReason.ResaveRootKey
+    );
     const response = await this.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true, passcode: undefined };
@@ -241,7 +242,7 @@ export class ChallengeService extends PureService {
   public async submitValuesForChallenge(
     challenge: Challenge,
     values: ChallengeValue[]
-    ) {
+  ) {
     if (values.length === 0) {
       throw Error("Attempting to submit 0 values for challenge");
     }

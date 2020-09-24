@@ -55,7 +55,7 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings, ChallengeStrings, ProtocolUpgradeStrings
+  UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings, ChallengeStrings, ProtocolUpgradeStrings, PasswordChangeStrings
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
@@ -794,7 +794,7 @@ export class SNApplication {
   public async upgradeProtocolVersion() {
     const result = await this.performProtocolUpgrade();
     if (result.success) {
-      if(this.hasAccount()) {
+      if (this.hasAccount()) {
         this.alertService!.alert(ProtocolUpgradeStrings.SuccessAccount);
       } else {
         this.alertService!.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
@@ -1161,6 +1161,26 @@ export class SNApplication {
     passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
+  ) {
+    const result = await this.performPasswordChange(
+      currentPassword,
+      newPassword,
+      passcode,
+      origination,
+      { validatePasswordStrength }
+    );
+    if (result.error) {
+      this.alertService.alert(result.error.message);
+    }
+    return result;
+  }
+
+  private async performPasswordChange(
+    currentPassword: string,
+    newPassword: string,
+    passcode?: string,
+    origination = KeyParamsOrigination.PasswordChange,
+    { validatePasswordStrength = true } = {}
   ): Promise<{ error?: { message: string } }> {
     if (validatePasswordStrength) {
       if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
@@ -1170,7 +1190,7 @@ export class SNApplication {
 
     const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary(passcode);
     if (canceled) {
-      return {};
+      return { error: Error(PasswordChangeStrings.PasscodeRequired) };
     }
 
     /** Change the password locally */

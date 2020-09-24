@@ -59,7 +59,7 @@ export class Challenge {
         case ChallengeReason.Migration:
           return ChallengeStrings.EnterLocalPasscode;
         case ChallengeReason.ResaveRootKey:
-          return ChallengeStrings.EnterPasscodeForLoginRegister;
+          return ChallengeStrings.EnterPasscodeForRootResave;
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
       }

@@ -9925,6 +9925,9 @@ function StrictSignInFailed(current, latest) {
 }
 const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.";
 const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
+const PasswordChangeStrings = {
+  PasscodeRequired: 'Your passcode is required to process your password change.'
+};
 const SignInStrings = {
   PasscodeRequired: 'Your passcode is required in order to sign in to your account.',
   IncorrectMfa: 'Incorrect two-factor authentication code. Please try again.',
@@ -9966,7 +9969,7 @@ const ChallengeStrings = {
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
-  EnterPasscodeForLoginRegister: 'Enter your application passcode before signing in or registering',
+  EnterPasscodeForRootResave: 'Enter your application passcode to continue',
   EnterCredentialsForProtocolUpgrade: 'Enter your credentials to perform encryption upgrade',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode'
@@ -11203,7 +11206,7 @@ class challenges_Challenge {
           return ChallengeStrings.EnterLocalPasscode;
 
         case ChallengeReason.ResaveRootKey:
-          return ChallengeStrings.EnterPasscodeForLoginRegister;
+          return ChallengeStrings.EnterPasscodeForRootResave;
 
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
@@ -23847,6 +23850,22 @@ class application_SNApplication {
     let {
       validatePasswordStrength = true
     } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    const result = await this.performPasswordChange(currentPassword, newPassword, passcode, origination, {
+      validatePasswordStrength
+    });
+
+    if (result.error) {
+      this.alertService.alert(result.error.message);
+    }
+
+    return result;
+  }
+
+  async performPasswordChange(currentPassword, newPassword, passcode) {
+    let origination = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : KeyParamsOrigination.PasswordChange;
+    let {
+      validatePasswordStrength = true
+    } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
     if (validatePasswordStrength) {
       if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
@@ -23862,7 +23881,9 @@ class application_SNApplication {
     } = await this.getWrappingKeyIfNecessary(passcode);
 
     if (canceled) {
-      return {};
+      return {
+        error: Error(PasswordChangeStrings.PasscodeRequired)
+      };
     }
     /** Change the password locally */
 

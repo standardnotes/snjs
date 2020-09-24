@@ -343,8 +343,9 @@ export declare class SNApplication {
     }): Promise<{
         error?: {
             message: string;
-        };
+        } | undefined;
     }>;
+    private performPasswordChange;
     signOut(): Promise<void>;
     validateAccountPassword(password: string): Promise<boolean>;
     isStarted(): boolean;
