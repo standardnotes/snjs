@@ -87,6 +87,7 @@ export declare class SNComponentManager extends PureService {
     private activeComponents;
     private permissionDialogs;
     private handlers;
+    private templateComponents;
     constructor(itemManager: ItemManager, syncService: SNSyncService, alertService: SNAlertService, environment: Environment, platform: Platform, timeout: any);
     get isDesktop(): boolean;
     get isMobile(): boolean;
@@ -106,6 +107,9 @@ export declare class SNComponentManager extends PureService {
     getActiveThemes(): SNTheme[];
     urlsForActiveThemes(): string[];
     postActiveThemesToComponent(component: SNComponent): void;
+    private findComponent;
+    addTemporaryTemplateComponent(component: SNComponent): void;
+    removeTemporaryTemplateComponent(component: SNComponent): void;
     contextItemDidChangeInArea(area: ComponentArea): void;
     isComponentHidden(component: SNComponent): boolean;
     setComponentHidden(component: SNComponent, hidden: boolean): void;

@@ -135,6 +135,8 @@ export class SNComponentManager extends PureService {
   private permissionDialogs: PermissionDialog[] = [];
   private handlers: ComponentHandler[] = [];
 
+  private templateComponents: SNComponent[] = []
+
   constructor(
     itemManager: ItemManager,
     syncService: SNSyncService,
@@ -184,6 +186,7 @@ export class SNComponentManager extends PureService {
     this.contextStreamObservers.length = 0;
     (this.activeComponents as any) = undefined;
     this.permissionDialogs.length = 0;
+    this.templateComponents.length = 0;
     this.handlers.length = 0;
     (this.itemManager as any) = undefined;
     (this.syncService as any) = undefined;
@@ -410,6 +413,21 @@ export class SNComponentManager extends PureService {
     );
   }
 
+  private findComponent(uuid: UuidString) {
+    return (
+      this.templateComponents.find(c => c.uuid === uuid) ||
+      this.itemManager.findItem(uuid) as SNComponent
+    );
+  }
+
+  public addTemporaryTemplateComponent(component: SNComponent) {
+    this.templateComponents.push(component);
+  }
+
+  public removeTemporaryTemplateComponent(component: SNComponent) {
+    removeFromArray(this.templateComponents, component);
+  }
+
   contextItemDidChangeInArea(area: ComponentArea) {
     for (const handler of this.handlers) {
       if (
@@ -491,7 +509,7 @@ export class SNComponentManager extends PureService {
     message: ComponentMessage,
     source?: PayloadSource
   ) {
-    const component = this.itemManager.findItem(componentUuid) as SNComponent;
+    const component = this.findComponent(componentUuid);
     this.log('Component manager send items in reply', component, items, message);
     const responseData: MessageReplyData = {};
     const mapped = items.map((item) => {
@@ -507,7 +525,7 @@ export class SNComponentManager extends PureService {
     originalMessage: ComponentMessage,
     source?: PayloadSource
   ) {
-    const component = this.itemManager.findItem(componentUuid) as SNComponent;
+    const component = this.findComponent(componentUuid);
     this.log('Component manager send context item in reply', component, item, originalMessage);
     const response: MessageReplyData = {
       item: this.jsonForItem(item, component, source)
@@ -1078,7 +1096,7 @@ export class SNComponentManager extends PureService {
     requiredPermissions: ComponentPermission[],
     runFunction: () => void
   ) {
-    const component = this.itemManager.findItem(componentUuid) as SNComponent;
+    const component = this.findComponent(componentUuid);
     /* Make copy as not to mutate input values */
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[];
     const acquiredPermissions = component.permissions;
@@ -1279,7 +1297,7 @@ export class SNComponentManager extends PureService {
 
   registerComponent(uuid: UuidString) {
     this.log('Registering component', uuid);
-    const component = this.itemManager.findItem(uuid) as SNComponent;
+    const component = this.findComponent(uuid);
     this.activeComponents[uuid] = component.area;
     for (const handler of this.handlers) {
       if (
@@ -1296,7 +1314,7 @@ export class SNComponentManager extends PureService {
 
   async activateComponent(uuid: UuidString) {
     this.log('Activating component', uuid);
-    const component = this.itemManager.findItem(uuid) as SNComponent;
+    const component = this.findComponent(uuid);
     if (!component.active) {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.active = true;
@@ -1307,7 +1325,7 @@ export class SNComponentManager extends PureService {
 
   deregisterComponent(uuid: UuidString) {
     this.log('Degregistering component', uuid);
-    const component = this.itemManager.findItem(uuid) as SNComponent | undefined;
+    const component = this.findComponent(uuid);
     delete this.componentState[uuid];
     const area = this.activeComponents[uuid];
     delete this.activeComponents[uuid];
@@ -1334,7 +1352,7 @@ export class SNComponentManager extends PureService {
 
   async deactivateComponent(uuid: UuidString) {
     this.log('Deactivating component', uuid);
-    const component = this.itemManager?.findItem(uuid) as SNComponent;
+    const component = this.findComponent(uuid);
     if (component?.active) {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.active = false;
@@ -1347,7 +1365,7 @@ export class SNComponentManager extends PureService {
   async reloadComponent(uuid: UuidString) {
     this.log('Reloading component', uuid);
     /* Do soft deactivate */
-    const component = this.itemManager?.findItem(uuid) as SNComponent;
+    const component = this.findComponent(uuid);
     await this.itemManager!.changeComponent(component.uuid, (mutator) => {
       mutator.active = false;
     });
