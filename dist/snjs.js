@@ -10514,19 +10514,37 @@ var ActionVerb;
 })(ActionVerb || (ActionVerb = {}));
 
 ;
+let availableId = Number.MIN_SAFE_INTEGER;
+
+function getAvailableId() {
+  availableId += 1;
+
+  if (availableId === Number.MAX_SAFE_INTEGER) {
+    /** Wrap around */
+    availableId = Number.MIN_SAFE_INTEGER;
+  }
+
+  return availableId;
+}
 /**
  * An in-memory only construct for displaying a list of actions, as part of SNActionsExtension.
  */
 
+
 class action_Action {
   constructor(json) {
+    var _json$running, _json$error, _json$subactions;
+
+    this.id = getAvailableId();
     merge_default()(this, json);
-    this.running = json.running || false;
-    this.error = json.error || false;
+    this.running = (_json$running = json.running) !== null && _json$running !== void 0 ? _json$running : false;
+    this.error = (_json$error = json.error) !== null && _json$error !== void 0 ? _json$error : false;
 
     if (this.lastExecuted) {
       this.lastExecuted = new Date(this.lastExecuted);
     }
+
+    this.subactions = (_json$subactions = json.subactions) === null || _json$subactions === void 0 ? void 0 : _json$subactions.map(json => new action_Action(json));
   }
 
 }

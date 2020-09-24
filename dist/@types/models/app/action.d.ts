@@ -13,6 +13,7 @@ export declare enum ActionVerb {
  * An in-memory only construct for displaying a list of actions, as part of SNActionsExtension.
  */
 export declare class Action {
+    readonly id: number;
     label: string;
     desc: string;
     running: boolean;
@@ -23,6 +24,5 @@ export declare class Action {
     url: string;
     access_type: ActionAccessType;
     readonly subactions?: Action[];
-    subrows?: any[];
     constructor(json: any);
 }
