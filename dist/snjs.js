@@ -1917,6 +1917,12 @@ var ApplicationEvent;
 
   ApplicationEvent[ApplicationEvent["Started"] = 10] = "Started";
   /**
+   * The application has loaded all pending migrations (but not run any, except for the base one),
+   * and consumers may now call `hasPendingMigrations`
+   */
+
+  ApplicationEvent[ApplicationEvent["MigrationsLoaded"] = 23] = "MigrationsLoaded";
+  /**
    * The applicaiton is fully unlocked and ready for i/o
    * Called when the application has been fully decrypted and unlocked. Use this to
    * to begin streaming data like notes and tags.
@@ -10010,11 +10016,9 @@ var MobilePrefKey;
 (function (MobilePrefKey) {
   MobilePrefKey["SortNotesBy"] = "mobileSortBy";
   MobilePrefKey["SortNotesReverse"] = "mobileSortReverse";
-  MobilePrefKey["NotesHideTags"] = "mobileHideTags";
   MobilePrefKey["NotesHideNotePreview"] = "mobileHideNotePreview";
   MobilePrefKey["NotesHideDate"] = "mobileHideDate";
-  MobilePrefKey["DarkTheme"] = "mobileDarkTheme";
-  MobilePrefKey["LightTgeme"] = "mobileLightTheme";
+  MobilePrefKey["LastExportDate"] = "mobileLastExportDate";
   MobilePrefKey["DoNotWarnUnsupportedEditors"] = "mobileDoNotShowAgainUnsupportedEditors";
 })(MobilePrefKey || (MobilePrefKey = {}));
 
@@ -14549,6 +14553,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       const uuids = Object(functions["b" /* Uuids */])(responsePayloads);
       const items = this.itemManager.findItems(uuids, true);
       let lockedCount = 0;
+      let lockedNoteCount = 0;
       items.forEach((item, index) => {
         if (!item) {
           const responseItem = responsePayloads[index]; // An item this extension is trying to save was possibly removed locally, notify user
@@ -14562,11 +14567,18 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
             uuid: item.uuid
           });
           lockedCount++;
+
+          if (item.content_type === content_types["a" /* ContentType */].Note) {
+            lockedNoteCount++;
+          }
         }
       });
 
-      if (lockedCount > 0) {
-        const itemNoun = lockedCount === 1 ? 'item' : 'items';
+      if (lockedNoteCount === 1) {
+        this.alertService.alert("The note you are attempting to save is locked and cannot be edited.", 'Note Locked');
+        return;
+      } else if (lockedCount > 0) {
+        const itemNoun = lockedCount === 1 ? 'item' : lockedNoteCount === lockedCount ? 'notes' : 'items';
         const auxVerb = lockedCount === 1 ? 'is' : 'are';
         this.alertService.alert("".concat(lockedCount, " ").concat(itemNoun, " you are attempting to save ").concat(auxVerb, " locked and cannot be edited."), 'Items Locked');
         return;
@@ -16664,6 +16676,10 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
   async runBaseMigration() {
     const baseMigration = new _2020_01_01_base_BaseMigration(this.services);
     await baseMigration.handleStage(ApplicationStage.PreparingForLaunch_0);
+  }
+
+  async hasPendingMigrations() {
+    return (await this.getRequiredMigrations()).length > 0;
   }
 
   async getRequiredMigrations() {
@@ -21423,7 +21439,7 @@ class operation_AccountSyncOperation {
     this.checkIntegrity = checkIntegrity;
     this.apiService = apiService;
     this.receiver = receiver;
-    this.pendingPayloads = payloads;
+    this.pendingPayloads = payloads.slice();
   }
   /**
    * Read the payloads that have been saved, or are currently in flight.
@@ -21441,6 +21457,10 @@ class operation_AccountSyncOperation {
   }
 
   async run() {
+    await this.receiver(SyncSignal.StatusChanged, undefined, {
+      completedUploadCount: this.totalUploadCount - this.pendingUploadCount,
+      totalUploadCount: this.totalUploadCount
+    });
     const payloads = this.popPayloads(this.upLimit);
     const rawResponse = await this.apiService.sync(payloads, this.lastSyncToken, this.paginationToken, this.downLimit, this.checkIntegrity, undefined, undefined);
     const response = new response_SyncResponse(rawResponse);
@@ -21454,16 +21474,16 @@ class operation_AccountSyncOperation {
     }
   }
 
-  pendingUploadCount() {
+  get done() {
+    return this.pendingPayloads.length === 0 && !this.paginationToken;
+  }
+
+  get pendingUploadCount() {
     return this.pendingPayloads.length;
   }
 
-  totalUploadCount() {
+  get totalUploadCount() {
     return this.payloads.length;
-  }
-
-  get done() {
-    return this.pendingPayloads.length === 0 && !this.paginationToken;
   }
 
   get upLimit() {
@@ -22184,15 +22204,20 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
 
   async syncOnlineOperation(payloads, checkIntegrity, source, mode) {
     this.log('Syncing online user', 'source:', source, "integrity check", checkIntegrity, 'mode:', mode, 'payloads:', payloads);
-    const operation = new operation_AccountSyncOperation(payloads, async (type, response) => {
-      if (type === SyncSignal.Response) {
-        if (response.hasError) {
-          await this.handleErrorServerResponse(response);
-        } else {
-          await this.handleSuccessServerResponse(operation, response);
-        }
-      } else if (type === SyncSignal.StatusChanged) {
-        await this.handleStatusChange(operation);
+    const operation = new operation_AccountSyncOperation(payloads, async (type, response, stats) => {
+      switch (type) {
+        case SyncSignal.Response:
+          if (response.hasError) {
+            await this.handleErrorServerResponse(response);
+          } else {
+            await this.handleSuccessServerResponse(operation, response);
+          }
+
+          break;
+
+        case SyncSignal.StatusChanged:
+          this.opStatus.setUploadStatus(stats.completedUploadCount, stats.totalUploadCount);
+          break;
       }
     }, await this.getLastSyncToken(), await this.getPaginationToken(), checkIntegrity, this.apiService);
     return operation;
@@ -22206,13 +22231,6 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
       }
     });
     return operation;
-  }
-
-  async handleStatusChange(operation) {
-    const pendingUploadCount = operation.pendingUploadCount();
-    const totalUploadCount = operation.totalUploadCount();
-    const completedUploadCount = totalUploadCount - pendingUploadCount;
-    this.opStatus.setUploadStatus(completedUploadCount, totalUploadCount);
   }
 
   async handleOfflineResponse(response) {
@@ -22895,6 +22913,7 @@ class application_SNApplication {
     });
     this.createdNewDatabase = (databaseResult === null || databaseResult === void 0 ? void 0 : databaseResult.isNewDatabase) || false;
     await this.migrationService.initialize();
+    await this.notifyEvent(events["a" /* ApplicationEvent */].MigrationsLoaded);
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService.initializeFromDisk();
     await this.protocolService.initialize();
@@ -24039,6 +24058,10 @@ class application_SNApplication {
   async setStorageEncryptionPolicy(encryptionPolicy) {
     await this.storageService.setEncryptionPolicy(encryptionPolicy);
     return this.protocolService.repersistAllItems();
+  }
+
+  hasPendingMigrations() {
+    return this.migrationService.hasPendingMigrations();
   }
 
   generateUuid() {
