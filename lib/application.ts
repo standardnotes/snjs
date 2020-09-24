@@ -269,6 +269,14 @@ export class SNApplication {
     }
   }
 
+  public onStart() {
+
+  }
+
+  public onLaunch() {
+
+  }
+
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
     if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts!.wrappingKey;
@@ -320,6 +328,11 @@ export class SNApplication {
   }
 
   private async notifyEvent(event: ApplicationEvent, data?: any) {
+    if (event === ApplicationEvent.Started) {
+      this.onStart();
+    } else if (event === ApplicationEvent.Launched) {
+      this.onLaunch();
+    }
     for (const observer of this.eventHandlers.slice()) {
       if (observer.singleEvent && observer.singleEvent === event) {
         await observer.callback(event, data || {});
