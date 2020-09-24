@@ -1,6 +1,8 @@
-export { SNApplicationGroup } from './application_group';
 export type { ApplicationDescriptor } from './application_group';
+export type { ActionResponse } from './services/actions_service';
 export type { UuidString, ApplicationIdentifier } from './types';
+
+export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
 export { KeyRecoveryStrings } from './services/api/messages';

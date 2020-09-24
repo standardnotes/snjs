@@ -17,7 +17,7 @@ import { PureService } from '@Lib/services/pure_service';
 import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { DeviceInterface } from '../device_interface';
 
-type ActionResponse = HttpResponse & {
+export type ActionResponse = HttpResponse & {
   description: string
   supported_types: string[]
   actions: any[]

@@ -10,7 +10,7 @@ import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PureService } from './pure_service';
 import { DeviceInterface } from '../device_interface';
-declare type ActionResponse = HttpResponse & {
+export declare type ActionResponse = HttpResponse & {
     description: string;
     supported_types: string[];
     actions: any[];
