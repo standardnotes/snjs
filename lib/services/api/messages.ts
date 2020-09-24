@@ -1,4 +1,4 @@
-import { SNRootKeyParams } from './../../protocol/key_params';
+import { KeyParamsOrigination, SNRootKeyParams } from './../../protocol/key_params';
 import { ProtocolVersion } from '@Protocol/versions';
 export const API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.';
 export const API_MESSAGE_GENERIC_REGISTRATION_FAIL = 'A server error occurred while trying to register. Please try again.';
@@ -21,7 +21,7 @@ export const UNSUPPORTED_PROTOCOL_VERSION = `This version of the application doe
 
 export const EXPIRED_PROTOCOL_VERSION = `The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security for more information.`;
 
-export const OUTDATED_PROTOCOL_VERSION = `The encryption version for your account is outdated and requires upgrade. You may proceed with login, but areadvised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.`;
+export const OUTDATED_PROTOCOL_VERSION = `The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.`;
 
 export const UNSUPPORTED_KEY_DERIVATION = `Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.`;
 
@@ -70,7 +70,23 @@ export const ProtocolUpgradeStrings = {
 
 export const KeyRecoveryStrings = {
   KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => {
-    return `Enter your account password as it was on ${keyParams?.createdDate}.`
+    const dateString = keyParams.createdDate?.toLocaleString();
+    switch(keyParams.origination) {
+      case KeyParamsOrigination.EmailChange:
+        return `Enter your account password as it was when you changed your email on ${dateString}.`
+      case KeyParamsOrigination.PasswordChange:
+        return `Enter your account password after it was changed on ${dateString}.`
+      case KeyParamsOrigination.Registration:
+        return `Enter your account password as it was when you registered ${dateString}.`
+      case KeyParamsOrigination.ProtocolUpgrade:
+        return `Enter your account password as it was when you upgraded your encryption version on ${dateString}.`
+      case KeyParamsOrigination.PasscodeChange:
+        return `Enter your application passcode after it was changed on ${dateString}.`
+      case KeyParamsOrigination.PasscodeCreate:
+        return `Enter your application passcode as it was when you created it on ${dateString}.`
+      default:
+        throw Error('Unhandled KeyParamsOrigination case for KeyRecoveryLoginFlowPrompt');
+    }
   },
   KeyRecoveryLoginFlowReason: 'Your account password is required to revalidate your session.',
   KeyRecoveryLoginFlowInvalidPassword: 'Incorrect credentials entered. Please try again.',
@@ -90,7 +106,7 @@ export const ChallengeModalTitle = {
 export const SessionStrings = {
   EnterEmailAndPassword: 'Please enter your account email and password.',
   RecoverSession: 'Your credentials are needed to refresh your session with the server.',
-  SessionRestored: 'Your session has been succesfully restored.',
+  SessionRestored: 'Your session has been successfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
   EmailInputPlaceholder: 'Email',
   PasswordInputPlaceholder: 'Password',

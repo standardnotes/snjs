@@ -128,6 +128,10 @@ export class SNRootKeyParams {
     return this.content.version;
   }
 
+  get origination() {
+    return this.content.origination;
+  }
+
   get content001() {
     return this.content as KeyParamsContent001;
   }
