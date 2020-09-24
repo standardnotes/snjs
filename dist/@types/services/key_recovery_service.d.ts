@@ -1,3 +1,4 @@
+import { SNSyncService } from './sync/sync_service';
 import { ApplicationStage } from './../stages';
 import { SNStorageService } from './storage_service';
 import { SNRootKeyParams } from './../protocol/key_params';
@@ -11,6 +12,7 @@ import { SNApiService } from './api/api_service';
 import { SNItemsKey } from './../models/app/items_key';
 import { ItemManager } from './item_manager';
 import { PureService } from './pure_service';
+declare type DecryptionCallback = (key: SNItemsKey, result: DecryptionResponse) => void;
 declare type DecryptionResponse = {
     success: boolean;
     rootKey?: SNRootKey;
@@ -18,6 +20,8 @@ declare type DecryptionResponse = {
 declare type DecryptionQueueItem = {
     key: SNItemsKey;
     keyParams: SNRootKeyParams;
+    callback?: DecryptionCallback;
+    promise?: Promise<DecryptionResponse>;
     resolve?: (result: DecryptionResponse) => void;
 };
 export declare class SNKeyRecoveryService extends PureService {
@@ -29,10 +33,12 @@ export declare class SNKeyRecoveryService extends PureService {
     private challengeService;
     private alertService;
     private storageService;
+    private syncService;
     private removeItemObserver;
     private decryptionQueue;
     private serverParams?;
-    constructor(itemManager: ItemManager, modelManager: PayloadManager, apiService: SNApiService, sessionManager: SNSessionManager, protocolService: SNProtocolService, challengeService: ChallengeService, alertService: SNAlertService, storageService: SNStorageService);
+    private isProcessingQueue;
+    constructor(itemManager: ItemManager, modelManager: PayloadManager, apiService: SNApiService, sessionManager: SNSessionManager, protocolService: SNProtocolService, challengeService: ChallengeService, alertService: SNAlertService, storageService: SNStorageService, syncService: SNSyncService);
     deinit(): void;
     handleApplicationStage(stage: ApplicationStage): Promise<void>;
     /**
@@ -51,12 +57,13 @@ export declare class SNKeyRecoveryService extends PureService {
      * keys we need to decrypt.
      */
     handleIgnoredItemsKeys(keys: SNItemsKey[], persistIncoming?: boolean): Promise<void>;
+    handleUndecryptableItemsKeys(keys: SNItemsKey[]): Promise<void>;
     private processPersistedUndecryptables;
     private getUndecryptables;
     private persistUndecryptables;
     private saveToUndecryptables;
     private removeFromUndecryptables;
-    handleUndecryptableItemsKeys(keys: SNItemsKey[]): Promise<void>;
+    get queuePromise(): Promise<(DecryptionResponse | undefined)[]>;
     getClientKeyParams(): Promise<SNRootKeyParams | undefined>;
     serverKeyParamsAreSafe(clientParams: SNRootKeyParams): boolean;
     performServerSignIn(keyParams: SNRootKeyParams): Promise<void>;
@@ -66,15 +73,9 @@ export declare class SNKeyRecoveryService extends PureService {
      */
     replaceClientRootKey(rootKey: SNRootKey): Promise<void>;
     getWrappingKeyIfApplicable(): Promise<SNRootKey | undefined>;
-    addKeysToQueue(keys: SNItemsKey[]): Promise<void>;
-    /** A detached recovery does not affect our local items key */
-    tryDecryptingKeys(keys: SNItemsKey[]): Promise<void>;
-    /**
-     * If this function succeeds, it will emit the items key, and
-     * return the decrypted key payload, as well as the root key used to decrypt the key.
-     * If it fails, it will keep trying until the user aborts.
-     */
-    tryDecryptingKey(key: SNItemsKey): Promise<DecryptionResponse>;
+    addKeysToQueue(keys: SNItemsKey[], callback?: DecryptionCallback): Promise<void>;
+    readdQueueItem(queueItem: DecryptionQueueItem): void;
+    private beginProcessingQueue;
     popQueueItem(queueItem: DecryptionQueueItem): Promise<void>;
     popQueueForKeyParams(keyParams: SNRootKeyParams): DecryptionQueueItem[];
 }

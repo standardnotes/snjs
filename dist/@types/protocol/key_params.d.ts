@@ -66,6 +66,7 @@ export declare class SNRootKeyParams {
     get isKeyParamsObject(): boolean;
     get identifier(): string;
     get version(): ProtocolVersion;
+    get origination(): KeyParamsOrigination | undefined;
     get content001(): KeyParamsContent001;
     get content002(): KeyParamsContent002;
     get content003(): KeyParamsContent003;

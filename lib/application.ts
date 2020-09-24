@@ -1394,8 +1394,8 @@ export class SNApplication {
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
-    this.createKeyRecoveryService();
     this.createSyncManager();
+    this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createComponentManager();
     this.createPrivilegesService();
@@ -1520,7 +1520,8 @@ export class SNApplication {
       this.protocolService,
       this.challengeService,
       this.alertService,
-      this.storageService
+      this.storageService,
+      this.syncService
     );
     this.services.push(this.keyRecoveryService!);
   }
