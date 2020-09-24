@@ -27,7 +27,7 @@ import { EncryptionIntent } from '@Protocol/intents';
 import { ContentType } from '@Models/content_types';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
-import { SyncSignal } from '@Services/sync/signals';
+import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 
@@ -108,7 +108,7 @@ export class SNSyncService extends PureService {
   private apiService?: SNApiService
   private interval: any
   private state?: SyncState
-  private opStatus?: SyncOpStatus
+  private opStatus!: SyncOpStatus
 
   private resolveQueue: SyncPromise[] = []
   private spawnQueue: SyncPromise[] = []
@@ -189,7 +189,7 @@ export class SNSyncService extends PureService {
     this.state!.reset();
     this.opStatus!.reset();
     this.state = undefined;
-    this.opStatus = undefined;
+    (this.opStatus as any) = undefined;
     this.resolveQueue.length = 0;
     this.spawnQueue.length = 0;
     super.deinit();
@@ -733,15 +733,21 @@ export class SNSyncService extends PureService {
     );
     const operation = new AccountSyncOperation(
       payloads,
-      async (type: SyncSignal, response?: SyncResponse) => {
-        if (type === SyncSignal.Response) {
-          if (response!.hasError) {
-            await this.handleErrorServerResponse(response!);
-          } else {
-            await this.handleSuccessServerResponse(operation, response!);
-          }
-        } else if (type === SyncSignal.StatusChanged) {
-          await this.handleStatusChange(operation);
+      async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
+        switch (type) {
+          case SyncSignal.Response:
+            if (response!.hasError) {
+              await this.handleErrorServerResponse(response!);
+            } else {
+              await this.handleSuccessServerResponse(operation, response!);
+            }
+            break;
+          case SyncSignal.StatusChanged:
+            this.opStatus!.setUploadStatus(
+              stats!.completedUploadCount,
+              stats!.totalUploadCount,
+            );
+            break;
         }
       },
       await this.getLastSyncToken(),
@@ -767,16 +773,6 @@ export class SNSyncService extends PureService {
       }
     );
     return operation;
-  }
-
-  private async handleStatusChange(operation: AccountSyncOperation) {
-    const pendingUploadCount = operation.pendingUploadCount();
-    const totalUploadCount = operation.totalUploadCount();
-    const completedUploadCount = totalUploadCount - pendingUploadCount;
-    this.opStatus!.setUploadStatus(
-      completedUploadCount,
-      totalUploadCount
-    );
   }
 
   private async handleOfflineResponse(response: SyncResponse) {

@@ -199,6 +199,7 @@ export class SNApplication {
       });
     this.createdNewDatabase = databaseResult?.isNewDatabase || false;
     await this.migrationService!.initialize();
+    await this.notifyEvent(ApplicationEvent.MigrationsLoaded);
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
     await this.storageService!.initializeFromDisk();
     await this.protocolService!.initialize();
@@ -1354,6 +1355,10 @@ export class SNApplication {
     return this.protocolService!.repersistAllItems();
   }
 
+
+  public hasPendingMigrations() {
+    return this.migrationService.hasPendingMigrations();
+  }
 
   public generateUuid() {
     return Uuid.GenerateUuid();

@@ -23,7 +23,7 @@ import {
 import { Uuid } from '@Lib/uuid';
 import {
   Copy, isString, extendArray, removeFromArray,
-  searchArray, concatArrays, addIfUnique, filterFromArray, sleep
+  searchArray, concatArrays, filterFromArray, sleep
 } from '@Lib/utils';
 import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
 import { UuidString } from '../types';
@@ -827,6 +827,7 @@ export class SNComponentManager extends PureService {
       const uuids = Uuids(responsePayloads);
       const items = this.itemManager!.findItems(uuids, true);
       let lockedCount = 0;
+      let lockedNoteCount = 0;
       items.forEach((item, index) => {
         if (!item) {
           const responseItem = responsePayloads[index];
@@ -841,11 +842,24 @@ export class SNComponentManager extends PureService {
         if (item.locked) {
           remove(responsePayloads, { uuid: item.uuid });
           lockedCount++;
+          if (item.content_type === ContentType.Note) {
+            lockedNoteCount++;
+          }
         }
       });
 
-      if (lockedCount > 0) {
-        const itemNoun = lockedCount === 1 ? 'item' : 'items';
+      if (lockedNoteCount === 1) {
+        this.alertService!.alert(
+          `The note you are attempting to save is locked and cannot be edited.`,
+          'Note Locked',
+        );
+        return;
+      } else if (lockedCount > 0) {
+        const itemNoun = lockedCount === 1
+          ? 'item'
+          : lockedNoteCount === lockedCount
+            ? 'notes'
+            : 'items';
         const auxVerb = lockedCount === 1 ? 'is' : 'are';
         this.alertService!.alert(
           `${lockedCount} ${itemNoun} you are attempting to save ${auxVerb} locked and cannot be edited.`,

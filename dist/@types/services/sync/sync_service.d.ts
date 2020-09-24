@@ -70,7 +70,7 @@ export declare class SNSyncService extends PureService {
     private apiService?;
     private interval;
     private state?;
-    private opStatus?;
+    private opStatus;
     private resolveQueue;
     private spawnQueue;
     private completedOnlineDownloadFirstSync;
@@ -104,7 +104,7 @@ export declare class SNSyncService extends PureService {
     unlockSyncing(): void;
     isOutOfSync(): boolean;
     getLastSyncDate(): Date | undefined;
-    getStatus(): SyncOpStatus | undefined;
+    getStatus(): SyncOpStatus;
     /**
      * Called by application when sign in or registration occurs.
      */
@@ -157,7 +157,6 @@ export declare class SNSyncService extends PureService {
     sync(options?: SyncOptions): Promise<any>;
     private syncOnlineOperation;
     private syncOfflineOperation;
-    private handleStatusChange;
     private handleOfflineResponse;
     private handleErrorServerResponse;
     private handleSuccessServerResponse;
