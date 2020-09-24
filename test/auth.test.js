@@ -81,6 +81,83 @@ describe('basic auth', () => {
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
   }).timeout(20000);
 
+  it('server retrieved key params should use our client inputted value for identifier', async function () {
+    /**
+     * We should ensure that when we retrieve key params from the server, in order to generate a root
+     * key server password for login, that the identifier used in the key params is the client side entered
+     * value, and not the value returned from the server.
+     *
+     * Apart from wanting to minimze trust from the server, we also want to ensure that if
+     * we register with an uppercase identifier, and request key params with the lowercase equivalent,
+     * that even though the server performs a case-insensitive search on email fields, we correct
+     * for this action locally.
+     */
+    const rand = `${Math.random()}`;
+    const uppercase = `FOO@BAR.COM${rand}`;
+    const lowercase = `foo@bar.com${rand}`;
+    /**
+     * Registering with an uppercase email should still allow us to sign in
+     * with lowercase email
+     */
+    await this.application.register(
+      uppercase,
+      this.password
+    );
+
+    const response = await this.application.sessionManager.retrieveKeyParams(lowercase);
+    const keyParams = response.keyParams;
+    expect(keyParams.identifier).to.equal(lowercase);
+    expect(keyParams.identifier).to.not.equal(uppercase);
+  }).timeout(20000);
+
+  it('can sign into account regardless of email case', async function () {
+    const rand = `${Math.random()}`;
+    const uppercase = `FOO@BAR.COM${rand}`;
+    const lowercase = `foo@bar.com${rand}`;
+    /**
+     * Registering with a lowercase email should allow us to sign in
+     * with an uppercase email
+     */
+    await this.application.register(
+      lowercase,
+      this.password
+    );
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    const response = await this.application.signIn(
+      uppercase,
+      this.password,
+      undefined, undefined, undefined,
+      true
+    );
+    expect(response).to.be.ok;
+    expect(response.error).to.not.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
+  }).timeout(20000);
+
+  it.only('can sign into account regardless of whitespace', async function () {
+    const rand = `${Math.random()}`;
+    const withspace = `FOO@BAR.COM${rand}   `;
+    const nospace = `foo@bar.com${rand}`;
+    /**
+     * Registering with a lowercase email should allow us to sign in
+     * with an uppercase email
+     */
+    await this.application.register(
+      nospace,
+      this.password
+    );
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    const response = await this.application.signIn(
+      withspace,
+      this.password,
+      undefined, undefined, undefined,
+      true
+    );
+    expect(response).to.be.ok;
+    expect(response.error).to.not.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
+  }).timeout(20000);
+
   it('fails login with wrong password', async function () {
     await this.application.register(
       this.email,

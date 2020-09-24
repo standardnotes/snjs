@@ -31,6 +31,10 @@ type User = {
   email?: string
 }
 
+const cleanedEmailString = (email: string) => {
+  return email.trim().toLowerCase();
+}
+
 /**
  * The session manager is responsible for loading initial user state, and any relevant
  * server credentials, such as the session token. It also exposes methods for registering
@@ -168,6 +172,7 @@ export class SNSessionManager extends PureService {
         )
       };
     }
+    email = cleanedEmailString(email);
     const rootKey = await this.protocolService!.createRootKey(
       email,
       password,
@@ -227,7 +232,8 @@ export class SNSessionManager extends PureService {
         return { response };
       }
     }
-    const keyParams = KeyParamsFromApiResponse(response);
+    /** Make sure to use client value for identifier/email */
+    const keyParams = KeyParamsFromApiResponse(response, email);
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
@@ -237,6 +243,36 @@ export class SNSessionManager extends PureService {
   }
 
   public async signIn(
+    email: string,
+    password: string,
+    strict = false,
+    minAllowedVersion?: ProtocolVersion
+    ): Promise<SessionManagerResponse> {
+    const result = await this.performSignIn(
+      email,
+      password,
+      strict,
+      minAllowedVersion
+    );
+
+    if (result.response.error) {
+      /**
+       * Try signing in with trimmed + lowercase version of email
+       */
+      const cleanedEmail = cleanedEmailString(email);
+      const secondResult = await this.performSignIn(
+        cleanedEmail,
+        password,
+        strict,
+        minAllowedVersion
+      );
+      return secondResult;
+    } {
+      return result;
+    }
+  }
+
+  private async performSignIn(
     email: string,
     password: string,
     strict = false,
