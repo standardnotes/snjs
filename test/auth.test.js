@@ -134,7 +134,7 @@ describe('basic auth', () => {
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
   }).timeout(20000);
 
-  it.only('can sign into account regardless of whitespace', async function () {
+  it('can sign into account regardless of whitespace', async function () {
     const rand = `${Math.random()}`;
     const withspace = `FOO@BAR.COM${rand}   `;
     const nospace = `foo@bar.com${rand}`;
