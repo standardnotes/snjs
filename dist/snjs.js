@@ -10577,6 +10577,7 @@ class extension_SNActionsExtension extends core_item["d" /* SNItem */] {
     this.name = payload.safeContent.name;
     this.package_info = payload.safeContent.package_info;
     this.supported_types = payload.safeContent.supported_types;
+    this.deprecation = payload.safeContent.deprecation;
 
     if (payload.safeContent.actions) {
       this.actions = payload.safeContent.actions.map(action => {
@@ -10603,6 +10604,10 @@ class extension_ActionsExtensionMutator extends core_item["b" /* ItemMutator */]
 
   set actions(actions) {
     this.content.actions = actions;
+  }
+
+  set deprecation(deprecation) {
+    this.content.deprecation = deprecation;
   }
 
 }
@@ -15937,6 +15942,7 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
       return new action_Action(action);
     }) : [];
     await this.itemManager.changeActionsExtension(extension.uuid, mutator => {
+      mutator.deprecation = response.deprecation;
       mutator.description = description;
       mutator.supported_types = supported_types;
       mutator.actions = actions;

@@ -20,6 +20,7 @@ import { DeviceInterface } from '../device_interface';
 export type ActionResponse = HttpResponse & {
   description: string
   supported_types: string[]
+  deprecation?: string
   actions: any[]
   item?: any
   keyParams?: any
@@ -130,6 +131,7 @@ export class SNActionsService extends PureService {
     await this.itemManager!.changeActionsExtension(
       extension.uuid,
       (mutator) => {
+        mutator.deprecation = response.deprecation!;
         mutator.description = description;
         mutator.supported_types = supported_types;
         mutator.actions = actions;
@@ -142,7 +144,7 @@ export class SNActionsService extends PureService {
     action: Action,
     item: SNItem,
     passwordRequestHandler: PasswordRequestHandler
-  ): Promise<ActionResponse> {
+    ): Promise<ActionResponse> {
     let result;
     switch (action.verb) {
       case 'get':

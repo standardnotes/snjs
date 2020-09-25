@@ -13,6 +13,7 @@ import { DeviceInterface } from '../device_interface';
 export declare type ActionResponse = HttpResponse & {
     description: string;
     supported_types: string[];
+    deprecation?: string;
     actions: any[];
     item?: any;
     keyParams?: any;
