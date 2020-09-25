@@ -1022,7 +1022,7 @@ export class SNComponentManager extends PureService {
           if ([ContentType.Component, ContentType.Theme].includes(item.content_type!)) {
             await this.deactivateComponent(item.uuid);
           }
-          await this.itemManager!.setItemToBeDeleted(item.uuid);
+          await this.itemManager!.setItemToBeDeleted(item.uuid, PayloadSource.ComponentRetrieved);
         }
         this.syncService!.sync();
         reply = { deleted: true };

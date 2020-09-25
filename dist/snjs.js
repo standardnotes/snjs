@@ -14842,7 +14842,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
             await this.deactivateComponent(item.uuid);
           }
 
-          await this.itemManager.setItemToBeDeleted(item.uuid);
+          await this.itemManager.setItemToBeDeleted(item.uuid, sources["a" /* PayloadSource */].ComponentRetrieved);
         }
 
         this.syncService.sync();
@@ -20767,14 +20767,14 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
    */
 
 
-  async setItemToBeDeleted(uuid) {
+  async setItemToBeDeleted(uuid, source) {
     /** Capture referencing ids before we delete the item below, otherwise
      * the index may be updated before we get a chance to act on it */
     const referencingIds = this.collection.uuidsThatReferenceUuid(uuid);
     const item = this.findItem(uuid);
     const changedItem = await this.changeItem(uuid, mutator => {
       mutator.setDeleted();
-    });
+    }, undefined, source);
     /** Handle indirect relationships.
      * (Direct relationships are cleared by clearing content above) */
 

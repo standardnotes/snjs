@@ -621,7 +621,7 @@ export class ItemManager extends PureService {
   /**
    * Marks the item as deleted and needing sync.
    */
-  public async setItemToBeDeleted(uuid: UuidString) {
+  public async setItemToBeDeleted(uuid: UuidString, source?: PayloadSource) {
     /** Capture referencing ids before we delete the item below, otherwise
      * the index may be updated before we get a chance to act on it */
     const referencingIds = this.collection.uuidsThatReferenceUuid(uuid);
@@ -629,7 +629,7 @@ export class ItemManager extends PureService {
     const item = this.findItem(uuid);
     const changedItem = await this.changeItem(uuid, (mutator) => {
       mutator.setDeleted();
-    });
+    }, undefined, source);
 
     /** Handle indirect relationships.
      * (Direct relationships are cleared by clearing content above) */

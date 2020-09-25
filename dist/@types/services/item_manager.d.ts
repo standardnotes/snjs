@@ -154,7 +154,7 @@ export declare class ItemManager extends PureService {
     /**
      * Marks the item as deleted and needing sync.
      */
-    setItemToBeDeleted(uuid: UuidString): Promise<SNItem | undefined>;
+    setItemToBeDeleted(uuid: UuidString, source?: PayloadSource): Promise<SNItem | undefined>;
     /**
      * Like `setItemToBeDeleted`, but acts on an array of items.
      */
