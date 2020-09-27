@@ -31,9 +31,9 @@ export declare class Challenge {
     /** Outside of the modal, this is the title of the modal itself */
     get modalTitle(): string;
     /** Inside of the modal, this is the H1 */
-    get heading(): string | undefined;
+    get heading(): string;
     /** Inside of the modal, this is the H2 */
-    get subheading(): string | undefined;
+    get subheading(): string;
     hasPromptForValidationType(type: ChallengeValidation): boolean;
 }
 /**
@@ -42,12 +42,13 @@ export declare class Challenge {
  */
 export declare class ChallengePrompt {
     readonly validation: ChallengeValidation;
-    readonly title?: string | undefined;
+    readonly _title?: string | undefined;
     readonly placeholder?: string | undefined;
     readonly secureTextEntry: boolean;
     readonly id: number;
-    constructor(validation: ChallengeValidation, title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean);
+    constructor(validation: ChallengeValidation, _title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean);
     get validates(): boolean;
+    get title(): string;
 }
 export declare class ChallengeValue {
     readonly prompt: ChallengePrompt;
@@ -62,7 +63,3 @@ export declare class ChallengeResponse {
     getValueForType(type: ChallengeValidation): ChallengeValue;
     getDefaultValue(): ChallengeValue;
 }
-/**
- * @returns The UI-friendly title for this challenge
- */
-export declare function challengeTypeToString(type: ChallengeValidation): string;

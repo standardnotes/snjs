@@ -76,3 +76,8 @@ export declare const ChallengeStrings: {
     AccountPasswordPlaceholder: string;
     LocalPasscodePlaceholder: string;
 };
+export declare const PromptTitles: {
+    AccountPassword: string;
+    LocalPasscode: string;
+    Biometrics: string;
+};

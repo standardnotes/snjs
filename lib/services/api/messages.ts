@@ -123,3 +123,9 @@ export const ChallengeStrings = {
   LocalPasscodePlaceholder: 'Application Passcode',
 }
 
+export const PromptTitles = {
+  AccountPassword: 'Account Password',
+  LocalPasscode: 'Application Passcode',
+  Biometrics: 'Biometrics',
+}
+

@@ -9359,9 +9359,8 @@ __webpack_require__.d(__webpack_exports__, "Challenge", function() { return /* r
 __webpack_require__.d(__webpack_exports__, "ChallengeReason", function() { return /* reexport */ ChallengeReason; });
 __webpack_require__.d(__webpack_exports__, "ChallengeResponse", function() { return /* reexport */ ChallengeResponse; });
 __webpack_require__.d(__webpack_exports__, "ChallengeValidation", function() { return /* reexport */ ChallengeValidation; });
-__webpack_require__.d(__webpack_exports__, "challengeTypeToString", function() { return /* reexport */ challengeTypeToString; });
 __webpack_require__.d(__webpack_exports__, "ChallengeValue", function() { return /* reexport */ ChallengeValue; });
-__webpack_require__.d(__webpack_exports__, "ChallengePrompt", function() { return /* reexport */ ChallengePrompt; });
+__webpack_require__.d(__webpack_exports__, "ChallengePrompt", function() { return /* reexport */ challenges_ChallengePrompt; });
 __webpack_require__.d(__webpack_exports__, "SNSyncService", function() { return /* reexport */ sync_service_SNSyncService; });
 __webpack_require__.d(__webpack_exports__, "SyncSources", function() { return /* reexport */ SyncSources; });
 __webpack_require__.d(__webpack_exports__, "SyncModes", function() { return /* reexport */ SyncModes; });
@@ -10022,6 +10021,11 @@ const ChallengeStrings = {
   EnterCredentialsForProtocolUpgrade: 'Enter your credentials to perform encryption upgrade',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode'
+};
+const PromptTitles = {
+  AccountPassword: 'Account Password',
+  LocalPasscode: 'Application Passcode',
+  Biometrics: 'Biometrics'
 };
 // EXTERNAL MODULE: ./lib/protocol/payloads/fields.ts
 var fields = __webpack_require__(4);
@@ -11287,6 +11291,9 @@ class challenges_Challenge {
 
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
+
+        default:
+          throw Error('No heading available for custom challenge. Pass heading to the constructor.');
       }
     }
   }
@@ -11301,6 +11308,9 @@ class challenges_Challenge {
     switch (this.reason) {
       case ChallengeReason.Migration:
         return ChallengeStrings.EnterPasscodeForMigration;
+
+      default:
+        throw Error('No subheading available for custom challenge. Pass subheading to the constructor.');
     }
   }
 
@@ -11320,11 +11330,11 @@ class challenges_Challenge {
  * such as a text field, or biometric scanner.
  */
 
-class ChallengePrompt {
-  constructor(validation, title, placeholder) {
+class challenges_ChallengePrompt {
+  constructor(validation, _title, placeholder) {
     let secureTextEntry = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
     this.validation = validation;
-    this.title = title;
+    this._title = _title;
     this.placeholder = placeholder;
     this.secureTextEntry = secureTextEntry;
     this.id = Math.random();
@@ -11333,6 +11343,26 @@ class ChallengePrompt {
 
   get validates() {
     return this.validation !== ChallengeValidation.None;
+  }
+
+  get title() {
+    if (this._title) {
+      return this._title;
+    }
+
+    switch (this.validation) {
+      case ChallengeValidation.AccountPassword:
+        return PromptTitles.AccountPassword;
+
+      case ChallengeValidation.Biometric:
+        return PromptTitles.Biometrics;
+
+      case ChallengeValidation.LocalPasscode:
+        return PromptTitles.LocalPasscode;
+
+      default:
+        throw Error('No title available for custom prompt. Pass title to the constructor.');
+    }
   }
 
 }
@@ -11364,19 +11394,6 @@ class ChallengeResponse {
     return this.values[0];
   }
 
-}
-/**
- * @returns The UI-friendly title for this challenge
- */
-
-function challengeTypeToString(type) {
-  const mapping = {
-    [ChallengeValidation.LocalPasscode]: 'application passcode',
-    [ChallengeValidation.AccountPassword]: 'account password',
-    [ChallengeValidation.Biometric]: 'biometrics',
-    [ChallengeValidation.None]: 'custom'
-  };
-  return mapping[type];
 }
 // EXTERNAL MODULE: ./node_modules/lodash/remove.js
 var remove = __webpack_require__(19);
@@ -12520,7 +12537,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
 
   async performServerSignIn(keyParams) {
     /** Get the user's account password */
-    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryLoginFlowReason);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryLoginFlowReason);
     const challengeResponse = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (!challengeResponse) {
@@ -12675,7 +12692,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       replacesRootKey = !hasLocalItemsKey || isNewerThanLatest;
     }
 
-    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryPasswordRequired);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryPasswordRequired);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (!response) {
@@ -13113,7 +13130,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     }
 
     this.isSessionRenewChallengePresented = true;
-    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession);
     this.challengeService.addChallengeObserver(challenge, {
       onCancel: () => {
         this.isSessionRenewChallengePresented = false;
@@ -13136,7 +13153,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async promptForMfaValue() {
-    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Custom, SessionStrings.EnterMfa);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Custom, SessionStrings.EnterMfa);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (response) {
@@ -16303,7 +16320,7 @@ class _2020_01_15_Migration20200115 extends Migration {
   }
 
   async promptForPasscodeUntilCorrect(validationCallback) {
-    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration);
     return new Promise(resolve => {
       this.services.challengeService.addChallengeObserver(challenge, {
         onNonvalidatedSubmit: async challengeResponse => {
@@ -22688,13 +22705,13 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     const hasPasscode = this.protocolService.hasPasscode();
 
     if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode));
     }
 
     const biometricEnabled = await this.hasBiometricsEnabled();
 
     if (biometricEnabled) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.Biometric));
     }
 
     if (prompts.length > 0) {
@@ -22705,7 +22722,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
   }
 
   async promptForPasscode() {
-    const challenge = new challenges_Challenge([new ChallengePrompt(ChallengeValidation.LocalPasscode)], ChallengeReason.ResaveRootKey);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode)], ChallengeReason.ResaveRootKey);
     const response = await this.promptForChallengeResponse(challenge);
 
     if (!response) {
@@ -23527,11 +23544,11 @@ class application_SNApplication {
     const prompts = [];
 
     if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
     }
 
     if (hasAccount) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword, undefined, ChallengeStrings.AccountPasswordPlaceholder));
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.AccountPassword, undefined, ChallengeStrings.AccountPasswordPlaceholder));
     }
 
     const challenge = new challenges_Challenge(prompts, ChallengeReason.ProtocolUpgrade);

@@ -1,5 +1,5 @@
 import { Migration } from '@Lib/migrations/migration';
-import { ChallengeModalTitle, ChallengeStrings } from './services/api/messages';
+import { ChallengeModalTitle, ChallengeStrings, PromptTitles } from './services/api/messages';
 import { SNRootKey } from '@Protocol/root_key';
 
 export type ChallengeArtifacts = {
@@ -62,19 +62,23 @@ export class Challenge {
           return ChallengeStrings.EnterPasscodeForRootResave;
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
+        default:
+          throw Error('No heading available for custom challenge. Pass heading to the constructor.')
       }
     }
   }
 
   /** Inside of the modal, this is the H2 */
   get subheading() {
-    if(this._subheading) {
+    if (this._subheading) {
       return this._subheading;
     }
 
-    switch(this.reason) {
+    switch (this.reason) {
       case ChallengeReason.Migration:
         return ChallengeStrings.EnterPasscodeForMigration;
+      default:
+        throw Error('No subheading available for custom challenge. Pass subheading to the constructor.')
     }
   }
 
@@ -96,7 +100,7 @@ export class ChallengePrompt {
   public readonly id = Math.random();
   constructor(
     public readonly validation: ChallengeValidation,
-    public readonly title?: string,
+    public readonly _title?: string,
     public readonly placeholder?: string,
     public readonly secureTextEntry = true
   ) {
@@ -105,6 +109,22 @@ export class ChallengePrompt {
 
   public get validates() {
     return this.validation !== ChallengeValidation.None;
+  }
+
+  public get title() {
+    if (this._title) {
+      return this._title;
+    }
+    switch (this.validation) {
+      case ChallengeValidation.AccountPassword:
+        return PromptTitles.AccountPassword;
+      case ChallengeValidation.Biometric:
+        return PromptTitles.Biometrics;
+      case ChallengeValidation.LocalPasscode:
+        return PromptTitles.LocalPasscode;
+      default:
+        throw Error('No title available for custom prompt. Pass title to the constructor.')
+    }
   }
 }
 
@@ -136,17 +156,4 @@ export class ChallengeResponse {
     }
     return this.values[0];
   }
-}
-
-/**
- * @returns The UI-friendly title for this challenge
- */
-export function challengeTypeToString(type: ChallengeValidation) {
-  const mapping = {
-    [ChallengeValidation.LocalPasscode]: 'application passcode',
-    [ChallengeValidation.AccountPassword]: 'account password',
-    [ChallengeValidation.Biometric]: 'biometrics',
-    [ChallengeValidation.None]: 'custom',
-  };
-  return mapping[type];
 }
