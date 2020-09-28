@@ -14141,11 +14141,9 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
           continue;
         }
 
-        const isActive = !!this.iframeForComponent(component.uuid);
+        const isDisplayed = !!this.iframeForComponent(component.uuid);
 
-        if (component.active && !component.deleted && !isActive) {
-          this.activateComponent(component.uuid);
-        } else if (!component.active && isActive) {
+        if (!component.active && isDisplayed) {
           this.deactivateComponent(component.uuid);
         }
       }
@@ -15214,6 +15212,14 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
   }
 
   allComponentIframes() {
+    if (this.isMobile) {
+      /**
+       * Retrieving all iframes is typically related to lifecycle management of
+       * non-editor components. So this function is not useful to mobile.
+       */
+      return [];
+    }
+
     return Array.from(document.getElementsByTagName('iframe'));
   }
 

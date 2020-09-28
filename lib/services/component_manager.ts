@@ -233,10 +233,8 @@ export class SNComponentManager extends PureService {
             /** Editors shouldn't get activated or deactivated */
             continue;
           }
-          const isActive = !!this.iframeForComponent(component.uuid);
-          if (component.active && !component.deleted && !isActive) {
-            this.activateComponent(component.uuid);
-          } else if (!component.active && isActive) {
+          const isDisplayed = !!this.iframeForComponent(component.uuid);
+          if (!component.active && isDisplayed) {
             this.deactivateComponent(component.uuid);
           }
         }
@@ -1357,6 +1355,13 @@ export class SNComponentManager extends PureService {
   }
 
   allComponentIframes() {
+    if (this.isMobile) {
+      /**
+       * Retrieving all iframes is typically related to lifecycle management of
+       * non-editor components. So this function is not useful to mobile.
+       */
+      return [];
+    }
     return Array.from(document.getElementsByTagName('iframe'));
   }
 
