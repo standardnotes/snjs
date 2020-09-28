@@ -108,6 +108,7 @@ export const SessionStrings = {
   RecoverSession: 'Your credentials are needed to refresh your session with the server.',
   SessionRestored: 'Your session has been successfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
+  MfaInputPlaceholder: 'Two-factor authentication code',
   EmailInputPlaceholder: 'Email',
   PasswordInputPlaceholder: 'Password',
 }

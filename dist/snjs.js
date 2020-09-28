@@ -10009,6 +10009,7 @@ const SessionStrings = {
   RecoverSession: 'Your credentials are needed to refresh your session with the server.',
   SessionRestored: 'Your session has been successfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
+  MfaInputPlaceholder: 'Two-factor authentication code',
   EmailInputPlaceholder: 'Email',
   PasswordInputPlaceholder: 'Password'
 };
@@ -13154,7 +13155,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async promptForMfaValue() {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Custom, true, SessionStrings.EnterMfa);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.MfaInputPlaceholder)], ChallengeReason.Custom, true, SessionStrings.EnterMfa);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (response) {

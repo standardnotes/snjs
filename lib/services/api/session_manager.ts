@@ -153,7 +153,7 @@ export class SNSessionManager extends PureService {
 
   private async promptForMfaValue() {
     const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.None)],
+      [new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.MfaInputPlaceholder)],
       ChallengeReason.Custom,
       true,
       SessionStrings.EnterMfa

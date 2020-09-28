@@ -63,6 +63,7 @@ export declare const SessionStrings: {
     RecoverSession: string;
     SessionRestored: string;
     EnterMfa: string;
+    MfaInputPlaceholder: string;
     EmailInputPlaceholder: string;
     PasswordInputPlaceholder: string;
 };
