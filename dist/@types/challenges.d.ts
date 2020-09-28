@@ -33,7 +33,7 @@ export declare class Challenge {
     /** Inside of the modal, this is the H1 */
     get heading(): string;
     /** Inside of the modal, this is the H2 */
-    get subheading(): string;
+    get subheading(): string | undefined;
     hasPromptForValidationType(type: ChallengeValidation): boolean;
 }
 /**

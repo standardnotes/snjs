@@ -11309,6 +11309,9 @@ class challenges_Challenge {
       case ChallengeReason.Migration:
         return ChallengeStrings.EnterPasscodeForMigration;
 
+      case ChallengeReason.ApplicationUnlock:
+        return undefined;
+
       default:
         throw Error('No subheading available for custom challenge. Pass subheading to the constructor.');
     }
