@@ -43,6 +43,7 @@ export class ThemeMutator extends ItemMutator {
   setMobileRules(rules: any) {
     this.setAppDataItem(AppDataField.MobileRules, rules);
   }
+
   setNotAvailOnMobile(notAvailable: boolean) {
     this.setAppDataItem(AppDataField.NotAvailableOnMobile, notAvailable);
   }

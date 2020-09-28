@@ -1,6 +1,5 @@
 import { PayloadContent } from '@Payloads/generator';
 import { DefaultAppDomain } from './content_types';
-import { omitInPlace, sortedCopy } from '@Lib/utils';
 /**
  * Returns an array of uuids for the given items or payloads
  */
@@ -11,7 +10,7 @@ export function Uuids(items: any[]): string[] {
 }
 
 /**
- * Modifies the input object to fill in any missing required values from the 
+ * Modifies the input object to fill in any missing required values from the
  * content body.
  */
 export function FillItemContent(content: Record<string, any>) {

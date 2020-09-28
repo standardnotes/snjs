@@ -379,9 +379,7 @@ export class SNComponentManager extends PureService {
 
   getActiveThemes() {
     if (this.environment === Environment.Mobile) {
-      return this.componentsForArea(ComponentArea.Themes).filter((theme) => {
-        return (theme as SNTheme).isMobileActive();
-      }) as SNTheme[];
+      throw Error('getActiveThemes must be handled separately by mobile');
     }
     return this.componentsForArea(ComponentArea.Themes).filter((theme) => {
       return theme.active;
@@ -427,7 +425,7 @@ export class SNComponentManager extends PureService {
   }
 
   public removeTemporaryTemplateComponent(component: SNComponent) {
-    removeFromArray(this.templateComponents, component);
+    this.templateComponents = this.templateComponents.filter(c => c.uuid !== component.uuid);
   }
 
   contextItemDidChangeInArea(area: ComponentArea) {
