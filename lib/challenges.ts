@@ -32,8 +32,9 @@ export class Challenge {
   constructor(
     public readonly prompts: ChallengePrompt[],
     public readonly reason: ChallengeReason,
+    public readonly cancelable: boolean,
     public readonly _heading?: string,
-    public readonly _subheading?: string
+    public readonly _subheading?: string,
   ) {
     Object.freeze(this);
   }

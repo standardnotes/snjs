@@ -24,10 +24,11 @@ export declare enum ChallengeReason {
 export declare class Challenge {
     readonly prompts: ChallengePrompt[];
     readonly reason: ChallengeReason;
+    readonly cancelable: boolean;
     readonly _heading?: string | undefined;
     readonly _subheading?: string | undefined;
     readonly id: number;
-    constructor(prompts: ChallengePrompt[], reason: ChallengeReason, _heading?: string | undefined, _subheading?: string | undefined);
+    constructor(prompts: ChallengePrompt[], reason: ChallengeReason, cancelable: boolean, _heading?: string | undefined, _subheading?: string | undefined);
     /** Outside of the modal, this is the title of the modal itself */
     get modalTitle(): string;
     /** Inside of the modal, this is the H1 */

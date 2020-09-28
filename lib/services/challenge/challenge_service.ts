@@ -54,6 +54,8 @@ export class ChallengeService extends PureService {
     this.storageService = undefined;
     this.protocolService = undefined;
     this.sendChallenge = undefined;
+    (this.challengeOperations as any) = undefined;
+    (this.challengeObservers as any) = undefined;
     super.deinit();
   }
 
@@ -95,7 +97,7 @@ export class ChallengeService extends PureService {
       prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
     }
     if (prompts.length > 0) {
-      return new Challenge(prompts, ChallengeReason.ApplicationUnlock);
+      return new Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
     } else {
       return null;
     }
@@ -104,7 +106,8 @@ export class ChallengeService extends PureService {
   public async promptForPasscode() {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
-      ChallengeReason.ResaveRootKey
+      ChallengeReason.ResaveRootKey,
+      true
     );
     const response = await this.promptForChallengeResponse(challenge);
     if (!response) {

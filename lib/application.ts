@@ -763,7 +763,7 @@ export class SNApplication {
         ChallengeStrings.AccountPasswordPlaceholder
       ));
     }
-    const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade);
+    const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade, true);
     const response = await this.challengeService!.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true };

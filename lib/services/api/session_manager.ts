@@ -118,6 +118,7 @@ export class SNSessionManager extends PureService {
         new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)
       ],
       ChallengeReason.Custom,
+      true,
       SessionStrings.EnterEmailAndPassword,
       SessionStrings.RecoverSession
     );
@@ -154,6 +155,7 @@ export class SNSessionManager extends PureService {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.None)],
       ChallengeReason.Custom,
+      true,
       SessionStrings.EnterMfa
     );
     const response = await this.challengeService

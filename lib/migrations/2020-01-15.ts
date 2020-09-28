@@ -174,7 +174,8 @@ export class Migration20200115 extends Migration {
   ) {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.None)],
-      ChallengeReason.Migration
+      ChallengeReason.Migration,
+      false
     );
     return new Promise((resolve) => {
       this.services.challengeService.addChallengeObserver(

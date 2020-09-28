@@ -243,6 +243,7 @@ export class SNKeyRecoveryService extends PureService {
         )
       ],
       ChallengeReason.Custom,
+      true,
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
       KeyRecoveryStrings.KeyRecoveryLoginFlowReason,
     );
@@ -417,6 +418,7 @@ export class SNKeyRecoveryService extends PureService {
         )
       ],
       ChallengeReason.Custom,
+      true,
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
       KeyRecoveryStrings.KeyRecoveryPasswordRequired
     );

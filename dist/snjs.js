@@ -11252,9 +11252,10 @@ var ChallengeReason;
  */
 
 class challenges_Challenge {
-  constructor(prompts, reason, _heading, _subheading) {
+  constructor(prompts, reason, cancelable, _heading, _subheading) {
     this.prompts = prompts;
     this.reason = reason;
+    this.cancelable = cancelable;
     this._heading = _heading;
     this._subheading = _subheading;
     this.id = Math.random();
@@ -12540,7 +12541,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
 
   async performServerSignIn(keyParams) {
     /** Get the user's account password */
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryLoginFlowReason);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, true, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryLoginFlowReason);
     const challengeResponse = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (!challengeResponse) {
@@ -12695,7 +12696,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       replacesRootKey = !hasLocalItemsKey || isNewerThanLatest;
     }
 
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryPasswordRequired);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)], ChallengeReason.Custom, true, KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams), KeyRecoveryStrings.KeyRecoveryPasswordRequired);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (!response) {
@@ -13133,7 +13134,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     }
 
     this.isSessionRenewChallengePresented = true;
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, true, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession);
     this.challengeService.addChallengeObserver(challenge, {
       onCancel: () => {
         this.isSessionRenewChallengePresented = false;
@@ -13156,7 +13157,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async promptForMfaValue() {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Custom, SessionStrings.EnterMfa);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Custom, true, SessionStrings.EnterMfa);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (response) {
@@ -16323,7 +16324,7 @@ class _2020_01_15_Migration20200115 extends Migration {
   }
 
   async promptForPasscodeUntilCorrect(validationCallback) {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration, false);
     return new Promise(resolve => {
       this.services.challengeService.addChallengeObserver(challenge, {
         onNonvalidatedSubmit: async challengeResponse => {
@@ -22672,6 +22673,8 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     this.storageService = undefined;
     this.protocolService = undefined;
     this.sendChallenge = undefined;
+    this.challengeOperations = undefined;
+    this.challengeObservers = undefined;
     super.deinit();
   }
   /**
@@ -22719,14 +22722,14 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     }
 
     if (prompts.length > 0) {
-      return new challenges_Challenge(prompts, ChallengeReason.ApplicationUnlock);
+      return new challenges_Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
     } else {
       return null;
     }
   }
 
   async promptForPasscode() {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode)], ChallengeReason.ResaveRootKey);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode)], ChallengeReason.ResaveRootKey, true);
     const response = await this.promptForChallengeResponse(challenge);
 
     if (!response) {
@@ -23558,7 +23561,7 @@ class application_SNApplication {
       prompts.push(new challenges_ChallengePrompt(ChallengeValidation.AccountPassword, undefined, ChallengeStrings.AccountPasswordPlaceholder));
     }
 
-    const challenge = new challenges_Challenge(prompts, ChallengeReason.ProtocolUpgrade);
+    const challenge = new challenges_Challenge(prompts, ChallengeReason.ProtocolUpgrade, true);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (!response) {
