@@ -43,7 +43,7 @@ export declare class ChallengeService extends PureService {
     hasBiometricsEnabled(): Promise<boolean>;
     enableBiometrics(): Promise<void>;
     disableBiometrics(): Promise<void>;
-    addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): void;
+    addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): () => void;
     private createOrGetChallengeOperation;
     private performOnObservers;
     private onChallengeValidValue;

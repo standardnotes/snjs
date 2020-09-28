@@ -13,6 +13,7 @@ import {
   ChallengeArtifacts,
 } from "@Lib/challenges";
 import { ChallengeOperation } from "./challenge_operation";
+import { removeFromArray } from '@Lib/utils';
 
 type ChallengeValidationResponse = {
   valid: boolean;
@@ -148,6 +149,9 @@ export class ChallengeService extends PureService {
     const observers = this.challengeObservers[challenge.id] || [];
     observers.push(observer);
     this.challengeObservers[challenge.id] = observers;
+    return () => {
+      removeFromArray(observers, observer);
+    }
   }
 
   private createOrGetChallengeOperation(
