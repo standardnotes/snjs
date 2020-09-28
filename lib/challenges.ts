@@ -77,6 +77,8 @@ export class Challenge {
     switch (this.reason) {
       case ChallengeReason.Migration:
         return ChallengeStrings.EnterPasscodeForMigration;
+      case ChallengeReason.ApplicationUnlock:
+        return undefined;
       default:
         throw Error('No subheading available for custom challenge. Pass subheading to the constructor.')
     }
