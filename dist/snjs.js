@@ -22649,6 +22649,7 @@ class challenge_operation_ChallengeOperation {
 
 
 
+
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
@@ -22760,6 +22761,9 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     const observers = this.challengeObservers[challenge.id] || [];
     observers.push(observer);
     this.challengeObservers[challenge.id] = observers;
+    return () => {
+      Object(utils["B" /* removeFromArray */])(observers, observer);
+    };
   }
 
   createOrGetChallengeOperation(challenge, resolve) {

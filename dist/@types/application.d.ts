@@ -300,7 +300,7 @@ export declare class SNApplication {
      */
     prepareForDeinit(maxWait?: number): Promise<void>;
     promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | undefined>;
-    addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): void;
+    addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): () => void;
     submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void>;
     cancelChallenge(challenge: Challenge): void;
     /** Set a function to be called when this application deinits */
