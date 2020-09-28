@@ -32,7 +32,7 @@ export declare class Challenge {
     /** Outside of the modal, this is the title of the modal itself */
     get modalTitle(): string;
     /** Inside of the modal, this is the H1 */
-    get heading(): string;
+    get heading(): string | undefined;
     /** Inside of the modal, this is the H2 */
     get subheading(): string | undefined;
     hasPromptForValidationType(type: ChallengeValidation): boolean;
@@ -49,7 +49,7 @@ export declare class ChallengePrompt {
     readonly id: number;
     constructor(validation: ChallengeValidation, _title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean);
     get validates(): boolean;
-    get title(): string;
+    get title(): string | undefined;
 }
 export declare class ChallengeValue {
     readonly prompt: ChallengePrompt;

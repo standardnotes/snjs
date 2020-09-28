@@ -64,7 +64,7 @@ export class Challenge {
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
         default:
-          throw Error('No heading available for custom challenge. Pass heading to the constructor.')
+          return undefined;
       }
     }
   }
@@ -78,10 +78,8 @@ export class Challenge {
     switch (this.reason) {
       case ChallengeReason.Migration:
         return ChallengeStrings.EnterPasscodeForMigration;
-      case ChallengeReason.ApplicationUnlock:
-        return undefined;
       default:
-        throw Error('No subheading available for custom challenge. Pass subheading to the constructor.')
+        return undefined;
     }
   }
 
@@ -126,7 +124,7 @@ export class ChallengePrompt {
       case ChallengeValidation.LocalPasscode:
         return PromptTitles.LocalPasscode;
       default:
-        throw Error('No title available for custom prompt. Pass title to the constructor.')
+        return undefined;
     }
   }
 }
