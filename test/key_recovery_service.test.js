@@ -16,12 +16,9 @@ describe('key recovery service', function () {
   });
 
   beforeEach(async function () {
+    localStorage.clear();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-  });
-
-  afterEach(function () {
-
   });
 
   it('when encountering an undecryptable items key, should recover through recovery wizard', async function () {
@@ -167,8 +164,6 @@ describe('key recovery service', function () {
       password: this.password
     });
 
-    const note = await Factory.createSyncedNote(appA);
-
     /** Set a passcode to expect it to be validated later */
     await appA.setPasscode(passcode);
 
@@ -186,6 +181,7 @@ describe('key recovery service', function () {
 
     /** Change password on appB */
     await appB.changePassword(this.password, newPassword);
+    const note = await Factory.createSyncedNote(appB);
     expect(appB.getItems(ContentType.ItemsKey).length).to.equal(2);
     await appB.sync();
 
@@ -222,6 +218,60 @@ describe('key recovery service', function () {
 
     appA.deinit();
     appB.deinit();
+  });
+
+  it('when items key associated with item is errored, item should be marked waiting for key', async function () {
+    const namespace = Factory.randomString();
+    const newPassword = `${Math.random()}`;
+    const appA = await Factory.createApplication(namespace);
+    const receiveChallenge = async (challenge) => {
+      const prompt = challenge.prompts[0];
+      /** Give newPassword when prompted */
+      appA.submitValuesForChallenge(
+        challenge,
+        [new ChallengeValue(prompt, newPassword)]
+      );
+    };
+    await appA.prepareForLaunch({ receiveChallenge });
+    await appA.launch(true);
+
+    await Factory.registerUserToApplication({
+      application: appA,
+      email: this.email,
+      password: this.password
+    });
+
+    expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
+
+    /** Create simultaneous appB signed into same account */
+    const appB = await Factory.createApplication('another-namespace');
+    await appB.prepareForLaunch({ receiveChallenge: () => { } });
+    await appB.launch(true);
+    await Factory.loginToApplication({
+      application: appB,
+      email: this.email,
+      password: this.password
+    });
+
+    /** Change password on appB */
+    await appB.changePassword(this.password, newPassword);
+    const note = await Factory.createSyncedNote(appB);
+    await appB.sync();
+
+    /** We expect the item in appA to be errored at this point, but we do not want it to recover */
+    await appA.sync();
+    expect(appA.findItem(note.uuid).waitingForKey).to.equal(true);
+    console.warn('Expecting exceptions below as we destroy app during key recovery');
+    appA.deinit();
+    appB.deinit();
+
+    const recreatedAppA = await Factory.createApplication(namespace);
+    await recreatedAppA.prepareForLaunch({ receiveChallenge: () => { } });
+    await recreatedAppA.launch(true);
+
+    expect(recreatedAppA.findItem(note.uuid).errorDecrypting).to.equal(true);
+    expect(recreatedAppA.findItem(note.uuid).waitingForKey).to.equal(true);
+    recreatedAppA.deinit();
   });
 
   it('when client key params differ from server, and no matching items key exists, should perform sign in flow', async function () {
@@ -356,7 +406,7 @@ describe('key recovery service', function () {
     expect(latestItemsKey.updated_at.getTime()).to.not.equal(currentItemsKey.updated_at.getTime());
     expect(latestItemsKey.updated_at.getTime()).to.equal(newUpdated.getTime());
 
-      expect(application.syncService.isOutOfSync()).to.equal(false);
+    expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
   });
 

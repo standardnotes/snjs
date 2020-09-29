@@ -18240,6 +18240,8 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async payloadByDecryptingPayload(payload, key) {
+    var _key;
+
     if (!payload.content) {
       throw Error('Attempting to decrypt payload that has no content.');
     }
@@ -18259,6 +18261,13 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
           errorDecrypting: true
         });
       }
+    }
+
+    if ((_key = key) === null || _key === void 0 ? void 0 : _key.errorDecrypting) {
+      return Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(payload, {
+        waitingForKey: true,
+        errorDecrypting: true
+      });
     }
 
     const version = payload.version;

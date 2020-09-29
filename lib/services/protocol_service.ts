@@ -545,6 +545,15 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         );
       }
     }
+    if(key?.errorDecrypting) {
+      return CreateMaxPayloadFromAnyObject(
+        payload,
+        {
+          waitingForKey: true,
+          errorDecrypting: true
+        }
+      );
+    }
     const version = payload.version!;
     const source = payload.source;
     const operator = this.operatorForVersion(version);
