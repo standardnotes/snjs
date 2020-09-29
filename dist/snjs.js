@@ -10006,7 +10006,11 @@ const ChallengeModalTitle = {
 };
 const SessionStrings = {
   EnterEmailAndPassword: 'Please enter your account email and password.',
-  RecoverSession: 'Your credentials are needed to refresh your session with the server.',
+
+  RecoverSession(email) {
+    return "Your credentials are needed for ".concat(email, " to refresh your session with the server.");
+  },
+
   SessionRestored: 'Your session has been successfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
   MfaInputPlaceholder: 'Two-factor authentication code',
@@ -13132,7 +13136,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     }
 
     this.isSessionRenewChallengePresented = true;
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, true, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, true, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession(this.getUser().email));
     this.challengeService.addChallengeObserver(challenge, {
       onCancel: () => {
         this.isSessionRenewChallengePresented = false;

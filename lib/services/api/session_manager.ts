@@ -120,7 +120,7 @@ export class SNSessionManager extends PureService {
       ChallengeReason.Custom,
       true,
       SessionStrings.EnterEmailAndPassword,
-      SessionStrings.RecoverSession
+      SessionStrings.RecoverSession(this.getUser()!.email!)
     );
     this.challengeService.addChallengeObserver(
       challenge,

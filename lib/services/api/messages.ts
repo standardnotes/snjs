@@ -105,7 +105,9 @@ export const ChallengeModalTitle = {
 
 export const SessionStrings = {
   EnterEmailAndPassword: 'Please enter your account email and password.',
-  RecoverSession: 'Your credentials are needed to refresh your session with the server.',
+  RecoverSession(email: string) {
+    return `Your credentials are needed for ${email} to refresh your session with the server.`;
+  },
   SessionRestored: 'Your session has been successfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
   MfaInputPlaceholder: 'Two-factor authentication code',

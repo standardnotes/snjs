@@ -60,7 +60,7 @@ export declare const ChallengeModalTitle: {
 };
 export declare const SessionStrings: {
     EnterEmailAndPassword: string;
-    RecoverSession: string;
+    RecoverSession(email: string): string;
     SessionRestored: string;
     EnterMfa: string;
     MfaInputPlaceholder: string;
