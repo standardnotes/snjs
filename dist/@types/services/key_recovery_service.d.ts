@@ -58,7 +58,7 @@ export declare class SNKeyRecoveryService extends PureService {
      */
     handleIgnoredItemsKeys(keys: SNItemsKey[], persistIncoming?: boolean): Promise<void>;
     handleUndecryptableItemsKeys(keys: SNItemsKey[]): Promise<void>;
-    private processPersistedUndecryptables;
+    processPersistedUndecryptables(): Promise<void>;
     private getUndecryptables;
     private persistUndecryptables;
     private saveToUndecryptables;

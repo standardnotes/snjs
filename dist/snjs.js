@@ -24193,6 +24193,10 @@ class application_SNApplication {
   generateUuid() {
     return uuid_Uuid.GenerateUuid();
   }
+
+  presentKeyRecoveryWizard() {
+    return this.keyRecoveryService.processPersistedUndecryptables();
+  }
   /**
    * Dynamically change the device interface, i.e when Desktop wants to override
    * default web interface.
