@@ -167,6 +167,8 @@ describe('key recovery service', function () {
       password: this.password
     });
 
+    const note = await Factory.createSyncedNote(appA);
+
     /** Set a passcode to expect it to be validated later */
     await appA.setPasscode(passcode);
 
@@ -210,6 +212,10 @@ describe('key recovery service', function () {
     const aKey = await appA.protocolService.getRootKey();
     const bKey = await appB.protocolService.getRootKey();
     expect(aKey.compare(bKey)).to.equal(true);
+
+    /** Expect appB note to be decrypted */
+    expect(appA.findItem(note.uuid).errorDecrypting).to.not.be.ok;
+    expect(appB.findItem(note.uuid).errorDecrypting).to.not.be.ok;
 
     expect(appA.syncService.isOutOfSync()).to.equal(false);
     expect(appB.syncService.isOutOfSync()).to.equal(false);

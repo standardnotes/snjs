@@ -146,8 +146,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     });
     this.removeItemsObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
-      (_, inserted) => {
-        if (inserted.length > 0) {
+      (changed, inserted) => {
+        if (changed.concat(inserted).length > 0) {
           this.decryptErroredItems();
         }
       }

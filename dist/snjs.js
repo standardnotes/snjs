@@ -17868,8 +17868,8 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       enumerable: false,
       writable: true
     });
-    this.removeItemsObserver = this.itemManager.addObserver([content_types["a" /* ContentType */].ItemsKey], (_, inserted) => {
-      if (inserted.length > 0) {
+    this.removeItemsObserver = this.itemManager.addObserver([content_types["a" /* ContentType */].ItemsKey], (changed, inserted) => {
+      if (changed.concat(inserted).length > 0) {
         this.decryptErroredItems();
       }
     });
