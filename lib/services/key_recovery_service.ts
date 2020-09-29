@@ -172,7 +172,7 @@ export class SNKeyRecoveryService extends PureService {
     await this.beginProcessingQueue();
   }
 
-  private async processPersistedUndecryptables() {
+  public async processPersistedUndecryptables() {
     const record = await this.getUndecryptables();
     const rawPayloads = Object.values(record);
     if (rawPayloads.length === 0) {

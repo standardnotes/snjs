@@ -1378,6 +1378,10 @@ export class SNApplication {
     return Uuid.GenerateUuid();
   }
 
+  public presentKeyRecoveryWizard(): Promise<void> {
+    return this.keyRecoveryService!.processPersistedUndecryptables();
+  }
+
   /**
    * Dynamically change the device interface, i.e when Desktop wants to override
    * default web interface.

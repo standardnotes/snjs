@@ -367,6 +367,7 @@ export declare class SNApplication {
     setStorageEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies): Promise<void>;
     hasPendingMigrations(): Promise<boolean>;
     generateUuid(): Promise<string>;
+    presentKeyRecoveryWizard(): Promise<void>;
     /**
      * Dynamically change the device interface, i.e when Desktop wants to override
      * default web interface.
