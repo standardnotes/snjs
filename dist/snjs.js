@@ -13053,12 +13053,19 @@ const MINIMUM_PASSWORD_LENGTH = 8;
 const cleanedEmailString = email => {
   return email.trim().toLowerCase();
 };
+
+var SessionEvent;
+
+(function (SessionEvent) {
+  SessionEvent["SessionRestored"] = "SessionRestored";
+})(SessionEvent || (SessionEvent = {}));
+
+;
 /**
  * The session manager is responsible for loading initial user state, and any relevant
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
-
 
 class session_manager_SNSessionManager extends pure_service["a" /* PureService */] {
   constructor(storageService, apiService, alertService, protocolService, challengeService) {
@@ -13151,6 +13158,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
           this.challengeService.setValidationStatusForChallenge(challenge, challengeResponse.values[1], false);
         } else {
           this.challengeService.completeChallenge(challenge);
+          this.notifyEvent(SessionEvent.SessionRestored);
           this.alertService.alert(SessionStrings.SessionRestored);
         }
       }
@@ -24330,6 +24338,11 @@ class application_SNApplication {
 
   createSessionManager() {
     this.sessionManager = new session_manager_SNSessionManager(this.storageService, this.apiService, this.alertService, this.protocolService, this.challengeService);
+    this.serviceObservers.push(this.sessionManager.addEventObserver(async event => {
+      if (event === SessionEvent.SessionRestored) {
+        this.sync();
+      }
+    }));
     this.services.push(this.sessionManager);
   }
 

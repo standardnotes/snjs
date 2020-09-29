@@ -2,23 +2,23 @@ import { removeFromArray } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
 
-type EventObserver = (eventName: string, data: any) => Promise<void>
+type EventObserver<T> = (eventName: T, data: any) => Promise<void>
 
-export abstract class PureService {
+export abstract class PureService<E = string> {
 
-  private eventObservers: EventObserver[] = []
+  private eventObservers: EventObserver<E>[] = []
   public loggingEnabled = false
   public deviceInterface?: DeviceInterface
   private criticalPromises: Promise<any>[] = []
 
-  public addEventObserver(observer: EventObserver) {
+  public addEventObserver(observer: EventObserver<E>) {
     this.eventObservers.push(observer);
     return () => {
       removeFromArray(this.eventObservers, observer);
     };
   }
 
-  protected async notifyEvent(eventName: string, data?: any) {
+  protected async notifyEvent(eventName: E, data?: any) {
     for (const observer of this.eventObservers) {
       await observer(eventName, data || {});
     }

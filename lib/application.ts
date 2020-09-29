@@ -1,5 +1,4 @@
 import { SNKeyRecoveryService } from './services/key_recovery_service';
-import { SNRootKey } from '@Protocol/root_key';
 import { CollectionSort, SortDirection } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
@@ -16,7 +15,7 @@ import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
 import { Challenge, ChallengeResponse, ChallengeValidation, ChallengeReason, ChallengeValue, ChallengePrompt } from './challenges';
-import { ValueCallback, ChallengeObserver } from './services/challenge/challenge_service';
+import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
 import { Environment, Platform } from './platforms';
@@ -57,7 +56,7 @@ import {
   DO_NOT_CLOSE_APPLICATION,
   UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings, ChallengeStrings, ProtocolUpgradeStrings, PasswordChangeStrings
 } from './services/api/messages';
-import { MINIMUM_PASSWORD_LENGTH } from './services/api/session_manager';
+import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
@@ -115,7 +114,7 @@ export class SNApplication {
   private keyRecoveryService!: SNKeyRecoveryService
 
   private eventHandlers: ApplicationObserver[] = [];
-  private services: PureService[] = [];
+  private services: PureService<any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
   private managedSubscribers: ObserverRemover[] = [];
@@ -1552,6 +1551,11 @@ export class SNApplication {
       this.protocolService,
       this.challengeService
     );
+    this.serviceObservers.push(this.sessionManager.addEventObserver(async event => {
+      if (event === SessionEvent.SessionRestored) {
+        this.sync();
+      }
+    }));
     this.services.push(this.sessionManager!);
   }
 
@@ -1565,12 +1569,12 @@ export class SNApplication {
       this.apiService!,
       this.deviceInterface!.interval
     );
-    const syncEventCallback = async (eventName: string) => {
-      const appEvent = applicationEventForSyncEvent(eventName as SyncEvent);
+    const syncEventCallback = async (eventName: SyncEvent) => {
+      const appEvent = applicationEventForSyncEvent(eventName);
       if (appEvent) {
         await this.notifyEvent(appEvent);
       }
-      await this.protocolService!.onSyncEvent(eventName as SyncEvent);
+      await this.protocolService!.onSyncEvent(eventName);
     };
     const uninstall = this.syncService!.addEventObserver(syncEventCallback);
     this.serviceObservers.push(uninstall);

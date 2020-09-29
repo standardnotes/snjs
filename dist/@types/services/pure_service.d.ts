@@ -1,13 +1,13 @@
 import { ApplicationStage } from '../stages';
 import { DeviceInterface } from '../device_interface';
-declare type EventObserver = (eventName: string, data: any) => Promise<void>;
-export declare abstract class PureService {
+declare type EventObserver<T> = (eventName: T, data: any) => Promise<void>;
+export declare abstract class PureService<E = string> {
     private eventObservers;
     loggingEnabled: boolean;
     deviceInterface?: DeviceInterface;
     private criticalPromises;
-    addEventObserver(observer: EventObserver): () => void;
-    protected notifyEvent(eventName: string, data?: any): Promise<void>;
+    addEventObserver(observer: EventObserver<E>): () => void;
+    protected notifyEvent(eventName: E, data?: any): Promise<void>;
     /**
      * Called by application to allow services to momentarily block deinit until
      * sensitive operations complete.

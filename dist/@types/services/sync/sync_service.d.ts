@@ -1,3 +1,4 @@
+import { SyncEvent } from './events';
 import { ItemManager } from '../item_manager';
 import { SNItem } from '../../models/core/item';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
@@ -61,7 +62,7 @@ export declare type SyncOptions = {
  * After each sync request, any changes made or retrieved are also persisted locally.
  * The sync service largely does not perform any task unless it is called upon.
  */
-export declare class SNSyncService extends PureService {
+export declare class SNSyncService extends PureService<SyncEvent> {
     private sessionManager?;
     private protocolService?;
     private storageService?;

@@ -98,7 +98,7 @@ type SyncPromise = {
  * After each sync request, any changes made or retrieved are also persisted locally.
  * The sync service largely does not perform any task unless it is called upon.
  */
-export class SNSyncService extends PureService {
+export class SNSyncService extends PureService<SyncEvent> {
 
   private sessionManager?: SNSessionManager
   private protocolService?: SNProtocolService

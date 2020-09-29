@@ -18,12 +18,15 @@ declare type User = {
     uuid: string;
     email?: string;
 };
+export declare const enum SessionEvent {
+    SessionRestored = "SessionRestored"
+}
 /**
  * The session manager is responsible for loading initial user state, and any relevant
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
-export declare class SNSessionManager extends PureService {
+export declare class SNSessionManager extends PureService<SessionEvent> {
     private storageService;
     private apiService;
     private alertService;

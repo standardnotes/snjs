@@ -35,12 +35,16 @@ const cleanedEmailString = (email: string) => {
   return email.trim().toLowerCase();
 }
 
+export const enum SessionEvent {
+  SessionRestored = 'SessionRestored'
+};
+
 /**
  * The session manager is responsible for loading initial user state, and any relevant
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
-export class SNSessionManager extends PureService {
+export class SNSessionManager extends PureService<SessionEvent> {
 
   private user?: User
   private isSessionRenewChallengePresented = false;
@@ -141,9 +145,8 @@ export class SNSessionManager extends PureService {
             );
           } else {
             this.challengeService.completeChallenge(challenge);
-            this.alertService!.alert(
-              SessionStrings.SessionRestored
-            );
+            this.notifyEvent(SessionEvent.SessionRestored);
+            this.alertService!.alert(SessionStrings.SessionRestored);
           }
         }
       })
