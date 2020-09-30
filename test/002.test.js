@@ -45,6 +45,35 @@ describe('002 protocol operations', () => {
     expect(key.keyParams.content.pw_salt).to.be.ok;
   });
 
+  it('generates valid keys from existing params and decrypts', async () => {
+    const password = 'password';
+    const keyParams = await application.protocolService.createKeyParams({
+      pw_salt: '8d381ef44cdeab1489194f87066b747b46053a833ee24956e846e7b40440f5f4',
+      pw_cost: 101000,
+      version: '002'
+    });
+    const key = await protocol002.computeRootKey(
+      password,
+      keyParams
+    );
+    expect(key.keyVersion).to.equal('002');
+    expect(key.serverPassword).to.equal('f3cc7efc93380a7a3765dcb0498dabe83387acdda78f43bc7cfc31f4a2a05077');
+    expect(key.masterKey).to.equal('66500f7c9fb8ba0843e13e2f555feb5e43a3c27fee23e9b900a2577f1b373e1a');
+    expect(key.dataAuthenticationKey).to.equal('af3d6a7fd6c0422a7a84b0e99d6ac2a79b77675c9848f74314c20046e1f95c75');
+    const payload = CreateMaxPayloadFromAnyObject({
+      content: '002:0ff292a79549e817003886e9c4865eaf5faa0b3ada5b41c846c63bd4056e6816:959b042a-3892-461e-8c50-477c10c7c40a:c856f9d81033994f397285e2d060e9d4:pQ/jKyb8qCsz18jdMiYkpxf4l8ELIbTtwqUwLM3fRUwDL4/ofZLGICuFlssmrb74Brm+N19znwfNQ9ouFPtijA==',
+      content_type: 'Note',
+      enc_item_key: '002:24a8e8f7728bbe06605d8209d87ad338d3d15ef81154bb64d3967c77daa01333:959b042a-3892-461e-8c50-477c10c7c40a:f1d294388742dca34f6f266a01483a4e:VdlEDyjhZ35GbJDg8ruSZv3Tp6WtMME3T5LLvcBYLHIMhrMi0RlPK83lK6F0aEaZvY82pZ0ntU+XpAX7JMSEdKdPXsACML7WeFrqKb3z2qHnA7NxgnIC0yVT/Z2mRrvlY3NNrUPGwJbfRcvfS7FVyw87MemT9CSubMZRviXvXETx82t7rsgjV/AIwOOeWhFi',
+      uuid: '959b042a-3892-461e-8c50-477c10c7c40a'
+    });
+    const decrypted = await application.protocolService.payloadByDecryptingPayload(
+      payload,
+      key
+    );
+    expect(decrypted.errorDecrypting).to.not.be.ok;
+    expect(decrypted.content.text).to.equal('Decryptable Sentence');
+  });
+
   it('properly encrypts and decrypts strings', async () => {
     const text = 'hello world';
     const key = _key.masterKey;

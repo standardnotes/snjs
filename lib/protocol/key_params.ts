@@ -81,14 +81,35 @@ export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
   return new SNRootKeyParams(keyParams);
 }
 
+function protocolVersionForKeyParamsResponse(response: KeyParamsResponse) {
+  if (response.version) {
+    return response.version;
+  }
+
+  /**
+   * 001 and 002 accounts may not report a version number.
+   * We deduce their version by:
+   * - if response.pw_nonce, it is 001
+   * - if response.pw_salt, it is 002
+   * (Note that these conditions would not apply if we were considering 003/004 accounts
+   * as newer accounts may also send pw_nonce. These conditions only apply because
+   * response.version is null.)
+   */
+
+   if(response.pw_nonce) {
+     return ProtocolVersion.V001;
+   } else {
+     return ProtocolVersion.V002;
+   }
+}
+
 export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier?: string) {
   const rawKeyParams: AnyKeyParamsContent = {
     identifier: identifier || response.identifier!,
     pw_cost: response.pw_cost!,
     pw_nonce: response.pw_nonce!,
     pw_salt: response.pw_salt!,
-    /* 002 doesn't have version automatically, newer versions do. */
-    version: response.version! || ProtocolVersion.V002,
+    version: protocolVersionForKeyParamsResponse(response),
     origination: response.origination,
     created: response.created,
   }

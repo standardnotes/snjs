@@ -9816,15 +9816,36 @@ function CreateAnyKeyParams(keyParams) {
 
   return new key_params_SNRootKeyParams(keyParams);
 }
+
+function protocolVersionForKeyParamsResponse(response) {
+  if (response.version) {
+    return response.version;
+  }
+  /**
+   * 001 and 002 accounts may not report a version number.
+   * We deduce their version by:
+   * - if response.pw_nonce, it is 001
+   * - if response.pw_salt, it is 002
+   * (Note that these conditions would not apply if we were considering 003/004 accounts
+   * as newer accounts may also send pw_nonce. These conditions only apply because
+   * response.version is null.)
+   */
+
+
+  if (response.pw_nonce) {
+    return versions["a" /* ProtocolVersion */].V001;
+  } else {
+    return versions["a" /* ProtocolVersion */].V002;
+  }
+}
+
 function KeyParamsFromApiResponse(response, identifier) {
   const rawKeyParams = {
     identifier: identifier || response.identifier,
     pw_cost: response.pw_cost,
     pw_nonce: response.pw_nonce,
     pw_salt: response.pw_salt,
-
-    /* 002 doesn't have version automatically, newer versions do. */
-    version: response.version || versions["a" /* ProtocolVersion */].V002,
+    version: protocolVersionForKeyParamsResponse(response),
     origination: response.origination,
     created: response.created
   };
@@ -17158,6 +17179,7 @@ class operator_001_SNProtocolOperator001 extends operator_SNProtocolOperator {
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
+        auth_hash: undefined,
         errorDecrypting: false,
         errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
         waitingForKey: false
@@ -17367,6 +17389,7 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
+        auth_hash: undefined,
         auth_params: authParams,
         errorDecrypting: false,
         errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
@@ -17724,6 +17747,7 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
+        auth_hash: undefined,
         errorDecrypting: false,
         errorDecryptingValueChanged: payload.errorDecrypting === true,
         waitingForKey: false

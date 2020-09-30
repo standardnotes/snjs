@@ -318,6 +318,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
           content: JSON.parse(content),
           items_key_id: undefined,
           enc_item_key: undefined,
+          auth_hash: undefined,
           errorDecrypting: false,
           errorDecryptingValueChanged: payload.errorDecrypting === true,
           waitingForKey: false,
