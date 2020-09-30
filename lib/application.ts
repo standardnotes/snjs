@@ -57,7 +57,7 @@ import {
   UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings, ChallengeStrings, ProtocolUpgradeStrings, PasswordChangeStrings
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
-import { SNComponent, SNTag, SNNote } from './models';
+import { SNComponent, SNTag, SNNote, ComponentMutator, TagMutator } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 
@@ -406,6 +406,12 @@ export class SNApplication {
    * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
   public async createManagedItem(
+    contentType: ContentType.Note,
+    content: PayloadContent,
+    needsSync?: boolean,
+    override?: PayloadOverride
+  ): Promise<SNNote>;
+  public async createManagedItem(
     contentType: ContentType,
     content: PayloadContent,
     needsSync = false,
@@ -422,7 +428,6 @@ export class SNApplication {
 
   /**
    * Creates an unmanaged item that can be added later.
-   * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
   public async createTemplateItem(
     contentType: ContentType,
@@ -616,8 +621,46 @@ export class SNApplication {
     );
   }
 
+  public async duplicateNote(note: SNNote, newContent?: PayloadContent): Promise<SNNote> {
+    if (typeof note.content !== 'object') {
+      throw Error(`Trying to duplicate note (${note.uuid}) before it was decrypted.`);
+    }
+
+    const duplicate = await this.createManagedItem(
+      ContentType.Note,
+      {
+        ...note.content,
+        ...newContent
+      },
+    );
+
+    /** Retain tags */
+    const associatedTags = this.referencingForItem(note, ContentType.Tag);
+    if (associatedTags.length) {
+      await this.changeItems(Uuids(associatedTags), (mutator) => {
+        mutator.addItemAsRelationship(duplicate);
+      });
+    }
+
+    /** Retain editor preference */
+    const associatedEditor = this.componentManager.editorForNote(note);
+    if (associatedEditor) {
+      await this.changeItem<ComponentMutator>(associatedEditor.uuid, (mutator) => {
+        mutator.associateWithItem(duplicate.uuid);
+      });
+    }
+
+    this.sync();
+
+    return duplicate;
+  }
+
   public getItems(contentType: ContentType | ContentType[]) {
     return this.itemManager!.getItems(contentType);
+  }
+
+  public getNoteTags(note: SNNote): SNTag[] {
+    return this.referencingForItem(note, ContentType.Tag);
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag) {
@@ -636,14 +679,14 @@ export class SNApplication {
   }
 
   /** Returns items referencing an item */
-  public referencingForItem(item: SNItem, contentType?: ContentType) {
-    let references = this.itemManager!.itemsReferencingItem(item.uuid);
+  public referencingForItem(item: SNItem, contentType: ContentType.Tag): SNTag[];
+  public referencingForItem(item: SNItem, contentType?: ContentType): SNItem[] {
+    const references = this.itemManager!.itemsReferencingItem(item.uuid);
     if (contentType) {
-      references = references.filter((ref) => {
-        return ref?.content_type === contentType;
-      })
+      return references.filter(ref => ref?.content_type === contentType) as SNItem[];
+    } else {
+      return references.filter(ref => ref !== undefined) as SNItem[];
     }
-    return references as SNItem[];
   }
 
   public findTagByTitle(title: string) {
