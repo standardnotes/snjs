@@ -1,6 +1,6 @@
 import { MutationType } from './../../models/core/item';
 import { SNComponent, ComponentArea, ComponentMutator } from './../../models/app/component';
-import { ContentReference } from './generator';
+import { ContentReference, PayloadContent } from './generator';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { CreateItemFromPayload } from '@Models/generator';
 import remove from 'lodash/remove';
@@ -49,8 +49,9 @@ const AffectorMapping = {
 export async function PayloadsByDuplicating(
   payload: PurePayload,
   baseCollection: ImmutablePayloadCollection,
-  isConflict: boolean
-  ) {
+  isConflict: boolean,
+  additionalContent?: Partial<PayloadContent>
+) {
   const results = [];
   const override: PayloadOverride = {
     uuid: await Uuid.GenerateUuid(),
@@ -60,11 +61,12 @@ export async function PayloadsByDuplicating(
     lastSyncEnd: null,
     duplicate_of: payload.uuid,
   };
+  override.content = {
+    ...payload.safeContent,
+    ...additionalContent,
+  }
   if (isConflict) {
-    override.content = {
-      ...payload.safeContent,
-      conflict_of: payload.uuid,
-    };
+    override.content.conflict_of = payload.uuid;
   }
   const copy = CopyPayload(
     payload,

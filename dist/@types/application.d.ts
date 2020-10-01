@@ -211,6 +211,7 @@ export declare class SNApplication {
     referencesForItem(item: SNItem, contentType?: ContentType): SNItem[];
     /** Returns items referencing an item */
     referencingForItem(item: SNItem, contentType?: ContentType): SNItem[];
+    duplicateItem<T extends SNItem>(item: T, additionalContent?: Partial<PayloadContent>): Promise<T>;
     findTagByTitle(title: string): SNTag | undefined;
     findOrCreateTag(title: string): Promise<SNTag>;
     getSmartTags(): SNSmartTag[];
