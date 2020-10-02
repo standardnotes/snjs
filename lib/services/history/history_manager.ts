@@ -1,9 +1,10 @@
+import { UuidString } from './../../types';
+import { RevisionListEntry, SingleRevision, SingleRevisionResponse } from './../api/responses';
 import { SessionHistoryMap } from '@Services/history/session/session_history_map';
-import { RawPayload } from './../../protocol/payloads/generator';
 import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 import { SNStorageService } from '@Services/storage_service';
 import { ItemManager } from '@Services/item_manager';
-import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import { CreateSourcedPayloadFromObject, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
@@ -12,20 +13,6 @@ import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined, concatArrays } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
-
-type RawRevisionPayload = RawPayload & {
-  item_id: string
-}
-
-export type RemoteHistoryListEntry = {
-  /** The uuid of the revision, not the item */
-  uuid: string
-  content_type: ContentType
-  created_at: Date
-  updated_at: Date
-}
-
-export type RemoteHistoryList = RemoteHistoryListEntry[];
 
 const PERSIST_TIMEOUT = 2000;
 
@@ -232,26 +219,29 @@ export class SNHistoryManager extends PureService {
    * individually upon selection via `fetchRemoteRevision`.
    */
   async remoteHistoryForItem(item: SNItem) {
-    const serverResponse = await this.apiService!.getItemRevisions(item.uuid);
-    if (serverResponse.error) {
+    const response = await this.apiService!.getItemRevisions(item.uuid);
+    if (response.error) {
       return undefined;
     }
-    return serverResponse.object as RemoteHistoryList;
+    return response.object as RevisionListEntry[];
   }
 
   /**
    * Expands on a revision fetched via `remoteHistoryForItem` by getting a revision's
    * complete fields (including encrypted content).
    */
-  async fetchRemoteRevision(itemUuid: string, revisionListEntry: RemoteHistoryListEntry) {
-    const serverResponse = await this.apiService!.getRevisionForItem(itemUuid, revisionListEntry.uuid);
-    if (serverResponse.error) {
+  async fetchRemoteRevision(itemUuid: UuidString, entry: RevisionListEntry) {
+    const revision = await this.apiService!.getRevision(entry, itemUuid) as SingleRevision;
+    if ((revision as SingleRevisionResponse).error) {
       return undefined;
     }
-    const payload = serverResponse.object as RawRevisionPayload;
-    const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory, {
-      uuid: itemUuid,
-    });
+    const payload = CreateMaxPayloadFromAnyObject(
+      revision as any,
+      {
+        uuid: revision.item_uuid
+      }
+    )
+    const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory);
     const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(encryptedPayload);
     return new ItemHistoryEntry(decryptedPayload);
   }

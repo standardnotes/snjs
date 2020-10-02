@@ -1,3 +1,5 @@
+import { UuidString } from './../../types';
+import { RevisionListEntry } from './../api/responses';
 import { ItemHistoryEntry } from './entries/item_history_entry';
 import { SNStorageService } from '../storage_service';
 import { ItemManager } from '../item_manager';
@@ -6,14 +8,6 @@ import { ContentType } from '../../models/content_types';
 import { PureService } from '../pure_service';
 import { SNApiService } from '../api/api_service';
 import { SNProtocolService } from '../protocol_service';
-export declare type RemoteHistoryListEntry = {
-    /** The uuid of the revision, not the item */
-    uuid: string;
-    content_type: ContentType;
-    created_at: Date;
-    updated_at: Date;
-};
-export declare type RemoteHistoryList = RemoteHistoryListEntry[];
 /**
  * The history manager is responsible for:
  * 1. Transient session history, which include keeping track of changes made in the
@@ -63,10 +57,10 @@ export declare class SNHistoryManager extends PureService {
      * include the item's content. Instead, each revision's content must be fetched
      * individually upon selection via `fetchRemoteRevision`.
      */
-    remoteHistoryForItem(item: SNItem): Promise<RemoteHistoryList | undefined>;
+    remoteHistoryForItem(item: SNItem): Promise<RevisionListEntry[] | undefined>;
     /**
      * Expands on a revision fetched via `remoteHistoryForItem` by getting a revision's
      * complete fields (including encrypted content).
      */
-    fetchRemoteRevision(itemUuid: string, revisionListEntry: RemoteHistoryListEntry): Promise<ItemHistoryEntry | undefined>;
+    fetchRemoteRevision(itemUuid: UuidString, entry: RevisionListEntry): Promise<ItemHistoryEntry | undefined>;
 }

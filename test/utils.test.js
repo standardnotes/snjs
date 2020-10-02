@@ -48,6 +48,15 @@ describe('utils', () => {
     expect(typeof parsed.b).to.equal('object');
   });
 
+  it('omitUndefined', () => {
+    const object = {
+      foo: '123',
+      bar: undefined
+    };
+    const omitted = omitUndefinedCopy(object);
+    expect(Object.keys(omitted).includes('bar')).to.equal(false);
+  });
+
   it('dateSorted', () => {
     const objects = [
       { date: new Date(10) },

@@ -40,7 +40,7 @@ export { SNHistoryManager } from './services/history/history_manager';
 export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
-export { Copy, findInArray, isNullOrUndefined, deepMerge, extendArray, removeFromIndex, subtractFromArray, arrayByDifference, uniqCombineObjArrays, greaterOfTwoDates, getGlobalScope, removeFromArray, addIfUnique, dictToArray, truncateHexString, jsonParseEmbeddedKeys, topLevelCompare, dateSorted } from './utils';
+export { addIfUnique, arrayByDifference, Copy, dateSorted, deepMerge, dictToArray, extendArray, findInArray, getGlobalScope, greaterOfTwoDates, isNullOrUndefined, jsonParseEmbeddedKeys, omitUndefinedCopy, removeFromArray, removeFromIndex, subtractFromArray, topLevelCompare, truncateHexString, uniqCombineObjArrays, } from './utils';
 export { Uuid } from './uuid';
 export { EncryptionIntent, isLocalStorageIntent, isFileIntent, isDecryptedIntent, intentRequiresEncryption, ContentTypeUsesRootKeyEncryption } from './protocol/intents';
 export { ContentType } from './models/content_types';
