@@ -51,7 +51,7 @@ export declare class SNApiService extends PureService {
     sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
     private refreshSessionThenRetryRequest;
     refreshSession(): Promise<SessionRenewalResponse>;
-    getItemRevisions(itemId: string): Promise<RevisionListResponse | HttpResponse>;
+    getItemRevisions(itemId: UuidString): Promise<RevisionListResponse | HttpResponse>;
     getRevision(entry: RevisionListEntry, itemId: UuidString): Promise<SingleRevisionResponse | HttpResponse>;
     private preprocessingError;
     /** Handle errored responses to authenticated requests */

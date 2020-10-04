@@ -357,7 +357,7 @@ export class SNApiService extends PureService {
   }
 
   async getItemRevisions(
-    itemId: string
+    itemId: UuidString
   ): Promise<RevisionListResponse | HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
