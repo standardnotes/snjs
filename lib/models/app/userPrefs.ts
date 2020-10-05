@@ -17,17 +17,6 @@ export enum WebPrefKey {
   NotesHideDate = 'hideDate'
 };
 
-export enum MobilePrefKey {
-  SortNotesBy = 'mobileSortBy',
-  SortNotesReverse = 'mobileSortReverse',
-  NotesHideNotePreview = 'mobileHideNotePreview',
-  NotesHideDate = 'mobileHideDate',
-  LastExportDate = 'mobileLastExportDate',
-  DoNotWarnUnsupportedEditors = 'mobileDoNotShowAgainUnsupportedEditors'
-}
-
-export type PrefKey = WebPrefKey | MobilePrefKey
-
 export class SNUserPrefs extends SNItem {
 
   get isSingleton() {
@@ -38,16 +27,13 @@ export class SNUserPrefs extends SNItem {
     return new SNPredicate('content_type', '=', this.content_type!);
   }
 
-  getPref(key: PrefKey) {
+  getPref(key: WebPrefKey) {
     return this.getAppDomainValue(key as any);
   }
 }
 
 export class UserPrefsMutator extends ItemMutator {
   setWebPref(key: WebPrefKey, value: any) {
-    this.setAppDataItem(key as any, value);
-  }
-  setMobilePref(key: MobilePrefKey, value: any) {
     this.setAppDataItem(key as any, value);
   }
 }
