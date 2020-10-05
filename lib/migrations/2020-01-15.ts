@@ -1,4 +1,3 @@
-import { ChallengeStrings } from './../services/api/messages';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
@@ -19,9 +18,9 @@ import {
 } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
-import { Session } from '@Services/api/session';
 import { CreateItemFromPayload } from '../models';
 import { isEnvironmentWebOrDesktop, isEnvironmentMobile } from '@Lib/platforms';
+import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 
 const LegacyKeys = {
   WebPasscodeParamsKey: 'offlineParams',
@@ -30,7 +29,13 @@ const LegacyKeys = {
   WebEncryptedStorageKey: 'encryptedStorage',
   MobileWrappedRootKeyKey: 'encrypted_account_keys',
   MobileBiometricsPrefs: 'biometrics_prefs',
-  AllMigrations: 'migrations'
+  AllMigrations: 'migrations',
+  MobileThemesCache: 'ThemePreferencesKey',
+  MobileLightTheme: 'lightTheme',
+  MobileDarkTheme: 'darkTheme',
+  MobileLastExportDate: 'LastExportDateKey',
+  MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
+  MobileOptionsState: 'options',
 };
 
 export class Migration20200115 extends Migration {
@@ -348,6 +353,29 @@ export class Migration20200115 extends Migration {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
+    const lastExportDate = await this.services.deviceInterface.getRawStorageValue(
+      LegacyKeys.MobileLastExportDate
+    );
+    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getRawStorageValue(
+      LegacyKeys.MobileDoNotWarnUnsupportedEditors
+    );
+    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
+    let migratedOptionsState = {}
+    if (legacyOptionsState) {
+      const legacySortBy = legacyOptionsState.sortBy;
+      migratedOptionsState = {
+        sortBy: isNullOrUndefined(legacySortBy) || legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
+        sortReverse: legacyOptionsState.sortReverse ?? false,
+        hideNotePreview: legacyOptionsState.hidePreviews ?? false,
+        hideDate: legacyOptionsState.hideDates ?? false
+      }
+    }
+    rawStructure.nonwrapped![StorageKey.MobilePreferences] = {
+      ...migratedOptionsState,
+      lastExportDate: lastExportDate ?? undefined,
+      doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors ?? false,
+    }
+
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
