@@ -38,7 +38,6 @@ type SessionBody = {
   refresh_expiration: number
 }
 
-
 export type KeyParamsResponse = HttpResponse & {
   identifier?: string
   pw_cost?: number
@@ -67,13 +66,37 @@ export type SignInResponse = RegistrationResponse & {
 
 export type ChangePasswordResponse = SignInResponse;
 
-export type SignOutResponse = HttpResponse & {
-
-}
+export type SignOutResponse = HttpResponse & {}
 
 export type SessionRenewalResponse = HttpResponse & {
   session?: SessionBody
 }
+
+export type RevisionListEntry = {
+  content_type: string
+  created_at: string,
+  updated_at: string,
+  /** The uuid of the revision */
+  uuid: string
+};
+
+export type RevisionListResponse = HttpResponse & RevisionListEntry[];
+
+export type SingleRevision = {
+  auth_hash?: string
+  content_type: string,
+  content: string,
+  created_at: string,
+  enc_item_key: string,
+  /** The uuid of the item this revision was created with */
+  item_uuid: string,
+  items_key_id: string,
+  updated_at: string,
+  /** The uuid of the revision */
+  uuid: string,
+}
+
+export type SingleRevisionResponse = HttpResponse & Partial<SingleRevision>
 
 export enum ConflictType {
   ConflictingData = 'sync_conflict',

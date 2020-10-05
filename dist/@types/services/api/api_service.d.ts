@@ -1,4 +1,5 @@
-import { SessionRenewalResponse, RegistrationResponse, SignInResponse, ChangePasswordResponse, KeyParamsResponse, HttpResponse } from './responses';
+import { UuidString } from './../../types';
+import { ChangePasswordResponse, HttpResponse, KeyParamsResponse, RegistrationResponse, RevisionListEntry, RevisionListResponse, SessionRenewalResponse, SignInResponse, SingleRevisionResponse } from './responses';
 import { Session } from './session';
 import { ContentType } from '../../models/content_types';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
@@ -50,8 +51,8 @@ export declare class SNApiService extends PureService {
     sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
     private refreshSessionThenRetryRequest;
     refreshSession(): Promise<SessionRenewalResponse>;
-    getItemRevisions(itemId: string): Promise<HttpResponse>;
-    getRevisionForItem(itemId: string, revisionId: string): Promise<HttpResponse>;
+    getItemRevisions(itemId: UuidString): Promise<RevisionListResponse | HttpResponse>;
+    getRevision(entry: RevisionListEntry, itemId: UuidString): Promise<SingleRevisionResponse | HttpResponse>;
     private preprocessingError;
     /** Handle errored responses to authenticated requests */
     private preprocessAuthenticatedErrorResponse;

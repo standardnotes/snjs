@@ -51,7 +51,7 @@ export function isDecryptedIntent(intent: EncryptionIntent) {
 }
 
 /**
- * @returns {boolean}  True if the intent requires encryption.
+ * @returns True if the intent requires encryption.
  */
 export function intentRequiresEncryption(intent: EncryptionIntent) {
   return (

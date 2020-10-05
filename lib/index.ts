@@ -82,24 +82,25 @@ export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
 export {
+  addIfUnique,
+  arrayByDifference,
   Copy,
-  findInArray,
-  isNullOrUndefined,
+  dateSorted,
   deepMerge,
+  dictToArray,
   extendArray,
+  findInArray,
+  getGlobalScope,
+  greaterOfTwoDates,
+  isNullOrUndefined,
+  jsonParseEmbeddedKeys,
+  omitUndefinedCopy,
+  removeFromArray,
   removeFromIndex,
   subtractFromArray,
-  arrayByDifference,
-  uniqCombineObjArrays,
-  greaterOfTwoDates,
-  getGlobalScope,
-  removeFromArray,
-  addIfUnique,
-  dictToArray,
-  truncateHexString,
-  jsonParseEmbeddedKeys,
   topLevelCompare,
-  dateSorted
+  truncateHexString,
+  uniqCombineObjArrays,
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {
