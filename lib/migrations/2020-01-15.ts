@@ -54,6 +54,7 @@ export class Migration20200115 extends Migration {
     });
     this.registerStageHandler(ApplicationStage.StorageDecrypted_09, async () => {
       await this.migrateArbitraryRawStorageToManagedStorageAllPlatforms();
+      await this.migrateMobilePreferences();
       await this.migrateSessionStorage();
       await this.deleteLegacyStorageValues();
     });
@@ -218,7 +219,6 @@ export class Migration20200115 extends Migration {
     const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
     /** Decrypt it with the passcode */
     let decryptedStoragePayload: PurePayload | undefined;
-    let errorDecrypting = true;
     let passcodeKey: SNRootKey;
     await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
       passcodeKey = await this.services.protocolService.computeRootKey(
@@ -352,29 +352,6 @@ export class Migration20200115 extends Migration {
     if (biometricPrefs) {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
-    }
-
-    const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.MobileLastExportDate
-    );
-    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.MobileDoNotWarnUnsupportedEditors
-    );
-    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
-    let migratedOptionsState = {}
-    if (legacyOptionsState) {
-      const legacySortBy = legacyOptionsState.sortBy;
-      migratedOptionsState = {
-        sortBy: legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
-        sortReverse: legacyOptionsState.sortReverse ?? false,
-        hideNotePreview: legacyOptionsState.hidePreviews ?? false,
-        hideDate: legacyOptionsState.hideDates ?? false
-      }
-    }
-    rawStructure.unwrapped![StorageKey.MobilePreferences] = {
-      ...migratedOptionsState,
-      lastExportDate: lastExportDate ?? undefined,
-      doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors ?? false,
     }
 
     if (rawPasscodeParams) {
@@ -530,6 +507,39 @@ export class Migration20200115 extends Migration {
     for (const key of managedKeys) {
       await this.services.deviceInterface.removeRawStorageValue(key);
     }
+  }
+
+  /**
+   * Mobile
+   * Migrate mobile preferences
+   * @access private
+   */
+  async migrateMobilePreferences() {
+    const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+      LegacyKeys.MobileLastExportDate
+    );
+    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+      LegacyKeys.MobileDoNotWarnUnsupportedEditors
+    );
+    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
+    let migratedOptionsState = {}
+    if (legacyOptionsState) {
+      const legacySortBy = legacyOptionsState.sortBy;
+      migratedOptionsState = {
+        sortBy: legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
+        sortReverse: legacyOptionsState.sortReverse ?? false,
+        hideNotePreview: legacyOptionsState.hidePreviews ?? false,
+        hideDate: legacyOptionsState.hideDates ?? false
+      }
+    }
+
+    const preferences = {
+      ...migratedOptionsState,
+      lastExportDate: lastExportDate ?? undefined,
+      doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors ?? false,
+    }
+
+    await this.services.storageService.setValue(StorageKey.MobilePreferences, preferences);
   }
 
   /**
