@@ -11486,7 +11486,7 @@ const AffectorMapping = {
  * @returns An array of payloads that have changed as a result of copying.
  */
 
-async function PayloadsByDuplicating(payload, baseCollection, isConflict) {
+async function PayloadsByDuplicating(payload, baseCollection, isConflict, additionalContent) {
   const results = [];
   const override = {
     uuid: await uuid_Uuid.GenerateUuid(),
@@ -11496,11 +11496,10 @@ async function PayloadsByDuplicating(payload, baseCollection, isConflict) {
     lastSyncEnd: null,
     duplicate_of: payload.uuid
   };
+  override.content = functions_objectSpread(functions_objectSpread({}, payload.safeContent), additionalContent);
 
   if (isConflict) {
-    override.content = functions_objectSpread(functions_objectSpread({}, payload.safeContent), {}, {
-      conflict_of: payload.uuid
-    });
+    override.content.conflict_of = payload.uuid;
   }
 
   const copy = Object(generator["b" /* CopyPayload */])(payload, override);
@@ -20796,9 +20795,10 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
   async duplicateItem(uuid) {
     let isConflict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    let additionalContent = arguments.length > 2 ? arguments[2] : undefined;
     const item = this.findItem(uuid);
     const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(item);
-    const resultingPayloads = await PayloadsByDuplicating(payload, this.modelManager.getMasterCollection(), isConflict);
+    const resultingPayloads = await PayloadsByDuplicating(payload, this.modelManager.getMasterCollection(), isConflict, additionalContent);
     await this.modelManager.emitPayloads(resultingPayloads, sources["a" /* PayloadSource */].LocalChanged);
     const duplicate = this.findItem(resultingPayloads[0].uuid);
     return duplicate;
@@ -23515,6 +23515,12 @@ class application_SNApplication {
     }
 
     return references;
+  }
+
+  duplicateItem(item, additionalContent) {
+    const duplicate = this.itemManager.duplicateItem(item.uuid, false, additionalContent);
+    this.sync();
+    return duplicate;
   }
 
   findTagByTitle(title) {
