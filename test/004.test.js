@@ -150,9 +150,10 @@ describe('004 protocol operations', () => {
       key,
     );
     const modifiedParams = CopyPayload(params, { uuid: 'foo' });
-    await Factory.expectThrowsAsync(() => protocol004.generateDecryptedParameters(
+    const result = await protocol004.generateDecryptedParameters(
       modifiedParams,
       key
-    ), 'The uuid/version in authenticated data');
+    );
+    expect(result.errorDecrypting).to.equal(true);
   });
 });

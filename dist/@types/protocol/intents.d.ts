@@ -22,6 +22,6 @@ export declare function isLocalStorageIntent(intent: EncryptionIntent): boolean;
 export declare function isFileIntent(intent: EncryptionIntent): boolean;
 export declare function isDecryptedIntent(intent: EncryptionIntent): boolean;
 /**
- * @returns {boolean}  True if the intent requires encryption.
+ * @returns True if the intent requires encryption.
  */
 export declare function intentRequiresEncryption(intent: EncryptionIntent): boolean;

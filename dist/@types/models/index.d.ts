@@ -7,7 +7,7 @@ export { SNActionsExtension } from './app/extension';
 export { Action } from './app/action';
 export { SNNote, NoteMutator } from './app/note';
 export { SNTag, TagMutator } from './app/tag';
-export { SNUserPrefs, UserPrefsMutator, WebPrefKey, MobilePrefKey } from './app/userPrefs';
+export { SNUserPrefs, UserPrefsMutator, WebPrefKey } from './app/userPrefs';
 export { SNPrivileges, PrivilegeMutator } from './app/privileges';
 export { SNSmartTag } from './app/smartTag';
 export { SNTheme, ThemeMutator } from './app/theme';

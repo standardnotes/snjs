@@ -646,6 +646,19 @@ export class SNApplication {
     return references as SNItem[];
   }
 
+  public duplicateItem<T extends SNItem>(
+    item: T,
+    additionalContent?: Partial<PayloadContent>
+  ) {
+    const duplicate = this.itemManager.duplicateItem<T>(
+      item.uuid,
+      false,
+      additionalContent
+    );
+    this.sync();
+    return duplicate;
+  }
+
   public findTagByTitle(title: string) {
     return this.itemManager!.findTagByTitle(title);
   }

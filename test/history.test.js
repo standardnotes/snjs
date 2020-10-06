@@ -225,7 +225,7 @@ describe('history manager', () => {
         );
         expect(itemHistory.entries.length).to.equal(4);
       });
-    
+
     it('entries should be ordered from newest to oldest', async function () {
       const payload = CreateMaxPayloadFromAnyObject(
         Factory.createNoteParams({
@@ -397,6 +397,58 @@ describe('history manager', () => {
       expect(payloadFromServer.uuid).to.eq(item.payload.uuid);
       expect(payloadFromServer.content).to.eql(item.payload.content);
       expect(payloadFromServer.content.title).to.eq(newTitleAfterFirstChange);
+    });
+
+    it('revisions count matches original for duplicated items', async function () {
+      const note = await Factory.createSyncedNote(this.application);
+      /** Make a few changes to note */
+      await this.application.saveItem(note.uuid);
+      await this.application.saveItem(note.uuid);
+      await this.application.saveItem(note.uuid);
+      const dupe = await this.application.itemManager.duplicateItem(note.uuid, true);
+      await this.application.saveItem(dupe.uuid);
+
+      const expectedRevisions = 3;
+      const noteHistory = await this.historyManager.remoteHistoryForItem(note);
+      const dupeHistory = await this.historyManager.remoteHistoryForItem(dupe);
+      expect(noteHistory.length).to.equal(expectedRevisions);
+      expect(dupeHistory.length).to.equal(expectedRevisions);
+    });
+
+    it('duplicate revisions should have the originals uuid', async function () {
+      const note = await Factory.createSyncedNote(this.application);
+      await this.application.saveItem(note.uuid);
+      const dupe = await this.application.itemManager.duplicateItem(note.uuid, true);
+      await this.application.saveItem(dupe.uuid);
+
+      const dupeHistory = await this.historyManager.remoteHistoryForItem(dupe);
+      const dupeRevision = await this.historyManager.fetchRemoteRevision(
+        dupe.uuid,
+        dupeHistory[0]
+      );
+      expect(dupeRevision.payload.uuid).to.equal(note.uuid);
+    });
+
+    it('can decrypt revisions for duplicate_of items', async function () {
+      const note = await Factory.createSyncedNote(this.application);
+      const changedText = `${Math.random()}`;
+      /** Make a few changes to note */
+      await this.application.changeAndSaveItem(note.uuid, (mutator) => {
+        mutator.title = changedText;
+      });
+      await this.application.saveItem(note.uuid);
+
+      const dupe = await this.application.itemManager.duplicateItem(note.uuid, true);
+      await this.application.saveItem(dupe.uuid);
+      const itemHistory = await this.historyManager.remoteHistoryForItem(dupe);
+      const newestRevision = itemHistory[0];
+
+      const fetched = await this.historyManager.fetchRemoteRevision(
+        dupe.uuid,
+        newestRevision
+      );
+      expect(fetched.payload.errorDecrypting).to.not.be.ok;
+      expect(fetched.payload.content.title).to.equal(changedText);
     });
   });
 });

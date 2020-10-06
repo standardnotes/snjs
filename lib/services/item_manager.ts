@@ -545,20 +545,25 @@ export class ItemManager extends PureService {
    * Duplicates an item and maps it, thus propagating the item to observers.
    * @param isConflict - Whether to mark the duplicate as a conflict of the original.
    */
-  public async duplicateItem(uuid: UuidString, isConflict = false) {
+  public async duplicateItem<T extends SNItem>(
+    uuid: UuidString,
+    isConflict = false,
+    additionalContent?: Partial<PayloadContent>
+  ) {
     const item = this.findItem(uuid)!;
     const payload = CreateMaxPayloadFromAnyObject(item);
     const resultingPayloads = await PayloadsByDuplicating(
       payload,
       this.modelManager!.getMasterCollection(),
       isConflict,
+      additionalContent
     );
     await this.modelManager!.emitPayloads(
       resultingPayloads,
       PayloadSource.LocalChanged
     );
     const duplicate = this.findItem(resultingPayloads[0].uuid!);
-    return duplicate!;
+    return duplicate! as T;
   }
 
   /**

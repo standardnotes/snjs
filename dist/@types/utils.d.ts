@@ -121,6 +121,8 @@ export declare function objectToValueArray(object: AnyRecord): any[];
  * For example, sortedCopy({b: '1', a: '2'}) returns {a: '2', b: '1'}
  */
 export declare function sortedCopy(object: any): any;
+/** Returns a new object by omitting any keys which have an undefined or null value  */
+export declare function omitUndefinedCopy(object: any): any;
 /**
  * Returns a new array by sorting an array of elements based on a date property,
  * as indicated by the input key value.

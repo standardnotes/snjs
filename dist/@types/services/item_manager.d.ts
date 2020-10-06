@@ -142,7 +142,7 @@ export declare class ItemManager extends PureService {
      * Duplicates an item and maps it, thus propagating the item to observers.
      * @param isConflict - Whether to mark the duplicate as a conflict of the original.
      */
-    duplicateItem(uuid: UuidString, isConflict?: boolean): Promise<SNItem>;
+    duplicateItem<T extends SNItem>(uuid: UuidString, isConflict?: boolean, additionalContent?: Partial<PayloadContent>): Promise<T>;
     /**
      * Creates an item and conditionally maps it and marks it as dirty.
      * @param needsSync - Whether to mark the item as needing sync

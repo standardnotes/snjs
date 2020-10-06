@@ -35,7 +35,7 @@ export function isWebCryptoAvailable() {
 /**
  * Whether we are in React Native app
  */
-export function isReactNativeEnvironment()  {
+export function isReactNativeEnvironment() {
   return typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
 }
 
@@ -271,6 +271,18 @@ export function sortedCopy(object: any) {
   }
   return Copy(result);
 }
+
+/** Returns a new object by omitting any keys which have an undefined or null value  */
+export function omitUndefinedCopy(object: any) {
+  const result: any = {};
+  for (const key of Object.keys(object)) {
+    if (!isNullOrUndefined(object[key])) {
+      result[key] = object[key];
+    }
+  }
+  return result;
+}
+
 
 /**
  * Returns a new array by sorting an array of elements based on a date property,

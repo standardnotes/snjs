@@ -105,41 +105,42 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "u", function() { return isWebCryptoAvailable; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "s", function() { return isReactNativeEnvironment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return findInArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "D", function() { return searchArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "E", function() { return searchArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return concatArrays; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return isObject; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return isFunction; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return isNullOrUndefined; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "t", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return greaterOfTwoDates; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "J", function() { return uniqCombineObjArrays; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "K", function() { return uniqueArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "K", function() { return uniqCombineObjArrays; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "L", function() { return uniqueArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "x", function() { return lastElement; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return extendArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "G", function() { return subtractFromArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "B", function() { return removeFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "H", function() { return subtractFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "C", function() { return removeFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return addIfUnique; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return filterFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return arrayByDifference; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return compareValues; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "C", function() { return removeFromIndex; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "D", function() { return removeFromIndex; });
 /* unused harmony export addAtIndex */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "y", function() { return objectToValueArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "F", function() { return sortedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "G", function() { return sortedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "A", function() { return omitUndefinedCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return dateSorted; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "H", function() { return topLevelCompare; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "I", function() { return topLevelCompare; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return jsonParseEmbeddedKeys; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "z", function() { return omitInPlace; });
 /* unused harmony export omitByCopy */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "v", function() { return joinPaths; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Copy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return deepMerge; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "A", function() { return pickByCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "B", function() { return pickByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return deepFreeze; });
 /* unused harmony export hasGetter */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "I", function() { return truncateHexString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "E", function() { return sleep; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "J", function() { return truncateHexString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "F", function() { return sleep; });
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
@@ -430,6 +431,19 @@ function sortedCopy(object) {
   }
 
   return Copy(result);
+}
+/** Returns a new object by omitting any keys which have an undefined or null value  */
+
+function omitUndefinedCopy(object) {
+  const result = {};
+
+  for (const key of Object.keys(object)) {
+    if (!isNullOrUndefined(object[key])) {
+      result[key] = object[key];
+    }
+  }
+
+  return result;
 }
 /**
  * Returns a new array by sorting an array of elements based on a date property,
@@ -740,7 +754,7 @@ function CopyPayload(payload, override) {
 }
 
 function CreatePayload(object, fields, source, override) {
-  const rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* pickByCopy */ "A"])(object, fields);
+  const rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* pickByCopy */ "B"])(object, fields);
   const overrideFields = override instanceof _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"] ? override.fields.slice() : Object.keys(override || []);
 
   for (const field of overrideFields) {
@@ -748,7 +762,7 @@ function CreatePayload(object, fields, source, override) {
     rawPayload[field] = value ? Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* Copy */ "a"])(value) : value;
   }
 
-  const newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* uniqueArray */ "K"])(fields.concat(overrideFields));
+  const newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* uniqueArray */ "L"])(fields.concat(overrideFields));
   return new _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"](rawPayload, newFields, source || _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__[/* PayloadSource */ "a"].Constructor);
 }
 
@@ -1612,7 +1626,7 @@ function ItemContentsDiffer(item1, item2, excludeContentKeys) {
 
 function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysToIgnore) {
   /* Create copies of objects before running omit as not to modify source values directly. */
-  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* sortedCopy */ "F"])(leftContent);
+  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* sortedCopy */ "G"])(leftContent);
 
   if (leftContent.appData) {
     const domainData = leftContent.appData[_content_types__WEBPACK_IMPORTED_MODULE_5__[/* DefaultAppDomain */ "b"]];
@@ -1633,7 +1647,7 @@ function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysT
   }
 
   Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* omitInPlace */ "z"])(leftContent, keysToIgnore);
-  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* sortedCopy */ "F"])(rightContent);
+  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* sortedCopy */ "G"])(rightContent);
 
   if (rightContent.appData) {
     const domainData = rightContent.appData[_content_types__WEBPACK_IMPORTED_MODULE_5__[/* DefaultAppDomain */ "b"]];
@@ -1704,7 +1718,7 @@ function isDecryptedIntent(intent) {
   return intent === EncryptionIntent.SyncDecrypted || intent === EncryptionIntent.LocalStorageDecrypted || intent === EncryptionIntent.FileDecrypted;
 }
 /**
- * @returns {boolean}  True if the intent requires encryption.
+ * @returns True if the intent requires encryption.
  */
 
 function intentRequiresEncryption(intent) {
@@ -1816,7 +1830,7 @@ class PureService {
   addEventObserver(observer) {
     this.eventObservers.push(observer);
     return () => {
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* removeFromArray */ "B"])(this.eventObservers, observer);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* removeFromArray */ "C"])(this.eventObservers, observer);
     };
   }
 
@@ -9333,7 +9347,6 @@ __webpack_require__.d(__webpack_exports__, "SNEditor", function() { return /* re
 __webpack_require__.d(__webpack_exports__, "SNUserPrefs", function() { return /* reexport */ userPrefs_SNUserPrefs; });
 __webpack_require__.d(__webpack_exports__, "UserPrefsMutator", function() { return /* reexport */ userPrefs_UserPrefsMutator; });
 __webpack_require__.d(__webpack_exports__, "WebPrefKey", function() { return /* reexport */ WebPrefKey; });
-__webpack_require__.d(__webpack_exports__, "MobilePrefKey", function() { return /* reexport */ MobilePrefKey; });
 __webpack_require__.d(__webpack_exports__, "MutationType", function() { return /* reexport */ core_item["c" /* MutationType */]; });
 __webpack_require__.d(__webpack_exports__, "ComponentArea", function() { return /* reexport */ ComponentArea; });
 __webpack_require__.d(__webpack_exports__, "LiveItem", function() { return /* reexport */ LiveItem; });
@@ -9373,24 +9386,25 @@ __webpack_require__.d(__webpack_exports__, "SNHistoryManager", function() { retu
 __webpack_require__.d(__webpack_exports__, "SNPrivilegesService", function() { return /* reexport */ privileges_service_SNPrivilegesService; });
 __webpack_require__.d(__webpack_exports__, "SNSingletonManager", function() { return /* reexport */ singleton_manager_SNSingletonManager; });
 __webpack_require__.d(__webpack_exports__, "SNApiService", function() { return /* reexport */ api_service_SNApiService; });
-__webpack_require__.d(__webpack_exports__, "Copy", function() { return /* reexport */ utils["a" /* Copy */]; });
-__webpack_require__.d(__webpack_exports__, "findInArray", function() { return /* reexport */ utils["m" /* findInArray */]; });
-__webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return /* reexport */ utils["q" /* isNullOrUndefined */]; });
-__webpack_require__.d(__webpack_exports__, "deepMerge", function() { return /* reexport */ utils["i" /* deepMerge */]; });
-__webpack_require__.d(__webpack_exports__, "extendArray", function() { return /* reexport */ utils["k" /* extendArray */]; });
-__webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return /* reexport */ utils["C" /* removeFromIndex */]; });
-__webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return /* reexport */ utils["G" /* subtractFromArray */]; });
-__webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return /* reexport */ utils["c" /* arrayByDifference */]; });
-__webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return /* reexport */ utils["J" /* uniqCombineObjArrays */]; });
-__webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return /* reexport */ utils["o" /* greaterOfTwoDates */]; });
-__webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return /* reexport */ utils["n" /* getGlobalScope */]; });
-__webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return /* reexport */ utils["B" /* removeFromArray */]; });
 __webpack_require__.d(__webpack_exports__, "addIfUnique", function() { return /* reexport */ utils["b" /* addIfUnique */]; });
-__webpack_require__.d(__webpack_exports__, "dictToArray", function() { return /* reexport */ utils["j" /* dictToArray */]; });
-__webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return /* reexport */ utils["I" /* truncateHexString */]; });
-__webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return /* reexport */ utils["w" /* jsonParseEmbeddedKeys */]; });
-__webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return /* reexport */ utils["H" /* topLevelCompare */]; });
+__webpack_require__.d(__webpack_exports__, "arrayByDifference", function() { return /* reexport */ utils["c" /* arrayByDifference */]; });
+__webpack_require__.d(__webpack_exports__, "Copy", function() { return /* reexport */ utils["a" /* Copy */]; });
 __webpack_require__.d(__webpack_exports__, "dateSorted", function() { return /* reexport */ utils["g" /* dateSorted */]; });
+__webpack_require__.d(__webpack_exports__, "deepMerge", function() { return /* reexport */ utils["i" /* deepMerge */]; });
+__webpack_require__.d(__webpack_exports__, "dictToArray", function() { return /* reexport */ utils["j" /* dictToArray */]; });
+__webpack_require__.d(__webpack_exports__, "extendArray", function() { return /* reexport */ utils["k" /* extendArray */]; });
+__webpack_require__.d(__webpack_exports__, "findInArray", function() { return /* reexport */ utils["m" /* findInArray */]; });
+__webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return /* reexport */ utils["n" /* getGlobalScope */]; });
+__webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return /* reexport */ utils["o" /* greaterOfTwoDates */]; });
+__webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return /* reexport */ utils["q" /* isNullOrUndefined */]; });
+__webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return /* reexport */ utils["w" /* jsonParseEmbeddedKeys */]; });
+__webpack_require__.d(__webpack_exports__, "omitUndefinedCopy", function() { return /* reexport */ utils["A" /* omitUndefinedCopy */]; });
+__webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return /* reexport */ utils["C" /* removeFromArray */]; });
+__webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return /* reexport */ utils["D" /* removeFromIndex */]; });
+__webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return /* reexport */ utils["H" /* subtractFromArray */]; });
+__webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return /* reexport */ utils["I" /* topLevelCompare */]; });
+__webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return /* reexport */ utils["J" /* truncateHexString */]; });
+__webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return /* reexport */ utils["K" /* uniqCombineObjArrays */]; });
 __webpack_require__.d(__webpack_exports__, "Uuid", function() { return /* reexport */ uuid_Uuid; });
 __webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return /* reexport */ intents["b" /* EncryptionIntent */]; });
 __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return /* reexport */ intents["f" /* isLocalStorageIntent */]; });
@@ -9572,7 +9586,7 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
         this.primaryApplication = undefined;
       }
 
-      Object(utils["B" /* removeFromArray */])(this.applications, application);
+      Object(utils["C" /* removeFromArray */])(this.applications, application);
 
       if (source === DeinitSource.SignOut) {
         this.removeDescriptor(this.descriptorForApplication(application));
@@ -9667,7 +9681,7 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
     }
 
     return () => {
-      Object(utils["B" /* removeFromArray */])(this.changeObservers, callback);
+      Object(utils["C" /* removeFromArray */])(this.changeObservers, callback);
     };
   }
 
@@ -10084,17 +10098,6 @@ var WebPrefKey;
 })(WebPrefKey || (WebPrefKey = {}));
 
 ;
-var MobilePrefKey;
-
-(function (MobilePrefKey) {
-  MobilePrefKey["SortNotesBy"] = "mobileSortBy";
-  MobilePrefKey["SortNotesReverse"] = "mobileSortReverse";
-  MobilePrefKey["NotesHideNotePreview"] = "mobileHideNotePreview";
-  MobilePrefKey["NotesHideDate"] = "mobileHideDate";
-  MobilePrefKey["LastExportDate"] = "mobileLastExportDate";
-  MobilePrefKey["DoNotWarnUnsupportedEditors"] = "mobileDoNotShowAgainUnsupportedEditors";
-})(MobilePrefKey || (MobilePrefKey = {}));
-
 class userPrefs_SNUserPrefs extends core_item["d" /* SNItem */] {
   get isSingleton() {
     return true;
@@ -10111,10 +10114,6 @@ class userPrefs_SNUserPrefs extends core_item["d" /* SNItem */] {
 }
 class userPrefs_UserPrefsMutator extends core_item["b" /* ItemMutator */] {
   setWebPref(key, value) {
-    this.setAppDataItem(key, value);
-  }
-
-  setMobilePref(key, value) {
     this.setAppDataItem(key, value);
   }
 
@@ -10202,7 +10201,7 @@ class privileges_PrivilegeMutator extends core_item["b" /* ItemMutator */] {
   }
 
   removeCredentialForAction(action, credential) {
-    Object(utils["B" /* removeFromArray */])(this.privilegeMap[action], credential);
+    Object(utils["C" /* removeFromArray */])(this.privilegeMap[action], credential);
   }
 
   addCredentialForAction(action, credential) {
@@ -10430,11 +10429,11 @@ class component_ComponentMutator extends core_item["b" /* ItemMutator */] {
   }
 
   removeAssociatedItemId(uuid) {
-    Object(utils["B" /* removeFromArray */])(this.typedContent.associatedItemIds || [], uuid);
+    Object(utils["C" /* removeFromArray */])(this.typedContent.associatedItemIds || [], uuid);
   }
 
   removeDisassociatedItemId(uuid) {
-    Object(utils["B" /* removeFromArray */])(this.typedContent.disassociatedItemIds || [], uuid);
+    Object(utils["C" /* removeFromArray */])(this.typedContent.disassociatedItemIds || [], uuid);
   }
 
   setLastSize(size) {
@@ -11487,7 +11486,7 @@ const AffectorMapping = {
  * @returns An array of payloads that have changed as a result of copying.
  */
 
-async function PayloadsByDuplicating(payload, baseCollection, isConflict) {
+async function PayloadsByDuplicating(payload, baseCollection, isConflict, additionalContent) {
   const results = [];
   const override = {
     uuid: await uuid_Uuid.GenerateUuid(),
@@ -11497,11 +11496,10 @@ async function PayloadsByDuplicating(payload, baseCollection, isConflict) {
     lastSyncEnd: null,
     duplicate_of: payload.uuid
   };
+  override.content = functions_objectSpread(functions_objectSpread({}, payload.safeContent), additionalContent);
 
   if (isConflict) {
-    override.content = functions_objectSpread(functions_objectSpread({}, payload.safeContent), {}, {
-      conflict_of: payload.uuid
-    });
+    override.content.conflict_of = payload.uuid;
   }
 
   const copy = Object(generator["b" /* CopyPayload */])(payload, override);
@@ -11731,7 +11729,7 @@ class uuid_map_UuidMap {
     const directReferences = this.directMap[uuid] || [];
 
     for (const directReference of directReferences) {
-      Object(utils["B" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
+      Object(utils["C" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
     }
 
     delete this.directMap[uuid];
@@ -11740,7 +11738,7 @@ class uuid_map_UuidMap {
     const inverseReferences = this.inverseMap[uuid] || [];
 
     for (const inverseReference of inverseReferences) {
-      Object(utils["B" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
+      Object(utils["C" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
     }
 
     delete this.inverseMap[uuid];
@@ -11760,13 +11758,13 @@ class uuid_map_UuidMap {
 
   deestablishDirectRelationship(uuidA, uuidB) {
     const index = this.directMap[uuidA] || [];
-    Object(utils["B" /* removeFromArray */])(index, uuidB);
+    Object(utils["C" /* removeFromArray */])(index, uuidB);
     this.directMap[uuidA] = index;
   }
 
   deestablishInverseRelationship(uuidA, uuidB) {
     const inverseIndex = this.inverseMap[uuidB] || [];
-    Object(utils["B" /* removeFromArray */])(inverseIndex, uuidA);
+    Object(utils["C" /* removeFromArray */])(inverseIndex, uuidA);
     this.inverseMap[uuidB] = inverseIndex;
   }
 
@@ -12090,7 +12088,7 @@ class conflict_ConflictDelta {
     }
 
     if (strategy === strategies["a" /* ConflictStrategy */].KeepLeftMergeRefs) {
-      const refs = Object(utils["J" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
+      const refs = Object(utils["K" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
       const updatedAt = Object(utils["o" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
       const payload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
         updated_at: updatedAt,
@@ -12699,7 +12697,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       throw Error('Attempting to pop queue element with no resolve function');
     }
 
-    Object(utils["B" /* removeFromArray */])(this.decryptionQueue, queueItem);
+    Object(utils["C" /* removeFromArray */])(this.decryptionQueue, queueItem);
     const keyParams = queueItem.keyParams;
     const key = queueItem.key;
     const resolve = queueItem.resolve;
@@ -13169,6 +13167,9 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       onCancel: () => {
         this.isSessionRenewChallengePresented = false;
       },
+      onComplete: () => {
+        this.isSessionRenewChallengePresented = false;
+      },
       onNonvalidatedSubmit: async challengeResponse => {
         const email = challengeResponse.values[0].value;
         const password = challengeResponse.values[1].value;
@@ -13417,8 +13418,9 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       /** Legacy JWT response */
       const session = new JwtSession(response.token);
       await this.setSession(session);
-    } else {
-      /** Non-legacy expirable sessions */
+    } else if (response.session) {
+      /** Note that change password requests do not resend the exiting session object, so we
+       * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
     }
@@ -13901,22 +13903,38 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
     const url = await this.path(path);
     const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
       this.preprocessAuthenticatedErrorResponse(errorResponse);
+
+      if (isErrorResponseExpiredToken(errorResponse)) {
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Get,
+          url
+        });
+      }
+
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
   }
 
-  async getRevisionForItem(itemId, revisionId) {
+  async getRevision(entry, itemId) {
     const preprocessingError = this.preprocessingError();
 
     if (preprocessingError) {
       return preprocessingError;
     }
 
-    const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, revisionId);
+    const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(/:id/, entry.uuid);
     const url = await this.path(path);
     const response = await this.httpService.getAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
       this.preprocessAuthenticatedErrorResponse(errorResponse);
+
+      if (isErrorResponseExpiredToken(errorResponse)) {
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Get,
+          url
+        });
+      }
+
       return this.errorResponseWithFallbackMessage(errorResponse, API_MESSAGE_GENERIC_SYNC_FAIL);
     });
     return response;
@@ -14711,7 +14729,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         requiredPermissions.push({
           name: ComponentAction.StreamContextItem
         });
-        Object(utils["B" /* removeFromArray */])(pendingResponseItems, responseItem);
+        Object(utils["C" /* removeFromArray */])(pendingResponseItems, responseItem);
         /* We break because there can only be one context item */
 
         break;
@@ -14772,11 +14790,11 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         return Object(generator["f" /* CreateSourcedPayloadFromObject */])(responseItem, sources["a" /* PayloadSource */].ComponentRetrieved);
       });
       await this.itemManager.changeItems(uuids, mutator => {
-        const payload = Object(utils["D" /* searchArray */])(payloads, {
+        const payload = Object(utils["E" /* searchArray */])(payloads, {
           uuid: mutator.getUuid()
         });
         mutator.mergePayload(payload);
-        const responseItem = Object(utils["D" /* searchArray */])(responsePayloads, {
+        const responseItem = Object(utils["E" /* searchArray */])(responsePayloads, {
           uuid: mutator.getUuid()
         });
 
@@ -14948,7 +14966,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
           await this.activateComponent(component.uuid);
 
           if (!theme.isLayerable()) {
-            await Object(utils["E" /* sleep */])(10);
+            await Object(utils["F" /* sleep */])(10);
 
             for (const candidate of activeThemes) {
               if (candidate && !candidate.isLayerable()) {
@@ -15000,7 +15018,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       }
 
       for (const acquiredContentType of respectiveAcquired.content_types) {
-        Object(utils["B" /* removeFromArray */])(requiredContentTypes, acquiredContentType);
+        Object(utils["C" /* removeFromArray */])(requiredContentTypes, acquiredContentType);
       }
 
       if (requiredContentTypes.length === 0) {
@@ -15119,7 +15137,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         return;
       }
 
-      Object(utils["B" /* removeFromArray */])(this.handlers, matching);
+      Object(utils["C" /* removeFromArray */])(this.handlers, matching);
     };
   }
 
@@ -15528,7 +15546,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
       ignored
     } = this.mergePayloadsOntoMaster(first.payloads);
     this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey);
-    Object(utils["B" /* removeFromArray */])(this.emitQueue, first);
+    Object(utils["C" /* removeFromArray */])(this.emitQueue, first);
     first.resolve(changed.concat(inserted, discarded));
 
     if (this.emitQueue.length > 0) {
@@ -15602,7 +15620,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     };
     this.changeObservers.push(observer);
     return () => {
-      Object(utils["B" /* removeFromArray */])(this.changeObservers, observer);
+      Object(utils["C" /* removeFromArray */])(this.changeObservers, observer);
     };
   }
   /**
@@ -17541,7 +17559,7 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
 
   async generateSalt004(identifier, seed) {
     const hash = await this.crypto.sha256([identifier, seed].join(PARTITION_CHARACTER));
-    return Object(utils["I" /* truncateHexString */])(hash, V004Algorithm.ArgonSaltLength);
+    return Object(utils["J" /* truncateHexString */])(hash, V004Algorithm.ArgonSaltLength);
   }
   /**
    * Computes a root key given a passworf
@@ -17656,11 +17674,12 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
   }
 
   async authenticatedDataToString(attachedData) {
-    return this.crypto.base64Encode(JSON.stringify(Object(utils["F" /* sortedCopy */])(attachedData)));
+    return this.crypto.base64Encode(JSON.stringify(Object(utils["G" /* sortedCopy */])(Object(utils["A" /* omitUndefinedCopy */])(attachedData))));
   }
 
-  async stringToAuthenticatedData(rawAuthenticatedData) {
-    return JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
+  async stringToAuthenticatedData(rawAuthenticatedData, override) {
+    const base = JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
+    return Object(utils["G" /* sortedCopy */])(operator_004_objectSpread(operator_004_objectSpread({}, base), override));
   }
 
   async generateEncryptedParameters(payload, format, key) {
@@ -17715,14 +17734,12 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
 
 
     const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key);
-    const rawAuthenticatedData = itemKeyComponents.rawAuthenticatedData;
-    const authenticatedData = await this.stringToAuthenticatedData(rawAuthenticatedData);
-
-    if (authenticatedData.u !== payload.uuid || authenticatedData.v !== payload.version) {
-      throw Error("The uuid/version in authenticated data doesn't match payload's.");
-    }
-
-    const itemKey = await this.decryptString004(itemKeyComponents.ciphertext, key.itemsKey, itemKeyComponents.nonce, rawAuthenticatedData);
+    const authenticatedData = await this.stringToAuthenticatedData(itemKeyComponents.rawAuthenticatedData, {
+      u: payload.uuid,
+      v: payload.version
+    });
+    const useAuthenticatedString = await this.authenticatedDataToString(authenticatedData);
+    const itemKey = await this.decryptString004(itemKeyComponents.ciphertext, key.itemsKey, itemKeyComponents.nonce, useAuthenticatedString);
 
     if (!itemKey) {
       console.error('Error decrypting itemKey parameters', payload);
@@ -17735,7 +17752,7 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
 
 
     const contentComponents = this.deconstructEncryptedPayloadString(payload.contentString);
-    const content = await this.decryptString004(contentComponents.ciphertext, itemKey, contentComponents.nonce, rawAuthenticatedData);
+    const content = await this.decryptString004(contentComponents.ciphertext, itemKey, contentComponents.nonce, useAuthenticatedString);
 
     if (!content) {
       return Object(generator["a" /* CopyEncryptionParameters */])(payload, {
@@ -18495,7 +18512,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   onKeyStatusChange(callback) {
     this.keyObservers.push(callback);
     return () => {
-      Object(utils["B" /* removeFromArray */])(this.keyObservers, callback);
+      Object(utils["C" /* removeFromArray */])(this.keyObservers, callback);
     };
   }
 
@@ -19696,13 +19713,13 @@ class history_manager_SNHistoryManager extends pure_service["a" /* PureService *
 
 
   async remoteHistoryForItem(item) {
-    const serverResponse = await this.apiService.getItemRevisions(item.uuid);
+    const response = await this.apiService.getItemRevisions(item.uuid);
 
-    if (serverResponse.error) {
+    if (response.error) {
       return undefined;
     }
 
-    return serverResponse.object;
+    return response.object;
   }
   /**
    * Expands on a revision fetched via `remoteHistoryForItem` by getting a revision's
@@ -19710,17 +19727,17 @@ class history_manager_SNHistoryManager extends pure_service["a" /* PureService *
    */
 
 
-  async fetchRemoteRevision(itemUuid, revisionListEntry) {
-    const serverResponse = await this.apiService.getRevisionForItem(itemUuid, revisionListEntry.uuid);
+  async fetchRemoteRevision(itemUuid, entry) {
+    const revision = await this.apiService.getRevision(entry, itemUuid);
 
-    if (serverResponse.error) {
+    if (revision.error) {
       return undefined;
     }
 
-    const payload = serverResponse.object;
-    const encryptedPayload = Object(generator["f" /* CreateSourcedPayloadFromObject */])(payload, sources["a" /* PayloadSource */].RemoteHistory, {
-      uuid: itemUuid
+    const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(revision, {
+      uuid: revision.item_uuid
     });
+    const encryptedPayload = Object(generator["f" /* CreateSourcedPayloadFromObject */])(payload, sources["a" /* PayloadSource */].RemoteHistory);
     const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(encryptedPayload);
     return new item_history_entry_ItemHistoryEntry(decryptedPayload);
   }
@@ -20501,7 +20518,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     };
     this.observers.push(observer);
     return () => {
-      Object(utils["B" /* removeFromArray */])(this.observers, observer);
+      Object(utils["C" /* removeFromArray */])(this.observers, observer);
     };
   }
   /**
@@ -20778,9 +20795,10 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
   async duplicateItem(uuid) {
     let isConflict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    let additionalContent = arguments.length > 2 ? arguments[2] : undefined;
     const item = this.findItem(uuid);
     const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(item);
-    const resultingPayloads = await PayloadsByDuplicating(payload, this.modelManager.getMasterCollection(), isConflict);
+    const resultingPayloads = await PayloadsByDuplicating(payload, this.modelManager.getMasterCollection(), isConflict, additionalContent);
     await this.modelManager.emitPayloads(resultingPayloads, sources["a" /* PayloadSource */].LocalChanged);
     const duplicate = this.findItem(resultingPayloads[0].uuid);
     return duplicate;
@@ -20936,7 +20954,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   findTagByTitle(title) {
-    return Object(utils["D" /* searchArray */])(this.tags, {
+    return Object(utils["E" /* searchArray */])(this.tags, {
       title: title
     });
   }
@@ -21606,7 +21624,7 @@ class operation_AccountSyncOperation {
 
   popPayloads(count) {
     const payloads = this.pendingPayloads.slice(0, count);
-    Object(utils["G" /* subtractFromArray */])(this.pendingPayloads, payloads);
+    Object(utils["H" /* subtractFromArray */])(this.pendingPayloads, payloads);
     return payloads;
   }
 
@@ -21929,7 +21947,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const itemsKeysPayloads = payloads.filter(payload => {
       return payload.content_type === content_types["a" /* ContentType */].ItemsKey;
     });
-    Object(utils["G" /* subtractFromArray */])(payloads, itemsKeysPayloads);
+    Object(utils["H" /* subtractFromArray */])(payloads, itemsKeysPayloads);
     const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(itemsKeysPayloads);
     await this.modelManager.emitPayloads(decryptedItemsKeys, sources["a" /* PayloadSource */].LocalRetrieved);
     /** Map in batches to give interface a chance to update */
@@ -22088,7 +22106,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     }
 
     const promise = this.spawnQueue[0];
-    Object(utils["C" /* removeFromIndex */])(this.spawnQueue, 0);
+    Object(utils["D" /* removeFromIndex */])(this.spawnQueue, 0);
     this.log('Syncing again from spawn queue');
     return this.sync(sync_service_objectSpread({
       queueStrategy: SyncQueueStrategy.ForceSpawnNew,
@@ -22123,7 +22141,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
       if (this.completedOnlineDownloadFirstSync) {
         return;
       } else {
-        await Object(utils["E" /* sleep */])(waitTimeOnFailureMs);
+        await Object(utils["F" /* sleep */])(waitTimeOnFailureMs);
       }
     }
 
@@ -22179,7 +22197,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const neverSyncedDeleted = items.filter(item => {
       return item.neverSynced && item.deleted;
     });
-    Object(utils["G" /* subtractFromArray */])(items, neverSyncedDeleted);
+    Object(utils["H" /* subtractFromArray */])(items, neverSyncedDeleted);
     const decryptedPayloads = items.map(item => {
       return item.payloadRepresentation();
     });
@@ -22216,7 +22234,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     /* Subtract from array as soon as we're sure they'll be called.
     resolves are triggered at the end of this function call */
 
-    Object(utils["G" /* subtractFromArray */])(this.resolveQueue, inTimeResolveQueue);
+    Object(utils["H" /* subtractFromArray */])(this.resolveQueue, inTimeResolveQueue);
     /** lastSyncBegan must be set *after* any point we may have returned above.
      * Setting this value means the item was 100% sent to the server. */
 
@@ -22421,7 +22439,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
 
   async handleSuccessServerResponse(operation, response) {
     if (this._simulate_latency) {
-      await Object(utils["E" /* sleep */])(this._simulate_latency.latency);
+      await Object(utils["F" /* sleep */])(this._simulate_latency.latency);
     }
 
     this.log('Online Sync Response', response.rawResponse);
@@ -22650,7 +22668,7 @@ class challenge_operation_ChallengeOperation {
     const matching = valuesArray.find(v => v.prompt.id === value.prompt.id);
 
     if (matching) {
-      Object(utils["B" /* removeFromArray */])(valuesArray, matching);
+      Object(utils["C" /* removeFromArray */])(valuesArray, matching);
     }
 
     valuesArray.push(value);
@@ -22671,7 +22689,7 @@ class challenge_operation_ChallengeOperation {
     const matching = valuesArray.find(v => v.prompt.validation === value.prompt.validation);
 
     if (matching) {
-      Object(utils["B" /* removeFromArray */])(valuesArray, matching);
+      Object(utils["C" /* removeFromArray */])(valuesArray, matching);
     }
 
     valuesArray.push(value);
@@ -22815,7 +22833,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     observers.push(observer);
     this.challengeObservers[challenge.id] = observers;
     return () => {
-      Object(utils["B" /* removeFromArray */])(observers, observer);
+      Object(utils["C" /* removeFromArray */])(observers, observer);
     };
   }
 
@@ -23192,7 +23210,7 @@ class application_SNApplication {
     };
     this.eventHandlers.push(observer);
     return () => {
-      Object(utils["B" /* removeFromArray */])(this.eventHandlers, observer);
+      Object(utils["C" /* removeFromArray */])(this.eventHandlers, observer);
     };
   }
 
@@ -23499,6 +23517,12 @@ class application_SNApplication {
     return references;
   }
 
+  duplicateItem(item, additionalContent) {
+    const duplicate = this.itemManager.duplicateItem(item.uuid, false, additionalContent);
+    this.sync();
+    return duplicate;
+  }
+
   findTagByTitle(title) {
     return this.itemManager.findTagByTitle(title);
   }
@@ -23537,7 +23561,7 @@ class application_SNApplication {
     this.streamRemovers.push(observer);
     return () => {
       observer();
-      Object(utils["B" /* removeFromArray */])(this.streamRemovers, observer);
+      Object(utils["C" /* removeFromArray */])(this.streamRemovers, observer);
     };
   }
   /**
@@ -23831,7 +23855,7 @@ class application_SNApplication {
       await promise;
     } else {
       /** Await up to maxWait. If not resolved by then, return. */
-      await Promise.race([promise, Object(utils["E" /* sleep */])(maxWait)]);
+      await Promise.race([promise, Object(utils["F" /* sleep */])(maxWait)]);
     }
   }
 

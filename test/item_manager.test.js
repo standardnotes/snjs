@@ -232,7 +232,6 @@ describe('item manager', () => {
     const sandbox = sinon.createSandbox();
 
     beforeEach(async function () {
-      this.note = await this.createNote();
       this.emitPayloads = sandbox.spy(this.itemManager.modelManager, 'emitPayloads');
     });
 
@@ -241,8 +240,9 @@ describe('item manager', () => {
     });
 
     it('should duplicate the item and set the duplicate_of property', async function () {
-      await this.itemManager.duplicateItem(this.note.uuid);
-      sinon.assert.calledOnce(this.emitPayloads);
+      const note = await this.createNote();
+      await this.itemManager.duplicateItem(note.uuid);
+      sinon.assert.calledTwice(this.emitPayloads);
 
       const originalNote = this.itemManager.notes[0];
       const duplicatedNote = this.itemManager.notes[1];
@@ -257,8 +257,9 @@ describe('item manager', () => {
     });
 
     it('should duplicate the item and set the duplicate_of and conflict_of properties', async function () {
-      await this.itemManager.duplicateItem(this.note.uuid, true);
-      sinon.assert.calledOnce(this.emitPayloads);
+      const note = await this.createNote();
+      await this.itemManager.duplicateItem(note.uuid, true);
+      sinon.assert.calledTwice(this.emitPayloads);
 
       const originalNote = this.itemManager.notes[0];
       const duplicatedNote = this.itemManager.notes[1];
@@ -271,16 +272,44 @@ describe('item manager', () => {
       expect(originalNote.uuid).to.equal(duplicatedNote.conflictOf);
       expect(originalNote.uuid).to.equal(duplicatedNote.payload.content.conflict_of);
     });
-  });
 
-  it('duplicate item with relationships', async function () {
-    const note = await this.createNote();
-    const tag = await this.createTag([note]);
-    const duplicate = await this.itemManager.duplicateItem(tag.uuid);
+    it('duplicate item with relationships', async function () {
+      const note = await this.createNote();
+      const tag = await this.createTag([note]);
+      const duplicate = await this.itemManager.duplicateItem(tag.uuid);
 
-    expect(duplicate.content.references.length).to.equal(1);
-    expect(this.itemManager.items.length).to.equal(3);
-    expect(this.itemManager.tags.length).to.equal(2);
+      expect(duplicate.content.references).to.have.length(1);
+      expect(this.itemManager.items).to.have.length(3);
+      expect(this.itemManager.tags).to.have.length(2);
+    });
+
+    it('adds duplicated item as a relationship to items referencing it', async function () {
+      const note = await this.createNote();
+      let tag = await this.createTag([note]);
+      const duplicateNote = await this.itemManager.duplicateItem(note.uuid);
+      expect(tag.content.references).to.have.length(1);
+
+      tag = this.itemManager.findItem(tag.uuid);
+      const references = tag.content.references.map(ref => ref.uuid);
+      expect(references).to.have.length(2);
+      expect(references).to.include(note.uuid, duplicateNote.uuid);
+    });
+
+    it('duplicates item with additional content', async function () {
+      const note = await this.itemManager.createItem(
+        ContentType.Note,
+        {
+          title: 'hello',
+          text: 'world',
+        }
+      );
+      const duplicateNote = await this.itemManager.duplicateItem(note.uuid, false, {
+        title: 'hello (copy)'
+      });
+
+      expect(duplicateNote.title).to.equal('hello (copy)');
+      expect(duplicateNote.text).to.equal('world');
+    });
   });
 
   it('create template item', async function () {

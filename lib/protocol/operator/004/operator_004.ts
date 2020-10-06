@@ -9,7 +9,7 @@ import { PayloadFormat } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
-import { truncateHexString, sortedCopy } from '@Lib/utils';
+import { truncateHexString, sortedCopy, omitUndefinedCopy } from '@Lib/utils';
 import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
 
 const PARTITION_CHARACTER = ':';
@@ -178,7 +178,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   ): ItemAuthenticatedData | RootKeyEncryptedAuthenticatedData {
     const baseData: ItemAuthenticatedData = {
       u: payload.uuid,
-      v: ProtocolVersion.V004
+      v: ProtocolVersion.V004,
     };
     if (ContentTypeUsesRootKeyEncryption(payload.content_type)) {
       return {
@@ -196,13 +196,26 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   private async authenticatedDataToString(
     attachedData: ItemAuthenticatedData
   ) {
-    return this.crypto.base64Encode(JSON.stringify(sortedCopy(attachedData)));
+    return this.crypto.base64Encode(
+      JSON.stringify(
+        sortedCopy(
+          omitUndefinedCopy(
+            attachedData
+          )
+        )
+      )
+    );
   }
 
   private async stringToAuthenticatedData(
-    rawAuthenticatedData: string
+    rawAuthenticatedData: string,
+    override?: Partial<ItemAuthenticatedData>
   ): Promise<ItemAuthenticatedData> {
-    return JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
+    const base = JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
+    return sortedCopy({
+      ...base,
+      ...override
+    });
   }
 
   public async generateEncryptedParameters(
@@ -228,7 +241,6 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     const itemKey = await this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength);
     /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content);
-
     const authenticatedData = this.generateAuthenticatedDataForPayload(payload, key);
     const encryptedContentString = await this.generateEncryptedProtocolString(
       contentPlaintext,
@@ -272,16 +284,19 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(
       payload.enc_item_key!
     );
-    const rawAuthenticatedData = itemKeyComponents.rawAuthenticatedData;
-    const authenticatedData = await this.stringToAuthenticatedData(rawAuthenticatedData);
-    if (authenticatedData.u !== payload.uuid || authenticatedData.v !== payload.version) {
-      throw Error(`The uuid/version in authenticated data doesn't match payload's.`);
-    }
+    const authenticatedData = await this.stringToAuthenticatedData(
+      itemKeyComponents.rawAuthenticatedData,
+      {
+        u: payload.uuid,
+        v: payload.version
+      }
+    );
+    const useAuthenticatedString = await this.authenticatedDataToString(authenticatedData);
     const itemKey = await this.decryptString004(
       itemKeyComponents.ciphertext,
       key.itemsKey,
       itemKeyComponents.nonce,
-      rawAuthenticatedData
+      useAuthenticatedString
     );
     if (!itemKey) {
       console.error('Error decrypting itemKey parameters', payload);
@@ -301,7 +316,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
       contentComponents.ciphertext,
       itemKey,
       contentComponents.nonce,
-      rawAuthenticatedData
+      useAuthenticatedString
     );
     if (!content) {
       return CopyEncryptionParameters(

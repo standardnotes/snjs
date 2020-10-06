@@ -132,6 +132,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
         onCancel: () => {
           this.isSessionRenewChallengePresented = false;
         },
+        onComplete: () => {
+          this.isSessionRenewChallengePresented = false;
+        },
         onNonvalidatedSubmit: async (challengeResponse) => {
           const email = challengeResponse.values[0].value as string;
           const password = challengeResponse.values[1].value as string;
@@ -428,8 +431,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
       /** Legacy JWT response */
       const session = new JwtSession(response.token);
       await this.setSession(session);
-    } else {
-      /** Non-legacy expirable sessions */
+    } else if(response.session) {
+      /** Note that change password requests do not resend the exiting session object, so we
+       * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
     }
