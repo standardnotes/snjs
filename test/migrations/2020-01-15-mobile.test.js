@@ -113,6 +113,26 @@ describe('2020-01-15 mobile migration', () => {
       noteEncryptionParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    /** setup options */
+    await application.deviceInterface.setRawStorageValue(
+      'LastExportDateKey',
+      true
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'DoNotShowAgainUnsupportedEditorsKey',
+      undefined
+    );
+    const options = JSON.stringify({
+      sortBy: 'created_at',
+      sortReverse: undefined,
+      selectedTagIds: [],
+      hidePreviews: true,
+      hideDates: false,
+    });
+    await application.deviceInterface.setRawStorageValue(
+      'options',
+      options
+    );
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
@@ -184,6 +204,14 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
     expect(await application.getUser().email).to.equal(identifier);
+    const preferences = await application.storageService.getValue('preferences');
+    expect(preferences.sortBy).to.equal('created_at');
+    expect(preferences.sortReverse).to.equal(undefined);
+    expect(preferences.hideNotePreview).to.equal(true);
+    expect(preferences.hideDate).to.equal(false);
+    expect(preferences.hideNotePreview).to.equal(undefined);
+    expect(preferences.lastExportDate).to.equal(true);
+    expect(preferences.doNotShowAgainUnsupportedEditors).to.equal(undefined);
   });
 
 
@@ -239,7 +267,26 @@ describe('2020-01-15 mobile migration', () => {
       noteEncryptionParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
-
+    /** setup options */
+    await application.deviceInterface.setRawStorageValue(
+      'LastExportDateKey',
+      true
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'DoNotShowAgainUnsupportedEditorsKey',
+      undefined
+    );
+    const options = JSON.stringify({
+      sortBy: 'created_at',
+      sortReverse: undefined,
+      selectedTagIds: [],
+      hidePreviews: true,
+      hideDates: false,
+    });
+    await application.deviceInterface.setRawStorageValue(
+      'options',
+      options
+    );
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
@@ -302,6 +349,14 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageService.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped)
     ).to.eql(passcodeTiming);
+    const preferences = await application.storageService.getValue('preferences');
+    expect(preferences.sortBy).to.equal('created_at');
+    expect(preferences.sortReverse).to.equal(false);
+    expect(preferences.hideNotePreview).to.equal(true);
+    expect(preferences.hideDate).to.equal(false);
+    expect(preferences.hideNotePreview).to.equal(undefined);
+    expect(preferences.lastExportDate).to.equal(true);
+    expect(preferences.doNotShowAgainUnsupportedEditors).to.equal(undefined);
     await application.deinit();
   });
 
@@ -363,7 +418,26 @@ describe('2020-01-15 mobile migration', () => {
       noteEncryptionParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
-
+    /** setup options */
+    await application.deviceInterface.setRawStorageValue(
+      'LastExportDateKey',
+      true
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'DoNotShowAgainUnsupportedEditorsKey',
+      undefined
+    );
+    const options = JSON.stringify({
+      sortBy: 'created_at',
+      sortReverse: undefined,
+      selectedTagIds: [],
+      hidePreviews: true,
+      hideDates: false,
+    });
+    await application.deviceInterface.setRawStorageValue(
+      'options',
+      options
+    );
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
@@ -425,6 +499,14 @@ describe('2020-01-15 mobile migration', () => {
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
     expect(await application.getUser().email).to.equal(identifier);
+    const preferences = await application.storageService.getValue('preferences');
+    expect(preferences.sortBy).to.equal('created_at');
+    expect(preferences.sortReverse).to.equal(false);
+    expect(preferences.hideNotePreview).to.equal(true);
+    expect(preferences.hideDate).to.equal(false);
+    expect(preferences.hideNotePreview).to.equal(undefined);
+    expect(preferences.lastExportDate).to.equal(true);
+    expect(preferences.doNotShowAgainUnsupportedEditors).to.equal(undefined);
     await application.deinit();
   }).timeout(10000);
 
@@ -464,7 +546,26 @@ describe('2020-01-15 mobile migration', () => {
       noteParams
     );
     await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload, application.identifier);
-
+    /** setup options */
+    await application.deviceInterface.setRawStorageValue(
+      'LastExportDateKey',
+      true
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'DoNotShowAgainUnsupportedEditorsKey',
+      undefined
+    );
+    const options = JSON.stringify({
+      sortBy: 'created_at',
+      sortReverse: undefined,
+      selectedTagIds: [],
+      hidePreviews: true,
+      hideDates: false,
+    });
+    await application.deviceInterface.setRawStorageValue(
+      'options',
+      options
+    );
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
@@ -517,7 +618,14 @@ describe('2020-01-15 mobile migration', () => {
     ).to.equal(false);
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
-
+    const preferences = await application.storageService.getValue('preferences');
+    expect(preferences.sortBy).to.equal('created_at');
+    expect(preferences.sortReverse).to.equal(false);
+    expect(preferences.hideNotePreview).to.equal(true);
+    expect(preferences.hideDate).to.equal(false);
+    expect(preferences.hideNotePreview).to.equal(undefined);
+    expect(preferences.lastExportDate).to.equal(true);
+    expect(preferences.doNotShowAgainUnsupportedEditors).to.equal(undefined);
     await application.deinit();
   });
 

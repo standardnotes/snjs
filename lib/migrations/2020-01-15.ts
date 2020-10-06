@@ -371,7 +371,7 @@ export class Migration20200115 extends Migration {
         hideDate: legacyOptionsState.hideDates ?? false
       }
     }
-    rawStructure[ValueModesKeys.Unwrapped]![StorageKey.MobilePreferences] = {
+    rawStructure.unwrapped![StorageKey.MobilePreferences] = {
       ...migratedOptionsState,
       lastExportDate: lastExportDate ?? undefined,
       doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors ?? false,
