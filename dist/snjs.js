@@ -9484,6 +9484,7 @@ var StorageKey;
   StorageKey["BiometricsState"] = "biometrics_state";
   StorageKey["MobilePasscodeTiming"] = "passcode_timing";
   StorageKey["MobileBiometricsTiming"] = "biometrics_timing";
+  StorageKey["MobilePreferences"] = "preferences";
   StorageKey["PrivilegesExpirey"] = "SessionExpiresAtKey";
   StorageKey["PrivilegesSessionLength"] = "SessionLengthKey";
   StorageKey["SessionHistoryPersistable"] = "sessionHistory_persist";
@@ -16232,7 +16233,282 @@ class Migration {
   }
 
 }
+// CONCATENATED MODULE: ./lib/protocol/collection/item_collection.ts
+
+
+var CollectionSort;
+
+(function (CollectionSort) {
+  CollectionSort["CreatedAt"] = "created_at";
+  CollectionSort["UpdatedAt"] = "userModifiedDate";
+  CollectionSort["Title"] = "title";
+})(CollectionSort || (CollectionSort = {}));
+/** The item collection class builds on mutable collection by providing an option to keep
+ * items sorted and filtered. */
+
+
+class item_collection_ItemCollection extends collection_MutableCollection {
+  constructor() {
+    super(...arguments);
+    this.displaySortBy = {};
+    this.displayFilter = {};
+    /** A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
+     * returns {uuid_123: 1, uuid_456: 2}, where 1 and 2 are the positions of the element
+     * in the sorted array. We keep track of positions so that when we want to re-sort or remove
+     * and element, we don't have to search the entire sorted array to do so. */
+
+    this.filteredMap = {};
+    /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
+     * an array of sorted elements, based on the current displaySortBy */
+
+    this.sortedMap = {};
+  }
+
+  set(elements) {
+    elements = Array.isArray(elements) ? elements : [elements];
+    super.set(elements);
+    this.filterSortElements(elements);
+  }
+
+  discard(elements) {
+    elements = Array.isArray(elements) ? elements : [elements];
+    super.discard(elements);
+    this.filterSortElements(elements);
+  }
+  /**
+   * Sets an optional sortBy and filter for a given content type. These options will be
+   * applied against a separate "display-only" record and not the master record. Passing
+   * null options removes any existing options. sortBy is always required, but a filter is
+   * not always required.
+   * Note that sorting and filtering only applies to collections of type SNItem, and not
+   * payloads. This is because we access item properties such as `pinned` and `title`.
+   * @param filter A function that receives an element and returns a boolean indicating
+   * whether the element passes the filter and should be in displayable results.
+   */
+
+
+  setDisplayOptions(contentType, sortBy, direction, filter) {
+    const existingSortBy = this.displaySortBy[contentType];
+    const existingFilter = this.displayFilter[contentType];
+    /** If the sort value is unchanged, and we are not setting a new filter,
+     * we return, as to not rebuild and resort all elements */
+
+    if (existingSortBy && existingSortBy.key === sortBy && existingSortBy.dir === direction && !existingFilter && !filter) {
+      return;
+    }
+
+    this.displaySortBy[contentType] = sortBy ? {
+      key: sortBy,
+      dir: direction
+    } : undefined;
+    this.displayFilter[contentType] = filter;
+    /** Reset existing maps */
+
+    this.filteredMap[contentType] = {};
+    this.sortedMap[contentType] = [];
+    /** Re-process all elements */
+
+    const elements = this.all(contentType);
+
+    if (elements.length > 0) {
+      this.filterSortElements(elements);
+    }
+  }
+  /** Returns the filtered and sorted list of elements for this content type,
+   * according to the options set via `setDisplayOptions` */
+
+
+  displayElements(contentType) {
+    const elements = this.sortedMap[contentType];
+
+    if (!elements) {
+      throw Error("Attempting to access display elements for\n        non-configured content type ".concat(contentType));
+    }
+
+    return elements.slice();
+  }
+
+  filterSortElements(elements) {
+    if (Object.keys(this.displaySortBy).length === 0) {
+      return;
+    }
+    /** If a content type is added to this set, we are indicating the entire sorted
+     * array will need to be re-sorted. The reason for sorting the entire array and not
+     * just inserting an element using binary search is that we need to keep track of the
+     * sorted index of an item so that we can look up and change its value without having
+     * to search the array for it. */
+
+
+    const typesNeedingResort = new Set();
+
+    for (const element of elements) {
+      const contentType = element.content_type;
+      const sortBy = this.displaySortBy[contentType];
+      /** Sort by is required, but filter is not */
+
+      if (!sortBy) {
+        continue;
+      }
+
+      const filter = this.displayFilter[contentType];
+      /** Filtered content type map */
+
+      const filteredCTMap = this.filteredMap[contentType];
+      const sortedElements = this.sortedMap[contentType];
+      const previousIndex = filteredCTMap[element.uuid];
+      const previousElement = !Object(utils["q" /* isNullOrUndefined */])(previousIndex) ? sortedElements[previousIndex] : undefined;
+      /** If the element is deleted, or if it no longer exists in the primary map (because
+       * it was discarded without neccessarily being marked as deleted), it does not pass
+       * the filter. If no filter the element passes by default. */
+
+      const passes = element.deleted || !this.map[element.uuid] ? false : filter ? filter(element) : true;
+
+      if (passes) {
+        if (!Object(utils["q" /* isNullOrUndefined */])(previousElement)) {
+          /** Check to see if the element has changed its sort value. If so, we need to re-sort.
+           * Previous element might be encrypted.
+           */
+          const previousValue = previousElement.errorDecrypting ? undefined : previousElement[sortBy.key];
+          const newValue = element[sortBy.key];
+          /** Replace the current element with the new one. */
+
+          sortedElements[previousIndex] = element;
+          /** If the pinned status of the element has changed, it needs to be resorted */
+
+          const pinChanged = previousElement.pinned !== element.pinned;
+
+          if (!Object(utils["e" /* compareValues */])(previousValue, newValue) || pinChanged) {
+            /** Needs resort because its re-sort value has changed,
+             * and thus its position might change */
+            typesNeedingResort.add(contentType);
+          }
+        } else {
+          /** Has not yet been inserted */
+          sortedElements.push(element);
+          /** Needs re-sort because we're just pushing the element to the end here */
+
+          typesNeedingResort.add(contentType);
+        }
+      } else {
+        /** Doesn't pass filter, remove from sorted and filtered */
+        if (!Object(utils["q" /* isNullOrUndefined */])(previousIndex)) {
+          delete filteredCTMap[element.uuid];
+          /** We don't yet remove the element directly from the array, since mutating
+           * the array inside a loop could render all other upcoming indexes invalid */
+
+          sortedElements[previousIndex] = undefined;
+          /** Since an element is being removed from the array, we need to recompute
+           * the new positions for elements that are staying */
+
+          typesNeedingResort.add(contentType);
+        }
+      }
+    }
+
+    for (const contentType of typesNeedingResort.values()) {
+      this.resortContentType(contentType);
+    }
+  }
+
+  resortContentType(contentType) {
+    const sortedElements = this.sortedMap[contentType];
+    const sortBy = this.displaySortBy[contentType];
+    const filteredCTMap = this.filteredMap[contentType];
+    /** Resort the elements array, and update the saved positions */
+
+    /** @O(n * log(n)) */
+
+    const sortFn = function sortFn(a, b) {
+      let skipPinnedCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      /** If the elements are undefined, move to beginning */
+      if (!a) {
+        return -1;
+      }
+
+      if (!b) {
+        return 1;
+      }
+
+      if (!skipPinnedCheck) {
+        if (a.pinned && b.pinned) {
+          return sortFn(a, b, true);
+        }
+
+        if (a.pinned) {
+          return -1;
+        }
+
+        if (b.pinned) {
+          return 1;
+        }
+      }
+
+      let aValue = a[sortBy.key] || '';
+      let bValue = b[sortBy.key] || '';
+      let vector = 1;
+
+      if (sortBy.dir === 'asc') {
+        vector *= -1;
+      }
+
+      if (sortBy.key === CollectionSort.Title) {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+
+        if (aValue.length === 0 && bValue.length === 0) {
+          return 0;
+        } else if (aValue.length === 0 && bValue.length !== 0) {
+          return 1 * vector;
+        } else if (aValue.length !== 0 && bValue.length === 0) {
+          return -1 * vector;
+        } else {
+          vector *= -1;
+        }
+      }
+
+      if (aValue > bValue) {
+        return -1 * vector;
+      } else if (aValue < bValue) {
+        return 1 * vector;
+      }
+
+      return 0;
+    };
+
+    const resorted = sortedElements.sort((a, b) => {
+      return sortFn(a, b);
+    });
+    /** Now that resorted contains the sorted elements (but also can contain undefined element)
+     * we create another array that filters out any of the undefinedes. We also keep track of the
+     * current index while we loop and set that in the filteredCTMap. */
+
+    const cleaned = [];
+    let currentIndex = 0;
+    /** @O(n) */
+
+    for (const element of resorted) {
+      if (!element) {
+        continue;
+      }
+
+      cleaned.push(element);
+      filteredCTMap[element.uuid] = currentIndex;
+      currentIndex++;
+    }
+
+    this.sortedMap[contentType] = cleaned;
+  }
+
+}
 // CONCATENATED MODULE: ./lib/migrations/2020-01-15.ts
+function _2020_01_15_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _2020_01_15_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { _2020_01_15_ownKeys(Object(source), true).forEach(function (key) { _2020_01_15_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { _2020_01_15_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _2020_01_15_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -16258,7 +16534,13 @@ const LegacyKeys = {
   WebEncryptedStorageKey: 'encryptedStorage',
   MobileWrappedRootKeyKey: 'encrypted_account_keys',
   MobileBiometricsPrefs: 'biometrics_prefs',
-  AllMigrations: 'migrations'
+  AllMigrations: 'migrations',
+  MobileThemesCache: 'ThemePreferencesKey',
+  MobileLightTheme: 'lightTheme',
+  MobileDarkTheme: 'darkTheme',
+  MobileLastExportDate: 'LastExportDateKey',
+  MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
+  MobileOptionsState: 'options'
 };
 class _2020_01_15_Migration20200115 extends Migration {
   static timestamp() {
@@ -16275,6 +16557,11 @@ class _2020_01_15_Migration20200115 extends Migration {
     });
     this.registerStageHandler(ApplicationStage.StorageDecrypted_09, async () => {
       await this.migrateArbitraryRawStorageToManagedStorageAllPlatforms();
+
+      if (isEnvironmentMobile(this.services.environment)) {
+        await this.migrateMobilePreferences();
+      }
+
       await this.migrateSessionStorage();
       await this.deleteLegacyStorageValues();
     });
@@ -16408,7 +16695,6 @@ class _2020_01_15_Migration20200115 extends Migration {
     /** Decrypt it with the passcode */
 
     let decryptedStoragePayload;
-    let errorDecrypting = true;
     let passcodeKey;
     await this.promptForPasscodeUntilCorrect(async candidate => {
       passcodeKey = await this.services.protocolService.computeRootKey(candidate, passcodeParams);
@@ -16640,6 +16926,38 @@ class _2020_01_15_Migration20200115 extends Migration {
     for (const key of managedKeys) {
       await this.services.deviceInterface.removeRawStorageValue(key);
     }
+  }
+  /**
+   * Mobile
+   * Migrate mobile preferences
+   * @access private
+   */
+
+
+  async migrateMobilePreferences() {
+    const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileLastExportDate);
+    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileDoNotWarnUnsupportedEditors);
+    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
+    let migratedOptionsState = {};
+
+    if (legacyOptionsState) {
+      var _legacyOptionsState$s, _legacyOptionsState$h, _legacyOptionsState$h2;
+
+      const legacySortBy = legacyOptionsState.sortBy;
+      migratedOptionsState = {
+        sortBy: legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
+        sortReverse: (_legacyOptionsState$s = legacyOptionsState.sortReverse) !== null && _legacyOptionsState$s !== void 0 ? _legacyOptionsState$s : false,
+        hideNotePreview: (_legacyOptionsState$h = legacyOptionsState.hidePreviews) !== null && _legacyOptionsState$h !== void 0 ? _legacyOptionsState$h : false,
+        hideDate: (_legacyOptionsState$h2 = legacyOptionsState.hideDates) !== null && _legacyOptionsState$h2 !== void 0 ? _legacyOptionsState$h2 : false
+      };
+    }
+
+    const preferences = _2020_01_15_objectSpread(_2020_01_15_objectSpread({}, migratedOptionsState), {}, {
+      lastExportDate: lastExportDate !== null && lastExportDate !== void 0 ? lastExportDate : undefined,
+      doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors !== null && doNotWarnUnsupportedEditors !== void 0 ? doNotWarnUnsupportedEditors : false
+    });
+
+    await this.services.storageService.setValue(StorageKey.MobilePreferences, preferences);
   }
   /**
    * All platforms
@@ -19986,274 +20304,6 @@ class privileges_service_SNPrivilegesService extends pure_service["a" /* PureSer
       value: PrivilegeSessionLength.OneWeek,
       label: '1 Week'
     }];
-  }
-
-}
-// CONCATENATED MODULE: ./lib/protocol/collection/item_collection.ts
-
-
-var CollectionSort;
-
-(function (CollectionSort) {
-  CollectionSort["CreatedAt"] = "created_at";
-  CollectionSort["UpdatedAt"] = "userModifiedDate";
-  CollectionSort["Title"] = "title";
-})(CollectionSort || (CollectionSort = {}));
-/** The item collection class builds on mutable collection by providing an option to keep
- * items sorted and filtered. */
-
-
-class item_collection_ItemCollection extends collection_MutableCollection {
-  constructor() {
-    super(...arguments);
-    this.displaySortBy = {};
-    this.displayFilter = {};
-    /** A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
-     * returns {uuid_123: 1, uuid_456: 2}, where 1 and 2 are the positions of the element
-     * in the sorted array. We keep track of positions so that when we want to re-sort or remove
-     * and element, we don't have to search the entire sorted array to do so. */
-
-    this.filteredMap = {};
-    /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
-     * an array of sorted elements, based on the current displaySortBy */
-
-    this.sortedMap = {};
-  }
-
-  set(elements) {
-    elements = Array.isArray(elements) ? elements : [elements];
-    super.set(elements);
-    this.filterSortElements(elements);
-  }
-
-  discard(elements) {
-    elements = Array.isArray(elements) ? elements : [elements];
-    super.discard(elements);
-    this.filterSortElements(elements);
-  }
-  /**
-   * Sets an optional sortBy and filter for a given content type. These options will be
-   * applied against a separate "display-only" record and not the master record. Passing
-   * null options removes any existing options. sortBy is always required, but a filter is
-   * not always required.
-   * Note that sorting and filtering only applies to collections of type SNItem, and not
-   * payloads. This is because we access item properties such as `pinned` and `title`.
-   * @param filter A function that receives an element and returns a boolean indicating
-   * whether the element passes the filter and should be in displayable results.
-   */
-
-
-  setDisplayOptions(contentType, sortBy, direction, filter) {
-    const existingSortBy = this.displaySortBy[contentType];
-    const existingFilter = this.displayFilter[contentType];
-    /** If the sort value is unchanged, and we are not setting a new filter,
-     * we return, as to not rebuild and resort all elements */
-
-    if (existingSortBy && existingSortBy.key === sortBy && existingSortBy.dir === direction && !existingFilter && !filter) {
-      return;
-    }
-
-    this.displaySortBy[contentType] = sortBy ? {
-      key: sortBy,
-      dir: direction
-    } : undefined;
-    this.displayFilter[contentType] = filter;
-    /** Reset existing maps */
-
-    this.filteredMap[contentType] = {};
-    this.sortedMap[contentType] = [];
-    /** Re-process all elements */
-
-    const elements = this.all(contentType);
-
-    if (elements.length > 0) {
-      this.filterSortElements(elements);
-    }
-  }
-  /** Returns the filtered and sorted list of elements for this content type,
-   * according to the options set via `setDisplayOptions` */
-
-
-  displayElements(contentType) {
-    const elements = this.sortedMap[contentType];
-
-    if (!elements) {
-      throw Error("Attempting to access display elements for\n        non-configured content type ".concat(contentType));
-    }
-
-    return elements.slice();
-  }
-
-  filterSortElements(elements) {
-    if (Object.keys(this.displaySortBy).length === 0) {
-      return;
-    }
-    /** If a content type is added to this set, we are indicating the entire sorted
-     * array will need to be re-sorted. The reason for sorting the entire array and not
-     * just inserting an element using binary search is that we need to keep track of the
-     * sorted index of an item so that we can look up and change its value without having
-     * to search the array for it. */
-
-
-    const typesNeedingResort = new Set();
-
-    for (const element of elements) {
-      const contentType = element.content_type;
-      const sortBy = this.displaySortBy[contentType];
-      /** Sort by is required, but filter is not */
-
-      if (!sortBy) {
-        continue;
-      }
-
-      const filter = this.displayFilter[contentType];
-      /** Filtered content type map */
-
-      const filteredCTMap = this.filteredMap[contentType];
-      const sortedElements = this.sortedMap[contentType];
-      const previousIndex = filteredCTMap[element.uuid];
-      const previousElement = !Object(utils["q" /* isNullOrUndefined */])(previousIndex) ? sortedElements[previousIndex] : undefined;
-      /** If the element is deleted, or if it no longer exists in the primary map (because
-       * it was discarded without neccessarily being marked as deleted), it does not pass
-       * the filter. If no filter the element passes by default. */
-
-      const passes = element.deleted || !this.map[element.uuid] ? false : filter ? filter(element) : true;
-
-      if (passes) {
-        if (!Object(utils["q" /* isNullOrUndefined */])(previousElement)) {
-          /** Check to see if the element has changed its sort value. If so, we need to re-sort.
-           * Previous element might be encrypted.
-           */
-          const previousValue = previousElement.errorDecrypting ? undefined : previousElement[sortBy.key];
-          const newValue = element[sortBy.key];
-          /** Replace the current element with the new one. */
-
-          sortedElements[previousIndex] = element;
-          /** If the pinned status of the element has changed, it needs to be resorted */
-
-          const pinChanged = previousElement.pinned !== element.pinned;
-
-          if (!Object(utils["e" /* compareValues */])(previousValue, newValue) || pinChanged) {
-            /** Needs resort because its re-sort value has changed,
-             * and thus its position might change */
-            typesNeedingResort.add(contentType);
-          }
-        } else {
-          /** Has not yet been inserted */
-          sortedElements.push(element);
-          /** Needs re-sort because we're just pushing the element to the end here */
-
-          typesNeedingResort.add(contentType);
-        }
-      } else {
-        /** Doesn't pass filter, remove from sorted and filtered */
-        if (!Object(utils["q" /* isNullOrUndefined */])(previousIndex)) {
-          delete filteredCTMap[element.uuid];
-          /** We don't yet remove the element directly from the array, since mutating
-           * the array inside a loop could render all other upcoming indexes invalid */
-
-          sortedElements[previousIndex] = undefined;
-          /** Since an element is being removed from the array, we need to recompute
-           * the new positions for elements that are staying */
-
-          typesNeedingResort.add(contentType);
-        }
-      }
-    }
-
-    for (const contentType of typesNeedingResort.values()) {
-      this.resortContentType(contentType);
-    }
-  }
-
-  resortContentType(contentType) {
-    const sortedElements = this.sortedMap[contentType];
-    const sortBy = this.displaySortBy[contentType];
-    const filteredCTMap = this.filteredMap[contentType];
-    /** Resort the elements array, and update the saved positions */
-
-    /** @O(n * log(n)) */
-
-    const sortFn = function sortFn(a, b) {
-      let skipPinnedCheck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-      /** If the elements are undefined, move to beginning */
-      if (!a) {
-        return -1;
-      }
-
-      if (!b) {
-        return 1;
-      }
-
-      if (!skipPinnedCheck) {
-        if (a.pinned && b.pinned) {
-          return sortFn(a, b, true);
-        }
-
-        if (a.pinned) {
-          return -1;
-        }
-
-        if (b.pinned) {
-          return 1;
-        }
-      }
-
-      let aValue = a[sortBy.key] || '';
-      let bValue = b[sortBy.key] || '';
-      let vector = 1;
-
-      if (sortBy.dir === 'asc') {
-        vector *= -1;
-      }
-
-      if (sortBy.key === CollectionSort.Title) {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-
-        if (aValue.length === 0 && bValue.length === 0) {
-          return 0;
-        } else if (aValue.length === 0 && bValue.length !== 0) {
-          return 1 * vector;
-        } else if (aValue.length !== 0 && bValue.length === 0) {
-          return -1 * vector;
-        } else {
-          vector *= -1;
-        }
-      }
-
-      if (aValue > bValue) {
-        return -1 * vector;
-      } else if (aValue < bValue) {
-        return 1 * vector;
-      }
-
-      return 0;
-    };
-
-    const resorted = sortedElements.sort((a, b) => {
-      return sortFn(a, b);
-    });
-    /** Now that resorted contains the sorted elements (but also can contain undefined element)
-     * we create another array that filters out any of the undefinedes. We also keep track of the
-     * current index while we loop and set that in the filteredCTMap. */
-
-    const cleaned = [];
-    let currentIndex = 0;
-    /** @O(n) */
-
-    for (const element of resorted) {
-      if (!element) {
-        continue;
-      }
-
-      cleaned.push(element);
-      filteredCTMap[element.uuid] = currentIndex;
-      currentIndex++;
-    }
-
-    this.sortedMap[contentType] = cleaned;
   }
 
 }

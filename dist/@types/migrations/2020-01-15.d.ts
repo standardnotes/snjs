@@ -71,6 +71,12 @@ export declare class Migration20200115 extends Migration {
      */
     deleteLegacyStorageValues(): Promise<void>;
     /**
+     * Mobile
+     * Migrate mobile preferences
+     * @access private
+     */
+    migrateMobilePreferences(): Promise<void>;
+    /**
      * All platforms
      * Migrate previously stored session string token into object
      * @access private
