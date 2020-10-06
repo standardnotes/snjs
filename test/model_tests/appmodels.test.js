@@ -340,4 +340,21 @@ describe('app models', () => {
     const refreshedTag_2 = this.application.itemManager.findItem(tag.uuid);
     expect(refreshedTag_2.content.references.length).to.equal(2);
   });
+
+  it('maintains editor reference when duplicating note', async function () {
+    const note = await Factory.createMappedNote(this.application);
+    const editor = await this.application.createManagedItem(
+      ContentType.Component,
+      { area: ComponentArea.Editor },
+      true
+    );
+    await this.application.itemManager.changeComponent(editor.uuid, (mutator) => {
+      mutator.associateWithItem(note.uuid);
+    });
+
+    expect(this.application.componentManager.editorForNote(note).uuid).to.equal(editor.uuid);
+
+    const duplicate = await this.application.itemManager.duplicateItem(note.uuid, true);
+    expect(this.application.componentManager.editorForNote(duplicate).uuid).to.equal(editor.uuid);
+  });
 });

@@ -1020,7 +1020,7 @@ describe('online syncing', function() {
       const currentItem = this.application.itemManager.findItem(note.uuid);
       expect(currentItem.content.text).to.equal(note.content.text);
       expect(currentItem.text).to.equal(note.text);
-      expect(currentItem.dirty).to.equal(false);
+      expect(currentItem.dirty).to.not.be.ok;
     });
 
   it('load local items should respect sort priority', async function () {

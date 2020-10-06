@@ -44,7 +44,7 @@ export class SyncResponseResolver {
     const collectionRetrieved = await this.collectionByProcessingPayloads(
       this.response.retrievedPayloads,
       PayloadSource.RemoteRetrieved
-      );
+    );
     if (collectionRetrieved.all().length > 0) {
       collections.push(collectionRetrieved);
     }
@@ -120,7 +120,7 @@ export class SyncResponseResolver {
      */
     let stillDirty;
     if (current) {
-      if (payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate!) {
+      if (!current.dirtiedDate || (payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate)) {
         /** The payload was dirtied as part of handling deltas, and not because it was
          * dirtied by a client. We keep the payload dirty state here. */
         stillDirty = payload.dirty;

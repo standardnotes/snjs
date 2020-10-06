@@ -2592,7 +2592,11 @@ class PurePayload {
     /** Fallback to initializing with 0 epoch date */
 
     this.updated_at = new Date(rawPayload.updated_at || new Date(0));
-    this.dirtiedDate = new Date(rawPayload.dirtiedDate);
+
+    if (rawPayload.dirtiedDate) {
+      this.dirtiedDate = new Date(rawPayload.dirtiedDate);
+    }
+
     this.dirty = rawPayload.dirty;
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
@@ -21503,7 +21507,7 @@ class response_resolver_SyncResponseResolver {
     let stillDirty;
 
     if (current) {
-      if (payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate) {
+      if (!current.dirtiedDate || payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate) {
         /** The payload was dirtied as part of handling deltas, and not because it was
          * dirtied by a client. We keep the payload dirty state here. */
         stillDirty = payload.dirty;

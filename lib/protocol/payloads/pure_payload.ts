@@ -11,16 +11,16 @@ import { PayloadFormat } from '@Payloads/formats';
  * A payload is a vehicle in which item data is transported or persisted.
  * This class represents an abstract PurePayload which does not have any fields. Instead,
  * subclasses must override the `fields` static method to return which fields this particular
- * class of payload contains. For example, a ServerItemPayload is a transmission vehicle for 
+ * class of payload contains. For example, a ServerItemPayload is a transmission vehicle for
  * transporting an item to the server, and does not contain fields like PayloadFields.Dirty.
  * However, a StorageItemPayload is a persistence vehicle for saving payloads to disk, and does contain
  * PayloadsFields.Dirty.
- * 
+ *
  * Payloads are completely immutable and may not be modified after creation. Payloads should
  * not be created directly using the constructor, but instead created using the generators avaiable
  * in generator.js.
- * 
- * Payloads also have a content format. Formats can either be 
+ *
+ * Payloads also have a content format. Formats can either be
  * DecryptedBase64String, EncryptedString, or DecryptedBareObject.
  */
 export class PurePayload {
@@ -89,7 +89,9 @@ export class PurePayload {
     this.created_at = new Date(rawPayload.created_at || new Date());
     /** Fallback to initializing with 0 epoch date */
     this.updated_at = new Date(rawPayload.updated_at || new Date(0));
-    this.dirtiedDate = new Date(rawPayload.dirtiedDate!);
+    if (rawPayload.dirtiedDate) {
+      this.dirtiedDate = new Date(rawPayload.dirtiedDate);
+    }
     this.dirty = rawPayload.dirty;
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
@@ -124,10 +126,10 @@ export class PurePayload {
     deepFreeze(this);
   }
 
-  /** 
+  /**
    * Returns a generic object with all payload fields except any that are meta-data
-   * related (such as `fields`, `dirtiedDate`, etc). "Ejected" means a payload for 
-   * generic, non-contextual consumption, such as saving to a backup file or syncing 
+   * related (such as `fields`, `dirtiedDate`, etc). "Ejected" means a payload for
+   * generic, non-contextual consumption, such as saving to a backup file or syncing
    * with a server.
    */
   ejected() {
@@ -145,7 +147,7 @@ export class PurePayload {
     ];
     const result = {} as RawPayload;
     for (const field of this.fields) {
-      if(nonRequiredFields.includes(field)) {
+      if (nonRequiredFields.includes(field)) {
         continue;
       }
       const value = this[field];
