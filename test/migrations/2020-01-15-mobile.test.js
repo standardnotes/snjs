@@ -270,11 +270,11 @@ describe('2020-01-15 mobile migration', () => {
     /** setup options */
     await application.deviceInterface.setRawStorageValue(
       'LastExportDateKey',
-      true
+      undefined
     );
     await application.deviceInterface.setRawStorageValue(
       'DoNotShowAgainUnsupportedEditorsKey',
-      undefined
+      true
     );
     const options = JSON.stringify({
       sortBy: 'created_at',
@@ -354,9 +354,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.sortReverse).to.equal(false);
     expect(preferences.hideNotePreview).to.equal(true);
     expect(preferences.hideDate).to.equal(false);
-    expect(preferences.hideNotePreview).to.equal(undefined);
-    expect(preferences.lastExportDate).to.equal(true);
-    expect(preferences.doNotShowAgainUnsupportedEditors).to.equal(undefined);
+    expect(preferences.hideNotePreview).to.equal(true);
+    expect(preferences.lastExportDate).to.equal(undefined);
+    expect(preferences.doNotShowAgainUnsupportedEditors).to.equal(true);
     await application.deinit();
   });
 
