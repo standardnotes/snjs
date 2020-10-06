@@ -353,6 +353,7 @@ export class Migration20200115 extends Migration {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
+
     const lastExportDate = await this.services.deviceInterface.getRawStorageValue(
       LegacyKeys.MobileLastExportDate
     );
@@ -370,7 +371,7 @@ export class Migration20200115 extends Migration {
         hideDate: legacyOptionsState.hideDates ?? false
       }
     }
-    rawStructure.nonwrapped![StorageKey.MobilePreferences] = {
+    rawStructure[ValueModesKeys.Unwrapped]![StorageKey.MobilePreferences] = {
       ...migratedOptionsState,
       lastExportDate: lastExportDate ?? undefined,
       doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors ?? false,
