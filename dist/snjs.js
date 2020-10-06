@@ -16557,7 +16557,11 @@ class _2020_01_15_Migration20200115 extends Migration {
     });
     this.registerStageHandler(ApplicationStage.StorageDecrypted_09, async () => {
       await this.migrateArbitraryRawStorageToManagedStorageAllPlatforms();
-      await this.migrateMobilePreferences();
+
+      if (isEnvironmentMobile(this.services.environment)) {
+        await this.migrateMobilePreferences();
+      }
+
       await this.migrateSessionStorage();
       await this.deleteLegacyStorageValues();
     });
