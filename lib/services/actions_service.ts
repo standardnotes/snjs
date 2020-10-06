@@ -1,3 +1,4 @@
+import { CreateItemFromPayload } from '@Models/generator';
 import { HttpResponse } from './api/responses';
 import { Action, ActionAccessType } from './../models/app/action';
 import { ContentType } from './../models/content_types';
@@ -226,10 +227,7 @@ export class SNActionsService extends PureService {
         passwordRequestHandler
       );
       if (payload) {
-        const item = await this.itemManager!.createItem(
-          payload.content_type!,
-          payload.contentObject
-        );
+        const item = CreateItemFromPayload(payload);
         return {
           ...response,
           item

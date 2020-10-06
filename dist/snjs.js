@@ -15941,6 +15941,7 @@ function actions_service_defineProperty(obj, key, value) { if (key in obj) { Obj
 
 
 
+
 /**
  * The Actions Service allows clients to interact with action-based extensions.
  * Action-based extensions are mostly RESTful actions that can push a local value or
@@ -16102,7 +16103,7 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
       const payload = await this.payloadByDecryptingResponse(response, passwordRequestHandler);
 
       if (payload) {
-        const item = await this.itemManager.createItem(payload.content_type, payload.contentObject);
+        const item = CreateItemFromPayload(payload);
         return actions_service_objectSpread(actions_service_objectSpread({}, response), {}, {
           item
         });
