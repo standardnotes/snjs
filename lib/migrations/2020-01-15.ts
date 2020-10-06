@@ -354,10 +354,10 @@ export class Migration20200115 extends Migration {
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
 
-    const lastExportDate = await this.services.deviceInterface.getRawStorageValue(
+    const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileLastExportDate
     );
-    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getRawStorageValue(
+    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileDoNotWarnUnsupportedEditors
     );
     const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
