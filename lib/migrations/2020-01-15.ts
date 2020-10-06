@@ -365,7 +365,7 @@ export class Migration20200115 extends Migration {
     if (legacyOptionsState) {
       const legacySortBy = legacyOptionsState.sortBy;
       migratedOptionsState = {
-        sortBy: isNullOrUndefined(legacySortBy) || legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
+        sortBy: legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
         sortReverse: legacyOptionsState.sortReverse ?? false,
         hideNotePreview: legacyOptionsState.hidePreviews ?? false,
         hideDate: legacyOptionsState.hideDates ?? false
