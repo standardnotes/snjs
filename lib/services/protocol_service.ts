@@ -207,7 +207,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * Returns encryption protocol display name for active account/wrapper
    */
-  public async getDefaultOperatorEncryptionDisplayName() {
+  public async getEncryptionDisplayName() {
     const version = await this.getEncryptionSourceVersion();
     if (version) {
       return this.operatorForVersion(version).getEncryptionDisplayName();

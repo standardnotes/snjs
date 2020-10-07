@@ -732,7 +732,7 @@ export class SNApplication {
   }
 
   public async getProtocolEncryptionDisplayName() {
-    return this.protocolService!.getDefaultOperatorEncryptionDisplayName();
+    return this.protocolService!.getEncryptionDisplayName();
   }
 
   public getUserVersion() {

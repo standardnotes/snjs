@@ -18293,7 +18293,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
    */
 
 
-  async getDefaultOperatorEncryptionDisplayName() {
+  async getEncryptionDisplayName() {
     const version = await this.getEncryptionSourceVersion();
 
     if (version) {
@@ -23670,7 +23670,7 @@ class application_SNApplication {
   }
 
   async getProtocolEncryptionDisplayName() {
-    return this.protocolService.getDefaultOperatorEncryptionDisplayName();
+    return this.protocolService.getEncryptionDisplayName();
   }
 
   getUserVersion() {
