@@ -361,6 +361,35 @@ describe('notes and tags', () => {
       expect(displayedNotes.length).to.equal(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
     });
+
+    it('should take filter into account when displaying tag', async function () {
+      const taggedNote = await Factory.createMappedNote(this.application);
+      const tag = await this.application.findOrCreateTag('A');
+      await this.application.changeItem(tag.uuid, (mutator) => {
+        mutator.addItemAsRelationship(taggedNote);
+      });
+      await this.application.changeItem(taggedNote.uuid, (mutator) => {
+        mutator.title = 'A';
+      });
+      await this.application.insertItem(
+        await this.application.createTemplateItem(
+          ContentType.Note, { title: 'B' }
+        )
+      );
+
+      this.application.setNotesDisplayOptions(tag, undefined, undefined, (note) =>
+        note.safeTitle().includes('A')
+      );
+      let displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.have.length(1);
+      expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
+
+      this.application.setNotesDisplayOptions(tag, undefined, undefined, (note) =>
+        note.title.includes('B')
+      );
+      displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.have.length(0);
+    });
   });
 
   describe('Smart tags', function () {

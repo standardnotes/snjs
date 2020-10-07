@@ -7,6 +7,7 @@ export declare class ItemCollectionNotesView {
     private collection;
     private displayedList;
     private tag?;
+    private displayFilter;
     private needsRebuilding;
     constructor(collection: ItemCollection);
     notesMatchingSmartTag(smartTag: SNSmartTag, notes: SNNote[]): SNNote[];
