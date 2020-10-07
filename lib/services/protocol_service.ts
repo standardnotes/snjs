@@ -196,10 +196,31 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   /**
-   * Returns encryption protocol display name
+   * Returns encryption protocol display name for active account/wrapper
    */
-  public getDefaultOperatorEncryptionDisplayName() {
-    return this.defaultOperator().getEncryptionDisplayName();
+  public async getDefaultOperatorEncryptionDisplayName() {
+    let version: ProtocolVersion | undefined;
+    switch (this.keyMode) {
+      case KeyMode.WrapperOnly: {
+        const keyParams = await this.getRootKeyWrapperKeyParams();
+        version = keyParams!.version;
+        break;
+      }
+      case KeyMode.RootKeyPlusWrapper:
+      case KeyMode.RootKeyOnly: {
+        version = await this.getUserVersion();
+        break;
+      }
+      default:
+        version = undefined;
+        break;
+    }
+    if (version) {
+      return this.operatorForVersion(version).getEncryptionDisplayName();
+    } else {
+      return undefined;
+    }
+
   }
 
   /**

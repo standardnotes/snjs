@@ -236,7 +236,7 @@ export declare class SNApplication {
         uuid: string;
         email?: string | undefined;
     } | undefined;
-    getProtocolEncryptionDisplayName(): string;
+    getProtocolEncryptionDisplayName(): Promise<string | undefined>;
     getUserVersion(): Promise<ProtocolVersion | undefined>;
     /**
      * Returns true if there is an upgrade available for the account or passcode

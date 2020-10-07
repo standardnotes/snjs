@@ -18280,12 +18280,38 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     }
   }
   /**
-   * Returns encryption protocol display name
+   * Returns encryption protocol display name for active account/wrapper
    */
 
 
-  getDefaultOperatorEncryptionDisplayName() {
-    return this.defaultOperator().getEncryptionDisplayName();
+  async getDefaultOperatorEncryptionDisplayName() {
+    let version;
+
+    switch (this.keyMode) {
+      case KeyMode.WrapperOnly:
+        {
+          const keyParams = await this.getRootKeyWrapperKeyParams();
+          version = keyParams.version;
+          break;
+        }
+
+      case KeyMode.RootKeyPlusWrapper:
+      case KeyMode.RootKeyOnly:
+        {
+          version = await this.getUserVersion();
+          break;
+        }
+
+      default:
+        version = undefined;
+        break;
+    }
+
+    if (version) {
+      return this.operatorForVersion(version).getEncryptionDisplayName();
+    } else {
+      return undefined;
+    }
   }
   /**
    * Returns the latest protocol version
@@ -23656,7 +23682,7 @@ class application_SNApplication {
     return this.sessionManager.getUser();
   }
 
-  getProtocolEncryptionDisplayName() {
+  async getProtocolEncryptionDisplayName() {
     return this.protocolService.getDefaultOperatorEncryptionDisplayName();
   }
 
