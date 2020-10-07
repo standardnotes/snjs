@@ -7,6 +7,7 @@ import { ItemCollection, CollectionSort, SortDirection } from "./item_collection
 export class ItemCollectionNotesView {
   private displayedList: SNNote[] = [];
   private tag?: SNTag;
+  private displayFilter: (element: SNItem) => boolean = () => true;
   private needsRebuilding = true;
 
   constructor(private collection: ItemCollection) {
@@ -64,6 +65,7 @@ export class ItemCollectionNotesView {
       filter
     );
     this.tag = tag;
+    this.displayFilter = filter || (() => true);
     this.needsRebuilding = true;
   }
 
@@ -80,7 +82,8 @@ export class ItemCollectionNotesView {
         .filter(element =>
           element.content_type === ContentType.Note &&
           !element.deleted &&
-          !element.trashed
+          !element.trashed &&
+          this.displayFilter(element)
       ) as SNNote[];
     } else {
       this.displayedList = notes;
