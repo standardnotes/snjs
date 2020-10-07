@@ -18279,38 +18279,25 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       await this.notifyObserversOfKeyChange();
     }
   }
+
+  async getEncryptionSourceVersion() {
+    if (this.hasAccount()) {
+      return this.getUserVersion();
+    } else if (this.hasPasscode()) {
+      const passcodeParams = await this.getRootKeyWrapperKeyParams();
+      return passcodeParams.version;
+    }
+  }
   /**
    * Returns encryption protocol display name for active account/wrapper
    */
 
 
   async getDefaultOperatorEncryptionDisplayName() {
-    let version;
-
-    switch (this.keyMode) {
-      case KeyMode.WrapperOnly:
-        {
-          const keyParams = await this.getRootKeyWrapperKeyParams();
-          version = keyParams.version;
-          break;
-        }
-
-      case KeyMode.RootKeyPlusWrapper:
-      case KeyMode.RootKeyOnly:
-        {
-          version = await this.getUserVersion();
-          break;
-        }
-
-      default:
-        version = undefined;
-        break;
-    }
+    const version = await this.getEncryptionSourceVersion();
 
     if (version) {
       return this.operatorForVersion(version).getEncryptionDisplayName();
-    } else {
-      return undefined;
     }
   }
   /**

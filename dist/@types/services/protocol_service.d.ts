@@ -74,6 +74,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     /** @override */
     deinit(): void;
     initialize(): Promise<void>;
+    private getEncryptionSourceVersion;
     /**
      * Returns encryption protocol display name for active account/wrapper
      */
