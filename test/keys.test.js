@@ -579,4 +579,19 @@ describe('keys', function () {
     expect(keyParams.origination).to.equal(KeyParamsOrigination.Registration);
   });
 
+  it('encryption name should be dependant on key params version', async function () {
+    /** Register with 003 account */
+    await Factory.registerOldUser({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      version: ProtocolVersion.V003
+    });
+    expect(await this.application.protocolService.getEncryptionDisplayName()).to.equal('AES-256');
+
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    /** Register with 004 account */
+    await this.application.register(this.email + 'new', this.password);
+    expect(await this.application.protocolService.getEncryptionDisplayName()).to.equal('XChaCha20-Poly1305');
+  });
 });

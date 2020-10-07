@@ -195,11 +195,23 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
   }
 
+  private async getEncryptionSourceVersion() {
+    if (this.hasAccount()) {
+      return this.getUserVersion();
+    } else if (this.hasPasscode()) {
+      const passcodeParams = await this.getRootKeyWrapperKeyParams();
+      return passcodeParams!.version
+    }
+  }
+
   /**
-   * Returns encryption protocol display name
+   * Returns encryption protocol display name for active account/wrapper
    */
-  public getDefaultOperatorEncryptionDisplayName() {
-    return this.defaultOperator().getEncryptionDisplayName();
+  public async getEncryptionDisplayName() {
+    const version = await this.getEncryptionSourceVersion();
+    if (version) {
+      return this.operatorForVersion(version).getEncryptionDisplayName();
+    }
   }
 
   /**
@@ -545,7 +557,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
         );
       }
     }
-    if(key?.errorDecrypting) {
+    if (key?.errorDecrypting) {
       return CreateMaxPayloadFromAnyObject(
         payload,
         {

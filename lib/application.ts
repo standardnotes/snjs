@@ -731,8 +731,8 @@ export class SNApplication {
     return this.sessionManager!.getUser();
   }
 
-  public getProtocolEncryptionDisplayName() {
-    return this.protocolService!.getDefaultOperatorEncryptionDisplayName();
+  public async getProtocolEncryptionDisplayName() {
+    return this.protocolService!.getEncryptionDisplayName();
   }
 
   public getUserVersion() {
