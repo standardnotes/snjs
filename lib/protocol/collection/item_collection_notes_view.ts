@@ -7,7 +7,6 @@ import { ItemCollection, CollectionSort, SortDirection } from "./item_collection
 export class ItemCollectionNotesView {
   private displayedList: SNNote[] = [];
   private tag?: SNTag;
-  private displayFilter: (element: SNItem) => boolean = () => true;
   private needsRebuilding = true;
 
   constructor(private collection: ItemCollection) {
@@ -65,7 +64,6 @@ export class ItemCollectionNotesView {
       filter
     );
     this.tag = tag;
-    this.displayFilter = filter || (() => true);
     this.needsRebuilding = true;
   }
 
@@ -78,13 +76,12 @@ export class ItemCollectionNotesView {
         notes
       );
     } else if (tag) {
-      this.displayedList = this.collection.referencesForElement(tag)
-        .filter(element =>
-          element.content_type === ContentType.Note &&
-          !element.deleted &&
-          !element.trashed &&
-          this.displayFilter(element)
-      ) as SNNote[];
+      const taggedNoteUuids = new Set(
+        this.collection.uuidReferencesForUuid(tag.uuid)
+      );
+      this.displayedList = notes.filter(
+        note => taggedNoteUuids.has(note.uuid)
+      );
     } else {
       this.displayedList = notes;
     }

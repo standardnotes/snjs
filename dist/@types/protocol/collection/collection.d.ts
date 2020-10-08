@@ -47,6 +47,7 @@ export declare class MutableCollection<T extends Payloadable> {
     private deleteFromTypedMap;
     uuidsThatReferenceUuid(uuid: UuidString): string[];
     elementsReferencingElement(element: T): T[];
+    uuidReferencesForUuid(uuid: UuidString): string[];
     referencesForElement(element: T): T[];
     conflictsOf(uuid: UuidString): T[];
 }

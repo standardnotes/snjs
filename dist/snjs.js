@@ -11963,6 +11963,14 @@ class collection_MutableCollection {
     return this.findAll(uuids);
   }
 
+  uuidReferencesForUuid(uuid) {
+    if (!Object(utils["t" /* isString */])(uuid)) {
+      throw Error('Must use uuid string');
+    }
+
+    return this.referenceMap.getDirectRelationships(uuid);
+  }
+
   referencesForElement(element) {
     const uuids = this.referenceMap.getDirectRelationships(element.uuid);
     return this.findAll(uuids);
@@ -20369,9 +20377,6 @@ class item_collection_notes_view_ItemCollectionNotesView {
   constructor(collection) {
     this.collection = collection;
     this.displayedList = [];
-
-    this.displayFilter = () => true;
-
     this.needsRebuilding = true;
   }
 
@@ -20412,9 +20417,6 @@ class item_collection_notes_view_ItemCollectionNotesView {
   setDisplayOptions(tag, sortBy, direction, filter) {
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].Note, sortBy, direction, filter);
     this.tag = tag;
-
-    this.displayFilter = filter || (() => true);
-
     this.needsRebuilding = true;
   }
 
@@ -20425,7 +20427,8 @@ class item_collection_notes_view_ItemCollectionNotesView {
     if (tag === null || tag === void 0 ? void 0 : tag.isSmartTag()) {
       this.displayedList = this.notesMatchingSmartTag(tag, notes);
     } else if (tag) {
-      this.displayedList = this.collection.referencesForElement(tag).filter(element => element.content_type === content_types["a" /* ContentType */].Note && !element.deleted && !element.trashed && this.displayFilter(element));
+      const taggedNoteUuids = new Set(this.collection.uuidReferencesForUuid(tag.uuid));
+      this.displayedList = notes.filter(note => taggedNoteUuids.has(note.uuid));
     } else {
       this.displayedList = notes;
     }

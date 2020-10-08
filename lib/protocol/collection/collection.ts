@@ -189,6 +189,13 @@ export class MutableCollection<T extends Payloadable> {
     return this.findAll(uuids) as T[];
   }
 
+  public uuidReferencesForUuid(uuid: UuidString) {
+    if (!isString(uuid)) {
+      throw Error('Must use uuid string');
+    }
+    return this.referenceMap.getDirectRelationships(uuid);
+  }
+
   public referencesForElement(element: T) {
     const uuids = this.referenceMap.getDirectRelationships(element.uuid);
     return this.findAll(uuids) as T[];

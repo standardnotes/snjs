@@ -337,6 +337,21 @@ describe('notes and tags', () => {
     expect(note.dirty).to.not.be.ok;
   });
 
+  it('should sort notes', async function () {
+    await Promise.all(
+      ['Y', 'Z', 'A', 'B'].map(async (title) => {
+        return this.application.insertItem(
+          await this.application.createTemplateItem(
+            ContentType.Note, { title }
+          )
+        );
+      })
+    );
+    this.application.setNotesDisplayOptions(undefined, 'title', 'dsc');
+    const titles = this.application.getDisplayableItems(ContentType.Note).map(note => note.title);
+    expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z']);
+  });
+
   it('setting a note dirty should collapse its properties into content', async function () {
     let note = await this.application.createTemplateItem(ContentType.Note, { title: 'Foo' });
     await this.application.insertItem(note);
@@ -356,10 +371,38 @@ describe('notes and tags', () => {
           ContentType.Note, { title: 'A' }
         )
       );
-      this.application.setNotesDisplayOptions(tag);
+      this.application.setNotesDisplayOptions(tag, 'title', 'dsc');
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
+    });
+
+    it('should sort notes when displaying tag', async function () {
+      await Promise.all(
+        ['Y', 'Z', 'A', 'B'].map(async (title) => {
+          return this.application.insertItem(
+            await this.application.createTemplateItem(
+              ContentType.Note, { title }
+            )
+          );
+        })
+      );
+      const Bnote = this.application.itemManager.notes.find(note => note.title === 'B');
+      await this.application.changeItem(Bnote.uuid, (mutator) => {
+        mutator.pinned = true;
+      });
+      const tag = await this.application.findOrCreateTag('A');
+      await this.application.changeItem(tag.uuid, mutator => {
+        for (const note of this.application.itemManager.notes) {
+          mutator.addItemAsRelationship(note);
+        }
+      });
+
+      this.application.setNotesDisplayOptions(tag, 'title', 'dsc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes).to.have.length(4);
+      expect(displayedNotes[0].title).to.equal('B');
+      expect(displayedNotes[1].title).to.equal('A');
     });
 
     it('should take filter into account when displaying tag', async function () {
@@ -377,7 +420,7 @@ describe('notes and tags', () => {
         )
       );
 
-      this.application.setNotesDisplayOptions(tag, undefined, undefined, (note) =>
+      this.application.setNotesDisplayOptions(tag, 'title', 'asc', (note) =>
         note.safeTitle().includes('A')
       );
       let displayedNotes = this.application.getDisplayableItems(ContentType.Note);
