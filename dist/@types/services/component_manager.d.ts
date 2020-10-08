@@ -14,7 +14,7 @@ import { UuidString } from '../types';
 declare type ComponentHandler = {
     identifier: string;
     areas: ComponentArea[];
-    actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void;
+    actionHandler?: (component: SNComponent, action: ComponentAction, data: MessageData) => void;
     contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined;
     componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined;
     focusHandler?: (component: SNComponent, focused: boolean) => void;
@@ -26,11 +26,30 @@ export declare type PermissionDialog = {
     actionBlock: (approved: boolean) => void;
     callback: (approved: boolean) => void;
 };
+declare type MessageData = Partial<{
+    content_types: ContentType[];
+    item: RawPayload & {
+        clientData: any;
+    };
+    items: (RawPayload & {
+        clientData: any;
+    })[];
+    permissions: ComponentPermission[];
+    componentData: any;
+    uuid: UuidString;
+    environment: string;
+    platform: string;
+    activeThemeUrls: string[];
+    width: string | number;
+    height: string | number;
+    /** Related to setSize action */
+    type: 'container';
+}>;
 declare type ComponentMessage = {
     action: ComponentAction;
     sessionKey?: string;
     componentData?: any;
-    data: any;
+    data: MessageData;
 };
 declare type MessageReplyData = {
     approved?: boolean;
@@ -160,7 +179,7 @@ export declare class SNComponentManager extends PureService {
     isComponentActive(component: SNComponent): boolean;
     allComponentIframes(): HTMLIFrameElement[];
     iframeForComponent(uuid: UuidString): HTMLIFrameElement | undefined;
-    handleSetSizeEvent(component: SNComponent, data: any): void;
+    handleSetSizeEvent(component: SNComponent, data: MessageData): void;
     editorForNote(note: SNNote): SNComponent | undefined;
     getDefaultEditor(): SNComponent;
     permissionsStringForPermissions(permissions: ComponentPermission[], component: SNComponent): string;

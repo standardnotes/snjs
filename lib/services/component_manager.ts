@@ -52,7 +52,7 @@ type StreamObserver = {
 type ComponentHandler = {
   identifier: string
   areas: ComponentArea[]
-  actionHandler?: (component: SNComponent, action: ComponentAction, data: any) => void
+  actionHandler?: (component: SNComponent, action: ComponentAction, data: MessageData) => void
   contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined
   componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined
   focusHandler?: (component: SNComponent, focused: boolean) => void
@@ -66,11 +66,27 @@ export type PermissionDialog = {
   callback: (approved: boolean) => void
 }
 
+type MessageData = Partial<{
+  content_types: ContentType[]
+  item: RawPayload & { clientData: any }
+  items: (RawPayload & { clientData: any })[]
+  permissions: ComponentPermission[]
+  componentData: any
+  uuid: UuidString
+  environment: string
+  platform: string
+  activeThemeUrls: string[]
+  width: string | number
+  height: string | number
+  /** Related to setSize action */
+  type: 'container'
+}>
+
 type ComponentMessage = {
   action: ComponentAction
   sessionKey?: string
   componentData?: any
-  data: any
+  data: MessageData
 }
 
 type MessageReplyData = {
@@ -670,7 +686,7 @@ export class SNComponentManager extends PureService {
     } else if (message.action === ComponentAction.SaveItems) {
       this.handleSaveItemsMessage(component, message);
     } else if (message.action === ComponentAction.ToggleActivateComponent) {
-      const componentToToggle = this.itemManager!.findItem(message.data.uuid) as SNComponent;
+      const componentToToggle = this.itemManager!.findItem(message.data.uuid!) as SNComponent;
       this.handleToggleComponentMessage(componentToToggle);
     } else if (message.action === ComponentAction.RequestPermissions) {
       this.handleRequestPermissionsMessage(component, message);
@@ -731,7 +747,7 @@ export class SNComponentManager extends PureService {
     const requiredPermissions = [
       {
         name: ComponentAction.StreamItems,
-        content_types: message.data.content_types.sort()
+        content_types: message.data.content_types!.sort()
       }
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, () => {
@@ -747,7 +763,7 @@ export class SNComponentManager extends PureService {
       }
       /* Push immediately now */
       const items: SNItem[] = [];
-      for (const contentType of message.data.content_types) {
+      for (const contentType of message.data.content_types!) {
         extendArray(
           items,
           this.itemManager!.nonErroredItemsForContentType(contentType)
@@ -924,7 +940,7 @@ export class SNComponentManager extends PureService {
   }
 
   handleDuplicateItemMessage(component: SNComponent, message: ComponentMessage) {
-    const itemParams = message.data.item;
+    const itemParams = message.data.item!;
     const item = this.itemManager!.findItem(itemParams.uuid)!;
     const requiredPermissions = [
       {
@@ -944,7 +960,7 @@ export class SNComponentManager extends PureService {
   }
 
   handleCreateItemsMessage(component: SNComponent, message: ComponentMessage) {
-    let responseItems = message.data.item ? [message.data.item] : message.data.items;
+    let responseItems = message.data.item ? [message.data.item] : message.data.items!;
     const uniqueContentTypes = uniq(
       responseItems.map((item: any) => { return item.content_type; })
     ) as ContentType[];
@@ -992,7 +1008,7 @@ export class SNComponentManager extends PureService {
 
   handleDeleteItemsMessage(component: SNComponent, message: ComponentMessage) {
     const requiredContentTypes = uniq(
-      message.data.items.map((item: any) => { return item.content_type; })
+      message.data.items!.map((item: any) => { return item.content_type; })
     ).sort() as ContentType[];
     const requiredPermissions: ComponentPermission[] = [
       {
@@ -1001,7 +1017,7 @@ export class SNComponentManager extends PureService {
       }
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      const itemsData = message.data.items;
+      const itemsData = message.data.items!;
       const noun = itemsData.length === 1 ? 'item' : 'items';
       let reply = null;
       const didConfirm = await this.alertService!.confirm(
@@ -1031,7 +1047,7 @@ export class SNComponentManager extends PureService {
   }
 
   handleRequestPermissionsMessage(component: SNComponent, message: ComponentMessage) {
-    this.runWithPermissions(component.uuid, message.data.permissions, () => {
+    this.runWithPermissions(component.uuid, message.data.permissions!, () => {
       this.replyToMessage(component, message, { approved: true });
     });
   }
@@ -1087,7 +1103,7 @@ export class SNComponentManager extends PureService {
     if (!this.isNativeExtension(sourceComponent)) {
       return;
     }
-    const targetComponent = this.itemManager!.findItem(message.data.uuid);
+    const targetComponent = this.itemManager!.findItem(message.data.uuid!);
     this.desktopManager.installComponent(targetComponent);
   }
 
@@ -1373,7 +1389,7 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  handleSetSizeEvent(component: SNComponent, data: any) {
+  handleSetSizeEvent(component: SNComponent, data: MessageData) {
     const setSize = (element: Element, size: any) => {
       const widthString = isString(size.width) ? size.width : `${data.width}px`;
       const heightString = isString(size.height) ? size.height : `${data.height}px`;
