@@ -846,13 +846,13 @@ export class SNComponentManager extends PureService {
       const items = this.itemManager!.findItems(uuids, true);
       let lockedCount = 0;
       let lockedNoteCount = 0;
-      items.forEach((item, index) => {
+      for (let [index, item] of items.entries()) {
         if (!item) {
           const responseItem = responsePayloads[index];
-          // An item this extension is trying to save was possibly removed locally, notify user
+          /** An item this extension is trying to save was possibly removed locally */
           this.alertService!.alert(
             `The extension ${component.name} is trying to save an item with type ` +
-            `${responseItem.content_type}, but that item does not exist .` +
+            `${responseItem.content_type}, but that item does not exist.` +
             `Please restart this extension and try again.`
           );
           return;
@@ -864,7 +864,7 @@ export class SNComponentManager extends PureService {
             lockedNoteCount++;
           }
         }
-      });
+      };
 
       if (lockedNoteCount === 1) {
         this.alertService!.alert(

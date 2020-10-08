@@ -14797,11 +14797,13 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       const items = this.itemManager.findItems(uuids, true);
       let lockedCount = 0;
       let lockedNoteCount = 0;
-      items.forEach((item, index) => {
-        if (!item) {
-          const responseItem = responsePayloads[index]; // An item this extension is trying to save was possibly removed locally, notify user
 
-          this.alertService.alert("The extension ".concat(component.name, " is trying to save an item with type ") + "".concat(responseItem.content_type, ", but that item does not exist .") + "Please restart this extension and try again.");
+      for (let [index, item] of items.entries()) {
+        if (!item) {
+          const responseItem = responsePayloads[index];
+          /** An item this extension is trying to save was possibly removed locally */
+
+          this.alertService.alert("The extension ".concat(component.name, " is trying to save an item with type ") + "".concat(responseItem.content_type, ", but that item does not exist.") + "Please restart this extension and try again.");
           return;
         }
 
@@ -14815,7 +14817,9 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
             lockedNoteCount++;
           }
         }
-      });
+      }
+
+      ;
 
       if (lockedNoteCount === 1) {
         this.alertService.alert("The note you are attempting to save is locked and cannot be edited.", 'Note Locked');
