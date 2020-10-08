@@ -11246,6 +11246,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     return this.executeCriticalFunction(async () => {
       await this.clearValues();
       await this.clearAllPayloads();
+      await this.deviceInterface.removeRawStorageValue(namespacedKey(this.identifier, RawStorageKey.LastMigrationTimestamp));
       await this.deviceInterface.removeRawStorageValue(this.getPersistenceKey());
     });
   }

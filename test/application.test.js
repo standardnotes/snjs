@@ -12,11 +12,11 @@ describe('application instances', () => {
     awaitAll: true
   };
 
-  before(async () => {
+  beforeEach(async () => {
     localStorage.clear();
   });
 
-  after(async () => {
+  afterEach(async () => {
     localStorage.clear();
   });
 
@@ -59,6 +59,14 @@ describe('application instances', () => {
     app.storageService.persistValuesToDisk();
     await app.prepareForDeinit();
     app.deinit();
+  });
+
+  it('signing out application should delete last_migration_timestamp', async () => {
+    const identifier = 'app';
+    const app = await Factory.createAndInitializeApplication(identifier);
+    expect(localStorage.getItem(`${identifier}-last_migration_timestamp`)).to.be.ok;
+    await app.signOut();
+    expect(localStorage.getItem(`${identifier}-last_migration_timestamp`)).to.not.be.ok;
   });
 
   it('locking application while critical func in progress should wait up to a limit',
