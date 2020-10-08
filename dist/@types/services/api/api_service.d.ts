@@ -48,7 +48,7 @@ export declare class SNApiService extends PureService {
     signIn(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<SignInResponse>;
     signOut(): Promise<HttpResponse>;
     changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<ChangePasswordResponse>;
-    sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<HttpResponse>;
+    sync(payloads: PurePayload[], lastSyncToken: string, paginationToken: string, limit: number, checkIntegrity?: boolean, contentType?: ContentType, customEvent?: string): Promise<any>;
     private refreshSessionThenRetryRequest;
     refreshSession(): Promise<SessionRenewalResponse>;
     getSessionsList(): Promise<HttpResponse>;

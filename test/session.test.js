@@ -423,4 +423,16 @@ describe('server session', function () {
     const response2 = await this.application.apiService.getSessionsList();
     expect(response2.object.length).to.equal(1);
   });
+
+  it('signing out with invalid session token should still delete local data', async function () {
+    const invalidSession = this.application.apiService.getSession();
+    invalidSession.accessToken = undefined;
+    invalidSession.refreshToken = undefined;
+
+    const storageKey = this.application.storageService.getPersistenceKey();
+    expect(localStorage.getItem(storageKey)).to.be.ok;
+
+    await this.application.signOut();
+    expect(localStorage.getItem(storageKey)).to.not.be.ok;
+  });
 });

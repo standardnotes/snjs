@@ -227,7 +227,9 @@ export class SNApiService extends PureService {
       url,
       undefined,
       this.session!.authorizationValue
-    ) as Promise<SignOutResponse>;
+    ).catch(errorResponse => {
+      return errorResponse;
+    }) as Promise<SignOutResponse>;
   }
 
   async changePassword(
@@ -324,6 +326,8 @@ export class SNApiService extends PureService {
       return this.httpService!.runHttp({
         ...httpRequest,
         authentication: this.session!.authorizationValue
+      }).catch((errorResponse) => {
+        return errorResponse;
       });
     }
   }

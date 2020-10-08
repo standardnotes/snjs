@@ -13802,7 +13802,9 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
   async signOut() {
     const url = await this.path(REQUEST_PATH_LOGOUT);
-    return this.httpService.postAbsolute(url, undefined, this.session.authorizationValue);
+    return this.httpService.postAbsolute(url, undefined, this.session.authorizationValue).catch(errorResponse => {
+      return errorResponse;
+    });
   }
 
   async changePassword(currentServerPassword, newServerPassword, newKeyParams) {
@@ -13881,7 +13883,9 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
     } else {
       return this.httpService.runHttp(api_service_objectSpread(api_service_objectSpread({}, httpRequest), {}, {
         authentication: this.session.authorizationValue
-      }));
+      })).catch(errorResponse => {
+        return errorResponse;
+      });
     }
   }
 
