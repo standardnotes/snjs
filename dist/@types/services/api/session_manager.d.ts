@@ -50,6 +50,7 @@ export declare class SNSessionManager extends PureService<SessionEvent> {
     private performSignIn;
     bypassChecksAndSignInWithServerPassword(email: string, serverPassword: string, mfaKeyPath?: string, mfaCode?: string): Promise<SignInResponse>;
     changePassword(currentServerPassword: string, newServerPassword: string, newKeyParams: SNRootKeyParams): Promise<SessionManagerResponse>;
+    getSessionsList(): Promise<HttpResponse>;
     private handleSuccessAuthResponse;
 }
 export {};

@@ -62,6 +62,14 @@ export declare type SignOutResponse = HttpResponse & {};
 export declare type SessionRenewalResponse = HttpResponse & {
     session?: SessionBody;
 };
+export declare type SessionListEntry = {
+    uuid: string;
+    api_version: string;
+    created_at: string;
+    updated_at: string;
+    device_info: string;
+};
+export declare type SessionListResponse = HttpResponse & SessionListEntry[];
 export declare type RevisionListEntry = {
     content_type: string;
     created_at: string;

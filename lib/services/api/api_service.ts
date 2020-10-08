@@ -8,6 +8,7 @@ import {
   RegistrationResponse,
   RevisionListEntry,
   RevisionListResponse,
+  SessionListResponse,
   SessionRenewalResponse,
   SignInResponse,
   SignOutResponse,
@@ -33,6 +34,7 @@ const REQUEST_PATH_CHANGE_PW = '/auth/change_pw';
 const REQUEST_PATH_SYNC = '/items/sync';
 const REQUEST_PATH_LOGOUT = '/auth/sign_out';
 const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
+const REQUEST_PATH_ALL_SESSIONS = '/sessions';
 const REQUEST_PATH_ITEM_REVISIONS = '/items/:item_id/revisions';
 const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 
@@ -354,6 +356,33 @@ export class SNApiService extends PureService {
     });
     this.refreshingSession = false;
     return result as SessionRenewalResponse;
+  }
+
+  async getSessionsList() {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
+    }
+    const url = await this.path(REQUEST_PATH_ALL_SESSIONS);
+    const response = await this.httpService!.getAbsolute(
+      url,
+      {},
+      this.session!.authorizationValue
+    ).catch(async (errorResponse) => {
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
+      if (isErrorResponseExpiredToken(errorResponse)) {
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Get,
+          url
+        });
+      }
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    });
+
+    return response as SessionListResponse;
   }
 
   async getItemRevisions(

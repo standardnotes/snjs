@@ -72,6 +72,16 @@ export type SessionRenewalResponse = HttpResponse & {
   session?: SessionBody
 }
 
+export type SessionListEntry = {
+  uuid: string
+  api_version: string
+  created_at: string
+  updated_at: string
+  device_info: string
+}
+
+export type SessionListResponse = HttpResponse & SessionListEntry[];
+
 export type RevisionListEntry = {
   content_type: string
   created_at: string,

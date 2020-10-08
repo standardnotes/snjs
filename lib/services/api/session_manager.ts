@@ -88,7 +88,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   private async setSession(session: Session, persist: boolean = true) {
-    await this.apiService!.setSession(session, persist);
+    await this.apiService.setSession(session, persist);
   }
 
   public online() {
@@ -96,7 +96,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public offline() {
-    return isNullOrUndefined(this.apiService!.getSession());
+    return isNullOrUndefined(this.apiService.getSession());
   }
 
   public getUser() {
@@ -105,9 +105,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   public async signOut() {
     this.user = undefined;
-    const session = this.apiService!.getSession();
+    const session = this.apiService.getSession();
     if (session && session.canExpire()) {
-      await this.apiService!.signOut();
+      await this.apiService.signOut();
     }
   }
 
@@ -175,7 +175,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   async register(email: string, password: string): Promise<SessionManagerResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
-        response: this.apiService!.createErrorResponse(
+        response: this.apiService.createErrorResponse(
           messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)
         )
       };
@@ -189,7 +189,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const serverPassword = rootKey.serverPassword;
     const keyParams = rootKey.keyParams;
 
-    const registerResponse = await this.apiService!.register(
+    const registerResponse = await this.apiService.register(
       email,
       serverPassword,
       keyParams
@@ -213,7 +213,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaKeyPath?: string,
     mfaCode?: string
   }> {
-    const response = await this.apiService!.getAccountKeyParams(
+    const response = await this.apiService.getAccountKeyParams(
       email,
       mfaKeyPath,
       mfaCode
@@ -228,7 +228,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
         if (!inputtedCode) {
           /** User dismissed window without input */
           return {
-            response: this.apiService!.createErrorResponse(SignInStrings.SignInCanceledMissingMfa)
+            response: this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa)
           };
         }
         return this.retrieveKeyParams(
@@ -244,7 +244,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const keyParams = KeyParamsFromApiResponse(response, email);
     if (!keyParams || !keyParams.version) {
       return {
-        response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
+        response: this.apiService.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
       };
     }
     return { keyParams, response, mfaKeyPath, mfaCode };
@@ -296,11 +296,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
     if (!this.protocolService!.supportedVersions().includes(keyParams.version)) {
       if (this.protocolService!.isVersionNewerThanLibraryVersion(keyParams.version)) {
         return {
-          response: this.apiService!.createErrorResponse(messages.UNSUPPORTED_PROTOCOL_VERSION)
+          response: this.apiService.createErrorResponse(messages.UNSUPPORTED_PROTOCOL_VERSION)
         };
       } else {
         return {
-          response: this.apiService!.createErrorResponse(messages.EXPIRED_PROTOCOL_VERSION)
+          response: this.apiService.createErrorResponse(messages.EXPIRED_PROTOCOL_VERSION)
         };
       }
     }
@@ -309,7 +309,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       const minimum = this.protocolService!.costMinimumForVersion(keyParams.version);
       if (keyParams.content002.pw_cost < minimum) {
         return {
-          response: this.apiService!.createErrorResponse(messages.INVALID_PASSWORD_COST)
+          response: this.apiService.createErrorResponse(messages.INVALID_PASSWORD_COST)
         };
       };
       const message = messages.OUTDATED_PROTOCOL_VERSION;
@@ -320,13 +320,13 @@ export class SNSessionManager extends PureService<SessionEvent> {
       );
       if (!confirmed) {
         return {
-          response: this.apiService!.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
+          response: this.apiService.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL)
         };
       }
     }
     if (!this.protocolService!.platformSupportsKeyDerivation(keyParams)) {
       return {
-        response: this.apiService!.createErrorResponse(messages.UNSUPPORTED_KEY_DERIVATION)
+        response: this.apiService.createErrorResponse(messages.UNSUPPORTED_KEY_DERIVATION)
       };
     }
     if (strict) {
@@ -335,7 +335,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     if (!isNullOrUndefined(minAllowedVersion)) {
       if (!leftVersionGreaterThanOrEqualToRight(keyParams.version, minAllowedVersion)) {
         return {
-          response: this.apiService!.createErrorResponse(
+          response: this.apiService.createErrorResponse(
             messages.StrictSignInFailed(keyParams.version, minAllowedVersion)
           )
         };
@@ -368,7 +368,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaKeyPath?: string,
     mfaCode?: string,
   ): Promise<SignInResponse> {
-    const signInResponse = await this.apiService!.signIn(
+    const signInResponse = await this.apiService.signIn(
       email,
       serverPassword,
       mfaKeyPath,
@@ -386,7 +386,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
         const inputtedCode = await this.promptForMfaValue();
         if (!inputtedCode) {
           /** User dismissed window without input */
-          return this.apiService!.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
+          return this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
         }
         return this.bypassChecksAndSignInWithServerPassword(
           email,
@@ -406,7 +406,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     newServerPassword: string,
     newKeyParams: SNRootKeyParams
   ): Promise<SessionManagerResponse> {
-    const response = await this.apiService!.changePassword(
+    const response = await this.apiService.changePassword(
       currentServerPassword,
       newServerPassword,
       newKeyParams
@@ -418,6 +418,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
       response: response,
       keyParams: response.key_params
     };
+  }
+
+  public getSessionsList() {
+    return this.apiService.getSessionsList();
   }
 
   private async handleSuccessAuthResponse(

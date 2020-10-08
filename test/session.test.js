@@ -279,8 +279,8 @@ describe('server session', function () {
     const refreshSessionResponse = await this.application.apiService.refreshSession();
 
     expect(refreshSessionResponse.status).to.equal(400);
-    expect(refreshSessionResponse.error.tag).to.equal('invalid-parameters');
-    expect(refreshSessionResponse.error.message).to.equal('The provided parameters are not valid.');
+    expect(refreshSessionResponse.error.tag).to.equal('invalid-refresh-token');
+    expect(refreshSessionResponse.error.message).to.equal('The refresh token is not valid.');
 
     // Access token should remain valid.
     const syncResponse = await this.application.apiService.sync([]);
@@ -403,5 +403,24 @@ describe('server session', function () {
     expect(appA.apiService.session.refreshToken).to.not.equal('bar');
 
     appA.deinit();
+  });
+
+  it('should return current session in list of sessions', async function () {
+    const sessions = await this.application.apiService.getSessionsList();
+    expect(sessions[0].current).to.equal(true);
+  });
+
+  it('signing out should delete session from all list', async function () {
+    /** Create new session aside from existing one */
+    const app2 = await Factory.createAndInitializeApplication('app2');
+    await app2.signIn(this.email, this.password);
+
+    const response = await this.application.apiService.getSessionsList();
+    expect(response.object.length).to.equal(2);
+
+    await app2.signOut();
+
+    const response2 = await this.application.apiService.getSessionsList();
+    expect(response2.object.length).to.equal(1);
   });
 });
