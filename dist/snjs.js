@@ -13158,6 +13158,10 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   getUser() {
+    if (this.user && !this.apiService.getSession()) {
+      throw Error('User is defined but no session is present.');
+    }
+
     return this.user;
   }
 
@@ -16248,7 +16252,8 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
 
 }
 // CONCATENATED MODULE: ./lib/migrations/migration.ts
-class Migration {
+
+class migration_Migration {
   constructor(services) {
     this.services = services;
     this.stageHandlers = {};
@@ -16268,6 +16273,27 @@ class Migration {
 
     (_this$onDoneHandler = this.onDoneHandler) === null || _this$onDoneHandler === void 0 ? void 0 : _this$onDoneHandler.call(this);
     this.onDoneHandler = undefined;
+  }
+
+  async promptForPasscodeUntilCorrect(validationCallback) {
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration, false);
+    return new Promise(resolve => {
+      this.services.challengeService.addChallengeObserver(challenge, {
+        onNonvalidatedSubmit: async challengeResponse => {
+          const value = challengeResponse.values[0];
+          const passcode = value.value;
+          const valid = await validationCallback(passcode);
+
+          if (valid) {
+            this.services.challengeService.completeChallenge(challenge);
+            resolve(passcode);
+          } else {
+            this.services.challengeService.setValidationStatusForChallenge(challenge, value, false);
+          }
+        }
+      });
+      this.services.challengeService.promptForChallengeResponse(challenge);
+    });
   }
 
   onDone(callback) {
@@ -16576,7 +16602,6 @@ function _2020_01_15_defineProperty(obj, key, value) { if (key in obj) { Object.
 
 
 
-
 const LegacyKeys = {
   WebPasscodeParamsKey: 'offlineParams',
   MobilePasscodeParamsKey: 'pc_params',
@@ -16592,7 +16617,8 @@ const LegacyKeys = {
   MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
   MobileOptionsState: 'options'
 };
-class _2020_01_15_Migration20200115 extends Migration {
+const LEGACY_SESSION_TOKEN_KEY = 'jwt';
+class _2020_01_15_Migration20200115 extends migration_Migration {
   static timestamp() {
     return new Date('2020-01-15').getTime();
   }
@@ -16711,27 +16737,6 @@ class _2020_01_15_Migration20200115 extends Migration {
     const newStructure = storage_service_SNStorageService.defaultValuesObject(rawStructure.wrapped, rawStructure.unwrapped, rawStructure.nonwrapped);
     newStructure[ValueModesKeys.Unwrapped] = undefined;
     await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.services.identifier, RawStorageKey.StorageObject), JSON.stringify(newStructure));
-  }
-
-  async promptForPasscodeUntilCorrect(validationCallback) {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration, false);
-    return new Promise(resolve => {
-      this.services.challengeService.addChallengeObserver(challenge, {
-        onNonvalidatedSubmit: async challengeResponse => {
-          const value = challengeResponse.values[0];
-          const passcode = value.value;
-          const valid = await validationCallback(passcode);
-
-          if (valid) {
-            this.services.challengeService.completeChallenge(challenge);
-            resolve(passcode);
-          } else {
-            this.services.challengeService.setValidationStatusForChallenge(challenge, value, false);
-          }
-        }
-      });
-      this.services.challengeService.promptForChallengeResponse(challenge);
-    });
   }
   /**
    * Helper
@@ -16885,6 +16890,12 @@ class _2020_01_15_Migration20200115 extends Migration {
         });
         const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(newAccountKey, intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
         rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected();
+
+        if (accountKeyContent.jwt) {
+          /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
+          this.services.deviceInterface.setRawStorageValue(LEGACY_SESSION_TOKEN_KEY, accountKeyContent.jwt);
+        }
+
         await this.services.deviceInterface.clearRawKeychainValue();
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
@@ -16914,6 +16925,11 @@ class _2020_01_15_Migration20200115 extends Migration {
           keyParams: rawAccountKeyParams
         });
         await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getKeychainValue(), this.services.identifier);
+
+        if (keychainValue.jwt) {
+          /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
+          this.services.deviceInterface.setRawStorageValue(LEGACY_SESSION_TOKEN_KEY, keychainValue.jwt);
+        }
       }
     }
     /** Move encrypted account key into place where it is now expected */
@@ -16980,7 +16996,6 @@ class _2020_01_15_Migration20200115 extends Migration {
   /**
    * Mobile
    * Migrate mobile preferences
-   * @access private
    */
 
 
@@ -17012,16 +17027,28 @@ class _2020_01_15_Migration20200115 extends Migration {
   /**
    * All platforms
    * Migrate previously stored session string token into object
-   * @access private
+   * On mobile, JWTs were previously stored in storage, inside of the user object,
+   * but then custom-migrated to be stored in the keychain. We must account for
+   * both scenarios here in case a user did not perform the custom platform migration.
+   * On desktop/web, JWT was stored in storage.
    */
 
 
   async migrateSessionStorage() {
-    const LEGACY_SESSION_TOKEN_KEY = 'jwt';
-    const currentToken = await this.services.storageService.getValue(LEGACY_SESSION_TOKEN_KEY);
+    let currentToken = await this.services.storageService.getValue(LEGACY_SESSION_TOKEN_KEY);
 
     if (!currentToken) {
-      return;
+      /** Try the user object */
+      const USER_OBJECT_KEY = 'user';
+      const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
+
+      if (user) {
+        currentToken = user.jwt;
+      }
+
+      if (!currentToken) {
+        return;
+      }
     }
 
     const session = new JwtSession(currentToken);
@@ -17068,7 +17095,7 @@ class _2020_01_15_Migration20200115 extends Migration {
 
 
 
-class _2020_01_01_base_BaseMigration extends Migration {
+class _2020_01_01_base_BaseMigration extends migration_Migration {
   static timestamp() {
     return new Date('2020-01-01').getTime();
   }

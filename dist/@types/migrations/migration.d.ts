@@ -10,6 +10,7 @@ export declare abstract class Migration {
     protected abstract registerStageHandlers(): void;
     protected registerStageHandler(stage: ApplicationStage, handler: StageHandler): void;
     protected markDone(): void;
+    protected promptForPasscodeUntilCorrect(validationCallback: (passcode: string) => Promise<boolean>): Promise<unknown>;
     onDone(callback: () => void): void;
     handleStage(stage: ApplicationStage): Promise<void>;
 }

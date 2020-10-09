@@ -53,16 +53,11 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify({ email: identifier })
     );
     await application.deviceInterface.legacy_setRawKeychainValue({
-      mk: accountKey.masterKey,
-      pw: accountKey.serverPassword,
-      ak: accountKey.dataAuthenticationKey,
-      version: ProtocolVersion.V003,
       offline: {
         pw: passcodeKey.serverPassword,
         timing: passcodeTiming
       }
     });
-
     /** Wrap account key with passcode key and store in storage */
     const keyPayload = CreateMaxPayloadFromAnyObject(
       {
@@ -70,6 +65,7 @@ describe('2020-01-15 mobile migration', () => {
         content_type: 'SN|Mobile|EncryptedKeys',
         content: {
           accountKeys: {
+            jwt: 'foo',
             mk: accountKey.masterKey,
             ak: accountKey.dataAuthenticationKey,
             pw: accountKey.serverPassword
@@ -96,7 +92,6 @@ describe('2020-01-15 mobile migration', () => {
       'biometrics_prefs',
       JSON.stringify(biometricPrefs)
     );
-
     await application.deviceInterface.setRawStorageValue(
       'first_run',
       false
@@ -192,6 +187,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(await application.getUser().email).to.equal(identifier);
 
     const appId = application.identifier;
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
     await application.deinit();
 
     /** Recreate application and ensure storage values are consistent */
@@ -208,6 +204,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(lastExportDate);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    application.deinit();
   });
 
 
@@ -382,6 +380,7 @@ describe('2020-01-15 mobile migration', () => {
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
+      jwt: 'foo',
       version: ProtocolVersion.V003
     });
     const biometricPrefs = {
@@ -434,8 +433,8 @@ describe('2020-01-15 mobile migration', () => {
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
-        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, passcode));
+        if (prompt.validation === ChallengeValidation.None) {
+          values.push(new ChallengeValue(prompt, password));
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
           values.push(new ChallengeValue(prompt, true));
@@ -498,9 +497,90 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(lastExportDate);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
     await application.deinit();
   }).timeout(10000);
 
+  it('2020-01-15 successfully creates session if jwt is stored in keychain', async function () {
+    const application = await Factory.createAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const identifier = 'foo';
+    const password = 'tar';
+    const accountKey = await operator003.createRootKey(
+      identifier,
+      password
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'auth_params',
+      JSON.stringify(accountKey.keyParams.getPortableValue())
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: identifier })
+    );
+    await application.deviceInterface.legacy_setRawKeychainValue({
+      mk: accountKey.masterKey,
+      pw: accountKey.serverPassword,
+      ak: accountKey.dataAuthenticationKey,
+      jwt: 'foo',
+      version: ProtocolVersion.V003
+    });
+
+    await application.prepareForLaunch({ receiveChallenge: () => { } });
+    await application.launch(true);
+
+    expect(application.apiService.getSession()).to.be.ok;
+
+    await application.deinit();
+  }).timeout(10000);
+
+  it('2020-01-15 successfully creates session if jwt is stored in storage', async function () {
+    const application = await Factory.createAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const identifier = 'foo';
+    const password = 'tar';
+    const accountKey = await operator003.createRootKey(
+      identifier,
+      password
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'auth_params',
+      JSON.stringify(accountKey.keyParams.getPortableValue())
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: identifier, jwt: 'foo' })
+    );
+    await application.deviceInterface.legacy_setRawKeychainValue({
+      mk: accountKey.masterKey,
+      pw: accountKey.serverPassword,
+      ak: accountKey.dataAuthenticationKey,
+      version: ProtocolVersion.V003
+    });
+
+    await application.prepareForLaunch({receiveChallenge: () => {}});
+    await application.launch(true);
+
+    expect(application.apiService.getSession()).to.be.ok;
+
+    await application.deinit();
+  }).timeout(10000);
 
   it('2020-01-15 migration with no account and no passcode', async function () {
     const application = await Factory.createAppWithRandNamespace(

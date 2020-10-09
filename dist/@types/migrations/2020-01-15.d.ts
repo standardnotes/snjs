@@ -20,7 +20,6 @@ export declare class Migration20200115 extends Migration {
      * All platforms
      */
     private allPlatformHelperSetStorageStructure;
-    private promptForPasscodeUntilCorrect;
     /**
      * Helper
      * Web/desktop only
@@ -73,15 +72,17 @@ export declare class Migration20200115 extends Migration {
     /**
      * Mobile
      * Migrate mobile preferences
-     * @access private
      */
-    migrateMobilePreferences(): Promise<void>;
+    private migrateMobilePreferences;
     /**
      * All platforms
      * Migrate previously stored session string token into object
-     * @access private
+     * On mobile, JWTs were previously stored in storage, inside of the user object,
+     * but then custom-migrated to be stored in the keychain. We must account for
+     * both scenarios here in case a user did not perform the custom platform migration.
+     * On desktop/web, JWT was stored in storage.
      */
-    migrateSessionStorage(): Promise<void>;
+    private migrateSessionStorage;
     /**
      * All platforms
      * Create new default SNItemsKey from root key.

@@ -6,7 +6,6 @@ import { EncryptionIntent } from './../protocol/intents';
 import { ProtocolVersion } from './../protocol/versions';
 import { ApplicationStage } from '@Lib/stages';
 import { StorageKey, RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from './../challenges';
 import { FillItemContent } from '@Models/functions';
 import { PurePayload } from '@Payloads/pure_payload';
 import { StorageValuesObject, SNStorageService } from './../services/storage_service';
@@ -37,6 +36,7 @@ const LegacyKeys = {
   MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
   MobileOptionsState: 'options',
 };
+const LEGACY_SESSION_TOKEN_KEY = 'jwt';
 
 export class Migration20200115 extends Migration {
 
@@ -175,38 +175,6 @@ export class Migration20200115 extends Migration {
       namespacedKey(this.services.identifier, RawStorageKey.StorageObject),
       JSON.stringify(newStructure)
     );
-  }
-
-  private async promptForPasscodeUntilCorrect(
-    validationCallback: (passcode: string) => Promise<boolean>
-  ) {
-    const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.None)],
-      ChallengeReason.Migration,
-      false
-    );
-    return new Promise((resolve) => {
-      this.services.challengeService.addChallengeObserver(
-        challenge,
-        {
-          onNonvalidatedSubmit: async (challengeResponse) => {
-            const value = challengeResponse.values[0];
-            const passcode = value.value as string;
-            const valid = await validationCallback(passcode);
-            if (valid) {
-              this.services.challengeService.completeChallenge(challenge);
-              resolve(passcode);
-            } else {
-              this.services.challengeService.setValidationStatusForChallenge(
-                challenge,
-                value,
-                false
-              );
-            }
-          }
-        });
-      this.services.challengeService.promptForChallengeResponse(challenge);
-    })
   }
 
   /**
@@ -355,7 +323,6 @@ export class Migration20200115 extends Migration {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
-
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
@@ -408,6 +375,13 @@ export class Migration20200115 extends Migration {
           passcodeKey,
         );
         rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected();
+        if (accountKeyContent.jwt) {
+          /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
+          this.services.deviceInterface.setRawStorageValue(
+            LEGACY_SESSION_TOKEN_KEY,
+            accountKeyContent.jwt
+          );
+        }
         await this.services.deviceInterface.clearRawKeychainValue();
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
@@ -448,6 +422,13 @@ export class Migration20200115 extends Migration {
           accountKey.getKeychainValue(),
           this.services.identifier
         );
+        if (keychainValue.jwt) {
+          /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
+          this.services.deviceInterface.setRawStorageValue(
+            LEGACY_SESSION_TOKEN_KEY,
+            keychainValue.jwt
+          );
+        }
       }
     }
 
@@ -514,9 +495,8 @@ export class Migration20200115 extends Migration {
   /**
    * Mobile
    * Migrate mobile preferences
-   * @access private
    */
-  async migrateMobilePreferences() {
+  private async migrateMobilePreferences() {
     const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileLastExportDate
     );
@@ -534,28 +514,36 @@ export class Migration20200115 extends Migration {
         hideDate: legacyOptionsState.hideDates ?? false
       }
     }
-
     const preferences = {
       ...migratedOptionsState,
       lastExportDate: lastExportDate ?? undefined,
       doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors ?? false,
     }
-
     await this.services.storageService.setValue(StorageKey.MobilePreferences, preferences);
   }
 
   /**
    * All platforms
    * Migrate previously stored session string token into object
-   * @access private
+   * On mobile, JWTs were previously stored in storage, inside of the user object,
+   * but then custom-migrated to be stored in the keychain. We must account for
+   * both scenarios here in case a user did not perform the custom platform migration.
+   * On desktop/web, JWT was stored in storage.
    */
-  async migrateSessionStorage() {
-    const LEGACY_SESSION_TOKEN_KEY = 'jwt';
-    const currentToken = await this.services.storageService.getValue(
+  private async migrateSessionStorage() {
+    let currentToken = await this.services.storageService.getValue(
       LEGACY_SESSION_TOKEN_KEY
     );
     if (!currentToken) {
-      return;
+      /** Try the user object */
+      const USER_OBJECT_KEY = 'user';
+      const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
+      if (user) {
+        currentToken = user.jwt;
+      }
+      if (!currentToken) {
+        return;
+      }
     }
     const session = new JwtSession(currentToken);
     await this.services.storageService.setValue(StorageKey.Session, session);
