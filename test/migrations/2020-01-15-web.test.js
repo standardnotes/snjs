@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('2020-01-15 web migration', () => {
+describe.only('2020-01-15 web migration', () => {
 
   beforeEach(() => {
     localStorage.clear();
@@ -483,6 +483,141 @@ describe('2020-01-15 web migration', () => {
       expect(storage[key]).to.equal(value);
     }
 
+    await application.deinit();
+  });
+
+  /**
+   * This test will pass but sync afterwards will not be successful
+   * as we are using a random value for the legacy session token
+   */
+  it.only('2020-01-15 migration from app v1.0.1 with account only', async function () {
+    const application = await Factory.createAppWithRandNamespace();
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator001 = new SNProtocolOperator001(new SNWebCrypto());
+    const identifier = 'foo';
+
+    /** Create old version account parameters */
+    const password = 'tar';
+    const accountKey = await operator001.createRootKey(
+      identifier,
+      password
+    );
+
+    /** Create arbitrary storage values and make sure they're migrated */
+    const storage = {
+      mk: accountKey.masterKey,
+      pw: accountKey.serverPassword,
+      jwt: 'anything',
+      server: 'anything',
+      /** Legacy versions would store json strings inside of embedded storage */
+      auth_params: JSON.stringify(accountKey.keyParams.getPortableValue()),
+      user: JSON.stringify({ uuid: 'anything', email: 'anything' })
+    };
+    for (const key of Object.keys(storage)) {
+      await application.deviceInterface.setRawStorageValue(
+        key,
+        storage[key]
+      );
+    }
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator001.generateEncryptedParameters(
+      notePayload,
+      PayloadFormat.EncryptedString,
+      accountKey,
+    );
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      noteEncryptionParams
+    );
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+
+    /** Run migration */
+    const promptValueReply = (prompts) => {
+      const values = [];
+      for (const prompt of prompts) {
+        /** We will be prompted to reauthetnicate our session, not relevant to this test
+         * but pass any value to avoid exception
+         */
+        values.push(new ChallengeValue(prompt, 'foo'));
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge) => {
+      application.addChallengeObserver(challenge, {
+        onInvalidValue: (value) => {
+          const values = promptValueReply([value.prompt]);
+          application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      const initialValues = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, initialValues);
+    };
+    await application.prepareForLaunch({
+      receiveChallenge: receiveChallenge,
+    });
+    await application.launch(true);
+    expect(application.sessionManager.online()).to.equal(true);
+    expect(application.sessionManager.getUser()).to.be.ok;
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyOnly
+    );
+    /** Should be decrypted */
+    const storageMode = application.storageService.domainKeyForMode(
+      StorageValueModes.Default
+    );
+    const valueStore = application.storageService.values[storageMode];
+    expect(valueStore.content_type).to.not.be.ok;
+    /** Embedded value should match */
+    const migratedKeyParams = await application.storageService.getValue(
+      StorageKey.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(migratedKeyParams).to.eql(accountKey.keyParams.getPortableValue());
+    const rootKey = await application.protocolService.getRootKey();
+    expect(rootKey).to.be.ok;
+
+    expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('auth_params')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('jwt')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('ak')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('mk')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('pw')).to.not.be.ok;
+
+    const keyParams = await application.storageService.getValue(
+      StorageKey.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(typeof keyParams).to.equal('object');
+
+    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.serverPassword).to.not.be.ok;
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V001);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
+
+    /** Expect note is decrypted */
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
+    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+
+    /** Ensure arbitrary values have been migrated */
+    for (const key of Object.keys(storage)) {
+      /** Is stringified in storage, but parsed in storageService */
+      const value = await application.storageService.getValue(key);
+      if (key === 'auth_params' ) {
+        continue;
+      } else if (key === 'user') {
+        expect(storage[key]).to.equal(JSON.stringify(value));
+      } else {
+        expect(storage[key]).to.equal(value);
+      }
+    }
     await application.deinit();
   });
 });

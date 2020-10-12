@@ -16709,11 +16709,12 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
        * No encrypted storage, take account keys (if they exist) out of raw storage
        * and place them in the keychain. */
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
+      const mk = await this.services.deviceInterface.getRawStorageValue('mk');
 
-      if (ak) {
-        const version = !Object(utils["q" /* isNullOrUndefined */])(ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+      if (ak || mk) {
+        const version = !Object(utils["q" /* isNullOrUndefined */])(ak) ? versions["a" /* ProtocolVersion */].V003 : ak ? versions["a" /* ProtocolVersion */].V002 : versions["a" /* ProtocolVersion */].V001;
         const accountKey = await root_key_SNRootKey.Create({
-          masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
+          masterKey: mk,
           serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
           dataAuthenticationKey: ak,
           version: version,
@@ -16986,7 +16987,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
 
   async deleteLegacyStorageValues() {
-    const miscKeys = ['mk', 'ak', 'jwt', 'ephemeral', 'cachedThemes'];
+    const miscKeys = ['mk', 'ak', 'pw', 'encryptionKey', 'authKey', 'jwt', 'ephemeral', 'cachedThemes'];
     const managedKeys = [...Object(utils["y" /* objectToValueArray */])(StorageKey), ...Object(utils["y" /* objectToValueArray */])(LegacyKeys), ...miscKeys];
 
     for (const key of managedKeys) {

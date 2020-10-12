@@ -136,13 +136,14 @@ export class Migration20200115 extends Migration {
        * No encrypted storage, take account keys (if they exist) out of raw storage
        * and place them in the keychain. */
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
-      if (ak) {
+      const mk = await this.services.deviceInterface.getRawStorageValue('mk');
+      if (ak || mk) {
         const version = !isNullOrUndefined(ak)
           ? ProtocolVersion.V003
-          : ProtocolVersion.V002;
+          : ak ? ProtocolVersion.V002 : ProtocolVersion.V001;
         const accountKey = await SNRootKey.Create(
           {
-            masterKey: await this.services.deviceInterface.getRawStorageValue('mk'),
+            masterKey: mk,
             serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
             dataAuthenticationKey: ak,
             version: version,
@@ -478,6 +479,9 @@ export class Migration20200115 extends Migration {
     const miscKeys = [
       'mk',
       'ak',
+      'pw',
+      'encryptionKey', /** v1 unused key */
+      'authKey', /** v1 unused key */
       'jwt',
       'ephemeral',
       'cachedThemes',
