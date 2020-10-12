@@ -1,4 +1,5 @@
-import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
+import { Environment } from '@Lib/platforms';
+import { RawStorageKey, namespacedKey, StorageKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
 import { PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { EncryptionDelegate } from './encryption_delegate';
@@ -70,13 +71,14 @@ export class SNStorageService extends PureService {
 
   constructor(
     deviceInterface: DeviceInterface,
-    identifier: string
+    identifier: string,
+    private environment: Environment
   ) {
     super();
     this.deviceInterface = deviceInterface;
     this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
-    this.setEncryptionPolicy(StorageEncryptionPolicies.Default);
+    this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false);
   }
 
   public deinit() {
@@ -92,6 +94,11 @@ export class SNStorageService extends PureService {
       if (this.needsPersist) {
         this.persistValuesToDisk();
       }
+    } else if (stage === ApplicationStage.StorageDecrypted_09) {
+      const persistedPolicy = await this.getValue(StorageKey.StorageEncryptionPolicy);
+      if (persistedPolicy) {
+        this.setEncryptionPolicy(persistedPolicy, false);
+      }
     }
   }
 
@@ -103,8 +110,20 @@ export class SNStorageService extends PureService {
     }
   }
 
-  public async setEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies) {
+  public async setEncryptionPolicy(
+    encryptionPolicy: StorageEncryptionPolicies,
+    persist = true
+  ) {
+    if (
+      encryptionPolicy === StorageEncryptionPolicies.Disabled &&
+      this.environment !== Environment.Mobile
+    ) {
+      throw Error('Disabling storage encryption is only available on mobile.');
+    }
     this.encryptionPolicy = encryptionPolicy;
+    if (persist) {
+      await this.setValue(StorageKey.StorageEncryptionPolicy, encryptionPolicy);
+    }
   }
 
   public isEphemeralSession() {

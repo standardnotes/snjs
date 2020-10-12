@@ -31,7 +31,8 @@ export enum StorageKey {
   SessionHistoryPersistable = 'sessionHistory_persist',
   SessionHistoryRevisions = 'sessionHistory_revisions',
   SessionHistoryOptimize = 'sessionHistory_autoOptimize',
-  KeyRecoveryUndecryptableItems = 'key_recovery_undecryptable'
+  KeyRecoveryUndecryptableItems = 'key_recovery_undecryptable',
+  StorageEncryptionPolicy = 'storage_policy'
 };
 
 export function namespacedKey(namespace: string, key: string) {

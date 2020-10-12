@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('2020-01-15 web migration', () => {
+describe('2020-01-15 web migration', () => {
 
   beforeEach(() => {
     localStorage.clear();
@@ -490,7 +490,7 @@ describe.only('2020-01-15 web migration', () => {
    * This test will pass but sync afterwards will not be successful
    * as we are using a random value for the legacy session token
    */
-  it.only('2020-01-15 migration from app v1.0.1 with account only', async function () {
+  it('2020-01-15 migration from app v1.0.1 with account only', async function () {
     const application = await Factory.createAppWithRandNamespace();
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(

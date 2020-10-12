@@ -9495,6 +9495,7 @@ var StorageKey;
   StorageKey["SessionHistoryRevisions"] = "sessionHistory_revisions";
   StorageKey["SessionHistoryOptimize"] = "sessionHistory_autoOptimize";
   StorageKey["KeyRecoveryUndecryptableItems"] = "key_recovery_undecryptable";
+  StorageKey["StorageEncryptionPolicy"] = "storage_policy";
 })(StorageKey || (StorageKey = {}));
 
 ;
@@ -10882,10 +10883,75 @@ var ApplicationStage;
 // EXTERNAL MODULE: ./lib/protocol/payloads/generator.ts
 var generator = __webpack_require__(1);
 
+// CONCATENATED MODULE: ./lib/platforms.ts
+var Environment;
+
+(function (Environment) {
+  Environment[Environment["Web"] = 1] = "Web";
+  Environment[Environment["Desktop"] = 2] = "Desktop";
+  Environment[Environment["Mobile"] = 3] = "Mobile";
+})(Environment || (Environment = {}));
+
+;
+var Platform;
+
+(function (Platform) {
+  Platform[Platform["Ios"] = 1] = "Ios";
+  Platform[Platform["Android"] = 2] = "Android";
+  Platform[Platform["MacWeb"] = 3] = "MacWeb";
+  Platform[Platform["MacDesktop"] = 4] = "MacDesktop";
+  Platform[Platform["WindowsWeb"] = 5] = "WindowsWeb";
+  Platform[Platform["WindowsDesktop"] = 6] = "WindowsDesktop";
+  Platform[Platform["LinuxWeb"] = 7] = "LinuxWeb";
+  Platform[Platform["LinuxDesktop"] = 8] = "LinuxDesktop";
+})(Platform || (Platform = {}));
+
+;
+function platformFromString(string) {
+  const map = {
+    'mac-web': Platform.MacWeb,
+    'mac-desktop': Platform.MacDesktop,
+    'linux-web': Platform.LinuxWeb,
+    'linux-desktop': Platform.LinuxDesktop,
+    'windows-web': Platform.WindowsWeb,
+    'windows-desktop': Platform.WindowsDesktop,
+    'ios': Platform.Ios,
+    'android': Platform.Android
+  };
+  return map[string];
+}
+function platformToString(platform) {
+  const map = {
+    [Platform.MacWeb]: 'mac-web',
+    [Platform.MacDesktop]: 'mac-desktop',
+    [Platform.LinuxWeb]: 'linux-web',
+    [Platform.LinuxDesktop]: 'linux-desktop',
+    [Platform.WindowsWeb]: 'windows-web',
+    [Platform.WindowsDesktop]: 'windows-desktop',
+    [Platform.Ios]: 'ios',
+    [Platform.Android]: 'android'
+  };
+  return map[platform];
+}
+function environmentToString(environment) {
+  const map = {
+    [Environment.Web]: 'web',
+    [Environment.Desktop]: 'desktop',
+    [Environment.Mobile]: 'mobile'
+  };
+  return map[environment];
+}
+function isEnvironmentWebOrDesktop(environment) {
+  return environment === Environment.Web || environment === Environment.Desktop;
+}
+function isEnvironmentMobile(environment) {
+  return environment === Environment.Mobile;
+}
 // EXTERNAL MODULE: ./lib/protocol/intents.ts
 var intents = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./lib/services/storage_service.ts
+
 
 
 
@@ -10947,8 +11013,9 @@ var ValueModesKeys;
  */
 
 class storage_service_SNStorageService extends pure_service["a" /* PureService */] {
-  constructor(deviceInterface, identifier) {
+  constructor(deviceInterface, identifier, environment) {
     super();
+    this.environment = environment;
     /** Wait until application has been unlocked before trying to persist */
 
     this.storagePersistable = false;
@@ -10956,7 +11023,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     this.deviceInterface = deviceInterface;
     this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
-    this.setEncryptionPolicy(StorageEncryptionPolicies.Default);
+    this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false);
   }
 
   deinit() {
@@ -10974,6 +11041,12 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
       if (this.needsPersist) {
         this.persistValuesToDisk();
       }
+    } else if (stage === ApplicationStage.StorageDecrypted_09) {
+      const persistedPolicy = await this.getValue(StorageKey.StorageEncryptionPolicy);
+
+      if (persistedPolicy) {
+        this.setEncryptionPolicy(persistedPolicy, false);
+      }
     }
   }
 
@@ -10987,7 +11060,17 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
   }
 
   async setEncryptionPolicy(encryptionPolicy) {
+    let persist = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    if (encryptionPolicy === StorageEncryptionPolicies.Disabled && this.environment !== Environment.Mobile) {
+      throw Error('Disabling storage encryption is only available on mobile.');
+    }
+
     this.encryptionPolicy = encryptionPolicy;
+
+    if (persist) {
+      await this.setValue(StorageKey.StorageEncryptionPolicy, encryptionPolicy);
+    }
   }
 
   isEphemeralSession() {
@@ -14021,70 +14104,6 @@ var find_default = /*#__PURE__*/__webpack_require__.n(find);
 var uniq = __webpack_require__(23);
 var uniq_default = /*#__PURE__*/__webpack_require__.n(uniq);
 
-// CONCATENATED MODULE: ./lib/platforms.ts
-var Environment;
-
-(function (Environment) {
-  Environment[Environment["Web"] = 1] = "Web";
-  Environment[Environment["Desktop"] = 2] = "Desktop";
-  Environment[Environment["Mobile"] = 3] = "Mobile";
-})(Environment || (Environment = {}));
-
-;
-var Platform;
-
-(function (Platform) {
-  Platform[Platform["Ios"] = 1] = "Ios";
-  Platform[Platform["Android"] = 2] = "Android";
-  Platform[Platform["MacWeb"] = 3] = "MacWeb";
-  Platform[Platform["MacDesktop"] = 4] = "MacDesktop";
-  Platform[Platform["WindowsWeb"] = 5] = "WindowsWeb";
-  Platform[Platform["WindowsDesktop"] = 6] = "WindowsDesktop";
-  Platform[Platform["LinuxWeb"] = 7] = "LinuxWeb";
-  Platform[Platform["LinuxDesktop"] = 8] = "LinuxDesktop";
-})(Platform || (Platform = {}));
-
-;
-function platformFromString(string) {
-  const map = {
-    'mac-web': Platform.MacWeb,
-    'mac-desktop': Platform.MacDesktop,
-    'linux-web': Platform.LinuxWeb,
-    'linux-desktop': Platform.LinuxDesktop,
-    'windows-web': Platform.WindowsWeb,
-    'windows-desktop': Platform.WindowsDesktop,
-    'ios': Platform.Ios,
-    'android': Platform.Android
-  };
-  return map[string];
-}
-function platformToString(platform) {
-  const map = {
-    [Platform.MacWeb]: 'mac-web',
-    [Platform.MacDesktop]: 'mac-desktop',
-    [Platform.LinuxWeb]: 'linux-web',
-    [Platform.LinuxDesktop]: 'linux-desktop',
-    [Platform.WindowsWeb]: 'windows-web',
-    [Platform.WindowsDesktop]: 'windows-desktop',
-    [Platform.Ios]: 'ios',
-    [Platform.Android]: 'android'
-  };
-  return map[platform];
-}
-function environmentToString(environment) {
-  const map = {
-    [Environment.Web]: 'web',
-    [Environment.Desktop]: 'desktop',
-    [Environment.Mobile]: 'mobile'
-  };
-  return map[environment];
-}
-function isEnvironmentWebOrDesktop(environment) {
-  return environment === Environment.Web || environment === Environment.Desktop;
-}
-function isEnvironmentMobile(environment) {
-  return environment === Environment.Mobile;
-}
 // CONCATENATED MODULE: ./lib/services/component_manager.ts
 function component_manager_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -24523,7 +24542,7 @@ class application_SNApplication {
   }
 
   createStorageManager() {
-    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.identifier);
+    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.identifier, this.environment);
     this.services.push(this.storageService);
   }
 

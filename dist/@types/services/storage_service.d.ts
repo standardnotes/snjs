@@ -1,3 +1,4 @@
+import { Environment } from '../platforms';
 import { ApplicationStage } from '../stages';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SNRootKey } from '../protocol/root_key';
@@ -40,6 +41,7 @@ export declare type StorageValuesObject = {
  * key can decrypt wrapped storage.
  */
 export declare class SNStorageService extends PureService {
+    private environment;
     encryptionDelegate?: EncryptionDelegate;
     /** Wait until application has been unlocked before trying to persist */
     private storagePersistable;
@@ -48,11 +50,11 @@ export declare class SNStorageService extends PureService {
     private identifier;
     private needsPersist;
     private values;
-    constructor(deviceInterface: DeviceInterface, identifier: string);
+    constructor(deviceInterface: DeviceInterface, identifier: string, environment: Environment);
     deinit(): void;
     handleApplicationStage(stage: ApplicationStage): Promise<void>;
     setPersistencePolicy(persistencePolicy: StoragePersistencePolicies): Promise<void>;
-    setEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies): Promise<void>;
+    setEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies, persist?: boolean): Promise<void>;
     isEphemeralSession(): boolean;
     initializeFromDisk(): Promise<void>;
     /**

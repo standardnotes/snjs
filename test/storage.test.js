@@ -27,7 +27,7 @@ describe('storage manager', function() {
   beforeEach(async function() {
     localStorage.clear();
     this.expectedKeyCount = BASE_KEY_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRandNamespace(Environment.Mobile);
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
   });
@@ -257,6 +257,12 @@ describe('storage manager', function() {
     const payload = payloads[0];
     expect(typeof payload.content).to.not.equal('string');
     expect(payload.content.references).to.be.ok;
+
+    const identifier = this.application.identifier;
+    this.application.deinit();
+
+    const app = await Factory.createAndInitializeApplication(identifier, Environment.Mobile);
+    expect(app.storageService.encryptionPolicy).to.equal(StorageEncryptionPolicies.Disabled);
   });
 
   it('stored payloads should not contain metadata fields', async function () {

@@ -1521,7 +1521,8 @@ export class SNApplication {
   private createStorageManager() {
     this.storageService = new SNStorageService(
       this.deviceInterface!,
-      this.identifier!,
+      this.identifier,
+      this.environment
     );
     this.services.push(this.storageService!);
   }
