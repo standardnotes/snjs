@@ -20425,21 +20425,24 @@ class item_collection_notes_view_ItemCollectionNotesView {
 
   setDisplayOptions(tag, sortBy, direction, filter) {
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].Note, sortBy, direction, filter);
-    this.tag = tag;
+    this.tagUuid = tag === null || tag === void 0 ? void 0 : tag.uuid;
     this.needsRebuilding = true;
   }
 
   rebuildList() {
-    const tag = this.tag;
     const notes = this.collection.displayElements(content_types["a" /* ContentType */].Note);
 
-    if (tag === null || tag === void 0 ? void 0 : tag.isSmartTag()) {
-      this.displayedList = this.notesMatchingSmartTag(tag, notes);
-    } else if (tag) {
-      const taggedNoteUuids = new Set(this.collection.uuidReferencesForUuid(tag.uuid));
-      this.displayedList = notes.filter(note => taggedNoteUuids.has(note.uuid));
-    } else {
+    if (!this.tagUuid) {
       this.displayedList = notes;
+      return;
+    }
+
+    const tag = this.collection.find(this.tagUuid);
+
+    if (tag.isSmartTag()) {
+      this.displayedList = this.notesMatchingSmartTag(tag, notes);
+    } else {
+      this.displayedList = notes.filter(note => !note.trashed && !note.deleted && tag.hasRelationshipWithItem(note));
     }
   }
 

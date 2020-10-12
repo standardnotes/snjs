@@ -377,6 +377,23 @@ describe('notes and tags', () => {
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
     });
 
+    it('should not show trashed notes when displaying a tag', async function () {
+      const taggedNote = await Factory.createMappedNote(this.application);
+      const trashedNote = await Factory.createMappedNote(this.application);
+      const tag = await this.application.findOrCreateTag('A');
+      await this.application.changeItem(tag.uuid, (mutator) => {
+        mutator.addItemAsRelationship(taggedNote);
+        mutator.addItemAsRelationship(trashedNote);
+      });
+      await this.application.changeItem(trashedNote.uuid, (mutator) => {
+        mutator.trashed = true;
+      });
+      this.application.setNotesDisplayOptions(tag, 'title', 'dsc');
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
+      expect(displayedNotes.length).to.equal(1);
+      expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
+    });
+
     it('should sort notes when displaying tag', async function () {
       await Promise.all(
         ['Y', 'Z', 'A', 'B'].map(async (title) => {
