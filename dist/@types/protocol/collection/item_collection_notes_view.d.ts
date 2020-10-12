@@ -6,7 +6,7 @@ import { ItemCollection, CollectionSort, SortDirection } from './item_collection
 export declare class ItemCollectionNotesView {
     private collection;
     private displayedList;
-    private tagUuid?;
+    private tag?;
     private needsRebuilding;
     constructor(collection: ItemCollection);
     notesMatchingSmartTag(smartTag: SNSmartTag, notes: SNNote[]): SNNote[];

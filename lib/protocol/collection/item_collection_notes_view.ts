@@ -18,7 +18,7 @@ import {
  */
 export class ItemCollectionNotesView {
   private displayedList: SNNote[] = [];
-  private tagUuid?: UuidString;
+  private tag?: SNTag;
   private needsRebuilding = true;
 
   constructor(private collection: ItemCollection) {}
@@ -82,21 +82,23 @@ export class ItemCollectionNotesView {
       direction,
       filter
     );
-    this.tagUuid = tag?.uuid;
+    this.tag = tag;
     this.needsRebuilding = true;
   }
 
   private rebuildList() {
     const notes = this.collection.displayElements(ContentType.Note) as SNNote[];
-    if (!this.tagUuid) {
+    if (!this.tag) {
       this.displayedList = notes;
       return;
     }
 
-    const tag = this.collection.find(this.tagUuid) as SNTag;
+    let tag = this.tag;
     if (tag.isSmartTag()) {
       this.displayedList = this.notesMatchingSmartTag(tag as SNSmartTag, notes);
     } else {
+      /** Get the most recent version of the tag */
+      tag = this.collection.find(tag.uuid) as SNTag;
       this.displayedList = notes.filter(
         (note) =>
           !note.trashed && !note.deleted && tag.hasRelationshipWithItem(note)
