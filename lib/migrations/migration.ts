@@ -1,3 +1,4 @@
+import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from './../challenges';
 import { MigrationServices } from './types';
 import { ApplicationStage } from '../stages';
 
@@ -24,6 +25,38 @@ export abstract class Migration {
   protected markDone() {
     this.onDoneHandler?.();
     this.onDoneHandler = undefined;
+  }
+
+  protected async promptForPasscodeUntilCorrect(
+    validationCallback: (passcode: string) => Promise<boolean>
+  ) {
+    const challenge = new Challenge(
+      [new ChallengePrompt(ChallengeValidation.None)],
+      ChallengeReason.Migration,
+      false
+    );
+    return new Promise((resolve) => {
+      this.services.challengeService.addChallengeObserver(
+        challenge,
+        {
+          onNonvalidatedSubmit: async (challengeResponse) => {
+            const value = challengeResponse.values[0];
+            const passcode = value.value as string;
+            const valid = await validationCallback(passcode);
+            if (valid) {
+              this.services.challengeService.completeChallenge(challenge);
+              resolve(passcode);
+            } else {
+              this.services.challengeService.setValidationStatusForChallenge(
+                challenge,
+                value,
+                false
+              );
+            }
+          }
+        });
+      this.services.challengeService.promptForChallengeResponse(challenge);
+    })
   }
 
   onDone(callback: () => void) {

@@ -100,6 +100,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public getUser() {
+    if (this.user && !this.apiService.getSession()) {
+      throw Error('User is defined but no session is present.')
+    }
     return this.user;
   }
 
@@ -435,7 +438,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       /** Legacy JWT response */
       const session = new JwtSession(response.token);
       await this.setSession(session);
-    } else if(response.session) {
+    } else if (response.session) {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response);
