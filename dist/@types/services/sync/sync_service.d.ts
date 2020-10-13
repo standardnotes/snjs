@@ -85,13 +85,6 @@ export declare class SNSyncService extends PureService<SyncEvent> {
     private _simulate_latency?;
     /** Content types appearing first are always mapped first */
     private readonly localLoadPriorty;
-    /**
-     * Non-encrypted types are items whose values a server must be able to read.
-     * These include server extensions (such as a note history endpoint), and
-     * multi-factor authentication items, which include a secret value that the server
-     * needs to be able to read in order to enforce.
-     */
-    private readonly nonEncryptedTypes;
     constructor(itemManager: ItemManager, sessionManager: SNSessionManager, protocolService: SNProtocolService, storageService: SNStorageService, modelManager: PayloadManager, apiService: SNApiService, interval: any);
     /**
      * If the database has been newly created (because its new or was previously destroyed)

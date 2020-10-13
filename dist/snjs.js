@@ -14509,7 +14509,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       content: item.content,
       clientData: clientData
     };
-    return this.removePrivatePropertiesFromResponseItems([params], component)[0];
+    return this.responseItemsByRemovingPrivateProperties([params], component)[0];
   }
 
   sendItemsInReply(componentUuid, items, message, source) {
@@ -14672,7 +14672,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     }
   }
 
-  removePrivatePropertiesFromResponseItems(responseItems, component) {
+  responseItemsByRemovingPrivateProperties(responseItems, component) {
     let includeUrls = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
     if (component && this.isNativeExtension(component)) {
@@ -14685,11 +14685,18 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     let privateContentProperties = ['autoupdateDisabled', 'permissions', 'active'];
 
     if (includeUrls) {
-      privateContentProperties = privateContentProperties.concat(['url', 'hosted_url', 'local_url']);
+      privateContentProperties = privateContentProperties.concat(['hosted_url', 'local_url']);
     }
 
     return responseItems.map(responseItem => {
-      if (!responseItem.content || typeof responseItem.content === 'string') {
+      const privateProperties = privateContentProperties.slice();
+      /** Server extensions are allowed to modify url property */
+
+      if (includeUrls && responseItem.content_type !== content_types["a" /* ContentType */].ServerExtension) {
+        privateProperties.push('url');
+      }
+
+      if (!responseItem.content || Object(utils["t" /* isString */])(responseItem.content)) {
         return responseItem;
       }
 
@@ -14697,13 +14704,13 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
 
       for (const [key, value] of Object.entries(responseItem.content)) {
         /** Only include non-private properties */
-        if (!privateContentProperties.includes(key)) {
+        if (!privateProperties.includes(key)) {
           content[key] = value;
         }
       }
 
       return component_manager_objectSpread(component_manager_objectSpread({}, responseItem), {}, {
-        content
+        content: content
       });
     });
   }
@@ -14829,7 +14836,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
     }
 
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      responsePayloads = this.removePrivatePropertiesFromResponseItems(responsePayloads, component, true);
+      responsePayloads = this.responseItemsByRemovingPrivateProperties(responsePayloads, component, true);
       /* Filter locked items */
 
       const uuids = Object(functions["b" /* Uuids */])(responsePayloads);
@@ -14931,7 +14938,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       content_types: uniqueContentTypes
     }];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      responseItems = this.removePrivatePropertiesFromResponseItems(responseItems, component);
+      responseItems = this.responseItemsByRemovingPrivateProperties(responseItems, component);
       const processedItems = [];
 
       for (const responseItem of responseItems) {
@@ -21968,6 +21975,14 @@ var SyncSources;
 
 ;
 /**
+ * Non-encrypted types are items whose values a server must be able to read.
+ * These include server extensions (such as a note history endpoint), and
+ * multi-factor authentication items, which include a secret value that the server
+ * needs to be able to read in order to enforce.
+ */
+
+const NonEncryptedTypes = Object.freeze([content_types["a" /* ContentType */].Mfa, content_types["a" /* ContentType */].ServerExtension]);
+/**
  * The sync service orchestrates with the model manager, api service, and storage service
  * to ensure consistent state between the three. When a change is made to an item, consumers
  * call the sync service's sync function to first persist pending changes to local storage.
@@ -21992,14 +22007,6 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     /** Content types appearing first are always mapped first */
 
     this.localLoadPriorty = [content_types["a" /* ContentType */].ItemsKey, content_types["a" /* ContentType */].UserPrefs, content_types["a" /* ContentType */].Privileges, content_types["a" /* ContentType */].Component, content_types["a" /* ContentType */].Theme];
-    /**
-     * Non-encrypted types are items whose values a server must be able to read.
-     * These include server extensions (such as a note history endpoint), and
-     * multi-factor authentication items, which include a secret value that the server
-     * needs to be able to read in order to enforce.
-     */
-
-    this.nonEncryptedTypes = [content_types["a" /* ContentType */].Mfa, content_types["a" /* ContentType */].ServerExtension];
     this.itemManager = itemManager;
     this.sessionManager = sessionManager;
     this.protocolService = protocolService;
@@ -22302,7 +22309,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
 
   async payloadsByPreparingForServer(payloads) {
     return this.protocolService.payloadsByEncryptingPayloads(payloads, payload => {
-      return this.nonEncryptedTypes.includes(payload.content_type) ? intents["b" /* EncryptionIntent */].SyncDecrypted : intents["b" /* EncryptionIntent */].Sync;
+      return NonEncryptedTypes.includes(payload.content_type) ? intents["b" /* EncryptionIntent */].SyncDecrypted : intents["b" /* EncryptionIntent */].Sync;
     });
   }
 

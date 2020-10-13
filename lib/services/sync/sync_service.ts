@@ -90,6 +90,18 @@ type SyncPromise = {
 }
 
 /**
+ * Non-encrypted types are items whose values a server must be able to read.
+ * These include server extensions (such as a note history endpoint), and
+ * multi-factor authentication items, which include a secret value that the server
+ * needs to be able to read in order to enforce.
+ */
+const NonEncryptedTypes = Object.freeze([
+  ContentType.Mfa,
+  ContentType.ServerExtension
+]);
+
+
+/**
  * The sync service orchestrates with the model manager, api service, and storage service
  * to ensure consistent state between the three. When a change is made to an item, consumers
  * call the sync service's sync function to first persist pending changes to local storage.
@@ -134,16 +146,6 @@ export class SNSyncService extends PureService<SyncEvent> {
     ContentType.Privileges,
     ContentType.Component,
     ContentType.Theme
-  ];
-  /**
-   * Non-encrypted types are items whose values a server must be able to read.
-   * These include server extensions (such as a note history endpoint), and
-   * multi-factor authentication items, which include a secret value that the server
-   * needs to be able to read in order to enforce.
-   */
-  private readonly nonEncryptedTypes = [
-    ContentType.Mfa,
-    ContentType.ServerExtension
   ];
 
   constructor(
@@ -469,7 +471,7 @@ export class SNSyncService extends PureService<SyncEvent> {
       payloads,
       (payload) => {
         return (
-          this.nonEncryptedTypes.includes(payload.content_type!)
+          NonEncryptedTypes.includes(payload.content_type!)
             ? EncryptionIntent.SyncDecrypted
             : EncryptionIntent.Sync
         );

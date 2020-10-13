@@ -140,7 +140,7 @@ export declare class SNComponentManager extends PureService {
     sessionKeyForComponent(component: SNComponent): string | undefined;
     componentForSessionKey(key: string): SNComponent | undefined;
     handleMessage(component: SNComponent, message: ComponentMessage): void;
-    removePrivatePropertiesFromResponseItems<T extends RawPayload>(responseItems: T[], component: SNComponent, includeUrls?: boolean): T[];
+    responseItemsByRemovingPrivateProperties<T extends RawPayload>(responseItems: T[], component: SNComponent, includeUrls?: boolean): T[];
     handleStreamItemsMessage(component: SNComponent, message: ComponentMessage): void;
     handleStreamContextItemMessage(component: SNComponent, message: ComponentMessage): void;
     isItemIdWithinComponentContextJurisdiction(uuid: string, component: SNComponent): boolean;

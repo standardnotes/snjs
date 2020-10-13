@@ -513,7 +513,7 @@ export class SNComponentManager extends PureService {
       content: item.content,
       clientData: clientData
     };
-    return this.removePrivatePropertiesFromResponseItems(
+    return this.responseItemsByRemovingPrivateProperties(
       [params],
       component
     )[0];
@@ -707,7 +707,7 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  removePrivatePropertiesFromResponseItems<T extends RawPayload>(
+  responseItemsByRemovingPrivateProperties<T extends RawPayload>(
     responseItems: T[],
     component: SNComponent,
     includeUrls = false
@@ -716,29 +716,37 @@ export class SNComponentManager extends PureService {
       /* System extensions can bypass this step */
       return responseItems;
     }
-
     /* Don't allow component to overwrite these properties. */
-    let privateContentProperties = ['autoupdateDisabled', 'permissions', 'active'];
+    let privateContentProperties = [
+      'autoupdateDisabled',
+      'permissions',
+      'active'
+    ];
     if (includeUrls) {
       privateContentProperties = privateContentProperties.concat([
-        'url', 'hosted_url', 'local_url'
+        'hosted_url',
+        'local_url'
       ]);
     }
-
     return responseItems.map((responseItem) => {
-      if (!responseItem.content || typeof responseItem.content === 'string') {
+      const privateProperties = privateContentProperties.slice();
+      /** Server extensions are allowed to modify url property */
+      if (includeUrls && responseItem.content_type !== ContentType.ServerExtension) {
+        privateProperties.push('url');
+      }
+      if (!responseItem.content || isString(responseItem.content)) {
         return responseItem;
       }
       const content: Partial<PayloadContent> = {};
       for (const [key, value] of Object.entries(responseItem.content)) {
         /** Only include non-private properties */
-        if (!privateContentProperties.includes(key)) {
+        if (!privateProperties.includes(key)) {
           content[key] = value;
         }
       }
       return {
         ...responseItem,
-        content
+        content: content
       };
     });
   }
@@ -851,7 +859,7 @@ export class SNComponentManager extends PureService {
       } as ComponentPermission);
     }
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      responsePayloads = this.removePrivatePropertiesFromResponseItems(
+      responsePayloads = this.responseItemsByRemovingPrivateProperties(
         responsePayloads,
         component,
         true
@@ -971,7 +979,7 @@ export class SNComponentManager extends PureService {
       }
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      responseItems = this.removePrivatePropertiesFromResponseItems(responseItems, component);
+      responseItems = this.responseItemsByRemovingPrivateProperties(responseItems, component);
       const processedItems = [];
       for (const responseItem of responseItems) {
         if (!responseItem.uuid) {
