@@ -1,15 +1,30 @@
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
-import { ChallengeValidation, ChallengeReason } from './../../challenges';
+import {
+  ChallengeValidation,
+  ChallengeReason,
+  ChallengeKeyboardType
+} from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, TokenSession } from './session';
-import { RegistrationResponse, SignInResponse, ChangePasswordResponse, HttpResponse, KeyParamsResponse } from './responses';
+import {
+  RegistrationResponse,
+  SignInResponse,
+  ChangePasswordResponse,
+  HttpResponse,
+  KeyParamsResponse
+} from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination, KeyParamsFromApiResponse } from './../../protocol/key_params';
+import {
+  SNRootKeyParams,
+  AnyKeyParamsContent,
+  KeyParamsOrigination,
+  KeyParamsFromApiResponse
+} from './../../protocol/key_params';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
 import { SNAlertService } from '@Services/alert_service';
@@ -162,7 +177,15 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   private async promptForMfaValue() {
     const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.MfaInputPlaceholder)],
+      [
+        new ChallengePrompt(
+          ChallengeValidation.None,
+          undefined,
+          SessionStrings.MfaInputPlaceholder,
+          false,
+          ChallengeKeyboardType.Numeric
+        )
+      ],
       ChallengeReason.Custom,
       true,
       SessionStrings.EnterMfa

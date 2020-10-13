@@ -13,6 +13,7 @@ export enum ChallengeValidation {
   AccountPassword = 2,
   Biometric = 3,
 };
+
 /** The source of the challenge */
 export enum ChallengeReason {
   ApplicationUnlock = 1,
@@ -21,6 +22,12 @@ export enum ChallengeReason {
   Migration = 4,
   Custom = 5
 };
+
+/** For mobile */
+export enum ChallengeKeyboardType {
+  Default = 0,
+  Numeric = 1
+}
 
 /**
  * A challenge is a stateless description of what the client needs to provide
@@ -103,7 +110,8 @@ export class ChallengePrompt {
     public readonly validation: ChallengeValidation,
     public readonly _title?: string,
     public readonly placeholder?: string,
-    public readonly secureTextEntry = true
+    public readonly secureTextEntry = true,
+    public readonly keyboardType = ChallengeKeyboardType.Default
   ) {
     Object.freeze(this);
   }

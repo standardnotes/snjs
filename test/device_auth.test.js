@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('device authentication', () => {
+describe.only('device authentication', () => {
 
   before(async () => {
     localStorage.clear();

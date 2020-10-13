@@ -11360,10 +11360,19 @@ var ChallengeReason;
 })(ChallengeReason || (ChallengeReason = {}));
 
 ;
+/** For mobile */
+
+var ChallengeKeyboardType;
+
+(function (ChallengeKeyboardType) {
+  ChallengeKeyboardType[ChallengeKeyboardType["Default"] = 0] = "Default";
+  ChallengeKeyboardType[ChallengeKeyboardType["Numeric"] = 1] = "Numeric";
+})(ChallengeKeyboardType || (ChallengeKeyboardType = {}));
 /**
  * A challenge is a stateless description of what the client needs to provide
  * in order to proceed.
  */
+
 
 class challenges_Challenge {
   constructor(prompts, reason, cancelable, _heading, _subheading) {
@@ -11448,10 +11457,12 @@ class challenges_Challenge {
 class challenges_ChallengePrompt {
   constructor(validation, _title, placeholder) {
     let secureTextEntry = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+    let keyboardType = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : ChallengeKeyboardType.Default;
     this.validation = validation;
     this._title = _title;
     this.placeholder = placeholder;
     this.secureTextEntry = secureTextEntry;
+    this.keyboardType = keyboardType;
     this.id = Math.random();
     Object.freeze(this);
   }
@@ -13290,7 +13301,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async promptForMfaValue() {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.MfaInputPlaceholder)], ChallengeReason.Custom, true, SessionStrings.EnterMfa);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.MfaInputPlaceholder, false, ChallengeKeyboardType.Numeric)], ChallengeReason.Custom, true, SessionStrings.EnterMfa);
     const response = await this.challengeService.promptForChallengeResponse(challenge);
 
     if (response) {

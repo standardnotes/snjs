@@ -17,6 +17,11 @@ export declare enum ChallengeReason {
     Migration = 4,
     Custom = 5
 }
+/** For mobile */
+export declare enum ChallengeKeyboardType {
+    Default = 0,
+    Numeric = 1
+}
 /**
  * A challenge is a stateless description of what the client needs to provide
  * in order to proceed.
@@ -46,8 +51,9 @@ export declare class ChallengePrompt {
     readonly _title?: string | undefined;
     readonly placeholder?: string | undefined;
     readonly secureTextEntry: boolean;
+    readonly keyboardType: ChallengeKeyboardType;
     readonly id: number;
-    constructor(validation: ChallengeValidation, _title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean);
+    constructor(validation: ChallengeValidation, _title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean, keyboardType?: ChallengeKeyboardType);
     get validates(): boolean;
     get title(): string | undefined;
 }
