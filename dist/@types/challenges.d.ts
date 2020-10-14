@@ -19,8 +19,8 @@ export declare enum ChallengeReason {
 }
 /** For mobile */
 export declare enum ChallengeKeyboardType {
-    Alphanumeric = 0,
-    Numeric = 1
+    Alphanumeric = "default",
+    Numeric = "numeric"
 }
 /**
  * A challenge is a stateless description of what the client needs to provide

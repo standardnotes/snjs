@@ -25,8 +25,8 @@ export enum ChallengeReason {
 
 /** For mobile */
 export enum ChallengeKeyboardType {
-  Alphanumeric = 0,
-  Numeric = 1
+  Alphanumeric = 'default',
+  Numeric = 'numeric'
 }
 
 /**
