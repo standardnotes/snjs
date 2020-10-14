@@ -19,7 +19,7 @@ export declare enum ChallengeReason {
 }
 /** For mobile */
 export declare enum ChallengeKeyboardType {
-    Default = 0,
+    Alphanumeric = 0,
     Numeric = 1
 }
 /**
@@ -51,9 +51,9 @@ export declare class ChallengePrompt {
     readonly _title?: string | undefined;
     readonly placeholder?: string | undefined;
     readonly secureTextEntry: boolean;
-    readonly keyboardType: ChallengeKeyboardType;
+    readonly keyboardType?: ChallengeKeyboardType | undefined;
     readonly id: number;
-    constructor(validation: ChallengeValidation, _title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean, keyboardType?: ChallengeKeyboardType);
+    constructor(validation: ChallengeValidation, _title?: string | undefined, placeholder?: string | undefined, secureTextEntry?: boolean, keyboardType?: ChallengeKeyboardType | undefined);
     get validates(): boolean;
     get title(): string | undefined;
 }

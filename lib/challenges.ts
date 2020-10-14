@@ -25,7 +25,7 @@ export enum ChallengeReason {
 
 /** For mobile */
 export enum ChallengeKeyboardType {
-  Default = 0,
+  Alphanumeric = 0,
   Numeric = 1
 }
 
@@ -111,7 +111,7 @@ export class ChallengePrompt {
     public readonly _title?: string,
     public readonly placeholder?: string,
     public readonly secureTextEntry = true,
-    public readonly keyboardType = ChallengeKeyboardType.Default
+    public readonly keyboardType?: ChallengeKeyboardType
   ) {
     Object.freeze(this);
   }

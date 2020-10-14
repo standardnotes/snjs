@@ -11365,7 +11365,7 @@ var ChallengeReason;
 var ChallengeKeyboardType;
 
 (function (ChallengeKeyboardType) {
-  ChallengeKeyboardType[ChallengeKeyboardType["Default"] = 0] = "Default";
+  ChallengeKeyboardType[ChallengeKeyboardType["Alphanumeric"] = 0] = "Alphanumeric";
   ChallengeKeyboardType[ChallengeKeyboardType["Numeric"] = 1] = "Numeric";
 })(ChallengeKeyboardType || (ChallengeKeyboardType = {}));
 /**
@@ -11457,7 +11457,7 @@ class challenges_Challenge {
 class challenges_ChallengePrompt {
   constructor(validation, _title, placeholder) {
     let secureTextEntry = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
-    let keyboardType = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : ChallengeKeyboardType.Default;
+    let keyboardType = arguments.length > 4 ? arguments[4] : undefined;
     this.validation = validation;
     this._title = _title;
     this.placeholder = placeholder;
