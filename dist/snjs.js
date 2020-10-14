@@ -11365,8 +11365,8 @@ var ChallengeReason;
 var ChallengeKeyboardType;
 
 (function (ChallengeKeyboardType) {
-  ChallengeKeyboardType[ChallengeKeyboardType["Alphanumeric"] = 0] = "Alphanumeric";
-  ChallengeKeyboardType[ChallengeKeyboardType["Numeric"] = 1] = "Numeric";
+  ChallengeKeyboardType["Alphanumeric"] = "default";
+  ChallengeKeyboardType["Numeric"] = "numeric";
 })(ChallengeKeyboardType || (ChallengeKeyboardType = {}));
 /**
  * A challenge is a stateless description of what the client needs to provide
