@@ -24476,6 +24476,10 @@ class application_SNApplication {
     return this.protocolService.repersistAllItems();
   }
 
+  enableEphemeralPersistencePolicy() {
+    return this.storageService.setPersistencePolicy(StoragePersistencePolicies.Ephemeral);
+  }
+
   hasPendingMigrations() {
     return this.migrationService.hasPendingMigrations();
   }
