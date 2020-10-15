@@ -1,4 +1,8 @@
-import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../../payloads/generator';
+import {
+  ItemAuthenticatedData,
+  RootKeyEncryptedAuthenticatedData,
+  LegacyAttachedData
+} from './../../payloads/generator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { Create001KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
@@ -58,7 +62,12 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     );
   }
 
-  public async getPayloadAuthenticatedData(_payload: PurePayload) {
+  public async getPayloadAuthenticatedData(_payload: PurePayload): Promise<
+    RootKeyEncryptedAuthenticatedData |
+    ItemAuthenticatedData |
+    LegacyAttachedData |
+    undefined
+  > {
     return undefined;
   }
 

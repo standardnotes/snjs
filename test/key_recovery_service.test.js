@@ -472,4 +472,59 @@ describe('key recovery service', function () {
     expect(recreatedApp.syncService.isOutOfSync()).to.equal(false);
     recreatedApp.deinit();
   });
+
+  it('when encountering an undecryptable 003 items key, should recover through recovery wizard', async function () {
+    const namespace = Factory.randomString();
+    const unassociatedPassword = 'randfoo';
+    const unassociatedIdentifier = 'foorand';
+
+    const application = await Factory.createApplication(namespace);
+    const receiveChallenge = async (challenge) => {
+      /** Give unassociated password when prompted */
+      application.submitValuesForChallenge(
+        challenge,
+        [new ChallengeValue(challenge.prompts[0], unassociatedPassword)]
+      );
+    };
+    await application.prepareForLaunch({ receiveChallenge });
+    await application.launch(true);
+
+    await Factory.registerOldUser({
+      application: application,
+      email: this.email,
+      password: this.password,
+      version: ProtocolVersion.V003
+    });
+
+    /** Create items key associated with a random root key */
+    const randomRootKey = await application.protocolService.createRootKey(
+      unassociatedIdentifier,
+      unassociatedPassword,
+      KeyParamsOrigination.Registration,
+      ProtocolVersion.V003
+    );
+    const randomItemsKey = await application.protocolService.operatorForVersion(ProtocolVersion.V003).createItemsKey();
+    const encrypted = await application.protocolService.payloadByEncryptingPayload(
+      randomItemsKey.payload,
+      EncryptionIntent.Sync,
+      randomRootKey
+    );
+
+    /** Attempt decryption and insert into rotation in errored state  */
+    const decrypted = await application.protocolService.payloadByDecryptingPayload(encrypted);
+    /** Expect to be errored */
+    expect(decrypted.errorDecrypting).to.equal(true);
+
+    /** Insert into rotation */
+    await application.modelManager.emitPayload(decrypted, PayloadSource.Constructor);
+
+    /** Wait and allow recovery wizard to complete */
+    await Factory.sleep(0.3);
+
+    /** Should be decrypted now */
+    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(false);
+
+    expect(application.syncService.isOutOfSync()).to.equal(false);
+    application.deinit();
+  });
 });

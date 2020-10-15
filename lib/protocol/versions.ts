@@ -24,3 +24,10 @@ export function leftVersionGreaterThanOrEqualToRight(
 ) {
   return compareVersions(a, b) >= 0;
 }
+
+export function isVersionLessThanOrEqualTo(
+  input: ProtocolVersion,
+  compareTo: ProtocolVersion
+) {
+  return compareVersions(input, compareTo) <= 0;
+}

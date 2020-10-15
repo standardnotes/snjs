@@ -13,3 +13,4 @@ export declare enum ProtocolVersion {
  */
 export declare function compareVersions(a: ProtocolVersion, b: ProtocolVersion): number;
 export declare function leftVersionGreaterThanOrEqualToRight(a: ProtocolVersion, b: ProtocolVersion): boolean;
+export declare function isVersionLessThanOrEqualTo(input: ProtocolVersion, compareTo: ProtocolVersion): boolean;

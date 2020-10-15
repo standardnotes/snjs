@@ -70,6 +70,12 @@ export type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
   /** The key params used to generate the root key that encrypts this item key */
   kp: AnyKeyParamsContent
 }
+/**
+ * <= V003 optionally included key params content as last component in encrypted string
+ * as a json stringified base64 representation. This data is attached but not included
+ * in authentication hash.
+ */
+export type LegacyAttachedData = AnyKeyParamsContent & {}
 
 /** The MaxItemPayload represents a payload with all possible fields */
 const MaxPayloadFields = [

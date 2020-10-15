@@ -1,4 +1,8 @@
-import { ItemAuthenticatedData, RootKeyEncryptedAuthenticatedData } from './../../payloads/generator';
+import {
+  ItemAuthenticatedData,
+  RootKeyEncryptedAuthenticatedData,
+  LegacyAttachedData
+} from './../../payloads/generator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
 import { Create004KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
@@ -156,7 +160,12 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     return components.join(PARTITION_CHARACTER);
   }
 
-  public async getPayloadAuthenticatedData(payload: PurePayload) {
+  public async getPayloadAuthenticatedData(payload: PurePayload): Promise<
+    RootKeyEncryptedAuthenticatedData |
+    ItemAuthenticatedData |
+    LegacyAttachedData |
+    undefined
+  > {
     if (payload.format !== PayloadFormat.EncryptedString) {
       throw Error('Attempting to get embedded key params of already decrypted item');
     }
@@ -164,7 +173,8 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
       payload.enc_item_key!
     );
     const authenticatedData = itemKeyComponents.rawAuthenticatedData;
-    return this.stringToAuthenticatedData(authenticatedData);
+    const result = await this.stringToAuthenticatedData(authenticatedData);
+    return result;
   }
 
   /**
@@ -210,7 +220,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
   private async stringToAuthenticatedData(
     rawAuthenticatedData: string,
     override?: Partial<ItemAuthenticatedData>
-  ): Promise<ItemAuthenticatedData> {
+  ): Promise<RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData> {
     const base = JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
     return sortedCopy({
       ...base,

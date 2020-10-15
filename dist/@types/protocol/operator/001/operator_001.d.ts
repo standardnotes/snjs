@@ -1,3 +1,4 @@
+import { ItemAuthenticatedData, RootKeyEncryptedAuthenticatedData, LegacyAttachedData } from './../../payloads/generator';
 import { SNItemsKey } from '../../../models/app/items_key';
 import { SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
@@ -15,7 +16,7 @@ export declare class SNProtocolOperator001 extends SNProtocolOperator {
     get version(): ProtocolVersion;
     protected generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
     createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
-    getPayloadAuthenticatedData(_payload: PurePayload): Promise<undefined>;
+    getPayloadAuthenticatedData(_payload: PurePayload): Promise<RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined>;
     computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
     private decryptString;
     private encryptString;

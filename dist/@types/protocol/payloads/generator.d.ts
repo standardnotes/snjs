@@ -59,6 +59,12 @@ export declare type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & 
     /** The key params used to generate the root key that encrypts this item key */
     kp: AnyKeyParamsContent;
 };
+/**
+ * <= V003 optionally included key params content as last component in encrypted string
+ * as a json stringified base64 representation. This data is attached but not included
+ * in authentication hash.
+ */
+export declare type LegacyAttachedData = AnyKeyParamsContent & {};
 export declare function CreateMaxPayloadFromAnyObject(object: RawPayload, override?: PayloadOverride, source?: PayloadSource): PurePayload;
 /**
  * Makes a new payload by starting with input payload, then overriding values of all

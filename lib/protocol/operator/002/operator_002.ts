@@ -1,8 +1,17 @@
-import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../../payloads/generator';
+import {
+  ItemAuthenticatedData,
+  RootKeyEncryptedAuthenticatedData,
+  LegacyAttachedData
+} from './../../payloads/generator';
 import { ItemsKeyContent } from './../operator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
-import { Create002KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
+import {
+  Create002KeyParams,
+  SNRootKeyParams,
+  KeyParamsOrigination,
+  AnyKeyParamsContent
+} from './../../key_params';
 import { V002Algorithm } from './../algorithms';
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';
 import { PayloadFormat } from '@Payloads/formats';
@@ -67,18 +76,33 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return this.crypto.aes256CbcEncrypt(text, iv, key);
   }
 
+  /**
+   * @param keyParams Supplied only when encrypting an items key
+   */
   async encryptTextParams(
     string: string,
     encryptionKey: string,
     authKey: string,
     uuid: string,
-    version: ProtocolVersion
+    version: ProtocolVersion,
+    keyParams?: SNRootKeyParams
   ) {
     const iv = await this.crypto.generateRandomKey(V002Algorithm.EncryptionIvLength);
     const contentCiphertext = await this.encryptString002(string, encryptionKey, iv);
     const ciphertextToAuth = [version, uuid, iv, contentCiphertext].join(':');
-    const authHash = await this.crypto.hmac256(ciphertextToAuth, authKey);
-    const fullCiphertext = [version, authHash, uuid, iv, contentCiphertext].join(':');
+    const authHash = (await this.crypto.hmac256(ciphertextToAuth, authKey))!;
+    const components: string[] = [
+      version as string,
+      authHash,
+      uuid,
+      iv,
+      contentCiphertext,
+    ];
+    if (keyParams) {
+      const keyParamsString = await this.crypto.base64Encode(JSON.stringify(keyParams.content));
+      components.push(keyParamsString);
+    }
+    const fullCiphertext = components.join(':');
     return fullCiphertext;
   }
 
@@ -101,19 +125,31 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return this.decryptString002(contentCiphertext, encryptionKey, iv);
   }
 
-  public async getPayloadAuthenticatedData(payload: PurePayload) {
+  public async getPayloadAuthenticatedData(payload: PurePayload): Promise<
+    RootKeyEncryptedAuthenticatedData |
+    ItemAuthenticatedData |
+    LegacyAttachedData |
+    undefined
+  > {
     const itemKeyComponents = this.encryptionComponentsFromString002(
       payload.enc_item_key!
     );
-    const authenticatedData = itemKeyComponents.authParams;
-    return JSON.parse(await this.crypto.base64Decode(authenticatedData));
+    const authenticatedData = itemKeyComponents.keyParams;
+    if (!authenticatedData) {
+      return undefined;
+    }
+    const decoded = JSON.parse(await this.crypto.base64Decode(authenticatedData));
+    const data: LegacyAttachedData = {
+      ...decoded as AnyKeyParamsContent
+    }
+    return data;
   }
 
   public async generateEncryptedParameters(
     payload: PurePayload,
     format: PayloadFormat,
     key?: SNItemsKey | SNRootKey,
-    ) {
+  ) {
     if ((
       format === PayloadFormat.DecryptedBareObject ||
       format === PayloadFormat.DecryptedBase64String
@@ -138,7 +174,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       key.itemsKey,
       key.dataAuthenticationKey,
       payload.uuid!,
-      key.keyVersion
+      key.keyVersion,
+      key instanceof SNRootKey ? (key as SNRootKey).keyParams : undefined
     );
     /** Encrypt content */
     const ek = await this.firstHalfOfKey(itemKey);
@@ -148,7 +185,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       ek,
       ak,
       payload.uuid!,
-      key.keyVersion
+      key.keyVersion,
+      key instanceof SNRootKey ? (key as SNRootKey).keyParams : undefined
     );
     return CreateEncryptionParameters(
       {
@@ -228,9 +266,9 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
         }
       );
     } else {
-      let authParams;
+      let keyParams;
       try {
-        authParams = JSON.parse(await this.crypto.base64Decode(itemParams.authParams));
+        keyParams = JSON.parse(await this.crypto.base64Decode(itemParams.keyParams));
         // eslint-disable-next-line no-empty
       } catch (e) { }
       return CopyEncryptionParameters(
@@ -240,7 +278,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
           items_key_id: undefined,
           enc_item_key: undefined,
           auth_hash: undefined,
-          auth_params: authParams,
+          auth_params: keyParams,
           errorDecrypting: false,
           errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
           waitingForKey: false,
@@ -284,7 +322,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       uuid: components[2],
       iv: components[3],
       contentCiphertext: components[4],
-      authParams: components[5],
+      keyParams: components[5],
       ciphertextToAuth: [
         components[0],
         components[2],

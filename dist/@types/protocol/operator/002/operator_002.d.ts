@@ -1,3 +1,4 @@
+import { ItemAuthenticatedData, RootKeyEncryptedAuthenticatedData, LegacyAttachedData } from './../../payloads/generator';
 import { ItemsKeyContent } from './../operator';
 import { SNItemsKey } from '../../../models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
@@ -22,9 +23,12 @@ export declare class SNProtocolOperator002 extends SNProtocolOperator001 {
     computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
     private decryptString002;
     private encryptString002;
-    encryptTextParams(string: string, encryptionKey: string, authKey: string, uuid: string, version: ProtocolVersion): Promise<string>;
+    /**
+     * @param keyParams Supplied only when encrypting an items key
+     */
+    encryptTextParams(string: string, encryptionKey: string, authKey: string, uuid: string, version: ProtocolVersion, keyParams?: SNRootKeyParams): Promise<string>;
     decryptTextParams(ciphertextToAuth: string, contentCiphertext: string, encryptionKey: string, iv: string, authHash: string, authKey: string): Promise<string | null>;
-    getPayloadAuthenticatedData(payload: PurePayload): Promise<any>;
+    getPayloadAuthenticatedData(payload: PurePayload): Promise<RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined>;
     generateEncryptedParameters(payload: PurePayload, format: PayloadFormat, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     generateDecryptedParameters(encryptedParameters: PurePayload, key?: SNItemsKey | SNRootKey): Promise<PurePayload>;
     protected deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>;
@@ -34,7 +38,7 @@ export declare class SNProtocolOperator002 extends SNProtocolOperator001 {
         uuid: string;
         iv: string;
         contentCiphertext: string;
-        authParams: string;
+        keyParams: string;
         ciphertextToAuth: string;
         encryptionKey: string | undefined;
         authKey: string | undefined;

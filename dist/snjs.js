@@ -994,7 +994,8 @@ var PayloadField;
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ProtocolVersion; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return compareVersions; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return leftVersionGreaterThanOrEqualToRight; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return leftVersionGreaterThanOrEqualToRight; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isVersionLessThanOrEqualTo; });
 var ProtocolVersion;
 
 (function (ProtocolVersion) {
@@ -1020,6 +1021,9 @@ function compareVersions(a, b) {
 }
 function leftVersionGreaterThanOrEqualToRight(a, b) {
   return compareVersions(a, b) >= 0;
+}
+function isVersionLessThanOrEqualTo(input, compareTo) {
+  return compareVersions(input, compareTo) <= 0;
 }
 
 /***/ }),
@@ -12665,7 +12669,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
   }
 
   serverKeyParamsAreSafe(clientParams) {
-    return Object(versions["c" /* leftVersionGreaterThanOrEqualToRight */])(this.serverParams.version, clientParams.version);
+    return Object(versions["d" /* leftVersionGreaterThanOrEqualToRight */])(this.serverParams.version, clientParams.version);
   }
 
   async performServerSignIn(keyParams) {
@@ -13454,7 +13458,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     }
 
     if (!Object(utils["q" /* isNullOrUndefined */])(minAllowedVersion)) {
-      if (!Object(versions["c" /* leftVersionGreaterThanOrEqualToRight */])(keyParams.version, minAllowedVersion)) {
+      if (!Object(versions["d" /* leftVersionGreaterThanOrEqualToRight */])(keyParams.version, minAllowedVersion)) {
         return {
           response: this.apiService.createErrorResponse(StrictSignInFailed(keyParams.version, minAllowedVersion))
         };
@@ -17661,6 +17665,12 @@ class operator_001_SNProtocolOperator001 extends operator_SNProtocolOperator {
 
 }
 // CONCATENATED MODULE: ./lib/protocol/operator/002/operator_002.ts
+function operator_002_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function operator_002_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { operator_002_ownKeys(Object(source), true).forEach(function (key) { operator_002_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { operator_002_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function operator_002_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -17723,13 +17733,24 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
   async encryptString002(text, key, iv) {
     return this.crypto.aes256CbcEncrypt(text, iv, key);
   }
+  /**
+   * @param keyParams Supplied only when encrypting an items key
+   */
 
-  async encryptTextParams(string, encryptionKey, authKey, uuid, version) {
+
+  async encryptTextParams(string, encryptionKey, authKey, uuid, version, keyParams) {
     const iv = await this.crypto.generateRandomKey(V002Algorithm.EncryptionIvLength);
     const contentCiphertext = await this.encryptString002(string, encryptionKey, iv);
     const ciphertextToAuth = [version, uuid, iv, contentCiphertext].join(':');
     const authHash = await this.crypto.hmac256(ciphertextToAuth, authKey);
-    const fullCiphertext = [version, authHash, uuid, iv, contentCiphertext].join(':');
+    const components = [version, authHash, uuid, iv, contentCiphertext];
+
+    if (keyParams) {
+      const keyParamsString = await this.crypto.base64Encode(JSON.stringify(keyParams.content));
+      components.push(keyParamsString);
+    }
+
+    const fullCiphertext = components.join(':');
     return fullCiphertext;
   }
 
@@ -17750,8 +17771,17 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
 
   async getPayloadAuthenticatedData(payload) {
     const itemKeyComponents = this.encryptionComponentsFromString002(payload.enc_item_key);
-    const authenticatedData = itemKeyComponents.authParams;
-    return JSON.parse(await this.crypto.base64Decode(authenticatedData));
+    const authenticatedData = itemKeyComponents.keyParams;
+
+    if (!authenticatedData) {
+      return undefined;
+    }
+
+    const decoded = JSON.parse(await this.crypto.base64Decode(authenticatedData));
+
+    const data = operator_002_objectSpread({}, decoded);
+
+    return data;
   }
 
   async generateEncryptedParameters(payload, format, key) {
@@ -17773,12 +17803,12 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
 
 
     const itemKey = await this.crypto.generateRandomKey(V002Algorithm.EncryptionKeyLength * 2);
-    const encItemKey = await this.encryptTextParams(itemKey, key.itemsKey, key.dataAuthenticationKey, payload.uuid, key.keyVersion);
+    const encItemKey = await this.encryptTextParams(itemKey, key.itemsKey, key.dataAuthenticationKey, payload.uuid, key.keyVersion, key instanceof root_key_SNRootKey ? key.keyParams : undefined);
     /** Encrypt content */
 
     const ek = await this.firstHalfOfKey(itemKey);
     const ak = await this.secondHalfOfKey(itemKey);
-    const ciphertext = await this.encryptTextParams(JSON.stringify(payload.content), ek, ak, payload.uuid, key.keyVersion);
+    const ciphertext = await this.encryptTextParams(JSON.stringify(payload.content), ek, ak, payload.uuid, key.keyVersion, key instanceof root_key_SNRootKey ? key.keyParams : undefined);
     return Object(generator["c" /* CreateEncryptionParameters */])({
       uuid: payload.uuid,
       items_key_id: key instanceof items_key_SNItemsKey ? key.uuid : undefined,
@@ -17830,10 +17860,10 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
         errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
       });
     } else {
-      let authParams;
+      let keyParams;
 
       try {
-        authParams = JSON.parse(await this.crypto.base64Decode(itemParams.authParams)); // eslint-disable-next-line no-empty
+        keyParams = JSON.parse(await this.crypto.base64Decode(itemParams.keyParams)); // eslint-disable-next-line no-empty
       } catch (e) {}
 
       return Object(generator["a" /* CopyEncryptionParameters */])(encryptedParameters, {
@@ -17841,7 +17871,7 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
         items_key_id: undefined,
         enc_item_key: undefined,
         auth_hash: undefined,
-        auth_params: authParams,
+        auth_params: keyParams,
         errorDecrypting: false,
         errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
         waitingForKey: false
@@ -17870,7 +17900,7 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
       uuid: components[2],
       iv: components[3],
       contentCiphertext: components[4],
-      authParams: components[5],
+      keyParams: components[5],
       ciphertextToAuth: [components[0], components[2], components[3], components[4]].join(':'),
       encryptionKey: encryptionKey,
       authKey: authKey
@@ -18078,7 +18108,8 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
 
     const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key);
     const authenticatedData = itemKeyComponents.rawAuthenticatedData;
-    return this.stringToAuthenticatedData(authenticatedData);
+    const result = await this.stringToAuthenticatedData(authenticatedData);
+    return result;
   }
   /**
    * For items that are encrypted with a root key, we append the root key's key params, so
@@ -18613,8 +18644,8 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   */
 
 
-  async createRootKey(identifier, password, origination) {
-    const operator = this.defaultOperator();
+  async createRootKey(identifier, password, origination, version) {
+    const operator = version ? this.operatorForVersion(version) : this.defaultOperator();
     return operator.createRootKey(identifier, password, origination);
   }
   /**
@@ -19534,15 +19565,21 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
       return undefined;
     }
 
-    const operator = this.operatorForVersion(key.version);
+    const version = key.version;
+    const operator = this.operatorForVersion(version);
     const authenticatedData = await operator.getPayloadAuthenticatedData(key.payload);
 
     if (!authenticatedData) {
       return undefined;
     }
 
-    const rawKeyParams = authenticatedData.kp;
-    return this.createKeyParams(rawKeyParams);
+    if (Object(versions["c" /* isVersionLessThanOrEqualTo */])(version, versions["a" /* ProtocolVersion */].V003)) {
+      const rawKeyParams = authenticatedData;
+      return this.createKeyParams(rawKeyParams);
+    } else {
+      const rawKeyParams = authenticatedData.kp;
+      return this.createKeyParams(rawKeyParams);
+    }
   }
   /**
    * When the root key changes (non-null only), we must re-encrypt all items

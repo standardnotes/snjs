@@ -1,4 +1,8 @@
-import { RootKeyEncryptedAuthenticatedData, ItemAuthenticatedData } from './../payloads/generator';
+import {
+  RootKeyEncryptedAuthenticatedData,
+  ItemAuthenticatedData,
+  LegacyAttachedData
+} from './../payloads/generator';
 import { FillItemContent } from '@Models/functions';
 import { Uuid } from './../../uuid';
 import { CreateItemFromPayload } from '@Models/generator';
@@ -69,7 +73,12 @@ export abstract class SNProtocolOperator {
    */
   public abstract async getPayloadAuthenticatedData(
     payload: PurePayload
-  ): Promise<RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | undefined>;
+  ): Promise<
+    RootKeyEncryptedAuthenticatedData |
+    ItemAuthenticatedData |
+    LegacyAttachedData |
+    undefined
+  >;
 
   protected abstract async generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
 

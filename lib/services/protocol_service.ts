@@ -1,8 +1,8 @@
-import { RootKeyEncryptedAuthenticatedData } from './../protocol/payloads/generator';
+import { RootKeyEncryptedAuthenticatedData, LegacyAttachedData } from './../protocol/payloads/generator';
 import { ApplicationIdentifier } from './../types';
 import { Uuids, FillItemContent } from '@Models/functions';
 import { ContentTypeUsesRootKeyEncryption, EncryptionIntent } from './../protocol/intents';
-import { compareVersions } from '@Protocol/versions';
+import { compareVersions, isVersionLessThanOrEqualTo } from '@Protocol/versions';
 import { ProtocolVersion } from './../protocol/versions';
 import { SNProtocolOperator004 } from './../protocol/operator/004/operator_004';
 import { SNProtocolOperator003 } from './../protocol/operator/003/operator_003';
@@ -400,9 +400,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public async createRootKey(
     identifier: string,
     password: string,
-    origination: KeyParamsOrigination
+    origination: KeyParamsOrigination,
+    version?: ProtocolVersion
   ) {
-    const operator = this.defaultOperator();
+    const operator = version ? this.operatorForVersion(version) : this.defaultOperator();
     return operator.createRootKey(identifier, password, origination);
   }
 
@@ -1356,13 +1357,19 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     if (key.payload.format === PayloadFormat.DecryptedBareObject) {
       return undefined;
     }
-    const operator = this.operatorForVersion(key.version);
+    const version = key.version;
+    const operator = this.operatorForVersion(version);
     const authenticatedData = await operator.getPayloadAuthenticatedData(key.payload);
     if (!authenticatedData) {
       return undefined;
     }
-    const rawKeyParams = (authenticatedData as RootKeyEncryptedAuthenticatedData).kp;
-    return this.createKeyParams(rawKeyParams);
+    if (isVersionLessThanOrEqualTo(version, ProtocolVersion.V003)) {
+      const rawKeyParams = (authenticatedData as LegacyAttachedData);
+      return this.createKeyParams(rawKeyParams);
+    } else {
+      const rawKeyParams = (authenticatedData as RootKeyEncryptedAuthenticatedData).kp;
+      return this.createKeyParams(rawKeyParams);
+    }
   }
 
   /**

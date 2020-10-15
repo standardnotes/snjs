@@ -138,7 +138,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     /**
      * Creates a root key using the latest protocol version
     */
-    createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>;
+    createRootKey(identifier: string, password: string, origination: KeyParamsOrigination, version?: ProtocolVersion): Promise<SNRootKey>;
     /**
      * Given a key and intent, returns the proper PayloadFormat,
      * or throws an exception if unsupported configuration of parameters.
