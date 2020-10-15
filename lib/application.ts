@@ -1381,6 +1381,11 @@ export class SNApplication {
     return this.protocolService!.repersistAllItems();
   }
 
+  public enableEphemeralPersistencePolicy(): Promise<void> {
+    return this.storageService.setPersistencePolicy(
+      StoragePersistencePolicies.Ephemeral
+    );
+  }
 
   public hasPendingMigrations() {
     return this.migrationService.hasPendingMigrations();
