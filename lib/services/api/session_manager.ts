@@ -221,7 +221,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       keyParams
     );
     if (!registerResponse.error) {
-      await this.handleSuccessAuthResponse(registerResponse);
+      await this.handleSuccessAuthResponse(registerResponse, rootKey);
     }
     return {
       response: registerResponse,
@@ -367,41 +367,36 @@ export class SNSessionManager extends PureService<SessionEvent> {
         };
       }
     }
-    const { rootKey, serverPassword } = await this.protocolService!.computeRootKey(
+    const rootKey = await this.protocolService!.computeRootKey(
       password,
       keyParams
-    ).then((rootKey) => {
-      return {
-        rootKey: rootKey,
-        serverPassword: rootKey.serverPassword
-      };
-    });
-    const signInResponse = await this.bypassChecksAndSignInWithServerPassword(
+    );
+    const signInResponse = await this.bypassChecksAndSignInWithRootKey(
       email,
-      serverPassword,
+      rootKey,
       paramsResult.mfaKeyPath,
       paramsResult.mfaCode
     )
     return {
-      response: signInResponse,
-      rootKey: await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params),
+      response: signInResponse
     };
   }
 
-  public async bypassChecksAndSignInWithServerPassword(
+  public async bypassChecksAndSignInWithRootKey(
     email: string,
-    serverPassword: string,
+    rootKey: SNRootKey,
     mfaKeyPath?: string,
     mfaCode?: string,
   ): Promise<SignInResponse> {
     const signInResponse = await this.apiService.signIn(
       email,
-      serverPassword,
+      rootKey.serverPassword,
       mfaKeyPath,
       mfaCode
     )
     if (!signInResponse.error) {
-      await this.handleSuccessAuthResponse(signInResponse);
+      const expandedRootKey = await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params);
+      await this.handleSuccessAuthResponse(signInResponse, expandedRootKey);
       return signInResponse;
     } else {
       if (signInResponse.error.payload?.mfa_key) {
@@ -414,9 +409,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
           /** User dismissed window without input */
           return this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
         }
-        return this.bypassChecksAndSignInWithServerPassword(
+        return this.bypassChecksAndSignInWithRootKey(
           email,
-          serverPassword,
+          rootKey,
           signInResponse.error.payload.mfa_key,
           inputtedCode
         )
@@ -429,16 +424,15 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   public async changePassword(
     currentServerPassword: string,
-    newServerPassword: string,
-    newKeyParams: SNRootKeyParams
+    newRootKey: SNRootKey,
   ): Promise<SessionManagerResponse> {
     const response = await this.apiService.changePassword(
       currentServerPassword,
-      newServerPassword,
-      newKeyParams
+      newRootKey.serverPassword,
+      newRootKey.keyParams
     );
     if (!response.error) {
-      await this.handleSuccessAuthResponse(response);
+      await this.handleSuccessAuthResponse(response, newRootKey);
     }
     return {
       response: response,
@@ -451,12 +445,17 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   private async handleSuccessAuthResponse(
-    response: RegistrationResponse | SignInResponse | ChangePasswordResponse
+    response: RegistrationResponse | SignInResponse | ChangePasswordResponse,
+    rootKey: SNRootKey
   ) {
+    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
+    await this.protocolService.setRootKey(
+      rootKey,
+      wrappingKey
+    );
     const user = response.user;
     this.user = user;
     await this.storageService!.setValue(StorageKey.User, user);
-
     if (response.token) {
       /** Legacy JWT response */
       const session = new JwtSession(response.token);

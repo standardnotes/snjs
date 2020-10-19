@@ -1,3 +1,4 @@
+import { SNRootKey } from './../../protocol/root_key';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
 import { PureService } from "../pure_service";
@@ -18,8 +19,8 @@ export declare type ChallengeObserver = {
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
 export declare class ChallengeService extends PureService {
-    private storageService?;
-    private protocolService?;
+    private storageService;
+    private protocolService;
     private challengeOperations;
     sendChallenge?: (challenge: Challenge) => void;
     private challengeObservers;
@@ -39,6 +40,7 @@ export declare class ChallengeService extends PureService {
         passcode: string;
         canceled: boolean;
     }>;
+    getWrappingKeyIfApplicable(requireCorrect?: boolean): Promise<SNRootKey | undefined>;
     isPasscodeLocked(): Promise<boolean>;
     hasBiometricsEnabled(): Promise<boolean>;
     enableBiometrics(): Promise<void>;

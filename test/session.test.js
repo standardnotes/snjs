@@ -187,7 +187,7 @@ describe('server session', function () {
       this.password,
       this.newPassword
     );
-    expect(changePasswordResponse.error.message).to.equal('Could not connect to server.');
+    expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
 
     expectFactoryException();
     const loginResponse = await Factory.loginToApplication({
@@ -211,7 +211,7 @@ describe('server session', function () {
     );
 
     expect(changePasswordResponse).to.be.ok;
-    expect(changePasswordResponse.error.message).to.equal('Could not connect to server.');
+    expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
 
     expectFactoryException();
     const loginResponseWithNewPassword = await Factory.loginToApplication({
@@ -388,6 +388,8 @@ describe('server session', function () {
       password: password
     });
 
+    const oldRootKey = await appA.protocolService.getRootKey();
+
     /** Set the session as nonsense */
     appA.apiService.session.accessToken = 'foo';
     appA.apiService.session.refreshToken = 'bar';
@@ -401,6 +403,10 @@ describe('server session', function () {
     expect(didPromptForSignIn).to.equal(true);
     expect(appA.apiService.session.accessToken).to.not.equal('foo');
     expect(appA.apiService.session.refreshToken).to.not.equal('bar');
+
+    /** Expect that the session recovery replaces the global root key */
+    const newRootKey = await appA.protocolService.getRootKey();
+    expect(oldRootKey).to.not.equal(newRootKey);
 
     appA.deinit();
   });

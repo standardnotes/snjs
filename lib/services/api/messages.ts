@@ -52,7 +52,8 @@ export const UNSUPPORTED_BACKUP_FILE_VERSION = `This backup file was created usi
 export const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = `This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.`;
 
 export const PasswordChangeStrings = {
-  PasscodeRequired: 'Your passcode is required to process your password change.'
+  PasscodeRequired: 'Your passcode is required to process your password change.',
+  Failed: 'Unable to change your password due to a sync error. Please try again.',
 }
 
 export const SignInStrings = {

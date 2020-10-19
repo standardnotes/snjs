@@ -324,24 +324,13 @@ export declare class SNApplication {
      *  @param mergeLocal  Whether to merge existing offline data into account. If false,
      *                     any pre-existing data will be fully deleted upon success.
      */
-    register(email: string, password: string, ephemeral?: boolean, mergeLocal?: boolean): Promise<import("./services/api/responses").HttpResponse | {
-        error: Error;
-    }>;
+    register(email: string, password: string, ephemeral?: boolean, mergeLocal?: boolean): Promise<import("./services/api/responses").HttpResponse>;
     /**
      * @param mergeLocal  Whether to merge existing offline data into account.
      * If false, any pre-existing data will be fully deleted upon success.
      */
-    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/responses").HttpResponse | {
-        error: Error;
-    }>;
-    /**
-     * @param passcode - Changing the account password requires the local
-     * passcode if configured (to rewrap the account key with passcode). If the passcode
-     * is not passed in, the user will be prompted for the passcode. However if the consumer
-     * already has referene to the passcode, they can pass it in here so that the user
-     * is not prompted again.
-     */
-    changePassword(currentPassword: string, newPassword: string, passcode?: string, origination?: KeyParamsOrigination, { validatePasswordStrength }?: {
+    signIn(email: string, password: string, strict?: boolean, ephemeral?: boolean, mergeLocal?: boolean, awaitSync?: boolean): Promise<import("./services/api/responses").HttpResponse>;
+    changePassword(currentPassword: string, newPassword: string, origination?: KeyParamsOrigination, { validatePasswordStrength }?: {
         validatePasswordStrength?: boolean | undefined;
     }): Promise<{
         error?: {

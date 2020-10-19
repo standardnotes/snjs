@@ -95,7 +95,7 @@ describe('keys', function () {
     const email = 'foo';
     const password = 'bar';
     const key = await this.application.protocolService.createRootKey(email, password, KeyParamsOrigination.Registration);
-    this.application.protocolService.setNewRootKey(key);
+    this.application.protocolService.setRootKey(key);
 
     const payload = CreateMaxPayloadFromAnyObject(
       {
@@ -120,7 +120,7 @@ describe('keys', function () {
       password,
       KeyParamsOrigination.Registration
     );
-    await this.application.protocolService.setNewRootKey(key);
+    await this.application.protocolService.setRootKey(key);
     await this.application.setPasscode(password);
 
     /** We should be able to decrypt wrapped root key with passcode */
@@ -139,7 +139,7 @@ describe('keys', function () {
         newPassword,
         KeyParamsOrigination.Registration
         );
-    await this.application.protocolService.setNewRootKey(
+    await this.application.protocolService.setRootKey(
       newKey,
       wrappingKey
     );

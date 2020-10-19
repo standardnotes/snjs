@@ -259,12 +259,14 @@ export class SNKeyRecoveryService extends PureService {
       password,
       keyParams
     );
-    const signInResponse = await this.sessionManager.bypassChecksAndSignInWithServerPassword(
+    const signInResponse = await this.sessionManager.bypassChecksAndSignInWithRootKey(
       keyParams.identifier,
-      rootKey.serverPassword
+      rootKey
     );
     if (!signInResponse.error) {
-      await this.replaceClientRootKey(rootKey);
+      this.alertService.alert(
+        KeyRecoveryStrings.KeyRecoveryRootKeyReplaced
+      );
     } else {
       await this.alertService.alert(
         KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword
@@ -279,10 +281,10 @@ export class SNKeyRecoveryService extends PureService {
    */
   async replaceClientRootKey(rootKey: SNRootKey): Promise<void> {
     const wrappingKey = await this.getWrappingKeyIfApplicable();
-    await this.protocolService.setNewRootKey(
+    await this.protocolService.setRootKey(
       rootKey,
       wrappingKey
-    )
+    );
     this.alertService.alert(
       KeyRecoveryStrings.KeyRecoveryRootKeyReplaced
     );
@@ -292,8 +294,8 @@ export class SNKeyRecoveryService extends PureService {
     if (!this.protocolService.hasPasscode()) {
       return undefined;
     }
-    const result = await this.challengeService.promptForPasscode();
-    if (result.canceled) {
+    const result = await this.challengeService.getWrappingKeyIfApplicable();
+    if(!result) {
       /** Show an alert saying they must enter the correct passcode to update
        * their root key, and try again */
       await this.alertService.alert(
@@ -302,7 +304,7 @@ export class SNKeyRecoveryService extends PureService {
       );
       return this.getWrappingKeyIfApplicable();
     }
-    return this.protocolService!.computeWrappingKey(result.passcode!);
+    return result;
   }
 
   async addKeysToQueue(keys: SNItemsKey[], callback?: DecryptionCallback) {

@@ -46,7 +46,7 @@ import {
 } from './services';
 import { DeviceInterface } from './device_interface';
 import {
-  API_MESSAGE_GENERIC_SYNC_FAIL,
+  PasswordChangeStrings,
   InsufficientPasswordMessage,
   UPGRADING_ENCRYPTION,
   SETTING_PASSCODE,
@@ -54,7 +54,7 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION, SignInStrings, ChallengeStrings, ProtocolUpgradeStrings, PasswordChangeStrings
+  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
@@ -785,12 +785,6 @@ export class SNApplication {
       UPGRADING_ENCRYPTION
     );
     try {
-      let passcode: string | undefined;
-      if (hasPasscode) {
-        /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
-        passcode = value.value as string;
-      }
       if (hasAccount) {
         /* Upgrade account version */
         const value = response.getValueForType(ChallengeValidation.AccountPassword);
@@ -798,7 +792,6 @@ export class SNApplication {
         const changeResponse = await this.changePassword(
           password,
           password,
-          passcode,
           KeyParamsOrigination.ProtocolUpgrade,
           { validatePasswordStrength: false }
         );
@@ -806,10 +799,12 @@ export class SNApplication {
           return { error: changeResponse.error };
         }
       }
-      if (passcode) {
+      if (hasPasscode) {
+        /* Upgrade passcode version */
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        const passcode = value.value as string;
         await this.changePasscode(passcode, KeyParamsOrigination.ProtocolUpgrade);
       }
-
       return { success: true };
     } catch (error) {
       return { error };
@@ -1086,17 +1081,9 @@ export class SNApplication {
     ephemeral = false,
     mergeLocal = true
   ) {
-    const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary();
-    if (canceled) {
-      return { error: Error(SignInStrings.PasscodeRequired) };
-    }
     this.lockSyncing();
     const result = await this.sessionManager!.register(email, password);
     if (!result.response.error) {
-      await this.protocolService!.setNewRootKey(
-        result.rootKey!,
-        wrappingKey
-      );
       this.syncService!.resetSyncState();
       await this.storageService!.setPersistencePolicy(
         ephemeral
@@ -1131,20 +1118,12 @@ export class SNApplication {
     mergeLocal = true,
     awaitSync = false
   ) {
-    const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary();
-    if (canceled) {
-      return { error: Error(SignInStrings.PasscodeRequired) };
-    }
     /** Prevent a timed sync from occuring while signing in. */
     this.lockSyncing();
     const result = await this.sessionManager!.signIn(
       email, password, strict
     );
     if (!result.response.error) {
-      await this.protocolService!.setNewRootKey(
-        result.rootKey!,
-        wrappingKey
-      );
       this.syncService!.resetSyncState();
       await this.storageService!.setPersistencePolicy(
         ephemeral
@@ -1175,24 +1154,15 @@ export class SNApplication {
     return result.response;
   }
 
-  /**
-   * @param passcode - Changing the account password requires the local
-   * passcode if configured (to rewrap the account key with passcode). If the passcode
-   * is not passed in, the user will be prompted for the passcode. However if the consumer
-   * already has referene to the passcode, they can pass it in here so that the user
-   * is not prompted again.
-   */
   public async changePassword(
     currentPassword: string,
     newPassword: string,
-    passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
   ) {
     const result = await this.performPasswordChange(
       currentPassword,
       newPassword,
-      passcode,
       origination,
       { validatePasswordStrength }
     );
@@ -1205,7 +1175,6 @@ export class SNApplication {
   private async performPasswordChange(
     currentPassword: string,
     newPassword: string,
-    passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
   ): Promise<{ error?: { message: string } }> {
@@ -1214,52 +1183,43 @@ export class SNApplication {
         return { error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)) };
       }
     }
-
-    const { wrappingKey, canceled } = await this.getWrappingKeyIfNecessary(passcode);
-    if (canceled) {
-      return { error: Error(PasswordChangeStrings.PasscodeRequired) };
+    const accountPasswordValidation = await this.protocolService.validateAccountPassword(currentPassword);
+    if (!accountPasswordValidation.valid) {
+      return {
+        error: Error(INVALID_PASSWORD)
+      }
     }
-
     /** Change the password locally */
-    const [error, changePasswordResult] = await this.protocolService!.changePassword(
+    const currentRootKey = (await this.protocolService.getRootKey())!;
+    const newRootKey = await this.protocolService.createRootKey(
       this.getUser()!.email!,
-      currentPassword,
       newPassword,
-      wrappingKey,
       origination
     );
-    if (error) return { error };
-
-    const {
-      currentServerPassword,
-      newRootKey,
-      newKeyParams,
-      rollback: rollbackPasswordChange
-    } = changePasswordResult!;
-
-    /** Sync the newly created items key. Roll back on failure */
-    await this.syncService!.sync({ awaitAll: true });
-    const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
-    if (!itemsKeyWasSynced) {
-      await rollbackPasswordChange();
-      await this.syncService!.sync({ awaitAll: true });
-      return { error: Error(API_MESSAGE_GENERIC_SYNC_FAIL) };
-    }
-
     this.lockSyncing();
-
     /** Now, change the password on the server. Roll back on failure */
     const result = await this.sessionManager!.changePassword(
-      currentServerPassword,
-      newRootKey.serverPassword,
-      newKeyParams
+      currentRootKey.serverPassword,
+      newRootKey
     );
-    if (result.response.error) {
-      await rollbackPasswordChange();
-      await this.syncService!.sync({ awaitAll: true });
-    }
-
     this.unlockSyncing();
+    if (!result.response.error) {
+      const rollback = await this.protocolService!.createNewItemsKeyWithRollback();
+      /** Sync the newly created items key. Roll back on failure */
+      await this.protocolService.reencryptItemsKeys();
+      await this.syncService!.sync({ awaitAll: true });
+      const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
+      if (!itemsKeyWasSynced) {
+        await this.sessionManager!.changePassword(
+          newRootKey.serverPassword,
+          currentRootKey
+        );
+        await this.protocolService.reencryptItemsKeys();
+        await rollback();
+        await this.syncService!.sync({ awaitAll: true });
+        return { error: Error(PasswordChangeStrings.Failed) };
+      }
+    }
     return result.response;
   }
 

@@ -1,3 +1,4 @@
+import { SNRootKey } from './../../protocol/root_key';
 import { ChallengePrompt } from './../../challenges';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
@@ -34,25 +35,21 @@ export type ChallengeObserver = {
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
 export class ChallengeService extends PureService {
-  private storageService?: SNStorageService;
-  private protocolService?: SNProtocolService;
   private challengeOperations: Record<string, ChallengeOperation> = {};
   public sendChallenge?: (challenge: Challenge) => void;
   private challengeObservers: Record<string, ChallengeObserver[]> = {}
 
   constructor(
-    storageService: SNStorageService,
-    protocolService: SNProtocolService
+    private storageService: SNStorageService,
+    private protocolService: SNProtocolService
   ) {
     super();
-    this.storageService = storageService;
-    this.protocolService = protocolService;
   }
 
   /** @override */
   public deinit() {
-    this.storageService = undefined;
-    this.protocolService = undefined;
+    (this.storageService as any) = undefined;
+    (this.protocolService as any) = undefined;
     this.sendChallenge = undefined;
     (this.challengeOperations as any) = undefined;
     (this.challengeObservers as any) = undefined;
@@ -115,6 +112,20 @@ export class ChallengeService extends PureService {
     }
     const value = response.getValueForType(ChallengeValidation.LocalPasscode);
     return { passcode: value.value as string, canceled: false }
+  }
+
+  async getWrappingKeyIfApplicable(requireCorrect = false): Promise<SNRootKey | undefined> {
+    if (!this.protocolService.hasPasscode()) {
+      return undefined;
+    }
+    const result = await this.promptForPasscode();
+    if (result.canceled) {
+      if (requireCorrect) {
+        return this.getWrappingKeyIfApplicable(requireCorrect);
+      }
+      return undefined;
+    }
+    return this.protocolService!.computeWrappingKey(result.passcode!);
   }
 
   public isPasscodeLocked() {

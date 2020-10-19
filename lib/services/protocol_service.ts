@@ -41,14 +41,12 @@ import {
   isWebCryptoAvailable,
   extendArray
 } from '@Lib/utils';
-
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '@Models/content_types';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
 import { isDecryptedIntent, intentRequiresEncryption } from '@Lib/protocol';
-import { INVALID_PASSWORD } from './api/messages';
 
 export type BackupFile = {
   version?: ProtocolVersion
@@ -1074,7 +1072,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @param wrappingKey If a passcode is configured, the wrapping key
    * must be supplied, so that the new root key can be wrapped with the wrapping key.
    */
-  public async setNewRootKey(
+  public async setRootKey(
     key: SNRootKey,
     wrappingKey?: SNRootKey
   ) {
@@ -1112,7 +1110,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       await this.wrapAndPersistRootKey(wrappingKey);
     }
     await this.notifyObserversOfKeyChange();
-    await this.reencryptItemsKeys();
   }
 
   /**
@@ -1284,7 +1281,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
        * No previous synced items key.
        * We can keep the one(s) we have, only if their version is equal to our root key version.
        * If their version is not equal to our root key version, delete them. If we end up with 0
-       * items keys, create a new one.  */
+       * items keys, create a new one. This covers the case when you open the app offline and it creates
+       * an 004 key, and then you sign into an 003 account. */
       const rootKey = await this.getRootKey();
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
@@ -1447,57 +1445,20 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return itemsKey;
   }
 
-  public async changePassword(
-    email: string,
-    currentPassword: string,
-    newPassword: string,
-    wrappingKey?: SNRootKey,
-    origination = KeyParamsOrigination.PasswordChange
-  ): Promise<[Error | null, {
-    currentServerPassword: string,
-    newRootKey: SNRootKey,
-    newKeyParams: SNRootKeyParams,
-    rollback: () => Promise<void>
-  }?]> {
-    const [currentRootKey, currentKeyParams] = await Promise.all([
-      this.getRootKey() as Promise<SNRootKey>,
-      this.getRootKeyParams() as Promise<SNRootKeyParams>,
-    ]);
+  public async createNewItemsKeyWithRollback() {
     const currentDefaultItemsKey = this.getDefaultItemsKey();
-
-    const computedRootKey = await this.computeRootKey(
-      currentPassword,
-      currentKeyParams
-    );
-    if (!currentRootKey.compare(computedRootKey)) {
-      /** Passwords do not match. */
-      return [Error(INVALID_PASSWORD)];
-    }
-
-    const newRootKey = await this.createRootKey(email, newPassword, origination);
-
-    await this.setNewRootKey(newRootKey, wrappingKey);
     const newDefaultItemsKey = await this.createNewDefaultItemsKey();
-
-    return [
-      null,
-      {
-        currentServerPassword: computedRootKey.serverPassword,
-        newRootKey: newRootKey,
-        newKeyParams: newRootKey.keyParams,
-        rollback: async () => {
-          await this.setNewRootKey(currentRootKey, wrappingKey);
-          await Promise.all([
-            this.itemManager!.setItemToBeDeleted(newDefaultItemsKey.uuid),
-            this.itemManager!.changeItem<ItemsKeyMutator>(
-              currentDefaultItemsKey!.uuid,
-              (mutator) => {
-                mutator.isDefault = true;
-              }
-            )
-          ]);
-        },
-      },
-    ];
+    const rollback = async () => {
+      await Promise.all([
+        this.itemManager!.setItemToBeDeleted(newDefaultItemsKey.uuid),
+        this.itemManager!.changeItem<ItemsKeyMutator>(
+          currentDefaultItemsKey!.uuid,
+          (mutator) => {
+            mutator.isDefault = true;
+          }
+        )
+      ]);
+    };
+    return rollback;
   }
 }
