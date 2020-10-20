@@ -121,7 +121,7 @@ export const SessionStrings = {
 }
 
 export const ChallengeStrings = {
-  UnlockApplication: 'Authentication is required to unlock the application',
+  UnlockApplication: 'Enter your application passcode',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',

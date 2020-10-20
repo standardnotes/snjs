@@ -2574,7 +2574,7 @@ class PurePayload {
     this.uuid = rawPayload.uuid;
 
     if (!this.uuid && this.fields.includes(_fields__WEBPACK_IMPORTED_MODULE_1__[/* PayloadField */ "a"].Uuid)) {
-      throw Error('uuid is null, yet this payloads fields indicate it shouldnt be.');
+      throw Error("uuid is null, yet this payloads fields indicate it shouldnt be. Content type: ".concat(rawPayload.content_type));
     }
 
     this.content_type = rawPayload.content_type;
@@ -10067,7 +10067,7 @@ const SessionStrings = {
   PasswordInputPlaceholder: 'Password'
 };
 const ChallengeStrings = {
-  UnlockApplication: 'Authentication is required to unlock the application',
+  UnlockApplication: 'Enter your application passcode',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
