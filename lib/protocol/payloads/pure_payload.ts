@@ -72,7 +72,7 @@ export class PurePayload {
     }
     this.uuid = rawPayload.uuid!;
     if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
-      throw Error('uuid is null, yet this payloads fields indicate it shouldnt be.');
+      throw Error(`uuid is null, yet this payloads fields indicate it shouldnt be. Content type: ${rawPayload.content_type}`);
     }
     this.content_type = rawPayload.content_type!;
     if (rawPayload.content) {
