@@ -31,6 +31,10 @@ export declare const UNSUPPORTED_BACKUP_FILE_VERSION = "This backup file was cre
 export declare const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.";
 export declare const PasswordChangeStrings: {
     PasscodeRequired: string;
+    Failed: string;
+};
+export declare const RegisterStrings: {
+    PasscodeRequired: string;
 };
 export declare const SignInStrings: {
     PasscodeRequired: string;

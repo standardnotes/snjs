@@ -318,7 +318,7 @@ describe('key recovery service', function () {
       unassociatedPassword,
       KeyParamsOrigination.Registration
     );
-    await application.protocolService.setNewRootKey(randomRootKey);
+    await application.protocolService.setRootKey(randomRootKey);
     const correctItemsKey = await application.protocolService.defaultOperator().createItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       correctItemsKey.payload,

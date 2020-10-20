@@ -239,7 +239,7 @@ describe('upgrading', () => {
     });
 
     it('rolls back the local protocol upgrade if the server responds with an error', async function () {
-      sinon.replace(this.application.protocolService, 'changePassword', async () => ([Error()]));
+      sinon.replace(this.application.sessionManager, 'changePassword', async () => ([Error()]));
 
       this.application.setLaunchCallback({
         receiveChallenge: this.receiveChallenge

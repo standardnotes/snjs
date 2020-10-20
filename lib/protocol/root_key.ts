@@ -102,7 +102,11 @@ export class SNRootKey extends SNItem {
     return this.payload.safeContent.masterKey;
   }
 
-  public get serverPassword() {
+  /**
+   * serverPassword is not persisted as part of keychainValue, so if loaded from disk,
+   * this value may be undefined.
+   */
+  public get serverPassword(): string | undefined {
     return this.payload.safeContent.serverPassword;
   }
 
@@ -121,7 +125,7 @@ export class SNRootKey extends SNItem {
     const hasServerPassword = this.serverPassword && otherKey.serverPassword;
     return (
       timingSafeEqual(this.masterKey, otherKey.masterKey) &&
-      (!hasServerPassword || timingSafeEqual(this.serverPassword, otherKey.serverPassword))
+      (!hasServerPassword || timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
     );
   }
 

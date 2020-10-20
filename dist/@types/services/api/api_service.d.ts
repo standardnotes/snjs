@@ -1,5 +1,5 @@
 import { UuidString } from './../../types';
-import { ChangePasswordResponse, HttpResponse, KeyParamsResponse, RegistrationResponse, RevisionListEntry, RevisionListResponse, SessionRenewalResponse, SignInResponse, SingleRevisionResponse } from './responses';
+import { ChangePasswordResponse, HttpResponse, HttpStatusCode, KeyParamsResponse, RegistrationResponse, RevisionListEntry, RevisionListResponse, SessionRenewalResponse, SignInResponse, SingleRevisionResponse } from './responses';
 import { Session } from './session';
 import { ContentType } from '../../models/content_types';
 import { PurePayload } from '../../protocol/payloads/pure_payload';
@@ -35,7 +35,7 @@ export declare class SNApiService extends PureService {
     getSession(): Session | undefined;
     private path;
     private params;
-    createErrorResponse(message: string): HttpResponse;
+    createErrorResponse(message: string, status?: HttpStatusCode): HttpResponse;
     private errorResponseWithFallbackMessage;
     /**
      * @param mfaKeyPath  The params path the server expects for authentication against

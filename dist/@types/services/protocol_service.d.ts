@@ -278,7 +278,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * @param wrappingKey If a passcode is configured, the wrapping key
      * must be supplied, so that the new root key can be wrapped with the wrapping key.
      */
-    setNewRootKey(key: SNRootKey, wrappingKey?: SNRootKey): Promise<void>;
+    setRootKey(key: SNRootKey, wrappingKey?: SNRootKey): Promise<void>;
     /**
      * Returns the in-memory root key value.
      */
@@ -377,11 +377,6 @@ export declare class SNProtocolService extends PureService implements Encryption
      * and its .itemsKey value should be equal to the root key masterKey value.
      */
     private createNewDefaultItemsKey;
-    changePassword(email: string, currentPassword: string, newPassword: string, wrappingKey?: SNRootKey, origination?: KeyParamsOrigination): Promise<[Error | null, {
-        currentServerPassword: string;
-        newRootKey: SNRootKey;
-        newKeyParams: SNRootKeyParams;
-        rollback: () => Promise<void>;
-    }?]>;
+    createNewItemsKeyWithRollback(): Promise<() => Promise<void>>;
 }
 export {};

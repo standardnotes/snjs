@@ -1,3 +1,4 @@
+import { SNRootKey } from './../../protocol/root_key';
 import { ChallengePrompt } from './../../challenges';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
@@ -34,25 +35,21 @@ export type ChallengeObserver = {
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
 export class ChallengeService extends PureService {
-  private storageService?: SNStorageService;
-  private protocolService?: SNProtocolService;
   private challengeOperations: Record<string, ChallengeOperation> = {};
   public sendChallenge?: (challenge: Challenge) => void;
   private challengeObservers: Record<string, ChallengeObserver[]> = {}
 
   constructor(
-    storageService: SNStorageService,
-    protocolService: SNProtocolService
+    private storageService: SNStorageService,
+    private protocolService: SNProtocolService
   ) {
     super();
-    this.storageService = storageService;
-    this.protocolService = protocolService;
   }
 
   /** @override */
   public deinit() {
-    this.storageService = undefined;
-    this.protocolService = undefined;
+    (this.storageService as any) = undefined;
+    (this.protocolService as any) = undefined;
     this.sendChallenge = undefined;
     (this.challengeOperations as any) = undefined;
     (this.challengeObservers as any) = undefined;
@@ -115,6 +112,30 @@ export class ChallengeService extends PureService {
     }
     const value = response.getValueForType(ChallengeValidation.LocalPasscode);
     return { passcode: value.value as string, canceled: false }
+  }
+
+  /**
+   * Returns the wrapping key for operations that require resaving the root key
+   * (changing the account password, signing in, registering, or upgrading protocol)
+   * Returns empty object if no passcode is configured.
+   * Otherwise returns {cancled: true} if the operation is canceled, or
+   * {wrappingKey} with the result.
+   * @param passcode - If the consumer already has access to the passcode,
+   * they can pass it here so that the user is not prompted again.
+   */
+  async getWrappingKeyIfApplicable(passcode?: string) {
+    if (!this.protocolService.hasPasscode()) {
+      return {};
+    }
+    if (!passcode) {
+      const result = await this.promptForPasscode();
+      if (result.canceled) {
+        return { canceled: true };
+      }
+      passcode = result.passcode!;
+    }
+    const wrappingKey = await this.protocolService!.computeWrappingKey(passcode);
+    return { wrappingKey };
   }
 
   public isPasscodeLocked() {

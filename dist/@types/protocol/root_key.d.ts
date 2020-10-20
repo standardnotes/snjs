@@ -31,7 +31,11 @@ export declare class SNRootKey extends SNItem {
      */
     get itemsKey(): any;
     get masterKey(): any;
-    get serverPassword(): any;
+    /**
+     * serverPassword is not persisted as part of keychainValue, so if loaded from disk,
+     * this value may be undefined.
+     */
+    get serverPassword(): string | undefined;
     /** 003 and below only. */
     get dataAuthenticationKey(): any;
     /**

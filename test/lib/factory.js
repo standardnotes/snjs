@@ -98,10 +98,7 @@ export async function registerOldUser({ application, email, password, version })
     accountKey.serverPassword,
     accountKey.keyParams
   );
-  await application.sessionManager.handleSuccessAuthResponse(response);
-  await application.protocolService.setNewRootKey(
-    accountKey
-  );
+  await application.sessionManager.handleSuccessAuthResponse(response, accountKey);
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
     mode: SyncModes.DownloadFirst,

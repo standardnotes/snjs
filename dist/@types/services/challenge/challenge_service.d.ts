@@ -1,3 +1,4 @@
+import { SNRootKey } from './../../protocol/root_key';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
 import { PureService } from "../pure_service";
@@ -18,8 +19,8 @@ export declare type ChallengeObserver = {
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
 export declare class ChallengeService extends PureService {
-    private storageService?;
-    private protocolService?;
+    private storageService;
+    private protocolService;
     private challengeOperations;
     sendChallenge?: (challenge: Challenge) => void;
     private challengeObservers;
@@ -38,6 +39,25 @@ export declare class ChallengeService extends PureService {
     } | {
         passcode: string;
         canceled: boolean;
+    }>;
+    /**
+     * Returns the wrapping key for operations that require resaving the root key
+     * (changing the account password, signing in, registering, or upgrading protocol)
+     * Returns empty object if no passcode is configured.
+     * Otherwise returns {cancled: true} if the operation is canceled, or
+     * {wrappingKey} with the result.
+     * @param passcode - If the consumer already has access to the passcode,
+     * they can pass it here so that the user is not prompted again.
+     */
+    getWrappingKeyIfApplicable(passcode?: string): Promise<{
+        canceled?: undefined;
+        wrappingKey?: undefined;
+    } | {
+        canceled: boolean;
+        wrappingKey?: undefined;
+    } | {
+        wrappingKey: SNRootKey;
+        canceled?: undefined;
     }>;
     isPasscodeLocked(): Promise<boolean>;
     hasBiometricsEnabled(): Promise<boolean>;

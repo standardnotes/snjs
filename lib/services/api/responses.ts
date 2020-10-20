@@ -10,6 +10,7 @@ export enum HttpStatusCode {
   HttpStatusExpiredAccessToken = 498,
   /** The session's access token and refresh token are expired, user must reauthenticate */
   HttpStatusInvalidSession = 401,
+  LocalValidationError = 10
 }
 
 export type HttpResponse = {

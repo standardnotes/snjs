@@ -1,29 +1,14 @@
 import { SNSyncService } from './sync/sync_service';
 import { ApplicationStage } from './../stages';
 import { SNStorageService } from './storage_service';
-import { SNRootKeyParams } from './../protocol/key_params';
 import { SNSessionManager } from './api/session_manager';
 import { PayloadManager } from './model_manager';
 import { SNAlertService } from './alert_service';
 import { ChallengeService } from './challenge/challenge_service';
-import { SNRootKey } from '../protocol/root_key';
 import { SNProtocolService } from './protocol_service';
 import { SNApiService } from './api/api_service';
-import { SNItemsKey } from './../models/app/items_key';
 import { ItemManager } from './item_manager';
 import { PureService } from './pure_service';
-declare type DecryptionCallback = (key: SNItemsKey, result: DecryptionResponse) => void;
-declare type DecryptionResponse = {
-    success: boolean;
-    rootKey?: SNRootKey;
-};
-declare type DecryptionQueueItem = {
-    key: SNItemsKey;
-    keyParams: SNRootKeyParams;
-    callback?: DecryptionCallback;
-    promise?: Promise<DecryptionResponse>;
-    resolve?: (result: DecryptionResponse) => void;
-};
 export declare class SNKeyRecoveryService extends PureService {
     private itemManager;
     private modelManager;
@@ -56,27 +41,21 @@ export declare class SNKeyRecoveryService extends PureService {
      * When the app first launches, we will query the isolated storage to see if there are any
      * keys we need to decrypt.
      */
-    handleIgnoredItemsKeys(keys: SNItemsKey[], persistIncoming?: boolean): Promise<void>;
-    handleUndecryptableItemsKeys(keys: SNItemsKey[]): Promise<void>;
+    private handleIgnoredItemsKeys;
+    private handleUndecryptableItemsKeys;
     processPersistedUndecryptables(): Promise<void>;
     private getUndecryptables;
     private persistUndecryptables;
     private saveToUndecryptables;
     private removeFromUndecryptables;
-    get queuePromise(): Promise<(DecryptionResponse | undefined)[]>;
-    getClientKeyParams(): Promise<SNRootKeyParams | undefined>;
-    serverKeyParamsAreSafe(clientParams: SNRootKeyParams): boolean;
-    performServerSignIn(keyParams: SNRootKeyParams): Promise<void>;
-    /**
-     * When we've successfully validated a root key that matches server params,
-     * we replace our current client root key with the newly generated key
-     */
-    replaceClientRootKey(rootKey: SNRootKey): Promise<void>;
-    getWrappingKeyIfApplicable(): Promise<SNRootKey | undefined>;
-    addKeysToQueue(keys: SNItemsKey[], callback?: DecryptionCallback): Promise<void>;
-    readdQueueItem(queueItem: DecryptionQueueItem): void;
+    private get queuePromise();
+    private getClientKeyParams;
+    private serverKeyParamsAreSafe;
+    private performServerSignIn;
+    private getWrappingKeyIfApplicable;
+    private addKeysToQueue;
+    private readdQueueItem;
     private beginProcessingQueue;
-    popQueueItem(queueItem: DecryptionQueueItem): Promise<void>;
-    popQueueForKeyParams(keyParams: SNRootKeyParams): DecryptionQueueItem[];
+    private popQueueItem;
+    private popQueueForKeyParams;
 }
-export {};
