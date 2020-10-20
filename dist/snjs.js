@@ -12699,17 +12699,6 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       return this.performServerSignIn(keyParams);
     }
   }
-  /**
-   * When we've successfully validated a root key that matches server params,
-   * we replace our current client root key with the newly generated key
-   */
-
-
-  async replaceClientRootKey(rootKey) {
-    const wrappingKey = await this.getWrappingKeyIfApplicable();
-    await this.protocolService.setRootKey(rootKey, wrappingKey);
-    this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
-  }
 
   async getWrappingKeyIfApplicable() {
     if (!this.protocolService.hasPasscode()) {
@@ -12874,7 +12863,9 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
 
       if (replacesRootKey) {
         /** Replace our root key with the generated root key */
-        await this.replaceClientRootKey(rootKey);
+        const wrappingKey = await this.getWrappingKeyIfApplicable();
+        await this.protocolService.setRootKey(rootKey, wrappingKey);
+        this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
       } else {
         this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);
       }
