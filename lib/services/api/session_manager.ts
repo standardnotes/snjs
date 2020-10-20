@@ -206,6 +206,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
         )
       };
     }
+    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     email = cleanedEmailString(email);
     const rootKey = await this.protocolService!.createRootKey(
       email,
@@ -221,7 +222,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       keyParams
     );
     if (!registerResponse.error) {
-      await this.handleSuccessAuthResponse(registerResponse, rootKey);
+      await this.handleSuccessAuthResponse(registerResponse, rootKey, wrappingKey);
     }
     return {
       response: registerResponse,
@@ -288,7 +289,6 @@ export class SNSessionManager extends PureService<SessionEvent> {
       strict,
       minAllowedVersion
     );
-
     if (result.response.error) {
       /**
        * Try signing in with trimmed + lowercase version of email
@@ -388,6 +388,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaKeyPath?: string,
     mfaCode?: string,
   ): Promise<SignInResponse> {
+    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     const signInResponse = await this.apiService.signIn(
       email,
       rootKey.serverPassword,
@@ -396,7 +397,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     )
     if (!signInResponse.error) {
       const expandedRootKey = await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params);
-      await this.handleSuccessAuthResponse(signInResponse, expandedRootKey);
+      await this.handleSuccessAuthResponse(signInResponse, expandedRootKey, wrappingKey);
       return signInResponse;
     } else {
       if (signInResponse.error.payload?.mfa_key) {
@@ -426,13 +427,14 @@ export class SNSessionManager extends PureService<SessionEvent> {
     currentServerPassword: string,
     newRootKey: SNRootKey,
   ): Promise<SessionManagerResponse> {
+    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     const response = await this.apiService.changePassword(
       currentServerPassword,
       newRootKey.serverPassword,
       newRootKey.keyParams
     );
     if (!response.error) {
-      await this.handleSuccessAuthResponse(response, newRootKey);
+      await this.handleSuccessAuthResponse(response, newRootKey, wrappingKey);
     }
     return {
       response: response,
@@ -446,9 +448,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   private async handleSuccessAuthResponse(
     response: RegistrationResponse | SignInResponse | ChangePasswordResponse,
-    rootKey: SNRootKey
+    rootKey: SNRootKey,
+    wrappingKey?: SNRootKey
   ) {
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     await this.protocolService.setRootKey(
       rootKey,
       wrappingKey

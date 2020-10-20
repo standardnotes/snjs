@@ -13322,6 +13322,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       };
     }
 
+    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     email = cleanedEmailString(email);
     const rootKey = await this.protocolService.createRootKey(email, password, KeyParamsOrigination.Registration);
     const serverPassword = rootKey.serverPassword;
@@ -13329,7 +13330,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const registerResponse = await this.apiService.register(email, serverPassword, keyParams);
 
     if (!registerResponse.error) {
-      await this.handleSuccessAuthResponse(registerResponse, rootKey);
+      await this.handleSuccessAuthResponse(registerResponse, rootKey, wrappingKey);
     }
 
     return {
@@ -13474,11 +13475,12 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async bypassChecksAndSignInWithRootKey(email, rootKey, mfaKeyPath, mfaCode) {
+    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     const signInResponse = await this.apiService.signIn(email, rootKey.serverPassword, mfaKeyPath, mfaCode);
 
     if (!signInResponse.error) {
       const expandedRootKey = await root_key_SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params);
-      await this.handleSuccessAuthResponse(signInResponse, expandedRootKey);
+      await this.handleSuccessAuthResponse(signInResponse, expandedRootKey, wrappingKey);
       return signInResponse;
     } else {
       var _signInResponse$error;
@@ -13506,10 +13508,11 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async changePassword(currentServerPassword, newRootKey) {
+    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     const response = await this.apiService.changePassword(currentServerPassword, newRootKey.serverPassword, newRootKey.keyParams);
 
     if (!response.error) {
-      await this.handleSuccessAuthResponse(response, newRootKey);
+      await this.handleSuccessAuthResponse(response, newRootKey, wrappingKey);
     }
 
     return {
@@ -13522,8 +13525,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     return this.apiService.getSessionsList();
   }
 
-  async handleSuccessAuthResponse(response, rootKey) {
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
+  async handleSuccessAuthResponse(response, rootKey, wrappingKey) {
     await this.protocolService.setRootKey(rootKey, wrappingKey);
     const user = response.user;
     this.user = user;
