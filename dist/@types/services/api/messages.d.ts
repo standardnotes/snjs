@@ -33,6 +33,9 @@ export declare const PasswordChangeStrings: {
     PasscodeRequired: string;
     Failed: string;
 };
+export declare const RegisterStrings: {
+    PasscodeRequired: string;
+};
 export declare const SignInStrings: {
     PasscodeRequired: string;
     IncorrectMfa: string;

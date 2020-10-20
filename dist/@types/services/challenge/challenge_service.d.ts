@@ -40,7 +40,25 @@ export declare class ChallengeService extends PureService {
         passcode: string;
         canceled: boolean;
     }>;
-    getWrappingKeyIfApplicable(requireCorrect?: boolean): Promise<SNRootKey | undefined>;
+    /**
+     * Returns the wrapping key for operations that require resaving the root key
+     * (changing the account password, signing in, registering, or upgrading protocol)
+     * Returns empty object if no passcode is configured.
+     * Otherwise returns {cancled: true} if the operation is canceled, or
+     * {wrappingKey} with the result.
+     * @param passcode - If the consumer already has access to the passcode,
+     * they can pass it here so that the user is not prompted again.
+     */
+    getWrappingKeyIfApplicable(passcode?: string): Promise<{
+        canceled?: undefined;
+        wrappingKey?: undefined;
+    } | {
+        canceled: boolean;
+        wrappingKey?: undefined;
+    } | {
+        wrappingKey: SNRootKey;
+        canceled?: undefined;
+    }>;
     isPasscodeLocked(): Promise<boolean>;
     hasBiometricsEnabled(): Promise<boolean>;
     enableBiometrics(): Promise<void>;

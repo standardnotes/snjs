@@ -9997,6 +9997,9 @@ const PasswordChangeStrings = {
   PasscodeRequired: 'Your passcode is required to process your password change.',
   Failed: 'Unable to change your password due to a sync error. Please try again.'
 };
+const RegisterStrings = {
+  PasscodeRequired: 'Your passcode is required in order to register for an account.'
+};
 const SignInStrings = {
   PasscodeRequired: 'Your passcode is required in order to sign in to your account.',
   IncorrectMfa: 'Incorrect two-factor authentication code. Please try again.',
@@ -12713,16 +12716,19 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       return undefined;
     }
 
-    const result = await this.challengeService.getWrappingKeyIfApplicable();
+    const {
+      wrappingKey,
+      canceled
+    } = await this.challengeService.getWrappingKeyIfApplicable();
 
-    if (!result) {
+    if (canceled) {
       /** Show an alert saying they must enter the correct passcode to update
        * their root key, and try again */
       await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryPasscodeRequiredText, KeyRecoveryStrings.KeyRecoveryPasscodeRequiredTitle);
       return this.getWrappingKeyIfApplicable();
     }
 
-    return result;
+    return wrappingKey;
   }
 
   async addKeysToQueue(keys, callback) {
@@ -12865,11 +12871,12 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       const allRelevantKeyPayloads = [decryptedPayload].concat(decryptedMatching);
       this.modelManager.emitPayloads(allRelevantKeyPayloads, sources["a" /* PayloadSource */].DecryptedTransient);
       await this.storageService.savePayloads(allRelevantKeyPayloads);
-      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);
 
       if (replacesRootKey) {
         /** Replace our root key with the generated root key */
         await this.replaceClientRootKey(rootKey);
+      } else {
+        this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);
       }
 
       const result = {
@@ -12990,6 +12997,45 @@ class TokenSession extends Session {
   }
 
 }
+// CONCATENATED MODULE: ./lib/services/api/keys.ts
+var ApiEndpointParam;
+
+(function (ApiEndpointParam) {
+  ApiEndpointParam["LastSyncToken"] = "sync_token";
+  ApiEndpointParam["PaginationToken"] = "cursor_token";
+  ApiEndpointParam["IntegrityCheck"] = "compute_integrity";
+  ApiEndpointParam["IntegrityResult"] = "integrity_hash";
+  ApiEndpointParam["SyncDlLimit"] = "limit";
+  ApiEndpointParam["SyncPayloads"] = "items";
+  ApiEndpointParam["ApiVersion"] = "api";
+})(ApiEndpointParam || (ApiEndpointParam = {}));
+
+;
+// CONCATENATED MODULE: ./lib/services/api/responses.ts
+
+var HttpStatusCode;
+
+(function (HttpStatusCode) {
+  HttpStatusCode[HttpStatusCode["HttpStatusMinSuccess"] = 200] = "HttpStatusMinSuccess";
+  HttpStatusCode[HttpStatusCode["HttpStatusMaxSuccess"] = 299] = "HttpStatusMaxSuccess";
+  /** The session's access token is expired, but the refresh token is valid */
+
+  HttpStatusCode[HttpStatusCode["HttpStatusExpiredAccessToken"] = 498] = "HttpStatusExpiredAccessToken";
+  /** The session's access token and refresh token are expired, user must reauthenticate */
+
+  HttpStatusCode[HttpStatusCode["HttpStatusInvalidSession"] = 401] = "HttpStatusInvalidSession";
+  HttpStatusCode[HttpStatusCode["LocalValidationError"] = 10] = "LocalValidationError";
+})(HttpStatusCode || (HttpStatusCode = {}));
+
+function isErrorResponseExpiredToken(errorResponse) {
+  return errorResponse.status === HttpStatusCode.HttpStatusExpiredAccessToken;
+}
+var ConflictType;
+
+(function (ConflictType) {
+  ConflictType["ConflictingData"] = "sync_conflict";
+  ConflictType["UuidConflict"] = "uuid_conflict";
+})(ConflictType || (ConflictType = {}));
 // CONCATENATED MODULE: ./node_modules/sncrypto/lib/common/utils.ts
 /**
  * Constant-time string comparison
@@ -13112,6 +13158,11 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
   get masterKey() {
     return this.payload.safeContent.masterKey;
   }
+  /**
+   * serverPassword is not persisted as part of keychainValue, so if loaded from disk,
+   * this value may be undefined.
+   */
+
 
   get serverPassword() {
     return this.payload.safeContent.serverPassword;
@@ -13168,6 +13219,7 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
 
 }
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
+
 
 
 
@@ -13322,7 +13374,17 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       };
     }
 
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
+    const {
+      wrappingKey,
+      canceled
+    } = await this.challengeService.getWrappingKeyIfApplicable();
+
+    if (canceled) {
+      return {
+        response: this.apiService.createErrorResponse(RegisterStrings.PasscodeRequired, HttpStatusCode.LocalValidationError)
+      };
+    }
+
     email = cleanedEmailString(email);
     const rootKey = await this.protocolService.createRootKey(email, password, KeyParamsOrigination.Registration);
     const serverPassword = rootKey.serverPassword;
@@ -13391,7 +13453,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     let minAllowedVersion = arguments.length > 3 ? arguments[3] : undefined;
     const result = await this.performSignIn(email, password, strict, minAllowedVersion);
 
-    if (result.response.error) {
+    if (result.response.error && result.response.error.status !== HttpStatusCode.LocalValidationError) {
       /**
        * Try signing in with trimmed + lowercase version of email
        */
@@ -13475,7 +13537,15 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async bypassChecksAndSignInWithRootKey(email, rootKey, mfaKeyPath, mfaCode) {
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
+    const {
+      wrappingKey,
+      canceled
+    } = await this.challengeService.getWrappingKeyIfApplicable();
+
+    if (canceled) {
+      return this.apiService.createErrorResponse(SignInStrings.PasscodeRequired, HttpStatusCode.LocalValidationError);
+    }
+
     const signInResponse = await this.apiService.signIn(email, rootKey.serverPassword, mfaKeyPath, mfaCode);
 
     if (!signInResponse.error) {
@@ -13507,8 +13577,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     }
   }
 
-  async changePassword(currentServerPassword, newRootKey) {
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
+  async changePassword(currentServerPassword, newRootKey, wrappingKey) {
     const response = await this.apiService.changePassword(currentServerPassword, newRootKey.serverPassword, newRootKey.keyParams);
 
     if (!response.error) {
@@ -13544,44 +13613,6 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
 }
-// CONCATENATED MODULE: ./lib/services/api/keys.ts
-var ApiEndpointParam;
-
-(function (ApiEndpointParam) {
-  ApiEndpointParam["LastSyncToken"] = "sync_token";
-  ApiEndpointParam["PaginationToken"] = "cursor_token";
-  ApiEndpointParam["IntegrityCheck"] = "compute_integrity";
-  ApiEndpointParam["IntegrityResult"] = "integrity_hash";
-  ApiEndpointParam["SyncDlLimit"] = "limit";
-  ApiEndpointParam["SyncPayloads"] = "items";
-  ApiEndpointParam["ApiVersion"] = "api";
-})(ApiEndpointParam || (ApiEndpointParam = {}));
-
-;
-// CONCATENATED MODULE: ./lib/services/api/responses.ts
-
-var HttpStatusCode;
-
-(function (HttpStatusCode) {
-  HttpStatusCode[HttpStatusCode["HttpStatusMinSuccess"] = 200] = "HttpStatusMinSuccess";
-  HttpStatusCode[HttpStatusCode["HttpStatusMaxSuccess"] = 299] = "HttpStatusMaxSuccess";
-  /** The session's access token is expired, but the refresh token is valid */
-
-  HttpStatusCode[HttpStatusCode["HttpStatusExpiredAccessToken"] = 498] = "HttpStatusExpiredAccessToken";
-  /** The session's access token and refresh token are expired, user must reauthenticate */
-
-  HttpStatusCode[HttpStatusCode["HttpStatusInvalidSession"] = 401] = "HttpStatusInvalidSession";
-})(HttpStatusCode || (HttpStatusCode = {}));
-
-function isErrorResponseExpiredToken(errorResponse) {
-  return errorResponse.status === HttpStatusCode.HttpStatusExpiredAccessToken;
-}
-var ConflictType;
-
-(function (ConflictType) {
-  ConflictType["ConflictingData"] = "sync_conflict";
-  ConflictType["UuidConflict"] = "uuid_conflict";
-})(ConflictType || (ConflictType = {}));
 // CONCATENATED MODULE: ./lib/services/api/http_service.ts
 
 
@@ -13815,10 +13846,11 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
     return params;
   }
 
-  createErrorResponse(message) {
+  createErrorResponse(message, status) {
     return {
       error: {
-        message: message
+        message,
+        status
       }
     };
   }
@@ -23013,25 +23045,38 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
       canceled: false
     };
   }
+  /**
+   * Returns the wrapping key for operations that require resaving the root key
+   * (changing the account password, signing in, registering, or upgrading protocol)
+   * Returns empty object if no passcode is configured.
+   * Otherwise returns {cancled: true} if the operation is canceled, or
+   * {wrappingKey} with the result.
+   * @param passcode - If the consumer already has access to the passcode,
+   * they can pass it here so that the user is not prompted again.
+   */
 
-  async getWrappingKeyIfApplicable() {
-    let requireCorrect = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
+  async getWrappingKeyIfApplicable(passcode) {
     if (!this.protocolService.hasPasscode()) {
-      return undefined;
+      return {};
     }
 
-    const result = await this.promptForPasscode();
+    if (!passcode) {
+      const result = await this.promptForPasscode();
 
-    if (result.canceled) {
-      if (requireCorrect) {
-        return this.getWrappingKeyIfApplicable(requireCorrect);
+      if (result.canceled) {
+        return {
+          canceled: true
+        };
       }
 
-      return undefined;
+      passcode = result.passcode;
     }
 
-    return this.protocolService.computeWrappingKey(result.passcode);
+    const wrappingKey = await this.protocolService.computeWrappingKey(passcode);
+    return {
+      wrappingKey
+    };
   }
 
   isPasscodeLocked() {
@@ -23867,11 +23912,19 @@ class application_SNApplication {
     const dismissBlockingDialog = await this.alertService.blockingDialog(DO_NOT_CLOSE_APPLICATION, UPGRADING_ENCRYPTION);
 
     try {
+      let passcode;
+
+      if (hasPasscode) {
+        /* Upgrade passcode version */
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        passcode = value.value;
+      }
+
       if (hasAccount) {
         /* Upgrade account version */
         const value = response.getValueForType(ChallengeValidation.AccountPassword);
         const password = value.value;
-        const changeResponse = await this.changePassword(password, password, KeyParamsOrigination.ProtocolUpgrade, {
+        const changeResponse = await this.changePassword(password, password, passcode, KeyParamsOrigination.ProtocolUpgrade, {
           validatePasswordStrength: false
         });
 
@@ -23884,8 +23937,6 @@ class application_SNApplication {
 
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
-        const passcode = value.value;
         await this.changePasscode(passcode, KeyParamsOrigination.ProtocolUpgrade);
       }
 
@@ -24133,39 +24184,6 @@ class application_SNApplication {
     this.started = false;
   }
   /**
-   * Returns the wrapping key for operations that require resaving the root key
-   * (changing the account password, signing in, registering, or upgrading protocol)
-   * Returns empty object if no passcode is configured.
-   * Otherwise returns {cancled: true} if the operation is canceled, or
-   * {wrappingKey} with the result.
-   * @param passcode - If the consumer already has access to the passcode,
-   * they can pass it here so that the user is not prompted again.
-   */
-
-
-  async getWrappingKeyIfNecessary(passcode) {
-    if (!this.hasPasscode()) {
-      return {};
-    }
-
-    if (!passcode) {
-      const result = await this.challengeService.promptForPasscode();
-
-      if (result.canceled) {
-        return {
-          canceled: true
-        };
-      }
-
-      passcode = result.passcode;
-    }
-
-    const wrappingKey = await this.protocolService.computeWrappingKey(passcode);
-    return {
-      wrappingKey
-    };
-  }
-  /**
    *  @param mergeLocal  Whether to merge existing offline data into account. If false,
    *                     any pre-existing data will be fully deleted upon success.
    */
@@ -24244,13 +24262,21 @@ class application_SNApplication {
 
     return result.response;
   }
+  /**
+   * @param passcode - Changing the account password requires the local
+   * passcode if configured (to rewrap the account key with passcode). If the passcode
+   * is not passed in, the user will be prompted for the passcode. However if the consumer
+   * already has reference to the passcode, they can pass it in here so that the user
+   * is not prompted again.
+   */
 
-  async changePassword(currentPassword, newPassword) {
-    let origination = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : KeyParamsOrigination.PasswordChange;
+
+  async changePassword(currentPassword, newPassword, passcode) {
+    let origination = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : KeyParamsOrigination.PasswordChange;
     let {
       validatePasswordStrength = true
-    } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-    const result = await this.performPasswordChange(currentPassword, newPassword, origination, {
+    } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    const result = await this.performPasswordChange(currentPassword, newPassword, passcode, origination, {
       validatePasswordStrength
     });
 
@@ -24261,11 +24287,21 @@ class application_SNApplication {
     return result;
   }
 
-  async performPasswordChange(currentPassword, newPassword) {
-    let origination = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : KeyParamsOrigination.PasswordChange;
+  async performPasswordChange(currentPassword, newPassword, passcode) {
+    let origination = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : KeyParamsOrigination.PasswordChange;
     let {
       validatePasswordStrength = true
-    } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    const {
+      wrappingKey,
+      canceled
+    } = await this.challengeService.getWrappingKeyIfApplicable(passcode);
+
+    if (canceled) {
+      return {
+        error: Error(PasswordChangeStrings.PasscodeRequired)
+      };
+    }
 
     if (validatePasswordStrength) {
       if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
@@ -24282,15 +24318,15 @@ class application_SNApplication {
         error: Error(INVALID_PASSWORD)
       };
     }
-    /** Change the password locally */
+    /** Current root key must be recomputed as persisted value does not contain server password */
 
 
-    const currentRootKey = await this.protocolService.getRootKey();
+    const currentRootKey = await this.protocolService.computeRootKey(currentPassword, await this.protocolService.getRootKeyParams());
     const newRootKey = await this.protocolService.createRootKey(this.getUser().email, newPassword, origination);
     this.lockSyncing();
     /** Now, change the password on the server. Roll back on failure */
 
-    const result = await this.sessionManager.changePassword(currentRootKey.serverPassword, newRootKey);
+    const result = await this.sessionManager.changePassword(currentRootKey.serverPassword, newRootKey, wrappingKey);
     this.unlockSyncing();
 
     if (!result.response.error) {
@@ -24304,7 +24340,7 @@ class application_SNApplication {
       const itemsKeyWasSynced = this.protocolService.getDefaultItemsKey().updated_at.getTime() > 0;
 
       if (!itemsKeyWasSynced) {
-        await this.sessionManager.changePassword(newRootKey.serverPassword, currentRootKey);
+        await this.sessionManager.changePassword(newRootKey.serverPassword, currentRootKey, wrappingKey);
         await this.protocolService.reencryptItemsKeys();
         await rollback();
         await this.syncService.sync({

@@ -56,6 +56,10 @@ export const PasswordChangeStrings = {
   Failed: 'Unable to change your password due to a sync error. Please try again.',
 }
 
+export const RegisterStrings = {
+  PasscodeRequired: 'Your passcode is required in order to register for an account.',
+}
+
 export const SignInStrings = {
   PasscodeRequired: 'Your passcode is required in order to sign in to your account.',
   IncorrectMfa: 'Incorrect two-factor authentication code. Please try again.',

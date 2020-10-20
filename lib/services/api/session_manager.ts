@@ -13,7 +13,8 @@ import {
   SignInResponse,
   ChangePasswordResponse,
   HttpResponse,
-  KeyParamsResponse
+  KeyParamsResponse,
+  HttpStatusCode
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
@@ -31,7 +32,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { SessionStrings, SignInStrings } from './messages';
+import { SessionStrings, SignInStrings, RegisterStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -206,16 +207,23 @@ export class SNSessionManager extends PureService<SessionEvent> {
         )
       };
     }
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
+    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable();
+    if (canceled) {
+      return {
+        response: this.apiService.createErrorResponse(
+          RegisterStrings.PasscodeRequired,
+          HttpStatusCode.LocalValidationError
+        )
+      };
+    }
     email = cleanedEmailString(email);
     const rootKey = await this.protocolService!.createRootKey(
       email,
       password,
       KeyParamsOrigination.Registration
     );
-    const serverPassword = rootKey.serverPassword;
+    const serverPassword = rootKey.serverPassword!;
     const keyParams = rootKey.keyParams;
-
     const registerResponse = await this.apiService.register(
       email,
       serverPassword,
@@ -289,7 +297,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       strict,
       minAllowedVersion
     );
-    if (result.response.error) {
+    if (result.response.error && result.response.error.status !== HttpStatusCode.LocalValidationError) {
       /**
        * Try signing in with trimmed + lowercase version of email
        */
@@ -388,10 +396,16 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaKeyPath?: string,
     mfaCode?: string,
   ): Promise<SignInResponse> {
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
+    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable();
+    if (canceled) {
+      return this.apiService.createErrorResponse(
+        SignInStrings.PasscodeRequired,
+        HttpStatusCode.LocalValidationError
+      );
+    }
     const signInResponse = await this.apiService.signIn(
       email,
-      rootKey.serverPassword,
+      rootKey.serverPassword!,
       mfaKeyPath,
       mfaCode
     )
@@ -426,11 +440,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
   public async changePassword(
     currentServerPassword: string,
     newRootKey: SNRootKey,
+    wrappingKey?: SNRootKey
   ): Promise<SessionManagerResponse> {
-    const wrappingKey = await this.challengeService.getWrappingKeyIfApplicable(true);
     const response = await this.apiService.changePassword(
       currentServerPassword,
-      newRootKey.serverPassword,
+      newRootKey.serverPassword!,
       newRootKey.keyParams
     );
     if (!response.error) {

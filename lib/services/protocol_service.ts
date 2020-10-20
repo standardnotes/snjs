@@ -1026,7 +1026,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const wrappedKey = await this.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.LocalStorageEncrypted,
-      wrappingKey,
+      wrappingKey
     );
     await this.storageService!.setValue(
       StorageKey.WrappedRootKey,

@@ -114,18 +114,28 @@ export class ChallengeService extends PureService {
     return { passcode: value.value as string, canceled: false }
   }
 
-  async getWrappingKeyIfApplicable(requireCorrect = false): Promise<SNRootKey | undefined> {
+  /**
+   * Returns the wrapping key for operations that require resaving the root key
+   * (changing the account password, signing in, registering, or upgrading protocol)
+   * Returns empty object if no passcode is configured.
+   * Otherwise returns {cancled: true} if the operation is canceled, or
+   * {wrappingKey} with the result.
+   * @param passcode - If the consumer already has access to the passcode,
+   * they can pass it here so that the user is not prompted again.
+   */
+  async getWrappingKeyIfApplicable(passcode?: string) {
     if (!this.protocolService.hasPasscode()) {
-      return undefined;
+      return {};
     }
-    const result = await this.promptForPasscode();
-    if (result.canceled) {
-      if (requireCorrect) {
-        return this.getWrappingKeyIfApplicable(requireCorrect);
+    if (!passcode) {
+      const result = await this.promptForPasscode();
+      if (result.canceled) {
+        return { canceled: true };
       }
-      return undefined;
+      passcode = result.passcode!;
     }
-    return this.protocolService!.computeWrappingKey(result.passcode!);
+    const wrappingKey = await this.protocolService!.computeWrappingKey(passcode);
+    return { wrappingKey };
   }
 
   public isPasscodeLocked() {

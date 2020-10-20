@@ -235,7 +235,7 @@ export class SNApplication {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService!.loadHost();
-    await this.sessionManager!.initializeFromDisk();
+    await this.sessionManager.initializeFromDisk();
     this.historyManager!.initializeFromDisk();
 
     this.launched = true;
@@ -728,7 +728,7 @@ export class SNApplication {
     if (!this.launched) {
       throw 'Attempting to access user before application unlocked';
     }
-    return this.sessionManager!.getUser();
+    return this.sessionManager.getUser();
   }
 
   public async getProtocolEncryptionDisplayName() {
@@ -785,6 +785,12 @@ export class SNApplication {
       UPGRADING_ENCRYPTION
     );
     try {
+      let passcode: string | undefined;
+      if (hasPasscode) {
+        /* Upgrade passcode version */
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        passcode = value.value as string;
+      }
       if (hasAccount) {
         /* Upgrade account version */
         const value = response.getValueForType(ChallengeValidation.AccountPassword);
@@ -792,6 +798,7 @@ export class SNApplication {
         const changeResponse = await this.changePassword(
           password,
           password,
+          passcode,
           KeyParamsOrigination.ProtocolUpgrade,
           { validatePasswordStrength: false }
         );
@@ -801,9 +808,7 @@ export class SNApplication {
       }
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
-        const passcode = value.value as string;
-        await this.changePasscode(passcode, KeyParamsOrigination.ProtocolUpgrade);
+        await this.changePasscode(passcode!, KeyParamsOrigination.ProtocolUpgrade);
       }
       return { success: true };
     } catch (error) {
@@ -1048,30 +1053,6 @@ export class SNApplication {
   }
 
   /**
-   * Returns the wrapping key for operations that require resaving the root key
-   * (changing the account password, signing in, registering, or upgrading protocol)
-   * Returns empty object if no passcode is configured.
-   * Otherwise returns {cancled: true} if the operation is canceled, or
-   * {wrappingKey} with the result.
-   * @param passcode - If the consumer already has access to the passcode,
-   * they can pass it here so that the user is not prompted again.
-   */
-  private async getWrappingKeyIfNecessary(passcode?: string) {
-    if (!this.hasPasscode()) {
-      return {};
-    }
-    if (!passcode) {
-      const result = await this.challengeService.promptForPasscode();
-      if (result.canceled) {
-        return { canceled: true };
-      }
-      passcode = result.passcode!;
-    }
-    const wrappingKey = await this.protocolService!.computeWrappingKey(passcode);
-    return { wrappingKey };
-  }
-
-  /**
    *  @param mergeLocal  Whether to merge existing offline data into account. If false,
    *                     any pre-existing data will be fully deleted upon success.
    */
@@ -1082,7 +1063,7 @@ export class SNApplication {
     mergeLocal = true
   ) {
     this.lockSyncing();
-    const result = await this.sessionManager!.register(email, password);
+    const result = await this.sessionManager.register(email, password);
     if (!result.response.error) {
       this.syncService!.resetSyncState();
       await this.storageService!.setPersistencePolicy(
@@ -1120,7 +1101,7 @@ export class SNApplication {
   ) {
     /** Prevent a timed sync from occuring while signing in. */
     this.lockSyncing();
-    const result = await this.sessionManager!.signIn(
+    const result = await this.sessionManager.signIn(
       email, password, strict
     );
     if (!result.response.error) {
@@ -1154,15 +1135,24 @@ export class SNApplication {
     return result.response;
   }
 
+  /**
+   * @param passcode - Changing the account password requires the local
+   * passcode if configured (to rewrap the account key with passcode). If the passcode
+   * is not passed in, the user will be prompted for the passcode. However if the consumer
+   * already has reference to the passcode, they can pass it in here so that the user
+   * is not prompted again.
+   */
   public async changePassword(
     currentPassword: string,
     newPassword: string,
+    passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
   ) {
     const result = await this.performPasswordChange(
       currentPassword,
       newPassword,
+      passcode,
       origination,
       { validatePasswordStrength }
     );
@@ -1175,22 +1165,34 @@ export class SNApplication {
   private async performPasswordChange(
     currentPassword: string,
     newPassword: string,
+    passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
   ): Promise<{ error?: { message: string } }> {
+    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable(
+      passcode
+    );
+    if (canceled) {
+      return { error: Error(PasswordChangeStrings.PasscodeRequired) };
+    }
     if (validatePasswordStrength) {
       if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
         return { error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)) };
       }
     }
-    const accountPasswordValidation = await this.protocolService.validateAccountPassword(currentPassword);
+    const accountPasswordValidation = await this.protocolService.validateAccountPassword(
+      currentPassword
+    );
     if (!accountPasswordValidation.valid) {
       return {
         error: Error(INVALID_PASSWORD)
       }
     }
-    /** Change the password locally */
-    const currentRootKey = (await this.protocolService.getRootKey())!;
+    /** Current root key must be recomputed as persisted value does not contain server password */
+    const currentRootKey = await this.protocolService.computeRootKey(
+      currentPassword,
+      (await this.protocolService.getRootKeyParams())!
+    )
     const newRootKey = await this.protocolService.createRootKey(
       this.getUser()!.email!,
       newPassword,
@@ -1198,9 +1200,10 @@ export class SNApplication {
     );
     this.lockSyncing();
     /** Now, change the password on the server. Roll back on failure */
-    const result = await this.sessionManager!.changePassword(
-      currentRootKey.serverPassword,
-      newRootKey
+    const result = await this.sessionManager.changePassword(
+      currentRootKey.serverPassword!,
+      newRootKey,
+      wrappingKey
     );
     this.unlockSyncing();
     if (!result.response.error) {
@@ -1210,9 +1213,10 @@ export class SNApplication {
       await this.syncService!.sync({ awaitAll: true });
       const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
       if (!itemsKeyWasSynced) {
-        await this.sessionManager!.changePassword(
-          newRootKey.serverPassword,
-          currentRootKey
+        await this.sessionManager.changePassword(
+          newRootKey.serverPassword!,
+          currentRootKey,
+          wrappingKey
         );
         await this.protocolService.reencryptItemsKeys();
         await rollback();
@@ -1224,7 +1228,7 @@ export class SNApplication {
   }
 
   public async signOut() {
-    await this.sessionManager!.signOut();
+    await this.sessionManager.signOut();
     await this.protocolService!.clearLocalKeyState();
     await this.storageService!.clearAllData();
     await this.notifyEvent(ApplicationEvent.SignedOut);
@@ -1535,13 +1539,13 @@ export class SNApplication {
         this.sync();
       }
     }));
-    this.services.push(this.sessionManager!);
+    this.services.push(this.sessionManager);
   }
 
   private createSyncManager() {
     this.syncService = new SNSyncService(
       this.itemManager!,
-      this.sessionManager!,
+      this.sessionManager,
       this.protocolService!,
       this.storageService!,
       this.modelManager!,
@@ -1575,7 +1579,7 @@ export class SNApplication {
       this.singletonManager!,
       this.protocolService!,
       this.storageService!,
-      this.sessionManager!,
+      this.sessionManager,
     );
     this.services.push(this.privilegesService!);
   }

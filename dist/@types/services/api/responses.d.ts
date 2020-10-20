@@ -8,7 +8,8 @@ export declare enum HttpStatusCode {
     /** The session's access token is expired, but the refresh token is valid */
     HttpStatusExpiredAccessToken = 498,
     /** The session's access token and refresh token are expired, user must reauthenticate */
-    HttpStatusInvalidSession = 401
+    HttpStatusInvalidSession = 401,
+    LocalValidationError = 10
 }
 export declare type HttpResponse = {
     status: HttpStatusCode;

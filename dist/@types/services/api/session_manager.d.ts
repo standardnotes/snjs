@@ -49,7 +49,7 @@ export declare class SNSessionManager extends PureService<SessionEvent> {
     signIn(email: string, password: string, strict?: boolean, minAllowedVersion?: ProtocolVersion): Promise<SessionManagerResponse>;
     private performSignIn;
     bypassChecksAndSignInWithRootKey(email: string, rootKey: SNRootKey, mfaKeyPath?: string, mfaCode?: string): Promise<SignInResponse>;
-    changePassword(currentServerPassword: string, newRootKey: SNRootKey): Promise<SessionManagerResponse>;
+    changePassword(currentServerPassword: string, newRootKey: SNRootKey, wrappingKey?: SNRootKey): Promise<SessionManagerResponse>;
     getSessionsList(): Promise<HttpResponse>;
     private handleSuccessAuthResponse;
 }

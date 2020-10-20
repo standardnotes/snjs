@@ -294,8 +294,8 @@ export class SNKeyRecoveryService extends PureService {
     if (!this.protocolService.hasPasscode()) {
       return undefined;
     }
-    const result = await this.challengeService.getWrappingKeyIfApplicable();
-    if(!result) {
+    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable();
+    if (canceled) {
       /** Show an alert saying they must enter the correct passcode to update
        * their root key, and try again */
       await this.alertService.alert(
@@ -304,7 +304,7 @@ export class SNKeyRecoveryService extends PureService {
       );
       return this.getWrappingKeyIfApplicable();
     }
-    return result;
+    return wrappingKey;
   }
 
   async addKeysToQueue(keys: SNItemsKey[], callback?: DecryptionCallback) {
@@ -460,12 +460,13 @@ export class SNKeyRecoveryService extends PureService {
         PayloadSource.DecryptedTransient
       );
       await this.storageService.savePayloads(allRelevantKeyPayloads);
-      this.alertService.alert(
-        KeyRecoveryStrings.KeyRecoveryKeyRecovered
-      );
       if (replacesRootKey) {
         /** Replace our root key with the generated root key */
         await this.replaceClientRootKey(rootKey);
+      } else {
+        this.alertService.alert(
+          KeyRecoveryStrings.KeyRecoveryKeyRecovered
+        );
       }
       const result = { success: true };
       resolve(result);

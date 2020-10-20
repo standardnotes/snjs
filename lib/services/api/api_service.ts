@@ -125,8 +125,8 @@ export class SNApiService extends PureService {
     return params;
   }
 
-  public createErrorResponse(message: string) {
-    return { error: { message: message } } as HttpResponse;
+  public createErrorResponse(message: string, status?: HttpStatusCode) {
+    return { error: { message, status } } as HttpResponse;
   }
 
   private errorResponseWithFallbackMessage(
