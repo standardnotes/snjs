@@ -80,6 +80,7 @@ export class ItemManager extends PureService {
     this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'asc');
     this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(ContentType.Theme, CollectionSort.Title, 'asc');
     this.collection.setDisplayOptions(ContentType.SmartTag, CollectionSort.Title, 'asc');
     this.notesView = new ItemCollectionNotesView(this.collection);
   }

@@ -20617,6 +20617,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].Tag, CollectionSort.Title, 'asc');
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].ItemsKey, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].Component, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(content_types["a" /* ContentType */].Theme, CollectionSort.Title, 'asc');
     this.collection.setDisplayOptions(content_types["a" /* ContentType */].SmartTag, CollectionSort.Title, 'asc');
     this.notesView = new item_collection_notes_view_ItemCollectionNotesView(this.collection);
   }
