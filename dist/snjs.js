@@ -20253,8 +20253,8 @@ const CredentialsMetadata = {
     prompt: 'Please enter your account password.'
   },
   [PrivilegeCredential.LocalPasscode]: {
-    label: 'Local Passcode',
-    prompt: 'Please enter your local passcode.'
+    label: 'Application Passcode',
+    prompt: 'Please enter your application passcode.'
   }
 };
 const ActionsMetadata = {

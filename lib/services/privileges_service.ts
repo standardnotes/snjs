@@ -26,8 +26,8 @@ const CredentialsMetadata = {
     prompt: 'Please enter your account password.'
   },
   [PrivilegeCredential.LocalPasscode] : {
-    label: 'Local Passcode',
-    prompt: 'Please enter your local passcode.'
+    label: 'Application Passcode',
+    prompt: 'Please enter your application passcode.'
   }
 };
 
@@ -52,7 +52,7 @@ const ActionsMetadata = {
   },
 };
 
-/** 
+/**
  * Privileges allows certain actions within the application to require extra authentication.
  * For example, the privileges service exposes functions that allow the action of deleting
  * a note or viewing a note to require extra authentication.
