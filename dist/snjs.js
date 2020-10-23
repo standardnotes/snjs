@@ -10109,6 +10109,7 @@ var WebPrefKey;
   WebPrefKey["NotesHidePinned"] = "hidePinned";
   WebPrefKey["NotesHideNotePreview"] = "hideNotePreview";
   WebPrefKey["NotesHideDate"] = "hideDate";
+  WebPrefKey["NotesHideTags"] = "hideTags";
 })(WebPrefKey || (WebPrefKey = {}));
 
 ;
