@@ -35,6 +35,7 @@ const LegacyKeys = {
   MobileLastExportDate: 'LastExportDateKey',
   MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
   MobileOptionsState: 'options',
+  MobilePasscodeKeyboardType: 'passcodeKeyboardType',
 };
 const LEGACY_SESSION_TOKEN_KEY = 'jwt';
 
@@ -324,6 +325,12 @@ export class Migration20200115 extends Migration {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
+    const passcodeKeyboardType = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+      LegacyKeys.MobilePasscodeKeyboardType
+    );
+    if (passcodeKeyboardType) {
+      rawStructure.nonwrapped![StorageKey.MobilePasscodeKeyboardType] = passcodeKeyboardType;
+    }
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
@@ -515,7 +522,8 @@ export class Migration20200115 extends Migration {
         sortBy: legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
         sortReverse: legacyOptionsState.sortReverse ?? false,
         hideNotePreview: legacyOptionsState.hidePreviews ?? false,
-        hideDate: legacyOptionsState.hideDates ?? false
+        hideDate: legacyOptionsState.hideDates ?? false,
+        hideTags: legacyOptionsState.hideTags ?? false
       }
     }
     const preferences = {
@@ -535,12 +543,12 @@ export class Migration20200115 extends Migration {
    * On desktop/web, JWT was stored in storage.
    */
   private async migrateSessionStorage() {
+    const USER_OBJECT_KEY = 'user';
     let currentToken = await this.services.storageService.getValue(
       LEGACY_SESSION_TOKEN_KEY
     );
     if (!currentToken) {
       /** Try the user object */
-      const USER_OBJECT_KEY = 'user';
       const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
       if (user) {
         currentToken = user.jwt;
@@ -551,6 +559,13 @@ export class Migration20200115 extends Migration {
     }
     const session = new JwtSession(currentToken);
     await this.services.storageService.setValue(StorageKey.Session, session);
+    /** Server has to be migrated separately on mobile */
+    if (isEnvironmentMobile(this.services.environment)) {
+      const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
+      if (user && user.server) {
+        await this.services.storageService.setValue(StorageKey.ServerHost, user.server);
+      }
+    }
   }
 
   /**

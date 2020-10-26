@@ -48,9 +48,10 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
     );
+    const customServer = 'http://server-dev.standardnotes.org';
     await application.deviceInterface.setRawStorageValue(
       'user',
-      JSON.stringify({ email: identifier })
+      JSON.stringify({ email: identifier, server: customServer })
     );
     await application.deviceInterface.legacy_setRawKeychainValue({
       offline: {
@@ -120,6 +121,7 @@ describe('2020-01-15 mobile migration', () => {
       selectedTagIds: [],
       hidePreviews: true,
       hideDates: false,
+      hideTags: false,
     });
     await application.deviceInterface.setRawStorageValue(
       'options',
@@ -197,10 +199,12 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
     expect(await application.getUser().email).to.equal(identifier);
+    expect(await application.getHost()).to.equal(customServer);
     const preferences = await application.storageService.getValue('preferences');
     expect(preferences.sortBy).to.equal('userModifiedAt');
     expect(preferences.sortReverse).to.be.false;
     expect(preferences.hideDate).to.be.false;
+    expect(preferences.hideTags).to.be.false;
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(lastExportDate);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
@@ -245,6 +249,11 @@ describe('2020-01-15 mobile migration', () => {
       'biometrics_prefs',
       JSON.stringify(biometricPrefs)
     );
+    const passcodeKeyboardType = 'numeric';
+    await application.deviceInterface.setRawStorageValue(
+      'passcodeKeyboardType',
+      JSON.stringify(passcodeKeyboardType)
+    );
     await application.deviceInterface.setRawStorageValue(
       'first_run',
       false
@@ -272,6 +281,7 @@ describe('2020-01-15 mobile migration', () => {
       selectedTagIds: [],
       hidePreviews: false,
       hideDates: undefined,
+      hideTags: true,
     });
     await application.deviceInterface.setRawStorageValue(
       'options',
@@ -339,11 +349,15 @@ describe('2020-01-15 mobile migration', () => {
     expect(
       await application.storageService.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped)
     ).to.eql(passcodeTiming);
+    expect(
+      await application.storageService.getValue(StorageKey.MobilePasscodeKeyboardType, StorageValueModes.Nonwrapped)
+    ).to.eql(passcodeKeyboardType);
     const preferences = await application.storageService.getValue('preferences');
     expect(preferences.sortBy).to.equal(undefined);
     expect(preferences.sortReverse).to.be.false;
     expect(preferences.hideNotePreview).to.be.false;
     expect(preferences.hideDate).to.be.false;
+    expect(preferences.hideTags).to.be.true;
     expect(preferences.lastExportDate).to.equal(undefined);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.true;
     await application.deinit();

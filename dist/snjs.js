@@ -9492,6 +9492,7 @@ var StorageKey;
   StorageKey["BiometricsState"] = "biometrics_state";
   StorageKey["MobilePasscodeTiming"] = "passcode_timing";
   StorageKey["MobileBiometricsTiming"] = "biometrics_timing";
+  StorageKey["MobilePasscodeKeyboardType"] = "passcodeKeyboardType";
   StorageKey["MobilePreferences"] = "preferences";
   StorageKey["PrivilegesExpirey"] = "SessionExpiresAtKey";
   StorageKey["PrivilegesSessionLength"] = "SessionLengthKey";
@@ -16677,7 +16678,8 @@ const LegacyKeys = {
   MobileDarkTheme: 'darkTheme',
   MobileLastExportDate: 'LastExportDateKey',
   MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
-  MobileOptionsState: 'options'
+  MobileOptionsState: 'options',
+  MobilePasscodeKeyboardType: 'passcodeKeyboardType'
 };
 const LEGACY_SESSION_TOKEN_KEY = 'jwt';
 class _2020_01_15_Migration20200115 extends migration_Migration {
@@ -16914,6 +16916,12 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       rawStructure.nonwrapped[StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
 
+    const passcodeKeyboardType = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobilePasscodeKeyboardType);
+
+    if (passcodeKeyboardType) {
+      rawStructure.nonwrapped[StorageKey.MobilePasscodeKeyboardType] = passcodeKeyboardType;
+    }
+
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
 
@@ -17069,14 +17077,15 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
     let migratedOptionsState = {};
 
     if (legacyOptionsState) {
-      var _legacyOptionsState$s, _legacyOptionsState$h, _legacyOptionsState$h2;
+      var _legacyOptionsState$s, _legacyOptionsState$h, _legacyOptionsState$h2, _legacyOptionsState$h3;
 
       const legacySortBy = legacyOptionsState.sortBy;
       migratedOptionsState = {
         sortBy: legacySortBy === 'updated_at' || legacySortBy === 'client_updated_at' ? CollectionSort.UpdatedAt : legacySortBy,
         sortReverse: (_legacyOptionsState$s = legacyOptionsState.sortReverse) !== null && _legacyOptionsState$s !== void 0 ? _legacyOptionsState$s : false,
         hideNotePreview: (_legacyOptionsState$h = legacyOptionsState.hidePreviews) !== null && _legacyOptionsState$h !== void 0 ? _legacyOptionsState$h : false,
-        hideDate: (_legacyOptionsState$h2 = legacyOptionsState.hideDates) !== null && _legacyOptionsState$h2 !== void 0 ? _legacyOptionsState$h2 : false
+        hideDate: (_legacyOptionsState$h2 = legacyOptionsState.hideDates) !== null && _legacyOptionsState$h2 !== void 0 ? _legacyOptionsState$h2 : false,
+        hideTags: (_legacyOptionsState$h3 = legacyOptionsState.hideTags) !== null && _legacyOptionsState$h3 !== void 0 ? _legacyOptionsState$h3 : false
       };
     }
 
@@ -17098,11 +17107,11 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
 
   async migrateSessionStorage() {
+    const USER_OBJECT_KEY = 'user';
     let currentToken = await this.services.storageService.getValue(LEGACY_SESSION_TOKEN_KEY);
 
     if (!currentToken) {
       /** Try the user object */
-      const USER_OBJECT_KEY = 'user';
       const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
 
       if (user) {
@@ -17116,6 +17125,15 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
     const session = new JwtSession(currentToken);
     await this.services.storageService.setValue(StorageKey.Session, session);
+    /** Server has to be migrated separately on mobile */
+
+    if (isEnvironmentMobile(this.services.environment)) {
+      const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
+
+      if (user && user.server) {
+        await this.services.storageService.setValue(StorageKey.ServerHost, user.server);
+      }
+    }
   }
   /**
    * All platforms
