@@ -2,7 +2,7 @@ import { UuidString } from './../../types';
 import {
   ChangePasswordResponse,
   HttpResponse,
-  HttpStatusCode,
+  StatusCode,
   isErrorResponseExpiredToken,
   KeyParamsResponse,
   RegistrationResponse,
@@ -125,7 +125,7 @@ export class SNApiService extends PureService {
     return params;
   }
 
-  public createErrorResponse(message: string, status?: HttpStatusCode) {
+  public createErrorResponse(message: string, status?: StatusCode) {
     return { error: { message, status } } as HttpResponse;
   }
 
@@ -462,7 +462,7 @@ export class SNApiService extends PureService {
 
   /** Handle errored responses to authenticated requests */
   private preprocessAuthenticatedErrorResponse(response: HttpResponse) {
-    if (response.status === HttpStatusCode.HttpStatusInvalidSession && this.session) {
+    if (response.status === StatusCode.HttpStatusInvalidSession && this.session) {
       this.invalidSessionObserver?.();
     }
   }

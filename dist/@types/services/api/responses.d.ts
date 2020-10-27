@@ -2,17 +2,18 @@ import { RawPayload } from '../../protocol/payloads/generator';
 import { ApiEndpointParam } from './keys';
 import { KeyParamsOrigination, AnyKeyParamsContent } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-export declare enum HttpStatusCode {
+export declare enum StatusCode {
     HttpStatusMinSuccess = 200,
     HttpStatusMaxSuccess = 299,
     /** The session's access token is expired, but the refresh token is valid */
     HttpStatusExpiredAccessToken = 498,
     /** The session's access token and refresh token are expired, user must reauthenticate */
     HttpStatusInvalidSession = 401,
-    LocalValidationError = 10
+    LocalValidationError = 10,
+    CanceledMfa = 11
 }
 export declare type HttpResponse = {
-    status: HttpStatusCode;
+    status: StatusCode;
     error?: {
         message: string;
         status: number;
