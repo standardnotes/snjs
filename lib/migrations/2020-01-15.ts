@@ -325,7 +325,7 @@ export class Migration20200115 extends Migration {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
-    const passcodeKeyboardType = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+    const passcodeKeyboardType = await this.services.deviceInterface.getRawStorageValue(
       LegacyKeys.MobilePasscodeKeyboardType
     );
     if (passcodeKeyboardType) {

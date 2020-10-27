@@ -252,7 +252,7 @@ describe('2020-01-15 mobile migration', () => {
     const passcodeKeyboardType = 'numeric';
     await application.deviceInterface.setRawStorageValue(
       'passcodeKeyboardType',
-      JSON.stringify(passcodeKeyboardType)
+      passcodeKeyboardType
     );
     await application.deviceInterface.setRawStorageValue(
       'first_run',
