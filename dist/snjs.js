@@ -22186,8 +22186,13 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     }
 
     const unsortedPayloads = rawPayloads.map(rawPayload => {
-      return Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(rawPayload);
-    });
+      try {
+        return Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(rawPayload);
+      } catch (e) {
+        console.error('Creating payload failed', e);
+        return undefined;
+      }
+    }).filter(payload => !Object(utils["q" /* isNullOrUndefined */])(payload));
     const payloads = SortPayloadsByRecentAndContentPriority(unsortedPayloads, this.localLoadPriorty);
     /** Decrypt and map items keys first */
 
