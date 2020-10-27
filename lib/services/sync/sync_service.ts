@@ -275,12 +275,18 @@ export class SNSyncService extends PureService<SyncEvent> {
       return;
     }
     const unsortedPayloads = rawPayloads.map((rawPayload) => {
-      return CreateMaxPayloadFromAnyObject(
-        rawPayload
-      );
-    });
+      try {
+        return CreateMaxPayloadFromAnyObject(
+          rawPayload
+        );
+      } catch (e) {
+        console.error('Creating payload failed', e)
+        return undefined;
+      }
+    }).filter(payload => !isNullOrUndefined(payload));
+
     const payloads = SortPayloadsByRecentAndContentPriority(
-      unsortedPayloads,
+      unsortedPayloads as PurePayload[],
       this.localLoadPriorty
     );
     /** Decrypt and map items keys first */
