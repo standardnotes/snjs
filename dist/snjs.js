@@ -13006,22 +13006,23 @@ var ApiEndpointParam;
 ;
 // CONCATENATED MODULE: ./lib/services/api/responses.ts
 
-var HttpStatusCode;
+var StatusCode;
 
-(function (HttpStatusCode) {
-  HttpStatusCode[HttpStatusCode["HttpStatusMinSuccess"] = 200] = "HttpStatusMinSuccess";
-  HttpStatusCode[HttpStatusCode["HttpStatusMaxSuccess"] = 299] = "HttpStatusMaxSuccess";
+(function (StatusCode) {
+  StatusCode[StatusCode["HttpStatusMinSuccess"] = 200] = "HttpStatusMinSuccess";
+  StatusCode[StatusCode["HttpStatusMaxSuccess"] = 299] = "HttpStatusMaxSuccess";
   /** The session's access token is expired, but the refresh token is valid */
 
-  HttpStatusCode[HttpStatusCode["HttpStatusExpiredAccessToken"] = 498] = "HttpStatusExpiredAccessToken";
+  StatusCode[StatusCode["HttpStatusExpiredAccessToken"] = 498] = "HttpStatusExpiredAccessToken";
   /** The session's access token and refresh token are expired, user must reauthenticate */
 
-  HttpStatusCode[HttpStatusCode["HttpStatusInvalidSession"] = 401] = "HttpStatusInvalidSession";
-  HttpStatusCode[HttpStatusCode["LocalValidationError"] = 10] = "LocalValidationError";
-})(HttpStatusCode || (HttpStatusCode = {}));
+  StatusCode[StatusCode["HttpStatusInvalidSession"] = 401] = "HttpStatusInvalidSession";
+  StatusCode[StatusCode["LocalValidationError"] = 10] = "LocalValidationError";
+  StatusCode[StatusCode["CanceledMfa"] = 11] = "CanceledMfa";
+})(StatusCode || (StatusCode = {}));
 
 function isErrorResponseExpiredToken(errorResponse) {
-  return errorResponse.status === HttpStatusCode.HttpStatusExpiredAccessToken;
+  return errorResponse.status === StatusCode.HttpStatusExpiredAccessToken;
 }
 var ConflictType;
 
@@ -13374,7 +13375,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
 
     if (canceled) {
       return {
-        response: this.apiService.createErrorResponse(RegisterStrings.PasscodeRequired, HttpStatusCode.LocalValidationError)
+        response: this.apiService.createErrorResponse(RegisterStrings.PasscodeRequired, StatusCode.LocalValidationError)
       };
     }
 
@@ -13411,7 +13412,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
         if (!inputtedCode) {
           /** User dismissed window without input */
           return {
-            response: this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa)
+            response: this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa, StatusCode.CanceledMfa)
           };
         }
 
@@ -13446,7 +13447,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     let minAllowedVersion = arguments.length > 3 ? arguments[3] : undefined;
     const result = await this.performSignIn(email, password, strict, minAllowedVersion);
 
-    if (result.response.error && result.response.error.status !== HttpStatusCode.LocalValidationError) {
+    if (result.response.error && result.response.error.status !== StatusCode.LocalValidationError && result.response.error.status !== StatusCode.CanceledMfa) {
       /**
        * Try signing in with trimmed + lowercase version of email
        */
@@ -13536,7 +13537,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     } = await this.challengeService.getWrappingKeyIfApplicable();
 
     if (canceled) {
-      return this.apiService.createErrorResponse(SignInStrings.PasscodeRequired, HttpStatusCode.LocalValidationError);
+      return this.apiService.createErrorResponse(SignInStrings.PasscodeRequired, StatusCode.LocalValidationError);
     }
 
     const signInResponse = await this.apiService.signIn(email, rootKey.serverPassword, mfaKeyPath, mfaCode);
@@ -13559,7 +13560,7 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
 
         if (!inputtedCode) {
           /** User dismissed window without input */
-          return this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
+          return this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa, StatusCode.CanceledMfa);
         }
 
         return this.bypassChecksAndSignInWithRootKey(email, rootKey, signInResponse.error.payload.mfa_key, inputtedCode);
@@ -13703,7 +13704,7 @@ class http_service_SNHttpService extends pure_service["a" /* PureService */] {
       Object.assign(response, body);
     } catch (error) {}
 
-    if (httpStatus >= HttpStatusCode.HttpStatusMinSuccess && httpStatus <= HttpStatusCode.HttpStatusMaxSuccess) {
+    if (httpStatus >= StatusCode.HttpStatusMinSuccess && httpStatus <= StatusCode.HttpStatusMaxSuccess) {
       resolve(response);
     } else {
       if (!response.error) {
@@ -14125,7 +14126,7 @@ class api_service_SNApiService extends pure_service["a" /* PureService */] {
 
 
   preprocessAuthenticatedErrorResponse(response) {
-    if (response.status === HttpStatusCode.HttpStatusInvalidSession && this.session) {
+    if (response.status === StatusCode.HttpStatusInvalidSession && this.session) {
       var _this$invalidSessionO;
 
       (_this$invalidSessionO = this.invalidSessionObserver) === null || _this$invalidSessionO === void 0 ? void 0 : _this$invalidSessionO.call(this);

@@ -1,6 +1,6 @@
 import { UNKNOWN_ERROR } from './messages';
 import { PureService } from '@Lib/services/pure_service';
-import { HttpResponse, HttpStatusCode } from './responses';
+import { HttpResponse, StatusCode } from './responses';
 
 export enum HttpVerb {
   Get = 'get',
@@ -104,8 +104,8 @@ export class SNHttpService extends PureService {
       response.object = body;
       Object.assign(response, body);
     } catch (error) { }
-    if ((httpStatus >= HttpStatusCode.HttpStatusMinSuccess
-      && httpStatus <= HttpStatusCode.HttpStatusMaxSuccess)) {
+    if ((httpStatus >= StatusCode.HttpStatusMinSuccess
+      && httpStatus <= StatusCode.HttpStatusMaxSuccess)) {
       resolve(response);
     } else {
       if (!response.error) {

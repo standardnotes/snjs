@@ -3,18 +3,20 @@ import { ApiEndpointParam } from './keys';
 import { KeyParamsOrigination, AnyKeyParamsContent } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 
-export enum HttpStatusCode {
+export enum StatusCode {
   HttpStatusMinSuccess = 200,
   HttpStatusMaxSuccess = 299,
   /** The session's access token is expired, but the refresh token is valid */
   HttpStatusExpiredAccessToken = 498,
   /** The session's access token and refresh token are expired, user must reauthenticate */
   HttpStatusInvalidSession = 401,
-  LocalValidationError = 10
+
+  LocalValidationError = 10,
+  CanceledMfa = 11,
 }
 
 export type HttpResponse = {
-  status: HttpStatusCode,
+  status: StatusCode,
   error?: {
     message: string,
     status: number,
@@ -29,7 +31,7 @@ export type HttpResponse = {
 }
 
 export function isErrorResponseExpiredToken(errorResponse: HttpResponse) {
-  return errorResponse.status === HttpStatusCode.HttpStatusExpiredAccessToken;
+  return errorResponse.status === StatusCode.HttpStatusExpiredAccessToken;
 }
 
 type SessionBody = {

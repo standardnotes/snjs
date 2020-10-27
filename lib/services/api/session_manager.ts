@@ -14,7 +14,7 @@ import {
   ChangePasswordResponse,
   HttpResponse,
   KeyParamsResponse,
-  HttpStatusCode
+  StatusCode
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
@@ -212,7 +212,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       return {
         response: this.apiService.createErrorResponse(
           RegisterStrings.PasscodeRequired,
-          HttpStatusCode.LocalValidationError
+          StatusCode.LocalValidationError
         )
       };
     }
@@ -263,7 +263,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
         if (!inputtedCode) {
           /** User dismissed window without input */
           return {
-            response: this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa)
+            response: this.apiService.createErrorResponse(
+              SignInStrings.SignInCanceledMissingMfa,
+              StatusCode.CanceledMfa
+            )
           };
         }
         return this.retrieveKeyParams(
@@ -297,7 +300,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
       strict,
       minAllowedVersion
     );
-    if (result.response.error && result.response.error.status !== HttpStatusCode.LocalValidationError) {
+    if (
+      result.response.error &&
+      result.response.error.status !== StatusCode.LocalValidationError &&
+      result.response.error.status !== StatusCode.CanceledMfa
+    ) {
       /**
        * Try signing in with trimmed + lowercase version of email
        */
@@ -400,7 +407,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     if (canceled) {
       return this.apiService.createErrorResponse(
         SignInStrings.PasscodeRequired,
-        HttpStatusCode.LocalValidationError
+        StatusCode.LocalValidationError
       );
     }
     const signInResponse = await this.apiService.signIn(
@@ -422,7 +429,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
         const inputtedCode = await this.promptForMfaValue();
         if (!inputtedCode) {
           /** User dismissed window without input */
-          return this.apiService.createErrorResponse(SignInStrings.SignInCanceledMissingMfa);
+          return this.apiService.createErrorResponse(
+            SignInStrings.SignInCanceledMissingMfa,
+            StatusCode.CanceledMfa
+          );
         }
         return this.bypassChecksAndSignInWithRootKey(
           email,
