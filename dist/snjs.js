@@ -16917,7 +16917,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       rawStructure.nonwrapped[StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
 
-    const passcodeKeyboardType = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobilePasscodeKeyboardType);
+    const passcodeKeyboardType = await this.services.deviceInterface.getRawStorageValue(LegacyKeys.MobilePasscodeKeyboardType);
 
     if (passcodeKeyboardType) {
       rawStructure.nonwrapped[StorageKey.MobilePasscodeKeyboardType] = passcodeKeyboardType;
