@@ -22971,6 +22971,7 @@ class challenge_operation_ChallengeOperation {
 
 
 
+
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
@@ -23029,7 +23030,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     const hasPasscode = this.protocolService.hasPasscode();
 
     if (hasPasscode) {
-      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode));
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
     }
 
     const biometricEnabled = await this.hasBiometricsEnabled();
