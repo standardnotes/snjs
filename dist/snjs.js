@@ -11367,6 +11367,7 @@ var ChallengeReason;
   ChallengeReason[ChallengeReason["ProtocolUpgrade"] = 3] = "ProtocolUpgrade";
   ChallengeReason[ChallengeReason["Migration"] = 4] = "Migration";
   ChallengeReason[ChallengeReason["Custom"] = 5] = "Custom";
+  ChallengeReason[ChallengeReason["CreateDecryptedBackupWithProtectedItems"] = 6] = "CreateDecryptedBackupWithProtectedItems";
 })(ChallengeReason || (ChallengeReason = {}));
 
 ;
@@ -18973,50 +18974,32 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   createKeyParams(keyParams) {
     return CreateAnyKeyParams(keyParams);
   }
-  /**
-   * Creates a JSON string representing the backup format of all items, or just subitems
-   * if supplied.
-   * @param subItems An optional array of items to create backup of.
-   * If not supplied, all items are backed up.
-   * @param returnIfEmpty Returns null if there are no items to make backup of.
-   * @returns JSON stringified representation of data, including keyParams.
-   */
 
+  async createBackupFile(intent) {
+    let items = this.itemManager.items;
+    let keyParams;
 
-  async createBackupFile(subItems) {
-    let intent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : intents["b" /* EncryptionIntent */].FilePreferEncrypted;
-    let returnIfEmpty = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    const items = subItems || this.itemManager.items;
+    if (intent === intents["b" /* EncryptionIntent */].FileDecrypted) {
+      var _await$this$getRootKe;
 
-    if (returnIfEmpty && items.length === 0) {
-      return undefined;
+      items = items.filter(item => item.content_type !== content_types["a" /* ContentType */].ItemsKey);
+      keyParams = (_await$this$getRootKe = await this.getRootKeyParams()) === null || _await$this$getRootKe === void 0 ? void 0 : _await$this$getRootKe.getPortableValue();
     }
 
-    const encryptedPayloads = [];
-
-    for (const item of items) {
+    const payloads = await Promise.all(items.map(item => {
       if (item.errorDecrypting) {
         /** Keep payload as-is */
-        encryptedPayloads.push(item.payload);
+        return item.payload;
       } else {
         const payload = Object(generator["f" /* CreateSourcedPayloadFromObject */])(item.payload, sources["a" /* PayloadSource */].FileImport);
-        const encrypted = await this.payloadByEncryptingPayload(payload, intent);
-        encryptedPayloads.push(encrypted);
+        return this.payloadByEncryptingPayload(payload, intent);
       }
-    }
-
-    const data = {
+    }));
+    return {
       version: this.getLatestVersion(),
-      items: encryptedPayloads.map(p => p.ejected())
+      keyParams,
+      items: payloads.map(p => p.ejected())
     };
-    const keyParams = await this.getRootKeyParams();
-
-    if (keyParams && intent !== intents["b" /* EncryptionIntent */].FileDecrypted) {
-      data.keyParams = keyParams.getPortableValue();
-    }
-
-    const prettyPrint = 2;
-    return JSON.stringify(data, null, prettyPrint);
   }
   /**
    * Register a callback to be notified when root key status changes.
@@ -23045,8 +23028,8 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     }
   }
 
-  async promptForPasscode() {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode)], ChallengeReason.ResaveRootKey, true);
+  async promptForPasscode(reason) {
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode)], reason, true);
     const response = await this.promptForChallengeResponse(challenge);
 
     if (!response) {
@@ -23079,7 +23062,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     }
 
     if (!passcode) {
-      const result = await this.promptForPasscode();
+      const result = await this.promptForPasscode(ChallengeReason.ResaveRootKey);
 
       if (result.canceled) {
         return {
@@ -23268,6 +23251,7 @@ function application_ownKeys(object, enumerableOnly) { var keys = Object.keys(ob
 function application_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { application_ownKeys(Object(source), true).forEach(function (key) { application_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { application_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function application_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -24057,14 +24041,41 @@ class application_SNApplication {
     };
   }
   /**
-   * Creates a JSON string representing the backup format of all items, or just subItems
-   * if supplied.
+   * @returns a JSON string representing the encrypted backup format of all
+   * items, including keyParams and protocol version.
    */
 
 
-  async createBackupFile(subItems, intent) {
-    let returnIfEmpty = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    return this.protocolService.createBackupFile(subItems, intent, returnIfEmpty);
+  async createEncryptedBackupString() {
+    const backup = await this.protocolService.createBackupFile(intents["b" /* EncryptionIntent */].FileEncrypted);
+    return JSON.stringify(backup, null, 2);
+  }
+  /**
+   * @returns a JSON string representing the decrypted backup format of all
+   * items, including keyParams and protocol version.
+   */
+
+
+  async createDecryptedBackupString() {
+    const backup = await this.createDecryptedBackup();
+
+    if (backup) {
+      return JSON.stringify(backup, null, 2);
+    } else {
+      return undefined;
+    }
+  }
+
+  async createDecryptedBackup() {
+    if (this.hasPasscode() && this.itemManager.notes.some(note => note.protected)) {
+      const response = await this.challengeService.promptForPasscode(ChallengeReason.CreateDecryptedBackupWithProtectedItems);
+
+      if (response.canceled) {
+        return undefined;
+      }
+    }
+
+    return this.protocolService.createBackupFile(intents["b" /* EncryptionIntent */].FileDecrypted);
   }
 
   isEphemeralSession() {

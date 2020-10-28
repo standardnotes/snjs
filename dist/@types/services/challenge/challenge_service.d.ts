@@ -2,7 +2,7 @@ import { SNRootKey } from './../../protocol/root_key';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
 import { PureService } from "../pure_service";
-import { Challenge, ChallengeResponse, ChallengeValue, ChallengeArtifacts } from "../../challenges";
+import { Challenge, ChallengeResponse, ChallengeReason, ChallengeValue, ChallengeArtifacts } from "../../challenges";
 declare type ChallengeValidationResponse = {
     valid: boolean;
     artifacts?: ChallengeArtifacts;
@@ -33,7 +33,7 @@ export declare class ChallengeService extends PureService {
     promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined>;
     validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse>;
     getLaunchChallenge(): Promise<Challenge | null>;
-    promptForPasscode(): Promise<{
+    promptForPasscode(reason: ChallengeReason): Promise<{
         canceled: boolean;
         passcode: undefined;
     } | {

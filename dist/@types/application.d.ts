@@ -4,7 +4,6 @@ import { UuidString, ApplicationIdentifier, DeinitSource } from './types';
 import { ApplicationEvent } from './events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { BackupFile } from './services/protocol_service';
-import { EncryptionIntent } from './protocol/intents';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
 import { SNItem, ItemMutator } from './models/core/item';
@@ -268,10 +267,16 @@ export declare class SNApplication {
         error: string;
     }>;
     /**
-     * Creates a JSON string representing the backup format of all items, or just subItems
-     * if supplied.
+     * @returns a JSON string representing the encrypted backup format of all
+     * items, including keyParams and protocol version.
      */
-    createBackupFile(subItems?: SNItem[], intent?: EncryptionIntent, returnIfEmpty?: boolean): Promise<string | undefined>;
+    createEncryptedBackupString(): Promise<string>;
+    /**
+     * @returns a JSON string representing the decrypted backup format of all
+     * items, including keyParams and protocol version.
+     */
+    createDecryptedBackupString(): Promise<string | undefined>;
+    createDecryptedBackup(): Promise<BackupFile | undefined>;
     isEphemeralSession(): boolean;
     private lockSyncing;
     private unlockSyncing;

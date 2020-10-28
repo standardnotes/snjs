@@ -20,7 +20,8 @@ export enum ChallengeReason {
   ResaveRootKey = 2,
   ProtocolUpgrade = 3,
   Migration = 4,
-  Custom = 5
+  Custom = 5,
+  CreateDecryptedBackupWithProtectedItems = 6,
 };
 
 /** For mobile */

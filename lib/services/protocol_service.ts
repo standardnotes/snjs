@@ -19,7 +19,6 @@ import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvent } from '@Lib/events';
 import { CreateItemFromPayload } from '@Models/generator';
-import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNItemsKey, ItemsKeyMutator } from '@Models/app/items_key';
 import {
@@ -727,50 +726,42 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     return CreateAnyKeyParams(keyParams);
   }
 
-  /**
-   * Creates a JSON string representing the backup format of all items, or just subitems
-   * if supplied.
-   * @param subItems An optional array of items to create backup of.
-   * If not supplied, all items are backed up.
-   * @param returnIfEmpty Returns null if there are no items to make backup of.
-   * @returns JSON stringified representation of data, including keyParams.
-   */
   public async createBackupFile(
-    subItems?: SNItem[],
-    intent = EncryptionIntent.FilePreferEncrypted,
-    returnIfEmpty = false
-  ) {
-    const items = subItems || this.itemManager!.items;
-    if (returnIfEmpty && items.length === 0) {
-      return undefined;
+    intent: EncryptionIntent.FileDecrypted | EncryptionIntent.FileEncrypted
+  ): Promise<BackupFile> {
+    let items = this.itemManager!.items;
+    let keyParams: AnyKeyParamsContent | undefined;
+
+    if (intent === EncryptionIntent.FileDecrypted) {
+      items = items.filter(
+        (item) => item.content_type !== ContentType.ItemsKey
+      );
+      keyParams = (await this.getRootKeyParams())?.getPortableValue();
     }
-    const encryptedPayloads: PurePayload[] = [];
-    for (const item of items) {
-      if (item.errorDecrypting) {
-        /** Keep payload as-is */
-        encryptedPayloads.push(item.payload);
-      } else {
-        const payload = CreateSourcedPayloadFromObject(
-          item.payload,
-          PayloadSource.FileImport
-        );
-        const encrypted = await this.payloadByEncryptingPayload(
-          payload,
-          intent
-        );
-        encryptedPayloads.push(encrypted);
-      }
-    }
-    const data: BackupFile = {
+
+    const payloads: PurePayload[] = await Promise.all(
+      items.map((item) => {
+        if (item.errorDecrypting) {
+          /** Keep payload as-is */
+          return item.payload;
+        } else {
+          const payload = CreateSourcedPayloadFromObject(
+            item.payload,
+            PayloadSource.FileImport
+          );
+          return this.payloadByEncryptingPayload(
+            payload,
+            intent
+          );
+        }
+      })
+    );
+
+    return {
       version: this.getLatestVersion(),
-      items: encryptedPayloads.map((p) => p.ejected())
+      keyParams,
+      items: payloads.map((p) => p.ejected()),
     };
-    const keyParams = await this.getRootKeyParams();
-    if (keyParams && intent !== EncryptionIntent.FileDecrypted) {
-      data.keyParams = keyParams.getPortableValue();
-    }
-    const prettyPrint = 2;
-    return JSON.stringify(data, null, prettyPrint);
   }
 
   /**

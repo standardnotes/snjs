@@ -4,7 +4,6 @@ import { ProtocolVersion } from './../protocol/versions';
 import { ItemManager } from './item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvent } from '../events';
-import { SNItem } from '../models/core/item';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { SNItemsKey } from '../models/app/items_key';
 import { SNRootKeyParams, AnyKeyParamsContent, KeyParamsOrigination } from './../protocol/key_params';
@@ -190,15 +189,7 @@ export declare class SNProtocolService extends PureService implements Encryption
      * @param keyParams - The raw key params object to create a KeyParams object from
      */
     createKeyParams(keyParams: AnyKeyParamsContent): SNRootKeyParams;
-    /**
-     * Creates a JSON string representing the backup format of all items, or just subitems
-     * if supplied.
-     * @param subItems An optional array of items to create backup of.
-     * If not supplied, all items are backed up.
-     * @param returnIfEmpty Returns null if there are no items to make backup of.
-     * @returns JSON stringified representation of data, including keyParams.
-     */
-    createBackupFile(subItems?: SNItem[], intent?: EncryptionIntent, returnIfEmpty?: boolean): Promise<string | undefined>;
+    createBackupFile(intent: EncryptionIntent.FileDecrypted | EncryptionIntent.FileEncrypted): Promise<BackupFile>;
     /**
      * Register a callback to be notified when root key status changes.
      * @param callback  A function that takes in a content type to call back when root

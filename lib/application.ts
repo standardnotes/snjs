@@ -910,18 +910,43 @@ export class SNApplication {
   }
 
   /**
-   * Creates a JSON string representing the backup format of all items, or just subItems
-   * if supplied.
+   * @returns a JSON string representing the encrypted backup format of all
+   * items, including keyParams and protocol version.
    */
-  public async createBackupFile(
-    subItems?: SNItem[],
-    intent?: EncryptionIntent,
-    returnIfEmpty = false
-  ) {
+  public async createEncryptedBackupString(): Promise<string> {
+    const backup = await this.protocolService!.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    return JSON.stringify(backup, null, 2);
+  }
+
+  /**
+   * @returns a JSON string representing the decrypted backup format of all
+   * items, including keyParams and protocol version.
+   */
+  public async createDecryptedBackupString(): Promise<string | undefined> {
+    const backup = await this.createDecryptedBackup();
+    if (backup) {
+      return JSON.stringify(backup, null, 2);
+    } else {
+      return undefined;
+    }
+  }
+
+  public async createDecryptedBackup(): Promise<BackupFile | undefined> {
+    if (
+      this.hasPasscode() &&
+      this.itemManager.notes.some(note => note.protected)
+    ) {
+      const response = await this.challengeService.promptForPasscode(
+        ChallengeReason.CreateDecryptedBackupWithProtectedItems
+      );
+      if (response.canceled) {
+        return undefined;
+      }
+    }
     return this.protocolService!.createBackupFile(
-      subItems,
-      intent,
-      returnIfEmpty
+      EncryptionIntent.FileDecrypted
     );
   }
 

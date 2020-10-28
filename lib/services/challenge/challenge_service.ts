@@ -100,10 +100,10 @@ export class ChallengeService extends PureService {
     }
   }
 
-  public async promptForPasscode() {
+  public async promptForPasscode(reason: ChallengeReason) {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
-      ChallengeReason.ResaveRootKey,
+      reason,
       true
     );
     const response = await this.promptForChallengeResponse(challenge);
@@ -128,7 +128,9 @@ export class ChallengeService extends PureService {
       return {};
     }
     if (!passcode) {
-      const result = await this.promptForPasscode();
+      const result = await this.promptForPasscode(
+        ChallengeReason.ResaveRootKey
+      );
       if (result.canceled) {
         return { canceled: true };
       }
