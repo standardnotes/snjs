@@ -15,6 +15,7 @@ import {
 } from "@Lib/challenges";
 import { ChallengeOperation } from "./challenge_operation";
 import { removeFromArray } from '@Lib/utils';
+import { ChallengeStrings } from '../api/messages';
 
 type ChallengeValidationResponse = {
   valid: boolean;
@@ -87,7 +88,7 @@ export class ChallengeService extends PureService {
     const prompts = [];
     const hasPasscode = this.protocolService!.hasPasscode();
     if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
+      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
     }
     const biometricEnabled = await this.hasBiometricsEnabled()
     if (biometricEnabled) {
