@@ -33,6 +33,10 @@ export declare class ChallengeService extends PureService {
     promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined>;
     validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse>;
     getLaunchChallenge(): Promise<Challenge | null>;
+    /**
+     * @returns whether the user has successfuly authenticated.
+     */
+    authenticateWithPasswordAndPasscode(reason: ChallengeReason): Promise<boolean>;
     promptForPasscode(reason: ChallengeReason): Promise<{
         canceled: boolean;
         passcode: undefined;

@@ -467,7 +467,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       return payload;
     }
     if (isNullOrUndefined(intent)) {
-      throw 'Attempting to encrypt payload with null intent';
+      throw Error('Attempting to encrypt payload with null intent');
     }
     if (!key && !isDecryptedIntent(intent)) {
       key = await this.keyToUseForEncryptionOfPayload(payload, intent);
@@ -476,13 +476,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       throw Error('Attempting to generate encrypted payload with no key.');
     }
     if (payload.format !== PayloadFormat.DecryptedBareObject) {
-      throw 'Attempting to encrypt already encrypted payload.';
+      throw Error('Attempting to encrypt already encrypted payload.');
     }
     if (!payload.content) {
-      throw 'Attempting to encrypt payload with no content.';
+      throw Error('Attempting to encrypt payload with no content.');
     }
     if (!payload.uuid) {
-      throw 'Attempting to encrypt payload with no uuid.';
+      throw Error('Attempting to encrypt payload with no uuid.');
     }
     const version = key ? key.keyVersion : this.getLatestVersion();
     const format = this.payloadContentFormatForIntent(intent, key);
@@ -736,7 +736,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       items = items.filter(
         (item) => item.content_type !== ContentType.ItemsKey
       );
+    } else {
       keyParams = (await this.getRootKeyParams())?.getPortableValue();
+      if (!keyParams) {
+        throw Error(
+          'An encrypted backup was requested, but no keyParams were found.'
+        );
+      }
     }
 
     const payloads: PurePayload[] = await Promise.all(

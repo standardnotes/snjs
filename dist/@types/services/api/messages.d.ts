@@ -78,6 +78,7 @@ export declare const ChallengeStrings: {
     EnterPasscodeForMigration: string;
     EnterPasscodeForRootResave: string;
     EnterCredentialsForProtocolUpgrade: string;
+    EnterCredentialsForDecryptedBackupDownload: string;
     AccountPasswordPlaceholder: string;
     LocalPasscodePlaceholder: string;
 };

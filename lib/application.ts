@@ -278,10 +278,10 @@ export class SNApplication {
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
-    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.ApplicationPasscode)) {
       let wrappingKey = response.artifacts!.wrappingKey;
       if (!wrappingKey) {
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
         wrappingKey = await this.protocolService!.computeWrappingKey(value.value as string);
       }
       await this.protocolService!.unwrapRootKey(wrappingKey);
@@ -763,7 +763,7 @@ export class SNApplication {
     const prompts = [];
     if (hasPasscode) {
       prompts.push(new ChallengePrompt(
-        ChallengeValidation.LocalPasscode,
+        ChallengeValidation.ApplicationPasscode,
         undefined,
         ChallengeStrings.LocalPasscodePlaceholder
       ));
@@ -788,7 +788,7 @@ export class SNApplication {
       let passcode: string | undefined;
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
         passcode = value.value as string;
       }
       if (hasAccount) {
@@ -934,15 +934,12 @@ export class SNApplication {
   }
 
   public async createDecryptedBackup(): Promise<BackupFile | undefined> {
-    if (
-      this.hasPasscode() &&
-      this.itemManager.notes.some(note => note.protected)
-    ) {
-      const response = await this.challengeService.promptForPasscode(
+    if (this.itemManager.notes.some(note => note.protected)) {
+      const authenticated = await this.challengeService.authenticateWithPasswordAndPasscode(
         ChallengeReason.CreateDecryptedBackupWithProtectedItems
       );
-      if (response.canceled) {
-        return undefined;
+      if (!authenticated) {
+        return;
       }
     }
     return this.protocolService!.createBackupFile(

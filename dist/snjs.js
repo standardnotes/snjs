@@ -10074,6 +10074,7 @@ const ChallengeStrings = {
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
   EnterPasscodeForRootResave: 'Enter your application passcode to continue',
   EnterCredentialsForProtocolUpgrade: 'Enter your credentials to perform encryption upgrade',
+  EnterCredentialsForDecryptedBackupDownload: 'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode'
 };
@@ -11351,7 +11352,7 @@ var ChallengeValidation;
 
 (function (ChallengeValidation) {
   ChallengeValidation[ChallengeValidation["None"] = 0] = "None";
-  ChallengeValidation[ChallengeValidation["LocalPasscode"] = 1] = "LocalPasscode";
+  ChallengeValidation[ChallengeValidation["ApplicationPasscode"] = 1] = "ApplicationPasscode";
   ChallengeValidation[ChallengeValidation["AccountPassword"] = 2] = "AccountPassword";
   ChallengeValidation[ChallengeValidation["Biometric"] = 3] = "Biometric";
 })(ChallengeValidation || (ChallengeValidation = {}));
@@ -11427,6 +11428,9 @@ class challenges_Challenge {
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
 
+        case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
+          return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
+
         default:
           return undefined;
       }
@@ -11494,7 +11498,7 @@ class challenges_ChallengePrompt {
       case ChallengeValidation.Biometric:
         return PromptTitles.Biometrics;
 
-      case ChallengeValidation.LocalPasscode:
+      case ChallengeValidation.ApplicationPasscode:
         return PromptTitles.LocalPasscode;
 
       default:
@@ -18736,7 +18740,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     }
 
     if (Object(utils["q" /* isNullOrUndefined */])(intent)) {
-      throw 'Attempting to encrypt payload with null intent';
+      throw Error('Attempting to encrypt payload with null intent');
     }
 
     if (!key && !Object(intents["d" /* isDecryptedIntent */])(intent)) {
@@ -18748,15 +18752,15 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     }
 
     if (payload.format !== formats["a" /* PayloadFormat */].DecryptedBareObject) {
-      throw 'Attempting to encrypt already encrypted payload.';
+      throw Error('Attempting to encrypt already encrypted payload.');
     }
 
     if (!payload.content) {
-      throw 'Attempting to encrypt payload with no content.';
+      throw Error('Attempting to encrypt payload with no content.');
     }
 
     if (!payload.uuid) {
-      throw 'Attempting to encrypt payload with no uuid.';
+      throw Error('Attempting to encrypt payload with no uuid.');
     }
 
     const version = key ? key.keyVersion : this.getLatestVersion();
@@ -18980,10 +18984,15 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     let keyParams;
 
     if (intent === intents["b" /* EncryptionIntent */].FileDecrypted) {
+      items = items.filter(item => item.content_type !== content_types["a" /* ContentType */].ItemsKey);
+    } else {
       var _await$this$getRootKe;
 
-      items = items.filter(item => item.content_type !== content_types["a" /* ContentType */].ItemsKey);
       keyParams = (_await$this$getRootKe = await this.getRootKeyParams()) === null || _await$this$getRootKe === void 0 ? void 0 : _await$this$getRootKe.getPortableValue();
+
+      if (!keyParams) {
+        throw Error('An encrypted backup was requested, but no keyParams were found.');
+      }
     }
 
     const payloads = await Promise.all(items.map(item => {
@@ -22991,7 +23000,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
 
   validateChallengeValue(value) {
     switch (value.prompt.validation) {
-      case ChallengeValidation.LocalPasscode:
+      case ChallengeValidation.ApplicationPasscode:
         return this.protocolService.validatePasscode(value.value);
 
       case ChallengeValidation.AccountPassword:
@@ -23012,7 +23021,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     const hasPasscode = this.protocolService.hasPasscode();
 
     if (hasPasscode) {
-      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode));
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.ApplicationPasscode));
     }
 
     const biometricEnabled = await this.hasBiometricsEnabled();
@@ -23027,9 +23036,34 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
       return null;
     }
   }
+  /**
+   * @returns whether the user has successfuly authenticated.
+   */
+
+
+  async authenticateWithPasswordAndPasscode(reason) {
+    const prompts = [];
+
+    if (this.protocolService.hasAccount()) {
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.AccountPassword));
+    }
+
+    if (this.protocolService.hasPasscode()) {
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.ApplicationPasscode));
+    }
+
+    if (!prompts.length) {
+      return true;
+    }
+
+    const response = await this.promptForChallengeResponse(new challenges_Challenge(prompts, reason, true
+    /** cancelable */
+    ));
+    return response ? true : false;
+  }
 
   async promptForPasscode(reason) {
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode)], reason, true);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.ApplicationPasscode)], reason, true);
     const response = await this.promptForChallengeResponse(challenge);
 
     if (!response) {
@@ -23039,7 +23073,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
       };
     }
 
-    const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+    const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
     return {
       passcode: value.value,
       canceled: false
@@ -23443,11 +23477,11 @@ class application_SNApplication {
   onLaunch() {}
 
   async handleLaunchChallengeResponse(response) {
-    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.ApplicationPasscode)) {
       let wrappingKey = response.artifacts.wrappingKey;
 
       if (!wrappingKey) {
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
         wrappingKey = await this.protocolService.computeWrappingKey(value.value);
       }
 
@@ -23894,7 +23928,7 @@ class application_SNApplication {
     const prompts = [];
 
     if (hasPasscode) {
-      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
+      prompts.push(new challenges_ChallengePrompt(ChallengeValidation.ApplicationPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
     }
 
     if (hasAccount) {
@@ -23917,7 +23951,7 @@ class application_SNApplication {
 
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
         passcode = value.value;
       }
 
@@ -24067,11 +24101,11 @@ class application_SNApplication {
   }
 
   async createDecryptedBackup() {
-    if (this.hasPasscode() && this.itemManager.notes.some(note => note.protected)) {
-      const response = await this.challengeService.promptForPasscode(ChallengeReason.CreateDecryptedBackupWithProtectedItems);
+    if (this.itemManager.notes.some(note => note.protected)) {
+      const authenticated = await this.challengeService.authenticateWithPasswordAndPasscode(ChallengeReason.CreateDecryptedBackupWithProtectedItems);
 
-      if (response.canceled) {
-        return undefined;
+      if (!authenticated) {
+        return;
       }
     }
 

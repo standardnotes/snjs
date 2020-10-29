@@ -9,7 +9,7 @@ export type ChallengeArtifacts = {
 
 export enum ChallengeValidation {
   None = 0,
-  LocalPasscode = 1,
+  ApplicationPasscode = 1,
   AccountPassword = 2,
   Biometric = 3,
 };
@@ -41,8 +41,8 @@ export class Challenge {
     public readonly prompts: ChallengePrompt[],
     public readonly reason: ChallengeReason,
     public readonly cancelable: boolean,
-    public readonly _heading?: string,
-    public readonly _subheading?: string,
+    private readonly _heading?: string,
+    private readonly _subheading?: string,
   ) {
     Object.freeze(this);
   }
@@ -71,6 +71,8 @@ export class Challenge {
           return ChallengeStrings.EnterPasscodeForRootResave;
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
+        case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
+          return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         default:
           return undefined;
       }
@@ -130,7 +132,7 @@ export class ChallengePrompt {
         return PromptTitles.AccountPassword;
       case ChallengeValidation.Biometric:
         return PromptTitles.Biometrics;
-      case ChallengeValidation.LocalPasscode:
+      case ChallengeValidation.ApplicationPasscode:
         return PromptTitles.LocalPasscode;
       default:
         return undefined;

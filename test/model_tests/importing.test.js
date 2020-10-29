@@ -368,7 +368,7 @@ describe('importing', () => {
         Factory.createMappedTag(this.application),
       ]);
 
-      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.createEncryptedBackupString();
       const backupData = JSON.parse(rawBackupFile);
 
       await this.application.sync({ awaitAll: true });
@@ -402,7 +402,7 @@ describe('importing', () => {
         Factory.createMappedTag(this.application),
       ]);
 
-      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.createEncryptedBackupString();
       const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
@@ -432,7 +432,7 @@ describe('importing', () => {
         Factory.createMappedTag(this.application),
       ]);
 
-      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.createEncryptedBackupString();
       const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
@@ -467,7 +467,7 @@ describe('importing', () => {
         }
       );
 
-      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.createEncryptedBackupString();
       const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
@@ -503,7 +503,7 @@ describe('importing', () => {
         }
       );
 
-      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.createEncryptedBackupString();
       const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
@@ -539,7 +539,7 @@ describe('importing', () => {
         }
       );
 
-      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.createEncryptedBackupString();
       const backupData = JSON.parse(rawBackupFile);
 
       await this.application.deinit();
@@ -585,7 +585,7 @@ describe('importing', () => {
         }
       );
 
-      const backupData = await this.application.protocolService.createBackupFile();
+      const backupData = await this.application.createEncryptedBackupString();
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
@@ -616,7 +616,7 @@ describe('importing', () => {
         }
       );
 
-      const backupData = await this.application.protocolService.createBackupFile();
+      const backupData = await this.application.createEncryptedBackupString();
 
       await this.application.deinit();
       this.application = await Factory.createInitAppWithRandNamespace();
@@ -647,7 +647,7 @@ describe('importing', () => {
         }
       );
 
-      const rawBackupFile = await this.application.protocolService.createBackupFile();
+      const rawBackupFile = await this.application.createEncryptedBackupString();
       let backupData = JSON.parse(rawBackupFile);
       backupData = {
         ...backupData,

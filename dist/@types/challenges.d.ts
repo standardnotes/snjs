@@ -5,7 +5,7 @@ export declare type ChallengeArtifacts = {
 };
 export declare enum ChallengeValidation {
     None = 0,
-    LocalPasscode = 1,
+    ApplicationPasscode = 1,
     AccountPassword = 2,
     Biometric = 3
 }
@@ -31,8 +31,8 @@ export declare class Challenge {
     readonly prompts: ChallengePrompt[];
     readonly reason: ChallengeReason;
     readonly cancelable: boolean;
-    readonly _heading?: string | undefined;
-    readonly _subheading?: string | undefined;
+    private readonly _heading?;
+    private readonly _subheading?;
     readonly id: number;
     constructor(prompts: ChallengePrompt[], reason: ChallengeReason, cancelable: boolean, _heading?: string | undefined, _subheading?: string | undefined);
     /** Outside of the modal, this is the title of the modal itself */

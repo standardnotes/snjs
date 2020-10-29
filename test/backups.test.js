@@ -8,6 +8,8 @@ describe('backups', () => {
 
   before(async function () {
     localStorage.clear();
+    this.email = () => Uuid.GenerateUuidSynchronously();
+    this.password = () => Uuid.GenerateUuidSynchronously();
   });
 
   after(async function () {
@@ -16,8 +18,6 @@ describe('backups', () => {
 
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
   });
 
   afterEach(function () {
@@ -25,25 +25,54 @@ describe('backups', () => {
     this.application = null;
   });
 
-  it('backup file should have a version number', async function () {
-    const backupString = await this.application.createBackupFile();
+  it('decrypted backup file should have a version number', async function () {
+    const backupString = await this.application.createDecryptedBackupString();
     const data = JSON.parse(backupString);
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion());
   });
 
-  it('backup file should have correct number of items', async function () {
+  it('encrypted backup file should have a version number', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email(),
+      password: this.password(),
+    });
+    const backupString = await this.application.createEncryptedBackupString();
+    const data = JSON.parse(backupString);
+    expect(data.version).to.equal(this.application.protocolService.getLatestVersion());
+  });
+
+  it('decrypted backup string should have correct number of items', async function () {
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
-    const backupString = await this.application.createBackupFile();
+    const backupString = await this.application.createDecryptedBackupString();
+    const backupData = JSON.parse(backupString);
+
+    expect(backupData.items).to.have.length(2);
+    expect(backupData.items[0].content_type).to.equal(ContentType.Note);
+    expect(backupData.items[1].content_type).to.equal(ContentType.Note);
+  });
+
+  it('encrypted backup string should have correct number of items', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email(),
+      password: this.password(),
+    });
+    await Promise.all([
+      Factory.createSyncedNote(this.application),
+      Factory.createSyncedNote(this.application),
+    ]);
+    const backupString = await this.application.createEncryptedBackupString();
     const backupData = JSON.parse(backupString);
 
     expect(backupData.items.length).to.equal(3);
   });
 
-  it('backup file item should have correct fields', async function () {
+  it('decrypted backup string items should have correct fields', async function () {
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
-    const backupString = await this.application.createBackupFile();
+    const backupString = await this.application.createDecryptedBackupString();
     const backupData = JSON.parse(backupString);
     const item = backupData.items[0];
 
@@ -58,7 +87,30 @@ describe('backups', () => {
     expect(item.updated_at).to.be.ok;
   });
 
-  it('downloading backup if item is error decrypting should succeed', async function () {
+  it('encrypted backup string items should have correct fields', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email(),
+      password: this.password(),
+    });
+    await Factory.createSyncedNote(this.application);
+    await Factory.createSyncedNote(this.application);
+    const backupString = await this.application.createDecryptedBackupString();
+    const backupData = JSON.parse(backupString);
+    const item = backupData.items[0];
+
+    expect(item.fields).to.not.be.ok;
+    expect(item.source).to.not.be.ok;
+    expect(item.dirtiedDate).to.not.be.ok;
+    expect(item.format).to.not.be.ok;
+    expect(item.uuid).to.be.ok;
+    expect(item.content_type).to.be.ok;
+    expect(item.content).to.be.ok;
+    expect(item.created_at).to.be.ok;
+    expect(item.updated_at).to.be.ok;
+  });
+
+  it('downloading decrypted backup if item is error decrypting should succeed', async function () {
     await Factory.createSyncedNote(this.application);
     const note = await Factory.createSyncedNote(this.application);
     const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
@@ -73,9 +125,35 @@ describe('backups', () => {
     );
     const erroredItem = await this.application.itemManager.emitItemFromPayload(errored);
     expect(erroredItem.errorDecrypting).to.equal(true);
-    const backupString = await this.application.createBackupFile();
+    const backupString = await this.application.createDecryptedBackupString();
     const backupData = JSON.parse(backupString);
 
-    expect(backupData.items.length).to.equal(3);
+    expect(backupData.items.length).to.equal(2);
+  });
+
+  it('downloading encrypted backup if item is error decrypting should succeed', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email(),
+      password: this.password(),
+    });
+    await Factory.createSyncedNote(this.application);
+    const note = await Factory.createSyncedNote(this.application);
+    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+      note.payload,
+      EncryptionIntent.FileEncrypted
+    );
+    const errored = CopyPayload(
+      encrypted,
+      {
+        errorDecrypting: true
+      }
+    );
+    const erroredItem = await this.application.itemManager.emitItemFromPayload(errored);
+    expect(erroredItem.errorDecrypting).to.equal(true);
+    const backupString = await this.application.createDecryptedBackupString();
+    const backupData = JSON.parse(backupString);
+
+    expect(backupData.items.length).to.equal(2);
   });
 });

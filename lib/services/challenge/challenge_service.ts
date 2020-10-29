@@ -70,7 +70,7 @@ export class ChallengeService extends PureService {
     value: ChallengeValue
   ): Promise<ChallengeValidationResponse> {
     switch (value.prompt.validation) {
-      case ChallengeValidation.LocalPasscode:
+      case ChallengeValidation.ApplicationPasscode:
         return this.protocolService!.validatePasscode(value.value as string);
       case ChallengeValidation.AccountPassword:
         return this.protocolService!.validateAccountPassword(
@@ -87,7 +87,7 @@ export class ChallengeService extends PureService {
     const prompts = [];
     const hasPasscode = this.protocolService!.hasPasscode();
     if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
+      prompts.push(new ChallengePrompt(ChallengeValidation.ApplicationPasscode));
     }
     const biometricEnabled = await this.hasBiometricsEnabled()
     if (biometricEnabled) {
@@ -100,9 +100,38 @@ export class ChallengeService extends PureService {
     }
   }
 
+  /**
+   * @returns whether the user has successfuly authenticated.
+   */
+  public async authenticateWithPasswordAndPasscode(
+    reason: ChallengeReason
+  ): Promise<boolean> {
+    const prompts: ChallengePrompt[] = [];
+    if (this.protocolService.hasAccount()) {
+      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
+    }
+    if (this.protocolService.hasPasscode()) {
+      prompts.push(
+        new ChallengePrompt(ChallengeValidation.ApplicationPasscode)
+      );
+    }
+    if (!prompts.length) {
+      return true;
+    }
+
+    const response = await this.promptForChallengeResponse(
+      new Challenge(
+        prompts,
+        reason,
+        true /** cancelable */
+      )
+    );
+    return response ? true : false;
+  }
+
   public async promptForPasscode(reason: ChallengeReason) {
     const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
+      [new ChallengePrompt(ChallengeValidation.ApplicationPasscode)],
       reason,
       true
     );
@@ -110,7 +139,7 @@ export class ChallengeService extends PureService {
     if (!response) {
       return { canceled: true, passcode: undefined };
     }
-    const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+    const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
     return { passcode: value.value as string, canceled: false }
   }
 
