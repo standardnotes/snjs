@@ -52,7 +52,7 @@ export declare abstract class DeviceInterface {
     abstract getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>;
     abstract setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>;
     abstract clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>;
-    abstract getRawKeychainValue<T = unknown>(): Promise<T | undefined | null>;
+    abstract getRawKeychainValue(): Promise<Record<string, any> | undefined | null>;
     abstract clearRawKeychainValue(): Promise<void>;
     abstract openUrl(url: string): void;
 }
