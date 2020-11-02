@@ -47,7 +47,7 @@ type LegacyMobileKeychainStructure = {
   ak: string
   version?: string
   jwt?: string
-};
+} | undefined | null;
 const LEGACY_SESSION_TOKEN_KEY = 'jwt';
 
 export class Migration20200115 extends Migration {
@@ -328,7 +328,7 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
     };
-    const keychainValue = await this.services.deviceInterface.getRawKeychainValue<LegacyMobileKeychainStructure>();
+    const keychainValue = await this.services.deviceInterface.getRawKeychainValue() as LegacyMobileKeychainStructure;
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileBiometricsPrefs
     );
