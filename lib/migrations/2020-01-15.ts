@@ -37,6 +37,17 @@ const LegacyKeys = {
   MobileOptionsState: 'options',
   MobilePasscodeKeyboardType: 'passcodeKeyboardType',
 };
+type LegacyMobileKeychainStructure = {
+  offline?: {
+    timing?: any
+    pw?: string
+  }
+  mk: string
+  pw: string
+  ak: string
+  version?: string
+  jwt?: string
+};
 const LEGACY_SESSION_TOKEN_KEY = 'jwt';
 
 export class Migration20200115 extends Migration {
@@ -317,7 +328,7 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
     };
-    const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
+    const keychainValue = await this.services.deviceInterface.getRawKeychainValue<LegacyMobileKeychainStructure>();
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileBiometricsPrefs
     );
@@ -334,21 +345,43 @@ export class Migration20200115 extends Migration {
     if (rawPasscodeParams) {
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
       const getPasscodeKey = async () => {
-        /** Validate current passcode by comparing against keychain offline.pw value */
-        const pwHash = keychainValue.offline.pw;
         let passcodeKey: SNRootKey;
         await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
           passcodeKey = await this.services.protocolService.computeRootKey(
             candidate,
             passcodeParams
           );
-          return passcodeKey.serverPassword === pwHash;
-
+          const pwHash = keychainValue?.offline?.pw;
+          if (pwHash) {
+            return passcodeKey.serverPassword === pwHash;
+          } else {
+            /** Fallback decryption if keychain is missing for some reason. If account,
+             * validate by attempting to decrypt wrapped account key. Otherwise, validate
+             * by attempting to decrypt random item. */
+            if (wrappedAccountKey) {
+              const decryptedAcctKey = await this.services.protocolService.payloadByDecryptingPayload(
+                CreateMaxPayloadFromAnyObject(wrappedAccountKey),
+                passcodeKey
+              );
+              return !decryptedAcctKey.errorDecrypting;
+            } else {
+              const item = (
+                await this.services.deviceInterface.getAllRawDatabasePayloads(this.services.identifier)
+              )[0] as any;
+              if (!item) {
+                throw Error('Passcode only migration aborting due to missing keychain.offline.pw');
+              }
+              const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(
+                CreateMaxPayloadFromAnyObject(item),
+                passcodeKey
+              );
+              return !decryptedItem.errorDecrypting;
+            }
+          }
         });
         return passcodeKey!;
       };
-      const timing = keychainValue.offline.timing;
-      rawStructure.nonwrapped![StorageKey.MobilePasscodeTiming] = timing;
+      rawStructure.nonwrapped![StorageKey.MobilePasscodeTiming] = keychainValue?.offline?.timing;
       if (wrappedAccountKey) {
         /**
          * Account key is encrypted with passcode. Inside, the accountKey is located inside
@@ -412,17 +445,17 @@ export class Migration20200115 extends Migration {
       }
     } else {
       /** No passcode, potentially account. Migrate keychain property keys. */
-      const hasAccount = keychainValue && keychainValue.mk;
+      const hasAccount = !isNullOrUndefined(keychainValue?.mk);
       if (hasAccount) {
-        const defaultVersion = !isNullOrUndefined(keychainValue.ak)
+        const defaultVersion = !isNullOrUndefined(keychainValue!.ak)
           ? ProtocolVersion.V003
           : ProtocolVersion.V002;
         const accountKey = await SNRootKey.Create(
           {
-            masterKey: keychainValue.mk,
-            serverPassword: keychainValue.pw,
-            dataAuthenticationKey: keychainValue.ak,
-            version: keychainValue.version || defaultVersion,
+            masterKey: keychainValue!.mk,
+            serverPassword: keychainValue!.pw,
+            dataAuthenticationKey: keychainValue!.ak,
+            version: (keychainValue!.version as ProtocolVersion) || defaultVersion,
             keyParams: rawAccountKeyParams
           }
         );
@@ -430,11 +463,11 @@ export class Migration20200115 extends Migration {
           accountKey.getKeychainValue(),
           this.services.identifier
         );
-        if (keychainValue.jwt) {
+        if (keychainValue!.jwt) {
           /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
           this.services.deviceInterface.setRawStorageValue(
             LEGACY_SESSION_TOKEN_KEY,
-            keychainValue.jwt
+            keychainValue!.jwt
           );
         }
       }

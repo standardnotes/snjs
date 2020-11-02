@@ -363,6 +363,112 @@ describe('2020-01-15 mobile migration', () => {
     await application.deinit();
   });
 
+  it('2020-01-15 migration with passcode-only missing keychain', async function () {
+    const application = await Factory.createAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const identifier = 'foo';
+    const passcode = 'bar';
+    /** Create old version passcode parameters */
+    const passcodeKey = await operator003.createRootKey(
+      identifier,
+      passcode
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'pc_params',
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
+    );
+    const biometricPrefs = { enabled: true, timing: 'immediately' };
+    /** Create legacy storage. Storage in mobile was never wrapped. */
+    await application.deviceInterface.setRawStorageValue(
+      'biometrics_prefs',
+      JSON.stringify(biometricPrefs)
+    );
+    const passcodeKeyboardType = 'numeric';
+    await application.deviceInterface.setRawStorageValue(
+      'passcodeKeyboardType',
+      passcodeKeyboardType
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'first_run',
+      false
+    );
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+      notePayload,
+      PayloadFormat.EncryptedString,
+      passcodeKey,
+    );
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      noteEncryptionParams
+    );
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    /** setup options */
+    await application.deviceInterface.setRawStorageValue(
+      'DoNotShowAgainUnsupportedEditorsKey',
+      true
+    );
+    const options = JSON.stringify({
+      sortBy: undefined,
+      sortReverse: undefined,
+      selectedTagIds: [],
+      hidePreviews: false,
+      hideDates: undefined,
+      hideTags: true,
+    });
+    await application.deviceInterface.setRawStorageValue(
+      'options',
+      options
+    );
+    /** Run migration */
+    const promptValueReply = (prompts) => {
+      const values = [];
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
+        }
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
+        }
+
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge) => {
+      application.addChallengeObserver(challenge, {
+        onInvalidValue: (value) => {
+          const values = promptValueReply([value.prompt]);
+          application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      await Factory.sleep(0);
+      const initialValues = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, initialValues);
+    };
+    await application.prepareForLaunch({
+      receiveChallenge: receiveChallenge,
+    });
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.WrapperOnly
+    );
+    await application.launch(true);
+
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.errorDecrypting).to.not.be.ok;
+
+    /** application should not crash */
+    await application.deinit();
+  });
+
   it('2020-01-15 migration with account only', async function () {
     const application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,

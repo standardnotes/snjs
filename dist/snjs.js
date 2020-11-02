@@ -16924,21 +16924,43 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
     }
 
     if (rawPasscodeParams) {
+      var _keychainValue$offlin2;
+
       const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
 
       const getPasscodeKey = async () => {
-        /** Validate current passcode by comparing against keychain offline.pw value */
-        const pwHash = keychainValue.offline.pw;
         let passcodeKey;
         await this.promptForPasscodeUntilCorrect(async candidate => {
+          var _keychainValue$offlin;
+
           passcodeKey = await this.services.protocolService.computeRootKey(candidate, passcodeParams);
-          return passcodeKey.serverPassword === pwHash;
+          const pwHash = keychainValue === null || keychainValue === void 0 ? void 0 : (_keychainValue$offlin = keychainValue.offline) === null || _keychainValue$offlin === void 0 ? void 0 : _keychainValue$offlin.pw;
+
+          if (pwHash) {
+            return passcodeKey.serverPassword === pwHash;
+          } else {
+            /** Fallback decryption if keychain is missing for some reason. If account,
+             * validate by attempting to decrypt wrapped account key. Otherwise, validate
+             * by attempting to decrypt random item. */
+            if (wrappedAccountKey) {
+              const decryptedAcctKey = await this.services.protocolService.payloadByDecryptingPayload(Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(wrappedAccountKey), passcodeKey);
+              return !decryptedAcctKey.errorDecrypting;
+            } else {
+              const item = (await this.services.deviceInterface.getAllRawDatabasePayloads(this.services.identifier))[0];
+
+              if (!item) {
+                throw Error('Passcode only migration aborting due to missing keychain.offline.pw');
+              }
+
+              const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(item), passcodeKey);
+              return !decryptedItem.errorDecrypting;
+            }
+          }
         });
         return passcodeKey;
       };
 
-      const timing = keychainValue.offline.timing;
-      rawStructure.nonwrapped[StorageKey.MobilePasscodeTiming] = timing;
+      rawStructure.nonwrapped[StorageKey.MobilePasscodeTiming] = keychainValue === null || keychainValue === void 0 ? void 0 : (_keychainValue$offlin2 = keychainValue.offline) === null || _keychainValue$offlin2 === void 0 ? void 0 : _keychainValue$offlin2.timing;
 
       if (wrappedAccountKey) {
         /**
@@ -16985,7 +17007,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       }
     } else {
       /** No passcode, potentially account. Migrate keychain property keys. */
-      const hasAccount = keychainValue && keychainValue.mk;
+      const hasAccount = !Object(utils["q" /* isNullOrUndefined */])(keychainValue === null || keychainValue === void 0 ? void 0 : keychainValue.mk);
 
       if (hasAccount) {
         const defaultVersion = !Object(utils["q" /* isNullOrUndefined */])(keychainValue.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;

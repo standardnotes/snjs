@@ -84,7 +84,7 @@ export abstract class DeviceInterface {
 
   abstract async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) : Promise<void>;
 
-  abstract async getRawKeychainValue() : Promise<any>;
+  abstract async getRawKeychainValue<T = unknown>() : Promise<T | undefined | null>;
 
   abstract async clearRawKeychainValue() : Promise<void>;
 
