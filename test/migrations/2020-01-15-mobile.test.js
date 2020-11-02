@@ -363,7 +363,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.deinit();
   });
 
-  it('2020-01-15 migration with missing keychain', async function () {
+  it('2020-01-15 migration with passcode-only missing keychain', async function () {
     const application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,
       Platform.Ios
@@ -385,7 +385,6 @@ describe('2020-01-15 mobile migration', () => {
       'pc_params',
       JSON.stringify(passcodeKey.keyParams.getPortableValue())
     );
-
     const biometricPrefs = { enabled: true, timing: 'immediately' };
     /** Create legacy storage. Storage in mobile was never wrapped. */
     await application.deviceInterface.setRawStorageValue(
@@ -462,6 +461,10 @@ describe('2020-01-15 mobile migration', () => {
       KeyMode.WrapperOnly
     );
     await application.launch(true);
+
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.errorDecrypting).to.not.be.ok;
+
     /** application should not crash */
     await application.deinit();
   });
