@@ -37,7 +37,7 @@ const LegacyKeys = {
   MobileOptionsState: 'options',
   MobilePasscodeKeyboardType: 'passcodeKeyboardType',
 };
-type LegacyMobileKeychainType = {
+type LegacyMobileKeychainStructure = {
   offline?: {
     timing?: any
     pw?: string
@@ -328,7 +328,7 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
     };
-    const keychainValue = await this.services.deviceInterface.getRawKeychainValue<LegacyMobileKeychainType>();
+    const keychainValue = await this.services.deviceInterface.getRawKeychainValue<LegacyMobileKeychainStructure>();
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileBiometricsPrefs
     );
