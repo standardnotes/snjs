@@ -57,12 +57,23 @@ export declare class Migration20200115 extends Migration {
      */
     migrateStorageStructureForMobile(): Promise<void>;
     /**
+     * If we are unable to determine a root key's version, due to missing version
+     * parameter from key params due to 001 or 002, we need to fallback to checking
+     * any encrypted payload and retrieving its version.
+     *
+     * If we are unable to garner any meaningful information, we will default to 002.
+     *
+     * (Previously we attempted to discern version based on presence of keys.ak; if ak,
+     * then 003, otherwise 002. However, late versions of 002 also inluded an ak, so this
+     * method can't be used. This method also didn't account for 001 versions.)
+     */
+    private getFallbackRootKeyVersion;
+    /**
      * All platforms
      * Migrate all previously independently stored storage keys into new
      * managed approach. Also deletes any legacy values from raw storage.
-     * @access private
      */
-    migrateArbitraryRawStorageToManagedStorageAllPlatforms(): Promise<void>;
+    private migrateArbitraryRawStorageToManagedStorageAllPlatforms;
     /**
      * All platforms
      * Deletes all StorageKey and LegacyKeys from root raw storage.

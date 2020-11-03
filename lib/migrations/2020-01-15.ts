@@ -150,17 +150,14 @@ export class Migration20200115 extends Migration {
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
       const mk = await this.services.deviceInterface.getRawStorageValue('mk');
       if (ak || mk) {
-        const version = rawAccountKeyParams?.version;
-        const fallbackVersion = !isNullOrUndefined(ak)
-          ? ProtocolVersion.V003
-          : ProtocolVersion.V002;
+        const version = rawAccountKeyParams?.version || await this.getFallbackRootKeyVersion();
         const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await SNRootKey.Create(
           {
             masterKey: mk as any,
             serverPassword: sp as any,
             dataAuthenticationKey: ak as any,
-            version: version || fallbackVersion,
+            version: version,
             keyParams: rawAccountKeyParams as any
           }
         );
@@ -232,16 +229,13 @@ export class Migration20200115 extends Migration {
     accountKeyParams: any,
     storageValueStore: Record<string, any>
   ) {
-    const version = accountKeyParams?.version;
-    const fallbackVersion = storageValueStore.ak
-      ? ProtocolVersion.V003
-      : ProtocolVersion.V002;
+    const version = accountKeyParams?.version || await this.getFallbackRootKeyVersion();
     const accountKey = await SNRootKey.Create(
       {
         masterKey: storageValueStore.mk,
         serverPassword: storageValueStore.pw,
         dataAuthenticationKey: storageValueStore.ak,
-        version: version || fallbackVersion,
+        version: version,
         keyParams: accountKeyParams
       }
     );
@@ -397,10 +391,7 @@ export class Migration20200115 extends Migration {
           passcodeKey
         );
         const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
-        const version = accountKeyContent.version || rawAccountKeyParams?.version;
-        const fallbackVersion = !isNullOrUndefined(accountKeyContent.ak)
-          ? ProtocolVersion.V003
-          : ProtocolVersion.V002;
+        const version = accountKeyContent.version || rawAccountKeyParams?.version || await this.getFallbackRootKeyVersion();
         const newAccountKey = CopyPayload(
           unwrappedAccountKey,
           {
@@ -408,7 +399,7 @@ export class Migration20200115 extends Migration {
               masterKey: accountKeyContent.mk,
               serverPassword: accountKeyContent.pw,
               dataAuthenticationKey: accountKeyContent.ak,
-              version: version || fallbackVersion,
+              version: version,
               keyParams: rawAccountKeyParams as any,
               accountKeys: undefined
             } as RootKeyContent
@@ -451,16 +442,15 @@ export class Migration20200115 extends Migration {
       /** No passcode, potentially account. Migrate keychain property keys. */
       const hasAccount = !isNullOrUndefined(keychainValue?.mk);
       if (hasAccount) {
-        const accountVersion = (keychainValue!.version as ProtocolVersion) || rawAccountKeyParams?.version;
-        const fallbackVersion = !isNullOrUndefined(keychainValue!.ak)
-          ? ProtocolVersion.V003
-          : ProtocolVersion.V002;
+        const accountVersion = (keychainValue!.version as ProtocolVersion) ||
+          rawAccountKeyParams?.version ||
+          await this.getFallbackRootKeyVersion();
         const accountKey = await SNRootKey.Create(
           {
             masterKey: keychainValue!.mk,
             serverPassword: keychainValue!.pw,
             dataAuthenticationKey: keychainValue!.ak,
-            version: accountVersion || fallbackVersion,
+            version: accountVersion,
             keyParams: rawAccountKeyParams as any
           }
         );
@@ -483,12 +473,33 @@ export class Migration20200115 extends Migration {
   }
 
   /**
+   * If we are unable to determine a root key's version, due to missing version
+   * parameter from key params due to 001 or 002, we need to fallback to checking
+   * any encrypted payload and retrieving its version.
+   *
+   * If we are unable to garner any meaningful information, we will default to 002.
+   *
+   * (Previously we attempted to discern version based on presence of keys.ak; if ak,
+   * then 003, otherwise 002. However, late versions of 002 also inluded an ak, so this
+   * method can't be used. This method also didn't account for 001 versions.)
+   */
+  private async getFallbackRootKeyVersion() {
+    const anyItem = (
+      await this.services.deviceInterface.getAllRawDatabasePayloads(this.services.identifier)
+    )[0] as any;
+    if (!anyItem) {
+      return ProtocolVersion.V002;
+    }
+    const payload = CreateMaxPayloadFromAnyObject(anyItem);
+    return payload.version || ProtocolVersion.V002;
+  }
+
+  /**
    * All platforms
    * Migrate all previously independently stored storage keys into new
    * managed approach. Also deletes any legacy values from raw storage.
-   * @access private
    */
-  async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
+  private async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
     const allKeyValues = await this.services.deviceInterface
       .getAllRawStorageKeyValues();
     const legacyKeys = objectToValueArray(LegacyKeys);
@@ -620,13 +631,15 @@ export class Migration20200115 extends Migration {
     const rootKey = await this.services.protocolService.getRootKey();
     if (rootKey) {
       const rootKeyParams = await this.services.protocolService.getRootKeyParams();
+      /** If params are missing a version, it must be 001 */
+      const fallbackVersion = ProtocolVersion.V001;
       const payload = CreateMaxPayloadFromAnyObject({
         uuid: await Uuid.GenerateUuid(),
         content_type: ContentType.ItemsKey,
         content: FillItemContent({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
-          version: rootKeyParams!.version
+          version: rootKeyParams!.version || fallbackVersion
         }),
         dirty: true,
         dirtiedDate: new Date()

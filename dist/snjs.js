@@ -16777,14 +16777,13 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       const mk = await this.services.deviceInterface.getRawStorageValue('mk');
 
       if (ak || mk) {
-        const version = rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version;
-        const fallbackVersion = !Object(utils["q" /* isNullOrUndefined */])(ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const version = (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version) || (await this.getFallbackRootKeyVersion());
         const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: mk,
           serverPassword: sp,
           dataAuthenticationKey: ak,
-          version: version || fallbackVersion,
+          version: version,
           keyParams: rawAccountKeyParams
         });
         await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getKeychainValue(), this.services.identifier);
@@ -16839,13 +16838,12 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
   async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(passcodeKey, accountKeyParams, storageValueStore) {
     var _encryptedAccountKey;
 
-    const version = accountKeyParams === null || accountKeyParams === void 0 ? void 0 : accountKeyParams.version;
-    const fallbackVersion = storageValueStore.ak ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+    const version = (accountKeyParams === null || accountKeyParams === void 0 ? void 0 : accountKeyParams.version) || (await this.getFallbackRootKeyVersion());
     const accountKey = await root_key_SNRootKey.Create({
       masterKey: storageValueStore.mk,
       serverPassword: storageValueStore.pw,
       dataAuthenticationKey: storageValueStore.ak,
-      version: version || fallbackVersion,
+      version: version,
       keyParams: accountKeyParams
     });
     delete storageValueStore.mk;
@@ -16974,14 +16972,13 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const passcodeKey = await getPasscodeKey();
         const unwrappedAccountKey = await this.services.protocolService.payloadByDecryptingPayload(Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(wrappedAccountKey), passcodeKey);
         const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
-        const version = accountKeyContent.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version);
-        const fallbackVersion = !Object(utils["q" /* isNullOrUndefined */])(accountKeyContent.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const version = accountKeyContent.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version) || (await this.getFallbackRootKeyVersion());
         const newAccountKey = Object(generator["b" /* CopyPayload */])(unwrappedAccountKey, {
           content: {
             masterKey: accountKeyContent.mk,
             serverPassword: accountKeyContent.pw,
             dataAuthenticationKey: accountKeyContent.ak,
-            version: version || fallbackVersion,
+            version: version,
             keyParams: rawAccountKeyParams,
             accountKeys: undefined
           }
@@ -17014,13 +17011,12 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       const hasAccount = !Object(utils["q" /* isNullOrUndefined */])(keychainValue === null || keychainValue === void 0 ? void 0 : keychainValue.mk);
 
       if (hasAccount) {
-        const accountVersion = keychainValue.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version);
-        const fallbackVersion = !Object(utils["q" /* isNullOrUndefined */])(keychainValue.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const accountVersion = keychainValue.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version) || (await this.getFallbackRootKeyVersion());
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: keychainValue.mk,
           serverPassword: keychainValue.pw,
           dataAuthenticationKey: keychainValue.ak,
-          version: accountVersion || fallbackVersion,
+          version: accountVersion,
           keyParams: rawAccountKeyParams
         });
         await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getKeychainValue(), this.services.identifier);
@@ -17037,10 +17033,32 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
     await this.allPlatformHelperSetStorageStructure(rawStructure);
   }
   /**
+   * If we are unable to determine a root key's version, due to missing version
+   * parameter from key params due to 001 or 002, we need to fallback to checking
+   * any encrypted payload and retrieving its version.
+   *
+   * If we are unable to garner any meaningful information, we will default to 002.
+   *
+   * (Previously we attempted to discern version based on presence of keys.ak; if ak,
+   * then 003, otherwise 002. However, late versions of 002 also inluded an ak, so this
+   * method can't be used. This method also didn't account for 001 versions.)
+   */
+
+
+  async getFallbackRootKeyVersion() {
+    const anyItem = (await this.services.deviceInterface.getAllRawDatabasePayloads(this.services.identifier))[0];
+
+    if (!anyItem) {
+      return versions["a" /* ProtocolVersion */].V002;
+    }
+
+    const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(anyItem);
+    return payload.version || versions["a" /* ProtocolVersion */].V002;
+  }
+  /**
    * All platforms
    * Migrate all previously independently stored storage keys into new
    * managed approach. Also deletes any legacy values from raw storage.
-   * @access private
    */
 
 
@@ -17180,13 +17198,16 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
     if (rootKey) {
       const rootKeyParams = await this.services.protocolService.getRootKeyParams();
+      /** If params are missing a version, it must be 001 */
+
+      const fallbackVersion = versions["a" /* ProtocolVersion */].V001;
       const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])({
         uuid: await uuid_Uuid.GenerateUuid(),
         content_type: content_types["a" /* ContentType */].ItemsKey,
         content: Object(functions["a" /* FillItemContent */])({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
-          version: rootKeyParams.version
+          version: rootKeyParams.version || fallbackVersion
         }),
         dirty: true,
         dirtiedDate: new Date()
