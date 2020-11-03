@@ -64,3 +64,4 @@ export { StorageKey, RawStorageKey } from './storage_keys';
 export { BaseMigration } from './migrations/2020-01-01-base';
 /** Privileges */
 export { PrivilegeSessionLength } from './services/privileges_service';
+export { SNLog } from './log';

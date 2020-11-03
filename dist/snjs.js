@@ -9452,6 +9452,7 @@ __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return /* 
 __webpack_require__.d(__webpack_exports__, "RawStorageKey", function() { return /* reexport */ RawStorageKey; });
 __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return /* reexport */ _2020_01_01_base_BaseMigration; });
 __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return /* reexport */ PrivilegeSessionLength; });
+__webpack_require__.d(__webpack_exports__, "SNLog", function() { return /* reexport */ SNLog; });
 
 // NAMESPACE OBJECT: ./lib/migrations/index.ts
 var migrations_namespaceObject = {};
@@ -17704,12 +17705,24 @@ class operator_001_SNProtocolOperator001 extends operator_SNProtocolOperator {
   }
 
 }
+// CONCATENATED MODULE: ./lib/log.ts
+class SNLog {
+  static log() {
+    this.onLog(...arguments);
+  }
+
+  static error(error) {
+    this.onError(error);
+  }
+
+}
 // CONCATENATED MODULE: ./lib/protocol/operator/002/operator_002.ts
 function operator_002_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function operator_002_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { operator_002_ownKeys(Object(source), true).forEach(function (key) { operator_002_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { operator_002_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function operator_002_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -17802,7 +17815,7 @@ class operator_002_SNProtocolOperator002 extends operator_001_SNProtocolOperator
     const localAuthHash = await this.crypto.hmac256(ciphertextToAuth, authKey);
 
     if (this.crypto.timingSafeEqual(authHash, localAuthHash) === false) {
-      console.error('Auth hash does not match, returning null.');
+      SNLog.error(Error('Auth hash does not match.'));
       return null;
     }
 
@@ -23289,6 +23302,7 @@ function application_defineProperty(obj, key, value) { if (key in obj) { Object.
 
 
 
+
 /** How often to automatically sync, in milliseconds */
 
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -23331,6 +23345,14 @@ class application_SNApplication {
     /** Whether the application has been destroyed via .deinit() */
 
     this.dealloced = false;
+
+    if (!SNLog.onLog) {
+      throw Error('SNLog.onLog must be set.');
+    }
+
+    if (!SNLog.onError) {
+      throw Error('SNLog.onError must be set.');
+    }
 
     if (!deviceInterface) {
       throw Error('Device Interface must be supplied.');
@@ -24826,6 +24848,7 @@ var application_service = __webpack_require__(77);
 
 
 /** Privileges */
+
 
 
 
