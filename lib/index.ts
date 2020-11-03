@@ -160,3 +160,7 @@ export { BaseMigration } from '@Lib/migrations/2020-01-01-base';
 export {
   PrivilegeSessionLength
 } from '@Services/privileges_service';
+
+export {
+  SNLog
+} from './log';

@@ -60,6 +60,7 @@ import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_ma
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
+import { SNLog } from './log';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -158,6 +159,12 @@ export class SNApplication {
     skipClasses?: any[],
     defaultHost?: string
   ) {
+    if (!SNLog.onLog) {
+      throw Error('SNLog.onLog must be set.');
+    }
+    if (!SNLog.onError) {
+      throw Error('SNLog.onError must be set.');
+    }
     if (!deviceInterface) {
       throw Error('Device Interface must be supplied.');
     }
