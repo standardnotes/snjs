@@ -107,7 +107,7 @@ export class Migration20200115 extends Migration {
     );
     if (encryptedStorage) {
       const encryptedStoragePayload = CreateMaxPayloadFromAnyObject(
-        encryptedStorage
+        encryptedStorage as any
       );
       const passcodeResult = await this.webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(
         encryptedStoragePayload
@@ -150,16 +150,18 @@ export class Migration20200115 extends Migration {
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
       const mk = await this.services.deviceInterface.getRawStorageValue('mk');
       if (ak || mk) {
-        const version = !isNullOrUndefined(ak)
+        const version = rawAccountKeyParams?.version;
+        const fallbackVersion = !isNullOrUndefined(ak)
           ? ProtocolVersion.V003
-          : ak ? ProtocolVersion.V002 : ProtocolVersion.V001;
+          : ProtocolVersion.V002;
+        const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await SNRootKey.Create(
           {
-            masterKey: mk,
-            serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
-            dataAuthenticationKey: ak,
-            version: version,
-            keyParams: rawAccountKeyParams
+            masterKey: mk as any,
+            serverPassword: sp as any,
+            dataAuthenticationKey: ak as any,
+            version: version || fallbackVersion,
+            keyParams: rawAccountKeyParams as any
           }
         );
         await this.services.deviceInterface.setNamespacedKeychainValue(
@@ -199,7 +201,7 @@ export class Migration20200115 extends Migration {
       .getJsonParsedRawStorageValue(
         LegacyKeys.WebPasscodeParamsKey
       );
-    const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
+    const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams as any);
     /** Decrypt it with the passcode */
     let decryptedStoragePayload: PurePayload | undefined;
     let passcodeKey: SNRootKey;
@@ -230,7 +232,8 @@ export class Migration20200115 extends Migration {
     accountKeyParams: any,
     storageValueStore: Record<string, any>
   ) {
-    const version = storageValueStore.ak
+    const version = accountKeyParams?.version;
+    const fallbackVersion = storageValueStore.ak
       ? ProtocolVersion.V003
       : ProtocolVersion.V002;
     const accountKey = await SNRootKey.Create(
@@ -238,7 +241,7 @@ export class Migration20200115 extends Migration {
         masterKey: storageValueStore.mk,
         serverPassword: storageValueStore.pw,
         dataAuthenticationKey: storageValueStore.ak,
-        version: version,
+        version: version || fallbackVersion,
         keyParams: accountKeyParams
       }
     );
@@ -343,7 +346,7 @@ export class Migration20200115 extends Migration {
       rawStructure.nonwrapped![StorageKey.MobilePasscodeKeyboardType] = passcodeKeyboardType;
     }
     if (rawPasscodeParams) {
-      const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
+      const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams as any);
       const getPasscodeKey = async () => {
         let passcodeKey: SNRootKey;
         await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
@@ -360,7 +363,7 @@ export class Migration20200115 extends Migration {
              * by attempting to decrypt random item. */
             if (wrappedAccountKey) {
               const decryptedAcctKey = await this.services.protocolService.payloadByDecryptingPayload(
-                CreateMaxPayloadFromAnyObject(wrappedAccountKey),
+                CreateMaxPayloadFromAnyObject(wrappedAccountKey as any),
                 passcodeKey
               );
               return !decryptedAcctKey.errorDecrypting;
@@ -390,11 +393,12 @@ export class Migration20200115 extends Migration {
          */
         const passcodeKey = await getPasscodeKey();
         const unwrappedAccountKey = await this.services.protocolService.payloadByDecryptingPayload(
-          CreateMaxPayloadFromAnyObject(wrappedAccountKey),
+          CreateMaxPayloadFromAnyObject(wrappedAccountKey as any),
           passcodeKey
         );
         const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
-        const defaultVersion = !isNullOrUndefined(accountKeyContent.ak)
+        const version = accountKeyContent.version || rawAccountKeyParams?.version;
+        const fallbackVersion = !isNullOrUndefined(accountKeyContent.ak)
           ? ProtocolVersion.V003
           : ProtocolVersion.V002;
         const newAccountKey = CopyPayload(
@@ -404,9 +408,9 @@ export class Migration20200115 extends Migration {
               masterKey: accountKeyContent.mk,
               serverPassword: accountKeyContent.pw,
               dataAuthenticationKey: accountKeyContent.ak,
-              version: accountKeyContent.version || defaultVersion,
-              keyParams: rawAccountKeyParams,
-              accountKeys: null
+              version: version || fallbackVersion,
+              keyParams: rawAccountKeyParams as any,
+              accountKeys: undefined
             } as RootKeyContent
           }
         );
@@ -447,7 +451,8 @@ export class Migration20200115 extends Migration {
       /** No passcode, potentially account. Migrate keychain property keys. */
       const hasAccount = !isNullOrUndefined(keychainValue?.mk);
       if (hasAccount) {
-        const defaultVersion = !isNullOrUndefined(keychainValue!.ak)
+        const accountVersion = (keychainValue!.version as ProtocolVersion) || rawAccountKeyParams?.version;
+        const fallbackVersion = !isNullOrUndefined(keychainValue!.ak)
           ? ProtocolVersion.V003
           : ProtocolVersion.V002;
         const accountKey = await SNRootKey.Create(
@@ -455,8 +460,8 @@ export class Migration20200115 extends Migration {
             masterKey: keychainValue!.mk,
             serverPassword: keychainValue!.pw,
             dataAuthenticationKey: keychainValue!.ak,
-            version: (keychainValue!.version as ProtocolVersion) || defaultVersion,
-            keyParams: rawAccountKeyParams
+            version: accountVersion || fallbackVersion,
+            keyParams: rawAccountKeyParams as any
           }
         );
         await this.services.deviceInterface.setNamespacedKeychainValue(

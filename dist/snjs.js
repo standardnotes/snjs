@@ -16777,12 +16777,14 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       const mk = await this.services.deviceInterface.getRawStorageValue('mk');
 
       if (ak || mk) {
-        const version = !Object(utils["q" /* isNullOrUndefined */])(ak) ? versions["a" /* ProtocolVersion */].V003 : ak ? versions["a" /* ProtocolVersion */].V002 : versions["a" /* ProtocolVersion */].V001;
+        const version = rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version;
+        const fallbackVersion = !Object(utils["q" /* isNullOrUndefined */])(ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: mk,
-          serverPassword: await this.services.deviceInterface.getRawStorageValue('pw'),
+          serverPassword: sp,
           dataAuthenticationKey: ak,
-          version: version,
+          version: version || fallbackVersion,
           keyParams: rawAccountKeyParams
         });
         await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getKeychainValue(), this.services.identifier);
@@ -16837,12 +16839,13 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
   async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(passcodeKey, accountKeyParams, storageValueStore) {
     var _encryptedAccountKey;
 
-    const version = storageValueStore.ak ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+    const version = accountKeyParams === null || accountKeyParams === void 0 ? void 0 : accountKeyParams.version;
+    const fallbackVersion = storageValueStore.ak ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
     const accountKey = await root_key_SNRootKey.Create({
       masterKey: storageValueStore.mk,
       serverPassword: storageValueStore.pw,
       dataAuthenticationKey: storageValueStore.ak,
-      version: version,
+      version: version || fallbackVersion,
       keyParams: accountKeyParams
     });
     delete storageValueStore.mk;
@@ -16971,15 +16974,16 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const passcodeKey = await getPasscodeKey();
         const unwrappedAccountKey = await this.services.protocolService.payloadByDecryptingPayload(Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(wrappedAccountKey), passcodeKey);
         const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys;
-        const defaultVersion = !Object(utils["q" /* isNullOrUndefined */])(accountKeyContent.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const version = accountKeyContent.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version);
+        const fallbackVersion = !Object(utils["q" /* isNullOrUndefined */])(accountKeyContent.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
         const newAccountKey = Object(generator["b" /* CopyPayload */])(unwrappedAccountKey, {
           content: {
             masterKey: accountKeyContent.mk,
             serverPassword: accountKeyContent.pw,
             dataAuthenticationKey: accountKeyContent.ak,
-            version: accountKeyContent.version || defaultVersion,
+            version: version || fallbackVersion,
             keyParams: rawAccountKeyParams,
-            accountKeys: null
+            accountKeys: undefined
           }
         });
         const newWrappedAccountKey = await this.services.protocolService.payloadByEncryptingPayload(newAccountKey, intents["b" /* EncryptionIntent */].LocalStoragePreferEncrypted, passcodeKey);
@@ -17010,12 +17014,13 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       const hasAccount = !Object(utils["q" /* isNullOrUndefined */])(keychainValue === null || keychainValue === void 0 ? void 0 : keychainValue.mk);
 
       if (hasAccount) {
-        const defaultVersion = !Object(utils["q" /* isNullOrUndefined */])(keychainValue.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
+        const accountVersion = keychainValue.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version);
+        const fallbackVersion = !Object(utils["q" /* isNullOrUndefined */])(keychainValue.ak) ? versions["a" /* ProtocolVersion */].V003 : versions["a" /* ProtocolVersion */].V002;
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: keychainValue.mk,
           serverPassword: keychainValue.pw,
           dataAuthenticationKey: keychainValue.ak,
-          version: keychainValue.version || defaultVersion,
+          version: accountVersion || fallbackVersion,
           keyParams: rawAccountKeyParams
         });
         await this.services.deviceInterface.setNamespacedKeychainValue(accountKey.getKeychainValue(), this.services.identifier);
@@ -24748,6 +24753,10 @@ class device_interface_DeviceInterface {
 
   async getJsonParsedRawStorageValue(key) {
     const value = await this.getRawStorageValue(key);
+
+    if (!value) {
+      return undefined;
+    }
 
     try {
       return JSON.parse(value);
