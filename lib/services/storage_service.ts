@@ -134,7 +134,7 @@ export class SNStorageService extends PureService {
     const value = await this.deviceInterface!.getRawStorageValue(
       this.getPersistenceKey()
     );
-    const values = value ? JSON.parse(value) : undefined;
+    const values = value ? JSON.parse(value as any) : undefined;
     this.setInitialValues(values);
   }
 

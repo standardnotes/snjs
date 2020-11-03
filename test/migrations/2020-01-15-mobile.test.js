@@ -212,7 +212,6 @@ describe('2020-01-15 mobile migration', () => {
     application.deinit();
   });
 
-
   it('2020-01-15 migration with passcode only', async function () {
     const application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,
@@ -617,6 +616,182 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(lastExportDate);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    await application.deinit();
+  }).timeout(10000);
+
+  it('2020-01-15 migration with 002 account should not create 003 data', async function () {
+    /** There was an issue where 002 account loading new app would create new default items key
+     * with 003 version. Should be 002. */
+    const application = await Factory.createAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator002 = new SNProtocolOperator002(new SNWebCrypto());
+    const identifier = 'foo';
+    /** Create old version account parameters */
+    const password = 'tar';
+    const accountKey = await operator002.createRootKey(
+      identifier,
+      password
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'auth_params',
+      JSON.stringify(accountKey.keyParams.getPortableValue())
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: identifier })
+    );
+    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V002);
+    await application.deviceInterface.legacy_setRawKeychainValue({
+      mk: accountKey.masterKey,
+      pw: accountKey.serverPassword,
+      ak: accountKey.dataAuthenticationKey,
+      jwt: 'foo'
+    });
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator002.generateEncryptedParameters(
+      notePayload,
+      PayloadFormat.EncryptedString,
+      accountKey,
+    );
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      noteEncryptionParams
+    );
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+
+    /** Run migration */
+    const promptValueReply = (prompts) => {
+      const values = [];
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None) {
+          values.push(new ChallengeValue(prompt, password));
+        }
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge) => {
+      application.addChallengeObserver(challenge, {
+        onInvalidValue: (value) => {
+          const values = promptValueReply([value.prompt]);
+          application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      const initialValues = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, initialValues);
+    };
+    await application.prepareForLaunch({
+      receiveChallenge: receiveChallenge,
+    });
+    await application.launch(true);
+
+    const itemsKey = application.itemManager.itemsKeys()[0];
+    expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V002);
+
+    /** Expect note is decrypted */
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
+    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+
+    expect(await application.getUser().email).to.equal(identifier);
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    await application.deinit();
+  }).timeout(10000);
+
+  it('2020-01-15 migration with 001 account detect 001 version even with missing info', async function () {
+    /** If 001 account, and for some reason we dont have version stored, the migrations
+     * should determine correct version based on saved payloads */
+    const application = await Factory.createAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator001 = new SNProtocolOperator001(new SNWebCrypto());
+    const identifier = 'foo';
+    /** Create old version account parameters */
+    const password = 'tar';
+    const accountKey = await operator001.createRootKey(
+      identifier,
+      password
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'auth_params',
+      JSON.stringify({
+        ...accountKey.keyParams.getPortableValue(),
+        version: undefined
+      })
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: identifier })
+    );
+    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V001);
+    await application.deviceInterface.legacy_setRawKeychainValue({
+      mk: accountKey.masterKey,
+      pw: accountKey.serverPassword,
+      jwt: 'foo'
+    });
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator001.generateEncryptedParameters(
+      notePayload,
+      PayloadFormat.EncryptedString,
+      accountKey,
+    );
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      noteEncryptionParams
+    );
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+
+    /** Run migration */
+    const promptValueReply = (prompts) => {
+      const values = [];
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None) {
+          values.push(new ChallengeValue(prompt, password));
+        }
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge) => {
+      application.addChallengeObserver(challenge, {
+        onInvalidValue: (value) => {
+          const values = promptValueReply([value.prompt]);
+          application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      const initialValues = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, initialValues);
+    };
+    await application.prepareForLaunch({
+      receiveChallenge: receiveChallenge,
+    });
+    await application.launch(true);
+
+    const itemsKey = application.itemManager.itemsKeys()[0];
+    expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V001);
+
+    /** Expect note is decrypted */
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
+    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+
+    expect(await application.getUser().email).to.equal(identifier);
     console.warn('Expecting exception due to deiniting application while trying to renew session');
     await application.deinit();
   }).timeout(10000);

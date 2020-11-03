@@ -1,4 +1,4 @@
-import { ApplicationIdentifier } from './types';
+import { ApplicationIdentifier, AnyRecord } from './types';
 /**
  * Platforms must override this class to provide platform specific utilities
  * and access to the migration service, such as exposing an interface to read
@@ -19,14 +19,14 @@ export declare abstract class DeviceInterface {
     */
     constructor(timeout: any, interval: any);
     deinit(): void;
-    abstract getRawStorageValue(key: string): Promise<any>;
+    abstract getRawStorageValue(key: string): Promise<AnyRecord | undefined>;
     /**
      * Gets the parsed raw storage value.
      * The return value from getRawStorageValue could be an object.
      * This is most likely the case for legacy values.
      * So we return the value as-is if JSON.parse throws an exception.
      */
-    getJsonParsedRawStorageValue(key: string): Promise<any>;
+    getJsonParsedRawStorageValue(key: string): Promise<AnyRecord | undefined>;
     abstract getAllRawStorageKeyValues(): Promise<{
         key: string;
         value: unknown;

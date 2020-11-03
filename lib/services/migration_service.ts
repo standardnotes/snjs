@@ -123,7 +123,7 @@ export class SNMigrationService extends PureService {
     if (isNullOrUndefined(timestamp)) {
       throw 'Timestamp should not be null. Be sure to run base migration first.';
     }
-    return JSON.parse(timestamp);
+    return JSON.parse(timestamp as any);
   }
 
   private async saveLastMigrationTimestamp(timestamp: number) {
