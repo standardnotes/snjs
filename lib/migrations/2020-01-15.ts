@@ -1,3 +1,4 @@
+import { NonwrappedStorageKey } from './../storage_keys';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
@@ -150,13 +151,13 @@ export class Migration20200115 extends Migration {
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
       const mk = await this.services.deviceInterface.getRawStorageValue('mk');
       if (ak || mk) {
-        const version = rawAccountKeyParams?.version || await this.getFallbackRootKeyVersion();
+        const version = (rawAccountKeyParams as any)?.version || await this.getFallbackRootKeyVersion();
         const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await SNRootKey.Create(
           {
-            masterKey: mk as any,
-            serverPassword: sp as any,
-            dataAuthenticationKey: ak as any,
+            masterKey: mk!,
+            serverPassword: sp!,
+            dataAuthenticationKey: ak!,
             version: version,
             keyParams: rawAccountKeyParams as any
           }
@@ -312,15 +313,19 @@ export class Migration20200115 extends Migration {
     );
     const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.AllAccountKeyParamsKey
-    );
+    ) as any;
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobilePasscodeParamsKey
     );
+    const firstRunValue = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+      NonwrappedStorageKey.MobileFirstRun
+    )
     const rawStructure: StorageValuesObject = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
         [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
-        [StorageKey.RootKeyParams]: rawAccountKeyParams
+        [StorageKey.RootKeyParams]: rawAccountKeyParams,
+        [NonwrappedStorageKey.MobileFirstRun]: firstRunValue
       },
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
@@ -328,7 +333,7 @@ export class Migration20200115 extends Migration {
     const keychainValue = await this.services.deviceInterface.getRawKeychainValue() as LegacyMobileKeychainStructure;
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileBiometricsPrefs
-    );
+    ) as any;
     if (biometricPrefs) {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
@@ -497,7 +502,7 @@ export class Migration20200115 extends Migration {
   /**
    * All platforms
    * Migrate all previously independently stored storage keys into new
-   * managed approach. Also deletes any legacy values from raw storage.
+   * managed approach.
    */
   private async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
     const allKeyValues = await this.services.deviceInterface
@@ -563,7 +568,8 @@ export class Migration20200115 extends Migration {
     const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileDoNotWarnUnsupportedEditors
     );
-    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
+    const legacyOptionsState = await this.services.deviceInterface
+      .getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState) as any;
     let migratedOptionsState = {}
     if (legacyOptionsState) {
       const legacySortBy = legacyOptionsState.sortBy;

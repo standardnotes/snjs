@@ -34,7 +34,6 @@ export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export { LiveItem } from './models/live_item';
 
-
 export { SNComponentManager } from './services/component_manager';
 export { SessionHistoryMap } from './services/history/session/session_history_map';
 export { ItemSessionHistory } from './services/history/session/item_session_history';
@@ -151,7 +150,7 @@ export { PayloadFormat } from '@Payloads/formats';
 export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadField } from '@Payloads/fields';
 
-export { StorageKey, RawStorageKey } from '@Lib/storage_keys';
+export { StorageKey, RawStorageKey, NonwrappedStorageKey } from '@Lib/storage_keys';
 
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/2020-01-01-base';

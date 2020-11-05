@@ -1,5 +1,5 @@
 import { ApplicationIdentifier, AnyRecord } from './types';
-import { getGlobalScope } from '@Lib/utils';
+import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
 
 /**
  * Platforms must override this class to provide platform specific utilities
@@ -34,7 +34,7 @@ export abstract class DeviceInterface {
     this.interval = null;
   }
 
-  abstract async getRawStorageValue(key: string): Promise<AnyRecord | undefined>;
+  abstract async getRawStorageValue(key: string): Promise<string | undefined>;
 
   /**
    * Gets the parsed raw storage value.
@@ -42,9 +42,9 @@ export abstract class DeviceInterface {
    * This is most likely the case for legacy values.
    * So we return the value as-is if JSON.parse throws an exception.
    */
-  public async getJsonParsedRawStorageValue(key: string): Promise<AnyRecord | undefined> {
-    const value = await this.getRawStorageValue(key) as any;
-    if (!value) {
+  public async getJsonParsedRawStorageValue(key: string): Promise<unknown | undefined> {
+    const value = await this.getRawStorageValue(key);
+    if (isNullOrUndefined(value)) {
       return undefined;
     }
     try {

@@ -59,7 +59,7 @@ export { ProtocolVersion } from './protocol/versions';
 export { PayloadFormat } from './protocol/payloads/formats';
 export { PurePayload } from './protocol/payloads/pure_payload';
 export { PayloadField } from './protocol/payloads/fields';
-export { StorageKey, RawStorageKey } from './storage_keys';
+export { StorageKey, RawStorageKey, NonwrappedStorageKey } from './storage_keys';
 /** Migrations */
 export { BaseMigration } from './migrations/2020-01-01-base';
 /** Privileges */

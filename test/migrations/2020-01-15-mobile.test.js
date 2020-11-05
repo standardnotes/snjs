@@ -94,7 +94,7 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(biometricPrefs)
     );
     await application.deviceInterface.setRawStorageValue(
-      'first_run',
+      NonwrappedStorageKey.MobileFirstRun,
       false
     );
     /** Create encrypted item and store it in db */
@@ -180,8 +180,9 @@ describe('2020-01-15 mobile migration', () => {
     const retrievedNote = application.itemManager.notes[0];
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+
     expect(
-      await application.storageService.getValue('first_run')
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
     ).to.equal(false);
 
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
@@ -254,7 +255,7 @@ describe('2020-01-15 mobile migration', () => {
       passcodeKeyboardType
     );
     await application.deviceInterface.setRawStorageValue(
-      'first_run',
+      NonwrappedStorageKey.MobileFirstRun,
       false
     );
     /** Create encrypted item and store it in db */
@@ -341,7 +342,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageService.getValue('first_run')
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
     ).to.equal(false);
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
@@ -396,7 +397,7 @@ describe('2020-01-15 mobile migration', () => {
       passcodeKeyboardType
     );
     await application.deviceInterface.setRawStorageValue(
-      'first_run',
+      NonwrappedStorageKey.MobileFirstRun,
       false
     );
     /** Create encrypted item and store it in db */
@@ -512,7 +513,7 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(biometricPrefs)
     );
     await application.deviceInterface.setRawStorageValue(
-      'first_run',
+      NonwrappedStorageKey.MobileFirstRun,
       false
     );
     /** Create encrypted item and store it in db */
@@ -604,7 +605,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageService.getValue('first_run')
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
     ).to.equal(false);
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
@@ -898,7 +899,7 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(biometricPrefs)
     );
     await application.deviceInterface.setRawStorageValue(
-      'first_run',
+      NonwrappedStorageKey.MobileFirstRun,
       false
     );
     /** Create encrypted item and store it in db */
@@ -976,7 +977,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageService.getValue('first_run')
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
     ).to.equal(false);
     expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
     expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
