@@ -24825,7 +24825,7 @@ class device_interface_DeviceInterface {
   async getJsonParsedRawStorageValue(key) {
     const value = await this.getRawStorageValue(key);
 
-    if (!value) {
+    if (Object(utils["q" /* isNullOrUndefined */])(value)) {
       return undefined;
     }
 

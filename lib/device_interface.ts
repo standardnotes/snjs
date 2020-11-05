@@ -1,5 +1,5 @@
 import { ApplicationIdentifier, AnyRecord } from './types';
-import { getGlobalScope } from '@Lib/utils';
+import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
 
 /**
  * Platforms must override this class to provide platform specific utilities
@@ -44,7 +44,7 @@ export abstract class DeviceInterface {
    */
   public async getJsonParsedRawStorageValue(key: string): Promise<AnyRecord | undefined> {
     const value = await this.getRawStorageValue(key) as any;
-    if (!value) {
+    if (isNullOrUndefined(value)) {
       return undefined;
     }
     try {
