@@ -137,3 +137,8 @@ export const PromptTitles = {
   Biometrics: 'Biometrics',
 }
 
+export const ErrorAlertStrings = {
+  MissingSessionTitle: 'Missing Session',
+  MissingSessionBody: 'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.'
+}
+

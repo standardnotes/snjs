@@ -1,3 +1,4 @@
+import { SNLog } from './../../log';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
@@ -32,7 +33,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { SessionStrings, SignInStrings, RegisterStrings } from './messages';
+import { SessionStrings, SignInStrings, RegisterStrings, ErrorAlertStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -117,7 +118,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   public getUser() {
     if (this.user && !this.apiService.getSession()) {
-      throw Error('User is defined but no session is present.')
+      this.alertService.alert(
+        ErrorAlertStrings.MissingSessionBody,
+        ErrorAlertStrings.MissingSessionTitle
+      );
+      SNLog.error(Error('User is defined but no session is present.'))
     }
     return this.user;
   }

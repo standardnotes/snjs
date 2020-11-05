@@ -10109,6 +10109,10 @@ const PromptTitles = {
   LocalPasscode: 'Application Passcode',
   Biometrics: 'Biometrics'
 };
+const ErrorAlertStrings = {
+  MissingSessionTitle: 'Missing Session',
+  MissingSessionBody: 'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.'
+};
 // EXTERNAL MODULE: ./lib/protocol/payloads/fields.ts
 var fields = __webpack_require__(4);
 
@@ -12952,6 +12956,9 @@ var ButtonType;
   ButtonType[ButtonType["Info"] = 0] = "Info";
   ButtonType[ButtonType["Danger"] = 1] = "Danger";
 })(ButtonType || (ButtonType = {}));
+// EXTERNAL MODULE: ./lib/log.ts
+var log = __webpack_require__(15);
+
 // CONCATENATED MODULE: ./lib/services/api/session.ts
 class Session {
   static FromRawStorageValue(raw) {
@@ -13253,6 +13260,7 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
 
 
 
+
 const MINIMUM_PASSWORD_LENGTH = 8;
 
 const cleanedEmailString = email => {
@@ -13331,7 +13339,8 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
 
   getUser() {
     if (this.user && !this.apiService.getSession()) {
-      throw Error('User is defined but no session is present.');
+      this.alertService.alert(ErrorAlertStrings.MissingSessionBody, ErrorAlertStrings.MissingSessionTitle);
+      log["a" /* SNLog */].error(Error('User is defined but no session is present.'));
     }
 
     return this.user;
@@ -17508,9 +17517,6 @@ var V004Algorithm;
   V004Algorithm[V004Algorithm["EncryptionKeyLength"] = 256] = "EncryptionKeyLength";
   V004Algorithm[V004Algorithm["EncryptionNonceLength"] = 192] = "EncryptionNonceLength";
 })(V004Algorithm || (V004Algorithm = {}));
-// EXTERNAL MODULE: ./lib/log.ts
-var log = __webpack_require__(15);
-
 // CONCATENATED MODULE: ./lib/protocol/operator/operator.ts
 
 

@@ -86,3 +86,7 @@ export declare const PromptTitles: {
     LocalPasscode: string;
     Biometrics: string;
 };
+export declare const ErrorAlertStrings: {
+    MissingSessionTitle: string;
+    MissingSessionBody: string;
+};
