@@ -165,6 +165,7 @@ const SessionHistoryPayloadFields = [
 const ComponentRetrievedPayloadFields = [
   PayloadField.Uuid,
   PayloadField.Content,
+  PayloadField.ContentType,
   PayloadField.CreatedAt
 ]
 

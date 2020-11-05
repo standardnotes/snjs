@@ -146,6 +146,10 @@ export declare class SNComponentManager extends PureService {
     isItemIdWithinComponentContextJurisdiction(uuid: string, component: SNComponent): boolean;
     itemIdsInContextJurisdictionForComponent(component: SNComponent): string[];
     handlersForArea(area: ComponentArea): ComponentHandler[];
+    /**
+     * Save items is capable of saving existing items, and also creating new ones
+     * if they don't exist.
+     */
     handleSaveItemsMessage(component: SNComponent, message: ComponentMessage): Promise<void>;
     handleDuplicateItemMessage(component: SNComponent, message: ComponentMessage): void;
     handleCreateItemsMessage(component: SNComponent, message: ComponentMessage): void;

@@ -832,6 +832,10 @@ export class SNComponentManager extends PureService {
     });
   }
 
+  /**
+   * Save items is capable of saving existing items, and also creating new ones
+   * if they don't exist.
+   */
   async handleSaveItemsMessage(component: SNComponent, message: ComponentMessage) {
     let responsePayloads = message.data.items as ComponentRawPayload[];
     const requiredPermissions = [];
@@ -864,22 +868,14 @@ export class SNComponentManager extends PureService {
         component,
         true
       );
-
       /* Filter locked items */
       const uuids = Uuids(responsePayloads);
       const items = this.itemManager!.findItems(uuids, true);
       let lockedCount = 0;
       let lockedNoteCount = 0;
-      for (let [index, item] of items.entries()) {
+      for (const item of items) {
         if (!item) {
-          const responseItem = responsePayloads[index];
-          /** An item this extension is trying to save was possibly removed locally */
-          this.alertService!.alert(
-            `The extension ${component.name} is trying to save an item with type ` +
-            `${responseItem.content_type}, but that item does not exist.` +
-            `Please restart this extension and try again.`
-          );
-          return;
+          continue;
         }
         if (item.locked) {
           remove(responsePayloads, { uuid: item.uuid });
@@ -889,7 +885,6 @@ export class SNComponentManager extends PureService {
           }
         }
       };
-
       if (lockedNoteCount === 1) {
         this.alertService!.alert(
           `The note you are attempting to save is locked and cannot be edited.`,
@@ -909,13 +904,23 @@ export class SNComponentManager extends PureService {
         );
         return;
       }
-
       const payloads = responsePayloads.map((responseItem: any) => {
         return CreateSourcedPayloadFromObject(
           responseItem,
           PayloadSource.ComponentRetrieved
         );
       });
+      for (const payload of payloads) {
+        const item = this.itemManager.findItem(payload.uuid);
+        if (!item) {
+          const template = CreateItemFromPayload(payload);
+          await this.itemManager!.insertItem(template);
+        } else {
+          if (payload.content_type !== item.content_type) {
+            throw Error('Extension is trying to modify content type of item.');
+          }
+        }
+      }
       await this.itemManager!.changeItems(
         uuids,
         (mutator) => {

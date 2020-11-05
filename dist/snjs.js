@@ -699,7 +699,7 @@ const SessionHistoryPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4
 /** Represents a payload with permissible fields for when a
  * payload is retrieved from a component for saving */
 
-const ComponentRetrievedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt];
+const ComponentRetrievedPayloadFields = [_Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Uuid, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].Content, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].ContentType, _Payloads_fields__WEBPACK_IMPORTED_MODULE_4__[/* PayloadField */ "a"].CreatedAt];
 /** Represents a payload with permissible fields for when a
  * component wants to create a new item */
 
@@ -14849,6 +14849,11 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       return candidate.areas.includes(area);
     });
   }
+  /**
+   * Save items is capable of saving existing items, and also creating new ones
+   * if they don't exist.
+   */
+
 
   async handleSaveItemsMessage(component, message) {
     let responsePayloads = message.data.items;
@@ -14891,13 +14896,9 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       let lockedCount = 0;
       let lockedNoteCount = 0;
 
-      for (let [index, item] of items.entries()) {
+      for (const item of items) {
         if (!item) {
-          const responseItem = responsePayloads[index];
-          /** An item this extension is trying to save was possibly removed locally */
-
-          this.alertService.alert("The extension ".concat(component.name, " is trying to save an item with type ") + "".concat(responseItem.content_type, ", but that item does not exist.") + "Please restart this extension and try again.");
-          return;
+          continue;
         }
 
         if (item.locked) {
@@ -14927,6 +14928,20 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       const payloads = responsePayloads.map(responseItem => {
         return Object(generator["f" /* CreateSourcedPayloadFromObject */])(responseItem, sources["a" /* PayloadSource */].ComponentRetrieved);
       });
+
+      for (const payload of payloads) {
+        const item = this.itemManager.findItem(payload.uuid);
+
+        if (!item) {
+          const template = CreateItemFromPayload(payload);
+          await this.itemManager.insertItem(template);
+        } else {
+          if (payload.content_type !== item.content_type) {
+            throw Error('Extension is trying to modify content type of item.');
+          }
+        }
+      }
+
       await this.itemManager.changeItems(uuids, mutator => {
         const payload = Object(utils["E" /* searchArray */])(payloads, {
           uuid: mutator.getUuid()
