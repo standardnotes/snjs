@@ -1,3 +1,4 @@
+import { NonwrappedStorageKey } from './../storage_keys';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
@@ -316,11 +317,15 @@ export class Migration20200115 extends Migration {
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobilePasscodeParamsKey
     );
+    const firstRunValue = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+      NonwrappedStorageKey.MobileFirstRun
+    )
     const rawStructure: StorageValuesObject = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
         [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
-        [StorageKey.RootKeyParams]: rawAccountKeyParams
+        [StorageKey.RootKeyParams]: rawAccountKeyParams,
+        [NonwrappedStorageKey.MobileFirstRun]: firstRunValue
       },
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
@@ -497,7 +502,7 @@ export class Migration20200115 extends Migration {
   /**
    * All platforms
    * Migrate all previously independently stored storage keys into new
-   * managed approach. Also deletes any legacy values from raw storage.
+   * managed approach.
    */
   private async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
     const allKeyValues = await this.services.deviceInterface

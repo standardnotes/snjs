@@ -36,6 +36,10 @@ export enum StorageKey {
   StorageEncryptionPolicy = 'storage_policy'
 };
 
+export enum NonwrappedStorageKey {
+  MobileFirstRun = 'first_run'
+}
+
 export function namespacedKey(namespace: string, key: string) {
   if (namespace) {
     return `${namespace}-${key}`;

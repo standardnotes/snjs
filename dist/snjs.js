@@ -9469,6 +9469,7 @@ __webpack_require__.d(__webpack_exports__, "PurePayload", function() { return /*
 __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return /* reexport */ fields["a" /* PayloadField */]; });
 __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return /* reexport */ StorageKey; });
 __webpack_require__.d(__webpack_exports__, "RawStorageKey", function() { return /* reexport */ RawStorageKey; });
+__webpack_require__.d(__webpack_exports__, "NonwrappedStorageKey", function() { return /* reexport */ NonwrappedStorageKey; });
 __webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return /* reexport */ _2020_01_01_base_BaseMigration; });
 __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return /* reexport */ PrivilegeSessionLength; });
 __webpack_require__.d(__webpack_exports__, "SNLog", function() { return /* reexport */ log["a" /* SNLog */]; });
@@ -9524,6 +9525,12 @@ var StorageKey;
 })(StorageKey || (StorageKey = {}));
 
 ;
+var NonwrappedStorageKey;
+
+(function (NonwrappedStorageKey) {
+  NonwrappedStorageKey["MobileFirstRun"] = "first_run";
+})(NonwrappedStorageKey || (NonwrappedStorageKey = {}));
+
 function namespacedKey(namespace, key) {
   if (namespace) {
     return "".concat(namespace, "-").concat(key);
@@ -16686,6 +16693,7 @@ function _2020_01_15_defineProperty(obj, key, value) { if (key in obj) { Object.
 
 
 
+
 const LegacyKeys = {
   WebPasscodeParamsKey: 'offlineParams',
   MobilePasscodeParamsKey: 'pc_params',
@@ -16921,11 +16929,13 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
     const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileWrappedRootKeyKey);
     const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.AllAccountKeyParamsKey);
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobilePasscodeParamsKey);
+    const firstRunValue = await this.services.deviceInterface.getJsonParsedRawStorageValue(NonwrappedStorageKey.MobileFirstRun);
     const rawStructure = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
         [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
-        [StorageKey.RootKeyParams]: rawAccountKeyParams
+        [StorageKey.RootKeyParams]: rawAccountKeyParams,
+        [NonwrappedStorageKey.MobileFirstRun]: firstRunValue
       },
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {}
@@ -17078,7 +17088,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
   /**
    * All platforms
    * Migrate all previously independently stored storage keys into new
-   * managed approach. Also deletes any legacy values from raw storage.
+   * managed approach.
    */
 
 

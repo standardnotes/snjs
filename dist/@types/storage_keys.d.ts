@@ -34,4 +34,7 @@ export declare enum StorageKey {
     KeyRecoveryUndecryptableItems = "key_recovery_undecryptable",
     StorageEncryptionPolicy = "storage_policy"
 }
+export declare enum NonwrappedStorageKey {
+    MobileFirstRun = "first_run"
+}
 export declare function namespacedKey(namespace: string, key: string): string;
