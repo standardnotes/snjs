@@ -71,7 +71,7 @@ export declare class Migration20200115 extends Migration {
     /**
      * All platforms
      * Migrate all previously independently stored storage keys into new
-     * managed approach. Also deletes any legacy values from raw storage.
+     * managed approach.
      */
     private migrateArbitraryRawStorageToManagedStorageAllPlatforms;
     /**
