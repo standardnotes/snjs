@@ -151,13 +151,13 @@ export class Migration20200115 extends Migration {
       const ak = await this.services.deviceInterface.getRawStorageValue('ak');
       const mk = await this.services.deviceInterface.getRawStorageValue('mk');
       if (ak || mk) {
-        const version = rawAccountKeyParams?.version || await this.getFallbackRootKeyVersion();
+        const version = (rawAccountKeyParams as any)?.version || await this.getFallbackRootKeyVersion();
         const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await SNRootKey.Create(
           {
-            masterKey: mk as any,
-            serverPassword: sp as any,
-            dataAuthenticationKey: ak as any,
+            masterKey: mk!,
+            serverPassword: sp!,
+            dataAuthenticationKey: ak!,
             version: version,
             keyParams: rawAccountKeyParams as any
           }
@@ -313,7 +313,7 @@ export class Migration20200115 extends Migration {
     );
     const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.AllAccountKeyParamsKey
-    );
+    ) as any;
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobilePasscodeParamsKey
     );
@@ -333,7 +333,7 @@ export class Migration20200115 extends Migration {
     const keychainValue = await this.services.deviceInterface.getRawKeychainValue() as LegacyMobileKeychainStructure;
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileBiometricsPrefs
-    );
+    ) as any;
     if (biometricPrefs) {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
@@ -568,7 +568,8 @@ export class Migration20200115 extends Migration {
     const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileDoNotWarnUnsupportedEditors
     );
-    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
+    const legacyOptionsState = await this.services.deviceInterface
+      .getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState) as any;
     let migratedOptionsState = {}
     if (legacyOptionsState) {
       const legacySortBy = legacyOptionsState.sortBy;

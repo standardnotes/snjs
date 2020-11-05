@@ -34,7 +34,7 @@ export abstract class DeviceInterface {
     this.interval = null;
   }
 
-  abstract async getRawStorageValue(key: string): Promise<AnyRecord | undefined>;
+  abstract async getRawStorageValue(key: string): Promise<string | undefined>;
 
   /**
    * Gets the parsed raw storage value.
@@ -42,8 +42,8 @@ export abstract class DeviceInterface {
    * This is most likely the case for legacy values.
    * So we return the value as-is if JSON.parse throws an exception.
    */
-  public async getJsonParsedRawStorageValue(key: string): Promise<AnyRecord | undefined> {
-    const value = await this.getRawStorageValue(key) as any;
+  public async getJsonParsedRawStorageValue(key: string): Promise<unknown | undefined> {
+    const value = await this.getRawStorageValue(key);
     if (isNullOrUndefined(value)) {
       return undefined;
     }
