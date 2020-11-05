@@ -1,3 +1,4 @@
+import { SNLog } from './../../../log';
 import {
   ItemAuthenticatedData,
   RootKeyEncryptedAuthenticatedData,
@@ -141,8 +142,14 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
       return super.generateDecryptedParameters(encryptedParameters, key);
     }
     if (!encryptedParameters.enc_item_key) {
-      console.error('Missing item encryption key, skipping decryption.');
-      return encryptedParameters;
+      SNLog.error(Error('Missing item encryption key, skipping decryption.'));
+      return CopyEncryptionParameters(
+        encryptedParameters,
+        {
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
+        }
+      );
     }
     /** Decrypt encrypted key */
     let encryptedItemKey = encryptedParameters.enc_item_key;

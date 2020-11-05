@@ -1,3 +1,4 @@
+import { SNLog } from './../../log';
 import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
@@ -74,7 +75,7 @@ export class SNItem {
       payload.format === PayloadFormat.DecryptedBareObject &&
       (payload.enc_item_key || payload.items_key_id || payload.auth_hash)
     ) {
-      throw Error('Creating an item from a decrypted payload should not contain enc params');
+      SNLog.error(Error('Creating an item from a decrypted payload should not contain enc params'));
     }
     this.payload = payload;
     this.conflictOf = payload.safeContent.conflict_of;
@@ -114,7 +115,7 @@ export class SNItem {
    * encrypted string protocol version.
    */
   get version() {
-    if(this.payload.format === PayloadFormat.DecryptedBareObject) {
+    if (this.payload.format === PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to access version of decrypted payload');
     }
     return this.payload.version as ProtocolVersion;
