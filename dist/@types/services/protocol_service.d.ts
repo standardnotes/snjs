@@ -282,7 +282,7 @@ export declare class SNProtocolService extends PureService implements Encryption
     /**
      * Returns the in-memory root key value.
      */
-    getRootKey(): Promise<SNRootKey | undefined>;
+    getRootKey(): SNRootKey | undefined;
     /**
      * Deletes root key and wrapper from keychain. Used when signing out of application.
      */

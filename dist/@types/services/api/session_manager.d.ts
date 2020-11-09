@@ -42,7 +42,7 @@ export declare class SNSessionManager extends PureService<SessionEvent> {
     offline(): boolean;
     getUser(): User | undefined;
     signOut(): Promise<void>;
-    private reauthenticateInvalidSession;
+    reauthenticateInvalidSession(cancelable?: boolean, onResponse?: (response: HttpResponse) => void): Promise<unknown>;
     private promptForMfaValue;
     register(email: string, password: string): Promise<SessionManagerResponse>;
     private retrieveKeyParams;

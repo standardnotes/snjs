@@ -1,3 +1,6 @@
+import { ErrorAlertStrings } from './api/messages';
+import { SNAlertService } from './alert_service';
+import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
 import { RawStorageKey, namespacedKey, StorageKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
@@ -64,19 +67,18 @@ export class SNStorageService extends PureService {
   private storagePersistable = false
   private persistencePolicy!: StoragePersistencePolicies
   private encryptionPolicy!: StorageEncryptionPolicies
-  private identifier: string
   private needsPersist = false
 
   private values!: StorageValuesObject
 
   constructor(
     deviceInterface: DeviceInterface,
-    identifier: string,
+    private alertService: SNAlertService,
+    private identifier: string,
     private environment: Environment
   ) {
     super();
     this.deviceInterface = deviceInterface;
-    this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false);
   }
@@ -175,14 +177,12 @@ export class SNStorageService extends PureService {
     if (!(wrappedValue?.content_type)) {
       throw Error('Attempting to decrypt nonexistent wrapped value');
     }
-
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue,
       {
         content_type: ContentType.EncryptedStorage
       }
     );
-
     const decryptedPayload = await this.encryptionDelegate!.payloadByDecryptingPayload(
       payload,
       key
@@ -194,7 +194,11 @@ export class SNStorageService extends PureService {
     const wrappedValue = this.values[ValueModesKeys.Wrapped];
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue);
     if (decryptedPayload.errorDecrypting) {
-      throw Error('Unable to decrypt storage.');
+      this.alertService.alert(
+        ErrorAlertStrings.StorageDecryptErrorBody,
+        ErrorAlertStrings.StorageDecryptErrorTitle,
+      )
+      throw SNLog.error(Error('Unable to decrypt storage.'));
     }
     this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);
   }

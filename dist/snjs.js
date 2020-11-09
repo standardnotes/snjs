@@ -1036,12 +1036,12 @@ function isVersionLessThanOrEqualTo(input, compareTo) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return SingletonStrategy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return SNItem; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ItemMutator; });
-/* harmony import */ var _log__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(15);
+/* harmony import */ var _log__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
 /* harmony import */ var _protocol_payloads_formats__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
 /* harmony import */ var _Protocol_payloads_deltas_strategies__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
 /* harmony import */ var _Payloads_generator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1);
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(0);
-/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(14);
+/* harmony import */ var _Models_core_predicate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(15);
 /* harmony import */ var _content_types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(3);
 /* harmony import */ var _Lib_protocol_payloads_sources__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(2);
 
@@ -2026,6 +2026,24 @@ var ConflictStrategy;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SNLog; });
+class SNLog {
+  static log() {
+    this.onLog(...arguments);
+  }
+
+  static error(error) {
+    this.onError(error);
+    return error;
+  }
+
+}
+
+/***/ }),
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SNPredicate; });
 /* harmony import */ var _Lib_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 
@@ -2252,23 +2270,6 @@ class SNPredicate {
     }
 
     return date;
-  }
-
-}
-
-/***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SNLog; });
-class SNLog {
-  static log() {
-    this.onLog(...arguments);
-  }
-
-  static error(error) {
-    this.onError(error);
   }
 
 }
@@ -10085,14 +10086,16 @@ const SessionStrings = {
   EnterEmailAndPassword: 'Please enter your account email and password.',
 
   RecoverSession(email) {
-    return "Your credentials are needed for ".concat(email, " to refresh your session with the server.");
+    return email ? "Your credentials are needed for ".concat(email, " to refresh your session with the server.") : "Your credentials are needed to refresh your session with the server.";
   },
 
   SessionRestored: 'Your session has been successfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
   MfaInputPlaceholder: 'Two-factor authentication code',
   EmailInputPlaceholder: 'Email',
-  PasswordInputPlaceholder: 'Password'
+  PasswordInputPlaceholder: 'Password',
+  KeychainRecoveryErrorTitle: 'Invalid Credentials',
+  KeychainRecoveryError: 'The email or password you entered is incorrect.\n\nPlease note that this sign-in request is made against the default server. If you are using a custom server, you must uninstall the app then reinstall, and sign back into your account.'
 };
 const ChallengeStrings = {
   UnlockApplication: 'Authentication is required to unlock the application',
@@ -10111,7 +10114,9 @@ const PromptTitles = {
 };
 const ErrorAlertStrings = {
   MissingSessionTitle: 'Missing Session',
-  MissingSessionBody: 'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.'
+  MissingSessionBody: 'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.',
+  StorageDecryptErrorTitle: 'Storage Error',
+  StorageDecryptErrorBody: "We were unable to decrypt your local storage. Please restart the app and try again. If you're unable to resolve this issue, and you have an account, you may try uninstalling the app then reinstalling, then signing back into your account. Otherwise, please contact help@standardnotes.org for support."
 };
 // EXTERNAL MODULE: ./lib/protocol/payloads/fields.ts
 var fields = __webpack_require__(4);
@@ -10120,7 +10125,7 @@ var fields = __webpack_require__(4);
 var core_item = __webpack_require__(6);
 
 // EXTERNAL MODULE: ./lib/models/core/predicate.ts
-var core_predicate = __webpack_require__(14);
+var core_predicate = __webpack_require__(15);
 
 // CONCATENATED MODULE: ./lib/models/app/userPrefs.ts
 
@@ -10924,6 +10929,9 @@ var ApplicationStage;
 // EXTERNAL MODULE: ./lib/protocol/payloads/generator.ts
 var generator = __webpack_require__(1);
 
+// EXTERNAL MODULE: ./lib/log.ts
+var log = __webpack_require__(14);
+
 // CONCATENATED MODULE: ./lib/platforms.ts
 var Environment;
 
@@ -11001,6 +11009,8 @@ var intents = __webpack_require__(7);
 
 
 
+
+
 var StoragePersistencePolicies;
 
 (function (StoragePersistencePolicies) {
@@ -11054,15 +11064,16 @@ var ValueModesKeys;
  */
 
 class storage_service_SNStorageService extends pure_service["a" /* PureService */] {
-  constructor(deviceInterface, identifier, environment) {
+  constructor(deviceInterface, alertService, identifier, environment) {
     super();
+    this.alertService = alertService;
+    this.identifier = identifier;
     this.environment = environment;
     /** Wait until application has been unlocked before trying to persist */
 
     this.storagePersistable = false;
     this.needsPersist = false;
     this.deviceInterface = deviceInterface;
-    this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false);
   }
@@ -11174,7 +11185,8 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue);
 
     if (decryptedPayload.errorDecrypting) {
-      throw Error('Unable to decrypt storage.');
+      this.alertService.alert(ErrorAlertStrings.StorageDecryptErrorBody, ErrorAlertStrings.StorageDecryptErrorTitle);
+      throw log["a" /* SNLog */].error(Error('Unable to decrypt storage.'));
     }
 
     this.values[ValueModesKeys.Unwrapped] = Object(utils["a" /* Copy */])(decryptedPayload.contentObject);
@@ -12956,9 +12968,6 @@ var ButtonType;
   ButtonType[ButtonType["Info"] = 0] = "Info";
   ButtonType[ButtonType["Danger"] = 1] = "Danger";
 })(ButtonType || (ButtonType = {}));
-// EXTERNAL MODULE: ./lib/log.ts
-var log = __webpack_require__(15);
-
 // CONCATENATED MODULE: ./lib/services/api/session.ts
 class Session {
   static FromRawStorageValue(raw) {
@@ -13356,35 +13365,44 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   async reauthenticateInvalidSession() {
+    var _this$getUser;
+
+    let cancelable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+    let onResponse = arguments.length > 1 ? arguments[1] : undefined;
+
     if (this.isSessionRenewChallengePresented) {
       return;
     }
 
     this.isSessionRenewChallengePresented = true;
-    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, true, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession(this.getUser().email));
-    this.challengeService.addChallengeObserver(challenge, {
-      onCancel: () => {
-        this.isSessionRenewChallengePresented = false;
-      },
-      onComplete: () => {
-        this.isSessionRenewChallengePresented = false;
-      },
-      onNonvalidatedSubmit: async challengeResponse => {
-        const email = challengeResponse.values[0].value;
-        const password = challengeResponse.values[1].value;
-        const currentKeyParams = await this.protocolService.getAccountKeyParams();
-        const signInResult = await this.signIn(email, password, false, currentKeyParams.version);
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, cancelable, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession((_this$getUser = this.getUser()) === null || _this$getUser === void 0 ? void 0 : _this$getUser.email));
+    return new Promise(resolve => {
+      this.challengeService.addChallengeObserver(challenge, {
+        onCancel: () => {
+          this.isSessionRenewChallengePresented = false;
+        },
+        onComplete: () => {
+          this.isSessionRenewChallengePresented = false;
+        },
+        onNonvalidatedSubmit: async challengeResponse => {
+          const email = challengeResponse.values[0].value;
+          const password = challengeResponse.values[1].value;
+          const currentKeyParams = await this.protocolService.getAccountKeyParams();
+          const signInResult = await this.signIn(email, password, false, currentKeyParams.version);
 
-        if (signInResult.response.error) {
-          this.challengeService.setValidationStatusForChallenge(challenge, challengeResponse.values[1], false);
-        } else {
-          this.challengeService.completeChallenge(challenge);
-          this.notifyEvent(SessionEvent.SessionRestored);
-          this.alertService.alert(SessionStrings.SessionRestored);
+          if (signInResult.response.error) {
+            this.challengeService.setValidationStatusForChallenge(challenge, challengeResponse.values[1], false);
+            onResponse === null || onResponse === void 0 ? void 0 : onResponse(signInResult.response);
+          } else {
+            resolve();
+            this.challengeService.completeChallenge(challenge);
+            this.notifyEvent(SessionEvent.SessionRestored);
+            this.alertService.alert(SessionStrings.SessionRestored);
+          }
         }
-      }
+      });
+      this.challengeService.promptForChallengeResponse(challenge);
     });
-    this.challengeService.promptForChallengeResponse(challenge);
   }
 
   async promptForMfaValue() {
@@ -17248,7 +17266,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
 
   async createDefaultItemsKeyForAllPlatforms() {
-    const rootKey = await this.services.protocolService.getRootKey();
+    const rootKey = this.services.protocolService.getRootKey();
 
     if (rootKey) {
       const rootKeyParams = await this.services.protocolService.getRootKeyParams();
@@ -19441,7 +19459,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
    */
 
 
-  async getRootKey() {
+  getRootKey() {
     return this.rootKey;
   }
   /**
@@ -19516,7 +19534,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     }
 
     if (Object(intents["a" /* ContentTypeUsesRootKeyEncryption */])(payload.content_type)) {
-      const rootKey = await this.getRootKey();
+      const rootKey = this.getRootKey();
 
       if (!rootKey) {
         if (Object(intents["c" /* intentRequiresEncryption */])(intent)) {
@@ -19629,7 +19647,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
        * If their version is not equal to our root key version, delete them. If we end up with 0
        * items keys, create a new one. This covers the case when you open the app offline and it creates
        * an 004 key, and then you sign into an 003 account. */
-      const rootKey = await this.getRootKey();
+      const rootKey = this.getRootKey();
 
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
@@ -19770,7 +19788,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
 
 
   async createNewDefaultItemsKey() {
-    const rootKey = await this.getRootKey();
+    const rootKey = this.getRootKey();
     const operatorVersion = rootKey ? rootKey.keyVersion : this.getLatestVersion();
     let itemTemplate;
 
@@ -23107,6 +23125,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
   }
   /**
    * Resolves when the challenge has been completed.
+   * For non-validated challenges, will resolve when the first value is submitted.
    */
 
 
@@ -23534,6 +23553,10 @@ class application_SNApplication {
     }
 
     if (this.storageService.isStorageWrapped()) {
+      if (!this.protocolService.getRootKey()) {
+        await this.presentAccountRecoveryChallenge();
+      }
+
       await this.storageService.decryptStorage();
     }
 
@@ -23572,6 +23595,14 @@ class application_SNApplication {
     if (awaitDatabaseLoad) {
       await loadPromise;
     }
+  }
+
+  async presentAccountRecoveryChallenge() {
+    return this.sessionManager.reauthenticateInvalidSession(false, response => {
+      if (response.error) {
+        this.alertService.alert(SessionStrings.KeychainRecoveryError, SessionStrings.KeychainRecoveryErrorTitle);
+      }
+    });
   }
 
   onStart() {}
@@ -24727,7 +24758,7 @@ class application_SNApplication {
   }
 
   createStorageManager() {
-    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.identifier, this.environment);
+    this.storageService = new storage_service_SNStorageService(this.deviceInterface, this.alertService, this.identifier, this.environment);
     this.services.push(this.storageService);
   }
 

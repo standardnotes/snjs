@@ -27,7 +27,8 @@ export function createApplication(identifier, environment, platform) {
     },
     identifier,
     undefined,
-    undefined
+    undefined,
+    'http://localhost:3000'
   );
 }
 

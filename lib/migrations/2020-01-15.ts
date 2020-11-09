@@ -634,7 +634,7 @@ export class Migration20200115 extends Migration {
    * @access private
    */
   async createDefaultItemsKeyForAllPlatforms() {
-    const rootKey = await this.services.protocolService.getRootKey();
+    const rootKey = this.services.protocolService.getRootKey();
     if (rootKey) {
       const rootKeyParams = await this.services.protocolService.getRootKeyParams();
       /** If params are missing a version, it must be 001 */

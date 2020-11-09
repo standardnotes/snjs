@@ -54,7 +54,7 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD
+  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD, SessionStrings
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
@@ -236,8 +236,10 @@ export class SNApplication {
       }
       await this.handleLaunchChallengeResponse(response);
     }
-
     if (this.storageService!.isStorageWrapped()) {
+      if (!this.protocolService.getRootKey()) {
+        await this.presentAccountRecoveryChallenge();
+      }
       await this.storageService!.decryptStorage();
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
@@ -274,6 +276,19 @@ export class SNApplication {
     if (awaitDatabaseLoad) {
       await loadPromise;
     }
+  }
+
+  private async presentAccountRecoveryChallenge() {
+    return this.sessionManager.reauthenticateInvalidSession(
+      false,
+      (response) => {
+        if (response.error) {
+          this.alertService.alert(
+            SessionStrings.KeychainRecoveryError,
+            SessionStrings.KeychainRecoveryErrorTitle
+          )
+        }
+      });
   }
 
   public onStart() {
@@ -1497,6 +1512,7 @@ export class SNApplication {
   private createStorageManager() {
     this.storageService = new SNStorageService(
       this.deviceInterface!,
+      this.alertService,
       this.identifier,
       this.environment
     );
