@@ -6,7 +6,7 @@ import uniqWith from 'lodash/uniqWith';
 import uniq from 'lodash/uniq';
 import { AnyRecord } from './types';
 
-export function getGlobalScope() {
+export function getGlobalScope(): Window | unknown | null {
   return typeof window !== 'undefined'
     ? window
     : (typeof global !== 'undefined' ? global : null);

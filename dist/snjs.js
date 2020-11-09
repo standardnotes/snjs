@@ -18754,7 +18754,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
     } else if (version === versions["a" /* ProtocolVersion */].V000Base64Decrypted) {
       return this.createOperatorForLatestVersion();
     } else {
-      throw "Unable to find operator for version ".concat(version);
+      throw Error("Unable to find operator for version ".concat(version));
     }
   }
 

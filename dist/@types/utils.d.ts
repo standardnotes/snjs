@@ -1,6 +1,5 @@
-/// <reference types="node" />
 import { AnyRecord } from './types';
-export declare function getGlobalScope(): (Window & typeof globalThis) | NodeJS.Global | null;
+export declare function getGlobalScope(): Window | unknown | null;
 export declare function dictToArray<T>(dict: Record<any, T>): NonNullable<T>[];
 /**
  * Whether we are in a web browser
