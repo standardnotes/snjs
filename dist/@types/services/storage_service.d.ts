@@ -1,3 +1,4 @@
+import { SNAlertService } from './alert_service';
 import { Environment } from '../platforms';
 import { ApplicationStage } from '../stages';
 import { EncryptionDelegate } from './encryption_delegate';
@@ -41,16 +42,17 @@ export declare type StorageValuesObject = {
  * key can decrypt wrapped storage.
  */
 export declare class SNStorageService extends PureService {
+    private alertService;
+    private identifier;
     private environment;
     encryptionDelegate?: EncryptionDelegate;
     /** Wait until application has been unlocked before trying to persist */
     private storagePersistable;
     private persistencePolicy;
     private encryptionPolicy;
-    private identifier;
     private needsPersist;
     private values;
-    constructor(deviceInterface: DeviceInterface, identifier: string, environment: Environment);
+    constructor(deviceInterface: DeviceInterface, alertService: SNAlertService, identifier: string, environment: Environment);
     deinit(): void;
     handleApplicationStage(stage: ApplicationStage): Promise<void>;
     setPersistencePolicy(persistencePolicy: StoragePersistencePolicies): Promise<void>;

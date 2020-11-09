@@ -64,12 +64,14 @@ export declare const ChallengeModalTitle: {
 };
 export declare const SessionStrings: {
     EnterEmailAndPassword: string;
-    RecoverSession(email: string): string;
+    RecoverSession(email?: string | undefined): string;
     SessionRestored: string;
     EnterMfa: string;
     MfaInputPlaceholder: string;
     EmailInputPlaceholder: string;
     PasswordInputPlaceholder: string;
+    KeychainRecoveryErrorTitle: string;
+    KeychainRecoveryError: string;
 };
 export declare const ChallengeStrings: {
     UnlockApplication: string;
@@ -89,4 +91,6 @@ export declare const PromptTitles: {
 export declare const ErrorAlertStrings: {
     MissingSessionTitle: string;
     MissingSessionBody: string;
+    StorageDecryptErrorTitle: string;
+    StorageDecryptErrorBody: string;
 };

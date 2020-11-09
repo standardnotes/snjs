@@ -128,17 +128,17 @@ describe('keys', function () {
     const wrappingKey = await this.application.protocolService.computeRootKey(
       password,
       wrappingKeyParams
-      );
-      await this.application.protocolService.unwrapRootKey(wrappingKey).catch((error) => {
-        expect(error).to.not.be.ok;
-      });
+    );
+    await this.application.protocolService.unwrapRootKey(wrappingKey).catch((error) => {
+      expect(error).to.not.be.ok;
+    });
 
-      const newPassword = 'bar';
-      const newKey = await this.application.protocolService.createRootKey(
-        email,
-        newPassword,
-        KeyParamsOrigination.Registration
-        );
+    const newPassword = 'bar';
+    const newKey = await this.application.protocolService.createRootKey(
+      email,
+      newPassword,
+      KeyParamsOrigination.Registration
+    );
     await this.application.protocolService.setRootKey(
       newKey,
       wrappingKey
@@ -593,5 +593,36 @@ describe('keys', function () {
     /** Register with 004 account */
     await this.application.register(this.email + 'new', this.password);
     expect(await this.application.protocolService.getEncryptionDisplayName()).to.equal('XChaCha20-Poly1305');
+  });
+
+  it('when launching mobile app with no keychain but data, should present account recovery challenge', async function () {
+    /**
+     * On iOS, when setting up a new device from restore, the keychain is deleted, but the data persists.
+     * We want to make sure we're prompting the user to re-authenticate their account.
+     */
+    const id = this.application.identifier;
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password
+    });
+    /** Simulate empty keychain */
+    await this.application.deviceInterface.clearRawKeychainValue();
+    this.application.deinit();
+
+    const recreatedApp = await Factory.createApplication(id);
+    const receiveChallenge = async (challenge) => {
+      recreatedApp.submitValuesForChallenge(
+        challenge,
+        [
+          new ChallengeValue(challenge.prompts[0], this.email),
+          new ChallengeValue(challenge.prompts[1], this.password)
+        ]
+      );
+    };
+    await recreatedApp.prepareForLaunch({ receiveChallenge });
+    await recreatedApp.launch(true);
+
+    expect(recreatedApp.protocolService.rootKey).to.be.ok;
   });
 });

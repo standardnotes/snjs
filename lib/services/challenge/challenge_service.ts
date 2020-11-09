@@ -59,6 +59,7 @@ export class ChallengeService extends PureService {
 
   /**
    * Resolves when the challenge has been completed.
+   * For non-validated challenges, will resolve when the first value is submitted.
    */
   public promptForChallengeResponse(challenge: Challenge) {
     return new Promise<ChallengeResponse | undefined>((resolve) => {

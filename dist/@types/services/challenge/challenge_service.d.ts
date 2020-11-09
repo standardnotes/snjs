@@ -29,6 +29,7 @@ export declare class ChallengeService extends PureService {
     deinit(): void;
     /**
      * Resolves when the challenge has been completed.
+     * For non-validated challenges, will resolve when the first value is submitted.
      */
     promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined>;
     validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse>;
