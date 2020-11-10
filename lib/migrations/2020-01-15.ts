@@ -42,7 +42,8 @@ type LegacyMobileKeychainStructure = {
   offline?: {
     timing?: any
     pw?: string
-  }
+  },
+  encryptedAccountKeys?: any,
   mk: string
   pw: string
   ak: string
@@ -295,6 +296,11 @@ export class Migration20200115 extends Migration {
    * not have encrypted storage, so we simply need to transfer all existing
    * storage values into new managed structure.
    *
+   * In version <= 3.0.16 on mobile, encrypted account keys were stored in the keychain
+   * under `encryptedAccountKeys`. In 3.0.17 a migration was introduced that moved this value
+   * to storage under key `encrypted_account_keys`. We need to anticipate the keys being in
+   * either location.
+   *
    * If no account but passcode only, the only thing we stored on mobile
    * previously was keys.offline.pw and keys.offline.timing in the keychain
    * that we compared against for valid decryption.
@@ -308,9 +314,11 @@ export class Migration20200115 extends Migration {
    * @access private
    */
   async migrateStorageStructureForMobile() {
+    const keychainValue = await this.services.deviceInterface
+      .getRawKeychainValue() as LegacyMobileKeychainStructure;
     const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileWrappedRootKeyKey
-    );
+    ) || keychainValue?.encryptedAccountKeys;
     const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.AllAccountKeyParamsKey
     ) as any;
@@ -330,7 +338,6 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {},
     };
-    const keychainValue = await this.services.deviceInterface.getRawKeychainValue() as LegacyMobileKeychainStructure;
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys.MobileBiometricsPrefs
     ) as any;
