@@ -991,4 +991,205 @@ describe('2020-01-15 mobile migration', () => {
     await application.deinit();
   });
 
+  it('2020-01-15 migration from mobile version 3.0.16', async function () {
+    /**
+     * In version 3.0.16, encrypted account keys were stored in keychain, not storage.
+     * This was migrated in version 3.0.17, but we want to be sure we can go from 3.0.16
+     * to current state directly.
+     */
+    let application = await Factory.createAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const identifier = 'foo';
+    const passcode = 'bar';
+    /** Create old version passcode parameters */
+    const passcodeKey = await operator003.createRootKey(
+      identifier,
+      passcode
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'pc_params',
+      JSON.stringify(passcodeKey.keyParams.getPortableValue())
+    );
+    const passcodeTiming = 'immediately';
+
+    /** Create old version account parameters */
+    const password = 'tar';
+    const accountKey = await operator003.createRootKey(
+      identifier,
+      password
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'auth_params',
+      JSON.stringify(accountKey.keyParams.getPortableValue())
+    );
+    const customServer = 'http://server-dev.standardnotes.org';
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: identifier, server: customServer })
+    );
+    /** Wrap account key with passcode key and store in storage */
+    const keyPayload = CreateMaxPayloadFromAnyObject(
+      {
+        uuid: Factory.generateUuid(),
+        content_type: 'SN|Mobile|EncryptedKeys',
+        content: {
+          accountKeys: {
+            jwt: 'foo',
+            mk: accountKey.masterKey,
+            ak: accountKey.dataAuthenticationKey,
+            pw: accountKey.serverPassword
+          }
+        }
+      }
+    );
+    const encryptedKeyParams = await operator003.generateEncryptedParameters(
+      keyPayload,
+      PayloadFormat.EncryptedString,
+      passcodeKey,
+    );
+    const wrappedKey = CreateMaxPayloadFromAnyObject(
+      keyPayload,
+      encryptedKeyParams
+    );
+    await application.deviceInterface.legacy_setRawKeychainValue({
+      encryptedAccountKeys: wrappedKey,
+      offline: {
+        pw: passcodeKey.serverPassword,
+        timing: passcodeTiming
+      }
+    });
+    const biometricPrefs = { enabled: true, timing: 'immediately' };
+    /** Create legacy storage. Storage in mobile was never wrapped. */
+    await application.deviceInterface.setRawStorageValue(
+      'biometrics_prefs',
+      JSON.stringify(biometricPrefs)
+    );
+    await application.deviceInterface.setRawStorageValue(
+      NonwrappedStorageKey.MobileFirstRun,
+      false
+    );
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+      notePayload,
+      PayloadFormat.EncryptedString,
+      accountKey,
+    );
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      noteEncryptionParams
+    );
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    /** setup options */
+    const lastExportDate = '2020:02';
+    await application.deviceInterface.setRawStorageValue(
+      'LastExportDateKey',
+      lastExportDate
+    );
+    const options = JSON.stringify({
+      sortBy: 'userModifiedAt',
+      sortReverse: undefined,
+      selectedTagIds: [],
+      hidePreviews: true,
+      hideDates: false,
+      hideTags: false,
+    });
+    await application.deviceInterface.setRawStorageValue(
+      'options',
+      options
+    );
+    /** Run migration */
+    const promptValueReply = (prompts) => {
+      const values = [];
+      for (const prompt of prompts) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+          values.push(new ChallengeValue(prompt, passcode));
+        }
+        if (prompt.validation === ChallengeValidation.Biometric) {
+          values.push(new ChallengeValue(prompt, true));
+        }
+      }
+      return values;
+    };
+    const receiveChallenge = async (challenge) => {
+      const values = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, values);
+    };
+    await application.prepareForLaunch({
+      receiveChallenge
+    });
+    await application.launch(true);
+
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper
+    );
+
+    /** Should be decrypted */
+    const storageMode = application.storageService.domainKeyForMode(
+      StorageValueModes.Default
+    );
+    const valueStore = application.storageService.values[storageMode];
+    expect(valueStore.content_type).to.not.be.ok;
+
+    const keyParams = await application.storageService.getValue(
+      StorageKey.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(typeof keyParams).to.equal('object');
+    const rootKey = await application.protocolService.getRootKey();
+    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
+
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
+    expect(keychainValue).to.not.be.ok;
+
+    /** Expect note is decrypted */
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
+    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+
+    expect(
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
+    ).to.equal(false);
+
+    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
+    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
+    expect(await application.getUser().email).to.equal(identifier);
+
+    const appId = application.identifier;
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    await application.deinit();
+
+    /** Recreate application and ensure storage values are consistent */
+    application = Factory.createApplication(appId);
+    await application.prepareForLaunch({
+      receiveChallenge
+    });
+    await application.launch(true);
+    expect(await application.getUser().email).to.equal(identifier);
+    expect(await application.getHost()).to.equal(customServer);
+    const preferences = await application.storageService.getValue('preferences');
+    expect(preferences.sortBy).to.equal('userModifiedAt');
+    expect(preferences.sortReverse).to.be.false;
+    expect(preferences.hideDate).to.be.false;
+    expect(preferences.hideTags).to.be.false;
+    expect(preferences.hideNotePreview).to.be.true;
+    expect(preferences.lastExportDate).to.equal(lastExportDate);
+    expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
+    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    application.deinit();
+  });
+
 });

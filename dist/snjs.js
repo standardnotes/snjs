@@ -16953,6 +16953,11 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
    * not have encrypted storage, so we simply need to transfer all existing
    * storage values into new managed structure.
    *
+   * In version <= 3.0.16 on mobile, encrypted account keys were stored in the keychain
+   * under `encryptedAccountKeys`. In 3.0.17 a migration was introduced that moved this value
+   * to storage under key `encrypted_account_keys`. We need to anticipate the keys being in
+   * either location.
+   *
    * If no account but passcode only, the only thing we stored on mobile
    * previously was keys.offline.pw and keys.offline.timing in the keychain
    * that we compared against for valid decryption.
@@ -16968,7 +16973,8 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
 
   async migrateStorageStructureForMobile() {
-    const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileWrappedRootKeyKey);
+    const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
+    const wrappedAccountKey = (await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileWrappedRootKeyKey)) || (keychainValue === null || keychainValue === void 0 ? void 0 : keychainValue.encryptedAccountKeys);
     const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.AllAccountKeyParamsKey);
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobilePasscodeParamsKey);
     const firstRunValue = await this.services.deviceInterface.getJsonParsedRawStorageValue(NonwrappedStorageKey.MobileFirstRun);
@@ -16982,7 +16988,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {}
     };
-    const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileBiometricsPrefs);
 
     if (biometricPrefs) {
