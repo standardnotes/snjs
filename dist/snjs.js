@@ -11010,7 +11010,6 @@ var intents = __webpack_require__(7);
 
 
 
-
 var StoragePersistencePolicies;
 
 (function (StoragePersistencePolicies) {
@@ -11185,7 +11184,6 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue);
 
     if (decryptedPayload.errorDecrypting) {
-      this.alertService.alert(ErrorAlertStrings.StorageDecryptErrorBody, ErrorAlertStrings.StorageDecryptErrorTitle);
       throw log["a" /* SNLog */].error(Error('Unable to decrypt storage.'));
     }
 
@@ -23572,11 +23570,25 @@ class application_SNApplication {
     }
 
     if (this.storageService.isStorageWrapped()) {
-      if (!this.protocolService.getRootKey()) {
-        await this.presentAccountRecoveryChallenge();
-      }
+      try {
+        await this.storageService.decryptStorage();
+      } catch (_firstAttemptError) {
+        const showError = () => {
+          this.alertService.alert(ErrorAlertStrings.StorageDecryptErrorBody, ErrorAlertStrings.StorageDecryptErrorTitle);
+        };
 
-      await this.storageService.decryptStorage();
+        if (!this.protocolService.getRootKey()) {
+          await this.presentAccountRecoveryChallenge();
+
+          try {
+            await this.storageService.decryptStorage();
+          } catch (_secondAttemptError) {
+            showError();
+          }
+        } else {
+          showError();
+        }
+      }
     }
 
     await this.handleStage(ApplicationStage.StorageDecrypted_09);

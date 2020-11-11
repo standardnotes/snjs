@@ -194,10 +194,6 @@ export class SNStorageService extends PureService {
     const wrappedValue = this.values[ValueModesKeys.Wrapped];
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue);
     if (decryptedPayload.errorDecrypting) {
-      this.alertService.alert(
-        ErrorAlertStrings.StorageDecryptErrorBody,
-        ErrorAlertStrings.StorageDecryptErrorTitle,
-      )
       throw SNLog.error(Error('Unable to decrypt storage.'));
     }
     this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);

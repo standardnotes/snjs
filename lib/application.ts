@@ -237,10 +237,26 @@ export class SNApplication {
       await this.handleLaunchChallengeResponse(response);
     }
     if (this.storageService!.isStorageWrapped()) {
-      if (!this.protocolService.getRootKey()) {
-        await this.presentAccountRecoveryChallenge();
+      try {
+        await this.storageService!.decryptStorage();
+      } catch (_firstAttemptError) {
+        const showError = () => {
+          this.alertService.alert(
+            ErrorAlertStrings.StorageDecryptErrorBody,
+            ErrorAlertStrings.StorageDecryptErrorTitle,
+          );
+        };
+        if (!this.protocolService.getRootKey()) {
+          await this.presentAccountRecoveryChallenge();
+          try {
+            await this.storageService!.decryptStorage();
+          } catch (_secondAttemptError) {
+            showError();
+          }
+        } else {
+          showError();
+        }
       }
-      await this.storageService!.decryptStorage();
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService!.loadHost();
