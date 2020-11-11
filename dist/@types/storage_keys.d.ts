@@ -4,8 +4,8 @@
  */
 export declare enum RawStorageKey {
     StorageObject = "storage",
-    LastMigrationTimestamp = "last_migration_timestamp",
-    DescriptorRecord = "descriptors"
+    DescriptorRecord = "descriptors",
+    SnjsVersion = "snjs_version"
 }
 /**
  * Keys used for retrieving and saving simple key/value pairs.

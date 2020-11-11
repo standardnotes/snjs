@@ -1,3 +1,5 @@
+export { SnjsVersion } from './version';
+
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';
 export type { UuidString, ApplicationIdentifier } from './types';
@@ -150,10 +152,10 @@ export { PayloadFormat } from '@Payloads/formats';
 export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadField } from '@Payloads/fields';
 
-export { StorageKey, RawStorageKey, NonwrappedStorageKey } from '@Lib/storage_keys';
+export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from '@Lib/storage_keys';
 
 /** Migrations */
-export { BaseMigration } from '@Lib/migrations/2020-01-01-base';
+export { BaseMigration } from '@Lib/migrations/base';
 
 /** Privileges */
 export {

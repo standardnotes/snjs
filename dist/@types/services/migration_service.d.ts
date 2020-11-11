@@ -28,9 +28,8 @@ export declare class SNMigrationService extends PureService {
     handleApplicationEvent(event: ApplicationEvent): Promise<void>;
     private runBaseMigration;
     hasPendingMigrations(): Promise<boolean>;
-    private getRequiredMigrations;
-    private getNamespacedTimeStampKey;
-    private getLastMigrationTimestamp;
-    private saveLastMigrationTimestamp;
+    getStoredSnjsVersion(): Promise<string>;
+    private static getRequiredMigrations;
+    private instantiateMigrationClasses;
     private handleStage;
 }

@@ -6,7 +6,7 @@ export declare abstract class Migration {
     private stageHandlers;
     private onDoneHandler?;
     constructor(services: MigrationServices);
-    static timestamp(): number;
+    static version(): string;
     protected abstract registerStageHandlers(): void;
     protected registerStageHandler(stage: ApplicationStage, handler: StageHandler): void;
     protected markDone(): void;

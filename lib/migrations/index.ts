@@ -1,1 +1,1 @@
-export { Migration20200115 } from './2020-01-15';
+export { Migration2_0_0 } from './2_0_0';

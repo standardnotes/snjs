@@ -1,3 +1,4 @@
+import { PreviousSnjsVersion2_0_0 } from './../version';
 import { NonwrappedStorageKey } from './../storage_keys';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
@@ -52,10 +53,10 @@ type LegacyMobileKeychainStructure = {
 } | undefined | null;
 const LEGACY_SESSION_TOKEN_KEY = 'jwt';
 
-export class Migration20200115 extends Migration {
+export class Migration2_0_0 extends Migration {
 
-  static timestamp() {
-    return (new Date('2020-01-15').getTime());
+  static version() {
+    return PreviousSnjsVersion2_0_0;
   }
 
   protected registerStageHandlers() {
