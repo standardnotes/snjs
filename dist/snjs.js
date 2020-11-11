@@ -13271,6 +13271,7 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
 
 
 const MINIMUM_PASSWORD_LENGTH = 8;
+const MissingAccountParams = 'missing-params';
 
 const cleanedEmailString = email => {
   return email.trim().toLowerCase();
@@ -13374,6 +13375,20 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       return;
     }
 
+    const currentKeyParams = await this.protocolService.getAccountKeyParams();
+
+    if (!currentKeyParams) {
+      onResponse === null || onResponse === void 0 ? void 0 : onResponse({
+        status: 0,
+        error: {
+          message: '',
+          status: 0,
+          tag: MissingAccountParams
+        }
+      });
+      return;
+    }
+
     this.isSessionRenewChallengePresented = true;
     const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, cancelable, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession((_this$getUser = this.getUser()) === null || _this$getUser === void 0 ? void 0 : _this$getUser.email));
     return new Promise(resolve => {
@@ -13387,7 +13402,6 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
         onNonvalidatedSubmit: async challengeResponse => {
           const email = challengeResponse.values[0].value;
           const password = challengeResponse.values[1].value;
-          const currentKeyParams = await this.protocolService.getAccountKeyParams();
           const signInResult = await this.signIn(email, password, false, currentKeyParams.version);
 
           if (signInResult.response.error) {
@@ -23605,7 +23619,11 @@ class application_SNApplication {
   async presentAccountRecoveryChallenge() {
     return this.sessionManager.reauthenticateInvalidSession(false, response => {
       if (response.error) {
-        this.alertService.alert(SessionStrings.KeychainRecoveryError, SessionStrings.KeychainRecoveryErrorTitle);
+        if (response.error.tag === MissingAccountParams) {
+          this.alertService.alert(ErrorAlertStrings.StorageDecryptErrorBody, ErrorAlertStrings.StorageDecryptErrorTitle);
+        } else {
+          this.alertService.alert(SessionStrings.KeychainRecoveryError, SessionStrings.KeychainRecoveryErrorTitle);
+        }
       }
     });
   }

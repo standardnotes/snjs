@@ -54,9 +54,9 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD, SessionStrings
+  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD, SessionStrings, ErrorAlertStrings
 } from './services/api/messages';
-import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
+import { MINIMUM_PASSWORD_LENGTH, MissingAccountParams, SessionEvent } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
@@ -283,10 +283,17 @@ export class SNApplication {
       false,
       (response) => {
         if (response.error) {
-          this.alertService.alert(
-            SessionStrings.KeychainRecoveryError,
-            SessionStrings.KeychainRecoveryErrorTitle
-          )
+          if (response.error.tag === MissingAccountParams) {
+            this.alertService.alert(
+              ErrorAlertStrings.StorageDecryptErrorBody,
+              ErrorAlertStrings.StorageDecryptErrorTitle,
+            );
+          } else {
+            this.alertService.alert(
+              SessionStrings.KeychainRecoveryError,
+              SessionStrings.KeychainRecoveryErrorTitle
+            );
+          }
         }
       });
   }

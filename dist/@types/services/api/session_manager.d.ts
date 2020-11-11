@@ -9,6 +9,7 @@ import { AnyKeyParamsContent } from './../../protocol/key_params';
 import { PureService } from '../pure_service';
 import { SNAlertService } from '../alert_service';
 export declare const MINIMUM_PASSWORD_LENGTH = 8;
+export declare const MissingAccountParams = "missing-params";
 declare type SessionManagerResponse = {
     response: HttpResponse;
     rootKey?: SNRootKey;

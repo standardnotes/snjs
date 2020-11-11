@@ -36,6 +36,7 @@ import * as messages from './messages';
 import { SessionStrings, SignInStrings, RegisterStrings, ErrorAlertStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
+export const MissingAccountParams = 'missing-params';
 
 type SessionManagerResponse = {
   response: HttpResponse;
@@ -142,6 +143,18 @@ export class SNSessionManager extends PureService<SessionEvent> {
     if (this.isSessionRenewChallengePresented) {
       return;
     }
+    const currentKeyParams = await this.protocolService.getAccountKeyParams();
+    if (!currentKeyParams) {
+      onResponse?.({
+        status: 0,
+        error: {
+          message: '',
+          status: 0,
+          tag: MissingAccountParams
+        },
+      });
+      return;
+    }
     this.isSessionRenewChallengePresented = true;
     const challenge = new Challenge(
       [
@@ -166,7 +179,6 @@ export class SNSessionManager extends PureService<SessionEvent> {
           onNonvalidatedSubmit: async (challengeResponse) => {
             const email = challengeResponse.values[0].value as string;
             const password = challengeResponse.values[1].value as string;
-            const currentKeyParams = await this.protocolService.getAccountKeyParams();
             const signInResult = await this.signIn(email, password, false, currentKeyParams!.version);
             if (signInResult.response.error) {
               this.challengeService.setValidationStatusForChallenge(
