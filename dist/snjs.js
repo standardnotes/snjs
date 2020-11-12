@@ -10004,7 +10004,7 @@ const UNSUPPORTED_PROTOCOL_VERSION = "This version of the application does not s
 const EXPIRED_PROTOCOL_VERSION = "The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security for more information.";
 const OUTDATED_PROTOCOL_VERSION = "The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.";
 const UNSUPPORTED_KEY_DERIVATION = "Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.";
-const INVALID_PASSWORD_COST = "Unable to login due to insecure password parameters. Please visit standardnotes.org/help/security for more information.";
+const INVALID_PASSWORD_COST = "Unable to sign in due to insecure password parameters. Please visit standardnotes.org/help/security for more information.";
 const INVALID_PASSWORD = "Invalid password.";
 const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
 const OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In';
@@ -13514,12 +13514,16 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
     const result = await this.performSignIn(email, password, strict, minAllowedVersion);
 
     if (result.response.error && result.response.error.status !== StatusCode.LocalValidationError && result.response.error.status !== StatusCode.CanceledMfa) {
-      /**
-       * Try signing in with trimmed + lowercase version of email
-       */
       const cleanedEmail = cleanedEmailString(email);
-      const secondResult = await this.performSignIn(cleanedEmail, password, strict, minAllowedVersion);
-      return secondResult;
+
+      if (cleanedEmail !== email) {
+        /**
+         * Try signing in with trimmed + lowercase version of email
+         */
+        return this.performSignIn(cleanedEmail, password, strict, minAllowedVersion);
+      } else {
+        return result;
+      }
     } else {
       return result;
     }
@@ -23478,6 +23482,8 @@ class application_SNApplication {
     /** Whether the application has been destroyed via .deinit() */
 
     this.dealloced = false;
+    this.signingIn = false;
+    this.registering = false;
 
     if (!log["a" /* SNLog */].onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -24385,6 +24391,7 @@ class application_SNApplication {
     this.clearServices();
     this.dealloced = true;
     this.started = false;
+    this.signingIn = false;
   }
   /**
    *  @param mergeLocal  Whether to merge existing offline data into account. If false,
@@ -24395,29 +24402,44 @@ class application_SNApplication {
   async register(email, password) {
     let ephemeral = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     let mergeLocal = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
-    this.lockSyncing();
-    const result = await this.sessionManager.register(email, password);
 
-    if (!result.response.error) {
-      this.syncService.resetSyncState();
-      await this.storageService.setPersistencePolicy(ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default);
-
-      if (mergeLocal) {
-        await this.syncService.markAllItemsAsNeedingSync(true);
-      } else {
-        this.itemManager.removeAllItemsFromMemory();
-        await this.clearDatabase();
-      }
-
-      await this.notifyEvent(events["a" /* ApplicationEvent */].SignedIn);
-      this.unlockSyncing();
-      await this.syncService.downloadFirstSync(300);
-      this.protocolService.decryptErroredItems();
-    } else {
-      this.unlockSyncing();
+    if (this.hasAccount()) {
+      throw Error('Tried to register when an account already exists.');
     }
 
-    return result.response;
+    if (this.registering) {
+      throw Error('Already registering.');
+    }
+
+    this.registering = true;
+
+    try {
+      this.lockSyncing();
+      const result = await this.sessionManager.register(email, password);
+
+      if (!result.response.error) {
+        this.syncService.resetSyncState();
+        await this.storageService.setPersistencePolicy(ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default);
+
+        if (mergeLocal) {
+          await this.syncService.markAllItemsAsNeedingSync(true);
+        } else {
+          this.itemManager.removeAllItemsFromMemory();
+          await this.clearDatabase();
+        }
+
+        await this.notifyEvent(events["a" /* ApplicationEvent */].SignedIn);
+        this.unlockSyncing();
+        await this.syncService.downloadFirstSync(300);
+        this.protocolService.decryptErroredItems();
+      } else {
+        this.unlockSyncing();
+      }
+
+      return result.response;
+    } finally {
+      this.registering = false;
+    }
   }
   /**
    * @param mergeLocal  Whether to merge existing offline data into account.
@@ -24431,39 +24453,53 @@ class application_SNApplication {
     let mergeLocal = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
     let awaitSync = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
-    /** Prevent a timed sync from occuring while signing in. */
-    this.lockSyncing();
-    const result = await this.sessionManager.signIn(email, password, strict);
-
-    if (!result.response.error) {
-      this.syncService.resetSyncState();
-      await this.storageService.setPersistencePolicy(ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default);
-
-      if (mergeLocal) {
-        await this.syncService.markAllItemsAsNeedingSync(true);
-      } else {
-        this.itemManager.removeAllItemsFromMemory();
-        await this.clearDatabase();
-      }
-
-      await this.notifyEvent(events["a" /* ApplicationEvent */].SignedIn);
-      this.unlockSyncing();
-      const syncPromise = this.syncService.downloadFirstSync(1000, {
-        checkIntegrity: true,
-        awaitAll: awaitSync
-      });
-
-      if (awaitSync) {
-        await syncPromise;
-        await this.protocolService.decryptErroredItems();
-      } else {
-        this.protocolService.decryptErroredItems();
-      }
-    } else {
-      this.unlockSyncing();
+    if (this.hasAccount()) {
+      throw Error('Tried to sign in when an account already exists.');
     }
 
-    return result.response;
+    if (this.signingIn) {
+      throw Error('Already signing in.');
+    }
+
+    this.signingIn = true;
+
+    try {
+      /** Prevent a timed sync from occuring while signing in. */
+      this.lockSyncing();
+      const result = await this.sessionManager.signIn(email, password, strict);
+
+      if (!result.response.error) {
+        this.syncService.resetSyncState();
+        await this.storageService.setPersistencePolicy(ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default);
+
+        if (mergeLocal) {
+          await this.syncService.markAllItemsAsNeedingSync(true);
+        } else {
+          this.itemManager.removeAllItemsFromMemory();
+          await this.clearDatabase();
+        }
+
+        await this.notifyEvent(events["a" /* ApplicationEvent */].SignedIn);
+        this.unlockSyncing();
+        const syncPromise = this.syncService.downloadFirstSync(1000, {
+          checkIntegrity: true,
+          awaitAll: awaitSync
+        });
+
+        if (awaitSync) {
+          await syncPromise;
+          await this.protocolService.decryptErroredItems();
+        } else {
+          this.protocolService.decryptErroredItems();
+        }
+      } else {
+        this.unlockSyncing();
+      }
+
+      return result.response;
+    } finally {
+      this.signingIn = false;
+    }
   }
   /**
    * @param passcode - Changing the account password requires the local

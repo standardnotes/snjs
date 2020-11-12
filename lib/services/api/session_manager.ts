@@ -328,17 +328,20 @@ export class SNSessionManager extends PureService<SessionEvent> {
       result.response.error.status !== StatusCode.LocalValidationError &&
       result.response.error.status !== StatusCode.CanceledMfa
     ) {
-      /**
-       * Try signing in with trimmed + lowercase version of email
-       */
       const cleanedEmail = cleanedEmailString(email);
-      const secondResult = await this.performSignIn(
-        cleanedEmail,
-        password,
-        strict,
-        minAllowedVersion
-      );
-      return secondResult;
+      if (cleanedEmail !== email) {
+        /**
+         * Try signing in with trimmed + lowercase version of email
+         */
+        return this.performSignIn(
+          cleanedEmail,
+          password,
+          strict,
+          minAllowedVersion
+        );
+      } else {
+        return result;
+      }
     } else {
       return result;
     }

@@ -70,6 +70,8 @@ export declare class SNApplication {
     private launched;
     /** Whether the application has been destroyed via .deinit() */
     private dealloced;
+    private signingIn;
+    private registering;
     /**
      * @param environment The Environment that identifies your application.
      * @param platform The Platform that identifies your application.
