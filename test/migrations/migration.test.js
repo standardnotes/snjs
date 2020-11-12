@@ -41,7 +41,7 @@ describe('migrations', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    await application.migrationService.runBaseMigration();
+    await application.migrationService.runBaseMigrationPreRun();
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal('1.0.0');
     application.deinit();
   });
@@ -53,14 +53,14 @@ describe('migrations', () => {
       namespacedKey(application.identifier, 'last_migration_timestamp'),
       'anything'
     );
-    await application.migrationService.runBaseMigration();
+    await application.migrationService.runBaseMigrationPreRun();
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal('2.0.0');
     application.deinit();
   });
 
   it('after running base migration with no present storage values, should set version to current', async function () {
     const application = await Factory.createAppWithRandNamespace();
-    await application.migrationService.runBaseMigration();
+    await application.migrationService.runBaseMigrationPreRun();
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(SnjsVersion);
     application.deinit();
   });
@@ -101,7 +101,7 @@ describe('migrations', () => {
       'migrations',
       'anything'
     );
-    await application.migrationService.runBaseMigration();
+    await application.migrationService.runBaseMigrationPreRun();
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal('1.0.0');
     const pendingMigrations = await SNMigrationService.getRequiredMigrations(
       await application.migrationService.getStoredSnjsVersion()

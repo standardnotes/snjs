@@ -4,6 +4,9 @@ import { Migration } from './migration';
  * to set up all other migrations.
  */
 export declare class BaseMigration extends Migration {
+    private reader?;
+    private didPreRun;
+    preRun(): Promise<void>;
     protected registerStageHandlers(): void;
     private getStoredVersion;
     /**
@@ -12,6 +15,7 @@ export declare class BaseMigration extends Migration {
      * value if we do not find it in storage.
      */
     private storeVersionNumber;
+    private loadReader;
     /**
      * If the keychain is empty, and the user does not have a passcode,
      * AND there appear to be stored account key params, this indicates
@@ -28,5 +32,6 @@ export declare class BaseMigration extends Migration {
      * The item is randomly chosen, but for 2.x applications, it must be an items key item
      * (since only item keys are encrypted directly with account password)
      */
+    needsKeychainRepair(): Promise<boolean>;
     private preemptivelyRepairMissingKeychain;
 }

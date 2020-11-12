@@ -1,16 +1,16 @@
+import { MigrationServices } from './types';
 import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ChallengeValidation, ChallengeReason } from './../challenges';
 import { SessionStrings, KeychainRecoveryStrings } from './../services/api/messages';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
-import { isEnvironmentMobile } from '@Lib/platforms';
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from './../version';
 import { Migration } from '@Lib/migrations/migration';
 import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
 import { isNullOrUndefined } from '@Lib/utils';
-import { StorageReader } from './readers/reader';
 import { CreateReader } from './readers/functions';
+import { StorageReader } from './readers/reader';
 
 /** A key that was briefly present in Snjs version 2.0.0 but removed in 2.0.1 */
 const LastMigrationTimeStampKey2_0_0 = 'last_migration_timestamp';
@@ -21,10 +21,19 @@ const LastMigrationTimeStampKey2_0_0 = 'last_migration_timestamp';
  */
 export class BaseMigration extends Migration {
 
+  private reader?: StorageReader;
+  private didPreRun = false;
+
+  public async preRun() {
+    await this.storeVersionNumber();
+    this.didPreRun = true;
+  }
+
   protected registerStageHandlers() {
     this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
-      await this.storeVersionNumber();
-      await this.preemptivelyRepairMissingKeychain();
+      if (await this.needsKeychainRepair()) {
+        await this.preemptivelyRepairMissingKeychain();
+      }
       this.markDone();
     });
   }
@@ -90,6 +99,19 @@ export class BaseMigration extends Migration {
     }
   }
 
+  private async loadReader() {
+    if (this.reader) {
+      return;
+    }
+    const version = (await this.getStoredVersion())!;
+    this.reader = CreateReader(
+      version,
+      this.services.deviceInterface,
+      this.services.identifier,
+      this.services.environment
+    );
+  }
+
   /**
    * If the keychain is empty, and the user does not have a passcode,
    * AND there appear to be stored account key params, this indicates
@@ -106,42 +128,54 @@ export class BaseMigration extends Migration {
    * The item is randomly chosen, but for 2.x applications, it must be an items key item
    * (since only item keys are encrypted directly with account password)
    */
-  private async preemptivelyRepairMissingKeychain() {
-    const version = (await this.getStoredVersion())!;
-    const reader = CreateReader(
-      version,
-      this.services.deviceInterface,
-      this.services.identifier,
-      this.services.environment
-    );
-    const usesKeychain = reader.usesKeychain;
-    if (!usesKeychain) {
-      /** Doesn't apply if this version did not use a keychain to begin with */
-      return;
+
+  public async needsKeychainRepair() {
+    if (!this.didPreRun) {
+      throw Error('Attempting to access specialized function before prerun');
+    }
+    if (!this.reader) {
+      await this.loadReader();
     }
 
-    const rawAccountParams = await reader.getAccountKeyParams();
+    const usesKeychain = this.reader!.usesKeychain;
+    if (!usesKeychain) {
+      /** Doesn't apply if this version did not use a keychain to begin with */
+      return false;
+    }
+
+    const rawAccountParams = await this.reader!.getAccountKeyParams();
     const hasAccountKeyParams = !isNullOrUndefined(rawAccountParams);
     if (!hasAccountKeyParams) {
       /** Doesn't apply if account is not involved */
-      return;
+      return false;
     }
 
-    const hasPasscode = await reader.hasPasscode();
+    const hasPasscode = await this.reader!.hasPasscode();
     if (hasPasscode) {
       /** Doesn't apply if using passcode, as keychain would be bypassed in that case */
-      return;
+      return false;
     }
 
-    const accountKeysMissing = !(await reader.hasNonWrappedAccountKeys());
+    const accountKeysMissing = !(await this.reader!.hasNonWrappedAccountKeys());
     if (!accountKeysMissing) {
-      return;
+      return false;
     }
 
+    return true;
+  }
+
+  private async preemptivelyRepairMissingKeychain() {
+    const version = (await this.getStoredVersion())!;
+    const rawAccountParams = await this.reader!.getAccountKeyParams();
     /** Challenge for account password */
     const challenge = new Challenge(
       [
-        new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder, false),
+        new ChallengePrompt(
+          ChallengeValidation.None,
+          undefined,
+          SessionStrings.PasswordInputPlaceholder,
+          true
+        ),
       ],
       ChallengeReason.Custom,
       false,

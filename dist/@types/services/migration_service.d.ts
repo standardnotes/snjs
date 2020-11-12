@@ -14,9 +14,11 @@ export declare class SNMigrationService extends PureService {
     private services;
     private activeMigrations?;
     private handledFullSyncStage;
+    private baseMigration;
     constructor(services: MigrationServices);
     deinit(): void;
     initialize(): Promise<void>;
+    private runBaseMigrationPreRun;
     /**
      * Application instances will call this function directly when they arrive
      * at a certain migratory state.
@@ -26,7 +28,6 @@ export declare class SNMigrationService extends PureService {
      * Called by application
      */
     handleApplicationEvent(event: ApplicationEvent): Promise<void>;
-    private runBaseMigration;
     hasPendingMigrations(): Promise<boolean>;
     getStoredSnjsVersion(): Promise<string>;
     private static getRequiredMigrations;

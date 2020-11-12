@@ -22,6 +22,7 @@ import { lastElement } from '@Lib/utils';
 export class SNMigrationService extends PureService {
   private activeMigrations?: Migration[]
   private handledFullSyncStage = false
+  private baseMigration!: BaseMigration;
 
   constructor(
     private services: MigrationServices
@@ -38,7 +39,8 @@ export class SNMigrationService extends PureService {
   }
 
   public async initialize() {
-    await this.runBaseMigration();
+    await this.runBaseMigrationPreRun();
+
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
       await this.getStoredSnjsVersion()
     );
@@ -57,6 +59,11 @@ export class SNMigrationService extends PureService {
         SnjsVersion
       );
     }
+  }
+
+  private async runBaseMigrationPreRun() {
+    this.baseMigration = new BaseMigration(this.services);
+    await this.baseMigration.preRun();
   }
 
   /**
@@ -83,18 +90,11 @@ export class SNMigrationService extends PureService {
     }
   }
 
-  private async runBaseMigration() {
-    const baseMigration = new BaseMigration(this.services);
-    await baseMigration.handleStage(
-      ApplicationStage.PreparingForLaunch_0
-    );
-  }
-
   public async hasPendingMigrations() {
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
       await this.getStoredSnjsVersion()
     );
-    return requiredMigrations.length > 0;
+    return requiredMigrations.length > 0 || await this.baseMigration.needsKeychainRepair();
   }
 
   public async getStoredSnjsVersion() {
@@ -134,6 +134,7 @@ export class SNMigrationService extends PureService {
   }
 
   private async handleStage(stage: ApplicationStage) {
+    await this.baseMigration.handleStage(stage);
     for (const migration of this.activeMigrations!) {
       await migration.handleStage(stage);
     }
