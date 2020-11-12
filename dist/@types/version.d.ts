@@ -12,3 +12,9 @@ export declare const PreviousSnjsVersion2_0_0 = "2.0.0";
  * on the left. Accepts any format version number, like 2, 2.0, 2.0.0, or even 2.0.0.01
  */
 export declare function isRightVersionGreaterThanLeft(left: string, right: string): boolean;
+/**
+ *  -1 if a < b
+ *  0 if a == b
+ *  1 if a > b
+ */
+export declare function compareSemVersions(a: string, b: string): 1 | -1 | 0;

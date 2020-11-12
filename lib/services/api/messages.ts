@@ -149,3 +149,8 @@ export const ErrorAlertStrings = {
   StorageDecryptErrorBody: `We were unable to decrypt your local storage. Please restart the app and try again. If you're unable to resolve this issue, and you have an account, you may try uninstalling the app then reinstalling, then signing back into your account. Otherwise, please contact help@standardnotes.org for support.`,
 }
 
+export const KeychainRecoveryStrings = {
+  Title: 'Restore Keychain',
+  Text: `We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.`
+}
+

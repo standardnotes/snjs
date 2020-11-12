@@ -239,23 +239,11 @@ export class SNApplication {
     if (this.storageService!.isStorageWrapped()) {
       try {
         await this.storageService!.decryptStorage();
-      } catch (_firstAttemptError) {
-        const showError = () => {
-          this.alertService.alert(
-            ErrorAlertStrings.StorageDecryptErrorBody,
-            ErrorAlertStrings.StorageDecryptErrorTitle,
-          );
-        };
-        if (!this.protocolService.getRootKey()) {
-          await this.presentAccountRecoveryChallenge();
-          try {
-            await this.storageService!.decryptStorage();
-          } catch (_secondAttemptError) {
-            showError();
-          }
-        } else {
-          showError();
-        }
+      } catch (_error) {
+        this.alertService.alert(
+          ErrorAlertStrings.StorageDecryptErrorBody,
+          ErrorAlertStrings.StorageDecryptErrorTitle,
+        );
       }
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
@@ -292,26 +280,6 @@ export class SNApplication {
     if (awaitDatabaseLoad) {
       await loadPromise;
     }
-  }
-
-  private async presentAccountRecoveryChallenge() {
-    return this.sessionManager.reauthenticateInvalidSession(
-      false,
-      (response) => {
-        if (response.error) {
-          if (response.error.tag === MissingAccountParams) {
-            this.alertService.alert(
-              ErrorAlertStrings.StorageDecryptErrorBody,
-              ErrorAlertStrings.StorageDecryptErrorTitle,
-            );
-          } else {
-            this.alertService.alert(
-              SessionStrings.KeychainRecoveryError,
-              SessionStrings.KeychainRecoveryErrorTitle
-            );
-          }
-        }
-      });
   }
 
   public onStart() {
@@ -1426,18 +1394,16 @@ export class SNApplication {
     this.createItemManager();
     this.createStorageManager();
     this.createProtocolService();
-
     const encryptionDelegate = {
       payloadByEncryptingPayload: this.protocolService!.payloadByEncryptingPayload.bind(this.protocolService),
       payloadByDecryptingPayload: this.protocolService!.payloadByDecryptingPayload.bind(this.protocolService)
     };
     this.storageService!.encryptionDelegate = encryptionDelegate;
-
     this.createChallengeService();
-    this.createMigrationService();
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
+    this.createMigrationService();
     this.createSyncManager();
     this.createKeyRecoveryService();
     this.createSingletonManager();
@@ -1475,6 +1441,7 @@ export class SNApplication {
         protocolService: this.protocolService!,
         deviceInterface: this.deviceInterface!,
         storageService: this.storageService!,
+        sessionManager: this.sessionManager,
         challengeService: this.challengeService!,
         itemManager: this.itemManager!,
         environment: this.environment!,

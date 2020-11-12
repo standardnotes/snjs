@@ -5,7 +5,7 @@ export type { UuidString, ApplicationIdentifier } from './types';
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
-export { KeyRecoveryStrings } from './services/api/messages';
+export { KeyRecoveryStrings, SessionStrings } from './services/api/messages';
 export { SNApplication } from './application';
 export { SNProtocolService, KeyMode } from './services/protocol_service';
 export { SNProtocolOperator001 } from './protocol/operator/001/operator_001';
@@ -60,7 +60,7 @@ export { ProtocolVersion } from './protocol/versions';
 export { PayloadFormat } from './protocol/payloads/formats';
 export { PurePayload } from './protocol/payloads/pure_payload';
 export { PayloadField } from './protocol/payloads/fields';
-export { StorageKey, RawStorageKey, NonwrappedStorageKey } from './storage_keys';
+export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from './storage_keys';
 /** Migrations */
 export { BaseMigration } from './migrations/base';
 /** Privileges */

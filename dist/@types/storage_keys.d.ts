@@ -38,3 +38,19 @@ export declare enum NonwrappedStorageKey {
     MobileFirstRun = "first_run"
 }
 export declare function namespacedKey(namespace: string, key: string): string;
+export declare const LegacyKeys1_0_0: {
+    WebPasscodeParamsKey: string;
+    MobilePasscodeParamsKey: string;
+    AllAccountKeyParamsKey: string;
+    WebEncryptedStorageKey: string;
+    MobileWrappedRootKeyKey: string;
+    MobileBiometricsPrefs: string;
+    AllMigrations: string;
+    MobileThemesCache: string;
+    MobileLightTheme: string;
+    MobileDarkTheme: string;
+    MobileLastExportDate: string;
+    MobileDoNotWarnUnsupportedEditors: string;
+    MobileOptionsState: string;
+    MobilePasscodeKeyboardType: string;
+};

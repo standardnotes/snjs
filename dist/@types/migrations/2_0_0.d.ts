@@ -1,7 +1,10 @@
+import { MigrationServices } from './types';
 import { SNRootKey } from './../protocol/root_key';
 import { PurePayload } from '../protocol/payloads/pure_payload';
 import { Migration } from './migration';
 export declare class Migration2_0_0 extends Migration {
+    private legacyReader;
+    constructor(services: MigrationServices);
     static version(): string;
     protected registerStageHandlers(): void;
     /**
@@ -81,7 +84,7 @@ export declare class Migration2_0_0 extends Migration {
     private migrateArbitraryRawStorageToManagedStorageAllPlatforms;
     /**
      * All platforms
-     * Deletes all StorageKey and LegacyKeys from root raw storage.
+     * Deletes all StorageKey and LegacyKeys1_0_0 from root raw storage.
      * @access private
      */
     deleteLegacyStorageValues(): Promise<void>;

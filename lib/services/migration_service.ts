@@ -1,6 +1,6 @@
+import { compareSemVersions } from '@Lib/version';
 import { SNLog } from '@Lib/log';
 import { isRightVersionGreaterThanLeft, SnjsVersion } from './../version';
-import { SyncEvent } from '@Services/sync/events';
 import { ApplicationEvent } from './../events';
 import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './../migrations/types';
@@ -9,7 +9,7 @@ import * as migrationImports from '@Lib/migrations';
 import { BaseMigration } from '@Lib/migrations/base';
 import { PureService } from '@Services/pure_service';
 import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
-import { isNullOrUndefined, lastElement } from '@Lib/utils';
+import { lastElement } from '@Lib/utils';
 
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -51,6 +51,11 @@ export class SNMigrationService extends PureService {
           SnjsVersion
         );
       });
+    } else {
+      await this.services.deviceInterface.setRawStorageValue(
+        namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
+        SnjsVersion
+      );
     }
   }
 
@@ -108,15 +113,7 @@ export class SNMigrationService extends PureService {
     const migrationClasses = Object.keys(migrationImports).map((key) => {
       return (migrationImports as any)[key];
     }).sort((a, b) => {
-      const aVersion = a.version();
-      const bVersion = b.version();
-      if (aVersion < bVersion) {
-        return -1;
-      } else if (aVersion > bVersion) {
-        return 1;
-      } else {
-        return 0;
-      }
+      return compareSemVersions(a.version(), b.version());
     });
     for (const migrationClass of migrationClasses) {
       const migrationVersion = migrationClass.version();

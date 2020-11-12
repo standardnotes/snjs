@@ -8,6 +8,7 @@ import { SNRootKey } from '../../protocol/root_key';
 import { AnyKeyParamsContent } from './../../protocol/key_params';
 import { PureService } from '../pure_service';
 import { SNAlertService } from '../alert_service';
+import { Session } from './session';
 export declare const MINIMUM_PASSWORD_LENGTH = 8;
 export declare const MissingAccountParams = "missing-params";
 declare type SessionManagerResponse = {
@@ -42,6 +43,7 @@ export declare class SNSessionManager extends PureService<SessionEvent> {
     online(): boolean;
     offline(): boolean;
     getUser(): User | undefined;
+    getSession(): Session | undefined;
     signOut(): Promise<void>;
     reauthenticateInvalidSession(cancelable?: boolean, onResponse?: (response: HttpResponse) => void): Promise<unknown>;
     private promptForMfaValue;

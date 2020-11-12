@@ -106,7 +106,6 @@ export declare class SNApplication {
      * Option to await database load before marking the app as ready.
      */
     launch(awaitDatabaseLoad?: boolean): Promise<void>;
-    private presentAccountRecoveryChallenge;
     onStart(): void;
     onLaunch(): void;
     private handleLaunchChallengeResponse;

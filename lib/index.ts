@@ -7,7 +7,7 @@ export type { UuidString, ApplicationIdentifier } from './types';
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
-export { KeyRecoveryStrings } from './services/api/messages';
+export { KeyRecoveryStrings, SessionStrings } from './services/api/messages';
 
 export { SNApplication } from '@Lib/application';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';

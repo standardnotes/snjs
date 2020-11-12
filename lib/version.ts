@@ -27,3 +27,19 @@ export function isRightVersionGreaterThanLeft(left: string, right: string) {
   }
   return false;
 }
+
+/**
+ *  -1 if a < b
+ *  0 if a == b
+ *  1 if a > b
+ */
+export function compareSemVersions(a: string, b: string) {
+  if (a === b) {
+    return 0;
+  }
+  if (isRightVersionGreaterThanLeft(a, b)) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
