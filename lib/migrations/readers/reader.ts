@@ -18,7 +18,7 @@ export abstract class StorageReader {
   }
 
   public static version(): string {
-    throw 'Must override';
+    throw Error('Must override');
   }
 
   public async abstract getAccountKeyParams(): Promise<unknown | undefined>;

@@ -1,4 +1,4 @@
-export declare const SnjsVersion: any;
+export declare const SnjsVersion: string;
 /**
  * Legacy architecture (pre-3.5 clients)
  */
@@ -17,4 +17,4 @@ export declare function isRightVersionGreaterThanLeft(left: string, right: strin
  *  0 if a == b
  *  1 if a > b
  */
-export declare function compareSemVersions(a: string, b: string): 1 | -1 | 0;
+export declare function compareSemVersions(left: string, right: string): 1 | -1 | 0;

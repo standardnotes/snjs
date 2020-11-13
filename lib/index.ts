@@ -1,4 +1,4 @@
-export { SnjsVersion } from './version';
+export {SnjsVersion, isRightVersionGreaterThanLeft, compareSemVersions } from './version';
 
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';

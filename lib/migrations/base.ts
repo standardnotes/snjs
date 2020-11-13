@@ -1,4 +1,4 @@
-import { MigrationServices } from './types';
+import { SNLog } from '@Lib/log';
 import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ChallengeValidation, ChallengeReason } from './../challenges';
@@ -32,7 +32,7 @@ export class BaseMigration extends Migration {
   protected registerStageHandlers() {
     this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
       if (await this.needsKeychainRepair()) {
-        await this.preemptivelyRepairMissingKeychain();
+        await this.repairMissingKeychain();
       }
       this.markDone();
     });
@@ -164,7 +164,7 @@ export class BaseMigration extends Migration {
     return true;
   }
 
-  private async preemptivelyRepairMissingKeychain() {
+  private async repairMissingKeychain() {
     const version = (await this.getStoredVersion())!;
     const rawAccountParams = await this.reader!.getAccountKeyParams();
     /** Challenge for account password */
@@ -201,6 +201,9 @@ export class BaseMigration extends Migration {
             if (!itemToDecrypt) {
               /** If no root key encrypted item, just choose any item */
               itemToDecrypt = allItems[0];
+            }
+            if (!itemToDecrypt) {
+              throw SNLog.error(Error('Attempting keychain recovery validation but no items present.'));
             }
             const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(
               CreateMaxPayloadFromAnyObject(itemToDecrypt),

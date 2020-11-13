@@ -33,5 +33,5 @@ export declare class BaseMigration extends Migration {
      * (since only item keys are encrypted directly with account password)
      */
     needsKeychainRepair(): Promise<boolean>;
-    private preemptivelyRepairMissingKeychain;
+    private repairMissingKeychain;
 }

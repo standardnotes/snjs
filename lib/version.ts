@@ -1,5 +1,6 @@
-const version = require('../package.json').version;
-export const SnjsVersion = version;
+/** Declared in webpack config */
+declare const __VERSION__: string;
+export const SnjsVersion = __VERSION__;
 
 /**
  * Legacy architecture (pre-3.5 clients)
@@ -16,16 +17,7 @@ export const PreviousSnjsVersion2_0_0 = '2.0.0';
  * on the left. Accepts any format version number, like 2, 2.0, 2.0.0, or even 2.0.0.01
  */
 export function isRightVersionGreaterThanLeft(left: string, right: string) {
-  const oldParts = left.split('.');
-  const newParts = right.split('.');
-  for (var i = 0; i < newParts.length; i++) {
-    /** ~~ parses int */
-    const a = ~~newParts[i];
-    const b = ~~oldParts[i];
-    if (a > b) return true;
-    if (a < b) return false;
-  }
-  return false;
+  return compareSemVersions(left, right) === -1;
 }
 
 /**
@@ -33,13 +25,19 @@ export function isRightVersionGreaterThanLeft(left: string, right: string) {
  *  0 if a == b
  *  1 if a > b
  */
-export function compareSemVersions(a: string, b: string) {
-  if (a === b) {
-    return 0;
+export function compareSemVersions(left: string, right: string) {
+  const leftParts = left.split('.');
+  const rightParts = right.split('.');
+  for (let i = 0; i < rightParts.length; i++) {
+    /**
+     * ~~ parses int
+     * Convert to number so that 001 becomes 1, then back to string
+     */
+    const rightComp = String(Number(~~rightParts[i]));
+    const leftComp = String(Number(~~leftParts[i]));
+    if (rightComp > leftComp) return -1;
+    if (rightComp < leftComp) return 1;
   }
-  if (isRightVersionGreaterThanLeft(a, b)) {
-    return -1;
-  } else {
-    return 1;
-  }
+
+  return 0;
 }
