@@ -1,3 +1,4 @@
+import { SNSessionManager } from './../services/api/session_manager';
 import { ApplicationIdentifier } from './../types';
 import { ItemManager } from '../services/item_manager';
 import { Environment } from './../platforms';
@@ -11,6 +12,7 @@ export declare type MigrationServices = {
     deviceInterface: DeviceInterface;
     storageService: SNStorageService;
     challengeService: ChallengeService;
+    sessionManager: SNSessionManager;
     itemManager: ItemManager;
     environment: Environment;
     /** The application identifier */

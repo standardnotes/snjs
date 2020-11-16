@@ -83,6 +83,9 @@ export abstract class DeviceInterface {
 
   abstract async getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>;
 
+  /** Allows SNJS to set the top level keychain value */
+  abstract async legacy_setRawKeychainValue(value: any): Promise<void>;
+
   abstract async setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>;
 
   abstract async clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>;

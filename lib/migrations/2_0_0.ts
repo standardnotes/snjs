@@ -1,4 +1,7 @@
-import { NonwrappedStorageKey } from './../storage_keys';
+import { StorageReader1_0_0 } from './readers/reader_1_0_0';
+import { MigrationServices } from './types';
+import { PreviousSnjsVersion2_0_0 } from './../version';
+import { NonwrappedStorageKey, LegacyKeys1_0_0 } from './../storage_keys';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
@@ -22,22 +25,6 @@ import { CreateItemFromPayload } from '../models';
 import { isEnvironmentWebOrDesktop, isEnvironmentMobile } from '@Lib/platforms';
 import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 
-const LegacyKeys = {
-  WebPasscodeParamsKey: 'offlineParams',
-  MobilePasscodeParamsKey: 'pc_params',
-  AllAccountKeyParamsKey: 'auth_params',
-  WebEncryptedStorageKey: 'encryptedStorage',
-  MobileWrappedRootKeyKey: 'encrypted_account_keys',
-  MobileBiometricsPrefs: 'biometrics_prefs',
-  AllMigrations: 'migrations',
-  MobileThemesCache: 'ThemePreferencesKey',
-  MobileLightTheme: 'lightTheme',
-  MobileDarkTheme: 'darkTheme',
-  MobileLastExportDate: 'LastExportDateKey',
-  MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
-  MobileOptionsState: 'options',
-  MobilePasscodeKeyboardType: 'passcodeKeyboardType',
-};
 type LegacyMobileKeychainStructure = {
   offline?: {
     timing?: any
@@ -52,10 +39,21 @@ type LegacyMobileKeychainStructure = {
 } | undefined | null;
 const LEGACY_SESSION_TOKEN_KEY = 'jwt';
 
-export class Migration20200115 extends Migration {
+export class Migration2_0_0 extends Migration {
 
-  static timestamp() {
-    return (new Date('2020-01-15').getTime());
+  private legacyReader!: StorageReader1_0_0;
+
+  constructor(services: MigrationServices) {
+    super(services);
+    this.legacyReader = new StorageReader1_0_0(
+      this.services.deviceInterface,
+      this.services.identifier,
+      this.services.environment
+    );
+  }
+
+  static version() {
+    return PreviousSnjsVersion2_0_0;
   }
 
   protected registerStageHandlers() {
@@ -97,15 +95,13 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Nonwrapped]: {}
     };
-    const rawAccountKeyParams = await deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.AllAccountKeyParamsKey
-    );
+    const rawAccountKeyParams = await this.legacyReader.getAccountKeyParams();
     /** Could be null if no account, or if account and storage is encrypted */
     if (rawAccountKeyParams) {
       newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = rawAccountKeyParams;
     }
     const encryptedStorage = await deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.WebEncryptedStorageKey
+      LegacyKeys1_0_0.WebEncryptedStorageKey
     );
     if (encryptedStorage) {
       const encryptedStoragePayload = CreateMaxPayloadFromAnyObject(
@@ -124,7 +120,7 @@ export class Migration20200115 extends Migration {
       const storageValueStore: Record<string, any> = jsonParseEmbeddedKeys(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      const accountKeyParams = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      const accountKeyParams = storageValueStore[LegacyKeys1_0_0.AllAccountKeyParamsKey];
       newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = accountKeyParams;
 
       let keyToEncryptStorageWith = passcodeKey;
@@ -198,7 +194,7 @@ export class Migration20200115 extends Migration {
   private async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedPayload: PurePayload) {
     const rawPasscodeParams = await this.services.deviceInterface
       .getJsonParsedRawStorageValue(
-        LegacyKeys.WebPasscodeParamsKey
+        LegacyKeys1_0_0.WebPasscodeParamsKey
       );
     const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams as any);
     /** Decrypt it with the passcode */
@@ -317,13 +313,11 @@ export class Migration20200115 extends Migration {
     const keychainValue = await this.services.deviceInterface
       .getRawKeychainValue() as LegacyMobileKeychainStructure;
     const wrappedAccountKey = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.MobileWrappedRootKeyKey
+      LegacyKeys1_0_0.MobileWrappedRootKeyKey
     ) || keychainValue?.encryptedAccountKeys;
-    const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.AllAccountKeyParamsKey
-    ) as any;
+    const rawAccountKeyParams = await this.legacyReader.getAccountKeyParams() as any;
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.MobilePasscodeParamsKey
+      LegacyKeys1_0_0.MobilePasscodeParamsKey
     );
     const firstRunValue = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       NonwrappedStorageKey.MobileFirstRun
@@ -339,14 +333,14 @@ export class Migration20200115 extends Migration {
       [ValueModesKeys.Wrapped]: {},
     };
     const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.MobileBiometricsPrefs
+      LegacyKeys1_0_0.MobileBiometricsPrefs
     ) as any;
     if (biometricPrefs) {
       rawStructure.nonwrapped![StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped![StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
     const passcodeKeyboardType = await this.services.deviceInterface.getRawStorageValue(
-      LegacyKeys.MobilePasscodeKeyboardType
+      LegacyKeys1_0_0.MobilePasscodeKeyboardType
     );
     if (passcodeKeyboardType) {
       rawStructure.nonwrapped![StorageKey.MobilePasscodeKeyboardType] = passcodeKeyboardType;
@@ -514,7 +508,7 @@ export class Migration20200115 extends Migration {
   private async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
     const allKeyValues = await this.services.deviceInterface
       .getAllRawStorageKeyValues();
-    const legacyKeys = objectToValueArray(LegacyKeys);
+    const legacyKeys = objectToValueArray(LegacyKeys1_0_0);
     const tryJsonParse = (value: any) => {
       try { return JSON.parse(value); }
       catch (e) { return value; }
@@ -540,7 +534,7 @@ export class Migration20200115 extends Migration {
 
   /**
    * All platforms
-   * Deletes all StorageKey and LegacyKeys from root raw storage.
+   * Deletes all StorageKey and LegacyKeys1_0_0 from root raw storage.
    * @access private
    */
   async deleteLegacyStorageValues() {
@@ -556,7 +550,7 @@ export class Migration20200115 extends Migration {
     ];
     const managedKeys = [
       ...objectToValueArray(StorageKey),
-      ...objectToValueArray(LegacyKeys),
+      ...objectToValueArray(LegacyKeys1_0_0),
       ...miscKeys
     ];
     for (const key of managedKeys) {
@@ -570,13 +564,13 @@ export class Migration20200115 extends Migration {
    */
   private async migrateMobilePreferences() {
     const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.MobileLastExportDate
+      LegacyKeys1_0_0.MobileLastExportDate
     );
     const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys.MobileDoNotWarnUnsupportedEditors
+      LegacyKeys1_0_0.MobileDoNotWarnUnsupportedEditors
     );
     const legacyOptionsState = await this.services.deviceInterface
-      .getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState) as any;
+      .getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobileOptionsState) as any;
     let migratedOptionsState = {}
     if (legacyOptionsState) {
       const legacySortBy = legacyOptionsState.sortBy;
@@ -609,13 +603,24 @@ export class Migration20200115 extends Migration {
     let currentToken = await this.services.storageService.getValue(
       LEGACY_SESSION_TOKEN_KEY
     );
+    const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
     if (!currentToken) {
       /** Try the user object */
-      const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
       if (user) {
         currentToken = user.jwt;
       }
-      if (!currentToken) {
+    }
+    if (!currentToken) {
+      /**
+       * If we detect that a user object is present, but the jwt is missing,
+       * we'll fill the jwt value with a junk value just so we create a session.
+       * When the client attempts to talk to the server, the server will reply
+       * with invalid token error, and the client will automatically prompt to reauthenticate.
+       */
+      const hasAccount = !isNullOrUndefined(user);
+      if (hasAccount) {
+        currentToken = 'junk-value';
+      } else {
         return;
       }
     }

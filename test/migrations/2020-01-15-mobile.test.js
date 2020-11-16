@@ -621,6 +621,127 @@ describe('2020-01-15 mobile migration', () => {
     await application.deinit();
   }).timeout(10000);
 
+  it('2020-01-15 launching with account but missing keychain', async function () {
+    /**
+     * We expect that the keychain will attempt to be recovered
+     * We expect two challenges, one to recover just the keychain
+     * and another to recover the user session via a sign in request
+     */
+
+     /** Register a real user so we can attempt to sign back into this account later */
+    const tempApp = await Factory.createInitAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    /** Register with 003 account */
+    await Factory.registerOldUser({
+      application: tempApp,
+      email: email,
+      password: password,
+      version: ProtocolVersion.V003
+    });
+    const accountKey = tempApp.protocolService.getRootKey();
+    tempApp.deinit();
+    localStorage.clear();
+
+    const application = await Factory.createAppWithRandNamespace(
+      Environment.Mobile,
+      Platform.Ios
+    );
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    /** Create old version account parameters */
+    await application.deviceInterface.setRawStorageValue(
+      'auth_params',
+      JSON.stringify(accountKey.keyParams.getPortableValue())
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'user',
+      JSON.stringify({ email: email })
+    );
+    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V003);
+
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+      notePayload,
+      PayloadFormat.EncryptedString,
+      accountKey,
+    );
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      noteEncryptionParams
+    );
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+
+    /** Run migration */
+    const promptValueReply = (prompts) => {
+      const values = [];
+      for (const prompt of prompts) {
+        if (prompt.placeholder === SessionStrings.EmailInputPlaceholder) {
+          values.push(new ChallengeValue(prompt, email));
+        } else if (prompt.placeholder === SessionStrings.PasswordInputPlaceholder) {
+          values.push(new ChallengeValue(prompt, password));
+        } else {
+          throw Error('Unhandled prompt');
+        }
+      }
+      return values;
+    };
+    let totalChallenges = 0;
+    const expectedChallenges = 2;
+    const receiveChallenge = async (challenge) => {
+      totalChallenges++;
+      application.addChallengeObserver(challenge, {
+        onInvalidValue: (value) => {
+          const values = promptValueReply([value.prompt]);
+          application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      const initialValues = promptValueReply(challenge.prompts);
+      application.submitValuesForChallenge(challenge, initialValues);
+    };
+    await application.prepareForLaunch({
+      receiveChallenge: receiveChallenge,
+    });
+    await application.launch(true);
+
+    /** Recovery migration is non-blocking, so let's block for it */
+    await Factory.sleep(1.0);
+
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyOnly
+    );
+    /** Should be decrypted */
+    const storageMode = application.storageService.domainKeyForMode(
+      StorageValueModes.Default
+    );
+    const valueStore = application.storageService.values[storageMode];
+    expect(valueStore.content_type).to.not.be.ok;
+    const rootKey = await application.protocolService.getRootKey();
+    expect(rootKey).to.be.ok;
+    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
+
+    /** Expect note is decrypted */
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
+    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(await application.getUser().email).to.equal(email);
+    expect(await application.apiService.getSession()).to.be.ok;
+    expect(totalChallenges).to.equal(expectedChallenges);
+    await application.deinit();
+  }).timeout(10000);
+
   it('2020-01-15 migration with 002 account should not create 003 data', async function () {
     /** There was an issue where 002 account loading new app would create new default items key
      * with 003 version. Should be 002. */
@@ -870,7 +991,7 @@ describe('2020-01-15 mobile migration', () => {
       version: ProtocolVersion.V003
     });
 
-    await application.prepareForLaunch({receiveChallenge: () => {}});
+    await application.prepareForLaunch({ receiveChallenge: () => { } });
     await application.launch(true);
 
     expect(application.apiService.getSession()).to.be.ok;
