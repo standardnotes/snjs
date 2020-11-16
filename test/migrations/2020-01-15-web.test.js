@@ -141,7 +141,8 @@ describe('2020-01-15 web migration', () => {
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
-    expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
+    /** Application should not retain server password from legacy versions */
+    expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
@@ -260,7 +261,8 @@ describe('2020-01-15 web migration', () => {
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
-    expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
+    /** Root key is in memory with passcode only, so server password can be defined */
+    expect(rootKey.serverPassword).to.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
@@ -610,7 +612,7 @@ describe('2020-01-15 web migration', () => {
     for (const key of Object.keys(storage)) {
       /** Is stringified in storage, but parsed in storageService */
       const value = await application.storageService.getValue(key);
-      if (key === 'auth_params' ) {
+      if (key === 'auth_params') {
         continue;
       } else if (key === 'user') {
         expect(storage[key]).to.equal(JSON.stringify(value));

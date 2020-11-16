@@ -13,6 +13,7 @@ export { SNProtocolOperator002 } from './protocol/operator/002/operator_002';
 export { SNProtocolOperator003 } from './protocol/operator/003/operator_003';
 export { SNProtocolOperator004 } from './protocol/operator/004/operator_004';
 export { SNRootKey } from './protocol/root_key';
+export { SNRootKeyParams } from './protocol/key_params';
 export { DeviceInterface } from './device_interface';
 export { SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, TagMutator, SNSmartTag, SNActionsExtension, Action, SNTheme, ThemeMutator, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, } from './models';
 export { MutationType } from './models/core/item';

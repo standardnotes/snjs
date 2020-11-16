@@ -5,7 +5,7 @@ import { ProtocolVersion } from './versions';
 export declare type RootKeyContent = {
     version: ProtocolVersion;
     masterKey: string;
-    serverPassword: string;
+    serverPassword?: string;
     dataAuthenticationKey?: string;
     keyParams: AnyKeyParamsContent;
 };
