@@ -9497,7 +9497,7 @@ __webpack_require__.d(readers_namespaceObject, "StorageReader2_0_0", function() 
 __webpack_require__.d(readers_namespaceObject, "StorageReader1_0_0", function() { return reader_1_0_0_StorageReader1_0_0; });
 
 // CONCATENATED MODULE: ./lib/version.ts
-const SnjsVersion = "2.0.1";
+const SnjsVersion = "2.0.2";
 /**
  * Legacy architecture (pre-3.5 clients)
  */
@@ -25294,6 +25294,7 @@ class LiveItem {
 var application_service = __webpack_require__(78);
 
 // CONCATENATED MODULE: ./lib/index.ts
+
 
 
 
