@@ -50,6 +50,8 @@ export declare abstract class DeviceInterface {
     abstract removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>;
     abstract removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>;
     abstract getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>;
+    /** Allows SNJS to set the top level keychain value */
+    abstract legacy_setRawKeychainValue(value: any): Promise<void>;
     abstract setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>;
     abstract clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>;
     abstract getRawKeychainValue(): Promise<Record<string, any> | undefined | null>;

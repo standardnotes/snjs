@@ -99,14 +99,13 @@ export declare class SNApplication {
     prepareForLaunch(callback: LaunchCallback): Promise<void>;
     private setLaunchCallback;
     /**
-     * Runs migrations, handles device authentication, unlocks application, and
+     * Handles device authentication, unlocks application, and
      * issues a callback if a device activation requires user input
      * (i.e local passcode or fingerprint).
      * @param awaitDatabaseLoad
      * Option to await database load before marking the app as ready.
      */
     launch(awaitDatabaseLoad?: boolean): Promise<void>;
-    private presentAccountRecoveryChallenge;
     onStart(): void;
     onLaunch(): void;
     private handleLaunchChallengeResponse;

@@ -394,7 +394,7 @@ export class SNStorageService extends PureService {
       await this.clearValues();
       await this.clearAllPayloads();
       await this.deviceInterface!.removeRawStorageValue(
-        namespacedKey(this.identifier, RawStorageKey.LastMigrationTimestamp)
+        namespacedKey(this.identifier, RawStorageKey.SnjsVersion)
       );
       await this.deviceInterface!.removeRawStorageValue(this.getPersistenceKey());
     });

@@ -1,3 +1,5 @@
+export {SnjsVersion, isRightVersionGreaterThanLeft, compareSemVersions } from './version';
+
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';
 export type { UuidString, ApplicationIdentifier } from './types';
@@ -5,7 +7,7 @@ export type { UuidString, ApplicationIdentifier } from './types';
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
-export { KeyRecoveryStrings } from './services/api/messages';
+export { KeyRecoveryStrings, SessionStrings } from './services/api/messages';
 
 export { SNApplication } from '@Lib/application';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';
@@ -151,10 +153,10 @@ export { PayloadFormat } from '@Payloads/formats';
 export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadField } from '@Payloads/fields';
 
-export { StorageKey, RawStorageKey, NonwrappedStorageKey } from '@Lib/storage_keys';
+export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from '@Lib/storage_keys';
 
 /** Migrations */
-export { BaseMigration } from '@Lib/migrations/2020-01-01-base';
+export { BaseMigration } from '@Lib/migrations/base';
 
 /** Privileges */
 export {
