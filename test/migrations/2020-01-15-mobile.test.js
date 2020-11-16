@@ -168,7 +168,7 @@ describe('2020-01-15 mobile migration', () => {
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
-    expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
+    expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 
@@ -329,7 +329,8 @@ describe('2020-01-15 mobile migration', () => {
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
-    expect(rootKey.serverPassword).to.equal(passcodeKey.serverPassword);
+    /** Root key is in memory with passcode only, so server password can be defined */
+    expect(rootKey.serverPassword).to.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
@@ -549,7 +550,6 @@ describe('2020-01-15 mobile migration', () => {
       'options',
       options
     );
-    /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
@@ -572,6 +572,7 @@ describe('2020-01-15 mobile migration', () => {
       const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
+    /** Runs migration */
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     });
@@ -870,7 +871,7 @@ describe('2020-01-15 mobile migration', () => {
       version: ProtocolVersion.V003
     });
 
-    await application.prepareForLaunch({receiveChallenge: () => {}});
+    await application.prepareForLaunch({ receiveChallenge: () => { } });
     await application.launch(true);
 
     expect(application.apiService.getSession()).to.be.ok;
@@ -1147,7 +1148,7 @@ describe('2020-01-15 mobile migration', () => {
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
-    expect(rootKey.serverPassword).to.equal(accountKey.serverPassword);
+    expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
 

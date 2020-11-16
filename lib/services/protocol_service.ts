@@ -1147,7 +1147,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public async validateAccountPassword(password: string) {
     const keyParams = await this.getRootKeyParams();
     const key = await this.computeRootKey(password, keyParams!);
-    const valid = key.compare(this.rootKey!);
+    const valid = this.rootKey!.compare(key);
     if (valid) {
       return { valid, artifacts: { rootKey: key } };
     } else {

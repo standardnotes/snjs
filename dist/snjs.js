@@ -105,42 +105,42 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "u", function() { return isWebCryptoAvailable; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "s", function() { return isReactNativeEnvironment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return findInArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "E", function() { return searchArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "F", function() { return searchArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return concatArrays; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return isObject; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return isFunction; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return isNullOrUndefined; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "t", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return greaterOfTwoDates; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "K", function() { return uniqCombineObjArrays; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "L", function() { return uniqueArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "L", function() { return uniqCombineObjArrays; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "M", function() { return uniqueArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "x", function() { return lastElement; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return extendArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "H", function() { return subtractFromArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "C", function() { return removeFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "I", function() { return subtractFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "D", function() { return removeFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return addIfUnique; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return filterFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return arrayByDifference; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return compareValues; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "D", function() { return removeFromIndex; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "E", function() { return removeFromIndex; });
 /* unused harmony export addAtIndex */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "y", function() { return objectToValueArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "G", function() { return sortedCopy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "A", function() { return omitUndefinedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "H", function() { return sortedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "B", function() { return omitUndefinedCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return dateSorted; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "I", function() { return topLevelCompare; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "J", function() { return topLevelCompare; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return jsonParseEmbeddedKeys; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "z", function() { return omitInPlace; });
-/* unused harmony export omitByCopy */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "A", function() { return omitInPlace; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "z", function() { return omitByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "v", function() { return joinPaths; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Copy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return deepMerge; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "B", function() { return pickByCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "C", function() { return pickByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return deepFreeze; });
 /* unused harmony export hasGetter */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "J", function() { return truncateHexString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "F", function() { return sleep; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "K", function() { return truncateHexString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "G", function() { return sleep; });
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(18);
@@ -532,6 +532,10 @@ function omitInPlace(object, keys) {
  */
 
 function omitByCopy(object, keys) {
+  if (isNullOrUndefined(object)) {
+    return undefined;
+  }
+
   const newObject = Object.assign({}, object);
   /**
    * Lodash's omit, which was previously used, seems to cause unexpected behavior
@@ -754,7 +758,7 @@ function CopyPayload(payload, override) {
 }
 
 function CreatePayload(object, fields, source, override) {
-  const rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* pickByCopy */ "B"])(object, fields);
+  const rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* pickByCopy */ "C"])(object, fields);
   const overrideFields = override instanceof _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"] ? override.fields.slice() : Object.keys(override || []);
 
   for (const field of overrideFields) {
@@ -762,7 +766,7 @@ function CreatePayload(object, fields, source, override) {
     rawPayload[field] = value ? Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* Copy */ "a"])(value) : value;
   }
 
-  const newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* uniqueArray */ "L"])(fields.concat(overrideFields));
+  const newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* uniqueArray */ "M"])(fields.concat(overrideFields));
   return new _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"](rawPayload, newFields, source || _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__[/* PayloadSource */ "a"].Constructor);
 }
 
@@ -1632,11 +1636,11 @@ function ItemContentsDiffer(item1, item2, excludeContentKeys) {
 
 function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysToIgnore) {
   /* Create copies of objects before running omit as not to modify source values directly. */
-  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "G"])(leftContent);
+  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "H"])(leftContent);
 
   if (leftContent.appData) {
     const domainData = leftContent.appData[_content_types__WEBPACK_IMPORTED_MODULE_6__[/* DefaultAppDomain */ "b"]];
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(domainData, appDataKeysToIgnore);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(domainData, appDataKeysToIgnore);
     /**
      * We don't want to disqualify comparison if one object contains an empty domain object
      * and the other doesn't contain a domain object. This can happen if you create an item
@@ -1652,12 +1656,12 @@ function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysT
     }
   }
 
-  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(leftContent, keysToIgnore);
-  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "G"])(rightContent);
+  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(leftContent, keysToIgnore);
+  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "H"])(rightContent);
 
   if (rightContent.appData) {
     const domainData = rightContent.appData[_content_types__WEBPACK_IMPORTED_MODULE_6__[/* DefaultAppDomain */ "b"]];
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(domainData, appDataKeysToIgnore);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(domainData, appDataKeysToIgnore);
 
     if (domainData) {
       if (Object.keys(domainData).length === 0) {
@@ -1668,7 +1672,7 @@ function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysT
     }
   }
 
-  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(rightContent, keysToIgnore);
+  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(rightContent, keysToIgnore);
   return JSON.stringify(leftContent) === JSON.stringify(rightContent);
 }
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(77).setImmediate))
@@ -1836,7 +1840,7 @@ class PureService {
   addEventObserver(observer) {
     this.eventObservers.push(observer);
     return () => {
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* removeFromArray */ "C"])(this.eventObservers, observer);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* removeFromArray */ "D"])(this.eventObservers, observer);
     };
   }
 
@@ -9353,6 +9357,7 @@ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator002", function() {
 __webpack_require__.d(__webpack_exports__, "SNProtocolOperator003", function() { return /* reexport */ operator_003_SNProtocolOperator003; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return /* reexport */ operator_004_SNProtocolOperator004; });
 __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return /* reexport */ root_key_SNRootKey; });
+__webpack_require__.d(__webpack_exports__, "SNRootKeyParams", function() { return /* reexport */ key_params_SNRootKeyParams; });
 __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return /* reexport */ device_interface_DeviceInterface; });
 __webpack_require__.d(__webpack_exports__, "SNItem", function() { return /* reexport */ core_item["d" /* SNItem */]; });
 __webpack_require__.d(__webpack_exports__, "ItemMutator", function() { return /* reexport */ core_item["b" /* ItemMutator */]; });
@@ -9426,13 +9431,13 @@ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return
 __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return /* reexport */ utils["o" /* greaterOfTwoDates */]; });
 __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return /* reexport */ utils["q" /* isNullOrUndefined */]; });
 __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return /* reexport */ utils["w" /* jsonParseEmbeddedKeys */]; });
-__webpack_require__.d(__webpack_exports__, "omitUndefinedCopy", function() { return /* reexport */ utils["A" /* omitUndefinedCopy */]; });
-__webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return /* reexport */ utils["C" /* removeFromArray */]; });
-__webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return /* reexport */ utils["D" /* removeFromIndex */]; });
-__webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return /* reexport */ utils["H" /* subtractFromArray */]; });
-__webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return /* reexport */ utils["I" /* topLevelCompare */]; });
-__webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return /* reexport */ utils["J" /* truncateHexString */]; });
-__webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return /* reexport */ utils["K" /* uniqCombineObjArrays */]; });
+__webpack_require__.d(__webpack_exports__, "omitUndefinedCopy", function() { return /* reexport */ utils["B" /* omitUndefinedCopy */]; });
+__webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return /* reexport */ utils["D" /* removeFromArray */]; });
+__webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return /* reexport */ utils["E" /* removeFromIndex */]; });
+__webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return /* reexport */ utils["I" /* subtractFromArray */]; });
+__webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return /* reexport */ utils["J" /* topLevelCompare */]; });
+__webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return /* reexport */ utils["K" /* truncateHexString */]; });
+__webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return /* reexport */ utils["L" /* uniqCombineObjArrays */]; });
 __webpack_require__.d(__webpack_exports__, "Uuid", function() { return /* reexport */ uuid_Uuid; });
 __webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return /* reexport */ intents["b" /* EncryptionIntent */]; });
 __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return /* reexport */ intents["f" /* isLocalStorageIntent */]; });
@@ -9625,7 +9630,7 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
         this.primaryApplication = undefined;
       }
 
-      Object(utils["C" /* removeFromArray */])(this.applications, application);
+      Object(utils["D" /* removeFromArray */])(this.applications, application);
 
       if (source === DeinitSource.SignOut) {
         this.removeDescriptor(this.descriptorForApplication(application));
@@ -9720,7 +9725,7 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
     }
 
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.changeObservers, callback);
+      Object(utils["D" /* removeFromArray */])(this.changeObservers, callback);
     };
   }
 
@@ -9827,6 +9832,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
+
 /**
  *  001, 002:
  *  - Nonce is not uploaded to server, instead used to compute salt locally and send to server
@@ -9850,6 +9856,7 @@ var KeyParamsOrigination;
   KeyParamsOrigination["PasscodeChange"] = "passcode-change";
 })(KeyParamsOrigination || (KeyParamsOrigination = {}));
 
+const ValidKeyParamsKeys = ['identifier', 'pw_cost', 'pw_nonce', 'pw_salt', 'version', 'origination', 'created'];
 function Create001KeyParams(keyParams) {
   return CreateAnyKeyParams(keyParams);
 }
@@ -9983,7 +9990,7 @@ class key_params_SNRootKeyParams {
 
 
   getPortableValue() {
-    return this.content;
+    return Object(utils["C" /* pickByCopy */])(this.content, ValidKeyParamsKeys);
   }
 
 }
@@ -10253,7 +10260,7 @@ class privileges_PrivilegeMutator extends core_item["b" /* ItemMutator */] {
   }
 
   removeCredentialForAction(action, credential) {
-    Object(utils["C" /* removeFromArray */])(this.privilegeMap[action], credential);
+    Object(utils["D" /* removeFromArray */])(this.privilegeMap[action], credential);
   }
 
   addCredentialForAction(action, credential) {
@@ -10481,11 +10488,11 @@ class component_ComponentMutator extends core_item["b" /* ItemMutator */] {
   }
 
   removeAssociatedItemId(uuid) {
-    Object(utils["C" /* removeFromArray */])(this.typedContent.associatedItemIds || [], uuid);
+    Object(utils["D" /* removeFromArray */])(this.typedContent.associatedItemIds || [], uuid);
   }
 
   removeDisassociatedItemId(uuid) {
-    Object(utils["C" /* removeFromArray */])(this.typedContent.disassociatedItemIds || [], uuid);
+    Object(utils["D" /* removeFromArray */])(this.typedContent.disassociatedItemIds || [], uuid);
   }
 
   setLastSize(size) {
@@ -11880,7 +11887,7 @@ class uuid_map_UuidMap {
     const directReferences = this.directMap[uuid] || [];
 
     for (const directReference of directReferences) {
-      Object(utils["C" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
+      Object(utils["D" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
     }
 
     delete this.directMap[uuid];
@@ -11889,7 +11896,7 @@ class uuid_map_UuidMap {
     const inverseReferences = this.inverseMap[uuid] || [];
 
     for (const inverseReference of inverseReferences) {
-      Object(utils["C" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
+      Object(utils["D" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
     }
 
     delete this.inverseMap[uuid];
@@ -11909,13 +11916,13 @@ class uuid_map_UuidMap {
 
   deestablishDirectRelationship(uuidA, uuidB) {
     const index = this.directMap[uuidA] || [];
-    Object(utils["C" /* removeFromArray */])(index, uuidB);
+    Object(utils["D" /* removeFromArray */])(index, uuidB);
     this.directMap[uuidA] = index;
   }
 
   deestablishInverseRelationship(uuidA, uuidB) {
     const inverseIndex = this.inverseMap[uuidB] || [];
-    Object(utils["C" /* removeFromArray */])(inverseIndex, uuidA);
+    Object(utils["D" /* removeFromArray */])(inverseIndex, uuidA);
     this.inverseMap[uuidB] = inverseIndex;
   }
 
@@ -12247,7 +12254,7 @@ class conflict_ConflictDelta {
     }
 
     if (strategy === strategies["a" /* ConflictStrategy */].KeepLeftMergeRefs) {
-      const refs = Object(utils["K" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
+      const refs = Object(utils["L" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
       const updatedAt = Object(utils["o" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
       const payload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
         updated_at: updatedAt,
@@ -12848,7 +12855,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       throw Error('Attempting to pop queue element with no resolve function');
     }
 
-    Object(utils["C" /* removeFromArray */])(this.decryptionQueue, queueItem);
+    Object(utils["D" /* removeFromArray */])(this.decryptionQueue, queueItem);
     const keyParams = queueItem.keyParams;
     const key = queueItem.key;
     const resolve = queueItem.resolve;
@@ -13218,7 +13225,7 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
       return false;
     }
 
-    const hasServerPassword = this.serverPassword && otherKey.serverPassword;
+    const hasServerPassword = !!(this.serverPassword && otherKey.serverPassword);
     return timingSafeEqual(this.masterKey, otherKey.masterKey) && (!hasServerPassword || timingSafeEqual(this.serverPassword, otherKey.serverPassword));
   }
   /**
@@ -14914,7 +14921,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         requiredPermissions.push({
           name: ComponentAction.StreamContextItem
         });
-        Object(utils["C" /* removeFromArray */])(pendingResponseItems, responseItem);
+        Object(utils["D" /* removeFromArray */])(pendingResponseItems, responseItem);
         /* We break because there can only be one context item */
 
         break;
@@ -14989,11 +14996,11 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       }
 
       await this.itemManager.changeItems(uuids, mutator => {
-        const payload = Object(utils["E" /* searchArray */])(payloads, {
+        const payload = Object(utils["F" /* searchArray */])(payloads, {
           uuid: mutator.getUuid()
         });
         mutator.mergePayload(payload);
-        const responseItem = Object(utils["E" /* searchArray */])(responsePayloads, {
+        const responseItem = Object(utils["F" /* searchArray */])(responsePayloads, {
           uuid: mutator.getUuid()
         });
 
@@ -15165,7 +15172,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
           await this.activateComponent(component.uuid);
 
           if (!theme.isLayerable()) {
-            await Object(utils["F" /* sleep */])(10);
+            await Object(utils["G" /* sleep */])(10);
 
             for (const candidate of activeThemes) {
               if (candidate && !candidate.isLayerable()) {
@@ -15217,7 +15224,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       }
 
       for (const acquiredContentType of respectiveAcquired.content_types) {
-        Object(utils["C" /* removeFromArray */])(requiredContentTypes, acquiredContentType);
+        Object(utils["D" /* removeFromArray */])(requiredContentTypes, acquiredContentType);
       }
 
       if (requiredContentTypes.length === 0) {
@@ -15336,7 +15343,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         return;
       }
 
-      Object(utils["C" /* removeFromArray */])(this.handlers, matching);
+      Object(utils["D" /* removeFromArray */])(this.handlers, matching);
     };
   }
 
@@ -15745,7 +15752,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
       ignored
     } = this.mergePayloadsOntoMaster(first.payloads);
     this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey);
-    Object(utils["C" /* removeFromArray */])(this.emitQueue, first);
+    Object(utils["D" /* removeFromArray */])(this.emitQueue, first);
     first.resolve(changed.concat(inserted, discarded));
 
     if (this.emitQueue.length > 0) {
@@ -15819,7 +15826,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     };
     this.changeObservers.push(observer);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.changeObservers, observer);
+      Object(utils["D" /* removeFromArray */])(this.changeObservers, observer);
     };
   }
   /**
@@ -16863,7 +16870,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: mk,
-          serverPassword: sp,
           dataAuthenticationKey: ak,
           version: version,
           keyParams: rawAccountKeyParams
@@ -16923,7 +16929,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
     const version = (accountKeyParams === null || accountKeyParams === void 0 ? void 0 : accountKeyParams.version) || (await this.getFallbackRootKeyVersion());
     const accountKey = await root_key_SNRootKey.Create({
       masterKey: storageValueStore.mk,
-      serverPassword: storageValueStore.pw,
       dataAuthenticationKey: storageValueStore.ak,
       version: version,
       keyParams: accountKeyParams
@@ -16993,7 +16998,9 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
     const rawStructure = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
-        [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
+
+        /** A 'hash' key may be present from legacy versions that should be deleted */
+        [StorageKey.RootKeyWrapperKeyParams]: Object(utils["z" /* omitByCopy */])(rawPasscodeParams, ['hash']),
         [StorageKey.RootKeyParams]: rawAccountKeyParams,
         [NonwrappedStorageKey.MobileFirstRun]: firstRunValue
       },
@@ -17065,7 +17072,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const newAccountKey = Object(generator["b" /* CopyPayload */])(unwrappedAccountKey, {
           content: {
             masterKey: accountKeyContent.mk,
-            serverPassword: accountKeyContent.pw,
             dataAuthenticationKey: accountKeyContent.ak,
             version: version,
             keyParams: rawAccountKeyParams,
@@ -17103,7 +17109,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const accountVersion = keychainValue.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version) || (await this.getFallbackRootKeyVersion());
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: keychainValue.mk,
-          serverPassword: keychainValue.pw,
           dataAuthenticationKey: keychainValue.ak,
           version: accountVersion,
           keyParams: rawAccountKeyParams
@@ -18207,7 +18212,7 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
 
   async generateSalt004(identifier, seed) {
     const hash = await this.crypto.sha256([identifier, seed].join(PARTITION_CHARACTER));
-    return Object(utils["J" /* truncateHexString */])(hash, V004Algorithm.ArgonSaltLength);
+    return Object(utils["K" /* truncateHexString */])(hash, V004Algorithm.ArgonSaltLength);
   }
   /**
    * Computes a root key given a passworf
@@ -18323,12 +18328,12 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
   }
 
   async authenticatedDataToString(attachedData) {
-    return this.crypto.base64Encode(JSON.stringify(Object(utils["G" /* sortedCopy */])(Object(utils["A" /* omitUndefinedCopy */])(attachedData))));
+    return this.crypto.base64Encode(JSON.stringify(Object(utils["H" /* sortedCopy */])(Object(utils["B" /* omitUndefinedCopy */])(attachedData))));
   }
 
   async stringToAuthenticatedData(rawAuthenticatedData, override) {
     const base = JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
-    return Object(utils["G" /* sortedCopy */])(operator_004_objectSpread(operator_004_objectSpread({}, base), override));
+    return Object(utils["H" /* sortedCopy */])(operator_004_objectSpread(operator_004_objectSpread({}, base), override));
   }
 
   async generateEncryptedParameters(payload, format, key) {
@@ -19173,7 +19178,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   onKeyStatusChange(callback) {
     this.keyObservers.push(callback);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.keyObservers, callback);
+      Object(utils["D" /* removeFromArray */])(this.keyObservers, callback);
     };
   }
 
@@ -19501,7 +19506,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   async validateAccountPassword(password) {
     const keyParams = await this.getRootKeyParams();
     const key = await this.computeRootKey(password, keyParams);
-    const valid = key.compare(this.rootKey);
+    const valid = this.rootKey.compare(key);
 
     if (valid) {
       return {
@@ -20910,7 +20915,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     };
     this.observers.push(observer);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.observers, observer);
+      Object(utils["D" /* removeFromArray */])(this.observers, observer);
     };
   }
   /**
@@ -21346,7 +21351,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   findTagByTitle(title) {
-    return Object(utils["E" /* searchArray */])(this.tags, {
+    return Object(utils["F" /* searchArray */])(this.tags, {
       title: title
     });
   }
@@ -22016,7 +22021,7 @@ class operation_AccountSyncOperation {
 
   popPayloads(count) {
     const payloads = this.pendingPayloads.slice(0, count);
-    Object(utils["H" /* subtractFromArray */])(this.pendingPayloads, payloads);
+    Object(utils["I" /* subtractFromArray */])(this.pendingPayloads, payloads);
     return payloads;
   }
 
@@ -22344,7 +22349,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const itemsKeysPayloads = payloads.filter(payload => {
       return payload.content_type === content_types["a" /* ContentType */].ItemsKey;
     });
-    Object(utils["H" /* subtractFromArray */])(payloads, itemsKeysPayloads);
+    Object(utils["I" /* subtractFromArray */])(payloads, itemsKeysPayloads);
     const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(itemsKeysPayloads);
     await this.modelManager.emitPayloads(decryptedItemsKeys, sources["a" /* PayloadSource */].LocalRetrieved);
     /** Map in batches to give interface a chance to update */
@@ -22503,7 +22508,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     }
 
     const promise = this.spawnQueue[0];
-    Object(utils["D" /* removeFromIndex */])(this.spawnQueue, 0);
+    Object(utils["E" /* removeFromIndex */])(this.spawnQueue, 0);
     this.log('Syncing again from spawn queue');
     return this.sync(sync_service_objectSpread({
       queueStrategy: SyncQueueStrategy.ForceSpawnNew,
@@ -22538,7 +22543,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
       if (this.completedOnlineDownloadFirstSync) {
         return;
       } else {
-        await Object(utils["F" /* sleep */])(waitTimeOnFailureMs);
+        await Object(utils["G" /* sleep */])(waitTimeOnFailureMs);
       }
     }
 
@@ -22594,7 +22599,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const neverSyncedDeleted = items.filter(item => {
       return item.neverSynced && item.deleted;
     });
-    Object(utils["H" /* subtractFromArray */])(items, neverSyncedDeleted);
+    Object(utils["I" /* subtractFromArray */])(items, neverSyncedDeleted);
     const decryptedPayloads = items.map(item => {
       return item.payloadRepresentation();
     });
@@ -22631,7 +22636,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     /* Subtract from array as soon as we're sure they'll be called.
     resolves are triggered at the end of this function call */
 
-    Object(utils["H" /* subtractFromArray */])(this.resolveQueue, inTimeResolveQueue);
+    Object(utils["I" /* subtractFromArray */])(this.resolveQueue, inTimeResolveQueue);
     /** lastSyncBegan must be set *after* any point we may have returned above.
      * Setting this value means the item was 100% sent to the server. */
 
@@ -22836,7 +22841,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
 
   async handleSuccessServerResponse(operation, response) {
     if (this._simulate_latency) {
-      await Object(utils["F" /* sleep */])(this._simulate_latency.latency);
+      await Object(utils["G" /* sleep */])(this._simulate_latency.latency);
     }
 
     this.log('Online Sync Response', response.rawResponse);
@@ -23065,7 +23070,7 @@ class challenge_operation_ChallengeOperation {
     const matching = valuesArray.find(v => v.prompt.id === value.prompt.id);
 
     if (matching) {
-      Object(utils["C" /* removeFromArray */])(valuesArray, matching);
+      Object(utils["D" /* removeFromArray */])(valuesArray, matching);
     }
 
     valuesArray.push(value);
@@ -23086,7 +23091,7 @@ class challenge_operation_ChallengeOperation {
     const matching = valuesArray.find(v => v.prompt.validation === value.prompt.validation);
 
     if (matching) {
-      Object(utils["C" /* removeFromArray */])(valuesArray, matching);
+      Object(utils["D" /* removeFromArray */])(valuesArray, matching);
     }
 
     valuesArray.push(value);
@@ -23265,7 +23270,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     observers.push(observer);
     this.challengeObservers[challenge.id] = observers;
     return () => {
-      Object(utils["C" /* removeFromArray */])(observers, observer);
+      Object(utils["D" /* removeFromArray */])(observers, observer);
     };
   }
 
@@ -23681,7 +23686,7 @@ class application_SNApplication {
     };
     this.eventHandlers.push(observer);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.eventHandlers, observer);
+      Object(utils["D" /* removeFromArray */])(this.eventHandlers, observer);
     };
   }
 
@@ -24032,7 +24037,7 @@ class application_SNApplication {
     this.streamRemovers.push(observer);
     return () => {
       observer();
-      Object(utils["C" /* removeFromArray */])(this.streamRemovers, observer);
+      Object(utils["D" /* removeFromArray */])(this.streamRemovers, observer);
     };
   }
   /**
@@ -24327,7 +24332,7 @@ class application_SNApplication {
       await promise;
     } else {
       /** Await up to maxWait. If not resolved by then, return. */
-      await Promise.race([promise, Object(utils["F" /* sleep */])(maxWait)]);
+      await Promise.race([promise, Object(utils["G" /* sleep */])(maxWait)]);
     }
   }
 
@@ -24952,6 +24957,7 @@ class LiveItem {
 var application_service = __webpack_require__(78);
 
 // CONCATENATED MODULE: ./lib/index.ts
+
 
 
 

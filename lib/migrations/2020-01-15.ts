@@ -14,7 +14,7 @@ import { Migration } from '@Lib/migrations/migration';
 import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
 import {
-  Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys
+  Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys, omitByCopy
 } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
@@ -157,7 +157,6 @@ export class Migration20200115 extends Migration {
         const accountKey = await SNRootKey.Create(
           {
             masterKey: mk!,
-            serverPassword: sp!,
             dataAuthenticationKey: ak!,
             version: version,
             keyParams: rawAccountKeyParams as any
@@ -235,7 +234,6 @@ export class Migration20200115 extends Migration {
     const accountKey = await SNRootKey.Create(
       {
         masterKey: storageValueStore.mk,
-        serverPassword: storageValueStore.pw,
         dataAuthenticationKey: storageValueStore.ak,
         version: version,
         keyParams: accountKeyParams
@@ -244,7 +242,6 @@ export class Migration20200115 extends Migration {
     delete storageValueStore.mk;
     delete storageValueStore.pw;
     delete storageValueStore.ak;
-
     const accountKeyPayload = CreateMaxPayloadFromAnyObject(
       accountKey
     );
@@ -331,7 +328,8 @@ export class Migration20200115 extends Migration {
     const rawStructure: StorageValuesObject = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
-        [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
+        /** A 'hash' key may be present from legacy versions that should be deleted */
+        [StorageKey.RootKeyWrapperKeyParams]: omitByCopy(rawPasscodeParams as any, ['hash']),
         [StorageKey.RootKeyParams]: rawAccountKeyParams,
         [NonwrappedStorageKey.MobileFirstRun]: firstRunValue
       },
@@ -409,7 +407,6 @@ export class Migration20200115 extends Migration {
           {
             content: {
               masterKey: accountKeyContent.mk,
-              serverPassword: accountKeyContent.pw,
               dataAuthenticationKey: accountKeyContent.ak,
               version: version,
               keyParams: rawAccountKeyParams as any,
@@ -460,7 +457,6 @@ export class Migration20200115 extends Migration {
         const accountKey = await SNRootKey.Create(
           {
             masterKey: keychainValue!.mk,
-            serverPassword: keychainValue!.pw,
             dataAuthenticationKey: keychainValue!.ak,
             version: accountVersion,
             keyParams: rawAccountKeyParams as any

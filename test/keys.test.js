@@ -625,4 +625,27 @@ describe('keys', function () {
 
     expect(recreatedApp.protocolService.rootKey).to.be.ok;
   });
+
+  it('extraneous parameters in key params should be ignored when ejecting', async function () {
+    const params = new SNRootKeyParams({
+      identifier: 'foo',
+      pw_cost: 110000,
+      pw_nonce: 'bar',
+      pw_salt: 'salt',
+      version: '003',
+      origination: 'registration',
+      created: new Date().getTime(),
+      hash: '123',
+      foo: 'bar'
+    });
+    const ejected = params.getPortableValue();
+    expect(ejected.hash).to.not.be.ok;
+    expect(ejected.pw_cost).to.be.ok;
+    expect(ejected.pw_nonce).to.be.ok;
+    expect(ejected.pw_salt).to.be.ok;
+    expect(ejected.version).to.be.ok;
+    expect(ejected.origination).to.be.ok;
+    expect(ejected.created).to.be.ok;
+    expect(ejected.identifier).to.be.ok;
+  });
 });

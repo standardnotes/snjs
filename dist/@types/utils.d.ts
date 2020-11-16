@@ -140,7 +140,7 @@ export declare function omitInPlace<T>(object: T, keys: Array<keyof T>): void;
 /**
  * Creates a new object by omitting `keys` from `object`
  */
-export declare function omitByCopy<T>(object: T, keys: Array<keyof T>): {} & T;
+export declare function omitByCopy<T>(object: T, keys: Array<keyof T>): ({} & T) | undefined;
 /**
  * Similiar to Node's path.join, this function combines an array of paths into
  * one resolved path.

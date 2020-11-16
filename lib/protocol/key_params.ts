@@ -1,5 +1,6 @@
 import { KeyParamsResponse } from './../services/api/responses';
 import { ProtocolVersion, compareVersions } from '@Protocol/versions';
+import { pickByCopy } from '@Lib/utils';
 
 /**
  *  001, 002:
@@ -21,6 +22,16 @@ export enum KeyParamsOrigination {
   PasscodeCreate = 'passcode-create',
   PasscodeChange = 'passcode-change'
 }
+
+const ValidKeyParamsKeys = [
+  'identifier',
+  'pw_cost',
+  'pw_nonce',
+  'pw_salt',
+  'version',
+  'origination',
+  'created',
+]
 
 type BaseKeyParams = {
   /** Seconds since creation date */
@@ -116,7 +127,6 @@ export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier
   return CreateAnyKeyParams(rawKeyParams);
 }
 
-
 /**
  * Key params are public data that contain information about how a root key was created.
  * Given a keyParams object and a password, clients can compute a root key that was created
@@ -202,6 +212,6 @@ export class SNRootKeyParams {
    * use the original values.
    */
   getPortableValue() {
-    return this.content;
+    return pickByCopy(this.content, ValidKeyParamsKeys as any);
   }
 }
