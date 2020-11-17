@@ -147,6 +147,7 @@ describe('server session', function () {
     expect(changePasswordResponse.status).to.equal(200);
     expect(changePasswordResponse.user).to.be.ok;
 
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponse = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
@@ -169,6 +170,7 @@ describe('server session', function () {
     expect(changePasswordResponse).to.be.ok;
     expect(changePasswordResponse.status).to.equal(200);
 
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponse = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
@@ -190,6 +192,8 @@ describe('server session', function () {
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
 
     expectFactoryException();
+
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponse = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
@@ -214,6 +218,8 @@ describe('server session', function () {
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
 
     expectFactoryException();
+
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponseWithNewPassword = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
@@ -235,12 +241,12 @@ describe('server session', function () {
 
   it('should sign in successfully after signing out', async function () {
     await this.application.apiService.signOut();
+    this.application.apiService.session = undefined;
 
-    await Factory.loginToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password
-    });
+    await this.application.sessionManager.signIn(
+      this.email,
+      this.password
+    );
 
     const currentSession = this.application.apiService.getSession();
 

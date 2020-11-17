@@ -50,7 +50,7 @@ describe('basic auth', () => {
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok;
   }).timeout(5000);
 
-  it('successfully logs out of account', async function () {
+  it('successfully signs out of account', async function () {
     await this.application.register(
       this.email,
       this.password
@@ -64,7 +64,7 @@ describe('basic auth', () => {
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT);
   });
 
-  it('successfully logins to registered account', async function () {
+  it('successfully signs in to registered account', async function () {
     await this.application.register(
       this.email,
       this.password
@@ -79,6 +79,150 @@ describe('basic auth', () => {
     expect(response).to.be.ok;
     expect(response.error).to.not.be.ok;
     expect(await this.application.protocolService.getRootKey()).to.be.ok;
+  }).timeout(20000);
+
+  it('cannot sign while already signed in', async function () {
+    await this.application.register(
+      this.email,
+      this.password
+    );
+    await Factory.createSyncedNote(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    const response = await this.application.signIn(
+      this.email,
+      this.password,
+      undefined, undefined, undefined,
+      true
+    );
+    expect(response).to.be.ok;
+    expect(response.error).to.not.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
+
+    let error;
+    try {
+      await this.application.signIn(
+        this.email,
+        this.password,
+        undefined, undefined, undefined,
+        true
+      );
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.ok;
+  }).timeout(20000);
+
+  it('cannot register while already signed in', async function () {
+    await this.application.register(
+      this.email,
+      this.password
+    );
+    let error;
+    try {
+      await this.application.register(
+        this.email,
+        this.password
+      );
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.ok;
+    expect(await this.application.protocolService.getRootKey()).to.be.ok;
+  }).timeout(20000);
+
+  it('cannot perform two sign-ins at the same time', async function () {
+    await this.application.register(
+      this.email,
+      this.password
+    );
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+
+    await Promise.all([
+      (async () => {
+        const response = await this.application.signIn(
+          this.email,
+          this.password,
+          undefined, undefined, undefined,
+          true
+        );
+        expect(response).to.be.ok;
+        expect(response.error).to.not.be.ok;
+        expect(await this.application.protocolService.getRootKey()).to.be.ok;
+      })(),
+      (async () => {
+        /** Make sure the first function runs first */
+        await new Promise(resolve => setTimeout(resolve));
+        /** Try to sign in while the first request is going */
+        let error;
+        try {
+          await this.application.signIn(
+            this.email,
+            this.password,
+            undefined, undefined, undefined,
+            true
+          );
+        } catch (e) {
+          error = e;
+        }
+        expect(error).to.be.ok;
+      })(),
+    ]);
+  }).timeout(20000);
+
+  it('cannot perform two register operations at the same time', async function () {
+    await Promise.all([
+      (async () => {
+        const response = await this.application.register(
+          this.email,
+          this.password,
+        );
+        expect(response).to.be.ok;
+        expect(response.error).to.not.be.ok;
+        expect(await this.application.protocolService.getRootKey()).to.be.ok;
+      })(),
+      (async () => {
+        /** Make sure the first function runs first */
+        await new Promise(resolve => setTimeout(resolve));
+        /** Try to register in while the first request is going */
+        let error;
+        try {
+          await this.application.register(
+            this.email,
+            this.password,
+          );
+        } catch (e) {
+          error = e;
+        }
+        expect(error).to.be.ok;
+      })(),
+    ]);
+  }).timeout(20000);
+
+  it('successfuly signs in after failing once', async function () {
+    await this.application.register(
+      this.email,
+      this.password
+    );
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+
+    let response = await this.application.signIn(
+      this.email,
+      'wrong password',
+      undefined, undefined, undefined,
+      true
+    );
+    expect(response).to.have.property('status', 401);
+    expect(response.error).to.be.ok;
+
+    response = await this.application.signIn(
+      this.email,
+      this.password,
+      undefined, undefined, undefined,
+      true
+    );
+
+    expect(response.status).to.equal(200);
+    expect(response).to.not.haveOwnProperty('error');
   }).timeout(20000);
 
   it('server retrieved key params should use our client inputted value for identifier', async function () {
@@ -346,4 +490,24 @@ describe('basic auth', () => {
       expect(await this.application.protocolService.getRootKey()).to.be.ok;
     }
   }).timeout(60000);
+
+  it('signing in with a clean email string should only try once', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    const performSignIn = sinon.spy(
+      this.application.sessionManager,
+      'performSignIn'
+    );
+    await this.application.signIn(
+      this.email,
+      'wrong password',
+      undefined, undefined, undefined,
+      true
+    );
+    expect(performSignIn.callCount).to.equal(1);
+  });
 });

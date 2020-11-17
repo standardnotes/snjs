@@ -129,6 +129,8 @@ export class SNApplication {
   private launched = false
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false
+  private signingIn = false;
+  private registering = false;
 
   /**
    * @param environment The Environment that identifies your application.
@@ -1063,6 +1065,7 @@ export class SNApplication {
     this.clearServices();
     this.dealloced = true;
     this.started = false;
+    this.signingIn = false;
   }
 
   /**
@@ -1075,29 +1078,40 @@ export class SNApplication {
     ephemeral = false,
     mergeLocal = true
   ) {
-    this.lockSyncing();
-    const result = await this.sessionManager.register(email, password);
-    if (!result.response.error) {
-      this.syncService!.resetSyncState();
-      await this.storageService!.setPersistencePolicy(
-        ephemeral
-          ? StoragePersistencePolicies.Ephemeral
-          : StoragePersistencePolicies.Default
-      );
-      if (mergeLocal) {
-        await this.syncService!.markAllItemsAsNeedingSync(true);
-      } else {
-        this.itemManager!.removeAllItemsFromMemory();
-        await this.clearDatabase();
-      }
-      await this.notifyEvent(ApplicationEvent.SignedIn);
-      this.unlockSyncing();
-      await this.syncService!.downloadFirstSync(300);
-      this.protocolService!.decryptErroredItems();
-    } else {
-      this.unlockSyncing();
+    if (this.hasAccount()) {
+      throw Error('Tried to register when an account already exists.');
     }
-    return result.response;
+    if (this.registering) {
+      throw Error('Already registering.');
+    }
+    this.registering = true;
+    try {
+      this.lockSyncing();
+      const result = await this.sessionManager.register(email, password);
+      if (!result.response.error) {
+        this.syncService!.resetSyncState();
+        await this.storageService!.setPersistencePolicy(
+          ephemeral
+            ? StoragePersistencePolicies.Ephemeral
+            : StoragePersistencePolicies.Default
+        );
+        if (mergeLocal) {
+          await this.syncService!.markAllItemsAsNeedingSync(true);
+        } else {
+          this.itemManager!.removeAllItemsFromMemory();
+          await this.clearDatabase();
+        }
+        await this.notifyEvent(ApplicationEvent.SignedIn);
+        this.unlockSyncing();
+        await this.syncService!.downloadFirstSync(300);
+        this.protocolService!.decryptErroredItems();
+      } else {
+        this.unlockSyncing();
+      }
+      return result.response;
+    } finally {
+      this.registering = false;
+    }
   }
 
   /**
@@ -1112,40 +1126,51 @@ export class SNApplication {
     mergeLocal = true,
     awaitSync = false
   ) {
-    /** Prevent a timed sync from occuring while signing in. */
-    this.lockSyncing();
-    const result = await this.sessionManager.signIn(
-      email, password, strict
-    );
-    if (!result.response.error) {
-      this.syncService!.resetSyncState();
-      await this.storageService!.setPersistencePolicy(
-        ephemeral
-          ? StoragePersistencePolicies.Ephemeral
-          : StoragePersistencePolicies.Default
-      );
-      if (mergeLocal) {
-        await this.syncService!.markAllItemsAsNeedingSync(true);
-      } else {
-        this.itemManager!.removeAllItemsFromMemory();
-        await this.clearDatabase();
-      }
-      await this.notifyEvent(ApplicationEvent.SignedIn);
-      this.unlockSyncing();
-      const syncPromise = this.syncService!.downloadFirstSync(1_000, {
-        checkIntegrity: true,
-        awaitAll: awaitSync,
-      });
-      if (awaitSync) {
-        await syncPromise;
-        await this.protocolService!.decryptErroredItems();
-      } else {
-        this.protocolService!.decryptErroredItems();
-      }
-    } else {
-      this.unlockSyncing();
+    if (this.hasAccount()) {
+      throw Error('Tried to sign in when an account already exists.');
     }
-    return result.response;
+    if (this.signingIn) {
+      throw Error('Already signing in.');
+    }
+    this.signingIn = true;
+    try {
+      /** Prevent a timed sync from occuring while signing in. */
+      this.lockSyncing();
+      const result = await this.sessionManager.signIn(
+        email, password, strict
+      );
+      if (!result.response.error) {
+        this.syncService!.resetSyncState();
+        await this.storageService!.setPersistencePolicy(
+          ephemeral
+            ? StoragePersistencePolicies.Ephemeral
+            : StoragePersistencePolicies.Default
+        );
+        if (mergeLocal) {
+          await this.syncService!.markAllItemsAsNeedingSync(true);
+        } else {
+          this.itemManager!.removeAllItemsFromMemory();
+          await this.clearDatabase();
+        }
+        await this.notifyEvent(ApplicationEvent.SignedIn);
+        this.unlockSyncing();
+        const syncPromise = this.syncService!.downloadFirstSync(1_000, {
+          checkIntegrity: true,
+          awaitAll: awaitSync,
+        });
+        if (awaitSync) {
+          await syncPromise;
+          await this.protocolService!.decryptErroredItems();
+        } else {
+          this.protocolService!.decryptErroredItems();
+        }
+      } else {
+        this.unlockSyncing();
+      }
+      return result.response;
+    } finally {
+      this.signingIn = false;
+    }
   }
 
   /**
