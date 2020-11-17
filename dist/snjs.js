@@ -9497,7 +9497,7 @@ __webpack_require__.d(readers_namespaceObject, "StorageReader2_0_0", function() 
 __webpack_require__.d(readers_namespaceObject, "StorageReader1_0_0", function() { return reader_1_0_0_StorageReader1_0_0; });
 
 // CONCATENATED MODULE: ./lib/version.ts
-const SnjsVersion = "2.0.2";
+const SnjsVersion = "2.0.3";
 /**
  * Legacy architecture (pre-3.5 clients)
  */
@@ -19499,38 +19499,54 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
    */
 
 
-  async createBackupFile(subItems) {
-    let intent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : intents["b" /* EncryptionIntent */].FilePreferEncrypted;
+  async createBackupFile(subItems, intent) {
     let returnIfEmpty = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    const items = subItems || this.itemManager.items;
+    let items = subItems || this.itemManager.items;
+    let keyParams;
+
+    if (intent) {
+      if (intent === intents["b" /* EncryptionIntent */].FileDecrypted) {
+        items = items.filter(item => item.content_type !== content_types["a" /* ContentType */].ItemsKey);
+        keyParams = undefined;
+      }
+    } else {
+      switch (this.keyMode) {
+        case KeyMode.RootKeyNone:
+          intent = intents["b" /* EncryptionIntent */].FileDecrypted;
+          items = items.filter(item => item.content_type !== content_types["a" /* ContentType */].ItemsKey);
+          keyParams = undefined;
+          break;
+
+        case KeyMode.WrapperOnly:
+        case KeyMode.RootKeyOnly:
+        case KeyMode.RootKeyPlusWrapper:
+          intent = intents["b" /* EncryptionIntent */].FilePreferEncrypted;
+          keyParams = this.getRootKeyParams().then(params => params === null || params === void 0 ? void 0 : params.getPortableValue());
+          break;
+
+        default:
+          throw Error("Unhandled keyMode value '".concat(this.keyMode, "'."));
+      }
+    }
 
     if (returnIfEmpty && items.length === 0) {
       return undefined;
     }
 
-    const encryptedPayloads = [];
-
-    for (const item of items) {
+    const ejectedPayloads = await Promise.all(items.map(item => {
       if (item.errorDecrypting) {
         /** Keep payload as-is */
-        encryptedPayloads.push(item.payload);
+        return item.payload.ejected();
       } else {
         const payload = Object(generator["f" /* CreateSourcedPayloadFromObject */])(item.payload, sources["a" /* PayloadSource */].FileImport);
-        const encrypted = await this.payloadByEncryptingPayload(payload, intent);
-        encryptedPayloads.push(encrypted);
+        return this.payloadByEncryptingPayload(payload, intent).then(p => p.ejected());
       }
-    }
-
+    }));
     const data = {
       version: this.getLatestVersion(),
-      items: encryptedPayloads.map(p => p.ejected())
+      items: ejectedPayloads,
+      keyParams: await keyParams
     };
-    const keyParams = await this.getRootKeyParams();
-
-    if (keyParams && intent !== intents["b" /* EncryptionIntent */].FileDecrypted) {
-      data.keyParams = keyParams.getPortableValue();
-    }
-
     const prettyPrint = 2;
     return JSON.stringify(data, null, prettyPrint);
   }

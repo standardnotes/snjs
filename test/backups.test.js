@@ -31,7 +31,54 @@ describe('backups', () => {
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion());
   });
 
-  it('backup file should have correct number of items', async function () {
+  it('no passcode + no account backup file should have correct number of items', async function () {
+    await Factory.createSyncedNote(this.application);
+    await Factory.createSyncedNote(this.application);
+    const backupString = await this.application.createBackupFile();
+    const backupData = JSON.parse(backupString);
+
+    expect(backupData.items.length).to.equal(2);
+  });
+
+  it('passcode + no account backup file should have correct number of items', async function () {
+    await this.application.setPasscode('passcode');
+    await Factory.createSyncedNote(this.application);
+    await Factory.createSyncedNote(this.application);
+    const backupString = await this.application.createBackupFile();
+    const backupData = JSON.parse(backupString);
+
+    expect(backupData.items.length).to.equal(3);
+  });
+
+  it('no passcode + account backup file should have correct number of items', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+    await Factory.createSyncedNote(this.application);
+    await Factory.createSyncedNote(this.application);
+    const backupString = await this.application.createBackupFile();
+    const backupData = JSON.parse(backupString);
+    console.log(backupData);
+    expect(backupData.items.length).to.equal(3);
+  });
+
+  it('passcode + account backup file should have correct number of items', async function () {
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        this.application.submitValuesForChallenge(
+          challenge,
+          [new ChallengeValue(challenge.prompts[0], 'passcode')]
+        );
+      }
+    });
+    await this.application.setPasscode('passcode');
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
     const backupString = await this.application.createBackupFile();
@@ -76,6 +123,40 @@ describe('backups', () => {
     const backupString = await this.application.createBackupFile();
     const backupData = JSON.parse(backupString);
 
-    expect(backupData.items.length).to.equal(3);
+    expect(backupData.items.length).to.equal(2);
+  });
+
+  it('decrypted backup file should not have keyParams', async function () {
+    const backup = JSON.parse(await this.application.createBackupFile());
+    expect(backup).to.not.haveOwnProperty('keyParams');
+  });
+
+  it('encrypted backup file should have keyParams', async function () {
+    await this.application.setPasscode('passcode');
+    const backup = JSON.parse(await this.application.createBackupFile());
+    expect(backup).to.haveOwnProperty('keyParams');
+  });
+
+  it('decrypted backup file should not have itemsKeys', async function () {
+    const backup = JSON.parse(await this.application.createBackupFile());
+    expect(backup.items.some(
+      item => item.content_type === ContentType.ItemsKey
+    )).to.be.false;
+  });
+
+  it('encrypted backup file should have itemsKeys', async function () {
+    await this.application.setPasscode('passcode');
+    const backup = JSON.parse(await this.application.createBackupFile());
+    expect(backup.items.some(
+      item => item.content_type === ContentType.ItemsKey
+    )).to.be.true;
+  });
+
+  it('backup file with no account and no passcode should be decrypted', async function () {
+    const note = await Factory.createSyncedNote(this.application);
+    const backup = JSON.parse(await this.application.createBackupFile());
+    expect(backup).to.not.haveOwnProperty('keyParams');
+    expect(backup.items.some(item => item.content_type === ContentType.ItemsKey)).to.be.false;
+    expect(backup.items.find(item => item.content_type === ContentType.Note).uuid).to.equal(note.uuid);
   });
 });

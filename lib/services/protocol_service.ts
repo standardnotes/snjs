@@ -737,38 +737,67 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    */
   public async createBackupFile(
     subItems?: SNItem[],
-    intent = EncryptionIntent.FilePreferEncrypted,
+    intent?: EncryptionIntent,
     returnIfEmpty = false
   ) {
-    const items = subItems || this.itemManager!.items;
+    let items = subItems || this.itemManager!.items;
+    let keyParams: Promise<SNRootKeyParams> | undefined;
+
+    if (intent) {
+      if (intent === EncryptionIntent.FileDecrypted) {
+        items = items.filter(
+          item => item.content_type !== ContentType.ItemsKey
+        );
+        keyParams = undefined;
+      }
+    } else {
+      switch (this.keyMode) {
+        case KeyMode.RootKeyNone:
+          intent = EncryptionIntent.FileDecrypted;
+          items = items.filter(
+            item => item.content_type !== ContentType.ItemsKey
+          );
+          keyParams = undefined;
+          break;
+        case KeyMode.WrapperOnly:
+        case KeyMode.RootKeyOnly:
+        case KeyMode.RootKeyPlusWrapper:
+          intent = EncryptionIntent.FilePreferEncrypted;
+          keyParams = this.getRootKeyParams()
+            .then(params => params?.getPortableValue());
+          break;
+        default:
+          throw Error(`Unhandled keyMode value '${this.keyMode}'.`);
+      }
+    }
+
     if (returnIfEmpty && items.length === 0) {
       return undefined;
     }
-    const encryptedPayloads: PurePayload[] = [];
-    for (const item of items) {
-      if (item.errorDecrypting) {
-        /** Keep payload as-is */
-        encryptedPayloads.push(item.payload);
-      } else {
-        const payload = CreateSourcedPayloadFromObject(
-          item.payload,
-          PayloadSource.FileImport
-        );
-        const encrypted = await this.payloadByEncryptingPayload(
-          payload,
-          intent
-        );
-        encryptedPayloads.push(encrypted);
-      }
-    }
+
+    const ejectedPayloads = await Promise.all(
+      items.map(item => {
+        if (item.errorDecrypting) {
+          /** Keep payload as-is */
+          return item.payload.ejected();
+        } else {
+          const payload = CreateSourcedPayloadFromObject(
+            item.payload,
+            PayloadSource.FileImport
+          );
+          return this.payloadByEncryptingPayload(
+            payload,
+            intent!
+          ).then(p => p.ejected());
+        }
+      })
+    );
+
     const data: BackupFile = {
       version: this.getLatestVersion(),
-      items: encryptedPayloads.map((p) => p.ejected())
+      items: ejectedPayloads,
+      keyParams: await keyParams
     };
-    const keyParams = await this.getRootKeyParams();
-    if (keyParams && intent !== EncryptionIntent.FileDecrypted) {
-      data.keyParams = keyParams.getPortableValue();
-    }
     const prettyPrint = 2;
     return JSON.stringify(data, null, prettyPrint);
   }
