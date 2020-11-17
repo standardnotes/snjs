@@ -12,7 +12,7 @@ export enum ChallengeValidation {
   LocalPasscode = 1,
   AccountPassword = 2,
   Biometric = 3,
-};
+}
 
 /** The source of the challenge */
 export enum ChallengeReason {
@@ -21,7 +21,7 @@ export enum ChallengeReason {
   ProtocolUpgrade = 3,
   Migration = 4,
   Custom = 5
-};
+}
 
 /** For mobile */
 export enum ChallengeKeyboardType {

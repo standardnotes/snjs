@@ -18,19 +18,19 @@ import { DeviceInterface } from '../device_interface';
 export enum StoragePersistencePolicies {
   Default = 1,
   Ephemeral = 2
-};
+}
 
 export enum StorageEncryptionPolicies {
   Default = 1,
   Disabled = 2,
-};
+}
 
 export enum StorageValueModes {
   /** Stored inside wrapped encrpyed storage object */
   Default = 1,
   /** Stored outside storage object, unencrypted */
   Nonwrapped = 2
-};
+}
 
 export enum ValueModesKeys {
   /* Is encrypted */
@@ -39,7 +39,7 @@ export enum ValueModesKeys {
   Unwrapped = 'unwrapped',
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped = 'nonwrapped',
-};
+}
 type ValuesObjectRecord = Record<string, any>
 
 export type StorageValuesObject = {

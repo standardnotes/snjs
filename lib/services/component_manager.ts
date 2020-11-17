@@ -884,7 +884,7 @@ export class SNComponentManager extends PureService {
             lockedNoteCount++;
           }
         }
-      };
+      }
       if (lockedNoteCount === 1) {
         this.alertService!.alert(
           `The note you are attempting to save is locked and cannot be edited.`,
@@ -1277,7 +1277,7 @@ export class SNComponentManager extends PureService {
   setReadonlyStateForComponent(
     component: SNComponent,
     readonly: boolean,
-    lockReadonly: boolean = false
+    lockReadonly = false
   ) {
     const data = this.findOrCreateDataForComponent(component.uuid);
     data.readonly = readonly;

@@ -24,7 +24,7 @@ export enum EncryptionIntent {
   FileEncrypted = 5,
   FileDecrypted = 6,
   FilePreferEncrypted = 7,
-};
+}
 
 export function isLocalStorageIntent(intent: EncryptionIntent) {
   return (

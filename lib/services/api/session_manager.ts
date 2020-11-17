@@ -55,7 +55,7 @@ const cleanedEmailString = (email: string) => {
 
 export const enum SessionEvent {
   SessionRestored = 'SessionRestored'
-};
+}
 
 /**
  * The session manager is responsible for loading initial user state, and any relevant
@@ -105,7 +105,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  private async setSession(session: Session, persist: boolean = true) {
+  private async setSession(session: Session, persist = true) {
     await this.apiService.setSession(session, persist);
   }
 
@@ -364,7 +364,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
         return {
           response: this.apiService.createErrorResponse(messages.INVALID_PASSWORD_COST)
         };
-      };
+      }
       const message = messages.OUTDATED_PROTOCOL_VERSION;
       const confirmed = await this.alertService!.confirm(
         message,

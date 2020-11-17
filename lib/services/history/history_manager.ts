@@ -147,12 +147,12 @@ export class SNHistoryManager extends PureService {
     if (entry && this.persistable) {
       /** Debounce, clear existing timeout */
       if (this.saveTimeout) {
-        if (this.timeout.hasOwnProperty('cancel')) {
+        if (Object.prototype.hasOwnProperty.call(this.timeout, 'cancel')) {
           this.timeout.cancel(this.saveTimeout);
         } else {
           clearTimeout(this.saveTimeout);
         }
-      };
+      }
       this.saveTimeout = this.timeout(() => {
         this.saveToDisk();
       }, PERSIST_TIMEOUT);

@@ -15,7 +15,7 @@ export enum ComponentArea {
   Rooms = 'rooms',
   Modal = 'modal',
   Any = '*'
-};
+}
 
 export enum ComponentAction {
   SetSize = 'set-size',
@@ -40,7 +40,7 @@ export enum ComponentAction {
   Reply = 'reply',
   SaveSuccess = 'save-success',
   SaveError = 'save-error'
-};
+}
 
 export type ComponentPermission = {
   name: ComponentAction

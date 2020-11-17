@@ -28,6 +28,7 @@ export function isWebEnvironment() {
  * @access public
  */
 export function isWebCryptoAvailable() {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore documentMode does not exit in definitions but might exist on IE
   return isWebEnvironment() && !isReactNativeEnvironment() && !(document && document.documentMode) || /Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle;
 }
@@ -332,7 +333,7 @@ export function jsonParseEmbeddedKeys(object: AnyRecord) {
   for (const key of Object.keys(object)) {
     let value;
     try {
-      value = JSON.parse(object[key]);;
+      value = JSON.parse(object[key]);
     } catch (error) {
       value = object[key];
     }
@@ -378,9 +379,9 @@ export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
 export function joinPaths(...args: string[]) {
   return args.map((part, i) => {
     if (i === 0) {
-      return part.trim().replace(/[\/]*$/g, '');
+      return part.trim().replace(/[/]*$/g, '');
     } else {
-      return part.trim().replace(/(^[\/]*|[\/]*$)/g, '');
+      return part.trim().replace(/(^[/]*|[/]*$)/g, '');
     }
   }).filter(x => x.length).join('/');
 }

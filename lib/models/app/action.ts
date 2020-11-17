@@ -3,7 +3,7 @@ import merge from 'lodash/merge';
 export enum ActionAccessType {
   Encrypted = 'encrypted',
   Decrypted = 'decrypted'
-};
+}
 
 export enum ActionVerb {
   Get = 'get',
@@ -11,7 +11,7 @@ export enum ActionVerb {
   Show = 'show',
   Post = 'post',
   Nested = 'nested'
-};
+}
 
 let availableId = Number.MIN_SAFE_INTEGER;
 function getAvailableId() {

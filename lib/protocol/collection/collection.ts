@@ -11,7 +11,7 @@ type Payloadable = PurePayload | SNItem
 export class MutableCollection<T extends Payloadable> {
 
   readonly map: Partial<Record<UuidString, T>> = {}
-  readonly typedMap: Partial<Record<ContentType, T[]>> = {} = {}
+  readonly typedMap: Partial<Record<ContentType, T[]>> = {}
 
   /** An array of uuids of items that are dirty */
   dirtyIndex: Set<UuidString> = new Set();

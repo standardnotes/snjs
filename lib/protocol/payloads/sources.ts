@@ -39,7 +39,7 @@ export enum PayloadSource {
    * have been saved to disk, and are about to be synced */
   PreSyncSave = 19,
   RemoteHistory = 20,
-};
+}
 
 /**
  * Whether the changed payload represents only an internal change that shouldn't

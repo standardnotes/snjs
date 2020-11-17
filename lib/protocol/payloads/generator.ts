@@ -75,7 +75,7 @@ export type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
  * as a json stringified base64 representation. This data is attached but not included
  * in authentication hash.
  */
-export type LegacyAttachedData = AnyKeyParamsContent & {}
+export type LegacyAttachedData = AnyKeyParamsContent & Record<string, unknown>
 
 /** The MaxItemPayload represents a payload with all possible fields */
 const MaxPayloadFields = [
