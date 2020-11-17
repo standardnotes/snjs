@@ -1,0 +1,18 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [ 004 ]
+
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://npm.pkg.github.com/
+          scope: '@standardnotes'
+      - run: npm ci
+      - run: npm run tsc
