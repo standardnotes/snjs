@@ -1,8 +1,14 @@
 {
-  "name": "snjs",
-  "version": "2.0.3",
+  "name": "@standardnotes/snjs",
+  "version": "2.0.4",
+  "engines": {
+    "node": ">=12.19.0 <14.0.0"
+  },
   "main": "dist/snjs.js",
   "types": "dist/@types",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "webpack -w --config webpack.dev.js",
     "bundle": "webpack --config webpack.prod.js && npm run tsc",
