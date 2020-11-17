@@ -61,12 +61,12 @@ describe('application instances', () => {
     app.deinit();
   });
 
-  it('signing out application should delete last_migration_timestamp', async () => {
+  it('signing out application should delete snjs_version', async () => {
     const identifier = 'app';
     const app = await Factory.createAndInitializeApplication(identifier);
-    expect(localStorage.getItem(`${identifier}-last_migration_timestamp`)).to.be.ok;
+    expect(localStorage.getItem(`${identifier}-snjs_version`)).to.be.ok;
     await app.signOut();
-    expect(localStorage.getItem(`${identifier}-last_migration_timestamp`)).to.not.be.ok;
+    expect(localStorage.getItem(`${identifier}-snjs_version`)).to.not.be.ok;
   });
 
   it('locking application while critical func in progress should wait up to a limit',

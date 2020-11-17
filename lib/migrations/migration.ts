@@ -12,7 +12,7 @@ export abstract class Migration {
     this.registerStageHandlers();
   }
 
-  public static timestamp(): number {
+  public static version(): string {
     throw 'Must override';
   }
 

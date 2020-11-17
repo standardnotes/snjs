@@ -565,7 +565,8 @@ describe('keys', function () {
   it('key params for 003 account should still have origination and created', async function () {
     /** origination and created are new properties since 004, but they can be added retroactively
      * to previous versions. They are not essential to <= 003, but are for >= 004 */
-    /** Register with 003 version */
+
+     /** Register with 003 version */
     await Factory.registerOldUser({
       application: this.application,
       email: this.email,
@@ -595,9 +596,10 @@ describe('keys', function () {
     expect(await this.application.protocolService.getEncryptionDisplayName()).to.equal('XChaCha20-Poly1305');
   });
 
-  it('when launching mobile app with no keychain but data, should present account recovery challenge', async function () {
+  it('when launching app with no keychain but data, should present account recovery challenge', async function () {
     /**
-     * On iOS, when setting up a new device from restore, the keychain is deleted, but the data persists.
+     * On iOS (and perhaps other platforms where keychains are not included in device backups),
+     * when setting up a new device from restore, the keychain is deleted, but the data persists.
      * We want to make sure we're prompting the user to re-authenticate their account.
      */
     const id = this.application.identifier;
@@ -611,12 +613,14 @@ describe('keys', function () {
     this.application.deinit();
 
     const recreatedApp = await Factory.createApplication(id);
+    let totalChallenges = 0;
+    const expectedChallenges = 1;
     const receiveChallenge = async (challenge) => {
+      totalChallenges++;
       recreatedApp.submitValuesForChallenge(
         challenge,
         [
-          new ChallengeValue(challenge.prompts[0], this.email),
-          new ChallengeValue(challenge.prompts[1], this.password)
+          new ChallengeValue(challenge.prompts[0], this.password)
         ]
       );
     };
@@ -624,5 +628,30 @@ describe('keys', function () {
     await recreatedApp.launch(true);
 
     expect(recreatedApp.protocolService.rootKey).to.be.ok;
+    expect(totalChallenges).to.equal(expectedChallenges);
+    recreatedApp.deinit();
+  });
+
+  it('extraneous parameters in key params should be ignored when ejecting', async function () {
+    const params = new SNRootKeyParams({
+      identifier: 'foo',
+      pw_cost: 110000,
+      pw_nonce: 'bar',
+      pw_salt: 'salt',
+      version: '003',
+      origination: 'registration',
+      created: new Date().getTime(),
+      hash: '123',
+      foo: 'bar'
+    });
+    const ejected = params.getPortableValue();
+    expect(ejected.hash).to.not.be.ok;
+    expect(ejected.pw_cost).to.be.ok;
+    expect(ejected.pw_nonce).to.be.ok;
+    expect(ejected.pw_salt).to.be.ok;
+    expect(ejected.version).to.be.ok;
+    expect(ejected.origination).to.be.ok;
+    expect(ejected.created).to.be.ok;
+    expect(ejected.identifier).to.be.ok;
   });
 });

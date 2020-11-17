@@ -105,42 +105,42 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "u", function() { return isWebCryptoAvailable; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "s", function() { return isReactNativeEnvironment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return findInArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "E", function() { return searchArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "F", function() { return searchArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return concatArrays; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return isObject; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return isFunction; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return isNullOrUndefined; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "t", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return greaterOfTwoDates; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "K", function() { return uniqCombineObjArrays; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "L", function() { return uniqueArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "L", function() { return uniqCombineObjArrays; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "M", function() { return uniqueArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "x", function() { return lastElement; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return extendArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "H", function() { return subtractFromArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "C", function() { return removeFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "I", function() { return subtractFromArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "D", function() { return removeFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return addIfUnique; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return filterFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return arrayByDifference; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return compareValues; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "D", function() { return removeFromIndex; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "E", function() { return removeFromIndex; });
 /* unused harmony export addAtIndex */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return arrayByRemovingFromIndex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "y", function() { return objectToValueArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "G", function() { return sortedCopy; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "A", function() { return omitUndefinedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "H", function() { return sortedCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "B", function() { return omitUndefinedCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return dateSorted; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "I", function() { return topLevelCompare; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "J", function() { return topLevelCompare; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "w", function() { return jsonParseEmbeddedKeys; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "z", function() { return omitInPlace; });
-/* unused harmony export omitByCopy */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "A", function() { return omitInPlace; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "z", function() { return omitByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "v", function() { return joinPaths; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Copy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return deepMerge; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "B", function() { return pickByCopy; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "C", function() { return pickByCopy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return deepFreeze; });
 /* unused harmony export hasGetter */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "J", function() { return truncateHexString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "F", function() { return sleep; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "K", function() { return truncateHexString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "G", function() { return sleep; });
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
 /* harmony import */ var lodash_remove__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_remove__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(18);
@@ -532,6 +532,10 @@ function omitInPlace(object, keys) {
  */
 
 function omitByCopy(object, keys) {
+  if (isNullOrUndefined(object)) {
+    return undefined;
+  }
+
   const newObject = Object.assign({}, object);
   /**
    * Lodash's omit, which was previously used, seems to cause unexpected behavior
@@ -754,7 +758,7 @@ function CopyPayload(payload, override) {
 }
 
 function CreatePayload(object, fields, source, override) {
-  const rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* pickByCopy */ "B"])(object, fields);
+  const rawPayload = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* pickByCopy */ "C"])(object, fields);
   const overrideFields = override instanceof _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"] ? override.fields.slice() : Object.keys(override || []);
 
   for (const field of overrideFields) {
@@ -762,7 +766,7 @@ function CreatePayload(object, fields, source, override) {
     rawPayload[field] = value ? Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* Copy */ "a"])(value) : value;
   }
 
-  const newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* uniqueArray */ "L"])(fields.concat(overrideFields));
+  const newFields = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_3__[/* uniqueArray */ "M"])(fields.concat(overrideFields));
   return new _Payloads_pure_payload__WEBPACK_IMPORTED_MODULE_0__[/* PurePayload */ "a"](rawPayload, newFields, source || _Payloads_sources__WEBPACK_IMPORTED_MODULE_1__[/* PayloadSource */ "a"].Constructor);
 }
 
@@ -1632,11 +1636,11 @@ function ItemContentsDiffer(item1, item2, excludeContentKeys) {
 
 function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysToIgnore) {
   /* Create copies of objects before running omit as not to modify source values directly. */
-  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "G"])(leftContent);
+  leftContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "H"])(leftContent);
 
   if (leftContent.appData) {
     const domainData = leftContent.appData[_content_types__WEBPACK_IMPORTED_MODULE_6__[/* DefaultAppDomain */ "b"]];
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(domainData, appDataKeysToIgnore);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(domainData, appDataKeysToIgnore);
     /**
      * We don't want to disqualify comparison if one object contains an empty domain object
      * and the other doesn't contain a domain object. This can happen if you create an item
@@ -1652,12 +1656,12 @@ function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysT
     }
   }
 
-  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(leftContent, keysToIgnore);
-  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "G"])(rightContent);
+  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(leftContent, keysToIgnore);
+  rightContent = Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* sortedCopy */ "H"])(rightContent);
 
   if (rightContent.appData) {
     const domainData = rightContent.appData[_content_types__WEBPACK_IMPORTED_MODULE_6__[/* DefaultAppDomain */ "b"]];
-    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(domainData, appDataKeysToIgnore);
+    Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(domainData, appDataKeysToIgnore);
 
     if (domainData) {
       if (Object.keys(domainData).length === 0) {
@@ -1668,7 +1672,7 @@ function ItemContentsEqual(leftContent, rightContent, keysToIgnore, appDataKeysT
     }
   }
 
-  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "z"])(rightContent, keysToIgnore);
+  Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_4__[/* omitInPlace */ "A"])(rightContent, keysToIgnore);
   return JSON.stringify(leftContent) === JSON.stringify(rightContent);
 }
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(77).setImmediate))
@@ -1836,7 +1840,7 @@ class PureService {
   addEventObserver(observer) {
     this.eventObservers.push(observer);
     return () => {
-      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* removeFromArray */ "C"])(this.eventObservers, observer);
+      Object(_Lib_utils__WEBPACK_IMPORTED_MODULE_0__[/* removeFromArray */ "D"])(this.eventObservers, observer);
     };
   }
 
@@ -9341,10 +9345,14 @@ process.umask = function () {
 __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
+__webpack_require__.d(__webpack_exports__, "SnjsVersion", function() { return /* reexport */ SnjsVersion; });
+__webpack_require__.d(__webpack_exports__, "isRightVersionGreaterThanLeft", function() { return /* reexport */ isRightVersionGreaterThanLeft; });
+__webpack_require__.d(__webpack_exports__, "compareSemVersions", function() { return /* reexport */ compareSemVersions; });
 __webpack_require__.d(__webpack_exports__, "SNApplicationGroup", function() { return /* reexport */ application_group_SNApplicationGroup; });
 __webpack_require__.d(__webpack_exports__, "DeinitSource", function() { return /* reexport */ DeinitSource; });
 __webpack_require__.d(__webpack_exports__, "KeyParamsOrigination", function() { return /* reexport */ KeyParamsOrigination; });
 __webpack_require__.d(__webpack_exports__, "KeyRecoveryStrings", function() { return /* reexport */ KeyRecoveryStrings; });
+__webpack_require__.d(__webpack_exports__, "SessionStrings", function() { return /* reexport */ SessionStrings; });
 __webpack_require__.d(__webpack_exports__, "SNApplication", function() { return /* reexport */ application_SNApplication; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolService", function() { return /* reexport */ protocol_service_SNProtocolService; });
 __webpack_require__.d(__webpack_exports__, "KeyMode", function() { return /* reexport */ KeyMode; });
@@ -9353,6 +9361,7 @@ __webpack_require__.d(__webpack_exports__, "SNProtocolOperator002", function() {
 __webpack_require__.d(__webpack_exports__, "SNProtocolOperator003", function() { return /* reexport */ operator_003_SNProtocolOperator003; });
 __webpack_require__.d(__webpack_exports__, "SNProtocolOperator004", function() { return /* reexport */ operator_004_SNProtocolOperator004; });
 __webpack_require__.d(__webpack_exports__, "SNRootKey", function() { return /* reexport */ root_key_SNRootKey; });
+__webpack_require__.d(__webpack_exports__, "SNRootKeyParams", function() { return /* reexport */ key_params_SNRootKeyParams; });
 __webpack_require__.d(__webpack_exports__, "DeviceInterface", function() { return /* reexport */ device_interface_DeviceInterface; });
 __webpack_require__.d(__webpack_exports__, "SNItem", function() { return /* reexport */ core_item["d" /* SNItem */]; });
 __webpack_require__.d(__webpack_exports__, "ItemMutator", function() { return /* reexport */ core_item["b" /* ItemMutator */]; });
@@ -9426,13 +9435,13 @@ __webpack_require__.d(__webpack_exports__, "getGlobalScope", function() { return
 __webpack_require__.d(__webpack_exports__, "greaterOfTwoDates", function() { return /* reexport */ utils["o" /* greaterOfTwoDates */]; });
 __webpack_require__.d(__webpack_exports__, "isNullOrUndefined", function() { return /* reexport */ utils["q" /* isNullOrUndefined */]; });
 __webpack_require__.d(__webpack_exports__, "jsonParseEmbeddedKeys", function() { return /* reexport */ utils["w" /* jsonParseEmbeddedKeys */]; });
-__webpack_require__.d(__webpack_exports__, "omitUndefinedCopy", function() { return /* reexport */ utils["A" /* omitUndefinedCopy */]; });
-__webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return /* reexport */ utils["C" /* removeFromArray */]; });
-__webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return /* reexport */ utils["D" /* removeFromIndex */]; });
-__webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return /* reexport */ utils["H" /* subtractFromArray */]; });
-__webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return /* reexport */ utils["I" /* topLevelCompare */]; });
-__webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return /* reexport */ utils["J" /* truncateHexString */]; });
-__webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return /* reexport */ utils["K" /* uniqCombineObjArrays */]; });
+__webpack_require__.d(__webpack_exports__, "omitUndefinedCopy", function() { return /* reexport */ utils["B" /* omitUndefinedCopy */]; });
+__webpack_require__.d(__webpack_exports__, "removeFromArray", function() { return /* reexport */ utils["D" /* removeFromArray */]; });
+__webpack_require__.d(__webpack_exports__, "removeFromIndex", function() { return /* reexport */ utils["E" /* removeFromIndex */]; });
+__webpack_require__.d(__webpack_exports__, "subtractFromArray", function() { return /* reexport */ utils["I" /* subtractFromArray */]; });
+__webpack_require__.d(__webpack_exports__, "topLevelCompare", function() { return /* reexport */ utils["J" /* topLevelCompare */]; });
+__webpack_require__.d(__webpack_exports__, "truncateHexString", function() { return /* reexport */ utils["K" /* truncateHexString */]; });
+__webpack_require__.d(__webpack_exports__, "uniqCombineObjArrays", function() { return /* reexport */ utils["L" /* uniqCombineObjArrays */]; });
 __webpack_require__.d(__webpack_exports__, "Uuid", function() { return /* reexport */ uuid_Uuid; });
 __webpack_require__.d(__webpack_exports__, "EncryptionIntent", function() { return /* reexport */ intents["b" /* EncryptionIntent */]; });
 __webpack_require__.d(__webpack_exports__, "isLocalStorageIntent", function() { return /* reexport */ intents["f" /* isLocalStorageIntent */]; });
@@ -9471,15 +9480,65 @@ __webpack_require__.d(__webpack_exports__, "PayloadField", function() { return /
 __webpack_require__.d(__webpack_exports__, "StorageKey", function() { return /* reexport */ StorageKey; });
 __webpack_require__.d(__webpack_exports__, "RawStorageKey", function() { return /* reexport */ RawStorageKey; });
 __webpack_require__.d(__webpack_exports__, "NonwrappedStorageKey", function() { return /* reexport */ NonwrappedStorageKey; });
-__webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return /* reexport */ _2020_01_01_base_BaseMigration; });
+__webpack_require__.d(__webpack_exports__, "namespacedKey", function() { return /* reexport */ namespacedKey; });
+__webpack_require__.d(__webpack_exports__, "BaseMigration", function() { return /* reexport */ base_BaseMigration; });
 __webpack_require__.d(__webpack_exports__, "PrivilegeSessionLength", function() { return /* reexport */ PrivilegeSessionLength; });
 __webpack_require__.d(__webpack_exports__, "SNLog", function() { return /* reexport */ log["a" /* SNLog */]; });
 
 // NAMESPACE OBJECT: ./lib/migrations/index.ts
 var migrations_namespaceObject = {};
 __webpack_require__.r(migrations_namespaceObject);
-__webpack_require__.d(migrations_namespaceObject, "Migration20200115", function() { return _2020_01_15_Migration20200115; });
+__webpack_require__.d(migrations_namespaceObject, "Migration2_0_0", function() { return _2_0_0_Migration2_0_0; });
 
+// NAMESPACE OBJECT: ./lib/migrations/readers/index.ts
+var readers_namespaceObject = {};
+__webpack_require__.r(readers_namespaceObject);
+__webpack_require__.d(readers_namespaceObject, "StorageReader2_0_0", function() { return reader_2_0_0_StorageReader2_0_0; });
+__webpack_require__.d(readers_namespaceObject, "StorageReader1_0_0", function() { return reader_1_0_0_StorageReader1_0_0; });
+
+// CONCATENATED MODULE: ./lib/version.ts
+const SnjsVersion = "2.0.2";
+/**
+ * Legacy architecture (pre-3.5 clients)
+ */
+
+const PreviousSnjsVersion1_0_0 = '1.0.0';
+/**
+ * First release of new architecture, did not automatically store version
+ */
+
+const PreviousSnjsVersion2_0_0 = '2.0.0';
+/**
+ * Returns true if the version string on the right is greater than the one
+ * on the left. Accepts any format version number, like 2, 2.0, 2.0.0, or even 2.0.0.01
+ */
+
+function isRightVersionGreaterThanLeft(left, right) {
+  return compareSemVersions(left, right) === -1;
+}
+/**
+ *  -1 if a < b
+ *  0 if a == b
+ *  1 if a > b
+ */
+
+function compareSemVersions(left, right) {
+  const leftParts = left.split('.');
+  const rightParts = right.split('.');
+
+  for (let i = 0; i < rightParts.length; i++) {
+    /**
+     * ~~ parses int
+     * Convert to number so that 001 becomes 1, then back to string
+     */
+    const rightComp = String(Number(~~rightParts[i]));
+    const leftComp = String(Number(~~leftParts[i]));
+    if (rightComp > leftComp) return -1;
+    if (rightComp < leftComp) return 1;
+  }
+
+  return 0;
+}
 // CONCATENATED MODULE: ./lib/storage_keys.ts
 /**
  * Unmanaged keys stored in root storage.
@@ -9489,8 +9548,8 @@ var RawStorageKey;
 
 (function (RawStorageKey) {
   RawStorageKey["StorageObject"] = "storage";
-  RawStorageKey["LastMigrationTimestamp"] = "last_migration_timestamp";
   RawStorageKey["DescriptorRecord"] = "descriptors";
+  RawStorageKey["SnjsVersion"] = "snjs_version";
 })(RawStorageKey || (RawStorageKey = {}));
 
 ;
@@ -9539,6 +9598,22 @@ function namespacedKey(namespace, key) {
     return key;
   }
 }
+const LegacyKeys1_0_0 = {
+  WebPasscodeParamsKey: 'offlineParams',
+  MobilePasscodeParamsKey: 'pc_params',
+  AllAccountKeyParamsKey: 'auth_params',
+  WebEncryptedStorageKey: 'encryptedStorage',
+  MobileWrappedRootKeyKey: 'encrypted_account_keys',
+  MobileBiometricsPrefs: 'biometrics_prefs',
+  AllMigrations: 'migrations',
+  MobileThemesCache: 'ThemePreferencesKey',
+  MobileLightTheme: 'lightTheme',
+  MobileDarkTheme: 'darkTheme',
+  MobileLastExportDate: 'LastExportDateKey',
+  MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
+  MobileOptionsState: 'options',
+  MobilePasscodeKeyboardType: 'passcodeKeyboardType'
+};
 // EXTERNAL MODULE: ./lib/utils.ts
 var utils = __webpack_require__(0);
 
@@ -9625,7 +9700,7 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
         this.primaryApplication = undefined;
       }
 
-      Object(utils["C" /* removeFromArray */])(this.applications, application);
+      Object(utils["D" /* removeFromArray */])(this.applications, application);
 
       if (source === DeinitSource.SignOut) {
         this.removeDescriptor(this.descriptorForApplication(application));
@@ -9720,7 +9795,7 @@ class application_group_SNApplicationGroup extends pure_service["a" /* PureServi
     }
 
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.changeObservers, callback);
+      Object(utils["D" /* removeFromArray */])(this.changeObservers, callback);
     };
   }
 
@@ -9827,6 +9902,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
+
 /**
  *  001, 002:
  *  - Nonce is not uploaded to server, instead used to compute salt locally and send to server
@@ -9850,6 +9926,7 @@ var KeyParamsOrigination;
   KeyParamsOrigination["PasscodeChange"] = "passcode-change";
 })(KeyParamsOrigination || (KeyParamsOrigination = {}));
 
+const ValidKeyParamsKeys = ['identifier', 'pw_cost', 'pw_nonce', 'pw_salt', 'version', 'origination', 'created'];
 function Create001KeyParams(keyParams) {
   return CreateAnyKeyParams(keyParams);
 }
@@ -9983,7 +10060,7 @@ class key_params_SNRootKeyParams {
 
 
   getPortableValue() {
-    return this.content;
+    return Object(utils["C" /* pickByCopy */])(this.content, ValidKeyParamsKeys);
   }
 
 }
@@ -10117,6 +10194,10 @@ const ErrorAlertStrings = {
   MissingSessionBody: 'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.',
   StorageDecryptErrorTitle: 'Storage Error',
   StorageDecryptErrorBody: "We were unable to decrypt your local storage. Please restart the app and try again. If you're unable to resolve this issue, and you have an account, you may try uninstalling the app then reinstalling, then signing back into your account. Otherwise, please contact help@standardnotes.org for support."
+};
+const KeychainRecoveryStrings = {
+  Title: 'Restore Keychain',
+  Text: "We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys."
 };
 // EXTERNAL MODULE: ./lib/protocol/payloads/fields.ts
 var fields = __webpack_require__(4);
@@ -10253,7 +10334,7 @@ class privileges_PrivilegeMutator extends core_item["b" /* ItemMutator */] {
   }
 
   removeCredentialForAction(action, credential) {
-    Object(utils["C" /* removeFromArray */])(this.privilegeMap[action], credential);
+    Object(utils["D" /* removeFromArray */])(this.privilegeMap[action], credential);
   }
 
   addCredentialForAction(action, credential) {
@@ -10481,11 +10562,11 @@ class component_ComponentMutator extends core_item["b" /* ItemMutator */] {
   }
 
   removeAssociatedItemId(uuid) {
-    Object(utils["C" /* removeFromArray */])(this.typedContent.associatedItemIds || [], uuid);
+    Object(utils["D" /* removeFromArray */])(this.typedContent.associatedItemIds || [], uuid);
   }
 
   removeDisassociatedItemId(uuid) {
-    Object(utils["C" /* removeFromArray */])(this.typedContent.disassociatedItemIds || [], uuid);
+    Object(utils["D" /* removeFromArray */])(this.typedContent.disassociatedItemIds || [], uuid);
   }
 
   setLastSize(size) {
@@ -11380,7 +11461,7 @@ class storage_service_SNStorageService extends pure_service["a" /* PureService *
     return this.executeCriticalFunction(async () => {
       await this.clearValues();
       await this.clearAllPayloads();
-      await this.deviceInterface.removeRawStorageValue(namespacedKey(this.identifier, RawStorageKey.LastMigrationTimestamp));
+      await this.deviceInterface.removeRawStorageValue(namespacedKey(this.identifier, RawStorageKey.SnjsVersion));
       await this.deviceInterface.removeRawStorageValue(this.getPersistenceKey());
     });
   }
@@ -11880,7 +11961,7 @@ class uuid_map_UuidMap {
     const directReferences = this.directMap[uuid] || [];
 
     for (const directReference of directReferences) {
-      Object(utils["C" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
+      Object(utils["D" /* removeFromArray */])(this.inverseMap[directReference] || [], uuid);
     }
 
     delete this.directMap[uuid];
@@ -11889,7 +11970,7 @@ class uuid_map_UuidMap {
     const inverseReferences = this.inverseMap[uuid] || [];
 
     for (const inverseReference of inverseReferences) {
-      Object(utils["C" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
+      Object(utils["D" /* removeFromArray */])(this.directMap[inverseReference] || [], uuid);
     }
 
     delete this.inverseMap[uuid];
@@ -11909,13 +11990,13 @@ class uuid_map_UuidMap {
 
   deestablishDirectRelationship(uuidA, uuidB) {
     const index = this.directMap[uuidA] || [];
-    Object(utils["C" /* removeFromArray */])(index, uuidB);
+    Object(utils["D" /* removeFromArray */])(index, uuidB);
     this.directMap[uuidA] = index;
   }
 
   deestablishInverseRelationship(uuidA, uuidB) {
     const inverseIndex = this.inverseMap[uuidB] || [];
-    Object(utils["C" /* removeFromArray */])(inverseIndex, uuidA);
+    Object(utils["D" /* removeFromArray */])(inverseIndex, uuidA);
     this.inverseMap[uuidB] = inverseIndex;
   }
 
@@ -12247,7 +12328,7 @@ class conflict_ConflictDelta {
     }
 
     if (strategy === strategies["a" /* ConflictStrategy */].KeepLeftMergeRefs) {
-      const refs = Object(utils["K" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
+      const refs = Object(utils["L" /* uniqCombineObjArrays */])(this.basePayload.contentObject.references, this.applyPayload.contentObject.references, ['uuid', 'content_type']);
       const updatedAt = Object(utils["o" /* greaterOfTwoDates */])(this.basePayload.updated_at, this.applyPayload.updated_at);
       const payload = Object(generator["b" /* CopyPayload */])(this.basePayload, {
         updated_at: updatedAt,
@@ -12848,7 +12929,7 @@ class key_recovery_service_SNKeyRecoveryService extends pure_service["a" /* Pure
       throw Error('Attempting to pop queue element with no resolve function');
     }
 
-    Object(utils["C" /* removeFromArray */])(this.decryptionQueue, queueItem);
+    Object(utils["D" /* removeFromArray */])(this.decryptionQueue, queueItem);
     const keyParams = queueItem.keyParams;
     const key = queueItem.key;
     const resolve = queueItem.resolve;
@@ -13218,7 +13299,7 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
       return false;
     }
 
-    const hasServerPassword = this.serverPassword && otherKey.serverPassword;
+    const hasServerPassword = !!(this.serverPassword && otherKey.serverPassword);
     return timingSafeEqual(this.masterKey, otherKey.masterKey) && (!hasServerPassword || timingSafeEqual(this.serverPassword, otherKey.serverPassword));
   }
   /**
@@ -13254,7 +13335,6 @@ class root_key_SNRootKey extends core_item["d" /* SNItem */] {
 
 }
 // CONCATENATED MODULE: ./lib/services/api/session_manager.ts
-
 
 
 
@@ -13346,12 +13426,11 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
   }
 
   getUser() {
-    if (this.user && !this.apiService.getSession()) {
-      this.alertService.alert(ErrorAlertStrings.MissingSessionBody, ErrorAlertStrings.MissingSessionTitle);
-      log["a" /* SNLog */].error(Error('User is defined but no session is present.'));
-    }
-
     return this.user;
+  }
+
+  getSession() {
+    return this.apiService.getSession();
   }
 
   async signOut() {
@@ -13373,20 +13452,6 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
       return;
     }
 
-    const currentKeyParams = await this.protocolService.getAccountKeyParams();
-
-    if (!currentKeyParams) {
-      onResponse === null || onResponse === void 0 ? void 0 : onResponse({
-        status: 0,
-        error: {
-          message: '',
-          status: 0,
-          tag: MissingAccountParams
-        }
-      });
-      return;
-    }
-
     this.isSessionRenewChallengePresented = true;
     const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false), new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)], ChallengeReason.Custom, cancelable, SessionStrings.EnterEmailAndPassword, SessionStrings.RecoverSession((_this$getUser = this.getUser()) === null || _this$getUser === void 0 ? void 0 : _this$getUser.email));
     return new Promise(resolve => {
@@ -13400,7 +13465,8 @@ class session_manager_SNSessionManager extends pure_service["a" /* PureService *
         onNonvalidatedSubmit: async challengeResponse => {
           const email = challengeResponse.values[0].value;
           const password = challengeResponse.values[1].value;
-          const signInResult = await this.signIn(email, password, false, currentKeyParams.version);
+          const currentKeyParams = await this.protocolService.getAccountKeyParams();
+          const signInResult = await this.signIn(email, password, false, currentKeyParams === null || currentKeyParams === void 0 ? void 0 : currentKeyParams.version);
 
           if (signInResult.response.error) {
             this.challengeService.setValidationStatusForChallenge(challenge, challengeResponse.values[1], false);
@@ -14918,7 +14984,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         requiredPermissions.push({
           name: ComponentAction.StreamContextItem
         });
-        Object(utils["C" /* removeFromArray */])(pendingResponseItems, responseItem);
+        Object(utils["D" /* removeFromArray */])(pendingResponseItems, responseItem);
         /* We break because there can only be one context item */
 
         break;
@@ -14993,11 +15059,11 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       }
 
       await this.itemManager.changeItems(uuids, mutator => {
-        const payload = Object(utils["E" /* searchArray */])(payloads, {
+        const payload = Object(utils["F" /* searchArray */])(payloads, {
           uuid: mutator.getUuid()
         });
         mutator.mergePayload(payload);
-        const responseItem = Object(utils["E" /* searchArray */])(responsePayloads, {
+        const responseItem = Object(utils["F" /* searchArray */])(responsePayloads, {
           uuid: mutator.getUuid()
         });
 
@@ -15169,7 +15235,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
           await this.activateComponent(component.uuid);
 
           if (!theme.isLayerable()) {
-            await Object(utils["F" /* sleep */])(10);
+            await Object(utils["G" /* sleep */])(10);
 
             for (const candidate of activeThemes) {
               if (candidate && !candidate.isLayerable()) {
@@ -15221,7 +15287,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
       }
 
       for (const acquiredContentType of respectiveAcquired.content_types) {
-        Object(utils["C" /* removeFromArray */])(requiredContentTypes, acquiredContentType);
+        Object(utils["D" /* removeFromArray */])(requiredContentTypes, acquiredContentType);
       }
 
       if (requiredContentTypes.length === 0) {
@@ -15340,7 +15406,7 @@ class component_manager_SNComponentManager extends pure_service["a" /* PureServi
         return;
       }
 
-      Object(utils["C" /* removeFromArray */])(this.handlers, matching);
+      Object(utils["D" /* removeFromArray */])(this.handlers, matching);
     };
   }
 
@@ -15749,7 +15815,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
       ignored
     } = this.mergePayloadsOntoMaster(first.payloads);
     this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey);
-    Object(utils["C" /* removeFromArray */])(this.emitQueue, first);
+    Object(utils["D" /* removeFromArray */])(this.emitQueue, first);
     first.resolve(changed.concat(inserted, discarded));
 
     if (this.emitQueue.length > 0) {
@@ -15823,7 +15889,7 @@ class model_manager_PayloadManager extends pure_service["a" /* PureService */] {
     };
     this.changeObservers.push(observer);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.changeObservers, observer);
+      Object(utils["D" /* removeFromArray */])(this.changeObservers, observer);
     };
   }
   /**
@@ -16400,6 +16466,70 @@ class actions_service_SNActionsService extends pure_service["a" /* PureService *
   }
 
 }
+// CONCATENATED MODULE: ./lib/migrations/readers/reader.ts
+/**
+ * A storage reader reads storage via a device interface
+ * given a specific version of SNJS
+ */
+class StorageReader {
+  constructor(deviceInterface, identifier, environment) {
+    this.deviceInterface = deviceInterface;
+    this.identifier = identifier;
+    this.environment = environment;
+  }
+
+  static version() {
+    throw Error('Must override');
+  }
+
+}
+// CONCATENATED MODULE: ./lib/migrations/readers/reader_1_0_0.ts
+
+
+
+
+
+class reader_1_0_0_StorageReader1_0_0 extends StorageReader {
+  static version() {
+    return PreviousSnjsVersion1_0_0;
+  }
+
+  async getAccountKeyParams() {
+    return this.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.AllAccountKeyParamsKey);
+  }
+  /**
+   * In 1.0.0, web uses raw storage for unwrapped account key, and mobile uses
+   * the keychain
+   */
+
+
+  async hasNonWrappedAccountKeys() {
+    if (isEnvironmentMobile(this.environment)) {
+      const value = await this.deviceInterface.getRawKeychainValue();
+      return !Object(utils["q" /* isNullOrUndefined */])(value);
+    } else {
+      const value = await this.deviceInterface.getRawStorageValue('mk');
+      return !Object(utils["q" /* isNullOrUndefined */])(value);
+    }
+  }
+
+  async hasPasscode() {
+    if (isEnvironmentMobile(this.environment)) {
+      const rawPasscodeParams = await this.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobilePasscodeParamsKey);
+      return !Object(utils["q" /* isNullOrUndefined */])(rawPasscodeParams);
+    } else {
+      const encryptedStorage = await this.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.WebEncryptedStorageKey);
+      return !Object(utils["q" /* isNullOrUndefined */])(encryptedStorage);
+    }
+  }
+  /** Keychain was not used on desktop/web in 1.0.0 */
+
+
+  usesKeychain() {
+    return isEnvironmentMobile(this.environment) ? true : false;
+  }
+
+}
 // CONCATENATED MODULE: ./lib/migrations/migration.ts
 
 class migration_Migration {
@@ -16409,7 +16539,7 @@ class migration_Migration {
     this.registerStageHandlers();
   }
 
-  static timestamp() {
+  static version() {
     throw 'Must override';
   }
 
@@ -16726,14 +16856,12 @@ class item_collection_ItemCollection extends collection_MutableCollection {
   }
 
 }
-// CONCATENATED MODULE: ./lib/migrations/2020-01-15.ts
-function _2020_01_15_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+// CONCATENATED MODULE: ./lib/migrations/2_0_0.ts
+function _2_0_0_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _2020_01_15_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { _2020_01_15_ownKeys(Object(source), true).forEach(function (key) { _2020_01_15_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { _2020_01_15_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _2_0_0_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { _2_0_0_ownKeys(Object(source), true).forEach(function (key) { _2_0_0_defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { _2_0_0_ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function _2020_01_15_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-
+function _2_0_0_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -16752,26 +16880,19 @@ function _2020_01_15_defineProperty(obj, key, value) { if (key in obj) { Object.
 
 
 
-const LegacyKeys = {
-  WebPasscodeParamsKey: 'offlineParams',
-  MobilePasscodeParamsKey: 'pc_params',
-  AllAccountKeyParamsKey: 'auth_params',
-  WebEncryptedStorageKey: 'encryptedStorage',
-  MobileWrappedRootKeyKey: 'encrypted_account_keys',
-  MobileBiometricsPrefs: 'biometrics_prefs',
-  AllMigrations: 'migrations',
-  MobileThemesCache: 'ThemePreferencesKey',
-  MobileLightTheme: 'lightTheme',
-  MobileDarkTheme: 'darkTheme',
-  MobileLastExportDate: 'LastExportDateKey',
-  MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
-  MobileOptionsState: 'options',
-  MobilePasscodeKeyboardType: 'passcodeKeyboardType'
-};
+
+
+
+
 const LEGACY_SESSION_TOKEN_KEY = 'jwt';
-class _2020_01_15_Migration20200115 extends migration_Migration {
-  static timestamp() {
-    return new Date('2020-01-15').getTime();
+class _2_0_0_Migration2_0_0 extends migration_Migration {
+  constructor(services) {
+    super(services);
+    this.legacyReader = new reader_1_0_0_StorageReader1_0_0(this.services.deviceInterface, this.services.identifier, this.services.environment);
+  }
+
+  static version() {
+    return PreviousSnjsVersion2_0_0;
   }
 
   registerStageHandlers() {
@@ -16816,14 +16937,14 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Nonwrapped]: {}
     };
-    const rawAccountKeyParams = await deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.AllAccountKeyParamsKey);
+    const rawAccountKeyParams = await this.legacyReader.getAccountKeyParams();
     /** Could be null if no account, or if account and storage is encrypted */
 
     if (rawAccountKeyParams) {
       newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = rawAccountKeyParams;
     }
 
-    const encryptedStorage = await deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.WebEncryptedStorageKey);
+    const encryptedStorage = await deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.WebEncryptedStorageKey);
 
     if (encryptedStorage) {
       const encryptedStoragePayload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(encryptedStorage);
@@ -16836,7 +16957,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       const storageValueStore = Object(utils["w" /* jsonParseEmbeddedKeys */])(rawStorageValueStore);
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      const accountKeyParams = storageValueStore[LegacyKeys.AllAccountKeyParamsKey];
+      const accountKeyParams = storageValueStore[LegacyKeys1_0_0.AllAccountKeyParamsKey];
       newStorageRawStructure.nonwrapped[StorageKey.RootKeyParams] = accountKeyParams;
       let keyToEncryptStorageWith = passcodeKey;
       /** Extract account key (mk, pw, ak) if it exists */
@@ -16867,7 +16988,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: mk,
-          serverPassword: sp,
           dataAuthenticationKey: ak,
           version: version,
           keyParams: rawAccountKeyParams
@@ -16898,7 +17018,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
 
   async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(encryptedPayload) {
-    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.WebPasscodeParamsKey);
+    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.WebPasscodeParamsKey);
     const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams);
     /** Decrypt it with the passcode */
 
@@ -16927,7 +17047,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
     const version = (accountKeyParams === null || accountKeyParams === void 0 ? void 0 : accountKeyParams.version) || (await this.getFallbackRootKeyVersion());
     const accountKey = await root_key_SNRootKey.Create({
       masterKey: storageValueStore.mk,
-      serverPassword: storageValueStore.pw,
       dataAuthenticationKey: storageValueStore.ak,
       version: version,
       keyParams: accountKeyParams
@@ -16990,28 +17109,30 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
   async migrateStorageStructureForMobile() {
     const keychainValue = await this.services.deviceInterface.getRawKeychainValue();
-    const wrappedAccountKey = (await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileWrappedRootKeyKey)) || (keychainValue === null || keychainValue === void 0 ? void 0 : keychainValue.encryptedAccountKeys);
-    const rawAccountKeyParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.AllAccountKeyParamsKey);
-    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobilePasscodeParamsKey);
+    const wrappedAccountKey = (await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobileWrappedRootKeyKey)) || (keychainValue === null || keychainValue === void 0 ? void 0 : keychainValue.encryptedAccountKeys);
+    const rawAccountKeyParams = await this.legacyReader.getAccountKeyParams();
+    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobilePasscodeParamsKey);
     const firstRunValue = await this.services.deviceInterface.getJsonParsedRawStorageValue(NonwrappedStorageKey.MobileFirstRun);
     const rawStructure = {
       [ValueModesKeys.Nonwrapped]: {
         [StorageKey.WrappedRootKey]: wrappedAccountKey,
-        [StorageKey.RootKeyWrapperKeyParams]: rawPasscodeParams,
+
+        /** A 'hash' key may be present from legacy versions that should be deleted */
+        [StorageKey.RootKeyWrapperKeyParams]: Object(utils["z" /* omitByCopy */])(rawPasscodeParams, ['hash']),
         [StorageKey.RootKeyParams]: rawAccountKeyParams,
         [NonwrappedStorageKey.MobileFirstRun]: firstRunValue
       },
       [ValueModesKeys.Unwrapped]: {},
       [ValueModesKeys.Wrapped]: {}
     };
-    const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileBiometricsPrefs);
+    const biometricPrefs = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobileBiometricsPrefs);
 
     if (biometricPrefs) {
       rawStructure.nonwrapped[StorageKey.BiometricsState] = biometricPrefs.enabled;
       rawStructure.nonwrapped[StorageKey.MobileBiometricsTiming] = biometricPrefs.timing;
     }
 
-    const passcodeKeyboardType = await this.services.deviceInterface.getRawStorageValue(LegacyKeys.MobilePasscodeKeyboardType);
+    const passcodeKeyboardType = await this.services.deviceInterface.getRawStorageValue(LegacyKeys1_0_0.MobilePasscodeKeyboardType);
 
     if (passcodeKeyboardType) {
       rawStructure.nonwrapped[StorageKey.MobilePasscodeKeyboardType] = passcodeKeyboardType;
@@ -17069,7 +17190,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const newAccountKey = Object(generator["b" /* CopyPayload */])(unwrappedAccountKey, {
           content: {
             masterKey: accountKeyContent.mk,
-            serverPassword: accountKeyContent.pw,
             dataAuthenticationKey: accountKeyContent.ak,
             version: version,
             keyParams: rawAccountKeyParams,
@@ -17107,7 +17227,6 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
         const accountVersion = keychainValue.version || (rawAccountKeyParams === null || rawAccountKeyParams === void 0 ? void 0 : rawAccountKeyParams.version) || (await this.getFallbackRootKeyVersion());
         const accountKey = await root_key_SNRootKey.Create({
           masterKey: keychainValue.mk,
-          serverPassword: keychainValue.pw,
           dataAuthenticationKey: keychainValue.ak,
           version: accountVersion,
           keyParams: rawAccountKeyParams
@@ -17157,7 +17276,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
   async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
     const allKeyValues = await this.services.deviceInterface.getAllRawStorageKeyValues();
-    const legacyKeys = Object(utils["y" /* objectToValueArray */])(LegacyKeys);
+    const legacyKeys = Object(utils["y" /* objectToValueArray */])(LegacyKeys1_0_0);
 
     const tryJsonParse = value => {
       try {
@@ -17190,14 +17309,14 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
   }
   /**
    * All platforms
-   * Deletes all StorageKey and LegacyKeys from root raw storage.
+   * Deletes all StorageKey and LegacyKeys1_0_0 from root raw storage.
    * @access private
    */
 
 
   async deleteLegacyStorageValues() {
     const miscKeys = ['mk', 'ak', 'pw', 'encryptionKey', 'authKey', 'jwt', 'ephemeral', 'cachedThemes'];
-    const managedKeys = [...Object(utils["y" /* objectToValueArray */])(StorageKey), ...Object(utils["y" /* objectToValueArray */])(LegacyKeys), ...miscKeys];
+    const managedKeys = [...Object(utils["y" /* objectToValueArray */])(StorageKey), ...Object(utils["y" /* objectToValueArray */])(LegacyKeys1_0_0), ...miscKeys];
 
     for (const key of managedKeys) {
       await this.services.deviceInterface.removeRawStorageValue(key);
@@ -17210,9 +17329,9 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 
 
   async migrateMobilePreferences() {
-    const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileLastExportDate);
-    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileDoNotWarnUnsupportedEditors);
-    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys.MobileOptionsState);
+    const lastExportDate = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobileLastExportDate);
+    const doNotWarnUnsupportedEditors = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobileDoNotWarnUnsupportedEditors);
+    const legacyOptionsState = await this.services.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.MobileOptionsState);
     let migratedOptionsState = {};
 
     if (legacyOptionsState) {
@@ -17228,7 +17347,7 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
       };
     }
 
-    const preferences = _2020_01_15_objectSpread(_2020_01_15_objectSpread({}, migratedOptionsState), {}, {
+    const preferences = _2_0_0_objectSpread(_2_0_0_objectSpread({}, migratedOptionsState), {}, {
       lastExportDate: lastExportDate !== null && lastExportDate !== void 0 ? lastExportDate : undefined,
       doNotShowAgainUnsupportedEditors: doNotWarnUnsupportedEditors !== null && doNotWarnUnsupportedEditors !== void 0 ? doNotWarnUnsupportedEditors : false
     });
@@ -17248,16 +17367,27 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
   async migrateSessionStorage() {
     const USER_OBJECT_KEY = 'user';
     let currentToken = await this.services.storageService.getValue(LEGACY_SESSION_TOKEN_KEY);
+    const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
 
     if (!currentToken) {
       /** Try the user object */
-      const user = await this.services.storageService.getValue(USER_OBJECT_KEY);
-
       if (user) {
         currentToken = user.jwt;
       }
+    }
 
-      if (!currentToken) {
+    if (!currentToken) {
+      /**
+       * If we detect that a user object is present, but the jwt is missing,
+       * we'll fill the jwt value with a junk value just so we create a session.
+       * When the client attempts to talk to the server, the server will reply
+       * with invalid token error, and the client will automatically prompt to reauthenticate.
+       */
+      const hasAccount = !Object(utils["q" /* isNullOrUndefined */])(user);
+
+      if (hasAccount) {
+        currentToken = 'junk-value';
+      } else {
         return;
       }
     }
@@ -17313,74 +17443,314 @@ class _2020_01_15_Migration20200115 extends migration_Migration {
 }
 // CONCATENATED MODULE: ./lib/migrations/index.ts
 
-// CONCATENATED MODULE: ./lib/migrations/2020-01-01-base.ts
+// CONCATENATED MODULE: ./lib/migrations/readers/reader_2_0_0.ts
 
 
 
 
-class _2020_01_01_base_BaseMigration extends migration_Migration {
-  static timestamp() {
-    return new Date('2020-01-01').getTime();
+
+class reader_2_0_0_StorageReader2_0_0 extends StorageReader {
+  static version() {
+    return PreviousSnjsVersion2_0_0;
+  }
+
+  async getStorage() {
+    const storageKey = namespacedKey(this.identifier, RawStorageKey.StorageObject);
+    const storage = await this.deviceInterface.getRawStorageValue(storageKey);
+    const values = storage ? JSON.parse(storage) : undefined;
+    return values;
+  }
+
+  async getNonWrappedValue(key) {
+    var _values$ValueModesKey;
+
+    const values = await this.getStorage();
+
+    if (!values) {
+      return undefined;
+    }
+
+    return (_values$ValueModesKey = values[ValueModesKeys.Nonwrapped]) === null || _values$ValueModesKey === void 0 ? void 0 : _values$ValueModesKey[key];
+  }
+  /**
+   * In 2.0.0+, account key params are stored in NonWrapped storage
+   */
+
+
+  async getAccountKeyParams() {
+    return this.getNonWrappedValue(StorageKey.RootKeyParams);
+  }
+
+  async hasNonWrappedAccountKeys() {
+    const value = await this.deviceInterface.getNamespacedKeychainValue(this.identifier);
+    return !Object(utils["q" /* isNullOrUndefined */])(value);
+  }
+
+  async hasPasscode() {
+    const wrappedRootKey = await this.getNonWrappedValue(StorageKey.WrappedRootKey);
+    return !Object(utils["q" /* isNullOrUndefined */])(wrappedRootKey);
+  }
+
+  usesKeychain() {
+    return true;
+  }
+
+}
+// CONCATENATED MODULE: ./lib/migrations/readers/index.ts
+
+
+// CONCATENATED MODULE: ./lib/migrations/readers/functions.ts
+
+
+
+function ReaderClassForVersion(version) {
+  /** Sort readers by newest first */
+  const allReaders = Object.values(readers_namespaceObject).sort((a, b) => {
+    return compareSemVersions(a.version(), b.version()) * -1;
+  });
+
+  for (const reader of allReaders) {
+    if (reader.version() === version) {
+      return reader;
+    }
+
+    if (isRightVersionGreaterThanLeft(reader.version(), version)) {
+      return reader;
+    }
+  }
+
+  throw Error("Cannot find reader for version ".concat(version));
+}
+
+function CreateReader(version, deviceInterface, identifier, environment) {
+  const readerClass = ReaderClassForVersion(version);
+  return new readerClass(deviceInterface, identifier, environment);
+}
+// CONCATENATED MODULE: ./lib/migrations/base.ts
+
+
+
+
+
+
+
+
+
+
+
+
+/** A key that was briefly present in Snjs version 2.0.0 but removed in 2.0.1 */
+
+const LastMigrationTimeStampKey2_0_0 = 'last_migration_timestamp';
+/**
+ * The base migration always runs during app initialization. It is meant as a way
+ * to set up all other migrations.
+ */
+
+class base_BaseMigration extends migration_Migration {
+  constructor() {
+    super(...arguments);
+    this.didPreRun = false;
+  }
+
+  async preRun() {
+    await this.storeVersionNumber();
+    this.didPreRun = true;
   }
 
   registerStageHandlers() {
     this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
-      await this.migrateMigrationTimestampAllPlatforms();
+      if (await this.needsKeychainRepair()) {
+        await this.repairMissingKeychain();
+      }
+
       this.markDone();
     });
   }
+
+  getStoredVersion() {
+    const storageKey = namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion);
+    return this.services.deviceInterface.getRawStorageValue(storageKey);
+  }
   /**
-   * Establish last_migration_date.
-   * We need to determine if this is a new application download,
-   * or if we're coming from an older, non-current client.
-   *
-   * If new application download, we expect last_migration_date
-   * to be null. However, last_migration_date can also be null if you
-   * haven't yet migration to using this system.
-   *
-   * So in addition to this date being null, we check if deviceInterface
-   * has pre-existing storage values for old migration system.
-   * If so, this means this is a legacy client making its first jump to
-   * this new migration system.
+   * In Snjs 1.x, and Snjs 2.0.0, version numbers were not stored (as they were introduced
+   * in 2.0.1). Because migrations can now rely on this value, we want to establish a base
+   * value if we do not find it in storage.
    */
 
 
-  async migrateMigrationTimestampAllPlatforms() {
-    /** If any of these keys exist in raw storage, we are coming from a previous application version */
-    const possibleLegacyKeys = ['migrations', 'ephemeral', 'user', 'cachedThemes', 'syncToken', 'encryptedStorage'];
-    let hasLegacyValue = false;
+  async storeVersionNumber() {
+    const storageKey = namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion);
+    const version = await this.getStoredVersion();
 
-    for (const legacyKey of possibleLegacyKeys) {
-      const value = await this.services.deviceInterface.getRawStorageValue(legacyKey);
+    if (!version) {
+      /** Determine if we are 1.0.0 or 2.0.0 */
 
-      if (value) {
-        hasLegacyValue = true;
-        break;
+      /** If any of these keys exist in raw storage, we are coming from a 1.x architecture */
+      const possibleLegacyKeys = ['migrations', 'ephemeral', 'user', 'cachedThemes', 'syncToken', 'encryptedStorage'];
+      let hasLegacyValue = false;
+
+      for (const legacyKey of possibleLegacyKeys) {
+        const value = await this.services.deviceInterface.getRawStorageValue(legacyKey);
+
+        if (value) {
+          hasLegacyValue = true;
+          break;
+        }
+      }
+
+      if (hasLegacyValue) {
+        /** Coming from 1.0.0 */
+        await this.services.deviceInterface.setRawStorageValue(storageKey, PreviousSnjsVersion1_0_0);
+      } else {
+        /** Coming from 2.0.0 (which did not store version) OR is brand new application */
+        const migrationKey = namespacedKey(this.services.identifier, LastMigrationTimeStampKey2_0_0);
+        const migrationValue = await this.services.deviceInterface.getRawStorageValue(migrationKey);
+        const is_2_0_0_application = !Object(utils["q" /* isNullOrUndefined */])(migrationValue);
+
+        if (is_2_0_0_application) {
+          await this.services.deviceInterface.setRawStorageValue(storageKey, PreviousSnjsVersion2_0_0);
+          await this.services.deviceInterface.removeRawStorageValue(LastMigrationTimeStampKey2_0_0);
+        } else {
+          /** Is new application, use current version as not to run any migrations */
+          await this.services.deviceInterface.setRawStorageValue(storageKey, SnjsVersion);
+        }
       }
     }
+  }
 
-    const newKey = namespacedKey(this.services.identifier, RawStorageKey.LastMigrationTimestamp);
-    const lastDate = await this.services.deviceInterface.getRawStorageValue(newKey);
-    const hasNewStructure = !Object(utils["q" /* isNullOrUndefined */])(lastDate);
-
-    if (!hasNewStructure && hasLegacyValue) {
-      /**
-       * Old client updating for the first time. We need to run all migrations.
-       * Set last migration date as epoch.
-       */
-      const newLastMigrationDate = new Date(0).getTime();
-      await this.services.deviceInterface.setRawStorageValue(newKey, newLastMigrationDate);
-    } else if (!hasNewStructure && !hasLegacyValue) {
-      /** New application, dont run any migrations. Set last migration date as now. */
-      const newLastMigrationDate = new Date().getTime();
-      await this.services.deviceInterface.setRawStorageValue(newKey, newLastMigrationDate);
-    } else if (hasNewStructure) {
-      /** Application which has already performed base migration. Keep date as is. */
+  async loadReader() {
+    if (this.reader) {
+      return;
     }
+
+    const version = await this.getStoredVersion();
+    this.reader = CreateReader(version, this.services.deviceInterface, this.services.identifier, this.services.environment);
+  }
+  /**
+   * If the keychain is empty, and the user does not have a passcode,
+   * AND there appear to be stored account key params, this indicates
+   * a launch where the keychain was wiped due to restoring device
+   * from cloud backup which did not include keychain. This typically occurs
+   * on mobile when restoring from iCloud, but we'll also follow this same behavior
+   * on desktop/web as well, since we recently introduced keychain to desktop.
+   *
+   * We must prompt user for account password, and validate based on ability to decrypt
+   * an item. We cannot validate based on storage because 1.x mobile applications did
+   * not use encrypted storage, although we did on 2.x. But instead of having two methods
+   * of validations best to use one that works on both.
+   *
+   * The item is randomly chosen, but for 2.x applications, it must be an items key item
+   * (since only item keys are encrypted directly with account password)
+   */
+
+
+  async needsKeychainRepair() {
+    if (!this.didPreRun) {
+      throw Error('Attempting to access specialized function before prerun');
+    }
+
+    if (!this.reader) {
+      await this.loadReader();
+    }
+
+    const usesKeychain = this.reader.usesKeychain;
+
+    if (!usesKeychain) {
+      /** Doesn't apply if this version did not use a keychain to begin with */
+      return false;
+    }
+
+    const rawAccountParams = await this.reader.getAccountKeyParams();
+    const hasAccountKeyParams = !Object(utils["q" /* isNullOrUndefined */])(rawAccountParams);
+
+    if (!hasAccountKeyParams) {
+      /** Doesn't apply if account is not involved */
+      return false;
+    }
+
+    const hasPasscode = await this.reader.hasPasscode();
+
+    if (hasPasscode) {
+      /** Doesn't apply if using passcode, as keychain would be bypassed in that case */
+      return false;
+    }
+
+    const accountKeysMissing = !(await this.reader.hasNonWrappedAccountKeys());
+
+    if (!accountKeysMissing) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async repairMissingKeychain() {
+    const version = await this.getStoredVersion();
+    const rawAccountParams = await this.reader.getAccountKeyParams();
+    /** Challenge for account password */
+
+    const challenge = new challenges_Challenge([new challenges_ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder, true)], ChallengeReason.Custom, false, KeychainRecoveryStrings.Title, KeychainRecoveryStrings.Text);
+    return new Promise(resolve => {
+      this.services.challengeService.addChallengeObserver(challenge, {
+        onNonvalidatedSubmit: async challengeResponse => {
+          const password = challengeResponse.values[0].value;
+          const accountParams = this.services.protocolService.createKeyParams(rawAccountParams);
+          const rootKey = await this.services.protocolService.computeRootKey(password, accountParams);
+          /** Choose an item to decrypt */
+
+          const allItems = await this.services.deviceInterface.getAllRawDatabasePayloads(this.services.identifier);
+          let itemToDecrypt = allItems.find(item => {
+            const payload = Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(item);
+            return Object(intents["a" /* ContentTypeUsesRootKeyEncryption */])(payload.content_type);
+          });
+
+          if (!itemToDecrypt) {
+            /** If no root key encrypted item, just choose any item */
+            itemToDecrypt = allItems[0];
+          }
+
+          if (!itemToDecrypt) {
+            throw log["a" /* SNLog */].error(Error('Attempting keychain recovery validation but no items present.'));
+          }
+
+          const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(Object(generator["e" /* CreateMaxPayloadFromAnyObject */])(itemToDecrypt), rootKey);
+
+          if (decryptedItem.errorDecrypting) {
+            /** Wrong password, try again */
+            this.services.challengeService.setValidationStatusForChallenge(challenge, challengeResponse.values[0], false);
+          } else {
+            /**
+             * If decryption succeeds, store the generated account key where it is expected,
+             * either in top-level keychain in 1.0.0, and namespaced location in 2.0.0+.
+             */
+            if (version === PreviousSnjsVersion1_0_0) {
+              /** Store in top level keychain */
+              await this.services.deviceInterface.legacy_setRawKeychainValue({
+                mk: rootKey.masterKey,
+                ak: rootKey.dataAuthenticationKey,
+                version: accountParams.version
+              });
+            } else {
+              /** Store in namespaced location */
+              const rawKey = rootKey.getKeychainValue();
+              await this.services.deviceInterface.setNamespacedKeychainValue(rawKey, this.services.identifier);
+            }
+
+            resolve();
+            this.services.challengeService.completeChallenge(challenge);
+          }
+        }
+      });
+      this.services.challengeService.promptForChallengeResponse(challenge);
+    });
   }
 
 }
 // CONCATENATED MODULE: ./lib/services/migration_service.ts
+
+
+
 
 
 
@@ -17415,15 +17785,23 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
   }
 
   async initialize() {
-    await this.runBaseMigration();
-    this.activeMigrations = await this.getRequiredMigrations();
+    await this.runBaseMigrationPreRun();
+    const requiredMigrations = await migration_service_SNMigrationService.getRequiredMigrations(await this.getStoredSnjsVersion());
+    this.activeMigrations = this.instantiateMigrationClasses(requiredMigrations);
 
     if (this.activeMigrations.length > 0) {
       const lastMigration = Object(utils["x" /* lastElement */])(this.activeMigrations);
       lastMigration.onDone(async () => {
-        await this.saveLastMigrationTimestamp(lastMigration.constructor.timestamp());
+        await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion), SnjsVersion);
       });
+    } else {
+      await this.services.deviceInterface.setRawStorageValue(namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion), SnjsVersion);
     }
+  }
+
+  async runBaseMigrationPreRun() {
+    this.baseMigration = new base_BaseMigration(this.services);
+    await this.baseMigration.preRun();
   }
   /**
    * Application instances will call this function directly when they arrive
@@ -17451,64 +17829,53 @@ class migration_service_SNMigrationService extends pure_service["a" /* PureServi
     }
   }
 
-  async runBaseMigration() {
-    const baseMigration = new _2020_01_01_base_BaseMigration(this.services);
-    await baseMigration.handleStage(ApplicationStage.PreparingForLaunch_0);
-  }
-
   async hasPendingMigrations() {
-    return (await this.getRequiredMigrations()).length > 0;
+    const requiredMigrations = await migration_service_SNMigrationService.getRequiredMigrations(await this.getStoredSnjsVersion());
+    return requiredMigrations.length > 0 || (await this.baseMigration.needsKeychainRepair());
   }
 
-  async getRequiredMigrations() {
-    const lastMigrationTimestamp = await this.getLastMigrationTimestamp();
-    const activeMigrations = [];
+  async getStoredSnjsVersion() {
+    const version = await this.services.deviceInterface.getRawStorageValue(namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion));
+
+    if (!version) {
+      throw log["a" /* SNLog */].error(Error('Snjs version missing from storage, run base migration.'));
+    }
+
+    return version;
+  }
+
+  static async getRequiredMigrations(storedVersion) {
+    const resultingClasses = [];
     const migrationClasses = Object.keys(migrations_namespaceObject).map(key => {
       return migrations_namespaceObject[key];
     }).sort((a, b) => {
-      const aTimestamp = a.timestamp();
-      const bTimestamp = b.timestamp();
-
-      if (aTimestamp < bTimestamp) {
-        return -1;
-      } else if (aTimestamp > bTimestamp) {
-        return 1;
-      } else {
-        return 0;
-      }
+      return compareSemVersions(a.version(), b.version());
     });
 
     for (const migrationClass of migrationClasses) {
-      const migrationTimestamp = migrationClass.timestamp();
+      const migrationVersion = migrationClass.version();
 
-      if (migrationTimestamp > lastMigrationTimestamp) {
-        // eslint-disable-next-line new-cap
-        activeMigrations.push(new migrationClass(this.services));
+      if (migrationVersion === storedVersion) {
+        continue;
+      }
+
+      if (isRightVersionGreaterThanLeft(storedVersion, migrationVersion)) {
+        resultingClasses.push(migrationClass);
       }
     }
 
-    return activeMigrations;
+    return resultingClasses;
   }
 
-  getNamespacedTimeStampKey() {
-    return namespacedKey(this.services.identifier, RawStorageKey.LastMigrationTimestamp);
-  }
-
-  async getLastMigrationTimestamp() {
-    const timestamp = await this.services.deviceInterface.getRawStorageValue(this.getNamespacedTimeStampKey());
-
-    if (Object(utils["q" /* isNullOrUndefined */])(timestamp)) {
-      throw 'Timestamp should not be null. Be sure to run base migration first.';
-    }
-
-    return JSON.parse(timestamp);
-  }
-
-  async saveLastMigrationTimestamp(timestamp) {
-    await this.services.deviceInterface.setRawStorageValue(this.getNamespacedTimeStampKey(), JSON.stringify(timestamp));
+  instantiateMigrationClasses(classes) {
+    return classes.map(migrationClass => {
+      return new migrationClass(this.services);
+    });
   }
 
   async handleStage(stage) {
+    await this.baseMigration.handleStage(stage);
+
     for (const migration of this.activeMigrations) {
       await migration.handleStage(stage);
     }
@@ -18211,7 +18578,7 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
 
   async generateSalt004(identifier, seed) {
     const hash = await this.crypto.sha256([identifier, seed].join(PARTITION_CHARACTER));
-    return Object(utils["J" /* truncateHexString */])(hash, V004Algorithm.ArgonSaltLength);
+    return Object(utils["K" /* truncateHexString */])(hash, V004Algorithm.ArgonSaltLength);
   }
   /**
    * Computes a root key given a passworf
@@ -18327,12 +18694,12 @@ class operator_004_SNProtocolOperator004 extends operator_003_SNProtocolOperator
   }
 
   async authenticatedDataToString(attachedData) {
-    return this.crypto.base64Encode(JSON.stringify(Object(utils["G" /* sortedCopy */])(Object(utils["A" /* omitUndefinedCopy */])(attachedData))));
+    return this.crypto.base64Encode(JSON.stringify(Object(utils["H" /* sortedCopy */])(Object(utils["B" /* omitUndefinedCopy */])(attachedData))));
   }
 
   async stringToAuthenticatedData(rawAuthenticatedData, override) {
     const base = JSON.parse(await this.crypto.base64Decode(rawAuthenticatedData));
-    return Object(utils["G" /* sortedCopy */])(operator_004_objectSpread(operator_004_objectSpread({}, base), override));
+    return Object(utils["H" /* sortedCopy */])(operator_004_objectSpread(operator_004_objectSpread({}, base), override));
   }
 
   async generateEncryptedParameters(payload, format, key) {
@@ -19177,7 +19544,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   onKeyStatusChange(callback) {
     this.keyObservers.push(callback);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.keyObservers, callback);
+      Object(utils["D" /* removeFromArray */])(this.keyObservers, callback);
     };
   }
 
@@ -19505,7 +19872,7 @@ class protocol_service_SNProtocolService extends pure_service["a" /* PureService
   async validateAccountPassword(password) {
     const keyParams = await this.getRootKeyParams();
     const key = await this.computeRootKey(password, keyParams);
-    const valid = key.compare(this.rootKey);
+    const valid = this.rootKey.compare(key);
 
     if (valid) {
       return {
@@ -20914,7 +21281,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
     };
     this.observers.push(observer);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.observers, observer);
+      Object(utils["D" /* removeFromArray */])(this.observers, observer);
     };
   }
   /**
@@ -21350,7 +21717,7 @@ class item_manager_ItemManager extends pure_service["a" /* PureService */] {
 
 
   findTagByTitle(title) {
-    return Object(utils["E" /* searchArray */])(this.tags, {
+    return Object(utils["F" /* searchArray */])(this.tags, {
       title: title
     });
   }
@@ -22020,7 +22387,7 @@ class operation_AccountSyncOperation {
 
   popPayloads(count) {
     const payloads = this.pendingPayloads.slice(0, count);
-    Object(utils["H" /* subtractFromArray */])(this.pendingPayloads, payloads);
+    Object(utils["I" /* subtractFromArray */])(this.pendingPayloads, payloads);
     return payloads;
   }
 
@@ -22348,7 +22715,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const itemsKeysPayloads = payloads.filter(payload => {
       return payload.content_type === content_types["a" /* ContentType */].ItemsKey;
     });
-    Object(utils["H" /* subtractFromArray */])(payloads, itemsKeysPayloads);
+    Object(utils["I" /* subtractFromArray */])(payloads, itemsKeysPayloads);
     const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(itemsKeysPayloads);
     await this.modelManager.emitPayloads(decryptedItemsKeys, sources["a" /* PayloadSource */].LocalRetrieved);
     /** Map in batches to give interface a chance to update */
@@ -22507,7 +22874,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     }
 
     const promise = this.spawnQueue[0];
-    Object(utils["D" /* removeFromIndex */])(this.spawnQueue, 0);
+    Object(utils["E" /* removeFromIndex */])(this.spawnQueue, 0);
     this.log('Syncing again from spawn queue');
     return this.sync(sync_service_objectSpread({
       queueStrategy: SyncQueueStrategy.ForceSpawnNew,
@@ -22542,7 +22909,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
       if (this.completedOnlineDownloadFirstSync) {
         return;
       } else {
-        await Object(utils["F" /* sleep */])(waitTimeOnFailureMs);
+        await Object(utils["G" /* sleep */])(waitTimeOnFailureMs);
       }
     }
 
@@ -22598,7 +22965,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     const neverSyncedDeleted = items.filter(item => {
       return item.neverSynced && item.deleted;
     });
-    Object(utils["H" /* subtractFromArray */])(items, neverSyncedDeleted);
+    Object(utils["I" /* subtractFromArray */])(items, neverSyncedDeleted);
     const decryptedPayloads = items.map(item => {
       return item.payloadRepresentation();
     });
@@ -22635,7 +23002,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
     /* Subtract from array as soon as we're sure they'll be called.
     resolves are triggered at the end of this function call */
 
-    Object(utils["H" /* subtractFromArray */])(this.resolveQueue, inTimeResolveQueue);
+    Object(utils["I" /* subtractFromArray */])(this.resolveQueue, inTimeResolveQueue);
     /** lastSyncBegan must be set *after* any point we may have returned above.
      * Setting this value means the item was 100% sent to the server. */
 
@@ -22840,7 +23207,7 @@ class sync_service_SNSyncService extends pure_service["a" /* PureService */] {
 
   async handleSuccessServerResponse(operation, response) {
     if (this._simulate_latency) {
-      await Object(utils["F" /* sleep */])(this._simulate_latency.latency);
+      await Object(utils["G" /* sleep */])(this._simulate_latency.latency);
     }
 
     this.log('Online Sync Response', response.rawResponse);
@@ -23069,7 +23436,7 @@ class challenge_operation_ChallengeOperation {
     const matching = valuesArray.find(v => v.prompt.id === value.prompt.id);
 
     if (matching) {
-      Object(utils["C" /* removeFromArray */])(valuesArray, matching);
+      Object(utils["D" /* removeFromArray */])(valuesArray, matching);
     }
 
     valuesArray.push(value);
@@ -23090,7 +23457,7 @@ class challenge_operation_ChallengeOperation {
     const matching = valuesArray.find(v => v.prompt.validation === value.prompt.validation);
 
     if (matching) {
-      Object(utils["C" /* removeFromArray */])(valuesArray, matching);
+      Object(utils["D" /* removeFromArray */])(valuesArray, matching);
     }
 
     valuesArray.push(value);
@@ -23269,7 +23636,7 @@ class challenge_service_ChallengeService extends pure_service["a" /* PureService
     observers.push(observer);
     this.challengeObservers[challenge.id] = observers;
     return () => {
-      Object(utils["C" /* removeFromArray */])(observers, observer);
+      Object(utils["D" /* removeFromArray */])(observers, observer);
     };
   }
 
@@ -23552,7 +23919,7 @@ class application_SNApplication {
     this.challengeService.sendChallenge = callback.receiveChallenge;
   }
   /**
-   * Runs migrations, handles device authentication, unlocks application, and
+   * Handles device authentication, unlocks application, and
    * issues a callback if a device activation requires user input
    * (i.e local passcode or fingerprint).
    * @param awaitDatabaseLoad
@@ -23578,22 +23945,8 @@ class application_SNApplication {
     if (this.storageService.isStorageWrapped()) {
       try {
         await this.storageService.decryptStorage();
-      } catch (_firstAttemptError) {
-        const showError = () => {
-          this.alertService.alert(ErrorAlertStrings.StorageDecryptErrorBody, ErrorAlertStrings.StorageDecryptErrorTitle);
-        };
-
-        if (!this.protocolService.getRootKey()) {
-          await this.presentAccountRecoveryChallenge();
-
-          try {
-            await this.storageService.decryptStorage();
-          } catch (_secondAttemptError) {
-            showError();
-          }
-        } else {
-          showError();
-        }
+      } catch (_error) {
+        this.alertService.alert(ErrorAlertStrings.StorageDecryptErrorBody, ErrorAlertStrings.StorageDecryptErrorTitle);
       }
     }
 
@@ -23632,18 +23985,6 @@ class application_SNApplication {
     if (awaitDatabaseLoad) {
       await loadPromise;
     }
-  }
-
-  async presentAccountRecoveryChallenge() {
-    return this.sessionManager.reauthenticateInvalidSession(false, response => {
-      if (response.error) {
-        if (response.error.tag === MissingAccountParams) {
-          this.alertService.alert(ErrorAlertStrings.StorageDecryptErrorBody, ErrorAlertStrings.StorageDecryptErrorTitle);
-        } else {
-          this.alertService.alert(SessionStrings.KeychainRecoveryError, SessionStrings.KeychainRecoveryErrorTitle);
-        }
-      }
-    });
   }
 
   onStart() {}
@@ -23687,7 +24028,7 @@ class application_SNApplication {
     };
     this.eventHandlers.push(observer);
     return () => {
-      Object(utils["C" /* removeFromArray */])(this.eventHandlers, observer);
+      Object(utils["D" /* removeFromArray */])(this.eventHandlers, observer);
     };
   }
 
@@ -24038,7 +24379,7 @@ class application_SNApplication {
     this.streamRemovers.push(observer);
     return () => {
       observer();
-      Object(utils["C" /* removeFromArray */])(this.streamRemovers, observer);
+      Object(utils["D" /* removeFromArray */])(this.streamRemovers, observer);
     };
   }
   /**
@@ -24333,7 +24674,7 @@ class application_SNApplication {
       await promise;
     } else {
       /** Await up to maxWait. If not resolved by then, return. */
-      await Promise.race([promise, Object(utils["F" /* sleep */])(maxWait)]);
+      await Promise.race([promise, Object(utils["G" /* sleep */])(maxWait)]);
     }
   }
 
@@ -24746,10 +25087,10 @@ class application_SNApplication {
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
-    this.createMigrationService();
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
+    this.createMigrationService();
     this.createSyncManager();
     this.createKeyRecoveryService();
     this.createSingletonManager();
@@ -24785,6 +25126,7 @@ class application_SNApplication {
       protocolService: this.protocolService,
       deviceInterface: this.deviceInterface,
       storageService: this.storageService,
+      sessionManager: this.sessionManager,
       challengeService: this.challengeService,
       itemManager: this.itemManager,
       environment: this.environment,
@@ -24988,6 +25330,8 @@ class LiveItem {
 var application_service = __webpack_require__(78);
 
 // CONCATENATED MODULE: ./lib/index.ts
+
+
 
 
 

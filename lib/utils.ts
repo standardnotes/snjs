@@ -357,6 +357,9 @@ export function omitInPlace<T>(object: T, keys: Array<keyof T>) {
  * Creates a new object by omitting `keys` from `object`
  */
 export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
+  if (isNullOrUndefined(object)) {
+    return undefined;
+  }
   const newObject = Object.assign({}, object);
   /**
    * Lodash's omit, which was previously used, seems to cause unexpected behavior

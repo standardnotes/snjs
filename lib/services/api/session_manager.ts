@@ -118,14 +118,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public getUser() {
-    if (this.user && !this.apiService.getSession()) {
-      this.alertService.alert(
-        ErrorAlertStrings.MissingSessionBody,
-        ErrorAlertStrings.MissingSessionTitle
-      );
-      SNLog.error(Error('User is defined but no session is present.'))
-    }
     return this.user;
+  }
+
+  public getSession() {
+    return this.apiService.getSession();
   }
 
   public async signOut() {
@@ -141,18 +138,6 @@ export class SNSessionManager extends PureService<SessionEvent> {
     onResponse?: (response: HttpResponse) => void
   ) {
     if (this.isSessionRenewChallengePresented) {
-      return;
-    }
-    const currentKeyParams = await this.protocolService.getAccountKeyParams();
-    if (!currentKeyParams) {
-      onResponse?.({
-        status: 0,
-        error: {
-          message: '',
-          status: 0,
-          tag: MissingAccountParams
-        },
-      });
       return;
     }
     this.isSessionRenewChallengePresented = true;
@@ -179,7 +164,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
           onNonvalidatedSubmit: async (challengeResponse) => {
             const email = challengeResponse.values[0].value as string;
             const password = challengeResponse.values[1].value as string;
-            const signInResult = await this.signIn(email, password, false, currentKeyParams!.version);
+            const currentKeyParams = await this.protocolService.getAccountKeyParams();
+            const signInResult = await this.signIn(email, password, false, currentKeyParams?.version);
             if (signInResult.response.error) {
               this.challengeService.setValidationStatusForChallenge(
                 challenge,

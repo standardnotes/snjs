@@ -94,3 +94,7 @@ export declare const ErrorAlertStrings: {
     StorageDecryptErrorTitle: string;
     StorageDecryptErrorBody: string;
 };
+export declare const KeychainRecoveryStrings: {
+    Title: string;
+    Text: string;
+};

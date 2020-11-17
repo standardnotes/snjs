@@ -1,13 +1,15 @@
-import { SyncEvent } from '@Services/sync/events';
+import { compareSemVersions } from '@Lib/version';
+import { SNLog } from '@Lib/log';
+import { isRightVersionGreaterThanLeft, SnjsVersion } from './../version';
 import { ApplicationEvent } from './../events';
 import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './../migrations/types';
 import { Migration } from '@Lib/migrations/migration';
 import * as migrationImports from '@Lib/migrations';
-import { BaseMigration } from '@Lib/migrations/2020-01-01-base';
+import { BaseMigration } from '@Lib/migrations/base';
 import { PureService } from '@Services/pure_service';
 import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
-import { isNullOrUndefined, lastElement } from '@Lib/utils';
+import { lastElement } from '@Lib/utils';
 
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -20,6 +22,7 @@ import { isNullOrUndefined, lastElement } from '@Lib/utils';
 export class SNMigrationService extends PureService {
   private activeMigrations?: Migration[]
   private handledFullSyncStage = false
+  private baseMigration!: BaseMigration;
 
   constructor(
     private services: MigrationServices
@@ -36,16 +39,31 @@ export class SNMigrationService extends PureService {
   }
 
   public async initialize() {
-    await this.runBaseMigration();
-    this.activeMigrations = await this.getRequiredMigrations();
+    await this.runBaseMigrationPreRun();
+
+    const requiredMigrations = await SNMigrationService.getRequiredMigrations(
+      await this.getStoredSnjsVersion()
+    );
+    this.activeMigrations = this.instantiateMigrationClasses(requiredMigrations);
     if (this.activeMigrations.length > 0) {
       const lastMigration = lastElement(this.activeMigrations) as Migration;
       lastMigration.onDone(async () => {
-        await this.saveLastMigrationTimestamp(
-          (lastMigration.constructor as any).timestamp()
+        await this.services.deviceInterface.setRawStorageValue(
+          namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
+          SnjsVersion
         );
       });
+    } else {
+      await this.services.deviceInterface.setRawStorageValue(
+        namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
+        SnjsVersion
+      );
     }
+  }
+
+  private async runBaseMigrationPreRun() {
+    this.baseMigration = new BaseMigration(this.services);
+    await this.baseMigration.preRun();
   }
 
   /**
@@ -65,75 +83,58 @@ export class SNMigrationService extends PureService {
       await this.handleStage(ApplicationStage.SignedIn_30);
     }
     else if (event === ApplicationEvent.CompletedFullSync) {
-      if(!this.handledFullSyncStage) {
+      if (!this.handledFullSyncStage) {
         this.handledFullSyncStage = true;
         await this.handleStage(ApplicationStage.FullSyncCompleted_13);
       }
     }
   }
 
-  private async runBaseMigration() {
-    const baseMigration = new BaseMigration(this.services);
-    await baseMigration.handleStage(
-      ApplicationStage.PreparingForLaunch_0
-    );
-  }
-
   public async hasPendingMigrations() {
-    return (await this.getRequiredMigrations()).length > 0;
+    const requiredMigrations = await SNMigrationService.getRequiredMigrations(
+      await this.getStoredSnjsVersion()
+    );
+    return requiredMigrations.length > 0 || await this.baseMigration.needsKeychainRepair();
   }
 
-  private async getRequiredMigrations() {
-    const lastMigrationTimestamp = await this.getLastMigrationTimestamp();
-    const activeMigrations = [];
+  public async getStoredSnjsVersion() {
+    const version = await this.services.deviceInterface.getRawStorageValue(namespacedKey(
+      this.services.identifier,
+      RawStorageKey.SnjsVersion
+    ));
+    if (!version) {
+      throw SNLog.error(Error('Snjs version missing from storage, run base migration.'));
+    }
+    return version;
+  }
+
+  private static async getRequiredMigrations(storedVersion: string) {
+    const resultingClasses = [];
     const migrationClasses = Object.keys(migrationImports).map((key) => {
       return (migrationImports as any)[key];
     }).sort((a, b) => {
-      const aTimestamp = a.timestamp();
-      const bTimestamp = b.timestamp();
-      if (aTimestamp < bTimestamp) {
-        return -1;
-      } else if (aTimestamp > bTimestamp) {
-        return 1;
-      } else {
-        return 0;
-      }
+      return compareSemVersions(a.version(), b.version());
     });
     for (const migrationClass of migrationClasses) {
-      const migrationTimestamp = migrationClass.timestamp();
-      if (migrationTimestamp > lastMigrationTimestamp) {
-        // eslint-disable-next-line new-cap
-        activeMigrations.push(new migrationClass(this.services));
+      const migrationVersion = migrationClass.version();
+      if (migrationVersion === storedVersion) {
+        continue;
+      }
+      if (isRightVersionGreaterThanLeft(storedVersion, migrationVersion)) {
+        resultingClasses.push(migrationClass);
       }
     }
-    return activeMigrations;
+    return resultingClasses;
   }
 
-  private getNamespacedTimeStampKey() {
-    return namespacedKey(
-      this.services.identifier,
-      RawStorageKey.LastMigrationTimestamp
-    );
-  }
-
-  private async getLastMigrationTimestamp() {
-    const timestamp = await this.services.deviceInterface.getRawStorageValue(
-      this.getNamespacedTimeStampKey()
-    );
-    if (isNullOrUndefined(timestamp)) {
-      throw 'Timestamp should not be null. Be sure to run base migration first.';
-    }
-    return JSON.parse(timestamp as any);
-  }
-
-  private async saveLastMigrationTimestamp(timestamp: number) {
-    await this.services.deviceInterface.setRawStorageValue(
-      this.getNamespacedTimeStampKey(),
-      JSON.stringify(timestamp)
-    );
+  private instantiateMigrationClasses(classes: any[]) {
+    return classes.map((migrationClass) => {
+      return new migrationClass(this.services);
+    })
   }
 
   private async handleStage(stage: ApplicationStage) {
+    await this.baseMigration.handleStage(stage);
     for (const migration of this.activeMigrations!) {
       await migration.handleStage(stage);
     }

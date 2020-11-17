@@ -1,10 +1,11 @@
+export { SnjsVersion, isRightVersionGreaterThanLeft, compareSemVersions } from './version';
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';
 export type { UuidString, ApplicationIdentifier } from './types';
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
-export { KeyRecoveryStrings } from './services/api/messages';
+export { KeyRecoveryStrings, SessionStrings } from './services/api/messages';
 export { SNApplication } from './application';
 export { SNProtocolService, KeyMode } from './services/protocol_service';
 export { SNProtocolOperator001 } from './protocol/operator/001/operator_001';
@@ -12,6 +13,7 @@ export { SNProtocolOperator002 } from './protocol/operator/002/operator_002';
 export { SNProtocolOperator003 } from './protocol/operator/003/operator_003';
 export { SNProtocolOperator004 } from './protocol/operator/004/operator_004';
 export { SNRootKey } from './protocol/root_key';
+export { SNRootKeyParams } from './protocol/key_params';
 export { DeviceInterface } from './device_interface';
 export { SNItem, ItemMutator, AppDataField, SNItemsKey, SNPredicate, SNNote, NoteMutator, SNTag, TagMutator, SNSmartTag, SNActionsExtension, Action, SNTheme, ThemeMutator, SNComponent, ComponentAction, ComponentMutator, SNEditor, SNUserPrefs, UserPrefsMutator, WebPrefKey, } from './models';
 export { MutationType } from './models/core/item';
@@ -59,9 +61,9 @@ export { ProtocolVersion } from './protocol/versions';
 export { PayloadFormat } from './protocol/payloads/formats';
 export { PurePayload } from './protocol/payloads/pure_payload';
 export { PayloadField } from './protocol/payloads/fields';
-export { StorageKey, RawStorageKey, NonwrappedStorageKey } from './storage_keys';
+export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from './storage_keys';
 /** Migrations */
-export { BaseMigration } from './migrations/2020-01-01-base';
+export { BaseMigration } from './migrations/base';
 /** Privileges */
 export { PrivilegeSessionLength } from './services/privileges_service';
 export { SNLog } from './log';
