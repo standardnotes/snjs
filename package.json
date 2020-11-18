@@ -9,6 +9,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "webpack -w --config webpack.dev.js",
     "bundle": "webpack --config webpack.prod.js && npm run tsc",
