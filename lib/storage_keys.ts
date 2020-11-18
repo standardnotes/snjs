@@ -4,9 +4,9 @@
  */
 export enum RawStorageKey {
   StorageObject = 'storage',
-  LastMigrationTimestamp = 'last_migration_timestamp',
-  DescriptorRecord = "descriptors"
-};
+  DescriptorRecord = 'descriptors',
+  SnjsVersion = 'snjs_version'
+}
 
 /**
  * Keys used for retrieving and saving simple key/value pairs.
@@ -34,7 +34,11 @@ export enum StorageKey {
   SessionHistoryOptimize = 'sessionHistory_autoOptimize',
   KeyRecoveryUndecryptableItems = 'key_recovery_undecryptable',
   StorageEncryptionPolicy = 'storage_policy'
-};
+}
+
+export enum NonwrappedStorageKey {
+  MobileFirstRun = 'first_run'
+}
 
 export function namespacedKey(namespace: string, key: string) {
   if (namespace) {
@@ -43,3 +47,20 @@ export function namespacedKey(namespace: string, key: string) {
     return key;
   }
 }
+
+export const LegacyKeys1_0_0 = {
+  WebPasscodeParamsKey: 'offlineParams',
+  MobilePasscodeParamsKey: 'pc_params',
+  AllAccountKeyParamsKey: 'auth_params',
+  WebEncryptedStorageKey: 'encryptedStorage',
+  MobileWrappedRootKeyKey: 'encrypted_account_keys',
+  MobileBiometricsPrefs: 'biometrics_prefs',
+  AllMigrations: 'migrations',
+  MobileThemesCache: 'ThemePreferencesKey',
+  MobileLightTheme: 'lightTheme',
+  MobileDarkTheme: 'darkTheme',
+  MobileLastExportDate: 'LastExportDateKey',
+  MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
+  MobileOptionsState: 'options',
+  MobilePasscodeKeyboardType: 'passcodeKeyboardType',
+};

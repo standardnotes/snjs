@@ -15,6 +15,7 @@ import {
 } from "@Lib/challenges";
 import { ChallengeOperation } from "./challenge_operation";
 import { removeFromArray } from '@Lib/utils';
+import { ChallengeStrings } from '../api/messages';
 
 type ChallengeValidationResponse = {
   valid: boolean;
@@ -58,6 +59,7 @@ export class ChallengeService extends PureService {
 
   /**
    * Resolves when the challenge has been completed.
+   * For non-validated challenges, will resolve when the first value is submitted.
    */
   public promptForChallengeResponse(challenge: Challenge) {
     return new Promise<ChallengeResponse | undefined>((resolve) => {
@@ -70,7 +72,7 @@ export class ChallengeService extends PureService {
     value: ChallengeValue
   ): Promise<ChallengeValidationResponse> {
     switch (value.prompt.validation) {
-      case ChallengeValidation.ApplicationPasscode:
+      case ChallengeValidation.LocalPasscode:
         return this.protocolService!.validatePasscode(value.value as string);
       case ChallengeValidation.AccountPassword:
         return this.protocolService!.validateAccountPassword(
@@ -87,7 +89,7 @@ export class ChallengeService extends PureService {
     const prompts = [];
     const hasPasscode = this.protocolService!.hasPasscode();
     if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.ApplicationPasscode));
+      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
     }
     const biometricEnabled = await this.hasBiometricsEnabled()
     if (biometricEnabled) {
@@ -100,46 +102,17 @@ export class ChallengeService extends PureService {
     }
   }
 
-  /**
-   * @returns whether the user has successfuly authenticated.
-   */
-  public async authenticateWithPasswordAndPasscode(
-    reason: ChallengeReason
-  ): Promise<boolean> {
-    const prompts: ChallengePrompt[] = [];
-    if (this.protocolService.hasAccount()) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
-    }
-    if (this.protocolService.hasPasscode()) {
-      prompts.push(
-        new ChallengePrompt(ChallengeValidation.ApplicationPasscode)
-      );
-    }
-    if (!prompts.length) {
-      return true;
-    }
-
-    const response = await this.promptForChallengeResponse(
-      new Challenge(
-        prompts,
-        reason,
-        true /** cancelable */
-      )
-    );
-    return response ? true : false;
-  }
-
-  public async promptForPasscode(reason: ChallengeReason) {
+  public async promptForPasscode() {
     const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.ApplicationPasscode)],
-      reason,
+      [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
+      ChallengeReason.ResaveRootKey,
       true
     );
     const response = await this.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true, passcode: undefined };
     }
-    const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
+    const value = response.getValueForType(ChallengeValidation.LocalPasscode);
     return { passcode: value.value as string, canceled: false }
   }
 
@@ -157,9 +130,7 @@ export class ChallengeService extends PureService {
       return {};
     }
     if (!passcode) {
-      const result = await this.promptForPasscode(
-        ChallengeReason.ResaveRootKey
-      );
+      const result = await this.promptForPasscode();
       if (result.canceled) {
         return { canceled: true };
       }

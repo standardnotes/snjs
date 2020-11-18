@@ -10,12 +10,12 @@ export enum ProtectedAction {
   ManagePrivileges = 'ActionManagePrivileges',
   ManagePasscode = 'ActionManagePasscode',
   DeleteNote = 'ActionDeleteNote',
-};
+}
 
 export enum PrivilegeCredential {
   AccountPassword = 'CredentialAccountPassword',
   LocalPasscode = 'CredentialLocalPasscode'
-};
+}
 
 type PrivilegeMap = Partial<Record<ProtectedAction, PrivilegeCredential[]>>
 

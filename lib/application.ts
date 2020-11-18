@@ -17,7 +17,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { Challenge, ChallengeResponse, ChallengeValidation, ChallengeReason, ChallengeValue, ChallengePrompt } from './challenges';
 import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
-import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
 import { removeFromArray, isString, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
@@ -54,12 +54,13 @@ import {
   CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD
+  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD, SessionStrings, ErrorAlertStrings
 } from './services/api/messages';
-import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
+import { MINIMUM_PASSWORD_LENGTH, MissingAccountParams, SessionEvent } from './services/api/session_manager';
 import { SNComponent, SNTag, SNNote } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
+import { SNLog } from './log';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -128,6 +129,8 @@ export class SNApplication {
   private launched = false
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false
+  private signingIn = false;
+  private registering = false;
 
   /**
    * @param environment The Environment that identifies your application.
@@ -158,6 +161,12 @@ export class SNApplication {
     skipClasses?: any[],
     defaultHost?: string
   ) {
+    if (!SNLog.onLog) {
+      throw Error('SNLog.onLog must be set.');
+    }
+    if (!SNLog.onError) {
+      throw Error('SNLog.onError must be set.');
+    }
     if (!deviceInterface) {
       throw Error('Device Interface must be supplied.');
     }
@@ -213,7 +222,7 @@ export class SNApplication {
   }
 
   /**
-   * Runs migrations, handles device authentication, unlocks application, and
+   * Handles device authentication, unlocks application, and
    * issues a callback if a device activation requires user input
    * (i.e local passcode or fingerprint).
    * @param awaitDatabaseLoad
@@ -229,9 +238,15 @@ export class SNApplication {
       }
       await this.handleLaunchChallengeResponse(response);
     }
-
     if (this.storageService!.isStorageWrapped()) {
-      await this.storageService!.decryptStorage();
+      try {
+        await this.storageService!.decryptStorage();
+      } catch (_error) {
+        this.alertService.alert(
+          ErrorAlertStrings.StorageDecryptErrorBody,
+          ErrorAlertStrings.StorageDecryptErrorTitle,
+        );
+      }
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService!.loadHost();
@@ -270,11 +285,11 @@ export class SNApplication {
   }
 
   public onStart() {
-
+    // optional override
   }
 
   public onLaunch() {
-
+    // optional override
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
@@ -1072,6 +1087,7 @@ export class SNApplication {
     this.clearServices();
     this.dealloced = true;
     this.started = false;
+    this.signingIn = false;
   }
 
   /**
@@ -1084,29 +1100,40 @@ export class SNApplication {
     ephemeral = false,
     mergeLocal = true
   ) {
-    this.lockSyncing();
-    const result = await this.sessionManager.register(email, password);
-    if (!result.response.error) {
-      this.syncService!.resetSyncState();
-      await this.storageService!.setPersistencePolicy(
-        ephemeral
-          ? StoragePersistencePolicies.Ephemeral
-          : StoragePersistencePolicies.Default
-      );
-      if (mergeLocal) {
-        await this.syncService!.markAllItemsAsNeedingSync(true);
-      } else {
-        this.itemManager!.removeAllItemsFromMemory();
-        await this.clearDatabase();
-      }
-      await this.notifyEvent(ApplicationEvent.SignedIn);
-      this.unlockSyncing();
-      await this.syncService!.downloadFirstSync(300);
-      this.protocolService!.decryptErroredItems();
-    } else {
-      this.unlockSyncing();
+    if (this.hasAccount()) {
+      throw Error('Tried to register when an account already exists.');
     }
-    return result.response;
+    if (this.registering) {
+      throw Error('Already registering.');
+    }
+    this.registering = true;
+    try {
+      this.lockSyncing();
+      const result = await this.sessionManager.register(email, password);
+      if (!result.response.error) {
+        this.syncService!.resetSyncState();
+        await this.storageService!.setPersistencePolicy(
+          ephemeral
+            ? StoragePersistencePolicies.Ephemeral
+            : StoragePersistencePolicies.Default
+        );
+        if (mergeLocal) {
+          await this.syncService!.markAllItemsAsNeedingSync(true);
+        } else {
+          this.itemManager!.removeAllItemsFromMemory();
+          await this.clearDatabase();
+        }
+        await this.notifyEvent(ApplicationEvent.SignedIn);
+        this.unlockSyncing();
+        await this.syncService!.downloadFirstSync(300);
+        this.protocolService!.decryptErroredItems();
+      } else {
+        this.unlockSyncing();
+      }
+      return result.response;
+    } finally {
+      this.registering = false;
+    }
   }
 
   /**
@@ -1121,40 +1148,51 @@ export class SNApplication {
     mergeLocal = true,
     awaitSync = false
   ) {
-    /** Prevent a timed sync from occuring while signing in. */
-    this.lockSyncing();
-    const result = await this.sessionManager.signIn(
-      email, password, strict
-    );
-    if (!result.response.error) {
-      this.syncService!.resetSyncState();
-      await this.storageService!.setPersistencePolicy(
-        ephemeral
-          ? StoragePersistencePolicies.Ephemeral
-          : StoragePersistencePolicies.Default
-      );
-      if (mergeLocal) {
-        await this.syncService!.markAllItemsAsNeedingSync(true);
-      } else {
-        this.itemManager!.removeAllItemsFromMemory();
-        await this.clearDatabase();
-      }
-      await this.notifyEvent(ApplicationEvent.SignedIn);
-      this.unlockSyncing();
-      const syncPromise = this.syncService!.downloadFirstSync(1_000, {
-        checkIntegrity: true,
-        awaitAll: awaitSync,
-      });
-      if (awaitSync) {
-        await syncPromise;
-        await this.protocolService!.decryptErroredItems();
-      } else {
-        this.protocolService!.decryptErroredItems();
-      }
-    } else {
-      this.unlockSyncing();
+    if (this.hasAccount()) {
+      throw Error('Tried to sign in when an account already exists.');
     }
-    return result.response;
+    if (this.signingIn) {
+      throw Error('Already signing in.');
+    }
+    this.signingIn = true;
+    try {
+      /** Prevent a timed sync from occuring while signing in. */
+      this.lockSyncing();
+      const result = await this.sessionManager.signIn(
+        email, password, strict
+      );
+      if (!result.response.error) {
+        this.syncService!.resetSyncState();
+        await this.storageService!.setPersistencePolicy(
+          ephemeral
+            ? StoragePersistencePolicies.Ephemeral
+            : StoragePersistencePolicies.Default
+        );
+        if (mergeLocal) {
+          await this.syncService!.markAllItemsAsNeedingSync(true);
+        } else {
+          this.itemManager!.removeAllItemsFromMemory();
+          await this.clearDatabase();
+        }
+        await this.notifyEvent(ApplicationEvent.SignedIn);
+        this.unlockSyncing();
+        const syncPromise = this.syncService!.downloadFirstSync(1_000, {
+          checkIntegrity: true,
+          awaitAll: awaitSync,
+        });
+        if (awaitSync) {
+          await syncPromise;
+          await this.protocolService!.decryptErroredItems();
+        } else {
+          this.protocolService!.decryptErroredItems();
+        }
+      } else {
+        this.unlockSyncing();
+      }
+      return result.response;
+    } finally {
+      this.signingIn = false;
+    }
   }
 
   /**
@@ -1403,18 +1441,16 @@ export class SNApplication {
     this.createItemManager();
     this.createStorageManager();
     this.createProtocolService();
-
     const encryptionDelegate = {
       payloadByEncryptingPayload: this.protocolService!.payloadByEncryptingPayload.bind(this.protocolService),
       payloadByDecryptingPayload: this.protocolService!.payloadByDecryptingPayload.bind(this.protocolService)
     };
     this.storageService!.encryptionDelegate = encryptionDelegate;
-
     this.createChallengeService();
-    this.createMigrationService();
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
+    this.createMigrationService();
     this.createSyncManager();
     this.createKeyRecoveryService();
     this.createSingletonManager();
@@ -1452,6 +1488,7 @@ export class SNApplication {
         protocolService: this.protocolService!,
         deviceInterface: this.deviceInterface!,
         storageService: this.storageService!,
+        sessionManager: this.sessionManager,
         challengeService: this.challengeService!,
         itemManager: this.itemManager!,
         environment: this.environment!,
@@ -1512,6 +1549,7 @@ export class SNApplication {
   private createStorageManager() {
     this.storageService = new SNStorageService(
       this.deviceInterface!,
+      this.alertService,
       this.identifier,
       this.environment
     );

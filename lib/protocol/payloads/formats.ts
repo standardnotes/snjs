@@ -3,4 +3,4 @@ export enum PayloadFormat {
   DecryptedBareObject = 1,
   DecryptedBase64String = 2,
   Deleted = 3,
-};
+}

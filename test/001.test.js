@@ -124,4 +124,22 @@ describe('001 protocol operations', () => {
     );
     expect(decrypted.content).to.eql(payload.content);
   });
+
+  it('payloads missing enc_item_key should decrypt as errorDecrypting', async () => {
+    const payload = Factory.createNotePayload();
+    const key = await protocol001.createItemsKey();
+    const params = await protocol001.generateEncryptedParameters(
+      payload,
+      PayloadFormat.EncryptedString,
+      key,
+    );
+    const modified = CreateMaxPayloadFromAnyObject(params, {
+      enc_item_key: undefined
+    });
+    const decrypted = await protocol001.generateDecryptedParameters(
+      modified,
+      key
+    );
+    expect(decrypted.errorDecrypting).to.equal(true);
+  });
 });

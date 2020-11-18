@@ -8,7 +8,7 @@ describe('storage manager', function() {
   this.timeout(Factory.TestTimeout);
   /**
    * Items are saved in localStorage in tests.
-   * Base keys are `storage`, `last_migration_timestamp`, and `keychain`
+   * Base keys are `storage`, `snjs_version`, and `keychain`
    */
   const BASE_KEY_COUNT = 3;
   const BASE_ITEM_COUNT = 1; /** Default items key */

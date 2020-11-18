@@ -25,7 +25,7 @@ export const OUTDATED_PROTOCOL_VERSION = `The encryption version for your accoun
 
 export const UNSUPPORTED_KEY_DERIVATION = `Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.`;
 
-export const INVALID_PASSWORD_COST = `Unable to login due to insecure password parameters. Please visit standardnotes.org/help/security for more information.`;
+export const INVALID_PASSWORD_COST = `Unable to sign in due to insecure password parameters. Please visit standardnotes.org/help/security for more information.`;
 export const INVALID_PASSWORD = `Invalid password.`;
 
 export const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
@@ -110,14 +110,18 @@ export const ChallengeModalTitle = {
 
 export const SessionStrings = {
   EnterEmailAndPassword: 'Please enter your account email and password.',
-  RecoverSession(email: string) {
-    return `Your credentials are needed for ${email} to refresh your session with the server.`;
+  RecoverSession(email?: string) {
+    return email
+      ? `Your credentials are needed for ${email} to refresh your session with the server.`
+      : `Your credentials are needed to refresh your session with the server.`;
   },
   SessionRestored: 'Your session has been successfully restored.',
   EnterMfa: 'Please enter your two-factor authentication code.',
   MfaInputPlaceholder: 'Two-factor authentication code',
   EmailInputPlaceholder: 'Email',
   PasswordInputPlaceholder: 'Password',
+  KeychainRecoveryErrorTitle: 'Invalid Credentials',
+  KeychainRecoveryError: 'The email or password you entered is incorrect.\n\nPlease note that this sign-in request is made against the default server. If you are using a custom server, you must uninstall the app then reinstall, and sign back into your account.'
 }
 
 export const ChallengeStrings = {
@@ -137,3 +141,17 @@ export const PromptTitles = {
   LocalPasscode: 'Application Passcode',
   Biometrics: 'Biometrics',
 }
+
+export const ErrorAlertStrings = {
+  MissingSessionTitle: 'Missing Session',
+  MissingSessionBody: 'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.',
+
+  StorageDecryptErrorTitle: 'Storage Error',
+  StorageDecryptErrorBody: `We were unable to decrypt your local storage. Please restart the app and try again. If you're unable to resolve this issue, and you have an account, you may try uninstalling the app then reinstalling, then signing back into your account. Otherwise, please contact help@standardnotes.org for support.`,
+}
+
+export const KeychainRecoveryStrings = {
+  Title: 'Restore Keychain',
+  Text: `We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.`
+}
+

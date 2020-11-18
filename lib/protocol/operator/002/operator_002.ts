@@ -18,6 +18,7 @@ import { PayloadFormat } from '@Payloads/formats';
 import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
+import { SNLog } from '@Lib/log';
 
 /**
  * @deprecated
@@ -119,7 +120,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
     const localAuthHash = await this.crypto.hmac256(ciphertextToAuth, authKey);
     if (this.crypto.timingSafeEqual(authHash, localAuthHash!) === false) {
-      console.error('Auth hash does not match, returning null.');
+      SNLog.error(Error('Auth hash does not match.'));
       return null;
     }
     return this.decryptString002(contentCiphertext, encryptionKey, iv);
@@ -210,11 +211,17 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       return super.generateDecryptedParameters(encryptedParameters, key);
     }
     if (!encryptedParameters.enc_item_key) {
-      console.error('Missing item encryption key, skipping decryption.');
-      return encryptedParameters;
+      SNLog.error(Error('Missing item encryption key, skipping decryption.'));
+      return CopyEncryptionParameters(
+        encryptedParameters,
+        {
+          errorDecrypting: true,
+          errorDecryptingValueChanged: !encryptedParameters.errorDecrypting
+        }
+      );
     }
     if (!key || !key.itemsKey) {
-      throw 'Attempting to generateDecryptedParameters with no itemsKey.';
+      throw Error('Attempting to generateDecryptedParameters with no itemsKey.');
     }
     /* Decrypt encrypted key */
     const encryptedItemKey = encryptedParameters.enc_item_key;

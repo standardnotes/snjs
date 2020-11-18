@@ -22,7 +22,7 @@ export enum ContentType {
   FilesafeFileMetadata = 'SN|FileSafe|FileMetadata',
   FilesafeIntegration = 'SN|FileSafe|Integration',
   ExtensionRepo = 'SN|ExtensionRepo'
-};
+}
 
 export function displayStringForContentType(contentType: ContentType) {
   const map: Record<any, string> = {

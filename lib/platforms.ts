@@ -2,7 +2,7 @@ export enum Environment {
   Web = 1,
   Desktop = 2,
   Mobile = 3
-};
+}
 
 export enum Platform {
   Ios = 1,
@@ -13,7 +13,7 @@ export enum Platform {
   WindowsDesktop = 6,
   LinuxWeb = 7,
   LinuxDesktop = 8
-};
+}
 
 export function platformFromString(string: string) {
   const map = {

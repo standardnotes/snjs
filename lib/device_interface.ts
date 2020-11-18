@@ -1,5 +1,5 @@
-import { ApplicationIdentifier } from './types';
-import { getGlobalScope } from '@Lib/utils';
+import { ApplicationIdentifier, AnyRecord } from './types';
+import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
 
 /**
  * Platforms must override this class to provide platform specific utilities
@@ -34,7 +34,7 @@ export abstract class DeviceInterface {
     this.interval = null;
   }
 
-  abstract async getRawStorageValue(key: string) : Promise<any>;
+  abstract async getRawStorageValue(key: string): Promise<string | undefined>;
 
   /**
    * Gets the parsed raw storage value.
@@ -42,8 +42,11 @@ export abstract class DeviceInterface {
    * This is most likely the case for legacy values.
    * So we return the value as-is if JSON.parse throws an exception.
    */
-  public async getJsonParsedRawStorageValue(key: string) {
+  public async getJsonParsedRawStorageValue(key: string): Promise<unknown | undefined> {
     const value = await this.getRawStorageValue(key);
+    if (isNullOrUndefined(value)) {
+      return undefined;
+    }
     try {
       return JSON.parse(value);
     } catch (e) {
@@ -51,13 +54,13 @@ export abstract class DeviceInterface {
     }
   }
 
-  abstract async getAllRawStorageKeyValues() : Promise<{ key: string, value: unknown }[]>;
+  abstract async getAllRawStorageKeyValues(): Promise<{ key: string, value: unknown }[]>;
 
-  abstract async setRawStorageValue(key: string, value: any) : Promise<void>;
+  abstract async setRawStorageValue(key: string, value: any): Promise<void>;
 
-  abstract async removeRawStorageValue(key: string) : Promise<void>;
+  abstract async removeRawStorageValue(key: string): Promise<void>;
 
-  abstract async removeAllRawStorageValues() : Promise<void>;
+  abstract async removeAllRawStorageValues(): Promise<void>;
 
   /**
    * On web platforms, databased created may be new.
@@ -66,27 +69,30 @@ export abstract class DeviceInterface {
    * from scratch.
    * @returns { isNewDatabase } - True if the database was newly created
    */
-  abstract async openDatabase(identifier: ApplicationIdentifier) : Promise<{ isNewDatabase?: boolean } | undefined>
+  abstract async openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
 
-  abstract async getAllRawDatabasePayloads(identifier: ApplicationIdentifier) : Promise<unknown[]>;
+  abstract async getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<unknown[]>;
 
-  abstract async saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier) : Promise<void>;
+  abstract async saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier) : Promise<void>;
+  abstract async saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier) : Promise<void>;
+  abstract async removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async removeAllRawDatabasePayloads(identifier: ApplicationIdentifier) : Promise<void>;
+  abstract async removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async getNamespacedKeychainValue(identifier: ApplicationIdentifier) : Promise<any>;
+  abstract async getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>;
 
-  abstract async setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier) : Promise<void>;
+  /** Allows SNJS to set the top level keychain value */
+  abstract async legacy_setRawKeychainValue(value: any): Promise<void>;
 
-  abstract async clearNamespacedKeychainValue(identifier: ApplicationIdentifier) : Promise<void>;
+  abstract async setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async getRawKeychainValue() : Promise<any>;
+  abstract async clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async clearRawKeychainValue() : Promise<void>;
+  abstract async getRawKeychainValue(): Promise<Record<string, any> | undefined | null>;
+
+  abstract async clearRawKeychainValue(): Promise<void>;
 
   abstract openUrl(url: string): void;
 

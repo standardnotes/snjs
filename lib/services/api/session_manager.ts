@@ -1,3 +1,4 @@
+import { SNLog } from './../../log';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
@@ -32,9 +33,10 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { SessionStrings, SignInStrings, RegisterStrings } from './messages';
+import { SessionStrings, SignInStrings, RegisterStrings, ErrorAlertStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
+export const MissingAccountParams = 'missing-params';
 
 type SessionManagerResponse = {
   response: HttpResponse;
@@ -53,7 +55,7 @@ const cleanedEmailString = (email: string) => {
 
 export const enum SessionEvent {
   SessionRestored = 'SessionRestored'
-};
+}
 
 /**
  * The session manager is responsible for loading initial user state, and any relevant
@@ -103,7 +105,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  private async setSession(session: Session, persist: boolean = true) {
+  private async setSession(session: Session, persist = true) {
     await this.apiService.setSession(session, persist);
   }
 
@@ -116,10 +118,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public getUser() {
-    if (this.user && !this.apiService.getSession()) {
-      throw Error('User is defined but no session is present.')
-    }
     return this.user;
+  }
+
+  public getSession() {
+    return this.apiService.getSession();
   }
 
   public async signOut() {
@@ -130,7 +133,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  private async reauthenticateInvalidSession() {
+  public async reauthenticateInvalidSession(
+    cancelable = true,
+    onResponse?: (response: HttpResponse) => void
+  ) {
     if (this.isSessionRenewChallengePresented) {
       return;
     }
@@ -141,39 +147,42 @@ export class SNSessionManager extends PureService<SessionEvent> {
         new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder)
       ],
       ChallengeReason.Custom,
-      true,
+      cancelable,
       SessionStrings.EnterEmailAndPassword,
-      SessionStrings.RecoverSession(this.getUser()!.email!)
+      SessionStrings.RecoverSession(this.getUser()?.email)
     );
-    this.challengeService.addChallengeObserver(
-      challenge,
-      {
-        onCancel: () => {
-          this.isSessionRenewChallengePresented = false;
-        },
-        onComplete: () => {
-          this.isSessionRenewChallengePresented = false;
-        },
-        onNonvalidatedSubmit: async (challengeResponse) => {
-          const email = challengeResponse.values[0].value as string;
-          const password = challengeResponse.values[1].value as string;
-          const currentKeyParams = await this.protocolService.getAccountKeyParams();
-          const signInResult = await this.signIn(email, password, false, currentKeyParams!.version);
-          if (signInResult.response.error) {
-            this.challengeService.setValidationStatusForChallenge(
-              challenge,
-              challengeResponse!.values[1],
-              false
-            );
-          } else {
-            this.challengeService.completeChallenge(challenge);
-            this.notifyEvent(SessionEvent.SessionRestored);
-            this.alertService!.alert(SessionStrings.SessionRestored);
+    return new Promise((resolve) => {
+      this.challengeService.addChallengeObserver(
+        challenge,
+        {
+          onCancel: () => {
+            this.isSessionRenewChallengePresented = false;
+          },
+          onComplete: () => {
+            this.isSessionRenewChallengePresented = false;
+          },
+          onNonvalidatedSubmit: async (challengeResponse) => {
+            const email = challengeResponse.values[0].value as string;
+            const password = challengeResponse.values[1].value as string;
+            const currentKeyParams = await this.protocolService.getAccountKeyParams();
+            const signInResult = await this.signIn(email, password, false, currentKeyParams?.version);
+            if (signInResult.response.error) {
+              this.challengeService.setValidationStatusForChallenge(
+                challenge,
+                challengeResponse!.values[1],
+                false
+              );
+              onResponse?.(signInResult.response);
+            } else {
+              resolve();
+              this.challengeService.completeChallenge(challenge);
+              this.notifyEvent(SessionEvent.SessionRestored);
+              this.alertService!.alert(SessionStrings.SessionRestored);
+            }
           }
-        }
-      })
-
-    this.challengeService.promptForChallengeResponse(challenge);
+        })
+      this.challengeService.promptForChallengeResponse(challenge);
+    })
   }
 
   private async promptForMfaValue() {
@@ -305,17 +314,20 @@ export class SNSessionManager extends PureService<SessionEvent> {
       result.response.error.status !== StatusCode.LocalValidationError &&
       result.response.error.status !== StatusCode.CanceledMfa
     ) {
-      /**
-       * Try signing in with trimmed + lowercase version of email
-       */
       const cleanedEmail = cleanedEmailString(email);
-      const secondResult = await this.performSignIn(
-        cleanedEmail,
-        password,
-        strict,
-        minAllowedVersion
-      );
-      return secondResult;
+      if (cleanedEmail !== email) {
+        /**
+         * Try signing in with trimmed + lowercase version of email
+         */
+        return this.performSignIn(
+          cleanedEmail,
+          password,
+          strict,
+          minAllowedVersion
+        );
+      } else {
+        return result;
+      }
     } else {
       return result;
     }
@@ -352,7 +364,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
         return {
           response: this.apiService.createErrorResponse(messages.INVALID_PASSWORD_COST)
         };
-      };
+      }
       const message = messages.OUTDATED_PROTOCOL_VERSION;
       const confirmed = await this.alertService!.confirm(
         message,

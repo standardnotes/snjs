@@ -29,7 +29,7 @@ import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
 import { PayloadManager } from './model_manager';
 import { PureService } from '@Lib/services/pure_service';
-import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Uuid } from '@Lib/uuid';
 import {
   isReactNativeEnvironment,
@@ -360,7 +360,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     } else if (version === ProtocolVersion.V000Base64Decrypted) {
       return this.createOperatorForLatestVersion();
     } else {
-      throw `Unable to find operator for version ${version}`;
+      throw Error(`Unable to find operator for version ${version}`);
     }
   }
 
@@ -1112,7 +1112,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   /**
    * Returns the in-memory root key value.
    */
-  public async getRootKey() {
+  public getRootKey() {
     return this.rootKey;
   }
 
@@ -1144,7 +1144,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   public async validateAccountPassword(password: string) {
     const keyParams = await this.getRootKeyParams();
     const key = await this.computeRootKey(password, keyParams!);
-    const valid = key.compare(this.rootKey!);
+    const valid = this.rootKey!.compare(key);
     if (valid) {
       return { valid, artifacts: { rootKey: key } };
     } else {
@@ -1181,7 +1181,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       throw 'Intent must be supplied when looking up key for encryption of item.';
     }
     if (ContentTypeUsesRootKeyEncryption(payload.content_type!)) {
-      const rootKey = await this.getRootKey();
+      const rootKey = this.getRootKey();
       if (!rootKey) {
         if (intentRequiresEncryption(intent)) {
           throw 'Root key encryption is required but no root key is available.';
@@ -1280,7 +1280,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
        * If their version is not equal to our root key version, delete them. If we end up with 0
        * items keys, create a new one. This covers the case when you open the app offline and it creates
        * an 004 key, and then you sign into an 003 account. */
-      const rootKey = await this.getRootKey();
+      const rootKey = this.getRootKey();
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
         const toDelete = neverSyncedKeys.filter((itemsKey) => {
@@ -1402,7 +1402,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
   private async createNewDefaultItemsKey() {
-    const rootKey = (await this.getRootKey())!;
+    const rootKey = this.getRootKey()!;
     const operatorVersion = rootKey
       ? rootKey.keyVersion
       : this.getLatestVersion();

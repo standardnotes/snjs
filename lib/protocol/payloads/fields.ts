@@ -17,4 +17,4 @@ export enum PayloadField {
   LastSyncBegan = 'lastSyncBegan',
   LastSyncEnd = 'lastSyncEnd',
   DuplicateOf = 'duplicate_of'
-};
+}

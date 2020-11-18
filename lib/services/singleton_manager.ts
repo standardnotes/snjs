@@ -194,6 +194,7 @@ export class SNSingletonManager extends PureService {
     createContentType: ContentType,
     createContent: PayloadContent
   ) {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve) => {
       const matchingItems = this.validItemsMatchingPredicate(predicate);
       if (matchingItems.length > 0) {

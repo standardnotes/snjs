@@ -6,12 +6,12 @@ import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Uuid } from '@Lib/uuid';
-import { timingSafeEqual } from 'sncrypto/lib/common/utils';
+import { timingSafeEqual } from '@standardnotes/sncrypto-common';
 
 export type RootKeyContent = {
   version: ProtocolVersion;
   masterKey: string;
-  serverPassword: string;
+  serverPassword?: string;
   dataAuthenticationKey?: string;
   keyParams: AnyKeyParamsContent
 }
@@ -122,7 +122,7 @@ export class SNRootKey extends SNItem {
     if (this.keyVersion !== otherKey.keyVersion) {
       return false;
     }
-    const hasServerPassword = this.serverPassword && otherKey.serverPassword;
+    const hasServerPassword = !!(this.serverPassword && otherKey.serverPassword);
     return (
       timingSafeEqual(this.masterKey, otherKey.masterKey) &&
       (!hasServerPassword || timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))

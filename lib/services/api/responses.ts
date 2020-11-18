@@ -69,7 +69,7 @@ export type SignInResponse = RegistrationResponse & {
 
 export type ChangePasswordResponse = SignInResponse;
 
-export type SignOutResponse = HttpResponse & {}
+export type SignOutResponse = HttpResponse & Record<string, unknown>
 
 export type SessionRenewalResponse = HttpResponse & {
   session?: SessionBody

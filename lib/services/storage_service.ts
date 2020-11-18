@@ -1,3 +1,6 @@
+import { ErrorAlertStrings } from './api/messages';
+import { SNAlertService } from './alert_service';
+import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
 import { RawStorageKey, namespacedKey, StorageKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
@@ -15,19 +18,19 @@ import { DeviceInterface } from '../device_interface';
 export enum StoragePersistencePolicies {
   Default = 1,
   Ephemeral = 2
-};
+}
 
 export enum StorageEncryptionPolicies {
   Default = 1,
   Disabled = 2,
-};
+}
 
 export enum StorageValueModes {
   /** Stored inside wrapped encrpyed storage object */
   Default = 1,
   /** Stored outside storage object, unencrypted */
   Nonwrapped = 2
-};
+}
 
 export enum ValueModesKeys {
   /* Is encrypted */
@@ -36,7 +39,7 @@ export enum ValueModesKeys {
   Unwrapped = 'unwrapped',
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped = 'nonwrapped',
-};
+}
 type ValuesObjectRecord = Record<string, any>
 
 export type StorageValuesObject = {
@@ -64,19 +67,18 @@ export class SNStorageService extends PureService {
   private storagePersistable = false
   private persistencePolicy!: StoragePersistencePolicies
   private encryptionPolicy!: StorageEncryptionPolicies
-  private identifier: string
   private needsPersist = false
 
   private values!: StorageValuesObject
 
   constructor(
     deviceInterface: DeviceInterface,
-    identifier: string,
+    private alertService: SNAlertService,
+    private identifier: string,
     private environment: Environment
   ) {
     super();
     this.deviceInterface = deviceInterface;
-    this.identifier = identifier;
     this.setPersistencePolicy(StoragePersistencePolicies.Default);
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false);
   }
@@ -134,7 +136,7 @@ export class SNStorageService extends PureService {
     const value = await this.deviceInterface!.getRawStorageValue(
       this.getPersistenceKey()
     );
-    const values = value ? JSON.parse(value) : undefined;
+    const values = value ? JSON.parse(value as any) : undefined;
     this.setInitialValues(values);
   }
 
@@ -175,14 +177,12 @@ export class SNStorageService extends PureService {
     if (!(wrappedValue?.content_type)) {
       throw Error('Attempting to decrypt nonexistent wrapped value');
     }
-
     const payload = CreateMaxPayloadFromAnyObject(
       wrappedValue,
       {
         content_type: ContentType.EncryptedStorage
       }
     );
-
     const decryptedPayload = await this.encryptionDelegate!.payloadByDecryptingPayload(
       payload,
       key
@@ -194,7 +194,7 @@ export class SNStorageService extends PureService {
     const wrappedValue = this.values[ValueModesKeys.Wrapped];
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue);
     if (decryptedPayload.errorDecrypting) {
-      throw Error('Unable to decrypt storage.');
+      throw SNLog.error(Error('Unable to decrypt storage.'));
     }
     this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);
   }
@@ -394,7 +394,7 @@ export class SNStorageService extends PureService {
       await this.clearValues();
       await this.clearAllPayloads();
       await this.deviceInterface!.removeRawStorageValue(
-        namespacedKey(this.identifier, RawStorageKey.LastMigrationTimestamp)
+        namespacedKey(this.identifier, RawStorageKey.SnjsVersion)
       );
       await this.deviceInterface!.removeRawStorageValue(this.getPersistenceKey());
     });
