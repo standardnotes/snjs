@@ -60,7 +60,7 @@ export abstract class PureService<E = string> {
   * at a certain migratory state.
   */
   public async handleApplicationStage(_stage: ApplicationStage) {
-    console.log('Function handleApplicationStage not implemented');
+    // optional override
   }
 
   log(message: string, ...args: any[]) {

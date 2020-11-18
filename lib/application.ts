@@ -285,11 +285,11 @@ export class SNApplication {
   }
 
   public onStart() {
-    console.error('onStart not implemented');
+    // optional override
   }
 
   public onLaunch() {
-    console.error('onLaunch not implemented');
+    // optional override
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
