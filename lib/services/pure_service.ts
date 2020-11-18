@@ -60,7 +60,7 @@ export abstract class PureService<E = string> {
   * at a certain migratory state.
   */
   public async handleApplicationStage(_stage: ApplicationStage) {
-
+    // optional override
   }
 
   log(message: string, ...args: any[]) {

@@ -47,7 +47,7 @@ export enum AppDataField {
 
 export enum SingletonStrategy {
   KeepEarliest = 1
-};
+}
 
 /**
  * The most abstract item that any syncable item needs to extend from.

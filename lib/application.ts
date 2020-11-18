@@ -285,11 +285,11 @@ export class SNApplication {
   }
 
   public onStart() {
-
+    // optional override
   }
 
   public onLaunch() {
-
+    // optional override
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {

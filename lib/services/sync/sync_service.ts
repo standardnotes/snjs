@@ -60,7 +60,7 @@ export enum SyncModes {
    * all data to see if user has an items key, and if not, only then create a new one.
    */
   DownloadFirst = 2
-};
+}
 
 export enum SyncSources {
   External = 1,
@@ -70,7 +70,7 @@ export enum SyncSources {
   AfterDownloadFirst = 5,
   IntegrityCheck = 6,
   ResolveOutOfSync = 7
-};
+}
 
 export type SyncOptions = {
   queueStrategy?: SyncQueueStrategy

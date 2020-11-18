@@ -6,4 +6,4 @@ export enum ApiEndpointParam {
   SyncDlLimit = 'limit',
   SyncPayloads = 'items',
   ApiVersion = 'api'
-};
+}

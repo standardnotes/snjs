@@ -96,7 +96,7 @@ export class SNApiService extends PureService {
     return this.host;
   }
 
-  public async setSession(session: Session, persist: boolean = true) {
+  public async setSession(session: Session, persist = true) {
     this.session = session;
     if (persist) {
       await this.storageService.setValue(StorageKey.Session, session);
