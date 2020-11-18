@@ -72,7 +72,7 @@ export class ChallengeService extends PureService {
     value: ChallengeValue
   ): Promise<ChallengeValidationResponse> {
     switch (value.prompt.validation) {
-      case ChallengeValidation.LocalPasscode:
+      case ChallengeValidation.ApplicationPasscode:
         return this.protocolService!.validatePasscode(value.value as string);
       case ChallengeValidation.AccountPassword:
         return this.protocolService!.validateAccountPassword(
@@ -89,7 +89,7 @@ export class ChallengeService extends PureService {
     const prompts = [];
     const hasPasscode = this.protocolService!.hasPasscode();
     if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
+      prompts.push(new ChallengePrompt(ChallengeValidation.ApplicationPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
     }
     const biometricEnabled = await this.hasBiometricsEnabled()
     if (biometricEnabled) {
@@ -104,7 +104,7 @@ export class ChallengeService extends PureService {
 
   public async promptForPasscode() {
     const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
+      [new ChallengePrompt(ChallengeValidation.ApplicationPasscode)],
       ChallengeReason.ResaveRootKey,
       true
     );
@@ -112,7 +112,7 @@ export class ChallengeService extends PureService {
     if (!response) {
       return { canceled: true, passcode: undefined };
     }
-    const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+    const value = response.getValueForType(ChallengeValidation.ApplicationPasscode);
     return { passcode: value.value as string, canceled: false }
   }
 
