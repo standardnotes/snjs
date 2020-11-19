@@ -18,7 +18,7 @@
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
     "start:test-server": "node test-server.js",
-    "test": "./test.sh",
+    "test": "bash test.sh",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
