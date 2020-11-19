@@ -1,4 +1,4 @@
-# !/bin/bash
+# !/bin/sh
 
 echo "Killing all containers"
 docker-compose kill
