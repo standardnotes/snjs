@@ -2,6 +2,7 @@ export {SnjsVersion, isRightVersionGreaterThanLeft, compareSemVersions } from '.
 
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';
+export type { BackupFile } from '@Services/protocol_service';
 export type { UuidString, ApplicationIdentifier } from './types';
 
 export { SNApplicationGroup } from './application_group';
@@ -26,6 +27,7 @@ export {
   SNTag, TagMutator,
   SNSmartTag,
   SNActionsExtension,
+  ActionsExtensionMutator,
   Action,
   SNTheme,
   ThemeMutator,
@@ -35,14 +37,17 @@ export {
 } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
+export type { ComponentPermission } from './models/app/component';
 export { LiveItem } from './models/live_item';
 
+export type { PermissionDialog } from './services/component_manager';
 export { SNComponentManager } from './services/component_manager';
 export { SessionHistoryMap } from './services/history/session/session_history_map';
 export { ItemSessionHistory } from './services/history/session/item_session_history';
 export { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 export {
   SNPrivileges,
+  PrivilegeMutator,
   ProtectedAction,
   PrivilegeCredential
 } from './models/app/privileges';
@@ -74,6 +79,7 @@ export {
   SyncModes,
   SyncQueueStrategy,
 } from './services/sync/sync_service';
+export { SyncOpStatus } from './services/sync/sync_op_status';
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
 export { SNSessionManager } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
@@ -83,6 +89,7 @@ export { SNHistoryManager } from './services/history/history_manager';
 export { SNPrivilegesService } from './services/privileges_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
+export type { RevisionListEntry, SingleRevision } from './services/api/responses';
 export {
   addIfUnique,
   arrayByDifference,
@@ -152,6 +159,7 @@ export { ProtocolVersion } from '@Lib/protocol/versions';
 export { PayloadFormat } from '@Payloads/formats';
 export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadField } from '@Payloads/fields';
+export type { PayloadContent } from '@Payloads/generator';
 
 export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from '@Lib/storage_keys';
 

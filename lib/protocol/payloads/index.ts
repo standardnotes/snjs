@@ -13,6 +13,7 @@ export { PayloadField } from '@Payloads/fields';
 export { PayloadSource as PayloadSource } from '@Payloads/sources';
 export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadFormat as PayloadFormat } from '@Payloads/formats';
+export type { PayloadContent } from '@Payloads/generator';
 
 export {
   PayloadsDelta,
