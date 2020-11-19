@@ -1,5 +1,8 @@
 export { ButtonType } from '@Services/alert_service';
 export type { DismissBlockingDialog, SNAlertService } from '@Services/alert_service';
+export type { BackupFile } from '@Services/protocol_service';
+export type { RevisionListEntry, SingleRevision } from '@Services/api/responses';
+export type { PermissionDialog } from '@Services/component_manager';
 export { SNSessionManager } from '@Services/api/session_manager';
 export { SNApiService } from '@Services/api/api_service';
 export { SNComponentManager } from '@Services/component_manager';
@@ -12,6 +15,7 @@ export { SNProtocolService, KeyMode } from '@Services/protocol_service';
 export { SNHistoryManager } from '@Services/history/history_manager';
 export { SNPrivilegesService } from '@Services/privileges_service';
 export { SyncEvent as SyncEvent } from '@Services/sync/events';
+export { SyncOpStatus } from '@Services/sync/sync_op_status';
 export { ItemManager } from '@Services/item_manager';
 export {
   SNSyncService,

@@ -7,7 +7,7 @@ export {
   ComponentAction
 } from './app/component';
 export { SNEditor } from '@Models/app/editor';
-export { SNActionsExtension } from '@Models/app/extension';
+export { ActionsExtensionMutator, SNActionsExtension } from '@Models/app/extension';
 export { Action } from '@Models/app/action';
 export { SNNote, NoteMutator } from '@Models/app/note';
 export { SNTag, TagMutator } from '@Models/app/tag';
@@ -18,3 +18,5 @@ export { SNTheme, ThemeMutator } from '@Models/app/theme';
 
 export { ContentType, displayStringForContentType } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';
+
+export type { ComponentPermission } from './app/component';
