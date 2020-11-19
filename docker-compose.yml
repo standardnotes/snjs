@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  snjs:
+    build: .
+    restart: unless-stopped
+    networks:
+      snjs: {}
+    ports:
+      - 9001:9001
+    volumes:
+      - .:/var/www/
+
+  db:
+    image: mysql:5.6
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpassword
+      MYSQL_ROOT_PASSWORD: testpassword
+    expose:
+      - 3306
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci
+    networks:
+      - snjs
+
+  syncing-server-ruby:
+    image: standardnotes/syncing-server:stable
+    environment:
+      EXPOSED_PORT: 3000
+      RAILS_ENV: test
+      RAILS_LOG_TO_STDOUT: 1
+      DB_PORT: 3306
+      DB_HOST: db
+      DB_DATABASE: testdb
+      DB_USERNAME: testuser
+      DB_PASSWORD: testpassword
+    expose:
+      - 3000
+    restart: unless-stopped
+    networks:
+      - snjs
+
+networks:
+  snjs:
+    name: snjs
