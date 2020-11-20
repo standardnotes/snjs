@@ -7,11 +7,11 @@
         <script src="./vendor/chai-as-promised-built.js"></script>
         <script src="../node_modules/regenerator-runtime/runtime.js"></script>
         <script src="../node_modules/mocha/mocha.js"></script>
-        <script src="../node_modules/sncrypto/dist/sncrypto-web.js"></script>
+        <script src="../node_modules/@standardnotes/sncrypto-web/dist/sncrypto-web.js"></script>
         <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../dist/snjs.js"></script>
         <script>
-          window._default_sync_server = 'http://localhost:3000';
+          window._default_sync_server = 'http://syncing-server-ruby:3123';
           Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
           SNLog.onLog = (message) => {

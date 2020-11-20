@@ -1,11 +1,11 @@
-name: Node.js Package
+name: Publish
 
 on:
   push:
     branches: [ 004 ]
 
 jobs:
-  publish-gpr:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,6 +15,20 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run lint
+      - run: npm run bundle
+      - run: npm test
+
+  publish:
+    needs: test
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
       - run: npm run bundle
       - run: npm publish
         env:

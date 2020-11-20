@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "engines": {
     "node": ">=12.19.0 <14.0.0"
   },
@@ -17,12 +17,14 @@
     "bundle": "webpack --config webpack.prod.js && npm run tsc",
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
-    "test": "node test-server.js",
+    "start:test-server": "node test-server.js",
+    "test": "bash test.sh",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
+    "@standardnotes/sncrypto-web": "^1.2.9",
     "@types/chai": "^4.2.11",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^7.0.2",
@@ -46,6 +48,7 @@
     "exports-loader": "^0.7.0",
     "lodash": "^4.17.19",
     "mocha": "^7.1.0",
+    "mocha-headless-chrome": "^3.1.0",
     "pre-push": "^0.1.1",
     "regenerator-runtime": "^0.13.5",
     "script-loader": "^0.7.2",
