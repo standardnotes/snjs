@@ -27,7 +27,6 @@ services:
   syncing-server-ruby:
     image: standardnotes/syncing-server:stable
     environment:
-      EXPOSED_PORT: 3000
       RAILS_ENV: test
       RAILS_LOG_TO_STDOUT: 1
       DB_PORT: 3306
@@ -35,8 +34,8 @@ services:
       DB_DATABASE: testdb
       DB_USERNAME: testuser
       DB_PASSWORD: testpassword
-    expose:
-      - 3000
+    ports:
+      - 3123:3000
     restart: unless-stopped
     networks:
       - snjs
