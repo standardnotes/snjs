@@ -1,8 +1,8 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "engines": {
-    "node": ">=12.19.0 <14.0.0"
+    "node": ">=14.0.0 <15.0.0"
   },
   "main": "dist/snjs.js",
   "types": "dist/@types",
