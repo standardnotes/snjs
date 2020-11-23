@@ -1,9 +1,9 @@
 import { isNullOrUndefined, removeFromArray } from "@Lib/utils";
 import {
   Challenge,
+  ChallengeArtifacts,
   ChallengeResponse,
-  ChallengeValue,
-  ChallengeArtifacts
+  ChallengeValue
 } from "@Lib/challenges";
 import { ValueCallback } from "./challenge_service";
 

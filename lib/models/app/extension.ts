@@ -1,5 +1,5 @@
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { ItemMutator, SNItem } from '@Models/core/item';
 import { Action } from './action';
 
 /**

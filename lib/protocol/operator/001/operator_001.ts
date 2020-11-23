@@ -1,15 +1,15 @@
 import { SNLog } from './../../../log';
 import {
   ItemAuthenticatedData,
-  RootKeyEncryptedAuthenticatedData,
-  LegacyAttachedData
+  LegacyAttachedData,
+  RootKeyEncryptedAuthenticatedData
 } from './../../payloads/generator';
 import { SNItemsKey } from '@Models/app/items_key';
-import { Create001KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
+import { Create001KeyParams, KeyParamsOrigination, SNRootKeyParams } from './../../key_params';
 import { ItemsKeyContent } from './../operator';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
 import { PayloadFormat } from '@Payloads/formats';
-import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
+import { CopyEncryptionParameters, CreateEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
 import { V001Algorithm } from '@Protocol/operator/algorithms';

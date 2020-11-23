@@ -1,6 +1,6 @@
 import { RawPayload } from '@Payloads/generator';
 import { ApiEndpointParam } from './keys';
-import { KeyParamsOrigination, AnyKeyParamsContent } from './../../protocol/key_params';
+import { AnyKeyParamsContent, KeyParamsOrigination } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 
 export enum StatusCode {

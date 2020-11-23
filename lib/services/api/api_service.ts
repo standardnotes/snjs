@@ -2,8 +2,6 @@ import { UuidString } from './../../types';
 import {
   ChangePasswordResponse,
   HttpResponse,
-  StatusCode,
-  isErrorResponseExpiredToken,
   KeyParamsResponse,
   RegistrationResponse,
   RevisionListEntry,
@@ -13,13 +11,15 @@ import {
   SignInResponse,
   SignOutResponse,
   SingleRevisionResponse,
+  StatusCode,
+  isErrorResponseExpiredToken,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
-import { SNHttpService, HttpVerb, HttpRequest } from './http_service';
+import { HttpRequest, HttpVerb, SNHttpService } from './http_service';
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';

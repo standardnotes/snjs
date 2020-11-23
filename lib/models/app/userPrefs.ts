@@ -1,4 +1,4 @@
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { ItemMutator, SNItem } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 
 export enum WebPrefKey {

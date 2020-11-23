@@ -5,7 +5,7 @@ import { CreateItemFromPayload } from '@Models/generator';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { CopyPayload } from '@Payloads/generator';
-import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
+import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
 import { PayloadField } from '../fields';
 

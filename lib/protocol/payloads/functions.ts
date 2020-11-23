@@ -1,5 +1,5 @@
 import { MutationType } from './../../models/core/item';
-import { SNComponent, ComponentArea, ComponentMutator } from './../../models/app/component';
+import { ComponentArea, ComponentMutator, SNComponent } from './../../models/app/component';
 import { ContentReference, PayloadContent } from './generator';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
 import { CreateItemFromPayload } from '@Models/generator';

@@ -3,18 +3,18 @@ import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
 import {
-  ChallengeValidation,
+  ChallengeKeyboardType,
   ChallengeReason,
-  ChallengeKeyboardType
+  ChallengeValidation
 } from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, TokenSession } from './session';
 import {
-  RegistrationResponse,
-  SignInResponse,
   ChangePasswordResponse,
   HttpResponse,
   KeyParamsResponse,
+  RegistrationResponse,
+  SignInResponse,
   StatusCode
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
@@ -22,10 +22,10 @@ import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import {
-  SNRootKeyParams,
   AnyKeyParamsContent,
+  KeyParamsFromApiResponse,
   KeyParamsOrigination,
-  KeyParamsFromApiResponse
+  SNRootKeyParams
 } from './../../protocol/key_params';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
@@ -33,7 +33,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { SessionStrings, SignInStrings, RegisterStrings, ErrorAlertStrings } from './messages';
+import { ErrorAlertStrings, RegisterStrings, SessionStrings, SignInStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MissingAccountParams = 'missing-params';

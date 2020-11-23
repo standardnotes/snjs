@@ -3,8 +3,8 @@ import { PayloadField } from './fields';
 import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@Models/content_types';
 import { ProtocolVersion } from '@Protocol/versions';
-import { isString, isObject, deepFreeze, isNullOrUndefined } from '@Lib/utils';
-import { RawPayload, PayloadContent } from '@Payloads/generator';
+import { deepFreeze, isNullOrUndefined, isObject, isString } from '@Lib/utils';
+import { PayloadContent, RawPayload } from '@Payloads/generator';
 import { PayloadFormat } from '@Payloads/formats';
 
 /**

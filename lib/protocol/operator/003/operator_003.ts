@@ -1,7 +1,7 @@
 import { ItemsKeyContent } from './../operator';
 import { SNRootKey } from './../../root_key';
 import { V003Algorithm } from './../algorithms';
-import { Create003KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
+import { Create003KeyParams, KeyParamsOrigination, SNRootKeyParams } from './../../key_params';
 import { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002';
 import { ProtocolVersion } from '@Protocol/versions';
 

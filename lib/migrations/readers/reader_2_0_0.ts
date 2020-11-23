@@ -1,6 +1,6 @@
 import { isNullOrUndefined } from '@Lib/utils';
 import { ValueModesKeys } from './../../services/storage_service';
-import { namespacedKey, RawStorageKey, StorageKey } from '@Lib/storage_keys';
+import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
 import { StorageReader } from './reader';
 import { PreviousSnjsVersion2_0_0 } from '@Lib/version';
 

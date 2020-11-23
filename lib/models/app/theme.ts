@@ -1,7 +1,7 @@
 import { AppDataField } from './../core/item';
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { ItemMutator, SNItem } from '@Models/core/item';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { SNComponent, ComponentArea } from '@Models/app/component';
+import { ComponentArea, SNComponent } from '@Models/app/component';
 
 export class SNTheme extends SNComponent {
 
