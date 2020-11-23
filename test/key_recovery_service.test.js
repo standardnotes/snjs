@@ -130,7 +130,7 @@ describe('key recovery service', function () {
     application.deinit();
   });
 
-  it('when changing password on another client, it should prompt us for new account password', async function () {
+  xit('when changing password on another client, it should prompt us for new account password', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
     const passcode = 'mypasscode';
@@ -220,7 +220,7 @@ describe('key recovery service', function () {
     appB.deinit();
   });
 
-  it('when items key associated with item is errored, item should be marked waiting for key', async function () {
+  xit('when items key associated with item is errored, item should be marked waiting for key', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
     const appA = await Factory.createApplication(namespace);
