@@ -1,3 +1,4 @@
+import { SNLog } from './../../../log';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
@@ -60,8 +61,13 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         payload.uuid!,
         PayloadSource.DecryptedTransient
       );
+      if (!decrypted) {
+        SNLog.error(Error('Cannot find decrypted payload in conflict handling'));
+        console.error('Unable to find decrypted counterpart for payload', payload);
+        continue;
+      }
       const alternateResults = await PayloadsByAlternatingUuid(
-        decrypted!,
+        decrypted,
         this.baseCollection
       );
       extendArray(results, alternateResults);

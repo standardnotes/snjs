@@ -9,7 +9,7 @@ export class DeltaRemoteSaved extends PayloadsDelta {
     const processed = [];
     for (const payload of this.applyCollection.all()) {
       const current = this.findBasePayload(payload.uuid!);
-      /** If we save an item, but while in transit it is deleted locally, we want to keep 
+      /** If we save an item, but while in transit it is deleted locally, we want to keep
        * local deletion status, and not old deleted value that was sent to server. */
       const deletedState = current ? current.deleted : payload.deleted;
       const result = CreateSourcedPayloadFromObject(
@@ -17,7 +17,8 @@ export class DeltaRemoteSaved extends PayloadsDelta {
         PayloadSource.RemoteSaved,
         {
           lastSyncEnd: new Date(),
-          deleted: deletedState
+          deleted: deletedState,
+          dirty: deletedState
         }
       );
       processed.push(result);
