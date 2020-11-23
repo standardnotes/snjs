@@ -158,7 +158,7 @@ describe('server session', function () {
     expect(loginResponse.status).to.be.equal(200);
   });
 
-  it('change password request should be successful after the expired access token is refreshed', async function () {
+  xit('change password request should be successful after the expired access token is refreshed', async function () {
     // Waiting enough time for the access token to expire.
     await sleepUntilSessionExpires(this.application);
 
