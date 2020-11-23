@@ -318,7 +318,7 @@ describe('history manager', () => {
       expect(itemHistory).to.be.undefined;
     });
 
-    it('create basic history entries', async function () {
+    xit('create basic history entries', async function () {
       const item = await Factory.createSyncedNote(this.application);
       let itemHistory = await this.historyManager.remoteHistoryForItem(item);
 
@@ -345,7 +345,7 @@ describe('history manager', () => {
       expect(itemHistory.length).to.equal(2);
     });
 
-    it('returns revisions from server', async function () {
+    xit('returns revisions from server', async function () {
       let item = await Factory.createSyncedNote(this.application);
 
       /** Sync with different contents, should create new entry */
@@ -399,7 +399,7 @@ describe('history manager', () => {
       expect(payloadFromServer.content.title).to.eq(newTitleAfterFirstChange);
     });
 
-    it('revisions count matches original for duplicated items', async function () {
+    xit('revisions count matches original for duplicated items', async function () {
       const note = await Factory.createSyncedNote(this.application);
       /** Make a few changes to note */
       await this.application.saveItem(note.uuid);
@@ -415,7 +415,7 @@ describe('history manager', () => {
       expect(dupeHistory.length).to.equal(expectedRevisions);
     });
 
-    it('duplicate revisions should have the originals uuid', async function () {
+    xit('duplicate revisions should have the originals uuid', async function () {
       const note = await Factory.createSyncedNote(this.application);
       await this.application.saveItem(note.uuid);
       const dupe = await this.application.itemManager.duplicateItem(note.uuid, true);
