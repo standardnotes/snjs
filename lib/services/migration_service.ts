@@ -1,6 +1,6 @@
 import { compareSemVersions } from '@Lib/version';
 import { SNLog } from '@Lib/log';
-import { isRightVersionGreaterThanLeft, SnjsVersion } from './../version';
+import { SnjsVersion, isRightVersionGreaterThanLeft } from './../version';
 import { ApplicationEvent } from './../events';
 import { ApplicationStage } from '@Lib/stages';
 import { MigrationServices } from './../migrations/types';
@@ -8,7 +8,7 @@ import { Migration } from '@Lib/migrations/migration';
 import * as migrationImports from '@Lib/migrations';
 import { BaseMigration } from '@Lib/migrations/base';
 import { PureService } from '@Services/pure_service';
-import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
+import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
 import { lastElement } from '@Lib/utils';
 
 /**

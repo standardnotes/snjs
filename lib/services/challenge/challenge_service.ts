@@ -7,11 +7,11 @@ import { StorageKey } from "@Lib/storage_keys";
 import { StorageValueModes } from "@Services/storage_service";
 import {
   Challenge,
+  ChallengeArtifacts,
+  ChallengeReason,
   ChallengeResponse,
   ChallengeValidation,
-  ChallengeReason,
   ChallengeValue,
-  ChallengeArtifacts,
 } from "@Lib/challenges";
 import { ChallengeOperation } from "./challenge_operation";
 import { removeFromArray } from '@Lib/utils';

@@ -1,5 +1,5 @@
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { ItemMutator, SNItem } from '@Models/core/item';
 import { ProtocolVersion } from '@Protocol/versions';
 
 /**

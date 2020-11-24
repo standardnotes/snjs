@@ -1,7 +1,7 @@
 import { ConflictType } from './../api/responses';
 import { RawSyncResponse } from '@Lib/services/api/responses';
 import { PurePayload } from '@Payloads/pure_payload';
-import { isNullOrUndefined, deepFreeze } from '@Lib/utils';
+import { deepFreeze, isNullOrUndefined } from '@Lib/utils';
 import { ApiEndpointParam } from '@Services/api/keys';
 import { PayloadSource } from '@Payloads/sources';
 import { CreateSourcedPayloadFromObject, RawPayload } from '@Payloads/generator';

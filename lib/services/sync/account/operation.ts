@@ -1,7 +1,7 @@
 import { PurePayload } from '@Payloads/pure_payload';
 import { arrayByDifference, subtractFromArray } from '@Lib/utils';
 import { SyncResponse } from '@Services/sync/response';
-import { SyncSignal, ResponseSignalReceiver } from '@Services/sync/signals';
+import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';
 
 const DEFAULT_UP_DOWN_LIMIT = 150;

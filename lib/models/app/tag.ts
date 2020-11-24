@@ -1,4 +1,4 @@
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { ItemMutator, SNItem } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { ContentType } from '@Models/content_types';
 

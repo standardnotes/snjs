@@ -1,19 +1,19 @@
 import {
-  RootKeyEncryptedAuthenticatedData,
   ItemAuthenticatedData,
-  LegacyAttachedData
+  LegacyAttachedData,
+  RootKeyEncryptedAuthenticatedData
 } from './../payloads/generator';
 import { FillItemContent } from '@Models/functions';
 import { Uuid } from './../../uuid';
 import { CreateItemFromPayload } from '@Models/generator';
 import { SNRootKey } from './../root_key';
-import { SNRootKeyParams, KeyParamsOrigination } from './../key_params';
+import { KeyParamsOrigination, SNRootKeyParams } from './../key_params';
 import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PayloadFormat } from '@Payloads/formats';
 import {
-  CreateEncryptionParameters,
   CopyEncryptionParameters,
+  CreateEncryptionParameters,
   CreateMaxPayloadFromAnyObject
 } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';

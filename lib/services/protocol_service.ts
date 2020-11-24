@@ -1,6 +1,6 @@
-import { RootKeyEncryptedAuthenticatedData, LegacyAttachedData } from './../protocol/payloads/generator';
+import { LegacyAttachedData, RootKeyEncryptedAuthenticatedData } from './../protocol/payloads/generator';
 import { ApplicationIdentifier } from './../types';
-import { Uuids, FillItemContent } from '@Models/functions';
+import { FillItemContent, Uuids } from '@Models/functions';
 import { ContentTypeUsesRootKeyEncryption, EncryptionIntent } from './../protocol/intents';
 import { compareVersions, isVersionLessThanOrEqualTo } from '@Protocol/versions';
 import { ProtocolVersion } from './../protocol/versions';
@@ -12,8 +12,8 @@ import { PayloadFormat } from './../protocol/payloads/formats';
 import { PayloadSource } from './../protocol/payloads/sources';
 import {
   CreateIntentPayloadFromObject,
-  CreateSourcedPayloadFromObject,
-  CreateMaxPayloadFromAnyObject
+  CreateMaxPayloadFromAnyObject,
+  CreateSourcedPayloadFromObject
 } from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
@@ -21,9 +21,9 @@ import { SyncEvent } from '@Lib/events';
 import { CreateItemFromPayload } from '@Models/generator';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
-import { SNItemsKey, ItemsKeyMutator } from '@Models/app/items_key';
+import { ItemsKeyMutator, SNItemsKey } from '@Models/app/items_key';
 import {
-  SNRootKeyParams, AnyKeyParamsContent, CreateAnyKeyParams, KeyParamsOrigination
+  AnyKeyParamsContent, CreateAnyKeyParams, KeyParamsOrigination, SNRootKeyParams
 } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
@@ -33,20 +33,20 @@ import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Uuid } from '@Lib/uuid';
 import {
+  extendArray,
+  isFunction,
+  isNullOrUndefined,
   isReactNativeEnvironment,
   isString,
-  isNullOrUndefined,
-  isFunction,
-  removeFromArray,
   isWebCryptoAvailable,
-  extendArray
+  removeFromArray
 } from '@Lib/utils';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '@Models/content_types';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
-import { isDecryptedIntent, intentRequiresEncryption } from '@Lib/protocol';
+import { intentRequiresEncryption, isDecryptedIntent } from '@Lib/protocol';
 
 export type BackupFile = {
   version?: ProtocolVersion

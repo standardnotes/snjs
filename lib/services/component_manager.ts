@@ -3,11 +3,11 @@ import { ComponentMutator } from './../models/app/component';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ContentType, displayStringForContentType } from './../models/content_types';
 import { PayloadSource } from './../protocol/payloads/sources';
-import { RawPayload, CreateSourcedPayloadFromObject, PayloadContent } from '@Payloads/generator';
+import { CreateSourcedPayloadFromObject, PayloadContent, RawPayload } from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
-import { SNItem, MutationType } from '@Models/core/item';
+import { MutationType, SNItem } from '@Models/core/item';
 import { SNAlertService } from './alert_service';
 import { SNSyncService } from './sync/sync_service';
 import find from 'lodash/find';
@@ -15,17 +15,17 @@ import uniq from 'lodash/uniq';
 import remove from 'lodash/remove';
 import { PureService } from '@Lib/services/pure_service';
 import {
-  ComponentArea,
-  SNComponent,
   ComponentAction,
-  ComponentPermission
+  ComponentArea,
+  ComponentPermission,
+  SNComponent
 } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
 import {
-  Copy, isString, extendArray, removeFromArray,
-  searchArray, concatArrays, filterFromArray, sleep
+  Copy, concatArrays, extendArray, filterFromArray,
+  isString, removeFromArray, searchArray, sleep
 } from '@Lib/utils';
-import { Platform, Environment, platformToString, environmentToString } from '@Lib/platforms';
+import { Environment, Platform, environmentToString, platformToString } from '@Lib/platforms';
 import { UuidString } from '../types';
 
 const DESKTOP_URL_PREFIX = 'sn://';

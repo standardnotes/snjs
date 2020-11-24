@@ -1,28 +1,28 @@
 import { StorageReader1_0_0 } from './readers/reader_1_0_0';
 import { MigrationServices } from './types';
 import { PreviousSnjsVersion2_0_0 } from './../version';
-import { NonwrappedStorageKey, LegacyKeys1_0_0 } from './../storage_keys';
+import { LegacyKeys1_0_0, NonwrappedStorageKey } from './../storage_keys';
 import { JwtSession } from './../services/api/session';
 import { ContentType } from './../models/content_types';
 import { SNItemsKey } from './../models/app/items_key';
-import { SNRootKey, RootKeyContent } from './../protocol/root_key';
+import { RootKeyContent, SNRootKey } from './../protocol/root_key';
 import { EncryptionIntent } from './../protocol/intents';
 import { ProtocolVersion } from './../protocol/versions';
 import { ApplicationStage } from '@Lib/stages';
-import { StorageKey, RawStorageKey, namespacedKey } from '@Lib/storage_keys';
+import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
 import { FillItemContent } from '@Models/functions';
 import { PurePayload } from '@Payloads/pure_payload';
-import { StorageValuesObject, SNStorageService } from './../services/storage_service';
+import { SNStorageService, StorageValuesObject } from './../services/storage_service';
 import { Migration } from '@Lib/migrations/migration';
 import { CopyPayload, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
 import {
-  Copy, isNullOrUndefined, objectToValueArray, jsonParseEmbeddedKeys, omitByCopy
+  Copy, isNullOrUndefined, jsonParseEmbeddedKeys, objectToValueArray, omitByCopy
 } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
 import { CreateItemFromPayload } from '../models';
-import { isEnvironmentWebOrDesktop, isEnvironmentMobile } from '@Lib/platforms';
+import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/platforms';
 import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 
 type LegacyMobileKeychainStructure = {
