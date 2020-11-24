@@ -235,6 +235,7 @@ export function createTagParams({ dirty = true } = {}) {
   const params = {
     uuid: generateUuid(),
     content_type: ContentType.Tag,
+    dirty: dirty,
     content: {
       title: 'thoughts',
       references: []

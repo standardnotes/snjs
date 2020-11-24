@@ -124,7 +124,6 @@ export async function PayloadsByAlternatingUuid(
       lastSyncEnd: null,
     }
   );
-
   results.push(copy);
 
   /**
@@ -140,7 +139,6 @@ export async function PayloadsByAlternatingUuid(
     }],
     [payload.uuid!]
   );
-
   extendArray(results, updatedReferencing);
 
   const updatedSelf = CopyPayload(
