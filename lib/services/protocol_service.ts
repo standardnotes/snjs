@@ -681,7 +681,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
           continue;
         }
         try {
-          let itemsKey = await this.keyToUseForDecryptionOfPayload(encryptedPayload);
+          let itemsKey: SNItemsKey | SNRootKey | undefined;
+          if (encryptedPayload.items_key_id) {
+            itemsKey = this.itemsKeyForPayload(encryptedPayload);
+          }
           if (!itemsKey) {
             const candidate = decryptedItemsKeysPayloads.find((itemsKeyPayload) => {
               return encryptedPayload.items_key_id === itemsKeyPayload.uuid;
