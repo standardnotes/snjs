@@ -182,29 +182,22 @@ export class ItemCollection extends MutableCollection<SNItem> {
         if (a.pinned) { return -1; }
         if (b.pinned) { return 1; }
       }
-      let aValue = (a as any)[sortBy.key] || '';
-      let bValue = (b as any)[sortBy.key] || '';
+      const aValue: string = (a as any)[sortBy.key] || '';
+      const bValue: string = (b as any)[sortBy.key] || '';
       let vector = 1;
       if (sortBy.dir === 'asc') {
         vector *= -1;
       }
       if (sortBy.key === CollectionSort.Title) {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-        if (aValue.length === 0 && bValue.length === 0) {
-          return 0;
-        } else if (aValue.length === 0 && bValue.length !== 0) {
-          return 1 * vector;
-        } else if (aValue.length !== 0 && bValue.length === 0) {
-          return -1 * vector;
-        } else {
-          vector *= -1;
-        }
+        return vector * aValue.localeCompare(bValue);
+      } else if (aValue > bValue) {
+        return -1 * vector;
+      } else if (aValue < bValue) {
+        return 1 * vector;
+      } else {
+        return 0;
       }
-      if (aValue > bValue) { return -1 * vector; }
-      else if (aValue < bValue) { return 1 * vector; }
-      return 0;
-    }
+    };
     const resorted = sortedElements.sort((a, b) => {
       return sortFn(a, b);
     });
