@@ -651,7 +651,7 @@ export class SNApplication {
   }
 
   /** Returns items referencing an item */
-  public referencingForItem(item: SNItem, contentType?: ContentType) {
+  public referencingForItem(item: SNItem, contentType?: ContentType): SNItem[] {
     let references = this.itemManager!.itemsReferencingItem(item.uuid);
     if (contentType) {
       references = references.filter((ref) => {
@@ -664,7 +664,7 @@ export class SNApplication {
   public duplicateItem<T extends SNItem>(
     item: T,
     additionalContent?: Partial<PayloadContent>
-  ) {
+  ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(
       item.uuid,
       false,
@@ -674,19 +674,19 @@ export class SNApplication {
     return duplicate;
   }
 
-  public findTagByTitle(title: string) {
+  public findTagByTitle(title: string): SNTag | undefined {
     return this.itemManager!.findTagByTitle(title);
   }
 
-  public async findOrCreateTag(title: string) {
+  public async findOrCreateTag(title: string): Promise<SNTag> {
     return this.itemManager!.findOrCreateTagByTitle(title);
   }
 
-  public getSmartTags() {
+  public getSmartTags(): SNSmartTag[] {
     return this.itemManager!.getSmartTags();
   }
 
-  public getNoteCount() {
+  public getNoteCount(): number {
     return this.itemManager!.noteCount;
   }
 
@@ -699,7 +699,7 @@ export class SNApplication {
   public streamItems(
     contentType: ContentType | ContentType[],
     stream: ItemStream
-  ) {
+  ): () => void {
     const observer = this.itemManager!.addObserver(
       contentType,
       (changed, inserted, discarded, _ignored, source) => {
@@ -731,17 +731,17 @@ export class SNApplication {
   /**
    * Set the server's URL
    */
-  public async setHost(host: string) {
+  public async setHost(host: string): Promise<void> {
     return this.apiService!.setHost(host);
   }
 
-  public async getHost() {
+  public async getHost(): Promise<string | undefined> {
     return this.apiService!.getHost();
   }
 
   public getUser() {
     if (!this.launched) {
-      throw 'Attempting to access user before application unlocked';
+      throw Error('Attempting to access user before application unlocked');
     }
     return this.sessionManager.getUser();
   }
@@ -847,11 +847,11 @@ export class SNApplication {
     return result;
   }
 
-  public noAccount() {
+  public noAccount(): boolean {
     return !this.hasAccount();
   }
 
-  public hasAccount() {
+  public hasAccount(): boolean {
     return this.protocolService!.hasAccount();
   }
 
