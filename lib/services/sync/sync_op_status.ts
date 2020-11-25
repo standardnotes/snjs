@@ -6,7 +6,6 @@ const TIMING_MONITOR_POLL_FREQUENCY_MS = 500;
 export class SyncOpStatus {
 
   error?: any
-  inProgress = false
   private interval: any
   private receiver: SyncEventReceiver
   private completedUpload = 0
@@ -27,10 +26,6 @@ export class SyncOpStatus {
 
   public deinit() {
     this.stopTimingMonitor();
-  }
-
-  setSyncInProgress() {
-    this.inProgress = true;
   }
 
   public setUploadStatus(completed: number, total: number) {
@@ -124,7 +119,6 @@ export class SyncOpStatus {
     this.downloaded = 0;
     this.completedUpload = 0;
     this.totalUpload = 0;
-    this.inProgress = false;
     this.syncing = false;
     this.error = null;
     this.stopTimingMonitor();
