@@ -136,7 +136,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   public async reauthenticateInvalidSession(
     cancelable = true,
     onResponse?: (response: HttpResponse) => void
-  ) {
+  ): Promise<void> {
     if (this.isSessionRenewChallengePresented) {
       return;
     }
@@ -177,7 +177,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
               resolve();
               this.challengeService.completeChallenge(challenge);
               this.notifyEvent(SessionEvent.SessionRestored);
-              this.alertService!.alert(SessionStrings.SessionRestored);
+              this.alertService.alert(SessionStrings.SessionRestored);
             }
           }
         })
@@ -493,7 +493,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     );
     const user = response.user;
     this.user = user;
-    await this.storageService!.setValue(StorageKey.User, user);
+    await this.storageService.setValue(StorageKey.User, user);
     if (response.token) {
       /** Legacy JWT response */
       const session = new JwtSession(response.token);

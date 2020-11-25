@@ -1574,7 +1574,11 @@ export class SNApplication {
     );
     this.serviceObservers.push(this.sessionManager.addEventObserver(async event => {
       if (event === SessionEvent.SessionRestored) {
-        this.sync();
+        this.sync().then(async () => {
+          if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
+            this.protocolService.createNewDefaultItemsKey();
+          }
+        })
       }
     }));
     this.services.push(this.sessionManager);

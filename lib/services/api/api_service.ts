@@ -118,9 +118,13 @@ export class SNApiService extends PureService {
     return joinPaths(host, path);
   }
 
+  private get apiVersion() {
+    return API_VERSION;
+  }
+
   private params(inParams: any) {
     const params = merge(inParams, {
-      [ApiEndpointParam.ApiVersion]: API_VERSION
+      [ApiEndpointParam.ApiVersion]: this.apiVersion
     });
     return params;
   }

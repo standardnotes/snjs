@@ -50,7 +50,7 @@ export async function createAndInitializeApplication(namespace, environment, pla
 
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
-    receiveChallenge: () => {
+    receiveChallenge: (_challenge) => {
       throw Error('Factory application shouldn\'t have challenges');
     }
   });
