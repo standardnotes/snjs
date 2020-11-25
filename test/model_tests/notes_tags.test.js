@@ -145,7 +145,7 @@ describe('notes and tags', () => {
     const tagPayload = pair[1];
 
     await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
+      pair,
       PayloadSource.LocalChanged
     );
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
@@ -159,6 +159,7 @@ describe('notes and tags', () => {
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
       {
+        dirty: false,
         content: {
           ...tagPayload.safeContent,
           references: []

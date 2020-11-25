@@ -4,7 +4,8 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('importing', () => {
+describe('importing', function() {
+  this.timeout(Factory.TestTimeout);
   const BASE_ITEM_COUNT = 1; /** Default items key */
 
   beforeEach(async function () {
@@ -766,5 +767,47 @@ describe('importing', () => {
       true
     );
     expect(result.errorCount).to.equal(0);
+  });
+
+  it('importing another accounts notes/tags should correctly keep relationships', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
+    const pair = Factory.createRelatedNoteTagPairPayload();
+    await this.application.itemManager.emitItemsFromPayloads(
+      pair,
+      PayloadSource.LocalChanged
+    );
+
+    await this.application.sync();
+
+    const rawBackupFile = await this.application.protocolService.createBackupFile();
+    const backupData = JSON.parse(rawBackupFile);
+
+    await this.application.deinit();
+    this.application = await Factory.createInitAppWithRandNamespace();
+
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: `${Math.random()}`,
+      password: this.password,
+    });
+
+    await this.application.importData(
+      backupData,
+      this.password,
+      true,
+    );
+
+    expect(this.application.itemManager.notes.length).to.equal(1);
+    expect(this.application.itemManager.tags.length).to.equal(1);
+
+    const importedNote = this.application.itemManager.notes[0];
+    const importedTag = this.application.itemManager.tags[0];
+    expect(this.application.itemManager.referencesForItem(importedTag.uuid).length).to.equal(1);
+    expect(this.application.itemManager.itemsReferencingItem(importedNote.uuid).length).to.equal(1);
   });
 });
