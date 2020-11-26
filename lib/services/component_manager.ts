@@ -585,7 +585,7 @@ export class SNComponentManager extends PureService {
       origin = window.location.href + origin;
     }
     /* Mobile messaging requires json */
-    componentState.window!.postMessage(
+    componentState.window?.postMessage(
       this.isMobile ? JSON.stringify(message) : message,
       origin!
     );
