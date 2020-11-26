@@ -566,7 +566,7 @@ describe('keys', function () {
     /** origination and created are new properties since 004, but they can be added retroactively
      * to previous versions. They are not essential to <= 003, but are for >= 004 */
 
-     /** Register with 003 version */
+    /** Register with 003 version */
     await Factory.registerOldUser({
       application: this.application,
       email: this.email,
@@ -654,4 +654,117 @@ describe('keys', function () {
     expect(ejected.created).to.be.ok;
     expect(ejected.identifier).to.be.ok;
   });
+
+  describe('changing password on 003 client while signed into 004 client should', function () {
+    /**
+     * When an 004 client signs into 003 account, it creates a root key based items key.
+     * Then, if the 003 client changes its account password, and the 004 client
+     * re-authenticates, incorrect behavior (2.0.13) would be not to create a new root key based
+     * items key based on the new root key. The result would be that when the modified 003
+     * items sync to the 004 client, it can't decrypt them with its existing items key
+     * because its based on the old root key.
+     */
+    it('add new items key', async function () {
+      const oldClient = this.application;
+
+      /** Register an 003 account */
+      await Factory.registerOldUser({
+        application: oldClient,
+        email: this.email,
+        password: this.password,
+        version: ProtocolVersion.V003
+      });
+
+      /** Sign into account from another app */
+      const newClient = await Factory.createAppWithRandNamespace();
+      await newClient.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          /** Reauth session challenge */
+          newClient.submitValuesForChallenge(
+            challenge,
+            [
+              new ChallengeValue(challenge.prompts[0], this.email),
+              new ChallengeValue(challenge.prompts[1], this.password),
+            ]
+          );
+        },
+      });
+      await newClient.launch();
+      await newClient.signIn(this.email, this.password);
+
+      /** Change password through session manager directly instead of application,
+       * as not to create any items key (to simulate 003 client behavior) */
+      const currentRootKey = await oldClient.protocolService.computeRootKey(
+        this.password,
+        (await oldClient.protocolService.getRootKeyParams())
+      )
+      const operator = oldClient.protocolService.operatorForVersion(ProtocolVersion.V003);
+      const newRootKey = await operator.createRootKey(
+        this.email,
+        this.password
+      );
+      Object.defineProperty(oldClient.apiService, "apiVersion", {
+        get: function () { return '20190520' }
+      });
+      await oldClient.sessionManager.changePassword(
+        currentRootKey.serverPassword,
+        newRootKey
+      );
+
+      /** Re-authenticate on other app; allow challenge to complete */
+      await newClient.sync();
+      await Factory.sleep(0.5);
+
+      /** Expect a new items key to be created based on the new root key */
+      expect(newClient.itemManager.itemsKeys().length).to.equal(2);
+
+      newClient.deinit();
+      oldClient.deinit();
+    });
+
+    it('add new items key from migration if pw change already happened', async function () {
+      /** Register an 003 account */
+      await Factory.registerOldUser({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+        version: ProtocolVersion.V003
+      });
+
+      /** Change password through session manager directly instead of application,
+       * as not to create any items key (to simulate 003 client behavior) */
+      const currentRootKey = await this.application.protocolService.computeRootKey(
+        this.password,
+        (await this.application.protocolService.getRootKeyParams())
+      )
+      const operator = this.application.protocolService.operatorForVersion(ProtocolVersion.V003);
+      const newRootKey = await operator.createRootKey(
+        this.email,
+        this.password
+      );
+      Object.defineProperty(this.application.apiService, "apiVersion", {
+        get: function () { return '20190520' }
+      });
+      await this.application.sessionManager.changePassword(
+        currentRootKey.serverPassword,
+        newRootKey
+      );
+      await this.application.protocolService.reencryptItemsKeys();
+      await this.application.sync({ awaitAll: true });
+
+      /** Relaunch application and expect new items key to be created */
+      const identifier = this.application.identifier;
+      /** Set to pre 2.0.15 version so migration runs */
+      await this.application.deviceInterface.setRawStorageValue(`${identifier}-snjs_version`, '2.0.14');
+      this.application.deinit();
+
+      const refreshedApp = await Factory.createApplication(identifier);
+      await Factory.initializeApplication(refreshedApp);
+
+      /** Expect a new items key to be created based on the new root key */
+      expect(refreshedApp.itemManager.itemsKeys().length).to.equal(2);
+    });
+  })
+
+
 });

@@ -100,9 +100,6 @@ const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003;
 */
 export class SNProtocolService extends PureService implements EncryptionDelegate {
 
-  private itemManager?: ItemManager
-  private modelManager?: PayloadManager
-  private storageService?: SNStorageService
   public crypto: SNPureCrypto
   private operators: Record<string, SNProtocolOperator> = {}
   private keyMode = KeyMode.RootKeyNone
@@ -111,10 +108,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   private removeItemsObserver: any
 
   constructor(
-    itemManager: ItemManager,
-    modelManager: PayloadManager,
+    private itemManager: ItemManager,
+    private modelManager: PayloadManager,
     deviceInterface: DeviceInterface,
-    storageService: SNStorageService,
+    private storageService: SNStorageService,
     private identifier: ApplicationIdentifier,
     crypto: SNPureCrypto
   ) {
@@ -153,13 +150,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
   }
 
   /** @override */
-  public deinit() {
-    this.itemManager = undefined;
-    this.modelManager = undefined;
+  public deinit(): void {
+    (this.itemManager as unknown) = undefined;
+    (this.modelManager as unknown) = undefined;
     this.deviceInterface = undefined;
-    this.storageService = undefined;
+    (this.storageService as unknown) = undefined;
     this.crypto.deinit();
-    (this.crypto as any) = undefined;
+    (this.crypto as unknown) = undefined;
     this.operators = {};
     this.keyObservers.length = 0;
     this.removeItemsObserver();
@@ -1205,7 +1202,6 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
          * We could throw an exception here, but will instead fall back to a corrective action:
          * return any items key that corresponds to the user's version
          */
-        console.warn("The user's default items key version is not equal to the account version.");
         const itemsKeys = this.latestItemsKeys();
         return itemsKeys.find((key) => key.keyVersion === userVersion);
       } else {
@@ -1396,10 +1392,43 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns The SNItemsKey object to decrypt items encrypted
    * with previous protocol version.
    */
-  public async defaultItemsKeyForItemVersion(version: ProtocolVersion) {
+  public defaultItemsKeyForItemVersion(version: ProtocolVersion): SNItemsKey | undefined {
+    /** Try to find one marked default first */
+    const priorityKey = this.latestItemsKeys().find((key) => {
+      return key.isDefault && key.keyVersion === version;
+    });
+    if (priorityKey) {
+      return priorityKey;
+    }
     return this.latestItemsKeys().find((key) => {
       return key.keyVersion === version;
     });
+  }
+
+  /**
+   * A new root key based items key is needed if a user changes their account password
+   * on an 003 client and syncs on a signed in 004 client.
+   */
+  public async needsNewRootKeyBasedItemsKey(): Promise<boolean> {
+    if (!this.hasAccount()) {
+      return false;
+    }
+    const rootKey = this.getRootKey();
+    if (!rootKey) {
+      return false;
+    }
+    if (compareVersions(rootKey.keyVersion, LAST_NONROOT_ITEMS_KEY_VERSION) > 0) {
+      /** Is >= 004, not needed */
+      return false;
+    }
+    /** A new root key based items key is needed if our default items key content
+     * isnt equal to our current root key */
+    const defaultItemsKey = this.getDefaultItemsKey();
+    /** Shouldn't be undefined, but if it is, we'll take the corrective action */
+    if (!defaultItemsKey) {
+      return true;
+    }
+    return defaultItemsKey.itemsKey !== rootKey.itemsKey;
   }
 
   /**
@@ -1407,7 +1436,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
-  private async createNewDefaultItemsKey() {
+  public async createNewDefaultItemsKey(): Promise<SNItemsKey> {
     const rootKey = this.getRootKey()!;
     const operatorVersion = rootKey
       ? rootKey.keyVersion
@@ -1431,15 +1460,15 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     }
     const currentDefault = this.getDefaultItemsKey();
     if (currentDefault) {
-      await this.itemManager!.changeItemsKey(
+      await this.itemManager.changeItemsKey(
         currentDefault.uuid,
         (mutator) => {
           mutator.isDefault = false;
         }
       )
     }
-    const itemsKey = await this.itemManager!.insertItem(itemTemplate);
-    await this.itemManager!.changeItemsKey(
+    const itemsKey = await this.itemManager.insertItem(itemTemplate) as SNItemsKey;
+    await this.itemManager.changeItemsKey(
       itemsKey.uuid,
       (mutator) => {
         mutator.isDefault = true;
@@ -1453,8 +1482,8 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     const newDefaultItemsKey = await this.createNewDefaultItemsKey();
     const rollback = async () => {
       await Promise.all([
-        this.itemManager!.setItemToBeDeleted(newDefaultItemsKey.uuid),
-        this.itemManager!.changeItem<ItemsKeyMutator>(
+        this.itemManager.setItemToBeDeleted(newDefaultItemsKey.uuid),
+        this.itemManager.changeItem<ItemsKeyMutator>(
           currentDefaultItemsKey!.uuid,
           (mutator) => {
             mutator.isDefault = true;

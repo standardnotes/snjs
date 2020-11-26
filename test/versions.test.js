@@ -20,6 +20,7 @@ describe('versions', () => {
     expect(compareSemVersions('1.0.0', '1.0.1')).to.equal(-1);
     expect(compareSemVersions('1.0.0', '1.0.0')).to.equal(0);
     expect(compareSemVersions('1.0.1', '1.0.0')).to.equal(1);
+    expect(compareSemVersions('100.0.1', '2.0.15')).to.equal(1);
 
     expect(compareSemVersions('0.1', '0.2')).to.equal(-1);
     expect(compareSemVersions('0.1', '0.0.2')).to.equal(1);

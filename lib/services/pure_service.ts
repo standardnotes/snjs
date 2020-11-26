@@ -36,7 +36,7 @@ export abstract class PureService<E = string> {
    * Called by application before restart.
    * Subclasses should deregister any observers/timers
    */
-  public deinit() {
+  public deinit(): void {
     this.eventObservers.length = 0;
     this.deviceInterface = undefined;
   }

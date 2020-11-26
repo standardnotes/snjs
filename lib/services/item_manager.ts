@@ -77,7 +77,7 @@ export class ItemManager extends PureService {
   private createCollection() {
     this.collection = new ItemCollection();
     this.collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc');
-    this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'asc');
+    this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'dsc');
     this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
     this.collection.setDisplayOptions(ContentType.Theme, CollectionSort.Title, 'asc');

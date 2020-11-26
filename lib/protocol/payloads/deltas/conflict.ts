@@ -29,7 +29,7 @@ export class ConflictDelta {
   }
 
 
-  public async resultingCollection() {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
     const strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem);
@@ -137,6 +137,6 @@ export class ConflictDelta {
       return [payload];
     }
 
-    throw 'Unhandled strategy';
+    throw Error('Unhandled strategy');
   }
 }

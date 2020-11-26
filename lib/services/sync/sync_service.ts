@@ -615,7 +615,7 @@ export class SNSyncService extends PureService<SyncEvent> {
       } else {
         return SyncModes.Default;
       }
-    })(options.mode)!;
+    })(options.mode);
 
     let uploadPayloads: PurePayload[] = []
     if (useMode === SyncModes.Default) {
