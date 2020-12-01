@@ -23,11 +23,16 @@ fi
 
 cleanup
 
+export NGINX_REROUTE_HOST="http://syncing-server-$SYNCING_SERVER_VERSION"
+
 echo "# Pulling latest versions"
 docker-compose pull
 
+echo "# Building Docker images"
+docker-compose build
+
 echo "# Starting all containers for $SYNCING_SERVER_VERSION Test Suite"
-NGINX_REROUTE_HOST="http://syncing-server-$SYNCING_SERVER_VERSION" docker-compose up -d
+docker-compose up -d
 
 attempt=0
 while [ $attempt -le 59 ]; do
