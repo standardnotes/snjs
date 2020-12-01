@@ -13,11 +13,11 @@ jobs:
         with:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run bundle
-      - run: npm run test:ruby
-      - run: npm run test:js
+      - run: yarn install --pure-lockfile
+      - run: yarn lint
+      - run: yarn bundle
+      - run: yarn test:ruby
+      - run: yarn test:js
 
   publish:
     needs: test
@@ -29,8 +29,8 @@ jobs:
         with:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run bundle
+      - run: yarn install --pure-lockfile
+      - run: yarn bundle
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

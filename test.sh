@@ -1,7 +1,7 @@
 # !/bin/bash
 
 echo "# Installing project dependecies (Host Machine)"
-npm ci
+yarn install --pure-lockfile
 
 function cleanup {
   echo "# Killing all containers"
@@ -67,7 +67,7 @@ then
 fi
 
 attempt=0
-while [ $attempt -le 59 ]; do
+while [ $attempt -le 119 ]; do
     attempt=$(( $attempt + 1 ))
     echo "# Waiting for Test Server to be up (attempt: $attempt)..."
     result=$(docker-compose logs snjs)
