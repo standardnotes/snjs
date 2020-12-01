@@ -16,4 +16,5 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run bundle
-      - run: npm test
+      - run: npm run test:ruby
+      - run: npm run test:js
