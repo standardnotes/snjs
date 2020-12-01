@@ -11,7 +11,7 @@
         <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../dist/snjs.js"></script>
         <script>
-          window._default_sync_server = 'http://syncing-server-ruby:3123';
+          window._default_sync_server = 'http://syncing-server-proxy:3123';
           Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
           SNLog.onLog = (message) => {
