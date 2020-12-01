@@ -22,6 +22,7 @@
           };
           mocha.setup('bdd');
           mocha.timeout(5000);
+          mocha.bail(true);
         </script>
         <script type="module" src="memory.test.js"></script>
         <script type="module" src="protocol.test.js"></script>

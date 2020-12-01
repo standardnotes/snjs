@@ -1,5 +1,8 @@
 # !/bin/bash
 
+echo "# Installing project dependecies (Host Machine)"
+npm ci
+
 function cleanup {
   echo "# Killing all containers"
   docker-compose kill
@@ -62,6 +65,18 @@ then
       sleep 2
   done
 fi
+
+attempt=0
+while [ $attempt -le 59 ]; do
+    attempt=$(( $attempt + 1 ))
+    echo "# Waiting for Test Server to be up (attempt: $attempt)..."
+    result=$(docker-compose logs snjs)
+    if grep -q 'Test Server Started' <<< $result ; then
+        echo "# Test Server Started is up!"
+        break
+    fi
+    sleep 2
+done
 
 echo "# Starting $SYNCING_SERVER_VERSION Test Suite"
 npx mocha-headless-chrome -f http://localhost:9001/test/test.html -t 600000

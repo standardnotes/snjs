@@ -2,6 +2,7 @@ version: '3.8'
 services:
   snjs:
     build: .
+    command: start-local
     restart: unless-stopped
     networks:
       snjs: {}
