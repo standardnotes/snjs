@@ -324,7 +324,7 @@ describe('history manager', () => {
 
       /** Server history should save initial revision */
       expect(itemHistory).to.be.ok;
-      expect(itemHistory.entries.length).to.equal(1);
+      expect(itemHistory.length).to.equal(1);
 
       /** Sync within 5 minutes, should not create a new entry */
       await this.application.saveItem(item.uuid);
@@ -336,8 +336,6 @@ describe('history manager', () => {
         item.uuid,
         (mutator) => {
           mutator.title = Math.random();
-          // change updated_at for next request to be treated as sent more than 5 minutes from last one
-          mutator.updated_at = Factory.yesterday();
         },
         undefined,
         undefined,
@@ -345,12 +343,13 @@ describe('history manager', () => {
       );
       itemHistory = await this.historyManager.remoteHistoryForItem(item);
       expect(itemHistory.length).to.equal(1);
-
-      /** Sync after more than 5 minutes, should create a new entry */
-      await this.application.saveItem(item.uuid);
-      itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.length).to.equal(2);
     });
+
+    xit('create consecutive history entries', async function () {
+      // implement remote history fetching more than 1 entry
+      // after 5 minutes delay apart of the updates
+      // setting updated_at is not permitted via the API
+    })
 
     xit('returns revisions from server', async function () {
       let item = await Factory.createSyncedNote(this.application);
