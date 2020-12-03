@@ -121,14 +121,14 @@ app.streamItems(
 
 ## Building
 
-1. `npm install`
-2. `npm run start` to start Webpack in development mode (watches changes), or `npm run bundle` to create dist files.
+1. `yarn install --pure-lockfile`
+2. `yarn start` to start Webpack in development mode (watches changes), or `yarn bundle` to create dist files.
 
 ## Tests
 
 Please make sure you have [Docker](https://www.docker.com) installed before running tests:
 ```
-npm test
+yarn test
 ```
 
 ## Notes

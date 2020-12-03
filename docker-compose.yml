@@ -2,6 +2,7 @@ version: '3.8'
 services:
   snjs:
     build: .
+    command: start-local
     restart: unless-stopped
     networks:
       snjs: {}
@@ -24,8 +25,24 @@ services:
     networks:
       - snjs
 
+  syncing-server-proxy:
+    image: nginx:alpine
+    volumes:
+      - ./test/proxy.conf.template:/etc/nginx/templates/default.conf.template
+    environment:
+      NGINX_REROUTE_HOST: '${NGINX_REROUTE_HOST}'
+    ports:
+      - 3123:3123
+    restart: always
+    networks:
+      - snjs
+
   syncing-server-ruby:
+    depends_on:
+      - syncing-server-proxy
+      - db
     image: standardnotes/syncing-server:stable
+    entrypoint: ["/tools/wait-for.sh", "db", "3306", "./docker/entrypoint.sh", "start-web"]
     environment:
       RAILS_ENV: test
       RAILS_LOG_TO_STDOUT: 1
@@ -34,9 +51,39 @@ services:
       DB_DATABASE: testdb
       DB_USERNAME: testuser
       DB_PASSWORD: testpassword
-    ports:
-      - 3123:3000
+    expose:
+      - 3000
     restart: unless-stopped
+    volumes:
+      - ./wait-for.sh:/tools/wait-for.sh
+    networks:
+      - snjs
+
+  syncing-server-js:
+    depends_on:
+      - syncing-server-proxy
+      - syncing-server-ruby
+    image: standardnotes/syncing-server-js:stable
+    entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
+    environment:
+      LOG_LEVEL: info
+      NODE_ENV: development
+      JWT_SECRET: secret
+      LEGACY_JWT_SECRET: legacy_jwt_secret
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USERNAME: testuser
+      DB_PASSWORD: testpassword
+      DB_DATABASE: testdb
+      DB_DEBUG: 'true'
+      DB_MIGRATIONS_PATH: dist/migrations/*.js
+      DD_TRACE_ENABLED: 'false'
+    expose:
+      - 3000
+    restart: unless-stopped
+    volumes:
+      - ./wait-for.sh:/tools/wait-for.sh
     networks:
       - snjs
 

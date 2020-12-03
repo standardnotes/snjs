@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.0.17",
+  "version": "2.0.18",
   "engines": {
     "node": ">=14.0.0 <15.0.0"
   },
@@ -14,11 +14,13 @@
   },
   "scripts": {
     "start": "webpack -w --config webpack.dev.js",
-    "bundle": "webpack --config webpack.prod.js && npm run tsc",
+    "bundle": "webpack --config webpack.prod.js && yarn tsc",
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
     "start:test-server": "node test-server.js",
-    "test": "bash test.sh",
+    "test:ruby": "bash test.sh ruby",
+    "test:js": "bash test.sh js",
+    "test": "yarn test:ruby && yarn test:js",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {

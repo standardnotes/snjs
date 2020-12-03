@@ -16,18 +16,16 @@ RUN chown -R $UID:$GID .
 
 USER snjs
 
-COPY --chown=$UID:$GID package.json package-lock.json /var/www/
+COPY --chown=$UID:$GID package.json yarn.lock /var/www/
 
-RUN npm ci
-
-USER root
-RUN apk del build-dependencies
-USER snjs
+RUN yarn install --pure-lockfile
 
 COPY --chown=$UID:$GID . /var/www
 
-RUN npm run bundle
+RUN yarn bundle
 
 EXPOSE 9001
 
-CMD [ "npm", "run", "start:test-server" ]
+ENTRYPOINT [ "docker/entrypoint.sh" ]
+
+CMD [ "start-web" ]

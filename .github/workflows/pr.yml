@@ -13,7 +13,8 @@ jobs:
         with:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run bundle
-      - run: npm test
+      - run: yarn install --pure-lockfile
+      - run: yarn lint
+      - run: yarn bundle
+      - run: yarn test:ruby
+      - run: yarn test:js

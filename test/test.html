@@ -11,7 +11,7 @@
         <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../dist/snjs.js"></script>
         <script>
-          window._default_sync_server = 'http://syncing-server-ruby:3123';
+          window._default_sync_server = 'http://syncing-server-proxy:3123';
           Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
           SNLog.onLog = (message) => {
@@ -22,6 +22,7 @@
           };
           mocha.setup('bdd');
           mocha.timeout(5000);
+          mocha.bail(true);
         </script>
         <script type="module" src="memory.test.js"></script>
         <script type="module" src="protocol.test.js"></script>
