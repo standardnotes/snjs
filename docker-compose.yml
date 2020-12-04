@@ -72,11 +72,12 @@ services:
       LEGACY_JWT_SECRET: legacy_jwt_secret
       PORT: 3000
       DB_HOST: db
+      DB_REPLICA_HOST: db
       DB_PORT: 3306
       DB_USERNAME: testuser
       DB_PASSWORD: testpassword
       DB_DATABASE: testdb
-      DB_DEBUG: 'true'
+      DB_DEBUG_LEVEL: all
       DB_MIGRATIONS_PATH: dist/migrations/*.js
       DD_TRACE_ENABLED: 'false'
     expose:
