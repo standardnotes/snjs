@@ -54,13 +54,17 @@ import {
   INVALID_PASSWORD,
   InsufficientPasswordMessage,
   PasswordChangeStrings,
-  ProtocolUpgradeStrings, REMOVING_PASSCODE, SETTING_PASSCODE, SessionStrings, UNSUPPORTED_BACKUP_FILE_VERSION, UPGRADING_ENCRYPTION
+  ProtocolUpgradeStrings,
+  REMOVING_PASSCODE, SETTING_PASSCODE,
+  UNSUPPORTED_BACKUP_FILE_VERSION,
+  UPGRADING_ENCRYPTION
 } from './services/api/messages';
-import { MINIMUM_PASSWORD_LENGTH, MissingAccountParams, SessionEvent } from './services/api/session_manager';
-import { SNComponent, SNNote, SNTag } from './models';
+import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
+import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
+import { SNPreferencesService } from './services/preferences_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -94,7 +98,7 @@ export class SNApplication {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void
 
   private crypto?: SNPureCrypto
-  public deviceInterface?: DeviceInterface
+  public deviceInterface: DeviceInterface
 
   private migrationService!: SNMigrationService
   public alertService!: SNAlertService
@@ -113,6 +117,7 @@ export class SNApplication {
   public historyManager!: SNHistoryManager
   private itemManager!: ItemManager
   private keyRecoveryService!: SNKeyRecoveryService
+  private preferencesService!: SNPreferencesService
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService<any>[] = [];
@@ -305,7 +310,7 @@ export class SNApplication {
 
   private beginAutoSyncTimer() {
     this.autoSyncInterval = this.deviceInterface!.interval(() => {
-      this.syncService!.log('Syncing from autosync');
+      this.syncService.log('Syncing from autosync');
       this.sync();
     }, DEFAULT_AUTO_SYNC_INTERVAL);
   }
@@ -377,7 +382,7 @@ export class SNApplication {
       dirtied,
       PayloadSource.LocalChanged
     );
-    await this.syncService!.sync();
+    await this.syncService.sync();
   }
 
   /**
@@ -952,35 +957,56 @@ export class SNApplication {
     this.syncService!.unlockSyncing();
   }
 
-  public async sync(options?: SyncOptions) {
-    return this.syncService!.sync(options);
+  public sync(options?: SyncOptions): Promise<any> {
+    return this.syncService.sync(options);
   }
 
-  public async isOutOfSync() {
-    return this.syncService!.isOutOfSync();
+  public isOutOfSync(): boolean {
+    return this.syncService.isOutOfSync();
   }
 
-  public async resolveOutOfSync() {
-    return this.syncService!.resolveOutOfSync();
+  public async resolveOutOfSync(): Promise<void> {
+    return this.syncService.resolveOutOfSync();
   }
 
-  public async setValue(key: string, value: any, mode?: StorageValueModes) {
-    return this.storageService!.setValue(key, value, mode);
+  public async setValue(key: string, value: any, mode?: StorageValueModes): Promise<void> {
+    return this.storageService.setValue(key, value, mode);
   }
 
-  public async getValue(key: string, mode?: StorageValueModes) {
-    return this.storageService!.getValue(key, mode);
+  public async getValue(key: string, mode?: StorageValueModes): Promise<any> {
+    return this.storageService.getValue(key, mode);
   }
 
-  public async removeValue(key: string, mode?: StorageValueModes) {
-    return this.storageService!.removeValue(key, mode);
+  public async removeValue(key: string, mode?: StorageValueModes): Promise<void> {
+    return this.storageService.removeValue(key, mode);
+  }
+
+  public getPreference<K extends PrefKey>(
+    key: K,
+  ): PrefValue[K] | undefined;
+  public getPreference<K extends PrefKey>(
+    key: K,
+    defaultValue: PrefValue[K]
+  ): PrefValue[K];
+  public getPreference<K extends PrefKey>(
+    key: K,
+    defaultValue?: PrefValue[K]
+  ): PrefValue[K] | undefined {
+    return this.preferencesService.getValue(key, defaultValue);
+  }
+
+  public async setPreference<K extends PrefKey>(
+    key: K,
+    value: PrefValue[K]
+  ): Promise<void> {
+    return this.preferencesService.setValue(key, value);
   }
 
   /**
    * Deletes all payloads from storage.
    */
-  public async clearDatabase() {
-    return this.storageService!.clearAllPayloads();
+  public async clearDatabase(): Promise<void> {
+    return this.storageService.clearAllPayloads();
   }
 
   /**
@@ -992,10 +1018,10 @@ export class SNApplication {
    * https://github.com/standardnotes/desktop/issues/131
    */
   private async rewriteItemsKeys() {
-    const itemsKeys = this.itemManager!.itemsKeys();
+    const itemsKeys = this.itemManager.itemsKeys();
     const payloads = itemsKeys.map((key) => key.payloadRepresentation());
-    await this.storageService!.deletePayloads(payloads);
-    await this.syncService!.persistPayloads(payloads);
+    await this.storageService.deletePayloads(payloads);
+    await this.syncService.persistPayloads(payloads);
   }
 
   /**
@@ -1003,7 +1029,7 @@ export class SNApplication {
    * @param maxWait The maximum number of milliseconds to wait for services
    * to finish tasks. 0 means no limit.
    */
-  async prepareForDeinit(maxWait = 0) {
+  async prepareForDeinit(maxWait = 0): Promise<void> {
     const promise = Promise.all(this.services.map((service) => service.blockDeinit()));
     if (maxWait === 0) {
       await promise;
@@ -1043,7 +1069,7 @@ export class SNApplication {
   /**
    * Destroys the application instance.
    */
-  public deinit(source: DeinitSource) {
+  public deinit(source: DeinitSource): void {
     clearInterval(this.autoSyncInterval);
     for (const uninstallObserver of this.serviceObservers) {
       uninstallObserver();
@@ -1103,8 +1129,8 @@ export class SNApplication {
         }
         await this.notifyEvent(ApplicationEvent.SignedIn);
         this.unlockSyncing();
-        await this.syncService!.downloadFirstSync(300);
-        this.protocolService!.decryptErroredItems();
+        await this.syncService.downloadFirstSync(300);
+        this.protocolService.decryptErroredItems();
       } else {
         this.unlockSyncing();
       }
@@ -1140,29 +1166,29 @@ export class SNApplication {
         email, password, strict
       );
       if (!result.response.error) {
-        this.syncService!.resetSyncState();
-        await this.storageService!.setPersistencePolicy(
+        this.syncService.resetSyncState();
+        await this.storageService.setPersistencePolicy(
           ephemeral
             ? StoragePersistencePolicies.Ephemeral
             : StoragePersistencePolicies.Default
         );
         if (mergeLocal) {
-          await this.syncService!.markAllItemsAsNeedingSync(true);
+          await this.syncService.markAllItemsAsNeedingSync(true);
         } else {
-          this.itemManager!.removeAllItemsFromMemory();
+          this.itemManager.removeAllItemsFromMemory();
           await this.clearDatabase();
         }
         await this.notifyEvent(ApplicationEvent.SignedIn);
         this.unlockSyncing();
-        const syncPromise = this.syncService!.downloadFirstSync(1_000, {
+        const syncPromise = this.syncService.downloadFirstSync(1_000, {
           checkIntegrity: true,
           awaitAll: awaitSync,
         });
         if (awaitSync) {
           await syncPromise;
-          await this.protocolService!.decryptErroredItems();
+          await this.protocolService.decryptErroredItems();
         } else {
-          this.protocolService!.decryptErroredItems();
+          this.protocolService.decryptErroredItems();
         }
       } else {
         this.unlockSyncing();
@@ -1245,11 +1271,11 @@ export class SNApplication {
     );
     this.unlockSyncing();
     if (!result.response.error) {
-      const rollback = await this.protocolService!.createNewItemsKeyWithRollback();
+      const rollback = await this.protocolService.createNewItemsKeyWithRollback();
       /** Sync the newly created items key. Roll back on failure */
       await this.protocolService.reencryptItemsKeys();
-      await this.syncService!.sync({ awaitAll: true });
-      const itemsKeyWasSynced = this.protocolService!.getDefaultItemsKey()!.updated_at.getTime() > 0;
+      await this.syncService.sync({ awaitAll: true });
+      const itemsKeyWasSynced = this.protocolService.getDefaultItemsKey()!.updated_at.getTime() > 0;
       if (!itemsKeyWasSynced) {
         await this.sessionManager.changePassword(
           newRootKey.serverPassword!,
@@ -1258,59 +1284,59 @@ export class SNApplication {
         );
         await this.protocolService.reencryptItemsKeys();
         await rollback();
-        await this.syncService!.sync({ awaitAll: true });
+        await this.syncService.sync({ awaitAll: true });
         return { error: Error(PasswordChangeStrings.Failed) };
       }
     }
     return result.response;
   }
 
-  public async signOut() {
+  public async signOut(): Promise<void> {
     await this.sessionManager.signOut();
-    await this.protocolService!.clearLocalKeyState();
-    await this.storageService!.clearAllData();
+    await this.protocolService.clearLocalKeyState();
+    await this.storageService.clearAllData();
     await this.notifyEvent(ApplicationEvent.SignedOut);
     await this.prepareForDeinit();
     this.deinit(DeinitSource.SignOut);
   }
 
-  public async validateAccountPassword(password: string) {
-    const { valid } = await this.protocolService!.validateAccountPassword(password);
+  public async validateAccountPassword(password: string): Promise<boolean> {
+    const { valid } = await this.protocolService.validateAccountPassword(password);
     return valid;
   }
 
-  public isStarted() {
+  public isStarted(): boolean {
     return this.started;
   }
 
-  public isLaunched() {
+  public isLaunched(): boolean {
     return this.launched;
   }
 
-  public async hasBiometrics() {
-    return this.challengeService!.hasBiometricsEnabled()
+  public hasBiometrics(): Promise<boolean> {
+    return this.challengeService.hasBiometricsEnabled()
   }
 
-  public async enableBiometrics() {
-    return this.challengeService!.enableBiometrics()
+  public enableBiometrics(): Promise<void> {
+    return this.challengeService.enableBiometrics()
   }
 
-  public async disableBiometrics() {
-    return this.challengeService!.disableBiometrics()
+  public disableBiometrics(): Promise<void> {
+    return this.challengeService.disableBiometrics()
   }
 
-  public hasPasscode() {
-    return this.protocolService!.hasPasscode();
+  public hasPasscode(): boolean {
+    return this.protocolService.hasPasscode();
   }
 
-  async isLocked() {
+  async isLocked(): Promise<boolean> {
     if (!this.started) {
       return true;
     }
-    return this.challengeService!.isPasscodeLocked();
+    return this.challengeService.isPasscodeLocked();
   }
 
-  public async lock() {
+  public async lock(): Promise<void> {
     /** Because locking is a critical operation, we want to try to do it safely,
      * but only up to a certain limit. */
     const MaximumWaitTime = 500;
@@ -1318,8 +1344,8 @@ export class SNApplication {
     return this.deinit(DeinitSource.Lock);
   }
 
-  public async setPasscode(passcode: string) {
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+  public async setPasscode(passcode: string): Promise<void> {
+    const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       SETTING_PASSCODE,
     );
@@ -1330,8 +1356,8 @@ export class SNApplication {
     }
   }
 
-  public async removePasscode() {
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+  public async removePasscode(): Promise<void> {
+    const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       REMOVING_PASSCODE,
     );
@@ -1342,8 +1368,11 @@ export class SNApplication {
     }
   }
 
-  public async changePasscode(passcode: string, origination = KeyParamsOrigination.PasscodeChange) {
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+  public async changePasscode(
+    passcode: string,
+    origination = KeyParamsOrigination.PasscodeChange
+  ): Promise<void> {
+    const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       origination === KeyParamsOrigination.ProtocolUpgrade
         ? ProtocolUpgradeStrings.UpgradingPasscode
@@ -1359,28 +1388,30 @@ export class SNApplication {
 
   private async setPasscodeWithoutWarning(passcode: string, origination: KeyParamsOrigination) {
     const identifier = await this.generateUuid();
-    const key = await this.protocolService!.createRootKey(
+    const key = await this.protocolService.createRootKey(
       identifier,
       passcode,
       origination
     );
-    await this.protocolService!.setNewRootKeyWrapper(key);
+    await this.protocolService.setNewRootKeyWrapper(key);
     await this.rewriteItemsKeys();
-    await this.syncService!.sync();
+    await this.syncService.sync();
   }
 
   private async removePasscodeWithoutWarning() {
-    await this.protocolService!.removeRootKeyWrapper();
+    await this.protocolService.removeRootKeyWrapper();
     await this.rewriteItemsKeys();
   }
 
-  public getStorageEncryptionPolicy() {
-    return this.storageService!.getStorageEncryptionPolicy();
+  public getStorageEncryptionPolicy(): StorageEncryptionPolicies {
+    return this.storageService.getStorageEncryptionPolicy();
   }
 
-  public async setStorageEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies) {
-    await this.storageService!.setEncryptionPolicy(encryptionPolicy);
-    return this.protocolService!.repersistAllItems();
+  public async setStorageEncryptionPolicy(
+    encryptionPolicy: StorageEncryptionPolicies
+  ): Promise<void> {
+    await this.storageService.setEncryptionPolicy(encryptionPolicy);
+    return this.protocolService.repersistAllItems();
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
@@ -1389,23 +1420,23 @@ export class SNApplication {
     );
   }
 
-  public hasPendingMigrations() {
+  public hasPendingMigrations(): Promise<boolean> {
     return this.migrationService.hasPendingMigrations();
   }
 
-  public generateUuid() {
+  public generateUuid(): Promise<string> {
     return Uuid.GenerateUuid();
   }
 
   public presentKeyRecoveryWizard(): Promise<void> {
-    return this.keyRecoveryService!.processPersistedUndecryptables();
+    return this.keyRecoveryService.processPersistedUndecryptables();
   }
 
   /**
    * Dynamically change the device interface, i.e when Desktop wants to override
    * default web interface.
    */
-  public async changeDeviceInterface(deviceInterface: DeviceInterface) {
+  public changeDeviceInterface(deviceInterface: DeviceInterface): void {
     this.deviceInterface = deviceInterface;
     for (const service of this.services) {
       if (service.deviceInterface) {
@@ -1420,10 +1451,10 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload: this.protocolService!.payloadByEncryptingPayload.bind(this.protocolService),
-      payloadByDecryptingPayload: this.protocolService!.payloadByDecryptingPayload.bind(this.protocolService)
+      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(this.protocolService),
+      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(this.protocolService)
     };
-    this.storageService!.encryptionDelegate = encryptionDelegate;
+    this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
     this.createHttpManager();
     this.createApiService();
@@ -1436,26 +1467,28 @@ export class SNApplication {
     this.createPrivilegesService();
     this.createHistoryManager();
     this.createActionsManager();
+    this.createPreferencesService();
   }
 
   private clearServices() {
-    (this.migrationService as any) = undefined;
-    (this.alertService as any) = undefined;
-    (this.httpService as any) = undefined;
-    (this.modelManager as any) = undefined;
-    (this.protocolService as any) = undefined;
-    (this.storageService as any) = undefined;
-    (this.apiService as any) = undefined;
-    (this.sessionManager as any) = undefined;
-    (this.syncService as any) = undefined;
-    (this.challengeService as any) = undefined;
-    (this.singletonManager as any) = undefined;
-    (this.componentManager as any) = undefined;
-    (this.privilegesService as any) = undefined;
-    (this.actionsManager as any) = undefined;
-    (this.historyManager as any) = undefined;
-    (this.itemManager as any) = undefined;
-    (this.keyRecoveryService as any) = undefined;
+    (this.migrationService as unknown) = undefined;
+    (this.alertService as unknown) = undefined;
+    (this.httpService as unknown) = undefined;
+    (this.modelManager as unknown) = undefined;
+    (this.protocolService as unknown) = undefined;
+    (this.storageService as unknown) = undefined;
+    (this.apiService as unknown) = undefined;
+    (this.sessionManager as unknown) = undefined;
+    (this.syncService as unknown) = undefined;
+    (this.challengeService as unknown) = undefined;
+    (this.singletonManager as unknown) = undefined;
+    (this.componentManager as unknown) = undefined;
+    (this.privilegesService as unknown) = undefined;
+    (this.actionsManager as unknown) = undefined;
+    (this.historyManager as unknown) = undefined;
+    (this.itemManager as unknown) = undefined;
+    (this.keyRecoveryService as unknown) = undefined;
+    (this.preferencesService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1463,31 +1496,31 @@ export class SNApplication {
   private createMigrationService() {
     this.migrationService = new SNMigrationService(
       {
-        protocolService: this.protocolService!,
-        deviceInterface: this.deviceInterface!,
-        storageService: this.storageService!,
+        protocolService: this.protocolService,
+        deviceInterface: this.deviceInterface,
+        storageService: this.storageService,
         sessionManager: this.sessionManager,
-        challengeService: this.challengeService!,
-        itemManager: this.itemManager!,
-        environment: this.environment!,
+        challengeService: this.challengeService,
+        itemManager: this.itemManager,
+        environment: this.environment,
         identifier: this.identifier
       }
     );
-    this.services.push(this.migrationService!);
+    this.services.push(this.migrationService);
   }
 
   private createApiService() {
     this.apiService = new SNApiService(
-      this.httpService!,
-      this.storageService!,
+      this.httpService,
+      this.storageService,
       this.defaultHost
     );
-    this.services.push(this.apiService!);
+    this.services.push(this.apiService);
   }
 
   private createItemManager() {
-    this.itemManager = new ItemManager(this.modelManager!);
-    this.services.push(this.itemManager!);
+    this.itemManager = new ItemManager(this.modelManager);
+    this.services.push(this.itemManager);
   }
 
   private createComponentManager() {
@@ -1496,57 +1529,57 @@ export class SNApplication {
     }
     const MaybeSwappedComponentManager = this.getClass<typeof SNComponentManager>(SNComponentManager)
     this.componentManager = new MaybeSwappedComponentManager(
-      this.itemManager!,
-      this.syncService!,
-      this.alertService!,
-      this.environment!,
-      this.platform!,
-      this.deviceInterface!.timeout,
+      this.itemManager,
+      this.syncService,
+      this.alertService,
+      this.environment,
+      this.platform,
+      this.deviceInterface.timeout,
     );
-    this.services.push(this.componentManager!);
+    this.services.push(this.componentManager);
   }
 
   private createHttpManager() {
     this.httpService = new SNHttpService();
-    this.services.push(this.httpService!);
+    this.services.push(this.httpService);
   }
 
   private createModelManager() {
     this.modelManager = new PayloadManager();
-    this.services.push(this.modelManager!);
+    this.services.push(this.modelManager);
   }
 
   private createSingletonManager() {
     this.singletonManager = new SNSingletonManager(
-      this.itemManager!,
-      this.syncService!
+      this.itemManager,
+      this.syncService
     );
-    this.services.push(this.singletonManager!);
+    this.services.push(this.singletonManager);
   }
 
   private createStorageManager() {
     this.storageService = new SNStorageService(
-      this.deviceInterface!,
+      this.deviceInterface,
       this.alertService,
       this.identifier,
       this.environment
     );
-    this.services.push(this.storageService!);
+    this.services.push(this.storageService);
   }
 
   private createProtocolService() {
     this.protocolService = new SNProtocolService(
-      this.itemManager!,
-      this.modelManager!,
-      this.deviceInterface!,
-      this.storageService!,
+      this.itemManager,
+      this.modelManager,
+      this.deviceInterface,
+      this.storageService,
       this.identifier,
       this.crypto!
     );
-    this.protocolService!.onKeyStatusChange(async () => {
+    this.protocolService.onKeyStatusChange(async () => {
       await this.notifyEvent(ApplicationEvent.KeyStatusChanged);
     });
-    this.services.push(this.protocolService!);
+    this.services.push(this.protocolService);
   }
 
   private createKeyRecoveryService() {
@@ -1561,7 +1594,7 @@ export class SNApplication {
       this.storageService,
       this.syncService
     );
-    this.services.push(this.keyRecoveryService!);
+    this.services.push(this.keyRecoveryService);
   }
 
   private createSessionManager() {
@@ -1586,69 +1619,81 @@ export class SNApplication {
 
   private createSyncManager() {
     this.syncService = new SNSyncService(
-      this.itemManager!,
+      this.itemManager,
       this.sessionManager,
-      this.protocolService!,
-      this.storageService!,
-      this.modelManager!,
-      this.apiService!,
-      this.deviceInterface!.interval
+      this.protocolService,
+      this.storageService,
+      this.modelManager,
+      this.apiService,
+      this.deviceInterface.interval
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName);
       if (appEvent) {
         await this.notifyEvent(appEvent);
       }
-      await this.protocolService!.onSyncEvent(eventName);
+      await this.protocolService.onSyncEvent(eventName);
     };
-    const uninstall = this.syncService!.addEventObserver(syncEventCallback);
+    const uninstall = this.syncService.addEventObserver(syncEventCallback);
     this.serviceObservers.push(uninstall);
-    this.services.push(this.syncService!);
+    this.services.push(this.syncService);
   }
 
   private createChallengeService() {
     this.challengeService = new ChallengeService(
-      this.storageService!,
-      this.protocolService!
+      this.storageService,
+      this.protocolService
     );
-    this.services.push(this.challengeService!);
+    this.services.push(this.challengeService);
   }
 
   private createPrivilegesService() {
     this.privilegesService = new SNPrivilegesService(
-      this.itemManager!,
-      this.syncService!,
-      this.singletonManager!,
-      this.protocolService!,
-      this.storageService!,
+      this.itemManager,
+      this.syncService,
+      this.singletonManager,
+      this.protocolService,
+      this.storageService,
       this.sessionManager,
     );
-    this.services.push(this.privilegesService!);
+    this.services.push(this.privilegesService);
   }
 
   private createHistoryManager() {
     this.historyManager = new SNHistoryManager(
-      this.itemManager!,
-      this.storageService!,
-      this.apiService!,
-      this.protocolService!,
+      this.itemManager,
+      this.storageService,
+      this.apiService,
+      this.protocolService,
       [ContentType.Note],
-      this.deviceInterface!.timeout
+      this.deviceInterface.timeout
     );
-    this.services.push(this.historyManager!);
+    this.services.push(this.historyManager);
   }
 
   private createActionsManager() {
     this.actionsManager = new SNActionsService(
-      this.itemManager!,
-      this.alertService!,
-      this.deviceInterface!,
-      this.httpService!,
-      this.modelManager!,
-      this.protocolService!,
-      this.syncService!,
+      this.itemManager,
+      this.alertService,
+      this.deviceInterface,
+      this.httpService,
+      this.modelManager,
+      this.protocolService,
+      this.syncService,
     );
-    this.services.push(this.actionsManager!);
+    this.services.push(this.actionsManager);
+  }
+
+  private createPreferencesService() {
+    this.preferencesService = new SNPreferencesService(
+      this.singletonManager,
+      this.itemManager,
+      this.syncService,
+    );
+    this.serviceObservers.push(this.preferencesService.addEventObserver(async () => {
+      this.notifyEvent(ApplicationEvent.PreferencesChanged);
+    }));
+    this.services.push(this.preferencesService);
   }
 
   private shouldSkipClass(classCandidate: any) {
