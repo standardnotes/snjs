@@ -653,13 +653,8 @@ export class ItemManager extends PureService {
   /**
    * Like `setItemToBeDeleted`, but acts on an array of items.
    */
-  public async setItemsToBeDeleted(uuids: UuidString[]) {
-    const changedItems = [];
-    for (const uuid of uuids) {
-      const changedItem = await this.setItemToBeDeleted(uuid);
-      changedItems.push(changedItem);
-    }
-    return changedItems;
+  public async setItemsToBeDeleted(uuids: UuidString[]): Promise<(SNItem | undefined)[]> {
+    return Promise.all(uuids.map((uuid) => this.setItemToBeDeleted(uuid)));
   }
 
   /**
