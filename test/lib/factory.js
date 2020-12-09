@@ -99,13 +99,17 @@ export async function registerOldUser({ application, email, password, version })
     accountKey.serverPassword,
     accountKey.keyParams
   );
+  /** Mark all existing items as dirty. */
+  await application.itemManager.changeItems(Uuids(application.itemManager.items), (m) => {
+    m.dirty = true;
+  })
   await application.sessionManager.handleSuccessAuthResponse(response, accountKey);
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
     mode: SyncModes.DownloadFirst,
     ...syncOptions
   });
-  application.protocolService.decryptErroredItems();
+  await application.protocolService.decryptErroredItems();
 }
 
 export function createStorageItemPayload(contentType) {
