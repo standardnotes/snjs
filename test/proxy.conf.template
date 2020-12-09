@@ -19,7 +19,7 @@ server {
         proxy_pass         ${NGINX_REROUTE_HOST};
     }
 
-    location ~ ^/session/all {
+    location ~ ^/session.* {
         proxy_pass         ${NGINX_REROUTE_HOST};
     }
 
