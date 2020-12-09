@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('preferences', () => {
+describe('preferences', function () {
 
   before(async function () {
     localStorage.clear();
@@ -68,4 +68,4 @@ describe.only('preferences', () => {
     const editorLeft = this.application.getPreference('editorLeft');
     expect(editorLeft).to.equal(undefined);
   });
-})
+});
