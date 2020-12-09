@@ -88,6 +88,7 @@ describe('application group', () => {
     const identifier = application.identifier;
     await application.deinit(DeinitSource.SignOut);
 
+    await Factory.sleep(0.0001);
     expect(group.applications.length).to.equal(1);
 
     /** Expect a new application to have been created */
