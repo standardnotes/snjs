@@ -25,24 +25,25 @@ import { Uuids } from '@Models/functions';
  */
 export class SNSingletonManager extends PureService {
 
-  private itemManager?: ItemManager
-  private syncService?: SNSyncService
   private resolveQueue: SNItem[] = []
   private registeredPredicates: SNPredicate[] = []
 
   private removeItemObserver: any
   private removeSyncObserver: any
 
-  constructor(itemManager: ItemManager, syncService: SNSyncService) {
+  constructor(
+    private itemManager: ItemManager,
+    private syncService: SNSyncService
+  ) {
     super();
     this.itemManager = itemManager;
     this.syncService = syncService;
     this.addObservers();
   }
 
-  public deinit() {
-    this.syncService = undefined;
-    this.itemManager = undefined;
+  public deinit(): void {
+    (this.syncService as unknown) = undefined;
+    (this.itemManager as unknown) = undefined;
     this.resolveQueue.length = 0;
     this.registeredPredicates.length = 0;
     this.removeItemObserver();
@@ -68,7 +69,7 @@ export class SNSingletonManager extends PureService {
    * all items keys have been downloaded.
    */
   private addObservers() {
-    this.removeItemObserver = this.itemManager!.addObserver(
+    this.removeItemObserver = this.itemManager.addObserver(
       ContentType.Any,
       (changed, inserted) => {
         if(changed.length > 0) {
@@ -89,7 +90,7 @@ export class SNSingletonManager extends PureService {
         }
       }
     );
-    this.removeSyncObserver = this.syncService!.addEventObserver(async (eventName) => {
+    this.removeSyncObserver = this.syncService.addEventObserver(async (eventName) => {
       if (
         eventName === SyncEvent.DownloadFirstSyncCompleted ||
         eventName === SyncEvent.FullSyncCompleted
@@ -107,12 +108,12 @@ export class SNSingletonManager extends PureService {
    * such that the item(s) match the predicate, procedures will be followed such that
    * the end result is that only 1 item remains, and the others are deleted.
    */
-  public registerPredicate(predicate: SNPredicate) {
+  public registerPredicate(predicate: SNPredicate): void {
     this.registeredPredicates.push(predicate);
   }
 
   private validItemsMatchingPredicate(predicate: SNPredicate) {
-    return this.itemManager!.itemsMatchingPredicate(predicate)
+    return this.itemManager.itemsMatchingPredicate(predicate)
       .filter((item) => {
         return !item.errorDecrypting;
       });
@@ -168,7 +169,7 @@ export class SNSingletonManager extends PureService {
        * Do not await. We want any local-side changes to
        * be awaited but the actual sync shouldn't be since it's non-essential
        */
-      this.syncService!.sync();
+      this.syncService.sync();
     }
   }
 
@@ -183,73 +184,68 @@ export class SNSingletonManager extends PureService {
       return a.created_at < b.created_at ? -1 : 1;
     });
     const deleteItems = arrayByRemovingFromIndex(earliestFirst, 0);
-    await this.itemManager!.setItemsToBeDeleted(Uuids(deleteItems));
+    await this.itemManager.setItemsToBeDeleted(Uuids(deleteItems));
   }
 
-  public async findOrCreateSingleton(
+  public async findOrCreateSingleton<T extends SNItem = SNItem>(
     predicate: SNPredicate,
     createContentType: ContentType,
     createContent: PayloadContent
-  ) {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
-      const matchingItems = this.validItemsMatchingPredicate(predicate);
-      if (matchingItems.length > 0) {
-        return resolve(matchingItems[0]);
-      }
-      /** Item not found, safe to create after full sync has completed */
-      if (!this.syncService!.getLastSyncDate()) {
-        /** Add a temporary observer in case of long-running sync request, where
-         * the item we're looking for ends up resolving early or in the middle. */
-        let didResolve = false;
-        const removeObserver = this.itemManager!.addObserver(
-          createContentType,
-          (_, inserted) => {
-            if (inserted.length > 0) {
-              const matchingItems = this.itemManager!.subItemsMatchingPredicates(
-                inserted,
-                [predicate]
-              );
-              if (matchingItems.length > 0) {
-                didResolve = true;
-                resolve(matchingItems[0]);
-              }
+  ): Promise<T> {
+    const matchingItems = this.validItemsMatchingPredicate(predicate);
+    if (matchingItems.length > 0) {
+      return matchingItems[0] as T;
+    }
+    if (!this.syncService.getLastSyncDate()) {
+      /** Add a temporary observer in case of long-running sync request, where
+       * the item we're looking for ends up resolving early or in the middle. */
+      let matchingItem: SNItem | undefined;
+      const removeObserver = this.itemManager.addObserver(
+        createContentType,
+        (_, inserted) => {
+          if (inserted.length > 0) {
+            const matchingItems = this.itemManager.subItemsMatchingPredicates(
+              inserted,
+              [predicate]
+            );
+            if (matchingItems.length > 0) {
+              matchingItem = matchingItems[0];
             }
           }
-        );
-        await this.syncService!.sync();
-        removeObserver!();
-        if (didResolve) {
-          return;
-        }
-        /** Check again */
-        const refreshedItems = this.validItemsMatchingPredicate(predicate);
-        if (refreshedItems.length > 0) {
-          return resolve(refreshedItems[0]);
-        }
-      }
-      /** Delete any items that are errored */
-      const errorDecrypting = this.itemManager!
-        .itemsMatchingPredicate(predicate).filter((item) => {
-          return item.errorDecrypting;
-        });
-      await this.itemManager!.setItemsToBeDeleted(Uuids(errorDecrypting));
-      /** Safe to create */
-      const dirtyPayload = CreateMaxPayloadFromAnyObject(
-        {
-          uuid: await Uuid.GenerateUuid(),
-          content_type: createContentType,
-          content: createContent,
-          dirty: true,
-          dirtiedDate: new Date()
         }
       );
-      const item = await this.itemManager!.emitItemFromPayload(dirtyPayload);
-      if (!item) {
-        throw Error(`Created singleton item should not be null ${createContentType}`);
+      await this.syncService.sync();
+      removeObserver();
+      if (matchingItem) {
+        return matchingItem as T;
       }
-      await this.syncService!.sync();
-      return resolve(item);
-    })
+      /** Check again */
+      const refreshedItems = this.validItemsMatchingPredicate(predicate);
+      if (refreshedItems.length > 0) {
+        return refreshedItems[0] as T;
+      }
+    }
+    /** Delete any items that are errored */
+    const errorDecrypting = this.itemManager
+      .itemsMatchingPredicate(predicate).filter((item) => {
+        return item.errorDecrypting;
+      });
+    if (errorDecrypting.length) {
+      await this.itemManager.setItemsToBeDeleted(Uuids(errorDecrypting));
+    }
+
+    /** Safe to create */
+    const dirtyPayload = CreateMaxPayloadFromAnyObject(
+      {
+        uuid: await Uuid.GenerateUuid(),
+        content_type: createContentType,
+        content: createContent,
+        dirty: true,
+        dirtiedDate: new Date()
+      }
+    );
+    const item = await this.itemManager.emitItemFromPayload(dirtyPayload);
+    this.syncService.sync();
+    return item as T;
   }
 }

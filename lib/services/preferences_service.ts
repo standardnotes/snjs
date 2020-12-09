@@ -50,10 +50,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
     key: K,
     defaultValue: PrefValue[K] | undefined
   ): PrefValue[K] | undefined;
-  getValue<K extends PrefKey>(
-    key: K,
-    defaultValue: PrefValue[K]
-  ): PrefValue[K];
+  getValue<K extends PrefKey>(key: K, defaultValue: PrefValue[K]): PrefValue[K];
   getValue<K extends PrefKey>(
     key: K,
     defaultValue?: PrefValue[K]
@@ -83,11 +80,11 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
       const contentType = ContentType.UserPrefs;
       const predicate = new SNPredicate('content_type', '=', contentType);
       const previousRef = this.preferences;
-      this.preferences = (await this.singletonManager.findOrCreateSingleton(
+      this.preferences = await this.singletonManager.findOrCreateSingleton<SNUserPrefs>(
         predicate,
         contentType,
         FillItemContent({})
-      )) as SNUserPrefs;
+      );
       if (
         previousRef?.uuid !== this.preferences.uuid ||
         this.preferences.lastSyncBegan?.getTime() !==
