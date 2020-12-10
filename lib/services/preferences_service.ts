@@ -88,8 +88,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
       );
       if (
         previousRef?.uuid !== this.preferences.uuid ||
-        this.preferences.lastSyncBegan?.getTime() !==
-          previousRef?.lastSyncBegan?.getTime()
+        this.preferences.userModifiedDate > previousRef.userModifiedDate
       ) {
         this.notifyEvent('preferencesChanged');
       }
