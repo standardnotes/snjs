@@ -5,7 +5,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('preferences', function () {
-
   before(async function () {
     localStorage.clear();
   });
@@ -14,7 +13,7 @@ describe('preferences', function () {
     localStorage.clear();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
@@ -45,17 +44,27 @@ describe('preferences', function () {
     expect(editorLeft).to.equal(300);
   });
 
+  it('clears preferences on signout', async function () {
+    await register.call(this);
+    await this.application.setPreference('editorLeft', 300);
+    await this.application.sync();
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    expect(this.application.getPreference('editorLeft')).to.equal(undefined);
+  });
+
   it('returns default value for non-existent preference', async function () {
     await register.call(this);
     const editorLeft = this.application.getPreference('editorLeft', 100);
     expect(editorLeft).to.equal(100);
   });
 
-  it('emits an event when preferences change', async function() {
+  it('emits an event when preferences change', async function () {
     let callTimes = 0;
     this.application.addEventObserver(() => {
       callTimes++;
-    }, ApplicationEvent.PreferencesChanged)
+    }, ApplicationEvent.PreferencesChanged);
     callTimes += 1;
     await Factory.sleep(0); /** Await next tick */
     expect(callTimes).to.equal(1); /** App start */
@@ -63,9 +72,21 @@ describe('preferences', function () {
     expect(callTimes).to.equal(2);
   });
 
-  it('merges local preferences when logging in', async function() {
-    await this.application.setPreference('editorLeft', 300);
+  it('discards existing preferences when logging in', async function () {
     await register.call(this);
+    await this.application.setPreference('editorLeft', 300);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    await this.application.setPreference('editorLeft', 200);
+    await this.application.signIn(
+      this.email,
+      this.password,
+      undefined,
+      undefined,
+      undefined,
+      true
+    );
     const editorLeft = this.application.getPreference('editorLeft');
     expect(editorLeft).to.equal(300);
   });
