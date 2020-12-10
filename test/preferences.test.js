@@ -56,16 +56,17 @@ describe('preferences', function () {
     this.application.addEventObserver(() => {
       callTimes++;
     }, ApplicationEvent.PreferencesChanged)
-    await Factory.sleep(0.1);
-    expect(callTimes).to.equal(1);
+    callTimes += 1;
+    await Factory.sleep(0); /** Await next tick */
+    expect(callTimes).to.equal(1); /** App start */
     await register.call(this);
     expect(callTimes).to.equal(2);
   });
 
-  it('discards local preferences when logging in', async function() {
+  it('merges local preferences when logging in', async function() {
     await this.application.setPreference('editorLeft', 300);
     await register.call(this);
     const editorLeft = this.application.getPreference('editorLeft');
-    expect(editorLeft).to.equal(undefined);
+    expect(editorLeft).to.equal(300);
   });
 });

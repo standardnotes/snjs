@@ -10,7 +10,7 @@ describe('singletons', function() {
   const syncOptions = {
     checkIntegrity: true
   };
-  const BASE_ITEM_COUNT = 1; /** Default items key */
+  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   function createPrivsPayload() {
     const params = {
@@ -81,7 +81,7 @@ describe('singletons', function() {
     await this.application.deinit();
   });
 
-  it('only resolves to 1 item', async function () {
+  it(`only resolves to ${BASE_ITEM_COUNT} items`, async function () {
     /** Privileges are an item we know to always return true for isSingleton */
     const privs1 = createPrivsPayload();
     const privs2 = createPrivsPayload();
@@ -121,7 +121,7 @@ describe('singletons', function() {
     const contentType = ContentType.UserPrefs;
     const predicate = new SNPredicate('content_type', '=', contentType);
     /* Start a sync right after we await singleton resolve below */
-    setImmediate(() => {
+    setTimeout(() => {
       this.application.syncService.ut_setDatabaseLoaded(true);
       this.application.sync({
         /* Simulate the first sync occuring as that is handled specially by sync service */
@@ -133,7 +133,6 @@ describe('singletons', function() {
       contentType,
       {}
     );
-    this.expectedItemCount += 1;
 
     expect(userPreferences).to.be.ok;
     const refreshedUserPrefs = this.application.findItem(userPreferences.uuid);
@@ -255,6 +254,7 @@ describe('singletons', function() {
       payload.content_type,
       payload.content
     );
+    await this.application.sync();
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
@@ -309,6 +309,7 @@ describe('singletons', function() {
       }
     );
     await this.application.modelManager.emitPayload(notErrored);
+    await Factory.sleep(0);
     await this.application.syncService.sync(syncOptions);
 
     expect(this.application.itemManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);

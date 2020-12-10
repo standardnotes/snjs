@@ -168,8 +168,11 @@ export class SNSingletonManager extends PureService {
       /**
        * Do not await. We want any local-side changes to
        * be awaited but the actual sync shouldn't be since it's non-essential
+       * Perform after timeout so that we can yield to event notifier that triggered us
        */
-      this.syncService.sync();
+      setTimeout(() => {
+        this.syncService?.sync();
+      });
     }
   }
 

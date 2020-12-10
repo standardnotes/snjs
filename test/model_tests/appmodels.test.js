@@ -6,7 +6,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('app models', () => {
-  const BASE_ITEM_COUNT = 1; /** Default items key */
+  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
   const sharedApplication = Factory.createApplication();
 
   before(async function () {

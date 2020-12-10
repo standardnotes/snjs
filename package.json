@@ -21,6 +21,7 @@
     "test:ruby": "bash test.sh ruby",
     "test:js": "bash test.sh js",
     "test": "yarn test:ruby && yarn test:js",
+    "test:dev": "mocha-headless-chrome -f http://localhost:9001/test/test.html -t 600000",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
