@@ -31,6 +31,11 @@ describe('preferences', function () {
     });
   }
 
+  it('sets preference', async function () {
+    await this.application.setPreference('editorLeft', 300);
+    expect(this.application.getPreference('editorLeft')).to.equal(300);
+  });
+
   it('saves preference', async function () {
     await register.call(this);
     await this.application.setPreference('editorLeft', 300);
@@ -70,23 +75,20 @@ describe('preferences', function () {
     expect(callTimes).to.equal(1); /** App start */
     await register.call(this);
     expect(callTimes).to.equal(2);
+    await this.application.setPreference('editorLeft', 300);
+    expect(callTimes).to.equal(3);
   });
 
   it('discards existing preferences when logging in', async function () {
     await register.call(this);
     await this.application.setPreference('editorLeft', 300);
+    await this.application.sync();
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
     await this.application.setPreference('editorLeft', 200);
-    await this.application.signIn(
-      this.email,
-      this.password,
-      undefined,
-      undefined,
-      undefined,
-      true
-    );
+    await this.application.signIn(this.email, this.password);
+    await this.application.sync({ awaitAll: true });
     const editorLeft = this.application.getPreference('editorLeft');
     expect(editorLeft).to.equal(300);
   });
