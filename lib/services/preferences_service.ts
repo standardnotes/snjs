@@ -63,12 +63,13 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
     value: PrefValue[K]
   ): Promise<void> {
     if (!this.preferences) return;
-    await this.itemManager.changeItem<UserPrefsMutator>(
+    this.preferences = (await this.itemManager.changeItem<UserPrefsMutator>(
       this.preferences.uuid,
       (m) => {
         m.setPref(key, value);
       }
-    );
+    )) as SNUserPrefs;
+    this.notifyEvent('preferencesChanged');
   }
 
   private async reload() {
