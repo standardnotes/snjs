@@ -925,19 +925,26 @@ export class SNApplication {
   }
 
   /**
-   * Creates a JSON string representing the backup format of all items, or just subItems
-   * if supplied.
+   * Creates a JSON-stringifiable backup object of all items.
    */
   public async createBackupFile(
-    subItems?: SNItem[],
-    intent?: EncryptionIntent,
-    returnIfEmpty = false
-  ) {
-    return this.protocolService!.createBackupFile(
-      subItems,
-      intent,
-      returnIfEmpty
-    );
+    intent: EncryptionIntent
+  ): Promise<BackupFile | undefined> {
+    let items = this.itemManager.items;
+
+    if (intent === EncryptionIntent.FileDecrypted) {
+      if (items.some(item => item.protected) && this.hasPasscode()) {
+        const passcode = this.challengeService.promptForPasscode(
+          ChallengeReason.CreateDecryptedBackupWithProtectedItems
+        );
+        if (!passcode) {
+          return;
+        }
+      }
+      items = items.filter(item => item.content_type !== ContentType.ItemsKey);
+    }
+
+    return this.protocolService.createBackupFile(intent, items);
   }
 
   public isEphemeralSession() {
