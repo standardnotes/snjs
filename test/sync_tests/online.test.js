@@ -251,7 +251,7 @@ describe('online syncing', function() {
     // set item to be merged for when sign in occurs
     await this.application.syncService.markAllItemsAsNeedingSync();
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    expect(this.application.itemManager.getDirtyItems().length).to.equal(3);
+    expect(this.application.itemManager.getDirtyItems().length).to.equal(BASE_ITEM_COUNT + 1);
 
     // Sign back in for next tests
     await Factory.loginToApplication({
