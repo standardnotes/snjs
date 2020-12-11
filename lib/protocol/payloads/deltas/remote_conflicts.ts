@@ -1,3 +1,4 @@
+import { SNLog } from './../../../log';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
@@ -56,12 +57,24 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
   private async collectionsByHandlingUuidConflicts() {
     const results: Array<PurePayload> = [];
     for (const payload of this.applyCollection.all()) {
-      const decrypted = this.findRelatedPayload(
+      /**
+       * The payload in question may have been modified as part of alternating a uuid for
+       * another item. For example, alternating a uuid for a note will also affect the
+       * referencing tag, which would be added to `results`, but could also be inside
+       * of this.applyCollection. In this case we'd prefer the most recently modified value.
+       */
+      const moreRecent = results.find(r => r.uuid === payload.uuid);
+      const decrypted = moreRecent || this.findRelatedPayload(
         payload.uuid!,
         PayloadSource.DecryptedTransient
       );
+      if (!decrypted) {
+        SNLog.error(Error('Cannot find decrypted payload in conflict handling'));
+        console.error('Unable to find decrypted counterpart for payload', payload);
+        continue;
+      }
       const alternateResults = await PayloadsByAlternatingUuid(
-        decrypted!,
+        decrypted,
         this.baseCollection
       );
       extendArray(results, alternateResults);

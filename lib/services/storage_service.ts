@@ -2,35 +2,35 @@ import { ErrorAlertStrings } from './api/messages';
 import { SNAlertService } from './alert_service';
 import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
-import { RawStorageKey, namespacedKey, StorageKey } from '@Lib/storage_keys';
+import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
-import { PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { EncryptionDelegate } from './encryption_delegate';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
 import { ContentType } from '@Models/content_types';
-import { isNullOrUndefined, Copy } from '@Lib/utils';
+import { Copy, isNullOrUndefined } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { DeviceInterface } from '../device_interface';
 
 export enum StoragePersistencePolicies {
   Default = 1,
   Ephemeral = 2
-};
+}
 
 export enum StorageEncryptionPolicies {
   Default = 1,
   Disabled = 2,
-};
+}
 
 export enum StorageValueModes {
   /** Stored inside wrapped encrpyed storage object */
   Default = 1,
   /** Stored outside storage object, unencrypted */
   Nonwrapped = 2
-};
+}
 
 export enum ValueModesKeys {
   /* Is encrypted */
@@ -39,7 +39,7 @@ export enum ValueModesKeys {
   Unwrapped = 'unwrapped',
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped = 'nonwrapped',
-};
+}
 type ValuesObjectRecord = Record<string, any>
 
 export type StorageValuesObject = {

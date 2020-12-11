@@ -4,7 +4,7 @@ import { SNPredicate } from '@Models/core/predicate';
 import { SNItem, SingletonStrategy } from '@Models/core/item';
 import { PureService } from '@Lib/services/pure_service';
 import { arrayByRemovingFromIndex, extendArray } from '@Lib/utils';
-import { PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';
@@ -194,6 +194,7 @@ export class SNSingletonManager extends PureService {
     createContentType: ContentType,
     createContent: PayloadContent
   ) {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve) => {
       const matchingItems = this.validItemsMatchingPredicate(predicate);
       if (matchingItems.length > 0) {

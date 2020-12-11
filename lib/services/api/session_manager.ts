@@ -3,18 +3,18 @@ import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
 import {
-  ChallengeValidation,
+  ChallengeKeyboardType,
   ChallengeReason,
-  ChallengeKeyboardType
+  ChallengeValidation
 } from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, TokenSession } from './session';
 import {
-  RegistrationResponse,
-  SignInResponse,
   ChangePasswordResponse,
   HttpResponse,
   KeyParamsResponse,
+  RegistrationResponse,
+  SignInResponse,
   StatusCode
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
@@ -22,10 +22,10 @@ import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import {
-  SNRootKeyParams,
   AnyKeyParamsContent,
+  KeyParamsFromApiResponse,
   KeyParamsOrigination,
-  KeyParamsFromApiResponse
+  SNRootKeyParams
 } from './../../protocol/key_params';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
@@ -33,7 +33,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { SessionStrings, SignInStrings, RegisterStrings, ErrorAlertStrings } from './messages';
+import { ErrorAlertStrings, RegisterStrings, SessionStrings, SignInStrings } from './messages';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MissingAccountParams = 'missing-params';
@@ -55,7 +55,7 @@ const cleanedEmailString = (email: string) => {
 
 export const enum SessionEvent {
   SessionRestored = 'SessionRestored'
-};
+}
 
 /**
  * The session manager is responsible for loading initial user state, and any relevant
@@ -105,7 +105,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  private async setSession(session: Session, persist: boolean = true) {
+  private async setSession(session: Session, persist = true) {
     await this.apiService.setSession(session, persist);
   }
 
@@ -136,7 +136,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   public async reauthenticateInvalidSession(
     cancelable = true,
     onResponse?: (response: HttpResponse) => void
-  ) {
+  ): Promise<void> {
     if (this.isSessionRenewChallengePresented) {
       return;
     }
@@ -177,7 +177,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
               resolve();
               this.challengeService.completeChallenge(challenge);
               this.notifyEvent(SessionEvent.SessionRestored);
-              this.alertService!.alert(SessionStrings.SessionRestored);
+              this.alertService.alert(SessionStrings.SessionRestored);
             }
           }
         })
@@ -364,7 +364,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
         return {
           response: this.apiService.createErrorResponse(messages.INVALID_PASSWORD_COST)
         };
-      };
+      }
       const message = messages.OUTDATED_PROTOCOL_VERSION;
       const confirmed = await this.alertService!.confirm(
         message,
@@ -493,7 +493,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     );
     const user = response.user;
     this.user = user;
-    await this.storageService!.setValue(StorageKey.User, user);
+    await this.storageService.setValue(StorageKey.User, user);
     if (response.token) {
       /** Legacy JWT response */
       const session = new JwtSession(response.token);

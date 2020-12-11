@@ -1,5 +1,5 @@
+import { ItemMutator, SNItem } from '@Models/core/item';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { SNItem, ItemMutator } from '@Models/core/item';
 import { ProtocolVersion } from '@Protocol/versions';
 
 /**
@@ -8,7 +8,7 @@ import { ProtocolVersion } from '@Protocol/versions';
 export class SNItemsKey extends SNItem {
 
   /** Do not duplicate items keys. Always keep original */
-  strategyWhenConflictingWithItem(item: SNItem) {
+  strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item);
     }
@@ -16,23 +16,23 @@ export class SNItemsKey extends SNItem {
     return ConflictStrategy.KeepLeft;
   }
 
-  get keyVersion() {
+  get keyVersion(): string | undefined {
     return this.payload.safeContent.version;
   }
 
-  get isItemsKey() {
+  get isItemsKey(): boolean {
     return true;
   }
 
-  get isDefault() {
+  get isDefault(): boolean | undefined {
     return this.payload.safeContent.isDefault;
   }
 
-  get itemsKey() {
+  get itemsKey(): string | undefined {
     return this.payload.safeContent.itemsKey;
   }
 
-  get dataAuthenticationKey() {
+  get dataAuthenticationKey(): string | undefined {
     if (this.keyVersion === ProtocolVersion.V004) {
       throw 'Attempting to access legacy data authentication key.';
     }

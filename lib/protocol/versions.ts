@@ -5,7 +5,7 @@ export enum ProtocolVersion {
   V003 = '003',
   V004 = '004',
   VersionLength = 3
-};
+}
 
 /**
  *  -1 if a < b

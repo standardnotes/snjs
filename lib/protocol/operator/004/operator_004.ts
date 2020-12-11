@@ -1,19 +1,19 @@
 import {
   ItemAuthenticatedData,
-  RootKeyEncryptedAuthenticatedData,
-  LegacyAttachedData
+  LegacyAttachedData,
+  RootKeyEncryptedAuthenticatedData
 } from './../../payloads/generator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PurePayload } from './../../payloads/pure_payload';
-import { Create004KeyParams, SNRootKeyParams, KeyParamsOrigination } from './../../key_params';
+import { Create004KeyParams, KeyParamsOrigination, SNRootKeyParams } from './../../key_params';
 import { V004Algorithm } from './../algorithms';
 import { ItemsKeyContent } from './../operator';
 import { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003';
 import { PayloadFormat } from '@Payloads/formats';
-import { CreateEncryptionParameters, CopyEncryptionParameters } from '@Payloads/generator';
+import { CopyEncryptionParameters, CreateEncryptionParameters } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
-import { truncateHexString, sortedCopy, omitUndefinedCopy } from '@Lib/utils';
+import { omitUndefinedCopy, sortedCopy, truncateHexString } from '@Lib/utils';
 import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
 
 const PARTITION_CHARACTER = ':';

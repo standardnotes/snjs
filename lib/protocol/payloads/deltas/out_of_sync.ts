@@ -1,7 +1,7 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
-import { PayloadsByDuplicating, PayloadContentsEqual } from '@Payloads/functions';
+import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions';
 
 import { extendArray } from '@Lib/utils';
 

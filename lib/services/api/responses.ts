@@ -1,6 +1,6 @@
 import { RawPayload } from '@Payloads/generator';
 import { ApiEndpointParam } from './keys';
-import { KeyParamsOrigination, AnyKeyParamsContent } from './../../protocol/key_params';
+import { AnyKeyParamsContent, KeyParamsOrigination } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 
 export enum StatusCode {
@@ -69,7 +69,7 @@ export type SignInResponse = RegistrationResponse & {
 
 export type ChangePasswordResponse = SignInResponse;
 
-export type SignOutResponse = HttpResponse & {}
+export type SignOutResponse = HttpResponse & Record<string, unknown>
 
 export type SessionRenewalResponse = HttpResponse & {
   session?: SessionBody

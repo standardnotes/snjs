@@ -1,15 +1,15 @@
 import { UuidString } from '@Lib/types';
 import {
-  SNNote,
-  SNTag,
-  SNSmartTag,
-  SNPredicate,
-  SNItem,
   ContentType,
+  SNItem,
+  SNNote,
+  SNPredicate,
+  SNSmartTag,
+  SNTag,
 } from '../../models';
 import {
-  ItemCollection,
   CollectionSort,
+  ItemCollection,
   SortDirection,
 } from './item_collection';
 

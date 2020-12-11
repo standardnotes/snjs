@@ -671,7 +671,6 @@ describe('online syncing', function() {
     await this.application.sync(syncOptions);
 
     /** We expect that item has been deleted */
-    // expect(note.deleted).to.equal(true);
     const allItems = this.application.itemManager.items;
     expect(allItems.length).to.equal(this.expectedItemCount);
   });

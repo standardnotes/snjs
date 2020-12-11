@@ -28,7 +28,7 @@ export function createApplication(identifier, environment, platform) {
     identifier,
     undefined,
     undefined,
-    'http://localhost:3000'
+    'http://localhost:3123'
   );
 }
 
@@ -50,7 +50,7 @@ export async function createAndInitializeApplication(namespace, environment, pla
 
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
-    receiveChallenge: () => {
+    receiveChallenge: (_challenge) => {
       throw Error('Factory application shouldn\'t have challenges');
     }
   });
@@ -235,6 +235,7 @@ export function createTagParams({ dirty = true } = {}) {
   const params = {
     uuid: generateUuid(),
     content_type: ContentType.Tag,
+    dirty: dirty,
     content: {
       title: 'thoughts',
       references: []

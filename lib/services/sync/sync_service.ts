@@ -3,12 +3,12 @@ import { StorageKey } from '@Lib/storage_keys';
 import { UuidString } from './../../types';
 import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
-import { SNItem, MutationType } from '@Models/core/item';
+import { MutationType, SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PayloadManager } from './../model_manager';
 import { SNStorageService } from './../storage_service';
 import { SNProtocolService } from './../protocol_service';
-import { removeFromIndex, sleep, subtractFromArray, isNullOrUndefined } from '@Lib/utils';
+import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@Lib/utils';
 import { PureService } from '@Services/pure_service';
 import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils';
 import { SyncOpStatus } from '@Services/sync/sync_op_status';
@@ -60,7 +60,7 @@ export enum SyncModes {
    * all data to see if user has an items key, and if not, only then create a new one.
    */
   DownloadFirst = 2
-};
+}
 
 export enum SyncSources {
   External = 1,
@@ -70,7 +70,7 @@ export enum SyncSources {
   AfterDownloadFirst = 5,
   IntegrityCheck = 6,
   ResolveOutOfSync = 7
-};
+}
 
 export type SyncOptions = {
   queueStrategy?: SyncQueueStrategy
@@ -615,7 +615,7 @@ export class SNSyncService extends PureService<SyncEvent> {
       } else {
         return SyncModes.Default;
       }
-    })(options.mode)!;
+    })(options.mode);
 
     let uploadPayloads: PurePayload[] = []
     if (useMode === SyncModes.Default) {

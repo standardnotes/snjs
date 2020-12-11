@@ -145,7 +145,7 @@ describe('notes and tags', () => {
     const tagPayload = pair[1];
 
     await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
+      pair,
       PayloadSource.LocalChanged
     );
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
@@ -159,6 +159,7 @@ describe('notes and tags', () => {
     const mutatedTag = CreateMaxPayloadFromAnyObject(
       tagPayload,
       {
+        dirty: false,
         content: {
           ...tagPayload.safeContent,
           references: []
@@ -360,6 +361,29 @@ describe('notes and tags', () => {
   });
 
   describe('Tags', function () {
+    it('should sort tags in ascending alphabetical order by default', async function () {
+      const titles = ['1', 'A', 'a', 'b', '1', '2', 'B'];
+      const sortedTitles = titles.sort((a, b) => a.localeCompare(b));
+      await Promise.all(
+        titles.map((title) => this.application.findOrCreateTag(title))
+      );
+      expect(
+        this.application.getDisplayableItems(ContentType.Tag).map(t => t.title)
+      ).to.deep.equal(sortedTitles);
+    });
+
+    it('should sort tags in reverse alphabetical order', async function () {
+      const titles = ['1', 'A', 'a', 'b', '1', '2', 'B'];
+      const sortedTitles = titles.sort((a, b) => b.localeCompare(a));
+      await Promise.all(
+        titles.map((title) => this.application.findOrCreateTag(title))
+      );
+      this.application.setDisplayOptions(ContentType.Tag, 'title', 'asc');
+      expect(
+        this.application.getDisplayableItems(ContentType.Tag).map(t => t.title)
+      ).to.deep.equal(sortedTitles);
+    });
+
     it('should match a tag', async function () {
       const taggedNote = await Factory.createMappedNote(this.application);
       const tag = await this.application.findOrCreateTag('A');

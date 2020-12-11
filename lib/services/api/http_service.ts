@@ -96,14 +96,16 @@ export class SNHttpService extends PureService {
       return;
     }
     const httpStatus = request.status;
-    let response: HttpResponse = {
+    const response: HttpResponse = {
       status: httpStatus
     }
     try {
       const body = JSON.parse(request.responseText);
       response.object = body;
       Object.assign(response, body);
-    } catch (error) { }
+    } catch (error) {
+      console.error(error)
+    }
     if ((httpStatus >= StatusCode.HttpStatusMinSuccess
       && httpStatus <= StatusCode.HttpStatusMaxSuccess)) {
       resolve(response);

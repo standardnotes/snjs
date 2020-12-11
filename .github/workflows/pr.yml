@@ -1,0 +1,20 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [ 004 ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install --pure-lockfile
+      - run: yarn lint
+      - run: yarn bundle
+      - run: yarn test:ruby
+      - run: yarn test:js

@@ -1,6 +1,6 @@
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { Copy, removeFromArray } from '@Lib/utils';
-import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
+import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 
 export enum ProtectedAction {
@@ -10,12 +10,12 @@ export enum ProtectedAction {
   ManagePrivileges = 'ActionManagePrivileges',
   ManagePasscode = 'ActionManagePasscode',
   DeleteNote = 'ActionDeleteNote',
-};
+}
 
 export enum PrivilegeCredential {
   AccountPassword = 'CredentialAccountPassword',
   LocalPasscode = 'CredentialLocalPasscode'
-};
+}
 
 type PrivilegeMap = Partial<Record<ProtectedAction, PrivilegeCredential[]>>
 

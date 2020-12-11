@@ -6,7 +6,7 @@ export enum RawStorageKey {
   StorageObject = 'storage',
   DescriptorRecord = 'descriptors',
   SnjsVersion = 'snjs_version'
-};
+}
 
 /**
  * Keys used for retrieving and saving simple key/value pairs.
@@ -34,7 +34,7 @@ export enum StorageKey {
   SessionHistoryOptimize = 'sessionHistory_autoOptimize',
   KeyRecoveryUndecryptableItems = 'key_recovery_undecryptable',
   StorageEncryptionPolicy = 'storage_policy'
-};
+}
 
 export enum NonwrappedStorageKey {
   MobileFirstRun = 'first_run'

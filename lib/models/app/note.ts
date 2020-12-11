@@ -1,6 +1,6 @@
 import { PayloadFormat } from './../../protocol/payloads/formats';
 import { isNullOrUndefined } from '@Lib/utils';
-import { SNItem, ItemMutator, AppDataField } from '@Models/core/item';
+import { AppDataField, ItemMutator, SNItem } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 
 export interface NoteContent {

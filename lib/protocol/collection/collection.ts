@@ -1,5 +1,5 @@
 import { UuidMap } from './uuid_map';
-import { isString, extendArray } from '@Lib/utils';
+import { extendArray, isString } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import remove from 'lodash/remove';
 import { ContentType } from '@Models/content_types';
@@ -11,7 +11,7 @@ type Payloadable = PurePayload | SNItem
 export class MutableCollection<T extends Payloadable> {
 
   readonly map: Partial<Record<UuidString, T>> = {}
-  readonly typedMap: Partial<Record<ContentType, T[]>> = {} = {}
+  readonly typedMap: Partial<Record<ContentType, T[]>> = {}
 
   /** An array of uuids of items that are dirty */
   dirtyIndex: Set<UuidString> = new Set();

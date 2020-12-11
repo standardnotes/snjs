@@ -1,12 +1,12 @@
 import { SNLog } from '@Lib/log';
 import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { ChallengeValidation, ChallengeReason } from './../challenges';
-import { SessionStrings, KeychainRecoveryStrings } from './../services/api/messages';
+import { ChallengeReason, ChallengeValidation } from './../challenges';
+import { KeychainRecoveryStrings, SessionStrings } from './../services/api/messages';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from './../version';
 import { Migration } from '@Lib/migrations/migration';
-import { namespacedKey, RawStorageKey } from '@Lib/storage_keys';
+import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
 import { isNullOrUndefined } from '@Lib/utils';
 import { CreateReader } from './readers/functions';

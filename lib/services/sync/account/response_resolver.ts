@@ -125,8 +125,14 @@ export class SyncResponseResolver {
          * dirtied by a client. We keep the payload dirty state here. */
         stillDirty = payload.dirty;
       } else {
-        /** Marking items dirty after lastSyncBegan will cause them to sync again. */
-        stillDirty = current.dirtiedDate! > current.lastSyncBegan!;
+        if (payload.discardable) {
+          /** If a payload is discardable, do not set as dirty no matter what.
+           * This occurs when alternating a uuid for a payload */
+          stillDirty = false;
+        } else {
+          /** Marking items dirty after lastSyncBegan will cause them to sync again. */
+          stillDirty = current.dirtiedDate! > current.lastSyncBegan!;
+        }
       }
     } else {
       /** Forward whatever value any delta resolver may have set */

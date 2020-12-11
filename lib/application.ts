@@ -3,61 +3,61 @@ import { CollectionSort, SortDirection } from '@Protocol/collection/item_collect
 import { Uuids } from '@Models/functions';
 import { PayloadOverride } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
-import { UuidString, ApplicationIdentifier, DeinitSource } from './types';
-import { SyncEvent, ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events';
+import { ApplicationIdentifier, DeinitSource, UuidString } from './types';
+import { ApplicationEvent, SyncEvent, applicationEventForSyncEvent } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { Uuid } from '@Lib/uuid';
 import { BackupFile } from './services/protocol_service';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
-import { SNItem, ItemMutator, MutationType } from '@Models/core/item';
+import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@Payloads/pure_payload';
-import { Challenge, ChallengeResponse, ChallengeValidation, ChallengeReason, ChallengeValue, ChallengePrompt } from './challenges';
+import { Challenge, ChallengePrompt, ChallengeReason, ChallengeResponse, ChallengeValidation, ChallengeValue } from './challenges';
 import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
-import { SNPureCrypto } from 'sncrypto/lib/common/pure_crypto';
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
-import { removeFromArray, isString, sleep } from '@Lib/utils';
+import { isString, removeFromArray, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
-import { CopyPayload, PayloadContent, CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { CopyPayload, CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
 import { CreateItemFromPayload } from '@Models/generator';
 import { StoragePersistencePolicies, StorageValueModes } from '@Services/storage_service';
 import {
-  SNMigrationService,
-  SNActionsService,
-  SNApiService,
+  ChallengeService,
+  ItemManager,
   PayloadManager,
-  SNProtocolService,
-  SNPrivilegesService,
-  SNHistoryManager,
+  SNActionsService,
   SNAlertService,
-  SNSessionManager,
+  SNApiService,
   SNComponentManager,
+  SNHistoryManager,
   SNHttpService,
+  SNMigrationService,
+  SNPrivilegesService,
+  SNProtocolService,
+  SNSessionManager,
   SNSingletonManager,
   SNStorageService,
   SNSyncService,
-  ChallengeService,
-  SyncModes,
-  ItemManager
+  SyncModes
 } from './services';
 import { DeviceInterface } from './device_interface';
 import {
-  PasswordChangeStrings,
-  InsufficientPasswordMessage,
-  UPGRADING_ENCRYPTION,
-  SETTING_PASSCODE,
-  REMOVING_PASSCODE,
-  CHANGING_PASSCODE,
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
+  CHANGING_PASSCODE,
+  ChallengeStrings,
   DO_NOT_CLOSE_APPLICATION,
-  UNSUPPORTED_BACKUP_FILE_VERSION, ChallengeStrings, ProtocolUpgradeStrings, INVALID_PASSWORD, SessionStrings, ErrorAlertStrings
+  ErrorAlertStrings,
+  INVALID_PASSWORD,
+  InsufficientPasswordMessage,
+  PasswordChangeStrings,
+  ProtocolUpgradeStrings, REMOVING_PASSCODE, SETTING_PASSCODE, SessionStrings, UNSUPPORTED_BACKUP_FILE_VERSION, UPGRADING_ENCRYPTION
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, MissingAccountParams, SessionEvent } from './services/api/session_manager';
-import { SNComponent, SNTag, SNNote } from './models';
+import { SNComponent, SNNote, SNTag } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
@@ -285,11 +285,11 @@ export class SNApplication {
   }
 
   public onStart() {
-
+    // optional override
   }
 
   public onLaunch() {
-
+    // optional override
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
@@ -651,7 +651,7 @@ export class SNApplication {
   }
 
   /** Returns items referencing an item */
-  public referencingForItem(item: SNItem, contentType?: ContentType) {
+  public referencingForItem(item: SNItem, contentType?: ContentType): SNItem[] {
     let references = this.itemManager!.itemsReferencingItem(item.uuid);
     if (contentType) {
       references = references.filter((ref) => {
@@ -664,7 +664,7 @@ export class SNApplication {
   public duplicateItem<T extends SNItem>(
     item: T,
     additionalContent?: Partial<PayloadContent>
-  ) {
+  ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(
       item.uuid,
       false,
@@ -674,19 +674,19 @@ export class SNApplication {
     return duplicate;
   }
 
-  public findTagByTitle(title: string) {
+  public findTagByTitle(title: string): SNTag | undefined {
     return this.itemManager!.findTagByTitle(title);
   }
 
-  public async findOrCreateTag(title: string) {
+  public async findOrCreateTag(title: string): Promise<SNTag> {
     return this.itemManager!.findOrCreateTagByTitle(title);
   }
 
-  public getSmartTags() {
+  public getSmartTags(): SNSmartTag[] {
     return this.itemManager!.getSmartTags();
   }
 
-  public getNoteCount() {
+  public getNoteCount(): number {
     return this.itemManager!.noteCount;
   }
 
@@ -699,7 +699,7 @@ export class SNApplication {
   public streamItems(
     contentType: ContentType | ContentType[],
     stream: ItemStream
-  ) {
+  ): () => void {
     const observer = this.itemManager!.addObserver(
       contentType,
       (changed, inserted, discarded, _ignored, source) => {
@@ -731,17 +731,17 @@ export class SNApplication {
   /**
    * Set the server's URL
    */
-  public async setHost(host: string) {
+  public async setHost(host: string): Promise<void> {
     return this.apiService!.setHost(host);
   }
 
-  public async getHost() {
+  public async getHost(): Promise<string | undefined> {
     return this.apiService!.getHost();
   }
 
   public getUser() {
     if (!this.launched) {
-      throw 'Attempting to access user before application unlocked';
+      throw Error('Attempting to access user before application unlocked');
     }
     return this.sessionManager.getUser();
   }
@@ -847,11 +847,11 @@ export class SNApplication {
     return result;
   }
 
-  public noAccount() {
+  public noAccount(): boolean {
     return !this.hasAccount();
   }
 
-  public hasAccount() {
+  public hasAccount(): boolean {
     return this.protocolService!.hasAccount();
   }
 
@@ -1574,7 +1574,11 @@ export class SNApplication {
     );
     this.serviceObservers.push(this.sessionManager.addEventObserver(async event => {
       if (event === SessionEvent.SessionRestored) {
-        this.sync();
+        this.sync().then(async () => {
+          if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
+            this.protocolService.createNewDefaultItemsKey();
+          }
+        })
       }
     }));
     this.services.push(this.sessionManager);

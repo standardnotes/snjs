@@ -4,9 +4,9 @@ import { PayloadFormat } from './../../protocol/payloads/formats';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
 import { PayloadContent } from './../../protocol/payloads/generator';
-import { PayloadOverride, CopyPayload } from '@Payloads/generator';
+import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { deepFreeze, Copy, sortedCopy, omitInPlace } from '@Lib/utils';
+import { Copy, deepFreeze, omitInPlace, sortedCopy } from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
@@ -47,7 +47,7 @@ export enum AppDataField {
 
 export enum SingletonStrategy {
   KeepEarliest = 1
-};
+}
 
 /**
  * The most abstract item that any syncable item needs to extend from.

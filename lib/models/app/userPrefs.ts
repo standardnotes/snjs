@@ -1,4 +1,4 @@
-import { SNItem, ItemMutator } from '@Models/core/item';
+import { ItemMutator, SNItem } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
 
 export enum WebPrefKey {
@@ -16,7 +16,7 @@ export enum WebPrefKey {
   NotesHideNotePreview = 'hideNotePreview',
   NotesHideDate = 'hideDate',
   NotesHideTags = 'hideTags',
-};
+}
 
 export class SNUserPrefs extends SNItem {
 

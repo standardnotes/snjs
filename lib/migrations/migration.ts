@@ -1,4 +1,4 @@
-import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from './../challenges';
+import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from './../challenges';
 import { MigrationServices } from './types';
 import { ApplicationStage } from '../stages';
 
