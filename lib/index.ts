@@ -33,8 +33,9 @@ export {
   ThemeMutator,
   SNComponent, ComponentAction, ComponentMutator,
   SNEditor,
-  SNUserPrefs, UserPrefsMutator, WebPrefKey,
+  SNUserPrefs, UserPrefsMutator, PrefKey
 } from './models';
+export type { PrefValue } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from './models/app/component';

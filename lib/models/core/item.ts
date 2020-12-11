@@ -11,6 +11,7 @@ import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { PayloadSource } from '@Lib/protocol/payloads/sources';
+import { PrefKey, PrefValue } from '../app/userPrefs';
 
 export enum MutationType {
   /**
@@ -221,7 +222,7 @@ export class SNItem {
     return data;
   }
 
-  public getAppDomainValue(key: AppDataField) {
+  public getAppDomainValue(key: AppDataField | PrefKey) {
     const appData = this.getDomainData(SNItem.DefaultAppDomain());
     return appData![key];
   }
@@ -547,7 +548,7 @@ export class ItemMutator {
     domainData[key] = value;
   }
 
-  public setAppDataItem(key: AppDataField, value: any) {
+  public setAppDataItem(key: AppDataField | PrefKey, value: any) {
     this.setDomainDataKey(key, value, SNItem.DefaultAppDomain());
   }
 

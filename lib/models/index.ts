@@ -11,7 +11,8 @@ export { ActionsExtensionMutator, SNActionsExtension } from '@Models/app/extensi
 export { Action } from '@Models/app/action';
 export { SNNote, NoteMutator } from '@Models/app/note';
 export { SNTag, TagMutator } from '@Models/app/tag';
-export { SNUserPrefs, UserPrefsMutator, WebPrefKey } from '@Models/app/userPrefs';
+export { SNUserPrefs, UserPrefsMutator, PrefKey } from '@Models/app/userPrefs';
+export type { PrefValue } from '@Models/app/userPrefs';
 export { SNPrivileges, PrivilegeMutator } from '@Models/app/privileges';
 export { SNSmartTag } from '@Models/app/smartTag';
 export { SNTheme, ThemeMutator } from '@Models/app/theme';

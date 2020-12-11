@@ -136,7 +136,7 @@ export class SNSyncService extends PureService<SyncEvent> {
   private syncToken?: string
   private cursorToken?: string
 
-  private syncLock?: any
+  private syncLock = false;
   private _simulate_latency?: any
 
   /** Content types appearing first are always mapped first */
@@ -582,7 +582,7 @@ export class SNSyncService extends PureService<SyncEvent> {
           source: options.source
         });
       } else {
-        throw `Unhandled timing strategy ${useStrategy}`;
+        throw Error(`Unhandled timing strategy ${useStrategy}`);
       }
     }
     /** Lock syncing immediately after checking in progress above */

@@ -11,7 +11,7 @@ describe('storage manager', function() {
    * Base keys are `storage`, `snjs_version`, and `keychain`
    */
   const BASE_KEY_COUNT = 3;
-  const BASE_ITEM_COUNT = 1; /** Default items key */
+  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
   const sharedApplication = Factory.createApplication();
 
   before(async function () {
@@ -78,7 +78,7 @@ describe('storage manager', function() {
       password: this.password,
       ephemeral: false
     });
-    this.expectedKeyCount++;
+    this.expectedKeyCount += 2;
     const key = 'foo';
     const value = 'bar';
     await this.application.storageService.setValue(

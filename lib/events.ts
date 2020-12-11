@@ -50,7 +50,8 @@ export enum ApplicationEvent {
   LocalDatabaseWriteError = 21,
   /** When a single roundtrip completes with sync, in a potentially multi-page sync request.
    * If just a single roundtrip, this event will be triggered, along with CompletedFullSync */
-  CompletedIncrementalSync = 22
+  CompletedIncrementalSync = 22,
+  PreferencesChanged = 23,
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {

@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('duplication', () => {
-  const BASE_ITEM_COUNT = 1; /** Default items key */
+  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {
     checkIntegrity: true,
@@ -132,7 +132,7 @@ describe('duplication', () => {
       undefined,
       syncOptions
     );
-    
+
     expect(this.application.componentManager.editorForNote(note)).to.be.ok;
 
     /** Conflict the note */

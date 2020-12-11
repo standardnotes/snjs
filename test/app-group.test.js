@@ -88,6 +88,11 @@ describe('application group', () => {
     const identifier = application.identifier;
     await application.deinit(DeinitSource.SignOut);
 
+    /**
+     * On Safari 14.0.1 the new app instance will only be created on the
+     * next tick
+     */
+    await Factory.sleep(0);
     expect(group.applications.length).to.equal(1);
 
     /** Expect a new application to have been created */

@@ -25,6 +25,8 @@ describe('backups', () => {
     this.application = null;
   });
 
+  const BASE_ITEM_COUNT = 4;
+
   it('backup file should have a version number', async function () {
     const backupString = await this.application.createBackupFile();
     const data = JSON.parse(backupString);
@@ -37,7 +39,7 @@ describe('backups', () => {
     const backupString = await this.application.createBackupFile();
     const backupData = JSON.parse(backupString);
 
-    expect(backupData.items.length).to.equal(3);
+    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT);
   });
 
   it('backup file item should have correct fields', async function () {
@@ -76,6 +78,6 @@ describe('backups', () => {
     const backupString = await this.application.createBackupFile();
     const backupData = JSON.parse(backupString);
 
-    expect(backupData.items.length).to.equal(3);
+    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT);
   });
 });

@@ -6,7 +6,7 @@ const expect = chai.expect;
 
 describe('online syncing', function() {
   this.timeout(Factory.TestTimeout);
-  const BASE_ITEM_COUNT = 1; /** Default items key */
+  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {
     checkIntegrity: true,
@@ -251,7 +251,7 @@ describe('online syncing', function() {
     // set item to be merged for when sign in occurs
     await this.application.syncService.markAllItemsAsNeedingSync();
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    expect(this.application.itemManager.getDirtyItems().length).to.equal(2);
+    expect(this.application.itemManager.getDirtyItems().length).to.equal(BASE_ITEM_COUNT + 1);
 
     // Sign back in for next tests
     await Factory.loginToApplication({
@@ -818,6 +818,7 @@ describe('online syncing', function() {
   it('duplicating an item should maintian its relationships', async function () {
     const payload1 = Factory.createStorageItemPayload(ContentType.ServerExtension);
     const payload2 = Factory.createStorageItemPayload(ContentType.UserPrefs);
+    this.expectedItemCount -= 1; /** auto-created user preferences  */
     await this.application.itemManager.emitItemsFromPayloads(
       [payload1, payload2],
       PayloadSource.LocalChanged
