@@ -371,8 +371,9 @@ describe('importing', function() {
       Factory.createMappedTag(this.application),
     ]);
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.sync({ awaitAll: true });
 
@@ -405,8 +406,9 @@ describe('importing', function() {
       Factory.createMappedTag(this.application),
     ]);
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -435,8 +437,9 @@ describe('importing', function() {
       Factory.createMappedTag(this.application),
     ]);
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -470,8 +473,9 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -506,8 +510,9 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -542,8 +547,9 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -588,13 +594,15 @@ describe('importing', function() {
       }
     );
 
-    const backupData = await this.application.protocolService.createBackupFile();
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
 
     const result = await this.application.importData(
-      JSON.parse(backupData),
+      backupData,
       'not-the-correct-password-1234',
       true,
     );
@@ -619,13 +627,15 @@ describe('importing', function() {
       }
     );
 
-    const backupData = await this.application.protocolService.createBackupFile();
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
 
     const result = await this.application.importData(
-      JSON.parse(backupData),
+      backupData,
       'not-the-correct-password-1234',
       true,
     );
@@ -784,8 +794,9 @@ describe('importing', function() {
 
     await this.application.sync();
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
