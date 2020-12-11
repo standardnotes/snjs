@@ -650,12 +650,12 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    let backupData = JSON.parse(rawBackupFile);
-    backupData = {
-      ...backupData,
-      items: backupData.items.filter((payload) => payload.content_type !== ContentType.ItemsKey),
-    };
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    backupData.items = backupData.items.filter(
+      (payload) => payload.content_type !== ContentType.ItemsKey
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();

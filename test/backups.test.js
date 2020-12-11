@@ -26,28 +26,27 @@ describe('backups', () => {
   });
 
   it('backup file should have a version number', async function () {
-    const backupString = await this.application.createBackupFile();
-    const data = JSON.parse(backupString);
+    let data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
+    expect(data.version).to.equal(this.application.protocolService.getLatestVersion());
+    await this.application.setPasscode('passcode');
+    data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion());
   });
 
   it('no passcode + no account backup file should have correct number of items', async function () {
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
-    const backupString = await this.application.createBackupFile();
-    const backupData = JSON.parse(backupString);
-
-    expect(backupData.items.length).to.equal(2);
+    const data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
+    expect(data.items.length).to.equal(2);
   });
 
   it('passcode + no account backup file should have correct number of items', async function () {
     await this.application.setPasscode('passcode');
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
-    const backupString = await this.application.createBackupFile();
-    const backupData = JSON.parse(backupString);
+    const data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
 
-    expect(backupData.items.length).to.equal(3);
+    expect(data.items.length).to.equal(3);
   });
 
   it('no passcode + account backup file should have correct number of items', async function () {
@@ -58,41 +57,59 @@ describe('backups', () => {
     });
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
-    const backupString = await this.application.createBackupFile();
-    const backupData = JSON.parse(backupString);
-    console.log(backupData);
-    expect(backupData.items.length).to.equal(3);
+    let data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
+    expect(data.items.length).to.equal(3);
+    data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
+    expect(data.items.length).to.equal(2); /** Minus itemsKey */
   });
 
   it('passcode + account backup file should have correct number of items', async function () {
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        this.application.submitValuesForChallenge(
-          challenge,
-          [new ChallengeValue(challenge.prompts[0], 'passcode')]
-        );
-      }
-    });
+    this.timeout(10000);
+    await this.application.register(this.email, this.password);
     await this.application.setPasscode('passcode');
+    await Factory.createSyncedNote(this.application);
+    await Factory.createSyncedNote(this.application);
+    let backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    expect(backupData.items.length).to.equal(3);
+    backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileDecrypted
+    );
+    expect(backupData.items.length).to.equal(2); /** minux itemsKey */
+  });
+
+  it('backup file item should have correct fields', async function () {
+    await Factory.createSyncedNote(this.application);
+    let backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileDecrypted
+    );
+    let item = backupData.items.find(
+      i => i.content_type === ContentType.Note
+    );
+
+    expect(item.fields).to.not.be.ok;
+    expect(item.source).to.not.be.ok;
+    expect(item.dirtiedDate).to.not.be.ok;
+    expect(item.format).to.not.be.ok;
+    expect(item.uuid).to.be.ok;
+    expect(item.content_type).to.be.ok;
+    expect(item.content).to.be.ok;
+    expect(item.created_at).to.be.ok;
+    expect(item.updated_at).to.be.ok;
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
     });
-    await Factory.createSyncedNote(this.application);
-    await Factory.createSyncedNote(this.application);
-    const backupString = await this.application.createBackupFile();
-    const backupData = JSON.parse(backupString);
 
-    expect(backupData.items.length).to.equal(3);
-  });
-
-  it('backup file item should have correct fields', async function () {
-    await Factory.createSyncedNote(this.application);
-    await Factory.createSyncedNote(this.application);
-    const backupString = await this.application.createBackupFile();
-    const backupData = JSON.parse(backupString);
-    const item = backupData.items[0];
+    backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    item = backupData.items.find(
+      i => i.content_type === ContentType.Note
+    );
 
     expect(item.fields).to.not.be.ok;
     expect(item.source).to.not.be.ok;
@@ -120,25 +137,32 @@ describe('backups', () => {
     );
     const erroredItem = await this.application.itemManager.emitItemFromPayload(errored);
     expect(erroredItem.errorDecrypting).to.equal(true);
-    const backupString = await this.application.createBackupFile();
-    const backupData = JSON.parse(backupString);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileDecrypted
+    );
 
     expect(backupData.items.length).to.equal(2);
   });
 
   it('decrypted backup file should not have keyParams', async function () {
-    const backup = JSON.parse(await this.application.createBackupFile());
+    const backup = await this.application.createBackupFile(
+      EncryptionIntent.FileDecrypted
+    );
     expect(backup).to.not.haveOwnProperty('keyParams');
   });
 
   it('encrypted backup file should have keyParams', async function () {
     await this.application.setPasscode('passcode');
-    const backup = JSON.parse(await this.application.createBackupFile());
+    const backup = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
     expect(backup).to.haveOwnProperty('keyParams');
   });
 
   it('decrypted backup file should not have itemsKeys', async function () {
-    const backup = JSON.parse(await this.application.createBackupFile());
+    const backup = await this.application.createBackupFile(
+      EncryptionIntent.FileDecrypted
+    );
     expect(backup.items.some(
       item => item.content_type === ContentType.ItemsKey
     )).to.be.false;
@@ -146,7 +170,9 @@ describe('backups', () => {
 
   it('encrypted backup file should have itemsKeys', async function () {
     await this.application.setPasscode('passcode');
-    const backup = JSON.parse(await this.application.createBackupFile());
+    const backup = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
     expect(backup.items.some(
       item => item.content_type === ContentType.ItemsKey
     )).to.be.true;
@@ -154,9 +180,20 @@ describe('backups', () => {
 
   it('backup file with no account and no passcode should be decrypted', async function () {
     const note = await Factory.createSyncedNote(this.application);
-    const backup = JSON.parse(await this.application.createBackupFile());
+    const backup = await this.application.createBackupFile(
+      EncryptionIntent.FileDecrypted
+    );
     expect(backup).to.not.haveOwnProperty('keyParams');
     expect(backup.items.some(item => item.content_type === ContentType.ItemsKey)).to.be.false;
     expect(backup.items.find(item => item.content_type === ContentType.Note).uuid).to.equal(note.uuid);
+    let error;
+    try {
+      await this.application.createBackupFile(
+        EncryptionIntent.Encrypted
+      );
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.ok;
   });
 });
