@@ -758,16 +758,14 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     );
 
     const keyParams = await this.getRootKeyParams();
-    let portableRootKeyParams: unknown | undefined;
-    if (keyParams) {
-      portableRootKeyParams = keyParams.getPortableValue();
-    }
 
     const data: BackupFile = {
       version: this.getLatestVersion(),
       items: await ejectedPayloads,
-      keyParams: portableRootKeyParams,
     };
+    if (keyParams) {
+      data.keyParams = keyParams.getPortableValue();
+    }
     return data;
   }
 
