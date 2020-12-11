@@ -199,6 +199,7 @@ export class SNSingletonManager extends PureService {
     if (matchingItems.length > 0) {
       return matchingItems[0] as T;
     }
+    /** Item not found, safe to create after full sync has completed */
     if (!this.syncService.getLastSyncDate()) {
       /** Add a temporary observer in case of long-running sync request, where
        * the item we're looking for ends up resolving early or in the middle. */
