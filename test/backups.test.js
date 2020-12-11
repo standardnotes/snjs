@@ -25,6 +25,8 @@ describe('backups', () => {
     this.application = null;
   });
 
+  const BASE_ITEM_COUNT = 4;
+
   it('backup file should have a version number', async function () {
     let data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion());
@@ -76,7 +78,7 @@ describe('backups', () => {
     backupData = await this.application.createBackupFile(
       EncryptionIntent.FileDecrypted
     );
-    expect(backupData.items.length).to.equal(2); /** minux itemsKey */
+    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT);
   });
 
   it('backup file item should have correct fields', async function () {
@@ -195,5 +197,6 @@ describe('backups', () => {
       error = e;
     }
     expect(error).to.be.ok;
+    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT);
   });
 });

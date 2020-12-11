@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('offline syncing', () => {
-  const BASE_ITEM_COUNT = 1; /** Default items key */
+  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {
     checkIntegrity: true,

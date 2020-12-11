@@ -6,7 +6,7 @@ const expect = chai.expect;
 
 describe('importing', function() {
   this.timeout(Factory.TestTimeout);
-  const BASE_ITEM_COUNT = 1; /** Default items key */
+  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -608,7 +608,7 @@ describe('importing', function() {
     );
     expect(result).to.not.be.undefined;
     expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(2);
+    expect(result.errorCount).to.be.eq(backupData.items.length);
     expect(this.application.itemManager.notes.length).to.equal(0);
   });
 
@@ -641,7 +641,7 @@ describe('importing', function() {
     );
     expect(result).to.not.be.undefined;
     expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(2);
+    expect(result.errorCount).to.be.eq(backupData.items.length);
     expect(this.application.itemManager.notes.length).to.equal(0);
   });
 
@@ -677,7 +677,7 @@ describe('importing', function() {
     );
     expect(result).to.not.be.undefined;
     expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(1);
+    expect(result.errorCount).to.be.eq(backupData.items.length);
     expect(this.application.itemManager.notes.length).to.equal(0);
   });
 

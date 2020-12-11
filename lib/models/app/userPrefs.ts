@@ -1,7 +1,8 @@
 import { ItemMutator, SNItem } from '@Models/core/item';
+import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 import { SNPredicate } from '@Models/core/predicate';
 
-export enum WebPrefKey {
+export enum PrefKey {
   TagsPanelWidth = 'tagsPanelWidth',
   NotesPanelWidth = 'notesPanelWidth',
   EditorWidth = 'editorWidth',
@@ -18,23 +19,40 @@ export enum WebPrefKey {
   NotesHideTags = 'hideTags',
 }
 
+export type PrefValue = {
+  [PrefKey.TagsPanelWidth]: number,
+  [PrefKey.NotesPanelWidth]: number,
+  [PrefKey.EditorWidth]: number | null,
+  [PrefKey.EditorLeft]: number | null,
+  [PrefKey.EditorMonospaceEnabled]: boolean,
+  [PrefKey.EditorSpellcheck]: boolean,
+  [PrefKey.EditorResizersEnabled]: boolean,
+  [PrefKey.SortNotesBy]: CollectionSort,
+  [PrefKey.SortNotesReverse]: boolean,
+  [PrefKey.NotesShowArchived]: boolean,
+  [PrefKey.NotesHidePinned]: boolean,
+  [PrefKey.NotesHideNotePreview]: boolean,
+  [PrefKey.NotesHideDate]: boolean,
+  [PrefKey.NotesHideTags]: boolean,
+}
+
 export class SNUserPrefs extends SNItem {
 
-  get isSingleton() {
+  get isSingleton(): true {
     return true;
   }
 
-  get singletonPredicate() {
-    return new SNPredicate('content_type', '=', this.content_type!);
+  get singletonPredicate(): SNPredicate {
+    return new SNPredicate('content_type', '=', this.content_type);
   }
 
-  getPref(key: WebPrefKey) {
-    return this.getAppDomainValue(key as any);
+  getPref<K extends PrefKey>(key: K): PrefValue[K] | undefined {
+    return this.getAppDomainValue(key);
   }
 }
 
 export class UserPrefsMutator extends ItemMutator {
-  setWebPref(key: WebPrefKey, value: any) {
-    this.setAppDataItem(key as any, value);
+  setPref<K extends PrefKey>(key: K, value: PrefValue[K]): void {
+    this.setAppDataItem(key, value);
   }
 }
