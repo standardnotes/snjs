@@ -118,7 +118,7 @@ export class ChallengePrompt {
     public readonly placeholder?: string,
     public readonly secureTextEntry = true,
     public readonly keyboardType?: ChallengeKeyboardType,
-    public readonly formValues?: ChallengeFormValue[]
+    public readonly formValues?: ChallengeFormValue[],
   ) {
     Object.freeze(this);
   }
@@ -147,7 +147,7 @@ export class ChallengePrompt {
 export class ChallengeValue {
   constructor(
     public readonly prompt: ChallengePrompt,
-    public readonly value: string | boolean | ChallengeFormValue,
+    public readonly value: string | boolean | number,
   ) {
     Object.freeze(this);
   }

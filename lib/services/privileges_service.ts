@@ -9,7 +9,7 @@ import { StorageKey } from '@Lib/storage_keys';
 import { ContentType } from '@Lib/models';
 import { PrivilegeCredential, ProtectedAction, SNPrivileges } from '@Models/app/privileges';
 import { Challenge, ChallengeFormValue, ChallengePrompt, ChallengeReason, ChallengeValidation } from '@Lib/challenges';
-import { ChallengeStrings } from './api/messages';
+import { ChallengeStrings, PromptTitles } from './api/messages';
 import { ChallengeService } from './challenge/challenge_service';
 
 export enum PrivilegeSessionLength {
@@ -89,6 +89,7 @@ export class SNPrivilegesService extends PureService {
   }
 
   public deinit() {
+    this.challengeService = undefined;
     this.singletonManager = undefined;
     this.protocolService = undefined;
     this.storageService = undefined;
@@ -124,7 +125,7 @@ export class SNPrivilegesService extends PureService {
     const netCredentials = [];
     for (const credential of credentials) {
       if (credential === PrivilegeCredential.AccountPassword) {
-        const isOnline = await this.sessionManager!.online();
+        const isOnline = this.sessionManager!.online();
         if (isOnline) {
           netCredentials.push(credential);
         }
@@ -239,6 +240,7 @@ export class SNPrivilegesService extends PureService {
 
   async authenticate(action: ProtectedAction): Promise<boolean> {
     const requiredCredentials = await this.netCredentialsForAction(action);
+
     if (requiredCredentials.length === 0) {
       return true;
     }
@@ -269,13 +271,15 @@ export class SNPrivilegesService extends PureService {
       }
     }
 
-    const response = await this.challengeService?.promptForChallengeResponse(new Challenge(challengePrompts, ChallengeReason.AuthenticatePrivilege, false));
+    challengePrompts.push(new ChallengePrompt(ChallengeValidation.Form, PromptTitles.SessionLength, undefined, false, undefined, this.getSessionLengthOptions()));
+
+    const response = await this.challengeService?.promptForChallengeResponse(new Challenge(challengePrompts, ChallengeReason.AuthenticatePrivilege, true));
     if (!response) {
       return false;
     }
     const value = response.getValueForType(ChallengeValidation.Form);
     if (value) {
-      this.setSessionLength((value.value as ChallengeFormValue).value)
+      this.setSessionLength(value.value as number)
     }
     return true;
   }

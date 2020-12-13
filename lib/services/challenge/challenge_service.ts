@@ -81,7 +81,7 @@ export class ChallengeService extends PureService {
       case ChallengeValidation.Biometric:
         return Promise.resolve({ valid: value.value === true });
       case ChallengeValidation.Form:
-        return Promise.resolve({ valid: Number.isInteger((value.value as ChallengeFormValue).value) });
+        return Promise.resolve({ valid: Number.isInteger(value.value) });
       default:
         throw Error(`Unhandled validation mode ${value.prompt.validation}`)
     }
