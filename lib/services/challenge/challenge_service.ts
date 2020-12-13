@@ -1,5 +1,5 @@
 import { SNRootKey } from './../../protocol/root_key';
-import { ChallengePrompt } from './../../challenges';
+import { ChallengeFormValue, ChallengePrompt } from './../../challenges';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
 import { PureService } from "@Lib/services/pure_service";
@@ -80,6 +80,8 @@ export class ChallengeService extends PureService {
         );
       case ChallengeValidation.Biometric:
         return Promise.resolve({ valid: value.value === true });
+      case ChallengeValidation.Form:
+        return Promise.resolve({ valid: Number.isInteger((value.value as ChallengeFormValue).value) });
       default:
         throw Error(`Unhandled validation mode ${value.prompt.validation}`)
     }

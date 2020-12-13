@@ -1649,8 +1649,7 @@ export class SNApplication {
 
   private createPrivilegesService() {
     this.privilegesService = new SNPrivilegesService(
-      this.itemManager,
-      this.syncService,
+      this.challengeService,
       this.singletonManager,
       this.protocolService,
       this.storageService,

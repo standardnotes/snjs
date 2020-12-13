@@ -139,6 +139,7 @@ export const PromptTitles = {
   AccountPassword: 'Account Password',
   LocalPasscode: 'Application Passcode',
   Biometrics: 'Biometrics',
+  SessionLength: 'Remember for'
 }
 
 export const ErrorAlertStrings = {

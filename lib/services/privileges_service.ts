@@ -1,15 +1,16 @@
 import { FillItemContent } from '@Models/functions';
-import { ItemManager } from '@Services/item_manager';
 import { SNSessionManager } from './api/session_manager';
 import { SNStorageService } from '@Services/storage_service';
 import { SNProtocolService } from './protocol_service';
 import { SNSingletonManager } from './singleton_manager';
-import { SNSyncService } from './sync/sync_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPredicate } from '@Models/core/predicate';
 import { StorageKey } from '@Lib/storage_keys';
 import { ContentType } from '@Lib/models';
 import { PrivilegeCredential, ProtectedAction, SNPrivileges } from '@Models/app/privileges';
+import { Challenge, ChallengeFormValue, ChallengePrompt, ChallengeReason, ChallengeValidation } from '@Lib/challenges';
+import { ChallengeStrings } from './api/messages';
+import { ChallengeService } from './challenge/challenge_service';
 
 export enum PrivilegeSessionLength {
   None = 0,
@@ -25,7 +26,7 @@ const CredentialsMetadata = {
     label: 'Account Password',
     prompt: 'Please enter your account password.'
   },
-  [PrivilegeCredential.LocalPasscode] : {
+  [PrivilegeCredential.LocalAuthentication] : {
     label: 'Application Passcode',
     prompt: 'Please enter your application passcode.'
   }
@@ -62,8 +63,7 @@ const ActionsMetadata = {
  * the user has yet authenticated this action.
  */
 export class SNPrivilegesService extends PureService {
-  private itemManager?: ItemManager
-  private syncService?: SNSyncService
+  private challengeService?: ChallengeService
   private singletonManager?: SNSingletonManager
   private protocolService?: SNProtocolService
   private storageService?: SNStorageService
@@ -71,19 +71,16 @@ export class SNPrivilegesService extends PureService {
 
   private availableActions: ProtectedAction[] = []
   private availableCredentials: PrivilegeCredential[] = []
-  // private sessionLengths: PrivilegeSessionLength[] = []
 
   constructor(
-    itemManager: ItemManager,
-    syncService: SNSyncService,
+    challengeService: ChallengeService,
     singletonManager: SNSingletonManager,
     protocolService: SNProtocolService,
     storageService: SNStorageService,
     sessionManager: SNSessionManager
   ) {
     super();
-    this.itemManager = itemManager;
-    this.syncService = syncService;
+    this.challengeService = challengeService;
     this.singletonManager = singletonManager;
     this.protocolService = protocolService;
     this.storageService = storageService;
@@ -92,8 +89,6 @@ export class SNPrivilegesService extends PureService {
   }
 
   public deinit() {
-    this.itemManager = undefined;
-    this.syncService = undefined;
     this.singletonManager = undefined;
     this.protocolService = undefined;
     this.storageService = undefined;
@@ -108,7 +103,7 @@ export class SNPrivilegesService extends PureService {
 
     this.availableCredentials = [
       PrivilegeCredential.AccountPassword,
-      PrivilegeCredential.LocalPasscode
+      PrivilegeCredential.LocalAuthentication
     ];
   }
 
@@ -133,9 +128,11 @@ export class SNPrivilegesService extends PureService {
         if (isOnline) {
           netCredentials.push(credential);
         }
-      } else if (credential === PrivilegeCredential.LocalPasscode) {
+      } else if (credential === PrivilegeCredential.LocalAuthentication) {
         const hasPasscode = await this.protocolService!.hasRootKeyWrapper();
         if (hasPasscode) {
+          netCredentials.push(credential);
+        } else if (await this.hasBiometrics()) {
           netCredentials.push(credential);
         }
       }
@@ -212,6 +209,9 @@ export class SNPrivilegesService extends PureService {
     return netCredentials.length > 0;
   }
 
+  /**
+   * @deprecated
+   */
   async authenticateAction(
     action: ProtectedAction,
     credentialAuthMapping: CredentialAuthMapping
@@ -237,6 +237,52 @@ export class SNPrivilegesService extends PureService {
     };
   }
 
+  async authenticate(action: ProtectedAction): Promise<boolean> {
+    const requiredCredentials = await this.netCredentialsForAction(action);
+    if (requiredCredentials.length === 0) {
+      return true;
+    }
+
+    const challengePrompts = []
+
+    for (const credential of requiredCredentials) {
+      if (credential === PrivilegeCredential.AccountPassword) {
+        challengePrompts.push(new ChallengePrompt(
+          ChallengeValidation.AccountPassword,
+          undefined,
+          ChallengeStrings.AccountPasswordPlaceholder
+        ));
+      }
+      if (credential === PrivilegeCredential.LocalAuthentication) {
+        if (await this.hasPasscode()) {
+          challengePrompts.push(new ChallengePrompt(
+            ChallengeValidation.LocalPasscode,
+            undefined,
+            ChallengeStrings.LocalPasscodePlaceholder
+          ));
+        }
+        if (await this.hasBiometrics()) {
+          challengePrompts.push(new ChallengePrompt(
+            ChallengeValidation.Biometric
+          ));
+        }
+      }
+    }
+
+    const response = await this.challengeService?.promptForChallengeResponse(new Challenge(challengePrompts, ChallengeReason.AuthenticatePrivilege, false));
+    if (!response) {
+      return false;
+    }
+    const value = response.getValueForType(ChallengeValidation.Form);
+    if (value) {
+      this.setSessionLength((value.value as ChallengeFormValue).value)
+    }
+    return true;
+  }
+
+   /**
+   * @deprecated
+   */
   async verifyAuthenticationParameters(
     credential: PrivilegeCredential,
     value: string
@@ -244,7 +290,7 @@ export class SNPrivilegesService extends PureService {
     if (credential === PrivilegeCredential.AccountPassword) {
       const { valid } = await this.protocolService!.validateAccountPassword(value);
       return valid;
-    } else if (credential === PrivilegeCredential.LocalPasscode) {
+    } else if (credential === PrivilegeCredential.LocalAuthentication) {
       const { valid } = await this.protocolService!.validatePasscode(value);
       return valid;
     }
@@ -277,5 +323,13 @@ export class SNPrivilegesService extends PureService {
         label: '1 Week'
       }
     ];
+  }
+
+  hasPasscode() {
+    return this.protocolService!.hasRootKeyWrapper();
+  }
+
+  hasBiometrics() {
+    return this.challengeService?.hasBiometricsEnabled();
   }
 }

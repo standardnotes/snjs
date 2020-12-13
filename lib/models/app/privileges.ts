@@ -14,7 +14,7 @@ export enum ProtectedAction {
 
 export enum PrivilegeCredential {
   AccountPassword = 'CredentialAccountPassword',
-  LocalPasscode = 'CredentialLocalPasscode'
+  LocalAuthentication = 'CredentialLocalPasscode'
 }
 
 type PrivilegeMap = Partial<Record<ProtectedAction, PrivilegeCredential[]>>

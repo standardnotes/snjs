@@ -1,4 +1,3 @@
-import { Migration } from '@Lib/migrations/migration';
 import { ChallengeModalTitle, ChallengeStrings, PromptTitles } from './services/api/messages';
 import { SNRootKey } from '@Protocol/root_key';
 
@@ -12,6 +11,7 @@ export enum ChallengeValidation {
   LocalPasscode = 1,
   AccountPassword = 2,
   Biometric = 3,
+  Form = 4,
 }
 
 /** The source of the challenge */
@@ -20,13 +20,19 @@ export enum ChallengeReason {
   ResaveRootKey = 2,
   ProtocolUpgrade = 3,
   Migration = 4,
-  Custom = 5
+  AuthenticatePrivilege = 6,
+  Custom = 5,
 }
 
 /** For mobile */
 export enum ChallengeKeyboardType {
   Alphanumeric = 'default',
   Numeric = 'numeric'
+}
+
+export type ChallengeFormValue = {
+  value: number,
+  label: string
 }
 
 /**
@@ -111,7 +117,8 @@ export class ChallengePrompt {
     public readonly _title?: string,
     public readonly placeholder?: string,
     public readonly secureTextEntry = true,
-    public readonly keyboardType?: ChallengeKeyboardType
+    public readonly keyboardType?: ChallengeKeyboardType,
+    public readonly formValues?: ChallengeFormValue[]
   ) {
     Object.freeze(this);
   }
@@ -140,7 +147,7 @@ export class ChallengePrompt {
 export class ChallengeValue {
   constructor(
     public readonly prompt: ChallengePrompt,
-    public readonly value: string | boolean,
+    public readonly value: string | boolean | ChallengeFormValue,
   ) {
     Object.freeze(this);
   }
