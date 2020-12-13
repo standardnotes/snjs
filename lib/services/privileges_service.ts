@@ -130,8 +130,7 @@ export class SNPrivilegesService extends PureService {
           netCredentials.push(credential);
         }
       } else if (credential === PrivilegeCredential.LocalAuthentication) {
-        const hasPasscode = await this.protocolService!.hasRootKeyWrapper();
-        if (hasPasscode) {
+        if (await this.hasPasscode()) {
           netCredentials.push(credential);
         } else if (await this.hasBiometrics()) {
           netCredentials.push(credential);
@@ -329,11 +328,11 @@ export class SNPrivilegesService extends PureService {
     ];
   }
 
-  hasPasscode() {
+  private hasPasscode() {
     return this.protocolService!.hasRootKeyWrapper();
   }
 
-  hasBiometrics() {
+  private hasBiometrics() {
     return this.challengeService?.hasBiometricsEnabled();
   }
 }
