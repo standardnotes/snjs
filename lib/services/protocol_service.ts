@@ -1183,7 +1183,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       const rootKey = this.getRootKey();
       if (!rootKey) {
         if (intentRequiresEncryption(intent)) {
-          throw 'Root key encryption is required but no root key is available.';
+          throw Error('Root key encryption is required but no root key is available.');
         } else {
           return undefined;
         }
