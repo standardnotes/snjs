@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('storage manager', function() {
+describe('storage manager', function () {
   this.timeout(Factory.TestTimeout);
   /**
    * Items are saved in localStorage in tests.
@@ -24,7 +24,7 @@ describe('storage manager', function() {
     await sharedApplication.deinit();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     localStorage.clear();
     this.expectedKeyCount = BASE_KEY_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace(Environment.Mobile);
@@ -32,7 +32,7 @@ describe('storage manager', function() {
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await this.application.deinit();
     localStorage.clear();
   });
@@ -71,21 +71,22 @@ describe('storage manager', function() {
     expect(keychainValue.serverPassword).to.not.be.ok;
   });
 
-  it('regular session should persist data', async function () {
+  it.only('regular session should persist data', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
       ephemeral: false
     });
-    this.expectedKeyCount += 2;
     const key = 'foo';
     const value = 'bar';
     await this.application.storageService.setValue(
       key,
       value
     );
-    expect(Object.keys(localStorage).length).to.equal(this.expectedKeyCount);
+    console.log("localStorage keys", Object.keys(localStorage));
+    /** Items are stored in local storage */
+    expect(Object.keys(localStorage).length).to.equal(this.expectedKeyCount + BASE_ITEM_COUNT);
     const retrievedValue = await this.application.storageService.getValue(key);
     expect(retrievedValue).to.equal(value);
   });
