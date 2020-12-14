@@ -40,7 +40,7 @@ describe('privileges', () => {
     await this.application.itemManager.changeItem(privileges.uuid, (mutator) => {
       mutator.addCredentialForAction(
         ProtectedAction.ViewProtectedNotes,
-        PrivilegeCredential.LocalPasscode
+        PrivilegeCredential.LocalAuthentication
       );
     });
     await this.application.setPasscode('foobar');
