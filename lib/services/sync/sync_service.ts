@@ -32,6 +32,7 @@ import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 import { SNAlertService } from '../alert_service';
 import { SessionInvalidState } from '../api/messages';
+import { SNLog } from '@Lib/log';
 
 const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
@@ -625,6 +626,7 @@ export class SNSyncService extends PureService<SyncEvent> {
         SessionInvalidState.Text,
         SessionInvalidState.Title,
       )
+      SNLog.error(new Error('Session missing while attempting to sync.'))
     }
 
     const online = this.sessionManager!.online();
