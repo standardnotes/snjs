@@ -5,7 +5,8 @@ import { HttpResponse, StatusCode } from './responses';
 export enum HttpVerb {
   Get = 'get',
   Post = 'post',
-  Patch = 'patch'
+  Patch = 'patch',
+  Delete = 'delete',
 }
 
 const REQUEST_READY_STATE_COMPLETED = 4;
@@ -48,6 +49,14 @@ export class SNHttpService extends PureService {
     return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication });
   }
 
+  public async deleteAbsolute(
+    url: string,
+    params?: HttpParams,
+    authentication?: string
+  ): Promise<HttpResponse> {
+    return this.runHttp({ url, params, verb: HttpVerb.Delete, authentication });
+  }
+
   public async runHttp(httpRequest: HttpRequest): Promise<HttpResponse> {
     const request = this.createXmlRequest(httpRequest);
     return this.runRequest(request, httpRequest.verb, httpRequest.params);
@@ -79,7 +88,7 @@ export class SNHttpService extends PureService {
       request.onreadystatechange = () => {
         this.stateChangeHandlerForRequest(request, resolve, reject);
       };
-      if (verb === HttpVerb.Post || verb === HttpVerb.Patch) {
+      if (verb === HttpVerb.Post || verb === HttpVerb.Patch || verb === HttpVerb.Delete) {
         request.send(JSON.stringify(params));
       } else {
         request.send();
@@ -100,9 +109,11 @@ export class SNHttpService extends PureService {
       status: httpStatus
     }
     try {
-      const body = JSON.parse(request.responseText);
-      response.object = body;
-      Object.assign(response, body);
+      if (httpStatus !== StatusCode.HttpStatusNoContent) {
+        const body = JSON.parse(request.responseText);
+        response.object = body;
+        Object.assign(response, body);
+      }
     } catch (error) {
       console.error(error)
     }
