@@ -739,6 +739,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     intent: EncryptionIntent,
     items: SNItem[]
   ): Promise<BackupFile> {
+    if (intent === EncryptionIntent.FileDecrypted) {
+      items = items.filter(item => item.content_type !== ContentType.ItemsKey);
+    }
+
     const ejectedPayloads = Promise.all(
       items.map(item => {
         if (item.errorDecrypting) {

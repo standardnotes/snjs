@@ -946,7 +946,6 @@ export class SNApplication {
           return;
         }
       }
-      items = items.filter(item => item.content_type !== ContentType.ItemsKey);
     }
 
     return this.protocolService.createBackupFile(intent, items);
