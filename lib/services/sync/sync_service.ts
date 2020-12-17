@@ -30,6 +30,9 @@ import { Uuids } from '@Models/functions';
 import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
+import { SNAlertService } from '../alert_service';
+import { SessionInvalidState } from '../api/messages';
+import { SNLog } from '@Lib/log';
 
 const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
@@ -118,6 +121,7 @@ export class SNSyncService extends PureService<SyncEvent> {
   private modelManager?: PayloadManager
   private itemManager?: ItemManager
   private apiService?: SNApiService
+  private alertService?: SNAlertService
   private interval: any
   private state?: SyncState
   private opStatus!: SyncOpStatus
@@ -155,6 +159,7 @@ export class SNSyncService extends PureService<SyncEvent> {
     storageService: SNStorageService,
     modelManager: PayloadManager,
     apiService: SNApiService,
+    alertService: SNAlertService,
     interval: any
   ) {
     super();
@@ -164,6 +169,7 @@ export class SNSyncService extends PureService<SyncEvent> {
     this.modelManager = modelManager;
     this.storageService = storageService;
     this.apiService = apiService;
+    this.alertService = alertService;
     this.interval = interval;
 
     this.initializeStatus();
@@ -604,6 +610,23 @@ export class SNSyncService extends PureService<SyncEvent> {
         MutationType.NonDirtying,
         PayloadSource.PreSyncSave
       );
+    }
+
+     /**
+     * This is a temporary patch for users in mobile where for some reason the session+user
+     * object go missing, and results in errorless sync in mistaken no account state.
+     * Mobile will use protocolService.hasAccount(), which checks key state for account status,
+     * to display a sign out button, whereas sync below will use sessionManager for account status,
+     * which checks for existence of session object. These two states should be equivalent,
+     * but if they're not, it means we're in an errored state.
+     */
+    const erroredState = this.protocolService!.hasAccount() !== this.sessionManager!.online();
+    if (erroredState) {
+      this.alertService!.alert(
+        SessionInvalidState.Text,
+        SessionInvalidState.Title,
+      )
+      SNLog.error(new Error('Session missing while attempting to sync.'))
     }
 
     const online = this.sessionManager!.online();
