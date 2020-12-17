@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('online syncing', function() {
+describe('online syncing', function () {
   this.timeout(Factory.TestTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
@@ -1308,5 +1308,34 @@ describe('online syncing', function() {
     const updatedNote = this.application.findItem(note.uuid);
     expect(updatedNote.lastSyncBegan.getTime()).to.equal(lastSyncBegan.getTime());
     expect(updatedNote.lastSyncEnd.getTime()).to.equal(lastSyncEnd.getTime());
+  });
+
+  it('syncing with missing session object should prompt for re-auth', async function () {
+    /**
+     * This covers the temporary function syncService.handleInvalidSessionState
+     * where mobile could be missing storage/session object
+     */
+    let didPromptForSignIn = false;
+    const receiveChallenge = async (challenge) => {
+      didPromptForSignIn = true;
+      this.application.submitValuesForChallenge(
+        challenge,
+        [
+          new ChallengeValue(challenge.prompts[0], this.email),
+          new ChallengeValue(challenge.prompts[1], this.password),
+        ]
+      );
+    };
+    this.application.setLaunchCallback({ receiveChallenge });
+    this.application.apiService.setSession(undefined);
+
+    await this.application.sync();
+
+    /** Allow session recovery to do its thing */
+    await Factory.sleep(2.0);
+
+    expect(didPromptForSignIn).to.equal(true);
+    expect(this.application.apiService.session.accessToken).to.be.ok;
+    expect(this.application.apiService.session.refreshToken).to.be.ok;
   });
 });

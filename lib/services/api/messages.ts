@@ -153,9 +153,3 @@ export const KeychainRecoveryStrings = {
   Title: 'Restore Keychain',
   Text: `We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.`
 }
-
-export const SessionInvalidState = {
-  Title: 'Invalid State',
-  Text:  "We've detected that your application is in an invalid state, and that changes you make will not be synced to your account. We are continuing to investigate why this may happen, but in the meantime, please sign out and back in to restore proper syncing functionality."
-}
-
