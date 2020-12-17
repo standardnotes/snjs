@@ -12,17 +12,6 @@ describe('storage manager', function () {
    */
   const BASE_KEY_COUNT = 3;
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
-  const sharedApplication = Factory.createApplication();
-
-  before(async function () {
-    localStorage.clear();
-    await Factory.initializeApplication(sharedApplication);
-  });
-
-  after(async function () {
-    localStorage.clear();
-    await sharedApplication.deinit();
-  });
 
   beforeEach(async function () {
     localStorage.clear();
@@ -32,31 +21,31 @@ describe('storage manager', function () {
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(async function () {
-    await this.application.deinit();
+  afterEach(function () {
+    this.application.deinit();
     localStorage.clear();
   });
 
   it('should set and retrieve values', async function () {
     const key = 'foo';
     const value = 'bar';
-    await sharedApplication.storageService.setValue(key, value);
-    expect(await sharedApplication.storageService.getValue(key)).to.eql(value);
+    await this.application.storageService.setValue(key, value);
+    expect(await this.application.storageService.getValue(key)).to.eql(value);
   });
 
   it('should set and retrieve items', async function () {
     const payload = Factory.createNotePayload();
-    await sharedApplication.storageService.savePayload(payload);
-    const payloads = await sharedApplication.storageService.getAllRawPayloads();
-    expect(payloads.length).to.equal(1);
+    await this.application.storageService.savePayload(payload);
+    const payloads = await this.application.storageService.getAllRawPayloads();
+    expect(payloads.length).to.equal(BASE_ITEM_COUNT + 1);
   });
 
   it('should clear values', async function () {
     const key = 'foo';
     const value = 'bar';
-    await sharedApplication.storageService.setValue(key, value);
-    await sharedApplication.storageService.clearAllData();
-    expect(await sharedApplication.storageService.getValue(key)).to.not.be.ok;
+    await this.application.storageService.setValue(key, value);
+    await this.application.storageService.clearAllData();
+    expect(await this.application.storageService.getValue(key)).to.not.be.ok;
   });
 
   it('serverPassword should not be saved to keychain', async function () {
