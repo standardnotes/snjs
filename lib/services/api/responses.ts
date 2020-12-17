@@ -5,6 +5,7 @@ import { ProtocolVersion } from './../../protocol/versions';
 
 export enum StatusCode {
   HttpStatusMinSuccess = 200,
+  HttpStatusNoContent = 204,
   HttpStatusMaxSuccess = 299,
   /** The session's access token is expired, but the refresh token is valid */
   HttpStatusExpiredAccessToken = 498,

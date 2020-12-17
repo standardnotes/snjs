@@ -19,7 +19,7 @@ import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
-import { isString, removeFromArray, sleep } from '@Lib/utils';
+import { isNullOrUndefined, isString, removeFromArray, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
@@ -65,6 +65,8 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
+import { HttpResponse } from './services/api/responses';
+import { RemoteSession } from './services/api/session';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -479,6 +481,22 @@ export class SNApplication {
 
   public getSyncStatus() {
     return this.syncService!.getStatus()!;
+  }
+
+  public getSessions(): Promise<RemoteSession[] | HttpResponse> {
+    return this.sessionManager.getSessionsList();
+  }
+
+  public revokeSession(sessionId: UuidString): Promise<HttpResponse> {
+    return this.sessionManager.revokeSession(sessionId);
+  }
+
+  public async userCanManageSessions(): Promise<boolean> {
+    const userVersion = await this.getUserVersion();
+    if (isNullOrUndefined(userVersion)) {
+      return false;
+    }
+    return compareVersions(userVersion, ProtocolVersion.V004) >= 0;
   }
 
   /**

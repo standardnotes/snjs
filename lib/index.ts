@@ -9,6 +9,7 @@ export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
 export { KeyParamsOrigination } from './protocol/key_params';
 export { KeyRecoveryStrings, SessionStrings } from './services/api/messages';
+export type { RemoteSession } from './services/api/session';
 
 export { SNApplication } from '@Lib/application';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';

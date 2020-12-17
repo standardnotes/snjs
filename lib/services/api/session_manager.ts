@@ -8,7 +8,7 @@ import {
   ChallengeValidation
 } from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
-import { JwtSession, TokenSession } from './session';
+import { JwtSession, RemoteSession, TokenSession } from './session';
 import {
   ChangePasswordResponse,
   HttpResponse,
@@ -34,6 +34,7 @@ import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
 import { ErrorAlertStrings, RegisterStrings, SessionStrings, SignInStrings } from './messages';
+import { UuidString } from '@Lib/types';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MissingAccountParams = 'missing-params';
@@ -478,8 +479,23 @@ export class SNSessionManager extends PureService<SessionEvent> {
     };
   }
 
-  public getSessionsList() {
-    return this.apiService.getSessionsList();
+  public async getSessionsList(): Promise<RemoteSession[] | HttpResponse> {
+    const response = await this.apiService.getSessionsList();
+    if (response.error) {
+      return response
+    }
+    return response.object
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((session: any) => ({
+        ...session,
+        updated_at: new Date(session.updated_at)
+      }))
+      .sort((s1: RemoteSession, s2: RemoteSession) => s1.updated_at < s2.updated_at);
+  }
+
+  public async revokeSession(sessionId: UuidString): Promise<HttpResponse> {
+    const response = await this.apiService.deleteSession(sessionId);
+    return response;
   }
 
   private async handleSuccessAuthResponse(
