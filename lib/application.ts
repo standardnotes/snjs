@@ -19,7 +19,7 @@ import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
-import { isString, removeFromArray, sleep } from '@Lib/utils';
+import { isNullOrUndefined, isString, removeFromArray, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
@@ -489,6 +489,14 @@ export class SNApplication {
 
   public revokeSession(sessionId: UuidString): Promise<HttpResponse> {
     return this.sessionManager.revokeSession(sessionId);
+  }
+
+  public async userCanManageSessions(): Promise<boolean> {
+    const userVersion = await this.getUserVersion();
+    if (isNullOrUndefined(userVersion)) {
+      return false;
+    }
+    return compareVersions(userVersion, ProtocolVersion.V004) >= 0;
   }
 
   /**
