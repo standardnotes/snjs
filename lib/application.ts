@@ -935,7 +935,7 @@ export class SNApplication {
   public async createBackupFile(
     intent: EncryptionIntent
   ): Promise<BackupFile | undefined> {
-    let items = this.itemManager.items;
+    const items = this.itemManager.items;
 
     if (intent === EncryptionIntent.FileDecrypted) {
       if (items.some(item => item.protected) && this.hasPasscode()) {
