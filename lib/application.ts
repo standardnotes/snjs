@@ -1643,7 +1643,6 @@ export class SNApplication {
       this.storageService,
       this.modelManager,
       this.apiService,
-      this.alertService,
       this.deviceInterface.interval,
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
