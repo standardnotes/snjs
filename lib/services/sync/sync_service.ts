@@ -745,7 +745,7 @@ export class SNSyncService extends PureService<SyncEvent> {
    * but if they're not, it means we're in an errored state.
    */
   private handleInvalidSessionState() {
-    SNLog.error(new Error('Session missing while attempting to sync.'))
+    SNLog.error(Error('Session missing while attempting to sync.'))
     this.sessionManager!.reauthenticateInvalidSession();
   }
 
