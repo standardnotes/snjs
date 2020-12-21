@@ -16,7 +16,7 @@ export enum Platform {
 }
 
 export function platformFromString(string: string) {
-  const map: Record<string, number> = {
+  const map: Record<string, Platform> = {
     'mac-web': Platform.MacWeb,
     'mac-desktop': Platform.MacDesktop,
     'linux-web': Platform.LinuxWeb,
@@ -44,7 +44,7 @@ export function platformToString(platform: Platform) {
 }
 
 export function environmentFromString(string: string) {
-  const map: Record<string, number> = {
+  const map: Record<string, Environment> = {
     'web': Environment.Web,
     'desktop': Environment.Desktop,
     'mobile': Environment.Mobile,
