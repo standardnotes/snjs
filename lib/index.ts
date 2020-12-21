@@ -134,7 +134,8 @@ export {
   Platform,
   isEnvironmentWebOrDesktop,
   isEnvironmentMobile,
-  platformFromString
+  platformFromString,
+  environmentFromString
 } from '@Lib/platforms';
 export {
   SyncEvent

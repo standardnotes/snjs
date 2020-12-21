@@ -43,6 +43,15 @@ export function platformToString(platform: Platform) {
   return map[platform];
 }
 
+export function environmentFromString(string: string) {
+  const map = {
+    'web': Environment.Web,
+    'desktop': Environment.Desktop,
+    'mobile': Environment.Mobile,
+  };
+  return (map as any)[string];
+}
+
 export function environmentToString(environment: Environment) {
   const map = {
     [Environment.Web]: 'web',
