@@ -44,8 +44,10 @@ services:
     image: standardnotes/syncing-server:stable
     entrypoint: ["/tools/wait-for.sh", "db", "3306", "./docker/entrypoint.sh", "start-web"]
     environment:
+      SECRET_KEY_BASE: s3cr3tK3y
       RAILS_ENV: test
       RAILS_LOG_TO_STDOUT: 1
+      RAILS_LOG_LEVEL: debug
       DB_PORT: 3306
       DB_HOST: db
       DB_DATABASE: testdb
@@ -66,9 +68,11 @@ services:
     image: standardnotes/syncing-server-js:latest
     entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
     environment:
-      LOG_LEVEL: info
+      LOG_LEVEL: debug
       NODE_ENV: development
-      JWT_SECRET: secret
+      JWT_SECRET: s3cr3tK3y
+      MAX_LOGIN_ATTEMPTS: 6
+      FAILED_LOGIN_LOCKOUT: 3600
       LEGACY_JWT_SECRET: legacy_jwt_secret
       PORT: 3000
       DB_HOST: db
