@@ -66,7 +66,7 @@ services:
     depends_on:
       - syncing-server-proxy
       - syncing-server-ruby
-    image: standardnotes/syncing-server-js:latest
+    image: standardnotes/syncing-server-js:stable
     entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
     environment:
       LOG_LEVEL: debug
