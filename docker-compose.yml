@@ -48,6 +48,7 @@ services:
       RAILS_ENV: test
       RAILS_LOG_TO_STDOUT: 1
       RAILS_LOG_LEVEL: debug
+      PSEUDO_KEY_PARAMS_KEY: secret_key
       DB_PORT: 3306
       DB_HOST: db
       DB_DATABASE: testdb
@@ -65,7 +66,7 @@ services:
     depends_on:
       - syncing-server-proxy
       - syncing-server-ruby
-    image: standardnotes/syncing-server-js:stable
+    image: standardnotes/syncing-server-js:latest
     entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
     environment:
       LOG_LEVEL: debug
@@ -74,6 +75,7 @@ services:
       MAX_LOGIN_ATTEMPTS: 6
       FAILED_LOGIN_LOCKOUT: 3600
       LEGACY_JWT_SECRET: legacy_jwt_secret
+      PSEUDO_KEY_PARAMS_KEY: secret_key
       PORT: 3000
       DB_HOST: db
       DB_REPLICA_HOST: db
