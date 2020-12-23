@@ -437,6 +437,8 @@ describe('server session', function () {
   });
 
   it('revoking a session should prevent further syncing', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     /** Create new session aside from existing one */
     const app2 = await Factory.createAndInitializeApplication('app2');
     app2.prepareForLaunch({
