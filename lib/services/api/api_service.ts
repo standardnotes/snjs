@@ -198,7 +198,8 @@ export class SNApiService extends PureService {
     email: string,
     serverPassword: string,
     mfaKeyPath?: string,
-    mfaCode?: string
+    mfaCode?: string,
+    ephemeral = false
   ) {
     if (this.authenticating) {
       return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS) as SignInResponse;
@@ -206,8 +207,9 @@ export class SNApiService extends PureService {
     this.authenticating = true;
     const url = await this.path(REQUEST_PATH_LOGIN);
     const params = this.params({
-      email: email,
-      password: serverPassword
+      email,
+      password: serverPassword,
+      ephemeral
     });
     if (mfaKeyPath) {
       params[mfaKeyPath] = mfaCode;
