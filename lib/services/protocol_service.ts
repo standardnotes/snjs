@@ -736,9 +736,10 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns JSON stringified representation of data, including keyParams.
    */
   public async createBackupFile(
-    intent: EncryptionIntent,
-    items: SNItem[]
+    intent: EncryptionIntent
   ): Promise<BackupFile> {
+    let items = this.itemManager.items;
+
     if (intent === EncryptionIntent.FileDecrypted) {
       items = items.filter(item => item.content_type !== ContentType.ItemsKey);
     }

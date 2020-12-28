@@ -948,7 +948,7 @@ export class SNApplication {
       }
     }
 
-    return this.protocolService.createBackupFile(intent, items);
+    return this.protocolService.createBackupFile(intent);
   }
 
   public isEphemeralSession() {
@@ -1181,7 +1181,7 @@ export class SNApplication {
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSync(true);
         } else {
-          this.itemManager.removeAllItemsFromMemory();
+          void this.itemManager.removeAllItemsFromMemory();
           await this.clearDatabase();
         }
         await this.notifyEvent(ApplicationEvent.SignedIn);
@@ -1227,7 +1227,7 @@ export class SNApplication {
       { validatePasswordStrength }
     );
     if (result.error) {
-      this.alertService.alert(result.error.message);
+      void this.alertService.alert(result.error.message);
     }
     return result;
   }
