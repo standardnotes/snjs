@@ -939,7 +939,7 @@ export class SNApplication {
 
     if (intent === EncryptionIntent.FileDecrypted) {
       if (items.some(item => item.protected) && this.hasPasscode()) {
-        const passcode = this.challengeService.promptForPasscode(
+        const passcode = await this.challengeService.promptForPasscode(
           ChallengeReason.CreateDecryptedBackupWithProtectedItems
         );
         if (!passcode) {
