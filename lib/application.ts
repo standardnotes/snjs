@@ -26,6 +26,7 @@ import { PayloadSource } from '@Payloads/sources';
 import { CreateItemFromPayload } from '@Models/generator';
 import { StoragePersistencePolicies, StorageValueModes } from '@Services/storage_service';
 import {
+  ButtonType,
   ChallengeService,
   ItemManager,
   PayloadManager,
@@ -57,7 +58,8 @@ import {
   ProtocolUpgradeStrings,
   REMOVING_PASSCODE, SETTING_PASSCODE,
   UNSUPPORTED_BACKUP_FILE_VERSION,
-  UPGRADING_ENCRYPTION
+  UPGRADING_ENCRYPTION,
+  SessionStrings
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
@@ -487,8 +489,18 @@ export class SNApplication {
     return this.sessionManager.getSessionsList();
   }
 
-  public revokeSession(sessionId: UuidString): Promise<HttpResponse> {
-    return this.sessionManager.revokeSession(sessionId);
+  public async revokeSession(
+    sessionId: UuidString
+  ): Promise<HttpResponse | undefined> {
+    const revoke = await this.alertService.confirm(
+      SessionStrings.RevokeText,
+      SessionStrings.RevokeTitle,
+      SessionStrings.RevokeConfirmButton,
+      ButtonType.Danger,
+    );
+    if (revoke) {
+      return this.sessionManager.revokeSession(sessionId);
+    }
   }
 
   public async userCanManageSessions(): Promise<boolean> {
