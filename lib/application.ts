@@ -489,18 +489,28 @@ export class SNApplication {
     return this.sessionManager.getSessionsList();
   }
 
+  /**
+   * Prompts the user to confirm their intent, and then revokes the session.
+   * @param sessionId The session's ID.
+   * @returns a response promise if the user confirmed their intent, undefined
+   * otherwise.
+   */
   public async revokeSession(
-    sessionId: UuidString
-  ): Promise<HttpResponse | undefined> {
+    sessionId: UuidString,
+  ): Promise<{
+    response?: Promise<HttpResponse>
+  }> {
     const revoke = await this.alertService.confirm(
       SessionStrings.RevokeText,
       SessionStrings.RevokeTitle,
       SessionStrings.RevokeConfirmButton,
       ButtonType.Danger,
     );
-    if (revoke) {
-      return this.sessionManager.revokeSession(sessionId);
-    }
+    return {
+      response: revoke
+        ? this.sessionManager.revokeSession(sessionId)
+        : undefined,
+    };
   }
 
   public async userCanManageSessions(): Promise<boolean> {
