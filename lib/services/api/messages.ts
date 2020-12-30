@@ -15,6 +15,8 @@ export const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL = `A server error occurred w
 
 export const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = `Your account session is being renewed with the server. Please try your request again.`;
 
+export const API_MESSAGE_RATE_LIMITED = 'Too many successive server requests. Please wait a few minutes and try again.';
+
 export const API_MESSAGE_INVALID_SESSION = 'Please sign in to an account in order to continue with your request.';
 
 export const UNSUPPORTED_PROTOCOL_VERSION = `This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.`;
