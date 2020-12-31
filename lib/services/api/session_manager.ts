@@ -67,7 +67,6 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   private user?: User
   private isSessionRenewChallengePresented = false;
-  private currentSessionIsEphemeral = false;
 
   constructor(
     private storageService: SNStorageService,
@@ -171,7 +170,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
               email,
               password,
               false,
-              this.currentSessionIsEphemeral,
+              this.storageService.isEphemeralSession(),
               currentKeyParams?.version
             );
             if (signInResult.response.error) {
@@ -444,7 +443,6 @@ export class SNSessionManager extends PureService<SessionEvent> {
       ephemeral,
     )
     if (!signInResponse.error) {
-      this.currentSessionIsEphemeral = ephemeral;
       const expandedRootKey = await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params);
       await this.handleSuccessAuthResponse(signInResponse, expandedRootKey, wrappingKey);
       return signInResponse;
