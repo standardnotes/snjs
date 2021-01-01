@@ -166,7 +166,13 @@ export class SNSessionManager extends PureService<SessionEvent> {
             const email = challengeResponse.values[0].value as string;
             const password = challengeResponse.values[1].value as string;
             const currentKeyParams = await this.protocolService.getAccountKeyParams();
-            const signInResult = await this.signIn(email, password, false, currentKeyParams?.version);
+            const signInResult = await this.signIn(
+              email,
+              password,
+              false,
+              this.storageService.isEphemeralSession(),
+              currentKeyParams?.version
+            );
             if (signInResult.response.error) {
               this.challengeService.setValidationStatusForChallenge(
                 challenge,
@@ -302,12 +308,14 @@ export class SNSessionManager extends PureService<SessionEvent> {
     email: string,
     password: string,
     strict = false,
+    ephemeral = false,
     minAllowedVersion?: ProtocolVersion
   ): Promise<SessionManagerResponse> {
     const result = await this.performSignIn(
       email,
       password,
       strict,
+      ephemeral,
       minAllowedVersion
     );
     if (
@@ -324,6 +332,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
           cleanedEmail,
           password,
           strict,
+          ephemeral,
           minAllowedVersion
         );
       } else {
@@ -338,6 +347,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     email: string,
     password: string,
     strict = false,
+    ephemeral = false,
     minAllowedVersion?: ProtocolVersion
   ): Promise<SessionManagerResponse> {
     const paramsResult = await this.retrieveKeyParams(email);
@@ -403,7 +413,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
       email,
       rootKey,
       paramsResult.mfaKeyPath,
-      paramsResult.mfaCode
+      paramsResult.mfaCode,
+      ephemeral
     )
     return {
       response: signInResponse
@@ -415,6 +426,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     rootKey: SNRootKey,
     mfaKeyPath?: string,
     mfaCode?: string,
+    ephemeral = false,
   ): Promise<SignInResponse> {
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable();
     if (canceled) {
@@ -427,7 +439,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
       email,
       rootKey.serverPassword!,
       mfaKeyPath,
-      mfaCode
+      mfaCode,
+      ephemeral,
     )
     if (!signInResponse.error) {
       const expandedRootKey = await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params);
