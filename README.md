@@ -6,9 +6,9 @@ SNJS is a client-side JavaScript library for [Standard Notes](https://standardno
 
 SNJS (Standard Notes JavaScript) is a shared library we use in all Standard Notes clients (desktop, web, and mobile React Native). Its role is essentially to extract any business or data logic from client code, so that clients are mostly responsible for UI-level code, and don’t have to think about encryption and key stretching, or even authentication or storage specifics. Extracting the code into a shared library also prevents us from having to write the same critical code on multiple platforms.
 
-The entry point of SNJS is the [`SNApplication`](https://github.com/standardnotes/snjs/blob/004/lib/application.js) class. The application class is a complete unit of application functionality. Theoretically, many instances of an application can be created, each with its own storage namespace and memory state. This can allow clients to support multiple user accounts.
+The entry point of SNJS is the [`SNApplication`](lib/application.ts) class. The application class is a complete unit of application functionality. Theoretically, many instances of an application can be created, each with its own storage namespace and memory state. This can allow clients to support multiple user accounts.
 
-An application must be supplied a custom subclass of [DeviceInterface](https://github.com/standardnotes/snjs/blob/004/lib/device_interface.js). This allows the library to generalize all behavior a client will need to perform throughout normal client operation, such as saving data to a local database store, saving key/values, and accessing the keychain.
+An application must be supplied a custom subclass of [DeviceInterface](lib/device_interface.ts). This allows the library to generalize all behavior a client will need to perform throughout normal client operation, such as saving data to a local database store, saving key/values, and accessing the keychain.
 
 The application interacts with a variety of services and managers to facilitate complete client functionality. While the distinction is not fully technical, a service can be thought of as a class that allows consumers to perform actions on demand, while a manager is responsible for managing and reacting to application state (but also expose on-demand functions). All managers and services live in `lib/services`.
 
