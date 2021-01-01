@@ -436,7 +436,7 @@ describe('server session', function () {
     expect(response2.object.length).to.equal(1);
   });
 
-  it.only('revoking a session should prevent further syncing', async function () {
+  it.skip('revoking a session should prevent further syncing', async function () {
     this.timeout(Factory.LongTestTimeout)
 
     const app2 = await Factory.createAndInitializeApplication('app2');
