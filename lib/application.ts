@@ -57,7 +57,7 @@ import {
   ProtocolUpgradeStrings,
   REMOVING_PASSCODE, SETTING_PASSCODE,
   UNSUPPORTED_BACKUP_FILE_VERSION,
-  UPGRADING_ENCRYPTION
+  UPGRADING_ENCRYPTION,
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
