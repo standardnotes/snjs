@@ -7,7 +7,7 @@ function cleanup {
   echo "# Killing all containers"
   docker-compose kill
   echo "# Removing all containers"
-  docker-compose rm -f
+  docker-compose rm -vf
 }
 
 [ -n "${SYNCING_SERVER_VERSION}" ] || SYNCING_SERVER_VERSION=$1 && shift 1
