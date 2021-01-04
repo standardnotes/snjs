@@ -7,7 +7,7 @@ function cleanup {
   echo "# Killing all containers"
   docker-compose kill
   echo "# Removing all containers"
-  docker-compose rm -f
+  docker-compose rm -vf
 }
 
 [ -n "${SYNCING_SERVER_VERSION}" ] || SYNCING_SERVER_VERSION=$1 && shift 1
@@ -79,7 +79,7 @@ while [ $attempt -le 119 ]; do
 done
 
 echo "# Starting $SYNCING_SERVER_VERSION Test Suite"
-npx mocha-headless-chrome -f http://localhost:9001/test/test.html -t 600000
+npx mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html
 test_result=$?
 
 cleanup

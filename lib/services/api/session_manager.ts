@@ -8,7 +8,7 @@ import {
   ChallengeValidation
 } from './../../challenges';
 import { ChallengeService } from './../challenge/challenge_service';
-import { JwtSession, TokenSession } from './session';
+import { JwtSession, RemoteSession, TokenSession } from './session';
 import {
   ChangePasswordResponse,
   HttpResponse,
@@ -34,6 +34,7 @@ import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
 import { ErrorAlertStrings, RegisterStrings, SessionStrings, SignInStrings } from './messages';
+import { UuidString } from '@Lib/types';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MissingAccountParams = 'missing-params';
@@ -165,7 +166,13 @@ export class SNSessionManager extends PureService<SessionEvent> {
             const email = challengeResponse.values[0].value as string;
             const password = challengeResponse.values[1].value as string;
             const currentKeyParams = await this.protocolService.getAccountKeyParams();
-            const signInResult = await this.signIn(email, password, false, currentKeyParams?.version);
+            const signInResult = await this.signIn(
+              email,
+              password,
+              false,
+              this.storageService.isEphemeralSession(),
+              currentKeyParams?.version
+            );
             if (signInResult.response.error) {
               this.challengeService.setValidationStatusForChallenge(
                 challenge,
@@ -301,12 +308,14 @@ export class SNSessionManager extends PureService<SessionEvent> {
     email: string,
     password: string,
     strict = false,
+    ephemeral = false,
     minAllowedVersion?: ProtocolVersion
   ): Promise<SessionManagerResponse> {
     const result = await this.performSignIn(
       email,
       password,
       strict,
+      ephemeral,
       minAllowedVersion
     );
     if (
@@ -323,6 +332,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
           cleanedEmail,
           password,
           strict,
+          ephemeral,
           minAllowedVersion
         );
       } else {
@@ -337,6 +347,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     email: string,
     password: string,
     strict = false,
+    ephemeral = false,
     minAllowedVersion?: ProtocolVersion
   ): Promise<SessionManagerResponse> {
     const paramsResult = await this.retrieveKeyParams(email);
@@ -402,7 +413,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
       email,
       rootKey,
       paramsResult.mfaKeyPath,
-      paramsResult.mfaCode
+      paramsResult.mfaCode,
+      ephemeral
     )
     return {
       response: signInResponse
@@ -414,6 +426,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     rootKey: SNRootKey,
     mfaKeyPath?: string,
     mfaCode?: string,
+    ephemeral = false,
   ): Promise<SignInResponse> {
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable();
     if (canceled) {
@@ -426,7 +439,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
       email,
       rootKey.serverPassword!,
       mfaKeyPath,
-      mfaCode
+      mfaCode,
+      ephemeral,
     )
     if (!signInResponse.error) {
       const expandedRootKey = await SNRootKey.ExpandedCopy(rootKey, signInResponse.key_params);
@@ -478,8 +492,23 @@ export class SNSessionManager extends PureService<SessionEvent> {
     };
   }
 
-  public getSessionsList() {
-    return this.apiService.getSessionsList();
+  public async getSessionsList(): Promise<RemoteSession[] | HttpResponse> {
+    const response = await this.apiService.getSessionsList();
+    if (response.error) {
+      return response
+    }
+    return response.object
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((session: any) => ({
+        ...session,
+        updated_at: new Date(session.updated_at)
+      }))
+      .sort((s1: RemoteSession, s2: RemoteSession) => s1.updated_at < s2.updated_at);
+  }
+
+  public async revokeSession(sessionId: UuidString): Promise<HttpResponse> {
+    const response = await this.apiService.deleteSession(sessionId);
+    return response;
   }
 
   private async handleSuccessAuthResponse(

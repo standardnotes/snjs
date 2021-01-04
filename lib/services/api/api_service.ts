@@ -35,6 +35,7 @@ const REQUEST_PATH_SYNC = '/items/sync';
 const REQUEST_PATH_LOGOUT = '/auth/sign_out';
 const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
 const REQUEST_PATH_ALL_SESSIONS = '/sessions';
+const REQUEST_PATH_SESSION = '/session';
 const REQUEST_PATH_ITEM_REVISIONS = '/items/:item_id/revisions';
 const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 
@@ -92,7 +93,7 @@ export class SNApiService extends PureService {
     await this.storageService.setValue(StorageKey.ServerHost, host);
   }
 
-  public async getHost() {
+  public getHost() {
     return this.host;
   }
 
@@ -197,7 +198,8 @@ export class SNApiService extends PureService {
     email: string,
     serverPassword: string,
     mfaKeyPath?: string,
-    mfaCode?: string
+    mfaCode?: string,
+    ephemeral = false
   ) {
     if (this.authenticating) {
       return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS) as SignInResponse;
@@ -205,8 +207,9 @@ export class SNApiService extends PureService {
     this.authenticating = true;
     const url = await this.path(REQUEST_PATH_LOGIN);
     const params = this.params({
-      email: email,
-      password: serverPassword
+      email,
+      password: serverPassword,
+      ephemeral
     });
     if (mfaKeyPath) {
       params[mfaKeyPath] = mfaCode;
@@ -391,6 +394,34 @@ export class SNApiService extends PureService {
     });
 
     return response as SessionListResponse;
+  }
+
+  async deleteSession(sessionId: UuidString): Promise<RevisionListResponse | HttpResponse> {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
+    }
+    const url = await this.path(REQUEST_PATH_SESSION);
+    try {
+      return this.httpService.deleteAbsolute(
+        url,
+        { uuid: sessionId },
+        this.session!.authorizationValue
+      );
+    } catch (error) {
+      const errorResponse = error as HttpResponse;
+      this.preprocessAuthenticatedErrorResponse(errorResponse);
+      if (isErrorResponseExpiredToken(errorResponse)) {
+        return this.refreshSessionThenRetryRequest({
+          verb: HttpVerb.Get,
+          url
+        });
+      }
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    }
   }
 
   async getItemRevisions(

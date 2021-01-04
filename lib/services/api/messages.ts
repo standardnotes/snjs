@@ -15,6 +15,8 @@ export const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL = `A server error occurred w
 
 export const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = `Your account session is being renewed with the server. Please try your request again.`;
 
+export const API_MESSAGE_RATE_LIMITED = 'Too many successive server requests. Please wait a few minutes and try again.';
+
 export const API_MESSAGE_INVALID_SESSION = 'Please sign in to an account in order to continue with your request.';
 
 export const UNSUPPORTED_PROTOCOL_VERSION = `This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.`;
@@ -40,11 +42,11 @@ export const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this
 
 export const UNKNOWN_ERROR = 'Unknown error.';
 
-export function InsufficientPasswordMessage(minimum: number) {
+export function InsufficientPasswordMessage(minimum: number): string {
   return `Your password must be at least ${minimum} characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.`;
 }
 
-export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion) {
+export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion): string {
   return `Strict Sign In has refused the server's sign-in parameters. The latest account version is ${latest}, but the server is reporting a version of ${current} for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.`;
 }
 
@@ -110,7 +112,7 @@ export const ChallengeModalTitle = {
 
 export const SessionStrings = {
   EnterEmailAndPassword: 'Please enter your account email and password.',
-  RecoverSession(email?: string) {
+  RecoverSession(email?: string): string {
     return email
       ? `Your credentials are needed for ${email} to refresh your session with the server.`
       : `Your credentials are needed to refresh your session with the server.`;
@@ -121,7 +123,14 @@ export const SessionStrings = {
   EmailInputPlaceholder: 'Email',
   PasswordInputPlaceholder: 'Password',
   KeychainRecoveryErrorTitle: 'Invalid Credentials',
-  KeychainRecoveryError: 'The email or password you entered is incorrect.\n\nPlease note that this sign-in request is made against the default server. If you are using a custom server, you must uninstall the app then reinstall, and sign back into your account.'
+  KeychainRecoveryError: 'The email or password you entered is incorrect.\n\nPlease note that this sign-in request is made against the default server. If you are using a custom server, you must uninstall the app then reinstall, and sign back into your account.',
+  RevokeTitle: 'Revoke this session?',
+  RevokeConfirmButton: 'Revoke',
+  RevokeCancelButton: 'Cancel',
+  RevokeText:
+    'The associated app will be signed out and all data removed ' +
+    'from the device when it is next launched. You can sign back in on that ' +
+    'device at any time.',
 }
 
 export const ChallengeStrings = {
@@ -154,9 +163,3 @@ export const KeychainRecoveryStrings = {
   Title: 'Restore Keychain',
   Text: `We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.`
 }
-
-export const SessionInvalidState = {
-  Title: 'Invalid State',
-  Text:  "We've detected that your application is in an invalid state, and that changes you make will not be synced to your account. We are continuing to investigate why this may happen, but in the meantime, please sign out and back in to restore proper syncing functionality."
-}
-

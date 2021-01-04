@@ -1,4 +1,5 @@
 import { SessionRenewalResponse } from './responses';
+import { UuidString } from '@Lib/types';
 
 type RawJwtPayload = {
   jwt?: string
@@ -11,13 +12,20 @@ type RawSessionPayload = {
 }
 type RawStorageValue = RawJwtPayload | RawSessionPayload
 
+export type RemoteSession = {
+  uuid: UuidString
+  updated_at: Date
+  device_info: string
+  current: boolean
+}
+
 export abstract class Session {
   public abstract canExpire(): boolean;
 
   /** Return the token that should be included in the header of authorized network requests */
   public abstract get authorizationValue(): string;
 
-  static FromRawStorageValue(raw: RawStorageValue) {
+  static FromRawStorageValue(raw: RawStorageValue): JwtSession | TokenSession {
     if ((raw as RawJwtPayload).jwt) {
       return new JwtSession(
         (raw as RawJwtPayload).jwt!
@@ -43,11 +51,11 @@ export class JwtSession extends Session {
     this.jwt = jwt;
   }
 
-  public get authorizationValue() {
+  public get authorizationValue(): string {
     return this.jwt;
   }
 
-  public canExpire() {
+  public canExpire(): false {
     return false;
   }
 }

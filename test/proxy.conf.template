@@ -27,6 +27,18 @@ server {
         proxy_pass         ${NGINX_REROUTE_HOST};
     }
 
+    location ~ ^/auth/sign_in {
+        proxy_pass         ${NGINX_REROUTE_HOST};
+    }
+
+    location ~ ^/auth/params {
+        proxy_pass         ${NGINX_REROUTE_HOST};
+    }
+
+    location ~ ^/auth/update {
+        proxy_pass         ${NGINX_REROUTE_HOST};
+    }
+
     location / {
         proxy_pass         http://syncing-server-ruby;
     }
