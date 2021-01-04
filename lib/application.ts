@@ -1203,7 +1203,7 @@ export class SNApplication {
       /** Prevent a timed sync from occuring while signing in. */
       this.lockSyncing();
       const result = await this.sessionManager.signIn(
-        email, password, strict
+        email, password, strict, ephemeral
       );
       if (!result.response.error) {
         this.syncService.resetSyncState();

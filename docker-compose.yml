@@ -25,6 +25,13 @@ services:
     networks:
       - snjs
 
+  cache:
+    image: redis:6.0-alpine
+    expose:
+      - 6379
+    networks:
+      - snjs
+
   syncing-server-proxy:
     image: nginx:alpine
     volumes:
@@ -67,7 +74,7 @@ services:
       - syncing-server-proxy
       - syncing-server-ruby
     image: standardnotes/syncing-server-js:stable
-    entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
+    entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "/tools/wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
     environment:
       LOG_LEVEL: debug
       NODE_ENV: development
@@ -85,6 +92,7 @@ services:
       DB_DATABASE: testdb
       DB_DEBUG_LEVEL: all
       DB_MIGRATIONS_PATH: dist/migrations/*.js
+      REDIS_URL: redis://cache
       DD_TRACE_ENABLED: 'false'
     expose:
       - 3000

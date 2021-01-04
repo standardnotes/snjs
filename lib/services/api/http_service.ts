@@ -1,4 +1,4 @@
-import { UNKNOWN_ERROR } from './messages';
+import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
 import { PureService } from '@Lib/services/pure_service';
 import { HttpResponse, StatusCode } from './responses';
 
@@ -122,7 +122,14 @@ export class SNHttpService extends PureService {
       resolve(response);
     } else {
       if (!response.error) {
-        response.error = { message: UNKNOWN_ERROR, status: httpStatus };
+        if (httpStatus === StatusCode.HttpStatusForbidden) {
+          response.error = {
+            message: API_MESSAGE_RATE_LIMITED,
+            status: httpStatus
+          };
+        } else {
+          response.error = { message: UNKNOWN_ERROR, status: httpStatus };
+        }
       }
       reject(response);
     }
