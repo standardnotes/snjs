@@ -126,6 +126,7 @@ export const SessionStrings = {
   KeychainRecoveryError: 'The email or password you entered is incorrect.\n\nPlease note that this sign-in request is made against the default server. If you are using a custom server, you must uninstall the app then reinstall, and sign back into your account.',
   RevokeTitle: 'Revoke this session?',
   RevokeConfirmButton: 'Revoke',
+  RevokeCancelButton: 'Cancel',
   RevokeText:
     'The associated app will be signed out and all data removed ' +
     'from the device when it is next launched. You can sign back in on that ' +
