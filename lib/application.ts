@@ -67,6 +67,7 @@ import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
+import { PayloadFormat } from './protocol/payloads';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -917,7 +918,10 @@ export class SNApplication {
       password
     );
     const validPayloads = decryptedPayloads.filter((payload) => {
-      return !payload.errorDecrypting;
+      return (
+        !payload.errorDecrypting &&
+        payload.format !== PayloadFormat.EncryptedString
+      );
     }).map((payload) => {
       /* Don't want to activate any components during import process in
        * case of exceptions breaking up the import proccess */

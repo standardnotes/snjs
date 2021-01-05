@@ -645,7 +645,7 @@ describe('importing', function() {
     expect(this.application.itemManager.notes.length).to.equal(0);
   });
 
-  it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
+  it('should not import encrypted data with no keyParams or auth_params', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -657,6 +657,40 @@ describe('importing', function() {
       {
         title: 'Encrypted note',
         text: 'On protocol version 004.'
+      }
+    );
+
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    delete backupData.keyParams;
+
+    await this.application.deinit();
+    this.application = await Factory.createInitAppWithRandNamespace();
+
+    const result = await this.application.importData(
+      backupData,
+      undefined,
+    );
+
+    expect(result).to.not.be.undefined;
+    expect(result.affectedItems.length).to.be.eq(0);
+    expect(result.errorCount).to.be.eq(backupData.items.length);
+    expect(this.application.itemManager.notes.length).to.equal(0);
+  })
+
+  it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
+    await this.application.itemManager.createItem(
+      ContentType.Note,
+      {
+        title: 'Encrypted note',
+        text: 'On protocol version 004.⭐️'
       }
     );
 
@@ -675,6 +709,7 @@ describe('importing', function() {
       this.password,
       true,
     );
+
     expect(result).to.not.be.undefined;
     expect(result.affectedItems.length).to.be.eq(0);
     expect(result.errorCount).to.be.eq(backupData.items.length);
