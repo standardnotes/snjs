@@ -145,7 +145,6 @@ export class SNSyncService extends PureService<SyncEvent> {
   private readonly localLoadPriorty = [
     ContentType.ItemsKey,
     ContentType.UserPrefs,
-    ContentType.Privileges,
     ContentType.Component,
     ContentType.Theme
   ];

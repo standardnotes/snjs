@@ -879,6 +879,13 @@ export class SNApplication {
   }
 
   /**
+   * @returns whether note access has been granted or not
+   */
+  public async authorizeNoteAccess(note: SNNote): Promise<boolean> {
+    return this.privilegesService.authorizeNoteAccess(note);
+  }
+
+  /**
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
    * .errorCount: The number of items that were not imported due to failure to decrypt.
@@ -1667,12 +1674,9 @@ export class SNApplication {
 
   private createPrivilegesService() {
     this.privilegesService = new SNPrivilegesService(
-      this.itemManager,
-      this.syncService,
-      this.singletonManager,
       this.protocolService,
-      this.storageService,
-      this.sessionManager,
+      this.challengeService,
+      this.storageService
     );
     this.services.push(this.privilegesService);
   }

@@ -171,7 +171,7 @@ export { BaseMigration } from '@Lib/migrations/base';
 
 /** Privileges */
 export {
-  PrivilegeSessionLength
+  PrivilegesSessionDurations
 } from '@Services/privileges_service';
 
 export {
