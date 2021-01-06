@@ -215,7 +215,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  async register(email: string, password: string): Promise<SessionManagerResponse> {
+  async register(
+    email: string,
+    password: string,
+    ephemeral: boolean,
+  ): Promise<SessionManagerResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
         response: this.apiService.createErrorResponse(
@@ -243,7 +247,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const registerResponse = await this.apiService.register(
       email,
       serverPassword,
-      keyParams
+      keyParams,
+      ephemeral
     );
     if (!registerResponse.error) {
       await this.handleSuccessAuthResponse(registerResponse, rootKey, wrappingKey);
