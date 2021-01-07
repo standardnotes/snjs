@@ -665,8 +665,8 @@ describe('keys', function () {
      * because its based on the old root key.
      */
     it('add new items key', async function () {
-      this.timeout(Factory.LongTestTimeout * 3);
-      const oldClient = this.application;
+      this.timeout(Factory.LongTestTimeout * 2);
+      let oldClient = this.application;
 
       /** Register an 003 account */
       await Factory.registerOldUser({
@@ -691,7 +691,6 @@ describe('keys', function () {
         },
       });
       await newClient.launch();
-      await newClient.signIn(this.email, this.password);
 
       /** Change password through session manager directly instead of application,
        * as not to create any items key (to simulate 003 client behavior) */
@@ -707,6 +706,12 @@ describe('keys', function () {
       Object.defineProperty(oldClient.apiService, "apiVersion", {
         get: function () { return '20190520' }
       });
+
+      /**
+       * Sign in as late as possible on new client to prevent session timeouts
+       */
+      await newClient.signIn(this.email, this.password);
+
       await oldClient.sessionManager.changePassword(
         currentRootKey.serverPassword,
         newRootKey
@@ -714,7 +719,7 @@ describe('keys', function () {
 
       /** Re-authenticate on other app; allow challenge to complete */
       await newClient.sync();
-      await Factory.sleep(0.5);
+      await Factory.sleep(1);
 
       /** Expect a new items key to be created based on the new root key */
       expect(newClient.itemManager.itemsKeys().length).to.equal(2);
@@ -746,6 +751,14 @@ describe('keys', function () {
       Object.defineProperty(this.application.apiService, "apiVersion", {
         get: function () { return '20190520' }
       });
+
+      /** Renew session to prevent timeouts */
+      this.application = await Factory.signOutAndBackIn(
+        this.application,
+        this.email,
+        this.password
+      );
+
       await this.application.sessionManager.changePassword(
         currentRootKey.serverPassword,
         newRootKey
