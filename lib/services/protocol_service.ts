@@ -744,7 +744,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       items = items.filter(item => item.content_type !== ContentType.ItemsKey);
     }
 
-    const ejectedPayloads = Promise.all(
+    const ejectedPayloadsPromise = Promise.all(
       items.map(item => {
         if (item.errorDecrypting) {
           /** Keep payload as-is */
@@ -766,7 +766,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
 
     const data: BackupFile = {
       version: this.getLatestVersion(),
-      items: await ejectedPayloads,
+      items: await ejectedPayloadsPromise,
     };
     if (keyParams) {
       data.keyParams = keyParams.getPortableValue();
