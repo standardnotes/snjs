@@ -881,8 +881,16 @@ export class SNApplication {
   /**
    * @returns whether note access has been granted or not
    */
-  public async authorizeNoteAccess(note: SNNote): Promise<boolean> {
+  public authorizeNoteAccess(note: SNNote): Promise<boolean> {
     return this.privilegesService.authorizeNoteAccess(note);
+  }
+
+  public authorizeFileImport(): Promise<boolean> {
+    return this.privilegesService.authorizeFileImport();
+  }
+
+  public authorizeAutolockIntervalChange(): Promise<boolean> {
+    return this.privilegesService.authorizeAutolockIntervalChange();
   }
 
   /**
@@ -1381,22 +1389,39 @@ export class SNApplication {
     }
   }
 
-  public async removePasscode(): Promise<void> {
+  /**
+   * @returns whether the passcode was successfuly removed or not
+   */
+  public async removePasscode(): Promise<boolean> {
+    const passcodePrompt = await this.challengeService.promptForPasscode(
+      ChallengeReason.RemovePasscode
+    );
+    if (passcodePrompt.canceled) return false;
+
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       REMOVING_PASSCODE,
     );
     try {
       await this.removePasscodeWithoutWarning();
+      return true;
     } finally {
       dismissBlockingDialog();
     }
   }
 
+  /**
+   * @returns whether the passcode was successfuly changed or not
+   */
   public async changePasscode(
-    passcode: string,
+    newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
-  ): Promise<void> {
+  ): Promise<boolean> {
+    const passcodePrompt = await this.challengeService.promptForPasscode(
+      ChallengeReason.ChangePasscode
+    );
+    if (passcodePrompt.canceled) return false;
+
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       origination === KeyParamsOrigination.ProtocolUpgrade
@@ -1405,7 +1430,11 @@ export class SNApplication {
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeChange);
+      await this.setPasscodeWithoutWarning(
+        newPasscode,
+        KeyParamsOrigination.PasscodeChange
+      );
+      return true;
     } finally {
       dismissBlockingDialog();
     }

@@ -1,7 +1,7 @@
 import { Migration } from '@Lib/migrations/migration';
 import { ChallengeModalTitle, ChallengeStrings, PromptTitles } from './services/api/messages';
 import { SNRootKey } from '@Protocol/root_key';
-import { isNullOrUndefined } from './utils';
+import { assertUnreachable, isNullOrUndefined } from './utils';
 
 export type ChallengeArtifacts = {
   wrappingKey?: SNRootKey
@@ -13,7 +13,7 @@ export enum ChallengeValidation {
   LocalPasscode = 1,
   AccountPassword = 2,
   Biometric = 3,
-  ProtectedNoteAccessDuration = 4,
+  PrivilegesSessionDuration = 4,
 }
 
 /** The source of the challenge */
@@ -24,6 +24,10 @@ export enum ChallengeReason {
   Migration = 4,
   Custom = 5,
   AccessProtectedNote = 6,
+  ImportFile = 7,
+  RemovePasscode = 8,
+  ChangePasscode = 9,
+  ChangeAutolockInterval = 10,
 }
 
 /** For mobile */
@@ -75,8 +79,18 @@ export class Challenge {
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
         case ChallengeReason.AccessProtectedNote:
           return ChallengeStrings.NoteAccess;
-        default:
+        case ChallengeReason.ImportFile:
+          return ChallengeStrings.ImportFile;
+        case ChallengeReason.RemovePasscode:
+          return ChallengeStrings.RemovePasscode;
+        case ChallengeReason.ChangePasscode:
+          return ChallengeStrings.ChangePasscode;
+        case ChallengeReason.ChangeAutolockInterval:
+          return ChallengeStrings.ChangeAutolockInterval;
+        case ChallengeReason.Custom:
           return undefined;
+        default:
+          return assertUnreachable(this.reason);
       }
     }
   }
@@ -139,7 +153,7 @@ export class ChallengePrompt {
         return PromptTitles.Biometrics;
       case ChallengeValidation.LocalPasscode:
         return PromptTitles.LocalPasscode;
-      case ChallengeValidation.ProtectedNoteAccessDuration:
+      case ChallengeValidation.PrivilegesSessionDuration:
         return PromptTitles.RememberFor;
       default:
         return undefined;

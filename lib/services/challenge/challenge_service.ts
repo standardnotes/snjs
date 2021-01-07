@@ -81,7 +81,7 @@ export class ChallengeService extends PureService {
         );
       case ChallengeValidation.Biometric:
         return { valid: value.value === true };
-      case ChallengeValidation.ProtectedNoteAccessDuration:
+      case ChallengeValidation.PrivilegesSessionDuration:
         return { valid: isValidPrivilegesSessionLength(value.value) };
       default:
         throw Error(`Unhandled validation mode ${value.prompt.validation}`)
@@ -105,15 +105,22 @@ export class ChallengeService extends PureService {
     }
   }
 
-  public async promptForPasscode() {
+  public async promptForPasscode(reason: ChallengeReason): Promise<
+    {
+      passcode: string,
+      canceled: false,
+    } | {
+      canceled: true
+    }
+  > {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
-      ChallengeReason.ResaveRootKey,
+      reason,
       true
     );
     const response = await this.promptForChallengeResponse(challenge);
     if (!response) {
-      return { canceled: true, passcode: undefined };
+      return { canceled: true };
     }
     const value = response.getValueForType(ChallengeValidation.LocalPasscode);
     return { passcode: value.value as string, canceled: false }
@@ -133,7 +140,7 @@ export class ChallengeService extends PureService {
       return {};
     }
     if (!passcode) {
-      const result = await this.promptForPasscode();
+      const result = await this.promptForPasscode(ChallengeReason.ResaveRootKey);
       if (result.canceled) {
         return { canceled: true };
       }

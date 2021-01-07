@@ -477,9 +477,13 @@ export function truncateHexString(string: string, desiredBits: number) {
  */
 export async function sleep(milliseconds: number) {
   console.warn(`Sleeping for ${milliseconds}ms`);
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     setTimeout(function () {
       resolve();
     }, milliseconds);
   });
+}
+
+export function assertUnreachable(uncheckedCase: never): never {
+  throw Error("Unchecked case " + uncheckedCase);
 }

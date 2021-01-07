@@ -71,8 +71,21 @@ export class SNPrivilegesService extends PureService {
       return true;
     }
 
+    return this.validateOrRenewSession(ChallengeReason.AccessProtectedNote);
+  }
+
+  async authorizeFileImport(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.ImportFile);
+  }
+
+  async authorizeAutolockIntervalChange(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.ChangeAutolockInterval);
+  }
+
+  private async validateOrRenewSession(
+    reason: ChallengeReason
+  ): Promise<boolean> {
     if ((await this.getSessionExpirey()) > new Date()) {
-      /** Session is still valid. */
       return true;
     }
 
@@ -95,7 +108,7 @@ export class SNPrivilegesService extends PureService {
 
     prompts.push(
       new ChallengePrompt(
-        ChallengeValidation.ProtectedNoteAccessDuration,
+        ChallengeValidation.PrivilegesSessionDuration,
         undefined,
         undefined,
         undefined,
@@ -105,13 +118,13 @@ export class SNPrivilegesService extends PureService {
     );
 
     const response = await this.challengeService.promptForChallengeResponse(
-      new Challenge(prompts, ChallengeReason.AccessProtectedNote, true)
+      new Challenge(prompts, reason, true)
     );
     if (response) {
       const length = response.values.find(
         (value) =>
           value.prompt.validation ===
-          ChallengeValidation.ProtectedNoteAccessDuration
+          ChallengeValidation.PrivilegesSessionDuration
       )?.value;
       if (isNullOrUndefined(length)) {
         SNLog.error(
