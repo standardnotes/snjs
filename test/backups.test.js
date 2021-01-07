@@ -25,17 +25,8 @@ describe('backups', () => {
     this.application = null;
   });
 
-  const BASE_ITEM_COUNT_ENCRYPTED = [
-    'Note',
-    'Note',
-    'ItemsKey',
-    'UserPreferences'
-  ].length;
-  const BASE_ITEM_COUNT_DECRYPTED = [
-    'Note',
-    'Note',
-    'UserPreferences'
-  ].length;
+  const BASE_ITEM_COUNT_ENCRYPTED = ['ItemsKey', 'UserPreferences'].length;
+  const BASE_ITEM_COUNT_DECRYPTED = ['UserPreferences'].length;
 
   it('backup file should have a version number', async function () {
     let data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
@@ -49,7 +40,7 @@ describe('backups', () => {
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
     const data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
-    expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED);
+    expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
   });
 
   it('passcode + no account backup file should have correct number of items', async function () {
@@ -59,7 +50,7 @@ describe('backups', () => {
       Factory.createSyncedNote(this.application)
     ]);
     const data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
-    expect(data.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED);
+    expect(data.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
   });
 
   it('no passcode + account backup file should have correct number of items', async function () {
@@ -71,9 +62,9 @@ describe('backups', () => {
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
     let data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
-    expect(data.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED);
+    expect(data.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
     data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
-    expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED);
+    expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
   });
 
   it('passcode + account backup file should have correct number of items', async function () {
@@ -85,11 +76,11 @@ describe('backups', () => {
     let backupData = await this.application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
-    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED);
+    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
     backupData = await this.application.createBackupFile(
       EncryptionIntent.FileDecrypted
     );
-    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED);
+    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
   });
 
   it('backup file item should have correct fields', async function () {
@@ -154,7 +145,7 @@ describe('backups', () => {
       EncryptionIntent.FileDecrypted
     );
 
-    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED);
+    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
   });
 
   it('decrypted backup file should not have keyParams', async function () {
