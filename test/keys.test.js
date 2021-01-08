@@ -664,7 +664,7 @@ describe('keys', function () {
      * items sync to the 004 client, it can't decrypt them with its existing items key
      * because its based on the old root key.
      */
-    it('add new items key', async function () {
+    it.only('add new items key', async function () {
       this.timeout(Factory.LongTestTimeout * 3);
       let oldClient = this.application;
 
@@ -681,6 +681,7 @@ describe('keys', function () {
       const newClient = await Factory.createAppWithRandNamespace();
       await newClient.prepareForLaunch({
         receiveChallenge: (challenge) => {
+          console.log('Received challenge', challenge);
           /** Reauth session challenge */
           newClient.submitValuesForChallenge(
             challenge,
@@ -724,8 +725,9 @@ describe('keys', function () {
 
       /** Re-authenticate on other app; allow challenge to complete */
       await newClient.sync();
-      await Factory.sleep(1);
       console.log('Synced on new client');
+      await Factory.sleep(1);
+      console.log('Slept on new client');
 
       /** Expect a new items key to be created based on the new root key */
       expect(newClient.itemManager.itemsKeys().length).to.equal(2);
