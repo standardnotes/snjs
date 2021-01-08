@@ -1141,7 +1141,11 @@ export class SNApplication {
     this.registering = true;
     try {
       this.lockSyncing();
-      const result = await this.sessionManager.register(email, password);
+      const result = await this.sessionManager.register(
+        email,
+        password,
+        ephemeral,
+      );
       if (!result.response.error) {
         this.syncService!.resetSyncState();
         await this.storageService!.setPersistencePolicy(

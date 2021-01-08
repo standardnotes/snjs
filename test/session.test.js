@@ -31,11 +31,6 @@ describe('server session', function () {
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
     this.newPassword = Factory.randomString();
-    await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password
-    });
   });
 
   afterEach(async function () {
@@ -61,6 +56,12 @@ describe('server session', function () {
   }
 
   it('should succeed when a sync request is perfomed with an expired access token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     await sleepUntilSessionExpires(this.application);
 
     const response = await this.application.apiService.sync([]);
@@ -69,6 +70,12 @@ describe('server session', function () {
   });
 
   it('should return the new session in the response when refreshed', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const response = await this.application.apiService.refreshSession();
 
     expect(response.status).to.equal(200);
@@ -79,6 +86,12 @@ describe('server session', function () {
   });
 
   it('should be refreshed on any api call if access token is expired', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     // Saving the current session information for later...
     const sessionBeforeSync = this.application.apiService.getSession();
 
@@ -99,7 +112,44 @@ describe('server session', function () {
     expect(sessionAfterSync.accessExpiration).to.be.greaterThan(Date.now());
   });
 
+  it('should succeed when a sync request is perfomed after signing into an ephemeral session', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+
+    await this.application.signIn(
+      this.email,
+      this.password,
+      false,
+      true
+    );
+
+    const response = await this.application.apiService.sync([]);
+    expect(response.status).to.equal(200);
+  });
+
+  it('should succeed when a sync request is perfomed after registering into an ephemeral session', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: true
+    });
+
+    const response = await this.application.apiService.sync([]);
+    expect(response.status).to.equal(200);
+  });
+
   it('should be consistent between storage and apiService', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const sessionFromStorage = await getSessionFromStorage(this.application);
     const sessionFromApiService = this.application.apiService.getSession();
 
@@ -114,6 +164,12 @@ describe('server session', function () {
   });
 
   it('should be performed successfully and terminate session with a valid access token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
@@ -125,6 +181,12 @@ describe('server session', function () {
   });
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     // Waiting enough time for the access token to expire, before performing a sign out request.
     await sleepUntilSessionExpires(this.application);
 
@@ -139,6 +201,12 @@ describe('server session', function () {
   });
 
   it('change password request should be successful with a valid access token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const changePasswordResponse = await this.application.changePassword(
       this.password,
       this.newPassword
@@ -159,6 +227,12 @@ describe('server session', function () {
   });
 
   xit('change password request should be successful after the expired access token is refreshed', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     // Waiting enough time for the access token to expire.
     await sleepUntilSessionExpires(this.application);
 
@@ -182,6 +256,12 @@ describe('server session', function () {
   });
 
   it('change password request should fail with an invalid access token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const fakeSession = this.application.apiService.getSession();
     fakeSession.accessToken = 'this-is-a-fake-token-1234';
     expectFactoryException();
@@ -205,6 +285,12 @@ describe('server session', function () {
   });
 
   it('change password request should fail with an expired refresh token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     /** Waiting for the refresh token to expire. */
     await sleepUntilSessionExpires(this.application, false);
 
@@ -240,6 +326,12 @@ describe('server session', function () {
   }).timeout(25000);
 
   it('should sign in successfully after signing out', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     await this.application.apiService.signOut();
     this.application.apiService.session = undefined;
 
@@ -257,6 +349,12 @@ describe('server session', function () {
   });
 
   it('should fail when renewing a session with an expired refresh token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     await sleepUntilSessionExpires(this.application, false);
 
     const refreshSessionResponse = await this.application.apiService.refreshSession();
@@ -277,6 +375,12 @@ describe('server session', function () {
   });
 
   it('should fail when renewing a session with an invalid refresh token', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const fakeSession = this.application.apiService.getSession();
     fakeSession.refreshToken = 'this-is-a-fake-token-1234';
 
@@ -294,6 +398,12 @@ describe('server session', function () {
   });
 
   it('should fail if syncing while a session refresh is in progress', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const refreshPromise = this.application.apiService.refreshSession();
     const syncResponse = await this.application.apiService.sync([]);
 
@@ -306,6 +416,12 @@ describe('server session', function () {
   });
 
   it('notes should be synced as expected after refreshing a session', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const notesBeforeSync = await Factory.createManyMappedNotes(this.application, 5);
 
     await sleepUntilSessionExpires(this.application);
@@ -332,6 +448,12 @@ describe('server session', function () {
   });
 
   it('changing password on one client should not invalidate other sessions', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const appA = await Factory.createApplication(Factory.randomString());
     await appA.prepareForLaunch({});
     await appA.launch(true);
@@ -371,6 +493,12 @@ describe('server session', function () {
   });
 
   it('should prompt user for account password and sign back in on invalid session', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const email = `${Math.random()}`;
     const password = `${Math.random()}`;
     let didPromptForSignIn = false;
@@ -418,11 +546,23 @@ describe('server session', function () {
   });
 
   it('should return current session in list of sessions', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const sessions = await this.application.apiService.getSessionsList();
     expect(sessions[0].current).to.equal(true);
   });
 
   it('signing out should delete session from all list', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     /** Create new session aside from existing one */
     const app2 = await Factory.createAndInitializeApplication('app2');
     await app2.signIn(this.email, this.password);
@@ -446,7 +586,11 @@ describe('server session', function () {
     /** Sign out and back in to prevent middle-of-test timeouts */
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     await Promise.all([
-      this.application.signIn(this.email, this.password),
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      }),
       app2.signIn(this.email, this.password)
     ]);
 
@@ -461,6 +605,12 @@ describe('server session', function () {
   });
 
   it('signing out with invalid session token should still delete local data', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
     const invalidSession = this.application.apiService.getSession();
     invalidSession.accessToken = undefined;
     invalidSession.refreshToken = undefined;
