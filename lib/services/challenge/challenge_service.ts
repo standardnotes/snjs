@@ -105,14 +105,9 @@ export class ChallengeService extends PureService {
     }
   }
 
-  public async promptForPasscode(reason: ChallengeReason): Promise<
-    {
-      passcode: string,
-      canceled: false,
-    } | {
-      canceled: true
-    }
-  > {
+  public async promptForPasscode(
+    reason: ChallengeReason,
+  ): Promise<string | undefined> {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
       reason,
@@ -120,10 +115,10 @@ export class ChallengeService extends PureService {
     );
     const response = await this.promptForChallengeResponse(challenge);
     if (!response) {
-      return { canceled: true };
+      return undefined;
     }
     const value = response.getValueForType(ChallengeValidation.LocalPasscode);
-    return { passcode: value.value as string, canceled: false }
+    return value.value as string;
   }
 
   /**
@@ -140,13 +135,12 @@ export class ChallengeService extends PureService {
       return {};
     }
     if (!passcode) {
-      const result = await this.promptForPasscode(ChallengeReason.ResaveRootKey);
-      if (result.canceled) {
+      passcode = await this.promptForPasscode(ChallengeReason.ResaveRootKey);
+      if (!passcode) {
         return { canceled: true };
       }
-      passcode = result.passcode!;
     }
-    const wrappingKey = await this.protocolService!.computeWrappingKey(passcode);
+    const wrappingKey = await this.protocolService.computeWrappingKey(passcode);
     return { wrappingKey };
   }
 

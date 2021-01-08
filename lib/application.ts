@@ -67,6 +67,7 @@ import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
+import { PayloadFormat } from './protocol/payloads';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -932,7 +933,10 @@ export class SNApplication {
       password
     );
     const validPayloads = decryptedPayloads.filter((payload) => {
-      return !payload.errorDecrypting;
+      return (
+        !payload.errorDecrypting &&
+        payload.format !== PayloadFormat.EncryptedString
+      );
     }).map((payload) => {
       /* Don't want to activate any components during import process in
        * case of exceptions breaking up the import proccess */
@@ -963,19 +967,25 @@ export class SNApplication {
   }
 
   /**
-   * Creates a JSON string representing the backup format of all items, or just subItems
-   * if supplied.
+   * Creates a JSON-stringifiable backup object of all items.
    */
   public async createBackupFile(
-    subItems?: SNItem[],
-    intent?: EncryptionIntent,
-    returnIfEmpty = false
-  ) {
-    return this.protocolService!.createBackupFile(
-      subItems,
-      intent,
-      returnIfEmpty
-    );
+    intent: EncryptionIntent
+  ): Promise<BackupFile | undefined> {
+    const items = this.itemManager.items;
+
+    if (intent === EncryptionIntent.FileDecrypted) {
+      if (items.some(item => item.protected) && this.hasPasscode()) {
+        const passcode = await this.challengeService.promptForPasscode(
+          ChallengeReason.CreateDecryptedBackupWithProtectedItems
+        );
+        if (!passcode) {
+          return;
+        }
+      }
+    }
+
+    return this.protocolService.createBackupFile(intent);
   }
 
   public isEphemeralSession() {
@@ -1146,7 +1156,11 @@ export class SNApplication {
     this.registering = true;
     try {
       this.lockSyncing();
-      const result = await this.sessionManager.register(email, password);
+      const result = await this.sessionManager.register(
+        email,
+        password,
+        ephemeral,
+      );
       if (!result.response.error) {
         this.syncService!.resetSyncState();
         await this.storageService!.setPersistencePolicy(
@@ -1208,7 +1222,7 @@ export class SNApplication {
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSync(true);
         } else {
-          this.itemManager.removeAllItemsFromMemory();
+          void this.itemManager.removeAllItemsFromMemory();
           await this.clearDatabase();
         }
         await this.notifyEvent(ApplicationEvent.SignedIn);
@@ -1254,7 +1268,7 @@ export class SNApplication {
       { validatePasswordStrength }
     );
     if (result.error) {
-      this.alertService.alert(result.error.message);
+      void this.alertService.alert(result.error.message);
     }
     return result;
   }
@@ -1393,10 +1407,10 @@ export class SNApplication {
    * @returns whether the passcode was successfuly removed or not
    */
   public async removePasscode(): Promise<boolean> {
-    const passcodePrompt = await this.challengeService.promptForPasscode(
+    const passcode = await this.challengeService.promptForPasscode(
       ChallengeReason.RemovePasscode
     );
-    if (passcodePrompt.canceled) return false;
+    if (isNullOrUndefined(passcode)) return false;
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
@@ -1417,10 +1431,10 @@ export class SNApplication {
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
-    const passcodePrompt = await this.challengeService.promptForPasscode(
+    const passcode = await this.challengeService.promptForPasscode(
       ChallengeReason.ChangePasscode
     );
-    if (passcodePrompt.canceled) return false;
+    if (!passcode) return false;
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,

@@ -1,7 +1,13 @@
-import { Migration } from '@Lib/migrations/migration';
-import { ChallengeModalTitle, ChallengeStrings, PromptTitles } from './services/api/messages';
+import {
+  ChallengeModalTitle,
+  ChallengeStrings,
+  PromptTitles,
+} from './services/api/messages';
+import {
+  assertUnreachable,
+  isNullOrUndefined,
+} from './utils';
 import { SNRootKey } from '@Protocol/root_key';
-import { assertUnreachable, isNullOrUndefined } from './utils';
 
 export type ChallengeArtifacts = {
   wrappingKey?: SNRootKey
@@ -28,6 +34,7 @@ export enum ChallengeReason {
   RemovePasscode = 8,
   ChangePasscode = 9,
   ChangeAutolockInterval = 10,
+  CreateDecryptedBackupWithProtectedItems = 11,
 }
 
 /** For mobile */
@@ -88,6 +95,8 @@ export class Challenge {
         case ChallengeReason.ChangeAutolockInterval:
           return ChallengeStrings.ChangeAutolockInterval;
         case ChallengeReason.Custom:
+        case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
+          return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
           return undefined;
         default:
           return assertUnreachable(this.reason);

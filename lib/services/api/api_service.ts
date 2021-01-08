@@ -172,7 +172,12 @@ export class SNApiService extends PureService {
     return response as KeyParamsResponse;
   }
 
-  async register(email: string, serverPassword: string, keyParams: SNRootKeyParams) {
+  async register(
+    email: string,
+    serverPassword: string,
+    keyParams: SNRootKeyParams,
+    ephemeral: boolean,
+  ) {
     if (this.registering) {
       return this.createErrorResponse(messages.API_MESSAGE_REGISTRATION_IN_PROGRESS) as RegistrationResponse;
     }
@@ -180,7 +185,8 @@ export class SNApiService extends PureService {
     const url = await this.path(REQUEST_PATH_REGISTER);
     const params = this.params({
       password: serverPassword,
-      email: email,
+      email,
+      ephemeral,
       ...keyParams.getPortableValue()
     });
     const response = await this.httpService!.postAbsolute(url, params)
