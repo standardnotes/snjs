@@ -140,6 +140,7 @@ export const ChallengeStrings = {
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
   EnterPasscodeForRootResave: 'Enter your application passcode to continue',
   EnterCredentialsForProtocolUpgrade: 'Enter your credentials to perform encryption upgrade',
+  EnterCredentialsForDecryptedBackupDownload: 'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode',
 }

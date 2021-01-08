@@ -371,8 +371,9 @@ describe('importing', function() {
       Factory.createMappedTag(this.application),
     ]);
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.sync({ awaitAll: true });
 
@@ -405,8 +406,9 @@ describe('importing', function() {
       Factory.createMappedTag(this.application),
     ]);
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -435,8 +437,9 @@ describe('importing', function() {
       Factory.createMappedTag(this.application),
     ]);
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -470,8 +473,9 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -506,8 +510,9 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -542,8 +547,9 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -588,8 +594,8 @@ describe('importing', function() {
       }
     );
 
-    const backupData = JSON.parse(
-      await this.application.protocolService.createBackupFile()
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
     );
 
     await this.application.deinit();
@@ -621,8 +627,8 @@ describe('importing', function() {
       }
     );
 
-    const backupData = JSON.parse(
-      await this.application.protocolService.createBackupFile()
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
     );
 
     await this.application.deinit();
@@ -639,7 +645,7 @@ describe('importing', function() {
     expect(this.application.itemManager.notes.length).to.equal(0);
   });
 
-  it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
+  it('should not import encrypted data with no keyParams or auth_params', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -654,12 +660,46 @@ describe('importing', function() {
       }
     );
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    let backupData = JSON.parse(rawBackupFile);
-    backupData = {
-      ...backupData,
-      items: backupData.items.filter((payload) => payload.content_type !== ContentType.ItemsKey),
-    };
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    delete backupData.keyParams;
+
+    await this.application.deinit();
+    this.application = await Factory.createInitAppWithRandNamespace();
+
+    const result = await this.application.importData(
+      backupData,
+      undefined,
+    );
+
+    expect(result).to.not.be.undefined;
+    expect(result.affectedItems.length).to.be.eq(0);
+    expect(result.errorCount).to.be.eq(backupData.items.length);
+    expect(this.application.itemManager.notes.length).to.equal(0);
+  })
+
+  it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
+    await this.application.itemManager.createItem(
+      ContentType.Note,
+      {
+        title: 'Encrypted note',
+        text: 'On protocol version 004.⭐️'
+      }
+    );
+
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    backupData.items = backupData.items.filter(
+      (payload) => payload.content_type !== ContentType.ItemsKey
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -669,6 +709,7 @@ describe('importing', function() {
       this.password,
       true,
     );
+
     expect(result).to.not.be.undefined;
     expect(result.affectedItems.length).to.be.eq(0);
     expect(result.errorCount).to.be.eq(backupData.items.length);
@@ -788,8 +829,9 @@ describe('importing', function() {
 
     await this.application.sync();
 
-    const rawBackupFile = await this.application.protocolService.createBackupFile();
-    const backupData = JSON.parse(rawBackupFile);
+    const backupData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();

@@ -2,7 +2,7 @@
 
 body {
   margin: 0;
-  background-color: rgb(138, 138, 138);
+  background-color: rgb(144, 144, 144);
 }
 
 #mocha {
@@ -106,12 +106,12 @@ body {
 }
 
 #mocha .test.pending {
-  color: #0b97c4;
+  color: #f0ec00;
 }
 
 #mocha .test.pending::before {
   content: '◦';
-  color: #0b97c4;
+  color: #f0ec00;
 }
 
 #mocha .test.fail {
@@ -223,7 +223,7 @@ body {
   right: 10px;
   font-size: 12px;
   margin: 0;
-  color: #888;
+  color: black;
   z-index: 1;
 }
 
@@ -233,7 +233,7 @@ body {
 }
 
 #mocha-stats em {
-  color: black;
+  color: #DDD;
 }
 
 #mocha-stats a {

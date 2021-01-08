@@ -20,7 +20,8 @@ export enum ChallengeReason {
   ResaveRootKey = 2,
   ProtocolUpgrade = 3,
   Migration = 4,
-  Custom = 5
+  Custom = 5,
+  CreateDecryptedBackupWithProtectedItems = 6,
 }
 
 /** For mobile */
@@ -70,6 +71,8 @@ export class Challenge {
           return ChallengeStrings.EnterPasscodeForRootResave;
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
+        case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
+          return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         default:
           return undefined;
       }

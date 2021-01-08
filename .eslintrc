@@ -1,6 +1,9 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./lib/tsconfig.json"
+  },
   "plugins": [
     "@typescript-eslint"
   ],
@@ -10,6 +13,9 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "sort-imports": "warn"
+    "sort-imports": "warn",
+    "require-await": "off",
+    "@typescript-eslint/require-await": "warn",
+    "@typescript-eslint/no-floating-promises": "warn"
   }
 }

@@ -465,7 +465,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       return payload;
     }
     if (isNullOrUndefined(intent)) {
-      throw 'Attempting to encrypt payload with null intent';
+      throw Error('Attempting to encrypt payload with null intent');
     }
     if (!key && !isDecryptedIntent(intent)) {
       key = await this.keyToUseForEncryptionOfPayload(payload, intent);
@@ -474,13 +474,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       throw Error('Attempting to generate encrypted payload with no key.');
     }
     if (payload.format !== PayloadFormat.DecryptedBareObject) {
-      throw 'Attempting to encrypt already encrypted payload.';
+      throw Error('Attempting to encrypt already encrypted payload.');
     }
     if (!payload.content) {
-      throw 'Attempting to encrypt payload with no content.';
+      throw Error('Attempting to encrypt payload with no content.');
     }
     if (!payload.uuid) {
-      throw 'Attempting to encrypt payload with no uuid.';
+      throw Error('Attempting to encrypt payload with no uuid.');
     }
     const version = key ? key.keyVersion : this.getLatestVersion();
     const format = this.payloadContentFormatForIntent(intent, key);
@@ -736,41 +736,42 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
    * @returns JSON stringified representation of data, including keyParams.
    */
   public async createBackupFile(
-    subItems?: SNItem[],
-    intent = EncryptionIntent.FilePreferEncrypted,
-    returnIfEmpty = false
-  ) {
-    const items = subItems || this.itemManager!.items;
-    if (returnIfEmpty && items.length === 0) {
-      return undefined;
+    intent: EncryptionIntent
+  ): Promise<BackupFile> {
+    let items = this.itemManager.items;
+
+    if (intent === EncryptionIntent.FileDecrypted) {
+      items = items.filter(item => item.content_type !== ContentType.ItemsKey);
     }
-    const encryptedPayloads: PurePayload[] = [];
-    for (const item of items) {
-      if (item.errorDecrypting) {
-        /** Keep payload as-is */
-        encryptedPayloads.push(item.payload);
-      } else {
-        const payload = CreateSourcedPayloadFromObject(
-          item.payload,
-          PayloadSource.FileImport
-        );
-        const encrypted = await this.payloadByEncryptingPayload(
-          payload,
-          intent
-        );
-        encryptedPayloads.push(encrypted);
-      }
-    }
+
+    const ejectedPayloadsPromise = Promise.all(
+      items.map(item => {
+        if (item.errorDecrypting) {
+          /** Keep payload as-is */
+          return item.payload.ejected();
+        } else {
+          const payload = CreateSourcedPayloadFromObject(
+            item.payload,
+            PayloadSource.FileImport
+          );
+          return this.payloadByEncryptingPayload(
+            payload,
+            intent
+          ).then(p => p.ejected());
+        }
+      })
+    );
+
+    const keyParams = await this.getRootKeyParams();
+
     const data: BackupFile = {
       version: this.getLatestVersion(),
-      items: encryptedPayloads.map((p) => p.ejected())
+      items: await ejectedPayloadsPromise,
     };
-    const keyParams = await this.getRootKeyParams();
-    if (keyParams && intent !== EncryptionIntent.FileDecrypted) {
+    if (keyParams) {
       data.keyParams = keyParams.getPortableValue();
     }
-    const prettyPrint = 2;
-    return JSON.stringify(data, null, prettyPrint);
+    return data;
   }
 
   /**
@@ -1187,7 +1188,7 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
       const rootKey = this.getRootKey();
       if (!rootKey) {
         if (intentRequiresEncryption(intent)) {
-          throw 'Root key encryption is required but no root key is available.';
+          throw Error('Root key encryption is required but no root key is available.');
         } else {
           return undefined;
         }
