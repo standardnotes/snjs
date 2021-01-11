@@ -725,7 +725,6 @@ describe('keys', function () {
       expect(newClient.itemManager.itemsKeys().length).to.equal(2);
 
       newClient.deinit();
-      oldClient.deinit();
     });
 
     it('add new items key from migration if pw change already happened', async function () {
