@@ -6,11 +6,11 @@ import {
 } from '@Lib/challenges';
 import { ChallengeService } from './challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
+import { SNLog } from '@Lib/log';
 import { SNNote } from '@Lib/models';
 import { SNProtocolService } from './protocol_service';
 import { SNStorageService } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
-import { SNLog } from '@Lib/log';
 import { isNullOrUndefined } from '@Lib/utils';
 
 enum PrivilegeSessionLengthSeconds {
