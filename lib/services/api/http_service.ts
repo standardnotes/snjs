@@ -1,12 +1,16 @@
 import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
-import { PureService } from '@Lib/services/pure_service';
 import { HttpResponse, StatusCode } from './responses';
+import { PureService } from '@Lib/services/pure_service';
 
 export enum HttpVerb {
   Get = 'get',
   Post = 'post',
   Patch = 'patch',
   Delete = 'delete',
+}
+
+export enum ErrorTag {
+  RevokedSession = 'revoked-session'
 }
 
 const REQUEST_READY_STATE_COMPLETED = 4;
@@ -23,7 +27,7 @@ export type HttpRequest = {
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
-export class SNHttpService extends PureService {
+export class SNHttpService extends PureService<ErrorTag> {
 
   public async getAbsolute(
     url: string,
@@ -98,8 +102,8 @@ export class SNHttpService extends PureService {
 
   private stateChangeHandlerForRequest(
     request: XMLHttpRequest,
-    resolve: any,
-    reject: any
+    resolve: (response: HttpResponse) => void,
+    reject: (response: HttpResponse) => void,
   ) {
     if (request.readyState !== REQUEST_READY_STATE_COMPLETED) {
       return;
@@ -121,7 +125,11 @@ export class SNHttpService extends PureService {
       && httpStatus <= StatusCode.HttpStatusMaxSuccess)) {
       resolve(response);
     } else {
-      if (!response.error) {
+      if (response.error) {
+        if (response.error?.tag === ErrorTag.RevokedSession) {
+          void this.notifyEvent(ErrorTag.RevokedSession);
+        }
+      } else {
         if (httpStatus === StatusCode.HttpStatusForbidden) {
           response.error = {
             message: API_MESSAGE_RATE_LIMITED,

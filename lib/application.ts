@@ -68,6 +68,7 @@ import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
+import { ErrorTag } from './services/api/http_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -1573,6 +1574,12 @@ export class SNApplication {
 
   private createHttpManager() {
     this.httpService = new SNHttpService();
+    this.serviceObservers.push(this.httpService.addEventObserver((tag) => {
+      if (tag === ErrorTag.RevokedSession) {
+        /** Sign out without warning. */
+        void this.signOut();
+      }
+    }));
     this.services.push(this.httpService);
   }
 
