@@ -1,3 +1,4 @@
+import { SNLog } from './../log';
 import { LegacyAttachedData, RootKeyEncryptedAuthenticatedData } from './../protocol/payloads/generator';
 import { ApplicationIdentifier } from './../types';
 import { FillItemContent, Uuids } from '@Models/functions';
@@ -535,7 +536,13 @@ export class SNProtocolService extends PureService implements EncryptionDelegate
     key?: SNRootKey | SNItemsKey
   ): Promise<PurePayload> {
     if (!payload.content) {
-      throw Error('Attempting to decrypt payload that has no content.');
+      SNLog.error(Error('Attempting to decrypt payload that has no content.'));
+      return CreateMaxPayloadFromAnyObject(
+        payload,
+        {
+          errorDecrypting: true
+        }
+      );
     }
     const format = payload.format;
     if (format === PayloadFormat.DecryptedBareObject) {
