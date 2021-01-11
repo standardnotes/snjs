@@ -675,30 +675,11 @@ describe('keys', function () {
         password: this.password,
         version: ProtocolVersion.V003
       });
-      console.log('Registered old account');
 
       /** Sign into account from another app */
       const newClient = await Factory.createAppWithRandNamespace();
       await newClient.prepareForLaunch({
         receiveChallenge: (challenge) => {
-          console.log('Received challenge', challenge);
-          newClient.addChallengeObserver(
-            challenge,
-            {
-              onValidValue: (value) => {
-                console.log("🚀 ~ file: keys.test.js ~ onValidValue", value);
-              },
-              onInvalidValue: (value) => {
-                console.log("🚀 ~ file: keys.test.js ~ onInvalidValue", value);
-              },
-              onComplete: () => {
-                console.log("🚀 ~ file: keys.test.js ~ onComplete");
-              },
-              onCancel: () => {
-                console.log("🚀 ~ file: keys.test.js ~ onCancel");
-              },
-            }
-          );
           /** Reauth session challenge */
           newClient.submitValuesForChallenge(
             challenge,
@@ -710,7 +691,6 @@ describe('keys', function () {
         },
       });
       await newClient.launch(true);
-      console.log('Launched new client');
 
       /** Change password through session manager directly instead of application,
        * as not to create any items key (to simulate 003 client behavior) */
@@ -726,25 +706,20 @@ describe('keys', function () {
       Object.defineProperty(oldClient.apiService, "apiVersion", {
         get: function () { return '20190520' }
       });
-      console.log('Created new root key');
 
       /**
        * Sign in as late as possible on new client to prevent session timeouts
        */
       await newClient.signIn(this.email, this.password);
-      console.log('Signed in with new client');
 
       await oldClient.sessionManager.changePassword(
         currentRootKey.serverPassword,
         newRootKey
       );
-      console.log('Changed password on old client');
 
       /** Re-authenticate on other app; allow challenge to complete */
       await newClient.sync();
-      console.log('Synced on new client');
       await Factory.sleep(1);
-      console.log('Slept on new client');
 
       /** Expect a new items key to be created based on the new root key */
       expect(newClient.itemManager.itemsKeys().length).to.equal(2);
