@@ -575,10 +575,11 @@ export class SNComponentManager extends PureService {
     this.log('Component manager send message to component', component, message);
     let origin = this.urlForComponent(component);
     if (!origin || !componentState.window) {
-      this.alertService!.alert(
+      void this.alertService!.alert(
         `Standard Notes is trying to communicate with ${component.name},
         but an error is occurring. Please restart this extension and try again.`
       );
+      return;
     }
     if (!origin!.startsWith('http') && !origin!.startsWith('file')) {
       /* Native extension running in web, prefix current host */
