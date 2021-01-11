@@ -665,7 +665,7 @@ describe('keys', function () {
      * because its based on the old root key.
      */
     it('add new items key', async function () {
-      this.timeout(Factory.LongTestTimeout * 3);
+      this.timeout(Factory.LongTestTimeout);
       let oldClient = this.application;
 
       /** Register an 003 account */
