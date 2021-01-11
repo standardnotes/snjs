@@ -709,7 +709,7 @@ describe('keys', function () {
           );
         },
       });
-      await newClient.launch();
+      await newClient.launch(true);
       console.log('Launched new client');
 
       /** Change password through session manager directly instead of application,
