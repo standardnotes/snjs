@@ -664,7 +664,7 @@ describe('keys', function () {
      * items sync to the 004 client, it can't decrypt them with its existing items key
      * because its based on the old root key.
      */
-    it.only('add new items key', async function () {
+    it('add new items key', async function () {
       this.timeout(Factory.LongTestTimeout * 3);
       let oldClient = this.application;
 
@@ -682,6 +682,23 @@ describe('keys', function () {
       await newClient.prepareForLaunch({
         receiveChallenge: (challenge) => {
           console.log('Received challenge', challenge);
+          newClient.addChallengeObserver(
+            challenge,
+            {
+              onValidValue: (value) => {
+                console.log("🚀 ~ file: keys.test.js ~ onValidValue", value);
+              },
+              onInvalidValue: (value) => {
+                console.log("🚀 ~ file: keys.test.js ~ onInvalidValue", value);
+              },
+              onComplete: () => {
+                console.log("🚀 ~ file: keys.test.js ~ onComplete");
+              },
+              onCancel: () => {
+                console.log("🚀 ~ file: keys.test.js ~ onCancel");
+              },
+            }
+          );
           /** Reauth session challenge */
           newClient.submitValuesForChallenge(
             challenge,
