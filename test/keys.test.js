@@ -719,7 +719,7 @@ describe('keys', function () {
 
       /** Re-authenticate on other app; allow challenge to complete */
       await newClient.sync();
-      await Factory.sleep(1);
+      await Factory.sleep(3);
 
       /** Expect a new items key to be created based on the new root key */
       expect(newClient.itemManager.itemsKeys().length).to.equal(2);
