@@ -82,6 +82,10 @@ export class SNPrivilegesService extends PureService {
     return this.validateOrRenewSession(ChallengeReason.ChangeAutolockInterval);
   }
 
+  async authorizeSessionRevoking(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.RevokeSession);
+  }
+
   private async validateOrRenewSession(
     reason: ChallengeReason
   ): Promise<boolean> {

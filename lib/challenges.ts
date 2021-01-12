@@ -35,6 +35,7 @@ export enum ChallengeReason {
   ChangePasscode = 9,
   ChangeAutolockInterval = 10,
   CreateDecryptedBackupWithProtectedItems = 11,
+  RevokeSession = 12,
 }
 
 /** For mobile */
@@ -97,7 +98,8 @@ export class Challenge {
         case ChallengeReason.Custom:
         case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
-          return undefined;
+        case ChallengeReason.RevokeSession:
+          return ChallengeStrings.RevokeSession;
         default:
           return assertUnreachable(this.reason);
       }

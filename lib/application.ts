@@ -488,8 +488,10 @@ export class SNApplication {
     return this.sessionManager.getSessionsList();
   }
 
-  public revokeSession(sessionId: UuidString): Promise<HttpResponse> {
-    return this.sessionManager.revokeSession(sessionId);
+  public async revokeSession(sessionId: UuidString): Promise<HttpResponse | undefined> {
+    if (await this.privilegesService.authorizeSessionRevoking()) {
+      return this.sessionManager.revokeSession(sessionId);
+    }
   }
 
   public async userCanManageSessions(): Promise<boolean> {

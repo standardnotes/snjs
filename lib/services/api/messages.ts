@@ -140,6 +140,7 @@ export const ChallengeStrings = {
   RemovePasscode: 'Authentication is required to remove your passcode',
   ChangePasscode: 'Authentication is required to change your passcode',
   ChangeAutolockInterval: 'Authentication is required to change autolock timer duration',
+  RevokeSession: 'Authentication is required to revoke a session',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
