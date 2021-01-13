@@ -22,6 +22,9 @@ type PrivilegeMap = Partial<Record<ProtectedAction, PrivilegeCredential[]>>
 /**
  * Privileges are a singleton object that store the preferences a user
  * may have configured for protecting certain actions.
+ *
+ * @deprecated Privileges are now inferred based on the user's active
+ * protections, like passcode or biometrics
  */
 export class SNPrivileges extends SNItem {
 
