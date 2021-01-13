@@ -576,7 +576,7 @@ describe('server session', function () {
     expect(response2.object.length).to.equal(1);
   });
 
-  it.skip('revoking a session should prevent further syncing', async function () {
+  it('revoking a session should destroy local data', async function () {
     this.timeout(Factory.LongTestTimeout)
 
     const app2 = await Factory.createAndInitializeApplication('app2');
@@ -597,11 +597,10 @@ describe('server session', function () {
     const sessions = await this.application.getSessions();
     const app2session = sessions.find(session => !session.current);
     await this.application.revokeSession(app2session.uuid);
-
-    const note = await Factory.createSyncedNote(app2);
-    await this.application.sync();
-    expect(this.application.findItem(note.uuid)).to.not.be.ok
-    app2.deinit();
+    void app2.sync();
+    /** Wait for app2 to deinit */
+    await Factory.sleep(3);
+    expect(app2.dealloced).to.be.true;
   });
 
   it('signing out with invalid session token should still delete local data', async function () {
