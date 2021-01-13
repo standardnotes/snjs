@@ -22,7 +22,7 @@ describe('keys', function () {
   });
 
   afterEach(function () {
-    this.application.deinit();
+    this.application?.deinit();
     this.application = null;
   });
 
@@ -408,6 +408,17 @@ describe('keys', function () {
   });
 
   it('When root key changes, all items keys must be re-encrypted', async function () {
+    const passcode = 'foo';
+
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        this.application.submitValuesForChallenge(
+          challenge,
+          challenge.prompts.map(prompt => new ChallengeValue(prompt, passcode))
+        )
+      }
+    });
+
     await this.application.setPasscode('foo');
     await Factory.createSyncedNote(this.application);
     const itemsKeys = this.application.itemManager.itemsKeys();
@@ -777,6 +788,7 @@ describe('keys', function () {
 
       /** Expect a new items key to be created based on the new root key */
       expect(refreshedApp.itemManager.itemsKeys().length).to.equal(2);
+      refreshedApp.deinit();
     });
   })
 

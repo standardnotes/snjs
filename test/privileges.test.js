@@ -5,6 +5,8 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('privileges', () => {
+  this.timeout(Factory.TestTimeout);
+
   before(async function () {
     localStorage.clear();
   });
@@ -21,9 +23,12 @@ describe('privileges', () => {
 
   it('prompts for password when accessing protected note', async function () {
     const passcode = 'passcode🌂';
+    let challengePrompts = 0;
+
     this.application = await Factory.createApplication(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
+        challengePrompts += 1;
         expect(
           challenge.prompts.find(
             (prompt) =>
@@ -51,20 +56,23 @@ describe('privileges', () => {
       password,
     });
 
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.changeItem(note.uuid, (mutator) => {
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.changeItem(note.uuid, (mutator) => {
       mutator.protected = true;
     });
 
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+    expect(challengePrompts).to.equal(1);
   });
 
   it('prompts for passcode when accessing protected note', async function () {
     const passcode = 'passcode🌂';
+    let challengePrompts = 0;
 
     this.application = await Factory.createApplication(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
+        challengePrompts += 1;
         expect(
           challenge.prompts.find(
             (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
@@ -86,12 +94,13 @@ describe('privileges', () => {
     await this.application.launch(true);
 
     await this.application.setPasscode(passcode);
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.changeItem(note.uuid, (mutator) => {
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.changeItem(note.uuid, (mutator) => {
       mutator.protected = true;
     });
 
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+    expect(challengePrompts).to.equal(1);
   });
 
   it('does not prompt for passcode again after setting a remember duration', async function () {
@@ -113,7 +122,7 @@ describe('privileges', () => {
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
-                : 300
+                : 3600
             )
         );
 
@@ -123,8 +132,8 @@ describe('privileges', () => {
     await this.application.launch(true);
 
     await this.application.setPasscode(passcode);
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.changeItem(note.uuid, (mutator) => {
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.changeItem(note.uuid, (mutator) => {
       mutator.protected = true;
     });
 
