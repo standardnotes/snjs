@@ -48,14 +48,15 @@ services:
     depends_on:
       - syncing-server-proxy
       - db
-    image: standardnotes/syncing-server:stable
-    entrypoint: ["/tools/wait-for.sh", "db", "3306", "./docker/entrypoint.sh", "start-web"]
+    image: standardnotes/syncing-server
+    entrypoint: ["/tools/wait-for.sh", "db", "3306", "/tools/wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
     environment:
       SECRET_KEY_BASE: s3cr3tK3y
       RAILS_ENV: test
       RAILS_LOG_TO_STDOUT: 1
       RAILS_LOG_LEVEL: debug
       PSEUDO_KEY_PARAMS_KEY: secret_key
+      REDIS_URL: redis://cache:6379
       DB_PORT: 3306
       DB_HOST: db
       DB_DATABASE: testdb
@@ -73,12 +74,15 @@ services:
     depends_on:
       - syncing-server-proxy
       - syncing-server-ruby
-    image: standardnotes/syncing-server-js:stable
-    entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "/tools/wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
+    image: standardnotes/syncing-server-js
+    entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
     environment:
       LOG_LEVEL: debug
       NODE_ENV: development
       JWT_SECRET: s3cr3tK3y
+      ACCESS_TOKEN_AGE: 5184000
+      REFRESH_TOKEN_AGE: 31556926
+      EPHEMERAL_SESSION_AGE: 300
       MAX_LOGIN_ATTEMPTS: 6
       FAILED_LOGIN_LOCKOUT: 3600
       LEGACY_JWT_SECRET: legacy_jwt_secret
