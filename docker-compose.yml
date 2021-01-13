@@ -48,7 +48,7 @@ services:
     depends_on:
       - syncing-server-proxy
       - db
-    image: standardnotes/syncing-server:stable
+    image: standardnotes/syncing-server
     entrypoint: ["/tools/wait-for.sh", "db", "3306", "./docker/entrypoint.sh", "start-web"]
     environment:
       SECRET_KEY_BASE: s3cr3tK3y
@@ -73,7 +73,7 @@ services:
     depends_on:
       - syncing-server-proxy
       - syncing-server-ruby
-    image: standardnotes/syncing-server-js:stable
+    image: standardnotes/syncing-server-js
     entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "/tools/wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
     environment:
       LOG_LEVEL: debug
