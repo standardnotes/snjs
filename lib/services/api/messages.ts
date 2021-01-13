@@ -131,7 +131,9 @@ export const SessionStrings = {
     'The associated app will be signed out and all data removed ' +
     'from the device when it is next launched. You can sign back in on that ' +
     'device at any time.',
-}
+  CurrentSessionRevoked:
+    'Your session has been revoked and all local data has been destroyed.',
+};
 
 export const ChallengeStrings = {
   UnlockApplication: 'Authentication is required to unlock the application',

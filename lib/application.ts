@@ -58,6 +58,7 @@ import {
   REMOVING_PASSCODE, SETTING_PASSCODE,
   UNSUPPORTED_BACKUP_FILE_VERSION,
   UPGRADING_ENCRYPTION,
+  SessionStrings,
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
@@ -1574,10 +1575,12 @@ export class SNApplication {
 
   private createHttpManager() {
     this.httpService = new SNHttpService();
-    this.serviceObservers.push(this.httpService.addEventObserver((tag) => {
+    this.serviceObservers.push(this.httpService.addEventObserver(async (tag) => {
       if (tag === ErrorTag.RevokedSession) {
-        /** Sign out without warning. */
-        void this.signOut();
+        /** Keep a reference to the soon-to-be-cleared alertService */
+        const alertService = this.alertService;
+        await this.signOut();
+        void alertService.alert(SessionStrings.CurrentSessionRevoked);
       }
     }));
     this.services.push(this.httpService);
