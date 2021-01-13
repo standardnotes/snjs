@@ -56,6 +56,7 @@ services:
       RAILS_LOG_TO_STDOUT: 1
       RAILS_LOG_LEVEL: debug
       PSEUDO_KEY_PARAMS_KEY: secret_key
+      REDIS_URL: redis://cache:6379
       DB_PORT: 3306
       DB_HOST: db
       DB_DATABASE: testdb
@@ -79,6 +80,9 @@ services:
       LOG_LEVEL: debug
       NODE_ENV: development
       JWT_SECRET: s3cr3tK3y
+      ACCESS_TOKEN_AGE: 5184000
+      REFRESH_TOKEN_AGE: 31556926
+      EPHEMERAL_SESSION_AGE: 300
       MAX_LOGIN_ATTEMPTS: 6
       FAILED_LOGIN_LOCKOUT: 3600
       LEGACY_JWT_SECRET: legacy_jwt_secret
