@@ -34,7 +34,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
 
     this.removeSyncObserver = syncService.addEventObserver(async (event) => {
       if (event === SyncEvent.FullSyncCompleted) {
-        this.reload();
+        void this.reload();
       }
     });
   }
@@ -69,7 +69,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
         m.setPref(key, value);
       }
     )) as SNUserPrefs;
-    this.notifyEvent('preferencesChanged');
+    void this.notifyEvent('preferencesChanged');
   }
 
   private async reload() {
@@ -90,7 +90,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
         previousRef?.uuid !== this.preferences.uuid ||
         this.preferences.userModifiedDate > previousRef.userModifiedDate
       ) {
-        this.notifyEvent('preferencesChanged');
+        void this.notifyEvent('preferencesChanged');
       }
       this.shouldReload = false;
     } finally {

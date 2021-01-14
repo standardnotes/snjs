@@ -1,5 +1,12 @@
-import { Migration } from '@Lib/migrations/migration';
-import { ChallengeModalTitle, ChallengeStrings, PromptTitles } from './services/api/messages';
+import {
+  ChallengeModalTitle,
+  ChallengeStrings,
+  PromptTitles,
+} from './services/api/messages';
+import {
+  assertUnreachable,
+  isNullOrUndefined,
+} from './utils';
 import { SNRootKey } from '@Protocol/root_key';
 
 export type ChallengeArtifacts = {
@@ -12,6 +19,7 @@ export enum ChallengeValidation {
   LocalPasscode = 1,
   AccountPassword = 2,
   Biometric = 3,
+  PrivilegesSessionDuration = 4,
 }
 
 /** The source of the challenge */
@@ -21,7 +29,13 @@ export enum ChallengeReason {
   ProtocolUpgrade = 3,
   Migration = 4,
   Custom = 5,
-  CreateDecryptedBackupWithProtectedItems = 6,
+  AccessProtectedNote = 6,
+  ImportFile = 7,
+  RemovePasscode = 8,
+  ChangePasscode = 9,
+  ChangeAutolockInterval = 10,
+  CreateDecryptedBackupWithProtectedItems = 11,
+  RevokeSession = 12,
 }
 
 /** For mobile */
@@ -48,7 +62,7 @@ export class Challenge {
   }
 
   /** Outside of the modal, this is the title of the modal itself */
-  get modalTitle() {
+  get modalTitle(): string {
     switch (this.reason) {
       case ChallengeReason.Migration:
         return ChallengeModalTitle.Migration;
@@ -58,7 +72,7 @@ export class Challenge {
   }
 
   /** Inside of the modal, this is the H1 */
-  get heading() {
+  get heading(): string | undefined {
     if (this._heading) {
       return this._heading;
     } else {
@@ -71,16 +85,29 @@ export class Challenge {
           return ChallengeStrings.EnterPasscodeForRootResave;
         case ChallengeReason.ProtocolUpgrade:
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade;
+        case ChallengeReason.AccessProtectedNote:
+          return ChallengeStrings.NoteAccess;
+        case ChallengeReason.ImportFile:
+          return ChallengeStrings.ImportFile;
+        case ChallengeReason.RemovePasscode:
+          return ChallengeStrings.RemovePasscode;
+        case ChallengeReason.ChangePasscode:
+          return ChallengeStrings.ChangePasscode;
+        case ChallengeReason.ChangeAutolockInterval:
+          return ChallengeStrings.ChangeAutolockInterval;
+        case ChallengeReason.Custom:
         case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
+        case ChallengeReason.RevokeSession:
+          return ChallengeStrings.RevokeSession;
         default:
-          return undefined;
+          return assertUnreachable(this.reason);
       }
     }
   }
 
   /** Inside of the modal, this is the H2 */
-  get subheading() {
+  get subheading(): string | undefined {
     if (this._subheading) {
       return this._subheading;
     }
@@ -93,7 +120,7 @@ export class Challenge {
     }
   }
 
-  hasPromptForValidationType(type: ChallengeValidation) {
+  hasPromptForValidationType(type: ChallengeValidation): boolean {
     for (const prompt of this.prompts) {
       if (prompt.validation === type) {
         return true;
@@ -102,6 +129,8 @@ export class Challenge {
     return false;
   }
 }
+
+type ChallengeRawValue = number | string | boolean;
 
 /**
  * A Challenge can have many prompts. Each prompt represents a unique input,
@@ -114,16 +143,17 @@ export class ChallengePrompt {
     public readonly _title?: string,
     public readonly placeholder?: string,
     public readonly secureTextEntry = true,
-    public readonly keyboardType?: ChallengeKeyboardType
+    public readonly keyboardType?: ChallengeKeyboardType,
+    public readonly initialValue?: ChallengeRawValue,
   ) {
     Object.freeze(this);
   }
 
-  public get validates() {
+  public get validates(): boolean {
     return this.validation !== ChallengeValidation.None;
   }
 
-  public get title() {
+  public get title(): string | undefined {
     if (this._title) {
       return this._title;
     }
@@ -134,6 +164,8 @@ export class ChallengePrompt {
         return PromptTitles.Biometrics;
       case ChallengeValidation.LocalPasscode:
         return PromptTitles.LocalPasscode;
+      case ChallengeValidation.PrivilegesSessionDuration:
+        return PromptTitles.RememberFor;
       default:
         return undefined;
     }
@@ -143,7 +175,7 @@ export class ChallengePrompt {
 export class ChallengeValue {
   constructor(
     public readonly prompt: ChallengePrompt,
-    public readonly value: string | boolean,
+    public readonly value: ChallengeRawValue,
   ) {
     Object.freeze(this);
   }
@@ -158,11 +190,15 @@ export class ChallengeResponse {
     Object.freeze(this);
   }
 
-  getValueForType(type: ChallengeValidation) {
-    return this.values.find((value) => value.prompt.validation === type)!;
+  getValueForType(type: ChallengeValidation): ChallengeValue {
+    const value = this.values.find((value) => value.prompt.validation === type);
+    if (isNullOrUndefined(value)) {
+      throw Error('Could not find value for validation type ' + type);
+    }
+    return value;
   }
 
-  getDefaultValue() {
+  getDefaultValue(): ChallengeValue {
     if (this.values.length > 1) {
       throw Error('Attempting to retrieve default response value when more than one value exists');
     }

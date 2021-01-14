@@ -5,6 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('privileges', () => {
+  this.timeout(Factory.TestTimeout);
 
   before(async function () {
     localStorage.clear();
@@ -14,44 +15,204 @@ describe('privileges', () => {
     localStorage.clear();
   });
 
-  beforeEach(async function() {
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.privilegesService = this.application.privilegesService;
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
-  });
+  beforeEach(async function () {});
 
   afterEach(async function () {
     await this.application.deinit();
   });
 
-  it('loads default actions and credentials', async function () {
-    expect(this.privilegesService.getAvailableActions().length).to.be.above(0);
-    expect(this.privilegesService.getAvailableCredentials().length).to.be.above(0);
-  });
+  it('prompts for password when accessing protected note', async function () {
+    const passcode = 'passcode🌂';
+    let challengePrompts = 0;
 
-  it('successfully loads privileges', async function () {
-    const privileges = await this.privilegesService.getPrivileges();
-    expect(privileges).to.be.ok;
-  });
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        challengePrompts += 1;
+        expect(
+          challenge.prompts.find(
+            (prompt) =>
+              prompt.validation === ChallengeValidation.AccountPassword
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.AccountPassword
+                ? passcode
+                : 0
+            )
+        );
 
-  it('adds credentials for actions', async function () {
-    const privileges = await this.privilegesService.getPrivileges();
-    await this.application.itemManager.changeItem(privileges.uuid, (mutator) => {
-      mutator.addCredentialForAction(
-        ProtectedAction.ViewProtectedNotes,
-        PrivilegeCredential.LocalPasscode
-      );
+        this.application.submitValuesForChallenge(challenge, values);
+      },
     });
-    await this.application.setPasscode('foobar');
-    const credentials = await this.privilegesService.netCredentialsForAction(
-      ProtectedAction.ViewProtectedNotes
-    );
-    expect(credentials.length).to.equal(1);
-    const requiresCredentials = await this.privilegesService.actionRequiresPrivilege(
-      ProtectedAction.ViewProtectedNotes
-    );
-    expect(requiresCredentials).to.equal(true);
+    await this.application.launch(true);
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: Uuid.GenerateUuidSynchronously(),
+      password,
+    });
+
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.protected = true;
+    });
+
+    expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+    expect(challengePrompts).to.equal(1);
+  });
+
+  it('prompts for passcode when accessing protected note', async function () {
+    const passcode = 'passcode🌂';
+    let challengePrompts = 0;
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        challengePrompts += 1;
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 0
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.protected = true;
+    });
+
+    expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+    expect(challengePrompts).to.equal(1);
+  });
+
+  it('does not prompt for passcode again after setting a remember duration', async function () {
+    const passcode = 'passcode🌂';
+
+    let challengePrompts = 0;
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        challengePrompts += 1;
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 3600
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.protected = true;
+    });
+
+    expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+    expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+    expect(challengePrompts).to.equal(1);
+  });
+
+  it('authorizes note access when no password or passcode are set', async function () {
+    this.application = await Factory.createInitAppWithRandNamespace();
+
+    const note = await Factory.createMappedNote(this.application);
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.protected = true;
+    });
+
+    expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+  });
+
+  it('authorizes file import', async function () {
+    const passcode = 'passcode🌂';
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 0
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+
+    expect(await this.application.authorizeFileImport()).to.be.true;
+  });
+
+  it('authorizes autolock interval change', async function () {
+    const passcode = 'passcode🌂';
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 0
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+
+    expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
   });
 
   it('handles session length', async function () {
@@ -63,4 +224,4 @@ describe('privileges', () => {
     const expirey = await this.privilegesService.getSessionExpirey();
     expect(expirey).to.be.ok;
   });
-})
+});
