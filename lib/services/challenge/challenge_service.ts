@@ -16,7 +16,7 @@ import {
 import { ChallengeOperation } from "./challenge_operation";
 import { removeFromArray } from '@Lib/utils';
 import { ChallengeStrings } from '../api/messages';
-import { isValidPrivilegesSessionLength } from '../privileges_service';
+import { isValidProtectionSessionLength } from '../protection_service';
 
 type ChallengeValidationResponse = {
   valid: boolean;
@@ -81,8 +81,8 @@ export class ChallengeService extends PureService {
         );
       case ChallengeValidation.Biometric:
         return { valid: value.value === true };
-      case ChallengeValidation.PrivilegesSessionDuration:
-        return { valid: isValidPrivilegesSessionLength(value.value) };
+      case ChallengeValidation.ProtectionSessionDuration:
+        return { valid: isValidProtectionSessionLength(value.value) };
       default:
         throw Error(`Unhandled validation mode ${value.prompt.validation}`)
     }

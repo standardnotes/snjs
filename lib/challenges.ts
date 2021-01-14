@@ -19,7 +19,7 @@ export enum ChallengeValidation {
   LocalPasscode = 1,
   AccountPassword = 2,
   Biometric = 3,
-  PrivilegesSessionDuration = 4,
+  ProtectionSessionDuration = 4,
 }
 
 /** The source of the challenge */
@@ -164,7 +164,7 @@ export class ChallengePrompt {
         return PromptTitles.Biometrics;
       case ChallengeValidation.LocalPasscode:
         return PromptTitles.LocalPasscode;
-      case ChallengeValidation.PrivilegesSessionDuration:
+      case ChallengeValidation.ProtectionSessionDuration:
         return PromptTitles.RememberFor;
       default:
         return undefined;
