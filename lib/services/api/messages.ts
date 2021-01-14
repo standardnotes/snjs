@@ -132,7 +132,8 @@ export const SessionStrings = {
     'from the device when it is next launched. You can sign back in on that ' +
     'device at any time.',
   CurrentSessionRevoked:
-    'Your session has been revoked and all local data has been destroyed.',
+    'Your session has been revoked and all local data has been removed ' +
+    'from this device.',
 };
 
 export const ChallengeStrings = {
