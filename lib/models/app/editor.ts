@@ -1,6 +1,6 @@
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { SNNote } from './note';
 import { SNItem } from '@Models/core/item';
+import { SNNote } from './note';
 
 /**
  * @deprecated
@@ -9,7 +9,7 @@ import { SNItem } from '@Models/core/item';
 export class SNEditor extends SNItem {
 
   public readonly notes: SNNote[] = []
-  public readonly data: Record<string, any> = {}
+  public readonly data: Record<string, unknown> = {}
   public readonly url!: string
   public readonly name!: string
   public readonly isDefault!: boolean

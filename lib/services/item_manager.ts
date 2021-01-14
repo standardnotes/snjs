@@ -1,7 +1,6 @@
 import { CollectionSort, ItemCollection, SortDirection } from '@Protocol/collection/item_collection';
 import { UserPrefsMutator } from './../models/app/userPrefs';
 import { SNItemsKey } from '@Models/app/items_key';
-import { PrivilegeMutator } from './../models/app/privileges';
 import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
@@ -90,7 +89,7 @@ export class ItemManager extends PureService {
     sortBy?: CollectionSort,
     direction?: SortDirection,
     filter?: (element: any) => boolean
-  ) {
+  ): void {
     if (contentType === ContentType.Note) {
       console.warn(
         `Called setDisplayOptions with ContentType.Note. ` +
@@ -105,7 +104,7 @@ export class ItemManager extends PureService {
     sortBy?: CollectionSort,
     direction?: SortDirection,
     filter?: (element: any) => boolean
-  ) {
+  ): void {
     this.notesView.setDisplayOptions(tag, sortBy, direction, filter);
   }
 
@@ -116,7 +115,7 @@ export class ItemManager extends PureService {
     return this.collection.displayElements(contentType);
   }
 
-  public deinit() {
+  public deinit(): void {
     this.unsubChangeObserver();
     this.unsubChangeObserver = undefined;
     this.modelManager = undefined;
@@ -124,15 +123,15 @@ export class ItemManager extends PureService {
     (this.notesView as any) = undefined;
   }
 
-  resetState() {
+  resetState(): void {
     this.createCollection();
   }
 
   /**
    * Returns an item for a given id
    */
-  findItem(uuid: UuidString) {
-    return this.collection.find(uuid) as SNItem | undefined;
+  findItem<T extends SNItem = SNItem>(uuid: UuidString): T | undefined {
+    return this.collection.find(uuid) as T | undefined;
   }
 
   /**
@@ -147,7 +146,7 @@ export class ItemManager extends PureService {
   /**
    * Returns a detached array of all items
    */
-  public get items() {
+  public get items(): SNItem[] {
     return this.collection.all();
   }
 
@@ -334,25 +333,23 @@ export class ItemManager extends PureService {
   }
 
   private createMutatorForItem(item: SNItem, type: MutationType) {
-    if (item.content_type === ContentType.Note) {
-      return new NoteMutator(item, type);
-    } else if (item.content_type === ContentType.Tag) {
-      return new TagMutator(item, type);
-    } else if (item.content_type === ContentType.Component) {
-      return new ComponentMutator(item, type);
-    } else if (item.content_type === ContentType.ActionsExtension) {
-      return new ActionsExtensionMutator(item, type);
-    } else if (item.content_type === ContentType.ItemsKey) {
-      return new ItemsKeyMutator(item, type);
-    } else if (item.content_type === ContentType.Privileges) {
-      return new PrivilegeMutator(item, type);
-    } else if (item.content_type === ContentType.UserPrefs) {
-      return new UserPrefsMutator(item, type);
-    } else if (item.content_type === ContentType.Theme) {
-      return new ThemeMutator(item, type);
-    }
-    else {
-      return new ItemMutator(item, type);
+    switch (item.content_type) {
+      case ContentType.Note:
+        return new NoteMutator(item, type);
+      case ContentType.Tag:
+        return new TagMutator(item, type);
+      case ContentType.Component:
+        return new ComponentMutator(item, type);
+      case ContentType.ActionsExtension:
+        return new ActionsExtensionMutator(item, type);
+      case ContentType.ItemsKey:
+        return new ItemsKeyMutator(item, type);
+      case ContentType.UserPrefs:
+        return new UserPrefsMutator(item, type);
+      case ContentType.Theme:
+        return new ThemeMutator(item, type);
+      default:
+        return new ItemMutator(item, type);
     }
   }
 

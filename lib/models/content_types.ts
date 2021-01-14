@@ -13,7 +13,6 @@ export enum ContentType {
   Editor = 'SN|Editor',
   ActionsExtension = 'Extension',
   UserPrefs = 'SN|UserPreferences',
-  Privileges = 'SN|Privileges',
   HistorySession = 'SN|HistorySession',
   Theme = 'SN|Theme',
   Mfa = 'SF|MFA',
@@ -21,23 +20,25 @@ export enum ContentType {
   FilesafeCredentials = 'SN|FileSafe|Credentials',
   FilesafeFileMetadata = 'SN|FileSafe|FileMetadata',
   FilesafeIntegration = 'SN|FileSafe|Integration',
-  ExtensionRepo = 'SN|ExtensionRepo'
+  ExtensionRepo = 'SN|ExtensionRepo',
 }
 
-export function displayStringForContentType(contentType: ContentType) {
-  const map: Record<any, string> = {
-    [ContentType.Note] : 'note',
-    [ContentType.Tag] : 'tag',
-    [ContentType.SmartTag] : 'smart tag',
-    [ContentType.ActionsExtension] : 'action-based extension',
-    [ContentType.Component] : 'component',
-    [ContentType.Editor] : 'editor',
-    [ContentType.Theme] : 'theme',
-    [ContentType.ServerExtension] : 'server extension',
-    [ContentType.Mfa] : 'two-factor authentication setting',
+export function displayStringForContentType(
+  contentType: ContentType
+): string | undefined {
+  const map: Record<string, string> = {
+    [ContentType.Note]: 'note',
+    [ContentType.Tag]: 'tag',
+    [ContentType.SmartTag]: 'smart tag',
+    [ContentType.ActionsExtension]: 'action-based extension',
+    [ContentType.Component]: 'component',
+    [ContentType.Editor]: 'editor',
+    [ContentType.Theme]: 'theme',
+    [ContentType.ServerExtension]: 'server extension',
+    [ContentType.Mfa]: 'two-factor authentication setting',
     [ContentType.FilesafeCredentials]: 'FileSafe credential',
     [ContentType.FilesafeFileMetadata]: 'FileSafe file',
-    [ContentType.FilesafeIntegration]: 'FileSafe integration'
+    [ContentType.FilesafeIntegration]: 'FileSafe integration',
   };
   return map[contentType];
 }

@@ -47,12 +47,6 @@ export { SNComponentManager } from './services/component_manager';
 export { SessionHistoryMap } from './services/history/session/session_history_map';
 export { ItemSessionHistory } from './services/history/session/item_session_history';
 export { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
-export {
-  SNPrivileges,
-  PrivilegeMutator,
-  ProtectedAction,
-  PrivilegeCredential
-} from './models/app/privileges';
 export { PayloadManager } from './services/model_manager';
 export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
@@ -171,7 +165,7 @@ export { BaseMigration } from '@Lib/migrations/base';
 
 /** Privileges */
 export {
-  PrivilegeSessionLength
+  PrivilegesSessionDurations
 } from '@Services/privileges_service';
 
 export {

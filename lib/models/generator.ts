@@ -1,18 +1,19 @@
-import { SNUserPrefs } from './app/userPrefs';
-import { SNPrivileges } from './app/privileges';
-import { SNComponent } from '@Models/app/component';
-import { SNTheme } from './app/theme';
-import { SNEditor } from './app/editor';
+import { ContentType } from '@Models/content_types';
+import { PurePayload } from '@Payloads/pure_payload';
 import { SNActionsExtension } from './app/extension';
+import { SNComponent } from '@Models/app/component';
+import { SNEditor } from './app/editor';
+import { SNItem } from './core/item';
+import { SNItemsKey } from './app/items_key';
+import { SNNote } from './app/note';
 import { SNSmartTag } from './app/smartTag';
 import { SNTag } from './app/tag';
-import { SNNote } from './app/note';
-import { SNItem } from './core/item';
-import { PurePayload } from '@Payloads/pure_payload';
-import { ContentType } from '@Models/content_types';
-import { SNItemsKey } from './app/items_key';
+import { SNTheme } from './app/theme';
+import { SNUserPrefs } from './app/userPrefs';
 
-const ContentTypeClassMapping: Record<any, any> = {
+const ContentTypeClassMapping: Partial<
+  Record<ContentType, new (payload: PurePayload) => SNItem>
+> = {
   [ContentType.Note]: SNNote,
   [ContentType.Tag]: SNTag,
   [ContentType.ItemsKey]: SNItemsKey,
@@ -21,13 +22,12 @@ const ContentTypeClassMapping: Record<any, any> = {
   [ContentType.Editor]: SNEditor,
   [ContentType.Theme]: SNTheme,
   [ContentType.Component]: SNComponent,
-  [ContentType.Privileges]: SNPrivileges,
-  [ContentType.UserPrefs]: SNUserPrefs
+  [ContentType.UserPrefs]: SNUserPrefs,
 };
 
 export function CreateItemFromPayload(payload: PurePayload): SNItem {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const itemClass = ContentTypeClassMapping[payload.content_type!] || SNItem;
-  // eslint-disable-next-line new-cap
   const item = new itemClass(payload);
   return item;
 }

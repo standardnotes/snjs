@@ -91,7 +91,7 @@ export function isFunction(value: any) {
 /**
  * @returns True if the object is null or undefined, otherwise false
  */
-export function isNullOrUndefined(value: any): value is null | undefined {
+export function isNullOrUndefined(value: unknown): value is null | undefined {
   return value === null || value === undefined;
 }
 
@@ -477,9 +477,13 @@ export function truncateHexString(string: string, desiredBits: number) {
  */
 export async function sleep(milliseconds: number) {
   console.warn(`Sleeping for ${milliseconds}ms`);
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     setTimeout(function () {
       resolve();
     }, milliseconds);
   });
+}
+
+export function assertUnreachable(uncheckedCase: never): never {
+  throw Error("Unchecked case " + uncheckedCase);
 }
