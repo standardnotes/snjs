@@ -419,7 +419,7 @@ describe('keys', function () {
       }
     });
 
-    await this.application.setPasscode('foo');
+    await this.application.setPasscode(passcode);
     await Factory.createSyncedNote(this.application);
     const itemsKeys = this.application.itemManager.itemsKeys();
     expect(itemsKeys.length).to.equal(1);

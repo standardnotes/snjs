@@ -978,7 +978,7 @@ export class SNApplication {
 
     if (intent === EncryptionIntent.FileDecrypted) {
       if (items.some(item => item.protected) && this.hasPasscode()) {
-        const passcode = await this.challengeService.promptForPasscode(
+        const passcode = await this.challengeService.promptForCorrectPasscode(
           ChallengeReason.CreateDecryptedBackupWithProtectedItems
         );
         if (!passcode) {
@@ -1409,7 +1409,7 @@ export class SNApplication {
    * @returns whether the passcode was successfuly removed or not
    */
   public async removePasscode(): Promise<boolean> {
-    const passcode = await this.challengeService.promptForPasscode(
+    const passcode = await this.challengeService.promptForCorrectPasscode(
       ChallengeReason.RemovePasscode
     );
     if (isNullOrUndefined(passcode)) return false;
@@ -1433,10 +1433,10 @@ export class SNApplication {
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
-    const passcode = await this.challengeService.promptForPasscode(
+    const passcode = await this.challengeService.promptForCorrectPasscode(
       ChallengeReason.ChangePasscode
     );
-    if (!passcode) return false;
+    if (isNullOrUndefined(passcode)) return false;
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,

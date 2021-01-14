@@ -105,7 +105,7 @@ export class ChallengeService extends PureService {
     }
   }
 
-  public async promptForPasscode(
+  public async promptForCorrectPasscode(
     reason: ChallengeReason,
   ): Promise<string | undefined> {
     const challenge = new Challenge(
@@ -135,7 +135,7 @@ export class ChallengeService extends PureService {
       return {};
     }
     if (!passcode) {
-      passcode = await this.promptForPasscode(ChallengeReason.ResaveRootKey);
+      passcode = await this.promptForCorrectPasscode(ChallengeReason.ResaveRootKey);
       if (!passcode) {
         return { canceled: true };
       }
