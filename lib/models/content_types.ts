@@ -13,11 +13,6 @@ export enum ContentType {
   Editor = 'SN|Editor',
   ActionsExtension = 'Extension',
   UserPrefs = 'SN|UserPreferences',
-  /**
-   * @deprecated Privileges are now inferred based on the user's active
-   * protections, like passcode or biometrics
-   */
-  Privileges = 'SN|Privileges',
   HistorySession = 'SN|HistorySession',
   Theme = 'SN|Theme',
   Mfa = 'SF|MFA',
