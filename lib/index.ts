@@ -82,7 +82,7 @@ export { SNMigrationService } from './services/migration_service';
 export { ButtonType } from './services/alert_service';
 export type { DismissBlockingDialog, SNAlertService } from './services/alert_service';
 export { SNHistoryManager } from './services/history/history_manager';
-export { SNPrivilegesService } from './services/privileges_service';
+export { SNProtectionService } from './services/protection_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
 export type { RevisionListEntry, SingleRevision } from './services/api/responses';
@@ -163,10 +163,9 @@ export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from '
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
 
-/** Privileges */
 export {
-  PrivilegesSessionDurations
-} from '@Services/privileges_service';
+  ProtectionSessionDurations
+} from '@Lib/services/protection_service';
 
 export {
   SNLog

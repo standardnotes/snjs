@@ -13,44 +13,45 @@ import { SNStorageService } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@Lib/utils';
 
-enum PrivilegeSessionLengthSeconds {
+enum ProtectionSessionLengthSeconds {
   None = 0,
   FiveMinutes = 300,
   OneHour = 3600,
   OneWeek = 604800,
 }
 
-export function isValidPrivilegesSessionLength(number: unknown): boolean {
+export function isValidProtectionSessionLength(number: unknown): boolean {
   return (
     typeof number === 'number' &&
-    Object.values(PrivilegeSessionLengthSeconds).includes(number)
+    Object.values(ProtectionSessionLengthSeconds).includes(number)
   );
 }
 
-export const PrivilegesSessionDurations = [
+export const ProtectionSessionDurations = [
   {
-    valueInSeconds: PrivilegeSessionLengthSeconds.None,
+    valueInSeconds: ProtectionSessionLengthSeconds.None,
     label: "Don't Remember",
   },
   {
-    valueInSeconds: PrivilegeSessionLengthSeconds.FiveMinutes,
+    valueInSeconds: ProtectionSessionLengthSeconds.FiveMinutes,
     label: '5 Minutes',
   },
   {
-    valueInSeconds: PrivilegeSessionLengthSeconds.OneHour,
+    valueInSeconds: ProtectionSessionLengthSeconds.OneHour,
     label: '1 Hour',
   },
   {
-    valueInSeconds: PrivilegeSessionLengthSeconds.OneWeek,
+    valueInSeconds: ProtectionSessionLengthSeconds.OneWeek,
     label: '1 Week',
   },
 ];
 
 /**
- * Privileges enforce certain actions to require extra authentication,
- * like viewing a protected note.
+ * Enforces certain actions to require extra authentication,
+ * like viewing a protected note, as well as managing how long that
+ * authentication should be valid for.
  */
-export class SNPrivilegesService extends PureService {
+export class SNProtectionService extends PureService {
   constructor(
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
@@ -112,7 +113,7 @@ export class SNPrivilegesService extends PureService {
 
     prompts.push(
       new ChallengePrompt(
-        ChallengeValidation.PrivilegesSessionDuration,
+        ChallengeValidation.ProtectionSessionDuration,
         undefined,
         undefined,
         undefined,
@@ -128,14 +129,14 @@ export class SNPrivilegesService extends PureService {
       const length = response.values.find(
         (value) =>
           value.prompt.validation ===
-          ChallengeValidation.PrivilegesSessionDuration
+          ChallengeValidation.ProtectionSessionDuration
       )?.value;
       if (isNullOrUndefined(length)) {
         SNLog.error(
-          Error('No valid privileges session length found. Got ' + length)
+          Error('No valid protection session length found. Got ' + length)
         );
       } else {
-        await this.setSessionLength(length as PrivilegeSessionLengthSeconds);
+        await this.setSessionLength(length as ProtectionSessionLengthSeconds);
       }
       return true;
     } else {
@@ -145,30 +146,30 @@ export class SNPrivilegesService extends PureService {
 
   private async getSessionLength(): Promise<number> {
     const length = await this.storageService.getValue(
-      StorageKey.PrivilegesSessionLength
+      StorageKey.ProtectionSessionLength
     );
     if (length) {
       return length;
     } else {
-      return PrivilegeSessionLengthSeconds.None;
+      return ProtectionSessionLengthSeconds.None;
     }
   }
 
   private async setSessionLength(
-    length: PrivilegeSessionLengthSeconds
+    length: ProtectionSessionLengthSeconds
   ): Promise<void> {
     const expiresAt = new Date();
     expiresAt.setSeconds(expiresAt.getSeconds() + length);
-    await this.storageService.setValue(StorageKey.PrivilegesExpirey, expiresAt);
+    await this.storageService.setValue(StorageKey.ProtectionExpirey, expiresAt);
     await this.storageService.setValue(
-      StorageKey.PrivilegesSessionLength,
+      StorageKey.ProtectionSessionLength,
       length
     );
   }
 
   private async getSessionExpirey(): Promise<Date> {
     const expiresAt = await this.storageService.getValue(
-      StorageKey.PrivilegesExpirey
+      StorageKey.ProtectionExpirey
     );
     if (expiresAt) {
       return new Date(expiresAt);
