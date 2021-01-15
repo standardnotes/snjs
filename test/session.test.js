@@ -576,7 +576,7 @@ describe('server session', function () {
     expect(response2.object.length).to.equal(1);
   });
 
-  it('revoking a session should destroy local data', async function () {
+  it('revoking a session should destroy local data @syncing-server-js-only', async function () {
     this.timeout(Factory.LongTestTimeout)
 
     const app2 = await Factory.createAndInitializeApplication('app2');
