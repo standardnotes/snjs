@@ -12,8 +12,7 @@
         <script src="../dist/snjs.js"></script>
         <script>
           var urlParams = new URLSearchParams(window.location.search);
-          window._default_sync_server = urlParams.has('server') ?
-            urlParams.get('server') : 'http://localhost:3123';
+          window._default_sync_server = 'http://syncing-server-proxy:3123';
           Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
           SNLog.onLog = (message) => {

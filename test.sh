@@ -86,7 +86,7 @@ else
 fi
 
 echo "# Starting $SYNCING_SERVER_VERSION Test Suite"
-npx mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html?skip=$SKIP_TAG&server=http://syncing-server-proxy:3123
+npx mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html?skip=$SKIP_TAG
 test_result=$?
 
 cleanup
