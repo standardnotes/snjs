@@ -19,7 +19,7 @@ import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
-import { HttpRequest, HttpVerb, SNHttpService } from './http_service';
+import { ErrorTag, HttpRequest, HttpVerb, SNHttpService } from './http_service';
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
@@ -41,7 +41,7 @@ const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
 
 const API_VERSION = '20200115';
 
-type InvalidSessionObserver = () => void;
+type InvalidSessionObserver = (revoked: boolean) => void;
 
 export class SNApiService extends PureService {
   private host?: string
@@ -64,9 +64,9 @@ export class SNApiService extends PureService {
   }
 
   /** @override */
-  deinit() {
-    (this.httpService as any) = undefined;
-    (this.storageService as any) = undefined;
+  deinit(): void {
+    (this.httpService as unknown) = undefined;
+    (this.storageService as unknown) = undefined;
     this.invalidSessionObserver = undefined;
     this.host = undefined;
     this.session = undefined;
@@ -78,33 +78,35 @@ export class SNApiService extends PureService {
    * Note that this applies only to sessions that are totally invalid. Sessions that
    * are expired but can be renewed are still considered to be valid. In those cases,
    * the server response is 498.
+   * If the session has been revoked, then the observer will have its first
+   * argument set to true.
    */
-  public setInvalidSessionObserver(observer: InvalidSessionObserver) {
+  public setInvalidSessionObserver(observer: InvalidSessionObserver): void {
     this.invalidSessionObserver = observer;
   }
 
-  public async loadHost() {
-    const storedValue = await this.storageService!.getValue(StorageKey.ServerHost);
+  public async loadHost(): Promise<void> {
+    const storedValue = await this.storageService.getValue(StorageKey.ServerHost);
     this.host = storedValue || this.host || (window as any)._default_sync_server;
   }
 
-  public async setHost(host: string) {
+  public async setHost(host: string): Promise<void> {
     this.host = host;
     await this.storageService.setValue(StorageKey.ServerHost, host);
   }
 
-  public getHost() {
+  public getHost(): string | undefined {
     return this.host;
   }
 
-  public async setSession(session: Session, persist = true) {
+  public async setSession(session: Session, persist = true): Promise<void> {
     this.session = session;
     if (persist) {
       await this.storageService.setValue(StorageKey.Session, session);
     }
   }
 
-  public getSession() {
+  public getSession(): Session | undefined {
     return this.session;
   }
 
@@ -130,7 +132,7 @@ export class SNApiService extends PureService {
     return params;
   }
 
-  public createErrorResponse(message: string, status?: StatusCode) {
+  public createErrorResponse(message: string, status?: StatusCode): HttpResponse {
     return { error: { message, status } } as HttpResponse;
   }
 
@@ -503,8 +505,13 @@ export class SNApiService extends PureService {
 
   /** Handle errored responses to authenticated requests */
   private preprocessAuthenticatedErrorResponse(response: HttpResponse) {
-    if (response.status === StatusCode.HttpStatusInvalidSession && this.session) {
-      this.invalidSessionObserver?.();
+    if (
+      response.status === StatusCode.HttpStatusInvalidSession &&
+      this.session
+    ) {
+      this.invalidSessionObserver?.(
+        response.error?.tag === ErrorTag.RevokedSession
+      );
     }
   }
 

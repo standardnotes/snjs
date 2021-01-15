@@ -19,7 +19,7 @@ import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
-import { isNullOrUndefined, isString, removeFromArray, sleep } from '@Lib/utils';
+import { assertUnreachable, isNullOrUndefined, isString, removeFromArray, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
@@ -1613,14 +1613,6 @@ export class SNApplication {
 
   private createHttpManager() {
     this.httpService = new SNHttpService();
-    this.serviceObservers.push(this.httpService.addEventObserver(async (tag) => {
-      if (tag === ErrorTag.RevokedSession) {
-        /** Keep a reference to the soon-to-be-cleared alertService */
-        const alertService = this.alertService;
-        await this.signOut();
-        void alertService.alert(SessionStrings.CurrentSessionRevoked);
-      }
-    }));
     this.services.push(this.httpService);
   }
 
@@ -1686,12 +1678,26 @@ export class SNApplication {
       this.challengeService
     );
     this.serviceObservers.push(this.sessionManager.addEventObserver(async event => {
-      if (event === SessionEvent.SessionRestored) {
-        this.sync().then(async () => {
-          if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
-            this.protocolService.createNewDefaultItemsKey();
-          }
-        })
+      switch (event) {
+        case SessionEvent.Restored: {
+          void (async () => {
+            await this.sync();
+            if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
+              void this.protocolService.createNewDefaultItemsKey();
+            }
+          })();
+          break;
+        }
+        case SessionEvent.Revoked: {
+          /** Keep a reference to the soon-to-be-cleared alertService */
+          const alertService = this.alertService;
+          await this.signOut();
+          void alertService.alert(SessionStrings.CurrentSessionRevoked);
+          break;
+        }
+        default: {
+          assertUnreachable(event);
+        }
       }
     }));
     this.services.push(this.sessionManager);

@@ -27,7 +27,7 @@ export type HttpRequest = {
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
-export class SNHttpService extends PureService<ErrorTag> {
+export class SNHttpService extends PureService {
 
   public async getAbsolute(
     url: string,
@@ -125,19 +125,13 @@ export class SNHttpService extends PureService<ErrorTag> {
       && httpStatus <= StatusCode.HttpStatusMaxSuccess)) {
       resolve(response);
     } else {
-      if (response.error) {
-        if (response.error?.tag === ErrorTag.RevokedSession) {
-          void this.notifyEvent(ErrorTag.RevokedSession);
-        }
+      if (httpStatus === StatusCode.HttpStatusForbidden) {
+        response.error = {
+          message: API_MESSAGE_RATE_LIMITED,
+          status: httpStatus
+        };
       } else {
-        if (httpStatus === StatusCode.HttpStatusForbidden) {
-          response.error = {
-            message: API_MESSAGE_RATE_LIMITED,
-            status: httpStatus
-          };
-        } else {
-          response.error = { message: UNKNOWN_ERROR, status: httpStatus };
-        }
+        response.error = { message: UNKNOWN_ERROR, status: httpStatus };
       }
       reject(response);
     }
