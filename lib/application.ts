@@ -1758,7 +1758,6 @@ export class SNApplication {
       this.syncService,
     );
     this.serviceObservers.push(this.preferencesService.addEventObserver(async () => {
-      void this.sync();
       void this.notifyEvent(ApplicationEvent.PreferencesChanged);
     }));
     this.services.push(this.preferencesService);

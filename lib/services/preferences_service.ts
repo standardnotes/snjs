@@ -21,7 +21,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
   constructor(
     private singletonManager: SNSingletonManager,
     private itemManager: ItemManager,
-    syncService: SNSyncService
+    private syncService: SNSyncService
   ) {
     super();
 
@@ -70,6 +70,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
       }
     )) as SNUserPrefs;
     void this.notifyEvent('preferencesChanged');
+    void this.syncService.sync();
   }
 
   private async reload() {
