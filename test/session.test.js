@@ -56,6 +56,8 @@ describe('server session', function () {
   }
 
   it('should succeed when a sync request is perfomed with an expired access token', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -86,6 +88,8 @@ describe('server session', function () {
   });
 
   it('should be refreshed on any api call if access token is expired', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -181,6 +185,8 @@ describe('server session', function () {
   });
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -227,6 +233,8 @@ describe('server session', function () {
   });
 
   xit('change password request should be successful after the expired access token is refreshed', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -285,6 +293,8 @@ describe('server session', function () {
   });
 
   it('change password request should fail with an expired refresh token', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -349,6 +359,8 @@ describe('server session', function () {
   });
 
   it('should fail when renewing a session with an expired refresh token', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -416,6 +428,8 @@ describe('server session', function () {
   });
 
   it('notes should be synced as expected after refreshing a session', async function () {
+    this.timeout(Factory.LongTestTimeout)
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
