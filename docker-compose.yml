@@ -82,8 +82,8 @@ services:
       LOG_LEVEL: debug
       NODE_ENV: development
       JWT_SECRET: s3cr3tK3y
-      ACCESS_TOKEN_AGE: 20
-      REFRESH_TOKEN_AGE: 40
+      ACCESS_TOKEN_AGE: 3
+      REFRESH_TOKEN_AGE: 6
       EPHEMERAL_SESSION_AGE: 300
       MAX_LOGIN_ATTEMPTS: 6
       FAILED_LOGIN_LOCKOUT: 3600
