@@ -47,7 +47,9 @@ describe('server session', function () {
       If the token has not expired yet, we will return the remaining time.
       Else, there's no need to add a delay.
     */
-    const sleepTime = timeRemaining > 0 ? timeRemaining : 0;
+    const sleepTime = timeRemaining > 0
+      ? timeRemaining + 0.3 /** Safety margin */
+      : 0;
     await Factory.sleep(sleepTime);
   }
 
