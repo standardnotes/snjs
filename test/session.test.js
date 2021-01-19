@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js';
+import WebDeviceInterface from './lib/web_device_interface.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -593,9 +594,11 @@ describe('server session', function () {
   });
 
   it('revoking a session should destroy local data @syncing-server-js-only', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
-    const app2 = await Factory.createAndInitializeApplication('app2');
+    const app2identifier = 'app2';
+
+    const app2 = await Factory.createAndInitializeApplication(app2identifier);
     app2.prepareForLaunch({
       receiveChallenge() {}
     });
@@ -617,6 +620,10 @@ describe('server session', function () {
     /** Wait for app2 to deinit */
     await Factory.sleep(3);
     expect(app2.dealloced).to.be.true;
+
+    const deviceInterface = new WebDeviceInterface();
+    const payloads = await deviceInterface.getAllRawDatabasePayloads(app2identifier);
+    expect(payloads).to.be.empty;
   });
 
   it('signing out with invalid session token should still delete local data', async function () {
