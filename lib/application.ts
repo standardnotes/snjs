@@ -36,7 +36,7 @@ import {
   SNHistoryManager,
   SNHttpService,
   SNMigrationService,
-  SNPrivilegesService,
+  SNProtectionService,
   SNProtocolService,
   SNSessionManager,
   SNSingletonManager,
@@ -117,7 +117,7 @@ export class SNApplication {
   private challengeService!: ChallengeService
   public singletonManager!: SNSingletonManager
   public componentManager!: SNComponentManager
-  public privilegesService!: SNPrivilegesService
+  public protectionService!: SNProtectionService
   public actionsManager!: SNActionsService
   public historyManager!: SNHistoryManager
   private itemManager!: ItemManager
@@ -491,7 +491,7 @@ export class SNApplication {
   }
 
   public async revokeSession(sessionId: UuidString): Promise<HttpResponse | undefined> {
-    if (await this.privilegesService.authorizeSessionRevoking()) {
+    if (await this.protectionService.authorizeSessionRevoking()) {
       return this.sessionManager.revokeSession(sessionId);
     }
   }
@@ -887,15 +887,15 @@ export class SNApplication {
    * @returns whether note access has been granted or not
    */
   public authorizeNoteAccess(note: SNNote): Promise<boolean> {
-    return this.privilegesService.authorizeNoteAccess(note);
+    return this.protectionService.authorizeNoteAccess(note);
   }
 
   public authorizeFileImport(): Promise<boolean> {
-    return this.privilegesService.authorizeFileImport();
+    return this.protectionService.authorizeFileImport();
   }
 
   public authorizeAutolockIntervalChange(): Promise<boolean> {
-    return this.privilegesService.authorizeAutolockIntervalChange();
+    return this.protectionService.authorizeAutolockIntervalChange();
   }
 
   /**
@@ -1536,7 +1536,7 @@ export class SNApplication {
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createComponentManager();
-    this.createPrivilegesService();
+    this.createProtectionService();
     this.createHistoryManager();
     this.createActionsManager();
     this.createPreferencesService();
@@ -1555,7 +1555,7 @@ export class SNApplication {
     (this.challengeService as unknown) = undefined;
     (this.singletonManager as unknown) = undefined;
     (this.componentManager as unknown) = undefined;
-    (this.privilegesService as unknown) = undefined;
+    (this.protectionService as unknown) = undefined;
     (this.actionsManager as unknown) = undefined;
     (this.historyManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
@@ -1733,13 +1733,13 @@ export class SNApplication {
     this.services.push(this.challengeService);
   }
 
-  private createPrivilegesService() {
-    this.privilegesService = new SNPrivilegesService(
+  private createProtectionService() {
+    this.protectionService = new SNProtectionService(
       this.protocolService,
       this.challengeService,
       this.storageService
     );
-    this.services.push(this.privilegesService);
+    this.services.push(this.protectionService);
   }
 
   private createHistoryManager() {

@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('privileges', () => {
+describe('protections', () => {
   this.timeout(Factory.TestTimeout);
 
   before(async function () {
@@ -216,12 +216,12 @@ describe('privileges', () => {
   });
 
   it('handles session length', async function () {
-    await this.privilegesService.setSessionLength(
-      PrivilegeSessionLength.FiveMinutes
+    await this.application.protectionService.setSessionLength(
+      ProtectionSessionLength.FiveMinutes
     );
-    const length = await this.privilegesService.getSelectedSessionLength();
-    expect(length).to.equal(PrivilegeSessionLength.FiveMinutes);
-    const expirey = await this.privilegesService.getSessionExpirey();
+    const length = await this.application.protectionService.getSessionLength();
+    expect(length).to.equal(ProtectionSessionLength.FiveMinutes);
+    const expirey = await this.application.protectionService.getSessionExpirey();
     expect(expirey).to.be.ok;
   });
 });
