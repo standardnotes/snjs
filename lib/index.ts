@@ -47,12 +47,6 @@ export { SNComponentManager } from './services/component_manager';
 export { SessionHistoryMap } from './services/history/session/session_history_map';
 export { ItemSessionHistory } from './services/history/session/item_session_history';
 export { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
-export {
-  SNPrivileges,
-  PrivilegeMutator,
-  ProtectedAction,
-  PrivilegeCredential
-} from './models/app/privileges';
 export { PayloadManager } from './services/model_manager';
 export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
@@ -88,7 +82,7 @@ export { SNMigrationService } from './services/migration_service';
 export { ButtonType } from './services/alert_service';
 export type { DismissBlockingDialog, SNAlertService } from './services/alert_service';
 export { SNHistoryManager } from './services/history/history_manager';
-export { SNPrivilegesService } from './services/privileges_service';
+export { SNProtectionService } from './services/protection_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
 export type { RevisionListEntry, SingleRevision } from './services/api/responses';
@@ -169,10 +163,9 @@ export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from '
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
 
-/** Privileges */
 export {
-  PrivilegeSessionLength
-} from '@Services/privileges_service';
+  ProtectionSessionDurations
+} from '@Lib/services/protection_service';
 
 export {
   SNLog

@@ -36,7 +36,7 @@ import {
   SNHistoryManager,
   SNHttpService,
   SNMigrationService,
-  SNPrivilegesService,
+  SNProtectionService,
   SNProtocolService,
   SNSessionManager,
   SNSingletonManager,
@@ -115,7 +115,7 @@ export class SNApplication {
   private challengeService!: ChallengeService
   public singletonManager!: SNSingletonManager
   public componentManager!: SNComponentManager
-  public privilegesService!: SNPrivilegesService
+  public protectionService!: SNProtectionService
   public actionsManager!: SNActionsService
   public historyManager!: SNHistoryManager
   private itemManager!: ItemManager
@@ -488,8 +488,10 @@ export class SNApplication {
     return this.sessionManager.getSessionsList();
   }
 
-  public revokeSession(sessionId: UuidString): Promise<HttpResponse> {
-    return this.sessionManager.revokeSession(sessionId);
+  public async revokeSession(sessionId: UuidString): Promise<HttpResponse | undefined> {
+    if (await this.protectionService.authorizeSessionRevoking()) {
+      return this.sessionManager.revokeSession(sessionId);
+    }
   }
 
   public async userCanManageSessions(): Promise<boolean> {
@@ -880,6 +882,21 @@ export class SNApplication {
   }
 
   /**
+   * @returns whether note access has been granted or not
+   */
+  public authorizeNoteAccess(note: SNNote): Promise<boolean> {
+    return this.protectionService.authorizeNoteAccess(note);
+  }
+
+  public authorizeFileImport(): Promise<boolean> {
+    return this.protectionService.authorizeFileImport();
+  }
+
+  public authorizeAutolockIntervalChange(): Promise<boolean> {
+    return this.protectionService.authorizeAutolockIntervalChange();
+  }
+
+  /**
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
    * .errorCount: The number of items that were not imported due to failure to decrypt.
@@ -961,7 +978,7 @@ export class SNApplication {
 
     if (intent === EncryptionIntent.FileDecrypted) {
       if (items.some(item => item.protected) && this.hasPasscode()) {
-        const passcode = await this.challengeService.promptForPasscode(
+        const passcode = await this.challengeService.promptForCorrectPasscode(
           ChallengeReason.CreateDecryptedBackupWithProtectedItems
         );
         if (!passcode) {
@@ -1388,22 +1405,39 @@ export class SNApplication {
     }
   }
 
-  public async removePasscode(): Promise<void> {
+  /**
+   * @returns whether the passcode was successfuly removed or not
+   */
+  public async removePasscode(): Promise<boolean> {
+    const passcode = await this.challengeService.promptForCorrectPasscode(
+      ChallengeReason.RemovePasscode
+    );
+    if (isNullOrUndefined(passcode)) return false;
+
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       REMOVING_PASSCODE,
     );
     try {
       await this.removePasscodeWithoutWarning();
+      return true;
     } finally {
       dismissBlockingDialog();
     }
   }
 
+  /**
+   * @returns whether the passcode was successfuly changed or not
+   */
   public async changePasscode(
-    passcode: string,
+    newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
-  ): Promise<void> {
+  ): Promise<boolean> {
+    const passcode = await this.challengeService.promptForCorrectPasscode(
+      ChallengeReason.ChangePasscode
+    );
+    if (isNullOrUndefined(passcode)) return false;
+
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       origination === KeyParamsOrigination.ProtocolUpgrade
@@ -1412,7 +1446,11 @@ export class SNApplication {
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeChange);
+      await this.setPasscodeWithoutWarning(
+        newPasscode,
+        KeyParamsOrigination.PasscodeChange
+      );
+      return true;
     } finally {
       dismissBlockingDialog();
     }
@@ -1496,7 +1534,7 @@ export class SNApplication {
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createComponentManager();
-    this.createPrivilegesService();
+    this.createProtectionService();
     this.createHistoryManager();
     this.createActionsManager();
     this.createPreferencesService();
@@ -1515,7 +1553,7 @@ export class SNApplication {
     (this.challengeService as unknown) = undefined;
     (this.singletonManager as unknown) = undefined;
     (this.componentManager as unknown) = undefined;
-    (this.privilegesService as unknown) = undefined;
+    (this.protectionService as unknown) = undefined;
     (this.actionsManager as unknown) = undefined;
     (this.historyManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
@@ -1679,16 +1717,13 @@ export class SNApplication {
     this.services.push(this.challengeService);
   }
 
-  private createPrivilegesService() {
-    this.privilegesService = new SNPrivilegesService(
-      this.itemManager,
-      this.syncService,
-      this.singletonManager,
+  private createProtectionService() {
+    this.protectionService = new SNProtectionService(
       this.protocolService,
-      this.storageService,
-      this.sessionManager,
+      this.challengeService,
+      this.storageService
     );
-    this.services.push(this.privilegesService);
+    this.services.push(this.protectionService);
   }
 
   private createHistoryManager() {

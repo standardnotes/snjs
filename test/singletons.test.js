@@ -12,15 +12,23 @@ describe('singletons', function() {
   };
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
-  function createPrivsPayload() {
+  function createPrefsPayload() {
     const params = {
       uuid: Uuid.GenerateUuidSynchronously(),
-      content_type: 'SN|Privileges',
+      content_type: ContentType.UserPrefs,
       content: {
         foo: 'bar'
       }
     };
     return CreateMaxPayloadFromAnyObject(params);
+  }
+
+  function insertPrefsPayload(application) {
+    return application.singletonManager.findOrCreateSingleton(
+      new SNPredicate('content_type', '=', ContentType.UserPrefs),
+      ContentType.UserPrefs,
+      FillItemContent({}),
+    );
   }
 
   before(async function () {
@@ -82,14 +90,13 @@ describe('singletons', function() {
   });
 
   it(`only resolves to ${BASE_ITEM_COUNT} items`, async function () {
-    /** Privileges are an item we know to always return true for isSingleton */
-    const privs1 = createPrivsPayload();
-    const privs2 = createPrivsPayload();
-    const privs3 = createPrivsPayload();
+    /** Preferences are an item we know to always return true for isSingleton */
+    const prefs1 = createPrefsPayload();
+    const prefs2 = createPrefsPayload();
+    const prefs3 = createPrefsPayload();
 
-    this.expectedItemCount++;
     const items = await this.application.itemManager.emitItemsFromPayloads(
-      [privs1, privs2, privs3],
+      [prefs1, prefs2, prefs3],
       PayloadSource.LocalChanged
     );
     await this.application.itemManager.setItemsDirty(Uuids(items));
@@ -194,67 +201,60 @@ describe('singletons', function() {
 
   it('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
     await this.registerUser();
-    /** Create privs */
-    const ogPrivs = await this.application.privilegesService.getPrivileges();
-    this.expectedItemCount++;
+    /** Create prefs */
+    const ogPrefs = await insertPrefsPayload(this.application);
     await this.application.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     /** Create another instance while signed out */
-    await this.application.privilegesService.getPrivileges();
+    await insertPrefsPayload(this.application);
     await Factory.loginToApplication({
       application: this.application,
       email: this.email,
       password: this.password
     });
     /** After signing in, the instance retrieved from the server should be the one kept */
-    const latestPrivs = await this.application.privilegesService.getPrivileges();
-    expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
-    const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrivs.content_type);
-    expect(allPrivs.length).to.equal(1);
+    const latestPrefs = await insertPrefsPayload(this.application);
+    expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
+    const allPrefs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
+    expect(allPrefs.length).to.equal(1);
   });
 
   it('resolving singleton before first sync, then signing in, should result in correct number of instances', async function () {
     await this.registerUser();
-    /** Create privs and associate them with account */
-    const ogPrivs = await this.application.privilegesService.getPrivileges();
-    this.expectedItemCount++;
+    /** Create prefs and associate them with account */
+    const ogPrefs = await insertPrefsPayload(this.application);
     await this.application.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
 
     /** Create another instance while signed out */
-    await this.application.privilegesService.getPrivileges();
+    await insertPrefsPayload(this.application);
     await Factory.loginToApplication({
       application: this.application,
       email: this.email,
       password: this.password
     });
     /** After signing in, the instance retrieved from the server should be the one kept */
-    const latestPrivs = await this.application.privilegesService.getPrivileges();
-    expect(latestPrivs.uuid).to.equal(ogPrivs.uuid);
-    const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrivs.content_type);
+    const latestPrefs = await insertPrefsPayload(this.application);
+    expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
+    const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
     expect(allPrivs.length).to.equal(1);
   });
 
   it('if only result is errorDecrypting, create new item', async function () {
-    const payload = createPrivsPayload();
-    const item = await this.application.itemManager.emitItemFromPayload(
-      payload,
-      PayloadSource.LocalChanged
+    const item = this.application.itemManager.items.find(
+      item => item.content_type === ContentType.UserPrefs
     );
-    this.expectedItemCount++;
-    await this.application.syncService.sync(syncOptions);
     await this.application.itemManager.changeItem(item.uuid, (mutator) => {
-      /** Set after sync so that it syncs properly */
       mutator.errorDecrypting = true;
     });
 
     const predicate = new SNPredicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
-      payload.content_type,
-      payload.content
+      item.content_type,
+      item.content
     );
-    await this.application.sync();
+    await this.application.sync({ awaitAll: true });
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
@@ -317,12 +317,11 @@ describe('singletons', function() {
   });
 
   it('alternating the uuid of a singleton should return correct result', async function () {
-    const payload = createPrivsPayload();
+    const payload = createPrefsPayload();
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
-    this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
     const predicate = new SNPredicate('content_type', '=', item.content_type);
     let resolvedItem = await this.application.singletonManager.findOrCreateSingleton(

@@ -16,6 +16,7 @@ import {
 import { ChallengeOperation } from "./challenge_operation";
 import { removeFromArray } from '@Lib/utils';
 import { ChallengeStrings } from '../api/messages';
+import { isValidProtectionSessionLength } from '../protection_service';
 
 type ChallengeValidationResponse = {
   valid: boolean;
@@ -68,7 +69,7 @@ export class ChallengeService extends PureService {
     });
   }
 
-  public validateChallengeValue(
+  public async validateChallengeValue(
     value: ChallengeValue
   ): Promise<ChallengeValidationResponse> {
     switch (value.prompt.validation) {
@@ -79,7 +80,9 @@ export class ChallengeService extends PureService {
           value.value as string
         );
       case ChallengeValidation.Biometric:
-        return Promise.resolve({ valid: value.value === true });
+        return { valid: value.value === true };
+      case ChallengeValidation.ProtectionSessionDuration:
+        return { valid: isValidProtectionSessionLength(value.value) };
       default:
         throw Error(`Unhandled validation mode ${value.prompt.validation}`)
     }
@@ -102,7 +105,7 @@ export class ChallengeService extends PureService {
     }
   }
 
-  public async promptForPasscode(
+  public async promptForCorrectPasscode(
     reason: ChallengeReason,
   ): Promise<string | undefined> {
     const challenge = new Challenge(
@@ -132,7 +135,7 @@ export class ChallengeService extends PureService {
       return {};
     }
     if (!passcode) {
-      passcode = await this.promptForPasscode(ChallengeReason.ResaveRootKey);
+      passcode = await this.promptForCorrectPasscode(ChallengeReason.ResaveRootKey);
       if (!passcode) {
         return { canceled: true };
       }
