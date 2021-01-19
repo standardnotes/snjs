@@ -2,6 +2,6 @@ node_modules
 .DS_Store
 .vscode
 dist
-
+docs
 yarn-error.log
 package-lock.json

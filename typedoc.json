@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["./lib"],
+  "name": "SNJS Documentation",
+  "includeVersion": true,
+  "out": "docs"
+}

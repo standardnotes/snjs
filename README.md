@@ -132,5 +132,21 @@ yarn test
 ## Notes
 - Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
+## Documentation
+
+Documentation is generated using [Typedoc](https://typedoc.org/). The documentation is available at https://standardnotes.github.io/snjs/. To update the docs or to view the latest version, run:
+
+```
+yarn docs
+```
+
+This will generate documentation and place it in the `docs/` directory. Create a localhost server using `http-server` and open the [docs/index.html](docs/index.html) file in a browser to view the docs.
+
+To deploy the latest version of the docs to the `gh-pages` branch to publish using [GitHub Pages](https://pages.github.com/), replace `2.0.41` with the latest version and run:
+
+```
+yarn deploy-docs -m "build: v2.0.41"
+```
+
 ## Help
 Join the #dev channel in [our Slack group](https://standardnotes.org/slack) for help and discussion.
