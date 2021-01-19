@@ -1,6 +1,7 @@
 import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
 import { HttpResponse, StatusCode } from './responses';
 import { PureService } from '@Lib/services/pure_service';
+import { isNullOrUndefined } from '@Lib/utils';
 
 export enum HttpVerb {
   Get = 'get',
@@ -130,7 +131,7 @@ export class SNHttpService extends PureService {
           message: API_MESSAGE_RATE_LIMITED,
           status: httpStatus
         };
-      } else {
+      } else if (isNullOrUndefined(response.error)) {
         response.error = { message: UNKNOWN_ERROR, status: httpStatus };
       }
       reject(response);
