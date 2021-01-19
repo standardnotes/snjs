@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('protections', () => {
+describe('protections', function () {
   this.timeout(Factory.TestTimeout);
 
   before(async function () {
