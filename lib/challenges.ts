@@ -101,6 +101,8 @@ export class Challenge {
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         case ChallengeReason.RevokeSession:
           return ChallengeStrings.RevokeSession;
+        case ChallengeReason.AccessBatchManager:
+          return ChallengeStrings.AccessBatchManager;
         default:
           return assertUnreachable(this.reason);
       }
