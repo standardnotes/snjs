@@ -22,6 +22,8 @@ describe('protections', function () {
   });
 
   it('prompts for password when accessing protected note', async function () {
+    const password = Uuid.GenerateUuidSynchronously();
+
     let challengePrompts = 0;
 
     this.application = await Factory.createApplication(Factory.randomString());
@@ -39,7 +41,7 @@ describe('protections', function () {
             new ChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.AccountPassword
-                ? this.password
+                ? password
                 : 0
             )
         );
@@ -48,7 +50,6 @@ describe('protections', function () {
       },
     });
     await this.application.launch(true);
-    const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: this.application,
       email: Uuid.GenerateUuidSynchronously(),
@@ -246,11 +247,10 @@ describe('protections', function () {
   });
 
   it('handles session length', async function () {
-    await this.application.protectionService.setSessionLength(
-      ProtectionSessionLength.FiveMinutes
-    );
+    this.application = await Factory.createInitAppWithRandNamespace();
+    await this.application.protectionService.setSessionLength(300);
     const length = await this.application.protectionService.getSessionLength();
-    expect(length).to.equal(ProtectionSessionLength.FiveMinutes);
+    expect(length).to.equal(300);
     const expirey = await this.application.protectionService.getSessionExpirey();
     expect(expirey).to.be.ok;
   });
