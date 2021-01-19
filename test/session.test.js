@@ -591,16 +591,27 @@ describe('server session', function () {
     app2.prepareForLaunch({
       receiveChallenge() {}
     });
-    /** Sign out and back in to prevent middle-of-test timeouts */
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    await Promise.all([
-      await Factory.registerUserToApplication({
-        application: this.application,
-        email: this.email,
-        password: this.password,
-      }),
-      app2.signIn(this.email, this.password)
-    ]);
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.AccountPassword
+                ? this.password
+                : 0
+            )
+        );
+        this.application.submitValuesForChallenge(challenge, values);
+      }
+    });
+
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    }),
+    await app2.signIn(this.email, this.password);
 
     const sessions = await this.application.getSessions();
     const app2session = sessions.find(session => !session.current);
