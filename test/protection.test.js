@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('protections', () => {
+describe('protections', function () {
   this.timeout(Factory.TestTimeout);
 
   before(async function () {
@@ -22,7 +22,6 @@ describe('protections', () => {
   });
 
   it('prompts for password when accessing protected note', async function () {
-    const passcode = 'passcode🌂';
     let challengePrompts = 0;
 
     this.application = await Factory.createApplication(Factory.randomString());
@@ -40,7 +39,7 @@ describe('protections', () => {
             new ChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.AccountPassword
-                ? passcode
+                ? this.password
                 : 0
             )
         );
@@ -185,6 +184,37 @@ describe('protections', () => {
   });
 
   it('authorizes autolock interval change', async function () {
+    const passcode = 'passcode🌂';
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 0
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+
+    expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
+  });
+
+  it('authorizes batch manager access', async function () {
     const passcode = 'passcode🌂';
 
     this.application = await Factory.createApplication(Factory.randomString());

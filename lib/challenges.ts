@@ -36,6 +36,7 @@ export enum ChallengeReason {
   ChangeAutolockInterval = 10,
   CreateDecryptedBackupWithProtectedItems = 11,
   RevokeSession = 12,
+  AccessBatchManager = 13,
 }
 
 /** For mobile */
