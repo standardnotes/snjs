@@ -19,13 +19,6 @@ describe('server session', function () {
     localStorage.clear();
   });
 
-  /** We expect to see many "Error: Factory application shouldn't have challenges" in the
-   * console as part of these tests, since the application will attempt to revalidate sessions
-   * via issuing a challenge, but not all tests are necessarily interested in that. */
-  function expectFactoryException() {
-    console.warn("Expecting 'Error: Factory application shouldnt have challenges' below");
-  }
-
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
@@ -180,7 +173,7 @@ describe('server session', function () {
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -188,7 +181,7 @@ describe('server session', function () {
   });
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -202,7 +195,7 @@ describe('server session', function () {
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -275,14 +268,12 @@ describe('server session', function () {
 
     const fakeSession = this.application.apiService.getSession();
     fakeSession.accessToken = 'this-is-a-fake-token-1234';
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const changePasswordResponse = await this.application.changePassword(
       this.password,
       this.newPassword
     );
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
-
-    expectFactoryException();
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponse = await Factory.loginToApplication({
@@ -307,7 +298,7 @@ describe('server session', function () {
     /** Waiting for the refresh token to expire. */
     await sleepUntilSessionExpires(this.application, false);
 
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const changePasswordResponse = await this.application.changePassword(
       this.password,
       this.newPassword
@@ -315,8 +306,6 @@ describe('server session', function () {
 
     expect(changePasswordResponse).to.be.ok;
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
-
-    expectFactoryException();
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponseWithNewPassword = await Factory.loginToApplication({
@@ -382,7 +371,7 @@ describe('server session', function () {
       The access token and refresh token should be expired up to this point.
       Here we make sure that any subsequent requests will fail.
     */
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
