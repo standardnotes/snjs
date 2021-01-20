@@ -896,6 +896,10 @@ export class SNApplication {
     return this.protectionService.authorizeAutolockIntervalChange();
   }
 
+  public authorizeBatchManagerAccess(): Promise<boolean> {
+    return this.protectionService.authorizeBatchManagerAccess();
+  }
+
   /**
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
