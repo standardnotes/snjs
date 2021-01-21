@@ -18,11 +18,13 @@ USER snjs
 
 COPY --chown=$UID:$GID package.json yarn.lock /var/www/
 
+COPY --chown=$UID:$GID packages/snjs/package.json /var/www/packages/snjs/package.json
+
 RUN yarn install --pure-lockfile
 
 COPY --chown=$UID:$GID . /var/www
 
-RUN yarn bundle
+RUN yarn build
 
 EXPOSE 9001
 

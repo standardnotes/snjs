@@ -2,14 +2,11 @@ version: '3.8'
 services:
   snjs:
     build: .
-    command: start-local
     restart: unless-stopped
     networks:
       snjs: {}
     ports:
       - 9001:9001
-    volumes:
-      - .:/var/www/
 
   db:
     image: mysql:5.6
