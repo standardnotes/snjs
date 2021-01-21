@@ -1,12 +1,17 @@
 import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
-import { PureService } from '@Lib/services/pure_service';
 import { HttpResponse, StatusCode } from './responses';
+import { PureService } from '@Lib/services/pure_service';
+import { isNullOrUndefined } from '@Lib/utils';
 
 export enum HttpVerb {
   Get = 'get',
   Post = 'post',
   Patch = 'patch',
   Delete = 'delete',
+}
+
+export enum ErrorTag {
+  RevokedSession = 'revoked-session'
 }
 
 const REQUEST_READY_STATE_COMPLETED = 4;
@@ -98,8 +103,8 @@ export class SNHttpService extends PureService {
 
   private stateChangeHandlerForRequest(
     request: XMLHttpRequest,
-    resolve: any,
-    reject: any
+    resolve: (response: HttpResponse) => void,
+    reject: (response: HttpResponse) => void,
   ) {
     if (request.readyState !== REQUEST_READY_STATE_COMPLETED) {
       return;
@@ -121,15 +126,13 @@ export class SNHttpService extends PureService {
       && httpStatus <= StatusCode.HttpStatusMaxSuccess)) {
       resolve(response);
     } else {
-      if (!response.error) {
-        if (httpStatus === StatusCode.HttpStatusForbidden) {
-          response.error = {
-            message: API_MESSAGE_RATE_LIMITED,
-            status: httpStatus
-          };
-        } else {
-          response.error = { message: UNKNOWN_ERROR, status: httpStatus };
-        }
+      if (httpStatus === StatusCode.HttpStatusForbidden) {
+        response.error = {
+          message: API_MESSAGE_RATE_LIMITED,
+          status: httpStatus
+        };
+      } else if (isNullOrUndefined(response.error)) {
+        response.error = { message: UNKNOWN_ERROR, status: httpStatus };
       }
       reject(response);
     }

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js';
+import WebDeviceInterface from './lib/web_device_interface.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -17,13 +18,6 @@ describe('server session', function () {
   before(async function () {
     localStorage.clear();
   });
-
-  /** We expect to see many "Error: Factory application shouldn't have challenges" in the
-   * console as part of these tests, since the application will attempt to revalidate sessions
-   * via issuing a challenge, but not all tests are necessarily interested in that. */
-  function expectFactoryException() {
-    console.warn("Expecting 'Error: Factory application shouldnt have challenges' below");
-  }
 
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
@@ -179,7 +173,7 @@ describe('server session', function () {
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -187,7 +181,7 @@ describe('server session', function () {
   });
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -201,7 +195,7 @@ describe('server session', function () {
     const signOutResponse = await this.application.apiService.signOut();
     expect(signOutResponse.status).to.equal(204);
 
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -274,14 +268,12 @@ describe('server session', function () {
 
     const fakeSession = this.application.apiService.getSession();
     fakeSession.accessToken = 'this-is-a-fake-token-1234';
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const changePasswordResponse = await this.application.changePassword(
       this.password,
       this.newPassword
     );
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
-
-    expectFactoryException();
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponse = await Factory.loginToApplication({
@@ -306,7 +298,7 @@ describe('server session', function () {
     /** Waiting for the refresh token to expire. */
     await sleepUntilSessionExpires(this.application, false);
 
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const changePasswordResponse = await this.application.changePassword(
       this.password,
       this.newPassword
@@ -314,8 +306,6 @@ describe('server session', function () {
 
     expect(changePasswordResponse).to.be.ok;
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
-
-    expectFactoryException();
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     const loginResponseWithNewPassword = await Factory.loginToApplication({
@@ -381,7 +371,7 @@ describe('server session', function () {
       The access token and refresh token should be expired up to this point.
       Here we make sure that any subsequent requests will fail.
     */
-    expectFactoryException();
+    Factory.ignoreChallenges(this.application);
     const syncResponse = await this.application.apiService.sync([]);
     expect(syncResponse.status).to.equal(401);
     expect(syncResponse.error.tag).to.equal('invalid-auth');
@@ -592,32 +582,48 @@ describe('server session', function () {
     expect(response2.object.length).to.equal(1);
   });
 
-  it.skip('revoking a session should prevent further syncing', async function () {
-    this.timeout(Factory.LongTestTimeout)
+  it('revoking a session should destroy local data @syncing-server-js-only', async function () {
+    this.timeout(Factory.LongTestTimeout);
 
-    const app2 = await Factory.createAndInitializeApplication('app2');
+    const app2identifier = 'app2';
+
+    const app2 = await Factory.createAndInitializeApplication(app2identifier);
     app2.prepareForLaunch({
       receiveChallenge() {}
     });
-    /** Sign out and back in to prevent middle-of-test timeouts */
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    await Promise.all([
-      await Factory.registerUserToApplication({
-        application: this.application,
-        email: this.email,
-        password: this.password,
-      }),
-      app2.signIn(this.email, this.password)
-    ]);
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.AccountPassword
+                ? this.password
+                : 0
+            )
+        );
+        this.application.submitValuesForChallenge(challenge, values);
+      }
+    });
+
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    }),
+    await app2.signIn(this.email, this.password);
 
     const sessions = await this.application.getSessions();
     const app2session = sessions.find(session => !session.current);
     await this.application.revokeSession(app2session.uuid);
+    void app2.sync();
+    /** Wait for app2 to deinit */
+    await Factory.sleep(3);
+    expect(app2.dealloced).to.be.true;
 
-    const note = await Factory.createSyncedNote(app2);
-    await this.application.sync();
-    expect(this.application.findItem(note.uuid)).to.not.be.ok
-    app2.deinit();
+    const deviceInterface = new WebDeviceInterface();
+    const payloads = await deviceInterface.getAllRawDatabasePayloads(app2identifier);
+    expect(payloads).to.be.empty;
   });
 
   it('signing out with invalid session token should still delete local data', async function () {

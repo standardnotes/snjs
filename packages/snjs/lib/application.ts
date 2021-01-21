@@ -19,7 +19,7 @@ import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
-import { isNullOrUndefined, isString, removeFromArray, sleep } from '@Lib/utils';
+import { assertUnreachable, isNullOrUndefined, isString, removeFromArray, sleep } from '@Lib/utils';
 import { ContentType } from '@Models/content_types';
 import { CopyPayload, CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { PayloadSource } from '@Payloads/sources';
@@ -58,6 +58,7 @@ import {
   REMOVING_PASSCODE, SETTING_PASSCODE,
   UNSUPPORTED_BACKUP_FILE_VERSION,
   UPGRADING_ENCRYPTION,
+  SessionStrings,
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
@@ -68,6 +69,7 @@ import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
+import { ErrorTag } from './services/api/http_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -1680,12 +1682,26 @@ export class SNApplication {
       this.challengeService
     );
     this.serviceObservers.push(this.sessionManager.addEventObserver(async event => {
-      if (event === SessionEvent.SessionRestored) {
-        this.sync().then(async () => {
-          if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
-            this.protocolService.createNewDefaultItemsKey();
-          }
-        })
+      switch (event) {
+        case SessionEvent.Restored: {
+          void (async () => {
+            await this.sync();
+            if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
+              void this.protocolService.createNewDefaultItemsKey();
+            }
+          })();
+          break;
+        }
+        case SessionEvent.Revoked: {
+          /** Keep a reference to the soon-to-be-cleared alertService */
+          const alertService = this.alertService;
+          await this.signOut();
+          void alertService.alert(SessionStrings.CurrentSessionRevoked);
+          break;
+        }
+        default: {
+          assertUnreachable(event);
+        }
       }
     }));
     this.services.push(this.sessionManager);

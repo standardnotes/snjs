@@ -55,7 +55,8 @@ const cleanedEmailString = (email: string) => {
 }
 
 export const enum SessionEvent {
-  SessionRestored = 'SessionRestored'
+  Restored = 'SessionRestored',
+  Revoked = 'SessionRevoked',
 }
 
 /**
@@ -76,16 +77,20 @@ export class SNSessionManager extends PureService<SessionEvent> {
     private challengeService: ChallengeService,
   ) {
     super();
-    apiService.setInvalidSessionObserver(() => {
-      this.reauthenticateInvalidSession();
+    apiService.setInvalidSessionObserver((revoked) => {
+      if (revoked) {
+        void this.notifyEvent(SessionEvent.Revoked);
+      } else {
+        void this.reauthenticateInvalidSession();
+      }
     });
   }
 
-  deinit() {
-    (this.protocolService as any) = undefined;
-    (this.storageService as any) = undefined;
-    (this.apiService as any) = undefined;
-    (this.alertService as any) = undefined;
+  deinit(): void {
+    (this.protocolService as unknown) = undefined;
+    (this.storageService as unknown) = undefined;
+    (this.apiService as unknown) = undefined;
+    (this.alertService as unknown) = undefined;
     this.user = undefined;
     super.deinit();
   }
@@ -183,7 +188,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
             } else {
               resolve();
               this.challengeService.completeChallenge(challenge);
-              this.notifyEvent(SessionEvent.SessionRestored);
+              this.notifyEvent(SessionEvent.Restored);
               this.alertService.alert(SessionStrings.SessionRestored);
             }
           }

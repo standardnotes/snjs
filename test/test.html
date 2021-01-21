@@ -11,6 +11,7 @@
         <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../packages/snjs/dist/snjs.js"></script>
         <script>
+          var urlParams = new URLSearchParams(window.location.search);
           window._default_sync_server = 'http://syncing-server-proxy:3123';
           Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
@@ -22,6 +23,9 @@
           };
           mocha.setup('bdd');
           mocha.timeout(5000);
+          if(urlParams.has('skip')) {
+            mocha.grep('@' + urlParams.get('skip')).invert();
+          }
           mocha.bail(true);
         </script>
         <script type="module" src="memory.test.js"></script>
