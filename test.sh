@@ -79,7 +79,7 @@ while [ $attempt -le 119 ]; do
 done
 
 echo "# Starting $SYNCING_SERVER_VERSION Test Suite"
-npx mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html
+yarn test:dev
 test_result=$?
 
 cleanup
