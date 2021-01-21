@@ -120,7 +120,7 @@ app.streamItems(
 ## Building
 
 1. `yarn install --pure-lockfile`
-2. `yarn start` to start Webpack in development mode (watches changes), or `yarn bundle` to create dist files.
+2. `yarn start` to start Webpack in development mode (watches changes), or `yarn build` to create dist files.
 
 ## Tests
 

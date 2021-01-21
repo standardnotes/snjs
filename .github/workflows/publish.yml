@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test-js:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,7 +15,16 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
       - run: yarn lint
-      - run: yarn bundle
+  test-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install --pure-lockfile
+      - run: yarn build
       - run: yarn test:js
 
   test-ruby:
@@ -27,12 +36,11 @@ jobs:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
-      - run: yarn lint
-      - run: yarn bundle
+      - run: yarn build
       - run: yarn test:ruby
 
   publish:
-    needs: [test-js, test-ruby]
+    needs: [lint, test-js, test-ruby]
 
     runs-on: ubuntu-latest
     steps:
@@ -42,7 +50,7 @@ jobs:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
-      - run: yarn bundle
-      - run: npm publish
+      - run: yarn build
+      - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
