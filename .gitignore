@@ -2,6 +2,8 @@ node_modules
 .DS_Store
 .vscode
 dist
+coverage
 
 yarn-error.log
 package-lock.json
+lerna-debug.log

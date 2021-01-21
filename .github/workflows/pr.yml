@@ -15,7 +15,17 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
       - run: yarn lint
-  test-js:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install --pure-lockfile
+      - run: yarn test
+  e2e-tests-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,7 +36,7 @@ jobs:
       - run: yarn install --pure-lockfile
       - run: yarn build
       - run: yarn test:js
-  test-ruby:
+  e2e-tests-ruby:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
