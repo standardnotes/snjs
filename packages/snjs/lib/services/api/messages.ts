@@ -144,6 +144,7 @@ export const ChallengeStrings = {
   ChangePasscode: 'Authentication is required to change your passcode',
   ChangeAutolockInterval: 'Authentication is required to change autolock timer duration',
   RevokeSession: 'Authentication is required to revoke a session',
+  AccessBatchManager: 'Authentication is required to access the batch manager',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',

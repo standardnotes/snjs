@@ -1,5 +1,7 @@
 # SNJS
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.org) that contains shared logic for all Standard Notes clients.
 
 ## Introduction
@@ -120,7 +122,7 @@ app.streamItems(
 ## Building
 
 1. `yarn install --pure-lockfile`
-2. `yarn start` to start Webpack in development mode (watches changes), or `yarn bundle` to create dist files.
+2. `yarn start` to start Webpack in development mode (watches changes), or `yarn build` to create dist files.
 
 ## Tests
 

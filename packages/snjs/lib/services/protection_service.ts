@@ -87,6 +87,10 @@ export class SNProtectionService extends PureService {
     return this.validateOrRenewSession(ChallengeReason.RevokeSession);
   }
 
+  async authorizeBatchManagerAccess(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.AccessBatchManager);
+  }
+
   private async validateOrRenewSession(
     reason: ChallengeReason
   ): Promise<boolean> {

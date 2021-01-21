@@ -215,6 +215,37 @@ describe('protections', function () {
     expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
   });
 
+  it('authorizes batch manager access', async function () {
+    const passcode = 'passcode🌂';
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 0
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+
+    expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
+  });
+
   it('handles session length', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     await this.application.protectionService.setSessionLength(300);
