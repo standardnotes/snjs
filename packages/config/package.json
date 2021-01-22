@@ -1,0 +1,19 @@
+{
+  "name": "@standardnotes/config",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=14.0.0 <16.0.0"
+  },
+  "description": "Common configuration files used in SN projects",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Karol Sójko <karolsojko@gmail.com>",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
