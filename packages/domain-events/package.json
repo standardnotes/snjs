@@ -14,7 +14,7 @@
     "access": "public"
   },
   "author": "Karol Sójko <karolsojko@gmail.com>",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "clean": "rm -fr dist",
     "prebuild": "yarn clean",

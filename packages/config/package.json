@@ -9,7 +9,7 @@
     "access": "public"
   },
   "author": "Karol Sójko <karolsojko@gmail.com>",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
   },
   "dependencies": {
