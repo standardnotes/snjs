@@ -1,38 +1,7 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "outDir": "dist",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noImplicitThis": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "declaration": true,
-    "removeComments": false,
-    "skipLibCheck": false,
-    "types": [
-      "jest",
-      "node"
-    ],
-    "typeRoots": [
-      "../../node_modules/@types"
-    ],
-    "lib": [
-      "es6",
-      "es7"
-    ],
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+    "rootDir": "src",
+    "outDir": "dist"
+  }
 }

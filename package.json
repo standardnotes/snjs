@@ -20,15 +20,11 @@
     "lint": "lerna run lint",
     "publish-packages": "lerna publish from-package --yes"
   },
-  "pre-push": [
-    "lint"
-  ],
   "devDependencies": {
+    "@types/node": "^14.14.22",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
-    "sinon": "^9.0.2",
     "eslint": "^7.13.0",
-    "lerna": "^3.22.1",
-    "pre-push": "^0.1.1"
+    "lerna": "^3.22.1"
   }
 }
