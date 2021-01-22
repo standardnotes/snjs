@@ -2,7 +2,7 @@ import { removeFromArray } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
 
-type EventObserver<T> = (eventName: T, data: any) => Promise<void>
+type EventObserver<T> = (eventName: T, data: any) => Promise<void> | void;
 
 export abstract class PureService<E = string> {
 

@@ -131,7 +131,10 @@ export const SessionStrings = {
     'The associated app will be signed out and all data removed ' +
     'from the device when it is next launched. You can sign back in on that ' +
     'device at any time.',
-}
+  CurrentSessionRevoked:
+    'Your session has been revoked and all local data has been removed ' +
+    'from this device.',
+};
 
 export const ChallengeStrings = {
   UnlockApplication: 'Authentication is required to unlock the application',
@@ -141,6 +144,7 @@ export const ChallengeStrings = {
   ChangePasscode: 'Authentication is required to change your passcode',
   ChangeAutolockInterval: 'Authentication is required to change autolock timer duration',
   RevokeSession: 'Authentication is required to revoke a session',
+  AccessBatchManager: 'Authentication is required to access the batch manager',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
   EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',

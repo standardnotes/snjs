@@ -78,8 +78,15 @@ while [ $attempt -le 119 ]; do
     sleep 2
 done
 
+if [ "$SYNCING_SERVER_VERSION" == "js" ];
+then
+  SKIP_TAG="syncing-server-ruby-only"
+else
+  SKIP_TAG="syncing-server-js-only"
+fi
+
 echo "# Starting $SYNCING_SERVER_VERSION Test Suite"
-npx mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html
+npx mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html?skip=$SKIP_TAG
 test_result=$?
 
 cleanup

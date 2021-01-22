@@ -324,3 +324,11 @@ export async function expectThrowsAsync(method, errorMessage) {
     expect(error.message).to.be.a('string').and.satisfy(msg => msg.startsWith(errorMessage));
   }
 };
+
+export function ignoreChallenges(application) {
+  application.setLaunchCallback({
+    receiveChallenge() {
+      /** no-op */
+    }
+  });
+}

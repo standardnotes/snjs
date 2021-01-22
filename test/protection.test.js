@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('protections', () => {
+describe('protections', function () {
   this.timeout(Factory.TestTimeout);
 
   before(async function () {
@@ -22,7 +22,8 @@ describe('protections', () => {
   });
 
   it('prompts for password when accessing protected note', async function () {
-    const passcode = 'passcode🌂';
+    const password = Uuid.GenerateUuidSynchronously();
+
     let challengePrompts = 0;
 
     this.application = await Factory.createApplication(Factory.randomString());
@@ -40,7 +41,7 @@ describe('protections', () => {
             new ChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.AccountPassword
-                ? passcode
+                ? password
                 : 0
             )
         );
@@ -49,7 +50,6 @@ describe('protections', () => {
       },
     });
     await this.application.launch(true);
-    const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: this.application,
       email: Uuid.GenerateUuidSynchronously(),
@@ -215,12 +215,42 @@ describe('protections', () => {
     expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
   });
 
+  it('authorizes batch manager access', async function () {
+    const passcode = 'passcode🌂';
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 0
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+
+    expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
+  });
+
   it('handles session length', async function () {
-    await this.application.protectionService.setSessionLength(
-      ProtectionSessionLength.FiveMinutes
-    );
+    this.application = await Factory.createInitAppWithRandNamespace();
+    await this.application.protectionService.setSessionLength(300);
     const length = await this.application.protectionService.getSessionLength();
-    expect(length).to.equal(ProtectionSessionLength.FiveMinutes);
+    expect(length).to.equal(300);
     const expirey = await this.application.protectionService.getSessionExpirey();
     expect(expirey).to.be.ok;
   });

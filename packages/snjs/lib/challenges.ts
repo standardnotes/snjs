@@ -36,6 +36,7 @@ export enum ChallengeReason {
   ChangeAutolockInterval = 10,
   CreateDecryptedBackupWithProtectedItems = 11,
   RevokeSession = 12,
+  AccessBatchManager = 13,
 }
 
 /** For mobile */
@@ -100,6 +101,8 @@ export class Challenge {
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         case ChallengeReason.RevokeSession:
           return ChallengeStrings.RevokeSession;
+        case ChallengeReason.AccessBatchManager:
+          return ChallengeStrings.AccessBatchManager;
         default:
           return assertUnreachable(this.reason);
       }
