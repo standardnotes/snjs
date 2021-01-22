@@ -26,6 +26,9 @@ jobs:
       - run: yarn install --pure-lockfile
       - run: yarn test
   e2e-tests-js:
+    env:
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -33,10 +36,11 @@ jobs:
         with:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: yarn install --pure-lockfile
-      - run: yarn build
       - run: yarn test:js
   e2e-tests-ruby:
+    env:
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -44,6 +48,4 @@ jobs:
         with:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: yarn install --pure-lockfile
-      - run: yarn build
       - run: yarn test:ruby
