@@ -70,7 +70,6 @@ import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
-import { ErrorTag } from './services/api/http_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -209,27 +208,27 @@ export class SNApplication {
    * The first thing consumers should call when starting their app.
    * This function will load all services in their correct order.
    */
-  async prepareForLaunch(callback: LaunchCallback) {
+  async prepareForLaunch(callback: LaunchCallback): Promise<void> {
     this.setLaunchCallback(callback);
-    const databaseResult = await this.deviceInterface!.openDatabase(this.identifier)
+    const databaseResult = await this.deviceInterface.openDatabase(this.identifier)
       .catch((error) => {
-        this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error);
+        void this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error);
         return undefined;
       });
     this.createdNewDatabase = databaseResult?.isNewDatabase || false;
-    await this.migrationService!.initialize();
+    await this.migrationService.initialize();
     await this.notifyEvent(ApplicationEvent.MigrationsLoaded);
     await this.handleStage(ApplicationStage.PreparingForLaunch_0);
-    await this.storageService!.initializeFromDisk();
+    await this.storageService.initializeFromDisk();
     await this.notifyEvent(ApplicationEvent.StorageReady);
-    await this.protocolService!.initialize();
+    await this.protocolService.initialize();
     await this.handleStage(ApplicationStage.ReadyForLaunch_05);
     this.started = true;
     await this.notifyEvent(ApplicationEvent.Started);
   }
 
   private setLaunchCallback(callback: LaunchCallback) {
-    this.challengeService!.sendChallenge = callback.receiveChallenge;
+    this.challengeService.sendChallenge = callback.receiveChallenge;
   }
 
   /**
@@ -239,54 +238,54 @@ export class SNApplication {
    * @param awaitDatabaseLoad
    * Option to await database load before marking the app as ready.
    */
-  public async launch(awaitDatabaseLoad = false) {
+  public async launch(awaitDatabaseLoad = false): Promise<void> {
     this.launched = false;
-    const launchChallenge = await this.challengeService!.getLaunchChallenge();
+    const launchChallenge = await this.challengeService.getLaunchChallenge();
     if (launchChallenge) {
-      const response = await this.challengeService!.promptForChallengeResponse(launchChallenge);
+      const response = await this.challengeService.promptForChallengeResponse(launchChallenge);
       if (!response) {
         throw Error('Launch challenge was cancelled.');
       }
       await this.handleLaunchChallengeResponse(response);
     }
-    if (this.storageService!.isStorageWrapped()) {
+    if (this.storageService.isStorageWrapped()) {
       try {
-        await this.storageService!.decryptStorage();
+        await this.storageService.decryptStorage();
       } catch (_error) {
-        this.alertService.alert(
+        void this.alertService.alert(
           ErrorAlertStrings.StorageDecryptErrorBody,
           ErrorAlertStrings.StorageDecryptErrorTitle,
         );
       }
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
-    await this.apiService!.loadHost();
+    await this.apiService.loadHost();
     await this.sessionManager.initializeFromDisk();
-    this.historyManager!.initializeFromDisk();
+    this.historyManager.initializeFromDisk();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
     await this.handleStage(ApplicationStage.Launched_10);
 
-    const databasePayloads = await this.syncService!.getDatabasePayloads();
+    const databasePayloads = await this.syncService.getDatabasePayloads();
     await this.handleStage(ApplicationStage.LoadingDatabase_11);
 
     if (this.createdNewDatabase) {
-      await this.syncService!.onNewDatabaseCreated();
+      await this.syncService.onNewDatabaseCreated();
     }
     /**
     * We don't want to await this, as we want to begin allowing the app to function
     * before local data has been loaded fully. We await only initial
     * `getDatabasePayloads` to lock in on database state.
     */
-    const loadPromise = this.syncService!.loadDatabasePayloads(databasePayloads)
+    const loadPromise = this.syncService.loadDatabasePayloads(databasePayloads)
       .then(async () => {
         if (this.dealloced) {
           throw 'Application has been destroyed.';
         }
         await this.handleStage(ApplicationStage.LoadedDatabase_12);
         this.beginAutoSyncTimer();
-        return this.syncService!.sync({
+        return this.syncService.sync({
           mode: SyncModes.DownloadFirst
         });
       });
@@ -295,29 +294,29 @@ export class SNApplication {
     }
   }
 
-  public onStart() {
+  public onStart(): void {
     // optional override
   }
 
-  public onLaunch() {
+  public onLaunch(): void {
     // optional override
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
     if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
-      let wrappingKey = response.artifacts!.wrappingKey;
+      let wrappingKey = response.artifacts?.wrappingKey;
       if (!wrappingKey) {
         const value = response.getValueForType(ChallengeValidation.LocalPasscode);
-        wrappingKey = await this.protocolService!.computeWrappingKey(value.value as string);
+        wrappingKey = await this.protocolService.computeWrappingKey(value.value as string);
       }
-      await this.protocolService!.unwrapRootKey(wrappingKey);
+      await this.protocolService.unwrapRootKey(wrappingKey);
     }
   }
 
   private beginAutoSyncTimer() {
-    this.autoSyncInterval = this.deviceInterface!.interval(() => {
+    this.autoSyncInterval = this.deviceInterface.interval(() => {
       this.syncService.log('Syncing from autosync');
-      this.sync();
+      void this.sync();
     }, DEFAULT_AUTO_SYNC_INTERVAL);
   }
 
@@ -333,7 +332,7 @@ export class SNApplication {
   public addEventObserver(
     callback: ApplicationEventCallback,
     singleEvent?: ApplicationEvent
-  ) {
+  ): () => void {
     const observer = { callback, singleEvent };
     this.eventHandlers.push(observer);
     return () => {
@@ -344,10 +343,10 @@ export class SNApplication {
   public addSingleEventObserver(
     event: ApplicationEvent,
     callback: ApplicationEventCallback
-  ) {
+  ): () => void {
     const filteredCallback = async (firedEvent: ApplicationEvent) => {
       if (firedEvent === event) {
-        callback(event);
+        void callback(event);
       }
     };
     return this.addEventObserver(filteredCallback, event);
@@ -366,17 +365,17 @@ export class SNApplication {
         await observer.callback(event, data || {});
       }
     }
-    this.migrationService!.handleApplicationEvent(event);
+    void this.migrationService.handleApplicationEvent(event);
   }
 
   /**
    * Whether the local database has completed loading local items.
    */
-  public isDatabaseLoaded() {
-    return this.syncService!.isDatabaseLoaded();
+  public isDatabaseLoaded(): boolean {
+    return this.syncService.isDatabaseLoaded();
   }
 
-  public async savePayload(payload: PurePayload) {
+  public async savePayload(payload: PurePayload): Promise<void> {
     const dirtied = CopyPayload(
       payload,
       {
@@ -384,7 +383,7 @@ export class SNApplication {
         dirtiedDate: new Date()
       }
     );
-    await this.modelManager!.emitPayload(
+    await this.modelManager.emitPayload(
       dirtied,
       PayloadSource.LocalChanged
     );
@@ -394,37 +393,37 @@ export class SNApplication {
   /**
    * Finds an item by UUID.
    */
-  public findItem(uuid: string) {
-    return this.itemManager!.findItem(uuid);
+  public findItem(uuid: string): SNItem | undefined {
+    return this.itemManager.findItem(uuid);
   }
 
   /**
    * Returns all items.
    */
-  public allItems() {
-    return this.itemManager!.items;
+  public allItems(): SNItem[] {
+    return this.itemManager.items;
   }
 
   /**
    * Finds an item by predicate.
   */
-  public findItems(predicate: SNPredicate) {
-    return this.itemManager!.itemsMatchingPredicate(predicate);
+  public findItems(predicate: SNPredicate): SNItem[] {
+    return this.itemManager.itemsMatchingPredicate(predicate);
   }
 
   /**
    * Finds an item by predicate.
    */
-  public getAll(uuids: UuidString[]) {
-    return this.itemManager!.findItems(uuids);
+  public getAll(uuids: UuidString[]): (SNItem | undefined)[] {
+    return this.itemManager.findItems(uuids);
   }
 
 
   /**
    * Takes the values of the input item and emits it onto global state.
    */
-  public async mergeItem(item: SNItem, source: PayloadSource) {
-    return this.itemManager!.emitItemFromPayload(item.payloadRepresentation(), source);
+  public async mergeItem(item: SNItem, source: PayloadSource): Promise<SNItem> {
+    return this.itemManager.emitItemFromPayload(item.payloadRepresentation(), source);
   }
 
   /**
@@ -436,14 +435,13 @@ export class SNApplication {
     content: PayloadContent,
     needsSync = false,
     override?: PayloadOverride
-  ) {
-    const item = await this.itemManager!.createItem(
+  ): Promise<SNItem> {
+    return this.itemManager.createItem(
       contentType,
       content,
       needsSync,
       override
     );
-    return item;
   }
 
   /**
@@ -453,18 +451,17 @@ export class SNApplication {
   public async createTemplateItem(
     contentType: ContentType,
     content?: PayloadContent
-  ) {
-    const item = await this.itemManager!.createTemplateItem(
+  ): Promise<SNItem> {
+    return this.itemManager.createTemplateItem(
       contentType,
       content,
     );
-    return item;
   }
 
   /**
    * Creates an unmanaged item from a payload.
    */
-  public createItemFromPayload(payload: PurePayload) {
+  public createItemFromPayload(payload: PurePayload): SNItem {
     return CreateItemFromPayload(payload);
   }
 
@@ -472,7 +469,7 @@ export class SNApplication {
    * Creates an unmanaged payload from any object, where the raw object
    * represents the same data a payload would.
    */
-  public createPayloadFromObject(object: any) {
+  public createPayloadFromObject(object: any): PurePayload {
     return CreateMaxPayloadFromAnyObject(object);
   }
 
