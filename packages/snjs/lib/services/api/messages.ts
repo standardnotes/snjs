@@ -153,6 +153,7 @@ export const ChallengeStrings = {
   EnterCredentialsForDecryptedBackupDownload: 'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode',
+  ImportEncryptedFile: 'Enter the account password associated with the import file'
 }
 
 export const PromptTitles = {

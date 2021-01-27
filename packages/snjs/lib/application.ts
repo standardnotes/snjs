@@ -59,6 +59,7 @@ import {
   UNSUPPORTED_BACKUP_FILE_VERSION,
   UPGRADING_ENCRYPTION,
   SessionStrings,
+  ImportStrings,
 } from './services/api/messages';
 import { MINIMUM_PASSWORD_LENGTH, SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
@@ -890,10 +891,6 @@ export class SNApplication {
     return this.protectionService.authorizeNoteAccess(note);
   }
 
-  public authorizeFileImport(): Promise<boolean> {
-    return this.protectionService.authorizeFileImport();
-  }
-
   public authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.protectionService.authorizeAutolockIntervalChange();
   }
@@ -909,14 +906,13 @@ export class SNApplication {
    */
   public async importData(
     data: BackupFile,
-    password?: string,
     awaitSync = false
   ): Promise<{
     affectedItems: SNItem[];
     errorCount: number;
   } | {
     error: string
-  }> {
+  } | undefined> {
     if (data.version) {
       /**
        * Prior to 003 backup files did not have a version field so we cannot
@@ -925,7 +921,7 @@ export class SNApplication {
        */
       const version = data.version as ProtocolVersion;
 
-      const supportedVersions = this.protocolService!.supportedVersions();
+      const supportedVersions = this.protocolService.supportedVersions();
       if (!supportedVersions.includes(version)) {
         return { error: UNSUPPORTED_BACKUP_FILE_VERSION };
       }
@@ -936,7 +932,37 @@ export class SNApplication {
         return { error: BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT };
       }
     }
-    const decryptedPayloads = await this.protocolService!.payloadsByDecryptingBackupFile(
+
+    let password: string | undefined;
+
+    if (data.auth_params || data.keyParams) {
+      /** Get import file password. */
+      const challenge = new Challenge(
+        [new ChallengePrompt(
+          ChallengeValidation.None,
+          ImportStrings.FileAccountPassword,
+          undefined,
+          true,
+        )],
+        ChallengeReason.ImportEncryptedFile,
+        true
+      );
+      const passwordResponse = await this.challengeService.promptForChallengeResponse(
+        challenge
+      );
+      if (isNullOrUndefined(passwordResponse)) {
+        this.challengeService.cancelChallenge(challenge);
+        return;
+      }
+      this.challengeService.completeChallenge(challenge);
+      password = passwordResponse.values[0].value as string;
+    }
+
+    if (!(await this.protectionService.authorizeFileImport())) {
+      return;
+    }
+
+    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
       data,
       password
     );
@@ -962,7 +988,7 @@ export class SNApplication {
         return payload;
       }
     });
-    const affectedUuids = await this.modelManager!.importPayloads(validPayloads);
+    const affectedUuids = await this.modelManager.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
       await promise;
