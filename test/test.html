@@ -11,8 +11,9 @@
         <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../packages/snjs/dist/snjs.js"></script>
         <script>
-          var urlParams = new URLSearchParams(window.location.search);
-          window._default_sync_server = 'http://syncing-server-proxy:3123';
+          const urlParams = new URLSearchParams(window.location.search);
+          const syncServerHostName = urlParams.get('sync_server_host_name') ?? 'syncing-server-proxy';
+          window._default_sync_server = `http://${syncServerHostName}:3123`;
           Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
           SNLog.onLog = (message) => {
