@@ -13,7 +13,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "sort-imports": "warn",
+    "sort-imports": "off",
     "require-await": "off",
     "@typescript-eslint/require-await": "warn",
     "@typescript-eslint/no-floating-promises": "warn"

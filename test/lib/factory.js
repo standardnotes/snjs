@@ -332,3 +332,20 @@ export function ignoreChallenges(application) {
     }
   });
 }
+
+export function handlePasswordChallenges(application, password) {
+  application.setLaunchCallback({
+    receiveChallenge: (challenge) => {
+      const values = challenge.prompts.map(
+        (prompt) =>
+          new ChallengeValue(
+            prompt,
+            prompt.validation === ChallengeValidation.ProtectionSessionDuration
+              ? 0
+              : password
+          )
+      );
+      application.submitValuesForChallenge(challenge, values);
+    }
+  });
+}

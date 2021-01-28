@@ -153,37 +153,6 @@ describe('protections', function () {
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
   });
 
-  it('authorizes file import', async function () {
-    const passcode = 'passcode🌂';
-
-    this.application = await Factory.createApplication(Factory.randomString());
-    await this.application.prepareForLaunch({
-      receiveChallenge: (challenge) => {
-        expect(
-          challenge.prompts.find(
-            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
-          )
-        ).to.be.ok;
-        const values = challenge.prompts.map(
-          (prompt) =>
-            new ChallengeValue(
-              prompt,
-              prompt.validation === ChallengeValidation.LocalPasscode
-                ? passcode
-                : 0
-            )
-        );
-
-        this.application.submitValuesForChallenge(challenge, values);
-      },
-    });
-    await this.application.launch(true);
-
-    await this.application.setPasscode(passcode);
-
-    expect(await this.application.authorizeFileImport()).to.be.true;
-  });
-
   it('authorizes autolock interval change', async function () {
     const passcode = 'passcode🌂';
 

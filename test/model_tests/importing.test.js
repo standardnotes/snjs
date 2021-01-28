@@ -13,6 +13,7 @@ describe('importing', function() {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
+    Factory.handlePasswordChallenges(this.application, this.password);
     localStorage.clear();
   });
 
@@ -68,7 +69,6 @@ describe('importing', function() {
       {
         items: [notePayload, tagPayload]
       },
-      undefined,
       true,
     );
 
@@ -109,7 +109,6 @@ describe('importing', function() {
           mutatedNote,
         ]
       },
-      undefined,
       true,
     );
     this.expectedItemCount++;
@@ -140,7 +139,6 @@ describe('importing', function() {
           mutatedTag
         ]
       },
-      undefined,
       true,
     );
     expect(this.application.itemManager.tags.length).to.equal(1);
@@ -183,7 +181,6 @@ describe('importing', function() {
           mutatedTag
         ]
       },
-      undefined,
       true,
     );
     this.expectedItemCount += 2;
@@ -254,7 +251,6 @@ describe('importing', function() {
             externalTag
           ]
         },
-        undefined,
         true,
       );
       this.expectedItemCount += 1;
@@ -273,6 +269,7 @@ describe('importing', function() {
       email: this.email,
       password: this.password,
     });
+    Factory.handlePasswordChallenges(this.application, this.password);
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(this.application),
       Factory.createMappedTag(this.application),
@@ -289,7 +286,6 @@ describe('importing', function() {
       {
         items: [note, tag]
       },
-      undefined,
       true,
     );
     expect(this.application.itemManager.notes.length).to.equal(1);
@@ -309,6 +305,7 @@ describe('importing', function() {
     /** Sign into another account and import the same item. It should get a different UUID. */
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     this.email = Uuid.GenerateUuidSynchronously();
+    Factory.handlePasswordChallenges(this.application, this.password);
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -319,7 +316,6 @@ describe('importing', function() {
       {
         items: [note]
       },
-      undefined,
       true,
     );
 
@@ -338,6 +334,7 @@ describe('importing', function() {
     /** Sign into another account and import the same items. They should get a different UUID. */
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     this.email = Uuid.GenerateUuidSynchronously();
+    Factory.handlePasswordChallenges(this.application, this.password);
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -348,7 +345,6 @@ describe('importing', function() {
       {
         items: [note]
       },
-      undefined,
       true,
     );
 
@@ -385,7 +381,6 @@ describe('importing', function() {
 
     await this.application.importData(
       backupData,
-      this.password,
       true,
     );
     expect(this.application.itemManager.notes.length).to.equal(1);
@@ -412,10 +407,10 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application, this.password);
 
     await this.application.importData(
       backupData,
-      this.password,
       true,
     );
 
@@ -443,10 +438,10 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application, this.password);
 
     await this.application.importData(
       backupData,
-      this.password,
       true,
     );
 
@@ -479,10 +474,10 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application, this.password);
 
     const result = await this.application.importData(
       backupData,
-      this.password,
       true,
     );
     expect(result).to.not.be.undefined;
@@ -516,10 +511,10 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application, this.password);
 
     const result = await this.application.importData(
       backupData,
-      this.password,
       true,
     );
     expect(result).to.not.be.undefined;
@@ -553,6 +548,7 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application, this.password);
 
     const madeUpPayload = JSON.parse(JSON.stringify(noteItem));
 
@@ -569,7 +565,6 @@ describe('importing', function() {
 
     const result = await this.application.importData(
       backupData,
-      this.password,
       true,
     );
     expect(result).to.not.be.undefined;
@@ -582,7 +577,7 @@ describe('importing', function() {
     await Factory.registerOldUser({
       application: this.application,
       email: this.email,
-      password: this.password,
+      password: Uuid.GenerateUuidSynchronously(),
       version: oldVersion
     });
 
@@ -600,10 +595,22 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
-
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.None
+                ? 'incorrect password'
+                : this.password
+            )
+        );
+        this.application.submitValuesForChallenge(challenge, values);
+      }
+    });
     const result = await this.application.importData(
       backupData,
-      'not-the-correct-password-1234',
       true,
     );
     expect(result).to.not.be.undefined;
@@ -633,10 +640,21 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              'incorrect password',
+            )
+        );
+        this.application.submitValuesForChallenge(challenge, values);
+      }
+    });
 
     const result = await this.application.importData(
       backupData,
-      'not-the-correct-password-1234',
       true,
     );
     expect(result).to.not.be.undefined;
@@ -668,10 +686,7 @@ describe('importing', function() {
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
 
-    const result = await this.application.importData(
-      backupData,
-      undefined,
-    );
+    const result = await this.application.importData(backupData);
 
     expect(result).to.not.be.undefined;
     expect(result.affectedItems.length).to.be.eq(0);
@@ -685,6 +700,7 @@ describe('importing', function() {
       email: this.email,
       password: this.password,
     });
+    Factory.handlePasswordChallenges(this.application);
 
     await this.application.itemManager.createItem(
       ContentType.Note,
@@ -703,10 +719,10 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application);
 
     const result = await this.application.importData(
       backupData,
-      this.password,
       true,
     );
 
@@ -781,9 +797,33 @@ describe('importing', function() {
         }
       })
     );
+    const password = 'password';
 
     await application.prepareForLaunch({
-      receiveChallenge: () => { },
+      receiveChallenge: (challenge) => {
+        if (challenge.prompts.length === 2) {
+          application.submitValuesForChallenge(
+            challenge,
+            challenge.prompts.map(prompt =>
+              new ChallengeValue(
+                prompt,
+                prompt.validation === ChallengeValidation.AccountPassword
+                  ? password
+                  : 0
+              )
+            )
+          )
+        } else {
+          const prompt = challenge.prompts[0];
+          application.submitValuesForChallenge(
+            challenge,
+            [new ChallengeValue(
+              prompt,
+              password
+            )],
+          )
+        }
+      },
     });
     await application.launch(true);
 
@@ -808,7 +848,6 @@ describe('importing', function() {
     };
     const result = await application.importData(
       backupFile,
-      'password',
       true
     );
     expect(result.errorCount).to.equal(0);
@@ -820,6 +859,7 @@ describe('importing', function() {
       email: this.email,
       password: this.password,
     });
+    Factory.handlePasswordChallenges(this.application, this.password);
 
     const pair = Factory.createRelatedNoteTagPairPayload();
     await this.application.itemManager.emitItemsFromPayloads(
@@ -835,6 +875,7 @@ describe('importing', function() {
 
     await this.application.deinit();
     this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application, this.password);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -844,7 +885,6 @@ describe('importing', function() {
 
     await this.application.importData(
       backupData,
-      this.password,
       true,
     );
 

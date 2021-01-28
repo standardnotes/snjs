@@ -12,6 +12,7 @@
     "test:ruby": "bash test.sh ruby",
     "test:js": "bash test.sh js",
     "test": "lerna run test --parallel",
+    "test:e2e:local": "NGINX_REROUTE_HOST=http://syncing-server-js docker-compose up",
     "test:e2e": "yarn test:ruby && yarn test:js",
     "test:dev": "mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html",
     "start": "lerna run start --parallel",

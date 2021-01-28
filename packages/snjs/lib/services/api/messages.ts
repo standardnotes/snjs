@@ -53,6 +53,10 @@ export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVer
 export const UNSUPPORTED_BACKUP_FILE_VERSION = `This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.`;
 export const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = `This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.`;
 
+export const ImportStrings = {
+  FileAccountPassword: "File account password"
+}
+
 export const PasswordChangeStrings = {
   PasscodeRequired: 'Your passcode is required to process your password change.',
   Failed: 'Unable to change your password due to a sync error. Please try again.',
@@ -153,6 +157,7 @@ export const ChallengeStrings = {
   EnterCredentialsForDecryptedBackupDownload: 'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode',
+  ImportEncryptedFile: 'Enter the account password associated with the import file'
 }
 
 export const PromptTitles = {
