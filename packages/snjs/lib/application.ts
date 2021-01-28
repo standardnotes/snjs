@@ -948,7 +948,7 @@ export class SNApplication {
         challenge
       );
       if (isNullOrUndefined(passwordResponse)) {
-        this.challengeService.cancelChallenge(challenge);
+        /** Challenge was canceled */
         return;
       }
       this.challengeService.completeChallenge(challenge);
