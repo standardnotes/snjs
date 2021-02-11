@@ -881,6 +881,9 @@ export class SNApplication {
     return this.protocolService!.hasAccount();
   }
 
+  public getProtectionSessionExpiryDate(): Promise<Date> {
+    return this.protectionService.getSessionExpiryDate();
+  }
   /**
    * @returns whether note access has been granted or not
    */

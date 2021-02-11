@@ -101,7 +101,7 @@ export class SNProtectionService extends PureService {
     reason: ChallengeReason,
     { fallBackToAccountPassword = true } = {}
   ): Promise<boolean> {
-    if ((await this.getSessionExpirey()) > new Date()) {
+    if ((await this.getSessionExpiryDate()) > new Date()) {
       return true;
     }
 
@@ -153,6 +153,17 @@ export class SNProtectionService extends PureService {
     }
   }
 
+  public async getSessionExpiryDate(): Promise<Date> {
+    const expiresAt = await this.storageService.getValue(
+      StorageKey.ProtectionExpirey
+    );
+    if (expiresAt) {
+      return new Date(expiresAt);
+    } else {
+      return new Date();
+    }
+  }
+
   private async getSessionLength(): Promise<number> {
     const length = await this.storageService.getValue(
       StorageKey.ProtectionSessionLength
@@ -174,16 +185,5 @@ export class SNProtectionService extends PureService {
       StorageKey.ProtectionSessionLength,
       length
     );
-  }
-
-  private async getSessionExpirey(): Promise<Date> {
-    const expiresAt = await this.storageService.getValue(
-      StorageKey.ProtectionExpirey
-    );
-    if (expiresAt) {
-      return new Date(expiresAt);
-    } else {
-      return new Date();
-    }
   }
 }
