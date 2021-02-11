@@ -79,6 +79,12 @@ export class SNProtectionService extends PureService {
     return this.validateOrRenewSession(ChallengeReason.ImportFile);
   }
 
+  async authorizeDecryptedBackupCreation(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.ExportDecryptedBackup, {
+      fallBackToAccountPassword: false,
+    });
+  }
+
   async authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.validateOrRenewSession(ChallengeReason.ChangeAutolockInterval);
   }
@@ -92,7 +98,8 @@ export class SNProtectionService extends PureService {
   }
 
   private async validateOrRenewSession(
-    reason: ChallengeReason
+    reason: ChallengeReason,
+    { fallBackToAccountPassword = true } = {}
   ): Promise<boolean> {
     if ((await this.getSessionExpirey()) > new Date()) {
       return true;
@@ -106,11 +113,9 @@ export class SNProtectionService extends PureService {
       prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
     }
     if (prompts.length === 0) {
-      if (this.protocolService.hasAccount()) {
-        /** Add account password as a bare-minimum safety check */
+      if (fallBackToAccountPassword && this.protocolService.hasAccount()) {
         prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
       } else {
-        /** No protection set up; grant access */
         return true;
       }
     }

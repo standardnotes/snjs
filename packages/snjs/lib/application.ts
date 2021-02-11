@@ -1003,17 +1003,11 @@ export class SNApplication {
   public async createBackupFile(
     intent: EncryptionIntent
   ): Promise<BackupFile | undefined> {
-    const items = this.itemManager.items;
-
-    if (intent === EncryptionIntent.FileDecrypted) {
-      if (items.some(item => item.protected) && this.hasPasscode()) {
-        const passcode = await this.challengeService.promptForCorrectPasscode(
-          ChallengeReason.CreateDecryptedBackupWithProtectedItems
-        );
-        if (!passcode) {
-          return;
-        }
-      }
+    if (
+      intent === EncryptionIntent.FileDecrypted &&
+      !(await this.protectionService.authorizeDecryptedBackupCreation())
+    ) {
+      return;
     }
 
     return this.protocolService.createBackupFile(intent);

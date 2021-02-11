@@ -38,6 +38,7 @@ export enum ChallengeReason {
   RevokeSession = 12,
   AccessBatchManager = 13,
   ImportEncryptedFile = 14,
+  ExportDecryptedBackup = 15,
 }
 
 /** For mobile */
@@ -106,6 +107,8 @@ export class Challenge {
           return ChallengeStrings.AccessBatchManager;
         case ChallengeReason.ImportEncryptedFile:
           return ChallengeStrings.ImportEncryptedFile;
+        case ChallengeReason.ExportDecryptedBackup:
+          return ChallengeStrings.ExportDecryptedBackup;
         default:
           return assertUnreachable(this.reason);
       }
