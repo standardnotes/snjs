@@ -112,7 +112,10 @@ const NonEncryptedTypes = Object.freeze([
  * After each sync request, any changes made or retrieved are also persisted locally.
  * The sync service largely does not perform any task unless it is called upon.
  */
-export class SNSyncService extends PureService<SyncEvent> {
+export class SNSyncService extends PureService<
+  SyncEvent,
+  SyncResponse | { source: SyncSources }
+> {
 
   private sessionManager?: SNSessionManager
   private protocolService?: SNProtocolService

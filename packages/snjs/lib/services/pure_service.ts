@@ -2,25 +2,29 @@ import { removeFromArray } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
 
-type EventObserver<T> = (eventName: T, data: any) => Promise<void> | void;
+type EventObserver<E, D> = (eventName: E, data?: D) => Promise<void> | void;
 
-export abstract class PureService<E = string> {
+/**
+ * E = the name of the event
+ * D = the data the event includes
+ */
+export abstract class PureService<E = string, D = undefined> {
 
-  private eventObservers: EventObserver<E>[] = []
+  private eventObservers: EventObserver<E, D>[] = []
   public loggingEnabled = false
   public deviceInterface?: DeviceInterface
-  private criticalPromises: Promise<any>[] = []
+  private criticalPromises: Promise<unknown>[] = []
 
-  public addEventObserver(observer: EventObserver<E>) {
+  public addEventObserver(observer: EventObserver<E, D>): () => void {
     this.eventObservers.push(observer);
     return () => {
       removeFromArray(this.eventObservers, observer);
     };
   }
 
-  protected async notifyEvent(eventName: E, data?: any) {
+  protected async notifyEvent(eventName: E, data?: D): Promise<void> {
     for (const observer of this.eventObservers) {
-      await observer(eventName, data || {});
+      await observer(eventName, data);
     }
   }
 
@@ -28,7 +32,7 @@ export abstract class PureService<E = string> {
    * Called by application to allow services to momentarily block deinit until
    * sensitive operations complete.
    */
-  public async blockDeinit() {
+  public async blockDeinit(): Promise<void> {
     await Promise.all(this.criticalPromises);
   }
 
@@ -48,7 +52,7 @@ export abstract class PureService<E = string> {
    * parent application instance will await all criticial functions via the `blockDeinit`
    * function before signing out and deiniting.
    */
-  protected async executeCriticalFunction<T = void>(func: () => Promise<T>) {
+  protected async executeCriticalFunction<T = void>(func: () => Promise<T>): Promise<T> {
     const promise = func();
     this.criticalPromises.push(promise);
     return promise;
@@ -59,11 +63,12 @@ export abstract class PureService<E = string> {
   * Application instances will call this function directly when they arrive
   * at a certain migratory state.
   */
-  public async handleApplicationStage(_stage: ApplicationStage) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async handleApplicationStage(_stage: ApplicationStage): Promise<void> {
     // optional override
   }
 
-  log(message: string, ...args: any[]) {
+  log(message: string, ...args: unknown[]): void {
     if (this.loggingEnabled) {
       const date = new Date();
       const timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '');

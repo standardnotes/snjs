@@ -46,49 +46,37 @@ type PasswordRequestHandler = () => Promise<string>
  */
 export class SNActionsService extends PureService {
 
-  private alertService?: SNAlertService
-  private httpService?: SNHttpService
-  private modelManager?: PayloadManager
-  private itemManager?: ItemManager
-  private protocolService?: SNProtocolService
-  private syncService?: SNSyncService
   private previousPasswords: string[] = []
 
   constructor(
-    itemManager: ItemManager,
-    alertService: SNAlertService,
+    private itemManager: ItemManager,
+    private alertService: SNAlertService,
     deviceInterface: DeviceInterface,
-    httpService: SNHttpService,
-    modelManager: PayloadManager,
-    protocolService: SNProtocolService,
-    syncService: SNSyncService,
+    private httpService: SNHttpService,
+    private modelManager: PayloadManager,
+    private protocolService: SNProtocolService,
+    private syncService: SNSyncService,
   ) {
     super();
-    this.itemManager = itemManager;
-    this.alertService = alertService;
     this.deviceInterface = deviceInterface;
-    this.httpService = httpService;
-    this.modelManager = modelManager;
-    this.protocolService = protocolService;
-    this.syncService = syncService;
     this.previousPasswords = [];
   }
 
   /** @override */
   public deinit() {
-    this.itemManager = undefined;
-    this.alertService = undefined;
-    this.deviceInterface = undefined;
-    this.httpService = undefined;
-    this.modelManager = undefined;
-    this.protocolService = undefined;
-    this.syncService = undefined;
+    (this.itemManager as unknown) = undefined;
+    (this.alertService as unknown) = undefined;
+    (this.deviceInterface as unknown) = undefined;
+    (this.httpService as unknown) = undefined;
+    (this.modelManager as unknown) = undefined;
+    (this.protocolService as unknown) = undefined;
+    (this.syncService as unknown) = undefined;
     this.previousPasswords.length = 0;
     super.deinit();
   }
 
   public getExtensions(): SNActionsExtension[] {
-    return this.itemManager!
+    return this.itemManager
       .nonErroredItemsForContentType(ContentType.ActionsExtension) as SNActionsExtension[];
   }
 

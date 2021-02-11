@@ -16,7 +16,7 @@ export enum ErrorTag {
 
 const REQUEST_READY_STATE_COMPLETED = 4;
 
-type HttpParams = Record<string, any>
+export type HttpParams = Record<string, unknown>
 
 export type HttpRequest = {
   url: string,
@@ -140,7 +140,7 @@ export class SNHttpService extends PureService {
 
   private urlForUrlAndParams(url: string, params: HttpParams) {
     const keyValueString = Object.keys(params).map((key) => {
-      return key + '=' + encodeURIComponent(params[key]);
+      return key + '=' + encodeURIComponent(params[key] as string);
     }).join('&');
 
     if (url.includes('?')) {

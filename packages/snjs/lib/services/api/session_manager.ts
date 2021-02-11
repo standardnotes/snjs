@@ -33,7 +33,7 @@ import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
-import { ErrorAlertStrings, RegisterStrings, SessionStrings, SignInStrings } from './messages';
+import { RegisterStrings, SessionStrings, SignInStrings } from './messages';
 import { UuidString } from '@Lib/types';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;

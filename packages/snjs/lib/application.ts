@@ -70,6 +70,7 @@ import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
+import { SNPermissionsService } from './services/permissions_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -123,9 +124,10 @@ export class SNApplication {
   private itemManager!: ItemManager
   private keyRecoveryService!: SNKeyRecoveryService
   private preferencesService!: SNPreferencesService
+  private permissionsService!: SNPermissionsService
 
   private eventHandlers: ApplicationObserver[] = [];
-  private services: PureService<any>[] = [];
+  private services: PureService<any, any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
   private managedSubscribers: ObserverRemover[] = [];
@@ -1006,11 +1008,9 @@ export class SNApplication {
     const items = this.itemManager.items;
 
     if (intent === EncryptionIntent.FileDecrypted) {
-      if (items.some(item => item.protected) && this.hasPasscode()) {
-        const passcode = await this.challengeService.promptForCorrectPasscode(
-          ChallengeReason.CreateDecryptedBackupWithProtectedItems
-        );
-        if (!passcode) {
+      if (items.some(item => item.protected)) {
+        const authorized = await this.protectionService.authorizeFileExportWithProtectedNotes();
+        if (!authorized) {
           return;
         }
       }
@@ -1545,6 +1545,7 @@ export class SNApplication {
   }
 
   private constructServices() {
+    this.createPermissionsService();
     this.createModelManager();
     this.createItemManager();
     this.createStorageManager();
@@ -1592,6 +1593,16 @@ export class SNApplication {
     this.services = [];
   }
 
+  private createPermissionsService() {
+    this.permissionsService = new SNPermissionsService();
+    this.serviceObservers.push(
+      this.permissionsService.addEventObserver((_event, permissions) => {
+        void this.notifyEvent(ApplicationEvent.PermissionsChanged, permissions);
+      })
+    );
+    this.services.push(this.permissionsService);
+  }
+
   private createMigrationService() {
     this.migrationService = new SNMigrationService(
       {
@@ -1612,6 +1623,7 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
+      this.permissionsService,
       this.defaultHost
     );
     this.services.push(this.apiService);

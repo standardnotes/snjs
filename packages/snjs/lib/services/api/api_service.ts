@@ -2,7 +2,6 @@ import { UuidString } from './../../types';
 import {
   ChangePasswordResponse,
   HttpResponse,
-  KeyParamsResponse,
   RegistrationResponse,
   RevisionListEntry,
   RevisionListResponse,
@@ -19,13 +18,21 @@ import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
-import { ErrorTag, HttpRequest, HttpVerb, SNHttpService } from './http_service';
+import {
+  ErrorTag,
+  HttpParams,
+  HttpRequest,
+  HttpVerb,
+  SNHttpService,
+} from './http_service';
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
 import { joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
+import { SNPermissionsService } from '../permissions_service';
+import { ROLES, Permissions } from '@standardnotes/auth';
 
 const REQUEST_PATH_KEY_PARAMS = '/auth/params';
 const REQUEST_PATH_REGISTER = '/auth';
@@ -43,24 +50,30 @@ const API_VERSION = '20200115';
 
 type InvalidSessionObserver = (revoked: boolean) => void;
 
-export class SNApiService extends PureService {
-  private host?: string
-  private session?: Session
+type ResponseMeta = {
+  auth: {
+    role: ROLES;
+    permissions: Permissions[];
+  };
+};
 
-  private registering = false
-  private authenticating = false
-  private changing = false
-  private refreshingSession = false
+export class SNApiService extends PureService {
+  private session?: Session;
+
+  private registering = false;
+  private authenticating = false;
+  private changing = false;
+  private refreshingSession = false;
 
   private invalidSessionObserver?: InvalidSessionObserver;
 
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    defaultHost?: string
+    private permissionsService: SNPermissionsService,
+    private host?: string
   ) {
     super();
-    this.host = defaultHost;
   }
 
   /** @override */
@@ -86,8 +99,11 @@ export class SNApiService extends PureService {
   }
 
   public async loadHost(): Promise<void> {
-    const storedValue = await this.storageService.getValue(StorageKey.ServerHost);
-    this.host = storedValue || this.host || (window as any)._default_sync_server;
+    const storedValue = await this.storageService.getValue(
+      StorageKey.ServerHost
+    );
+    this.host =
+      storedValue || this.host || (window as any)._default_sync_server;
   }
 
   public async setHost(host: string): Promise<void> {
@@ -110,13 +126,13 @@ export class SNApiService extends PureService {
     return this.session;
   }
 
-  private async path(path: string) {
-    const host = await this.getHost();
+  private path(path: string) {
+    const host = this.getHost();
     if (!host) {
-      throw `Attempting to build path ${path} with no host.`;
+      throw Error(`Attempting to build path ${path} with no host.`);
     }
     if (!path) {
-      throw 'Attempting to build path with null path.';
+      throw Error('Attempting to build path with null path.');
     }
     return joinPaths(host, path);
   }
@@ -125,14 +141,17 @@ export class SNApiService extends PureService {
     return API_VERSION;
   }
 
-  private params(inParams: any) {
+  private params(inParams: any): HttpParams {
     const params = merge(inParams, {
-      [ApiEndpointParam.ApiVersion]: this.apiVersion
+      [ApiEndpointParam.ApiVersion]: this.apiVersion,
     });
     return params;
   }
 
-  public createErrorResponse(message: string, status?: StatusCode): HttpResponse {
+  public createErrorResponse(
+    message: string,
+    status?: StatusCode
+  ): HttpResponse {
     return { error: { message, status } } as HttpResponse;
   }
 
@@ -146,58 +165,88 @@ export class SNApiService extends PureService {
     return response;
   }
 
+  private processMetaObject(meta: ResponseMeta) {
+    this.permissionsService.update(meta.auth.role, meta.auth.permissions);
+  }
+
+  private processResponse(response: HttpResponse) {
+    if (response.object?.meta) {
+      const meta = response.object.meta as ResponseMeta;
+      this.processMetaObject(meta);
+    }
+  }
+
+  private async request(params: {
+    verb: HttpVerb;
+    url: string;
+    fallbackErrorMessage: string;
+    params?: HttpParams;
+    authentication?: string;
+  }) {
+    try {
+      const response = await this.httpService.runHttp(params);
+      this.processResponse(response);
+      return response;
+    } catch (errorResponse) {
+      return this.errorResponseWithFallbackMessage(
+        errorResponse,
+        params.fallbackErrorMessage
+      );
+    }
+  }
+
   /**
    * @param mfaKeyPath  The params path the server expects for authentication against
    *                    a particular mfa challenge. A value of foo would mean the server
    *                    would receive parameters as params['foo'] with value equal to mfaCode.
    * @param mfaCode     The mfa challenge response value.
    */
-  async getAccountKeyParams(email: string, mfaKeyPath?: string, mfaCode?: string) {
-    const url = await this.path(REQUEST_PATH_KEY_PARAMS);
+  getAccountKeyParams(
+    email: string,
+    mfaKeyPath?: string,
+    mfaCode?: string
+  ): Promise<HttpResponse> {
     const params = this.params({
-      email: email
+      email: email,
     });
-    if (mfaKeyPath) {
+    if (mfaKeyPath && mfaCode) {
       params[mfaKeyPath] = mfaCode;
     }
-    const response = await this.httpService!.getAbsolute(
-      url,
+    return this.request({
+      verb: HttpVerb.Get,
+      url: this.path(REQUEST_PATH_KEY_PARAMS),
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
       /** A session is optional here, if valid, endpoint returns extra params */
-      this.session?.authorizationValue
-    ).catch((errorResponse: HttpResponse) => {
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_INVALID_LOGIN
-      );
+      authentication: this.session?.authorizationValue,
     });
-    return response as KeyParamsResponse;
   }
 
   async register(
     email: string,
     serverPassword: string,
     keyParams: SNRootKeyParams,
-    ephemeral: boolean,
-  ) {
+    ephemeral: boolean
+  ): Promise<RegistrationResponse> {
     if (this.registering) {
-      return this.createErrorResponse(messages.API_MESSAGE_REGISTRATION_IN_PROGRESS) as RegistrationResponse;
+      return this.createErrorResponse(
+        messages.API_MESSAGE_REGISTRATION_IN_PROGRESS
+      ) as RegistrationResponse;
     }
     this.registering = true;
-    const url = await this.path(REQUEST_PATH_REGISTER);
+    const url = this.path(REQUEST_PATH_REGISTER);
     const params = this.params({
       password: serverPassword,
       email,
       ephemeral,
-      ...keyParams.getPortableValue()
+      ...keyParams.getPortableValue(),
     });
-    const response = await this.httpService!.postAbsolute(url, params)
-      .catch((errorResponse) => {
-        return this.errorResponseWithFallbackMessage(
-          errorResponse,
-          messages.API_MESSAGE_GENERIC_REGISTRATION_FAIL
-        );
-      });
+    const response = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_REGISTRATION_FAIL,
+      params,
+    });
     this.registering = false;
     return response as RegistrationResponse;
   }
@@ -208,43 +257,40 @@ export class SNApiService extends PureService {
     mfaKeyPath?: string,
     mfaCode?: string,
     ephemeral = false
-  ) {
+  ): Promise<SignInResponse> {
     if (this.authenticating) {
-      return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS) as SignInResponse;
+      return this.createErrorResponse(
+        messages.API_MESSAGE_LOGIN_IN_PROGRESS
+      ) as SignInResponse;
     }
     this.authenticating = true;
-    const url = await this.path(REQUEST_PATH_LOGIN);
+    const url = this.path(REQUEST_PATH_LOGIN);
     const params = this.params({
       email,
       password: serverPassword,
-      ephemeral
+      ephemeral,
     });
-    if (mfaKeyPath) {
+    if (mfaKeyPath && mfaCode) {
       params[mfaKeyPath] = mfaCode;
     }
-    const response = await this.httpService!.postAbsolute(
+    const response = await this.request({
+      verb: HttpVerb.Post,
       url,
-      params
-    ).catch((errorResponse) => {
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_INVALID_LOGIN
-      );
+      params,
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
     });
 
     this.authenticating = false;
     return response as SignInResponse;
   }
 
-  async signOut() {
-    const url = await this.path(REQUEST_PATH_LOGOUT);
-    return this.httpService!.postAbsolute(
-      url,
-      undefined,
-      this.session!.authorizationValue
-    ).catch(errorResponse => {
-      return errorResponse;
-    }) as Promise<SignOutResponse>;
+  signOut(): Promise<SignOutResponse> {
+    const url = this.path(REQUEST_PATH_LOGOUT);
+    return this.httpService
+      .postAbsolute(url, undefined, this.session!.authorizationValue)
+      .catch((errorResponse) => {
+        return errorResponse;
+      }) as Promise<SignOutResponse>;
   }
 
   async changePassword(
@@ -253,36 +299,38 @@ export class SNApiService extends PureService {
     newKeyParams: SNRootKeyParams
   ): Promise<ChangePasswordResponse> {
     if (this.changing) {
-      return this.createErrorResponse(messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS);
+      return this.createErrorResponse(
+        messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS
+      );
     }
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
     }
     this.changing = true;
-    const url = await this.path(REQUEST_PATH_CHANGE_PW);
+    const url = this.path(REQUEST_PATH_CHANGE_PW);
     const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
-      ...newKeyParams.getPortableValue()
+      ...newKeyParams.getPortableValue(),
     });
-    const response = await this.httpService!.postAbsolute(
-      url,
-      params,
-      this.session!.authorizationValue
-    ).catch(async (errorResponse) => {
-      if (isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSessionThenRetryRequest({
-          verb: HttpVerb.Post,
-          url,
-          params
-        });
-      }
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_CHANGE_PW_FAIL
-      );
-    });
+    const response = await this.httpService
+      .postAbsolute(url, params, this.session!.authorizationValue)
+      .catch(async (errorResponse) => {
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Post,
+            url,
+            params,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_CHANGE_PW_FAIL
+        );
+      });
+
+    this.processResponse(response);
 
     this.changing = false;
     return response;
@@ -296,7 +344,7 @@ export class SNApiService extends PureService {
     checkIntegrity = false,
     contentType?: ContentType,
     customEvent?: string
-  ) {
+  ): Promise<HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
@@ -309,26 +357,25 @@ export class SNApiService extends PureService {
       [ApiEndpointParam.IntegrityCheck]: checkIntegrity,
       [ApiEndpointParam.SyncDlLimit]: limit,
       content_type: contentType,
-      event: customEvent
+      event: customEvent,
     });
-    const response = await this.httpService!.postAbsolute(
-      url,
-      params,
-      this.session!.authorizationValue
-    ).catch(async (errorResponse) => {
-      this.preprocessAuthenticatedErrorResponse(errorResponse);
-      if (isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSessionThenRetryRequest({
-          verb: HttpVerb.Post,
-          url,
-          params
-        });
-      }
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_SYNC_FAIL
-      );
-    });
+    const response = await this.httpService
+      .postAbsolute(url, params, this.session!.authorizationValue)
+      .catch<HttpResponse>(async (errorResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Post,
+            url,
+            params,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SYNC_FAIL
+        );
+      });
+    this.processResponse(response);
 
     return response;
   }
@@ -338,12 +385,14 @@ export class SNApiService extends PureService {
     if (sessionResponse?.error) {
       return sessionResponse;
     } else {
-      return this.httpService!.runHttp({
-        ...httpRequest,
-        authentication: this.session!.authorizationValue
-      }).catch((errorResponse) => {
-        return errorResponse;
-      });
+      return this.httpService
+        .runHttp({
+          ...httpRequest,
+          authentication: this.session!.authorizationValue,
+        })
+        .catch((errorResponse) => {
+          return errorResponse;
+        });
     }
   }
 
@@ -353,26 +402,29 @@ export class SNApiService extends PureService {
       return preprocessingError as SessionRenewalResponse;
     }
     this.refreshingSession = true;
-    const url = await this.path(REQUEST_PATH_SESSION_REFRESH);
+    const url = this.path(REQUEST_PATH_SESSION_REFRESH);
     const session = this.session! as TokenSession;
     const params = this.params({
       access_token: session.accessToken,
-      refresh_token: session.refreshToken
+      refresh_token: session.refreshToken,
     });
-    const result = await this.httpService!.postAbsolute(
-      url,
-      params
-    ).then(async (response) => {
-      const session = TokenSession.FromApiResponse(response as SessionRenewalResponse);
-      await this.setSession(session);
-      return response;
-    }).catch((errorResponse) => {
-      this.preprocessAuthenticatedErrorResponse(errorResponse);
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL
-      );
-    });
+    const result = await this.httpService
+      .postAbsolute(url, params)
+      .then(async (response) => {
+        const session = TokenSession.FromApiResponse(
+          response as SessionRenewalResponse
+        );
+        await this.setSession(session);
+        this.processResponse(response);
+        return response;
+      })
+      .catch((errorResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL
+        );
+      });
     this.refreshingSession = false;
     return result as SessionRenewalResponse;
   }
@@ -382,54 +434,59 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = await this.path(REQUEST_PATH_ALL_SESSIONS);
-    const response = await this.httpService!.getAbsolute(
-      url,
-      {},
-      this.session!.authorizationValue
-    ).catch(async (errorResponse) => {
-      this.preprocessAuthenticatedErrorResponse(errorResponse);
-      if (isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSessionThenRetryRequest({
-          verb: HttpVerb.Get,
-          url
-        });
-      }
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_SYNC_FAIL
-      );
-    });
+    const url = this.path(REQUEST_PATH_ALL_SESSIONS);
+    const response = await this.httpService
+      .getAbsolute(url, {}, this.session!.authorizationValue)
+      .catch(async (errorResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Get,
+            url,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SYNC_FAIL
+        );
+      });
+    this.processResponse(response);
 
     return response as SessionListResponse;
   }
 
-  async deleteSession(sessionId: UuidString): Promise<RevisionListResponse | HttpResponse> {
+  async deleteSession(
+    sessionId: UuidString
+  ): Promise<RevisionListResponse | HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = await this.path(REQUEST_PATH_SESSION);
-    try {
-      return this.httpService.deleteAbsolute(
+    const url = this.path(REQUEST_PATH_SESSION);
+    const response:
+      | RevisionListResponse
+      | HttpResponse = await this.httpService
+      .deleteAbsolute(
         url,
         { uuid: sessionId },
         this.session!.authorizationValue
-      );
-    } catch (error) {
-      const errorResponse = error as HttpResponse;
-      this.preprocessAuthenticatedErrorResponse(errorResponse);
-      if (isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSessionThenRetryRequest({
-          verb: HttpVerb.Get,
-          url
-        });
-      }
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_SYNC_FAIL
-      );
-    }
+      )
+      .catch((error: HttpResponse) => {
+        const errorResponse = error as HttpResponse;
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Get,
+            url,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SYNC_FAIL
+        );
+      });
+    this.processResponse(response);
+    return response;
   }
 
   async getItemRevisions(
@@ -440,24 +497,25 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
-    const url = await this.path(path);
-    const response = await this.httpService!.getAbsolute(
-      url,
-      undefined,
-      this.session!.authorizationValue
-    ).catch((errorResponse: HttpResponse) => {
-      this.preprocessAuthenticatedErrorResponse(errorResponse);
-      if (isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSessionThenRetryRequest({
-          verb: HttpVerb.Get,
-          url
-        });
-      }
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_SYNC_FAIL
-      );
-    });
+    const url = this.path(path);
+    const response:
+      | RevisionListResponse
+      | HttpResponse = await this.httpService
+      .getAbsolute(url, undefined, this.session!.authorizationValue)
+      .catch((errorResponse: HttpResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Get,
+            url,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SYNC_FAIL
+        );
+      });
+    this.processResponse(response);
     return response;
   }
 
@@ -469,33 +527,37 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const path = REQUEST_PATH_ITEM_REVISION
-      .replace(/:item_id/, itemId)
-      .replace(/:id/, entry.uuid);
-    const url = await this.path(path);
-    const response = await this.httpService!.getAbsolute(
-      url,
-      undefined,
-      this.session!.authorizationValue
-    ).catch((errorResponse: HttpResponse) => {
-      this.preprocessAuthenticatedErrorResponse(errorResponse);
-      if (isErrorResponseExpiredToken(errorResponse)) {
-        return this.refreshSessionThenRetryRequest({
-          verb: HttpVerb.Get,
-          url
-        });
-      }
-      return this.errorResponseWithFallbackMessage(
-        errorResponse,
-        messages.API_MESSAGE_GENERIC_SYNC_FAIL
-      );
-    });
+    const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(
+      /:id/,
+      entry.uuid
+    );
+    const url = this.path(path);
+    const response:
+      | SingleRevisionResponse
+      | HttpResponse = await this.httpService
+      .getAbsolute(url, undefined, this.session!.authorizationValue)
+      .catch((errorResponse: HttpResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Get,
+            url,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SYNC_FAIL
+        );
+      });
+    this.processResponse(response);
     return response;
   }
 
   private preprocessingError() {
     if (this.refreshingSession) {
-      return this.createErrorResponse(messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS);
+      return this.createErrorResponse(
+        messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS
+      );
     }
     if (!this.session) {
       return this.createErrorResponse(messages.API_MESSAGE_INVALID_SESSION);
@@ -514,5 +576,4 @@ export class SNApiService extends PureService {
       );
     }
   }
-
 }
