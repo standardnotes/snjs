@@ -164,6 +164,10 @@ export class SNProtectionService extends PureService {
     }
   }
 
+  public clearSession(): Promise<void> {
+    return this.setSessionLength(ProtectionSessionLengthSeconds.None);
+  }
+
   private async getSessionLength(): Promise<number> {
     const length = await this.storageService.getValue(
       StorageKey.ProtectionSessionLength

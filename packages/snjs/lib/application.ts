@@ -884,6 +884,11 @@ export class SNApplication {
   public getProtectionSessionExpiryDate(): Promise<Date> {
     return this.protectionService.getSessionExpiryDate();
   }
+
+  public clearProtectionSession(): Promise<void> {
+    return this.protectionService.clearSession();
+  }
+
   /**
    * @returns whether note access has been granted or not
    */
