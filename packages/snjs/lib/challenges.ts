@@ -148,37 +148,48 @@ type ChallengeRawValue = number | string | boolean;
  */
 export class ChallengePrompt {
   public readonly id = Math.random();
+  public readonly placeholder: string;
+  public readonly title: string;
+  public readonly validates: boolean;
+
   constructor(
     public readonly validation: ChallengeValidation,
-    public readonly _title?: string,
-    public readonly placeholder?: string,
+    title?: string,
+    placeholder?: string,
     public readonly secureTextEntry = true,
     public readonly keyboardType?: ChallengeKeyboardType,
     public readonly initialValue?: ChallengeRawValue
   ) {
-    Object.freeze(this);
-  }
-
-  public get validates(): boolean {
-    return this.validation !== ChallengeValidation.None;
-  }
-
-  public get title(): string | undefined {
-    if (this._title) {
-      return this._title;
-    }
     switch (this.validation) {
       case ChallengeValidation.AccountPassword:
-        return PromptTitles.AccountPassword;
-      case ChallengeValidation.Biometric:
-        return PromptTitles.Biometrics;
+        this.title = title ?? PromptTitles.AccountPassword;
+        this.placeholder = placeholder ?? PromptTitles.AccountPassword;
+        this.validates = true;
+        break;
       case ChallengeValidation.LocalPasscode:
-        return PromptTitles.LocalPasscode;
+        this.title = title ?? PromptTitles.AccountPassword;
+        this.placeholder = placeholder ?? PromptTitles.AccountPassword;
+        this.validates = true;
+        break;
+      case ChallengeValidation.Biometric:
+        this.title = title ?? PromptTitles.Biometrics;
+        this.placeholder = placeholder ?? '';
+        this.validates = true;
+        break;
       case ChallengeValidation.ProtectionSessionDuration:
-        return PromptTitles.RememberFor;
+        this.title = title ?? PromptTitles.RememberFor;
+        this.placeholder = placeholder ?? '';
+        this.validates = true;
+        break;
+      case ChallengeValidation.None:
+        this.title = title ?? '';
+        this.placeholder = placeholder ?? '';
+        this.validates = false;
+        break;
       default:
-        return undefined;
+        assertUnreachable(this.validation);
     }
+    Object.freeze(this);
   }
 }
 
