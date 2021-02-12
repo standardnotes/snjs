@@ -34,7 +34,7 @@ export abstract class DeviceInterface {
     this.interval = null;
   }
 
-  abstract async getRawStorageValue(key: string): Promise<string | undefined>;
+  abstract getRawStorageValue(key: string): Promise<string | undefined>;
 
   /**
    * Gets the parsed raw storage value.
@@ -54,13 +54,13 @@ export abstract class DeviceInterface {
     }
   }
 
-  abstract async getAllRawStorageKeyValues(): Promise<{ key: string, value: unknown }[]>;
+  abstract getAllRawStorageKeyValues(): Promise<{ key: string, value: unknown }[]>;
 
-  abstract async setRawStorageValue(key: string, value: any): Promise<void>;
+  abstract setRawStorageValue(key: string, value: any): Promise<void>;
 
-  abstract async removeRawStorageValue(key: string): Promise<void>;
+  abstract removeRawStorageValue(key: string): Promise<void>;
 
-  abstract async removeAllRawStorageValues(): Promise<void>;
+  abstract removeAllRawStorageValues(): Promise<void>;
 
   /**
    * On web platforms, databased created may be new.
@@ -69,30 +69,30 @@ export abstract class DeviceInterface {
    * from scratch.
    * @returns { isNewDatabase } - True if the database was newly created
    */
-  abstract async openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
+  abstract openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
 
-  abstract async getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<unknown[]>;
+  abstract getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<unknown[]>;
 
-  abstract async saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>;
+  abstract saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>;
+  abstract saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>;
+  abstract removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>;
+  abstract removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>;
+  abstract getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>;
 
   /** Allows SNJS to set the top level keychain value */
-  abstract async legacy_setRawKeychainValue(value: any): Promise<void>;
+  abstract legacy_setRawKeychainValue(value: any): Promise<void>;
 
-  abstract async setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>;
+  abstract setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>;
+  abstract clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>;
 
-  abstract async getRawKeychainValue(): Promise<Record<string, any> | undefined | null>;
+  abstract getRawKeychainValue(): Promise<Record<string, any> | undefined | null>;
 
-  abstract async clearRawKeychainValue(): Promise<void>;
+  abstract clearRawKeychainValue(): Promise<void>;
 
   abstract openUrl(url: string): void;
 
