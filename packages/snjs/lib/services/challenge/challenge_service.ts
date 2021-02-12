@@ -1,10 +1,7 @@
-import { SNRootKey } from './../../protocol/root_key';
 import { ChallengePrompt } from './../../challenges';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
 import { PureService } from "@Lib/services/pure_service";
-import { StorageKey } from "@Lib/storage_keys";
-import { StorageValueModes } from "@Services/storage_service";
 import {
   Challenge,
   ChallengeArtifacts,
@@ -15,7 +12,6 @@ import {
 } from "@Lib/challenges";
 import { ChallengeOperation } from "./challenge_operation";
 import { removeFromArray } from '@Lib/utils';
-import { ChallengeStrings } from '../api/messages';
 import { isValidProtectionSessionLength } from '../protection_service';
 
 type ChallengeValidationResponse = {

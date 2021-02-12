@@ -1,4 +1,4 @@
-import { AnyRecord, ApplicationIdentifier } from './types';
+import { ApplicationIdentifier } from './types';
 import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
 
 /**
