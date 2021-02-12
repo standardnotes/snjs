@@ -11,9 +11,13 @@
         <script src="../node_modules/sinon/pkg/sinon.js"></script>
         <script src="../packages/snjs/dist/snjs.js"></script>
         <script>
+
           const urlParams = new URLSearchParams(window.location.search);
           const syncServerHostName = urlParams.get('sync_server_host_name') ?? 'syncing-server-proxy';
+          const bail = urlParams.get('bail') === 'false' ? false : true;
+
           window._default_sync_server = `http://${syncServerHostName}:3123`;
+
           Object.assign(window, SNCrypto);
           Object.assign(window, SNLibrary);
           SNLog.onLog = (message) => {
@@ -22,12 +26,13 @@
           SNLog.onError = (error) => {
             console.error(error);
           };
+
           mocha.setup('bdd');
           mocha.timeout(5000);
           if(urlParams.has('skip')) {
             mocha.grep('@' + urlParams.get('skip')).invert();
           }
-          mocha.bail(true);
+          mocha.bail(bail);
         </script>
         <script type="module" src="memory.test.js"></script>
         <script type="module" src="protocol.test.js"></script>
