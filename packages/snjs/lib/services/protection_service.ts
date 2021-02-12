@@ -212,8 +212,8 @@ export class SNProtectionService extends PureService {
     }
   }
 
-  public async getSessionExpiryDate(): Promise<Date> {
-    const expiresAt = await this.storageService.getValue(
+  public getSessionExpiryDate(): Date {
+    const expiresAt = this.storageService.getValue(
       StorageKey.ProtectionExpirey
     );
     if (expiresAt) {

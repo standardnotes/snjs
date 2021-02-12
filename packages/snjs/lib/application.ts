@@ -881,7 +881,7 @@ export class SNApplication {
     return this.protocolService!.hasAccount();
   }
 
-  public getProtectionSessionExpiryDate(): Promise<Date> {
+  public getProtectionSessionExpiryDate(): Date {
     return this.protectionService.getSessionExpiryDate();
   }
 
