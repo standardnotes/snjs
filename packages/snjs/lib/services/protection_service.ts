@@ -110,13 +110,11 @@ export class SNProtectionService extends PureService {
   }
 
   public createLaunchChallenge(): Challenge | null {
-    const prompts = [];
-    const biometricEnabled = this.hasBiometricsEnabled();
-    if (biometricEnabled) {
+    const prompts: ChallengePrompt[] = [];
+    if (this.hasBiometricsEnabled()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
     }
-    const hasPasscode = this.protocolService.hasPasscode();
-    if (hasPasscode) {
+    if (this.protocolService.hasPasscode()) {
       prompts.push(
         new ChallengePrompt(ChallengeValidation.LocalPasscode)
       );
