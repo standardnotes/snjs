@@ -9,7 +9,7 @@ import { PureService } from '@Lib/services/pure_service';
 import { SNLog } from '@Lib/log';
 import { SNNote } from '@Lib/models';
 import { SNProtocolService } from './protocol_service';
-import { SNStorageService } from '@Services/storage_service';
+import { SNStorageService, StorageValueModes } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@Lib/utils';
 
@@ -67,6 +67,67 @@ export class SNProtectionService extends PureService {
     super.deinit();
   }
 
+  public hasBiometricsEnabled(): boolean {
+    const biometricsState = this.storageService.getValue(
+      StorageKey.BiometricsState,
+      StorageValueModes.Nonwrapped
+    );
+    return Boolean(biometricsState);
+  }
+
+  public async enableBiometrics(): Promise<boolean> {
+    if (this.hasBiometricsEnabled()) {
+      SNLog.onError(
+        Error('Tried to enable biometrics when they already are enabled.')
+      );
+      return false;
+    }
+    await this.storageService.setValue(
+      StorageKey.BiometricsState,
+      true,
+      StorageValueModes.Nonwrapped
+    );
+    return true;
+  }
+
+  public async disableBiometrics(): Promise<boolean> {
+    if (!this.hasBiometricsEnabled()) {
+      SNLog.onError(
+        Error('Tried to disable biometrics when they already are disabled.')
+      );
+      return false;
+    }
+    if (await this.validateOrRenewSession(ChallengeReason.DisableBiometrics)) {
+      await this.storageService.setValue(
+        StorageKey.BiometricsState,
+        false,
+        StorageValueModes.Nonwrapped
+      );
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public createLaunchChallenge(): Challenge | null {
+    const prompts = [];
+    const biometricEnabled = this.hasBiometricsEnabled();
+    if (biometricEnabled) {
+      prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
+    }
+    const hasPasscode = this.protocolService.hasPasscode();
+    if (hasPasscode) {
+      prompts.push(
+        new ChallengePrompt(ChallengeValidation.LocalPasscode)
+      );
+    }
+    if (prompts.length > 0) {
+      return new Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
+    } else {
+      return null;
+    }
+  }
+
   async authorizeNoteAccess(note: SNNote): Promise<boolean> {
     if (!note.protected) {
       return true;
@@ -106,7 +167,7 @@ export class SNProtectionService extends PureService {
     }
 
     const prompts: ChallengePrompt[] = [];
-    if (await this.challengeService.hasBiometricsEnabled()) {
+    if (this.hasBiometricsEnabled()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
     }
     if (this.protocolService.hasPasscode()) {

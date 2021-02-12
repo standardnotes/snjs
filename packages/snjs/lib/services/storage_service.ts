@@ -259,7 +259,7 @@ export class SNStorageService extends PureService {
     return this.persistValuesToDisk();
   }
 
-  public async getValue(key: string, mode = StorageValueModes.Default, defaultValue?: any) {
+  public getValue(key: string, mode = StorageValueModes.Default, defaultValue?: any) {
     if (!this.values) {
       throw Error(`Attempting to get storage key ${key} before loading local storage.`);
     }

@@ -240,7 +240,7 @@ export class SNApplication {
    */
   public async launch(awaitDatabaseLoad = false): Promise<void> {
     this.launched = false;
-    const launchChallenge = await this.challengeService.getLaunchChallenge();
+    const launchChallenge = this.protectionService.createLaunchChallenge();
     if (launchChallenge) {
       const response = await this.challengeService.promptForChallengeResponse(launchChallenge);
       if (!response) {
@@ -1393,16 +1393,22 @@ export class SNApplication {
     return this.launched;
   }
 
-  public hasBiometrics(): Promise<boolean> {
-    return this.challengeService.hasBiometricsEnabled()
+  public hasBiometrics(): boolean {
+    return this.protectionService.hasBiometricsEnabled()
   }
 
-  public enableBiometrics(): Promise<void> {
-    return this.challengeService.enableBiometrics()
+  /**
+   * @returns whether the operation was successful or not
+   */
+  public enableBiometrics(): Promise<boolean> {
+    return this.protectionService.enableBiometrics()
   }
 
-  public disableBiometrics(): Promise<void> {
-    return this.challengeService.disableBiometrics()
+  /**
+   * @returns whether the operation was successful or not
+   */
+  public disableBiometrics(): Promise<boolean> {
+    return this.protectionService.disableBiometrics()
   }
 
   public hasPasscode(): boolean {
