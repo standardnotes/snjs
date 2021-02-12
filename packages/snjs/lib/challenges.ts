@@ -3,16 +3,13 @@ import {
   ChallengeStrings,
   PromptTitles,
 } from './services/api/messages';
-import {
-  assertUnreachable,
-  isNullOrUndefined,
-} from './utils';
+import { assertUnreachable, isNullOrUndefined } from './utils';
 import { SNRootKey } from '@Protocol/root_key';
 
 export type ChallengeArtifacts = {
-  wrappingKey?: SNRootKey
-  rootKey?: SNRootKey
-}
+  wrappingKey?: SNRootKey;
+  rootKey?: SNRootKey;
+};
 
 export enum ChallengeValidation {
   None = 0,
@@ -38,12 +35,14 @@ export enum ChallengeReason {
   RevokeSession = 12,
   AccessBatchManager = 13,
   ImportEncryptedFile = 14,
+  ExportDecryptedBackup = 15,
+  DisableBiometrics = 15,
 }
 
 /** For mobile */
 export enum ChallengeKeyboardType {
   Alphanumeric = 'default',
-  Numeric = 'numeric'
+  Numeric = 'numeric',
 }
 
 /**
@@ -58,7 +57,7 @@ export class Challenge {
     public readonly reason: ChallengeReason,
     public readonly cancelable: boolean,
     public readonly _heading?: string,
-    public readonly _subheading?: string,
+    public readonly _subheading?: string
   ) {
     Object.freeze(this);
   }
@@ -97,7 +96,6 @@ export class Challenge {
           return ChallengeStrings.ChangePasscode;
         case ChallengeReason.ChangeAutolockInterval:
           return ChallengeStrings.ChangeAutolockInterval;
-        case ChallengeReason.Custom:
         case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         case ChallengeReason.RevokeSession:
@@ -106,6 +104,12 @@ export class Challenge {
           return ChallengeStrings.AccessBatchManager;
         case ChallengeReason.ImportEncryptedFile:
           return ChallengeStrings.ImportEncryptedFile;
+        case ChallengeReason.ExportDecryptedBackup:
+          return ChallengeStrings.ExportDecryptedBackup;
+        case ChallengeReason.DisableBiometrics:
+          return ChallengeStrings.DisableBiometrics;
+        case ChallengeReason.Custom:
+          return '';
         default:
           return assertUnreachable(this.reason);
       }
@@ -150,7 +154,7 @@ export class ChallengePrompt {
     public readonly placeholder?: string,
     public readonly secureTextEntry = true,
     public readonly keyboardType?: ChallengeKeyboardType,
-    public readonly initialValue?: ChallengeRawValue,
+    public readonly initialValue?: ChallengeRawValue
   ) {
     Object.freeze(this);
   }
@@ -181,7 +185,7 @@ export class ChallengePrompt {
 export class ChallengeValue {
   constructor(
     public readonly prompt: ChallengePrompt,
-    public readonly value: ChallengeRawValue,
+    public readonly value: ChallengeRawValue
   ) {
     Object.freeze(this);
   }
@@ -191,7 +195,7 @@ export class ChallengeResponse {
   constructor(
     public readonly challenge: Challenge,
     public readonly values: ChallengeValue[],
-    public readonly artifacts?: ChallengeArtifacts,
+    public readonly artifacts?: ChallengeArtifacts
   ) {
     Object.freeze(this);
   }
@@ -206,7 +210,9 @@ export class ChallengeResponse {
 
   getDefaultValue(): ChallengeValue {
     if (this.values.length > 1) {
-      throw Error('Attempting to retrieve default response value when more than one value exists');
+      throw Error(
+        'Attempting to retrieve default response value when more than one value exists'
+      );
     }
     return this.values[0];
   }

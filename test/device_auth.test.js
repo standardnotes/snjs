@@ -4,13 +4,13 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('device authentication', () => {
+describe('device authentication', function () {
 
-  before(async () => {
+  before(async function () {
     localStorage.clear();
   });
 
-  after(async () => {
+  after(async function () {
     localStorage.clear();
   });
 
@@ -19,10 +19,10 @@ describe('device authentication', () => {
     const application = await Factory.createAndInitializeApplication(namespace);
     const passcode = 'foobar';
     const wrongPasscode = 'barfoo';
-    expect((await application.challengeService.getLaunchChallenge())).to.not.be.ok;
+    expect((await application.protectionService.createLaunchChallenge())).to.not.be.ok;
     await application.setPasscode(passcode);
     expect(await application.hasPasscode()).to.equal(true);
-    expect((await application.challengeService.getLaunchChallenge())).to.be.ok;
+    expect((await application.protectionService.createLaunchChallenge())).to.be.ok;
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.deinit();
 
@@ -63,9 +63,9 @@ describe('device authentication', () => {
     const passcode = 'foobar';
     const wrongPasscode = 'barfoo';
     await application.setPasscode(passcode);
-    await application.challengeService.enableBiometrics();
+    await application.protectionService.enableBiometrics();
     expect(await application.hasPasscode()).to.equal(true);
-    expect(((await application.challengeService.getLaunchChallenge()).prompts.length)).to.equal(2);
+    expect(((await application.protectionService.createLaunchChallenge()).prompts.length)).to.equal(2);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.deinit();
 
@@ -97,7 +97,7 @@ describe('device authentication', () => {
     };
     await tmpApplication.prepareForLaunch({ receiveChallenge });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
-    expect(((await tmpApplication.challengeService.getLaunchChallenge()).prompts.length)).to.equal(2);
+    expect(((await tmpApplication.protectionService.createLaunchChallenge()).prompts.length)).to.equal(2);
     await tmpApplication.launch(true);
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
     expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);

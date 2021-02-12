@@ -9,7 +9,7 @@ import { PureService } from '@Lib/services/pure_service';
 import { SNLog } from '@Lib/log';
 import { SNNote } from '@Lib/models';
 import { SNProtocolService } from './protocol_service';
-import { SNStorageService } from '@Services/storage_service';
+import { SNStorageService, StorageValueModes } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@Lib/utils';
 
@@ -67,6 +67,65 @@ export class SNProtectionService extends PureService {
     super.deinit();
   }
 
+  public hasBiometricsEnabled(): boolean {
+    const biometricsState = this.storageService.getValue(
+      StorageKey.BiometricsState,
+      StorageValueModes.Nonwrapped
+    );
+    return Boolean(biometricsState);
+  }
+
+  public async enableBiometrics(): Promise<boolean> {
+    if (this.hasBiometricsEnabled()) {
+      SNLog.onError(
+        Error('Tried to enable biometrics when they already are enabled.')
+      );
+      return false;
+    }
+    await this.storageService.setValue(
+      StorageKey.BiometricsState,
+      true,
+      StorageValueModes.Nonwrapped
+    );
+    return true;
+  }
+
+  public async disableBiometrics(): Promise<boolean> {
+    if (!this.hasBiometricsEnabled()) {
+      SNLog.onError(
+        Error('Tried to disable biometrics when they already are disabled.')
+      );
+      return false;
+    }
+    if (await this.validateOrRenewSession(ChallengeReason.DisableBiometrics)) {
+      await this.storageService.setValue(
+        StorageKey.BiometricsState,
+        false,
+        StorageValueModes.Nonwrapped
+      );
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public createLaunchChallenge(): Challenge | null {
+    const prompts: ChallengePrompt[] = [];
+    if (this.hasBiometricsEnabled()) {
+      prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
+    }
+    if (this.protocolService.hasPasscode()) {
+      prompts.push(
+        new ChallengePrompt(ChallengeValidation.LocalPasscode)
+      );
+    }
+    if (prompts.length > 0) {
+      return new Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
+    } else {
+      return null;
+    }
+  }
+
   async authorizeNoteAccess(note: SNNote): Promise<boolean> {
     if (!note.protected) {
       return true;
@@ -77,6 +136,12 @@ export class SNProtectionService extends PureService {
 
   async authorizeFileImport(): Promise<boolean> {
     return this.validateOrRenewSession(ChallengeReason.ImportFile);
+  }
+
+  async authorizeDecryptedBackupCreation(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.ExportDecryptedBackup, {
+      fallBackToAccountPassword: false,
+    });
   }
 
   async authorizeAutolockIntervalChange(): Promise<boolean> {
@@ -92,25 +157,24 @@ export class SNProtectionService extends PureService {
   }
 
   private async validateOrRenewSession(
-    reason: ChallengeReason
+    reason: ChallengeReason,
+    { fallBackToAccountPassword = true } = {}
   ): Promise<boolean> {
-    if ((await this.getSessionExpirey()) > new Date()) {
+    if ((await this.getSessionExpiryDate()) > new Date()) {
       return true;
     }
 
     const prompts: ChallengePrompt[] = [];
-    if (await this.challengeService.hasBiometricsEnabled()) {
+    if (this.hasBiometricsEnabled()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
     }
     if (this.protocolService.hasPasscode()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
     }
     if (prompts.length === 0) {
-      if (this.protocolService.hasAccount()) {
-        /** Add account password as a bare-minimum safety check */
+      if (fallBackToAccountPassword && this.protocolService.hasAccount()) {
         prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
       } else {
-        /** No protection set up; grant access */
         return true;
       }
     }
@@ -148,6 +212,21 @@ export class SNProtectionService extends PureService {
     }
   }
 
+  public async getSessionExpiryDate(): Promise<Date> {
+    const expiresAt = await this.storageService.getValue(
+      StorageKey.ProtectionExpirey
+    );
+    if (expiresAt) {
+      return new Date(expiresAt);
+    } else {
+      return new Date();
+    }
+  }
+
+  public clearSession(): Promise<void> {
+    return this.setSessionLength(ProtectionSessionLengthSeconds.None);
+  }
+
   private async getSessionLength(): Promise<number> {
     const length = await this.storageService.getValue(
       StorageKey.ProtectionSessionLength
@@ -169,16 +248,5 @@ export class SNProtectionService extends PureService {
       StorageKey.ProtectionSessionLength,
       length
     );
-  }
-
-  private async getSessionExpirey(): Promise<Date> {
-    const expiresAt = await this.storageService.getValue(
-      StorageKey.ProtectionExpirey
-    );
-    if (expiresAt) {
-      return new Date(expiresAt);
-    } else {
-      return new Date();
-    }
   }
 }

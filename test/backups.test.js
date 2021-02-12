@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('backups', () => {
+describe('backups', function () {
 
   before(async function () {
     localStorage.clear();
@@ -69,8 +69,10 @@ describe('backups', () => {
 
   it('passcode + account backup file should have correct number of items', async function () {
     this.timeout(10000);
+    const passcode = 'passcode';
     await this.application.register(this.email, this.password);
-    await this.application.setPasscode('passcode');
+    await this.application.setPasscode(passcode);
+    Factory.handlePasswordChallenges(this.application, passcode);
     await Factory.createSyncedNote(this.application);
     await Factory.createSyncedNote(this.application);
     let backupData = await this.application.createBackupFile(

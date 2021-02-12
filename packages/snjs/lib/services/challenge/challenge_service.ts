@@ -1,10 +1,7 @@
-import { SNRootKey } from './../../protocol/root_key';
 import { ChallengePrompt } from './../../challenges';
 import { SNProtocolService } from "../protocol_service";
 import { SNStorageService } from "../storage_service";
 import { PureService } from "@Lib/services/pure_service";
-import { StorageKey } from "@Lib/storage_keys";
-import { StorageValueModes } from "@Services/storage_service";
 import {
   Challenge,
   ChallengeArtifacts,
@@ -15,7 +12,6 @@ import {
 } from "@Lib/challenges";
 import { ChallengeOperation } from "./challenge_operation";
 import { removeFromArray } from '@Lib/utils';
-import { ChallengeStrings } from '../api/messages';
 import { isValidProtectionSessionLength } from '../protection_service';
 
 type ChallengeValidationResponse = {
@@ -88,23 +84,6 @@ export class ChallengeService extends PureService {
     }
   }
 
-  public async getLaunchChallenge() {
-    const prompts = [];
-    const hasPasscode = this.protocolService!.hasPasscode();
-    if (hasPasscode) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode, undefined, ChallengeStrings.LocalPasscodePlaceholder));
-    }
-    const biometricEnabled = await this.hasBiometricsEnabled()
-    if (biometricEnabled) {
-      prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
-    }
-    if (prompts.length > 0) {
-      return new Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
-    } else {
-      return null;
-    }
-  }
-
   public async promptForCorrectPasscode(
     reason: ChallengeReason,
   ): Promise<string | undefined> {
@@ -146,30 +125,6 @@ export class ChallengeService extends PureService {
 
   public isPasscodeLocked() {
     return this.protocolService!.rootKeyNeedsUnwrapping();
-  }
-
-  public async hasBiometricsEnabled() {
-    const biometricsState = await this.storageService!.getValue(
-      StorageKey.BiometricsState,
-      StorageValueModes.Nonwrapped
-    );
-    return Boolean(biometricsState);
-  }
-
-  public async enableBiometrics() {
-    await this.storageService!.setValue(
-      StorageKey.BiometricsState,
-      true,
-      StorageValueModes.Nonwrapped
-    );
-  }
-
-  public async disableBiometrics() {
-    await this.storageService!.setValue(
-      StorageKey.BiometricsState,
-      false,
-      StorageValueModes.Nonwrapped
-    );
   }
 
   public addChallengeObserver(

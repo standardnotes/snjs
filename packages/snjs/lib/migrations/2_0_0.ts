@@ -149,7 +149,6 @@ export class Migration2_0_0 extends Migration {
       const mk = await this.services.deviceInterface.getRawStorageValue('mk');
       if (ak || mk) {
         const version = (rawAccountKeyParams as any)?.version || await this.getFallbackRootKeyVersion();
-        const sp = await this.services.deviceInterface.getRawStorageValue('pw');
         const accountKey = await SNRootKey.Create(
           {
             masterKey: mk!,

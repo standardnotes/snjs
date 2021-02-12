@@ -220,7 +220,7 @@ describe('protections', function () {
     await this.application.protectionService.setSessionLength(300);
     const length = await this.application.protectionService.getSessionLength();
     expect(length).to.equal(300);
-    const expirey = await this.application.protectionService.getSessionExpirey();
+    const expirey = await this.application.getProtectionSessionExpiryDate();
     expect(expirey).to.be.ok;
   });
 });

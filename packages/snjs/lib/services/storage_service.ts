@@ -1,4 +1,3 @@
-import { ErrorAlertStrings } from './api/messages';
 import { SNAlertService } from './alert_service';
 import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
@@ -47,8 +46,6 @@ export type StorageValuesObject = {
   [ValueModesKeys.Unwrapped]?: ValuesObjectRecord
   [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
 }
-
-type PayloadEncryptionFunction = (payload: PurePayload, intent: EncryptionIntent) => Promise<PurePayload>
 
 /**
  * The storage service is responsible for persistence of both simple key-values, and payload
@@ -259,7 +256,7 @@ export class SNStorageService extends PureService {
     return this.persistValuesToDisk();
   }
 
-  public async getValue(key: string, mode = StorageValueModes.Default, defaultValue?: any) {
+  public getValue(key: string, mode = StorageValueModes.Default, defaultValue?: any) {
     if (!this.values) {
       throw Error(`Attempting to get storage key ${key} before loading local storage.`);
     }
