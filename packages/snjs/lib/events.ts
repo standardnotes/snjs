@@ -4,14 +4,15 @@ export { SyncEvent };
 export enum ApplicationEvent {
   SignedIn = 2,
   SignedOut = 3,
+
   /** When a full, potentially multi-page sync completes */
   CompletedFullSync = 5,
+
   FailedSync = 6,
   HighLatencySync = 7,
   EnteredOutOfSync = 8,
   ExitedOutOfSync = 9,
-  /** When StorageService is ready to start servicing read/write requests */
-  StorageReady = 24,
+
   /**
    * The application has finished it `prepareForLaunch` state and is now ready for unlock
    * Called when the application has initialized and is ready for launch, but before
@@ -20,11 +21,6 @@ export enum ApplicationEvent {
    */
   Started = 10,
 
-  /**
-   * The application has loaded all pending migrations (but not run any, except for the base one),
-   * and consumers may now call `hasPendingMigrations`
-   */
-  MigrationsLoaded = 23,
   /**
    * The applicaiton is fully unlocked and ready for i/o
    * Called when the application has been fully decrypted and unlocked. Use this to
@@ -40,6 +36,7 @@ export enum ApplicationEvent {
    * changes (adding, removing, changing).
    */
   KeyStatusChanged = 13,
+
   MajorDataChange = 14,
   CompletedRestart = 15,
   LocalDataIncrementalLoad = 16,
@@ -48,10 +45,21 @@ export enum ApplicationEvent {
   InvalidSyncSession = 19,
   LocalDatabaseReadError = 20,
   LocalDatabaseWriteError = 21,
+
   /** When a single roundtrip completes with sync, in a potentially multi-page sync request.
    * If just a single roundtrip, this event will be triggered, along with CompletedFullSync */
   CompletedIncrementalSync = 22,
-  PreferencesChanged = 23,
+
+  /**
+   * The application has loaded all pending migrations (but not run any, except for the base one),
+   * and consumers may now call `hasPendingMigrations`
+   */
+  MigrationsLoaded = 23,
+
+  /** When StorageService is ready to start servicing read/write requests */
+  StorageReady = 24,
+
+  PreferencesChanged = 25,
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
