@@ -167,8 +167,8 @@ export class ChallengePrompt {
         this.validates = true;
         break;
       case ChallengeValidation.LocalPasscode:
-        this.title = title ?? PromptTitles.AccountPassword;
-        this.placeholder = placeholder ?? PromptTitles.AccountPassword;
+        this.title = title ?? PromptTitles.LocalPasscode;
+        this.placeholder = placeholder ?? PromptTitles.LocalPasscode;
         this.validates = true;
         break;
       case ChallengeValidation.Biometric:
