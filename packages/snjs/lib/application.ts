@@ -70,6 +70,7 @@ import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
+import { ProtectionEvent } from './services/protection_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -1779,6 +1780,15 @@ export class SNApplication {
       this.protocolService,
       this.challengeService,
       this.storageService
+    );
+    this.serviceObservers.push(
+      this.protectionService.addEventObserver((event) => {
+        if (event === ProtectionEvent.SessionExpiryDateChanged) {
+          void this.notifyEvent(
+            ApplicationEvent.ProtectionSessionExpiryDateChanged
+          );
+        }
+      })
     );
     this.services.push(this.protectionService);
   }

@@ -59,7 +59,7 @@ export abstract class PureService<E = string> {
   * Application instances will call this function directly when they arrive
   * at a certain migratory state.
   */
-  public async handleApplicationStage(_stage: ApplicationStage) {
+  public async handleApplicationStage(_stage: ApplicationStage): Promise<void> {
     // optional override
   }
 

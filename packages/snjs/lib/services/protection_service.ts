@@ -12,6 +12,11 @@ import { SNProtocolService } from './protocol_service';
 import { SNStorageService, StorageValueModes } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@Lib/utils';
+import { ApplicationStage } from '@Lib/stages';
+
+export enum ProtectionEvent {
+  SessionExpiryDateChanged = 'SessionExpiryDateChanged',
+}
 
 enum ProtectionSessionLengthSeconds {
   None = 0,
@@ -51,7 +56,9 @@ export const ProtectionSessionDurations = [
  * like viewing a protected note, as well as managing how long that
  * authentication should be valid for.
  */
-export class SNProtectionService extends PureService {
+export class SNProtectionService extends PureService<ProtectionEvent.SessionExpiryDateChanged> {
+  private sessionExpiryTimeout = -1;
+
   constructor(
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
@@ -65,6 +72,13 @@ export class SNProtectionService extends PureService {
     (this.challengeService as unknown) = undefined;
     (this.storageService as unknown) = undefined;
     super.deinit();
+  }
+
+  handleApplicationStage(stage: ApplicationStage): Promise<void> {
+    if (stage === ApplicationStage.LoadedDatabase_12) {
+      this.updateSessionExpiryTimer(this.getSessionExpiryDate());
+    }
+    return Promise.resolve();
   }
 
   public hasBiometricsEnabled(): boolean {
@@ -115,9 +129,7 @@ export class SNProtectionService extends PureService {
       prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
     }
     if (this.protocolService.hasPasscode()) {
-      prompts.push(
-        new ChallengePrompt(ChallengeValidation.LocalPasscode)
-      );
+      prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
     }
     if (prompts.length > 0) {
       return new Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
@@ -160,7 +172,7 @@ export class SNProtectionService extends PureService {
     reason: ChallengeReason,
     { fallBackToAccountPassword = true } = {}
   ): Promise<boolean> {
-    if ((await this.getSessionExpiryDate()) > new Date()) {
+    if (this.getSessionExpiryDate() > new Date()) {
       return true;
     }
 
@@ -224,7 +236,12 @@ export class SNProtectionService extends PureService {
   }
 
   public clearSession(): Promise<void> {
-    return this.setSessionLength(ProtectionSessionLengthSeconds.None);
+    return this.setSessionExpiryDate(new Date());
+  }
+
+  private async setSessionExpiryDate(date: Date) {
+    await this.storageService.setValue(StorageKey.ProtectionExpirey, date);
+    void this.notifyEvent(ProtectionEvent.SessionExpiryDateChanged);
   }
 
   private async getSessionLength(): Promise<number> {
@@ -241,12 +258,27 @@ export class SNProtectionService extends PureService {
   private async setSessionLength(
     length: ProtectionSessionLengthSeconds
   ): Promise<void> {
-    const expiresAt = new Date();
-    expiresAt.setSeconds(expiresAt.getSeconds() + length);
-    await this.storageService.setValue(StorageKey.ProtectionExpirey, expiresAt);
     await this.storageService.setValue(
       StorageKey.ProtectionSessionLength,
       length
     );
+    const expiresAt = new Date();
+    expiresAt.setSeconds(expiresAt.getSeconds() + length);
+    await this.setSessionExpiryDate(expiresAt);
+    this.updateSessionExpiryTimer(expiresAt);
+  }
+
+  private updateSessionExpiryTimer(expiryDate: Date) {
+    const expiryTime = expiryDate.getTime();
+    if (expiryTime > Date.now()) {
+      const timer: TimerHandler = () => {
+        void this.setSessionExpiryDate(new Date());
+      };
+      clearTimeout(this.sessionExpiryTimeout);
+      this.sessionExpiryTimeout = setTimeout(
+        timer,
+        expiryTime - Date.now()
+      );
+    }
   }
 }
