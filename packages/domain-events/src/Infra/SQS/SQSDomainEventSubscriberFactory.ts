@@ -15,13 +15,13 @@ export class SQSDomainEventSubscriberFactory implements DomainEventSubscriberFac
 
   create (): DomainEventSubscriberInterface {
     const sqsConsumer = Consumer.create({
-        attributeNames: ['All'],
-        messageAttributeNames: ['compression', 'event'],
-        queueUrl: this.queueUrl,
-        sqs: this.sqs,
-        handleMessage:
-          /* istanbul ignore next */
-          async (message: SQSMessage) => await this.domainEventMessageHandler.handleMessage(<string> message.Body)
+      attributeNames: ['All'],
+      messageAttributeNames: ['compression', 'event'],
+      queueUrl: this.queueUrl,
+      sqs: this.sqs,
+      handleMessage:
+        /* istanbul ignore next */
+        async (message: SQSMessage) => await this.domainEventMessageHandler.handleMessage(<string> message.Body)
     })
 
     sqsConsumer.on('error', this.domainEventMessageHandler.handleError.bind(this.domainEventMessageHandler))
