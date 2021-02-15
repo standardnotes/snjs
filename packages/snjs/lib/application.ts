@@ -776,21 +776,21 @@ export class SNApplication {
     return this.protocolService!.getEncryptionDisplayName();
   }
 
-  public getUserVersion() {
-    return this.protocolService!.getUserVersion();
+  public getUserVersion(): Promise<ProtocolVersion | undefined> {
+    return this.protocolService.getUserVersion();
   }
 
   /**
    * Returns true if there is an upgrade available for the account or passcode
    */
-  public async protocolUpgradeAvailable() {
-    return this.protocolService!.upgradeAvailable();
+  public async protocolUpgradeAvailable(): Promise<boolean> {
+    return this.protocolService.upgradeAvailable();
   }
 
   /**
    * Returns true if there is an encryption source available
    */
-  public isEncryptionAvailable() {
+  public isEncryptionAvailable(): boolean {
     return this.hasAccount() || this.hasPasscode();
   }
 
@@ -817,11 +817,11 @@ export class SNApplication {
       ));
     }
     const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade, true);
-    const response = await this.challengeService!.promptForChallengeResponse(challenge);
+    const response = await this.challengeService.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true };
     }
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+    const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       UPGRADING_ENCRYPTION
     );
@@ -859,16 +859,22 @@ export class SNApplication {
     }
   }
 
-  public async upgradeProtocolVersion() {
+  public async upgradeProtocolVersion(): Promise<{
+    success?: true,
+    canceled?: true,
+    error?: {
+      message: string
+    }
+  }> {
     const result = await this.performProtocolUpgrade();
     if (result.success) {
       if (this.hasAccount()) {
-        this.alertService!.alert(ProtocolUpgradeStrings.SuccessAccount);
+        void this.alertService.alert(ProtocolUpgradeStrings.SuccessAccount);
       } else {
-        this.alertService!.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
+        void this.alertService.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
       }
     } else if (result.error) {
-      this.alertService!.alert(ProtocolUpgradeStrings.Fail);
+      void this.alertService.alert(ProtocolUpgradeStrings.Fail);
     }
     return result;
   }
@@ -878,7 +884,7 @@ export class SNApplication {
   }
 
   public hasAccount(): boolean {
-    return this.protocolService!.hasAccount();
+    return this.protocolService.hasAccount();
   }
 
   public getProtectionSessionExpiryDate(): Date {
