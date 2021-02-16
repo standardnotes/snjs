@@ -487,3 +487,14 @@ export async function sleep(milliseconds: number) {
 export function assertUnreachable(uncheckedCase: never): never {
   throw Error("Unchecked case " + uncheckedCase);
 }
+
+/**
+ * Returns a boolean representing whether two dates are on the same day
+ */
+export function isSameDay(dateA: Date, dateB: Date) {
+  return (
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate()
+  );
+}
