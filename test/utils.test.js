@@ -159,7 +159,7 @@ describe('utils', () => {
   });
 
   describe('isSameDay', () => {
-    it('Returns true if two dates are on the same day', () => {
+    it('returns true if two dates are on the same day', () => {
       const dateA = new Date(2021, 1, 16, 16, 30, 0);
       const dateB = new Date(2021, 1, 16, 17, 30, 0);
 
@@ -167,7 +167,7 @@ describe('utils', () => {
       expect(result).to.equal(true);
     });
 
-    it('Returns false if two dates are not on the same day', () => {
+    it('returns false if two dates are not on the same day', () => {
       const dateA = new Date(2021, 1, 16, 16, 30, 0);
       const dateB = new Date(2021, 1, 17, 17, 30, 0);
 
