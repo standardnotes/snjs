@@ -223,4 +223,106 @@ describe('protections', function () {
     const expirey = await this.application.getProtectionSessionExpiryDate();
     expect(expirey).to.be.ok;
   });
+
+  it('handles session length', async function () {
+    this.application = await Factory.createInitAppWithRandNamespace();
+    await this.application.protectionService.setSessionLength(300);
+    const length = await this.application.protectionService.getSessionLength();
+    expect(length).to.equal(300);
+    const expirey = await this.application.getProtectionSessionExpiryDate();
+    expect(expirey).to.be.ok;
+  });
+
+  describe('hasProtectionSources', async function () {
+
+    it('no account, no passcode, no biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      expect(this.application.hasProtectionSources()).to.be.false;
+    });
+
+    it('no account, no passcode, biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await this.application.enableBiometrics();
+      expect(this.application.hasProtectionSources()).to.be.true;
+    });
+
+    it('no account, passcode, no biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await this.application.setPasscode('passcode');
+      expect(this.application.hasProtectionSources()).to.be.true;
+    });
+
+    it('no account, passcode, biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await this.application.setPasscode('passcode');
+      await this.application.enableBiometrics();
+      expect(this.application.hasProtectionSources()).to.be.true;
+    });
+
+    it('account, no passcode, no biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: Uuid.GenerateUuidSynchronously(),
+        password: Uuid.GenerateUuidSynchronously(),
+      });
+      expect(this.application.hasProtectionSources()).to.be.true
+    });
+
+    it('account, no passcode, biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: Uuid.GenerateUuidSynchronously(),
+        password: Uuid.GenerateUuidSynchronously(),
+      });
+      await this.application.enableBiometrics();
+      expect(this.application.hasProtectionSources()).to.be.true
+    });
+
+    it('account, passcode, no biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: Uuid.GenerateUuidSynchronously(),
+        password: Uuid.GenerateUuidSynchronously(),
+      });
+      await this.application.setPasscode('passcode');
+      expect(this.application.hasProtectionSources()).to.be.true
+    });
+
+    it('account, passcode, biometrics', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: Uuid.GenerateUuidSynchronously(),
+        password: Uuid.GenerateUuidSynchronously(),
+      });
+      await this.application.setPasscode('passcode');
+      await this.application.enableBiometrics();
+      expect(this.application.hasProtectionSources()).to.be.true
+    });
+  });
+
+
+  describe('areProtectionsEnabled', async function () {
+
+    it('should return true when session length has not been set', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await this.application.setPasscode('passcode');
+      expect(this.application.areProtectionsEnabled()).to.be.true;
+    });
+
+    it('should return false when session length has been set', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      await this.application.setPasscode('passcode');
+      await this.application.protectionService.setSessionLength(300);
+      expect(this.application.areProtectionsEnabled()).to.be.false;
+    });
+
+    it('should return false when there are no protection sources', async function () {
+      this.application = await Factory.createInitAppWithRandNamespace();
+      expect(this.application.areProtectionsEnabled()).to.be.false;
+    });
+  });
 });
