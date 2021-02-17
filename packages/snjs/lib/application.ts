@@ -889,8 +889,8 @@ export class SNApplication {
   }
 
   /**
-   * If a user does not have any protection source it may not be relevant to
-   * show them any information related to them.
+   * Use this method if you do not want to display protections-related
+   * information to a user who cannot currently exploit the feature.
    */
   public hasProtectionSources(): boolean {
     return this.protectionService.hasProtectionSources();
