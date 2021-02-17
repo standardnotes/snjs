@@ -888,6 +888,10 @@ export class SNApplication {
     return this.protocolService.hasAccount();
   }
 
+  public hasProtections(): boolean {
+    return this.hasAccount() || this.hasPasscode() || this.hasBiometrics();
+  }
+
   public getProtectionSessionExpiryDate(): Date {
     return this.protectionService.getSessionExpiryDate();
   }
@@ -1398,10 +1402,6 @@ export class SNApplication {
 
   public isLaunched(): boolean {
     return this.launched;
-  }
-
-  public hasProtections(): boolean {
-    return this.hasAccount() || this.hasPasscode() || this.hasBiometrics();
   }
 
   public hasBiometrics(): boolean {
