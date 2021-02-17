@@ -893,11 +893,11 @@ export class SNApplication {
    * show them any information related to them.
    */
   public hasProtectionSources(): boolean {
-    return this.hasAccount() || this.hasPasscode() || this.hasBiometrics();
+    return this.protectionService.hasProtectionSources();
   }
 
   public areProtectionsEnabled(): boolean {
-    return this.protectionService.getSessionExpiryDate() <= new Date();
+    return this.protectionService.areProtectionsEnabled();
   }
 
   /**

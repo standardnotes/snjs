@@ -89,6 +89,12 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     );
   }
 
+  public areProtectionsEnabled(): boolean {
+    return (
+      this.hasProtectionSources() && this.getSessionExpiryDate() <= new Date()
+    );
+  }
+
   public hasBiometricsEnabled(): boolean {
     const biometricsState = this.storageService.getValue(
       StorageKey.BiometricsState,
