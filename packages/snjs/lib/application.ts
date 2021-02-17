@@ -892,6 +892,10 @@ export class SNApplication {
     return this.hasAccount() || this.hasPasscode() || this.hasBiometrics();
   }
 
+  public areProtectionsEnabled(): boolean {
+    return this.protectionService.getSessionExpiryDate() <= new Date();
+  }
+
   public getProtectionSessionExpiryDate(): Date {
     return this.protectionService.getSessionExpiryDate();
   }
