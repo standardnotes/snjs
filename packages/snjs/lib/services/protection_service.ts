@@ -81,6 +81,14 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return Promise.resolve();
   }
 
+  public hasProtectionSources(): boolean {
+    return (
+      this.protocolService.hasAccount() ||
+      this.protocolService.hasPasscode() ||
+      this.hasBiometricsEnabled()
+    );
+  }
+
   public hasBiometricsEnabled(): boolean {
     const biometricsState = this.storageService.getValue(
       StorageKey.BiometricsState,
@@ -275,10 +283,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
         void this.setSessionExpiryDate(new Date());
       };
       clearTimeout(this.sessionExpiryTimeout);
-      this.sessionExpiryTimeout = setTimeout(
-        timer,
-        expiryTime - Date.now()
-      );
+      this.sessionExpiryTimeout = setTimeout(timer, expiryTime - Date.now());
     }
   }
 }

@@ -888,7 +888,11 @@ export class SNApplication {
     return this.protocolService.hasAccount();
   }
 
-  public hasProtections(): boolean {
+  /**
+   * If a user does not have any protection source it may not be relevant to
+   * show them any information related to them.
+   */
+  public hasProtectionSources(): boolean {
     return this.hasAccount() || this.hasPasscode() || this.hasBiometrics();
   }
 
@@ -896,6 +900,10 @@ export class SNApplication {
     return this.protectionService.getSessionExpiryDate() <= new Date();
   }
 
+  /**
+   * When a user specifies a non-zero remember duration on a protection
+   * challenge, a session will be started during which protections are disabled.
+   */
   public getProtectionSessionExpiryDate(): Date {
     return this.protectionService.getSessionExpiryDate();
   }
