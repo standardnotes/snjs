@@ -1400,6 +1400,10 @@ export class SNApplication {
     return this.launched;
   }
 
+  public hasProtections(): boolean {
+    return this.hasAccount() || this.hasPasscode() || this.hasBiometrics();
+  }
+
   public hasBiometrics(): boolean {
     return this.protectionService.hasBiometricsEnabled()
   }
