@@ -888,6 +888,22 @@ export class SNApplication {
     return this.protocolService.hasAccount();
   }
 
+  /**
+   * @returns true if the user has a source of protection available, such as a
+   * passcode, password, or biometrics.
+   */
+  public hasProtectionSources(): boolean {
+    return this.protectionService.hasProtectionSources();
+  }
+
+  public areProtectionsEnabled(): boolean {
+    return this.protectionService.areProtectionsEnabled();
+  }
+
+  /**
+   * When a user specifies a non-zero remember duration on a protection
+   * challenge, a session will be started during which protections are disabled.
+   */
   public getProtectionSessionExpiryDate(): Date {
     return this.protectionService.getSessionExpiryDate();
   }
@@ -1398,10 +1414,6 @@ export class SNApplication {
 
   public isLaunched(): boolean {
     return this.launched;
-  }
-
-  public hasProtections(): boolean {
-    return this.hasAccount() || this.hasPasscode() || this.hasBiometrics();
   }
 
   public hasBiometrics(): boolean {
