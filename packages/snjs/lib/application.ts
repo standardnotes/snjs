@@ -889,8 +889,8 @@ export class SNApplication {
   }
 
   /**
-   * Use this method if you do not want to display protections-related
-   * information to a user who cannot currently exploit the feature.
+   * @returns true if the user has a source of protection available, such as a
+   * passcode, password, or biometrics.
    */
   public hasProtectionSources(): boolean {
     return this.protectionService.hasProtectionSources();
