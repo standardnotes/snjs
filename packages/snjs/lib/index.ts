@@ -98,6 +98,7 @@ export {
   getGlobalScope,
   greaterOfTwoDates,
   isNullOrUndefined,
+  isSameDay,
   jsonParseEmbeddedKeys,
   omitUndefinedCopy,
   removeFromArray,
