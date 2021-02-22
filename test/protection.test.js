@@ -57,13 +57,19 @@ describe('protections', function () {
     });
 
     let note = await Factory.createMappedNote(this.application);
-    note = await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.protected = true;
-    });
+    note = await this.application.protectNote(note);
 
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
     expect(challengePrompts).to.equal(1);
   });
+
+  it('sets `note.protected` to true', async function () {
+    this.application = await Factory.createInitAppWithRandNamespace();
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.protectNote(note);
+    expect(note.protected).to.be.true;
+  });
+
 
   it('prompts for passcode when accessing protected note', async function () {
     const passcode = 'passcode🌂';
@@ -95,11 +101,68 @@ describe('protections', function () {
 
     await this.application.setPasscode(passcode);
     let note = await Factory.createMappedNote(this.application);
-    note = await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.protected = true;
-    });
+    note = await this.application.protectNote(note);
 
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
+    expect(challengePrompts).to.equal(1);
+  });
+
+  it('prompts for passcode when unprotecting a note', async function () {
+    const passcode = 'passcode🌂';
+    let challengePrompts = 0;
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        challengePrompts += 1;
+        expect(
+          challenge.prompts.find(
+            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+          )
+        ).to.be.ok;
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.LocalPasscode
+                ? passcode
+                : 0
+            )
+        );
+
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+    let note = await Factory.createMappedNote(this.application);
+    const uuid = note.uuid;
+    note = await this.application.protectNote(note);
+    note = await this.application.unprotectNote(note);
+    expect(note.uuid).to.equal(uuid);
+    expect(note.protected).to.equal(false);
+    expect(challengePrompts).to.equal(1);
+  });
+
+  it('does not unprotect note if challenge is canceled', async function () {
+    const passcode = 'passcode🌂';
+    let challengePrompts = 0;
+
+    this.application = await Factory.createApplication(Factory.randomString());
+    await this.application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        challengePrompts++;
+        this.application.cancelChallenge(challenge);
+      },
+    });
+    await this.application.launch(true);
+
+    await this.application.setPasscode(passcode);
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.protectNote(note);
+    const result = await this.application.unprotectNote(note);
+    expect(result).to.be.undefined;
     expect(challengePrompts).to.equal(1);
   });
 
@@ -133,9 +196,7 @@ describe('protections', function () {
 
     await this.application.setPasscode(passcode);
     let note = await Factory.createMappedNote(this.application);
-    note = await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.protected = true;
-    });
+    note = await this.application.protectNote(note);
 
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
@@ -145,10 +206,8 @@ describe('protections', function () {
   it('authorizes note access when no password or passcode are set', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
 
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.protected = true;
-    });
+    let note = await Factory.createMappedNote(this.application);
+    note = await this.application.protectNote(note);
 
     expect(await this.application.authorizeNoteAccess(note)).to.be.true;
   });
