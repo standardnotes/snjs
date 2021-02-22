@@ -59,7 +59,8 @@ export abstract class PureService<E = string> {
   * Application instances will call this function directly when they arrive
   * at a certain migratory state.
   */
-  public async handleApplicationStage(_stage: ApplicationStage): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public handleApplicationStage(_stage: ApplicationStage): Promise<void> | void {
     // optional override
   }
 

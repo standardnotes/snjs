@@ -10,6 +10,7 @@ import { PureService } from './pure_service';
 import { SNSingletonManager } from './singleton_manager';
 import { SNSyncService } from './sync/sync_service';
 import { SyncEvent } from './sync/events';
+import { ApplicationStage } from '@Lib/stages';
 
 export class SNPreferencesService extends PureService<'preferencesChanged'> {
   private shouldReload = true;
@@ -44,6 +45,12 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
     this.removeSyncObserver?.();
     (this.singletonManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
+  }
+
+  public handleApplicationStage(stage: ApplicationStage): void {
+    if (stage === ApplicationStage.LoadedDatabase_12) {
+      void this.reload();
+    }
   }
 
   getValue<K extends PrefKey>(
