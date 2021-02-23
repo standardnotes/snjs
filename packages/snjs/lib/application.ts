@@ -658,6 +658,20 @@ export class SNApplication {
     );
   }
 
+  public async protectNote(note: SNNote): Promise<SNNote> {
+    const protectedNote = await this.protectionService.protectNote(note);
+    void this.syncService.sync();
+    return protectedNote;
+  }
+
+  public async unprotectNote(note: SNNote): Promise<SNNote | undefined> {
+    const unprotectedNote = await this.protectionService.unprotectNote(note);
+    if (!isNullOrUndefined(unprotectedNote)) {
+      void this.syncService.sync();
+    }
+    return unprotectedNote;
+  }
+
   public getItems(contentType: ContentType | ContentType[]) {
     return this.itemManager!.getItems(contentType);
   }
@@ -1795,7 +1809,8 @@ export class SNApplication {
     this.protectionService = new SNProtectionService(
       this.protocolService,
       this.challengeService,
-      this.storageService
+      this.storageService,
+      this.itemManager
     );
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {

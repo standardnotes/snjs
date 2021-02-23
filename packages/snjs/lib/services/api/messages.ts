@@ -160,6 +160,7 @@ export const ChallengeStrings = {
   ImportEncryptedFile: 'Enter the account password associated with the import file',
   ExportDecryptedBackup: 'Authentication is required to export a decrypted backup',
   DisableBiometrics: 'Authentication is required to disable biometrics',
+  UnprotectNote: 'Authentication is required to unprotect a note',
 }
 
 export const PromptTitles = {
