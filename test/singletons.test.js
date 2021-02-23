@@ -240,6 +240,37 @@ describe('singletons', function() {
     expect(allPrivs.length).to.equal(1);
   });
 
+  it('keeps server singleton even when a local item is created before sync', async function () {
+    const identifier  = this.application.identifier;
+    await this.registerUser();
+
+    /** Create prefs and associate them with account */
+    const ogPrefs = await insertPrefsPayload(this.application);
+    await this.application.sync(syncOptions);
+
+    /** Remove prefs locally and create a newer one */
+    this.application.lockSyncing();
+    await this.application.itemManager.removeItemLocally(ogPrefs);
+    const localPrefs = await insertPrefsPayload(this.application);
+
+    expect(this.application.findItem(localPrefs.uuid)).to.exist;
+    expect(this.application.findItem(ogPrefs.uuid)).to.not.exist;
+
+    await Factory.sleep(0.05); /** Give the application time to save payloads */
+    await this.application.deinit();
+    this.application = await Factory.createAndInitializeApplication(identifier);
+
+    /**
+     * After restarting and syncing, the instance retrieved from the server
+     * should be the one kept
+     */
+    const latestPrefs = await insertPrefsPayload(this.application);
+    expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
+    expect(this.application.findItem(localPrefs.uuid)).to.not.exist;
+    const allPrivs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
+    expect(allPrivs.length).to.equal(1);
+  });
+
   it('if only result is errorDecrypting, create new item', async function () {
     const item = this.application.itemManager.items.find(
       item => item.content_type === ContentType.UserPrefs
