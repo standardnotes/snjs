@@ -36,7 +36,7 @@ export class SNPreferencesService extends PureService<PreferencesChangedEvent> {
       }
     );
 
-    this.removeSyncObserver = syncService.addEventObserver(async (event) => {
+    this.removeSyncObserver = syncService.addEventObserver((event) => {
       if (event === SyncEvent.FullSyncCompleted) {
         void this.reload();
       }
