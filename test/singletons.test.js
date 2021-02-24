@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js';
+import WebDeviceInterface from './lib/web_device_interface.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -240,7 +241,7 @@ describe('singletons', function() {
     expect(allPrefs.length).to.equal(1);
   });
 
-  it('keeps server singleton even when a local item is created before sync', async function () {
+  it('keeps local singleton when it is created before sync', async function () {
     const identifier  = this.application.identifier;
     await this.registerUser();
 
@@ -249,24 +250,25 @@ describe('singletons', function() {
     await this.application.sync(syncOptions);
 
     /** Remove prefs locally and create a newer one */
-    this.application.lockSyncing();
-    await this.application.itemManager.removeItemLocally(ogPrefs);
-    const localPrefs = await findOrCreatePrefsSingleton(this.application);
+    await this.application.storageService.deletePayloads([ogPrefs]);
+    const localPrefs = createPrefsPayload();
+    await this.application.storageService.savePayloads([localPrefs]);
 
-    expect(this.application.findItem(localPrefs.uuid)).to.exist;
-    expect(this.application.findItem(ogPrefs.uuid)).to.not.exist;
-
-    await Factory.sleep(0.05); /** Give the application time to save payloads */
     await this.application.deinit();
+
+    const deviceInterface = new WebDeviceInterface();
+    const payloads = await deviceInterface.getAllRawDatabasePayloads(identifier);
+    expect(payloads.some(payload => payload.uuid === localPrefs.uuid)).to.be.true;
+    expect(payloads.some(payload => payload.uuid === ogPrefs.uuid)).to.be.false;
+
     this.application = await Factory.createAndInitializeApplication(identifier);
 
     /**
-     * After restarting and syncing, the instance retrieved from the server
-     * should be the one kept
+     * After restarting and syncing, the local instance should be the one kept
      */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application);
-    expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
-    expect(this.application.findItem(localPrefs.uuid)).to.not.exist;
+    expect(latestPrefs.uuid).to.equal(localPrefs.uuid);
+    expect(this.application.findItem(ogPrefs.uuid)).to.not.exist;
     const allPrefs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
     expect(allPrefs.length).to.equal(1);
   });
