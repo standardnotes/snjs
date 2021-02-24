@@ -12,7 +12,10 @@ import { SNSyncService } from './sync/sync_service';
 import { SyncEvent } from './sync/events';
 import { ApplicationStage } from '@Lib/stages';
 
-export class SNPreferencesService extends PureService<'preferencesChanged'> {
+const preferencesChangedEvent = 'preferencesChanged';
+type PreferencesChangedEvent = typeof preferencesChangedEvent;
+
+export class SNPreferencesService extends PureService<PreferencesChangedEvent> {
   private shouldReload = true;
   private reloading = false;
   private preferences?: SNUserPrefs;
@@ -51,9 +54,13 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
   public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
     if (stage === ApplicationStage.LoadedDatabase_12) {
+      /** Try to read preferences singleton from storage */
       this.preferences = this.singletonManager.findSingleton(
         SNUserPrefs.singletonPredicate
       );
+      if (this.preferences) {
+        void this.notifyEvent(preferencesChangedEvent);
+      }
     }
   }
 
@@ -80,7 +87,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
         m.setPref(key, value);
       }
     )) as SNUserPrefs;
-    void this.notifyEvent('preferencesChanged');
+    void this.notifyEvent(preferencesChangedEvent);
     void this.syncService.sync();
   }
 
