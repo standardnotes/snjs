@@ -7,12 +7,14 @@ import {
 import { ChallengeService } from './challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNLog } from '@Lib/log';
-import { SNNote } from '@Lib/models';
+import { NoteMutator, SNNote } from '@Lib/models';
 import { SNProtocolService } from './protocol_service';
 import { SNStorageService, StorageValueModes } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
+import { ItemManager } from './item_manager';
+import { MutationType } from '@Lib/models/core/item';
 
 export enum ProtectionEvent {
   SessionExpiryDateChanged = 'SessionExpiryDateChanged',
@@ -62,7 +64,8 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
   constructor(
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
-    private storageService: SNStorageService
+    private storageService: SNStorageService,
+    private itemManager: ItemManager
   ) {
     super();
   }
@@ -71,6 +74,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     (this.protocolService as unknown) = undefined;
     (this.challengeService as unknown) = undefined;
     (this.storageService as unknown) = undefined;
+    (this.itemManager as unknown) = undefined;
     super.deinit();
   }
 
@@ -149,6 +153,20 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
       return new Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
     } else {
       return null;
+    }
+  }
+
+  protectNote(note: SNNote): Promise<SNNote> {
+    return this.itemManager.changeItem<NoteMutator>(note.uuid, (mutator) => {
+      mutator.protected = true;
+    }) as Promise<SNNote>;
+  }
+
+  async unprotectNote(note: SNNote): Promise<SNNote | undefined> {
+    if (await this.validateOrRenewSession(ChallengeReason.UnprotectNote)) {
+      return this.itemManager.changeItem<NoteMutator>(note.uuid, (mutator) => {
+        mutator.protected = false;
+      }) as Promise<SNNote>;
     }
   }
 

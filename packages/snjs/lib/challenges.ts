@@ -37,6 +37,7 @@ export enum ChallengeReason {
   ImportEncryptedFile,
   ExportDecryptedBackup,
   DisableBiometrics,
+  UnprotectNote,
 }
 
 /** For mobile */
@@ -108,6 +109,8 @@ export class Challenge {
           return ChallengeStrings.ExportDecryptedBackup;
         case ChallengeReason.DisableBiometrics:
           return ChallengeStrings.DisableBiometrics;
+        case ChallengeReason.UnprotectNote:
+          return ChallengeStrings.UnprotectNote;
         case ChallengeReason.Custom:
           return '';
         default:
