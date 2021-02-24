@@ -141,7 +141,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     }
   }
 
-  public createLaunchChallenge(): Challenge | null {
+  public createLaunchChallenge(): Challenge | undefined {
     const prompts: ChallengePrompt[] = [];
     if (this.hasBiometricsEnabled()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.Biometric));
@@ -152,7 +152,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     if (prompts.length > 0) {
       return new Challenge(prompts, ChallengeReason.ApplicationUnlock, false);
     } else {
-      return null;
+      return undefined;
     }
   }
 
