@@ -3,7 +3,7 @@ import { ItemManager } from '@Services/item_manager';
 import { SNPredicate } from '@Models/core/predicate';
 import { SNItem, SingletonStrategy } from '@Models/core/item';
 import { PureService } from '@Lib/services/pure_service';
-import { arrayByRemovingFromIndex, extendArray } from '@Lib/utils';
+import { arrayByRemovingFromIndex, extendArray, isNullOrUndefined } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
@@ -190,14 +190,24 @@ export class SNSingletonManager extends PureService {
     await this.itemManager.setItemsToBeDeleted(Uuids(deleteItems));
   }
 
+  public findSingleton<T extends SNItem>(
+    predicate: SNPredicate
+  ): T | undefined {
+    const matchingItems = this.validItemsMatchingPredicate(predicate);
+    if (matchingItems.length > 0) {
+      return matchingItems[0] as T;
+    }
+    return undefined;
+  }
+
   public async findOrCreateSingleton<T extends SNItem = SNItem>(
     predicate: SNPredicate,
     createContentType: ContentType,
     createContent: PayloadContent
   ): Promise<T> {
-    const matchingItems = this.validItemsMatchingPredicate(predicate);
-    if (matchingItems.length > 0) {
-      return matchingItems[0] as T;
+    const existingSingleton = this.findSingleton<T>(predicate);
+    if (!isNullOrUndefined(existingSingleton)) {
+      return existingSingleton;
     }
     /** Item not found, safe to create after full sync has completed */
     if (!this.syncService.getLastSyncDate()) {

@@ -1,4 +1,4 @@
-import { ContentType, SNPredicate, SNUserPrefs } from '@Lib/models';
+import { ContentType, SNUserPrefs } from '@Lib/models';
 import {
   PrefKey,
   PrefValue,
@@ -51,7 +51,9 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
   public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
     if (stage === ApplicationStage.LoadedDatabase_12) {
-      void this.reload();
+      this.preferences = this.singletonManager.findSingleton(
+        SNUserPrefs.singletonPredicate
+      );
     }
   }
 
@@ -88,12 +90,10 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
     }
     this.reloading = true;
     try {
-      const contentType = ContentType.UserPrefs;
-      const predicate = new SNPredicate('content_type', '=', contentType);
       const previousRef = this.preferences;
       this.preferences = await this.singletonManager.findOrCreateSingleton<SNUserPrefs>(
-        predicate,
-        contentType,
+        SNUserPrefs.singletonPredicate,
+        ContentType.UserPrefs,
         FillItemContent({})
       );
       if (
