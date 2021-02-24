@@ -303,7 +303,7 @@ export class SNApplication {
     // optional override
   }
 
-  public getLaunchChallenge() {
+  public getLaunchChallenge(): Challenge | undefined {
     return this.protectionService.createLaunchChallenge();
   }
 
