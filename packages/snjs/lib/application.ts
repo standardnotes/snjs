@@ -241,7 +241,7 @@ export class SNApplication {
    */
   public async launch(awaitDatabaseLoad = false): Promise<void> {
     this.launched = false;
-    const launchChallenge = this.protectionService.createLaunchChallenge();
+    const launchChallenge = this.getLaunchChallenge();
     if (launchChallenge) {
       const response = await this.challengeService.promptForChallengeResponse(launchChallenge);
       if (!response) {
@@ -301,6 +301,10 @@ export class SNApplication {
 
   public onLaunch(): void {
     // optional override
+  }
+
+  public getLaunchChallenge() {
+    return this.protectionService.createLaunchChallenge();
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
