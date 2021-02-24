@@ -60,7 +60,7 @@ export abstract class PureService<E = string> {
   * at a certain migratory state.
   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public handleApplicationStage(_stage: ApplicationStage): Promise<void> | void {
+  public async handleApplicationStage(_stage: ApplicationStage): Promise<void> {
     // optional override
   }
 

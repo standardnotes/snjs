@@ -45,9 +45,11 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
     this.removeSyncObserver?.();
     (this.singletonManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
+    super.deinit();
   }
 
-  public handleApplicationStage(stage: ApplicationStage): void {
+  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+    await super.handleApplicationStage(stage);
     if (stage === ApplicationStage.LoadedDatabase_12) {
       void this.reload();
     }
