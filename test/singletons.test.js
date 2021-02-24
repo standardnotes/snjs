@@ -23,7 +23,7 @@ describe('singletons', function() {
     return CreateMaxPayloadFromAnyObject(params);
   }
 
-  function insertPrefsPayload(application) {
+  function findOrCreatePrefsSingleton(application) {
     return application.singletonManager.findOrCreateSingleton(
       new SNPredicate('content_type', '=', ContentType.UserPrefs),
       ContentType.UserPrefs,
@@ -202,18 +202,18 @@ describe('singletons', function() {
   it('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
     await this.registerUser();
     /** Create prefs */
-    const ogPrefs = await insertPrefsPayload(this.application);
+    const ogPrefs = await findOrCreatePrefsSingleton(this.application);
     await this.application.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
     /** Create another instance while signed out */
-    await insertPrefsPayload(this.application);
+    await findOrCreatePrefsSingleton(this.application);
     await Factory.loginToApplication({
       application: this.application,
       email: this.email,
       password: this.password
     });
     /** After signing in, the instance retrieved from the server should be the one kept */
-    const latestPrefs = await insertPrefsPayload(this.application);
+    const latestPrefs = await findOrCreatePrefsSingleton(this.application);
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
     const allPrefs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
     expect(allPrefs.length).to.equal(1);
@@ -222,19 +222,19 @@ describe('singletons', function() {
   it('resolving singleton before first sync, then signing in, should result in correct number of instances', async function () {
     await this.registerUser();
     /** Create prefs and associate them with account */
-    const ogPrefs = await insertPrefsPayload(this.application);
+    const ogPrefs = await findOrCreatePrefsSingleton(this.application);
     await this.application.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(this.application);
 
     /** Create another instance while signed out */
-    await insertPrefsPayload(this.application);
+    await findOrCreatePrefsSingleton(this.application);
     await Factory.loginToApplication({
       application: this.application,
       email: this.email,
       password: this.password
     });
     /** After signing in, the instance retrieved from the server should be the one kept */
-    const latestPrefs = await insertPrefsPayload(this.application);
+    const latestPrefs = await findOrCreatePrefsSingleton(this.application);
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
     const allPrefs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
     expect(allPrefs.length).to.equal(1);
@@ -245,13 +245,13 @@ describe('singletons', function() {
     await this.registerUser();
 
     /** Create prefs and associate them with account */
-    const ogPrefs = await insertPrefsPayload(this.application);
+    const ogPrefs = await findOrCreatePrefsSingleton(this.application);
     await this.application.sync(syncOptions);
 
     /** Remove prefs locally and create a newer one */
     this.application.lockSyncing();
     await this.application.itemManager.removeItemLocally(ogPrefs);
-    const localPrefs = await insertPrefsPayload(this.application);
+    const localPrefs = await findOrCreatePrefsSingleton(this.application);
 
     expect(this.application.findItem(localPrefs.uuid)).to.exist;
     expect(this.application.findItem(ogPrefs.uuid)).to.not.exist;
@@ -264,7 +264,7 @@ describe('singletons', function() {
      * After restarting and syncing, the instance retrieved from the server
      * should be the one kept
      */
-    const latestPrefs = await insertPrefsPayload(this.application);
+    const latestPrefs = await findOrCreatePrefsSingleton(this.application);
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
     expect(this.application.findItem(localPrefs.uuid)).to.not.exist;
     const allPrefs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
