@@ -241,7 +241,7 @@ export class SNApplication {
    */
   public async launch(awaitDatabaseLoad = false): Promise<void> {
     this.launched = false;
-    const launchChallenge = this.protectionService.createLaunchChallenge();
+    const launchChallenge = this.getLaunchChallenge();
     if (launchChallenge) {
       const response = await this.challengeService.promptForChallengeResponse(launchChallenge);
       if (!response) {
@@ -301,6 +301,10 @@ export class SNApplication {
 
   public onLaunch(): void {
     // optional override
+  }
+
+  public getLaunchChallenge(): Challenge | undefined {
+    return this.protectionService.createLaunchChallenge();
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
@@ -656,6 +660,20 @@ export class SNApplication {
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined
     );
+  }
+
+  public async protectNote(note: SNNote): Promise<SNNote> {
+    const protectedNote = await this.protectionService.protectNote(note);
+    void this.syncService.sync();
+    return protectedNote;
+  }
+
+  public async unprotectNote(note: SNNote): Promise<SNNote | undefined> {
+    const unprotectedNote = await this.protectionService.unprotectNote(note);
+    if (!isNullOrUndefined(unprotectedNote)) {
+      void this.syncService.sync();
+    }
+    return unprotectedNote;
   }
 
   public getItems(contentType: ContentType | ContentType[]) {
@@ -1795,7 +1813,8 @@ export class SNApplication {
     this.protectionService = new SNProtectionService(
       this.protocolService,
       this.challengeService,
-      this.storageService
+      this.storageService,
+      this.itemManager
     );
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
