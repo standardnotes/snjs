@@ -250,7 +250,7 @@ describe('singletons', function() {
     await this.application.sync(syncOptions);
 
     /** Remove prefs locally and create a newer one */
-    await this.application.storageService.deletePayloads([ogPrefs]);
+    await this.application.storageService.deletePayloads([ogPrefs.payload]);
     const localPrefs = createPrefsPayload();
     await this.application.storageService.savePayloads([localPrefs]);
 
