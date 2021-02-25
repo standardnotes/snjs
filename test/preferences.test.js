@@ -105,24 +105,13 @@ describe('preferences', function () {
     await this.application.deinit();
 
     this.application = Factory.createApplication(identifier);
+    const willSyncPromise = new Promise((resolve) => {
+      this.application.addEventObserver(resolve, ApplicationEvent.WillSync);
+    });
+    Factory.initializeApplication(this.application);
+    await willSyncPromise;
 
-    let preferences;
-    const removeEventObserver = this.application.addEventObserver(() => {
-      preferences = this.application.preferencesService.preferences;
-      removeEventObserver();
-    }, ApplicationEvent.WillSync);
-
-    return new Promise((resolve, reject) => {
-      this.application.addEventObserver(() => {
-        if (preferences) {
-          expect(this.application.getPreference(prefKey)).to.equal(prefValue);
-          resolve();
-        } else {
-          reject(Error('preferences have not been loaded.'));
-        }
-      }, ApplicationEvent.CompletedFullSync);
-
-      Factory.initializeApplication(this.application);
-    })
+    expect(this.application.preferencesService.preferences).to.exist;
+    expect(this.application.getPreference(prefKey)).to.equal(prefValue);
   });
 });
