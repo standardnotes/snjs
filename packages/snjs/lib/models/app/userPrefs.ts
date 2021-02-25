@@ -1,6 +1,7 @@
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 import { SNPredicate } from '@Models/core/predicate';
+import { ContentType } from '../content_types';
 
 export enum PrefKey {
   TagsPanelWidth = 'tagsPanelWidth',
@@ -37,13 +38,18 @@ export type PrefValue = {
 }
 
 export class SNUserPrefs extends SNItem {
+  static singletonPredicate = new SNPredicate(
+    'content_type',
+    '=',
+    ContentType.UserPrefs
+  );
 
   get isSingleton(): true {
     return true;
   }
 
   get singletonPredicate(): SNPredicate {
-    return new SNPredicate('content_type', '=', this.content_type);
+    return SNUserPrefs.singletonPredicate;
   }
 
   getPref<K extends PrefKey>(key: K): PrefValue[K] | undefined {

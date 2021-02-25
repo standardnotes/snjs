@@ -79,7 +79,7 @@ describe('preferences', function () {
     expect(callTimes).to.equal(3);
   });
 
-  it('discards existing preferences when logging in', async function () {
+  it('discards existing preferences when signing in', async function () {
     await register.call(this);
     await this.application.setPreference('editorLeft', 300);
     await this.application.sync();
@@ -91,5 +91,27 @@ describe('preferences', function () {
     await this.application.sync({ awaitAll: true });
     const editorLeft = this.application.getPreference('editorLeft');
     expect(editorLeft).to.equal(300);
+  });
+
+  it('reads stored preferences on start without waiting for syncing to complete', async function () {
+    const prefKey = 'editorLeft';
+    const prefValue = 300;
+    const identifier = this.application.identifier;
+
+    await register.call(this);
+    await this.application.setPreference(prefKey, prefValue);
+    await this.application.sync();
+
+    await this.application.deinit();
+
+    this.application = Factory.createApplication(identifier);
+    const willSyncPromise = new Promise((resolve) => {
+      this.application.addEventObserver(resolve, ApplicationEvent.WillSync);
+    });
+    Factory.initializeApplication(this.application);
+    await willSyncPromise;
+
+    expect(this.application.preferencesService.preferences).to.exist;
+    expect(this.application.getPreference(prefKey)).to.equal(prefValue);
   });
 });
