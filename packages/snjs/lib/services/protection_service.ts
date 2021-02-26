@@ -182,9 +182,9 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return this.validateOrRenewSession(ChallengeReason.ImportFile);
   }
 
-  async authorizeDecryptedBackupCreation(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.ExportDecryptedBackup, {
-      fallBackToAccountPassword: false,
+  async authorizeBackupCreation(encrypted: boolean): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.ExportBackup, {
+      fallBackToAccountPassword: encrypted,
     });
   }
 
