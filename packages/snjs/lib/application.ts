@@ -1051,7 +1051,7 @@ export class SNApplication {
    */
   public async createBackupFile(
     intent: EncryptionIntent,
-    authorizeEncrypted: boolean = false
+    authorizeEncrypted = false
   ): Promise<BackupFile | undefined> {
     const encrypted = intent === EncryptionIntent.FileEncrypted;
     const decrypted = intent === EncryptionIntent.FileDecrypted;
