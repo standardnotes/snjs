@@ -1050,11 +1050,16 @@ export class SNApplication {
    * Creates a JSON-stringifiable backup object of all items.
    */
   public async createBackupFile(
-    intent: EncryptionIntent
+    intent: EncryptionIntent,
+    authorizeEncrypted: boolean = false
   ): Promise<BackupFile | undefined> {
+    const encrypted = intent === EncryptionIntent.FileEncrypted;
+    const decrypted = intent === EncryptionIntent.FileDecrypted;
+    const authorize = encrypted && authorizeEncrypted || decrypted;
+
     if (
-      intent === EncryptionIntent.FileDecrypted &&
-      !(await this.protectionService.authorizeDecryptedBackupCreation())
+      authorize &&
+      !(await this.protectionService.authorizeBackupCreation(encrypted))
     ) {
       return;
     }
