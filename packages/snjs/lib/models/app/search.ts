@@ -8,7 +8,7 @@ export interface SearchPayload {
     sortBy: CollectionSort,
     isReversedSort: "asc"|"dsc"|undefined,
     showArchiveOrTrashed: boolean,
-    hidePinned: boolean, //TODO Consider being showWHATEVEr instead of showArchivedOrTrashed, showPinned (less negating or negating the negation)
+    hidePinned: boolean,
     searchTerm: string
 
 }
