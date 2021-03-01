@@ -11,8 +11,6 @@ export interface NoteContent {
   preview_plain?: string
   preview_html?: string
 }
-
-/** A note item */
 export class SNNote extends SNItem implements NoteContent {
 
   public readonly title!: string
