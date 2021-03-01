@@ -2,7 +2,7 @@ import { SNNote } from "@Lib/models/app/note";
 
 export function notePassesFilter(
     note: SNNote,
-    showArchived: boolean, //TODO Discuss with Mo and Baptiste perhaps showArchivedOrTrashedNotes
+    showArchived: boolean,
     hidePinned: boolean,
     filterText: string
   ) {
