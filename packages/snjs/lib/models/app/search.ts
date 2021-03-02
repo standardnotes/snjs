@@ -15,12 +15,6 @@ export interface SearchPayload {
 
 export class Search {
 
-  /**
-   * This is a static class so instantiation should be impossible.
-   */
-  private constructor() {
-  }
-
   public static create(tag: SNTag,
     sortBy: CollectionSort,
     isReversedSort: "asc" | "dsc",

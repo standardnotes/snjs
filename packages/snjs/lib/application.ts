@@ -74,7 +74,6 @@ import { ProtectionEvent } from './services/protection_service';
 import { notePassesFilter } from './services/search_service';
 import { SearchPayload } from './models/app/search';
 
-
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
 
