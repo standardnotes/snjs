@@ -9,7 +9,7 @@ export interface SearchPayload {
     isReversedSort: "asc"|"dsc"|undefined,
     showArchiveOrTrashed: boolean,
     hidePinned: boolean,
-    searchTerm: string
+    query: string
 
 }
 
@@ -26,14 +26,14 @@ export class Search {
                          isReversedSort: "asc"|"dsc", 
                          showArchivedOrTrashed:boolean, 
                          hidePinned: boolean, 
-                         searchTerm: string) : SearchPayload {
+                         query: string) : SearchPayload {
         return {
             tag:tag,
             sortBy:sortBy,
             isReversedSort:isReversedSort,
             showArchiveOrTrashed:showArchivedOrTrashed,
             hidePinned:hidePinned,
-            searchTerm:searchTerm
+            query:query
         }
     }
 }

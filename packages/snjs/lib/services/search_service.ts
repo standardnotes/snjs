@@ -4,9 +4,8 @@ export function notePassesFilter(
     note: SNNote,
     showArchived: boolean,
     hidePinned: boolean,
-    filterText: string
+    query: string
   ) {
-  
     const canShowArchived = showArchived;
     const canShowPinned = !hidePinned;
     if (
@@ -15,7 +14,7 @@ export function notePassesFilter(
     ) {
       return false;
     }
-    return noteMatchesQuery(note, filterText);
+    return noteMatchesQuery(note, query);
 }
 
 function noteMatchesQuery(
