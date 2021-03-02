@@ -1,20 +1,20 @@
 import { SNNote } from "@Lib/models/app/note";
 
 export function notePassesFilter(
-    note: SNNote,
-    showArchived: boolean,
-    hidePinned: boolean,
-    query: string
+  note: SNNote,
+  showArchived: boolean,
+  hidePinned: boolean,
+  query: string
+) {
+  const canShowArchived = showArchived;
+  const canShowPinned = !hidePinned;
+  if (
+    (note.archived && !canShowArchived) ||
+    (note.pinned && !canShowPinned)
   ) {
-    const canShowArchived = showArchived;
-    const canShowPinned = !hidePinned;
-    if (
-      (note.archived && !canShowArchived) ||
-      (note.pinned && !canShowPinned)
-    ) {
-      return false;
-    }
-    return noteMatchesQuery(note, query);
+    return false;
+  }
+  return noteMatchesQuery(note, query);
 }
 
 function noteMatchesQuery(
@@ -49,7 +49,7 @@ function stringBetweenQuotes(text: string) {
   return matches ? matches[1] : null;
 }
 
-function stringIsUuid(text: string) : boolean {
+function stringIsUuid(text: string): boolean {
   const matches = text.match(
     /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/
   );
