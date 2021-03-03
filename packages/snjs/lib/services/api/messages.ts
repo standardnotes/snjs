@@ -168,6 +168,7 @@ export const PromptTitles = {
   LocalPasscode: 'Application Passcode',
   Biometrics: 'Biometrics',
   RememberFor: 'Remember For',
+  Mfa: 'Two-factor Authentication Code',
 }
 
 export const ErrorAlertStrings = {
