@@ -72,7 +72,7 @@ import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { notePassesFilter } from './services/search_service';
-import { SearchPayload } from './models/app/search';
+import { SearchQuery } from './models/app/search';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -544,10 +544,8 @@ export class SNApplication {
     this.itemManager!.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
-  public setNotesDisplayOptions(
-    search:SearchPayload
-  ) {
-    this.itemManager!.setNotesDisplayOptions(search.tag, search.sortBy, search.isReversedSort, (note:SNNote) => {return notePassesFilter(note,search.showArchiveOrTrashed,search.hidePinned,search.searchTerm)});
+  public setNotesDisplayOptions(search:SearchQuery) {
+    this.itemManager!.setNotesDisplayOptions(search);
   }
 
   public getDisplayableItems(contentType: ContentType) {

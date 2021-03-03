@@ -40,7 +40,7 @@ export type { PrefValue } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from './models/app/component';
-export { Search } from "./models/app/search";
+export type { SearchQuery } from "./models/app/search";
 export { LiveItem } from './models/live_item';
 
 export type { PermissionDialog } from './services/component_manager';
