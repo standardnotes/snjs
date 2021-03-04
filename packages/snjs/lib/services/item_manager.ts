@@ -26,6 +26,8 @@ import { PayloadManager } from './model_manager';
 import { ContentType } from '../models/content_types';
 import { ThemeMutator } from '@Lib/models';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
+import { SearchQuery } from '@Lib/models/app/search';
+import { notePassesFilter } from './search_service';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -99,13 +101,14 @@ export class ItemManager extends PureService {
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
-  public setNotesDisplayOptions(
-    tag?: SNTag,
-    sortBy?: CollectionSort,
-    direction?: SortDirection,
-    filter?: (element: any) => boolean
-  ): void {
-    this.notesView.setDisplayOptions(tag, sortBy, direction, filter);
+  public setNotesDisplayOptions(search:SearchQuery): void {
+    this.notesView.setDisplayOptions(search.tag, search.sortBy,
+      search.direction, (note:any) => {
+        return notePassesFilter(note, 
+                                search.showArchiveOrTrashed,
+                                search.hidePinned,
+                                search.query)
+      })
   }
 
   public getDisplayableItems(contentType: ContentType) {
