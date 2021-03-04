@@ -6,6 +6,9 @@ import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collect
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
+import { PayloadContent } from '@Lib/protocol';
+import { CopyPayload } from '../generator';
+import { ContentType } from '@Lib/models/content_types';
 
 export class DeltaRemoteConflicts extends PayloadsDelta {
 
@@ -56,7 +59,77 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
    */
   private async collectionsByHandlingUuidConflicts() {
     const results: Array<PurePayload> = [];
-    for (const payload of this.applyCollection.all()) {
+
+    const notes = []
+    const tags = []
+    const rest = []
+    for (const item of this.applyCollection.all()
+    ) {
+      if (item.content_type === ContentType.Note) notes.push(item)
+      else if (item.content_type === ContentType.Tag) tags.push(item)
+      else rest.push(item)
+    }
+
+    const noteUuidOldToNew = new Map()
+    for (const payload of notes) {
+      const decrypted = this.findRelatedPayload(
+        payload.uuid!,
+        PayloadSource.DecryptedTransient
+      );
+      if (!decrypted) {
+        this.errorLogMissingDecrypted(payload)
+        continue;
+      }
+
+      const alternateResults = await PayloadsByAlternatingUuid(
+        decrypted,
+        this.baseCollection,
+        false
+      );
+      extendArray(results, alternateResults);
+
+      // note: depends on return order of PayloadsByAlternatingUuid
+      const [updated] = alternateResults
+      noteUuidOldToNew.set(payload.uuid, updated.uuid)
+    }
+
+    for (const payload of tags) {
+      const decrypted = this.findRelatedPayload(
+        payload.uuid!,
+        PayloadSource.DecryptedTransient
+      );
+      if (!decrypted) {
+        this.errorLogMissingDecrypted(payload)
+        continue;
+      }
+
+      const {content} = decrypted
+      const decryptedWithValidRefs = typeof content !== 'string' && typeof content !== 'undefined'?
+        CopyPayload(decrypted, {
+          content: {
+            ...content,
+            references: content.references.map(ref => {
+              const {uuid} = ref
+              return {
+                ...ref,
+                uuid: noteUuidOldToNew.has(uuid)? 
+                  noteUuidOldToNew.get(uuid): 
+                  uuid
+              }
+            })
+          }
+        }): 
+        decrypted
+
+      const alternateResults = await PayloadsByAlternatingUuid(
+        decryptedWithValidRefs,
+        this.baseCollection,
+        false
+      );
+      extendArray(results, alternateResults);
+    }
+
+    for (const payload of rest) {
       /**
        * The payload in question may have been modified as part of alternating a uuid for
        * another item. For example, alternating a uuid for a note will also affect the
@@ -69,8 +142,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         PayloadSource.DecryptedTransient
       );
       if (!decrypted) {
-        SNLog.error(Error('Cannot find decrypted payload in conflict handling'));
-        console.error('Unable to find decrypted counterpart for payload', payload);
+        this.errorLogMissingDecrypted(payload)
         continue;
       }
       const alternateResults = await PayloadsByAlternatingUuid(
@@ -81,5 +153,10 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
     }
 
     return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved);
+  }
+
+  private errorLogMissingDecrypted(payload: PurePayload): void {
+    SNLog.error(Error('Cannot find decrypted payload in conflict handling'));
+    console.error('Unable to find decrypted counterpart for payload', payload);
   }
 }

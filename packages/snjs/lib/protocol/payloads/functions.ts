@@ -107,7 +107,8 @@ export async function PayloadsByDuplicating(
  */
 export async function PayloadsByAlternatingUuid(
   payload: PurePayload,
-  baseCollection: ImmutablePayloadCollection
+  baseCollection: ImmutablePayloadCollection,
+  updateReferencing = true,
 ) {
   const results = [];
   /**
@@ -126,20 +127,22 @@ export async function PayloadsByAlternatingUuid(
   );
   results.push(copy);
 
-  /**
-   * Get the payloads that make reference to payload and remove
-   * payload as a relationship, instead adding the new copy.
-   */
-  const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = await PayloadsByUpdatingReferences(
-    referencing,
-    [{
-      uuid: copy.uuid!,
-      content_type: copy.content_type!
-    }],
-    [payload.uuid!]
-  );
-  extendArray(results, updatedReferencing);
+  if (updateReferencing) {
+    /**
+     * Get the payloads that make reference to payload and remove
+     * payload as a relationship, instead adding the new copy.
+     */
+    const referencing = baseCollection.elementsReferencingElement(payload);
+    const updatedReferencing = await PayloadsByUpdatingReferences(
+      referencing,
+      [{
+        uuid: copy.uuid!,
+        content_type: copy.content_type!
+      }],
+      [payload.uuid!]
+    );
+    extendArray(results, updatedReferencing);
+  }
 
   const updatedSelf = CopyPayload(
     payload,
