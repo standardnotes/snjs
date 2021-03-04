@@ -65,6 +65,20 @@ describe('payload collections', () => {
     expect(collection.conflictsOf(payload.uuid)).to.eql([manualResults]);
   });
 
+  it.skip('setting same element twice should not yeild duplicates', async () => {
+    const collection = new ItemCollection();
+    collection.setDisplayOptions(
+      ContentType.Note,
+      CollectionSort.CreatedAt,
+      'asc'
+    );
+    const payload = Factory.createNotePayload();
+
+    collection.set([payload, payload]);
+    const sorted = collection.displayElements(ContentType.Note);
+    expect(sorted.length).to.equal(1);
+  });
+
   it('display sort asc', async () => {
     const collection = new ItemCollection();
     collection.setDisplayOptions(

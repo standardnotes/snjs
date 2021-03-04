@@ -70,11 +70,6 @@ export class NotesDisplayCriteria {
       const predicate = SNPredicate.CompoundPredicate(userSmartTags.map(t => t.predicate));
       filters.push((note) => {
         if (predicate.keypathIncludesVerb('tags')) {
-          const noteWithTags = {
-            ...note,
-            ...note.payload,
-            tags: collection.elementsReferencingElement(note),
-          }
           /**
            * A note object doesn't come with its tags, so we map the list to
            * flattened note-like objects that also contain
@@ -82,6 +77,11 @@ export class NotesDisplayCriteria {
            * properties is necessary because SNNote has many getters that are
            * proxies to its inner payload object.
            */
+          const noteWithTags = {
+            ...note,
+            ...note.payload,
+            tags: collection.elementsReferencingElement(note),
+          }
           return SNPredicate.ObjectSatisfiesPredicate(noteWithTags, predicate);
         } else {
           return SNPredicate.ObjectSatisfiesPredicate(note, predicate);

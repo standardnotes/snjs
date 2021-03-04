@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('notes and tags', () => {
+describe.only('notes and tags', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {
@@ -348,7 +348,10 @@ describe('notes and tags', () => {
         );
       })
     );
-    this.application.setNotesDisplayOptions(undefined, 'title', 'dsc');
+    this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      criteria.sortProperty = 'title';
+      criteria.sortDirection = 'dsc';
+    }));
     const titles = this.application.getDisplayableItems(ContentType.Note).map(note => note.title);
     expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z']);
   });
@@ -395,7 +398,11 @@ describe('notes and tags', () => {
           ContentType.Note, { title: 'A' }
         )
       );
-      this.application.setNotesDisplayOptions(tag, 'title', 'dsc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'dsc';
+        criteria.tags = [tag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
@@ -412,7 +419,11 @@ describe('notes and tags', () => {
       await this.application.changeItem(trashedNote.uuid, (mutator) => {
         mutator.trashed = true;
       });
-      this.application.setNotesDisplayOptions(tag, 'title', 'dsc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'dsc';
+        criteria.tags = [tag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
@@ -439,7 +450,12 @@ describe('notes and tags', () => {
         }
       });
 
-      this.application.setNotesDisplayOptions(tag, 'title', 'dsc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'dsc';
+        criteria.tags = [tag];
+      }));
+
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.have.length(4);
       expect(displayedNotes[0].title).to.equal('B');
@@ -461,16 +477,23 @@ describe('notes and tags', () => {
         )
       );
 
-      this.application.setNotesDisplayOptions(tag, 'title', 'asc', (note) =>
-        note.safeTitle().includes('A')
-      );
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [tag];
+        criteria.subFilter = (note) => note.safeTitle().includes('A');
+      }));
+
       let displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.have.length(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
 
-      this.application.setNotesDisplayOptions(tag, undefined, undefined, (note) =>
-        note.title.includes('B')
-      );
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = undefined;
+        criteria.sortDirection = undefined;
+        criteria.tags = [tag];
+        criteria.subFilter = (note) => note.safeTitle().includes('B');
+      }));
       displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.have.length(0);
     });
@@ -491,16 +514,21 @@ describe('notes and tags', () => {
       );
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'Foo Notes',
-          predicate: {
-            keypath: 'title',
-            operator: 'startsWith',
-            value: 'Foo'
-          }
+        title: 'Foo Notes',
+        predicate: {
+          keypath: 'title',
+          operator: 'startsWith',
+          value: 'Foo'
         }
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
+
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -523,16 +551,21 @@ describe('notes and tags', () => {
       );
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'Pinned',
-          predicate: {
-            keypath: 'pinned',
-            operator: '=',
-            value: true
-          }
+        title: 'Pinned',
+        predicate: {
+          keypath: 'pinned',
+          operator: '=',
+          value: true
         }
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
+
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -555,16 +588,21 @@ describe('notes and tags', () => {
       );
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'Not pinned',
-          predicate: {
-            keypath: 'pinned',
-            operator: '=',
-            value: false
-          }
+        title: 'Not pinned',
+        predicate: {
+          keypath: 'pinned',
+          operator: '=',
+          value: false
         }
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
+
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -584,16 +622,20 @@ describe('notes and tags', () => {
       );
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'Long',
-          predicate: {
-            keypath: 'text.length',
-            operator: '>',
-            value: 500
-          }
+        title: 'Long',
+        predicate: {
+          keypath: 'text.length',
+          operator: '>',
+          value: 500
         }
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -630,16 +672,20 @@ describe('notes and tags', () => {
       );
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'One day ago',
-          predicate: {
-            keypath: 'updated_at',
-            operator: '>',
-            value: '1.days.ago'
-          }
+        title: 'One day ago',
+        predicate: {
+          keypath: 'updated_at',
+          operator: '>',
+          value: '1.days.ago'
         }
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -660,16 +706,20 @@ describe('notes and tags', () => {
 
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'Untagged',
-          predicate: {
-            keypath: 'tags.length',
-            operator: '=',
-            value: 0
-          }
+        title: 'Untagged',
+        predicate: {
+          keypath: 'tags.length',
+          operator: '=',
+          value: 0
         }
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -690,16 +740,20 @@ describe('notes and tags', () => {
 
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'B-tags',
-          predicate: {
-            keypath: 'tags',
-            operator: 'includes',
-            value: ['title', 'startsWith', 'B']
-          }
+        title: 'B-tags',
+        predicate: {
+          keypath: 'tags',
+          operator: 'includes',
+          value: ['title', 'startsWith', 'B']
         }
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -733,16 +787,20 @@ describe('notes and tags', () => {
 
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'Pinned & Locked',
-          predicate: SNPredicate.FromArray([
-            'ignored',
-            'and',
-            [['pinned', '=', true], ['locked', '=', true]]
-          ])
-        }
+        title: 'Pinned & Locked',
+        predicate: SNPredicate.FromArray([
+          'ignored',
+          'and',
+          [['pinned', '=', true], ['locked', '=', true]]
+        ])
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'title', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'title';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
@@ -782,16 +840,20 @@ describe('notes and tags', () => {
 
       const smartTag = await this.application.insertItem(await this.application.createTemplateItem(
         ContentType.SmartTag, {
-          title: 'Protected or Pinned',
-          predicate: SNPredicate.FromArray([
-            'ignored',
-            'or',
-            [['content.protected', '=', true], ['pinned', '=', true]]
-          ])
-        }
+        title: 'Protected or Pinned',
+        predicate: SNPredicate.FromArray([
+          'ignored',
+          'or',
+          [['content.protected', '=', true], ['pinned', '=', true]]
+        ])
+      }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayOptions(smartTag, 'created_at', 'asc');
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+        criteria.sortProperty = 'created_at';
+        criteria.sortDirection = 'asc';
+        criteria.tags = [smartTag];
+      }));
       const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(matches.length);
       expect(matches.length).to.equal(3);
