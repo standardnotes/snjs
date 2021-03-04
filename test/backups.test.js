@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('backups', () => {
+describe('backups', function () {
 
   before(async function () {
     localStorage.clear();
@@ -37,20 +37,32 @@ describe('backups', () => {
   });
 
   it('no passcode + no account backup file should have correct number of items', async function () {
-    await Factory.createSyncedNote(this.application);
-    await Factory.createSyncedNote(this.application);
+    await Promise.all([
+      Factory.createSyncedNote(this.application),
+      Factory.createSyncedNote(this.application)
+    ]);
     const data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
     expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
   });
 
   it('passcode + no account backup file should have correct number of items', async function () {
-    await this.application.setPasscode('passcode');
+    const passcode = 'passcode';
+    await this.application.setPasscode(passcode);
     await Promise.all([
       Factory.createSyncedNote(this.application),
       Factory.createSyncedNote(this.application)
     ]);
-    const data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
-    expect(data.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
+
+    // Encrypted backup without authorization
+    const encryptedData = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
+    expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
+
+    // Encrypted backup with authorization
+    Factory.handlePasswordChallenges(this.application, passcode);
+    const authorizedEncryptedData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted,
+      true);
+    expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
   });
 
   it('no passcode + account backup file should have correct number of items', async function () {
@@ -59,28 +71,57 @@ describe('backups', () => {
       email: this.email,
       password: this.password,
     });
-    await Factory.createSyncedNote(this.application);
-    await Factory.createSyncedNote(this.application);
-    let data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
-    expect(data.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
-    data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
-    expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
+    await Promise.all([
+      Factory.createSyncedNote(this.application),
+      Factory.createSyncedNote(this.application)
+    ]);
+
+    // Encrypted backup without authorization
+    const encryptedData = await this.application.createBackupFile(EncryptionIntent.FileEncrypted);
+    expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
+
+    // Decrypted backup
+    const decryptedData = await this.application.createBackupFile(EncryptionIntent.FileDecrypted);
+    expect(decryptedData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
+
+    // Encrypted backup with authorization
+    Factory.handlePasswordChallenges(this.application, this.password);
+    const authorizedEncryptedData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted,
+      true);
+    expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
   });
 
   it('passcode + account backup file should have correct number of items', async function () {
     this.timeout(10000);
+    const passcode = 'passcode';
     await this.application.register(this.email, this.password);
-    await this.application.setPasscode('passcode');
-    await Factory.createSyncedNote(this.application);
-    await Factory.createSyncedNote(this.application);
-    let backupData = await this.application.createBackupFile(
+    await this.application.setPasscode(passcode);
+    await Promise.all([
+      Factory.createSyncedNote(this.application),
+      Factory.createSyncedNote(this.application)
+    ]);
+
+    // Encrypted backup without authorization
+    const encryptedData = await this.application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
-    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
-    backupData = await this.application.createBackupFile(
+    expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
+
+    Factory.handlePasswordChallenges(this.application, passcode);
+
+    // Decrypted backup
+    const decryptedData = await this.application.createBackupFile(
       EncryptionIntent.FileDecrypted
     );
-    expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
+    expect(decryptedData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2);
+
+    // Encrypted backup with authorization
+    const authorizedEncryptedData = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted,
+      true
+    );
+    expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2);
   });
 
   it('backup file item should have correct fields', async function () {

@@ -1,4 +1,4 @@
-import { ContentType, SNPredicate, SNUserPrefs } from '@Lib/models';
+import { ContentType, SNUserPrefs } from '@Lib/models';
 import {
   PrefKey,
   PrefValue,
@@ -10,8 +10,12 @@ import { PureService } from './pure_service';
 import { SNSingletonManager } from './singleton_manager';
 import { SNSyncService } from './sync/sync_service';
 import { SyncEvent } from './sync/events';
+import { ApplicationStage } from '@Lib/stages';
 
-export class SNPreferencesService extends PureService<'preferencesChanged'> {
+const preferencesChangedEvent = 'preferencesChanged';
+type PreferencesChangedEvent = typeof preferencesChangedEvent;
+
+export class SNPreferencesService extends PureService<PreferencesChangedEvent> {
   private shouldReload = true;
   private reloading = false;
   private preferences?: SNUserPrefs;
@@ -32,7 +36,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
       }
     );
 
-    this.removeSyncObserver = syncService.addEventObserver(async (event) => {
+    this.removeSyncObserver = syncService.addEventObserver((event) => {
       if (event === SyncEvent.FullSyncCompleted) {
         void this.reload();
       }
@@ -44,6 +48,20 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
     this.removeSyncObserver?.();
     (this.singletonManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
+    super.deinit();
+  }
+
+  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+    await super.handleApplicationStage(stage);
+    if (stage === ApplicationStage.LoadedDatabase_12) {
+      /** Try to read preferences singleton from storage */
+      this.preferences = this.singletonManager.findSingleton(
+        SNUserPrefs.singletonPredicate
+      );
+      if (this.preferences) {
+        void this.notifyEvent(preferencesChangedEvent);
+      }
+    }
   }
 
   getValue<K extends PrefKey>(
@@ -69,7 +87,7 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
         m.setPref(key, value);
       }
     )) as SNUserPrefs;
-    void this.notifyEvent('preferencesChanged');
+    void this.notifyEvent(preferencesChangedEvent);
     void this.syncService.sync();
   }
 
@@ -79,12 +97,10 @@ export class SNPreferencesService extends PureService<'preferencesChanged'> {
     }
     this.reloading = true;
     try {
-      const contentType = ContentType.UserPrefs;
-      const predicate = new SNPredicate('content_type', '=', contentType);
       const previousRef = this.preferences;
       this.preferences = await this.singletonManager.findOrCreateSingleton<SNUserPrefs>(
-        predicate,
-        contentType,
+        SNUserPrefs.singletonPredicate,
+        ContentType.UserPrefs,
         FillItemContent({})
       );
       if (

@@ -3,16 +3,13 @@ import {
   ChallengeStrings,
   PromptTitles,
 } from './services/api/messages';
-import {
-  assertUnreachable,
-  isNullOrUndefined,
-} from './utils';
+import { assertUnreachable, isNullOrUndefined } from './utils';
 import { SNRootKey } from '@Protocol/root_key';
 
 export type ChallengeArtifacts = {
-  wrappingKey?: SNRootKey
-  rootKey?: SNRootKey
-}
+  wrappingKey?: SNRootKey;
+  rootKey?: SNRootKey;
+};
 
 export enum ChallengeValidation {
   None = 0,
@@ -25,25 +22,28 @@ export enum ChallengeValidation {
 /** The source of the challenge */
 export enum ChallengeReason {
   ApplicationUnlock = 1,
-  ResaveRootKey = 2,
-  ProtocolUpgrade = 3,
-  Migration = 4,
-  Custom = 5,
-  AccessProtectedNote = 6,
-  ImportFile = 7,
-  RemovePasscode = 8,
-  ChangePasscode = 9,
-  ChangeAutolockInterval = 10,
-  CreateDecryptedBackupWithProtectedItems = 11,
-  RevokeSession = 12,
-  AccessBatchManager = 13,
-  ImportEncryptedFile = 14,
+  ResaveRootKey,
+  ProtocolUpgrade,
+  Migration,
+  Custom,
+  AccessProtectedNote,
+  ImportFile,
+  RemovePasscode,
+  ChangePasscode,
+  ChangeAutolockInterval,
+  CreateDecryptedBackupWithProtectedItems,
+  RevokeSession,
+  AccessBatchManager,
+  ImportEncryptedFile,
+  ExportBackup,
+  DisableBiometrics,
+  UnprotectNote,
 }
 
 /** For mobile */
 export enum ChallengeKeyboardType {
   Alphanumeric = 'default',
-  Numeric = 'numeric'
+  Numeric = 'numeric',
 }
 
 /**
@@ -58,7 +58,7 @@ export class Challenge {
     public readonly reason: ChallengeReason,
     public readonly cancelable: boolean,
     public readonly _heading?: string,
-    public readonly _subheading?: string,
+    public readonly _subheading?: string
   ) {
     Object.freeze(this);
   }
@@ -97,7 +97,6 @@ export class Challenge {
           return ChallengeStrings.ChangePasscode;
         case ChallengeReason.ChangeAutolockInterval:
           return ChallengeStrings.ChangeAutolockInterval;
-        case ChallengeReason.Custom:
         case ChallengeReason.CreateDecryptedBackupWithProtectedItems:
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         case ChallengeReason.RevokeSession:
@@ -106,6 +105,14 @@ export class Challenge {
           return ChallengeStrings.AccessBatchManager;
         case ChallengeReason.ImportEncryptedFile:
           return ChallengeStrings.ImportEncryptedFile;
+        case ChallengeReason.ExportBackup:
+          return ChallengeStrings.ExportBackup;
+        case ChallengeReason.DisableBiometrics:
+          return ChallengeStrings.DisableBiometrics;
+        case ChallengeReason.UnprotectNote:
+          return ChallengeStrings.UnprotectNote;
+        case ChallengeReason.Custom:
+          return '';
         default:
           return assertUnreachable(this.reason);
       }
@@ -144,44 +151,55 @@ type ChallengeRawValue = number | string | boolean;
  */
 export class ChallengePrompt {
   public readonly id = Math.random();
+  public readonly placeholder: string;
+  public readonly title: string;
+  public readonly validates: boolean;
+
   constructor(
     public readonly validation: ChallengeValidation,
-    public readonly _title?: string,
-    public readonly placeholder?: string,
+    title?: string,
+    placeholder?: string,
     public readonly secureTextEntry = true,
     public readonly keyboardType?: ChallengeKeyboardType,
-    public readonly initialValue?: ChallengeRawValue,
+    public readonly initialValue?: ChallengeRawValue
   ) {
-    Object.freeze(this);
-  }
-
-  public get validates(): boolean {
-    return this.validation !== ChallengeValidation.None;
-  }
-
-  public get title(): string | undefined {
-    if (this._title) {
-      return this._title;
-    }
     switch (this.validation) {
       case ChallengeValidation.AccountPassword:
-        return PromptTitles.AccountPassword;
-      case ChallengeValidation.Biometric:
-        return PromptTitles.Biometrics;
+        this.title = title ?? PromptTitles.AccountPassword;
+        this.placeholder = placeholder ?? PromptTitles.AccountPassword;
+        this.validates = true;
+        break;
       case ChallengeValidation.LocalPasscode:
-        return PromptTitles.LocalPasscode;
+        this.title = title ?? PromptTitles.LocalPasscode;
+        this.placeholder = placeholder ?? PromptTitles.LocalPasscode;
+        this.validates = true;
+        break;
+      case ChallengeValidation.Biometric:
+        this.title = title ?? PromptTitles.Biometrics;
+        this.placeholder = placeholder ?? '';
+        this.validates = true;
+        break;
       case ChallengeValidation.ProtectionSessionDuration:
-        return PromptTitles.RememberFor;
+        this.title = title ?? PromptTitles.RememberFor;
+        this.placeholder = placeholder ?? '';
+        this.validates = true;
+        break;
+      case ChallengeValidation.None:
+        this.title = title ?? '';
+        this.placeholder = placeholder ?? '';
+        this.validates = false;
+        break;
       default:
-        return undefined;
+        assertUnreachable(this.validation);
     }
+    Object.freeze(this);
   }
 }
 
 export class ChallengeValue {
   constructor(
     public readonly prompt: ChallengePrompt,
-    public readonly value: ChallengeRawValue,
+    public readonly value: ChallengeRawValue
   ) {
     Object.freeze(this);
   }
@@ -191,7 +209,7 @@ export class ChallengeResponse {
   constructor(
     public readonly challenge: Challenge,
     public readonly values: ChallengeValue[],
-    public readonly artifacts?: ChallengeArtifacts,
+    public readonly artifacts?: ChallengeArtifacts
   ) {
     Object.freeze(this);
   }
@@ -206,7 +224,9 @@ export class ChallengeResponse {
 
   getDefaultValue(): ChallengeValue {
     if (this.values.length > 1) {
-      throw Error('Attempting to retrieve default response value when more than one value exists');
+      throw Error(
+        'Attempting to retrieve default response value when more than one value exists'
+      );
     }
     return this.values[0];
   }

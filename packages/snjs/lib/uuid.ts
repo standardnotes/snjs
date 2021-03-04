@@ -18,7 +18,7 @@ export class Uuid {
   static SetGenerators(
     asyncImpl: () => Promise<string>,
     syncImpl?: () => string
-  ) {
+  ): void {
     this.syncUuidFunc = syncImpl;
     this.asyncUuidFunc = asyncImpl;
   }
@@ -26,14 +26,14 @@ export class Uuid {
   /**
    * Whether there is a syncronous UUID generation function available.
    */
-  public static canGenSync() {
+  public static canGenSync(): boolean {
     return !isNullOrUndefined(this.syncUuidFunc);
   }
 
   /**
    * Generates a UUID string asyncronously.
    */
-  public static async GenerateUuid() {
+  public static async GenerateUuid(): Promise<string> {
     if (this.syncUuidFunc) {
       return this.syncUuidFunc();
     } else {
@@ -44,7 +44,8 @@ export class Uuid {
   /**
    * Generates a UUID string syncronously.
    */
-  public static GenerateUuidSynchronously() {
+  public static GenerateUuidSynchronously(): string {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.syncUuidFunc!();
   }
 }

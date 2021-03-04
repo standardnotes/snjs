@@ -71,6 +71,7 @@ import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
+import { ProtectionEvent } from './services/protection_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -242,7 +243,7 @@ export class SNApplication {
    */
   public async launch(awaitDatabaseLoad = false): Promise<void> {
     this.launched = false;
-    const launchChallenge = await this.challengeService.getLaunchChallenge();
+    const launchChallenge = this.getLaunchChallenge();
     if (launchChallenge) {
       const response = await this.challengeService.promptForChallengeResponse(launchChallenge);
       if (!response) {
@@ -302,6 +303,10 @@ export class SNApplication {
 
   public onLaunch(): void {
     // optional override
+  }
+
+  public getLaunchChallenge(): Challenge | undefined {
+    return this.protectionService.createLaunchChallenge();
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
@@ -659,6 +664,20 @@ export class SNApplication {
     );
   }
 
+  public async protectNote(note: SNNote): Promise<SNNote> {
+    const protectedNote = await this.protectionService.protectNote(note);
+    void this.syncService.sync();
+    return protectedNote;
+  }
+
+  public async unprotectNote(note: SNNote): Promise<SNNote | undefined> {
+    const unprotectedNote = await this.protectionService.unprotectNote(note);
+    if (!isNullOrUndefined(unprotectedNote)) {
+      void this.syncService.sync();
+    }
+    return unprotectedNote;
+  }
+
   public getItems(contentType: ContentType | ContentType[]) {
     return this.itemManager!.getItems(contentType);
   }
@@ -778,21 +797,21 @@ export class SNApplication {
     return this.protocolService!.getEncryptionDisplayName();
   }
 
-  public getUserVersion() {
-    return this.protocolService!.getUserVersion();
+  public getUserVersion(): Promise<ProtocolVersion | undefined> {
+    return this.protocolService.getUserVersion();
   }
 
   /**
    * Returns true if there is an upgrade available for the account or passcode
    */
-  public async protocolUpgradeAvailable() {
-    return this.protocolService!.upgradeAvailable();
+  public async protocolUpgradeAvailable(): Promise<boolean> {
+    return this.protocolService.upgradeAvailable();
   }
 
   /**
    * Returns true if there is an encryption source available
    */
-  public isEncryptionAvailable() {
+  public isEncryptionAvailable(): boolean {
     return this.hasAccount() || this.hasPasscode();
   }
 
@@ -819,11 +838,11 @@ export class SNApplication {
       ));
     }
     const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade, true);
-    const response = await this.challengeService!.promptForChallengeResponse(challenge);
+    const response = await this.challengeService.promptForChallengeResponse(challenge);
     if (!response) {
       return { canceled: true };
     }
-    const dismissBlockingDialog = await this.alertService!.blockingDialog(
+    const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       UPGRADING_ENCRYPTION
     );
@@ -861,16 +880,22 @@ export class SNApplication {
     }
   }
 
-  public async upgradeProtocolVersion() {
+  public async upgradeProtocolVersion(): Promise<{
+    success?: true,
+    canceled?: true,
+    error?: {
+      message: string
+    }
+  }> {
     const result = await this.performProtocolUpgrade();
     if (result.success) {
       if (this.hasAccount()) {
-        this.alertService!.alert(ProtocolUpgradeStrings.SuccessAccount);
+        void this.alertService.alert(ProtocolUpgradeStrings.SuccessAccount);
       } else {
-        this.alertService!.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
+        void this.alertService.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
       }
     } else if (result.error) {
-      this.alertService!.alert(ProtocolUpgradeStrings.Fail);
+      void this.alertService.alert(ProtocolUpgradeStrings.Fail);
     }
     return result;
   }
@@ -880,7 +905,31 @@ export class SNApplication {
   }
 
   public hasAccount(): boolean {
-    return this.protocolService!.hasAccount();
+    return this.protocolService.hasAccount();
+  }
+
+  /**
+   * @returns true if the user has a source of protection available, such as a
+   * passcode, password, or biometrics.
+   */
+  public hasProtectionSources(): boolean {
+    return this.protectionService.hasProtectionSources();
+  }
+
+  public areProtectionsEnabled(): boolean {
+    return this.protectionService.areProtectionsEnabled();
+  }
+
+  /**
+   * When a user specifies a non-zero remember duration on a protection
+   * challenge, a session will be started during which protections are disabled.
+   */
+  public getProtectionSessionExpiryDate(): Date {
+    return this.protectionService.getSessionExpiryDate();
+  }
+
+  public clearProtectionSession(): Promise<void> {
+    return this.protectionService.clearSession();
   }
 
   /**
@@ -1003,17 +1052,18 @@ export class SNApplication {
    * Creates a JSON-stringifiable backup object of all items.
    */
   public async createBackupFile(
-    intent: EncryptionIntent
+    intent: EncryptionIntent,
+    authorizeEncrypted = false
   ): Promise<BackupFile | undefined> {
-    const items = this.itemManager.items;
+    const encrypted = intent === EncryptionIntent.FileEncrypted;
+    const decrypted = intent === EncryptionIntent.FileDecrypted;
+    const authorize = encrypted && authorizeEncrypted || decrypted;
 
-    if (intent === EncryptionIntent.FileDecrypted) {
-      if (items.some(item => item.protected)) {
-        const authorized = await this.protectionService.authorizeFileExportWithProtectedNotes();
-        if (!authorized) {
-          return;
-        }
-      }
+    if (
+      authorize &&
+      !(await this.protectionService.authorizeBackupCreation(encrypted))
+    ) {
+      return;
     }
 
     return this.protocolService.createBackupFile(intent);
@@ -1391,16 +1441,22 @@ export class SNApplication {
     return this.launched;
   }
 
-  public hasBiometrics(): Promise<boolean> {
-    return this.challengeService.hasBiometricsEnabled()
+  public hasBiometrics(): boolean {
+    return this.protectionService.hasBiometricsEnabled()
   }
 
-  public enableBiometrics(): Promise<void> {
-    return this.challengeService.enableBiometrics()
+  /**
+   * @returns whether the operation was successful or not
+   */
+  public enableBiometrics(): Promise<boolean> {
+    return this.protectionService.enableBiometrics()
   }
 
-  public disableBiometrics(): Promise<void> {
-    return this.challengeService.disableBiometrics()
+  /**
+   * @returns whether the operation was successful or not
+   */
+  public disableBiometrics(): Promise<boolean> {
+    return this.protectionService.disableBiometrics()
   }
 
   public hasPasscode(): boolean {
@@ -1776,7 +1832,17 @@ export class SNApplication {
     this.protectionService = new SNProtectionService(
       this.protocolService,
       this.challengeService,
-      this.storageService
+      this.storageService,
+      this.itemManager
+    );
+    this.serviceObservers.push(
+      this.protectionService.addEventObserver((event) => {
+        if (event === ProtectionEvent.SessionExpiryDateChanged) {
+          void this.notifyEvent(
+            ApplicationEvent.ProtectionSessionExpiryDateChanged
+          );
+        }
+      })
     );
     this.services.push(this.protectionService);
   }

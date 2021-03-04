@@ -74,11 +74,9 @@ export class SNHistoryManager extends PureService {
     this.persistable = await this.storageService!.getValue(
       StorageKey.SessionHistoryPersistable
     );
-    this.sessionHistory = await this.storageService!.getValue(
-      StorageKey.SessionHistoryRevisions
-    ).then((historyValue) => {
-      return SessionHistoryMap.FromJson(historyValue);
-    });
+    this.sessionHistory = SessionHistoryMap.FromJson(
+      this.storageService!.getValue(StorageKey.SessionHistoryRevisions)
+    );
     const autoOptimize = await this.storageService!.getValue(
       StorageKey.SessionHistoryOptimize
     );

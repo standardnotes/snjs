@@ -157,7 +157,10 @@ export const ChallengeStrings = {
   EnterCredentialsForDecryptedBackupDownload: 'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode',
-  ImportEncryptedFile: 'Enter the account password associated with the import file'
+  ImportEncryptedFile: 'Enter the account password associated with the import file',
+  ExportBackup: 'Authentication is required to export a backup',
+  DisableBiometrics: 'Authentication is required to disable biometrics',
+  UnprotectNote: 'Authentication is required to unprotect a note',
 }
 
 export const PromptTitles = {
@@ -165,6 +168,7 @@ export const PromptTitles = {
   LocalPasscode: 'Application Passcode',
   Biometrics: 'Biometrics',
   RememberFor: 'Remember For',
+  Mfa: 'Two-factor Authentication Code',
 }
 
 export const ErrorAlertStrings = {

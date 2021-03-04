@@ -20,7 +20,6 @@ import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvent } from '@Lib/events';
 import { CreateItemFromPayload } from '@Models/generator';
-import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ItemsKeyMutator, SNItemsKey } from '@Models/app/items_key';
 import {

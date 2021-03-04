@@ -1,5 +1,5 @@
 import { RawStorageKey } from '@Lib/storage_keys';
-import { findInArray, removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@Lib/utils';
 import { DeinitSource, UuidString } from './types';
 import { SNApplication } from './application';
 import { PureService } from '@Services/pure_service';
