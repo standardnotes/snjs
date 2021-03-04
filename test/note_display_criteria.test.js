@@ -65,27 +65,22 @@ describe('note display criteria', function () {
   }
 
   it('display criteria copying', async function () {
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.includeArchived = true;
-    });
-    const copy = NotesDisplayCriteria.Copy(criteria);
+    const criteria = NotesDisplayCriteria.Create({ includeArchived: true });
+    const copy = NotesDisplayCriteria.Copy(criteria, { includeTrashed: true });
     expect(copy.includeArchived).to.equal(true);
+    expect(copy.includeTrashed).to.equal(true);
   });
 
   it('string query title', async function () {
     const query = "foo";
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.searchQuery = { query: query };
-    });
+    const criteria = NotesDisplayCriteria.Create({ searchQuery: { query: query } });
     const collection = collectionWithNotes(['hello', 'fobar', 'foobar', 'foo']);
     expect(notesMatchingCriteria(criteria, collection).length).to.equal(2);
   });
 
   it('string query text', async function () {
     const query = "foo";
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.searchQuery = { query: query };
-    });
+    const criteria = NotesDisplayCriteria.Create({ searchQuery: { query: query } });
     const collection = collectionWithNotes(
       [undefined, undefined, undefined, undefined],
       ['hello', 'fobar', 'foobar', 'foo']
@@ -95,9 +90,7 @@ describe('note display criteria', function () {
 
   it('string query title and text', async function () {
     const query = "foo";
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.searchQuery = { query: query };
-    });
+    const criteria = NotesDisplayCriteria.Create({ searchQuery: { query: query } });
     const collection = collectionWithNotes(['hello', 'foobar'], ['foo', 'fobar']);
     expect(notesMatchingCriteria(criteria, collection).length).to.equal(2);
   });
@@ -111,9 +104,7 @@ describe('note display criteria', function () {
         mutator.pinned = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.includePinned = false;
-    });
+    const criteria = NotesDisplayCriteria.Create({ includePinned: false });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(1);
   });
 
@@ -126,9 +117,7 @@ describe('note display criteria', function () {
         mutator.pinned = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.includePinned = true;
-    });
+    const criteria = NotesDisplayCriteria.Create({ includePinned: true });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(2);
   });
 
@@ -141,9 +130,7 @@ describe('note display criteria', function () {
         mutator.trashed = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.includeTrashed = false;
-    });
+    const criteria = NotesDisplayCriteria.Create({ includeTrashed: false });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(1);
   });
 
@@ -156,9 +143,7 @@ describe('note display criteria', function () {
         mutator.trashed = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.includeTrashed = true;
-    });
+    const criteria = NotesDisplayCriteria.Create({ includeTrashed: true });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(2);
   });
 
@@ -171,9 +156,7 @@ describe('note display criteria', function () {
         mutator.archived = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.includeArchived = false;
-    });
+    const criteria = NotesDisplayCriteria.Create({ includeArchived: false });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(1);
   });
 
@@ -186,8 +169,8 @@ describe('note display criteria', function () {
         mutator.archived = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.includeArchived = true;
+    const criteria = NotesDisplayCriteria.Create({
+      includeArchived: true
     });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(2);
   });
@@ -200,8 +183,8 @@ describe('note display criteria', function () {
         mutator.protected = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.searchQuery = { query: 'world', includeProtectedNoteText: false };
+    const criteria = NotesDisplayCriteria.Create({
+      searchQuery: { query: 'world', includeProtectedNoteText: false }
     });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(0);
   });
@@ -214,8 +197,8 @@ describe('note display criteria', function () {
         mutator.protected = true;
       }
     );
-    const criteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.searchQuery = { query: 'world', includeProtectedNoteText: true };
+    const criteria = NotesDisplayCriteria.Create({
+      searchQuery: { query: 'world', includeProtectedNoteText: true }
     });
     expect(notesMatchingCriteria(criteria, this.itemManager.collection).length).to.equal(1);
   });
@@ -225,13 +208,13 @@ describe('note display criteria', function () {
     const tag = await this.createTag([note]);
     const looseTag = await this.createTag([], 'loose');
 
-    const matchingCriteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.tags = [tag];
+    const matchingCriteria = NotesDisplayCriteria.Create({
+      tags: [tag]
     });
     expect(notesMatchingCriteria(matchingCriteria, this.itemManager.collection).length).to.equal(1);
 
-    const nonmatchingCriteria = NotesDisplayCriteria.Create((criteria) => {
-      criteria.tags = [looseTag];
+    const nonmatchingCriteria = NotesDisplayCriteria.Create({
+      tags: [looseTag]
     });
     expect(notesMatchingCriteria(nonmatchingCriteria, this.itemManager.collection).length).to.equal(0);
   });
@@ -245,20 +228,20 @@ describe('note display criteria', function () {
 
       await this.createNote();
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag]
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
     });
@@ -278,20 +261,20 @@ describe('note display criteria', function () {
       );
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag]
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
     });
@@ -311,20 +294,20 @@ describe('note display criteria', function () {
         }
       );
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag]
         }), this.itemManager.collection).length
       ).to.equal(1);
 
@@ -345,20 +328,20 @@ describe('note display criteria', function () {
         }
       );
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag]
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag]
         }), this.itemManager.collection).length
       ).to.equal(0);
     });
@@ -373,16 +356,16 @@ describe('note display criteria', function () {
       await this.createNote();
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(0);
     });
@@ -403,30 +386,30 @@ describe('note display criteria', function () {
       );
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeTrashed = false;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeTrashed: false
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(0);
     });
@@ -447,23 +430,23 @@ describe('note display criteria', function () {
         }
       );
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
-          criteria.includeTrashed = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag],
+          includeTrashed: true
         }), this.itemManager.collection).length
       ).to.equal(1);
     });
@@ -478,16 +461,16 @@ describe('note display criteria', function () {
       await this.createNote();
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeArchived = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeArchived: true
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
-          criteria.includeArchived = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag],
+          includeArchived: true
         }), this.itemManager.collection).length
       ).to.equal(0);
     });
@@ -507,30 +490,30 @@ describe('note display criteria', function () {
       );
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeArchived = false;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeArchived: false
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeArchived = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeArchived: true
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
-          criteria.includeArchived = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag],
+          includeArchived: true
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
-          criteria.includeArchived = false;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag],
+          includeArchived: false
         }), this.itemManager.collection).length
       ).to.equal(1);
     });
@@ -551,23 +534,23 @@ describe('note display criteria', function () {
       );
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [allTag];
-          criteria.includeArchived = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [allTag],
+          includeArchived: true
         }), this.itemManager.collection).length
       ).to.equal(0);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [trashTag];
-          criteria.includeArchived = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [trashTag],
+          includeArchived: true
         }), this.itemManager.collection).length
       ).to.equal(1);
 
       expect(
-        notesMatchingCriteria(NotesDisplayCriteria.Create((criteria) => {
-          criteria.tags = [archivedTag];
-          criteria.includeArchived = true;
+        notesMatchingCriteria(NotesDisplayCriteria.Create({
+          tags: [archivedTag],
+          includeArchived: true
         }), this.itemManager.collection).length
       ).to.equal(0);
     });
