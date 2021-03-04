@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('notes and tags', () => {
+describe('notes and tags', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {

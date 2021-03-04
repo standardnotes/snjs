@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('note display criteria', function () {
+describe('note display criteria', function () {
   before(async function () {
     const crypto = new SNWebCrypto();
     Uuid.SetGenerators(
