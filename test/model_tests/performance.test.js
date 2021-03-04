@@ -136,9 +136,10 @@ describe('mapping performance', () => {
     const seconds = (t1 - t0) / 1000;
     /** Expected run time depends on many different factors,
      * like how many other tests you're running and overall system capacity.
-     * Best case should be around 3.3s and worst case should be 5s.
-    */
-    const EXPECTED_RUN_TIME = 9.0; // seconds
+     * Locally, best case should be around 3.3s and worst case should be 5s.
+     * However on CI this can sometimes take up to 10s.
+     */
+    const EXPECTED_RUN_TIME = 10.0; // seconds
     expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
 
     application.itemManager.nonErroredItemsForContentType(ContentType.Tag)[0];
