@@ -159,6 +159,8 @@ export { PurePayload } from '@Payloads/pure_payload';
 export { PayloadField } from '@Payloads/fields';
 export type { PayloadContent } from '@Payloads/generator';
 
+export { NotesDisplayCriteria, notesMatchingCriteria } from '@Lib/protocol/collection/notes_display_criteria';
+
 export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from '@Lib/storage_keys';
 
 /** Migrations */

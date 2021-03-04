@@ -1,109 +1,56 @@
-import { UuidString } from '@Lib/types';
+import { SNSmartTag } from './../../models/app/smartTag';
+import { ItemCollection } from './item_collection';
+import { Uuids } from '@Lib/models/functions';
 import {
   ContentType,
-  SNItem,
   SNNote,
-  SNPredicate,
-  SNSmartTag,
   SNTag,
 } from '../../models';
-import {
-  CollectionSort,
-  ItemCollection,
-  SortDirection,
-} from './item_collection';
+import { criteriaForSmartTag, NotesDisplayCriteria, notesMatchingCriteria } from './notes_display_criteria';
 
 /**
  * A view into ItemCollection that allows filtering by tag and smart tag.
  */
 export class ItemCollectionNotesView {
-  private displayedList: SNNote[] = [];
-  private tag?: SNTag;
+  private displayedNotes: SNNote[] = [];
   private needsRebuilding = true;
+  private criteria!: NotesDisplayCriteria;
 
-  constructor(private collection: ItemCollection) {}
+  constructor(
+    private collection: ItemCollection
+  ) {}
 
-  public notesMatchingSmartTag(
-    smartTag: SNSmartTag,
-    notes: SNNote[]
-  ): SNNote[] {
-    const predicate = smartTag.predicate;
-
-    /** Optimized special cases */
-    if (smartTag.isArchiveTag) {
-      return notes.filter(
-        (note) => note.archived && !note.trashed && !note.deleted
-      );
-    } else if (smartTag.isTrashTag) {
-      return notes.filter((note) => note.trashed && !note.deleted);
-    }
-    const allNotes = notes.filter((note) => !note.trashed && !note.deleted);
-    if (smartTag.isAllTag) {
-      return allNotes;
-    }
-
-    if (predicate.keypathIncludesVerb('tags')) {
-      /**
-       * A note object doesn't come with its tags, so we map the list to
-       * flattened note-like objects that also contain
-       * their tags. Having the payload properties on the same level as the note
-       * properties is necessary because SNNote has many getters that are
-       * proxies to its inner payload object.
-       */
-      return (
-        allNotes
-          .map((note) => ({
-            ...note,
-            ...note.payload,
-            tags: this.collection.elementsReferencingElement(note),
-          }))
-          .filter((note) =>
-            SNPredicate.ObjectSatisfiesPredicate(note, predicate)
-          )
-          /** Map our special-case items back to notes */
-          .map((note) => this.collection.map[note.uuid] as SNNote)
-      );
-    } else {
-      return allNotes.filter((note) =>
-        SNPredicate.ObjectSatisfiesPredicate(note, predicate)
-      );
-    }
-  }
-
-  public setDisplayOptions(
-    tag?: SNTag,
-    sortBy?: CollectionSort,
-    direction?: SortDirection,
-    filter?: (element: SNItem) => boolean
-  ) {
+  public setCriteria(criteria: NotesDisplayCriteria): void {
+    this.criteria = criteria;
     this.collection.setDisplayOptions(
       ContentType.Note,
-      sortBy,
-      direction,
-      filter
+      criteria.sortProperty,
+      criteria.sortDirection,
     );
-    this.tag = tag;
     this.needsRebuilding = true;
   }
 
-  private rebuildList() {
-    const notes = this.collection.displayElements(ContentType.Note) as SNNote[];
-    if (!this.tag) {
-      this.displayedList = notes;
-      return;
-    }
+  public notesMatchingSmartTag(smartTag: SNSmartTag) {
+    const criteria = criteriaForSmartTag(smartTag);
+    return notesMatchingCriteria(criteria, this.collection);
+  }
 
-    let tag = this.tag;
-    if (tag.isSmartTag()) {
-      this.displayedList = this.notesMatchingSmartTag(tag as SNSmartTag, notes);
-    } else {
-      /** Get the most recent version of the tag */
-      tag = this.collection.find(tag.uuid) as SNTag;
-      this.displayedList = notes.filter(
-        (note) =>
-          !note.trashed && !note.deleted && tag.hasRelationshipWithItem(note)
-      );
-    }
+  private rebuildList(): void {
+    const criteria = NotesDisplayCriteria.Copy(this.criteria, (criteria) => {
+      /** Get the most recent version of the tags */
+      if (criteria.tags) {
+        const refreshedTags: SNTag[] = [];
+        for(const tag of criteria.tags) {
+          if(tag.isSystemSmartTag) {
+            refreshedTags.push(tag);
+          } else {
+            refreshedTags.push(this.collection.find(tag.uuid) as SNTag)
+          }
+        }
+        criteria.tags = refreshedTags;
+      }
+    })
+    this.displayedNotes = notesMatchingCriteria(criteria, this.collection);
   }
 
   setNeedsRebuilding() {
@@ -115,7 +62,7 @@ export class ItemCollectionNotesView {
       this.rebuildList();
       this.needsRebuilding = false;
     }
-    return this.displayedList.slice();
+    return this.displayedNotes.slice();
   }
 
   all() {
