@@ -1,6 +1,5 @@
 import { SNSmartTag } from './../../models/app/smartTag';
 import { ItemCollection } from './item_collection';
-import { Uuids } from '@Lib/models/functions';
 import {
   ContentType,
   SNNote,
@@ -14,11 +13,11 @@ import { criteriaForSmartTag, NotesDisplayCriteria, notesMatchingCriteria } from
 export class ItemCollectionNotesView {
   private displayedNotes: SNNote[] = [];
   private needsRebuilding = true;
-  private criteria!: NotesDisplayCriteria;
 
   constructor(
-    private collection: ItemCollection
-  ) {}
+    private collection: ItemCollection,
+    private criteria: NotesDisplayCriteria = NotesDisplayCriteria.Create({})
+  ) { }
 
   public setCriteria(criteria: NotesDisplayCriteria): void {
     this.criteria = criteria;
@@ -36,19 +35,16 @@ export class ItemCollectionNotesView {
   }
 
   private rebuildList(): void {
-    const criteria = NotesDisplayCriteria.Copy(this.criteria, (criteria) => {
+    const criteria = NotesDisplayCriteria.Copy(this.criteria, {
       /** Get the most recent version of the tags */
-      if (criteria.tags) {
-        const refreshedTags: SNTag[] = [];
-        for(const tag of criteria.tags) {
-          if(tag.isSystemSmartTag) {
-            refreshedTags.push(tag);
-          } else {
-            refreshedTags.push(this.collection.find(tag.uuid) as SNTag)
-          }
+      tags: this.criteria.tags.map((tag) => {
+        if (tag.isSystemSmartTag) {
+          return tag;
+        } else {
+          return this.collection.find(tag.uuid) as SNTag;
         }
-        criteria.tags = refreshedTags;
-      }
+
+      })
     })
     this.displayedNotes = notesMatchingCriteria(criteria, this.collection);
   }

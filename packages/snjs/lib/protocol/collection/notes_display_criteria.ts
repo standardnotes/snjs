@@ -22,21 +22,19 @@ export class NotesDisplayCriteria {
   public sortProperty?: CollectionSort;
   public sortDirection?: SortDirection;
 
-  static Create(
-    initializer: (criteria: NotesDisplayCriteria) => void
-  ): NotesDisplayCriteria {
+  static Create(properties: Partial<NotesDisplayCriteria>): NotesDisplayCriteria {
     const criteria = new NotesDisplayCriteria();
-    initializer(criteria);
+    Object.assign(criteria, properties);
     return Object.freeze(criteria);
   }
 
   static Copy(
     criteria: NotesDisplayCriteria,
-    initializer?: (criteria: NotesDisplayCriteria) => void
+    override: Partial<NotesDisplayCriteria>
   ): NotesDisplayCriteria {
     const copy = new NotesDisplayCriteria();
     Object.assign(copy, criteria);
-    initializer?.(copy);
+    Object.assign(copy, override);
     return Object.freeze(copy);
   }
 
@@ -110,8 +108,8 @@ export class NotesDisplayCriteria {
 type NoteFilter = (note: SNNote) => boolean;
 
 export function criteriaForSmartTag(tag: SNSmartTag): NotesDisplayCriteria {
-  const criteria = NotesDisplayCriteria.Create((criteria) => {
-    criteria.tags = [tag];
+  const criteria = NotesDisplayCriteria.Create({
+    tags: [tag]
   })
   return criteria;
 }
