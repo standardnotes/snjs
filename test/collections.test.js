@@ -65,7 +65,7 @@ describe('payload collections', () => {
     expect(collection.conflictsOf(payload.uuid)).to.eql([manualResults]);
   });
 
-  it.skip('setting same element twice should not yeild duplicates', async () => {
+  it.skip('setting same element twice should not yield duplicates', async () => {
     const collection = new ItemCollection();
     collection.setDisplayOptions(
       ContentType.Note,

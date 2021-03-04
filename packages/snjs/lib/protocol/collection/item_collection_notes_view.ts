@@ -64,8 +64,4 @@ export class ItemCollectionNotesView {
     }
     return this.displayedNotes.slice();
   }
-
-  all() {
-    return this.collection.all(ContentType.Note) as SNNote[];
-  }
 }

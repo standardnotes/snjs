@@ -7,28 +7,22 @@ import { ItemCollection } from './item_collection';
 import { SNNote } from './../../models/app/note';
 import { SNSmartTag } from './../../models/app/smartTag';
 
-type SearchQuery = {
+export type SearchQuery = {
   query: string
-  /** Whether to search the bodies of protected notes (as opposed to just title) */
-  protectedBodySearch: boolean
+  includeProtectedNoteText: boolean
 }
 
 export class NotesDisplayCriteria {
 
   public searchQuery?: SearchQuery
-  public tags?: SNTag[];
+  public tags: SNTag[] = [];
   public includePinned = true;
   public includeTrashed = false;
   public includeArchived = false;
   public sortProperty?: CollectionSort;
   public sortDirection?: SortDirection;
-  /**
-   * Once all results are calculated, run them through this additional
-   * filter to determine whether they should be displayed.
-   */
-  public subFilter?: (element: any) => boolean;
 
-  static CreateCriteria(
+  static Create(
     initializer: (criteria: NotesDisplayCriteria) => void
   ): NotesDisplayCriteria {
     const criteria = new NotesDisplayCriteria();
@@ -47,9 +41,8 @@ export class NotesDisplayCriteria {
   }
 
   computeFilters(collection: ItemCollection) {
-    const tags = this.tags || [];
-    const nonSmartTags = tags.filter(tag => !tag.isSmartTag);
-    const allSmartTags = tags.filter(tag => tag.isSmartTag) as [SNSmartTag];
+    const nonSmartTags = this.tags.filter(tag => !tag.isSmartTag);
+    const allSmartTags = this.tags.filter(tag => tag.isSmartTag) as [SNSmartTag];
     const systemSmartTags = allSmartTags.filter((t => t.isSystemSmartTag));
     const userSmartTags = allSmartTags.filter((t => !t.isSystemSmartTag));
 
@@ -108,9 +101,6 @@ export class NotesDisplayCriteria {
     if (!this.includeArchived && !usesArchiveSmartTag && !usesTrashSmartTag) {
       filters.push((note) => !note.archived);
     }
-    if (this.subFilter) {
-      filters.push(this.subFilter);
-    }
 
     return filters;
   }
@@ -120,7 +110,7 @@ export class NotesDisplayCriteria {
 type NoteFilter = (note: SNNote) => boolean;
 
 export function criteriaForSmartTag(tag: SNSmartTag): NotesDisplayCriteria {
-  const criteria = NotesDisplayCriteria.CreateCriteria((criteria) => {
+  const criteria = NotesDisplayCriteria.Create((criteria) => {
     criteria.tags = [tag];
   })
   return criteria;
@@ -150,7 +140,7 @@ export function noteMatchesQuery(
   note: SNNote,
   searchQuery: SearchQuery,
 ): boolean {
-  if (note.protected && !searchQuery.protectedBodySearch) {
+  if (note.protected && !searchQuery.includeProtectedNoteText) {
     const match = matchTypeForStringQuery(note, searchQuery.query);
     /** Only true if there is a match in the titles */
     return match === Match.Title || match === Match.TitleAndText;

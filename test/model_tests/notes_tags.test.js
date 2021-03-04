@@ -348,7 +348,7 @@ describe('notes and tags', () => {
         );
       })
     );
-    this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+    this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
       criteria.sortProperty = 'title';
       criteria.sortDirection = 'dsc';
     }));
@@ -398,7 +398,7 @@ describe('notes and tags', () => {
           ContentType.Note, { title: 'A' }
         )
       );
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'dsc';
         criteria.tags = [tag];
@@ -419,7 +419,7 @@ describe('notes and tags', () => {
       await this.application.changeItem(trashedNote.uuid, (mutator) => {
         mutator.trashed = true;
       });
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'dsc';
         criteria.tags = [tag];
@@ -450,7 +450,7 @@ describe('notes and tags', () => {
         }
       });
 
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'dsc';
         criteria.tags = [tag];
@@ -460,42 +460,6 @@ describe('notes and tags', () => {
       expect(displayedNotes).to.have.length(4);
       expect(displayedNotes[0].title).to.equal('B');
       expect(displayedNotes[1].title).to.equal('A');
-    });
-
-    it('should take filter into account when displaying tag', async function () {
-      const taggedNote = await Factory.createMappedNote(this.application);
-      const tag = await this.application.findOrCreateTag('A');
-      await this.application.changeItem(tag.uuid, (mutator) => {
-        mutator.addItemAsRelationship(taggedNote);
-      });
-      await this.application.changeItem(taggedNote.uuid, (mutator) => {
-        mutator.title = 'A';
-      });
-      await this.application.insertItem(
-        await this.application.createTemplateItem(
-          ContentType.Note, { title: 'B' }
-        )
-      );
-
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
-        criteria.sortProperty = 'title';
-        criteria.sortDirection = 'asc';
-        criteria.tags = [tag];
-        criteria.subFilter = (note) => note.safeTitle().includes('A');
-      }));
-
-      let displayedNotes = this.application.getDisplayableItems(ContentType.Note);
-      expect(displayedNotes).to.have.length(1);
-      expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
-
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
-        criteria.sortProperty = undefined;
-        criteria.sortDirection = undefined;
-        criteria.tags = [tag];
-        criteria.subFilter = (note) => note.safeTitle().includes('B');
-      }));
-      displayedNotes = this.application.getDisplayableItems(ContentType.Note);
-      expect(displayedNotes).to.have.length(0);
     });
   });
 
@@ -523,7 +487,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -560,7 +524,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -597,7 +561,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -631,7 +595,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -681,7 +645,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -715,7 +679,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -749,7 +713,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -796,7 +760,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'title';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
@@ -849,7 +813,7 @@ describe('notes and tags', () => {
       }
       ));
       const matches = this.application.notesMatchingSmartTag(smartTag);
-      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.CreateCriteria((criteria) => {
+      this.application.setNotesDisplayCriteria(NotesDisplayCriteria.Create((criteria) => {
         criteria.sortProperty = 'created_at';
         criteria.sortDirection = 'asc';
         criteria.tags = [smartTag];
