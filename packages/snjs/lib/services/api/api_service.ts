@@ -109,6 +109,7 @@ const Paths: VersionedPaths = {
   },
 }
 
+/** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115';
 
 type InvalidSessionObserver = (revoked: boolean) => void;
