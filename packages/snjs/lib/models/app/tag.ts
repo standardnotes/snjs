@@ -19,8 +19,12 @@ export class SNTag extends SNItem {
     return this.payload.safeReferences.length;
   }
 
-  public isSmartTag(): boolean {
+  public get isSmartTag(): boolean {
     return this.content_type === ContentType.SmartTag;
+  }
+
+  public get isSystemSmartTag(): boolean {
+    return this.payload.safeContent.isSystemTag;
   }
 
   public get isAllTag(): boolean {

@@ -26,6 +26,7 @@ import { PayloadManager } from './model_manager';
 import { ContentType } from '../models/content_types';
 import { ThemeMutator } from '@Lib/models';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
+import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -93,19 +94,14 @@ export class ItemManager extends PureService {
     if (contentType === ContentType.Note) {
       console.warn(
         `Called setDisplayOptions with ContentType.Note. ` +
-        `setNotesDisplayOptions should be used instead.`
+        `setNotesDisplayCriteria should be used instead.`
       );
     }
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
-  public setNotesDisplayOptions(
-    tag?: SNTag,
-    sortBy?: CollectionSort,
-    direction?: SortDirection,
-    filter?: (element: any) => boolean
-  ): void {
-    this.notesView.setDisplayOptions(tag, sortBy, direction, filter);
+  public setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void {
+    this.notesView.setCriteria(criteria);
   }
 
   public getDisplayableItems(contentType: ContentType) {
@@ -727,7 +723,7 @@ export class ItemManager extends PureService {
    * Returns all notes matching the smart tag
    */
   public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    return this.notesView.notesMatchingSmartTag(smartTag, this.notesView.all())
+    return this.notesView.notesMatchingSmartTag(smartTag)
   }
 
   /**
@@ -800,8 +796,7 @@ function BuildSmartTags() {
       content: FillItemContent({
         title: 'All notes',
         isSystemTag: true,
-        isAllTag: true,
-        predicate: SNPredicate.FromArray(['content_type', '=', ContentType.Note])
+        isAllTag: true
       })
     }
   );
@@ -812,8 +807,7 @@ function BuildSmartTags() {
       content: FillItemContent({
         title: 'Archived',
         isSystemTag: true,
-        isArchiveTag: true,
-        predicate: SNPredicate.FromArray(['archived', '=', JSON.stringify(true)])
+        isArchiveTag: true
       })
     }
   );
@@ -824,8 +818,7 @@ function BuildSmartTags() {
       content: FillItemContent({
         title: 'Trash',
         isSystemTag: true,
-        isTrashTag: true,
-        predicate: SNPredicate.FromArray(['trashed', '=', JSON.stringify(true)])
+        isTrashTag: true
       })
     }
   );

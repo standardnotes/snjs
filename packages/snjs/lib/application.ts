@@ -1,3 +1,4 @@
+import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria';
 import { SNKeyRecoveryService } from './services/key_recovery_service';
 import { CollectionSort, SortDirection } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
@@ -548,13 +549,10 @@ export class SNApplication {
     this.itemManager!.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
-  public setNotesDisplayOptions(
-    tag?: SNTag,
-    sortBy?: CollectionSort,
-    direction?: SortDirection,
-    filter?: (element: SNNote) => boolean
+  public setNotesDisplayCriteria(
+    criteria: NotesDisplayCriteria
   ) {
-    this.itemManager!.setNotesDisplayOptions(tag, sortBy, direction, filter);
+    this.itemManager!.setNotesDisplayCriteria(criteria);
   }
 
   public getDisplayableItems(contentType: ContentType) {
