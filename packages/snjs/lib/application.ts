@@ -73,7 +73,7 @@ import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
-import { Permissions } from '@standardnotes/auth';
+import { Permission } from '@standardnotes/auth';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -1125,7 +1125,7 @@ export class SNApplication {
     return this.preferencesService.setValue(key, value);
   }
 
-  public hasPermission(permission: Permissions): boolean {
+  public hasPermission(permission: Permission): boolean {
     return this.permissionsService.hasPermission(permission);
   }
 

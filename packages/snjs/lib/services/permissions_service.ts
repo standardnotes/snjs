@@ -1,4 +1,4 @@
-import { Permissions, ROLES } from '@standardnotes/auth';
+import { Permission, Role } from '@standardnotes/auth';
 import { PureService } from './pure_service';
 
 const permissionsChanged = 'permissionsChanged';
@@ -7,16 +7,16 @@ export type PermissionsChangeEvent = typeof permissionsChanged;
 
 export class SNPermissionsService extends PureService<
   PermissionsChangeEvent,
-  Set<Permissions>
+  Set<Permission>
 > {
-  private role = ROLES.USER;
-  private permissions = new Set<Permissions>();
+  private role = Role.User;
+  private permissions = new Set<Permission>();
 
-  hasPermission(permission: Permissions): boolean {
+  hasPermission(permission: Permission): boolean {
     return this.permissions.has(permission);
   }
 
-  update(role: ROLES, permissions: Permissions[]): void {
+  update(role: Role, permissions: Permission[]): void {
     this.role = role;
     if (
       this.permissions.size !== permissions.length ||
@@ -28,7 +28,7 @@ export class SNPermissionsService extends PureService<
   }
 
   deinit(): void {
-    this.role = ROLES.USER;
+    this.role = Role.User;
     (this.permissions as unknown) = undefined;
   }
 }

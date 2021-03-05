@@ -2,7 +2,7 @@ import { RawPayload } from '@Payloads/generator';
 import { ApiEndpointParam } from './keys';
 import { AnyKeyParamsContent, KeyParamsOrigination } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-import { ROLES, Permissions } from '@standardnotes/auth';
+import { Role, Permission } from '@standardnotes/auth';
 
 export enum StatusCode {
   HttpStatusMinSuccess = 200,
@@ -37,8 +37,8 @@ export type HttpResponse<T = unknown> = {
 
 export type ResponseMeta = {
   auth: {
-    role: ROLES;
-    permissions: Permissions[];
+    role: Role;
+    permissions: Permission[];
   };
 };
 
