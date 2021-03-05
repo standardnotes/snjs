@@ -298,7 +298,12 @@ describe('actions service', () => {
     it('should return response and item keys', async function () {
       const actionResponse = await this.actionsManager.runAction(this.getAction, this.noteItem, this.passwordRequestHandler);
 
-      expect(Object.keys(actionResponse)).to.have.members(['item', 'status', 'object', 'auth_params']);
+      expect(Object.keys(actionResponse)).to.have.members([
+        'item',
+        'status',
+        'data',
+        'auth_params'
+      ]);
     });
 
     it('should perform a sync request', async function () {
