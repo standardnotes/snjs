@@ -29,7 +29,7 @@ import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
-import { joinPaths } from '@Lib/utils';
+import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { SNPermissionsService } from '../permissions_service';
 
@@ -186,9 +186,6 @@ export class SNApiService extends PureService {
     const host = this.getHost();
     if (!host) {
       throw Error(`Attempting to build path ${path} with no host.`);
-    }
-    if (!path) {
-      throw Error('Attempting to build path with null path.');
     }
     return joinPaths(host, Paths[path][version]);
   }
