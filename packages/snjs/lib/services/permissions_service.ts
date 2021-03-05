@@ -12,10 +12,6 @@ export class SNPermissionsService extends PureService<
   private role = ROLES.USER;
   private permissions = new Set<Permissions>();
 
-  constructor() {
-    super();
-  }
-
   hasPermission(permission: Permissions): boolean {
     return this.permissions.has(permission);
   }
