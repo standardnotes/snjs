@@ -116,7 +116,9 @@ export class SNHttpService extends PureService {
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
         const body = JSON.parse(request.responseText);
-        response.object = body;
+        if (!body.data) {
+          response.data = body;
+        }
         Object.assign(response, body);
       }
     } catch (error) {

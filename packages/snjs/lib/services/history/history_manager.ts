@@ -221,7 +221,7 @@ export class SNHistoryManager extends PureService {
     if (response.error) {
       return undefined;
     }
-    return response.object as RevisionListEntry[];
+    return response.data as RevisionListEntry[];
   }
 
   /**

@@ -5,15 +5,15 @@ import {
   RegistrationResponse,
   RevisionListEntry,
   RevisionListResponse,
-  SessionListResponse,
   SessionRenewalResponse,
   SignInResponse,
   SignOutResponse,
   SingleRevisionResponse,
   StatusCode,
   isErrorResponseExpiredToken,
+  ResponseMeta,
 } from './responses';
-import { Session, TokenSession } from './session';
+import { RemoteSession, Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
@@ -32,30 +32,86 @@ import { PureService } from '@Services/pure_service';
 import { joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { SNPermissionsService } from '../permissions_service';
-import { ROLES, Permissions } from '@standardnotes/auth';
 
-const REQUEST_PATH_KEY_PARAMS = '/auth/params';
-const REQUEST_PATH_REGISTER = '/auth';
-const REQUEST_PATH_LOGIN = '/auth/sign_in';
-const REQUEST_PATH_CHANGE_PW = '/auth/change_pw';
-const REQUEST_PATH_SYNC = '/items/sync';
-const REQUEST_PATH_LOGOUT = '/auth/sign_out';
-const REQUEST_PATH_SESSION_REFRESH = '/session/refresh';
-const REQUEST_PATH_ALL_SESSIONS = '/sessions';
-const REQUEST_PATH_SESSION = '/session';
-const REQUEST_PATH_ITEM_REVISIONS = '/items/:item_id/revisions';
-const REQUEST_PATH_ITEM_REVISION = '/items/:item_id/revisions/:id';
+const enum Path {
+  KeyParams,
+  Register,
+  Login,
+  ChangePassword,
+  Sync,
+  Logout,
+  SessionRefresh,
+  Sessions,
+  Session,
+  ItemRevisions,
+  ItemRevision,
+}
 
-const API_VERSION = '20200115';
+const enum ApiVersion {
+  V0,
+  V1,
+}
+
+type VersionedPaths = {
+  [key in Path]: {
+    [key in ApiVersion]: string
+  }
+}
+
+const Paths: VersionedPaths = {
+  [Path.KeyParams]: {
+    [ApiVersion.V0]: '/auth/params',
+    [ApiVersion.V1]: '/auth/params'
+  },
+  [Path.Sessions]: {
+    [ApiVersion.V0]: '/sessions',
+    [ApiVersion.V1]: '/v1/sessions',
+  },
+  [Path.Register]: {
+    [ApiVersion.V0]: '/auth',
+    [ApiVersion.V1]: '/auth',
+  },
+  [Path.Login]: {
+    [ApiVersion.V0]: '/auth/sign_in',
+    [ApiVersion.V1]: '/auth/sign_in',
+  },
+  [Path.ChangePassword]: {
+    [ApiVersion.V0]: '/auth/change_pw',
+    [ApiVersion.V1]: '/auth/change_pw',
+  },
+  [Path.Sync]: {
+    [ApiVersion.V0]: '/items/sync',
+    [ApiVersion.V1]: '/items/sync',
+  },
+  [Path.Logout]: {
+    [ApiVersion.V0]: '/auth/sign_out',
+    [ApiVersion.V1]: '/auth/sign_out',
+  },
+  [Path.SessionRefresh]: {
+    [ApiVersion.V0]: '/session/refresh',
+    [ApiVersion.V1]: '/session/refresh',
+  },
+  [Path.Sessions]: {
+    [ApiVersion.V0]: '/sessions',
+    [ApiVersion.V1]: '/sessions',
+  },
+  [Path.Session]: {
+    [ApiVersion.V0]: '/session',
+    [ApiVersion.V1]: '/session',
+  },
+  [Path.ItemRevisions]: {
+    [ApiVersion.V0]: '/items/:item_id/revisions',
+    [ApiVersion.V1]: '/items/:item_id/revisions',
+  },
+  [Path.ItemRevision]: {
+    [ApiVersion.V0]: '/items/:item_id/revisions/:id',
+    [ApiVersion.V1]: '/items/:item_id/revisions/:id',
+  },
+}
+
+const V0_API_VERSION = '20200115';
 
 type InvalidSessionObserver = (revoked: boolean) => void;
-
-type ResponseMeta = {
-  auth: {
-    role: ROLES;
-    permissions: Permissions[];
-  };
-};
 
 export class SNApiService extends PureService {
   private session?: Session;
@@ -126,7 +182,7 @@ export class SNApiService extends PureService {
     return this.session;
   }
 
-  private path(path: string) {
+  private path(path: Path, version = ApiVersion.V0) {
     const host = this.getHost();
     if (!host) {
       throw Error(`Attempting to build path ${path} with no host.`);
@@ -134,25 +190,21 @@ export class SNApiService extends PureService {
     if (!path) {
       throw Error('Attempting to build path with null path.');
     }
-    return joinPaths(host, path);
-  }
-
-  private get apiVersion() {
-    return API_VERSION;
+    return joinPaths(host, Paths[path][version]);
   }
 
   private params(inParams: any): HttpParams {
     const params = merge(inParams, {
-      [ApiEndpointParam.ApiVersion]: this.apiVersion,
+      [ApiEndpointParam.ApiVersion]: V0_API_VERSION,
     });
     return params;
   }
 
-  public createErrorResponse(
+  public createErrorResponse<T = unknown>(
     message: string,
     status?: StatusCode
-  ): HttpResponse {
-    return { error: { message, status } } as HttpResponse;
+  ): HttpResponse<T> {
+    return { error: { message, status } } as HttpResponse<T>;
   }
 
   private errorResponseWithFallbackMessage(
@@ -170,9 +222,8 @@ export class SNApiService extends PureService {
   }
 
   private processResponse(response: HttpResponse) {
-    if (response.object?.meta) {
-      const meta = response.object.meta as ResponseMeta;
-      this.processMetaObject(meta);
+    if (response.meta) {
+      this.processMetaObject(response.meta);
     }
   }
 
@@ -214,7 +265,7 @@ export class SNApiService extends PureService {
     }
     return this.request({
       verb: HttpVerb.Get,
-      url: this.path(REQUEST_PATH_KEY_PARAMS),
+      url: this.path(Path.KeyParams),
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
       /** A session is optional here, if valid, endpoint returns extra params */
@@ -234,7 +285,7 @@ export class SNApiService extends PureService {
       ) as RegistrationResponse;
     }
     this.registering = true;
-    const url = this.path(REQUEST_PATH_REGISTER);
+    const url = this.path(Path.Register);
     const params = this.params({
       password: serverPassword,
       email,
@@ -264,7 +315,7 @@ export class SNApiService extends PureService {
       ) as SignInResponse;
     }
     this.authenticating = true;
-    const url = this.path(REQUEST_PATH_LOGIN);
+    const url = this.path(Path.Login);
     const params = this.params({
       email,
       password: serverPassword,
@@ -285,7 +336,7 @@ export class SNApiService extends PureService {
   }
 
   signOut(): Promise<SignOutResponse> {
-    const url = this.path(REQUEST_PATH_LOGOUT);
+    const url = this.path(Path.Logout);
     return this.httpService
       .postAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse) => {
@@ -308,7 +359,7 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     this.changing = true;
-    const url = this.path(REQUEST_PATH_CHANGE_PW);
+    const url = this.path(Path.ChangePassword);
     const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
@@ -349,7 +400,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = await this.path(REQUEST_PATH_SYNC);
+    const url = await this.path(Path.Sync);
     const params = this.params({
       [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
       [ApiEndpointParam.LastSyncToken]: lastSyncToken,
@@ -402,7 +453,7 @@ export class SNApiService extends PureService {
       return preprocessingError as SessionRenewalResponse;
     }
     this.refreshingSession = true;
-    const url = this.path(REQUEST_PATH_SESSION_REFRESH);
+    const url = this.path(Path.SessionRefresh);
     const session = this.session! as TokenSession;
     const params = this.params({
       access_token: session.accessToken,
@@ -429,12 +480,12 @@ export class SNApiService extends PureService {
     return result as SessionRenewalResponse;
   }
 
-  async getSessionsList() {
-    const preprocessingError = this.preprocessingError();
+  async getSessionsList(): Promise<HttpResponse<RemoteSession[]>> {
+    const preprocessingError = this.preprocessingError<RemoteSession[]>();
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = this.path(REQUEST_PATH_ALL_SESSIONS);
+    const url = this.path(Path.Sessions);
     const response = await this.httpService
       .getAbsolute(url, {}, this.session!.authorizationValue)
       .catch(async (errorResponse) => {
@@ -452,7 +503,7 @@ export class SNApiService extends PureService {
       });
     this.processResponse(response);
 
-    return response as SessionListResponse;
+    return response;
   }
 
   async deleteSession(
@@ -462,7 +513,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = this.path(REQUEST_PATH_SESSION);
+    const url = this.path(Path.Session);
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
@@ -496,8 +547,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const path = REQUEST_PATH_ITEM_REVISIONS.replace(/:item_id/, itemId);
-    const url = this.path(path);
+    const url = this.path(Path.ItemRevisions).replace(/:item_id/, itemId);
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
@@ -527,11 +577,9 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const path = REQUEST_PATH_ITEM_REVISION.replace(/:item_id/, itemId).replace(
-      /:id/,
-      entry.uuid
-    );
-    const url = this.path(path);
+    const url = this.path(Path.ItemRevision)
+      .replace(/:item_id/, itemId)
+      .replace(/:id/, entry.uuid);
     const response:
       | SingleRevisionResponse
       | HttpResponse = await this.httpService
@@ -553,14 +601,14 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private preprocessingError() {
+  private preprocessingError<T = unknown>() {
     if (this.refreshingSession) {
-      return this.createErrorResponse(
+      return this.createErrorResponse<T>(
         messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS
       );
     }
     if (!this.session) {
-      return this.createErrorResponse(messages.API_MESSAGE_INVALID_SESSION);
+      return this.createErrorResponse<T>(messages.API_MESSAGE_INVALID_SESSION);
     }
     return undefined;
   }

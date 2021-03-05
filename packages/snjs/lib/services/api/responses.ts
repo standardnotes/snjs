@@ -2,6 +2,7 @@ import { RawPayload } from '@Payloads/generator';
 import { ApiEndpointParam } from './keys';
 import { AnyKeyParamsContent, KeyParamsOrigination } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
+import { ROLES, Permissions } from '@standardnotes/auth';
 
 export enum StatusCode {
   HttpStatusMinSuccess = 200,
@@ -18,7 +19,7 @@ export enum StatusCode {
   CanceledMfa = 11,
 }
 
-export type HttpResponse = {
+export type HttpResponse<T = unknown> = {
   status: StatusCode,
   error?: {
     message: string,
@@ -30,8 +31,16 @@ export type HttpResponse = {
       mfa_key?: string
     }
   }
-  object?: any
+  data?: T,
+  meta?: ResponseMeta
 }
+
+export type ResponseMeta = {
+  auth: {
+    role: ROLES;
+    permissions: Permissions[];
+  };
+};
 
 export function isErrorResponseExpiredToken(errorResponse: HttpResponse) {
   return errorResponse.status === StatusCode.HttpStatusExpiredAccessToken;
@@ -85,8 +94,6 @@ export type SessionListEntry = {
   updated_at: string
   device_info: string
 }
-
-export type SessionListResponse = HttpResponse & SessionListEntry[];
 
 export type RevisionListEntry = {
   content_type: string

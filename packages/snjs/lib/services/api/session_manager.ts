@@ -502,18 +502,20 @@ export class SNSessionManager extends PureService<SessionEvent> {
     };
   }
 
-  public async getSessionsList(): Promise<RemoteSession[] | HttpResponse> {
+  public async getSessionsList(): Promise<HttpResponse<RemoteSession[]>> {
     const response = await this.apiService.getSessionsList();
-    if (response.error) {
+    if (response.error || !response.data) {
       return response
     }
-    return response.object
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((session: any) => ({
+    response.data = response.data
+      .map<RemoteSession>((session) => ({
         ...session,
         updated_at: new Date(session.updated_at)
       }))
-      .sort((s1: RemoteSession, s2: RemoteSession) => s1.updated_at < s2.updated_at);
+      .sort((s1: RemoteSession, s2: RemoteSession) =>
+        s1.updated_at < s2.updated_at ? 1 : -1
+      );
+    return response;
   }
 
   public async revokeSession(sessionId: UuidString): Promise<HttpResponse> {

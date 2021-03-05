@@ -73,6 +73,7 @@ import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
+import { Permissions } from '@standardnotes/auth';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -492,7 +493,7 @@ export class SNApplication {
     return this.syncService!.getStatus()!;
   }
 
-  public getSessions(): Promise<RemoteSession[] | HttpResponse> {
+  public getSessions(): Promise<HttpResponse<RemoteSession[]>> {
     return this.sessionManager.getSessionsList();
   }
 
@@ -1122,6 +1123,10 @@ export class SNApplication {
     value: PrefValue[K]
   ): Promise<void> {
     return this.preferencesService.setValue(key, value);
+  }
+
+  public hasPermission(permission: Permissions): boolean {
+    return this.permissionsService.hasPermission(permission);
   }
 
   /**
