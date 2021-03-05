@@ -55,7 +55,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@standardnotes/auth": "^1.0.0",
+    "@standardnotes/auth": "^1.1.0",
     "@standardnotes/sncrypto-common": "^1.2.9"
   }
 }
