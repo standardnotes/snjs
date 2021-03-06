@@ -652,7 +652,7 @@ describe('keys', function () {
      * items sync to the 004 client, it can't decrypt them with its existing items key
      * because its based on the old root key.
      */
-    it('add new items key', async function () {
+    it.skip('add new items key', async function () {
       this.timeout(Factory.LongTestTimeout * 3);
       let oldClient = this.application;
 
