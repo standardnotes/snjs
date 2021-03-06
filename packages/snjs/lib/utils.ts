@@ -25,17 +25,17 @@ export function isWebEnvironment() {
   return getGlobalScope() !== null;
 }
 
+interface IEDocument {
+  documentMode?: number;
+}
+
 /**
- * Returns true if WebCrypto is available
- * @access public
+ * @returns true if WebCrypto is available
  */
-export function isWebCryptoAvailable() {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore documentMode does not exit in definitions but might exist on IE
+export function isWebCryptoAvailable(): boolean {
+  const isIE = document && (document as IEDocument).documentMode;
   return (
-    (isWebEnvironment() &&
-      !isReactNativeEnvironment() &&
-      !(document && document.documentMode)) ||
+    (isWebEnvironment() && !isReactNativeEnvironment() && !isIE) ||
     (/Edge/.test(navigator.userAgent) &&
       window.crypto &&
       !!window.crypto.subtle)
@@ -45,7 +45,7 @@ export function isWebCryptoAvailable() {
 /**
  * Whether we are in React Native app
  */
-export function isReactNativeEnvironment() {
+export function isReactNativeEnvironment(): boolean {
   return (
     typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
   );
