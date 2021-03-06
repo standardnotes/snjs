@@ -19,7 +19,7 @@ export function dictToArray<T>(dict: Record<any, T>) {
 /**
  * Whether we are in a web browser
  */
-export function isWebEnvironment() {
+export function isWebEnvironment(): boolean {
   return getGlobalScope() !== null;
 }
 
@@ -27,7 +27,7 @@ export function isWebEnvironment() {
  * Returns true if WebCrypto is available
  * @access public
  */
-export function isWebCryptoAvailable() {
+export function isWebCryptoAvailable() : boolean {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore documentMode does not exit in definitions but might exist on IE
   return isWebEnvironment() && !isReactNativeEnvironment() && !(document && document.documentMode) || /Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle;
@@ -36,7 +36,7 @@ export function isWebCryptoAvailable() {
 /**
  * Whether we are in React Native app
  */
-export function isReactNativeEnvironment() {
+export function isReactNativeEnvironment() : boolean {
   return typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
 }
 
@@ -61,8 +61,7 @@ export function searchArray<T>(array: T[], predicate: Partial<T>): T | undefined
 }
 
 /**
- * Searches array of objects for first object where object[key] === value
- * @returns Matching object or null if not found
+ * @returns An array that is all the passed arrays joined togeather
  */
 export function concatArrays(...args: any[]) {
   let result: any[] = [];
@@ -75,7 +74,7 @@ export function concatArrays(...args: any[]) {
 /**
  * @returns Whether the value is a function or object
  */
-export function isObject(value: any) {
+export function isObject<T>(value: T|null): boolean {
   if (value === null) { return false; }
   return typeof value === 'function' || typeof value === 'object';
 }
