@@ -77,8 +77,7 @@ export function searchArray<T>(
 }
 
 /**
- * Searches array of objects for first object where object[key] === value
- * @returns Matching object or null if not found
+ * @returns An array that is all the passed arrays joined togeather
  */
 export function concatArrays(...args: any[]) {
   let result: any[] = [];
