@@ -478,7 +478,7 @@ export function deepFreeze(object: AnyRecord): AnyRecord {
 /**
  * Determines if an object has a getter defined for a given property
  */
-export function hasGetter(object: any, property: string): boolean {
+export function hasGetter(object: AnyRecord, property: string): boolean {
   const descriptor = Object.getOwnPropertyDescriptor(
     Object.getPrototypeOf(object),
     property
