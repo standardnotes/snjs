@@ -48,6 +48,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const pwSalt = await this.crypto.unsafeSha1(identifier + ':' + pwNonce);
     const keyParams = Create002KeyParams({
       email: identifier,
+      pw_nonce: pwNonce,
       pw_cost: pwCost,
       pw_salt: pwSalt,
       version: ProtocolVersion.V002,
