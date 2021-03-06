@@ -23,8 +23,8 @@ describe('application instances', () => {
   it('two distinct applications should not share model manager state', async () => {
     const app1 = await Factory.createAndInitializeApplication('app1');
     const app2 = await Factory.createAndInitializeApplication('app2');
-    expect(app1.modelManager).to.equal(app1.modelManager);
-    expect(app1.modelManager).to.not.equal(app2.modelManager);
+    expect(app1.payloadManager).to.equal(app1.payloadManager);
+    expect(app1.payloadManager).to.not.equal(app2.payloadManager);
 
     await Factory.createMappedNote(app1);
     expect(app1.itemManager.items.length).length.to.equal(BASE_ITEM_COUNT + 1);

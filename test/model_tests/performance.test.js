@@ -82,7 +82,7 @@ describe('mapping performance', () => {
     /*
       There was an issue where if you have a tag with thousands of notes, it will take minutes to resolve.
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
-      so that things require less loops in modelManager, regarding missedReferences.
+      so that things require less loops in payloadManager, regarding missedReferences.
     */
     const application = await Factory.createInitAppWithRandNamespace();
 

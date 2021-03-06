@@ -33,7 +33,7 @@ describe('notes + tags syncing', async function () {
     const note = await Factory.createMappedNote(this.application);
     await this.application.itemManager.setItemDirty(note.uuid);
     await this.application.syncService.sync(syncOptions);
-    await this.application.modelManager.resetState();
+    await this.application.payloadManager.resetState();
     await this.application.itemManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync(syncOptions);

@@ -65,7 +65,7 @@ describe('key recovery service', function () {
     expect(decrypted.errorDecrypting).to.equal(true);
 
     /** Insert into rotation */
-    await application.modelManager.emitPayload(
+    await application.payloadManager.emitPayload(
       decrypted,
       PayloadSource.Constructor
     );
@@ -128,7 +128,7 @@ describe('key recovery service', function () {
       encrypted
     );
 
-    await application.modelManager.emitPayloads(
+    await application.payloadManager.emitPayloads(
       decrypted,
       PayloadSource.Constructor
     );
@@ -150,7 +150,7 @@ describe('key recovery service', function () {
     application.deinit();
   });
 
-  xit('when changing password on another client, it should prompt us for new account password', async function () {
+  it.skip('when changing password on another client, it should prompt us for new account password', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
     const passcode = 'mypasscode';
@@ -240,7 +240,7 @@ describe('key recovery service', function () {
     appB.deinit();
   });
 
-  xit('when items key associated with item is errored, item should be marked waiting for key', async function () {
+  it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
     const appA = await Factory.createApplication(namespace);
@@ -349,7 +349,7 @@ describe('key recovery service', function () {
       EncryptionIntent.Sync,
       randomRootKey
     );
-    await application.modelManager.emitPayload(
+    await application.payloadManager.emitPayload(
       CopyPayload(encrypted, {
         errorDecrypting: true,
       }),
@@ -392,7 +392,7 @@ describe('key recovery service', function () {
       EncryptionIntent.Sync
     );
     const newUpdated = new Date();
-    await application.modelManager.emitPayload(
+    await application.payloadManager.emitPayload(
       CopyPayload(encrypted, {
         errorDecrypting: true,
         updated_at: newUpdated,
@@ -450,7 +450,7 @@ describe('key recovery service', function () {
       EncryptionIntent.Sync
     );
 
-    await application.modelManager.emitPayload(
+    await application.payloadManager.emitPayload(
       CopyPayload(encrypted, {
         errorDecrypting: true,
       }),
@@ -538,7 +538,7 @@ describe('key recovery service', function () {
     expect(decrypted.errorDecrypting).to.equal(true);
 
     /** Insert into rotation */
-    await application.modelManager.emitPayload(
+    await application.payloadManager.emitPayload(
       decrypted,
       PayloadSource.Constructor
     );

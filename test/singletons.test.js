@@ -333,7 +333,7 @@ describe('singletons', function () {
       errorDecrypting: false,
       errorDecryptingValueChanged: true,
     });
-    await this.application.modelManager.emitPayload(notErrored);
+    await this.application.payloadManager.emitPayload(notErrored);
     /** Item will get decrypted on current tick, so wait one before syncing */
     await Factory.sleep(0);
     await this.application.syncService.sync(syncOptions);

@@ -11,7 +11,7 @@ describe('payload manager', () => {
   });
 
   beforeEach(function () {
-    this.modelManager = new PayloadManager();
+    this.payloadManager = new PayloadManager();
     this.createNotePayload = async () => {
       return CreateMaxPayloadFromAnyObject({
         uuid: Factory.generateUuidish(),
@@ -26,9 +26,9 @@ describe('payload manager', () => {
 
   it('emit payload should create local record', async function () {
     const payload = await this.createNotePayload();
-    await this.modelManager.emitPayload(payload);
+    await this.payloadManager.emitPayload(payload);
 
-    expect(this.modelManager.collection.find(payload.uuid)).to.be.ok;
+    expect(this.payloadManager.collection.find(payload.uuid)).to.be.ok;
   });
 
   it('emit collection', async function () {
@@ -37,14 +37,14 @@ describe('payload manager', () => {
       [payload],
       PayloadSource.RemoteRetrieved
     );
-    await this.modelManager.emitCollection(collection);
+    await this.payloadManager.emitCollection(collection);
 
-    expect(this.modelManager.collection.find(payload.uuid)).to.be.ok;
+    expect(this.payloadManager.collection.find(payload.uuid)).to.be.ok;
   });
 
   it('merge payloads onto master', async function () {
     const payload = await this.createNotePayload();
-    await this.modelManager.emitPayload(payload);
+    await this.payloadManager.emitPayload(payload);
 
     const newTitle = `${Math.random()}`;
     const changedPayload = CopyPayload(payload, {
@@ -56,21 +56,21 @@ describe('payload manager', () => {
     const {
       changed,
       inserted,
-    } = await this.modelManager.mergePayloadsOntoMaster([changedPayload]);
+    } = await this.payloadManager.mergePayloadsOntoMaster([changedPayload]);
     expect(changed.length).to.equal(1);
     expect(inserted.length).to.equal(0);
     expect(
-      this.modelManager.collection.find(payload.uuid).content.title
+      this.payloadManager.collection.find(payload.uuid).content.title
     ).to.equal(newTitle);
   });
 
   it('insertion observer', async function () {
     const observations = [];
-    this.modelManager.addObserver(ContentType.Any, (_, inserted) => {
+    this.payloadManager.addObserver(ContentType.Any, (_, inserted) => {
       observations.push({ inserted });
     });
     const payload = await this.createNotePayload();
-    await this.modelManager.emitPayload(payload);
+    await this.payloadManager.emitPayload(payload);
 
     expect(observations.length).equal(1);
     expect(observations[0].inserted[0]).equal(payload);
@@ -78,14 +78,14 @@ describe('payload manager', () => {
 
   it('change observer', async function () {
     const observations = [];
-    this.modelManager.addObserver(ContentType.Any, (changed) => {
+    this.payloadManager.addObserver(ContentType.Any, (changed) => {
       if (changed.length > 0) {
         observations.push({ changed });
       }
     });
     const payload = await this.createNotePayload();
-    await this.modelManager.emitPayload(payload);
-    await this.modelManager.emitPayload(
+    await this.payloadManager.emitPayload(payload);
+    await this.payloadManager.emitPayload(
       CopyPayload(payload, {
         content: {
           ...payload.safeContent,
@@ -99,12 +99,12 @@ describe('payload manager', () => {
   });
 
   it('reset state', async function () {
-    this.modelManager.addObserver(ContentType.Any, (payloads) => {});
+    this.payloadManager.addObserver(ContentType.Any, (payloads) => {});
     const payload = await this.createNotePayload();
-    await this.modelManager.emitPayload(payload);
-    await this.modelManager.resetState();
+    await this.payloadManager.emitPayload(payload);
+    await this.payloadManager.resetState();
 
-    expect(this.modelManager.collection.all().length).to.equal(0);
-    expect(this.modelManager.changeObservers.length).equal(1);
+    expect(this.payloadManager.collection.all().length).to.equal(0);
+    expect(this.payloadManager.changeObservers.length).equal(1);
   });
 });

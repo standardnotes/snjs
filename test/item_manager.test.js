@@ -11,8 +11,8 @@ describe('item manager', () => {
   });
 
   beforeEach(function () {
-    this.modelManager = new PayloadManager();
-    this.itemManager = new ItemManager(this.modelManager);
+    this.payloadManager = new PayloadManager();
+    this.itemManager = new ItemManager(this.payloadManager);
     this.createNote = async () => {
       return this.itemManager.createItem(ContentType.Note, {
         title: 'hello',
@@ -230,7 +230,7 @@ describe('item manager', () => {
 
     beforeEach(async function () {
       this.emitPayloads = sandbox.spy(
-        this.itemManager.modelManager,
+        this.itemManager.payloadManager,
         'emitPayloads'
       );
     });

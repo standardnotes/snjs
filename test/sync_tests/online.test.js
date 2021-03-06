@@ -436,7 +436,7 @@ describe('online syncing', function () {
     // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.storageService.clearAllPayloads();
-    await this.application.modelManager.resetState();
+    await this.application.payloadManager.resetState();
     await this.application.itemManager.resetState();
     await this.application.syncService.sync(syncOptions);
 
@@ -854,7 +854,7 @@ describe('online syncing', function () {
     await this.application.syncService.markAllItemsAsNeedingSync(false);
 
     this.application.itemManager.resetState();
-    this.application.modelManager.resetState();
+    this.application.payloadManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
 
     expect(this.application.itemManager.items.length).to.equal(0);
@@ -997,7 +997,7 @@ describe('online syncing', function () {
     this.expectedItemCount += largeItemCount;
 
     /** Clear local data */
-    await this.application.modelManager.resetState();
+    await this.application.payloadManager.resetState();
     await this.application.itemManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.storageService.clearAllPayloads();
@@ -1084,7 +1084,7 @@ describe('online syncing', function () {
   it('syncing a new item before local data has loaded should still persist the item to disk', async function () {
     this.application.syncService.ut_setDatabaseLoaded(false);
     /** You don't want to clear model manager state as we'll lose encrypting items key */
-    // await this.application.modelManager.resetState();
+    // await this.application.payloadManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
 
@@ -1114,7 +1114,7 @@ describe('online syncing', function () {
 
     /** Clear state data and upload item from storage to server */
     await this.application.syncService.clearSyncPositionTokens();
-    await this.application.modelManager.resetState();
+    await this.application.payloadManager.resetState();
     await this.application.itemManager.resetState();
     const databasePayloads = await this.application.storageService.getAllRawPayloads();
     await this.application.syncService.loadDatabasePayloads(databasePayloads);
@@ -1355,7 +1355,7 @@ describe('online syncing', function () {
     expect(note.content.text).to.equal(text);
 
     // client B
-    await this.application.modelManager.resetState();
+    await this.application.payloadManager.resetState();
     await this.application.itemManager.resetState();
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync(syncOptions);

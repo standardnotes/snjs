@@ -418,7 +418,7 @@ describe('basic auth', () => {
 
   it('successfully changes password', changePassword).timeout(20000);
 
-  xit('successfully changes password when passcode is set', async function () {
+  it.skip('successfully changes password when passcode is set', async function () {
     const passcode = 'passcode';
     const promptValueReply = (prompts) => {
       const values = [];

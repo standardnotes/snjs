@@ -24,7 +24,7 @@ describe('history manager', () => {
     beforeEach(async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
       this.historyManager = this.application.historyManager;
-      this.modelManager = this.application.modelManager;
+      this.payloadManager = this.application.payloadManager;
       /** Automatically optimize after every revision by setting this to 0 */
       this.historyManager.setSessionItemRevisionThreshold(0);
     });
@@ -293,7 +293,7 @@ describe('history manager', () => {
     beforeEach(async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
       this.historyManager = this.application.historyManager;
-      this.modelManager = this.application.modelManager;
+      this.payloadManager = this.application.payloadManager;
       this.email = Uuid.GenerateUuidSynchronously();
       this.password = Uuid.GenerateUuidSynchronously();
       await Factory.registerUserToApplication({
@@ -311,7 +311,7 @@ describe('history manager', () => {
       await this.application.signOut();
       this.application = await Factory.createInitAppWithRandNamespace();
       this.historyManager = this.application.historyManager;
-      this.modelManager = this.application.modelManager;
+      this.payloadManager = this.application.payloadManager;
       const item = await Factory.createSyncedNote(this.application);
       await this.application.syncService.sync(syncOptions);
       const itemHistory = await this.historyManager.remoteHistoryForItem(item);
@@ -345,13 +345,13 @@ describe('history manager', () => {
       expect(itemHistory.length).to.equal(1);
     });
 
-    xit('create consecutive history entries', async function () {
+    it.skip('create consecutive history entries', async function () {
       // implement remote history fetching more than 1 entry
       // after 5 minutes delay apart of the updates
       // setting updated_at is not permitted via the API
     });
 
-    xit('returns revisions from server', async function () {
+    it.skip('returns revisions from server', async function () {
       let item = await Factory.createSyncedNote(this.application);
 
       /** Sync with different contents, should create new entry */
@@ -411,7 +411,7 @@ describe('history manager', () => {
       expect(payloadFromServer.content.title).to.eq(newTitleAfterFirstChange);
     });
 
-    xit('revisions count matches original for duplicated items', async function () {
+    it.skip('revisions count matches original for duplicated items', async function () {
       const note = await Factory.createSyncedNote(this.application);
       /** Make a few changes to note */
       await this.application.saveItem(note.uuid);
@@ -430,7 +430,7 @@ describe('history manager', () => {
       expect(dupeHistory.length).to.equal(expectedRevisions);
     });
 
-    xit('duplicate revisions should have the originals uuid', async function () {
+    it.skip('duplicate revisions should have the originals uuid', async function () {
       const note = await Factory.createSyncedNote(this.application);
       await this.application.saveItem(note.uuid);
       const dupe = await this.application.itemManager.duplicateItem(

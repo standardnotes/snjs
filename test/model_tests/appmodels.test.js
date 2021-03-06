@@ -28,8 +28,8 @@ describe('app models', () => {
     await this.application.deinit();
   });
 
-  it('modelManager should be defined', () => {
-    expect(sharedApplication.modelManager).to.be.ok;
+  it('payloadManager should be defined', () => {
+    expect(sharedApplication.payloadManager).to.be.ok;
   });
 
   it('item should be defined', () => {

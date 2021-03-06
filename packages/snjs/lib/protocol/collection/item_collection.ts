@@ -67,7 +67,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
     sortBy?: CollectionSort,
     direction?: SortDirection,
     filter?: (element: SNItem) => boolean
-  ) {
+  ): void {
     const existingSortBy = this.displaySortBy[contentType];
     const existingFilter = this.displayFilter[contentType];
     /** If the sort value is unchanged, and we are not setting a new filter,
@@ -129,7 +129,6 @@ export class ItemCollection extends MutableCollection<SNItem> {
       /** Filtered content type map */
       const filteredCTMap = this.filteredMap[contentType]!;
       const sortedElements = this.sortedMap[contentType]!;
-
       const previousIndex = filteredCTMap[element.uuid];
       const previousElement = !isNullOrUndefined(previousIndex)
         ? sortedElements[previousIndex]
@@ -146,8 +145,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
       if (passes) {
         if (!isNullOrUndefined(previousElement)) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort.
-           * Previous element might be encrypted.
-           */
+           * Previous element might be encrypted. */
           const previousValue:
             | SNItem
             | undefined = previousElement.errorDecrypting
@@ -166,6 +164,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
         } else {
           /** Has not yet been inserted */
           sortedElements.push(element);
+          filteredCTMap[element.uuid] = Object.keys(filteredCTMap).length;
           /** Needs re-sort because we're just pushing the element to the end here */
           typesNeedingResort.add(contentType);
         }

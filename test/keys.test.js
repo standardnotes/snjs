@@ -331,7 +331,7 @@ describe('keys', function () {
       errorDecrypting: true,
     });
 
-    await this.application.modelManager.emitPayload(
+    await this.application.payloadManager.emitPayload(
       errored,
       PayloadSource.Constructor
     );

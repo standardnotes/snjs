@@ -239,7 +239,7 @@ describe('server session', function () {
     expect(loginResponse.status).to.be.equal(200);
   });
 
-  xit('change password request should be successful after the expired access token is refreshed', async function () {
+  it.skip('change password request should be successful after the expired access token is refreshed', async function () {
     this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
