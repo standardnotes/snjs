@@ -25,7 +25,7 @@ describe('key params', function () {
       origination: 'registration',
       created: new Date().getTime(),
       hash: '123',
-      foo: 'bar'
+      foo: 'bar',
     });
     const ejected = params.getPortableValue();
     expect(ejected.hash).to.not.be.ok;
@@ -39,7 +39,6 @@ describe('key params', function () {
   });
 
   describe('with missing version', function () {
-
     it('should default to 002 if uses high cost', async function () {
       const params = new SNRootKeyParams({
         identifier: 'foo',
@@ -83,7 +82,5 @@ describe('key params', function () {
 
       expect(params.version).to.equal('001');
     });
-
   });
-
 });

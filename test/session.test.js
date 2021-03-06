@@ -12,7 +12,7 @@ describe('server session', function () {
 
   const syncOptions = {
     checkIntegrity: true,
-    awaitAll: true
+    awaitAll: true,
   };
 
   before(async function () {
@@ -33,17 +33,21 @@ describe('server session', function () {
     localStorage.clear();
   });
 
-  async function sleepUntilSessionExpires(application, basedOnAccessToken = true) {
+  async function sleepUntilSessionExpires(
+    application,
+    basedOnAccessToken = true
+  ) {
     const currentSession = application.apiService.getSession();
-    const timestamp = basedOnAccessToken ? currentSession.accessExpiration : currentSession.refreshExpiration;
+    const timestamp = basedOnAccessToken
+      ? currentSession.accessExpiration
+      : currentSession.refreshExpiration;
     const timeRemaining = (timestamp - Date.now()) / 1000; // in ms
     /*
       If the token has not expired yet, we will return the remaining time.
       Else, there's no need to add a delay.
     */
-    const sleepTime = timeRemaining > 0
-      ? timeRemaining + 1 /** Safety margin */
-      : 0;
+    const sleepTime =
+      timeRemaining > 0 ? timeRemaining + 1 /** Safety margin */ : 0;
     await Factory.sleep(sleepTime);
   }
 
@@ -52,7 +56,7 @@ describe('server session', function () {
   }
 
   it('should succeed when a sync request is perfomed with an expired access token', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -84,7 +88,7 @@ describe('server session', function () {
   });
 
   it('should be refreshed on any api call if access token is expired', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -105,9 +109,15 @@ describe('server session', function () {
     const sessionAfterSync = this.application.apiService.getSession();
 
     expect(sessionBeforeSync).to.not.equal(sessionAfterSync);
-    expect(sessionBeforeSync.accessToken).to.not.equal(sessionAfterSync.accessToken);
-    expect(sessionBeforeSync.refreshToken).to.not.equal(sessionAfterSync.refreshToken);
-    expect(sessionBeforeSync.accessExpiration).to.be.lessThan(sessionAfterSync.accessExpiration);
+    expect(sessionBeforeSync.accessToken).to.not.equal(
+      sessionAfterSync.accessToken
+    );
+    expect(sessionBeforeSync.refreshToken).to.not.equal(
+      sessionAfterSync.refreshToken
+    );
+    expect(sessionBeforeSync.accessExpiration).to.be.lessThan(
+      sessionAfterSync.accessExpiration
+    );
     // New token should expire in the future.
     expect(sessionAfterSync.accessExpiration).to.be.greaterThan(Date.now());
   });
@@ -118,14 +128,11 @@ describe('server session', function () {
       email: this.email,
       password: this.password,
     });
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-
-    await this.application.signIn(
-      this.email,
-      this.password,
-      false,
-      true
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
     );
+
+    await this.application.signIn(this.email, this.password, false, true);
 
     const response = await this.application.apiService.sync([]);
     expect(response.status).to.equal(200);
@@ -136,7 +143,7 @@ describe('server session', function () {
       application: this.application,
       email: this.email,
       password: this.password,
-      ephemeral: true
+      ephemeral: true,
     });
 
     const response = await this.application.apiService.sync([]);
@@ -157,7 +164,9 @@ describe('server session', function () {
 
     await this.application.apiService.refreshSession();
 
-    const updatedSessionFromStorage = await getSessionFromStorage(this.application);
+    const updatedSessionFromStorage = await getSessionFromStorage(
+      this.application
+    );
     const updatedSessionFromApiService = this.application.apiService.getSession();
 
     expect(updatedSessionFromStorage).to.equal(updatedSessionFromApiService);
@@ -217,11 +226,13 @@ describe('server session', function () {
     expect(changePasswordResponse.status).to.equal(200);
     expect(changePasswordResponse.user).to.be.ok;
 
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
     const loginResponse = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
-      password: this.newPassword
+      password: this.newPassword,
     });
 
     expect(loginResponse).to.be.ok;
@@ -229,7 +240,7 @@ describe('server session', function () {
   });
 
   xit('change password request should be successful after the expired access token is refreshed', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -248,11 +259,13 @@ describe('server session', function () {
     expect(changePasswordResponse).to.be.ok;
     expect(changePasswordResponse.status).to.equal(200);
 
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
     const loginResponse = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
-      password: this.newPassword
+      password: this.newPassword,
     });
 
     expect(loginResponse).to.be.ok;
@@ -273,13 +286,17 @@ describe('server session', function () {
       this.password,
       this.newPassword
     );
-    expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
+    expect(changePasswordResponse.error.message).to.equal(
+      'Invalid login credentials.'
+    );
 
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
     const loginResponse = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
-      password: this.newPassword
+      password: this.newPassword,
     });
 
     expect(loginResponse).to.be.ok;
@@ -287,7 +304,7 @@ describe('server session', function () {
   });
 
   it('change password request should fail with an expired refresh token', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -305,13 +322,17 @@ describe('server session', function () {
     );
 
     expect(changePasswordResponse).to.be.ok;
-    expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.');
+    expect(changePasswordResponse.error.message).to.equal(
+      'Invalid login credentials.'
+    );
 
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
     const loginResponseWithNewPassword = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
-      password: this.newPassword
+      password: this.newPassword,
     });
 
     expect(loginResponseWithNewPassword).to.be.ok;
@@ -320,7 +341,7 @@ describe('server session', function () {
     const loginResponseWithOldPassword = await Factory.loginToApplication({
       application: this.application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     expect(loginResponseWithOldPassword).to.be.ok;
@@ -337,10 +358,7 @@ describe('server session', function () {
     await this.application.apiService.signOut();
     this.application.apiService.session = undefined;
 
-    await this.application.sessionManager.signIn(
-      this.email,
-      this.password
-    );
+    await this.application.sessionManager.signIn(this.email, this.password);
 
     const currentSession = this.application.apiService.getSession();
 
@@ -351,7 +369,7 @@ describe('server session', function () {
   });
 
   it('should fail when renewing a session with an expired refresh token', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -365,7 +383,9 @@ describe('server session', function () {
 
     expect(refreshSessionResponse.status).to.equal(400);
     expect(refreshSessionResponse.error.tag).to.equal('expired-refresh-token');
-    expect(refreshSessionResponse.error.message).to.equal('The refresh token has expired.');
+    expect(refreshSessionResponse.error.message).to.equal(
+      'The refresh token has expired.'
+    );
 
     /*
       The access token and refresh token should be expired up to this point.
@@ -394,7 +414,9 @@ describe('server session', function () {
 
     expect(refreshSessionResponse.status).to.equal(400);
     expect(refreshSessionResponse.error.tag).to.equal('invalid-refresh-token');
-    expect(refreshSessionResponse.error.message).to.equal('The refresh token is not valid.');
+    expect(refreshSessionResponse.error.message).to.equal(
+      'The refresh token is not valid.'
+    );
 
     // Access token should remain valid.
     const syncResponse = await this.application.apiService.sync([]);
@@ -413,14 +435,15 @@ describe('server session', function () {
 
     expect(syncResponse.error).to.be.ok;
 
-    const errorMessage = 'Your account session is being renewed with the server. Please try your request again.';
+    const errorMessage =
+      'Your account session is being renewed with the server. Please try your request again.';
     expect(syncResponse.error.message).to.be.equal(errorMessage);
     /** Wait for finish so that test cleans up properly */
     await refreshPromise;
   });
 
   it('notes should be synced as expected after refreshing a session', async function () {
-    this.timeout(Factory.LongTestTimeout)
+    this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -428,27 +451,38 @@ describe('server session', function () {
       password: this.password,
     });
 
-    const notesBeforeSync = await Factory.createManyMappedNotes(this.application, 5);
+    const notesBeforeSync = await Factory.createManyMappedNotes(
+      this.application,
+      5
+    );
 
     await sleepUntilSessionExpires(this.application);
     await this.application.syncService.sync(syncOptions);
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
 
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
     await this.application.signIn(
       this.email,
       this.password,
-      undefined, undefined, undefined,
+      undefined,
+      undefined,
+      undefined,
       true
     );
 
-    const expectedNotesUuids = notesBeforeSync.map(n => n.uuid);
-    const notesResults = await this.application.itemManager.findItems(expectedNotesUuids);
+    const expectedNotesUuids = notesBeforeSync.map((n) => n.uuid);
+    const notesResults = await this.application.itemManager.findItems(
+      expectedNotesUuids
+    );
 
     expect(notesResults.length).to.equal(notesBeforeSync.length);
 
     for (const aNoteBeforeSync of notesBeforeSync) {
-      const noteResult = await this.application.itemManager.findItem(aNoteBeforeSync.uuid);
+      const noteResult = await this.application.itemManager.findItem(
+        aNoteBeforeSync.uuid
+      );
       expect(aNoteBeforeSync.isItemContentEqualWith(noteResult)).to.equal(true);
     }
   });
@@ -470,7 +504,7 @@ describe('server session', function () {
     await Factory.registerUserToApplication({
       application: appA,
       email: email,
-      password: password
+      password: password,
     });
 
     /** Create simultaneous appB signed into same account */
@@ -480,7 +514,7 @@ describe('server session', function () {
     await Factory.loginToApplication({
       application: appB,
       email: email,
-      password: password
+      password: password,
     });
 
     /** Change password on appB */
@@ -510,13 +544,10 @@ describe('server session', function () {
     let didPromptForSignIn = false;
     const receiveChallenge = async (challenge) => {
       didPromptForSignIn = true;
-      appA.submitValuesForChallenge(
-        challenge,
-        [
-          new ChallengeValue(challenge.prompts[0], email),
-          new ChallengeValue(challenge.prompts[1], password),
-        ]
-      );
+      appA.submitValuesForChallenge(challenge, [
+        new ChallengeValue(challenge.prompts[0], email),
+        new ChallengeValue(challenge.prompts[1], password),
+      ]);
     };
     const appA = await Factory.createApplication(Factory.randomString());
     await appA.prepareForLaunch({ receiveChallenge });
@@ -525,7 +556,7 @@ describe('server session', function () {
     await Factory.registerUserToApplication({
       application: appA,
       email: email,
-      password: password
+      password: password,
     });
 
     const oldRootKey = await appA.protocolService.getRootKey();
@@ -589,7 +620,7 @@ describe('server session', function () {
 
     const app2 = await Factory.createAndInitializeApplication(app2identifier);
     app2.prepareForLaunch({
-      receiveChallenge() {}
+      receiveChallenge() {},
     });
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -603,7 +634,7 @@ describe('server session', function () {
             )
         );
         this.application.submitValuesForChallenge(challenge, values);
-      }
+      },
     });
 
     await Factory.registerUserToApplication({
@@ -611,10 +642,10 @@ describe('server session', function () {
       email: this.email,
       password: this.password,
     }),
-    await app2.signIn(this.email, this.password);
+      await app2.signIn(this.email, this.password);
 
     const sessions = await this.application.getSessions();
-    const app2session = sessions.find(session => !session.current);
+    const app2session = sessions.find((session) => !session.current);
     await this.application.revokeSession(app2session.uuid);
     void app2.sync();
     /** Wait for app2 to deinit */
@@ -622,7 +653,9 @@ describe('server session', function () {
     expect(app2.dealloced).to.be.true;
 
     const deviceInterface = new WebDeviceInterface();
-    const payloads = await deviceInterface.getAllRawDatabasePayloads(app2identifier);
+    const payloads = await deviceInterface.getAllRawDatabasePayloads(
+      app2identifier
+    );
     expect(payloads).to.be.empty;
   });
 

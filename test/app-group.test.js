@@ -6,7 +6,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('application group', () => {
-
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
@@ -24,8 +23,11 @@ describe('application group', () => {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplication(descriptor.identifier, deviceInterface);
-      }
+        return Factory.createApplication(
+          descriptor.identifier,
+          deviceInterface
+        );
+      },
     });
     expect(group.primaryApplication).to.be.ok;
     expect(group.primaryApplication.identifier).to.be.ok;
@@ -35,8 +37,11 @@ describe('application group', () => {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplication(descriptor.identifier, deviceInterface);
-      }
+        return Factory.createApplication(
+          descriptor.identifier,
+          deviceInterface
+        );
+      },
     });
     const identifier = group.primaryApplication.identifier;
     expect(group.descriptorRecord[identifier].identifier).to.equal(identifier);
@@ -46,29 +51,41 @@ describe('application group', () => {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplication(descriptor.identifier, deviceInterface);
-      }
+        return Factory.createApplication(
+          descriptor.identifier,
+          deviceInterface
+        );
+      },
     });
     const identifier = group.primaryApplication.identifier;
 
-    const descriptorRecord = await group.deviceInterface.getJsonParsedRawStorageValue(RawStorageKey.DescriptorRecord);
+    const descriptorRecord = await group.deviceInterface.getJsonParsedRawStorageValue(
+      RawStorageKey.DescriptorRecord
+    );
     expect(descriptorRecord[identifier].identifier).to.equal(identifier);
     expect(descriptorRecord[identifier].primary).to.equal(true);
 
     await group.addNewApplication();
-    const descriptorRecord2 = await group.deviceInterface.getJsonParsedRawStorageValue(RawStorageKey.DescriptorRecord);
+    const descriptorRecord2 = await group.deviceInterface.getJsonParsedRawStorageValue(
+      RawStorageKey.DescriptorRecord
+    );
     expect(Object.keys(descriptorRecord2).length).to.equal(2);
 
     expect(descriptorRecord2[identifier].primary).to.equal(false);
-    expect(descriptorRecord2[group.primaryApplication.identifier].primary).to.equal(true);
+    expect(
+      descriptorRecord2[group.primaryApplication.identifier].primary
+    ).to.equal(true);
   });
 
   it('adding new application should incrememnt total descriptor count', async () => {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplication(descriptor.identifier, deviceInterface);
-      }
+        return Factory.createApplication(
+          descriptor.identifier,
+          deviceInterface
+        );
+      },
     });
     const currentIdentifier = group.primaryApplication.identifier;
     await group.addNewApplication();
@@ -81,8 +98,11 @@ describe('application group', () => {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplication(descriptor.identifier, deviceInterface);
-      }
+        return Factory.createApplication(
+          descriptor.identifier,
+          deviceInterface
+        );
+      },
     });
     const application = group.primaryApplication;
     const identifier = application.identifier;
@@ -107,14 +127,17 @@ describe('application group', () => {
     return new Promise(async (resolve) => {
       group.addApplicationChangeObserver(() => {
         notifyCount++;
-        if(notifyCount === expectedCount) {
+        if (notifyCount === expectedCount) {
           resolve();
         }
       });
       await group.initialize({
         applicationCreator: (descriptor, deviceInterface) => {
-          return Factory.createApplication(descriptor.identifier, deviceInterface);
-        }
+          return Factory.createApplication(
+            descriptor.identifier,
+            deviceInterface
+          );
+        },
       });
       await group.addNewApplication();
     }).then(() => {

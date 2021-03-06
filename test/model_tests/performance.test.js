@@ -5,7 +5,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('mapping performance', () => {
-
   it('shouldnt take a long time', async () => {
     /*
     There was an issue with mapping where we were using arrays for everything instead of hashes (like items, missedReferences),
@@ -24,8 +23,8 @@ describe('mapping performance', () => {
         content_type: ContentType.Tag,
         content: {
           title: `${Math.random()}`,
-          references: []
-        }
+          references: [],
+        },
       };
       tags.push(tag);
     }
@@ -36,16 +35,14 @@ describe('mapping performance', () => {
         content: {
           title: `${Math.random()}`,
           text: `${Math.random()}`,
-          references: []
-        }
+          references: [],
+        },
       };
       const randomTag = Factory.randomArrayValue(tags);
-      randomTag.content.references.push(
-        {
-          content_type: ContentType.Note,
-          uuid: note.uuid
-        }
-      );
+      randomTag.content.references.push({
+        content_type: ContentType.Note,
+        uuid: note.uuid,
+      });
       notes.push(note);
     }
 
@@ -71,8 +68,12 @@ describe('mapping performance', () => {
     const expectedRunTime = 3; // seconds
     expect(seconds).to.be.at.most(expectedRunTime);
 
-    for (const note of application.itemManager.nonErroredItemsForContentType(ContentType.Note)) {
-      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.be.above(0);
+    for (const note of application.itemManager.nonErroredItemsForContentType(
+      ContentType.Note
+    )) {
+      expect(
+        application.itemManager.itemsReferencingItem(note.uuid).length
+      ).to.be.above(0);
     }
     await application.deinit();
   }).timeout(20000);
@@ -93,8 +94,8 @@ describe('mapping performance', () => {
       content_type: ContentType.Tag,
       content: {
         title: `${Math.random()}`,
-        references: []
-      }
+        references: [],
+      },
     };
 
     for (let i = 0; i < noteCount; i++) {
@@ -104,20 +105,20 @@ describe('mapping performance', () => {
         content: {
           title: `${Math.random()}`,
           text: `${Math.random()}`,
-          references: []
-        }
+          references: [],
+        },
       };
 
       tag.content.references.push({
         content_type: ContentType.Note,
-        uuid: note.uuid
+        uuid: note.uuid,
       });
       notes.push(note);
     }
 
-    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject(
-      item
-    ));
+    const payloads = [tag]
+      .concat(notes)
+      .map((item) => CreateMaxPayloadFromAnyObject(item));
 
     const t0 = performance.now();
     // process items in separate batches, so as to trigger missed references
@@ -143,8 +144,12 @@ describe('mapping performance', () => {
     expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
 
     application.itemManager.nonErroredItemsForContentType(ContentType.Tag)[0];
-    for (const note of application.itemManager.nonErroredItemsForContentType(ContentType.Note)) {
-      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
+    for (const note of application.itemManager.nonErroredItemsForContentType(
+      ContentType.Note
+    )) {
+      expect(
+        application.itemManager.itemsReferencingItem(note.uuid).length
+      ).to.equal(1);
     }
     await application.deinit();
   }).timeout(20000);

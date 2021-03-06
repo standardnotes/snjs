@@ -5,10 +5,9 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('notes + tags syncing', async function () {
-
   const syncOptions = {
     checkIntegrity: true,
-    awaitAll: true
+    awaitAll: true,
   };
 
   after(async function () {
@@ -19,7 +18,11 @@ describe('notes + tags syncing', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     const email = Uuid.GenerateUuidSynchronously();
     const password = Uuid.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({ application: this.application, email, password });
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email,
+      password,
+    });
   });
 
   afterEach(async function () {
@@ -61,7 +64,9 @@ describe('notes + tags syncing', async function () {
       await this.application.syncService.sync(syncOptions);
       this.application.syncService.clearSyncPositionTokens();
       expect(tag.content.references.length).to.equal(1);
-      expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
+      expect(
+        this.application.itemManager.itemsReferencingItem(note.uuid).length
+      ).to.equal(1);
       expect(tag.noteCount).to.equal(1);
       expect(this.application.itemManager.notes.length).to.equal(1);
       expect(this.application.itemManager.tags.length).to.equal(1);
@@ -80,13 +85,19 @@ describe('notes + tags syncing', async function () {
     );
     const originalNote = this.application.itemManager.notes[0];
     const originalTag = this.application.itemManager.tags[0];
-    await this.application.itemManager.setItemsDirty([originalNote.uuid, originalTag.uuid]);
+    await this.application.itemManager.setItemsDirty([
+      originalNote.uuid,
+      originalTag.uuid,
+    ]);
 
     await this.application.syncService.sync(syncOptions);
 
     expect(originalTag.content.references.length).to.equal(1);
     expect(originalTag.noteCount).to.equal(1);
-    expect(this.application.itemManager.itemsReferencingItem(originalNote.uuid).length).to.equal(1);
+    expect(
+      this.application.itemManager.itemsReferencingItem(originalNote.uuid)
+        .length
+    ).to.equal(1);
 
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.
@@ -105,7 +116,9 @@ describe('notes + tags syncing', async function () {
     expect(note.content.references.length).to.equal(0);
 
     expect(tag.noteCount).to.equal(1);
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
+    expect(
+      this.application.itemManager.itemsReferencingItem(note.uuid).length
+    ).to.equal(1);
   });
 
   it('duplicating a tag should maintian its relationships', async function () {
@@ -113,15 +126,14 @@ describe('notes + tags syncing', async function () {
     const notePayload = pair[0];
     const tagPayload = pair[1];
     await this.application.itemManager.emitItemsFromPayloads(
-      [
-        notePayload,
-        tagPayload
-      ],
+      [notePayload, tagPayload],
       PayloadSource.LocalChanged
     );
     let note = this.application.itemManager.notes[0];
     let tag = this.application.itemManager.tags[0];
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
+    expect(
+      this.application.itemManager.itemsReferencingItem(note.uuid).length
+    ).to.equal(1);
 
     await this.application.itemManager.setItemsDirty([note.uuid, tag.uuid]);
     await this.application.syncService.sync(syncOptions);
@@ -165,11 +177,18 @@ describe('notes + tags syncing', async function () {
     expect(conflictedTag.content.conflict_of).to.equal(originalTag.uuid);
     expect(conflictedTag.noteCount).to.equal(originalTag.noteCount);
 
-    expect(this.application.itemManager.itemsReferencingItem(conflictedTag.uuid).length).to.equal(0);
-    expect(this.application.itemManager.itemsReferencingItem(originalTag.uuid).length).to.equal(0);
+    expect(
+      this.application.itemManager.itemsReferencingItem(conflictedTag.uuid)
+        .length
+    ).to.equal(0);
+    expect(
+      this.application.itemManager.itemsReferencingItem(originalTag.uuid).length
+    ).to.equal(0);
 
     // Two tags now link to this note
-    const referencingItems = this.application.itemManager.itemsReferencingItem(note.uuid);
+    const referencingItems = this.application.itemManager.itemsReferencingItem(
+      note.uuid
+    );
     expect(referencingItems.length).to.equal(2);
     expect(referencingItems[0]).to.not.equal(referencingItems[1]);
   }).timeout(10000);

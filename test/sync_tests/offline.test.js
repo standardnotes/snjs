@@ -9,28 +9,28 @@ describe('offline syncing', () => {
 
   const syncOptions = {
     checkIntegrity: true,
-    awaitAll: true
+    awaitAll: true,
   };
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     this.application.deinit();
   });
 
-  before(async function() {
+  before(async function () {
     localStorage.clear();
   });
 
-  after(async function() {
+  after(async function () {
     localStorage.clear();
   });
 
-  it('should sync item with no passcode', async function() {
+  it('should sync item with no passcode', async function () {
     let note = await Factory.createMappedNote(this.application);
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();
@@ -46,12 +46,15 @@ describe('offline syncing', () => {
     const rawPayloads2 = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads2.length).to.equal(this.expectedItemCount);
 
-    const itemsKeyRP = (await Factory.getStoragePayloadsOfType(
-      this.application, ContentType.ItemsKey
-    ))[0];
-    const noteRP = (await Factory.getStoragePayloadsOfType(
-      this.application, ContentType.Note
-    ))[0];
+    const itemsKeyRP = (
+      await Factory.getStoragePayloadsOfType(
+        this.application,
+        ContentType.ItemsKey
+      )
+    )[0];
+    const noteRP = (
+      await Factory.getStoragePayloadsOfType(this.application, ContentType.Note)
+    )[0];
 
     /** Encrypts with default items key */
     expect(typeof noteRP.content).to.equal('string');
@@ -59,7 +62,7 @@ describe('offline syncing', () => {
     expect(typeof itemsKeyRP.content).to.equal('object');
   });
 
-  it('should sync item encrypted with passcode', async function() {
+  it('should sync item encrypted with passcode', async function () {
     await this.application.setPasscode('foobar');
     await Factory.createMappedNote(this.application);
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1);
@@ -75,14 +78,20 @@ describe('offline syncing', () => {
 
     const payload = rawPayloads2[0];
     expect(typeof payload.content).to.equal('string');
-    expect(payload.content.startsWith(this.application.protocolService.getLatestVersion())).to.equal(true);
+    expect(
+      payload.content.startsWith(
+        this.application.protocolService.getLatestVersion()
+      )
+    ).to.equal(true);
   });
 
   it('signing out while offline should succeed', async function () {
     await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
     expect(this.application.noAccount()).to.equal(true);
     expect(this.application.getUser()).to.not.be.ok;
   });
