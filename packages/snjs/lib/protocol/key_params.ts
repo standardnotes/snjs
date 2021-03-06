@@ -22,7 +22,7 @@ export enum KeyParamsOrigination {
   PasswordChange = 'password-change',
   ProtocolUpgrade = 'protocol-upgrade',
   PasscodeCreate = 'passcode-create',
-  PasscodeChange = 'passcode-change'
+  PasscodeChange = 'passcode-change',
 }
 
 const ValidKeyParamsKeys = [
@@ -33,45 +33,45 @@ const ValidKeyParamsKeys = [
   'version',
   'origination',
   'created',
-]
+];
 
 type BaseKeyParams = {
   /** Seconds since creation date */
-  created?: string
+  created?: string;
   /** The event that lead to the creation of these params */
-  origination?: KeyParamsOrigination
-  version: ProtocolVersion
-}
+  origination?: KeyParamsOrigination;
+  version: ProtocolVersion;
+};
 
 export type KeyParamsContent001 = BaseKeyParams & {
-  email: string
-  pw_cost: number
-  pw_salt: string
-  pw_nonce: string
-}
+  email: string;
+  pw_cost: number;
+  pw_salt: string;
+  pw_nonce: string;
+};
 
 export type KeyParamsContent002 = BaseKeyParams & {
-  email: string
-  pw_cost: number
-  pw_salt: string
-  pw_nonce: string
-}
+  email: string;
+  pw_cost: number;
+  pw_salt: string;
+  pw_nonce: string;
+};
 
 export type KeyParamsContent003 = BaseKeyParams & {
-  identifier: string
-  pw_nonce: string
-}
+  identifier: string;
+  pw_nonce: string;
+};
 
 export type KeyParamsContent004 = Required<BaseKeyParams> & {
-  identifier: string
-  pw_nonce: string
-}
+  identifier: string;
+  pw_nonce: string;
+};
 
 export type AnyKeyParamsContent =
-  KeyParamsContent001 |
-  KeyParamsContent002 |
-  KeyParamsContent003 |
-  KeyParamsContent004;
+  | KeyParamsContent001
+  | KeyParamsContent002
+  | KeyParamsContent003
+  | KeyParamsContent004;
 
 export function Create001KeyParams(keyParams: KeyParamsContent001) {
   return CreateAnyKeyParams(keyParams);
@@ -91,12 +91,16 @@ export function Create004KeyParams(keyParams: KeyParamsContent004) {
 
 export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
   if ((keyParams as any).content) {
-    throw Error('Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.');
+    throw Error(
+      'Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.'
+    );
   }
   return new SNRootKeyParams(keyParams);
 }
 
-function protocolVersionForKeyParams(response: KeyParamsResponse | AnyKeyParamsContent): ProtocolVersion {
+function protocolVersionForKeyParams(
+  response: KeyParamsResponse | AnyKeyParamsContent
+): ProtocolVersion {
   if (response.version) {
     return response.version;
   }
@@ -122,7 +126,7 @@ function protocolVersionForKeyParams(response: KeyParamsResponse | AnyKeyParamsC
      * If the cost appears in both versions, we can be certain it's 002 if it's missing
      * the pw_nonce property. (However late versions of 002 also used a pw_nonce, so its
      * presence doesn't automatically indicate 001.)
-    */
+     */
     if (!response.pw_nonce) {
       return ProtocolVersion.V002;
     } else {
@@ -142,7 +146,10 @@ function protocolVersionForKeyParams(response: KeyParamsResponse | AnyKeyParamsC
   }
 }
 
-export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier?: string) {
+export function KeyParamsFromApiResponse(
+  response: KeyParamsResponse,
+  identifier?: string
+) {
   const rawKeyParams: AnyKeyParamsContent = {
     identifier: identifier || response.identifier!,
     pw_cost: response.pw_cost!,
@@ -151,7 +158,7 @@ export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier
     version: protocolVersionForKeyParams(response),
     origination: response.origination,
     created: response.created,
-  }
+  };
   return CreateAnyKeyParams(rawKeyParams);
 }
 
@@ -161,14 +168,13 @@ export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier
  * previously.
  */
 export class SNRootKeyParams {
-
-  public readonly content: AnyKeyParamsContent
+  public readonly content: AnyKeyParamsContent;
 
   constructor(content: AnyKeyParamsContent) {
     this.content = {
       ...content,
       origination: content.origination || KeyParamsOrigination.Registration,
-      version: content.version || protocolVersionForKeyParams(content)
+      version: content.version || protocolVersionForKeyParams(content),
     };
   }
 
@@ -225,7 +231,9 @@ export class SNRootKeyParams {
         this.identifier === other.identifier &&
         this.content004.pw_nonce === other.content003.pw_nonce
       );
-    } else if ([ProtocolVersion.V002, ProtocolVersion.V001].includes(this.version)) {
+    } else if (
+      [ProtocolVersion.V002, ProtocolVersion.V001].includes(this.version)
+    ) {
       return (
         this.identifier === other.identifier &&
         this.content002.pw_salt === other.content001.pw_salt

@@ -1,8 +1,8 @@
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 
 export class ImmutablePayloadCollectionSet {
-  readonly collections: Array<ImmutablePayloadCollection>
+  readonly collections: Array<ImmutablePayloadCollection>;
 
   /**
    * @param collections An array of ImmutablePayloadCollection objects.
@@ -13,7 +13,7 @@ export class ImmutablePayloadCollectionSet {
   }
 
   collectionForSource(source: PayloadSource) {
-    return this.collections.find(collection => {
+    return this.collections.find((collection) => {
       return collection.source === source;
     });
   }

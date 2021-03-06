@@ -28,32 +28,32 @@ export class PurePayload {
    * contains. These fields allow consumers to determine whether a given payload has an actual
    * undefined value for payload.content, for example, or whether the payload was constructed
    * to omit that field altogether (as in the case of server saved payloads) */
-  readonly fields: PayloadField[]
-  readonly source: PayloadSource
-  readonly uuid: string
-  readonly content_type: ContentType
-  readonly content?: PayloadContent | string
-  readonly deleted?: boolean
-  readonly items_key_id?: string
-  readonly enc_item_key?: string
-  readonly created_at?: Date
-  readonly updated_at?: Date
-  readonly dirtiedDate?: Date
-  readonly dirty?: boolean
-  readonly errorDecrypting?: boolean
-  readonly waitingForKey?: boolean
-  readonly errorDecryptingValueChanged?: boolean
-  readonly lastSyncBegan?: Date
-  readonly lastSyncEnd?: Date
+  readonly fields: PayloadField[];
+  readonly source: PayloadSource;
+  readonly uuid: string;
+  readonly content_type: ContentType;
+  readonly content?: PayloadContent | string;
+  readonly deleted?: boolean;
+  readonly items_key_id?: string;
+  readonly enc_item_key?: string;
+  readonly created_at?: Date;
+  readonly updated_at?: Date;
+  readonly dirtiedDate?: Date;
+  readonly dirty?: boolean;
+  readonly errorDecrypting?: boolean;
+  readonly waitingForKey?: boolean;
+  readonly errorDecryptingValueChanged?: boolean;
+  readonly lastSyncBegan?: Date;
+  readonly lastSyncEnd?: Date;
 
   /** @deprecated */
-  readonly auth_hash?: string
+  readonly auth_hash?: string;
   /** @deprecated */
-  readonly auth_params?: any
+  readonly auth_params?: any;
 
-  readonly format: PayloadFormat
-  readonly version?: ProtocolVersion
-  readonly duplicate_of?: string
+  readonly format: PayloadFormat;
+  readonly version?: ProtocolVersion;
+  readonly duplicate_of?: string;
 
   constructor(
     rawPayload: RawPayload,
@@ -72,7 +72,9 @@ export class PurePayload {
     }
     this.uuid = rawPayload.uuid!;
     if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
-      throw Error(`uuid is null, yet this payloads fields indicate it shouldnt be. Content type: ${rawPayload.content_type}`);
+      throw Error(
+        `uuid is null, yet this payloads fields indicate it shouldnt be. Content type: ${rawPayload.content_type}`
+      );
     }
     this.content_type = rawPayload.content_type!;
     if (rawPayload.content) {
@@ -96,14 +98,20 @@ export class PurePayload {
     this.errorDecrypting = rawPayload.errorDecrypting;
     this.waitingForKey = rawPayload.waitingForKey;
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged;
-    this.lastSyncBegan = rawPayload.lastSyncBegan ? new Date(rawPayload.lastSyncBegan) : undefined;
-    this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined;
+    this.lastSyncBegan = rawPayload.lastSyncBegan
+      ? new Date(rawPayload.lastSyncBegan)
+      : undefined;
+    this.lastSyncEnd = rawPayload.lastSyncEnd
+      ? new Date(rawPayload.lastSyncEnd)
+      : undefined;
     this.auth_hash = rawPayload.auth_hash;
     this.auth_params = rawPayload.auth_params;
     this.duplicate_of = rawPayload.duplicate_of;
 
     if (isString(this.content)) {
-      if ((this.content as string).startsWith(ProtocolVersion.V000Base64Decrypted)) {
+      if (
+        (this.content as string).startsWith(ProtocolVersion.V000Base64Decrypted)
+      ) {
         this.format = PayloadFormat.DecryptedBase64String;
       } else {
         this.format = PayloadFormat.EncryptedString;
@@ -135,7 +143,7 @@ export class PurePayload {
   ejected() {
     const optionalFields = [
       PayloadField.Legacy003AuthHash,
-      PayloadField.Deleted
+      PayloadField.Deleted,
     ];
     const nonRequiredFields = [
       PayloadField.DirtiedDate,
@@ -143,7 +151,7 @@ export class PurePayload {
       PayloadField.ErrorDecryptingChanged,
       PayloadField.WaitingForKey,
       PayloadField.LastSyncBegan,
-      PayloadField.LastSyncEnd
+      PayloadField.LastSyncEnd,
     ];
     const result = {} as RawPayload;
     for (const field of this.fields) {

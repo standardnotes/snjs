@@ -19,7 +19,12 @@ export const V002Algorithm = Object.freeze({
    * While some 002 accounts also used costs in V001.PbkdfCostsUsed,
    * the vast majority used costs >= 100,000
    */
-  PbkdfCostsUsed: V001Algorithm.PbkdfCostsUsed.concat([100_000, 101_000, 102_000, 103_000]),
+  PbkdfCostsUsed: V001Algorithm.PbkdfCostsUsed.concat([
+    100_000,
+    101_000,
+    102_000,
+    103_000,
+  ]),
   /** Possible costs used, but statistically more likely these were 001 accounts */
   ImprobablePbkdfCostsUsed: [3000, 5000],
   PbkdfOutputLength: 768,

@@ -2,13 +2,12 @@ import { SNLog } from './../../../log';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteConflicts extends PayloadsDelta {
-
   public async resultingCollection() {
     if (this.applyCollection.source === PayloadSource.ConflictUuid) {
       return this.collectionsByHandlingUuidConflicts();
@@ -46,7 +45,10 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       const payloads = deltaCollection.all();
       extendArray(results, payloads);
     }
-    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved);
+    return ImmutablePayloadCollection.WithPayloads(
+      results,
+      PayloadSource.RemoteRetrieved
+    );
   }
 
   /**
@@ -63,14 +65,21 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
        * referencing tag, which would be added to `results`, but could also be inside
        * of this.applyCollection. In this case we'd prefer the most recently modified value.
        */
-      const moreRecent = results.find(r => r.uuid === payload.uuid);
-      const decrypted = moreRecent || this.findRelatedPayload(
-        payload.uuid!,
-        PayloadSource.DecryptedTransient
-      );
+      const moreRecent = results.find((r) => r.uuid === payload.uuid);
+      const decrypted =
+        moreRecent ||
+        this.findRelatedPayload(
+          payload.uuid!,
+          PayloadSource.DecryptedTransient
+        );
       if (!decrypted) {
-        SNLog.error(Error('Cannot find decrypted payload in conflict handling'));
-        console.error('Unable to find decrypted counterpart for payload', payload);
+        SNLog.error(
+          Error('Cannot find decrypted payload in conflict handling')
+        );
+        console.error(
+          'Unable to find decrypted counterpart for payload',
+          payload
+        );
         continue;
       }
       const alternateResults = await PayloadsByAlternatingUuid(
@@ -80,6 +89,9 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       extendArray(results, alternateResults);
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved);
+    return ImmutablePayloadCollection.WithPayloads(
+      results,
+      PayloadSource.RemoteRetrieved
+    );
   }
 }

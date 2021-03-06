@@ -46,16 +46,15 @@ export enum PayloadSource {
  * require a UI refresh
  */
 export function isPayloadSourceInternalChange(source: PayloadSource) {
-  return [
-    PayloadSource.RemoteSaved,
-    PayloadSource.PreSyncSave,
-  ].includes(source);
+  return [PayloadSource.RemoteSaved, PayloadSource.PreSyncSave].includes(
+    source
+  );
 }
 
 export function isPayloadSourceRetrieved(source: PayloadSource) {
   return [
     PayloadSource.RemoteRetrieved,
     PayloadSource.ComponentRetrieved,
-    PayloadSource.RemoteActionRetrieved
+    PayloadSource.RemoteActionRetrieved,
   ].includes(source);
 }

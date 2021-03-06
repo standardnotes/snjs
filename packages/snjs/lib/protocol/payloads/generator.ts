@@ -5,77 +5,75 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@Models/content_types';
 import { EncryptionIntent } from '@Protocol/intents';
-import {
-  Copy,
-  pickByCopy,
-  uniqueArray,
-} from '@Lib/utils';
+import { Copy, pickByCopy, uniqueArray } from '@Lib/utils';
 import { PayloadField } from '@Payloads/fields';
 
 export type ContentReference = {
-  uuid: string
-  content_type: string
-}
+  uuid: string;
+  content_type: string;
+};
 
 export type PayloadContent = {
-  [key: string]: any
-  references: ContentReference[]
-}
+  [key: string]: any;
+  references: ContentReference[];
+};
 
-export type PayloadOverride = {
-  [key in PayloadField]?: any;
-} | PurePayload
+export type PayloadOverride =
+  | {
+      [key in PayloadField]?: any;
+    }
+  | PurePayload;
 
 export type RawPayload = {
-  uuid: string
-  content_type: ContentType
-  content?: PayloadContent | string
-  deleted?: boolean
-  items_key_id?: string
-  enc_item_key?: string
-  created_at?: Date
-  updated_at?: Date
-  dirtiedDate?: Date
-  dirty?: boolean
-  errorDecrypting?: boolean
-  waitingForKey?: boolean
-  errorDecryptingValueChanged?: boolean
-  lastSyncBegan?: Date
-  lastSyncEnd?: Date
-  auth_hash?: string
-  auth_params?: any
-  duplicate_of?: string
-}
+  uuid: string;
+  content_type: ContentType;
+  content?: PayloadContent | string;
+  deleted?: boolean;
+  items_key_id?: string;
+  enc_item_key?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  dirtiedDate?: Date;
+  dirty?: boolean;
+  errorDecrypting?: boolean;
+  waitingForKey?: boolean;
+  errorDecryptingValueChanged?: boolean;
+  lastSyncBegan?: Date;
+  lastSyncEnd?: Date;
+  auth_hash?: string;
+  auth_params?: any;
+  duplicate_of?: string;
+};
 
 export type RawEncryptionParameters = {
-  uuid?: string
-  content?: PayloadContent | string
-  items_key_id?: string
-  enc_item_key?: string
-  errorDecrypting?: boolean
-  waitingForKey?: boolean
-  errorDecryptingValueChanged?: boolean
-  auth_hash?: string
-  auth_params?: any
-}
+  uuid?: string;
+  content?: PayloadContent | string;
+  items_key_id?: string;
+  enc_item_key?: string;
+  errorDecrypting?: boolean;
+  waitingForKey?: boolean;
+  errorDecryptingValueChanged?: boolean;
+  auth_hash?: string;
+  auth_params?: any;
+};
 
 export type ItemAuthenticatedData = {
   /** The UUID of the item */
-  u: UuidString
+  u: UuidString;
   /** The encryption version of the item */
-  v: ProtocolVersion
-}
+  v: ProtocolVersion;
+};
 /** Data that is attached to items that are encrypted with a root key */
 export type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
   /** The key params used to generate the root key that encrypts this item key */
-  kp: AnyKeyParamsContent
-}
+  kp: AnyKeyParamsContent;
+};
 /**
  * <= V003 optionally included key params content as last component in encrypted string
  * as a json stringified base64 representation. This data is attached but not included
  * in authentication hash.
  */
-export type LegacyAttachedData = AnyKeyParamsContent & Record<string, unknown>
+export type LegacyAttachedData = AnyKeyParamsContent & Record<string, unknown>;
 
 /** The MaxItemPayload represents a payload with all possible fields */
 const MaxPayloadFields = [
@@ -96,8 +94,8 @@ const MaxPayloadFields = [
   PayloadField.WaitingForKey,
   PayloadField.LastSyncBegan,
   PayloadField.LastSyncEnd,
-  PayloadField.DuplicateOf
-]
+  PayloadField.DuplicateOf,
+];
 
 const EncryptionParametersFields = [
   PayloadField.Uuid,
@@ -107,7 +105,7 @@ const EncryptionParametersFields = [
   PayloadField.Legacy003AuthHash,
   PayloadField.ErrorDecrypting,
   PayloadField.ErrorDecryptingChanged,
-  PayloadField.WaitingForKey
+  PayloadField.WaitingForKey,
 ];
 
 const FilePayloadFields = [
@@ -119,8 +117,8 @@ const FilePayloadFields = [
   PayloadField.CreatedAt,
   PayloadField.UpdatedAt,
   PayloadField.Legacy003AuthHash,
-  PayloadField.DuplicateOf
-]
+  PayloadField.DuplicateOf,
+];
 
 const StoragePayloadFields = [
   PayloadField.Uuid,
@@ -137,8 +135,8 @@ const StoragePayloadFields = [
   PayloadField.DirtiedDate,
   PayloadField.ErrorDecrypting,
   PayloadField.WaitingForKey,
-  PayloadField.DuplicateOf
-]
+  PayloadField.DuplicateOf,
+];
 
 const ServerPayloadFields = [
   PayloadField.Uuid,
@@ -150,15 +148,15 @@ const ServerPayloadFields = [
   PayloadField.UpdatedAt,
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
-  PayloadField.DuplicateOf
-]
+  PayloadField.DuplicateOf,
+];
 
 const SessionHistoryPayloadFields = [
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.Content,
   PayloadField.UpdatedAt,
-]
+];
 
 /** Represents a payload with permissible fields for when a
  * payload is retrieved from a component for saving */
@@ -166,8 +164,8 @@ const ComponentRetrievedPayloadFields = [
   PayloadField.Uuid,
   PayloadField.Content,
   PayloadField.ContentType,
-  PayloadField.CreatedAt
-]
+  PayloadField.CreatedAt,
+];
 
 /** Represents a payload with permissible fields for when a
  * component wants to create a new item */
@@ -175,8 +173,8 @@ const ComponentCreatedPayloadFields = [
   PayloadField.Uuid,
   PayloadField.Content,
   PayloadField.ContentType,
-  PayloadField.CreatedAt
-]
+  PayloadField.CreatedAt,
+];
 
 /**
  * The saved server item payload represents the payload we want to map
@@ -190,8 +188,8 @@ const ServerSavedPayloadFields = [
   PayloadField.UpdatedAt,
   PayloadField.Deleted,
   PayloadField.Dirty,
-  PayloadField.LastSyncEnd
-]
+  PayloadField.LastSyncEnd,
+];
 
 const RemoteHistoryPayloadFields = ServerPayloadFields.slice();
 
@@ -200,12 +198,7 @@ export function CreateMaxPayloadFromAnyObject(
   override?: PayloadOverride,
   source?: PayloadSource
 ) {
-  return CreatePayload(
-    object,
-    MaxPayloadFields.slice(),
-    source,
-    override
-  );
+  return CreatePayload(object, MaxPayloadFields.slice(), source, override);
 }
 
 /**
@@ -231,10 +224,7 @@ export function PayloadByMerging(
       resultOverride[key] = override[key];
     }
   }
-  return CopyPayload(
-    payload,
-    resultOverride
-  );
+  return CopyPayload(payload, resultOverride);
 }
 
 export function CreateIntentPayloadFromObject(
@@ -257,24 +247,14 @@ export function CreateSourcedPayloadFromObject(
   override?: PayloadOverride
 ) {
   const payloadFields = payloadFieldsForSource(source);
-  return CreatePayload(
-    object,
-    payloadFields,
-    source,
-    override
-  );
+  return CreatePayload(object, payloadFields, source, override);
 }
 
 export function CopyPayload(
   payload: PurePayload,
   override?: PayloadOverride
 ): PurePayload {
-  return CreatePayload(
-    payload,
-    payload.fields,
-    payload.source,
-    override
-  );
+  return CreatePayload(payload, payload.fields, payload.source, override);
 }
 
 function CreatePayload(
@@ -284,9 +264,10 @@ function CreatePayload(
   override?: PayloadOverride
 ): PurePayload {
   const rawPayload = pickByCopy(object, fields);
-  const overrideFields = override instanceof PurePayload
-    ? override.fields.slice()
-    : Object.keys(override || []) as PayloadField[];
+  const overrideFields =
+    override instanceof PurePayload
+      ? override.fields.slice()
+      : (Object.keys(override || []) as PayloadField[]);
   for (const field of overrideFields) {
     const value = override![field];
     rawPayload[field] = value ? Copy(value) : value;
@@ -304,11 +285,7 @@ export function CreateEncryptionParameters(
   source?: PayloadSource
 ): PurePayload {
   const fields = Object.keys(raw) as PayloadField[];
-  return CreatePayload(
-    raw,
-    fields,
-    source
-  );
+  return CreatePayload(raw, fields, source);
 }
 
 export function CopyEncryptionParameters(
@@ -324,26 +301,26 @@ export function CopyEncryptionParameters(
 }
 
 function payloadFieldsForIntent(intent: EncryptionIntent) {
-  if ((
+  if (
     intent === EncryptionIntent.FileEncrypted ||
     intent === EncryptionIntent.FileDecrypted ||
     intent === EncryptionIntent.FilePreferEncrypted
-  )) {
+  ) {
     return FilePayloadFields.slice();
   }
 
-  if ((
+  if (
     intent === EncryptionIntent.LocalStoragePreferEncrypted ||
     intent === EncryptionIntent.LocalStorageDecrypted ||
     intent === EncryptionIntent.LocalStorageEncrypted
-  )) {
+  ) {
     return StoragePayloadFields.slice();
   }
 
-  if ((
+  if (
     intent === EncryptionIntent.Sync ||
     intent === EncryptionIntent.SyncDecrypted
-  )) {
+  ) {
     return ServerPayloadFields.slice();
   } else {
     throw `No payload fields found for intent ${intent}`;
@@ -371,24 +348,24 @@ export function payloadFieldsForSource(source: PayloadSource) {
     return ComponentCreatedPayloadFields.slice();
   }
 
-  if ((
+  if (
     source === PayloadSource.LocalRetrieved ||
     source === PayloadSource.LocalChanged
-  )) {
+  ) {
     return StoragePayloadFields.slice();
   }
 
-  if ((
+  if (
     source === PayloadSource.RemoteRetrieved ||
     source === PayloadSource.ConflictData ||
     source === PayloadSource.ConflictUuid
-  )) {
+  ) {
     return ServerPayloadFields.slice();
   }
-  if ((
+  if (
     source === PayloadSource.LocalSaved ||
     source === PayloadSource.RemoteSaved
-  )) {
+  ) {
     return ServerSavedPayloadFields.slice();
   } else {
     throw `No payload fields found for source ${source}`;
