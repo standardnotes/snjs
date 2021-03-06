@@ -2,9 +2,16 @@ import { SNLog } from '@Lib/log';
 import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ChallengeReason, ChallengeValidation } from './../challenges';
-import { KeychainRecoveryStrings, SessionStrings } from './../services/api/messages';
+import {
+  KeychainRecoveryStrings,
+  SessionStrings,
+} from './../services/api/messages';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
-import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from './../version';
+import {
+  PreviousSnjsVersion1_0_0,
+  PreviousSnjsVersion2_0_0,
+  SnjsVersion,
+} from './../version';
 import { Migration } from '@Lib/migrations/migration';
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
@@ -20,7 +27,6 @@ const LastMigrationTimeStampKey2_0_0 = 'last_migration_timestamp';
  * to set up all other migrations.
  */
 export class BaseMigration extends Migration {
-
   private reader?: StorageReader;
   private didPreRun = false;
 
@@ -30,12 +36,15 @@ export class BaseMigration extends Migration {
   }
 
   protected registerStageHandlers() {
-    this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
-      if (await this.needsKeychainRepair()) {
-        await this.repairMissingKeychain();
+    this.registerStageHandler(
+      ApplicationStage.PreparingForLaunch_0,
+      async () => {
+        if (await this.needsKeychainRepair()) {
+          await this.repairMissingKeychain();
+        }
+        this.markDone();
       }
-      this.markDone();
-    });
+    );
   }
 
   private getStoredVersion() {
@@ -61,11 +70,18 @@ export class BaseMigration extends Migration {
       /** Determine if we are 1.0.0 or 2.0.0 */
       /** If any of these keys exist in raw storage, we are coming from a 1.x architecture */
       const possibleLegacyKeys = [
-        'migrations', 'ephemeral', 'user', 'cachedThemes', 'syncToken', 'encryptedStorage'
+        'migrations',
+        'ephemeral',
+        'user',
+        'cachedThemes',
+        'syncToken',
+        'encryptedStorage',
       ];
       let hasLegacyValue = false;
       for (const legacyKey of possibleLegacyKeys) {
-        const value = await this.services.deviceInterface.getRawStorageValue(legacyKey);
+        const value = await this.services.deviceInterface.getRawStorageValue(
+          legacyKey
+        );
         if (value) {
           hasLegacyValue = true;
           break;
@@ -79,15 +95,22 @@ export class BaseMigration extends Migration {
         );
       } else {
         /** Coming from 2.0.0 (which did not store version) OR is brand new application */
-        const migrationKey = namespacedKey(this.services!.identifier, LastMigrationTimeStampKey2_0_0);
-        const migrationValue = await this.services.deviceInterface.getRawStorageValue(migrationKey);
+        const migrationKey = namespacedKey(
+          this.services!.identifier,
+          LastMigrationTimeStampKey2_0_0
+        );
+        const migrationValue = await this.services.deviceInterface.getRawStorageValue(
+          migrationKey
+        );
         const is_2_0_0_application = !isNullOrUndefined(migrationValue);
         if (is_2_0_0_application) {
           await this.services.deviceInterface.setRawStorageValue(
             storageKey,
             PreviousSnjsVersion2_0_0
           );
-          await this.services.deviceInterface.removeRawStorageValue(LastMigrationTimeStampKey2_0_0);
+          await this.services.deviceInterface.removeRawStorageValue(
+            LastMigrationTimeStampKey2_0_0
+          );
         } else {
           /** Is new application, use current version as not to run any migrations */
           await this.services.deviceInterface.setRawStorageValue(
@@ -183,65 +206,72 @@ export class BaseMigration extends Migration {
       KeychainRecoveryStrings.Text
     );
     return new Promise((resolve) => {
-      this.services.challengeService.addChallengeObserver(
-        challenge,
-        {
-          onNonvalidatedSubmit: async (challengeResponse) => {
-            const password = challengeResponse.values[0].value as string;
-            const accountParams = this.services.protocolService.createKeyParams(rawAccountParams as any);
-            const rootKey = await this.services.protocolService.computeRootKey(password, accountParams);
-            /** Choose an item to decrypt */
-            const allItems = (
-              await this.services.deviceInterface.getAllRawDatabasePayloads(this.services.identifier)
-            ) as any[];
-            let itemToDecrypt = allItems.find(item => {
-              const payload = CreateMaxPayloadFromAnyObject(item);
-              return ContentTypeUsesRootKeyEncryption(payload.content_type);
-            });
-            if (!itemToDecrypt) {
-              /** If no root key encrypted item, just choose any item */
-              itemToDecrypt = allItems[0];
-            }
-            if (!itemToDecrypt) {
-              throw SNLog.error(Error('Attempting keychain recovery validation but no items present.'));
-            }
-            const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(
-              CreateMaxPayloadFromAnyObject(itemToDecrypt),
-              rootKey
-            );
-            if (decryptedItem.errorDecrypting) {
-              /** Wrong password, try again */
-              this.services.challengeService.setValidationStatusForChallenge(
-                challenge,
-                challengeResponse!.values[0],
-                false
-              );
-            } else {
-              /**
-               * If decryption succeeds, store the generated account key where it is expected,
-               * either in top-level keychain in 1.0.0, and namespaced location in 2.0.0+.
-               */
-              if (version === PreviousSnjsVersion1_0_0) {
-                /** Store in top level keychain */
-                await this.services.deviceInterface.legacy_setRawKeychainValue({
-                  mk: rootKey.masterKey,
-                  ak: rootKey.dataAuthenticationKey,
-                  version: accountParams.version
-                });
-              } else {
-                /** Store in namespaced location */
-                const rawKey = rootKey.getKeychainValue();
-                await this.services.deviceInterface.setNamespacedKeychainValue(
-                  rawKey,
-                  this.services.identifier
-                );
-              }
-              resolve();
-              this.services.challengeService.completeChallenge(challenge);
-            }
+      this.services.challengeService.addChallengeObserver(challenge, {
+        onNonvalidatedSubmit: async (challengeResponse) => {
+          const password = challengeResponse.values[0].value as string;
+          const accountParams = this.services.protocolService.createKeyParams(
+            rawAccountParams as any
+          );
+          const rootKey = await this.services.protocolService.computeRootKey(
+            password,
+            accountParams
+          );
+          /** Choose an item to decrypt */
+          const allItems = (await this.services.deviceInterface.getAllRawDatabasePayloads(
+            this.services.identifier
+          )) as any[];
+          let itemToDecrypt = allItems.find((item) => {
+            const payload = CreateMaxPayloadFromAnyObject(item);
+            return ContentTypeUsesRootKeyEncryption(payload.content_type);
+          });
+          if (!itemToDecrypt) {
+            /** If no root key encrypted item, just choose any item */
+            itemToDecrypt = allItems[0];
           }
-        })
+          if (!itemToDecrypt) {
+            throw SNLog.error(
+              Error(
+                'Attempting keychain recovery validation but no items present.'
+              )
+            );
+          }
+          const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(
+            CreateMaxPayloadFromAnyObject(itemToDecrypt),
+            rootKey
+          );
+          if (decryptedItem.errorDecrypting) {
+            /** Wrong password, try again */
+            this.services.challengeService.setValidationStatusForChallenge(
+              challenge,
+              challengeResponse!.values[0],
+              false
+            );
+          } else {
+            /**
+             * If decryption succeeds, store the generated account key where it is expected,
+             * either in top-level keychain in 1.0.0, and namespaced location in 2.0.0+.
+             */
+            if (version === PreviousSnjsVersion1_0_0) {
+              /** Store in top level keychain */
+              await this.services.deviceInterface.legacy_setRawKeychainValue({
+                mk: rootKey.masterKey,
+                ak: rootKey.dataAuthenticationKey,
+                version: accountParams.version,
+              });
+            } else {
+              /** Store in namespaced location */
+              const rawKey = rootKey.getKeychainValue();
+              await this.services.deviceInterface.setNamespacedKeychainValue(
+                rawKey,
+                this.services.identifier
+              );
+            }
+            resolve();
+            this.services.challengeService.completeChallenge(challenge);
+          }
+        },
+      });
       this.services.challengeService.promptForChallengeResponse(challenge);
-    })
+    });
   }
 }

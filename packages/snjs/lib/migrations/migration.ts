@@ -1,12 +1,17 @@
-import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from './../challenges';
+import {
+  Challenge,
+  ChallengePrompt,
+  ChallengeReason,
+  ChallengeValidation,
+} from './../challenges';
 import { MigrationServices } from './types';
 import { ApplicationStage } from '../stages';
 
-type StageHandler = () => Promise<void>
+type StageHandler = () => Promise<void>;
 
 export abstract class Migration {
-  private stageHandlers: Partial<Record<ApplicationStage, StageHandler>> = {}
-  private onDoneHandler?: () => void
+  private stageHandlers: Partial<Record<ApplicationStage, StageHandler>> = {};
+  private onDoneHandler?: () => void;
 
   constructor(protected services: MigrationServices) {
     this.registerStageHandlers();
@@ -18,7 +23,10 @@ export abstract class Migration {
 
   protected abstract registerStageHandlers(): void;
 
-  protected registerStageHandler(stage: ApplicationStage, handler: StageHandler) {
+  protected registerStageHandler(
+    stage: ApplicationStage,
+    handler: StageHandler
+  ) {
     this.stageHandlers[stage] = handler;
   }
 
@@ -36,27 +44,25 @@ export abstract class Migration {
       false
     );
     return new Promise((resolve) => {
-      this.services.challengeService.addChallengeObserver(
-        challenge,
-        {
-          onNonvalidatedSubmit: async (challengeResponse) => {
-            const value = challengeResponse.values[0];
-            const passcode = value.value as string;
-            const valid = await validationCallback(passcode);
-            if (valid) {
-              this.services.challengeService.completeChallenge(challenge);
-              resolve(passcode);
-            } else {
-              this.services.challengeService.setValidationStatusForChallenge(
-                challenge,
-                value,
-                false
-              );
-            }
+      this.services.challengeService.addChallengeObserver(challenge, {
+        onNonvalidatedSubmit: async (challengeResponse) => {
+          const value = challengeResponse.values[0];
+          const passcode = value.value as string;
+          const valid = await validationCallback(passcode);
+          if (valid) {
+            this.services.challengeService.completeChallenge(challenge);
+            resolve(passcode);
+          } else {
+            this.services.challengeService.setValidationStatusForChallenge(
+              challenge,
+              value,
+              false
+            );
           }
-        });
+        },
+      });
       this.services.challengeService.promptForChallengeResponse(challenge);
-    })
+    });
   }
 
   onDone(callback: () => void) {
