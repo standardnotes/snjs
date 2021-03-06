@@ -60,7 +60,7 @@ describe('storage manager', function () {
     expect(keychainValue.serverPassword).to.not.be.ok;
   });
 
-  it('regular session should persist data', async function () {
+  it.skip('regular session should persist data', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
