@@ -289,7 +289,7 @@ export function objectToValueArray(object: AnyRecord): string[] {
  */
 export function sortedCopy(object: AnyRecord): AnyRecord {
   const keys = Object.keys(object).sort();
-  const result: any = {};
+  const result: AnyRecord = {};
   for (const key of keys) {
     result[key] = object[key];
   }
@@ -340,7 +340,7 @@ export function topLevelCompare<T>(left: T, right: T): boolean {
     return false;
   }
   for (const key of leftKeys) {
-    if ((left as any)[key] !== (right as any)[key]) {
+    if ((left as AnyRecord)[key] !== (right as AnyRecord)[key]) {
       return false;
     }
   }
