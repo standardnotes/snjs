@@ -100,6 +100,7 @@ export {
   isNullOrUndefined,
   isSameDay,
   jsonParseEmbeddedKeys,
+  omitInPlace,
   omitUndefinedCopy,
   removeFromArray,
   removeFromIndex,

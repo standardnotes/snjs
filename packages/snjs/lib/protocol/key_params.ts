@@ -92,7 +92,7 @@ export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
   return new SNRootKeyParams(keyParams);
 }
 
-function protocolVersionForKeyParamsResponse(response: KeyParamsResponse) {
+function protocolVersionForKeyParams(response: KeyParamsResponse | AnyKeyParamsContent) {
   if (response.version) {
     return response.version;
   }
@@ -106,7 +106,6 @@ function protocolVersionForKeyParamsResponse(response: KeyParamsResponse) {
    * as newer accounts may also send pw_nonce. These conditions only apply because
    * response.version is null.)
    */
-
    if(response.pw_nonce) {
      return ProtocolVersion.V001;
    } else {
@@ -120,7 +119,7 @@ export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier
     pw_cost: response.pw_cost!,
     pw_nonce: response.pw_nonce!,
     pw_salt: response.pw_salt!,
-    version: protocolVersionForKeyParamsResponse(response),
+    version: protocolVersionForKeyParams(response),
     origination: response.origination,
     created: response.created,
   }
@@ -139,7 +138,8 @@ export class SNRootKeyParams {
   constructor(content: AnyKeyParamsContent) {
     this.content = {
       ...content,
-      origination: content.origination || KeyParamsOrigination.Registration
+      origination: content.origination || KeyParamsOrigination.Registration,
+      version: content.version || protocolVersionForKeyParams(content)
     };
   }
 

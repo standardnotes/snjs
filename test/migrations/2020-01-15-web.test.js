@@ -622,4 +622,144 @@ describe('2020-01-15 web migration', () => {
     }
     await application.deinit();
   });
+
+  it('2020-01-15 migration from 002 app with account and passcode but missing offlineParams.version', async function () {
+    /**
+     * There was an issue where if the user had offlineParams but it was missing the version key,
+     * the user could not get past the passcode migration screen.
+     */
+    const application = await Factory.createAppWithRandNamespace();
+    /** Create legacy migrations value so that base migration detects old app */
+    await application.deviceInterface.setRawStorageValue(
+      'migrations',
+      JSON.stringify(['anything'])
+    );
+    const operator002 = new SNProtocolOperator002(new SNWebCrypto());
+    const identifier = 'foo';
+    const passcode = 'bar';
+    /** Create old version passcode parameters */
+    const passcodeKey = await operator002.createRootKey(
+      identifier,
+      passcode
+    );
+
+    /** The primary chaos agent */
+    const offlineParams = passcodeKey.keyParams.getPortableValue();
+    omitInPlace(offlineParams, ['version']);
+
+    await application.deviceInterface.setRawStorageValue(
+      'offlineParams',
+      JSON.stringify(offlineParams)
+    );
+
+    /** Create old version account parameters */
+    const password = 'tar';
+    const accountKey = await operator002.createRootKey(
+      identifier,
+      password
+    );
+
+    /** Create legacy storage and encrypt it with passcode */
+    const embeddedStorage = {
+      mk: accountKey.masterKey,
+      ak: accountKey.dataAuthenticationKey,
+      pw: accountKey.serverPassword,
+      jwt: 'anything',
+      /** Legacy versions would store json strings inside of embedded storage */
+      auth_params: JSON.stringify(accountKey.keyParams.getPortableValue()),
+      user: JSON.stringify({ uuid: 'anything', email: 'anything' })
+    };
+    const storagePayload = CreateMaxPayloadFromAnyObject(
+      {
+        uuid: await operator002.crypto.generateUUID(),
+        content_type: ContentType.EncryptedStorage,
+        content: {
+          storage: embeddedStorage
+        },
+      }
+    );
+    const encryptionParams = await operator002.generateEncryptedParameters(
+      storagePayload,
+      PayloadFormat.EncryptedString,
+      passcodeKey,
+    );
+    const persistPayload = CreateMaxPayloadFromAnyObject(
+      storagePayload,
+      encryptionParams
+    );
+    await application.deviceInterface.setRawStorageValue(
+      'encryptedStorage',
+      JSON.stringify(persistPayload)
+    );
+
+    /** Create encrypted item and store it in db */
+    const notePayload = Factory.createNotePayload();
+    const noteEncryptionParams = await operator002.generateEncryptedParameters(
+      notePayload,
+      PayloadFormat.EncryptedString,
+      accountKey,
+    );
+    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
+      notePayload,
+      noteEncryptionParams
+    );
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+
+    /** Runs migration */
+    await application.prepareForLaunch({
+      receiveChallenge: async (challenge) => {
+        application.submitValuesForChallenge(
+          challenge,
+          [new ChallengeValue(challenge.prompts[0], passcode)]
+        );
+      },
+    });
+    await application.launch(true);
+    expect(application.sessionManager.online()).to.equal(true);
+    expect(application.sessionManager.getUser()).to.be.ok;
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper
+    );
+    /** Should be decrypted */
+    const storageMode = application.storageService.domainKeyForMode(
+      StorageValueModes.Default
+    );
+    const valueStore = application.storageService.values[storageMode];
+    expect(valueStore.content_type).to.not.be.ok;
+    /** Embedded value should match */
+    const migratedKeyParams = await application.storageService.getValue(
+      StorageKey.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(migratedKeyParams).to.eql(accountKey.keyParams.getPortableValue());
+    const rootKey = await application.protocolService.getRootKey();
+    expect(rootKey).to.be.ok;
+
+    expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('auth_params')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('jwt')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('ak')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('mk')).to.not.be.ok;
+    expect(await application.deviceInterface.getRawStorageValue('pw')).to.not.be.ok;
+
+    const keyParams = await application.storageService.getValue(
+      StorageKey.RootKeyParams,
+      StorageValueModes.Nonwrapped
+    );
+    expect(typeof keyParams).to.equal('object');
+
+    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.serverPassword).to.not.be.ok;
+    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V002);
+
+    /** Expect note is decrypted */
+    expect(application.itemManager.notes.length).to.equal(1);
+    const retrievedNote = application.itemManager.notes[0];
+    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
+    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+
+    await application.deinit();
+  });
+
 });
