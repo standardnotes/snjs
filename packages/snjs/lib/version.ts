@@ -16,7 +16,10 @@ export const PreviousSnjsVersion2_0_0 = '2.0.0';
  * Returns true if the version string on the right is greater than the one
  * on the left. Accepts any format version number, like 2, 2.0, 2.0.0, or even 2.0.0.01
  */
-export function isRightVersionGreaterThanLeft(left: string, right: string): boolean {
+export function isRightVersionGreaterThanLeft(
+  left: string,
+  right: string
+): boolean {
   return compareSemVersions(left, right) === -1;
 }
 

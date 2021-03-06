@@ -4,7 +4,7 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = {
   entry: {
-    'snjs.js': './lib/index.ts'
+    'snjs.js': './lib/index.ts',
   },
   resolve: {
     extensions: ['.ts', '.js'],
@@ -13,8 +13,8 @@ module.exports = {
       '@Services': path.resolve(__dirname, 'lib/services'),
       '@Models': path.resolve(__dirname, 'lib/models'),
       '@Protocol': path.resolve(__dirname, 'lib/protocol'),
-      '@Payloads': path.resolve(__dirname, 'lib/protocol/payloads')
-    }
+      '@Payloads': path.resolve(__dirname, 'lib/protocol/payloads'),
+    },
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -22,7 +22,7 @@ module.exports = {
     library: 'SNLibrary',
     libraryTarget: 'umd',
     umdNamedDefine: true,
-    publicPath: '/dist/'
+    publicPath: '/dist/',
   },
   optimization: {
     minimize: false,
@@ -40,8 +40,8 @@ module.exports = {
             },
           },
         ],
-      }
-    ]
+      },
+    ],
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -57,6 +57,6 @@ module.exports = {
       allowAsyncCycles: false,
       // set the current working directory for displaying module paths
       cwd: process.cwd(),
-    })
-  ]
+    }),
+  ],
 };
