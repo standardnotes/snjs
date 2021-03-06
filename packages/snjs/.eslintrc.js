@@ -17,6 +17,6 @@ module.exports = {
     'require-await': 'off',
     '@typescript-eslint/require-await': 'warn',
     '@typescript-eslint/no-floating-promises': 'warn',
-    quotes: ['error', 'single'],
+    quotes: ['warn', 'single'],
   },
 };
