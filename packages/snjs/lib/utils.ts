@@ -10,8 +10,8 @@ export function getGlobalScope(): Window | unknown | null {
   return typeof window !== 'undefined'
     ? window
     : typeof global !== 'undefined'
-    ? global
-    : null;
+      ? global
+      : null;
 }
 
 export function dictToArray<T>(dict: Record<any, T>) {
@@ -21,7 +21,7 @@ export function dictToArray<T>(dict: Record<any, T>) {
 /**
  * Whether we are in a web browser
  */
-export function isWebEnvironment() {
+export function isWebEnvironment(): boolean {
   return getGlobalScope() !== null;
 }
 
@@ -29,12 +29,14 @@ export function isWebEnvironment() {
  * Returns true if WebCrypto is available
  * @access public
  */
-export function isWebCryptoAvailable() {
+export function isWebCryptoAvailable(): boolean {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore documentMode does not exit in definitions but might exist on IE
   return (
     (isWebEnvironment() &&
       !isReactNativeEnvironment() &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore documentMode exists for IE and we need to check if IE
       !(document && document.documentMode)) ||
     (/Edge/.test(navigator.userAgent) &&
       window.crypto &&
@@ -45,7 +47,7 @@ export function isWebCryptoAvailable() {
 /**
  * Whether we are in React Native app
  */
-export function isReactNativeEnvironment() {
+export function isReactNativeEnvironment(): boolean {
   return (
     typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
   );
@@ -89,7 +91,7 @@ export function concatArrays(...args: any[]) {
 /**
  * @returns Whether the value is a function or object
  */
-export function isObject(value: any) {
+export function isObject<T>(value: T | null): boolean {
   if (value === null) {
     return false;
   }
@@ -99,7 +101,7 @@ export function isObject(value: any) {
 /**
  * @returns Whether the value is a function
  */
-export function isFunction(value: any) {
+export function isFunction(value: any): boolean {
   if (value === null) {
     return false;
   }
@@ -156,7 +158,7 @@ export function uniqCombineObjArrays(
  * Returns a new array containing only unique values
  * @returns Array containing unique values
  */
-export function uniqueArray(array: any[]): any[] {
+export function uniqueArray<T>(array: T[]): T[] {
   return uniq(array);
 }
 
@@ -164,7 +166,7 @@ export function uniqueArray(array: any[]): any[] {
  * Returns the last element in the array.
  * @returns The last element in the array
  */
-export function lastElement(array: any[]) {
+export function lastElement<T>(array: T[]): T {
   return array[array.length - 1];
 }
 
@@ -172,7 +174,7 @@ export function lastElement(array: any[]) {
  * Adds all items from otherArray into inArray, in-place.
  * Does not return a value.
  */
-export function extendArray<T>(inArray: T[], otherArray: T[]) {
+export function extendArray<T>(inArray: T[], otherArray: T[]): void {
   for (const value of otherArray) {
     inArray.push(value);
   }
@@ -182,7 +184,7 @@ export function extendArray<T>(inArray: T[], otherArray: T[]) {
  * Removes all items appearing in toSubtract from inArray, in-place
  * @param toSubtract - The list of items to remove from inArray
  */
-export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
+export function subtractFromArray<T>(inArray: T[], toSubtract: T[]): void {
   for (const value of toSubtract) {
     removeFromArray(inArray, value);
   }
@@ -192,7 +194,7 @@ export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
  * Removes the first matching element of an array by strict equality.
  * If no matchin element is found, the array is left unchanged.
  */
-export function removeFromArray<T>(array: T[], value: T) {
+export function removeFromArray<T>(array: T[], value: T): void {
   const valueIndex = array.indexOf(value);
   if (valueIndex === -1) {
     return;
@@ -220,20 +222,20 @@ export function addIfUnique<T>(array: T[], value: T): boolean {
 export function filterFromArray<T>(
   array: T[],
   predicate: Partial<Record<keyof T, any>>
-) {
+): void {
   remove(array, predicate);
 }
 
 /**
  * Returns a new array by removing all elements in subtract from array
  */
-export function arrayByDifference<T>(array: T[], subtract: T[]) {
+export function arrayByDifference<T>(array: T[], subtract: T[]): T[] {
   return array
     .filter((x) => !subtract.includes(x))
     .concat(subtract.filter((x) => !array.includes(x)));
 }
 
-export function compareValues<T>(left: T, right: T) {
+export function compareValues<T>(left: T, right: T): boolean {
   if ((left && !right) || (!left && right)) {
     return false;
   }
@@ -249,21 +251,21 @@ export function compareValues<T>(left: T, right: T) {
 /**
  * Removes the value from the array at the given index, in-place.
  */
-export function removeFromIndex(array: any[], index: number) {
+export function removeFromIndex<T>(array: T[], index: number): void {
   array.splice(index, 1);
 }
 
 /**
  * Adds the value from the array at the given index, in-place.
  */
-export function addAtIndex<T>(array: T[], element: T, index: number) {
+export function addAtIndex<T>(array: T[], element: T, index: number): void {
   array.splice(index, 0, element);
 }
 
 /**
  * Returns a new array by removeing the value from the array at the given index
  */
-export function arrayByRemovingFromIndex<T>(array: T[], index: number) {
+export function arrayByRemovingFromIndex<T>(array: T[], index: number): T[] {
   const copy = array.slice();
   removeFromIndex(copy, index);
   return copy;
@@ -274,7 +276,7 @@ export function arrayByRemovingFromIndex<T>(array: T[], index: number) {
  * object key.
  * Example: objectToValueArray({a: 1, b: 2}) returns [1, 2]
  */
-export function objectToValueArray(object: AnyRecord) {
+export function objectToValueArray(object: AnyRecord): string[] {
   const values = [];
   for (const key of Object.keys(object)) {
     values.push(object[key]);
@@ -286,7 +288,7 @@ export function objectToValueArray(object: AnyRecord) {
  * Returns a key-sorted copy of the object.
  * For example, sortedCopy({b: '1', a: '2'}) returns {a: '2', b: '1'}
  */
-export function sortedCopy(object: any) {
+export function sortedCopy(object: AnyRecord): AnyRecord {
   const keys = Object.keys(object).sort();
   const result: any = {};
   for (const key of keys) {
@@ -296,8 +298,8 @@ export function sortedCopy(object: any) {
 }
 
 /** Returns a new object by omitting any keys which have an undefined or null value  */
-export function omitUndefinedCopy(object: any) {
-  const result: any = {};
+export function omitUndefinedCopy(object: AnyRecord): AnyRecord {
+  const result: AnyRecord = {};
   for (const key of Object.keys(object)) {
     if (!isNullOrUndefined(object[key])) {
       result[key] = object[key];
@@ -310,7 +312,7 @@ export function omitUndefinedCopy(object: any) {
  * Returns a new array by sorting an array of elements based on a date property,
  * as indicated by the input key value.
  */
-export function dateSorted<T>(elements: T[], key: keyof T, ascending = true) {
+export function dateSorted<T>(elements: T[], key: keyof T, ascending = true): T[] {
   return elements.sort((a, b) => {
     const aTimestamp = ((a[key] as unknown) as Date).getTime();
     const bTimestamp = ((b[key] as unknown) as Date).getTime();
@@ -326,7 +328,7 @@ export function dateSorted<T>(elements: T[], key: keyof T, ascending = true) {
 }
 
 /** Compares for equality by comparing top-level keys value equality (===) */
-export function topLevelCompare<T>(left: T, right: T) {
+export function topLevelCompare<T>(left: T, right: T): boolean {
   if (!left && !right) {
     return true;
   }
@@ -349,7 +351,7 @@ export function topLevelCompare<T>(left: T, right: T) {
 /**
  * Returns a new object by attempting to JSON.parse any top-level object keys.
  */
-export function jsonParseEmbeddedKeys(object: AnyRecord) {
+export function jsonParseEmbeddedKeys(object: AnyRecord): AnyRecord {
   const result: AnyRecord = {};
   for (const key of Object.keys(object)) {
     let value;
@@ -366,7 +368,7 @@ export function jsonParseEmbeddedKeys(object: AnyRecord) {
 /**
  * Deletes keys of the input object.
  */
-export function omitInPlace<T>(object: T, keys: Array<keyof T>) {
+export function omitInPlace<T>(object: T, keys: Array<keyof T>): T | undefined {
   if (!object) {
     return;
   }
@@ -378,7 +380,7 @@ export function omitInPlace<T>(object: T, keys: Array<keyof T>) {
 /**
  * Creates a new object by omitting `keys` from `object`
  */
-export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
+export function omitByCopy<T>(object: T, keys: Array<keyof T>): T | undefined {
   if (isNullOrUndefined(object)) {
     return undefined;
   }
@@ -397,7 +399,7 @@ export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
  * Similiar to Node's path.join, this function combines an array of paths into
  * one resolved path.
  */
-export function joinPaths(...args: string[]) {
+export function joinPaths(...args: string[]): string {
   return args
     .map((part, i) => {
       if (i === 0) {
@@ -415,7 +417,7 @@ export function joinPaths(...args: string[]) {
  * the string (if the input is an object). If input is date, a Date copy will be created,
  * and if input is a primitive value, it will be returned as-is.
  */
-export function Copy(object: any) {
+export function Copy(object: AnyRecord): AnyRecord {
   if (object instanceof Date) {
     return new Date(object);
   } else if (isObject(object)) {
@@ -429,7 +431,7 @@ export function Copy(object: any) {
  * Merges the second object parameter into the first object, in-place.
  * @returns The now modified first object parameter passed into the function.
  */
-export function deepMerge(a: AnyRecord, b: AnyRecord) {
+export function deepMerge(a: any, b: any) {
   /**
    * lodash.merge will not merge a full array with an empty one.
    * deepMerge will replace arrays wholesale
@@ -449,8 +451,8 @@ export function deepMerge(a: AnyRecord, b: AnyRecord) {
 /**
  * Returns a new object by selecting certain keys from input object.
  */
-export function pickByCopy<T>(object: T, keys: Array<keyof T>) {
-  const result = {} as T;
+export function pickByCopy(object: AnyRecord, keys: Array<keyof AnyRecord>): AnyRecord {
+  const result = {} as AnyRecord;
   for (const key of keys) {
     result[key] = object[key];
   }
@@ -460,7 +462,7 @@ export function pickByCopy<T>(object: T, keys: Array<keyof T>) {
 /**
  * Recursively makes an object immutable via Object.freeze
  */
-export function deepFreeze(object: any) {
+export function deepFreeze(object: AnyRecord): AnyRecord {
   const propNames = Object.getOwnPropertyNames(object);
   for (const name of propNames) {
     const value = object[name];
@@ -477,19 +479,19 @@ export function deepFreeze(object: any) {
 /**
  * Determines if an object has a getter defined for a given property
  */
-export function hasGetter(object: any, property: string) {
+export function hasGetter(object: any, property: string): boolean {
   const descriptor = Object.getOwnPropertyDescriptor(
     Object.getPrototypeOf(object),
     property
   );
-  return descriptor && !isNullOrUndefined(descriptor.get);
+  return !!descriptor && !isNullOrUndefined(descriptor.get);
 }
 
 /**
  * Truncates a hex string into a desired number of bits
  * @returns A hexadecimal string truncated to the number of desired bits
  */
-export function truncateHexString(string: string, desiredBits: number) {
+export function truncateHexString(string: string, desiredBits: number): string {
   const BITS_PER_HEX_CHAR = 4;
   const desiredCharLength = desiredBits / BITS_PER_HEX_CHAR;
   return string.substring(0, desiredCharLength);
@@ -499,7 +501,7 @@ export function truncateHexString(string: string, desiredBits: number) {
  * When awaited, this function allows code execution to pause for a set time.
  * Should be used primarily for testing.
  */
-export async function sleep(milliseconds: number) {
+export async function sleep(milliseconds: number): Promise<void> {
   console.warn(`Sleeping for ${milliseconds}ms`);
   return new Promise<void>((resolve) => {
     setTimeout(function () {
@@ -515,7 +517,7 @@ export function assertUnreachable(uncheckedCase: never): never {
 /**
  * Returns a boolean representing whether two dates are on the same day
  */
-export function isSameDay(dateA: Date, dateB: Date) {
+export function isSameDay(dateA: Date, dateB: Date): boolean {
   return (
     dateA.getFullYear() === dateB.getFullYear() &&
     dateA.getMonth() === dateB.getMonth() &&
