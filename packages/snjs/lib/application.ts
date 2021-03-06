@@ -137,7 +137,7 @@ export class SNApplication {
   private migrationService!: SNMigrationService;
   public alertService!: SNAlertService;
   private httpService!: SNHttpService;
-  private modelManager!: PayloadManager;
+  private payloadManager!: PayloadManager;
   public protocolService!: SNProtocolService;
   private storageService!: SNStorageService;
   private apiService!: SNApiService;
@@ -427,7 +427,7 @@ export class SNApplication {
       dirty: true,
       dirtiedDate: new Date(),
     });
-    await this.modelManager.emitPayload(dirtied, PayloadSource.LocalChanged);
+    await this.payloadManager.emitPayload(dirtied, PayloadSource.LocalChanged);
     await this.syncService.sync();
   }
 
@@ -1092,7 +1092,7 @@ export class SNApplication {
           return payload;
         }
       });
-    const affectedUuids = await this.modelManager.importPayloads(validPayloads);
+    const affectedUuids = await this.payloadManager.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
       await promise;
@@ -1681,7 +1681,7 @@ export class SNApplication {
   }
 
   private constructServices() {
-    this.createModelManager();
+    this.createPayloadManager();
     this.createItemManager();
     this.createStorageManager();
     this.createProtocolService();
@@ -1713,7 +1713,7 @@ export class SNApplication {
     (this.migrationService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
     (this.httpService as unknown) = undefined;
-    (this.modelManager as unknown) = undefined;
+    (this.payloadManager as unknown) = undefined;
     (this.protocolService as unknown) = undefined;
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;
@@ -1756,7 +1756,7 @@ export class SNApplication {
   }
 
   private createItemManager() {
-    this.itemManager = new ItemManager(this.modelManager);
+    this.itemManager = new ItemManager(this.payloadManager);
     this.services.push(this.itemManager);
   }
 
@@ -1783,9 +1783,9 @@ export class SNApplication {
     this.services.push(this.httpService);
   }
 
-  private createModelManager() {
-    this.modelManager = new PayloadManager();
-    this.services.push(this.modelManager);
+  private createPayloadManager() {
+    this.payloadManager = new PayloadManager();
+    this.services.push(this.payloadManager);
   }
 
   private createSingletonManager() {
@@ -1809,7 +1809,7 @@ export class SNApplication {
   private createProtocolService() {
     this.protocolService = new SNProtocolService(
       this.itemManager,
-      this.modelManager,
+      this.payloadManager,
       this.deviceInterface,
       this.storageService,
       this.identifier,
@@ -1824,7 +1824,7 @@ export class SNApplication {
   private createKeyRecoveryService() {
     this.keyRecoveryService = new SNKeyRecoveryService(
       this.itemManager,
-      this.modelManager,
+      this.payloadManager,
       this.apiService,
       this.sessionManager,
       this.protocolService,
@@ -1878,7 +1878,7 @@ export class SNApplication {
       this.sessionManager,
       this.protocolService,
       this.storageService,
-      this.modelManager,
+      this.payloadManager,
       this.apiService,
       this.deviceInterface.interval
     );
@@ -1939,7 +1939,7 @@ export class SNApplication {
       this.alertService,
       this.deviceInterface,
       this.httpService,
-      this.modelManager,
+      this.payloadManager,
       this.protocolService,
       this.syncService
     );

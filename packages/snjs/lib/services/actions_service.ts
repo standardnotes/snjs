@@ -9,7 +9,7 @@ import { SNActionsExtension } from './../models/app/extension';
 import { SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
-import { PayloadManager } from './model_manager';
+import { PayloadManager } from './payload_manager';
 import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
 import { PayloadSource } from '@Payloads/sources';
@@ -50,7 +50,7 @@ type PasswordRequestHandler = () => Promise<string>;
 export class SNActionsService extends PureService {
   private alertService?: SNAlertService;
   private httpService?: SNHttpService;
-  private modelManager?: PayloadManager;
+  private payloadManager?: PayloadManager;
   private itemManager?: ItemManager;
   private protocolService?: SNProtocolService;
   private syncService?: SNSyncService;
@@ -61,7 +61,7 @@ export class SNActionsService extends PureService {
     alertService: SNAlertService,
     deviceInterface: DeviceInterface,
     httpService: SNHttpService,
-    modelManager: PayloadManager,
+    payloadManager: PayloadManager,
     protocolService: SNProtocolService,
     syncService: SNSyncService
   ) {
@@ -70,7 +70,7 @@ export class SNActionsService extends PureService {
     this.alertService = alertService;
     this.deviceInterface = deviceInterface;
     this.httpService = httpService;
-    this.modelManager = modelManager;
+    this.payloadManager = payloadManager;
     this.protocolService = protocolService;
     this.syncService = syncService;
     this.previousPasswords = [];
@@ -82,7 +82,7 @@ export class SNActionsService extends PureService {
     this.alertService = undefined;
     this.deviceInterface = undefined;
     this.httpService = undefined;
-    this.modelManager = undefined;
+    this.payloadManager = undefined;
     this.protocolService = undefined;
     this.syncService = undefined;
     this.previousPasswords.length = 0;
@@ -213,7 +213,7 @@ export class SNActionsService extends PureService {
       response,
       passwordRequestHandler
     );
-    await this.modelManager!.emitPayload(
+    await this.payloadManager!.emitPayload(
       CopyPayload(payload!, {
         dirty: true,
         dirtiedDate: new Date(),

@@ -8,7 +8,7 @@ import { SNItemsKey } from '@Models/app/items_key';
 import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
-import { NoteMutator, SNNote } from './../models/app/note';
+import { NoteMutator } from './../models/app/note';
 import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
@@ -29,7 +29,7 @@ import {
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
 import { PayloadSource } from './../protocol/payloads/sources';
 import { PurePayload } from './../protocol/payloads/pure_payload';
-import { PayloadManager } from './model_manager';
+import { PayloadManager } from './payload_manager';
 import { ContentType } from '../models/content_types';
 import { ThemeMutator } from '@Lib/models';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
@@ -64,19 +64,18 @@ type Observer = {
  * and then  we'll propagate them to our listeners.
  */
 export class ItemManager extends PureService {
-  private modelManager?: PayloadManager;
   private unsubChangeObserver: any;
   private observers: Observer[] = [];
   private collection!: ItemCollection;
   private notesView!: ItemCollectionNotesView;
   private systemSmartTags: SNSmartTag[];
 
-  constructor(modelManager: PayloadManager) {
+  constructor(private payloadManager: PayloadManager) {
     super();
-    this.modelManager = modelManager;
+    this.payloadManager = payloadManager;
     this.systemSmartTags = BuildSmartTags();
     this.createCollection();
-    this.unsubChangeObserver = this.modelManager.addObserver(
+    this.unsubChangeObserver = this.payloadManager.addObserver(
       ContentType.Any,
       this.setPayloads.bind(this)
     );
@@ -146,9 +145,9 @@ export class ItemManager extends PureService {
   public deinit(): void {
     this.unsubChangeObserver();
     this.unsubChangeObserver = undefined;
-    this.modelManager = undefined;
-    (this.collection as any) = undefined;
-    (this.notesView as any) = undefined;
+    (this.payloadManager as unknown) = undefined;
+    (this.collection as unknown) = undefined;
+    (this.notesView as unknown) = undefined;
   }
 
   resetState(): void {
@@ -407,7 +406,7 @@ export class ItemManager extends PureService {
       const payload = mutator.getResult();
       payloads.push(payload);
     }
-    await this.modelManager!.emitPayloads(
+    await this.payloadManager!.emitPayloads(
       payloads,
       payloadSource,
       payloadSourceKey
@@ -504,7 +503,7 @@ export class ItemManager extends PureService {
   ) {
     mutate(mutator);
     const payload = mutator.getResult();
-    return this.modelManager!.emitPayload(
+    return this.payloadManager!.emitPayload(
       payload,
       payloadSource,
       payloadSourceKey
@@ -574,11 +573,11 @@ export class ItemManager extends PureService {
     const payload = CreateMaxPayloadFromAnyObject(item);
     const resultingPayloads = await PayloadsByDuplicating(
       payload,
-      this.modelManager!.getMasterCollection(),
+      this.payloadManager!.getMasterCollection(),
       isConflict,
       additionalContent
     );
-    await this.modelManager!.emitPayloads(
+    await this.payloadManager!.emitPayloads(
       resultingPayloads,
       PayloadSource.LocalChanged
     );
@@ -608,7 +607,7 @@ export class ItemManager extends PureService {
       },
       override
     );
-    await this.modelManager!.emitPayload(payload, PayloadSource.Constructor);
+    await this.payloadManager!.emitPayload(payload, PayloadSource.Constructor);
     return this.findItem(payload.uuid!)!;
   }
 
@@ -628,7 +627,7 @@ export class ItemManager extends PureService {
     payload: PurePayload,
     source = PayloadSource.Constructor
   ) {
-    await this.modelManager!.emitPayload(payload, source);
+    await this.payloadManager!.emitPayload(payload, source);
     return this.findItem(payload.uuid!)!;
   }
 
@@ -636,7 +635,7 @@ export class ItemManager extends PureService {
     payloads: PurePayload[],
     source = PayloadSource.Constructor
   ) {
-    await this.modelManager!.emitPayloads(payloads, source);
+    await this.payloadManager!.emitPayloads(payloads, source);
     const uuids = Uuids(payloads);
     return this.findItems(uuids);
   }
@@ -818,12 +817,12 @@ export class ItemManager extends PureService {
       MutationType.NonDirtying
     );
     this.resetState();
-    this.modelManager!.resetState();
+    this.payloadManager!.resetState();
   }
 
   public removeItemLocally(item: SNItem) {
     this.collection.discard(item);
-    this.modelManager!.removePayloadLocally(item.payload);
+    this.payloadManager!.removePayloadLocally(item.payload);
   }
 }
 

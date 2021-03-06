@@ -5,7 +5,7 @@ import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
 import { MutationType, SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
-import { PayloadManager } from './../model_manager';
+import { PayloadManager } from './../payload_manager';
 import { SNStorageService } from './../storage_service';
 import { SNProtocolService } from './../protocol_service';
 import {
@@ -120,7 +120,7 @@ export class SNSyncService extends PureService<SyncEvent> {
   private sessionManager?: SNSessionManager;
   private protocolService?: SNProtocolService;
   private storageService?: SNStorageService;
-  private modelManager?: PayloadManager;
+  private payloadManager?: PayloadManager;
   private itemManager?: ItemManager;
   private apiService?: SNApiService;
   private interval: any;
@@ -157,7 +157,7 @@ export class SNSyncService extends PureService<SyncEvent> {
     sessionManager: SNSessionManager,
     protocolService: SNProtocolService,
     storageService: SNStorageService,
-    modelManager: PayloadManager,
+    payloadManager: PayloadManager,
     apiService: SNApiService,
     interval: any
   ) {
@@ -165,7 +165,7 @@ export class SNSyncService extends PureService<SyncEvent> {
     this.itemManager = itemManager;
     this.sessionManager = sessionManager;
     this.protocolService = protocolService;
-    this.modelManager = modelManager;
+    this.payloadManager = payloadManager;
     this.storageService = storageService;
     this.apiService = apiService;
     this.interval = interval;
@@ -188,7 +188,7 @@ export class SNSyncService extends PureService<SyncEvent> {
     this.sessionManager = undefined;
     this.itemManager = undefined;
     this.protocolService = undefined;
-    this.modelManager = undefined;
+    this.payloadManager = undefined;
     this.storageService = undefined;
     this.apiService = undefined;
     this.interval = undefined;
@@ -295,7 +295,7 @@ export class SNSyncService extends PureService<SyncEvent> {
     const decryptedItemsKeys = await this.protocolService!.payloadsByDecryptingPayloads(
       itemsKeysPayloads
     );
-    await this.modelManager!.emitPayloads(
+    await this.payloadManager!.emitPayloads(
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
     );
@@ -312,7 +312,7 @@ export class SNSyncService extends PureService<SyncEvent> {
       const decrypted = await this.protocolService!.payloadsByDecryptingPayloads(
         batch
       );
-      await this.modelManager!.emitPayloads(
+      await this.payloadManager!.emitPayloads(
         decrypted,
         PayloadSource.LocalRetrieved
       );
@@ -376,9 +376,9 @@ export class SNSyncService extends PureService<SyncEvent> {
     const payload = CreateMaxPayloadFromAnyObject(item);
     const results = await PayloadsByAlternatingUuid(
       payload,
-      this.modelManager!.getMasterCollection()
+      this.payloadManager!.getMasterCollection()
     );
-    await this.modelManager!.emitPayloads(results, PayloadSource.LocalChanged);
+    await this.payloadManager!.emitPayloads(results, PayloadSource.LocalChanged);
     await this.persistPayloads(results);
     return this.itemManager!.findItem(results[0].uuid!);
   }
@@ -408,7 +408,7 @@ export class SNSyncService extends PureService<SyncEvent> {
         dirtiedDate: new Date(),
       });
     });
-    await this.modelManager!.emitPayloads(payloads, PayloadSource.LocalChanged);
+    await this.payloadManager!.emitPayloads(payloads, PayloadSource.LocalChanged);
     await this.persistPayloads(payloads);
   }
 
@@ -828,11 +828,11 @@ export class SNSyncService extends PureService<SyncEvent> {
     this.log('Offline Sync Response', response.rawResponse);
     const payloadsToEmit = response.savedPayloads;
     if (payloadsToEmit.length > 0) {
-      await this.modelManager!.emitPayloads(
+      await this.payloadManager!.emitPayloads(
         payloadsToEmit,
         PayloadSource.LocalSaved
       );
-      const payloadsToPersist = this.modelManager!.find(
+      const payloadsToPersist = this.payloadManager!.find(
         Uuids(payloadsToEmit)
       ) as PurePayload[];
       await this.persistPayloads(payloadsToPersist);
@@ -884,7 +884,7 @@ export class SNSyncService extends PureService<SyncEvent> {
       );
       decryptedPayloads.push(decrypted);
     }
-    const masterCollection = this.modelManager!.getMasterCollection();
+    const masterCollection = this.payloadManager!.getMasterCollection();
     const resolver = new SyncResponseResolver(
       response,
       decryptedPayloads,
@@ -894,7 +894,7 @@ export class SNSyncService extends PureService<SyncEvent> {
 
     const collections = await resolver.collectionsByProcessingResponse();
     for (const collection of collections) {
-      const payloadsToPersist = await this.modelManager!.emitCollection(
+      const payloadsToPersist = await this.payloadManager!.emitCollection(
         collection
       );
       await this.persistPayloads(payloadsToPersist);
@@ -923,7 +923,7 @@ export class SNSyncService extends PureService<SyncEvent> {
         dirty: false,
       });
     });
-    await this.modelManager!.emitPayloads(payloads, PayloadSource.LocalChanged);
+    await this.payloadManager!.emitPayloads(payloads, PayloadSource.LocalChanged);
     await this.persistPayloads(payloads);
   }
 
@@ -975,14 +975,14 @@ export class SNSyncService extends PureService<SyncEvent> {
     );
     const payloads = await downloader.run();
     const delta = new DeltaOutOfSync(
-      this.modelManager!.getMasterCollection(),
+      this.payloadManager!.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(
         payloads,
         PayloadSource.RemoteRetrieved
       )
     );
     const collection = await delta.resultingCollection();
-    await this.modelManager!.emitCollection(collection);
+    await this.payloadManager!.emitCollection(collection);
     await this.persistPayloads(collection.payloads);
     return this.sync({
       checkIntegrity: true,

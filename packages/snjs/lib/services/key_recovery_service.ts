@@ -8,7 +8,7 @@ import { KeyRecoveryStrings } from './api/messages';
 import { SNStorageService, StorageValueModes } from './storage_service';
 import { SNRootKeyParams } from './../protocol/key_params';
 import { SNSessionManager } from './api/session_manager';
-import { PayloadManager } from './model_manager';
+import { PayloadManager } from './payload_manager';
 import {
   Challenge,
   ChallengePrompt,
@@ -90,7 +90,7 @@ export class SNKeyRecoveryService extends PureService {
 
   constructor(
     private itemManager: ItemManager,
-    private modelManager: PayloadManager,
+    private payloadManager: PayloadManager,
     private apiService: SNApiService,
     private sessionManager: SNSessionManager,
     private protocolService: SNProtocolService,
@@ -121,7 +121,7 @@ export class SNKeyRecoveryService extends PureService {
 
   public deinit() {
     (this.itemManager as any) = undefined;
-    (this.modelManager as any) = undefined;
+    (this.payloadManager as any) = undefined;
     (this.apiService as any) = undefined;
     (this.sessionManager as any) = undefined;
     (this.protocolService as any) = undefined;
@@ -464,7 +464,7 @@ export class SNKeyRecoveryService extends PureService {
       const allRelevantKeyPayloads = [decryptedPayload].concat(
         decryptedMatching
       );
-      this.modelManager.emitPayloads(
+      this.payloadManager.emitPayloads(
         allRelevantKeyPayloads,
         PayloadSource.DecryptedTransient
       );

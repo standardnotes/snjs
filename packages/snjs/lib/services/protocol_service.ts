@@ -40,7 +40,7 @@ import {
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolOperator } from '@Protocol/operator/operator';
-import { PayloadManager } from './model_manager';
+import { PayloadManager } from './payload_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Uuid } from '@Lib/uuid';
@@ -122,7 +122,7 @@ export class SNProtocolService
 
   constructor(
     private itemManager: ItemManager,
-    private modelManager: PayloadManager,
+    private payloadManager: PayloadManager,
     deviceInterface: DeviceInterface,
     private storageService: SNStorageService,
     private identifier: ApplicationIdentifier,
@@ -130,7 +130,7 @@ export class SNProtocolService
   ) {
     super();
     this.itemManager = itemManager;
-    this.modelManager = modelManager;
+    this.payloadManager = payloadManager;
     this.deviceInterface = deviceInterface;
     this.storageService = storageService;
     this.crypto = crypto;
@@ -165,7 +165,7 @@ export class SNProtocolService
   /** @override */
   public deinit(): void {
     (this.itemManager as unknown) = undefined;
-    (this.modelManager as unknown) = undefined;
+    (this.payloadManager as unknown) = undefined;
     this.deviceInterface = undefined;
     (this.storageService as unknown) = undefined;
     this.crypto.deinit();
@@ -645,7 +645,7 @@ export class SNProtocolService
       return item.payloadRepresentation();
     });
     const decrypted = await this.payloadsByDecryptingPayloads(payloads);
-    await this.modelManager!.emitPayloads(
+    await this.payloadManager!.emitPayloads(
       decrypted,
       PayloadSource.LocalChanged
     );
