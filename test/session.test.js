@@ -42,7 +42,7 @@ describe('server session', function () {
       Else, there's no need to add a delay.
     */
     const sleepTime = timeRemaining > 0
-      ? timeRemaining + 0.3 /** Safety margin */
+      ? timeRemaining + 1 /** Safety margin */
       : 0;
     await Factory.sleep(sleepTime);
   }

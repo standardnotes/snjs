@@ -1,3 +1,4 @@
+import { lastElement } from '@Lib/utils';
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,
@@ -43,7 +44,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   public async createRootKey(identifier: string, password: string, origination: KeyParamsOrigination) {
-    const pwCost = V002Algorithm.PbkdfMinCost;
+    const pwCost = lastElement(V002Algorithm.PbkdfCostsUsed);
     const pwNonce = await this.crypto.generateRandomKey(V002Algorithm.SaltSeedLength);
     const pwSalt = await this.crypto.unsafeSha1(identifier + ':' + pwNonce);
     const keyParams = Create002KeyParams({
