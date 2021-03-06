@@ -3,7 +3,10 @@ import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
 import { ApplicationStage } from '@Lib/stages';
-import { CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
+import {
+  CreateMaxPayloadFromAnyObject,
+  PayloadContent,
+} from '@Payloads/generator';
 import { EncryptionDelegate } from './encryption_delegate';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
@@ -16,7 +19,7 @@ import { DeviceInterface } from '../device_interface';
 
 export enum StoragePersistencePolicies {
   Default = 1,
-  Ephemeral = 2
+  Ephemeral = 2,
 }
 
 export enum StorageEncryptionPolicies {
@@ -28,7 +31,7 @@ export enum StorageValueModes {
   /** Stored inside wrapped encrpyed storage object */
   Default = 1,
   /** Stored outside storage object, unencrypted */
-  Nonwrapped = 2
+  Nonwrapped = 2,
 }
 
 export enum ValueModesKeys {
@@ -39,13 +42,13 @@ export enum ValueModesKeys {
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped = 'nonwrapped',
 }
-type ValuesObjectRecord = Record<string, any>
+type ValuesObjectRecord = Record<string, any>;
 
 export type StorageValuesObject = {
-  [ValueModesKeys.Wrapped]: ValuesObjectRecord
-  [ValueModesKeys.Unwrapped]?: ValuesObjectRecord
-  [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
-}
+  [ValueModesKeys.Wrapped]: ValuesObjectRecord;
+  [ValueModesKeys.Unwrapped]?: ValuesObjectRecord;
+  [ValueModesKeys.Nonwrapped]: ValuesObjectRecord;
+};
 
 /**
  * The storage service is responsible for persistence of both simple key-values, and payload
@@ -58,15 +61,14 @@ export type StorageValuesObject = {
  * key can decrypt wrapped storage.
  */
 export class SNStorageService extends PureService {
-
-  public encryptionDelegate?: EncryptionDelegate
+  public encryptionDelegate?: EncryptionDelegate;
   /** Wait until application has been unlocked before trying to persist */
-  private storagePersistable = false
-  private persistencePolicy!: StoragePersistencePolicies
-  private encryptionPolicy!: StorageEncryptionPolicies
-  private needsPersist = false
+  private storagePersistable = false;
+  private persistencePolicy!: StoragePersistencePolicies;
+  private encryptionPolicy!: StorageEncryptionPolicies;
+  private needsPersist = false;
 
-  private values!: StorageValuesObject
+  private values!: StorageValuesObject;
 
   constructor(
     deviceInterface: DeviceInterface,
@@ -94,14 +96,18 @@ export class SNStorageService extends PureService {
         this.persistValuesToDisk();
       }
     } else if (stage === ApplicationStage.StorageDecrypted_09) {
-      const persistedPolicy = await this.getValue(StorageKey.StorageEncryptionPolicy);
+      const persistedPolicy = await this.getValue(
+        StorageKey.StorageEncryptionPolicy
+      );
       if (persistedPolicy) {
         this.setEncryptionPolicy(persistedPolicy, false);
       }
     }
   }
 
-  public async setPersistencePolicy(persistencePolicy: StoragePersistencePolicies) {
+  public async setPersistencePolicy(
+    persistencePolicy: StoragePersistencePolicies
+  ) {
     this.persistencePolicy = persistencePolicy;
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       await this.deviceInterface!.removeAllRawStorageValues();
@@ -153,33 +159,29 @@ export class SNStorageService extends PureService {
 
   public isStorageWrapped() {
     const wrappedValue = this.values[ValueModesKeys.Wrapped];
-    return !isNullOrUndefined(wrappedValue) && Object.keys(wrappedValue).length > 0;
+    return (
+      !isNullOrUndefined(wrappedValue) && Object.keys(wrappedValue).length > 0
+    );
   }
 
   public async canDecryptWithKey(key: SNRootKey) {
     const wrappedValue = this.values[ValueModesKeys.Wrapped];
-    const decryptedPayload = await this.decryptWrappedValue(
-      wrappedValue,
-      key,
-    );
+    const decryptedPayload = await this.decryptWrappedValue(wrappedValue, key);
     return !decryptedPayload.errorDecrypting;
   }
 
   private async decryptWrappedValue(wrappedValue: any, key?: SNRootKey) {
     /**
-    * The read content type doesn't matter, so long as we know it responds
-    * to content type. This allows a more seamless transition when both web
-    * and mobile used different content types for encrypted storage.
-    */
-    if (!(wrappedValue?.content_type)) {
+     * The read content type doesn't matter, so long as we know it responds
+     * to content type. This allows a more seamless transition when both web
+     * and mobile used different content types for encrypted storage.
+     */
+    if (!wrappedValue?.content_type) {
       throw Error('Attempting to decrypt nonexistent wrapped value');
     }
-    const payload = CreateMaxPayloadFromAnyObject(
-      wrappedValue,
-      {
-        content_type: ContentType.EncryptedStorage
-      }
-    );
+    const payload = CreateMaxPayloadFromAnyObject(wrappedValue, {
+      content_type: ContentType.EncryptedStorage,
+    });
     const decryptedPayload = await this.encryptionDelegate!.payloadByDecryptingPayload(
       payload,
       key
@@ -193,7 +195,9 @@ export class SNStorageService extends PureService {
     if (decryptedPayload.errorDecrypting) {
       throw SNLog.error(Error('Unable to decrypt storage.'));
     }
-    this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject);
+    this.values[ValueModesKeys.Unwrapped] = Copy(
+      decryptedPayload.contentObject
+    );
   }
 
   /** @todo This function should be debounced. */
@@ -227,18 +231,13 @@ export class SNStorageService extends PureService {
    * either as a plain object, or an encrypted item.
    */
   private async generatePersistableValues() {
-    const rawContent = Object.assign(
-      {},
-      this.values
-    );
+    const rawContent = Object.assign({}, this.values);
     const valuesToWrap = rawContent[ValueModesKeys.Unwrapped];
-    const payload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: await Uuid.GenerateUuid(),
-        content: valuesToWrap as PayloadContent,
-        content_type: ContentType.EncryptedStorage
-      }
-    );
+    const payload = CreateMaxPayloadFromAnyObject({
+      uuid: await Uuid.GenerateUuid(),
+      content: valuesToWrap as PayloadContent,
+      content_type: ContentType.EncryptedStorage,
+    });
     const encryptedPayload = await this.encryptionDelegate!.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.LocalStoragePreferEncrypted
@@ -248,17 +247,29 @@ export class SNStorageService extends PureService {
     return rawContent;
   }
 
-  public async setValue(key: string, value: any, mode = StorageValueModes.Default) {
+  public async setValue(
+    key: string,
+    value: any,
+    mode = StorageValueModes.Default
+  ) {
     if (!this.values) {
-      throw Error(`Attempting to set storage key ${key} before loading local storage.`);
+      throw Error(
+        `Attempting to set storage key ${key} before loading local storage.`
+      );
     }
     this.values[this.domainKeyForMode(mode)]![key] = value;
     return this.persistValuesToDisk();
   }
 
-  public getValue(key: string, mode = StorageValueModes.Default, defaultValue?: any) {
+  public getValue(
+    key: string,
+    mode = StorageValueModes.Default,
+    defaultValue?: any
+  ) {
     if (!this.values) {
-      throw Error(`Attempting to get storage key ${key} before loading local storage.`);
+      throw Error(
+        `Attempting to get storage key ${key} before loading local storage.`
+      );
     }
     if (!this.values[this.domainKeyForMode(mode)]) {
       throw Error(`Storage domain mode not available ${mode} for key ${key}`);
@@ -269,7 +280,9 @@ export class SNStorageService extends PureService {
 
   public async removeValue(key: string, mode = StorageValueModes.Default) {
     if (!this.values) {
-      throw Error(`Attempting to remove storage key ${key} before loading local storage.`);
+      throw Error(
+        `Attempting to remove storage key ${key} before loading local storage.`
+      );
     }
     const domain = this.values[this.domainKeyForMode(mode)];
     if (domain?.[key]) {
@@ -294,11 +307,7 @@ export class SNStorageService extends PureService {
     unwrapped?: ValuesObjectRecord,
     nonwrapped?: ValuesObjectRecord
   ) {
-    return SNStorageService.defaultValuesObject(
-      wrapped,
-      unwrapped,
-      nonwrapped
-    );
+    return SNStorageService.defaultValuesObject(wrapped, unwrapped, nonwrapped);
   }
 
   public static defaultValuesObject(
@@ -309,7 +318,7 @@ export class SNStorageService extends PureService {
     return {
       [ValueModesKeys.Wrapped]: wrapped,
       [ValueModesKeys.Unwrapped]: unwrapped,
-      [ValueModesKeys.Nonwrapped]: nonwrapped
+      [ValueModesKeys.Nonwrapped]: nonwrapped,
     } as StorageValuesObject;
   }
 
@@ -364,7 +373,10 @@ export class SNStorageService extends PureService {
     }
 
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.saveRawDatabasePayloads(nondeleted, this.identifier);
+      return this.deviceInterface!.saveRawDatabasePayloads(
+        nondeleted,
+        this.identifier
+      );
     });
   }
 
@@ -376,13 +388,18 @@ export class SNStorageService extends PureService {
 
   public async deletePayloadWithId(id: string) {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.removeRawDatabasePayloadWithId(id, this.identifier);
+      return this.deviceInterface!.removeRawDatabasePayloadWithId(
+        id,
+        this.identifier
+      );
     });
   }
 
   public async clearAllPayloads() {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.removeAllRawDatabasePayloads(this.identifier);
+      return this.deviceInterface!.removeAllRawDatabasePayloads(
+        this.identifier
+      );
     });
   }
 
@@ -393,7 +410,9 @@ export class SNStorageService extends PureService {
       await this.deviceInterface!.removeRawStorageValue(
         namespacedKey(this.identifier, RawStorageKey.SnjsVersion)
       );
-      await this.deviceInterface!.removeRawStorageValue(this.getPersistenceKey());
+      await this.deviceInterface!.removeRawStorageValue(
+        this.getPersistenceKey()
+      );
     });
   }
 }

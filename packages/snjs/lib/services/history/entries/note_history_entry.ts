@@ -1,7 +1,6 @@
 import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 
 export class NoteHistoryEntry extends ItemHistoryEntry {
-
   previewTitle() {
     return this.payload.updated_at!.toLocaleString();
   }

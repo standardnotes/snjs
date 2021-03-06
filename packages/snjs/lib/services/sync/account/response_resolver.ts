@@ -2,7 +2,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { SyncResponse } from '@Services/sync/response';
 import { DeltaClassForSource } from '@Payloads/deltas/generator';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
 import { CopyPayload } from '@Payloads/generator';
 
@@ -13,10 +13,9 @@ import { CopyPayload } from '@Payloads/generator';
  * offers the 'recommended' new global state given a sync response and a current base state.
  */
 export class SyncResponseResolver {
-
-  private response: SyncResponse
+  private response: SyncResponse;
   private baseCollection: ImmutablePayloadCollection;
-  private relatedCollectionSet: ImmutablePayloadCollectionSet
+  private relatedCollectionSet: ImmutablePayloadCollectionSet;
 
   constructor(
     response: SyncResponse,
@@ -34,7 +33,7 @@ export class SyncResponseResolver {
       ImmutablePayloadCollection.WithPayloads(
         payloadsSavedOrSaving,
         PayloadSource.SavedOrSaving
-      )
+      ),
     ]);
   }
 
@@ -98,13 +97,10 @@ export class SyncResponseResolver {
     const resultCollection = await delta.resultingCollection();
     const updatedDirtyPayloads = resultCollection.all().map((payload) => {
       const stillDirty = this.finalDirtyStateForPayload(payload);
-      return CopyPayload(
-        payload,
-        {
-          dirty: stillDirty,
-          dirtiedDate: stillDirty ? new Date() : undefined
-        }
-      );
+      return CopyPayload(payload, {
+        dirty: stillDirty,
+        dirtiedDate: stillDirty ? new Date() : undefined,
+      });
     });
     return ImmutablePayloadCollection.WithPayloads(
       updatedDirtyPayloads,
@@ -120,7 +116,10 @@ export class SyncResponseResolver {
      */
     let stillDirty;
     if (current) {
-      if (!current.dirtiedDate || (payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate)) {
+      if (
+        !current.dirtiedDate ||
+        (payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate)
+      ) {
         /** The payload was dirtied as part of handling deltas, and not because it was
          * dirtied by a client. We keep the payload dirty state here. */
         stillDirty = payload.dirty;

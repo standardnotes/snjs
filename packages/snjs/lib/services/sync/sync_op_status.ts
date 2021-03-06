@@ -4,20 +4,19 @@ const HEALTHY_SYNC_DURATION_THRESHOLD_S = 5;
 const TIMING_MONITOR_POLL_FREQUENCY_MS = 500;
 
 export class SyncOpStatus {
-
-  error?: any
-  private interval: any
-  private receiver: SyncEventReceiver
-  private completedUpload = 0
-  private totalUpload = 0
-  private downloaded = 0
+  error?: any;
+  private interval: any;
+  private receiver: SyncEventReceiver;
+  private completedUpload = 0;
+  private totalUpload = 0;
+  private downloaded = 0;
   private databaseLoadCurrent = 0;
   private databaseLoadTotal = 0;
   private databaseLoadDone = false;
-  private syncing = false
-  private syncStart!: Date
-  private syncEnd!: Date
-  private timingMonitor?: any
+  private syncing = false;
+  private syncStart!: Date;
+  private syncEnd!: Date;
+  private timingMonitor?: any;
 
   constructor(interval: any, receiver: SyncEventReceiver) {
     this.interval = interval;
@@ -57,7 +56,7 @@ export class SyncOpStatus {
       downloadCount: this.downloaded,
       localDataDone: this.databaseLoadDone,
       localDataCurrent: this.databaseLoadCurrent,
-      localDataTotal: this.databaseLoadTotal
+      localDataTotal: this.databaseLoadTotal,
     };
   }
 

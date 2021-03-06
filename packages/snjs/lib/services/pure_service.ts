@@ -5,11 +5,10 @@ import { DeviceInterface } from '../device_interface';
 type EventObserver<T> = (eventName: T, data: any) => Promise<void> | void;
 
 export abstract class PureService<E = string> {
-
-  private eventObservers: EventObserver<E>[] = []
-  public loggingEnabled = false
-  public deviceInterface?: DeviceInterface
-  private criticalPromises: Promise<any>[] = []
+  private eventObservers: EventObserver<E>[] = [];
+  public loggingEnabled = false;
+  public deviceInterface?: DeviceInterface;
+  private criticalPromises: Promise<any>[] = [];
 
   public addEventObserver(observer: EventObserver<E>) {
     this.eventObservers.push(observer);
@@ -54,11 +53,10 @@ export abstract class PureService<E = string> {
     return promise;
   }
 
-
   /**
-  * Application instances will call this function directly when they arrive
-  * at a certain migratory state.
-  */
+   * Application instances will call this function directly when they arrive
+   * at a certain migratory state.
+   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async handleApplicationStage(_stage: ApplicationStage): Promise<void> {
     // optional override
@@ -67,16 +65,19 @@ export abstract class PureService<E = string> {
   log(message: string, ...args: any[]) {
     if (this.loggingEnabled) {
       const date = new Date();
-      const timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '');
+      const timeString = date
+        .toLocaleTimeString()
+        .replace(' PM', '')
+        .replace(' AM', '');
       const string = `${timeString}.${date.getMilliseconds()}`;
       if (args) {
         args = args.map((arg) => {
-          if(Array.isArray(arg)) {
+          if (Array.isArray(arg)) {
             return arg.slice();
           } else {
             return arg;
           }
-        })
+        });
         console.log(string, message, ...args);
       } else {
         console.log(string, message);

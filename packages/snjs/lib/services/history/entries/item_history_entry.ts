@@ -4,15 +4,14 @@ import { CopyPayload } from '@Payloads/generator';
 import { CreateItemFromPayload } from '@Lib/models';
 
 export class ItemHistoryEntry {
-
-  public payload: PurePayload
+  public payload: PurePayload;
   /**
    * We'll assume a `text` content value to diff on.
    * If it doesn't exist, no problem.
    */
-  protected defaultContentKeyToDiffOn = 'text'
-  protected textCharDiffLength = 0
-  protected hasPreviousEntry = false
+  protected defaultContentKeyToDiffOn = 'text';
+  protected textCharDiffLength = 0;
+  protected hasPreviousEntry = false;
 
   constructor(payload: PurePayload) {
     /**
@@ -27,12 +26,9 @@ export class ItemHistoryEntry {
     if (updated_at.getTime() === 0) {
       updated_at = new Date();
     }
-    this.payload = CopyPayload(
-      payload,
-      {
-        updated_at: updated_at
-      }
-    );
+    this.payload = CopyPayload(payload, {
+      updated_at: updated_at,
+    });
   }
 
   setPreviousEntry(previousEntry: ItemHistoryEntry) {
@@ -44,11 +40,13 @@ export class ItemHistoryEntry {
     if (this.payload.safeContent[this.defaultContentKeyToDiffOn]) {
       if (previousEntry) {
         this.textCharDiffLength =
-          this.payload.contentObject[this.defaultContentKeyToDiffOn].length
-          - previousEntry.payload.contentObject[this.defaultContentKeyToDiffOn].length;
+          this.payload.contentObject[this.defaultContentKeyToDiffOn].length -
+          previousEntry.payload.contentObject[this.defaultContentKeyToDiffOn]
+            .length;
       } else {
-        this.textCharDiffLength =
-          this.payload.contentObject[this.defaultContentKeyToDiffOn].length;
+        this.textCharDiffLength = this.payload.contentObject[
+          this.defaultContentKeyToDiffOn
+        ].length;
       }
     }
   }

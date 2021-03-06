@@ -5,5 +5,5 @@ export enum ApiEndpointParam {
   IntegrityResult = 'integrity_hash',
   SyncDlLimit = 'limit',
   SyncPayloads = 'items',
-  ApiVersion = 'api'
+  ApiVersion = 'api',
 }

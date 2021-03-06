@@ -17,20 +17,20 @@ type ChangeCallback = (
   ignored: PurePayload[],
   source?: PayloadSource,
   sourceKey?: string
-) => void
+) => void;
 
 type ChangeObserver = {
-  types: ContentType[]
-  priority: number
-  callback: ChangeCallback
-}
+  types: ContentType[];
+  priority: number;
+  callback: ChangeCallback;
+};
 
 type QueueElement = {
-  payloads: PurePayload[],
-  source: PayloadSource,
-  sourceKey?: string
-  resolve: (alteredPayloads: PurePayload[]) => void
-}
+  payloads: PurePayload[];
+  source: PayloadSource;
+  sourceKey?: string;
+  resolve: (alteredPayloads: PurePayload[]) => void;
+};
 
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
@@ -43,18 +43,17 @@ type QueueElement = {
  * applications 'stream' items to display in the interface.
  */
 export class PayloadManager extends PureService {
-
-  private changeObservers: ChangeObserver[] = []
-  public collection: MutableCollection<PurePayload>
-  private emitQueue: QueueElement[] = []
+  private changeObservers: ChangeObserver[] = [];
+  public collection: MutableCollection<PurePayload>;
+  private emitQueue: QueueElement[] = [];
   /**
    * An array of content types for which we enable encrypted overwrite protection.
    * If a payload attempting to be emitted is errored, yet our current local version
    * is not errored, and the payload's content type is in this array, we do not overwrite
    * our local version. We instead notify observers of this interaction for them to handle
    * as needed
-  */
-  private overwriteProtection: ContentType[] = [ContentType.ItemsKey]
+   */
+  private overwriteProtection: ContentType[] = [ContentType.ItemsKey];
 
   constructor() {
     super();
@@ -92,11 +91,7 @@ export class PayloadManager extends PureService {
     collection: ImmutablePayloadCollection,
     sourceKey?: string
   ) {
-    return this.emitPayloads(
-      collection.all(),
-      collection.source!,
-      sourceKey
-    );
+    return this.emitPayloads(collection.all(), collection.source!, sourceKey);
   }
 
   /**
@@ -110,11 +105,7 @@ export class PayloadManager extends PureService {
     source: PayloadSource,
     sourceKey?: string
   ): Promise<PurePayload[]> {
-    return this.emitPayloads(
-      [payload],
-      source,
-      sourceKey
-    );
+    return this.emitPayloads([payload], source, sourceKey);
   }
 
   /**
@@ -129,25 +120,37 @@ export class PayloadManager extends PureService {
     sourceKey?: string
   ): Promise<PurePayload[]> {
     if (payloads.length === 0) {
-      console.warn("Attempting to emit 0 payloads.");
+      console.warn('Attempting to emit 0 payloads.');
     }
     return new Promise((resolve) => {
       this.emitQueue.push({
         payloads,
         source,
         sourceKey,
-        resolve
+        resolve,
       });
       if (this.emitQueue.length === 1) {
         this.popQueue();
       }
-    })
+    });
   }
 
   private async popQueue() {
     const first = this.emitQueue[0];
-    const { changed, inserted, discarded, ignored } = this.mergePayloadsOntoMaster(first.payloads);
-    this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey);
+    const {
+      changed,
+      inserted,
+      discarded,
+      ignored,
+    } = this.mergePayloadsOntoMaster(first.payloads);
+    this.notifyChangeObservers(
+      changed,
+      inserted,
+      discarded,
+      ignored,
+      first.source,
+      first.sourceKey
+    );
     removeFromArray(this.emitQueue, first);
     first.resolve(changed.concat(inserted, discarded));
     if (this.emitQueue.length > 0) {
@@ -168,7 +171,8 @@ export class PayloadManager extends PureService {
       const masterPayload = this.collection.find(payload.uuid!);
       if (
         payload.errorDecrypting &&
-        masterPayload && !masterPayload.errorDecrypting &&
+        masterPayload &&
+        !masterPayload.errorDecrypting &&
         this.overwriteProtection.includes(payload.content_type)
       ) {
         ignored.push(payload);
@@ -211,7 +215,7 @@ export class PayloadManager extends PureService {
     const observer: ChangeObserver = {
       types,
       priority,
-      callback
+      callback,
     };
     this.changeObservers.push(observer);
     return () => {
@@ -239,9 +243,9 @@ export class PayloadManager extends PureService {
       return types.includes(ContentType.Any)
         ? payloads.slice()
         : payloads.slice().filter((payload) => {
-          return types.includes(payload.content_type!);
-        });
-    }
+            return types.includes(payload.content_type!);
+          });
+    };
     for (const observer of observers) {
       observer.callback(
         filter(changed, observer.types),

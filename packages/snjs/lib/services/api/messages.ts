@@ -1,13 +1,21 @@
-import { KeyParamsOrigination, SNRootKeyParams } from './../../protocol/key_params';
+import {
+  KeyParamsOrigination,
+  SNRootKeyParams,
+} from './../../protocol/key_params';
 import { ProtocolVersion } from '@Protocol/versions';
-export const API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.';
-export const API_MESSAGE_GENERIC_REGISTRATION_FAIL = 'A server error occurred while trying to register. Please try again.';
+export const API_MESSAGE_GENERIC_INVALID_LOGIN =
+  'A server error occurred while trying to sign in. Please try again.';
+export const API_MESSAGE_GENERIC_REGISTRATION_FAIL =
+  'A server error occurred while trying to register. Please try again.';
 export const API_MESSAGE_GENERIC_CHANGE_PW_FAIL = `Something went wrong while changing your password. Your password was not changed. Please try again.`;
 export const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.';
 
-export const API_MESSAGE_REGISTRATION_IN_PROGRESS = 'An existing registration request is already in progress.';
-export const API_MESSAGE_LOGIN_IN_PROGRESS = 'An existing sign in request is already in progress.';
-export const API_MESSAGE_CHANGE_PW_IN_PROGRESS = 'An existing change password request is already in progress.';
+export const API_MESSAGE_REGISTRATION_IN_PROGRESS =
+  'An existing registration request is already in progress.';
+export const API_MESSAGE_LOGIN_IN_PROGRESS =
+  'An existing sign in request is already in progress.';
+export const API_MESSAGE_CHANGE_PW_IN_PROGRESS =
+  'An existing change password request is already in progress.';
 
 export const API_MESSAGE_FALLBACK_LOGIN_FAIL = 'Invalid email or password.';
 
@@ -15,9 +23,11 @@ export const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL = `A server error occurred w
 
 export const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS = `Your account session is being renewed with the server. Please try your request again.`;
 
-export const API_MESSAGE_RATE_LIMITED = 'Too many successive server requests. Please wait a few minutes and try again.';
+export const API_MESSAGE_RATE_LIMITED =
+  'Too many successive server requests. Please wait a few minutes and try again.';
 
-export const API_MESSAGE_INVALID_SESSION = 'Please sign in to an account in order to continue with your request.';
+export const API_MESSAGE_INVALID_SESSION =
+  'Please sign in to an account in order to continue with your request.';
 
 export const UNSUPPORTED_PROTOCOL_VERSION = `This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.`;
 
@@ -38,7 +48,8 @@ export const SETTING_PASSCODE = `Setting passcode…`;
 export const CHANGING_PASSCODE = `Changing passcode…`;
 export const REMOVING_PASSCODE = `Removing passcode…`;
 
-export const DO_NOT_CLOSE_APPLICATION = 'Do not close the application until this process completes.';
+export const DO_NOT_CLOSE_APPLICATION =
+  'Do not close the application until this process completes.';
 
 export const UNKNOWN_ERROR = 'Unknown error.';
 
@@ -46,7 +57,10 @@ export function InsufficientPasswordMessage(minimum: number): string {
   return `Your password must be at least ${minimum} characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.`;
 }
 
-export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVersion): string {
+export function StrictSignInFailed(
+  current: ProtocolVersion,
+  latest: ProtocolVersion
+): string {
   return `Strict Sign In has refused the server's sign-in parameters. The latest account version is ${latest}, but the server is reporting a version of ${current} for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.`;
 }
 
@@ -54,65 +68,79 @@ export const UNSUPPORTED_BACKUP_FILE_VERSION = `This backup file was created usi
 export const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT = `This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again.`;
 
 export const ImportStrings = {
-  FileAccountPassword: "File account password"
-}
+  FileAccountPassword: 'File account password',
+};
 
 export const PasswordChangeStrings = {
-  PasscodeRequired: 'Your passcode is required to process your password change.',
-  Failed: 'Unable to change your password due to a sync error. Please try again.',
-}
+  PasscodeRequired:
+    'Your passcode is required to process your password change.',
+  Failed:
+    'Unable to change your password due to a sync error. Please try again.',
+};
 
 export const RegisterStrings = {
-  PasscodeRequired: 'Your passcode is required in order to register for an account.',
-}
+  PasscodeRequired:
+    'Your passcode is required in order to register for an account.',
+};
 
 export const SignInStrings = {
-  PasscodeRequired: 'Your passcode is required in order to sign in to your account.',
+  PasscodeRequired:
+    'Your passcode is required in order to sign in to your account.',
   IncorrectMfa: 'Incorrect two-factor authentication code. Please try again.',
-  SignInCanceledMissingMfa: 'Your sign in request has been canceled.'
-}
+  SignInCanceledMissingMfa: 'Your sign in request has been canceled.',
+};
 
 export const ProtocolUpgradeStrings = {
-  SuccessAccount: "Your encryption version has been successfully upgraded. You may be asked to enter your credentials again on other devices you're signed into.",
-  SuccessPasscodeOnly: "Your encryption version has been successfully upgraded.",
-  Fail: "Unable to upgrade encryption version. Please try again.",
-  UpgradingPasscode: 'Upgrading local encryption...'
-}
+  SuccessAccount:
+    "Your encryption version has been successfully upgraded. You may be asked to enter your credentials again on other devices you're signed into.",
+  SuccessPasscodeOnly:
+    'Your encryption version has been successfully upgraded.',
+  Fail: 'Unable to upgrade encryption version. Please try again.',
+  UpgradingPasscode: 'Upgrading local encryption...',
+};
 
 export const KeyRecoveryStrings = {
   KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => {
     const dateString = keyParams.createdDate?.toLocaleString();
-    switch(keyParams.origination) {
+    switch (keyParams.origination) {
       case KeyParamsOrigination.EmailChange:
-        return `Enter your account password as it was when you changed your email on ${dateString}.`
+        return `Enter your account password as it was when you changed your email on ${dateString}.`;
       case KeyParamsOrigination.PasswordChange:
-        return `Enter your account password after it was changed on ${dateString}.`
+        return `Enter your account password after it was changed on ${dateString}.`;
       case KeyParamsOrigination.Registration:
-        return `Enter your account password as it was when you registered ${dateString}.`
+        return `Enter your account password as it was when you registered ${dateString}.`;
       case KeyParamsOrigination.ProtocolUpgrade:
-        return `Enter your account password as it was when you upgraded your encryption version on ${dateString}.`
+        return `Enter your account password as it was when you upgraded your encryption version on ${dateString}.`;
       case KeyParamsOrigination.PasscodeChange:
-        return `Enter your application passcode after it was changed on ${dateString}.`
+        return `Enter your application passcode after it was changed on ${dateString}.`;
       case KeyParamsOrigination.PasscodeCreate:
-        return `Enter your application passcode as it was when you created it on ${dateString}.`
+        return `Enter your application passcode as it was when you created it on ${dateString}.`;
       default:
-        throw Error('Unhandled KeyParamsOrigination case for KeyRecoveryLoginFlowPrompt');
+        throw Error(
+          'Unhandled KeyParamsOrigination case for KeyRecoveryLoginFlowPrompt'
+        );
     }
   },
-  KeyRecoveryLoginFlowReason: 'Your account password is required to revalidate your session.',
-  KeyRecoveryLoginFlowInvalidPassword: 'Incorrect credentials entered. Please try again.',
-  KeyRecoveryRootKeyReplaced: 'Your credentials have successfully been updated.',
+  KeyRecoveryLoginFlowReason:
+    'Your account password is required to revalidate your session.',
+  KeyRecoveryLoginFlowInvalidPassword:
+    'Incorrect credentials entered. Please try again.',
+  KeyRecoveryRootKeyReplaced:
+    'Your credentials have successfully been updated.',
   KeyRecoveryPasscodeRequiredTitle: 'Passcode Required',
-  KeyRecoveryPasscodeRequiredText: 'You must enter your passcode in order to save your new credentials.',
-  KeyRecoveryPasswordRequired: 'Your account password is required to recover an encryption key.',
+  KeyRecoveryPasscodeRequiredText:
+    'You must enter your passcode in order to save your new credentials.',
+  KeyRecoveryPasswordRequired:
+    'Your account password is required to recover an encryption key.',
   KeyRecoveryKeyRecovered: 'Your key has successfully been recovered.',
-  KeyRecoveryUnableToRecover: 'Unable to recover your key with the attempted password. Please try again.',
-}
+  KeyRecoveryUnableToRecover:
+    'Unable to recover your key with the attempted password. Please try again.',
+};
 
 export const ChallengeModalTitle = {
   Generic: 'Authentication Required',
-  Migration: 'Storage Update'
-}
+  Migration: 'Storage Update',
+};
 
 export const SessionStrings = {
   EnterEmailAndPassword: 'Please enter your account email and password.',
@@ -127,7 +155,8 @@ export const SessionStrings = {
   EmailInputPlaceholder: 'Email',
   PasswordInputPlaceholder: 'Password',
   KeychainRecoveryErrorTitle: 'Invalid Credentials',
-  KeychainRecoveryError: 'The email or password you entered is incorrect.\n\nPlease note that this sign-in request is made against the default server. If you are using a custom server, you must uninstall the app then reinstall, and sign back into your account.',
+  KeychainRecoveryError:
+    'The email or password you entered is incorrect.\n\nPlease note that this sign-in request is made against the default server. If you are using a custom server, you must uninstall the app then reinstall, and sign back into your account.',
   RevokeTitle: 'Revoke this session?',
   RevokeConfirmButton: 'Revoke',
   RevokeCancelButton: 'Cancel',
@@ -146,22 +175,27 @@ export const ChallengeStrings = {
   ImportFile: 'Authentication is required to import a backup file',
   RemovePasscode: 'Authentication is required to remove your passcode',
   ChangePasscode: 'Authentication is required to change your passcode',
-  ChangeAutolockInterval: 'Authentication is required to change autolock timer duration',
+  ChangeAutolockInterval:
+    'Authentication is required to change autolock timer duration',
   RevokeSession: 'Authentication is required to revoke a session',
   AccessBatchManager: 'Authentication is required to access the batch manager',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
-  EnterPasscodeForMigration: 'Your application passcode is required to perform an upgrade of your local data storage structure.',
+  EnterPasscodeForMigration:
+    'Your application passcode is required to perform an upgrade of your local data storage structure.',
   EnterPasscodeForRootResave: 'Enter your application passcode to continue',
-  EnterCredentialsForProtocolUpgrade: 'Enter your credentials to perform encryption upgrade',
-  EnterCredentialsForDecryptedBackupDownload: 'Enter your credentials to download a decrypted backup',
+  EnterCredentialsForProtocolUpgrade:
+    'Enter your credentials to perform encryption upgrade',
+  EnterCredentialsForDecryptedBackupDownload:
+    'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode',
-  ImportEncryptedFile: 'Enter the account password associated with the import file',
+  ImportEncryptedFile:
+    'Enter the account password associated with the import file',
   ExportBackup: 'Authentication is required to export a backup',
   DisableBiometrics: 'Authentication is required to disable biometrics',
   UnprotectNote: 'Authentication is required to unprotect a note',
-}
+};
 
 export const PromptTitles = {
   AccountPassword: 'Account Password',
@@ -169,17 +203,18 @@ export const PromptTitles = {
   Biometrics: 'Biometrics',
   RememberFor: 'Remember For',
   Mfa: 'Two-factor Authentication Code',
-}
+};
 
 export const ErrorAlertStrings = {
   MissingSessionTitle: 'Missing Session',
-  MissingSessionBody: 'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.',
+  MissingSessionBody:
+    'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.',
 
   StorageDecryptErrorTitle: 'Storage Error',
   StorageDecryptErrorBody: `We were unable to decrypt your local storage. Please restart the app and try again. If you're unable to resolve this issue, and you have an account, you may try uninstalling the app then reinstalling, then signing back into your account. Otherwise, please contact help@standardnotes.org for support.`,
-}
+};
 
 export const KeychainRecoveryStrings = {
   Title: 'Restore Keychain',
-  Text: `We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.`
-}
+  Text: `We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.`,
+};

@@ -3,8 +3,7 @@ import { ApplicationEvent } from '@Lib/events';
 import { SNApplication } from '../application';
 
 export class ApplicationService extends PureService {
-
-  private unsubApp: any
+  private unsubApp: any;
 
   constructor(protected application: SNApplication) {
     super();
@@ -28,20 +27,22 @@ export class ApplicationService extends PureService {
     if (this.application!.isLaunched()) {
       this.onAppLaunch();
     }
-    this.unsubApp = this.application!.addEventObserver(async (event: ApplicationEvent) => {
-      await this.onAppEvent(event);
-      if (event === ApplicationEvent.Started) {
-        this.onAppStart();
-      } else if (event === ApplicationEvent.Launched) {
-        this.onAppLaunch();
-      } else if (event === ApplicationEvent.CompletedFullSync) {
-        this.onAppFullSync();
-      } else if (event === ApplicationEvent.CompletedIncrementalSync) {
-        this.onAppIncrementalSync();
-      } else if (event === ApplicationEvent.KeyStatusChanged) {
-        this.onAppKeyChange();
+    this.unsubApp = this.application!.addEventObserver(
+      async (event: ApplicationEvent) => {
+        await this.onAppEvent(event);
+        if (event === ApplicationEvent.Started) {
+          this.onAppStart();
+        } else if (event === ApplicationEvent.Launched) {
+          this.onAppLaunch();
+        } else if (event === ApplicationEvent.CompletedFullSync) {
+          this.onAppFullSync();
+        } else if (event === ApplicationEvent.CompletedIncrementalSync) {
+          this.onAppIncrementalSync();
+        } else if (event === ApplicationEvent.KeyStatusChanged) {
+          this.onAppKeyChange();
+        }
       }
-    });
+    );
   }
 
   async onAppEvent(_event: ApplicationEvent) {
@@ -67,5 +68,4 @@ export class ApplicationService extends PureService {
   onAppFullSync() {
     /** Optional override */
   }
-
 }

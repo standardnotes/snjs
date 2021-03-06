@@ -1,9 +1,16 @@
 import { Uuids } from '@Models/functions';
 import { ComponentMutator } from './../models/app/component';
 import { CreateItemFromPayload } from '@Models/generator';
-import { ContentType, displayStringForContentType } from './../models/content_types';
+import {
+  ContentType,
+  displayStringForContentType,
+} from './../models/content_types';
 import { PayloadSource } from './../protocol/payloads/sources';
-import { CreateSourcedPayloadFromObject, PayloadContent, RawPayload } from '@Payloads/generator';
+import {
+  CreateSourcedPayloadFromObject,
+  PayloadContent,
+  RawPayload,
+} from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from './../models/app/note';
 import { SNTheme } from './../models/app/theme';
@@ -18,14 +25,25 @@ import {
   ComponentAction,
   ComponentArea,
   ComponentPermission,
-  SNComponent
+  SNComponent,
 } from '@Models/app/component';
 import { Uuid } from '@Lib/uuid';
 import {
-  Copy, concatArrays, extendArray, filterFromArray,
-  isString, removeFromArray, searchArray, sleep
+  Copy,
+  concatArrays,
+  extendArray,
+  filterFromArray,
+  isString,
+  removeFromArray,
+  searchArray,
+  sleep,
 } from '@Lib/utils';
-import { Environment, Platform, environmentToString, platformToString } from '@Lib/platforms';
+import {
+  Environment,
+  Platform,
+  environmentToString,
+  platformToString,
+} from '@Lib/platforms';
 import { UuidString } from '../types';
 
 const DESKTOP_URL_PREFIX = 'sn://';
@@ -34,98 +52,104 @@ const CUSTOM_LOCAL_HOST = 'sn.local';
 const ANDROID_LOCAL_HOST = '10.0.2.2';
 
 type ComponentRawPayload = RawPayload & {
-  clientData: any
-}
+  clientData: any;
+};
 
 /* This domain will be used to save context item client data */
 const ComponentDataDomain = 'org.standardnotes.sn.components';
 
 type StreamObserver = {
-  identifier: string
-  componentUuid: UuidString,
-  area: ComponentArea
-  originalMessage: any,
+  identifier: string;
+  componentUuid: UuidString;
+  area: ComponentArea;
+  originalMessage: any;
   /** contentTypes is optional in the case of a context stream observer */
-  contentTypes?: ContentType[]
-}
+  contentTypes?: ContentType[];
+};
 
 type ComponentHandler = {
-  identifier: string
-  areas: ComponentArea[]
-  actionHandler?: (component: SNComponent, action: ComponentAction, data: MessageData) => void
-  contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined
-  componentForSessionKeyHandler?: (sessionKey: string) => SNComponent | undefined
-  focusHandler?: (component: SNComponent, focused: boolean) => void
-}
+  identifier: string;
+  areas: ComponentArea[];
+  actionHandler?: (
+    component: SNComponent,
+    action: ComponentAction,
+    data: MessageData
+  ) => void;
+  contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined;
+  componentForSessionKeyHandler?: (
+    sessionKey: string
+  ) => SNComponent | undefined;
+  focusHandler?: (component: SNComponent, focused: boolean) => void;
+};
 
 export type PermissionDialog = {
-  component: SNComponent
-  permissions: ComponentPermission[]
-  permissionsString: string
-  actionBlock: (approved: boolean) => void
-  callback: (approved: boolean) => void
-}
+  component: SNComponent;
+  permissions: ComponentPermission[];
+  permissionsString: string;
+  actionBlock: (approved: boolean) => void;
+  callback: (approved: boolean) => void;
+};
 
 type MessageData = Partial<{
-  content_types: ContentType[]
-  item: RawPayload & { clientData: any }
-  items: (RawPayload & { clientData: any })[]
-  permissions: ComponentPermission[]
-  componentData: any
-  uuid: UuidString
-  environment: string
-  platform: string
-  activeThemeUrls: string[]
-  width: string | number
-  height: string | number
+  content_types: ContentType[];
+  item: RawPayload & { clientData: any };
+  items: (RawPayload & { clientData: any })[];
+  permissions: ComponentPermission[];
+  componentData: any;
+  uuid: UuidString;
+  environment: string;
+  platform: string;
+  activeThemeUrls: string[];
+  width: string | number;
+  height: string | number;
   /** Related to setSize action */
-  type: 'container'
-}>
+  type: 'container';
+}>;
 
 type ComponentMessage = {
-  action: ComponentAction
-  sessionKey?: string
-  componentData?: any
-  data: MessageData
-}
+  action: ComponentAction;
+  sessionKey?: string;
+  componentData?: any;
+  data: MessageData;
+};
 
 type MessageReplyData = {
-  approved?: boolean
-  deleted?: boolean
-  error?: string
-  item?: any
-  items?: any[]
-  themes?: string[]
-}
+  approved?: boolean;
+  deleted?: boolean;
+  error?: string;
+  item?: any;
+  items?: any[];
+  themes?: string[];
+};
 
 type MessageReply = {
-  action: ComponentAction
-  original: ComponentMessage
-  data: MessageReplyData
-}
+  action: ComponentAction;
+  original: ComponentMessage;
+  data: MessageReplyData;
+};
 
 type ItemMessagePayload = {
-  uuid: string
-  content_type: ContentType
-  created_at: Date
-  updated_at: Date
-  deleted: boolean
-  content: any
-  clientData: any
+  uuid: string;
+  content_type: ContentType;
+  created_at: Date;
+  updated_at: Date;
+  deleted: boolean;
+  content: any;
+  clientData: any;
   /** isMetadataUpdate implies that the extension should make reference of updated
-  * metadata, but not update content values as they may be stale relative to what the
-  * extension currently has. Changes are always metadata updates if the mapping source
-  * is PayloadSource.RemoteSaved || PayloadSource.LocalSaved || PayloadSource.PreSyncSave */
-  isMetadataUpdate: any
+   * metadata, but not update content values as they may be stale relative to what the
+   * extension currently has. Changes are always metadata updates if the mapping source
+   * is PayloadSource.RemoteSaved || PayloadSource.LocalSaved || PayloadSource.PreSyncSave */
+  isMetadataUpdate: any;
 };
 
 type ComponentState = {
-  window?: Window
-  hidden: boolean
-  readonly: boolean
-  lockReadonly: boolean
-  sessionKey?: string
-}
+  window?: Window;
+  hidden: boolean;
+  readonly: boolean;
+  lockReadonly: boolean;
+  sessionKey?: string;
+};
 
 /**
  * Responsible for orchestrating component functionality, including editors, themes,
@@ -133,23 +157,22 @@ type ComponentState = {
  * sending and receiving messages to and from frames via the postMessage API.
  */
 export class SNComponentManager extends PureService {
+  private itemManager!: ItemManager;
+  private syncService!: SNSyncService;
+  protected alertService!: SNAlertService;
+  private environment: Environment;
+  private platform: Platform;
+  private timeout: any;
+  private desktopManager: any;
+  private componentState: Partial<Record<UuidString, ComponentState>> = {};
 
-  private itemManager!: ItemManager
-  private syncService!: SNSyncService
-  protected alertService!: SNAlertService
-  private environment: Environment
-  private platform: Platform
-  private timeout: any
-  private desktopManager: any
-  private componentState: Partial<Record<UuidString, ComponentState>> = {}
-
-  private removeItemObserver?: any
+  private removeItemObserver?: any;
   private streamObservers: StreamObserver[] = [];
   private contextStreamObservers: StreamObserver[] = [];
   private permissionDialogs: PermissionDialog[] = [];
   private handlers: ComponentHandler[] = [];
 
-  private templateComponents: SNComponent[] = []
+  private templateComponents: SNComponent[] = [];
 
   constructor(
     itemManager: ItemManager,
@@ -157,7 +180,7 @@ export class SNComponentManager extends PureService {
     alertService: SNAlertService,
     environment: Environment,
     platform: Platform,
-    timeout: any,
+    timeout: any
   ) {
     super();
     this.timeout = timeout || setTimeout.bind(window);
@@ -183,7 +206,7 @@ export class SNComponentManager extends PureService {
   get components() {
     return this.itemManager!.getItems([
       ContentType.Component,
-      ContentType.Theme
+      ContentType.Theme,
     ]) as SNComponent[];
   }
 
@@ -226,20 +249,24 @@ export class SNComponentManager extends PureService {
         const syncedComponents = items.filter((item) => {
           return (
             item.content_type === ContentType.Component ||
-            item.content_type === ContentType.Theme);
+            item.content_type === ContentType.Theme
+          );
         }) as SNComponent[];
         /**
          * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid
          * recursion caused by the component being modified and saved after it is updated.
-        */
-        if (syncedComponents.length > 0 && source !== PayloadSource.RemoteSaved) {
+         */
+        if (
+          syncedComponents.length > 0 &&
+          source !== PayloadSource.RemoteSaved
+        ) {
           /* Ensure any component in our data is installed by the system */
           if (this.isDesktop) {
             this.desktopManager.syncComponentsInstallation(syncedComponents);
           }
         }
 
-        const themes = syncedComponents.filter(c => c.isTheme());
+        const themes = syncedComponents.filter((c) => c.isTheme());
         if (themes.length > 0) {
           this.postActiveThemesToAllComponents();
         }
@@ -261,10 +288,14 @@ export class SNComponentManager extends PureService {
           this.notifyStreamObservers(items, source, sourceKey);
         }
       }
-    )
+    );
   }
 
-  notifyStreamObservers(allItems: SNItem[], source?: PayloadSource, sourceKey?: string) {
+  notifyStreamObservers(
+    allItems: SNItem[],
+    source?: PayloadSource,
+    sourceKey?: string
+  ) {
     for (const observer of this.streamObservers) {
       if (sourceKey && sourceKey === observer.componentUuid) {
         /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
@@ -276,17 +307,29 @@ export class SNComponentManager extends PureService {
       if (relevantItems.length === 0) {
         continue;
       }
-      const requiredPermissions: ComponentPermission[] = [{
-        name: ComponentAction.StreamItems,
-        content_types: observer.contentTypes!.sort()
-      }];
-      this.runWithPermissions(observer.componentUuid, requiredPermissions, () => {
-        this.sendItemsInReply(observer.componentUuid, relevantItems, observer.originalMessage);
-      });
+      const requiredPermissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: observer.contentTypes!.sort(),
+        },
+      ];
+      this.runWithPermissions(
+        observer.componentUuid,
+        requiredPermissions,
+        () => {
+          this.sendItemsInReply(
+            observer.componentUuid,
+            relevantItems,
+            observer.originalMessage
+          );
+        }
+      );
     }
-    const requiredContextPermissions = [{
-      name: ComponentAction.StreamContextItem
-    }] as ComponentPermission[];
+    const requiredContextPermissions = [
+      {
+        name: ComponentAction.StreamContextItem,
+      },
+    ] as ComponentPermission[];
     for (const observer of this.contextStreamObservers) {
       if (sourceKey && sourceKey === observer.componentUuid) {
         /* Don't notify source of change, as it is the originator, doesn't need duplicate event. */
@@ -300,7 +343,9 @@ export class SNComponentManager extends PureService {
           continue;
         }
         if (handler.contextRequestHandler) {
-          const itemInContext = handler.contextRequestHandler(observer.componentUuid);
+          const itemInContext = handler.contextRequestHandler(
+            observer.componentUuid
+          );
           if (itemInContext) {
             const matchingItem = find(allItems, { uuid: itemInContext.uuid });
             if (matchingItem) {
@@ -317,7 +362,8 @@ export class SNComponentManager extends PureService {
                     observer.originalMessage,
                     source
                   );
-                });
+                }
+              );
             }
           }
         }
@@ -328,10 +374,12 @@ export class SNComponentManager extends PureService {
   isNativeExtension(component: SNComponent) {
     const nativeUrls = [
       (window as any)._extensions_manager_location,
-      (window as any)._batch_manager_location
+      (window as any)._batch_manager_location,
     ];
     const hostedUrl = component.hosted_url;
-    const localUrl = component.local_url && component.local_url.replace(DESKTOP_URL_PREFIX, '');
+    const localUrl =
+      component.local_url &&
+      component.local_url.replace(DESKTOP_URL_PREFIX, '');
     return nativeUrls.includes(hostedUrl) || nativeUrls.includes(localUrl);
   }
 
@@ -360,7 +408,7 @@ export class SNComponentManager extends PureService {
         event.data
       );
     }
-  }
+  };
 
   configureForNonMobileUsage() {
     window.addEventListener
@@ -417,22 +465,19 @@ export class SNComponentManager extends PureService {
   postActiveThemesToComponent(component: SNComponent) {
     const urls = this.urlsForActiveThemes();
     const data: MessageReplyData = {
-      themes: urls
+      themes: urls,
     };
     const message: ComponentMessage = {
       action: ComponentAction.ActivateThemes,
-      data: data
-    }
-    this.sendMessageToComponent(
-      component,
-      message
-    );
+      data: data,
+    };
+    this.sendMessageToComponent(component, message);
   }
 
   private findComponent(uuid: UuidString) {
     return (
-      this.templateComponents.find(c => c.uuid === uuid) ||
-      this.itemManager.findItem(uuid) as SNComponent
+      this.templateComponents.find((c) => c.uuid === uuid) ||
+      (this.itemManager.findItem(uuid) as SNComponent)
     );
   }
 
@@ -441,7 +486,9 @@ export class SNComponentManager extends PureService {
   }
 
   public removeTemporaryTemplateComponent(component: SNComponent) {
-    this.templateComponents = this.templateComponents.filter(c => c.uuid !== component.uuid);
+    this.templateComponents = this.templateComponents.filter(
+      (c) => c.uuid !== component.uuid
+    );
   }
 
   contextItemDidChangeInArea(area: ComponentArea) {
@@ -457,7 +504,9 @@ export class SNComponentManager extends PureService {
       });
       for (const observer of observers) {
         if (handler.contextRequestHandler) {
-          const itemInContext = handler.contextRequestHandler(observer.componentUuid);
+          const itemInContext = handler.contextRequestHandler(
+            observer.componentUuid
+          );
           if (itemInContext) {
             this.sendContextItemInReply(
               observer.componentUuid,
@@ -483,13 +532,23 @@ export class SNComponentManager extends PureService {
       componentState.hidden = true;
     } else if (componentState.hidden) {
       componentState.hidden = false;
-      const contextObserver = find(this.contextStreamObservers, { identifier: component.uuid });
+      const contextObserver = find(this.contextStreamObservers, {
+        identifier: component.uuid,
+      });
       if (contextObserver) {
-        this.handleStreamContextItemMessage(component, contextObserver.originalMessage);
+        this.handleStreamContextItemMessage(
+          component,
+          contextObserver.originalMessage
+        );
       }
-      const streamObserver = find(this.streamObservers, { identifier: component.uuid });
+      const streamObserver = find(this.streamObservers, {
+        identifier: component.uuid,
+      });
       if (streamObserver) {
-        this.handleStreamItemsMessage(component, streamObserver.originalMessage);
+        this.handleStreamItemsMessage(
+          component,
+          streamObserver.originalMessage
+        );
       }
     }
   }
@@ -511,7 +570,7 @@ export class SNComponentManager extends PureService {
       deleted: item.deleted!,
       isMetadataUpdate: isMetadatUpdate,
       content: item.content,
-      clientData: clientData
+      clientData: clientData,
     };
     return this.responseItemsByRemovingPrivateProperties(
       [params],
@@ -526,7 +585,12 @@ export class SNComponentManager extends PureService {
     source?: PayloadSource
   ) {
     const component = this.findComponent(componentUuid);
-    this.log('Component manager send items in reply', component, items, message);
+    this.log(
+      'Component manager send items in reply',
+      component,
+      items,
+      message
+    );
     const responseData: MessageReplyData = {};
     const mapped = items.map((item) => {
       return this.jsonForItem(item, component, source);
@@ -542,9 +606,14 @@ export class SNComponentManager extends PureService {
     source?: PayloadSource
   ) {
     const component = this.findComponent(componentUuid);
-    this.log('Component manager send context item in reply', component, item, originalMessage);
+    this.log(
+      'Component manager send context item in reply',
+      component,
+      item,
+      originalMessage
+    );
     const response: MessageReplyData = {
-      item: this.jsonForItem(item, component, source)
+      item: this.jsonForItem(item, component, source),
     };
     this.replyToMessage(component, originalMessage, response);
   }
@@ -557,19 +626,28 @@ export class SNComponentManager extends PureService {
     const reply: MessageReply = {
       action: ComponentAction.Reply,
       original: originalMessage,
-      data: replyData
+      data: replyData,
     };
     this.sendMessageToComponent(component, reply);
   }
 
-  sendMessageToComponent(component: SNComponent, message: ComponentMessage | MessageReply) {
+  sendMessageToComponent(
+    component: SNComponent,
+    message: ComponentMessage | MessageReply
+  ) {
     const permissibleActionsWhileHidden = [
       ComponentAction.ComponentRegistered,
-      ComponentAction.ActivateThemes
+      ComponentAction.ActivateThemes,
     ];
     const componentState = this.findOrCreateDataForComponent(component.uuid);
-    if (componentState.hidden && !permissibleActionsWhileHidden.includes(message.action)) {
-      this.log('Component disabled for current item, ignoring messages.', component.name);
+    if (
+      componentState.hidden &&
+      !permissibleActionsWhileHidden.includes(message.action)
+    ) {
+      this.log(
+        'Component disabled for current item, ignoring messages.',
+        component.name
+      );
       return;
     }
     this.log('Component manager send message to component', component, message);
@@ -598,16 +676,21 @@ export class SNComponentManager extends PureService {
       return null;
     }
     if (component.offlineOnly || (this.isDesktop && component.local_url)) {
-      return component.local_url
-        && component.local_url.replace(
+      return (
+        component.local_url &&
+        component.local_url.replace(
           DESKTOP_URL_PREFIX,
           this.desktopManager.getExtServerHost()
-        );
+        )
+      );
     } else {
       let url = component.hosted_url || component.legacy_url;
       if (this.isMobile) {
-        const localReplacement = this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
-        url = url.replace(LOCAL_HOST, localReplacement).replace(CUSTOM_LOCAL_HOST, localReplacement);
+        const localReplacement =
+          this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
+        url = url
+          .replace(LOCAL_HOST, localReplacement)
+          .replace(CUSTOM_LOCAL_HOST, localReplacement);
       }
       return url;
     }
@@ -651,7 +734,7 @@ export class SNComponentManager extends PureService {
       this.log('Component not defined for message, returning', message);
       this.alertService!.alert(
         'An extension is trying to communicate with Standard Notes,' +
-        'but there is an error establishing a bridge. Please restart the app and try again.'
+          'but there is an error establishing a bridge. Please restart the app and try again.'
       );
       return;
     }
@@ -662,7 +745,7 @@ export class SNComponentManager extends PureService {
       ComponentAction.CreateItem,
       ComponentAction.CreateItems,
       ComponentAction.DeleteItems,
-      ComponentAction.SetComponentData
+      ComponentAction.SetComponentData,
     ];
     const readonlyState = this.getReadonlyStateForComponent(component);
     if (readonlyState.readonly && readwriteActions.includes(message.action)) {
@@ -687,7 +770,9 @@ export class SNComponentManager extends PureService {
     } else if (message.action === ComponentAction.SaveItems) {
       this.handleSaveItemsMessage(component, message);
     } else if (message.action === ComponentAction.ToggleActivateComponent) {
-      const componentToToggle = this.itemManager!.findItem(message.data.uuid!) as SNComponent;
+      const componentToToggle = this.itemManager!.findItem(
+        message.data.uuid!
+      ) as SNComponent;
       this.handleToggleComponentMessage(componentToToggle);
     } else if (message.action === ComponentAction.RequestPermissions) {
       this.handleRequestPermissionsMessage(component, message);
@@ -697,10 +782,11 @@ export class SNComponentManager extends PureService {
       this.handleDuplicateItemMessage(component, message);
     }
     for (const handler of this.handlers) {
-      if (handler.actionHandler && (
-        handler.areas.includes(component.area) ||
-        handler.areas.includes(ComponentArea.Any)
-      )) {
+      if (
+        handler.actionHandler &&
+        (handler.areas.includes(component.area) ||
+          handler.areas.includes(ComponentArea.Any))
+      ) {
         this.timeout(() => {
           handler.actionHandler!(component, message.action, message.data);
         });
@@ -721,18 +807,21 @@ export class SNComponentManager extends PureService {
     let privateContentProperties = [
       'autoupdateDisabled',
       'permissions',
-      'active'
+      'active',
     ];
     if (includeUrls) {
       privateContentProperties = privateContentProperties.concat([
         'hosted_url',
-        'local_url'
+        'local_url',
       ]);
     }
     return responseItems.map((responseItem) => {
       const privateProperties = privateContentProperties.slice();
       /** Server extensions are allowed to modify url property */
-      if (includeUrls && responseItem.content_type !== ContentType.ServerExtension) {
+      if (
+        includeUrls &&
+        responseItem.content_type !== ContentType.ServerExtension
+      ) {
         privateProperties.push('url');
       }
       if (!responseItem.content || isString(responseItem.content)) {
@@ -747,7 +836,7 @@ export class SNComponentManager extends PureService {
       }
       return {
         ...responseItem,
-        content: content
+        content: content,
       };
     });
   }
@@ -756,8 +845,8 @@ export class SNComponentManager extends PureService {
     const requiredPermissions = [
       {
         name: ComponentAction.StreamItems,
-        content_types: message.data.content_types!.sort()
-      }
+        content_types: message.data.content_types!.sort(),
+      },
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, () => {
       if (!find(this.streamObservers, { identifier: component.uuid })) {
@@ -767,7 +856,7 @@ export class SNComponentManager extends PureService {
           componentUuid: component.uuid,
           area: component.area,
           originalMessage: message,
-          contentTypes: message.data.content_types
+          contentTypes: message.data.content_types,
         });
       }
       /* Push immediately now */
@@ -782,11 +871,14 @@ export class SNComponentManager extends PureService {
     });
   }
 
-  handleStreamContextItemMessage(component: SNComponent, message: ComponentMessage) {
+  handleStreamContextItemMessage(
+    component: SNComponent,
+    message: ComponentMessage
+  ) {
     const requiredPermissions: ComponentPermission[] = [
       {
-        name: ComponentAction.StreamContextItem
-      }
+        name: ComponentAction.StreamContextItem,
+      },
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, () => {
       if (!find(this.contextStreamObservers, { identifier: component.uuid })) {
@@ -794,7 +886,7 @@ export class SNComponentManager extends PureService {
           identifier: component.uuid,
           componentUuid: component.uuid,
           area: component.area,
-          originalMessage: message
+          originalMessage: message,
         });
       }
       for (const handler of this.handlersForArea(component.area)) {
@@ -808,8 +900,13 @@ export class SNComponentManager extends PureService {
     });
   }
 
-  isItemIdWithinComponentContextJurisdiction(uuid: string, component: SNComponent) {
-    const itemIdsInJurisdiction = this.itemIdsInContextJurisdictionForComponent(component);
+  isItemIdWithinComponentContextJurisdiction(
+    uuid: string,
+    component: SNComponent
+  ) {
+    const itemIdsInJurisdiction = this.itemIdsInContextJurisdictionForComponent(
+      component
+    );
     return itemIdsInJurisdiction.includes(uuid);
   }
 
@@ -837,16 +934,21 @@ export class SNComponentManager extends PureService {
    * Save items is capable of saving existing items, and also creating new ones
    * if they don't exist.
    */
-  async handleSaveItemsMessage(component: SNComponent, message: ComponentMessage) {
+  async handleSaveItemsMessage(
+    component: SNComponent,
+    message: ComponentMessage
+  ) {
     let responsePayloads = message.data.items as ComponentRawPayload[];
     const requiredPermissions = [];
-    const itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(component);
+    const itemIdsInContextJurisdiction = this.itemIdsInContextJurisdictionForComponent(
+      component
+    );
     /* Pending as in needed to be accounted for in permissions. */
     const pendingResponseItems = responsePayloads.slice();
     for (const responseItem of responsePayloads.slice()) {
       if (itemIdsInContextJurisdiction.includes(responseItem.uuid)) {
         requiredPermissions.push({
-          name: ComponentAction.StreamContextItem
+          name: ComponentAction.StreamContextItem,
         });
         removeFromArray(pendingResponseItems, responseItem);
         /* We break because there can only be one context item */
@@ -855,12 +957,14 @@ export class SNComponentManager extends PureService {
     }
     /* Check to see if additional privileges are required */
     if (pendingResponseItems.length > 0) {
-      const requiredContentTypes = uniq(pendingResponseItems.map((item: any) => {
-        return item.content_type;
-      })).sort();
+      const requiredContentTypes = uniq(
+        pendingResponseItems.map((item: any) => {
+          return item.content_type;
+        })
+      ).sort();
       requiredPermissions.push({
         name: ComponentAction.StreamItems,
-        content_types: requiredContentTypes
+        content_types: requiredContentTypes,
       } as ComponentPermission);
     }
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
@@ -889,19 +993,20 @@ export class SNComponentManager extends PureService {
       if (lockedNoteCount === 1) {
         this.alertService!.alert(
           `The note you are attempting to save is locked and cannot be edited.`,
-          'Note Locked',
+          'Note Locked'
         );
         return;
       } else if (lockedCount > 0) {
-        const itemNoun = lockedCount === 1
-          ? 'item'
-          : lockedNoteCount === lockedCount
+        const itemNoun =
+          lockedCount === 1
+            ? 'item'
+            : lockedNoteCount === lockedCount
             ? 'notes'
             : 'items';
         const auxVerb = lockedCount === 1 ? 'is' : 'are';
         this.alertService!.alert(
           `${lockedCount} ${itemNoun} you are attempting to save ${auxVerb} locked and cannot be edited.`,
-          'Items Locked',
+          'Items Locked'
         );
         return;
       }
@@ -927,10 +1032,15 @@ export class SNComponentManager extends PureService {
         (mutator) => {
           const payload = searchArray(payloads, { uuid: mutator.getUuid() })!;
           mutator.mergePayload(payload);
-          const responseItem = searchArray(responsePayloads, { uuid: mutator.getUuid() })!;
+          const responseItem = searchArray(responsePayloads, {
+            uuid: mutator.getUuid(),
+          })!;
           if (responseItem.clientData) {
-            const allComponentData = Copy(mutator.getItem().getDomainData(ComponentDataDomain) || {});
-            allComponentData[component.getClientDataKey()!] = responseItem.clientData;
+            const allComponentData = Copy(
+              mutator.getItem().getDomainData(ComponentDataDomain) || {}
+            );
+            allComponentData[component.getClientDataKey()!] =
+              responseItem.clientData;
             mutator.setDomainData(allComponentData, ComponentDataDomain);
           }
         },
@@ -938,54 +1048,66 @@ export class SNComponentManager extends PureService {
         PayloadSource.ComponentRetrieved,
         component.uuid
       );
-      this.syncService!.sync().then(() => {
-        /* Allow handlers to be notified when a save begins and ends, to update the UI */
-        const saveMessage = Object.assign({}, message);
-        saveMessage.action = ComponentAction.SaveSuccess;
-        this.replyToMessage(component, message, {});
-        this.handleMessage(component, saveMessage);
-      }).catch(() => {
-        const saveMessage = Object.assign({}, message);
-        saveMessage.action = ComponentAction.SaveError;
-        this.replyToMessage(component, message, { error: ComponentAction.SaveError });
-        this.handleMessage(component, saveMessage);
-      });
+      this.syncService!.sync()
+        .then(() => {
+          /* Allow handlers to be notified when a save begins and ends, to update the UI */
+          const saveMessage = Object.assign({}, message);
+          saveMessage.action = ComponentAction.SaveSuccess;
+          this.replyToMessage(component, message, {});
+          this.handleMessage(component, saveMessage);
+        })
+        .catch(() => {
+          const saveMessage = Object.assign({}, message);
+          saveMessage.action = ComponentAction.SaveError;
+          this.replyToMessage(component, message, {
+            error: ComponentAction.SaveError,
+          });
+          this.handleMessage(component, saveMessage);
+        });
     });
   }
 
-  handleDuplicateItemMessage(component: SNComponent, message: ComponentMessage) {
+  handleDuplicateItemMessage(
+    component: SNComponent,
+    message: ComponentMessage
+  ) {
     const itemParams = message.data.item!;
     const item = this.itemManager!.findItem(itemParams.uuid)!;
     const requiredPermissions = [
       {
         name: ComponentAction.StreamItems,
-        content_types: [item.content_type!]
-      }
+        content_types: [item.content_type!],
+      },
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       const duplicate = await this.itemManager!.duplicateItem(item.uuid);
       this.syncService!.sync();
-      this.replyToMessage(
-        component,
-        message,
-        { item: this.jsonForItem(duplicate, component) }
-      );
+      this.replyToMessage(component, message, {
+        item: this.jsonForItem(duplicate, component),
+      });
     });
   }
 
   handleCreateItemsMessage(component: SNComponent, message: ComponentMessage) {
-    let responseItems = message.data.item ? [message.data.item] : message.data.items!;
+    let responseItems = message.data.item
+      ? [message.data.item]
+      : message.data.items!;
     const uniqueContentTypes = uniq(
-      responseItems.map((item: any) => { return item.content_type; })
+      responseItems.map((item: any) => {
+        return item.content_type;
+      })
     ) as ContentType[];
     const requiredPermissions: ComponentPermission[] = [
       {
         name: ComponentAction.StreamItems,
-        content_types: uniqueContentTypes
-      }
+        content_types: uniqueContentTypes,
+      },
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
-      responseItems = this.responseItemsByRemovingPrivateProperties(responseItems, component);
+      responseItems = this.responseItemsByRemovingPrivateProperties(
+        responseItems,
+        component
+      );
       const processedItems = [];
       for (const responseItem of responseItems) {
         if (!responseItem.uuid) {
@@ -1001,8 +1123,11 @@ export class SNComponentManager extends PureService {
           item.uuid,
           (mutator) => {
             if (responseItem.clientData) {
-              const allComponentData = Copy(item.getDomainData(ComponentDataDomain) || {});
-              allComponentData[component.getClientDataKey()!] = responseItem.clientData;
+              const allComponentData = Copy(
+                item.getDomainData(ComponentDataDomain) || {}
+              );
+              allComponentData[component.getClientDataKey()!] =
+                responseItem.clientData;
               mutator.setDomainData(allComponentData, ComponentDataDomain);
             }
           },
@@ -1013,22 +1138,29 @@ export class SNComponentManager extends PureService {
         processedItems.push(item);
       }
       this.syncService!.sync();
-      const reply = message.action === ComponentAction.CreateItem
-        ? { item: this.jsonForItem(processedItems[0], component) }
-        : { items: processedItems.map((item) => { return this.jsonForItem(item, component); }) };
+      const reply =
+        message.action === ComponentAction.CreateItem
+          ? { item: this.jsonForItem(processedItems[0], component) }
+          : {
+              items: processedItems.map((item) => {
+                return this.jsonForItem(item, component);
+              }),
+            };
       this.replyToMessage(component, message, reply);
     });
   }
 
   handleDeleteItemsMessage(component: SNComponent, message: ComponentMessage) {
     const requiredContentTypes = uniq(
-      message.data.items!.map((item: any) => { return item.content_type; })
+      message.data.items!.map((item: any) => {
+        return item.content_type;
+      })
     ).sort() as ContentType[];
     const requiredPermissions: ComponentPermission[] = [
       {
         name: ComponentAction.StreamItems,
-        content_types: requiredContentTypes
-      }
+        content_types: requiredContentTypes,
+      },
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       const itemsData = message.data.items!;
@@ -1042,13 +1174,22 @@ export class SNComponentManager extends PureService {
         for (const itemData of itemsData) {
           const item = this.itemManager!.findItem(itemData.uuid);
           if (!item) {
-            this.alertService!.alert('The item you are trying to delete cannot be found.');
+            this.alertService!.alert(
+              'The item you are trying to delete cannot be found.'
+            );
             continue;
           }
-          if ([ContentType.Component, ContentType.Theme].includes(item.content_type!)) {
+          if (
+            [ContentType.Component, ContentType.Theme].includes(
+              item.content_type!
+            )
+          ) {
             await this.deactivateComponent(item.uuid);
           }
-          await this.itemManager!.setItemToBeDeleted(item.uuid, PayloadSource.ComponentRetrieved);
+          await this.itemManager!.setItemToBeDeleted(
+            item.uuid,
+            PayloadSource.ComponentRetrieved
+          );
         }
         this.syncService!.sync();
         reply = { deleted: true };
@@ -1060,18 +1201,24 @@ export class SNComponentManager extends PureService {
     });
   }
 
-  handleRequestPermissionsMessage(component: SNComponent, message: ComponentMessage) {
+  handleRequestPermissionsMessage(
+    component: SNComponent,
+    message: ComponentMessage
+  ) {
     this.runWithPermissions(component.uuid, message.data.permissions!, () => {
       this.replyToMessage(component, message, { approved: true });
     });
   }
 
-  handleSetComponentDataMessage(component: SNComponent, message: ComponentMessage) {
+  handleSetComponentDataMessage(
+    component: SNComponent,
+    message: ComponentMessage
+  ) {
     /* A component setting its own data does not require special permissions */
     this.runWithPermissions(component.uuid, [], async () => {
       await this.itemManager!.changeComponent(component.uuid, (mutator) => {
         mutator.componentData = message.data.componentData;
-      })
+      });
       this.syncService!.sync();
     });
   }
@@ -1132,7 +1279,9 @@ export class SNComponentManager extends PureService {
     const acquiredPermissions = component.permissions;
     for (const required of requiredPermissions.slice()) {
       /* Remove anything we already have */
-      const respectiveAcquired = acquiredPermissions.find((candidate) => candidate.name === required.name);
+      const respectiveAcquired = acquiredPermissions.find(
+        (candidate) => candidate.name === required.name
+      );
       if (!respectiveAcquired) {
         continue;
       }
@@ -1153,11 +1302,15 @@ export class SNComponentManager extends PureService {
       }
     }
     if (requiredPermissions.length > 0) {
-      this.promptForPermissions(component, requiredPermissions, async (approved) => {
-        if (approved) {
-          runFunction();
+      this.promptForPermissions(
+        component,
+        requiredPermissions,
+        async (approved) => {
+          if (approved) {
+            runFunction();
+          }
         }
-      });
+      );
     } else {
       runFunction();
     }
@@ -1171,70 +1324,86 @@ export class SNComponentManager extends PureService {
     const params: PermissionDialog = {
       component: component,
       permissions: permissions,
-      permissionsString: this.permissionsStringForPermissions(permissions, component),
+      permissionsString: this.permissionsStringForPermissions(
+        permissions,
+        component
+      ),
       actionBlock: callback,
       callback: async (approved: boolean) => {
         if (approved) {
-          this.log("Changing component to expand permissions", component);
+          this.log('Changing component to expand permissions', component);
           await this.itemManager!.changeItem(component.uuid, (m) => {
-            const componentPermissions = Copy(component.permissions) as ComponentPermission[];
+            const componentPermissions = Copy(
+              component.permissions
+            ) as ComponentPermission[];
             for (const permission of permissions) {
-              const matchingPermission = componentPermissions
-                .find((candidate) => candidate.name === permission.name);
+              const matchingPermission = componentPermissions.find(
+                (candidate) => candidate.name === permission.name
+              );
               if (!matchingPermission) {
                 componentPermissions.push(permission);
               } else {
                 /* Permission already exists, but content_types may have been expanded */
                 const contentTypes = matchingPermission.content_types || [];
-                matchingPermission.content_types = uniq(contentTypes.concat(permission.content_types!));
+                matchingPermission.content_types = uniq(
+                  contentTypes.concat(permission.content_types!)
+                );
               }
             }
             const mutator = m as ComponentMutator;
             mutator.permissions = componentPermissions;
-          })
+          });
           this.syncService!.sync();
         }
-        this.permissionDialogs = this.permissionDialogs.filter((pendingDialog) => {
-          /* Remove self */
-          if (pendingDialog === params) {
-            pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
-            return false;
-          }
-          const containsObjectSubset = (
-            source: ComponentPermission[],
-            target: ComponentPermission[]
-          ) => {
-            return !target.some(
-              val => !source.find((candidate) => JSON.stringify(candidate) === JSON.stringify(val))
-            );
-          };
-          if (pendingDialog.component === component) {
-            /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
-            if (pendingDialog.permissions === permissions || containsObjectSubset(
-              permissions,
-              pendingDialog.permissions
-            )) {
-              /* If approved, run the action block. Otherwise, if canceled, cancel any
-              pending ones as well, since the user was explicit in their intentions */
-              if (approved) {
-                pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
-              }
+        this.permissionDialogs = this.permissionDialogs.filter(
+          (pendingDialog) => {
+            /* Remove self */
+            if (pendingDialog === params) {
+              pendingDialog.actionBlock && pendingDialog.actionBlock(approved);
               return false;
             }
+            const containsObjectSubset = (
+              source: ComponentPermission[],
+              target: ComponentPermission[]
+            ) => {
+              return !target.some(
+                (val) =>
+                  !source.find(
+                    (candidate) =>
+                      JSON.stringify(candidate) === JSON.stringify(val)
+                  )
+              );
+            };
+            if (pendingDialog.component === component) {
+              /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
+              if (
+                pendingDialog.permissions === permissions ||
+                containsObjectSubset(permissions, pendingDialog.permissions)
+              ) {
+                /* If approved, run the action block. Otherwise, if canceled, cancel any
+              pending ones as well, since the user was explicit in their intentions */
+                if (approved) {
+                  pendingDialog.actionBlock &&
+                    pendingDialog.actionBlock(approved);
+                }
+                return false;
+              }
+            }
+            return true;
           }
-          return true;
-        });
+        );
         if (this.permissionDialogs.length > 0) {
           this.presentPermissionsDialog(this.permissionDialogs[0]);
         }
-      }
-
+      },
     };
     /**
      * Since these calls are asyncronous, multiple dialogs may be requested at the same time.
      * We only want to present one and trigger all callbacks based on one modal result
      */
-    const existingDialog = find(this.permissionDialogs, { component: component });
+    const existingDialog = find(this.permissionDialogs, {
+      component: component,
+    });
     this.permissionDialogs.push(params);
     if (!existingDialog) {
       this.presentPermissionsDialog(params);
@@ -1254,10 +1423,7 @@ export class SNComponentManager extends PureService {
   public registerHandler(handler: ComponentHandler) {
     this.handlers.push(handler);
     return () => {
-      const matching = find(
-        this.handlers,
-        { identifier: handler.identifier }
-      );
+      const matching = find(this.handlers, { identifier: handler.identifier });
       if (!matching) {
         this.log('Attempting to deregister non-existing handler');
         return;
@@ -1285,14 +1451,12 @@ export class SNComponentManager extends PureService {
     data.lockReadonly = lockReadonly;
   }
 
-  getReadonlyStateForComponent(
-    component: SNComponent
-  ) {
+  getReadonlyStateForComponent(component: SNComponent) {
     const data = this.findOrCreateDataForComponent(component.uuid);
     return {
       readonly: data.readonly,
-      lockReadonly: data.lockReadonly
-    } as ComponentState
+      lockReadonly: data.lockReadonly,
+    } as ComponentState;
   }
 
   /** Called by other views when the iframe is ready */
@@ -1303,7 +1467,10 @@ export class SNComponentManager extends PureService {
     this.log('Register component window', component);
     const data = this.findOrCreateDataForComponent(component.uuid);
     if (data.window === componentWindow) {
-      this.log('Web|componentManager', 'attempting to re-register same component window.');
+      this.log(
+        'Web|componentManager',
+        'attempting to re-register same component window.'
+      );
     }
     this.log('Web|componentManager|registerComponentWindow', component);
     data.window = componentWindow;
@@ -1316,8 +1483,8 @@ export class SNComponentManager extends PureService {
         uuid: component.uuid,
         environment: environmentToString(this.environment),
         platform: platformToString(this.platform),
-        activeThemeUrls: this.urlsForActiveThemes()
-      }
+        activeThemeUrls: this.urlsForActiveThemes(),
+      },
     });
     this.postActiveThemesToComponent(component);
     if (this.desktopManager) {
@@ -1406,14 +1573,25 @@ export class SNComponentManager extends PureService {
   handleSetSizeEvent(component: SNComponent, data: MessageData) {
     const setSize = (element: Element, size: any) => {
       const widthString = isString(size.width) ? size.width : `${data.width}px`;
-      const heightString = isString(size.height) ? size.height : `${data.height}px`;
+      const heightString = isString(size.height)
+        ? size.height
+        : `${data.height}px`;
       if (element) {
-        element.setAttribute('style', `width:${widthString}; height:${heightString};`);
+        element.setAttribute(
+          'style',
+          `width:${widthString}; height:${heightString};`
+        );
       }
     };
-    if (component.area === ComponentArea.Rooms || component.area === ComponentArea.Modal) {
-      const selector = component.area === ComponentArea.Rooms ? 'inner' : 'outer';
-      const content = document.getElementById(`component-content-${selector}-${component.uuid}`);
+    if (
+      component.area === ComponentArea.Rooms ||
+      component.area === ComponentArea.Modal
+    ) {
+      const selector =
+        component.area === ComponentArea.Rooms ? 'inner' : 'outer';
+      const content = document.getElementById(
+        `component-content-${selector}-${component.uuid}`
+      );
       if (content) {
         setSize(content, data);
       }
@@ -1456,7 +1634,10 @@ export class SNComponentManager extends PureService {
         defaultEditor = this.getDefaultEditor();
       }
     }
-    if (defaultEditor && !defaultEditor.isExplicitlyDisabledForItem(note.uuid)) {
+    if (
+      defaultEditor &&
+      !defaultEditor.isExplicitlyDisabledForItem(note.uuid)
+    ) {
       return defaultEditor;
     } else {
       return undefined;
@@ -1466,7 +1647,7 @@ export class SNComponentManager extends PureService {
   getDefaultEditor() {
     const editors = this.componentsForArea(ComponentArea.Editor);
     if (this.isMobile) {
-      return editors.filter(e => {
+      return editors.filter((e) => {
         return e.isMobileDefault;
       })[0];
     } else {
@@ -1474,7 +1655,10 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  permissionsStringForPermissions(permissions: ComponentPermission[], component: SNComponent) {
+  permissionsStringForPermissions(
+    permissions: ComponentPermission[],
+    component: SNComponent
+  ) {
     let finalString = '';
     const permissionsCount = permissions.length;
     const addSeparator = (index: number, length: number) => {
@@ -1504,7 +1688,10 @@ export class SNComponentManager extends PureService {
         let typesString = '';
         for (let i = 0; i < types.length; i++) {
           const type = types[i];
-          typesString += addSeparator(i, types.length + permissionsCount - index - 1);
+          typesString += addSeparator(
+            i,
+            types.length + permissionsCount - index - 1
+          );
           typesString += type;
         }
         finalString += addSeparator(index, permissionsCount);
@@ -1518,7 +1705,7 @@ export class SNComponentManager extends PureService {
         const mapping = {
           [ComponentArea.EditorStack]: 'working note',
           [ComponentArea.NoteTags]: 'working note',
-          [ComponentArea.Editor]: 'working note'
+          [ComponentArea.Editor]: 'working note',
         };
         finalString += addSeparator(index, permissionsCount);
         finalString += (mapping as any)[component.area];
