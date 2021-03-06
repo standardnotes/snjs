@@ -40,7 +40,7 @@ describe('001 protocol operations', () => {
     expect(key.serverPassword).to.be.ok;
     expect(key.masterKey).to.be.ok;
 
-    expect(key.keyParams.content.pw_nonce).to.not.be.ok;
+    expect(key.keyParams.content.pw_nonce).to.be.ok;
     expect(key.keyParams.content.pw_cost).to.be.ok;
     expect(key.keyParams.content.pw_salt).to.be.ok;
   });

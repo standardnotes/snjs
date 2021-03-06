@@ -643,29 +643,6 @@ describe('keys', function () {
     recreatedApp.deinit();
   });
 
-  it('extraneous parameters in key params should be ignored when ejecting', async function () {
-    const params = new SNRootKeyParams({
-      identifier: 'foo',
-      pw_cost: 110000,
-      pw_nonce: 'bar',
-      pw_salt: 'salt',
-      version: '003',
-      origination: 'registration',
-      created: new Date().getTime(),
-      hash: '123',
-      foo: 'bar'
-    });
-    const ejected = params.getPortableValue();
-    expect(ejected.hash).to.not.be.ok;
-    expect(ejected.pw_cost).to.be.ok;
-    expect(ejected.pw_nonce).to.be.ok;
-    expect(ejected.pw_salt).to.be.ok;
-    expect(ejected.version).to.be.ok;
-    expect(ejected.origination).to.be.ok;
-    expect(ejected.created).to.be.ok;
-    expect(ejected.identifier).to.be.ok;
-  });
-
   describe('changing password on 003 client while signed into 004 client should', function () {
     /**
      * When an 004 client signs into 003 account, it creates a root key based items key.
@@ -675,7 +652,7 @@ describe('keys', function () {
      * items sync to the 004 client, it can't decrypt them with its existing items key
      * because its based on the old root key.
      */
-    it.skip('add new items key', async function () {
+    it('add new items key', async function () {
       this.timeout(Factory.LongTestTimeout * 3);
       let oldClient = this.application;
 

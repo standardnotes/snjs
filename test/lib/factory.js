@@ -22,8 +22,8 @@ export function createApplication(identifier, environment, platform) {
     new SNWebCrypto(),
     {
       confirm: async () => true,
-      alert: async () => {},
-      blockingDialog: () => () => {},
+      alert: async () => { },
+      blockingDialog: () => () => { },
     },
     identifier,
     undefined,
@@ -50,8 +50,10 @@ export async function createAndInitializeApplication(namespace, environment, pla
 
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
-    receiveChallenge: (_challenge) => {
-      throw Error('Factory application shouldn\'t have challenges');
+    receiveChallenge: (challenge) => {
+      if (challenge.reason !== ChallengeReason.Custom) {
+        throw Error('Factory application shouldn\'t have challenges');
+      }
     }
   });
   await application.launch(true);
