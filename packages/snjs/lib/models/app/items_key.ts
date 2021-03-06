@@ -6,7 +6,6 @@ import { ProtocolVersion } from '@Protocol/versions';
  * A key used to encrypt other items. Items keys are synced and persisted.
  */
 export class SNItemsKey extends SNItem {
-
   /** Do not duplicate items keys. Always keep original */
   strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy {
     if (this.errorDecrypting) {

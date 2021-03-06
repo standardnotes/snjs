@@ -6,7 +6,7 @@ import { DefaultAppDomain } from './content_types';
 export function Uuids(items: any[]): string[] {
   return items.map((item) => {
     return item.uuid;
-  })
+  });
 }
 
 /**

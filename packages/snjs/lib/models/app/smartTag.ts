@@ -7,12 +7,11 @@ import { SNPredicate } from '@Models/core/predicate';
  * list of notes.
  */
 export class SNSmartTag extends SNTag {
-
-  public readonly predicate!: SNPredicate
+  public readonly predicate!: SNPredicate;
 
   constructor(payload: PurePayload) {
     super(payload);
-    if(payload.safeContent.predicate) {
+    if (payload.safeContent.predicate) {
       this.predicate = SNPredicate.FromJson(payload.safeContent.predicate);
     }
   }
