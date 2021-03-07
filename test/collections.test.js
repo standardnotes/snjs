@@ -67,7 +67,11 @@ describe('payload collections', () => {
     );
     const payload = Factory.createNotePayload();
 
-    collection.set([payload, payload]);
+    const copy = CopyPayload(payload);
+    collection.set([payload, copy]);
+    collection.set([payload]);
+    collection.set([payload, copy]);
+
     const sorted = collection.displayElements(ContentType.Note);
     expect(sorted.length).to.equal(1);
   });

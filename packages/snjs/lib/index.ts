@@ -125,6 +125,7 @@ export {
   subtractFromArray,
   topLevelCompare,
   truncateHexString,
+  uniqueArrayByKey,
   uniqCombineObjArrays,
 } from './utils';
 export { Uuid } from '@Lib/uuid';

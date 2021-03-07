@@ -137,12 +137,12 @@ export function greaterOfTwoDates(dateA: Date, dateB: Date) {
  * @param equalityKeys - Keys to determine element equality
  * @returns Array containing unique values
  */
-export function uniqCombineObjArrays(
-  arrayA: any[],
-  arrayB: any[],
-  equalityKeys: string[]
-) {
-  return uniqWith(arrayA.concat(arrayB), (a: any, b: any) => {
+export function uniqCombineObjArrays<T>(
+  arrayA: T[],
+  arrayB: T[],
+  equalityKeys: [keyof T]
+): T[] {
+  return uniqWith(arrayA.concat(arrayB), (a: T, b: T) => {
     for (const key of equalityKeys) {
       if (a[key] !== b[key]) {
         return false;
@@ -156,8 +156,18 @@ export function uniqCombineObjArrays(
  * Returns a new array containing only unique values
  * @returns Array containing unique values
  */
-export function uniqueArray(array: any[]): any[] {
+export function uniqueArray<T>(array: T[]): T[] {
   return uniq(array);
+}
+
+/**
+ * Returns a new array containing only unique values
+ * @returns Array containing unique values
+ */
+export function uniqueArrayByKey<T>(array: T[], key: keyof T): T[] {
+  return uniqWith(array, (a: T, b: T) => {
+    return a[key] === b[key];
+  });
 }
 
 /**

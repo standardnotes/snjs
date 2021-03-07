@@ -131,6 +131,23 @@ Please make sure you have [Docker](https://www.docker.com) installed before runn
 yarn test
 ```
 
+Running packages/snjs tests:
+
+```
+yarn run start:test-server:dev
+
+# Spins up Ruby and JS server
+yarn run test:e2e:dev-setup
+```
+
+Then either run
+
+```
+yarn run test:e2e:dev
+```
+
+Or open browser to `localhost:9002/test/test.html`.
+
 ## Notes
 - Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 

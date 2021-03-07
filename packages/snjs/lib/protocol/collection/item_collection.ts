@@ -1,5 +1,10 @@
 import { MutableCollection } from './collection';
-import { compareValues, isNullOrUndefined } from '@Lib/utils';
+import {
+  compareValues,
+  isNullOrUndefined,
+  uniqueArray,
+  uniqueArrayByKey,
+} from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import { ContentType } from '@Models/content_types';
 import { UuidString } from './../../types';
@@ -40,8 +45,11 @@ export class ItemCollection extends MutableCollection<SNItem> {
     Record<ContentType, Array<SNItem | undefined>>
   > = {};
 
-  public set(elements: SNItem | SNItem[]) {
-    elements = Array.isArray(elements) ? elements : [elements];
+  public set(elements: SNItem | SNItem[]): void {
+    elements = uniqueArrayByKey(
+      Array.isArray(elements) ? elements : [elements],
+      'uuid'
+    );
     super.set(elements);
     this.filterSortElements(elements);
   }
@@ -164,7 +172,6 @@ export class ItemCollection extends MutableCollection<SNItem> {
         } else {
           /** Has not yet been inserted */
           sortedElements.push(element);
-          filteredCTMap[element.uuid] = Object.keys(filteredCTMap).length;
           /** Needs re-sort because we're just pushing the element to the end here */
           typesNeedingResort.add(contentType);
         }

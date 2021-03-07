@@ -132,6 +132,14 @@ describe('utils', () => {
     expect(result.length).to.equal(2);
   });
 
+  it('uniqueArrayByKey', () => {
+    const arrayA = [{ uuid: 1 }, { uuid: 2 }];
+    const arrayB = [{ uuid: 1 }, { uuid: 2 }, { uuid: 1 }, { uuid: 2 }];
+
+    const result = uniqueArrayByKey(arrayA.concat(arrayB), ['uuid']);
+    expect(result.length).to.equal(2);
+  });
+
   it('lodash merge should behave as expected', () => {
     const a = {
       content: {
