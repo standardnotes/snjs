@@ -8,8 +8,10 @@ import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
  * This avoids the need for platforms to override migrations directly.
  */
 export abstract class DeviceInterface {
-  public timeout: any;
-  public interval: any;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public timeout: Function | null;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public interval: Function | null;
 
   /**
     * @param {function} timeout
@@ -20,12 +22,13 @@ export abstract class DeviceInterface {
        A platform-specific function that is fed functions to
        perform repeatedly. Similar to setInterval.
   */
-  constructor(timeout: any, interval: any) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  constructor(timeout: Function, interval: Function) {
     this.timeout = timeout || setTimeout.bind(getGlobalScope());
     this.interval = interval || setInterval.bind(getGlobalScope());
   }
 
-  public deinit() {
+  public deinit(): void {
     this.timeout = null;
     this.interval = null;
   }
