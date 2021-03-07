@@ -8,8 +8,8 @@ import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
  * This avoids the need for platforms to override migrations directly.
  */
 export abstract class DeviceInterface {
-  public interval: any;
   public timeout: any;
+  public interval: any;
 
   /**
     * @param {function} timeout
