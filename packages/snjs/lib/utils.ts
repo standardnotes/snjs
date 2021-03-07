@@ -117,14 +117,14 @@ export function isNullOrUndefined(value: unknown): value is null | undefined {
 /**
  * @returns Whether the value is a string
  */
-export function isString(value: any) {
+export function isString(value: unknown): boolean {
   return typeof value === 'string' || value instanceof String;
 }
 
 /**
  * @returns The greater of the two dates
  */
-export function greaterOfTwoDates(dateA: Date, dateB: Date) {
+export function greaterOfTwoDates(dateA: Date, dateB: Date): Date {
   if (dateA > dateB) {
     return dateA;
   } else {
