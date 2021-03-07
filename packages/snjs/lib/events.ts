@@ -1,4 +1,5 @@
 import { SyncEvent } from '@Services/sync/events';
+import { AnyRecord } from '@Lib/types';
 export { SyncEvent };
 
 export enum ApplicationEvent {
@@ -63,7 +64,7 @@ export enum ApplicationEvent {
   ProtectionSessionExpiryDateChanged = 26,
 }
 
-export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
+export function applicationEventForSyncEvent(syncEvent: SyncEvent): ApplicationEvent | undefined {
   return ({
     [SyncEvent.FullSyncCompleted]: ApplicationEvent.CompletedFullSync,
     [SyncEvent.SingleSyncCompleted]: ApplicationEvent.CompletedIncrementalSync,
@@ -80,5 +81,5 @@ export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
     [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
     [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
     [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
-  } as any)[syncEvent];
+  } as AnyRecord)[syncEvent];
 }
