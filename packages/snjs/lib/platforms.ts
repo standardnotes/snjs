@@ -15,7 +15,7 @@ export enum Platform {
   LinuxDesktop = 8,
 }
 
-export function platformFromString(string: string) {
+export function platformFromString(string: string): Platform {
   const map: Record<string, Platform> = {
     'mac-web': Platform.MacWeb,
     'mac-desktop': Platform.MacDesktop,
@@ -29,7 +29,7 @@ export function platformFromString(string: string) {
   return map[string];
 }
 
-export function platformToString(platform: Platform) {
+export function platformToString(platform: Platform): string {
   const map = {
     [Platform.MacWeb]: 'mac-web',
     [Platform.MacDesktop]: 'mac-desktop',
@@ -43,7 +43,7 @@ export function platformToString(platform: Platform) {
   return map[platform];
 }
 
-export function environmentFromString(string: string) {
+export function environmentFromString(string: string): Environment {
   const map: Record<string, Environment> = {
     web: Environment.Web,
     desktop: Environment.Desktop,
@@ -52,7 +52,7 @@ export function environmentFromString(string: string) {
   return map[string];
 }
 
-export function environmentToString(environment: Environment) {
+export function environmentToString(environment: Environment): string {
   const map = {
     [Environment.Web]: 'web',
     [Environment.Desktop]: 'desktop',
@@ -61,10 +61,10 @@ export function environmentToString(environment: Environment) {
   return map[environment];
 }
 
-export function isEnvironmentWebOrDesktop(environment: Environment) {
+export function isEnvironmentWebOrDesktop(environment: Environment): boolean {
   return environment === Environment.Web || environment === Environment.Desktop;
 }
 
-export function isEnvironmentMobile(environment: Environment) {
+export function isEnvironmentMobile(environment: Environment): boolean {
   return environment === Environment.Mobile;
 }
