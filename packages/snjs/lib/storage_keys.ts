@@ -40,7 +40,7 @@ export enum NonwrappedStorageKey {
   MobileFirstRun = 'first_run',
 }
 
-export function namespacedKey(namespace: string, key: string) {
+export function namespacedKey(namespace: string, key: string): string {
   if (namespace) {
     return `${namespace}-${key}`;
   } else {
