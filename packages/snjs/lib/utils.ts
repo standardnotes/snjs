@@ -140,7 +140,7 @@ export function greaterOfTwoDates(dateA: Date, dateB: Date) {
 export function uniqCombineObjArrays<T>(
   arrayA: T[],
   arrayB: T[],
-  equalityKeys: [keyof T]
+  equalityKeys: (keyof T)[]
 ): T[] {
   return uniqWith(arrayA.concat(arrayB), (a: T, b: T) => {
     for (const key of equalityKeys) {
