@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('004 protocol operations', () => {
+describe('004 protocol operations', function () {
   const _identifier = 'hello@test.com';
   const _password = 'password';
   let _keyParams;
@@ -13,7 +13,7 @@ describe('004 protocol operations', () => {
   const application = Factory.createApplication();
   const protocol004 = new SNProtocolOperator004(new SNWebCrypto());
 
-  before(async () => {
+  before(async function () {
     await Factory.initializeApplication(application);
     _key = await protocol004.createRootKey(
       _identifier,
@@ -23,17 +23,17 @@ describe('004 protocol operations', () => {
     _keyParams = _key.keyParams;
   });
 
-  after(() => {
+  after(function () {
     application.deinit();
   });
 
-  it('cost minimum should throw', () => {
-    expect(() => {
+  it('cost minimum should throw', function () {
+    expect(function () {
       application.protocolService.costMinimumForVersion('004');
     }).to.throw('Cost minimums only apply to versions <= 002');
   });
 
-  it('generates valid keys for registration', async () => {
+  it('generates valid keys for registration', async function () {
     const key = await application.protocolService.createRootKey(
       _identifier,
       _password,
@@ -52,7 +52,7 @@ describe('004 protocol operations', () => {
     expect(key.keyParams.content004.identifier).to.be.ok;
   });
 
-  it('computes proper keys for sign in', async () => {
+  it('computes proper keys for sign in', async function () {
     const identifier = 'foo@bar.com';
     const password = 'very_secure';
     const keyParams = application.protocolService.createKeyParams({
@@ -71,7 +71,7 @@ describe('004 protocol operations', () => {
     expect(key.dataAuthenticationKey).to.not.be.ok;
   });
 
-  it('generates random key', async () => {
+  it('generates random key', async function () {
     const length = 96;
     const key = await application.protocolService.crypto.generateRandomKey(
       length
@@ -79,7 +79,7 @@ describe('004 protocol operations', () => {
     expect(key.length).to.equal(length / 4);
   });
 
-  it('properly encrypts and decrypts', async () => {
+  it('properly encrypts and decrypts', async function () {
     const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(
@@ -104,7 +104,7 @@ describe('004 protocol operations', () => {
     expect(decString).to.equal(text);
   });
 
-  it('fails to decrypt non-matching aad', async () => {
+  it('fails to decrypt non-matching aad', async function () {
     const text = 'hello world';
     const rawKey = _key.masterKey;
     const nonce = await application.protocolService.crypto.generateRandomKey(
@@ -125,7 +125,7 @@ describe('004 protocol operations', () => {
     expect(decString).to.not.be.ok;
   });
 
-  it('generates existing keys for key params', async () => {
+  it('generates existing keys for key params', async function () {
     const key = await application.protocolService.computeRootKey(
       _password,
       _keyParams
@@ -133,7 +133,7 @@ describe('004 protocol operations', () => {
     expect(key.compare(_key)).to.be.true;
   });
 
-  it('can decrypt encrypted params', async () => {
+  it('can decrypt encrypted params', async function () {
     const payload = Factory.createNotePayload();
     const key = await protocol004.createItemsKey();
     const params = await protocol004.generateEncryptedParameters(
@@ -149,7 +149,7 @@ describe('004 protocol operations', () => {
     expect(decrypted.content).to.eql(payload.content);
   });
 
-  it('modifying the uuid of the payload should fail to decrypt', async () => {
+  it('modifying the uuid of the payload should fail to decrypt', async function () {
     const payload = Factory.createNotePayload();
     const key = await protocol004.createItemsKey();
     const params = await protocol004.generateEncryptedParameters(

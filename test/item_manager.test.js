@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('item manager', () => {
+describe('item manager', function () {
   before(async function () {
     const crypto = new SNWebCrypto();
     Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
