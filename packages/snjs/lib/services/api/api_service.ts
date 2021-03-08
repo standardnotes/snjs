@@ -70,7 +70,7 @@ type InvalidSessionObserver = (revoked: boolean) => void;
 
 export class SNApiService extends PureService {
   /** Legacy api version field to be specified in params when calling v0 APIs. */
-  static V0_API_VERSION = '20200115';
+  static readonly V0_API_VERSION = '20200115';
 
   private session?: Session;
   private host!: string;
