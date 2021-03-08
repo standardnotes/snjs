@@ -63,10 +63,6 @@ const Paths: VersionedPaths = {
     [ApiVersion.V0]: '/auth/params',
     [ApiVersion.V1]: '/auth/params',
   },
-  [Path.Sessions]: {
-    [ApiVersion.V0]: '/sessions',
-    [ApiVersion.V1]: '/v1/sessions',
-  },
   [Path.Register]: {
     [ApiVersion.V0]: '/auth',
     [ApiVersion.V1]: '/auth',
@@ -93,7 +89,7 @@ const Paths: VersionedPaths = {
   },
   [Path.Sessions]: {
     [ApiVersion.V0]: '/sessions',
-    [ApiVersion.V1]: '/sessions',
+    [ApiVersion.V1]: '/v1/sessions',
   },
   [Path.Session]: {
     [ApiVersion.V0]: '/session',
@@ -116,6 +112,7 @@ type InvalidSessionObserver = (revoked: boolean) => void;
 
 export class SNApiService extends PureService {
   private session?: Session;
+  private host!: string;
 
   private registering = false;
   private authenticating = false;
@@ -128,9 +125,12 @@ export class SNApiService extends PureService {
     private httpService: SNHttpService,
     private storageService: SNStorageService,
     private permissionsService: SNPermissionsService,
-    private host?: string
+    host?: string
   ) {
     super();
+    if (!isNullOrUndefined(host)) {
+      this.host = host;
+    }
   }
 
   /** @override */
@@ -138,7 +138,6 @@ export class SNApiService extends PureService {
     (this.httpService as unknown) = undefined;
     (this.storageService as unknown) = undefined;
     this.invalidSessionObserver = undefined;
-    this.host = undefined;
     this.session = undefined;
     super.deinit();
   }
@@ -161,6 +160,10 @@ export class SNApiService extends PureService {
     );
     this.host =
       storedValue || this.host || (window as any)._default_sync_server;
+
+    if (isNullOrUndefined(this.host)) {
+      throw Error('Could not find a host value in storage or memory.');
+    }
   }
 
   public async setHost(host: string): Promise<void> {
@@ -184,14 +187,12 @@ export class SNApiService extends PureService {
   }
 
   private path(path: Path, version = ApiVersion.V0) {
-    const host = this.getHost();
-    if (!host) {
-      throw Error(`Attempting to build path ${path} with no host.`);
-    }
-    return joinPaths(host, Paths[path][version]);
+    return joinPaths(this.host, Paths[path][version]);
   }
 
-  private params(inParams: any): HttpParams {
+  private params(
+    inParams: Record<string | number | symbol, unknown>
+  ): HttpParams {
     const params = merge(inParams, {
       [ApiEndpointParam.ApiVersion]: V0_API_VERSION,
     });
@@ -209,8 +210,12 @@ export class SNApiService extends PureService {
     response: HttpResponse,
     message: string
   ) {
-    if (!response.error!.message) {
-      response.error!.message = message;
+    if (!response.error?.message) {
+      response.error = {
+        ...response.error,
+        status: response.error?.status ?? StatusCode.UnknownError,
+        message,
+      };
     }
     return response;
   }

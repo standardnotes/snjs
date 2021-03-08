@@ -8,6 +8,10 @@ import { ProtocolVersion } from './../../protocol/versions';
 import { Role, Permission } from '@standardnotes/auth';
 
 export enum StatusCode {
+  LocalValidationError = 10,
+  CanceledMfa = 11,
+  UnknownError = 12,
+
   HttpStatusMinSuccess = 200,
   HttpStatusNoContent = 204,
   HttpStatusMaxSuccess = 299,
@@ -17,9 +21,6 @@ export enum StatusCode {
   HttpStatusInvalidSession = 401,
   /** User's IP is rate-limited. */
   HttpStatusForbidden = 403,
-
-  LocalValidationError = 10,
-  CanceledMfa = 11,
 }
 
 export type HttpResponse<T = unknown> = {
