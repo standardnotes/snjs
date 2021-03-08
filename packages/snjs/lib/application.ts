@@ -104,6 +104,7 @@ import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
+import { Permission } from '@standardnotes/auth';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;

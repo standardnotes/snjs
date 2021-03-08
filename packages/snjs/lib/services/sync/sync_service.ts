@@ -123,7 +123,7 @@ export class SNSyncService extends PureService<
   private sessionManager?: SNSessionManager;
   private protocolService?: SNProtocolService;
   private storageService?: SNStorageService;
-  private modelManager?: PayloadManager;
+  private payloadManager?: PayloadManager;
   private itemManager?: ItemManager;
   private apiService?: SNApiService;
   private interval: any;
