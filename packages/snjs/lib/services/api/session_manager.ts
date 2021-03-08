@@ -557,7 +557,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   public async getSessionsList(): Promise<HttpResponse<RemoteSession[]>> {
     const response = await this.apiService.getSessionsList();
-    if (response.error || !response.data) {
+    if (response.error || isNullOrUndefined(response.data)) {
       return response;
     }
     response.data = response.data
