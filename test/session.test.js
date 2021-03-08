@@ -37,7 +37,7 @@ describe('server session', function () {
     application,
     basedOnAccessToken = true
   ) {
-    const currentSession = application.apiService.getSession();
+    const currentSession = application.apiService.session;
     const timestamp = basedOnAccessToken
       ? currentSession.accessExpiration
       : currentSession.refreshExpiration;
