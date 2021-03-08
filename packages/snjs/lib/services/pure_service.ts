@@ -4,12 +4,8 @@ import { DeviceInterface } from '../device_interface';
 
 type EventObserver<E, D> = (eventName: E, data?: D) => Promise<void> | void;
 
-/**
- * E = the name of the event
- * D = the data the event includes
- */
-export abstract class PureService<E = string, D = undefined> {
-  private eventObservers: EventObserver<E, D>[] = [];
+export abstract class PureService<EventName = string, EventData = undefined> {
+  private eventObservers: EventObserver<EventName, EventData>[] = [];
   public loggingEnabled = false;
   public deviceInterface?: DeviceInterface;
   private criticalPromises: Promise<unknown>[] = [];
