@@ -48,7 +48,7 @@ type PathNames = {
 };
 
 const Paths: {
-  v0: PathNames
+  v0: PathNames;
 } = {
   v0: {
     keyParams: '/auth/params',
@@ -73,7 +73,6 @@ export class SNApiService extends PureService {
   static readonly V0_API_VERSION = '20200115';
 
   private session?: Session;
-  private host!: string;
 
   private registering = false;
   private authenticating = false;
@@ -86,12 +85,9 @@ export class SNApiService extends PureService {
     private httpService: SNHttpService,
     private storageService: SNStorageService,
     private permissionsService: SNPermissionsService,
-    host?: string
+    private host: string
   ) {
     super();
-    if (!isNullOrUndefined(host)) {
-      this.host = host;
-    }
   }
 
   /** @override */
@@ -125,10 +121,6 @@ export class SNApiService extends PureService {
       (window as {
         _default_sync_server?: string;
       })._default_sync_server;
-
-    if (isNullOrUndefined(this.host)) {
-      throw Error('Could not find a host value in storage or memory.');
-    }
   }
 
   public async setHost(host: string): Promise<void> {
