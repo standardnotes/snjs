@@ -20,9 +20,6 @@ describe('payload encryption', function () {
 
   afterEach(async function () {
     this.application.deinit();
-  });
-
-  after(function () {
     localStorage.clear();
   });
 

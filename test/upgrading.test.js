@@ -5,7 +5,13 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('upgrading', () => {
-  before(async function () {
+  beforeEach(async function () {
+    localStorage.clear();
+    this.application = await Factory.createInitAppWithRandNamespace();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
+    this.passcode = '1234';
+
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
@@ -31,22 +37,11 @@ describe('upgrading', () => {
       const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
-  beforeEach(async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
-    this.passcode = '1234';
   });
 
   afterEach(async function () {
     await this.application.deinit();
+    localStorage.clear();
   });
 
   it('upgrade should be available when account only', async function () {

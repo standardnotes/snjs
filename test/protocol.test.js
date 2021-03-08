@@ -5,15 +5,8 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('protocol', function () {
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
+    localStorage.clear();
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
@@ -22,6 +15,7 @@ describe('protocol', function () {
   afterEach(function () {
     this.application.deinit();
     this.application = null;
+    localStorage.clear();
   });
 
   it('checks version to make sure its 004', function () {

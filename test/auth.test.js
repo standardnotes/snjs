@@ -12,15 +12,8 @@ describe('basic auth', () => {
     awaitAll: true,
   };
 
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
+    localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -29,6 +22,7 @@ describe('basic auth', () => {
 
   afterEach(async function () {
     this.application.deinit();
+    localStorage.clear();
   });
 
   it('successfully register new account', async function () {

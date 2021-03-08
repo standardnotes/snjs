@@ -7,18 +7,13 @@ const expect = chai.expect;
 describe('protections', function () {
   this.timeout(Factory.TestTimeout);
 
-  before(async function () {
+  beforeEach(async function () {
     localStorage.clear();
   });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
-  beforeEach(async function () {});
 
   afterEach(async function () {
     await this.application.deinit();
+    localStorage.clear();
   });
 
   it('prompts for password when accessing protected note', async function () {

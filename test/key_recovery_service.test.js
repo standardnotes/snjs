@@ -7,18 +7,16 @@ const expect = chai.expect;
 describe('key recovery service', function () {
   this.timeout(Factory.LongTestTimeout);
 
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
     localStorage.clear();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
+  });
+
+  afterEach(function () {
+    this.application?.deinit();
+    this.application = null;
+    localStorage.clear();
   });
 
   it('when encountering an undecryptable items key, should recover through recovery wizard', async function () {

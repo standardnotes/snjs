@@ -12,11 +12,11 @@ describe('history manager', () => {
     awaitAll: true,
   };
 
-  before(async function () {
+  beforeEach(async function () {
     localStorage.clear();
   });
 
-  after(async function () {
+  afterEach(async function () {
     localStorage.clear();
   });
 
