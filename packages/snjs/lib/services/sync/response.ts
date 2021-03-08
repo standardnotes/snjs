@@ -4,58 +4,60 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { deepFreeze, isNullOrUndefined } from '@Lib/utils';
 import { ApiEndpointParam } from '@Services/api/keys';
 import { PayloadSource } from '@Payloads/sources';
-import { CreateSourcedPayloadFromObject, RawPayload } from '@Payloads/generator';
+import {
+  CreateSourcedPayloadFromObject,
+  RawPayload,
+} from '@Payloads/generator';
 
 export class SyncResponse {
-
-  public readonly rawResponse: RawSyncResponse
-  public readonly savedPayloads: PurePayload[]
-  public readonly retrievedPayloads: PurePayload[]
-  public readonly uuidConflictPayloads: PurePayload[]
-  public readonly dataConflictPayloads: PurePayload[]
-  public readonly deletedPayloads: PurePayload[]
+  public readonly rawResponse: RawSyncResponse;
+  public readonly savedPayloads: PurePayload[];
+  public readonly retrievedPayloads: PurePayload[];
+  public readonly uuidConflictPayloads: PurePayload[];
+  public readonly dataConflictPayloads: PurePayload[];
+  public readonly deletedPayloads: PurePayload[];
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse;
-    this.savedPayloads = this.
-      filterRawItemArray(rawResponse.saved_items).
-      map((rawItem) => {
+    this.savedPayloads = this.filterRawItemArray(rawResponse.saved_items).map(
+      (rawItem) => {
         return CreateSourcedPayloadFromObject(
           rawItem,
           PayloadSource.RemoteSaved
         );
-      });
-    this.retrievedPayloads = this.
-      filterRawItemArray(rawResponse.retrieved_items).
-      map((rawItem) => {
-        return CreateSourcedPayloadFromObject(
-          rawItem,
-          PayloadSource.RemoteRetrieved
-        );
-      });
-    this.dataConflictPayloads = this.
-      filterRawItemArray(this.rawDataConflictItems).
-      map((rawItem) => {
-        return CreateSourcedPayloadFromObject(
-          rawItem,
-          PayloadSource.ConflictData
-        );
-      });
-    this.uuidConflictPayloads = this.
-      filterRawItemArray(this.rawUuidConflictItems).
-      map((rawItem) => {
-        return CreateSourcedPayloadFromObject(
-          rawItem,
-          PayloadSource.ConflictUuid
-        );
-      });
+      }
+    );
+    this.retrievedPayloads = this.filterRawItemArray(
+      rawResponse.retrieved_items
+    ).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(
+        rawItem,
+        PayloadSource.RemoteRetrieved
+      );
+    });
+    this.dataConflictPayloads = this.filterRawItemArray(
+      this.rawDataConflictItems
+    ).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(
+        rawItem,
+        PayloadSource.ConflictData
+      );
+    });
+    this.uuidConflictPayloads = this.filterRawItemArray(
+      this.rawUuidConflictItems
+    ).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(
+        rawItem,
+        PayloadSource.ConflictUuid
+      );
+    });
     /**
      * Items may be deleted from a combination of sources, such as from RemoteSaved,
      * or if a conflict handler decides to delete a payload.
      */
     this.deletedPayloads = this.allProcessedPayloads.filter((payload) => {
       return payload.discardable;
-    })
+    });
     deepFreeze(this);
   }
 
@@ -69,7 +71,7 @@ export class SyncResponse {
       } else {
         return true;
       }
-    })
+    });
   }
 
   public get error() {
@@ -112,19 +114,23 @@ export class SyncResponse {
   }
 
   private get rawUuidConflictItems() {
-    return this.rawConflictObjects.filter((conflict) => {
-      return conflict.type === ConflictType.UuidConflict;
-    }).map((conflict) => {
-      return conflict.unsaved_item! || conflict.item!;
-    });
+    return this.rawConflictObjects
+      .filter((conflict) => {
+        return conflict.type === ConflictType.UuidConflict;
+      })
+      .map((conflict) => {
+        return conflict.unsaved_item! || conflict.item!;
+      });
   }
 
   private get rawDataConflictItems() {
-    return this.rawConflictObjects.filter((conflict) => {
-      return conflict.type === ConflictType.ConflictingData;
-    }).map((conflict) => {
-      return conflict.server_item! || conflict.item!;
-    });
+    return this.rawConflictObjects
+      .filter((conflict) => {
+        return conflict.type === ConflictType.ConflictingData;
+      })
+      .map((conflict) => {
+        return conflict.server_item! || conflict.item!;
+      });
   }
 
   private get rawConflictObjects() {

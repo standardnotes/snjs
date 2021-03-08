@@ -7,19 +7,18 @@ import { SNProtocolService } from '../../protocol_service';
 import { RawSyncResponse } from '@Lib/services/api/responses';
 
 type Progress = {
-  retrievedPayloads: PurePayload[]
-  lastSyncToken?: string
-  paginationToken?: string
-}
+  retrievedPayloads: PurePayload[];
+  lastSyncToken?: string;
+  paginationToken?: string;
+};
 
 export class AccountDownloader {
-
-  private apiService: SNApiService
-  private protocolService: SNProtocolService
-  private contentType?: ContentType
-  private customEvent?: string
-  private limit?: number
-  private progress: Progress
+  private apiService: SNApiService;
+  private protocolService: SNProtocolService;
+  private contentType?: ContentType;
+  private customEvent?: string;
+  private limit?: number;
+  private progress: Progress;
 
   constructor(
     apiService: SNApiService,
@@ -40,22 +39,24 @@ export class AccountDownloader {
    * Executes a sync request with a blank sync token and high download limit. It will download all items,
    * but won't do anything with them other than decrypting and creating respective objects.
    */
-  async run() : Promise<PurePayload[]> {
-    const response = await this.apiService.sync(
+  async run(): Promise<PurePayload[]> {
+    const response = (await this.apiService.sync(
       [],
       this.progress.lastSyncToken!,
       this.progress.paginationToken!,
       this.limit || 500,
       false,
       this.contentType,
-      this.customEvent,
-    ) as RawSyncResponse;
-    const encryptedPayloads = response.retrieved_items!.map((rawPayload: any) => {
-      return CreateSourcedPayloadFromObject(
-        rawPayload,
-        PayloadSource.RemoteRetrieved
-      );
-    });
+      this.customEvent
+    )) as RawSyncResponse;
+    const encryptedPayloads = response.retrieved_items!.map(
+      (rawPayload: any) => {
+        return CreateSourcedPayloadFromObject(
+          rawPayload,
+          PayloadSource.RemoteRetrieved
+        );
+      }
+    );
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingPayloads(
       encryptedPayloads
     );

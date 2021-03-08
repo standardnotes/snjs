@@ -4,8 +4,8 @@ import { SNItem } from '@Models/core/item';
 
 /** Keeps an item reference up to date with changes */
 export class LiveItem<T extends SNItem> {
-  public item: T
-  private removeObserver: any
+  public item: T;
+  private removeObserver: any;
 
   constructor(
     uuid: string,

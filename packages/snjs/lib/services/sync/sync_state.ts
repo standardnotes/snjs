@@ -1,17 +1,16 @@
 import { SyncEvent, SyncEventReceiver } from '@Lib/services/sync/events';
 
 export class SyncState {
+  public lastPreSyncSave?: Date;
+  public lastSyncDate?: Date;
 
-  public lastPreSyncSave?: Date
-  public lastSyncDate?: Date
+  private receiver: SyncEventReceiver;
+  private discordance = 0;
+  private maxDiscordance: number;
+  private outOfSync = false;
 
-  private receiver: SyncEventReceiver
-  private discordance = 0
-  private maxDiscordance: number
-  private outOfSync = false
-
-  private lastClientHash?: string
-  private lastServerHash?: string
+  private lastClientHash?: string;
+  private lastServerHash?: string;
 
   constructor(receiver: SyncEventReceiver, maxDiscordance: number) {
     this.receiver = receiver;
@@ -31,8 +30,7 @@ export class SyncState {
   }
 
   get needsSync() {
-    return this.discordance > 0
-      && this.discordance < this.maxDiscordance;
+    return this.discordance > 0 && this.discordance < this.maxDiscordance;
   }
 
   getLastClientIntegrityHash() {
@@ -47,11 +45,11 @@ export class SyncState {
   async setIntegrityHashes(clientHash: string, serverHash: string) {
     this.lastClientHash = clientHash;
     this.lastServerHash = serverHash;
-    const isInSync = (
-      (!serverHash || serverHash.length === 0) ||
+    const isInSync =
+      !serverHash ||
+      serverHash.length === 0 ||
       !clientHash ||
-      clientHash === serverHash
-    );
+      clientHash === serverHash;
 
     if (isInSync) {
       if (this.outOfSync) {

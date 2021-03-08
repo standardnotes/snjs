@@ -73,11 +73,12 @@ export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
     [SyncEvent.ExitOutOfSync]: ApplicationEvent.ExitedOutOfSync,
     [SyncEvent.LocalDataLoaded]: ApplicationEvent.LocalDataLoaded,
     [SyncEvent.MajorDataChange]: ApplicationEvent.MajorDataChange,
-    [SyncEvent.LocalDataIncrementalLoad]: ApplicationEvent.LocalDataIncrementalLoad,
+    [SyncEvent.LocalDataIncrementalLoad]:
+      ApplicationEvent.LocalDataIncrementalLoad,
     [SyncEvent.StatusChanged]: ApplicationEvent.SyncStatusChanged,
     [SyncEvent.SyncWillBegin]: ApplicationEvent.WillSync,
     [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
     [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
-    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError
+    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
   } as any)[syncEvent];
 }

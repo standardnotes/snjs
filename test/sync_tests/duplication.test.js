@@ -9,7 +9,7 @@ describe('duplication', () => {
 
   const syncOptions = {
     checkIntegrity: true,
-    awaitAll: true
+    awaitAll: true,
   };
 
   before(async function () {
@@ -28,7 +28,7 @@ describe('duplication', () => {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
   });
 
@@ -44,16 +44,13 @@ describe('duplication', () => {
       uuid: Uuid.GenerateUuidSynchronously(),
       content_type: contentType,
       content: {
-        foo: 'bar'
-      }
+        foo: 'bar',
+      },
     };
-    const payload = CreateMaxPayloadFromAnyObject(
-      params,
-      {
-        dirty: true,
-        dirtiedDate: new Date()
-      }
-    );
+    const payload = CreateMaxPayloadFromAnyObject(params, {
+      dirty: true,
+      dirtiedDate: new Date(),
+    });
     return payload;
   }
 
@@ -77,7 +74,9 @@ describe('duplication', () => {
       undefined,
       syncOptions
     );
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 
   it('items keys should not be duplicated under any circumstances', async function () {
@@ -100,22 +99,21 @@ describe('duplication', () => {
       undefined,
       syncOptions
     );
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 
   it('duplicating note should maintain editor ref', async function () {
     const note = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;
     const basePayload = createDirtyPayload(ContentType.Component);
-    const payload = CopyPayload(
-      basePayload,
-      {
-        content: {
-          ...basePayload.content,
-          area: ComponentArea.Editor
-        }
-      }
-    );
+    const payload = CopyPayload(basePayload, {
+      content: {
+        ...basePayload.content,
+        area: ComponentArea.Editor,
+      },
+    });
     const editor = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged

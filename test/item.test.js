@@ -5,18 +5,15 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('item', () => {
-
   beforeEach(function () {
     this.createBarePayload = () => {
-      return new PurePayload(
-        {
-          uuid: '123',
-          content_type: ContentType.Note,
-          content: {
-            title: 'hello'
-          }
-        }
-      );
+      return new PurePayload({
+        uuid: '123',
+        content_type: ContentType.Note,
+        content: {
+          title: 'hello',
+        },
+      });
     };
 
     this.createNote = () => {
@@ -27,7 +24,7 @@ describe('item', () => {
       const references = notes.map((note) => {
         return {
           uuid: note.uuid,
-          content_type: note.content_type
+          content_type: note.content_type,
         };
       });
       return new SNTag(
@@ -36,12 +33,11 @@ describe('item', () => {
           content_type: ContentType.Tag,
           content: {
             title: 'thoughts',
-            references: references
-          }
+            references: references,
+          },
         })
       );
     };
-
   });
 
   it('constructing without uuid should throw', function () {

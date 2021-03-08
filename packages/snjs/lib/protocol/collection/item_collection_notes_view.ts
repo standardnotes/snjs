@@ -1,11 +1,11 @@
 import { SNSmartTag } from './../../models/app/smartTag';
 import { ItemCollection } from './item_collection';
+import { ContentType, SNNote, SNTag } from '../../models';
 import {
-  ContentType,
-  SNNote,
-  SNTag,
-} from '../../models';
-import { criteriaForSmartTag, NotesDisplayCriteria, notesMatchingCriteria } from './notes_display_criteria';
+  criteriaForSmartTag,
+  NotesDisplayCriteria,
+  notesMatchingCriteria,
+} from './notes_display_criteria';
 
 /**
  * A view into ItemCollection that allows filtering by tag and smart tag.
@@ -17,14 +17,14 @@ export class ItemCollectionNotesView {
   constructor(
     private collection: ItemCollection,
     private criteria: NotesDisplayCriteria = NotesDisplayCriteria.Create({})
-  ) { }
+  ) {}
 
   public setCriteria(criteria: NotesDisplayCriteria): void {
     this.criteria = criteria;
     this.collection.setDisplayOptions(
       ContentType.Note,
       criteria.sortProperty,
-      criteria.sortDirection,
+      criteria.sortDirection
     );
     this.needsRebuilding = true;
   }
@@ -43,9 +43,8 @@ export class ItemCollectionNotesView {
         } else {
           return this.collection.find(tag.uuid) as SNTag;
         }
-
-      })
-    })
+      }),
+    });
     this.displayedNotes = notesMatchingCriteria(criteria, this.collection);
   }
 

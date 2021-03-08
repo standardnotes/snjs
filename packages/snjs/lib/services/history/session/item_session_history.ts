@@ -8,12 +8,11 @@ import { CreateHistoryEntryForPayload } from '@Services/history/functions';
 const LARGE_ENTRY_DELTA_THRESHOLD = 15;
 
 type ItemHistoryJson = {
-  entries: ItemHistoryEntry[]
-}
+  entries: ItemHistoryEntry[];
+};
 
 export class ItemSessionHistory {
-
-  public entries: ItemHistoryEntry[] = []
+  public entries: ItemHistoryEntry[] = [];
 
   constructor(entries?: ItemHistoryEntry[]) {
     /** Deserialize the entries into entry objects. */
@@ -57,7 +56,11 @@ export class ItemSessionHistory {
     const isEntrySignificant = (entry: ItemHistoryEntry) => {
       return entry.deltaSize() > LARGE_ENTRY_DELTA_THRESHOLD;
     };
-    const processEntry = (entry: ItemHistoryEntry, index: number, keep: boolean) => {
+    const processEntry = (
+      entry: ItemHistoryEntry,
+      index: number,
+      keep: boolean
+    ) => {
       /**
        * Entries may be processed retrospectively, meaning it can be
        * decided to be deleted, then an upcoming processing can change that.
@@ -79,7 +82,7 @@ export class ItemSessionHistory {
         }
       }
     };
-    for (let index = this.entries.length; index--;) {
+    for (let index = this.entries.length; index--; ) {
       const entry = this.entries[index];
       if (index === 0 || index === this.entries.length - 1) {
         /** Keep the first and last */

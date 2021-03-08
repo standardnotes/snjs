@@ -5,7 +5,6 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('2020-01-15 mobile migration', () => {
-
   beforeEach(() => {
     localStorage.clear();
   });
@@ -28,10 +27,7 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeKey = await operator003.createRootKey(
-      identifier,
-      passcode
-    );
+    const passcodeKey = await operator003.createRootKey(identifier, passcode);
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
       JSON.stringify(passcodeKey.keyParams.getPortableValue())
@@ -40,10 +36,7 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountKey = await operator003.createRootKey(
-      identifier,
-      password
-    );
+    const accountKey = await operator003.createRootKey(identifier, password);
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
@@ -56,28 +49,26 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.legacy_setRawKeychainValue({
       offline: {
         pw: passcodeKey.serverPassword,
-        timing: passcodeTiming
-      }
+        timing: passcodeTiming,
+      },
     });
     /** Wrap account key with passcode key and store in storage */
-    const keyPayload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: Factory.generateUuid(),
-        content_type: 'SN|Mobile|EncryptedKeys',
-        content: {
-          accountKeys: {
-            jwt: 'foo',
-            mk: accountKey.masterKey,
-            ak: accountKey.dataAuthenticationKey,
-            pw: accountKey.serverPassword
-          }
-        }
-      }
-    );
+    const keyPayload = CreateMaxPayloadFromAnyObject({
+      uuid: Factory.generateUuid(),
+      content_type: 'SN|Mobile|EncryptedKeys',
+      content: {
+        accountKeys: {
+          jwt: 'foo',
+          mk: accountKey.masterKey,
+          ak: accountKey.dataAuthenticationKey,
+          pw: accountKey.serverPassword,
+        },
+      },
+    });
     const encryptedKeyParams = await operator003.generateEncryptedParameters(
       keyPayload,
       PayloadFormat.EncryptedString,
-      passcodeKey,
+      passcodeKey
     );
     const wrappedKey = CreateMaxPayloadFromAnyObject(
       keyPayload,
@@ -102,13 +93,16 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      accountKey,
+      accountKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
     /** setup options */
     const lastExportDate = '2020:02';
     await application.deviceInterface.setRawStorageValue(
@@ -123,15 +117,15 @@ describe('2020-01-15 mobile migration', () => {
       hideDates: false,
       hideTags: false,
     });
-    await application.deviceInterface.setRawStorageValue(
-      'options',
-      options
-    );
+    await application.deviceInterface.setRawStorageValue('options', options);
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
-        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+        if (
+          prompt.validation === ChallengeValidation.None ||
+          prompt.validation === ChallengeValidation.LocalPasscode
+        ) {
           values.push(new ChallengeValue(prompt, passcode));
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
@@ -145,7 +139,7 @@ describe('2020-01-15 mobile migration', () => {
       application.submitValuesForChallenge(challenge, values);
     };
     await application.prepareForLaunch({
-      receiveChallenge
+      receiveChallenge,
     });
     await application.launch(true);
 
@@ -167,12 +161,18 @@ describe('2020-01-15 mobile migration', () => {
     expect(typeof keyParams).to.equal('object');
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(
+      accountKey.dataAuthenticationKey
+    );
     expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper
+    );
 
-    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
+      application.identifier
+    );
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
@@ -182,26 +182,43 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
+      await application.storageService.getValue(
+        NonwrappedStorageKey.MobileFirstRun,
+        StorageValueModes.Nonwrapped
+      )
     ).to.equal(false);
 
-    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
-    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.BiometricsState,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.enabled);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.MobileBiometricsTiming,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.timing);
     expect(await application.getUser().email).to.equal(identifier);
 
     const appId = application.identifier;
-    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    console.warn(
+      'Expecting exception due to deiniting application while trying to renew session'
+    );
     await application.deinit();
 
     /** Recreate application and ensure storage values are consistent */
     application = Factory.createApplication(appId);
     await application.prepareForLaunch({
-      receiveChallenge
+      receiveChallenge,
     });
     await application.launch(true);
     expect(await application.getUser().email).to.equal(identifier);
     expect(await application.getHost()).to.equal(customServer);
-    const preferences = await application.storageService.getValue('preferences');
+    const preferences = await application.storageService.getValue(
+      'preferences'
+    );
     expect(preferences.sortBy).to.equal('userModifiedAt');
     expect(preferences.sortReverse).to.be.false;
     expect(preferences.hideDate).to.be.false;
@@ -209,7 +226,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(lastExportDate);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
-    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    console.warn(
+      'Expecting exception due to deiniting application while trying to renew session'
+    );
     application.deinit();
   });
 
@@ -227,10 +246,7 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeKey = await operator003.createRootKey(
-      identifier,
-      passcode
-    );
+    const passcodeKey = await operator003.createRootKey(identifier, passcode);
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
       JSON.stringify(passcodeKey.keyParams.getPortableValue())
@@ -239,8 +255,8 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.legacy_setRawKeychainValue({
       offline: {
         pw: passcodeKey.serverPassword,
-        timing: passcodeTiming
-      }
+        timing: passcodeTiming,
+      },
     });
 
     const biometricPrefs = { enabled: true, timing: 'immediately' };
@@ -263,13 +279,16 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      passcodeKey,
+      passcodeKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
     /** setup options */
     await application.deviceInterface.setRawStorageValue(
       'DoNotShowAgainUnsupportedEditorsKey',
@@ -283,21 +302,20 @@ describe('2020-01-15 mobile migration', () => {
       hideDates: undefined,
       hideTags: true,
     });
-    await application.deviceInterface.setRawStorageValue(
-      'options',
-      options
-    );
+    await application.deviceInterface.setRawStorageValue('options', options);
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
-        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+        if (
+          prompt.validation === ChallengeValidation.None ||
+          prompt.validation === ChallengeValidation.LocalPasscode
+        ) {
           values.push(new ChallengeValue(prompt, passcode));
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
           values.push(new ChallengeValue(prompt, true));
         }
-
       }
       return values;
     };
@@ -315,9 +333,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     });
-    expect(application.protocolService.keyMode).to.equal(
-      KeyMode.WrapperOnly
-    );
+    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.launch(true);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
@@ -328,13 +344,17 @@ describe('2020-01-15 mobile migration', () => {
 
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(passcodeKey.dataAuthenticationKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(
+      passcodeKey.dataAuthenticationKey
+    );
     /** Root key is in memory with passcode only, so server password can be defined */
     expect(rootKey.serverPassword).to.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
 
-    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
+      application.identifier
+    );
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
@@ -343,17 +363,38 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
+      await application.storageService.getValue(
+        NonwrappedStorageKey.MobileFirstRun,
+        StorageValueModes.Nonwrapped
+      )
     ).to.equal(false);
-    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
-    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
     expect(
-      await application.storageService.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped)
+      await application.storageService.getValue(
+        StorageKey.BiometricsState,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.enabled);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.MobileBiometricsTiming,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.timing);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.MobilePasscodeTiming,
+        StorageValueModes.Nonwrapped
+      )
     ).to.eql(passcodeTiming);
     expect(
-      await application.storageService.getValue(StorageKey.MobilePasscodeKeyboardType, StorageValueModes.Nonwrapped)
+      await application.storageService.getValue(
+        StorageKey.MobilePasscodeKeyboardType,
+        StorageValueModes.Nonwrapped
+      )
     ).to.eql(passcodeKeyboardType);
-    const preferences = await application.storageService.getValue('preferences');
+    const preferences = await application.storageService.getValue(
+      'preferences'
+    );
     expect(preferences.sortBy).to.equal(undefined);
     expect(preferences.sortReverse).to.be.false;
     expect(preferences.hideNotePreview).to.be.false;
@@ -378,10 +419,7 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeKey = await operator003.createRootKey(
-      identifier,
-      passcode
-    );
+    const passcodeKey = await operator003.createRootKey(identifier, passcode);
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
       JSON.stringify(passcodeKey.keyParams.getPortableValue())
@@ -406,13 +444,16 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      passcodeKey,
+      passcodeKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
     /** setup options */
     await application.deviceInterface.setRawStorageValue(
       'DoNotShowAgainUnsupportedEditorsKey',
@@ -426,21 +467,20 @@ describe('2020-01-15 mobile migration', () => {
       hideDates: undefined,
       hideTags: true,
     });
-    await application.deviceInterface.setRawStorageValue(
-      'options',
-      options
-    );
+    await application.deviceInterface.setRawStorageValue('options', options);
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
-        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+        if (
+          prompt.validation === ChallengeValidation.None ||
+          prompt.validation === ChallengeValidation.LocalPasscode
+        ) {
           values.push(new ChallengeValue(prompt, passcode));
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
           values.push(new ChallengeValue(prompt, true));
         }
-
       }
       return values;
     };
@@ -458,9 +498,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     });
-    expect(application.protocolService.keyMode).to.equal(
-      KeyMode.WrapperOnly
-    );
+    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.launch(true);
 
     const retrievedNote = application.itemManager.notes[0];
@@ -484,10 +522,7 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
-    const accountKey = await operator003.createRootKey(
-      identifier,
-      password
-    );
+    const accountKey = await operator003.createRootKey(identifier, password);
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
@@ -502,11 +537,11 @@ describe('2020-01-15 mobile migration', () => {
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
       jwt: 'foo',
-      version: ProtocolVersion.V003
+      version: ProtocolVersion.V003,
     });
     const biometricPrefs = {
       enabled: true,
-      timing: 'immediately'
+      timing: 'immediately',
     };
     /** Create legacy storage. Storage in mobile was never wrapped. */
     await application.deviceInterface.setRawStorageValue(
@@ -522,18 +557,21 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      accountKey,
+      accountKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
     /** setup options */
     const lastExportDate = '2020:02';
     await application.deviceInterface.setRawStorageValue(
       'LastExportDateKey',
-      lastExportDate,
+      lastExportDate
     );
     await application.deviceInterface.setRawStorageValue(
       'DoNotShowAgainUnsupportedEditorsKey',
@@ -546,10 +584,7 @@ describe('2020-01-15 mobile migration', () => {
       hidePreviews: true,
       hideDates: false,
     });
-    await application.deviceInterface.setRawStorageValue(
-      'options',
-      options
-    );
+    await application.deviceInterface.setRawStorageValue('options', options);
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
@@ -578,9 +613,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
 
-    expect(application.protocolService.keyMode).to.equal(
-      KeyMode.RootKeyOnly
-    );
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
@@ -589,7 +622,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(valueStore.content_type).to.not.be.ok;
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(
+      accountKey.dataAuthenticationKey
+    );
     expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
@@ -606,19 +641,36 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
+      await application.storageService.getValue(
+        NonwrappedStorageKey.MobileFirstRun,
+        StorageValueModes.Nonwrapped
+      )
     ).to.equal(false);
-    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
-    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.BiometricsState,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.enabled);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.MobileBiometricsTiming,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.timing);
     expect(await application.getUser().email).to.equal(identifier);
-    const preferences = await application.storageService.getValue('preferences');
+    const preferences = await application.storageService.getValue(
+      'preferences'
+    );
     expect(preferences.sortBy).to.equal('created_at');
     expect(preferences.sortReverse).to.be.false;
     expect(preferences.hideDate).to.be.false;
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(lastExportDate);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
-    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    console.warn(
+      'Expecting exception due to deiniting application while trying to renew session'
+    );
     await application.deinit();
   }).timeout(10000);
 
@@ -629,7 +681,7 @@ describe('2020-01-15 mobile migration', () => {
      * and another to recover the user session via a sign in request
      */
 
-     /** Register a real user so we can attempt to sign back into this account later */
+    /** Register a real user so we can attempt to sign back into this account later */
     const tempApp = await Factory.createInitAppWithRandNamespace(
       Environment.Mobile,
       Platform.Ios
@@ -641,7 +693,7 @@ describe('2020-01-15 mobile migration', () => {
       application: tempApp,
       email: email,
       password: password,
-      version: ProtocolVersion.V003
+      version: ProtocolVersion.V003,
     });
     const accountKey = tempApp.protocolService.getRootKey();
     tempApp.deinit();
@@ -673,13 +725,16 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      accountKey,
+      accountKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -687,7 +742,9 @@ describe('2020-01-15 mobile migration', () => {
       for (const prompt of prompts) {
         if (prompt.placeholder === SessionStrings.EmailInputPlaceholder) {
           values.push(new ChallengeValue(prompt, email));
-        } else if (prompt.placeholder === SessionStrings.PasswordInputPlaceholder) {
+        } else if (
+          prompt.placeholder === SessionStrings.PasswordInputPlaceholder
+        ) {
           values.push(new ChallengeValue(prompt, password));
         } else {
           throw Error('Unhandled prompt');
@@ -716,9 +773,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Recovery migration is non-blocking, so let's block for it */
     await Factory.sleep(1.0);
 
-    expect(application.protocolService.keyMode).to.equal(
-      KeyMode.RootKeyOnly
-    );
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
@@ -728,7 +783,9 @@ describe('2020-01-15 mobile migration', () => {
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey).to.be.ok;
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(
+      accountKey.dataAuthenticationKey
+    );
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
 
@@ -759,10 +816,7 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
-    const accountKey = await operator002.createRootKey(
-      identifier,
-      password
-    );
+    const accountKey = await operator002.createRootKey(identifier, password);
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
@@ -776,20 +830,23 @@ describe('2020-01-15 mobile migration', () => {
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
-      jwt: 'foo'
+      jwt: 'foo',
     });
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator002.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      accountKey,
+      accountKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -826,7 +883,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     expect(await application.getUser().email).to.equal(identifier);
-    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    console.warn(
+      'Expecting exception due to deiniting application while trying to renew session'
+    );
     await application.deinit();
   }).timeout(10000);
 
@@ -846,15 +905,12 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
-    const accountKey = await operator001.createRootKey(
-      identifier,
-      password
-    );
+    const accountKey = await operator001.createRootKey(identifier, password);
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify({
         ...accountKey.keyParams.getPortableValue(),
-        version: undefined
+        version: undefined,
       })
     );
     await application.deviceInterface.setRawStorageValue(
@@ -865,20 +921,23 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
-      jwt: 'foo'
+      jwt: 'foo',
     });
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
     const noteEncryptionParams = await operator001.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      accountKey,
+      accountKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -915,7 +974,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     expect(await application.getUser().email).to.equal(identifier);
-    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    console.warn(
+      'Expecting exception due to deiniting application while trying to renew session'
+    );
     await application.deinit();
   }).timeout(10000);
 
@@ -932,10 +993,7 @@ describe('2020-01-15 mobile migration', () => {
     const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
     const password = 'tar';
-    const accountKey = await operator003.createRootKey(
-      identifier,
-      password
-    );
+    const accountKey = await operator003.createRootKey(identifier, password);
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
@@ -949,10 +1007,10 @@ describe('2020-01-15 mobile migration', () => {
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
       jwt: 'foo',
-      version: ProtocolVersion.V003
+      version: ProtocolVersion.V003,
     });
 
-    await application.prepareForLaunch({ receiveChallenge: () => { } });
+    await application.prepareForLaunch({ receiveChallenge: () => {} });
     await application.launch(true);
 
     expect(application.apiService.getSession()).to.be.ok;
@@ -973,10 +1031,7 @@ describe('2020-01-15 mobile migration', () => {
     const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const identifier = 'foo';
     const password = 'tar';
-    const accountKey = await operator003.createRootKey(
-      identifier,
-      password
-    );
+    const accountKey = await operator003.createRootKey(identifier, password);
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
@@ -989,10 +1044,10 @@ describe('2020-01-15 mobile migration', () => {
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
-      version: ProtocolVersion.V003
+      version: ProtocolVersion.V003,
     });
 
-    await application.prepareForLaunch({ receiveChallenge: () => { } });
+    await application.prepareForLaunch({ receiveChallenge: () => {} });
     await application.launch(true);
 
     expect(application.apiService.getSession()).to.be.ok;
@@ -1013,7 +1068,7 @@ describe('2020-01-15 mobile migration', () => {
     const operator003 = new SNProtocolOperator003(new SNWebCrypto());
     const biometricPrefs = {
       enabled: true,
-      timing: 'immediately'
+      timing: 'immediately',
     };
     /** Create legacy storage. Storage in mobile was never wrapped. */
     await application.deviceInterface.setRawStorageValue(
@@ -1034,7 +1089,10 @@ describe('2020-01-15 mobile migration', () => {
       notePayload,
       noteParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteProcessedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteProcessedPayload,
+      application.identifier
+    );
     /** setup options */
     await application.deviceInterface.setRawStorageValue(
       'DoNotShowAgainUnsupportedEditorsKey',
@@ -1047,15 +1105,15 @@ describe('2020-01-15 mobile migration', () => {
       hidePreviews: true,
       hideDates: false,
     });
-    await application.deviceInterface.setRawStorageValue(
-      'options',
-      options
-    );
+    await application.deviceInterface.setRawStorageValue('options', options);
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
-        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+        if (
+          prompt.validation === ChallengeValidation.None ||
+          prompt.validation === ChallengeValidation.LocalPasscode
+        ) {
           values.push(new ChallengeValue(prompt, passcode));
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
@@ -1079,9 +1137,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
 
-    expect(application.protocolService.keyMode).to.equal(
-      KeyMode.RootKeyNone
-    );
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
@@ -1099,11 +1155,26 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid);
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
+      await application.storageService.getValue(
+        NonwrappedStorageKey.MobileFirstRun,
+        StorageValueModes.Nonwrapped
+      )
     ).to.equal(false);
-    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
-    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
-    const preferences = await application.storageService.getValue('preferences');
+    expect(
+      await application.storageService.getValue(
+        StorageKey.BiometricsState,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.enabled);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.MobileBiometricsTiming,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.timing);
+    const preferences = await application.storageService.getValue(
+      'preferences'
+    );
     expect(preferences.sortBy).to.equal('created_at');
     expect(preferences.sortReverse).to.be.false;
     expect(preferences.hideDate).to.be.false;
@@ -1132,10 +1203,7 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
-    const passcodeKey = await operator003.createRootKey(
-      identifier,
-      passcode
-    );
+    const passcodeKey = await operator003.createRootKey(identifier, passcode);
     await application.deviceInterface.setRawStorageValue(
       'pc_params',
       JSON.stringify(passcodeKey.keyParams.getPortableValue())
@@ -1144,10 +1212,7 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Create old version account parameters */
     const password = 'tar';
-    const accountKey = await operator003.createRootKey(
-      identifier,
-      password
-    );
+    const accountKey = await operator003.createRootKey(identifier, password);
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
@@ -1158,24 +1223,22 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify({ email: identifier, server: customServer })
     );
     /** Wrap account key with passcode key and store in storage */
-    const keyPayload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: Factory.generateUuid(),
-        content_type: 'SN|Mobile|EncryptedKeys',
-        content: {
-          accountKeys: {
-            jwt: 'foo',
-            mk: accountKey.masterKey,
-            ak: accountKey.dataAuthenticationKey,
-            pw: accountKey.serverPassword
-          }
-        }
-      }
-    );
+    const keyPayload = CreateMaxPayloadFromAnyObject({
+      uuid: Factory.generateUuid(),
+      content_type: 'SN|Mobile|EncryptedKeys',
+      content: {
+        accountKeys: {
+          jwt: 'foo',
+          mk: accountKey.masterKey,
+          ak: accountKey.dataAuthenticationKey,
+          pw: accountKey.serverPassword,
+        },
+      },
+    });
     const encryptedKeyParams = await operator003.generateEncryptedParameters(
       keyPayload,
       PayloadFormat.EncryptedString,
-      passcodeKey,
+      passcodeKey
     );
     const wrappedKey = CreateMaxPayloadFromAnyObject(
       keyPayload,
@@ -1185,8 +1248,8 @@ describe('2020-01-15 mobile migration', () => {
       encryptedAccountKeys: wrappedKey,
       offline: {
         pw: passcodeKey.serverPassword,
-        timing: passcodeTiming
-      }
+        timing: passcodeTiming,
+      },
     });
     const biometricPrefs = { enabled: true, timing: 'immediately' };
     /** Create legacy storage. Storage in mobile was never wrapped. */
@@ -1203,13 +1266,16 @@ describe('2020-01-15 mobile migration', () => {
     const noteEncryptionParams = await operator003.generateEncryptedParameters(
       notePayload,
       PayloadFormat.EncryptedString,
-      accountKey,
+      accountKey
     );
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(
       notePayload,
       noteEncryptionParams
     );
-    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier);
+    await application.deviceInterface.saveRawDatabasePayload(
+      noteEncryptedPayload,
+      application.identifier
+    );
     /** setup options */
     const lastExportDate = '2020:02';
     await application.deviceInterface.setRawStorageValue(
@@ -1224,15 +1290,15 @@ describe('2020-01-15 mobile migration', () => {
       hideDates: false,
       hideTags: false,
     });
-    await application.deviceInterface.setRawStorageValue(
-      'options',
-      options
-    );
+    await application.deviceInterface.setRawStorageValue('options', options);
     /** Run migration */
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
-        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
+        if (
+          prompt.validation === ChallengeValidation.None ||
+          prompt.validation === ChallengeValidation.LocalPasscode
+        ) {
           values.push(new ChallengeValue(prompt, passcode));
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
@@ -1246,7 +1312,7 @@ describe('2020-01-15 mobile migration', () => {
       application.submitValuesForChallenge(challenge, values);
     };
     await application.prepareForLaunch({
-      receiveChallenge
+      receiveChallenge,
     });
     await application.launch(true);
 
@@ -1268,12 +1334,18 @@ describe('2020-01-15 mobile migration', () => {
     expect(typeof keyParams).to.equal('object');
     const rootKey = await application.protocolService.getRootKey();
     expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey);
+    expect(rootKey.dataAuthenticationKey).to.equal(
+      accountKey.dataAuthenticationKey
+    );
     expect(rootKey.serverPassword).to.not.be.ok;
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper
+    );
 
-    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier);
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
+      application.identifier
+    );
     expect(keychainValue).to.not.be.ok;
 
     /** Expect note is decrypted */
@@ -1283,26 +1355,43 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.content.text).to.equal(notePayload.content.text);
 
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped)
+      await application.storageService.getValue(
+        NonwrappedStorageKey.MobileFirstRun,
+        StorageValueModes.Nonwrapped
+      )
     ).to.equal(false);
 
-    expect(await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.enabled);
-    expect(await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped)).to.equal(biometricPrefs.timing);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.BiometricsState,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.enabled);
+    expect(
+      await application.storageService.getValue(
+        StorageKey.MobileBiometricsTiming,
+        StorageValueModes.Nonwrapped
+      )
+    ).to.equal(biometricPrefs.timing);
     expect(await application.getUser().email).to.equal(identifier);
 
     const appId = application.identifier;
-    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    console.warn(
+      'Expecting exception due to deiniting application while trying to renew session'
+    );
     await application.deinit();
 
     /** Recreate application and ensure storage values are consistent */
     application = Factory.createApplication(appId);
     await application.prepareForLaunch({
-      receiveChallenge
+      receiveChallenge,
     });
     await application.launch(true);
     expect(await application.getUser().email).to.equal(identifier);
     expect(await application.getHost()).to.equal(customServer);
-    const preferences = await application.storageService.getValue('preferences');
+    const preferences = await application.storageService.getValue(
+      'preferences'
+    );
     expect(preferences.sortBy).to.equal('userModifiedAt');
     expect(preferences.sortReverse).to.be.false;
     expect(preferences.hideDate).to.be.false;
@@ -1310,8 +1399,9 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(lastExportDate);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
-    console.warn('Expecting exception due to deiniting application while trying to renew session');
+    console.warn(
+      'Expecting exception due to deiniting application while trying to renew session'
+    );
     application.deinit();
   });
-
 });

@@ -54,14 +54,14 @@ const enum ApiVersion {
 
 type VersionedPaths = {
   [key in Path]: {
-    [key in ApiVersion]: string
-  }
-}
+    [key in ApiVersion]: string;
+  };
+};
 
 const Paths: VersionedPaths = {
   [Path.KeyParams]: {
     [ApiVersion.V0]: '/auth/params',
-    [ApiVersion.V1]: '/auth/params'
+    [ApiVersion.V1]: '/auth/params',
   },
   [Path.Sessions]: {
     [ApiVersion.V0]: '/sessions',
@@ -107,7 +107,7 @@ const Paths: VersionedPaths = {
     [ApiVersion.V0]: '/items/:item_id/revisions/:id',
     [ApiVersion.V1]: '/items/:item_id/revisions/:id',
   },
-}
+};
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115';

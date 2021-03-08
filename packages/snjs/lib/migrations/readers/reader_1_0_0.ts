@@ -5,7 +5,6 @@ import { LegacyKeys1_0_0 } from './../../storage_keys';
 import { StorageReader } from './reader';
 
 export class StorageReader1_0_0 extends StorageReader {
-
   static version() {
     return PreviousSnjsVersion1_0_0;
   }
@@ -13,7 +12,7 @@ export class StorageReader1_0_0 extends StorageReader {
   public async getAccountKeyParams() {
     return this.deviceInterface.getJsonParsedRawStorageValue(
       LegacyKeys1_0_0.AllAccountKeyParamsKey
-    )
+    );
   }
 
   /**
@@ -48,5 +47,4 @@ export class StorageReader1_0_0 extends StorageReader {
   public usesKeychain() {
     return isEnvironmentMobile(this.environment) ? true : false;
   }
-
 }

@@ -43,30 +43,29 @@ export enum AppDataField {
   MobileActive = 'mobileActive',
   LastSize = 'lastSize',
   PrefersPlainEditor = 'prefersPlainEditor',
-  ComponentInstallError = 'installError'
+  ComponentInstallError = 'installError',
 }
 
 export enum SingletonStrategy {
-  KeepEarliest = 1
+  KeepEarliest = 1,
 }
 
 /**
  * The most abstract item that any syncable item needs to extend from.
  */
 export class SNItem {
-
-  public readonly payload: PurePayload
-  public readonly conflictOf?: UuidString
-  public readonly duplicateOf?: UuidString
-  public readonly createdAtString?: string
-  public readonly updatedAtString?: string
-  public readonly protected = false
-  public readonly trashed = false
-  public readonly pinned = false
-  public readonly archived = false
-  public readonly locked = false
-  public readonly userModifiedDate: Date
-  private static sharedDateFormatter: Intl.DateTimeFormat
+  public readonly payload: PurePayload;
+  public readonly conflictOf?: UuidString;
+  public readonly duplicateOf?: UuidString;
+  public readonly createdAtString?: string;
+  public readonly updatedAtString?: string;
+  public readonly protected = false;
+  public readonly trashed = false;
+  public readonly pinned = false;
+  public readonly archived = false;
+  public readonly locked = false;
+  public readonly userModifiedDate: Date;
+  private static sharedDateFormatter: Intl.DateTimeFormat;
 
   constructor(payload: PurePayload) {
     if (!payload.uuid || !payload.content_type) {
@@ -76,14 +75,21 @@ export class SNItem {
       payload.format === PayloadFormat.DecryptedBareObject &&
       (payload.enc_item_key || payload.items_key_id || payload.auth_hash)
     ) {
-      SNLog.error(Error('Creating an item from a decrypted payload should not contain enc params'));
+      SNLog.error(
+        Error(
+          'Creating an item from a decrypted payload should not contain enc params'
+        )
+      );
     }
     this.payload = payload;
     this.conflictOf = payload.safeContent.conflict_of;
     this.duplicateOf = payload.duplicate_of;
-    this.createdAtString = this.created_at && this.dateToLocalizedString(this.created_at);
+    this.createdAtString =
+      this.created_at && this.dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
-      this.userModifiedDate = new Date(this.getAppDomainValue(AppDataField.UserModifiedDate) || this.updated_at);
+      this.userModifiedDate = new Date(
+        this.getAppDomainValue(AppDataField.UserModifiedDate) || this.updated_at
+      );
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
       this.protected = this.payload.safeContent.protected;
       this.trashed = this.payload.safeContent.trashed;
@@ -96,7 +102,7 @@ export class SNItem {
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
       deepFreeze(this);
-    })
+    });
   }
 
   public static DefaultAppDomain() {
@@ -299,11 +305,9 @@ export class SNItem {
     if (!contentDiffers) {
       return ConflictStrategy.KeepRight;
     }
-    const itemsAreDifferentExcludingRefs = ItemContentsDiffer(
-      this,
-      item,
-      ['references']
-    );
+    const itemsAreDifferentExcludingRefs = ItemContentsDiffer(this, item, [
+      'references',
+    ]);
     if (itemsAreDifferentExcludingRefs) {
       const twentySeconds = 20_000;
       if (
@@ -348,11 +352,10 @@ export class SNItem {
   private dateToLocalizedString(date: Date) {
     if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
       if (!SNItem.sharedDateFormatter) {
-        const locale = (
-          (navigator.languages && navigator.languages.length)
+        const locale =
+          navigator.languages && navigator.languages.length
             ? navigator.languages[0]
-            : navigator.language
-        );
+            : navigator.language;
         SNItem.sharedDateFormatter = new Intl.DateTimeFormat(locale, {
           year: 'numeric',
           month: 'short',
@@ -378,10 +381,10 @@ export class SNItem {
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 export class ItemMutator {
-  public readonly item: SNItem
-  protected readonly type: MutationType
-  protected payload: PurePayload
-  protected content?: PayloadContent
+  public readonly item: SNItem;
+  protected readonly type: MutationType;
+  protected payload: PurePayload;
+  protected content?: PayloadContent;
 
   constructor(item: SNItem, type: MutationType) {
     this.item = item;
@@ -403,12 +406,9 @@ export class ItemMutator {
 
   public getResult() {
     if (this.type === MutationType.NonDirtying) {
-      return CopyPayload(
-        this.payload,
-        {
-          content: this.content,
-        }
-      )
+      return CopyPayload(this.payload, {
+        content: this.content,
+      });
     }
     if (!this.payload.deleted) {
       if (this.type === MutationType.UserInteraction) {
@@ -422,14 +422,11 @@ export class ItemMutator {
         }
       }
     }
-    const result = CopyPayload(
-      this.payload,
-      {
-        content: this.content,
-        dirty: true,
-        dirtiedDate: new Date()
-      }
-    )
+    const result = CopyPayload(this.payload, {
+      content: this.content,
+      dirty: true,
+      dirtiedDate: new Date(),
+    });
     return result;
   }
 
@@ -450,42 +447,30 @@ export class ItemMutator {
 
   public setDeleted() {
     this.content = undefined;
-    this.payload = CopyPayload(
-      this.payload,
-      {
-        content: this.content,
-        deleted: true
-      }
-    )
+    this.payload = CopyPayload(this.payload, {
+      content: this.content,
+      deleted: true,
+    });
   }
 
   public set lastSyncBegan(began: Date) {
-    this.payload = CopyPayload(
-      this.payload,
-      {
-        content: this.content,
-        lastSyncBegan: began
-      }
-    )
+    this.payload = CopyPayload(this.payload, {
+      content: this.content,
+      lastSyncBegan: began,
+    });
   }
 
   public set errorDecrypting(errorDecrypting: boolean) {
-    this.payload = CopyPayload(
-      this.payload,
-      {
-        content: this.content,
-        errorDecrypting: errorDecrypting
-      }
-    )
+    this.payload = CopyPayload(this.payload, {
+      content: this.content,
+      errorDecrypting: errorDecrypting,
+    });
   }
 
   public set updated_at(updated_at: Date) {
-    this.payload = CopyPayload(
-      this.payload,
-      {
-        updated_at: updated_at
-      }
-    )
+    this.payload = CopyPayload(this.payload, {
+      updated_at: updated_at,
+    });
   }
 
   public set userModifiedDate(date: Date) {
@@ -557,7 +542,7 @@ export class ItemMutator {
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
         uuid: item.uuid,
-        content_type: item.content_type!
+        content_type: item.content_type!,
       });
     }
     this.content!.references = references;
@@ -609,7 +594,6 @@ function ItemContentsEqual(
     } else {
       delete leftContent.appData;
     }
-
   }
   omitInPlace(leftContent, keysToIgnore);
 

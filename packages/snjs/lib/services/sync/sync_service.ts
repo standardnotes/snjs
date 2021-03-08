@@ -5,10 +5,15 @@ import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
 import { MutationType, SNItem } from '@Models/core/item';
 import { PurePayload } from '@Payloads/pure_payload';
-import { PayloadManager } from './../model_manager';
+import { PayloadManager } from './../payload_manager';
 import { SNStorageService } from './../storage_service';
 import { SNProtocolService } from './../protocol_service';
-import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@Lib/utils';
+import {
+  isNullOrUndefined,
+  removeFromIndex,
+  sleep,
+  subtractFromArray,
+} from '@Lib/utils';
 import { PureService } from '@Services/pure_service';
 import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils';
 import { SyncOpStatus } from '@Services/sync/sync_op_status';
@@ -20,7 +25,7 @@ import { OfflineSyncOperation } from '@Services/sync/offline/operation';
 import { DeltaOutOfSync } from '@Payloads/deltas';
 import { PayloadField } from '@Payloads/fields';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { EncryptionIntent } from '@Protocol/intents';
@@ -48,7 +53,7 @@ export enum SyncQueueStrategy {
    * A new sync request is guarenteed to be generated for your request, no matter how long it takes.
    * Promise will be resolved whenever this sync request is processed in the serial queue.
    */
-  ForceSpawnNew = 2
+  ForceSpawnNew = 2,
 }
 
 export enum SyncModes {
@@ -61,7 +66,7 @@ export enum SyncModes {
    * before uploading any dirty items. This allows a consumer, for example, to download
    * all data to see if user has an items key, and if not, only then create a new one.
    */
-  DownloadFirst = 2
+  DownloadFirst = 2,
 }
 
 export enum SyncSources {
@@ -71,25 +76,25 @@ export enum SyncSources {
   MoreDirtyItems = 4,
   AfterDownloadFirst = 5,
   IntegrityCheck = 6,
-  ResolveOutOfSync = 7
+  ResolveOutOfSync = 7,
 }
 
 export type SyncOptions = {
-  queueStrategy?: SyncQueueStrategy
-  mode?: SyncModes
+  queueStrategy?: SyncQueueStrategy;
+  mode?: SyncModes;
   /** Whether the server should compute and return an integrity hash. */
-  checkIntegrity?: boolean
+  checkIntegrity?: boolean;
   /** Internally used to keep track of how sync requests were spawned. */
-  source?: SyncSources
+  source?: SyncSources;
   /** Whether to await any sync requests that may be queued from this call. */
-  awaitAll?: boolean
-}
+  awaitAll?: boolean;
+};
 
 type SyncPromise = {
-  resolve: (value?: any) => void
-  reject: () => void
-  options?: SyncOptions
-}
+  resolve: (value?: any) => void;
+  reject: () => void;
+  options?: SyncOptions;
+};
 
 /**
  * Non-encrypted types are items whose values a server must be able to read.
@@ -99,9 +104,8 @@ type SyncPromise = {
  */
 const NonEncryptedTypes = Object.freeze([
   ContentType.Mfa,
-  ContentType.ServerExtension
+  ContentType.ServerExtension,
 ]);
-
 
 /**
  * The sync service orchestrates with the model manager, api service, and storage service
@@ -116,40 +120,39 @@ export class SNSyncService extends PureService<
   SyncEvent,
   SyncResponse | { source: SyncSources }
 > {
+  private sessionManager?: SNSessionManager;
+  private protocolService?: SNProtocolService;
+  private storageService?: SNStorageService;
+  private modelManager?: PayloadManager;
+  private itemManager?: ItemManager;
+  private apiService?: SNApiService;
+  private interval: any;
+  private state?: SyncState;
+  private opStatus!: SyncOpStatus;
 
-  private sessionManager?: SNSessionManager
-  private protocolService?: SNProtocolService
-  private storageService?: SNStorageService
-  private modelManager?: PayloadManager
-  private itemManager?: ItemManager
-  private apiService?: SNApiService
-  private interval: any
-  private state?: SyncState
-  private opStatus!: SyncOpStatus
-
-  private resolveQueue: SyncPromise[] = []
-  private spawnQueue: SyncPromise[] = []
+  private resolveQueue: SyncPromise[] = [];
+  private spawnQueue: SyncPromise[] = [];
 
   /* A DownloadFirst sync must always be the first sync completed */
-  private completedOnlineDownloadFirstSync = false
+  private completedOnlineDownloadFirstSync = false;
 
-  private majorChangeThreshold = DEFAULT_MAJOR_CHANGE_THRESHOLD
-  private maxDiscordance = DEFAULT_MAX_DISCORDANCE
-  private locked = false
-  private databaseLoaded = false
+  private majorChangeThreshold = DEFAULT_MAJOR_CHANGE_THRESHOLD;
+  private maxDiscordance = DEFAULT_MAX_DISCORDANCE;
+  private locked = false;
+  private databaseLoaded = false;
 
-  private syncToken?: string
-  private cursorToken?: string
+  private syncToken?: string;
+  private cursorToken?: string;
 
   private syncLock = false;
-  private _simulate_latency?: any
+  private _simulate_latency?: any;
 
   /** Content types appearing first are always mapped first */
   private readonly localLoadPriorty = [
     ContentType.ItemsKey,
     ContentType.UserPrefs,
     ContentType.Component,
-    ContentType.Theme
+    ContentType.Theme,
   ];
 
   constructor(
@@ -157,7 +160,7 @@ export class SNSyncService extends PureService<
     sessionManager: SNSessionManager,
     protocolService: SNProtocolService,
     storageService: SNStorageService,
-    modelManager: PayloadManager,
+    payloadManager: PayloadManager,
     apiService: SNApiService,
     interval: any
   ) {
@@ -165,7 +168,7 @@ export class SNSyncService extends PureService<
     this.itemManager = itemManager;
     this.sessionManager = sessionManager;
     this.protocolService = protocolService;
-    this.modelManager = modelManager;
+    this.payloadManager = payloadManager;
     this.storageService = storageService;
     this.apiService = apiService;
     this.interval = interval;
@@ -188,7 +191,7 @@ export class SNSyncService extends PureService<
     this.sessionManager = undefined;
     this.itemManager = undefined;
     this.protocolService = undefined;
-    this.modelManager = undefined;
+    this.payloadManager = undefined;
     this.storageService = undefined;
     this.apiService = undefined;
     this.interval = undefined;
@@ -202,25 +205,19 @@ export class SNSyncService extends PureService<
   }
 
   private initializeStatus() {
-    this.opStatus = new SyncOpStatus(
-      this.interval,
-      (event) => {
-        this.notifyEvent(event);
-      }
-    );
+    this.opStatus = new SyncOpStatus(this.interval, (event) => {
+      this.notifyEvent(event);
+    });
   }
 
   private initializeState() {
-    this.state = new SyncState(
-      (event) => {
-        if (event === SyncEvent.EnterOutOfSync) {
-          this.notifyEvent(SyncEvent.EnterOutOfSync);
-        } else if (event === SyncEvent.ExitOutOfSync) {
-          this.notifyEvent(SyncEvent.ExitOutOfSync);
-        }
-      },
-      this.maxDiscordance,
-    );
+    this.state = new SyncState((event) => {
+      if (event === SyncEvent.EnterOutOfSync) {
+        this.notifyEvent(SyncEvent.EnterOutOfSync);
+      } else if (event === SyncEvent.ExitOutOfSync) {
+        this.notifyEvent(SyncEvent.ExitOutOfSync);
+      }
+    }, this.maxDiscordance);
   }
 
   public lockSyncing() {
@@ -278,16 +275,16 @@ export class SNSyncService extends PureService<
       this.opStatus!.setDatabaseLoadStatus(0, 0, true);
       return;
     }
-    const unsortedPayloads = rawPayloads.map((rawPayload) => {
-      try {
-        return CreateMaxPayloadFromAnyObject(
-          rawPayload
-        );
-      } catch (e) {
-        console.error('Creating payload failed', e)
-        return undefined;
-      }
-    }).filter(payload => !isNullOrUndefined(payload));
+    const unsortedPayloads = rawPayloads
+      .map((rawPayload) => {
+        try {
+          return CreateMaxPayloadFromAnyObject(rawPayload);
+        } catch (e) {
+          console.error('Creating payload failed', e);
+          return undefined;
+        }
+      })
+      .filter((payload) => !isNullOrUndefined(payload));
 
     const payloads = SortPayloadsByRecentAndContentPriority(
       unsortedPayloads as PurePayload[],
@@ -298,9 +295,10 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
-    const decryptedItemsKeys = await this.protocolService!
-      .payloadsByDecryptingPayloads(itemsKeysPayloads);
-    await this.modelManager!.emitPayloads(
+    const decryptedItemsKeys = await this.protocolService!.payloadsByDecryptingPayloads(
+      itemsKeysPayloads
+    );
+    await this.payloadManager!.emitPayloads(
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
     );
@@ -310,16 +308,18 @@ export class SNSyncService extends PureService<
     const numBatches = Math.ceil(payloadCount / batchSize);
     for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
       const currentPosition = batchIndex * batchSize;
-      const batch = payloads.slice(currentPosition, currentPosition + batchSize);
-      const decrypted = await this.protocolService!
-        .payloadsByDecryptingPayloads(batch);
-      await this.modelManager!.emitPayloads(
+      const batch = payloads.slice(
+        currentPosition,
+        currentPosition + batchSize
+      );
+      const decrypted = await this.protocolService!.payloadsByDecryptingPayloads(
+        batch
+      );
+      await this.payloadManager!.emitPayloads(
         decrypted,
         PayloadSource.LocalRetrieved
       );
-      this.notifyEvent(
-        SyncEvent.LocalDataIncrementalLoad
-      );
+      this.notifyEvent(SyncEvent.LocalDataIncrementalLoad);
       this.opStatus!.setDatabaseLoadStatus(
         currentPosition,
         payloadCount,
@@ -346,14 +346,18 @@ export class SNSyncService extends PureService<
 
   private async getLastSyncToken() {
     if (!this.syncToken) {
-      this.syncToken = await this.storageService!.getValue(StorageKey.LastSyncToken);
+      this.syncToken = await this.storageService!.getValue(
+        StorageKey.LastSyncToken
+      );
     }
     return this.syncToken!;
   }
 
   private async getPaginationToken() {
     if (!this.cursorToken) {
-      this.cursorToken = await this.storageService!.getValue(StorageKey.PaginationToken);
+      this.cursorToken = await this.storageService!.getValue(
+        StorageKey.PaginationToken
+      );
     }
     return this.cursorToken!;
   }
@@ -375,9 +379,9 @@ export class SNSyncService extends PureService<
     const payload = CreateMaxPayloadFromAnyObject(item);
     const results = await PayloadsByAlternatingUuid(
       payload,
-      this.modelManager!.getMasterCollection()
+      this.payloadManager!.getMasterCollection()
     );
-    await this.modelManager!.emitPayloads(
+    await this.payloadManager!.emitPayloads(
       results,
       PayloadSource.LocalChanged
     );
@@ -405,15 +409,12 @@ export class SNSyncService extends PureService<
     }
     const items = this.itemManager!.items;
     const payloads = items.map((item) => {
-      return CreateMaxPayloadFromAnyObject(
-        item,
-        {
-          dirty: true,
-          dirtiedDate: new Date()
-        }
-      );
+      return CreateMaxPayloadFromAnyObject(item, {
+        dirty: true,
+        dirtiedDate: new Date(),
+      });
     });
-    await this.modelManager!.emitPayloads(
+    await this.payloadManager!.emitPayloads(
       payloads,
       PayloadSource.LocalChanged
     );
@@ -464,12 +465,14 @@ export class SNSyncService extends PureService<
     return this.sync({
       queueStrategy: SyncQueueStrategy.ForceSpawnNew,
       source: SyncSources.SpawnQueue,
-      ...promise.options
-    }).then(() => {
-      promise.resolve();
-    }).catch(() => {
-      promise.reject();
-    });
+      ...promise.options,
+    })
+      .then(() => {
+        promise.resolve();
+      })
+      .catch(() => {
+        promise.reject();
+      });
   }
 
   /**
@@ -480,22 +483,23 @@ export class SNSyncService extends PureService<
     return this.protocolService!.payloadsByEncryptingPayloads(
       payloads,
       (payload) => {
-        return (
-          NonEncryptedTypes.includes(payload.content_type!)
-            ? EncryptionIntent.SyncDecrypted
-            : EncryptionIntent.Sync
-        );
+        return NonEncryptedTypes.includes(payload.content_type!)
+          ? EncryptionIntent.SyncDecrypted
+          : EncryptionIntent.Sync;
       }
     );
   }
 
-  public async downloadFirstSync(waitTimeOnFailureMs: number, otherSyncOptions?: SyncOptions) {
+  public async downloadFirstSync(
+    waitTimeOnFailureMs: number,
+    otherSyncOptions?: SyncOptions
+  ) {
     const maxTries = 5;
     for (let i = 0; i < maxTries; i++) {
       await this.sync({
         mode: SyncModes.DownloadFirst,
         queueStrategy: SyncQueueStrategy.ForceSpawnNew,
-        ...otherSyncOptions
+        ...otherSyncOptions,
       }).catch(console.error);
       if (this.completedOnlineDownloadFirstSync) {
         return;
@@ -565,17 +569,16 @@ export class SNSyncService extends PureService<
      * _after_ in-time will schedule a new sync request. */
     const inTimeResolveQueue = this.resolveQueue.slice();
 
-    const useStrategy = (
-      !isNullOrUndefined(options.queueStrategy)
-        ? options.queueStrategy
-        : SyncQueueStrategy.ResolveOnNext
-    );
+    const useStrategy = !isNullOrUndefined(options.queueStrategy)
+      ? options.queueStrategy
+      : SyncQueueStrategy.ResolveOnNext;
     if (syncInProgress || !databaseLoaded || !canExecuteSync) {
       this.log(
-        !canExecuteSync ? 'Another function call has begun preparing for sync.' :
-          syncInProgress ?
-            'Attempting to sync while existing sync in progress.' :
-            'Attempting to sync before local database has loaded.'
+        !canExecuteSync
+          ? 'Another function call has begun preparing for sync.'
+          : syncInProgress
+          ? 'Attempting to sync while existing sync in progress.'
+          : 'Attempting to sync before local database has loaded.'
       );
       if (useStrategy === SyncQueueStrategy.ResolveOnNext) {
         return this.queueStrategyResolveOnNext();
@@ -583,7 +586,7 @@ export class SNSyncService extends PureService<
         return this.queueStrategyForceSpawnNew({
           mode: options.mode,
           checkIntegrity: options.checkIntegrity,
-          source: options.source
+          source: options.source,
         });
       } else {
         throw Error(`Unhandled timing strategy ${useStrategy}`);
@@ -610,7 +613,8 @@ export class SNSyncService extends PureService<
       );
     }
 
-    const erroredState = this.protocolService!.hasAccount() !== this.sessionManager!.online();
+    const erroredState =
+      this.protocolService!.hasAccount() !== this.sessionManager!.online();
     if (erroredState) {
       this.handleInvalidSessionState();
     }
@@ -626,13 +630,17 @@ export class SNSyncService extends PureService<
       }
     })(options.mode);
 
-    let uploadPayloads: PurePayload[] = []
+    let uploadPayloads: PurePayload[] = [];
     if (useMode === SyncModes.Default) {
       if (online && !this.completedOnlineDownloadFirstSync) {
-        throw Error('Attempting to default mode sync without having completed initial.');
+        throw Error(
+          'Attempting to default mode sync without having completed initial.'
+        );
       }
       if (online) {
-        uploadPayloads = await this.payloadsByPreparingForServer(decryptedPayloads);
+        uploadPayloads = await this.payloadsByPreparingForServer(
+          decryptedPayloads
+        );
       } else {
         uploadPayloads = decryptedPayloads;
       }
@@ -675,7 +683,9 @@ export class SNSyncService extends PureService<
       await this.handleNeverSyncedDeleted(neverSyncedDeleted);
     }
     if (useMode !== SyncModes.DownloadFirst) {
-      await this.notifyEvent(SyncEvent.FullSyncCompleted, { source: options.source });
+      await this.notifyEvent(SyncEvent.FullSyncCompleted, {
+        source: options.source,
+      });
     }
 
     if (useMode === SyncModes.DownloadFirst) {
@@ -687,14 +697,14 @@ export class SNSyncService extends PureService<
       await this.sync({
         source: SyncSources.AfterDownloadFirst,
         checkIntegrity: true,
-        awaitAll: options.awaitAll
+        awaitAll: options.awaitAll,
       });
     } else if (!this.popSpawnQueue() && this.resolveQueue.length > 0) {
       this.log('Syncing again from resolve queue');
       /** No need to await. */
       const promise = this.sync({
         source: SyncSources.ResolveQueue,
-        checkIntegrity: options.checkIntegrity
+        checkIntegrity: options.checkIntegrity,
       });
       if (options.awaitAll) {
         await promise;
@@ -708,16 +718,19 @@ export class SNSyncService extends PureService<
       await this.sync({
         source: SyncSources.MoreDirtyItems,
         checkIntegrity: options.checkIntegrity,
-        awaitAll: options.awaitAll
+        awaitAll: options.awaitAll,
       });
-    } else if (operation instanceof AccountSyncOperation && operation.checkIntegrity) {
+    } else if (
+      operation instanceof AccountSyncOperation &&
+      operation.checkIntegrity
+    ) {
       if (this.state!.needsSync && operation.done) {
         this.log('Syncing again from integrity check');
         const promise = this.sync({
           checkIntegrity: true,
           queueStrategy: SyncQueueStrategy.ForceSpawnNew,
           source: SyncSources.IntegrityCheck,
-          awaitAll: options.awaitAll
+          awaitAll: options.awaitAll,
         });
         if (options.awaitAll) {
           await promise;
@@ -747,7 +760,7 @@ export class SNSyncService extends PureService<
    * but if they're not, it means we're in an errored state.
    */
   private handleInvalidSessionState() {
-    SNLog.error(Error('Session missing while attempting to sync.'))
+    SNLog.error(Error('Session missing while attempting to sync.'));
     this.sessionManager!.reauthenticateInvalidSession();
   }
 
@@ -758,8 +771,15 @@ export class SNSyncService extends PureService<
     mode: SyncModes
   ) {
     this.log(
-      'Syncing online user', 'source:', source, "integrity check",
-      checkIntegrity, 'mode:', mode, 'payloads:', payloads
+      'Syncing online user',
+      'source:',
+      source,
+      'integrity check',
+      checkIntegrity,
+      'mode:',
+      mode,
+      'payloads:',
+      payloads
     );
     const operation = new AccountSyncOperation(
       payloads,
@@ -775,7 +795,7 @@ export class SNSyncService extends PureService<
           case SyncSignal.StatusChanged:
             this.opStatus!.setUploadStatus(
               stats!.completedUploadCount,
-              stats!.totalUploadCount,
+              stats!.totalUploadCount
             );
             break;
         }
@@ -783,7 +803,7 @@ export class SNSyncService extends PureService<
       await this.getLastSyncToken(),
       await this.getPaginationToken(),
       checkIntegrity,
-      this.apiService!,
+      this.apiService!
     );
     return operation;
   }
@@ -793,7 +813,15 @@ export class SNSyncService extends PureService<
     source: SyncSources,
     mode: SyncModes
   ) {
-    this.log('Syncing offline user', 'source:', source, 'mode:', mode, 'payloads:', payloads);
+    this.log(
+      'Syncing offline user',
+      'source:',
+      source,
+      'mode:',
+      mode,
+      'payloads:',
+      payloads
+    );
     const operation = new OfflineSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse) => {
@@ -809,11 +837,13 @@ export class SNSyncService extends PureService<
     this.log('Offline Sync Response', response.rawResponse);
     const payloadsToEmit = response.savedPayloads;
     if (payloadsToEmit.length > 0) {
-      await this.modelManager!.emitPayloads(
+      await this.payloadManager!.emitPayloads(
         payloadsToEmit,
         PayloadSource.LocalSaved
       );
-      const payloadsToPersist = this.modelManager!.find(Uuids(payloadsToEmit)) as PurePayload[];
+      const payloadsToPersist = this.payloadManager!.find(
+        Uuids(payloadsToEmit)
+      ) as PurePayload[];
       await this.persistPayloads(payloadsToPersist);
     }
 
@@ -825,10 +855,7 @@ export class SNSyncService extends PureService<
     this.opStatus!.clearError();
     this.opStatus!.setDownloadStatus(response.retrievedPayloads.length);
 
-    await this.notifyEvent(
-      SyncEvent.SingleSyncCompleted,
-      response
-    );
+    await this.notifyEvent(SyncEvent.SingleSyncCompleted, response);
   }
 
   private async handleErrorServerResponse(response: SyncResponse) {
@@ -845,14 +872,14 @@ export class SNSyncService extends PureService<
     operation: AccountSyncOperation,
     response: SyncResponse
   ) {
-    if (this._simulate_latency) { await sleep(this._simulate_latency.latency); }
+    if (this._simulate_latency) {
+      await sleep(this._simulate_latency.latency);
+    }
     this.log('Online Sync Response', response.rawResponse);
     this.setLastSyncToken(response.lastSyncToken!);
     this.setPaginationToken(response.paginationToken!);
     this.opStatus!.clearError();
-    this.opStatus!.setDownloadStatus(
-      response.retrievedPayloads.length
-    );
+    this.opStatus!.setDownloadStatus(response.retrievedPayloads.length);
 
     const decryptedPayloads = [];
     for (const payload of response.allProcessedPayloads) {
@@ -861,30 +888,31 @@ export class SNSyncService extends PureService<
           do not contiain content (like remote saved) */
         continue;
       }
-      const decrypted = await this.protocolService!.payloadByDecryptingPayload(payload);
+      const decrypted = await this.protocolService!.payloadByDecryptingPayload(
+        payload
+      );
       decryptedPayloads.push(decrypted);
     }
-    const masterCollection = this.modelManager!.getMasterCollection();
+    const masterCollection = this.payloadManager!.getMasterCollection();
     const resolver = new SyncResponseResolver(
       response,
       decryptedPayloads,
       masterCollection,
-      operation.payloadsSavedOrSaving,
+      operation.payloadsSavedOrSaving
     );
 
     const collections = await resolver.collectionsByProcessingResponse();
     for (const collection of collections) {
-      const payloadsToPersist = await this.modelManager!.emitCollection(collection);
+      const payloadsToPersist = await this.payloadManager!.emitCollection(
+        collection
+      );
       await this.persistPayloads(payloadsToPersist);
     }
     const deletedPayloads = response.deletedPayloads;
     if (deletedPayloads.length > 0) {
       await this.deletePayloads(deletedPayloads);
     }
-    await this.notifyEvent(
-      SyncEvent.SingleSyncCompleted,
-      response
-    );
+    await this.notifyEvent(SyncEvent.SingleSyncCompleted, response);
     if (response.checkIntegrity) {
       const clientHash = await this.computeDataIntegrityHash();
       await this.state!.setIntegrityHashes(
@@ -900,13 +928,11 @@ export class SNSyncService extends PureService<
    */
   private async handleNeverSyncedDeleted(items: SNItem[]) {
     const payloads = items.map((item) => {
-      return item.payloadRepresentation(
-        {
-          dirty: false
-        }
-      );
+      return item.payloadRepresentation({
+        dirty: false,
+      });
     });
-    await this.modelManager!.emitPayloads(
+    await this.payloadManager!.emitPayloads(
       payloads,
       PayloadSource.LocalChanged
     );
@@ -926,9 +952,7 @@ export class SNSyncService extends PureService<
     });
   }
 
-  private async deletePayloads(
-    payloads: PurePayload[]
-  ) {
+  private async deletePayloads(payloads: PurePayload[]) {
     return this.persistPayloads(payloads);
   }
 
@@ -963,22 +987,25 @@ export class SNSyncService extends PureService<
     );
     const payloads = await downloader.run();
     const delta = new DeltaOutOfSync(
-      this.modelManager!.getMasterCollection(),
+      this.payloadManager!.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(
         payloads,
         PayloadSource.RemoteRetrieved
       )
     );
     const collection = await delta.resultingCollection();
-    await this.modelManager!.emitCollection(collection);
+    await this.payloadManager!.emitCollection(collection);
     await this.persistPayloads(collection.payloads);
     return this.sync({
       checkIntegrity: true,
-      source: SyncSources.ResolveOutOfSync
+      source: SyncSources.ResolveOutOfSync,
     });
   }
 
-  public async statelessDownloadAllItems(contentType?: ContentType, customEvent?: string) {
+  public async statelessDownloadAllItems(
+    contentType?: ContentType,
+    customEvent?: string
+  ) {
     const downloader = new AccountDownloader(
       this.apiService!,
       this.protocolService!,
@@ -1009,7 +1036,7 @@ export class SNSyncService extends PureService<
   ut_beginLatencySimulator(latency: number) {
     this._simulate_latency = {
       latency: latency || 1000,
-      enabled: true
+      enabled: true,
     };
   }
 

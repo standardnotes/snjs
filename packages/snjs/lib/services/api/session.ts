@@ -2,22 +2,22 @@ import { SessionRenewalResponse } from './responses';
 import { UuidString } from '@Lib/types';
 
 type RawJwtPayload = {
-  jwt?: string
-}
+  jwt?: string;
+};
 type RawSessionPayload = {
-  accessToken: string
-  refreshToken: string
-  accessExpiration: number
-  refreshExpiration: number
-}
-type RawStorageValue = RawJwtPayload | RawSessionPayload
+  accessToken: string;
+  refreshToken: string;
+  accessExpiration: number;
+  refreshExpiration: number;
+};
+type RawStorageValue = RawJwtPayload | RawSessionPayload;
 
 export type RemoteSession = {
-  uuid: UuidString
-  updated_at: Date
-  device_info: string
-  current: boolean
-}
+  uuid: UuidString;
+  updated_at: Date;
+  device_info: string;
+  current: boolean;
+};
 
 export abstract class Session {
   public abstract canExpire(): boolean;
@@ -27,9 +27,7 @@ export abstract class Session {
 
   static FromRawStorageValue(raw: RawStorageValue): JwtSession | TokenSession {
     if ((raw as RawJwtPayload).jwt) {
-      return new JwtSession(
-        (raw as RawJwtPayload).jwt!
-      );
+      return new JwtSession((raw as RawJwtPayload).jwt!);
     } else {
       const rawSession = raw as RawSessionPayload;
       return new TokenSession(
@@ -62,18 +60,22 @@ export class JwtSession extends Session {
 
 /** For protocol versions >= 004 */
 export class TokenSession extends Session {
-
-  public accessToken: string
-  public accessExpiration: number
-  public refreshToken: string
-  public refreshExpiration: number
+  public accessToken: string;
+  public accessExpiration: number;
+  public refreshToken: string;
+  public refreshExpiration: number;
 
   static FromApiResponse(response: SessionRenewalResponse) {
     const accessToken: string = response.session!.access_token;
     const refreshToken: string = response.session!.refresh_token;
     const accessExpiration: number = response.session!.access_expiration;
     const refreshExpiration: number = response.session!.refresh_expiration;
-    return new TokenSession(accessToken, accessExpiration, refreshToken, refreshExpiration);
+    return new TokenSession(
+      accessToken,
+      accessExpiration,
+      refreshToken,
+      refreshExpiration
+    );
   }
 
   constructor(

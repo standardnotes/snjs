@@ -9,11 +9,10 @@ type EventObserver<E, D> = (eventName: E, data?: D) => Promise<void> | void;
  * D = the data the event includes
  */
 export abstract class PureService<E = string, D = undefined> {
-
-  private eventObservers: EventObserver<E, D>[] = []
-  public loggingEnabled = false
-  public deviceInterface?: DeviceInterface
-  private criticalPromises: Promise<unknown>[] = []
+  private eventObservers: EventObserver<E, D>[] = [];
+  public loggingEnabled = false;
+  public deviceInterface?: DeviceInterface;
+  private criticalPromises: Promise<unknown>[] = [];
 
   public addEventObserver(observer: EventObserver<E, D>): () => void {
     this.eventObservers.push(observer);
@@ -52,17 +51,18 @@ export abstract class PureService<E = string, D = undefined> {
    * parent application instance will await all criticial functions via the `blockDeinit`
    * function before signing out and deiniting.
    */
-  protected async executeCriticalFunction<T = void>(func: () => Promise<T>): Promise<T> {
+  protected async executeCriticalFunction<T = void>(
+    func: () => Promise<T>
+  ): Promise<T> {
     const promise = func();
     this.criticalPromises.push(promise);
     return promise;
   }
 
-
   /**
-  * Application instances will call this function directly when they arrive
-  * at a certain migratory state.
-  */
+   * Application instances will call this function directly when they arrive
+   * at a certain migratory state.
+   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async handleApplicationStage(_stage: ApplicationStage): Promise<void> {
     // optional override
@@ -71,16 +71,19 @@ export abstract class PureService<E = string, D = undefined> {
   log(message: string, ...args: unknown[]): void {
     if (this.loggingEnabled) {
       const date = new Date();
-      const timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '');
+      const timeString = date
+        .toLocaleTimeString()
+        .replace(' PM', '')
+        .replace(' AM', '');
       const string = `${timeString}.${date.getMilliseconds()}`;
       if (args) {
         args = args.map((arg) => {
-          if(Array.isArray(arg)) {
+          if (Array.isArray(arg)) {
             return arg.slice();
           } else {
             return arg;
           }
-        })
+        });
         console.log(string, message, ...args);
       } else {
         console.log(string, message);

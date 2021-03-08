@@ -2,19 +2,21 @@ import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { PayloadSource } from './../sources';
 import { PurePayload } from './../pure_payload';
 import { CreateItemFromPayload } from '@Models/generator';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { CopyPayload } from '@Payloads/generator';
-import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions';
+import {
+  PayloadContentsEqual,
+  PayloadsByDuplicating,
+} from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
 import { PayloadField } from '../fields';
 
 export class ConflictDelta {
-
-  protected readonly baseCollection: ImmutablePayloadCollection
-  protected readonly basePayload: PurePayload
-  protected readonly applyPayload: PurePayload
-  protected readonly source: PayloadSource
+  protected readonly baseCollection: ImmutablePayloadCollection;
+  protected readonly basePayload: PurePayload;
+  protected readonly applyPayload: PurePayload;
+  protected readonly source: PayloadSource;
 
   constructor(
     baseCollection: ImmutablePayloadCollection,
@@ -27,7 +29,6 @@ export class ConflictDelta {
     this.applyPayload = applyPayload;
     this.source = source;
   }
-
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
@@ -43,8 +44,13 @@ export class ConflictDelta {
      * we make changes to many items, including duplicating, but since we are still not
      * uploading the changes until after the multi-page request completes, we may have
      * already conflicted this item. */
-    const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0];
-    if (existingConflict && PayloadContentsEqual(existingConflict, this.applyPayload)) {
+    const existingConflict = this.baseCollection.conflictsOf(
+      this.applyPayload.uuid
+    )[0];
+    if (
+      existingConflict &&
+      PayloadContentsEqual(existingConflict, this.applyPayload)
+    ) {
       /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
       return [];
     }
@@ -53,14 +59,11 @@ export class ConflictDelta {
         this.basePayload.updated_at!,
         this.applyPayload.updated_at!
       );
-      const leftPayload = CopyPayload(
-        this.basePayload,
-        {
-          updated_at: updatedAt,
-          dirty: true,
-          dirtiedDate: new Date(),
-        }
-      );
+      const leftPayload = CopyPayload(this.basePayload, {
+        updated_at: updatedAt,
+        dirty: true,
+        dirtiedDate: new Date(),
+      });
       return [leftPayload];
     }
     if (strategy === ConflictStrategy.KeepRight) {
@@ -69,9 +72,9 @@ export class ConflictDelta {
         this.basePayload,
         [PayloadField.LastSyncBegan],
         {
-          lastSyncEnd: new Date()
+          lastSyncEnd: new Date(),
         }
-      )
+      );
       return [result];
     }
     if (strategy === ConflictStrategy.KeepLeftDuplicateRight) {
@@ -79,18 +82,15 @@ export class ConflictDelta {
         this.basePayload.updated_at!,
         this.applyPayload.updated_at!
       );
-      const leftPayload = CopyPayload(
-        this.basePayload,
-        {
-          updated_at: updatedAt,
-          dirty: true,
-          dirtiedDate: new Date(),
-        }
-      );
+      const leftPayload = CopyPayload(this.basePayload, {
+        updated_at: updatedAt,
+        dirty: true,
+        dirtiedDate: new Date(),
+      });
       const rightPayloads = await PayloadsByDuplicating(
         this.applyPayload,
         this.baseCollection,
-        true,
+        true
       );
       return [leftPayload].concat(rightPayloads);
     }
@@ -99,14 +99,14 @@ export class ConflictDelta {
       const leftPayloads = await PayloadsByDuplicating(
         this.basePayload,
         this.baseCollection,
-        true,
+        true
       );
       const rightPayload = PayloadByMerging(
         this.applyPayload,
         this.basePayload,
         [PayloadField.LastSyncBegan],
         {
-          lastSyncEnd: new Date()
+          lastSyncEnd: new Date(),
         }
       );
       return leftPayloads.concat([rightPayload]);
@@ -122,18 +122,15 @@ export class ConflictDelta {
         this.basePayload.updated_at!,
         this.applyPayload.updated_at!
       );
-      const payload = CopyPayload(
-        this.basePayload,
-        {
-          updated_at: updatedAt,
-          dirty: true,
-          dirtiedDate: new Date(),
-          content: {
-            ...this.basePayload.safeContent,
-            references: refs
-          }
-        }
-      );
+      const payload = CopyPayload(this.basePayload, {
+        updated_at: updatedAt,
+        dirty: true,
+        dirtiedDate: new Date(),
+        content: {
+          ...this.basePayload.safeContent,
+          references: refs,
+        },
+      });
       return [payload];
     }
 

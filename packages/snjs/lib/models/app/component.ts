@@ -14,7 +14,7 @@ export enum ComponentArea {
   NoteTags = 'note-tags',
   Rooms = 'rooms',
   Modal = 'modal',
-  Any = '*'
+  Any = '*',
 }
 
 export enum ComponentAction {
@@ -39,32 +39,32 @@ export enum ComponentAction {
   ActivateThemes = 'themes',
   Reply = 'reply',
   SaveSuccess = 'save-success',
-  SaveError = 'save-error'
+  SaveError = 'save-error',
 }
 
 export type ComponentPermission = {
-  name: ComponentAction
-  content_types?: ContentType[]
-}
+  name: ComponentAction;
+  content_types?: ContentType[];
+};
 
 interface ComponentContent {
-  componentData: Record<string, any>
+  componentData: Record<string, any>;
   /** Items that have requested a component to be disabled in its context */
-  disassociatedItemIds: string[]
+  disassociatedItemIds: string[];
   /** Items that have requested a component to be enabled in its context */
-  associatedItemIds: string[]
-  local_url: string
-  hosted_url: string
-  offlineOnly: boolean
-  name: string
-  autoupdateDisabled: boolean
-  package_info: any
-  area: ComponentArea
-  permissions: ComponentPermission[]
-  valid_until: Date
-  active: boolean
-  legacy_url: string
-  isMobileDefault: boolean
+  associatedItemIds: string[];
+  local_url: string;
+  hosted_url: string;
+  offlineOnly: boolean;
+  name: string;
+  autoupdateDisabled: boolean;
+  package_info: any;
+  area: ComponentArea;
+  permissions: ComponentPermission[];
+  valid_until: Date;
+  active: boolean;
+  legacy_url: string;
+  isMobileDefault: boolean;
 }
 
 /**
@@ -73,31 +73,31 @@ interface ComponentContent {
  * only by its url.
  */
 export class SNComponent extends SNItem implements ComponentContent {
-
-  public readonly componentData: Record<string, any>
+  public readonly componentData: Record<string, any>;
   /** Items that have requested a component to be disabled in its context */
-  public readonly disassociatedItemIds: string[]
+  public readonly disassociatedItemIds: string[];
   /** Items that have requested a component to be enabled in its context */
-  public readonly associatedItemIds: string[]
-  public readonly local_url: string
-  public readonly hosted_url: string
-  public readonly offlineOnly: boolean
-  public readonly name: string
-  public readonly autoupdateDisabled: boolean
-  public readonly package_info: any
-  public readonly area: ComponentArea
-  public readonly permissions: ComponentPermission[] = []
-  public readonly valid_until: Date
-  public readonly active: boolean
-  public readonly legacy_url: string
-  public readonly isMobileDefault: boolean
+  public readonly associatedItemIds: string[];
+  public readonly local_url: string;
+  public readonly hosted_url: string;
+  public readonly offlineOnly: boolean;
+  public readonly name: string;
+  public readonly autoupdateDisabled: boolean;
+  public readonly package_info: any;
+  public readonly area: ComponentArea;
+  public readonly permissions: ComponentPermission[] = [];
+  public readonly valid_until: Date;
+  public readonly active: boolean;
+  public readonly legacy_url: string;
+  public readonly isMobileDefault: boolean;
 
   constructor(payload: PurePayload) {
     super(payload);
     /** Custom data that a component can store in itself */
     this.componentData = this.payload.safeContent.componentData || {};
     this.legacy_url = this.payload.safeContent.legacy_url;
-    this.hosted_url = this.payload.safeContent.hosted_url || this.payload.safeContent.url;
+    this.hosted_url =
+      this.payload.safeContent.hosted_url || this.payload.safeContent.url;
     this.local_url = this.payload.safeContent.local_url;
     this.valid_until = new Date(this.payload.safeContent.valid_until);
     this.offlineOnly = this.payload.safeContent.offlineOnly;
@@ -107,17 +107,20 @@ export class SNComponent extends SNItem implements ComponentContent {
     this.permissions = this.payload.safeContent.permissions || [];
     this.active = this.payload.safeContent.active;
     this.autoupdateDisabled = this.payload.safeContent.autoupdateDisabled;
-    this.disassociatedItemIds = this.payload.safeContent.disassociatedItemIds || [];
+    this.disassociatedItemIds =
+      this.payload.safeContent.disassociatedItemIds || [];
     this.associatedItemIds = this.payload.safeContent.associatedItemIds || [];
     this.isMobileDefault = this.payload.safeContent.isMobileDefault;
     /**
-    * @legacy
-    * We don't want to set the url directly, as we'd like to phase it out.
-    * If the content.url exists, we'll transfer it to legacy_url. We'll only
-    * need to set this if content.hosted_url is blank, otherwise,
-    * hosted_url is the url replacement.
-    */
-    this.legacy_url = !this.payload.safeContent.hosted_url ? this.payload.safeContent.url : undefined;
+     * @legacy
+     * We don't want to set the url directly, as we'd like to phase it out.
+     * If the content.url exists, we'll transfer it to legacy_url. We'll only
+     * need to set this if content.hosted_url is blank, otherwise,
+     * hosted_url is the url replacement.
+     */
+    this.legacy_url = !this.payload.safeContent.hosted_url
+      ? this.payload.safeContent.url
+      : undefined;
   }
 
   /** Do not duplicate components under most circumstances. Always keep original */
@@ -168,11 +171,9 @@ export class SNComponent extends SNItem implements ComponentContent {
   }
 
   public contentKeysToIgnoreWhenCheckingEquality() {
-    return [
-      'active',
-      'disassociatedItemIds',
-      'associatedItemIds'
-    ].concat(super.contentKeysToIgnoreWhenCheckingEquality());
+    return ['active', 'disassociatedItemIds', 'associatedItemIds'].concat(
+      super.contentKeysToIgnoreWhenCheckingEquality()
+    );
   }
 
   /**
@@ -198,7 +199,6 @@ export class SNComponent extends SNItem implements ComponentContent {
 }
 
 export class ComponentMutator extends ItemMutator {
-
   get typedContent() {
     return this.content! as Partial<ComponentContent>;
   }

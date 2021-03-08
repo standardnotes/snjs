@@ -7,8 +7,7 @@ import { PurePayload } from './../../protocol/payloads/pure_payload';
  * can have many tags.
  */
 export class SNTag extends SNItem {
-
-  public readonly title!: string
+  public readonly title!: string;
 
   constructor(payload: PurePayload) {
     super(payload);
@@ -40,11 +39,14 @@ export class SNTag extends SNItem {
   }
 
   public static arrayToDisplayString(tags: SNTag[]): string {
-    return tags.sort((a, b) => {
-      return a.title > b.title ? 1 : -1;
-    }).map((tag) => {
-      return '#' + tag.title;
-    }).join(' ');
+    return tags
+      .sort((a, b) => {
+        return a.title > b.title ? 1 : -1;
+      })
+      .map((tag) => {
+        return '#' + tag.title;
+      })
+      .join(' ');
   }
 }
 

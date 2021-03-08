@@ -1,5 +1,8 @@
 import * as readerClasses from '@Lib/migrations/readers';
-import { compareSemVersions, isRightVersionGreaterThanLeft } from '@Lib/version';
+import {
+  compareSemVersions,
+  isRightVersionGreaterThanLeft,
+} from '@Lib/version';
 import { ApplicationIdentifier } from './../../types';
 import { Environment } from '@Lib/platforms';
 import { DeviceInterface } from '@Lib/device_interface';

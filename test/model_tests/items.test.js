@@ -9,7 +9,7 @@ describe('items', () => {
 
   const syncOptions = {
     checkIntegrity: true,
-    awaitAll: true
+    awaitAll: true,
   };
 
   beforeEach(async function () {
@@ -91,7 +91,8 @@ describe('items', () => {
 
     // items should ignore this field when checking for equality
     item1 = await this.application.changeAndSaveItem(
-      item1.uuid, (mutator) => {
+      item1.uuid,
+      (mutator) => {
         mutator.userModifiedDate = new Date();
       },
       undefined,
@@ -99,7 +100,8 @@ describe('items', () => {
       syncOptions
     );
     item2 = await this.application.changeAndSaveItem(
-      item2.uuid, (mutator) => {
+      item2.uuid,
+      (mutator) => {
         mutator.userModifiedDate = undefined;
       },
       undefined,

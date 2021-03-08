@@ -17,19 +17,18 @@ const DEFAULT_ITEM_REVISIONS_THRESHOLD = 60;
  */
 
 type SessionHistoryContent = {
-  itemUUIDToItemHistoryMapping: Record<string, ItemSessionHistory>
-}
+  itemUUIDToItemHistoryMapping: Record<string, ItemSessionHistory>;
+};
 
 export class SessionHistoryMap {
-
-  private content?: SessionHistoryContent
-  private itemRevisionThreshold = DEFAULT_ITEM_REVISIONS_THRESHOLD
+  private content?: SessionHistoryContent;
+  private itemRevisionThreshold = DEFAULT_ITEM_REVISIONS_THRESHOLD;
 
   constructor(content?: SessionHistoryContent) {
     this.content = content;
     if (!this.content) {
       this.content = {
-        itemUUIDToItemHistoryMapping: {}
+        itemUUIDToItemHistoryMapping: {},
       };
     }
   }
@@ -40,8 +39,9 @@ export class SessionHistoryMap {
       const uuids = Object.keys(content.itemUUIDToItemHistoryMapping);
       uuids.forEach((itemUUID) => {
         const rawItemHistory = content.itemUUIDToItemHistoryMapping[itemUUID];
-        content.itemUUIDToItemHistoryMapping[itemUUID] =
-          ItemSessionHistory.FromJson(rawItemHistory);
+        content.itemUUIDToItemHistoryMapping[
+          itemUUID
+        ] = ItemSessionHistory.FromJson(rawItemHistory);
       });
       return new SessionHistoryMap(content);
     } else {

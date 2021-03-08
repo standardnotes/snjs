@@ -21,21 +21,21 @@ export enum PrefKey {
 }
 
 export type PrefValue = {
-  [PrefKey.TagsPanelWidth]: number,
-  [PrefKey.NotesPanelWidth]: number,
-  [PrefKey.EditorWidth]: number | null,
-  [PrefKey.EditorLeft]: number | null,
-  [PrefKey.EditorMonospaceEnabled]: boolean,
-  [PrefKey.EditorSpellcheck]: boolean,
-  [PrefKey.EditorResizersEnabled]: boolean,
-  [PrefKey.SortNotesBy]: CollectionSort,
-  [PrefKey.SortNotesReverse]: boolean,
-  [PrefKey.NotesShowArchived]: boolean,
-  [PrefKey.NotesHidePinned]: boolean,
-  [PrefKey.NotesHideNotePreview]: boolean,
-  [PrefKey.NotesHideDate]: boolean,
-  [PrefKey.NotesHideTags]: boolean,
-}
+  [PrefKey.TagsPanelWidth]: number;
+  [PrefKey.NotesPanelWidth]: number;
+  [PrefKey.EditorWidth]: number | null;
+  [PrefKey.EditorLeft]: number | null;
+  [PrefKey.EditorMonospaceEnabled]: boolean;
+  [PrefKey.EditorSpellcheck]: boolean;
+  [PrefKey.EditorResizersEnabled]: boolean;
+  [PrefKey.SortNotesBy]: CollectionSort;
+  [PrefKey.SortNotesReverse]: boolean;
+  [PrefKey.NotesShowArchived]: boolean;
+  [PrefKey.NotesHidePinned]: boolean;
+  [PrefKey.NotesHideNotePreview]: boolean;
+  [PrefKey.NotesHideDate]: boolean;
+  [PrefKey.NotesHideTags]: boolean;
+};
 
 export class SNUserPrefs extends SNItem {
   static singletonPredicate = new SNPredicate(

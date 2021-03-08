@@ -3,7 +3,6 @@
 const KEYCHAIN_STORAGE_KEY = 'keychain';
 
 export default class WebDeviceInterface extends DeviceInterface {
-
   async getRawStorageValue(key) {
     return localStorage.getItem(key);
   }
@@ -13,7 +12,7 @@ export default class WebDeviceInterface extends DeviceInterface {
     for (const key of Object.keys(localStorage)) {
       results.push({
         key: key,
-        value: localStorage[key]
+        value: localStorage[key],
       });
     }
     return results;
@@ -96,10 +95,13 @@ export default class WebDeviceInterface extends DeviceInterface {
     if (!keychain) {
       keychain = {};
     }
-    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify({
-      ...keychain,
-      [identifier]: value,
-    }));
+    localStorage.setItem(
+      KEYCHAIN_STORAGE_KEY,
+      JSON.stringify({
+        ...keychain,
+        [identifier]: value,
+      })
+    );
   }
 
   async clearNamespacedKeychainValue(identifier) {

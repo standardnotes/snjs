@@ -1,10 +1,17 @@
 import { UuidString } from './../../types';
-import { RevisionListEntry, SingleRevision, SingleRevisionResponse } from './../api/responses';
+import {
+  RevisionListEntry,
+  SingleRevision,
+  SingleRevisionResponse,
+} from './../api/responses';
 import { SessionHistoryMap } from '@Services/history/session/session_history_map';
 import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 import { SNStorageService } from '@Services/storage_service';
 import { ItemManager } from '@Services/item_manager';
-import { CreateMaxPayloadFromAnyObject, CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import {
+  CreateMaxPayloadFromAnyObject,
+  CreateSourcedPayloadFromObject,
+} from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
@@ -26,18 +33,17 @@ const PERSIST_TIMEOUT = 2000;
  *    retrieved per item via an API call.
  */
 export class SNHistoryManager extends PureService {
-
-  private itemManager?: ItemManager
-  private storageService?: SNStorageService
-  private apiService: SNApiService
-  private protocolService: SNProtocolService
-  private contentTypes: ContentType[] = []
-  private timeout: any
-  private sessionHistory?: SessionHistoryMap
-  private removeChangeObserver: any
-  private persistable = false
-  public autoOptimize = false
-  private saveTimeout: any
+  private itemManager?: ItemManager;
+  private storageService?: SNStorageService;
+  private apiService: SNApiService;
+  private protocolService: SNProtocolService;
+  private contentTypes: ContentType[] = [];
+  private timeout: any;
+  private sessionHistory?: SessionHistoryMap;
+  private removeChangeObserver: any;
+  private persistable = false;
+  public autoOptimize = false;
+  private saveTimeout: any;
 
   constructor(
     itemManager: ItemManager,
@@ -107,7 +113,7 @@ export class SNHistoryManager extends PureService {
           }
         }
       }
-    )
+    );
   }
 
   /** For local session history */
@@ -137,7 +143,10 @@ export class SNHistoryManager extends PureService {
   }
 
   async addHistoryEntryForItem(item: SNItem) {
-    const payload = CreateSourcedPayloadFromObject(item, PayloadSource.SessionHistory)
+    const payload = CreateSourcedPayloadFromObject(
+      item,
+      PayloadSource.SessionHistory
+    );
     const entry = this.sessionHistory!.addEntryForPayload(payload);
     if (this.autoOptimize) {
       this.sessionHistory!.optimizeHistoryForItem(item.uuid);
@@ -170,19 +179,14 @@ export class SNHistoryManager extends PureService {
   /** For local session history */
   async clearAllHistory() {
     this.sessionHistory!.clearAllHistory();
-    return this.storageService!.removeValue(
-      StorageKey.SessionHistoryRevisions
-    );
+    return this.storageService!.removeValue(StorageKey.SessionHistoryRevisions);
   }
 
   /** For local session history */
   async toggleDiskSaving() {
     this.persistable = !this.persistable;
     if (this.persistable) {
-      this.storageService!.setValue(
-        StorageKey.SessionHistoryPersistable,
-        true
-      );
+      this.storageService!.setValue(StorageKey.SessionHistoryPersistable, true);
       this.saveToDisk();
     } else {
       this.storageService!.setValue(
@@ -199,15 +203,9 @@ export class SNHistoryManager extends PureService {
   async toggleAutoOptimize() {
     this.autoOptimize = !this.autoOptimize;
     if (this.autoOptimize) {
-      this.storageService!.setValue(
-        StorageKey.SessionHistoryOptimize,
-        true
-      );
+      this.storageService!.setValue(StorageKey.SessionHistoryOptimize, true);
     } else {
-      this.storageService!.setValue(
-        StorageKey.SessionHistoryOptimize,
-        false
-      );
+      this.storageService!.setValue(StorageKey.SessionHistoryOptimize, false);
     }
   }
 
@@ -229,18 +227,23 @@ export class SNHistoryManager extends PureService {
    * complete fields (including encrypted content).
    */
   async fetchRemoteRevision(itemUuid: UuidString, entry: RevisionListEntry) {
-    const revision = await this.apiService!.getRevision(entry, itemUuid) as SingleRevision;
+    const revision = (await this.apiService!.getRevision(
+      entry,
+      itemUuid
+    )) as SingleRevision;
     if ((revision as SingleRevisionResponse).error) {
       return undefined;
     }
-    const payload = CreateMaxPayloadFromAnyObject(
-      revision as any,
-      {
-        uuid: revision.item_uuid
-      }
-    )
-    const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory);
-    const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(encryptedPayload);
+    const payload = CreateMaxPayloadFromAnyObject(revision as any, {
+      uuid: revision.item_uuid,
+    });
+    const encryptedPayload = CreateSourcedPayloadFromObject(
+      payload,
+      PayloadSource.RemoteHistory
+    );
+    const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(
+      encryptedPayload
+    );
     return new ItemHistoryEntry(decryptedPayload);
   }
 }

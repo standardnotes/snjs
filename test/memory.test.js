@@ -9,7 +9,6 @@ const expect = chai.expect;
  * Then check browser Memory tool to make sure there are no leaks.
  */
 describe('memory', () => {
-
   before(async function () {
     localStorage.clear();
   });
@@ -30,5 +29,4 @@ describe('memory', () => {
   it('passes', async function () {
     expect(true).to.equal(true);
   });
-
 });

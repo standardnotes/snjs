@@ -11,16 +11,15 @@ const DEFAULT_UP_DOWN_LIMIT = 150;
  * emitting a stream of values that should be acted upon in real time.
  */
 export class AccountSyncOperation {
+  private payloads: PurePayload[];
+  private receiver: ResponseSignalReceiver;
+  private lastSyncToken: string;
+  private paginationToken: string;
+  public checkIntegrity: boolean;
+  private apiService: SNApiService;
 
-  private payloads: PurePayload[]
-  private receiver: ResponseSignalReceiver
-  private lastSyncToken: string
-  private paginationToken: string
-  public checkIntegrity: boolean
-  private apiService: SNApiService
-
-  private pendingPayloads: PurePayload[]
-  private responses: SyncResponse[] = []
+  private pendingPayloads: PurePayload[];
+  private responses: SyncResponse[] = [];
 
   /**
    * @param payloads   An array of payloads to send to the server
@@ -56,10 +55,10 @@ export class AccountSyncOperation {
     return payloads;
   }
 
-  async run() : Promise<void> {
+  async run(): Promise<void> {
     await this.receiver(SyncSignal.StatusChanged, undefined, {
       completedUploadCount: this.totalUploadCount - this.pendingUploadCount,
-      totalUploadCount: this.totalUploadCount
+      totalUploadCount: this.totalUploadCount,
     });
     const payloads = this.popPayloads(this.upLimit);
     const rawResponse = await this.apiService.sync(

@@ -5,10 +5,13 @@ export {
   CopyEncryptionParameters,
   CreateSourcedPayloadFromObject,
   CreateIntentPayloadFromObject,
-  payloadFieldsForSource
+  payloadFieldsForSource,
 } from './generator';
 
-export { PayloadsByDuplicating, PayloadsByAlternatingUuid } from '@Payloads/functions';
+export {
+  PayloadsByDuplicating,
+  PayloadsByAlternatingUuid,
+} from '@Payloads/functions';
 export { PayloadField } from '@Payloads/fields';
 export { PayloadSource as PayloadSource } from '@Payloads/sources';
 export { PurePayload } from '@Payloads/pure_payload';
@@ -22,5 +25,5 @@ export {
   DeltaRemoteConflicts,
   DeltaRemoteRetrieved,
   DeltaRemoteSaved,
-  ConflictDelta
+  ConflictDelta,
 } from '@Payloads/deltas';

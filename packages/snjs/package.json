@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.0.63",
+  "version": "2.0.64",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
@@ -27,13 +27,15 @@
     "@types/chai": "^4.2.11",
     "@types/lodash": "^4.14.149",
     "@typescript-eslint/parser": "^4.16.1",
+    "@typescript-eslint/eslint-plugin": "^4.14.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "chai": "^4.2.0",
     "circular-dependency-plugin": "^5.2.0",
     "connect": "^3.7.0",
     "docdash": "^1.2.0",
-    "eslint-config-prettier": "^6.10.0",
+    "eslint": "^7.18.0",
+    "eslint-config-prettier": "^7.2.0",
     "eslint-config-semistandard": "^15.0.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.20.1",

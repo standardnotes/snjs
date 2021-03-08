@@ -2,7 +2,7 @@ export { ProtocolVersion, compareVersions } from '@Protocol/versions';
 export {
   EncryptionIntent as EncryptionIntent,
   isDecryptedIntent,
-  intentRequiresEncryption
+  intentRequiresEncryption,
 } from '@Protocol/intents';
 export { SNRootKey } from '@Protocol/root_key';
 export { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';

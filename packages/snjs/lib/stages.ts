@@ -6,5 +6,5 @@ export enum ApplicationStage {
   LoadingDatabase_11 = 1.1,
   LoadedDatabase_12 = 1.2,
   FullSyncCompleted_13 = 1.3,
-  SignedIn_30 = 3.0
+  SignedIn_30 = 3.0,
 }

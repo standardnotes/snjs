@@ -5,8 +5,8 @@ import { isNullOrUndefined } from '@Lib/utils';
  * consumer. Application must call SetGenerators before use.
  */
 export class Uuid {
-  private static syncUuidFunc?: () => string
-  private static asyncUuidFunc: () => Promise<string>
+  private static syncUuidFunc?: () => string;
+  private static asyncUuidFunc: () => Promise<string>;
 
   /**
    * Dynamically feed both a syncronous and asyncronous implementation of a UUID generator function.

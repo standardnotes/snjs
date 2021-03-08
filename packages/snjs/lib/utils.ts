@@ -9,7 +9,9 @@ import { AnyRecord } from './types';
 export function getGlobalScope(): Window | unknown | null {
   return typeof window !== 'undefined'
     ? window
-    : (typeof global !== 'undefined' ? global : null);
+    : typeof global !== 'undefined'
+    ? global
+    : null;
 }
 
 export function dictToArray<T>(dict: Record<any, T>) {
@@ -23,21 +25,30 @@ export function isWebEnvironment() {
   return getGlobalScope() !== null;
 }
 
+interface IEDocument {
+  documentMode?: number;
+}
+
 /**
- * Returns true if WebCrypto is available
- * @access public
+ * @returns true if WebCrypto is available
  */
-export function isWebCryptoAvailable() {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore documentMode does not exit in definitions but might exist on IE
-  return isWebEnvironment() && !isReactNativeEnvironment() && !(document && document.documentMode) || /Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle;
+export function isWebCryptoAvailable(): boolean {
+  const isIE = document && (document as IEDocument).documentMode;
+  return (
+    (isWebEnvironment() && !isReactNativeEnvironment() && !isIE) ||
+    (/Edge/.test(navigator.userAgent) &&
+      window.crypto &&
+      !!window.crypto.subtle)
+  );
 }
 
 /**
  * Whether we are in React Native app
  */
-export function isReactNativeEnvironment() {
-  return typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
+export function isReactNativeEnvironment(): boolean {
+  return (
+    typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
+  );
 }
 
 /**
@@ -56,7 +67,10 @@ export function findInArray<T>(
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export function searchArray<T>(array: T[], predicate: Partial<T>): T | undefined {
+export function searchArray<T>(
+  array: T[],
+  predicate: Partial<T>
+): T | undefined {
   return find(array, predicate) as T;
 }
 
@@ -76,7 +90,9 @@ export function concatArrays(...args: any[]) {
  * @returns Whether the value is a function or object
  */
 export function isObject(value: any) {
-  if (value === null) { return false; }
+  if (value === null) {
+    return false;
+  }
   return typeof value === 'function' || typeof value === 'object';
 }
 
@@ -84,7 +100,9 @@ export function isObject(value: any) {
  * @returns Whether the value is a function
  */
 export function isFunction(value: any) {
-  if (value === null) { return false; }
+  if (value === null) {
+    return false;
+  }
   return typeof value === 'function';
 }
 
@@ -119,26 +137,37 @@ export function greaterOfTwoDates(dateA: Date, dateB: Date) {
  * @param equalityKeys - Keys to determine element equality
  * @returns Array containing unique values
  */
-export function uniqCombineObjArrays(arrayA: any[], arrayB: any[], equalityKeys: string[]) {
-  return uniqWith(
-    arrayA.concat(arrayB),
-    (a: any, b: any) => {
-      for (const key of equalityKeys) {
-        if (a[key] !== b[key]) {
-          return false;
-        }
+export function uniqCombineObjArrays<T>(
+  arrayA: T[],
+  arrayB: T[],
+  equalityKeys: (keyof T)[]
+): T[] {
+  return uniqWith(arrayA.concat(arrayB), (a: T, b: T) => {
+    for (const key of equalityKeys) {
+      if (a[key] !== b[key]) {
+        return false;
       }
-      return true;
     }
-  );
+    return true;
+  });
 }
 
 /**
  * Returns a new array containing only unique values
  * @returns Array containing unique values
  */
-export function uniqueArray(array: any[]): any[] {
+export function uniqueArray<T>(array: T[]): T[] {
   return uniq(array);
+}
+
+/**
+ * Returns a new array containing only unique values
+ * @returns Array containing unique values
+ */
+export function uniqueArrayByKey<T>(array: T[], key: keyof T): T[] {
+  return uniqWith(array, (a: T, b: T) => {
+    return a[key] === b[key];
+  });
 }
 
 /**
@@ -198,7 +227,10 @@ export function addIfUnique<T>(array: T[], value: T): boolean {
  * Removes an object from the array in-place by searching for an object where all the
  * key/values in predicate match with the candidate element.
  */
-export function filterFromArray<T>(array: T[], predicate: Partial<Record<keyof T, any>>) {
+export function filterFromArray<T>(
+  array: T[],
+  predicate: Partial<Record<keyof T, any>>
+) {
   remove(array, predicate);
 }
 
@@ -207,8 +239,8 @@ export function filterFromArray<T>(array: T[], predicate: Partial<Record<keyof T
  */
 export function arrayByDifference<T>(array: T[], subtract: T[]) {
   return array
-    .filter(x => !subtract.includes(x))
-    .concat(subtract.filter(x => !array.includes(x)));
+    .filter((x) => !subtract.includes(x))
+    .concat(subtract.filter((x) => !array.includes(x)));
 }
 
 export function compareValues<T>(left: T, right: T) {
@@ -284,15 +316,14 @@ export function omitUndefinedCopy(object: any) {
   return result;
 }
 
-
 /**
  * Returns a new array by sorting an array of elements based on a date property,
  * as indicated by the input key value.
  */
 export function dateSorted<T>(elements: T[], key: keyof T, ascending = true) {
   return elements.sort((a, b) => {
-    const aTimestamp = (a[key] as unknown as Date).getTime();
-    const bTimestamp = (b[key] as unknown as Date).getTime();
+    const aTimestamp = ((a[key] as unknown) as Date).getTime();
+    const bTimestamp = ((b[key] as unknown) as Date).getTime();
     const vector = ascending ? 1 : -1;
     if (aTimestamp < bTimestamp) {
       return -1 * vector;
@@ -301,7 +332,7 @@ export function dateSorted<T>(elements: T[], key: keyof T, ascending = true) {
     } else {
       return 0;
     }
-  })
+  });
 }
 
 /** Compares for equality by comparing top-level keys value equality (===) */
@@ -377,13 +408,16 @@ export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
  * one resolved path.
  */
 export function joinPaths(...args: string[]) {
-  return args.map((part, i) => {
-    if (i === 0) {
-      return part.trim().replace(/[/]*$/g, '');
-    } else {
-      return part.trim().replace(/(^[/]*|[/]*$)/g, '');
-    }
-  }).filter(x => x.length).join('/');
+  return args
+    .map((part, i) => {
+      if (i === 0) {
+        return part.trim().replace(/[/]*$/g, '');
+      } else {
+        return part.trim().replace(/(^[/]*|[/]*$)/g, '');
+      }
+    })
+    .filter((x) => x.length)
+    .join('/');
 }
 
 /**
@@ -462,9 +496,9 @@ export function hasGetter(object: any, property: string) {
 }
 
 /**
-  * Truncates a hex string into a desired number of bits
-  * @returns A hexadecimal string truncated to the number of desired bits
-  */
+ * Truncates a hex string into a desired number of bits
+ * @returns A hexadecimal string truncated to the number of desired bits
+ */
 export function truncateHexString(string: string, desiredBits: number) {
   const BITS_PER_HEX_CHAR = 4;
   const desiredCharLength = desiredBits / BITS_PER_HEX_CHAR;
@@ -485,7 +519,7 @@ export async function sleep(milliseconds: number) {
 }
 
 export function assertUnreachable(uncheckedCase: never): never {
-  throw Error("Unchecked case " + uncheckedCase);
+  throw Error('Unchecked case ' + uncheckedCase);
 }
 
 /**

@@ -5,7 +5,7 @@ import { ContentType } from '@Models/content_types';
 
 export function CreateHistoryEntryForPayload(payload: PurePayload) {
   const mapping = {
-    [ContentType.Note]: NoteHistoryEntry
+    [ContentType.Note]: NoteHistoryEntry,
   } as Partial<Record<ContentType, any>>;
   const type = payload[PayloadField.ContentType] as ContentType;
   const historyItemClass = mapping[type];

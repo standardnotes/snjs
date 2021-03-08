@@ -3,9 +3,9 @@ import { UuidString } from './../../types';
 
 export class UuidMap {
   /** uuid to uuids that we have a relationship with */
-  private directMap: Partial<Record<UuidString, UuidString[]>> = {}
+  private directMap: Partial<Record<UuidString, UuidString[]>> = {};
   /** uuid to uuids that have a relationship with us */
-  private inverseMap: Partial<Record<UuidString, UuidString[]>> = {}
+  private inverseMap: Partial<Record<UuidString, UuidString[]>> = {};
 
   public makeCopy() {
     const copy = new UuidMap();
@@ -36,9 +36,9 @@ export class UuidMap {
     const previousDirect = this.directMap[uuid] || [];
     this.directMap[uuid] = relationships;
 
-    /** Remove all previous values in case relationships have changed 
+    /** Remove all previous values in case relationships have changed
      * The updated references will be added afterwards.
-    */
+     */
     for (const previousRelationship of previousDirect) {
       this.deestablishInverseRelationship(uuid, previousRelationship);
     }
@@ -51,22 +51,16 @@ export class UuidMap {
 
   public removeFromMap(uuid: UuidString) {
     /** Items that we reference */
-    const directReferences = this.directMap[uuid] || []
+    const directReferences = this.directMap[uuid] || [];
     for (const directReference of directReferences) {
-      removeFromArray(
-        this.inverseMap[directReference] || [],
-        uuid
-      );
+      removeFromArray(this.inverseMap[directReference] || [], uuid);
     }
     delete this.directMap[uuid];
 
     /** Items that are referencing us */
-    const inverseReferences = this.inverseMap[uuid] || []
+    const inverseReferences = this.inverseMap[uuid] || [];
     for (const inverseReference of inverseReferences) {
-      removeFromArray(
-        this.directMap[inverseReference] || [],
-        uuid
-      );
+      removeFromArray(this.directMap[inverseReference] || [], uuid);
     }
     delete this.inverseMap[uuid];
   }

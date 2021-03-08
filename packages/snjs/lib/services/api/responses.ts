@@ -1,6 +1,9 @@
 import { RawPayload } from '@Payloads/generator';
 import { ApiEndpointParam } from './keys';
-import { AnyKeyParamsContent, KeyParamsOrigination } from './../../protocol/key_params';
+import {
+  AnyKeyParamsContent,
+  KeyParamsOrigination,
+} from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 import { Role, Permission } from '@standardnotes/auth';
 
@@ -22,9 +25,9 @@ export enum StatusCode {
 export type HttpResponse<T = unknown> = {
   status: StatusCode,
   error?: {
-    message: string,
-    status: number,
-    tag?: string,
+    message: string;
+    status: number;
+    tag?: string;
     /** In the case of MFA required responses,
      * the required prompt is returned as part of the error */
     payload?: {
@@ -47,101 +50,101 @@ export function isErrorResponseExpiredToken(errorResponse: HttpResponse) {
 }
 
 type SessionBody = {
-  access_token: string
-  refresh_token: string
-  access_expiration: number
-  refresh_expiration: number
-}
+  access_token: string;
+  refresh_token: string;
+  access_expiration: number;
+  refresh_expiration: number;
+};
 
 export type KeyParamsResponse = HttpResponse & {
-  identifier?: string
-  pw_cost?: number
-  pw_nonce?: string
-  version?: ProtocolVersion
+  identifier?: string;
+  pw_cost?: number;
+  pw_nonce?: string;
+  version?: ProtocolVersion;
   /** Legacy V002 */
-  pw_salt?: string
+  pw_salt?: string;
   /** Legacy V001 */
-  pw_func?: string
-  pw_alg?: string
-  pw_key_size?: number,
-  origination?: KeyParamsOrigination,
-  created?: string,
-}
+  pw_func?: string;
+  pw_alg?: string;
+  pw_key_size?: number;
+  origination?: KeyParamsOrigination;
+  created?: string;
+};
 
 export type RegistrationResponse = HttpResponse & {
-  session?: SessionBody
+  session?: SessionBody;
   /** Represents legacy JWT token */
-  token?: string,
-  user?: { email: string, uuid: string },
-}
+  token?: string;
+  user?: { email: string; uuid: string };
+};
 
 export type SignInResponse = RegistrationResponse & {
-  key_params?: AnyKeyParamsContent
-}
+  key_params?: AnyKeyParamsContent;
+};
 
 export type ChangePasswordResponse = SignInResponse;
 
-export type SignOutResponse = HttpResponse & Record<string, unknown>
+export type SignOutResponse = HttpResponse & Record<string, unknown>;
 
 export type SessionRenewalResponse = HttpResponse & {
-  session?: SessionBody
-}
+  session?: SessionBody;
+};
 
 export type SessionListEntry = {
-  uuid: string
-  api_version: string
-  created_at: string
-  updated_at: string
-  device_info: string
-}
+  uuid: string;
+  api_version: string;
+  created_at: string;
+  updated_at: string;
+  device_info: string;
+};
 
 export type RevisionListEntry = {
-  content_type: string
-  created_at: string,
-  updated_at: string,
+  content_type: string;
+  created_at: string;
+  updated_at: string;
   /** The uuid of the revision */
-  uuid: string
+  uuid: string;
 };
 
 export type RevisionListResponse = HttpResponse & RevisionListEntry[];
 
 export type SingleRevision = {
-  auth_hash?: string
-  content_type: string,
-  content: string,
-  created_at: string,
-  enc_item_key: string,
+  auth_hash?: string;
+  content_type: string;
+  content: string;
+  created_at: string;
+  enc_item_key: string;
   /** The uuid of the item this revision was created with */
-  item_uuid: string,
-  items_key_id: string,
-  updated_at: string,
+  item_uuid: string;
+  items_key_id: string;
+  updated_at: string;
   /** The uuid of the revision */
-  uuid: string,
-}
+  uuid: string;
+};
 
-export type SingleRevisionResponse = HttpResponse & Partial<SingleRevision>
+export type SingleRevisionResponse = HttpResponse & Partial<SingleRevision>;
 
 export enum ConflictType {
   ConflictingData = 'sync_conflict',
-  UuidConflict = 'uuid_conflict'
+  UuidConflict = 'uuid_conflict',
 }
 
 export type ConflictParams = {
-  type: ConflictType
-  server_item?: RawPayload
-  unsaved_item?: RawPayload
+  type: ConflictType;
+  server_item?: RawPayload;
+  unsaved_item?: RawPayload;
   /** @legacay */
-  item?: RawPayload
-}
+  item?: RawPayload;
+};
 
 export type RawSyncResponse = {
-  error?: any
-  [ApiEndpointParam.LastSyncToken]?: string
-  [ApiEndpointParam.PaginationToken]?: string
-  [ApiEndpointParam.IntegrityResult]?: string
-  retrieved_items?: RawPayload[]
-  saved_items?: RawPayload[]
-  conflicts?: ConflictParams[]
-  unsaved?: ConflictParams[]
-  status?: number
-}
+  error?: any;
+  [ApiEndpointParam.LastSyncToken]?: string;
+  [ApiEndpointParam.PaginationToken]?: string;
+  [ApiEndpointParam.IntegrityResult]?: string;
+  retrieved_items?: RawPayload[];
+  saved_items?: RawPayload[];
+  conflicts?: ConflictParams[];
+  unsaved?: ConflictParams[];
+  status?: number;
+};

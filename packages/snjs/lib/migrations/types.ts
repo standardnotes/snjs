@@ -9,13 +9,13 @@ import { ChallengeService } from '@Lib/services';
 
 /** Services that the migration service needs to function */
 export type MigrationServices = {
-  protocolService: SNProtocolService,
-  deviceInterface: DeviceInterface,
-  storageService: SNStorageService,
-  challengeService: ChallengeService,
-  sessionManager: SNSessionManager,
-  itemManager: ItemManager,
-  environment: Environment,
+  protocolService: SNProtocolService;
+  deviceInterface: DeviceInterface;
+  storageService: SNStorageService;
+  challengeService: ChallengeService;
+  sessionManager: SNSessionManager;
+  itemManager: ItemManager;
+  environment: Environment;
   /** The application identifier */
-  identifier: ApplicationIdentifier
-}
+  identifier: ApplicationIdentifier;
+};

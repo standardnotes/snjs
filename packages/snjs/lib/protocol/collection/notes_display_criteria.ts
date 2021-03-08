@@ -8,13 +8,12 @@ import { SNNote } from './../../models/app/note';
 import { SNSmartTag } from './../../models/app/smartTag';
 
 export type SearchQuery = {
-  query: string
-  includeProtectedNoteText: boolean
-}
+  query: string;
+  includeProtectedNoteText: boolean;
+};
 
 export class NotesDisplayCriteria {
-
-  public searchQuery?: SearchQuery
+  public searchQuery?: SearchQuery;
   public tags: SNTag[] = [];
   public includePinned = true;
   public includeTrashed = false;
@@ -22,7 +21,9 @@ export class NotesDisplayCriteria {
   public sortProperty?: CollectionSort;
   public sortDirection?: SortDirection;
 
-  static Create(properties: Partial<NotesDisplayCriteria>): NotesDisplayCriteria {
+  static Create(
+    properties: Partial<NotesDisplayCriteria>
+  ): NotesDisplayCriteria {
     const criteria = new NotesDisplayCriteria();
     Object.assign(criteria, properties);
     return Object.freeze(criteria);
@@ -39,10 +40,12 @@ export class NotesDisplayCriteria {
   }
 
   computeFilters(collection: ItemCollection) {
-    const nonSmartTags = this.tags.filter(tag => !tag.isSmartTag);
-    const allSmartTags = this.tags.filter(tag => tag.isSmartTag) as [SNSmartTag];
-    const systemSmartTags = allSmartTags.filter((t => t.isSystemSmartTag));
-    const userSmartTags = allSmartTags.filter((t => !t.isSystemSmartTag));
+    const nonSmartTags = this.tags.filter((tag) => !tag.isSmartTag);
+    const allSmartTags = this.tags.filter((tag) => tag.isSmartTag) as [
+      SNSmartTag
+    ];
+    const systemSmartTags = allSmartTags.filter((t) => t.isSystemSmartTag);
+    const userSmartTags = allSmartTags.filter((t) => !t.isSystemSmartTag);
 
     let usesArchiveSmartTag = false;
     let usesTrashSmartTag = false;
@@ -58,7 +61,9 @@ export class NotesDisplayCriteria {
       }
     }
     if (userSmartTags.length > 0) {
-      const predicate = SNPredicate.CompoundPredicate(userSmartTags.map(t => t.predicate));
+      const predicate = SNPredicate.CompoundPredicate(
+        userSmartTags.map((t) => t.predicate)
+      );
       filters.push((note) => {
         if (predicate.keypathIncludesVerb('tags')) {
           /**
@@ -72,12 +77,12 @@ export class NotesDisplayCriteria {
             ...note,
             ...note.payload,
             tags: collection.elementsReferencingElement(note),
-          }
+          };
           return SNPredicate.ObjectSatisfiesPredicate(noteWithTags, predicate);
         } else {
           return SNPredicate.ObjectSatisfiesPredicate(note, predicate);
         }
-      })
+      });
     } else if (nonSmartTags.length > 0) {
       for (const tag of nonSmartTags) {
         filters.push((note) => tag.hasRelationshipWithItem(note));
@@ -102,15 +107,14 @@ export class NotesDisplayCriteria {
 
     return filters;
   }
-
 }
 
 type NoteFilter = (note: SNNote) => boolean;
 
 export function criteriaForSmartTag(tag: SNSmartTag): NotesDisplayCriteria {
   const criteria = NotesDisplayCriteria.Create({
-    tags: [tag]
-  })
+    tags: [tag],
+  });
   return criteria;
 }
 
@@ -122,7 +126,7 @@ export function notesMatchingCriteria(
   const allNotes = collection.displayElements(ContentType.Note) as SNNote[];
   return allNotes.filter((note) => {
     return notePassesFilters(note, filters);
-  })
+  });
 }
 
 function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
@@ -136,7 +140,7 @@ function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
 
 export function noteMatchesQuery(
   note: SNNote,
-  searchQuery: SearchQuery,
+  searchQuery: SearchQuery
 ): boolean {
   if (note.protected && !searchQuery.includeProtectedNoteText) {
     const match = matchTypeForStringQuery(note, searchQuery.query);
