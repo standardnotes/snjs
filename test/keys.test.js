@@ -817,11 +817,7 @@ describe('keys', function () {
         this.email,
         this.password
       );
-      Object.defineProperty(this.application.apiService, 'apiVersion', {
-        get: function () {
-          return '20190520';
-        },
-      });
+      SNApiService.V0_API_VERSION = '20190520';
 
       /** Renew session to prevent timeouts */
       this.application = await Factory.signOutAndBackIn(
