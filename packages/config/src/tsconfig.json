@@ -16,7 +16,5 @@
     "removeComments": false,
     "skipLibCheck": false
   },
-  "exclude": [
-    "**/*.spec.ts"
-  ]
+  "exclude": ["**/*.spec.ts", "dist"]
 }
