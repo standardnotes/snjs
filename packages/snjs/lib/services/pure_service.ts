@@ -10,14 +10,19 @@ export abstract class PureService<EventName = string, EventData = undefined> {
   public deviceInterface?: DeviceInterface;
   private criticalPromises: Promise<unknown>[] = [];
 
-  public addEventObserver(observer: EventObserver<E, D>): () => void {
+  public addEventObserver(
+    observer: EventObserver<EventName, EventData>
+  ): () => void {
     this.eventObservers.push(observer);
     return () => {
       removeFromArray(this.eventObservers, observer);
     };
   }
 
-  protected async notifyEvent(eventName: E, data?: D): Promise<void> {
+  protected async notifyEvent(
+    eventName: EventName,
+    data?: EventData
+  ): Promise<void> {
     for (const observer of this.eventObservers) {
       await observer(eventName, data);
     }
