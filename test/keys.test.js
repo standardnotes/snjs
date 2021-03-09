@@ -7,15 +7,8 @@ const expect = chai.expect;
 describe('keys', function () {
   this.timeout(Factory.TestTimeout);
 
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
+    localStorage.clear();
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
@@ -24,6 +17,7 @@ describe('keys', function () {
   afterEach(function () {
     this.application?.deinit();
     this.application = null;
+    localStorage.clear();
   });
 
   it('validate isLocalStorageIntent', async function () {

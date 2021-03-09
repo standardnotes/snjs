@@ -32,15 +32,8 @@ describe('singletons', function () {
     );
   }
 
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
+    localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -94,6 +87,7 @@ describe('singletons', function () {
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
+    localStorage.clear();
   });
 
   it(`only resolves to ${BASE_ITEM_COUNT} items`, async function () {

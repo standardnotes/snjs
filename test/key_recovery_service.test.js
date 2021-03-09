@@ -13,7 +13,9 @@ describe('key recovery service', function () {
     this.password = Factory.generateUuid();
   });
 
-  after(async function () {
+  afterEach(function () {
+    this.application?.deinit();
+    this.application = null;
     localStorage.clear();
   });
 

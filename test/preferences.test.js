@@ -5,15 +5,8 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('preferences', function () {
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
+    localStorage.clear();
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
@@ -21,6 +14,7 @@ describe('preferences', function () {
 
   afterEach(async function () {
     await this.application.deinit();
+    localStorage.clear();
   });
 
   function register() {

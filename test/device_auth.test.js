@@ -5,11 +5,11 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('device authentication', function () {
-  before(async function () {
+  beforeEach(async function () {
     localStorage.clear();
   });
 
-  after(async function () {
+  afterEach(async function () {
     localStorage.clear();
   });
 

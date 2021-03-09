@@ -33,12 +33,12 @@ const createItemParams = function () {
 
 describe('predicates', async function () {
   before(async function () {
-    localStorage.clear();
     const crypto = new SNWebCrypto();
     Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
   });
 
   beforeEach(function () {
+    localStorage.clear();
     this.itemManager = new PayloadManager();
     this.itemManager = new ItemManager(this.itemManager);
     this.createItem = async () => {

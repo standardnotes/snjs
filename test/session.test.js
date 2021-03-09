@@ -15,11 +15,8 @@ describe('server session', function () {
     awaitAll: true,
   };
 
-  before(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
+    localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();

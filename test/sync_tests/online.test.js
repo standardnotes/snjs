@@ -1466,4 +1466,46 @@ describe('online syncing', function () {
     expect(this.application.apiService.session.accessToken).to.be.ok;
     expect(this.application.apiService.session.refreshToken).to.be.ok;
   });
+
+  it.skip('succesful server side saving but dropped packet response should not create sync conflict', async function () {
+    /**
+     * 1. Initiate a change locally that is successfully saved by the server, but the client
+     * drops the server response.
+     * 2. Make a change to this note locally that then syncs and the response is successfully recorded.
+     *
+     * Expected result: no sync conflict is created
+     */
+    const note = await Factory.createSyncedNote(this.application);
+    this.expectedItemCount++;
+
+    const baseTitle = `${Math.random()}`;
+    /** Change the note, but drop the server response */
+    const noteAfterChange = await this.application.itemManager.changeItem(
+      note.uuid,
+      (mutator) => {
+        mutator.title = baseTitle;
+      }
+    );
+    await this.application.sync();
+
+    /** Simulate a dropped response by reverting the note back its post-change, pre-sync state */
+    const retroNote = await this.application.itemManager.emitItemFromPayload(
+      noteAfterChange.payload
+    );
+    expect(retroNote.updated_at.getTime()).to.equal(
+      noteAfterChange.updated_at.getTime()
+    );
+
+    /** Change the item to its final title and sync */
+    const finalTitle = `${Math.random()}`;
+    await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+      mutator.title = finalTitle;
+    });
+    await this.application.sync();
+
+    /** Expect that no duplicates have been created, and that the note's title is now finalTitle */
+    expect(this.application.itemManager.notes.length).to.equal(1);
+    const finalNote = this.application.findItem(note.uuid);
+    expect(finalNote.title).to.equal(finalTitle);
+  });
 });
