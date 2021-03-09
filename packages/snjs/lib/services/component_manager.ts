@@ -859,7 +859,7 @@ export class SNComponentManager extends PureService {
         return item.content_type;
       })).sort();
       requiredPermissions.push({
-        name: ComponentAction.StreamItems,
+        name: ComponentAction.SaveItems,
         content_types: requiredContentTypes
       } as ComponentPermission);
     }
@@ -958,7 +958,7 @@ export class SNComponentManager extends PureService {
     const item = this.itemManager!.findItem(itemParams.uuid)!;
     const requiredPermissions = [
       {
-        name: ComponentAction.StreamItems,
+        name: ComponentAction.DuplicateItem,
         content_types: [item.content_type!]
       }
     ];
@@ -980,7 +980,7 @@ export class SNComponentManager extends PureService {
     ) as ContentType[];
     const requiredPermissions: ComponentPermission[] = [
       {
-        name: ComponentAction.StreamItems,
+        name: ComponentAction.CreateItems,
         content_types: uniqueContentTypes
       }
     ];
@@ -1026,7 +1026,7 @@ export class SNComponentManager extends PureService {
     ).sort() as ContentType[];
     const requiredPermissions: ComponentPermission[] = [
       {
-        name: ComponentAction.StreamItems,
+        name: ComponentAction.DeleteItems,
         content_types: requiredContentTypes
       }
     ];
@@ -1288,11 +1288,11 @@ export class SNComponentManager extends PureService {
   getReadonlyStateForComponent(
     component: SNComponent
   ) {
-    const data = this.findOrCreateDataForComponent(component.uuid);
+    const { readonly, lockReadonly } = this.findOrCreateDataForComponent(component.uuid);
     return {
-      readonly: data.readonly,
-      lockReadonly: data.lockReadonly
-    } as ComponentState
+      readonly,
+      lockReadonly
+    } as ComponentState;
   }
 
   /** Called by other views when the iframe is ready */
