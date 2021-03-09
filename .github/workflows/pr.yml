@@ -14,6 +14,7 @@ jobs:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
+      - run: yarn build
       - run: yarn lint
   unit-tests:
     runs-on: ubuntu-latest
