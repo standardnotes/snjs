@@ -66,12 +66,12 @@ const Paths: {
   },
 };
 
+/** Legacy api version field to be specified in params when calling v0 APIs. */
+const V0_API_VERSION = '20200115';
+
 type InvalidSessionObserver = (revoked: boolean) => void;
 
 export class SNApiService extends PureService {
-  /** Legacy api version field to be specified in params when calling v0 APIs. */
-  static readonly V0_API_VERSION = '20200115';
-
   private session?: Session;
 
   private registering = false;
@@ -143,11 +143,16 @@ export class SNApiService extends PureService {
     return this.session;
   }
 
+  /** Exposes apiVersion to tests */
+  private get apiVersion() {
+    return V0_API_VERSION;
+  }
+
   private params(
     inParams: Record<string | number | symbol, unknown>
   ): HttpParams {
     const params = merge(inParams, {
-      [ApiEndpointParam.ApiVersion]: SNApiService.V0_API_VERSION,
+      [ApiEndpointParam.ApiVersion]: this.apiVersion,
     });
     return params;
   }
