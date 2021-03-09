@@ -1,7 +1,7 @@
 import { SNItem } from '@Models/core/item';
 import { isString } from '@Lib/utils';
-type PredicateType = string[] | SNPredicate
-type PredicateArray = Array<string[]> | SNPredicate[]
+type PredicateType = string[] | SNPredicate;
+type PredicateArray = Array<string[]> | SNPredicate[];
 type PredicateValue = string | Date | boolean | PredicateType | PredicateArray;
 
 function toPredicate(object: unknown): SNPredicate {
@@ -18,35 +18,26 @@ function toPredicate(object: unknown): SNPredicate {
  * dynamically search items.
  */
 export class SNPredicate {
+  private keypath: string;
+  private operator: string;
+  private value: PredicateValue;
 
-  private keypath: string
-  private operator: string
-  private value: PredicateValue
-
-  constructor(
-    keypath: string,
-    operator: string,
-    value: PredicateValue
-  ) {
+  constructor(keypath: string, operator: string, value: PredicateValue) {
     this.keypath = keypath;
     this.operator = operator;
     this.value = value;
 
     if (this.isRecursive()) {
       const array = this.value as Array<any>;
-      this.value = array.map(element => toPredicate(element));
-    } else if(this.value === 'true' || this.value === 'false') {
+      this.value = array.map((element) => toPredicate(element));
+    } else if (this.value === 'true' || this.value === 'false') {
       /* If value is boolean string, convert to boolean */
       this.value = JSON.parse(this.value);
     }
   }
 
   static FromJson(values: any) {
-    return new SNPredicate(
-      values.keypath,
-      values.operator,
-      values.value
-    );
+    return new SNPredicate(values.keypath, values.operator, values.value);
   }
 
   static FromArray(array: string[]) {
@@ -58,11 +49,7 @@ export class SNPredicate {
   }
 
   arrayRepresentation() {
-    return [
-      this.keypath,
-      this.operator,
-      this.value
-    ]
+    return [this.keypath, this.operator, this.value];
   }
 
   valueAsArray() {
@@ -83,14 +70,13 @@ export class SNPredicate {
   }
 
   static CompoundPredicate(predicates: PredicateArray) {
-    return new SNPredicate(
-      'ignored',
-      'and',
-      predicates
-    );
+    return new SNPredicate('ignored', 'and', predicates);
   }
 
-  static ObjectSatisfiesPredicate(object: any, predicate: PredicateType): boolean {
+  static ObjectSatisfiesPredicate(
+    object: any,
+    predicate: PredicateType
+  ): boolean {
     /* Predicates may not always be created using the official constructor
        so if it's still an array here, convert to object */
     predicate = toPredicate(predicate);
@@ -115,18 +101,23 @@ export class SNPredicate {
     }
 
     let targetValue = predicate.value;
-    if (typeof (targetValue) === 'string' && targetValue.includes('.ago')) {
+    if (typeof targetValue === 'string' && targetValue.includes('.ago')) {
       targetValue = this.DateFromString(targetValue);
     }
 
     /* Process not before handling the keypath, because not does not use it. */
     if (predicate.operator === 'not') {
-      return !this.ObjectSatisfiesPredicate(object, targetValue as PredicateType);
+      return !this.ObjectSatisfiesPredicate(
+        object,
+        targetValue as PredicateType
+      );
     }
 
-    const valueAtKeyPath = predicate.keypath.split('.').reduce((previous, current) => {
-      return previous && previous[current];
-    }, object);
+    const valueAtKeyPath = predicate.keypath
+      .split('.')
+      .reduce((previous, current) => {
+        return previous && previous[current];
+      }, object);
 
     const falseyValues = [false, '', null, undefined, NaN];
     /* If the value at keyPath is undefined, either because the
@@ -146,37 +137,28 @@ export class SNPredicate {
       } else {
         return valueAtKeyPath === targetValue;
       }
-    }
-    else if (predicate.operator === '!=') {
+    } else if (predicate.operator === '!=') {
       // Use array comparison
       if (Array.isArray(valueAtKeyPath)) {
         return JSON.stringify(valueAtKeyPath) !== JSON.stringify(targetValue);
       } else {
         return valueAtKeyPath !== targetValue;
       }
-    }
-    else if (predicate.operator === '<') {
+    } else if (predicate.operator === '<') {
       return valueAtKeyPath < targetValue;
-    }
-    else if (predicate.operator === '>') {
+    } else if (predicate.operator === '>') {
       return valueAtKeyPath > targetValue;
-    }
-    else if (predicate.operator === '<=') {
+    } else if (predicate.operator === '<=') {
       return valueAtKeyPath <= targetValue;
-    }
-    else if (predicate.operator === '>=') {
+    } else if (predicate.operator === '>=') {
       return valueAtKeyPath >= targetValue;
-    }
-    else if (predicate.operator === 'startsWith') {
+    } else if (predicate.operator === 'startsWith') {
       return valueAtKeyPath.startsWith(targetValue);
-    }
-    else if (predicate.operator === 'in') {
+    } else if (predicate.operator === 'in') {
       return (targetValue as any[]).indexOf(valueAtKeyPath) !== -1;
-    }
-    else if (predicate.operator === 'includes') {
+    } else if (predicate.operator === 'includes') {
       return this.resolveIncludesPredicate(valueAtKeyPath, targetValue);
-    }
-    else if (predicate.operator === 'matches') {
+    } else if (predicate.operator === 'matches') {
       const regex = new RegExp(targetValue as string);
       return regex.test(valueAtKeyPath);
     }
@@ -188,7 +170,10 @@ export class SNPredicate {
    * value should be an array.
    * @param containsValue  The value we are checking to see if exists in itemValueArray
    */
-  static resolveIncludesPredicate(itemValueArray: Array<any>, containsValue: any) {
+  static resolveIncludesPredicate(
+    itemValueArray: Array<any>,
+    containsValue: any
+  ) {
     // includes can be a string or a predicate (in array form)
     if (isString(containsValue)) {
       // if string, simply check if the itemValueArray includes the predicate value
@@ -229,7 +214,7 @@ export class SNPredicate {
   static DateFromString(string: string) {
     const comps = string.split('.');
     const unit = comps[1];
-    const date = new Date;
+    const date = new Date();
     const offset = parseInt(comps[0]);
     if (unit === 'days') {
       date.setDate(date.getDate() - offset);

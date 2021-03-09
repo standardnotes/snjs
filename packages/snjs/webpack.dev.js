@@ -5,6 +5,6 @@ module.exports = merge(config, {
   mode: 'development',
   devtool: 'eval-cheap-module-source-map',
   stats: {
-    colors: true
-  }
+    colors: true,
+  },
 });

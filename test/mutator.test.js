@@ -5,18 +5,15 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('mutator', () => {
-
   beforeEach(function () {
     this.createBarePayload = () => {
-      return new PurePayload(
-        {
-          uuid: '123',
-          content_type: ContentType.Note,
-          content: {
-            title: 'hello'
-          }
-        }
-      );
+      return new PurePayload({
+        uuid: '123',
+        content_type: ContentType.Note,
+        content: {
+          title: 'hello',
+        },
+      });
     };
 
     this.createNote = () => {
@@ -27,7 +24,7 @@ describe('mutator', () => {
       const references = notes.map((note) => {
         return {
           uuid: note.uuid,
-          content_type: note.content_type
+          content_type: note.content_type,
         };
       });
       return new SNTag(
@@ -36,8 +33,8 @@ describe('mutator', () => {
           content_type: ContentType.Tag,
           content: {
             title: 'thoughts',
-            references: references
-          }
+            references: references,
+          },
         })
       );
     };
@@ -58,7 +55,9 @@ describe('mutator', () => {
     mutator.pinned = true;
     const payload = mutator.getResult();
 
-    expect(payload.content.appData[SNItem.DefaultAppDomain()].pinned).to.equal(true);
+    expect(payload.content.appData[SNItem.DefaultAppDomain()].pinned).to.equal(
+      true
+    );
   });
 
   it('mutate set archived', function () {
@@ -67,7 +66,9 @@ describe('mutator', () => {
     mutator.archived = true;
     const payload = mutator.getResult();
 
-    expect(payload.content.appData[SNItem.DefaultAppDomain()].archived).to.equal(true);
+    expect(
+      payload.content.appData[SNItem.DefaultAppDomain()].archived
+    ).to.equal(true);
   });
 
   it('mutate set locked', function () {
@@ -76,7 +77,9 @@ describe('mutator', () => {
     mutator.locked = true;
     const payload = mutator.getResult();
 
-    expect(payload.content.appData[SNItem.DefaultAppDomain()].locked).to.equal(true);
+    expect(payload.content.appData[SNItem.DefaultAppDomain()].locked).to.equal(
+      true
+    );
   });
 
   it('mutate set protected', function () {
@@ -122,8 +125,12 @@ describe('mutator', () => {
     mutator.setAppDataItem('foo', 'bar');
     mutator.setAppDataItem('bar', 'foo');
     const payload = mutator.getResult();
-    expect(payload.content.appData[SNItem.DefaultAppDomain()].foo).to.equal('bar');
-    expect(payload.content.appData[SNItem.DefaultAppDomain()].bar).to.equal('foo');
+    expect(payload.content.appData[SNItem.DefaultAppDomain()].foo).to.equal(
+      'bar'
+    );
+    expect(payload.content.appData[SNItem.DefaultAppDomain()].bar).to.equal(
+      'foo'
+    );
   });
 
   it('mutate add item as relationship', function () {

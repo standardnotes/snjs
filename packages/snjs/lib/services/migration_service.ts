@@ -20,13 +20,11 @@ import { lastElement } from '@Lib/utils';
  * first sync completes. Migrations live under /migrations and inherit from the base Migration class.
  */
 export class SNMigrationService extends PureService {
-  private activeMigrations?: Migration[]
-  private handledFullSyncStage = false
+  private activeMigrations?: Migration[];
+  private handledFullSyncStage = false;
   private baseMigration!: BaseMigration;
 
-  constructor(
-    private services: MigrationServices
-  ) {
+  constructor(private services: MigrationServices) {
     super();
   }
 
@@ -44,7 +42,9 @@ export class SNMigrationService extends PureService {
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
       await this.getStoredSnjsVersion()
     );
-    this.activeMigrations = this.instantiateMigrationClasses(requiredMigrations);
+    this.activeMigrations = this.instantiateMigrationClasses(
+      requiredMigrations
+    );
     if (this.activeMigrations.length > 0) {
       const lastMigration = lastElement(this.activeMigrations) as Migration;
       lastMigration.onDone(async () => {
@@ -81,8 +81,7 @@ export class SNMigrationService extends PureService {
   public async handleApplicationEvent(event: ApplicationEvent) {
     if (event === ApplicationEvent.SignedIn) {
       await this.handleStage(ApplicationStage.SignedIn_30);
-    }
-    else if (event === ApplicationEvent.CompletedFullSync) {
+    } else if (event === ApplicationEvent.CompletedFullSync) {
       if (!this.handledFullSyncStage) {
         this.handledFullSyncStage = true;
         await this.handleStage(ApplicationStage.FullSyncCompleted_13);
@@ -94,27 +93,33 @@ export class SNMigrationService extends PureService {
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
       await this.getStoredSnjsVersion()
     );
-    return requiredMigrations.length > 0 || await this.baseMigration.needsKeychainRepair();
+    return (
+      requiredMigrations.length > 0 ||
+      (await this.baseMigration.needsKeychainRepair())
+    );
   }
 
   public async getStoredSnjsVersion() {
-    const version = await this.services.deviceInterface.getRawStorageValue(namespacedKey(
-      this.services.identifier,
-      RawStorageKey.SnjsVersion
-    ));
+    const version = await this.services.deviceInterface.getRawStorageValue(
+      namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion)
+    );
     if (!version) {
-      throw SNLog.error(Error('Snjs version missing from storage, run base migration.'));
+      throw SNLog.error(
+        Error('Snjs version missing from storage, run base migration.')
+      );
     }
     return version;
   }
 
   private static async getRequiredMigrations(storedVersion: string) {
     const resultingClasses = [];
-    const migrationClasses = Object.keys(migrationImports).map((key) => {
-      return (migrationImports as any)[key];
-    }).sort((a, b) => {
-      return compareSemVersions(a.version(), b.version());
-    });
+    const migrationClasses = Object.keys(migrationImports)
+      .map((key) => {
+        return (migrationImports as any)[key];
+      })
+      .sort((a, b) => {
+        return compareSemVersions(a.version(), b.version());
+      });
     for (const migrationClass of migrationClasses) {
       const migrationVersion = migrationClass.version();
       if (migrationVersion === storedVersion) {
@@ -130,7 +135,7 @@ export class SNMigrationService extends PureService {
   private instantiateMigrationClasses(classes: any[]) {
     return classes.map((migrationClass) => {
       return new migrationClass(this.services);
-    })
+    });
   }
 
   private async handleStage(stage: ApplicationStage) {

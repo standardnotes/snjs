@@ -5,8 +5,13 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('upgrading', () => {
+  beforeEach(async function () {
+    localStorage.clear();
+    this.application = await Factory.createInitAppWithRandNamespace();
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
+    this.passcode = '1234';
 
-  before(async function () {
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {
@@ -32,22 +37,11 @@ describe('upgrading', () => {
       const initialValues = promptValueReply(challenge.prompts);
       application.submitValuesForChallenge(challenge, initialValues);
     };
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
-  beforeEach(async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
-    this.passcode = '1234';
   });
 
   afterEach(async function () {
     await this.application.deinit();
+    localStorage.clear();
   });
 
   it('upgrade should be available when account only', async function () {
@@ -57,7 +51,7 @@ describe('upgrading', () => {
       application: this.application,
       email: this.email,
       password: this.password,
-      version: oldVersion
+      version: oldVersion,
     });
 
     expect(await this.application.protocolUpgradeAvailable()).to.equal(true);
@@ -68,7 +62,7 @@ describe('upgrading', () => {
     await Factory.setOldVersionPasscode({
       application: this.application,
       passcode: this.passcode,
-      version: oldVersion
+      version: oldVersion,
     });
 
     expect(await this.application.protocolUpgradeAvailable()).to.equal(true);
@@ -85,17 +79,18 @@ describe('upgrading', () => {
       application: this.application,
       email: this.email,
       password: this.password,
-      version: oldVersion
+      version: oldVersion,
     });
 
     await Factory.setOldVersionPasscode({
       application: this.application,
       passcode: this.passcode,
-      version: oldVersion
+      version: oldVersion,
     });
 
     expect(
-      (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
+      (await this.application.protocolService.getRootKeyWrapperKeyParams())
+        .version
     ).to.equal(oldVersion);
     expect(
       (await this.application.protocolService.getRootKeyParams()).version
@@ -105,7 +100,7 @@ describe('upgrading', () => {
     ).to.equal(oldVersion);
 
     this.application.setLaunchCallback({
-      receiveChallenge: this.receiveChallenge
+      receiveChallenge: this.receiveChallenge,
     });
     const result = await this.application.upgradeProtocolVersion();
     expect(result).to.deep.equal({ success: true });
@@ -115,7 +110,8 @@ describe('upgrading', () => {
     expect(payload.version).to.equal(newVersion);
 
     expect(
-      (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
+      (await this.application.protocolService.getRootKeyWrapperKeyParams())
+        .version
     ).to.equal(newVersion);
     expect(
       (await this.application.protocolService.getRootKeyParams()).version
@@ -128,8 +124,12 @@ describe('upgrading', () => {
      * Immediately logging out ensures we don't rely on subsequent
      * sync events to complete the upgrade
      */
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
-    await this.application.signIn(this.email, this.password,
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    await this.application.signIn(
+      this.email,
+      this.password,
       undefined,
       undefined,
       undefined,
@@ -150,12 +150,12 @@ describe('upgrading', () => {
     await Factory.setOldVersionPasscode({
       application: this.application,
       passcode: this.passcode,
-      version: oldVersion
+      version: oldVersion,
     });
     await Factory.createSyncedNote(this.application);
 
     this.application.setLaunchCallback({
-      receiveChallenge: this.receiveChallenge
+      receiveChallenge: this.receiveChallenge,
     });
 
     const identifier = this.application.identifier;
@@ -166,7 +166,7 @@ describe('upgrading', () => {
     await appFirst.prepareForLaunch({
       receiveChallenge: (challenge) => {
         this.receiveChallengeWithApp(appFirst, challenge);
-      }
+      },
     });
     await appFirst.launch(true);
     const result = await appFirst.upgradeProtocolVersion();
@@ -179,7 +179,7 @@ describe('upgrading', () => {
     await appSecond.prepareForLaunch({
       receiveChallenge: (challenge) => {
         this.receiveChallengeWithApp(appSecond, challenge);
-      }
+      },
     });
     await appSecond.launch(true);
     expect(appSecond.itemManager.invalidItems).to.be.empty;
@@ -198,13 +198,13 @@ describe('upgrading', () => {
         application: this.application,
         email: this.email,
         password: this.password,
-        version: oldVersion
+        version: oldVersion,
       });
 
       await Factory.setOldVersionPasscode({
         application: this.application,
         passcode: this.passcode,
-        version: oldVersion
+        version: oldVersion,
       });
     });
 
@@ -212,20 +212,22 @@ describe('upgrading', () => {
       sinon.restore();
     });
 
-    it('rolls back the local protocol upgrade if syncing fails', async function() {
+    it('rolls back the local protocol upgrade if syncing fails', async function () {
       sinon.replace(this.application.syncService, 'sync', sinon.fake());
       this.application.setLaunchCallback({
-        receiveChallenge: this.receiveChallenge
+        receiveChallenge: this.receiveChallenge,
       });
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
+        (await this.application.protocolService.getRootKeyWrapperKeyParams())
+          .version
       ).to.equal(oldVersion);
       const errors = await this.application.upgradeProtocolVersion();
       expect(errors).to.not.be.empty;
 
       /** Ensure we're still on 003 */
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
+        (await this.application.protocolService.getRootKeyWrapperKeyParams())
+          .version
       ).to.equal(oldVersion);
       expect(
         (await this.application.protocolService.getRootKeyParams()).version
@@ -239,20 +241,26 @@ describe('upgrading', () => {
     });
 
     it('rolls back the local protocol upgrade if the server responds with an error', async function () {
-      sinon.replace(this.application.sessionManager, 'changePassword', async () => ([Error()]));
+      sinon.replace(
+        this.application.sessionManager,
+        'changePassword',
+        async () => [Error()]
+      );
 
       this.application.setLaunchCallback({
-        receiveChallenge: this.receiveChallenge
+        receiveChallenge: this.receiveChallenge,
       });
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
+        (await this.application.protocolService.getRootKeyWrapperKeyParams())
+          .version
       ).to.equal(oldVersion);
       const errors = await this.application.upgradeProtocolVersion();
       expect(errors).to.not.be.empty;
 
       /** Ensure we're still on 003 */
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version
+        (await this.application.protocolService.getRootKeyWrapperKeyParams())
+          .version
       ).to.equal(oldVersion);
       expect(
         (await this.application.protocolService.getRootKeyParams()).version
@@ -279,7 +287,7 @@ describe('upgrading', () => {
       application: this.application,
       email: this.email,
       password: this.password,
-      version: ProtocolVersion.V003
+      version: ProtocolVersion.V003,
     });
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);

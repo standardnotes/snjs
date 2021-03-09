@@ -3,8 +3,15 @@ import { ItemManager } from '@Services/item_manager';
 import { SNPredicate } from '@Models/core/predicate';
 import { SNItem, SingletonStrategy } from '@Models/core/item';
 import { PureService } from '@Lib/services/pure_service';
-import { arrayByRemovingFromIndex, extendArray, isNullOrUndefined } from '@Lib/utils';
-import { CreateMaxPayloadFromAnyObject, PayloadContent } from '@Payloads/generator';
+import {
+  arrayByRemovingFromIndex,
+  extendArray,
+  isNullOrUndefined,
+} from '@Lib/utils';
+import {
+  CreateMaxPayloadFromAnyObject,
+  PayloadContent,
+} from '@Payloads/generator';
 import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';
@@ -24,12 +31,11 @@ import { Uuids } from '@Models/functions';
  *    intitially create the item.
  */
 export class SNSingletonManager extends PureService {
+  private resolveQueue: SNItem[] = [];
+  private registeredPredicates: SNPredicate[] = [];
 
-  private resolveQueue: SNItem[] = []
-  private registeredPredicates: SNPredicate[] = []
-
-  private removeItemObserver: any
-  private removeSyncObserver: any
+  private removeItemObserver: any;
+  private removeSyncObserver: any;
 
   constructor(
     private itemManager: ItemManager,
@@ -72,7 +78,7 @@ export class SNSingletonManager extends PureService {
     this.removeItemObserver = this.itemManager.addObserver(
       ContentType.Any,
       (changed, inserted) => {
-        if(changed.length > 0) {
+        if (changed.length > 0) {
           /**
            * For performance reasons, we typically only queue items in the resolveQueue once,
            * when they are inserted. However, items recently inserted could still be errorDecrypting.
@@ -80,9 +86,13 @@ export class SNSingletonManager extends PureService {
            * due to the fact that singleton logic does not apply properly if an item is not
            * decrypted.
            */
-          const decryptionStatusChanged = changed.filter(i => i.errorDecryptingValueChanged);
-          if(decryptionStatusChanged.length > 0) {
-            this.resolveQueue = this.resolveQueue.concat(decryptionStatusChanged);
+          const decryptionStatusChanged = changed.filter(
+            (i) => i.errorDecryptingValueChanged
+          );
+          if (decryptionStatusChanged.length > 0) {
+            this.resolveQueue = this.resolveQueue.concat(
+              decryptionStatusChanged
+            );
           }
         }
         if (inserted.length > 0) {
@@ -90,17 +100,19 @@ export class SNSingletonManager extends PureService {
         }
       }
     );
-    this.removeSyncObserver = this.syncService.addEventObserver(async (eventName) => {
-      if (
-        eventName === SyncEvent.DownloadFirstSyncCompleted ||
-        eventName === SyncEvent.FullSyncCompleted
-      ) {
-        await this.resolveSingletonsForItems(
-          this.popResolveQueue(),
-          eventName
-        );
+    this.removeSyncObserver = this.syncService.addEventObserver(
+      async (eventName) => {
+        if (
+          eventName === SyncEvent.DownloadFirstSyncCompleted ||
+          eventName === SyncEvent.FullSyncCompleted
+        ) {
+          await this.resolveSingletonsForItems(
+            this.popResolveQueue(),
+            eventName
+          );
+        }
       }
-    });
+    );
   }
 
   /**
@@ -113,10 +125,9 @@ export class SNSingletonManager extends PureService {
   }
 
   private validItemsMatchingPredicate(predicate: SNPredicate) {
-    return this.itemManager.itemsMatchingPredicate(predicate)
-      .filter((item) => {
-        return !item.errorDecrypting;
-      });
+    return this.itemManager.itemsMatchingPredicate(predicate).filter((item) => {
+      return !item.errorDecrypting;
+    });
   }
 
   private async resolveSingletonsForItems(
@@ -153,10 +164,7 @@ export class SNSingletonManager extends PureService {
       if (!matchingItems || matchingItems.length <= 1) {
         continue;
       }
-      await this.handleStrategy(
-        matchingItems,
-        item.singletonStrategy
-      );
+      await this.handleStrategy(matchingItems, item.singletonStrategy);
     }
     /**
      * Only sync if event source is FullSyncCompleted.
@@ -182,8 +190,12 @@ export class SNSingletonManager extends PureService {
     }
     const earliestFirst = items.sort((a, b) => {
       /** -1: a comes first, 1: b comes first */
-      if (a.errorDecrypting) { return 1; }
-      if (b.errorDecrypting) { return -1; }
+      if (a.errorDecrypting) {
+        return 1;
+      }
+      if (b.errorDecrypting) {
+        return -1;
+      }
       return a.created_at < b.created_at ? -1 : 1;
     });
     const deleteItems = arrayByRemovingFromIndex(earliestFirst, 0);
@@ -241,7 +253,8 @@ export class SNSingletonManager extends PureService {
     }
     /** Delete any items that are errored */
     const errorDecrypting = this.itemManager
-      .itemsMatchingPredicate(predicate).filter((item) => {
+      .itemsMatchingPredicate(predicate)
+      .filter((item) => {
         return item.errorDecrypting;
       });
     if (errorDecrypting.length) {
@@ -249,15 +262,13 @@ export class SNSingletonManager extends PureService {
     }
 
     /** Safe to create */
-    const dirtyPayload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: await Uuid.GenerateUuid(),
-        content_type: createContentType,
-        content: createContent,
-        dirty: true,
-        dirtiedDate: new Date()
-      }
-    );
+    const dirtyPayload = CreateMaxPayloadFromAnyObject({
+      uuid: await Uuid.GenerateUuid(),
+      content_type: createContentType,
+      content: createContent,
+      dirty: true,
+      dirtiedDate: new Date(),
+    });
     const item = await this.itemManager.emitItemFromPayload(dirtyPayload);
     this.syncService.sync();
     return item as T;

@@ -41,7 +41,7 @@ describe('utils', () => {
   it('jsonParseEmbeddedKeys', () => {
     const object = {
       a: { foo: 'bar' },
-      b: JSON.stringify({ foo: 'bar' })
+      b: JSON.stringify({ foo: 'bar' }),
     };
     const parsed = jsonParseEmbeddedKeys(object);
     expect(typeof parsed.a).to.equal('object');
@@ -51,7 +51,7 @@ describe('utils', () => {
   it('omitUndefined', () => {
     const object = {
       foo: '123',
-      bar: undefined
+      bar: undefined,
     };
     const omitted = omitUndefinedCopy(object);
     expect(Object.keys(omitted).includes('bar')).to.equal(false);
@@ -122,28 +122,34 @@ describe('utils', () => {
   });
 
   it('uniqCombineObjArrays', () => {
-    const arrayA = [
-      { a: 'a', b: 'a' }
-    ];
+    const arrayA = [{ a: 'a', b: 'a' }];
     const arrayB = [
       { a: 'a', b: 'a' },
-      { a: '2', b: '2' }
+      { a: '2', b: '2' },
     ];
 
     const result = uniqCombineObjArrays(arrayA, arrayB, ['a', 'b']);
     expect(result.length).to.equal(2);
   });
 
+  it('uniqueArrayByKey', () => {
+    const arrayA = [{ uuid: 1 }, { uuid: 2 }];
+    const arrayB = [{ uuid: 1 }, { uuid: 2 }, { uuid: 1 }, { uuid: 2 }];
+
+    const result = uniqueArrayByKey(arrayA.concat(arrayB), ['uuid']);
+    expect(result.length).to.equal(2);
+  });
+
   it('lodash merge should behave as expected', () => {
     const a = {
       content: {
-        references: [{ a: 'a' }]
-      }
+        references: [{ a: 'a' }],
+      },
     };
     const b = {
       content: {
-        references: []
-      }
+        references: [],
+      },
     };
     // merging a with b should replace total content
     deepMerge(a, b);
@@ -151,7 +157,8 @@ describe('utils', () => {
   });
 
   it('truncates hex string', () => {
-    const hex256 = 'f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b';
+    const hex256 =
+      'f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b';
     const desiredBits = 128;
     const expectedLength = 32;
     const result = truncateHexString(hex256, desiredBits);
@@ -174,5 +181,5 @@ describe('utils', () => {
       const result = isSameDay(dateA, dateB);
       expect(result).to.equal(false);
     });
-  })
+  });
 });

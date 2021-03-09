@@ -4,43 +4,33 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('item manager', () => {
-
+describe('item manager', function () {
   before(async function () {
     const crypto = new SNWebCrypto();
-    Uuid.SetGenerators(
-      crypto.generateUUIDSync,
-      crypto.generateUUID
-    );
+    Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
   });
 
   beforeEach(function () {
-    this.modelManager = new PayloadManager();
-    this.itemManager = new ItemManager(this.modelManager);
+    this.payloadManager = new PayloadManager();
+    this.itemManager = new ItemManager(this.payloadManager);
     this.createNote = async () => {
-      return this.itemManager.createItem(
-        ContentType.Note,
-        {
-          title: 'hello',
-          text: 'world'
-        }
-      );
+      return this.itemManager.createItem(ContentType.Note, {
+        title: 'hello',
+        text: 'world',
+      });
     };
 
     this.createTag = async (notes = []) => {
       const references = notes.map((note) => {
         return {
           uuid: note.uuid,
-          content_type: note.content_type
+          content_type: note.content_type,
         };
       });
-      return this.itemManager.createItem(
-        ContentType.Tag,
-        {
-          title: 'thoughts',
-          references: references
-        }
-      );
+      return this.itemManager.createItem(ContentType.Tag, {
+        title: 'thoughts',
+        references: references,
+      });
     };
   });
 
@@ -96,14 +86,18 @@ describe('item manager', () => {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([note.uuid]);
+    expect(
+      this.itemManager.collection.referenceMap.directMap[tag.uuid]
+    ).to.eql([note.uuid]);
   });
 
   it('inverse reference map', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.eql([tag.uuid]);
+    expect(
+      this.itemManager.collection.referenceMap.inverseMap[note.uuid]
+    ).to.eql([tag.uuid]);
   });
 
   it('inverse reference map should not have duplicates', async function () {
@@ -111,7 +105,9 @@ describe('item manager', () => {
     const tag = await this.createTag([note]);
     await this.itemManager.changeItem(tag.uuid);
 
-    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.eql([tag.uuid]);
+    expect(
+      this.itemManager.collection.referenceMap.inverseMap[note.uuid]
+    ).to.eql([tag.uuid]);
   });
 
   it('deleting from reference map', async function () {
@@ -119,8 +115,11 @@ describe('item manager', () => {
     const tag = await this.createTag([note]);
     await this.itemManager.setItemToBeDeleted(note.uuid);
 
-    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([]);
-    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.not.be.ok;
+    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql(
+      []
+    );
+    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to
+      .not.be.ok;
   });
 
   it('deleting referenced item should update referencing item references', async function () {
@@ -139,15 +138,19 @@ describe('item manager', () => {
       mutator.removeItemAsRelationship(note);
     });
 
-    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([]);
-    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.eql([]);
+    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql(
+      []
+    );
+    expect(
+      this.itemManager.collection.referenceMap.inverseMap[note.uuid]
+    ).to.eql([]);
   });
 
   it('emitting discardable payload should remove it from our collection', async function () {
     const note = await this.createNote();
     const payload = note.payloadRepresentation({
       deleted: true,
-      dirty: false
+      dirty: false,
     });
     await this.itemManager.emitItemFromPayload(payload);
 
@@ -170,7 +173,7 @@ describe('item manager', () => {
       ContentType.Any,
       (changed, inserted, discarded, ignored, source, sourceKey) => {
         observed.push({ changed, inserted, discarded, source, sourceKey });
-      },
+      }
     );
     const note = await this.createNote();
     const tag = await this.createTag([note]);
@@ -186,36 +189,30 @@ describe('item manager', () => {
   it('change existing item', async function () {
     const note = await this.createNote();
     const newTitle = String(Math.random());
-    await this.itemManager.changeItem(
-      note.uuid,
-      (mutator) => {
-        mutator.title = newTitle;
-      }
-    );
+    await this.itemManager.changeItem(note.uuid, (mutator) => {
+      mutator.title = newTitle;
+    });
 
     const latestVersion = this.itemManager.findItem(note.uuid);
     expect(latestVersion.title).to.equal(newTitle);
   });
 
   it('change non-existant item through uuid should fail', async function () {
-    const note = await this.itemManager.createTemplateItem(
-      ContentType.Note,
-      {
-        title: 'hello',
-        text: 'world'
-      }
-    );
+    const note = await this.itemManager.createTemplateItem(ContentType.Note, {
+      title: 'hello',
+      text: 'world',
+    });
 
     const changeFn = async () => {
       const newTitle = String(Math.random());
-      return this.itemManager.changeItem(
-        note.uuid,
-        (mutator) => {
-          mutator.title = newTitle;
-        }
-      );
+      return this.itemManager.changeItem(note.uuid, (mutator) => {
+        mutator.title = newTitle;
+      });
     };
-    await Factory.expectThrowsAsync(() => changeFn(), 'Attempting to change non-existant item');
+    await Factory.expectThrowsAsync(
+      () => changeFn(),
+      'Attempting to change non-existant item'
+    );
   });
 
   it('set items dirty', async function () {
@@ -232,7 +229,10 @@ describe('item manager', () => {
     const sandbox = sinon.createSandbox();
 
     beforeEach(async function () {
-      this.emitPayloads = sandbox.spy(this.itemManager.modelManager, 'emitPayloads');
+      this.emitPayloads = sandbox.spy(
+        this.itemManager.payloadManager,
+        'emitPayloads'
+      );
     });
 
     afterEach(function () {
@@ -270,7 +270,9 @@ describe('item manager', () => {
       expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf);
       expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of);
       expect(originalNote.uuid).to.equal(duplicatedNote.conflictOf);
-      expect(originalNote.uuid).to.equal(duplicatedNote.payload.content.conflict_of);
+      expect(originalNote.uuid).to.equal(
+        duplicatedNote.payload.content.conflict_of
+      );
     });
 
     it('duplicate item with relationships', async function () {
@@ -290,22 +292,23 @@ describe('item manager', () => {
       expect(tag.content.references).to.have.length(1);
 
       tag = this.itemManager.findItem(tag.uuid);
-      const references = tag.content.references.map(ref => ref.uuid);
+      const references = tag.content.references.map((ref) => ref.uuid);
       expect(references).to.have.length(2);
       expect(references).to.include(note.uuid, duplicateNote.uuid);
     });
 
     it('duplicates item with additional content', async function () {
-      const note = await this.itemManager.createItem(
-        ContentType.Note,
+      const note = await this.itemManager.createItem(ContentType.Note, {
+        title: 'hello',
+        text: 'world',
+      });
+      const duplicateNote = await this.itemManager.duplicateItem(
+        note.uuid,
+        false,
         {
-          title: 'hello',
-          text: 'world',
+          title: 'hello (copy)',
         }
       );
-      const duplicateNote = await this.itemManager.duplicateItem(note.uuid, false, {
-        title: 'hello (copy)'
-      });
 
       expect(duplicateNote.title).to.equal('hello (copy)');
       expect(duplicateNote.text).to.equal('world');
@@ -313,12 +316,9 @@ describe('item manager', () => {
   });
 
   it('create template item', async function () {
-    const item = await this.itemManager.createTemplateItem(
-      ContentType.Note,
-      {
-        title: 'hello'
-      }
-    );
+    const item = await this.itemManager.createTemplateItem(ContentType.Note, {
+      title: 'hello',
+    });
 
     expect(item).to.be.ok;
     /* Template items should never be added to the record */
@@ -393,7 +393,7 @@ describe('item manager', () => {
       ContentType.Any,
       (changed, inserted, discarded, ignored) => {
         observed.push({ changed, inserted, discarded, ignored });
-      },
+      }
     );
     await this.createNote();
     await this.itemManager.removeAllItemsFromMemory();
@@ -409,7 +409,7 @@ describe('item manager', () => {
       ContentType.Any,
       (changed, inserted, discarded, ignored) => {
         observed.push({ changed, inserted, discarded, ignored });
-      },
+      }
     );
     const note = await this.createNote();
     await this.itemManager.removeItemLocally(note);
@@ -437,15 +437,12 @@ describe('item manager', () => {
         const all = changed.concat(inserted);
         if (!didEmit) {
           didEmit = true;
-          const changedPayload = CopyPayload(
-            payload,
-            {
-              content: {
-                ...payload.content,
-                title: changedTitle
-              }
-            }
-          );
+          const changedPayload = CopyPayload(payload, {
+            content: {
+              ...payload.content,
+              title: changedTitle,
+            },
+          });
           this.itemManager.emitItemFromPayload(changedPayload);
         }
         latestVersion = all[0];

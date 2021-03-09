@@ -5,12 +5,11 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('device authentication', function () {
-
-  before(async function () {
+  beforeEach(async function () {
     localStorage.clear();
   });
 
-  after(async function () {
+  afterEach(async function () {
     localStorage.clear();
   });
 
@@ -19,10 +18,12 @@ describe('device authentication', function () {
     const application = await Factory.createAndInitializeApplication(namespace);
     const passcode = 'foobar';
     const wrongPasscode = 'barfoo';
-    expect((await application.protectionService.createLaunchChallenge())).to.not.be.ok;
+    expect(await application.protectionService.createLaunchChallenge()).to.not
+      .be.ok;
     await application.setPasscode(passcode);
     expect(await application.hasPasscode()).to.equal(true);
-    expect((await application.protectionService.createLaunchChallenge())).to.be.ok;
+    expect(await application.protectionService.createLaunchChallenge()).to.be
+      .ok;
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.deinit();
 
@@ -33,7 +34,12 @@ describe('device authentication', function () {
       const values = [];
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
+          values.push(
+            new ChallengeValue(
+              prompt,
+              numPasscodeAttempts < 2 ? wrongPasscode : passcode
+            )
+          );
         }
       }
       return values;
@@ -53,7 +59,9 @@ describe('device authentication', function () {
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
     await tmpApplication.launch(true);
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
-    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
+    expect(tmpApplication.protocolService.keyMode).to.equal(
+      KeyMode.WrapperOnly
+    );
     await tmpApplication.deinit();
   }).timeout(10000);
 
@@ -65,7 +73,10 @@ describe('device authentication', function () {
     await application.setPasscode(passcode);
     await application.protectionService.enableBiometrics();
     expect(await application.hasPasscode()).to.equal(true);
-    expect(((await application.protectionService.createLaunchChallenge()).prompts.length)).to.equal(2);
+    expect(
+      (await application.protectionService.createLaunchChallenge()).prompts
+        .length
+    ).to.equal(2);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
     await application.deinit();
 
@@ -76,7 +87,10 @@ describe('device authentication', function () {
       const values = [];
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          const response = new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode);
+          const response = new ChallengeValue(
+            prompt,
+            numPasscodeAttempts < 2 ? wrongPasscode : passcode
+          );
           values.push(response);
         } else if (prompt.validation === ChallengeValidation.Biometric) {
           values.push(new ChallengeValue(prompt, true));
@@ -97,10 +111,15 @@ describe('device authentication', function () {
     };
     await tmpApplication.prepareForLaunch({ receiveChallenge });
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
-    expect(((await tmpApplication.protectionService.createLaunchChallenge()).prompts.length)).to.equal(2);
+    expect(
+      (await tmpApplication.protectionService.createLaunchChallenge()).prompts
+        .length
+    ).to.equal(2);
     await tmpApplication.launch(true);
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
-    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
+    expect(tmpApplication.protocolService.keyMode).to.equal(
+      KeyMode.WrapperOnly
+    );
     tmpApplication.deinit();
   }).timeout(20000);
 
@@ -111,18 +130,22 @@ describe('device authentication', function () {
     const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: application,
-      email, password
+      email,
+      password,
     });
     const sampleStorageKey = 'foo';
     const sampleStorageValue = 'bar';
-    await application.storageService.setValue(sampleStorageKey, sampleStorageValue);
+    await application.storageService.setValue(
+      sampleStorageKey,
+      sampleStorageValue
+    );
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
     const passcode = 'foobar';
     await application.setPasscode(passcode);
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
-    expect(
-      await application.hasPasscode()
-    ).to.equal(true);
+    expect(application.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper
+    );
+    expect(await application.hasPasscode()).to.equal(true);
     await application.deinit();
 
     const wrongPasscode = 'barfoo';
@@ -133,7 +156,12 @@ describe('device authentication', function () {
       const values = [];
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode));
+          values.push(
+            new ChallengeValue(
+              prompt,
+              numPasscodeAttempts < 2 ? wrongPasscode : passcode
+            )
+          );
         }
       }
       return values;
@@ -158,7 +186,9 @@ describe('device authentication', function () {
       await tmpApplication.storageService.getValue(sampleStorageKey)
     ).to.equal(sampleStorageValue);
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
-    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper);
+    expect(tmpApplication.protocolService.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper
+    );
     tmpApplication.deinit();
   }).timeout(10000);
 });

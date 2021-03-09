@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('004 protocol operations', () => {
+describe('004 protocol operations', function () {
   const _identifier = 'hello@test.com';
   const _password = 'password';
   let _keyParams;
@@ -13,7 +13,7 @@ describe('004 protocol operations', () => {
   const application = Factory.createApplication();
   const protocol004 = new SNProtocolOperator004(new SNWebCrypto());
 
-  before(async () => {
+  before(async function () {
     await Factory.initializeApplication(application);
     _key = await protocol004.createRootKey(
       _identifier,
@@ -23,16 +23,17 @@ describe('004 protocol operations', () => {
     _keyParams = _key.keyParams;
   });
 
-  after(() => {
+  after(function () {
     application.deinit();
   });
 
-  it('cost minimum should throw', () => {
-    expect(() => { application.protocolService.costMinimumForVersion('004') })
-      .to.throw('Cost minimums only apply to versions <= 002');
+  it('cost minimum should throw', function () {
+    expect(function () {
+      application.protocolService.costMinimumForVersion('004');
+    }).to.throw('Cost minimums only apply to versions <= 002');
   });
 
-  it('generates valid keys for registration', async () => {
+  it('generates valid keys for registration', async function () {
     const key = await application.protocolService.createRootKey(
       _identifier,
       _password,
@@ -51,34 +52,42 @@ describe('004 protocol operations', () => {
     expect(key.keyParams.content004.identifier).to.be.ok;
   });
 
-  it('computes proper keys for sign in', async () => {
+  it('computes proper keys for sign in', async function () {
     const identifier = 'foo@bar.com';
     const password = 'very_secure';
     const keyParams = application.protocolService.createKeyParams({
-      pw_nonce: 'baaec0131d677cf993381367eb082fe377cefe70118c1699cb9b38f0bc850e7b',
+      pw_nonce:
+        'baaec0131d677cf993381367eb082fe377cefe70118c1699cb9b38f0bc850e7b',
       identifier: identifier,
-      version: '004'
+      version: '004',
     });
-    const key = await protocol004.computeRootKey(
-      password,
-      keyParams,
+    const key = await protocol004.computeRootKey(password, keyParams);
+    expect(key.masterKey).to.equal(
+      '5d68e78b56d454e32e1f5dbf4c4e7cf25d74dc1efc942e7c9dfce572c1f3b943'
     );
-    expect(key.masterKey).to.equal('5d68e78b56d454e32e1f5dbf4c4e7cf25d74dc1efc942e7c9dfce572c1f3b943');
-    expect(key.serverPassword).to.equal('83707dfc837b3fe52b317be367d3ed8e14e903b2902760884fd0246a77c2299d');
+    expect(key.serverPassword).to.equal(
+      '83707dfc837b3fe52b317be367d3ed8e14e903b2902760884fd0246a77c2299d'
+    );
     expect(key.dataAuthenticationKey).to.not.be.ok;
   });
 
-  it('generates random key', async () => {
+  it('generates random key', async function () {
     const length = 96;
-    const key = await application.protocolService.crypto.generateRandomKey(length);
+    const key = await application.protocolService.crypto.generateRandomKey(
+      length
+    );
     expect(key.length).to.equal(length / 4);
   });
 
-  it('properly encrypts and decrypts', async () => {
+  it('properly encrypts and decrypts', async function () {
     const text = 'hello world';
     const rawKey = _key.masterKey;
-    const nonce = await application.protocolService.crypto.generateRandomKey(192);
-    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
+    const nonce = await application.protocolService.crypto.generateRandomKey(
+      192
+    );
+    const operator = application.protocolService.operatorForVersion(
+      ProtocolVersion.V004
+    );
     const authenticatedData = { foo: 'bar' };
     const encString = await operator.encryptString004(
       text,
@@ -95,19 +104,18 @@ describe('004 protocol operations', () => {
     expect(decString).to.equal(text);
   });
 
-  it('fails to decrypt non-matching aad', async () => {
+  it('fails to decrypt non-matching aad', async function () {
     const text = 'hello world';
     const rawKey = _key.masterKey;
-    const nonce = await application.protocolService.crypto.generateRandomKey(192);
-    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
+    const nonce = await application.protocolService.crypto.generateRandomKey(
+      192
+    );
+    const operator = application.protocolService.operatorForVersion(
+      ProtocolVersion.V004
+    );
     const aad = { foo: 'bar' };
     const nonmatchingAad = { foo: 'rab' };
-    const encString = await operator.encryptString004(
-      text,
-      rawKey,
-      nonce,
-      aad
-    );
+    const encString = await operator.encryptString004(text, rawKey, nonce, aad);
     const decString = await operator.decryptString004(
       encString,
       rawKey,
@@ -117,7 +125,7 @@ describe('004 protocol operations', () => {
     expect(decString).to.not.be.ok;
   });
 
-  it('generates existing keys for key params', async () => {
+  it('generates existing keys for key params', async function () {
     const key = await application.protocolService.computeRootKey(
       _password,
       _keyParams
@@ -125,13 +133,13 @@ describe('004 protocol operations', () => {
     expect(key.compare(_key)).to.be.true;
   });
 
-  it('can decrypt encrypted params', async () => {
+  it('can decrypt encrypted params', async function () {
     const payload = Factory.createNotePayload();
     const key = await protocol004.createItemsKey();
     const params = await protocol004.generateEncryptedParameters(
       payload,
       PayloadFormat.EncryptedString,
-      key,
+      key
     );
     const decrypted = await protocol004.generateDecryptedParameters(
       params,
@@ -141,13 +149,13 @@ describe('004 protocol operations', () => {
     expect(decrypted.content).to.eql(payload.content);
   });
 
-  it('modifying the uuid of the payload should fail to decrypt', async () => {
+  it('modifying the uuid of the payload should fail to decrypt', async function () {
     const payload = Factory.createNotePayload();
     const key = await protocol004.createItemsKey();
     const params = await protocol004.generateEncryptedParameters(
       payload,
       PayloadFormat.EncryptedString,
-      key,
+      key
     );
     const modifiedParams = CopyPayload(params, { uuid: 'foo' });
     const result = await protocol004.generateDecryptedParameters(

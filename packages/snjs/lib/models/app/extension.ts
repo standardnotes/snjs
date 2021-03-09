@@ -6,14 +6,13 @@ import { Action } from './action';
  * Related to the SNActionsService and the local Action model.
  */
 export class SNActionsExtension extends SNItem {
-
-  public readonly actions: Action[] = []
-  public readonly description!: string
-  public readonly name!: string
-  public readonly url!: string
-  public readonly package_info!: Record<string, any>
-  public readonly supported_types!: string[]
-  public readonly deprecation?: string
+  public readonly actions: Action[] = [];
+  public readonly description!: string;
+  public readonly name!: string;
+  public readonly url!: string;
+  public readonly package_info!: Record<string, any>;
+  public readonly supported_types!: string[];
+  public readonly deprecation?: string;
 
   constructor(payload: PurePayload) {
     super(payload);
@@ -32,16 +31,12 @@ export class SNActionsExtension extends SNItem {
 
   actionsWithContextForItem(item: SNItem) {
     return this.actions.filter((action) => {
-      return (
-        action.context === item.content_type ||
-        action.context === 'Item'
-      )
+      return action.context === item.content_type || action.context === 'Item';
     });
   }
 }
 
 export class ActionsExtensionMutator extends ItemMutator {
-
   set description(description: string) {
     this.content!.description = description;
   }

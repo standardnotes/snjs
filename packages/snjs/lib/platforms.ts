@@ -1,7 +1,7 @@
 export enum Environment {
   Web = 1,
   Desktop = 2,
-  Mobile = 3
+  Mobile = 3,
 }
 
 export enum Platform {
@@ -12,7 +12,7 @@ export enum Platform {
   WindowsWeb = 5,
   WindowsDesktop = 6,
   LinuxWeb = 7,
-  LinuxDesktop = 8
+  LinuxDesktop = 8,
 }
 
 export function platformFromString(string: string) {
@@ -23,8 +23,8 @@ export function platformFromString(string: string) {
     'linux-desktop': Platform.LinuxDesktop,
     'windows-web': Platform.WindowsWeb,
     'windows-desktop': Platform.WindowsDesktop,
-    'ios': Platform.Ios,
-    'android': Platform.Android,
+    ios: Platform.Ios,
+    android: Platform.Android,
   };
   return map[string];
 }
@@ -45,9 +45,9 @@ export function platformToString(platform: Platform) {
 
 export function environmentFromString(string: string) {
   const map: Record<string, Environment> = {
-    'web': Environment.Web,
-    'desktop': Environment.Desktop,
-    'mobile': Environment.Mobile,
+    web: Environment.Web,
+    desktop: Environment.Desktop,
+    mobile: Environment.Mobile,
   };
   return map[string];
 }
@@ -62,8 +62,7 @@ export function environmentToString(environment: Environment) {
 }
 
 export function isEnvironmentWebOrDesktop(environment: Environment) {
-  return environment === Environment.Web ||
-    environment === Environment.Desktop;
+  return environment === Environment.Web || environment === Environment.Desktop;
 }
 
 export function isEnvironmentMobile(environment: Environment) {

@@ -1,10 +1,9 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 
 export class DeltaRemoteSaved extends PayloadsDelta {
-
   public async resultingCollection() {
     const processed = [];
     for (const payload of this.applyCollection.all()) {
@@ -18,11 +17,14 @@ export class DeltaRemoteSaved extends PayloadsDelta {
         {
           lastSyncEnd: new Date(),
           deleted: deletedState,
-          dirty: deletedState
+          dirty: deletedState,
         }
       );
       processed.push(result);
     }
-    return ImmutablePayloadCollection.WithPayloads(processed, PayloadSource.RemoteSaved);
+    return ImmutablePayloadCollection.WithPayloads(
+      processed,
+      PayloadSource.RemoteSaved
+    );
   }
 }

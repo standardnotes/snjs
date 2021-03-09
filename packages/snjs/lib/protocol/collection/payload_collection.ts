@@ -15,7 +15,7 @@ export class ImmutablePayloadCollection extends MutableCollection<PurePayload> {
   static WithPayloads(payloads: PurePayload[] = [], source?: PayloadSource) {
     const collection = new ImmutablePayloadCollection();
     collection.source = source;
-    if(payloads.length > 0) {
+    if (payloads.length > 0) {
       collection.set(payloads);
     }
     Object.freeze(collection);
@@ -25,8 +25,12 @@ export class ImmutablePayloadCollection extends MutableCollection<PurePayload> {
   static FromCollection(collection: MutableCollection<PurePayload>) {
     const mapCopy = Object.freeze(Object.assign({}, collection.map));
     const typedMapCopy = Object.freeze(Object.assign({}, collection.typedMap));
-    const referenceMapCopy = Object.freeze(collection.referenceMap.makeCopy()) as UuidMap;
-    const conflictMapCopy = Object.freeze(collection.conflictMap.makeCopy()) as UuidMap;
+    const referenceMapCopy = Object.freeze(
+      collection.referenceMap.makeCopy()
+    ) as UuidMap;
+    const conflictMapCopy = Object.freeze(
+      collection.conflictMap.makeCopy()
+    ) as UuidMap;
     const result = new ImmutablePayloadCollection(
       true,
       mapCopy as Partial<Record<UuidString, PurePayload>>,

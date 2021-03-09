@@ -1,7 +1,7 @@
 import { ChallengePrompt } from './../../challenges';
-import { SNProtocolService } from "../protocol_service";
-import { SNStorageService } from "../storage_service";
-import { PureService } from "@Lib/services/pure_service";
+import { SNProtocolService } from '../protocol_service';
+import { SNStorageService } from '../storage_service';
+import { PureService } from '@Lib/services/pure_service';
 import {
   Challenge,
   ChallengeArtifacts,
@@ -9,8 +9,8 @@ import {
   ChallengeResponse,
   ChallengeValidation,
   ChallengeValue,
-} from "@Lib/challenges";
-import { ChallengeOperation } from "./challenge_operation";
+} from '@Lib/challenges';
+import { ChallengeOperation } from './challenge_operation';
 import { removeFromArray } from '@Lib/utils';
 import { isValidProtectionSessionLength } from '../protection_service';
 
@@ -22,11 +22,11 @@ type ChallengeValidationResponse = {
 export type ValueCallback = (value: ChallengeValue) => void;
 
 export type ChallengeObserver = {
-  onValidValue?: ValueCallback,
-  onInvalidValue?: ValueCallback,
-  onNonvalidatedSubmit?: (response: ChallengeResponse) => void,
-  onComplete?: (response: ChallengeResponse) => void,
-  onCancel?: () => void
+  onValidValue?: ValueCallback;
+  onInvalidValue?: ValueCallback;
+  onNonvalidatedSubmit?: (response: ChallengeResponse) => void;
+  onComplete?: (response: ChallengeResponse) => void;
+  onCancel?: () => void;
 };
 
 /**
@@ -35,7 +35,7 @@ export type ChallengeObserver = {
 export class ChallengeService extends PureService {
   private challengeOperations: Record<string, ChallengeOperation> = {};
   public sendChallenge?: (challenge: Challenge) => void;
-  private challengeObservers: Record<string, ChallengeObserver[]> = {}
+  private challengeObservers: Record<string, ChallengeObserver[]> = {};
 
   constructor(
     private storageService: SNStorageService,
@@ -80,12 +80,12 @@ export class ChallengeService extends PureService {
       case ChallengeValidation.ProtectionSessionDuration:
         return { valid: isValidProtectionSessionLength(value.value) };
       default:
-        throw Error(`Unhandled validation mode ${value.prompt.validation}`)
+        throw Error(`Unhandled validation mode ${value.prompt.validation}`);
     }
   }
 
   public async promptForCorrectPasscode(
-    reason: ChallengeReason,
+    reason: ChallengeReason
   ): Promise<string | undefined> {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
@@ -114,7 +114,9 @@ export class ChallengeService extends PureService {
       return {};
     }
     if (!passcode) {
-      passcode = await this.promptForCorrectPasscode(ChallengeReason.ResaveRootKey);
+      passcode = await this.promptForCorrectPasscode(
+        ChallengeReason.ResaveRootKey
+      );
       if (!passcode) {
         return { canceled: true };
       }
@@ -136,7 +138,7 @@ export class ChallengeService extends PureService {
     this.challengeObservers[challenge.id] = observers;
     return () => {
       removeFromArray(observers, observer);
-    }
+    };
   }
 
   private createOrGetChallengeOperation(
@@ -171,7 +173,10 @@ export class ChallengeService extends PureService {
     return operation;
   }
 
-  private performOnObservers(challenge: Challenge, perform: (observer: ChallengeObserver) => void) {
+  private performOnObservers(
+    challenge: Challenge,
+    perform: (observer: ChallengeObserver) => void
+  ) {
     const observers = this.challengeObservers[challenge.id] || [];
     for (const observer of observers) {
       perform(observer);
@@ -181,31 +186,37 @@ export class ChallengeService extends PureService {
   private onChallengeValidValue(challenge: Challenge, value: ChallengeValue) {
     this.performOnObservers(challenge, (observer) => {
       observer.onValidValue?.(value);
-    })
+    });
   }
 
   private onChallengeInvalidValue(challenge: Challenge, value: ChallengeValue) {
     this.performOnObservers(challenge, (observer) => {
       observer.onInvalidValue?.(value);
-    })
+    });
   }
 
-  private onChallengeNonvalidatedSubmit(challenge: Challenge, response: ChallengeResponse) {
+  private onChallengeNonvalidatedSubmit(
+    challenge: Challenge,
+    response: ChallengeResponse
+  ) {
     this.performOnObservers(challenge, (observer) => {
       observer.onNonvalidatedSubmit?.(response);
-    })
+    });
   }
 
-  private onChallengeComplete(challenge: Challenge, response: ChallengeResponse) {
+  private onChallengeComplete(
+    challenge: Challenge,
+    response: ChallengeResponse
+  ) {
     this.performOnObservers(challenge, (observer) => {
       observer.onComplete?.(response);
-    })
+    });
   }
 
   private onChallengeCancel(challenge: Challenge) {
     this.performOnObservers(challenge, (observer) => {
       observer.onCancel?.();
-    })
+    });
   }
 
   private getChallengeOperation(challenge: Challenge) {
@@ -233,7 +244,7 @@ export class ChallengeService extends PureService {
     values: ChallengeValue[]
   ) {
     if (values.length === 0) {
-      throw Error("Attempting to submit 0 values for challenge");
+      throw Error('Attempting to submit 0 values for challenge');
     }
     for (const value of values) {
       if (!value.prompt.validates) {

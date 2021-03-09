@@ -11,25 +11,24 @@ export enum HttpVerb {
 }
 
 export enum ErrorTag {
-  RevokedSession = 'revoked-session'
+  RevokedSession = 'revoked-session',
 }
 
 const REQUEST_READY_STATE_COMPLETED = 4;
 
-type HttpParams = Record<string, any>
+export type HttpParams = Record<string, unknown>;
 
 export type HttpRequest = {
-  url: string,
-  params?: HttpParams,
-  verb: HttpVerb,
-  authentication?: string
-}
+  url: string;
+  params?: HttpParams;
+  verb: HttpVerb;
+  authentication?: string;
+};
 
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export class SNHttpService extends PureService {
-
   public async getAbsolute(
     url: string,
     params?: HttpParams,
@@ -71,15 +70,21 @@ export class SNHttpService extends PureService {
     const request = new XMLHttpRequest();
     if (
       httpRequest.params &&
-      httpRequest.verb === HttpVerb.Get
-      && Object.keys(httpRequest.params).length > 0
+      httpRequest.verb === HttpVerb.Get &&
+      Object.keys(httpRequest.params).length > 0
     ) {
-      httpRequest.url = this.urlForUrlAndParams(httpRequest.url, httpRequest.params);
+      httpRequest.url = this.urlForUrlAndParams(
+        httpRequest.url,
+        httpRequest.params
+      );
     }
     request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
     if (httpRequest.authentication) {
-      request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication);
+      request.setRequestHeader(
+        'Authorization',
+        'Bearer ' + httpRequest.authentication
+      );
     }
     return request;
   }
@@ -93,7 +98,11 @@ export class SNHttpService extends PureService {
       request.onreadystatechange = () => {
         this.stateChangeHandlerForRequest(request, resolve, reject);
       };
-      if (verb === HttpVerb.Post || verb === HttpVerb.Patch || verb === HttpVerb.Delete) {
+      if (
+        verb === HttpVerb.Post ||
+        verb === HttpVerb.Patch ||
+        verb === HttpVerb.Delete
+      ) {
         request.send(JSON.stringify(params));
       } else {
         request.send();
@@ -104,32 +113,41 @@ export class SNHttpService extends PureService {
   private stateChangeHandlerForRequest(
     request: XMLHttpRequest,
     resolve: (response: HttpResponse) => void,
-    reject: (response: HttpResponse) => void,
+    reject: (response: HttpResponse) => void
   ) {
     if (request.readyState !== REQUEST_READY_STATE_COMPLETED) {
       return;
     }
     const httpStatus = request.status;
     const response: HttpResponse = {
-      status: httpStatus
-    }
+      status: httpStatus,
+    };
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
         const body = JSON.parse(request.responseText);
-        response.object = body;
+        /**
+         * v0 APIs do not have a `data` top-level object. In such cases, mimic
+         * the newer response body style by putting all the top-level
+         * properties inside a `data` object.
+         */
+        if (!body.data) {
+          response.data = body;
+        }
         Object.assign(response, body);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-    if ((httpStatus >= StatusCode.HttpStatusMinSuccess
-      && httpStatus <= StatusCode.HttpStatusMaxSuccess)) {
+    if (
+      httpStatus >= StatusCode.HttpStatusMinSuccess &&
+      httpStatus <= StatusCode.HttpStatusMaxSuccess
+    ) {
       resolve(response);
     } else {
       if (httpStatus === StatusCode.HttpStatusForbidden) {
         response.error = {
           message: API_MESSAGE_RATE_LIMITED,
-          status: httpStatus
+          status: httpStatus,
         };
       } else if (isNullOrUndefined(response.error)) {
         response.error = { message: UNKNOWN_ERROR, status: httpStatus };
@@ -139,9 +157,11 @@ export class SNHttpService extends PureService {
   }
 
   private urlForUrlAndParams(url: string, params: HttpParams) {
-    const keyValueString = Object.keys(params).map((key) => {
-      return key + '=' + encodeURIComponent(params[key]);
-    }).join('&');
+    const keyValueString = Object.keys(params)
+      .map((key) => {
+        return key + '=' + encodeURIComponent(params[key] as string);
+      })
+      .join('&');
 
     if (url.includes('?')) {
       return url + '&' + keyValueString;

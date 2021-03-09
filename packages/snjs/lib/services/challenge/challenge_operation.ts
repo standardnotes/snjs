@@ -1,11 +1,11 @@
-import { isNullOrUndefined, removeFromArray } from "@Lib/utils";
+import { isNullOrUndefined, removeFromArray } from '@Lib/utils';
 import {
   Challenge,
   ChallengeArtifacts,
   ChallengeResponse,
-  ChallengeValue
-} from "@Lib/challenges";
-import { ValueCallback } from "./challenge_service";
+  ChallengeValue,
+} from '@Lib/challenges';
+import { ValueCallback } from './challenge_service';
 
 /**
  * A challenge operation stores user-submitted values and callbacks.
@@ -27,8 +27,8 @@ export class ChallengeOperation {
     public onInvalidValue: ValueCallback,
     public onNonvalidatedSubmit: (response: ChallengeResponse) => void,
     public onComplete: (response: ChallengeResponse) => void,
-    public onCancel: () => void,
-  ) { }
+    public onCancel: () => void
+  ) {}
 
   /**
    * Mark this challenge as complete, triggering the resolve function,
@@ -68,7 +68,7 @@ export class ChallengeOperation {
   }
 
   private nonvalidatedPrompts() {
-    return this.challenge.prompts.filter(p => !p.validates);
+    return this.challenge.prompts.filter((p) => !p.validates);
   }
 
   public addNonvalidatedValue(value: ChallengeValue) {
@@ -94,7 +94,9 @@ export class ChallengeOperation {
     artifacts?: ChallengeArtifacts
   ) {
     const valuesArray = valid ? this.validValues : this.invalidValues;
-    const matching = valuesArray.find((v) => v.prompt.validation === value.prompt.validation);
+    const matching = valuesArray.find(
+      (v) => v.prompt.validation === value.prompt.validation
+    );
     if (matching) {
       removeFromArray(valuesArray, matching);
     }

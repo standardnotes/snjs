@@ -1,7 +1,7 @@
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,
-  RootKeyEncryptedAuthenticatedData
+  RootKeyEncryptedAuthenticatedData,
 } from './../payloads/generator';
 import { FillItemContent } from '@Models/functions';
 import { Uuid } from './../../uuid';
@@ -14,17 +14,17 @@ import { PayloadFormat } from '@Payloads/formats';
 import {
   CopyEncryptionParameters,
   CreateEncryptionParameters,
-  CreateMaxPayloadFromAnyObject
+  CreateMaxPayloadFromAnyObject,
 } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { ContentType } from '@Lib/models';
 
 export type ItemsKeyContent = {
-  itemsKey: string,
-  dataAuthenticationKey?: string,
-  version: ProtocolVersion
-}
+  itemsKey: string;
+  dataAuthenticationKey?: string;
+  version: ProtocolVersion;
+};
 
 /**w
  * An operator is responsible for performing crypto operations, such as generating keys
@@ -34,8 +34,7 @@ export type ItemsKeyContent = {
  * across all versions appear in this generic parent class.
  */
 export abstract class SNProtocolOperator {
-
-  protected readonly crypto: SNPureCrypto
+  protected readonly crypto: SNPureCrypto;
 
   constructor(crypto: SNPureCrypto) {
     this.crypto = crypto;
@@ -74,10 +73,10 @@ export abstract class SNProtocolOperator {
   public abstract async getPayloadAuthenticatedData(
     payload: PurePayload
   ): Promise<
-    RootKeyEncryptedAuthenticatedData |
-    ItemAuthenticatedData |
-    LegacyAttachedData |
-    undefined
+    | RootKeyEncryptedAuthenticatedData
+    | ItemAuthenticatedData
+    | LegacyAttachedData
+    | undefined
   >;
 
   protected abstract async generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
@@ -90,18 +89,12 @@ export abstract class SNProtocolOperator {
     return key.substring(key.length / 2, key.length);
   }
 
-  protected splitKey(
-    key: string,
-    parts: number
-  ) {
+  protected splitKey(key: string, parts: number) {
     const outputLength = key.length;
     const partLength = outputLength / parts;
     const partitions = [];
     for (let i = 0; i < parts; i++) {
-      const partition = key.slice(
-        partLength * i,
-        partLength * (i + 1)
-      );
+      const partition = key.slice(partLength * i, partLength * (i + 1));
       partitions.push(partition);
     }
     return partitions;
@@ -113,66 +106,59 @@ export abstract class SNProtocolOperator {
    */
   public async createItemsKey() {
     const content = await this.generateNewItemsKeyContent();
-    const payload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: await Uuid.GenerateUuid(),
-        content_type: ContentType.ItemsKey,
-        content: FillItemContent(content)
-      }
-    );
+    const payload = CreateMaxPayloadFromAnyObject({
+      uuid: await Uuid.GenerateUuid(),
+      content_type: ContentType.ItemsKey,
+      content: FillItemContent(content),
+    });
     return CreateItemFromPayload(payload) as SNItemsKey;
   }
 
   /**
-  * Converts a bare payload into an encrypted one in the desired format.
-  * @param payload - The non-encrypted payload object to encrypt
-  * @param key - The key to use to encrypt the payload. Can be either
-  *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
-  * items keys), or an ItemsKey (if encrypted regular items)
-  * @param format - The desired result format
-  */
+   * Converts a bare payload into an encrypted one in the desired format.
+   * @param payload - The non-encrypted payload object to encrypt
+   * @param key - The key to use to encrypt the payload. Can be either
+   *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
+   * items keys), or an ItemsKey (if encrypted regular items)
+   * @param format - The desired result format
+   */
   public async generateEncryptedParameters(
     payload: PurePayload,
     format: PayloadFormat,
-    _key?: SNItemsKey | SNRootKey,
+    _key?: SNItemsKey | SNRootKey
   ) {
     if (format === PayloadFormat.DecryptedBareObject) {
-      return CreateEncryptionParameters(
-        {
-          content: payload.content
-        }
-      );
+      return CreateEncryptionParameters({
+        content: payload.content,
+      });
     } else if (format === PayloadFormat.DecryptedBase64String) {
       const jsonString = JSON.stringify(payload.content);
       const base64String = await this.crypto.base64Encode(jsonString);
       const content = ProtocolVersion.V000Base64Decrypted + base64String;
-      return CreateEncryptionParameters(
-        {
-          content: content
-        }
-      );
+      return CreateEncryptionParameters({
+        content: content,
+      });
     } else {
       throw `Must override generateEncryptedParameters to handle format ${format}.`;
     }
   }
 
   /**
-  * Converts encrypted parameters (a subset of a Payload) into decrypted counterpart.
-  * @param encryptedParameters - The encrypted payload object to decrypt
-  * @param key - The key to use to decrypt the payload. Can be either
-  *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
-  * items keys), or an ItemsKey (if encrypted regular items)
-  */
+   * Converts encrypted parameters (a subset of a Payload) into decrypted counterpart.
+   * @param encryptedParameters - The encrypted payload object to decrypt
+   * @param key - The key to use to decrypt the payload. Can be either
+   *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
+   * items keys), or an ItemsKey (if encrypted regular items)
+   */
   public async generateDecryptedParameters(
     encryptedParameters: PurePayload,
-    _key?: SNItemsKey | SNRootKey,
+    _key?: SNItemsKey | SNRootKey
   ) {
     const format = encryptedParameters.format;
     if (format === PayloadFormat.DecryptedBareObject) {
       /** No decryption required */
       return encryptedParameters;
-    }
-    else if (format === PayloadFormat.DecryptedBase64String) {
+    } else if (format === PayloadFormat.DecryptedBase64String) {
       const contentString = encryptedParameters.contentString.substring(
         ProtocolVersion.VersionLength,
         encryptedParameters.contentString.length
@@ -184,14 +170,13 @@ export abstract class SNProtocolOperator {
       } catch (e) {
         decodedContent = encryptedParameters.content;
       }
-      return CopyEncryptionParameters(
-        encryptedParameters,
-        {
-          content: decodedContent
-        }
-      );
+      return CopyEncryptionParameters(encryptedParameters, {
+        content: decodedContent,
+      });
     } else {
-      throw Error(`Must override generateDecryptedParameters to handle format ${format}.`);
+      throw Error(
+        `Must override generateDecryptedParameters to handle format ${format}.`
+      );
     }
   }
 }

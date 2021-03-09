@@ -5,7 +5,7 @@
 export enum RawStorageKey {
   StorageObject = 'storage',
   DescriptorRecord = 'descriptors',
-  SnjsVersion = 'snjs_version'
+  SnjsVersion = 'snjs_version',
 }
 
 /**
@@ -33,11 +33,11 @@ export enum StorageKey {
   SessionHistoryRevisions = 'sessionHistory_revisions',
   SessionHistoryOptimize = 'sessionHistory_autoOptimize',
   KeyRecoveryUndecryptableItems = 'key_recovery_undecryptable',
-  StorageEncryptionPolicy = 'storage_policy'
+  StorageEncryptionPolicy = 'storage_policy',
 }
 
 export enum NonwrappedStorageKey {
-  MobileFirstRun = 'first_run'
+  MobileFirstRun = 'first_run',
 }
 
 export function namespacedKey(namespace: string, key: string) {

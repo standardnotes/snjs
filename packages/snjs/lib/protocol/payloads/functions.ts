@@ -1,7 +1,11 @@
 import { MutationType } from './../../models/core/item';
-import { ComponentArea, ComponentMutator, SNComponent } from './../../models/app/component';
+import {
+  ComponentArea,
+  ComponentMutator,
+  SNComponent,
+} from './../../models/app/component';
 import { ContentReference, PayloadContent } from './generator';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { CreateItemFromPayload } from '@Models/generator';
 import remove from 'lodash/remove';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';
@@ -14,7 +18,7 @@ type AffectorFunction = (
   basePayload: PurePayload,
   duplicatePayload: PurePayload,
   baseCollection: ImmutablePayloadCollection
-) => PurePayload[]
+) => PurePayload[];
 
 function NoteDuplicationAffectedPayloads(
   basePayload: PurePayload,
@@ -22,12 +26,16 @@ function NoteDuplicationAffectedPayloads(
   baseCollection: ImmutablePayloadCollection
 ) {
   /** If note has editor, maintain editor relationship in duplicate note */
-  const components = baseCollection.all(ContentType.Component).map((payload) => {
-    return CreateItemFromPayload(payload);
-  }) as SNComponent[];
-  const editor = components.filter((c) => c.area === ComponentArea.Editor).find((e) => {
-    return e.isExplicitlyEnabledForItem(basePayload.uuid);
-  })
+  const components = baseCollection
+    .all(ContentType.Component)
+    .map((payload) => {
+      return CreateItemFromPayload(payload);
+    }) as SNComponent[];
+  const editor = components
+    .filter((c) => c.area === ComponentArea.Editor)
+    .find((e) => {
+      return e.isExplicitlyEnabledForItem(basePayload.uuid);
+    });
   if (!editor) {
     return undefined;
   }
@@ -39,8 +47,8 @@ function NoteDuplicationAffectedPayloads(
 }
 
 const AffectorMapping = {
-  [ContentType.Note]: NoteDuplicationAffectedPayloads
-} as Partial<Record<ContentType, AffectorFunction>>
+  [ContentType.Note]: NoteDuplicationAffectedPayloads,
+} as Partial<Record<ContentType, AffectorFunction>>;
 
 /**
  * Copies payload and assigns it a new uuid.
@@ -64,14 +72,11 @@ export async function PayloadsByDuplicating(
   override.content = {
     ...payload.safeContent,
     ...additionalContent,
-  }
+  };
   if (isConflict) {
     override.content.conflict_of = payload.uuid;
   }
-  const copy = CopyPayload(
-    payload,
-    override
-  );
+  const copy = CopyPayload(payload, override);
 
   results.push(copy);
 
@@ -79,19 +84,18 @@ export async function PayloadsByDuplicating(
    * Get the payloads that make reference to payload and add the copy.
    */
   const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = await PayloadsByUpdatingReferences(
-    referencing,
-    [{
+  const updatedReferencing = await PayloadsByUpdatingReferences(referencing, [
+    {
       uuid: copy.uuid!,
-      content_type: copy.content_type!
-    }]
-  );
+      content_type: copy.content_type!,
+    },
+  ]);
   extendArray(results, updatedReferencing);
 
   const affector = AffectorMapping[payload.content_type];
   if (affector) {
     const affected = affector(payload, copy, baseCollection);
-    if(affected) {
+    if (affected) {
       extendArray(results, affected);
     }
   }
@@ -111,19 +115,16 @@ export async function PayloadsByAlternatingUuid(
 ) {
   const results = [];
   /**
-  * We need to clone payload and give it a new uuid,
-  * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
-  */
-  const copy = CopyPayload(
-    payload,
-    {
-      uuid: await Uuid.GenerateUuid(),
-      dirty: true,
-      dirtiedDate: new Date(),
-      lastSyncBegan: null,
-      lastSyncEnd: null,
-    }
-  );
+   * We need to clone payload and give it a new uuid,
+   * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
+   */
+  const copy = CopyPayload(payload, {
+    uuid: await Uuid.GenerateUuid(),
+    dirty: true,
+    dirtiedDate: new Date(),
+    lastSyncBegan: null,
+    lastSyncEnd: null,
+  });
   results.push(copy);
 
   /**
@@ -133,24 +134,23 @@ export async function PayloadsByAlternatingUuid(
   const referencing = baseCollection.elementsReferencingElement(payload);
   const updatedReferencing = await PayloadsByUpdatingReferences(
     referencing,
-    [{
-      uuid: copy.uuid!,
-      content_type: copy.content_type!
-    }],
+    [
+      {
+        uuid: copy.uuid!,
+        content_type: copy.content_type!,
+      },
+    ],
     [payload.uuid!]
   );
   extendArray(results, updatedReferencing);
 
-  const updatedSelf = CopyPayload(
-    payload,
-    {
-      deleted: true,
-      /** Do not set as dirty; this item is non-syncable
+  const updatedSelf = CopyPayload(payload, {
+    deleted: true,
+    /** Do not set as dirty; this item is non-syncable
         and should be immediately discarded */
-      dirty: false,
-      content: undefined
-    }
-  );
+    dirty: false,
+    content: undefined,
+  });
 
   results.push(updatedSelf);
   return results;
@@ -174,17 +174,14 @@ async function PayloadsByUpdatingReferences(
         remove(references, { uuid: id });
       }
     }
-    const result = CopyPayload(
-      payload,
-      {
-        dirty: true,
-        dirtiedDate: new Date(),
-        content: {
-          ...payload.safeContent,
-          references: references
-        }
-      }
-    );
+    const result = CopyPayload(payload, {
+      dirty: true,
+      dirtiedDate: new Date(),
+      content: {
+        ...payload.safeContent,
+        references: references,
+      },
+    });
     results.push(result);
   }
   return results;
@@ -194,7 +191,10 @@ async function PayloadsByUpdatingReferences(
  * Compares the .content fields for equality, creating new SNItem objects
  * to properly handle .content intricacies.
  */
-export function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload) {
+export function PayloadContentsEqual(
+  payloadA: PurePayload,
+  payloadB: PurePayload
+) {
   const itemA = CreateItemFromPayload(payloadA);
   const itemB = CreateItemFromPayload(payloadB);
   return itemA.isItemContentEqualWith(itemB);

@@ -22,22 +22,23 @@ describe('model manager mapping', () => {
       PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 
   it('mapping nonexistent deleted item doesnt create it', async function () {
-    const payload = CreateMaxPayloadFromAnyObject(
-      Factory.createNoteParams(),
-      {
-        dirty: false,
-        deleted: true
-      }
-    );
+    const payload = CreateMaxPayloadFromAnyObject(Factory.createNoteParams(), {
+      dirty: false,
+      deleted: true,
+    });
     await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged
     );
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 
   it('mapping with omitted content should preserve item content', async function () {
@@ -68,21 +69,22 @@ describe('model manager mapping', () => {
       PayloadSource.LocalChanged
     );
     this.expectedItemCount++;
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
-
-    const changedParams = CreateMaxPayloadFromAnyObject(
-      payload,
-      {
-        dirty: false,
-        deleted: true
-      }
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
     );
+
+    const changedParams = CreateMaxPayloadFromAnyObject(payload, {
+      dirty: false,
+      deleted: true,
+    });
     this.expectedItemCount--;
     await this.application.itemManager.emitItemsFromPayloads(
       [changedParams],
       PayloadSource.LocalChanged
     );
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 
   it('mapping deleted but dirty item should not delete it', async function () {
@@ -94,15 +96,20 @@ describe('model manager mapping', () => {
     this.expectedItemCount++;
 
     let item = this.application.itemManager.items[0];
-    item = await this.application.itemManager.changeItem(item.uuid, (mutator) => {
-      mutator.setDeleted();
-    });
+    item = await this.application.itemManager.changeItem(
+      item.uuid,
+      (mutator) => {
+        mutator.setDeleted();
+      }
+    );
     const payload2 = CreateMaxPayloadFromAnyObject(item);
     await this.application.itemManager.emitItemsFromPayloads(
       [payload2],
       PayloadSource.LocalChanged
     );
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 
   it('mapping existing item updates its properties', async function () {
@@ -113,15 +120,12 @@ describe('model manager mapping', () => {
     );
 
     const newTitle = 'updated title';
-    const mutated = CreateMaxPayloadFromAnyObject(
-      payload,
-      {
-        content: {
-          ...payload.safeContent,
-          title: newTitle
-        }
-      }
-    );
+    const mutated = CreateMaxPayloadFromAnyObject(payload, {
+      content: {
+        ...payload.safeContent,
+        title: newTitle,
+      },
+    });
     await this.application.itemManager.emitItemsFromPayloads(
       [mutated],
       PayloadSource.LocalChanged

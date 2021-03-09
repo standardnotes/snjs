@@ -14,20 +14,15 @@ describe('payload collections', () => {
   });
 
   const copyPayload = (payload, timestamp, changeUuid) => {
-    return CopyPayload(
-      payload,
-      {
-        uuid: changeUuid ? Factory.generateUuidish() : payload.uuid,
-        created_at: timestamp ? new Date(timestamp) : new Date()
-      }
-    );
+    return CopyPayload(payload, {
+      uuid: changeUuid ? Factory.generateUuidish() : payload.uuid,
+      created_at: timestamp ? new Date(timestamp) : new Date(),
+    });
   };
 
   it('find', async () => {
     const payload = Factory.createNotePayload();
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      [payload]
-    );
+    const collection = ImmutablePayloadCollection.WithPayloads([payload]);
     expect(collection.find(payload.uuid)).to.be.ok;
   });
 
@@ -35,9 +30,10 @@ describe('payload collections', () => {
     const payloads = Factory.createRelatedNoteTagPairPayload();
     const notePayload = payloads[0];
     const tagPayload = payloads[1];
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      [notePayload, tagPayload]
-    );
+    const collection = ImmutablePayloadCollection.WithPayloads([
+      notePayload,
+      tagPayload,
+    ]);
     const referencing = collection.elementsReferencingElement(notePayload);
     expect(referencing.length).to.equal(1);
   });
@@ -46,15 +42,12 @@ describe('payload collections', () => {
     const payload = Factory.createNotePayload();
     const collection = new ItemCollection();
     collection.set([payload]);
-    const conflict = CopyPayload(
-      payload,
-      {
-        content: {
-          conflict_of: payload.uuid,
-          ...payload.content
-        }
-      }
-    );
+    const conflict = CopyPayload(payload, {
+      content: {
+        conflict_of: payload.uuid,
+        ...payload.content,
+      },
+    });
     collection.set([conflict]);
 
     expect(collection.conflictsOf(payload.uuid)).to.eql([conflict]);
@@ -65,6 +58,24 @@ describe('payload collections', () => {
     expect(collection.conflictsOf(payload.uuid)).to.eql([manualResults]);
   });
 
+  it('setting same element twice should not yield duplicates', async () => {
+    const collection = new ItemCollection();
+    collection.setDisplayOptions(
+      ContentType.Note,
+      CollectionSort.CreatedAt,
+      'asc'
+    );
+    const payload = Factory.createNotePayload();
+
+    const copy = CopyPayload(payload);
+    collection.set([payload, copy]);
+    collection.set([payload]);
+    collection.set([payload, copy]);
+
+    const sorted = collection.displayElements(ContentType.Note);
+    expect(sorted.length).to.equal(1);
+  });
+
   it('display sort asc', async () => {
     const collection = new ItemCollection();
     collection.setDisplayOptions(
@@ -73,20 +84,14 @@ describe('payload collections', () => {
       'asc'
     );
     const present = Factory.createNotePayload();
-    const oldest = CopyPayload(
-      present,
-      {
-        uuid: Factory.generateUuidish(),
-        created_at: Factory.yesterday()
-      }
-    );
-    const newest = CopyPayload(
-      present,
-      {
-        uuid: Factory.generateUuidish(),
-        created_at: Factory.tomorrow()
-      }
-    );
+    const oldest = CopyPayload(present, {
+      uuid: Factory.generateUuidish(),
+      created_at: Factory.yesterday(),
+    });
+    const newest = CopyPayload(present, {
+      uuid: Factory.generateUuidish(),
+      created_at: Factory.tomorrow(),
+    });
     collection.set([newest, oldest, present]);
     const sorted = collection.displayElements(ContentType.Note);
 
@@ -103,20 +108,14 @@ describe('payload collections', () => {
       'dsc'
     );
     const present = Factory.createNotePayload();
-    const oldest = CopyPayload(
-      present,
-      {
-        uuid: Factory.generateUuidish(),
-        created_at: Factory.yesterday()
-      }
-    );
-    const newest = CopyPayload(
-      present,
-      {
-        uuid: Factory.generateUuidish(),
-        created_at: Factory.tomorrow()
-      }
-    );
+    const oldest = CopyPayload(present, {
+      uuid: Factory.generateUuidish(),
+      created_at: Factory.yesterday(),
+    });
+    const newest = CopyPayload(present, {
+      uuid: Factory.generateUuidish(),
+      created_at: Factory.tomorrow(),
+    });
     collection.set([oldest, newest, present]);
     const sorted = collection.displayElements(ContentType.Note);
 
@@ -161,15 +160,14 @@ describe('payload collections', () => {
     expect(collection.all(ContentType.Note).length).to.equal(1);
     expect(collection.displayElements(ContentType.Note).length).to.equal(1);
 
-    const deleted = CopyPayload(
-      present,
-      {
-        deleted: true
-      }
-    );
+    const deleted = CopyPayload(present, {
+      deleted: true,
+    });
     collection.set([deleted]);
 
-    expect(collection.all(ContentType.Note).filter((n) => !n.deleted).length).to.equal(0);
+    expect(
+      collection.all(ContentType.Note).filter((n) => !n.deleted).length
+    ).to.equal(0);
     expect(collection.displayElements(ContentType.Note).length).to.equal(0);
   });
 
@@ -219,19 +217,18 @@ describe('payload collections', () => {
     expect(sorted[0].uuid).to.equal(unpinned1.uuid);
     expect(sorted[1].uuid).to.equal(unpinned2.uuid);
 
-    const pinned2 = CreateItemFromPayload(CopyPayload(
-      unpinned2.payload,
-      {
+    const pinned2 = CreateItemFromPayload(
+      CopyPayload(unpinned2.payload, {
         content: {
           ...unpinned1.content,
           appData: {
             [SNItem.DefaultAppDomain()]: {
-              pinned: true
-            }
-          }
-        }
-      }
-    ));
+              pinned: true,
+            },
+          },
+        },
+      })
+    );
     collection.set(pinned2);
     const resorted = collection.displayElements(ContentType.Note);
 
@@ -241,17 +238,20 @@ describe('payload collections', () => {
 
   it('setDisplayOptions should not fail for encrypted items', async () => {
     const collection = new ItemCollection();
-    const regularPayload1 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText'));
-    const regularPayload2 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText2'));
-    const encryptedPayloadUpdated = CreateItemFromPayload(CopyPayload(
-      regularPayload1.payload,
-      {
+    const regularPayload1 = CreateItemFromPayload(
+      Factory.createNotePayload('foo', 'noteText')
+    );
+    const regularPayload2 = CreateItemFromPayload(
+      Factory.createNotePayload('foo', 'noteText2')
+    );
+    const encryptedPayloadUpdated = CreateItemFromPayload(
+      CopyPayload(regularPayload1.payload, {
         ...regularPayload1.payload,
         errorDecrypting: true,
         content: 'ssss',
-        uuid: Factory.generateUuidish()
-      }
-    ));
+        uuid: Factory.generateUuidish(),
+      })
+    );
     collection.set([regularPayload1, encryptedPayloadUpdated, regularPayload2]);
     collection.setDisplayOptions(
       ContentType.Note,
@@ -264,5 +264,4 @@ describe('payload collections', () => {
     expect(displayed[1].errorDecrypting).to.equal(true);
     expect(displayed[2].text).to.equal('noteText2');
   });
-
 });

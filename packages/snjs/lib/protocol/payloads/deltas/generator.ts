@@ -4,14 +4,14 @@ import { DeltaRemoteRetrieved } from './remote_retrieved';
 import { PayloadSource } from '@Payloads/sources';
 
 export function DeltaClassForSource(source: PayloadSource) {
-  if(source === PayloadSource.RemoteRetrieved) {
+  if (source === PayloadSource.RemoteRetrieved) {
     return DeltaRemoteRetrieved;
-  } else if(source === PayloadSource.RemoteSaved) {
+  } else if (source === PayloadSource.RemoteSaved) {
     return DeltaRemoteSaved;
-  } else if((
+  } else if (
     source === PayloadSource.ConflictData ||
     source === PayloadSource.ConflictUuid
-  )) {
+  ) {
     return DeltaRemoteConflicts;
   }
 }

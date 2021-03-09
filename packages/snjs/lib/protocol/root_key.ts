@@ -13,8 +13,8 @@ export type RootKeyContent = {
   masterKey: string;
   serverPassword?: string;
   dataAuthenticationKey?: string;
-  keyParams: AnyKeyParamsContent
-}
+  keyParams: AnyKeyParamsContent;
+};
 
 /**
  * A root key is a local only construct that houses the key used for the encryption
@@ -22,8 +22,7 @@ export type RootKeyContent = {
  * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
 export class SNRootKey extends SNItem {
-
-  public readonly keyParams: SNRootKeyParams
+  public readonly keyParams: SNRootKeyParams;
 
   static async Create(content: RootKeyContent, uuid?: string) {
     if (!uuid) {
@@ -40,20 +39,19 @@ export class SNRootKey extends SNItem {
         content.version = ProtocolVersion.V001;
       }
     }
-    const payload = CreateMaxPayloadFromAnyObject(
-      {
-        uuid: uuid,
-        content_type: ContentType.RootKey,
-        content: FillItemContent(content)
-      }
-    )
+    const payload = CreateMaxPayloadFromAnyObject({
+      uuid: uuid,
+      content_type: ContentType.RootKey,
+      content: FillItemContent(content),
+    });
     const keyParamsInput = content.keyParams;
     if (!keyParamsInput) {
       throw Error('Attempting to create root key without key params');
     }
-    const keyParams = keyParamsInput instanceof SNRootKeyParams
-      ? keyParamsInput
-      : new SNRootKeyParams(keyParamsInput);
+    const keyParams =
+      keyParamsInput instanceof SNRootKeyParams
+        ? keyParamsInput
+        : new SNRootKeyParams(keyParamsInput);
 
     return new SNRootKey(payload, keyParams);
   }
@@ -66,8 +64,8 @@ export class SNRootKey extends SNItem {
     const content = key.typedContent as RootKeyContent;
     const copiedKey = await this.Create({
       ...content,
-      keyParams: keyParams ? keyParams : content.keyParams
-    })
+      keyParams: keyParams ? keyParams : content.keyParams,
+    });
     return copiedKey;
   }
 
@@ -122,10 +120,13 @@ export class SNRootKey extends SNItem {
     if (this.keyVersion !== otherKey.keyVersion) {
       return false;
     }
-    const hasServerPassword = !!(this.serverPassword && otherKey.serverPassword);
+    const hasServerPassword = !!(
+      this.serverPassword && otherKey.serverPassword
+    );
     return (
       timingSafeEqual(this.masterKey, otherKey.masterKey) &&
-      (!hasServerPassword || timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
+      (!hasServerPassword ||
+        timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
     );
   }
 
@@ -139,11 +140,11 @@ export class SNRootKey extends SNItem {
   }
 
   /**
- * @returns Object that is suitable for persisting in a keychain
- */
+   * @returns Object that is suitable for persisting in a keychain
+   */
   public getKeychainValue() {
     const values: Partial<RootKeyContent> = {
-      version: this.keyVersion
+      version: this.keyVersion,
     };
     if (this.masterKey) {
       values.masterKey = this.masterKey;

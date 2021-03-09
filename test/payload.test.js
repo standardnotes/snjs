@@ -4,28 +4,23 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('payload', () => {
-
   beforeEach(function () {
     this.createBarePayload = () => {
-      return new PurePayload(
-        {
-          uuid: '123',
-          content_type: ContentType.Note,
-          content: {
-            title: 'hello'
-          }
-        }
-      );
+      return new PurePayload({
+        uuid: '123',
+        content_type: ContentType.Note,
+        content: {
+          title: 'hello',
+        },
+      });
     };
 
     this.createEncryptedPayload = () => {
-      return new PurePayload(
-        {
-          uuid: '123',
-          content_type: ContentType.Note,
-          content: '004:foo:bar'
-        }
-      );
+      return new PurePayload({
+        uuid: '123',
+        content_type: ContentType.Note,
+        content: '004:foo:bar',
+      });
     };
   });
 
@@ -38,35 +33,31 @@ describe('payload', () => {
   });
 
   it('not supplying fields should infer them', function () {
-    const payload = new PurePayload(
-      {
-        uuid: '123',
-        content_type: ContentType.Note,
-        content: {
-          title: 'hello'
-        }
-      }
-    );
+    const payload = new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      content: {
+        title: 'hello',
+      },
+    });
 
     const expectedFields = [
       PayloadField.Uuid,
       PayloadField.ContentType,
-      PayloadField.Content
+      PayloadField.Content,
     ];
 
     expect(payload.fields).to.eql(expectedFields);
   });
 
   it('not supplying source should default to constructor source', function () {
-    const payload = new PurePayload(
-      {
-        uuid: '123',
-        content_type: ContentType.Note,
-        content: {
-          title: 'hello'
-        }
-      }
-    );
+    const payload = new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      content: {
+        title: 'hello',
+      },
+    });
 
     expect(payload.source).to.equal(PayloadSource.Constructor);
   });
@@ -96,25 +87,21 @@ describe('payload', () => {
   });
 
   it('payload format base64 string', function () {
-    const payload = new PurePayload(
-      {
-        uuid: '123',
-        content_type: ContentType.Note,
-        content: '000:somebase64string'
-      }
-    );
+    const payload = new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      content: '000:somebase64string',
+    });
 
     expect(payload.format).to.equal(PayloadFormat.DecryptedBase64String);
   });
 
   it('payload format deleted', function () {
-    const payload = new PurePayload(
-      {
-        uuid: '123',
-        content_type: ContentType.Note,
-        deleted: true
-      }
-    );
+    const payload = new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      deleted: true,
+    });
 
     expect(payload.format).to.equal(PayloadFormat.Deleted);
   });
@@ -127,15 +114,13 @@ describe('payload', () => {
 
   it('merged with absent content', function () {
     const payload = this.createBarePayload();
-    const otherPayload = new PurePayload(
-      {
-        uuid: '123',
-        content_type: ContentType.Note,
-        updated_at: new Date(),
-        dirty: true,
-        dirtiedDate: new Date()
-      }
-    );
+    const otherPayload = new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      updated_at: new Date(),
+      dirty: true,
+      dirtiedDate: new Date(),
+    });
     const merged = PayloadByMerging(payload, otherPayload);
 
     expect(merged.content).to.eql(payload.content);
@@ -146,11 +131,9 @@ describe('payload', () => {
 
   it('merged with undefined content', function () {
     const payload = this.createBarePayload();
-    const otherPayload = new PurePayload(
-      {
-        content: undefined,
-      }
-    );
+    const otherPayload = new PurePayload({
+      content: undefined,
+    });
     const merged = PayloadByMerging(payload, otherPayload);
 
     expect(merged.uuid).to.equal(payload.uuid);
@@ -158,14 +141,12 @@ describe('payload', () => {
   });
 
   it('deleted and not dirty should be discardable', function () {
-    const payload = new PurePayload(
-      {
-        uuid: '123',
-        content_type: ContentType.Note,
-        deleted: true,
-        dirty: false
-      }
-    );
+    const payload = new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      deleted: true,
+      dirty: false,
+    });
 
     expect(payload.discardable).to.equal(true);
   });
@@ -183,7 +164,7 @@ describe('payload', () => {
     const payload = this.createBarePayload();
     const override = new PurePayload(
       {
-        content: '004:...'
+        content: '004:...',
       },
       [PayloadField.Content]
     );
@@ -200,7 +181,7 @@ describe('payload', () => {
     const payload = this.createBarePayload();
     const override = CreateEncryptionParameters({
       waitingForKey: true,
-      errorDecrypting: true
+      errorDecrypting: true,
     });
     const intentPayload = CreateIntentPayloadFromObject(
       payload,

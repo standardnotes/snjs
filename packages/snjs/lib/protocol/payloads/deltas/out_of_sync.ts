@@ -1,12 +1,14 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
-import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions';
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
+import {
+  PayloadContentsEqual,
+  PayloadsByDuplicating,
+} from '@Payloads/functions';
 
 import { extendArray } from '@Lib/utils';
 
 export class DeltaOutOfSync extends PayloadsDelta {
-
   public async resultingCollection() {
     const results = [];
     for (const payload of this.applyCollection.all()) {
@@ -35,6 +37,9 @@ export class DeltaOutOfSync extends PayloadsDelta {
       );
       extendArray(results, copyResults);
     }
-    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved);
+    return ImmutablePayloadCollection.WithPayloads(
+      results,
+      PayloadSource.RemoteRetrieved
+    );
   }
 }

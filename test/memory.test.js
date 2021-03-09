@@ -8,8 +8,7 @@ const expect = chai.expect;
  * Simple empty test page to create and deinit empty application
  * Then check browser Memory tool to make sure there are no leaks.
  */
-describe('memory', () => {
-
+describe('memory', function () {
   before(async function () {
     localStorage.clear();
   });
@@ -30,5 +29,4 @@ describe('memory', () => {
   it('passes', async function () {
     expect(true).to.equal(true);
   });
-
 });

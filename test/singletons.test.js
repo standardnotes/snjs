@@ -5,11 +5,11 @@ import WebDeviceInterface from './lib/web_device_interface.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('singletons', function() {
+describe('singletons', function () {
   this.timeout(Factory.TestTimeout);
 
   const syncOptions = {
-    checkIntegrity: true
+    checkIntegrity: true,
   };
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
@@ -18,8 +18,8 @@ describe('singletons', function() {
       uuid: Uuid.GenerateUuidSynchronously(),
       content_type: ContentType.UserPrefs,
       content: {
-        foo: 'bar'
-      }
+        foo: 'bar',
+      },
     };
     return CreateMaxPayloadFromAnyObject(params);
   }
@@ -28,19 +28,12 @@ describe('singletons', function() {
     return application.singletonManager.findOrCreateSingleton(
       new SNPredicate('content_type', '=', ContentType.UserPrefs),
       ContentType.UserPrefs,
-      FillItemContent({}),
+      FillItemContent({})
     );
   }
 
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
+    localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
     this.email = Uuid.GenerateUuidSynchronously();
@@ -49,24 +42,28 @@ describe('singletons', function() {
       await Factory.registerUserToApplication({
         application: this.application,
         email: this.email,
-        password: this.password
+        password: this.password,
       });
     };
     this.signOut = async () => {
-      this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+      this.application = await Factory.signOutApplicationAndReturnNew(
+        this.application
+      );
     };
     this.signIn = async () => {
       await this.application.signIn(
         this.email,
         this.password,
-        undefined, undefined, undefined,
+        undefined,
+        undefined,
+        undefined,
         true
       );
     };
     this.extManagerId = 'org.standardnotes.extensions-manager';
     this.extPred = SNPredicate.CompoundPredicate([
       new SNPredicate('content_type', '=', ContentType.Component),
-      new SNPredicate('package_info.identifier', '=', this.extManagerId)
+      new SNPredicate('package_info.identifier', '=', this.extManagerId),
     ]);
     this.createExtMgr = async () => {
       return this.application.createManagedItem(
@@ -74,20 +71,23 @@ describe('singletons', function() {
         {
           package_info: {
             name: 'Extensions',
-            identifier: this.extManagerId
-          }
+            identifier: this.extManagerId,
+          },
         },
-        true,
+        true
       );
     };
   });
 
   afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
+    localStorage.clear();
   });
 
   it(`only resolves to ${BASE_ITEM_COUNT} items`, async function () {
@@ -102,7 +102,9 @@ describe('singletons', function() {
     );
     await this.application.itemManager.setItemsDirty(Uuids(items));
     await this.application.syncService.sync(syncOptions);
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 
   it('resolves registered predicate', async function () {
@@ -119,7 +121,9 @@ describe('singletons', function() {
     const refreshedExtMgr = this.application.findItem(extManager.uuid);
     expect(refreshedExtMgr).to.be.ok;
     await this.application.sync(syncOptions);
-    expect(this.application.itemManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
+    expect(
+      this.application.itemManager.itemsMatchingPredicate(this.extPred).length
+    ).to.equal(1);
   });
 
   it('resolves via find or create', async function () {
@@ -133,7 +137,7 @@ describe('singletons', function() {
       this.application.syncService.ut_setDatabaseLoaded(true);
       this.application.sync({
         /* Simulate the first sync occuring as that is handled specially by sync service */
-        mode: SyncModes.DownloadFirst
+        mode: SyncModes.DownloadFirst,
       });
     });
     const userPreferences = await this.application.singletonManager.findOrCreateSingleton(
@@ -146,7 +150,9 @@ describe('singletons', function() {
     const refreshedUserPrefs = this.application.findItem(userPreferences.uuid);
     expect(refreshedUserPrefs).to.be.ok;
     await this.application.sync(syncOptions);
-    expect(this.application.itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(
+      this.application.itemManager.itemsMatchingPredicate(predicate).length
+    ).to.equal(1);
   });
 
   it('resolves registered predicate with signing in/out', async function () {
@@ -160,7 +166,7 @@ describe('singletons', function() {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
     await this.signOut();
     this.application.singletonManager.registerPredicate(this.extPred);
@@ -188,11 +194,16 @@ describe('singletons', function() {
       if (!beginCheckingResponse) {
         return;
       }
-      if (!didCompleteRelevantSync && eventName === SyncEvent.SingleSyncCompleted) {
+      if (
+        !didCompleteRelevantSync &&
+        eventName === SyncEvent.SingleSyncCompleted
+      ) {
         didCompleteRelevantSync = true;
         const saved = data.savedPayloads;
         expect(saved.length).to.equal(1);
-        const matching = saved.find((p) => p.content_type === ContentType.Component && p.deleted);
+        const matching = saved.find(
+          (p) => p.content_type === ContentType.Component && p.deleted
+        );
         expect(matching).to.not.be.ok;
       }
     });
@@ -205,18 +216,22 @@ describe('singletons', function() {
     /** Create prefs */
     const ogPrefs = await findOrCreatePrefsSingleton(this.application);
     await this.application.sync(syncOptions);
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
     /** Create another instance while signed out */
     await findOrCreatePrefsSingleton(this.application);
     await Factory.loginToApplication({
       application: this.application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application);
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
-    const allPrefs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
+    const allPrefs = this.application.itemManager.nonErroredItemsForContentType(
+      ogPrefs.content_type
+    );
     expect(allPrefs.length).to.equal(1);
   });
 
@@ -225,25 +240,29 @@ describe('singletons', function() {
     /** Create prefs and associate them with account */
     const ogPrefs = await findOrCreatePrefsSingleton(this.application);
     await this.application.sync(syncOptions);
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application);
+    this.application = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
 
     /** Create another instance while signed out */
     await findOrCreatePrefsSingleton(this.application);
     await Factory.loginToApplication({
       application: this.application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application);
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid);
-    const allPrefs = this.application.itemManager.nonErroredItemsForContentType(ogPrefs.content_type);
+    const allPrefs = this.application.itemManager.nonErroredItemsForContentType(
+      ogPrefs.content_type
+    );
     expect(allPrefs.length).to.equal(1);
   });
 
   it('if only result is errorDecrypting, create new item', async function () {
     const item = this.application.itemManager.items.find(
-      item => item.content_type === ContentType.UserPrefs
+      (item) => item.content_type === ContentType.UserPrefs
     );
     await this.application.itemManager.changeItem(item.uuid, (mutator) => {
       mutator.errorDecrypting = true;
@@ -256,7 +275,9 @@ describe('singletons', function() {
       item.content
     );
     await this.application.sync({ awaitAll: true });
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
     expect(resolvedItem.uuid).to.not.equal(item.uuid);
     expect(resolvedItem.errorDecrypting).to.not.be.ok;
   });
@@ -276,12 +297,12 @@ describe('singletons', function() {
       {
         package_info: {
           name: 'Extensions',
-          identifier: this.extManagerId
-        }
+          identifier: this.extManagerId,
+        },
       },
       true,
       {
-        errorDecrypting: false
+        errorDecrypting: false,
       }
     );
 
@@ -290,31 +311,30 @@ describe('singletons', function() {
       {
         package_info: {
           name: 'Extensions',
-          identifier: this.extManagerId
-        }
+          identifier: this.extManagerId,
+        },
       },
       true,
       {
-        errorDecrypting: true
+        errorDecrypting: true,
       }
     );
 
     this.expectedItemCount += 1;
     await this.application.sync(syncOptions);
     /** Now mark errored as not errorDecrypting and sync */
-    const notErrored = CreateMaxPayloadFromAnyObject(
-      errored,
-      {
-        errorDecrypting: false,
-        errorDecryptingValueChanged: true
-      }
-    );
-    await this.application.modelManager.emitPayload(notErrored);
+    const notErrored = CreateMaxPayloadFromAnyObject(errored, {
+      errorDecrypting: false,
+      errorDecryptingValueChanged: true,
+    });
+    await this.application.payloadManager.emitPayload(notErrored);
     /** Item will get decrypted on current tick, so wait one before syncing */
     await Factory.sleep(0);
     await this.application.syncService.sync(syncOptions);
 
-    expect(this.application.itemManager.itemsMatchingPredicate(this.extPred).length).to.equal(1);
+    expect(
+      this.application.itemManager.itemsMatchingPredicate(this.extPred).length
+    ).to.equal(1);
   });
 
   it('alternating the uuid of a singleton should return correct result', async function () {
@@ -341,6 +361,8 @@ describe('singletons', function() {
     resolvedItem = this.application.findItem(resolvedItem.uuid);
     expect(resolvedItem).to.not.be.ok;
     expect(resolvedItem2.uuid).to.not.equal(originalUuid);
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount);
+    expect(this.application.itemManager.items.length).to.equal(
+      this.expectedItemCount
+    );
   });
 });

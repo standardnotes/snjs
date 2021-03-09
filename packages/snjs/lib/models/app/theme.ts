@@ -4,8 +4,7 @@ import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { ComponentArea, SNComponent } from '@Models/app/component';
 
 export class SNTheme extends SNComponent {
-
-  public area: ComponentArea = ComponentArea.Themes
+  public area: ComponentArea = ComponentArea.Themes;
 
   isLayerable() {
     return this.package_info && this.package_info.layerable;
@@ -21,7 +20,12 @@ export class SNTheme extends SNComponent {
   }
 
   getMobileRules() {
-    return this.getAppDomainValue(AppDataField.MobileRules) || { constants: {}, rules: {} };
+    return (
+      this.getAppDomainValue(AppDataField.MobileRules) || {
+        constants: {},
+        rules: {},
+      }
+    );
   }
 
   /** Same as getMobileRules but without default value. */
@@ -39,7 +43,6 @@ export class SNTheme extends SNComponent {
 }
 
 export class ThemeMutator extends ItemMutator {
-
   setMobileRules(rules: any) {
     this.setAppDataItem(AppDataField.MobileRules, rules);
   }

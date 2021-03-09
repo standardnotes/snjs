@@ -7,7 +7,7 @@ export const LongTestTimeout = 20000;
 
 const syncOptions = {
   checkIntegrity: true,
-  awaitAll: true
+  awaitAll: true,
 };
 
 export function createApplication(identifier, environment, platform) {
@@ -26,8 +26,7 @@ export function createApplication(identifier, environment, platform) {
       blockingDialog: () => () => {},
     },
     identifier,
-    undefined,
-    undefined,
+    [],
     'http://localhost:3123'
   );
 }
@@ -42,7 +41,11 @@ export async function createInitAppWithRandNamespace(environment, platform) {
   return createAndInitializeApplication(namespace, environment, platform);
 }
 
-export async function createAndInitializeApplication(namespace, environment, platform) {
+export async function createAndInitializeApplication(
+  namespace,
+  environment,
+  platform
+) {
   const application = createApplication(namespace, environment, platform);
   await initializeApplication(application);
   return application;
@@ -50,22 +53,32 @@ export async function createAndInitializeApplication(namespace, environment, pla
 
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
-    receiveChallenge: (_challenge) => {
-      throw Error('Factory application shouldn\'t have challenges');
-    }
+    receiveChallenge: (challenge) => {
+      if (challenge.reason !== ChallengeReason.Custom) {
+        throw Error("Factory application shouldn't have challenges");
+      }
+    },
   });
   await application.launch(true);
 }
 
-export async function registerUserToApplication(
-  { application, email, password, ephemeral, mergeLocal = true }
-) {
+export async function registerUserToApplication({
+  application,
+  email,
+  password,
+  ephemeral,
+  mergeLocal = true,
+}) {
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   return application.register(email, password, ephemeral, mergeLocal);
 }
 
-export async function setOldVersionPasscode({ application, passcode, version }) {
+export async function setOldVersionPasscode({
+  application,
+  passcode,
+  version,
+}) {
   const identifier = await application.protocolService.crypto.generateUUID();
   const operator = application.protocolService.operatorForVersion(version);
   const key = await operator.createRootKey(
@@ -73,9 +86,7 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
     passcode,
     KeyParamsOrigination.PasscodeCreate
   );
-  await application.protocolService.setNewRootKeyWrapper(
-    key
-  );
+  await application.protocolService.setNewRootKeyWrapper(key);
   await application.rewriteItemsKeys();
   await application.syncService.sync(syncOptions);
 }
@@ -84,7 +95,12 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
  * Using application.register will always use latest version of protocol.
  * To use older version, use this method.
  */
-export async function registerOldUser({ application, email, password, version }) {
+export async function registerOldUser({
+  application,
+  email,
+  password,
+  version,
+}) {
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   const operator = application.protocolService.operatorForVersion(version);
@@ -100,22 +116,26 @@ export async function registerOldUser({ application, email, password, version })
     accountKey.keyParams
   );
   /** Mark all existing items as dirty. */
-  await application.itemManager.changeItems(Uuids(application.itemManager.items), (m) => {
-    m.dirty = true;
-  })
-  await application.sessionManager.handleSuccessAuthResponse(response, accountKey);
+  await application.itemManager.changeItems(
+    Uuids(application.itemManager.items),
+    (m) => {
+      m.dirty = true;
+    }
+  );
+  await application.sessionManager.handleSuccessAuthResponse(
+    response,
+    accountKey
+  );
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
     mode: SyncModes.DownloadFirst,
-    ...syncOptions
+    ...syncOptions,
   });
   await application.protocolService.decryptErroredItems();
 }
 
 export function createStorageItemPayload(contentType) {
-  return CreateMaxPayloadFromAnyObject(
-    createItemParams(contentType)
-  );
+  return CreateMaxPayloadFromAnyObject(createItemParams(contentType));
 }
 
 export function createNotePayload(title, text = undefined) {
@@ -160,11 +180,11 @@ export async function createSyncedNote(application) {
 
 export async function getStoragePayloadsOfType(application, type) {
   const rawPayloads = await application.storageService.getAllRawPayloads();
-  return rawPayloads.filter((rp) => rp.content_type === type).map((rp) => {
-    return CreateMaxPayloadFromAnyObject(
-      rp
-    );
-  });
+  return rawPayloads
+    .filter((rp) => rp.content_type === type)
+    .map((rp) => {
+      return CreateMaxPayloadFromAnyObject(rp);
+    });
 }
 
 export async function createManyMappedNotes(application, count) {
@@ -177,7 +197,13 @@ export async function createManyMappedNotes(application, count) {
   return createdNotes;
 }
 
-export async function loginToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
+export async function loginToApplication({
+  application,
+  email,
+  password,
+  ephemeral,
+  mergeLocal = true,
+}) {
   return application.signIn(
     email,
     password,
@@ -200,7 +226,11 @@ export async function signOutApplicationAndReturnNew(application) {
 export async function signOutAndBackIn(application, email, password) {
   await application.signOut();
   const newApplication = await createInitAppWithRandNamespace();
-  await this.loginToApplication({ application: newApplication, email, password });
+  await this.loginToApplication({
+    application: newApplication,
+    email,
+    password,
+  });
   return newApplication;
 }
 
@@ -210,8 +240,8 @@ export function createItemParams(contentType) {
     content_type: contentType,
     content: {
       title: 'hello',
-      text: 'world'
-    }
+      text: 'world',
+    },
   };
   return params;
 }
@@ -229,8 +259,8 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
     content: {
       title: title || 'hello',
       text: text || 'world',
-      references: []
-    }
+      references: [],
+    },
   };
   return params;
 }
@@ -242,8 +272,8 @@ export function createTagParams({ dirty = true } = {}) {
     dirty: dirty,
     content: {
       title: 'thoughts',
-      references: []
-    }
+      references: [],
+    },
   };
   return params;
 }
@@ -251,14 +281,16 @@ export function createTagParams({ dirty = true } = {}) {
 export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
   const noteParams = createNoteParams({ dirty });
   const tagParams = createTagParams({ dirty });
-  tagParams.content.references = [{
-    uuid: noteParams.uuid,
-    content_type: noteParams.content_type
-  }];
+  tagParams.content.references = [
+    {
+      uuid: noteParams.uuid,
+      content_type: noteParams.content_type,
+    },
+  ];
   noteParams.content.references = [];
   return [
     CreateMaxPayloadFromAnyObject(noteParams),
-    CreateMaxPayloadFromAnyObject(tagParams)
+    CreateMaxPayloadFromAnyObject(tagParams),
   ];
 }
 
@@ -294,7 +326,8 @@ export function shuffleArray(a) {
 
 export function randomString(length = 10) {
   let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -314,22 +347,23 @@ export async function expectThrowsAsync(method, errorMessage) {
   let error = null;
   try {
     await method();
-  }
-  catch (err) {
+  } catch (err) {
     error = err;
   }
   const expect = chai.expect;
   expect(error).to.be.an('Error');
   if (errorMessage) {
-    expect(error.message).to.be.a('string').and.satisfy(msg => msg.startsWith(errorMessage));
+    expect(error.message)
+      .to.be.a('string')
+      .and.satisfy((msg) => msg.startsWith(errorMessage));
   }
-};
+}
 
 export function ignoreChallenges(application) {
   application.setLaunchCallback({
     receiveChallenge() {
       /** no-op */
-    }
+    },
   });
 }
 
@@ -346,6 +380,6 @@ export function handlePasswordChallenges(application, password) {
           )
       );
       application.submitValuesForChallenge(challenge, values);
-    }
+    },
   });
 }

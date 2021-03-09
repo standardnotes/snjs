@@ -7,18 +7,16 @@ const expect = chai.expect;
 describe('key recovery service', function () {
   this.timeout(Factory.LongTestTimeout);
 
-  before(async function () {
-    localStorage.clear();
-  });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
   beforeEach(async function () {
     localStorage.clear();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Factory.generateUuid();
+    this.password = Factory.generateUuid();
+  });
+
+  afterEach(function () {
+    this.application?.deinit();
+    this.application = null;
+    localStorage.clear();
   });
 
   it('when encountering an undecryptable items key, should recover through recovery wizard', async function () {
@@ -29,10 +27,9 @@ describe('key recovery service', function () {
     const application = await Factory.createApplication(namespace);
     const receiveChallenge = async (challenge) => {
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(challenge.prompts[0], unassociatedPassword)]
-      );
+      application.submitValuesForChallenge(challenge, [
+        new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+      ]);
     };
     await application.prepareForLaunch({ receiveChallenge });
     await application.launch(true);
@@ -40,7 +37,7 @@ describe('key recovery service', function () {
     await Factory.registerUserToApplication({
       application: application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     /** Create items key associated with a random root key */
@@ -49,7 +46,9 @@ describe('key recovery service', function () {
       unassociatedPassword,
       KeyParamsOrigination.Registration
     );
-    const randomItemsKey = await application.protocolService.defaultOperator().createItemsKey();
+    const randomItemsKey = await application.protocolService
+      .defaultOperator()
+      .createItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       randomItemsKey.payload,
       EncryptionIntent.Sync,
@@ -57,18 +56,25 @@ describe('key recovery service', function () {
     );
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.payloadByDecryptingPayload(encrypted);
+    const decrypted = await application.protocolService.payloadByDecryptingPayload(
+      encrypted
+    );
     /** Expect to be errored */
     expect(decrypted.errorDecrypting).to.equal(true);
 
     /** Insert into rotation */
-    await application.modelManager.emitPayload(decrypted, PayloadSource.Constructor);
+    await application.payloadManager.emitPayload(
+      decrypted,
+      PayloadSource.Constructor
+    );
 
     /** Wait and allow recovery wizard to complete */
     await Factory.sleep(0.3);
 
     /** Should be decrypted now */
-    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(false);
+    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(
+      false
+    );
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
@@ -84,10 +90,9 @@ describe('key recovery service', function () {
     const receiveChallenge = async (challenge) => {
       totalPromptCount++;
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(challenge.prompts[0], unassociatedPassword)]
-      );
+      application.submitValuesForChallenge(challenge, [
+        new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+      ]);
     };
     await application.prepareForLaunch({ receiveChallenge });
     await application.launch(true);
@@ -95,7 +100,7 @@ describe('key recovery service', function () {
     await Factory.registerUserToApplication({
       application: application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     /** Create items key associated with a random root key */
@@ -104,8 +109,12 @@ describe('key recovery service', function () {
       unassociatedPassword,
       KeyParamsOrigination.Registration
     );
-    const randomItemsKey = await application.protocolService.defaultOperator().createItemsKey();
-    const randomItemsKey2 = await application.protocolService.defaultOperator().createItemsKey();
+    const randomItemsKey = await application.protocolService
+      .defaultOperator()
+      .createItemsKey();
+    const randomItemsKey2 = await application.protocolService
+      .defaultOperator()
+      .createItemsKey();
     const encrypted = await application.protocolService.payloadsByEncryptingPayloads(
       [randomItemsKey.payload, randomItemsKey2.payload],
       EncryptionIntent.Sync,
@@ -113,16 +122,25 @@ describe('key recovery service', function () {
     );
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.payloadsByDecryptingPayloads(encrypted);
+    const decrypted = await application.protocolService.payloadsByDecryptingPayloads(
+      encrypted
+    );
 
-    await application.modelManager.emitPayloads(decrypted, PayloadSource.Constructor);
+    await application.payloadManager.emitPayloads(
+      decrypted,
+      PayloadSource.Constructor
+    );
 
     /** Wait and allow recovery wizard to complete */
     await Factory.sleep(1.5);
 
     /** Should be decrypted now */
-    expect(application.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(false);
-    expect(application.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(false);
+    expect(application.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(
+      false
+    );
+    expect(application.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(
+      false
+    );
 
     expect(totalPromptCount).to.equal(1);
 
@@ -130,7 +148,7 @@ describe('key recovery service', function () {
     application.deinit();
   });
 
-  xit('when changing password on another client, it should prompt us for new account password', async function () {
+  it.skip('when changing password on another client, it should prompt us for new account password', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
     const passcode = 'mypasscode';
@@ -146,14 +164,14 @@ describe('key recovery service', function () {
         didPromptForNewPassword = true;
       }
       /** Give newPassword when prompted */
-      appA.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(
+      appA.submitValuesForChallenge(challenge, [
+        new ChallengeValue(
           prompt,
           prompt.validation === ChallengeValidation.LocalPasscode
             ? passcode
-            : newPassword)]
-      );
+            : newPassword
+        ),
+      ]);
     };
     await appA.prepareForLaunch({ receiveChallenge });
     await appA.launch(true);
@@ -161,7 +179,7 @@ describe('key recovery service', function () {
     await Factory.registerUserToApplication({
       application: appA,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     /** Set a passcode to expect it to be validated later */
@@ -176,7 +194,7 @@ describe('key recovery service', function () {
     await Factory.loginToApplication({
       application: appB,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     /** Change password on appB */
@@ -191,7 +209,7 @@ describe('key recovery service', function () {
 
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(2);
     const itemsKeys = appA.getItems(ContentType.ItemsKey);
-    const errored = itemsKeys.filter(k => k.errorDecrypting);
+    const errored = itemsKeys.filter((k) => k.errorDecrypting);
     expect(errored.length).to.equal(1);
 
     /** Allow key recovery service ample time to do its thing */
@@ -220,17 +238,16 @@ describe('key recovery service', function () {
     appB.deinit();
   });
 
-  xit('when items key associated with item is errored, item should be marked waiting for key', async function () {
+  it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
     const appA = await Factory.createApplication(namespace);
     const receiveChallenge = async (challenge) => {
       const prompt = challenge.prompts[0];
       /** Give newPassword when prompted */
-      appA.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(prompt, newPassword)]
-      );
+      appA.submitValuesForChallenge(challenge, [
+        new ChallengeValue(prompt, newPassword),
+      ]);
     };
     await appA.prepareForLaunch({ receiveChallenge });
     await appA.launch(true);
@@ -238,19 +255,19 @@ describe('key recovery service', function () {
     await Factory.registerUserToApplication({
       application: appA,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
 
     /** Create simultaneous appB signed into same account */
     const appB = await Factory.createApplication('another-namespace');
-    await appB.prepareForLaunch({ receiveChallenge: () => { } });
+    await appB.prepareForLaunch({ receiveChallenge: () => {} });
     await appB.launch(true);
     await Factory.loginToApplication({
       application: appB,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     /** Change password on appB */
@@ -261,12 +278,14 @@ describe('key recovery service', function () {
     /** We expect the item in appA to be errored at this point, but we do not want it to recover */
     await appA.sync();
     expect(appA.findItem(note.uuid).waitingForKey).to.equal(true);
-    console.warn('Expecting exceptions below as we destroy app during key recovery');
+    console.warn(
+      'Expecting exceptions below as we destroy app during key recovery'
+    );
     appA.deinit();
     appB.deinit();
 
     const recreatedAppA = await Factory.createApplication(namespace);
-    await recreatedAppA.prepareForLaunch({ receiveChallenge: () => { } });
+    await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} });
     await recreatedAppA.launch(true);
 
     expect(recreatedAppA.findItem(note.uuid).errorDecrypting).to.equal(true);
@@ -284,15 +303,16 @@ describe('key recovery service', function () {
     const application = await Factory.createApplication('some-namespace');
     const receiveChallenge = async (challenge) => {
       /** This is the sign in prompt, return proper value */
-      application.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(
+      application.submitValuesForChallenge(challenge, [
+        new ChallengeValue(
           challenge.prompts[0],
-          challenge.subheading.includes(KeyRecoveryStrings.KeyRecoveryLoginFlowReason)
+          challenge.subheading.includes(
+            KeyRecoveryStrings.KeyRecoveryLoginFlowReason
+          )
             ? this.password
             : unassociatedPassword
-        )]
-      );
+        ),
+      ]);
     };
     await application.prepareForLaunch({ receiveChallenge });
     await application.launch(true);
@@ -300,7 +320,7 @@ describe('key recovery service', function () {
     await Factory.registerUserToApplication({
       application: application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     const correctRootKey = await application.protocolService.getRootKey();
@@ -319,19 +339,18 @@ describe('key recovery service', function () {
       KeyParamsOrigination.Registration
     );
     await application.protocolService.setRootKey(randomRootKey);
-    const correctItemsKey = await application.protocolService.defaultOperator().createItemsKey();
+    const correctItemsKey = await application.protocolService
+      .defaultOperator()
+      .createItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       correctItemsKey.payload,
       EncryptionIntent.Sync,
       randomRootKey
     );
-    await application.modelManager.emitPayload(
-      CopyPayload(
-        encrypted,
-        {
-          errorDecrypting: true
-        }
-      ),
+    await application.payloadManager.emitPayload(
+      CopyPayload(encrypted, {
+        errorDecrypting: true,
+      }),
       PayloadSource.Constructor
     );
 
@@ -351,10 +370,9 @@ describe('key recovery service', function () {
           it should be temporarily ignored and recovered separately`, async function () {
     const application = await Factory.createApplication(Factory.randomString());
     const receiveChallenge = async (challenge) => {
-      application.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(challenge.prompts[0], this.password)]
-      );
+      application.submitValuesForChallenge(challenge, [
+        new ChallengeValue(challenge.prompts[0], this.password),
+      ]);
     };
     await application.prepareForLaunch({ receiveChallenge });
     await application.launch(true);
@@ -362,24 +380,21 @@ describe('key recovery service', function () {
     await Factory.registerUserToApplication({
       application: application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getDefaultItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       itemsKey.payload,
-      EncryptionIntent.Sync,
+      EncryptionIntent.Sync
     );
     const newUpdated = new Date();
-    await application.modelManager.emitPayload(
-      CopyPayload(
-        encrypted,
-        {
-          errorDecrypting: true,
-          updated_at: newUpdated
-        }
-      ),
+    await application.payloadManager.emitPayload(
+      CopyPayload(encrypted, {
+        errorDecrypting: true,
+        updated_at: newUpdated,
+      }),
       PayloadSource.Constructor
     );
 
@@ -387,7 +402,9 @@ describe('key recovery service', function () {
     const currentItemsKey = application.findItem(itemsKey.uuid);
     expect(currentItemsKey.errorDecrypting).to.not.be.ok;
     expect(currentItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
-    expect(currentItemsKey.updated_at.getTime()).to.equal(itemsKey.updated_at.getTime());
+    expect(currentItemsKey.updated_at.getTime()).to.equal(
+      itemsKey.updated_at.getTime()
+    );
 
     /** Payload should be persisted as unrecoverable */
     const undecryptables = await application.keyRecoveryService.getUndecryptables();
@@ -403,7 +420,9 @@ describe('key recovery service', function () {
     const latestItemsKey = application.findItem(itemsKey.uuid);
     expect(latestItemsKey.errorDecrypting).to.not.be.ok;
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
-    expect(latestItemsKey.updated_at.getTime()).to.not.equal(currentItemsKey.updated_at.getTime());
+    expect(latestItemsKey.updated_at.getTime()).to.not.equal(
+      currentItemsKey.updated_at.getTime()
+    );
     expect(latestItemsKey.updated_at.getTime()).to.equal(newUpdated.getTime());
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
@@ -419,27 +438,26 @@ describe('key recovery service', function () {
     await Factory.registerUserToApplication({
       application: application,
       email: this.email,
-      password: this.password
+      password: this.password,
     });
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getDefaultItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       itemsKey.payload,
-      EncryptionIntent.Sync,
+      EncryptionIntent.Sync
     );
 
-    await application.modelManager.emitPayload(
-      CopyPayload(
-        encrypted,
-        {
-          errorDecrypting: true,
-        }
-      ),
+    await application.payloadManager.emitPayload(
+      CopyPayload(encrypted, {
+        errorDecrypting: true,
+      }),
       PayloadSource.Constructor
     );
     /** Allow enough time to persist to disk, but not enough to complete recovery wizard */
-    console.warn('Expecting some error below because we are destroying app in the middle of processing.');
+    console.warn(
+      'Expecting some error below because we are destroying app in the middle of processing.'
+    );
     await Factory.sleep(0.1);
     expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();
@@ -449,10 +467,9 @@ describe('key recovery service', function () {
     let didReceivePasswordPrompt = false;
     const receiveChallenge = async (challenge) => {
       didReceivePasswordPrompt = true;
-      recreatedApp.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(challenge.prompts[0], this.password)]
-      );
+      recreatedApp.submitValuesForChallenge(challenge, [
+        new ChallengeValue(challenge.prompts[0], this.password),
+      ]);
     };
     await recreatedApp.prepareForLaunch({ receiveChallenge });
     await recreatedApp.launch(true);
@@ -481,10 +498,9 @@ describe('key recovery service', function () {
     const application = await Factory.createApplication(namespace);
     const receiveChallenge = async (challenge) => {
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(
-        challenge,
-        [new ChallengeValue(challenge.prompts[0], unassociatedPassword)]
-      );
+      application.submitValuesForChallenge(challenge, [
+        new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+      ]);
     };
     await application.prepareForLaunch({ receiveChallenge });
     await application.launch(true);
@@ -493,7 +509,7 @@ describe('key recovery service', function () {
       application: application,
       email: this.email,
       password: this.password,
-      version: ProtocolVersion.V003
+      version: ProtocolVersion.V003,
     });
 
     /** Create items key associated with a random root key */
@@ -503,7 +519,9 @@ describe('key recovery service', function () {
       KeyParamsOrigination.Registration,
       ProtocolVersion.V003
     );
-    const randomItemsKey = await application.protocolService.operatorForVersion(ProtocolVersion.V003).createItemsKey();
+    const randomItemsKey = await application.protocolService
+      .operatorForVersion(ProtocolVersion.V003)
+      .createItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       randomItemsKey.payload,
       EncryptionIntent.Sync,
@@ -511,18 +529,25 @@ describe('key recovery service', function () {
     );
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.payloadByDecryptingPayload(encrypted);
+    const decrypted = await application.protocolService.payloadByDecryptingPayload(
+      encrypted
+    );
     /** Expect to be errored */
     expect(decrypted.errorDecrypting).to.equal(true);
 
     /** Insert into rotation */
-    await application.modelManager.emitPayload(decrypted, PayloadSource.Constructor);
+    await application.payloadManager.emitPayload(
+      decrypted,
+      PayloadSource.Constructor
+    );
 
     /** Wait and allow recovery wizard to complete */
     await Factory.sleep(0.3);
 
     /** Should be decrypted now */
-    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(false);
+    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(
+      false
+    );
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
     application.deinit();

@@ -7,18 +7,13 @@ const expect = chai.expect;
 describe('protections', function () {
   this.timeout(Factory.TestTimeout);
 
-  before(async function () {
+  beforeEach(async function () {
     localStorage.clear();
   });
-
-  after(async function () {
-    localStorage.clear();
-  });
-
-  beforeEach(async function () {});
 
   afterEach(async function () {
     await this.application.deinit();
+    localStorage.clear();
   });
 
   it('prompts for password when accessing protected note', async function () {
@@ -69,7 +64,6 @@ describe('protections', function () {
     note = await this.application.protectNote(note);
     expect(note.protected).to.be.true;
   });
-
 
   it('prompts for passcode when accessing protected note', async function () {
     const passcode = 'passcode🌂';
@@ -293,7 +287,6 @@ describe('protections', function () {
   });
 
   describe('hasProtectionSources', async function () {
-
     it('no account, no passcode, no biometrics', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
       expect(this.application.hasProtectionSources()).to.be.false;
@@ -325,7 +318,7 @@ describe('protections', function () {
         email: Uuid.GenerateUuidSynchronously(),
         password: Uuid.GenerateUuidSynchronously(),
       });
-      expect(this.application.hasProtectionSources()).to.be.true
+      expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('account, no passcode, biometrics', async function () {
@@ -336,7 +329,7 @@ describe('protections', function () {
         password: Uuid.GenerateUuidSynchronously(),
       });
       await this.application.enableBiometrics();
-      expect(this.application.hasProtectionSources()).to.be.true
+      expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('account, passcode, no biometrics', async function () {
@@ -347,7 +340,7 @@ describe('protections', function () {
         password: Uuid.GenerateUuidSynchronously(),
       });
       await this.application.setPasscode('passcode');
-      expect(this.application.hasProtectionSources()).to.be.true
+      expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('account, passcode, biometrics', async function () {
@@ -359,13 +352,11 @@ describe('protections', function () {
       });
       await this.application.setPasscode('passcode');
       await this.application.enableBiometrics();
-      expect(this.application.hasProtectionSources()).to.be.true
+      expect(this.application.hasProtectionSources()).to.be.true;
     });
   });
 
-
   describe('areProtectionsEnabled', async function () {
-
     it('should return true when session length has not been set', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
       await this.application.setPasscode('passcode');

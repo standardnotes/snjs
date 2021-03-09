@@ -1,3 +1,3 @@
-export * from './Permission/Permissions'
-export * from './Role/Roles'
+export * from './Permission/Permission'
+export * from './Role/Role'
 export * from './Token/Token'

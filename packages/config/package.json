@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/config",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
@@ -10,9 +10,16 @@
   },
   "author": "Karol Sójko <karol@standardnotes.org>",
   "license": "AGPL-3.0-or-later",
-  "scripts": {},
+  "scripts": {
+    "lint": "yarn lint:formatting",
+    "lint:formatting": "prettier --check .",
+    "format": "prettier --write ."
+  },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^4.14.0",
     "@typescript-eslint/parser": "^4.14.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1"
   }
 }

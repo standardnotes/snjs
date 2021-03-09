@@ -1,19 +1,18 @@
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from "@Protocol/collection/payload_collection";
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteRetrieved extends PayloadsDelta {
-
   public async resultingCollection() {
     const filtered = [];
     const conflicted = [];
     /**
-    * If we have retrieved an item that was saved as part of this ongoing sync operation,
-    * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
-    */
+     * If we have retrieved an item that was saved as part of this ongoing sync operation,
+     * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
+     */
     for (const received of this.applyCollection.all()) {
       const savedOrSaving = this.findRelatedPayload(
         received.uuid!,

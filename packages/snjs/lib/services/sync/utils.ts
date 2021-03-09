@@ -2,16 +2,17 @@ import { PayloadField } from './../../protocol/payloads/fields';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 /**
-  * Sorts payloads according by most recently modified first, according to the priority,
-  * whereby the earlier a content_type appears in the priorityList,
-  * the earlier it will appear in the resulting sorted array.
-  */
+ * Sorts payloads according by most recently modified first, according to the priority,
+ * whereby the earlier a content_type appears in the priorityList,
+ * the earlier it will appear in the resulting sorted array.
+ */
 export function SortPayloadsByRecentAndContentPriority(
   payloads: PurePayload[],
   priorityList: ContentType[]
 ) {
   return payloads.sort((a: PurePayload, b: PurePayload) => {
-    const dateResult = new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime();
+    const dateResult =
+      new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime();
     let aPriority = 0;
     let bPriority = 0;
     if (priorityList) {

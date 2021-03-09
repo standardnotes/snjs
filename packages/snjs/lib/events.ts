@@ -27,7 +27,6 @@ export enum ApplicationEvent {
    * to begin streaming data like notes and tags.
    */
   Launched = 11,
-
   LocalDataLoaded = 12,
 
   /**
@@ -61,6 +60,7 @@ export enum ApplicationEvent {
 
   PreferencesChanged = 25,
   ProtectionSessionExpiryDateChanged = 26,
+  PermissionsChanged = 27,
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
@@ -73,11 +73,12 @@ export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
     [SyncEvent.ExitOutOfSync]: ApplicationEvent.ExitedOutOfSync,
     [SyncEvent.LocalDataLoaded]: ApplicationEvent.LocalDataLoaded,
     [SyncEvent.MajorDataChange]: ApplicationEvent.MajorDataChange,
-    [SyncEvent.LocalDataIncrementalLoad]: ApplicationEvent.LocalDataIncrementalLoad,
+    [SyncEvent.LocalDataIncrementalLoad]:
+      ApplicationEvent.LocalDataIncrementalLoad,
     [SyncEvent.StatusChanged]: ApplicationEvent.SyncStatusChanged,
     [SyncEvent.SyncWillBegin]: ApplicationEvent.WillSync,
     [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
     [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
-    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError
+    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
   } as any)[syncEvent];
 }
