@@ -18,7 +18,9 @@
     "build": "webpack --config webpack.prod.js && yarn tsc",
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
-    "lint": "eslint . --ext .ts"
+    "lint": "yarn lint:eslint && yarn lint:tsc",
+    "lint:eslint": "eslint . --ext .ts",
+    "lint:tsc": "tsc --noEmit --emitDeclarationOnly false --project lib/tsconfig.json"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
