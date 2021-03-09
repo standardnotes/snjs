@@ -9,8 +9,8 @@ describe('key recovery service', function () {
 
   beforeEach(async function () {
     localStorage.clear();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Factory.generateUuid();
+    this.password = Factory.generateUuid();
   });
 
   afterEach(function () {

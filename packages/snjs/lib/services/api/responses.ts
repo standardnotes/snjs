@@ -5,8 +5,13 @@ import {
   KeyParamsOrigination,
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
+import { Role, Permission } from '@standardnotes/auth';
 
 export enum StatusCode {
+  LocalValidationError = 10,
+  CanceledMfa = 11,
+  UnknownError = 12,
+
   HttpStatusMinSuccess = 200,
   HttpStatusNoContent = 204,
   HttpStatusMaxSuccess = 299,
@@ -16,13 +21,10 @@ export enum StatusCode {
   HttpStatusInvalidSession = 401,
   /** User's IP is rate-limited. */
   HttpStatusForbidden = 403,
-
-  LocalValidationError = 10,
-  CanceledMfa = 11,
 }
 
-export type HttpResponse = {
-  status: StatusCode;
+export type HttpResponse<T = unknown> = {
+  status: StatusCode,
   error?: {
     message: string;
     status: number;
@@ -30,10 +32,18 @@ export type HttpResponse = {
     /** In the case of MFA required responses,
      * the required prompt is returned as part of the error */
     payload?: {
-      mfa_key?: string;
-    };
+      mfa_key?: string
+    }
+  }
+  data?: T,
+  meta?: ResponseMeta
+}
+
+export type ResponseMeta = {
+  auth: {
+    role: Role;
+    permissions: Permission[];
   };
-  object?: any;
 };
 
 export function isErrorResponseExpiredToken(errorResponse: HttpResponse) {
@@ -88,8 +98,6 @@ export type SessionListEntry = {
   updated_at: string;
   device_info: string;
 };
-
-export type SessionListResponse = HttpResponse & SessionListEntry[];
 
 export type RevisionListEntry = {
   content_type: string;

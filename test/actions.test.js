@@ -358,7 +358,7 @@ describe('actions service', () => {
       expect(Object.keys(actionResponse)).to.have.members([
         'item',
         'status',
-        'object',
+        'data',
         'auth_params',
       ]);
     });

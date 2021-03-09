@@ -16,7 +16,7 @@ export enum ErrorTag {
 
 const REQUEST_READY_STATE_COMPLETED = 4;
 
-type HttpParams = Record<string, any>;
+export type HttpParams = Record<string, unknown>;
 
 export type HttpRequest = {
   url: string;
@@ -125,7 +125,14 @@ export class SNHttpService extends PureService {
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
         const body = JSON.parse(request.responseText);
-        response.object = body;
+        /**
+         * v0 APIs do not have a `data` top-level object. In such cases, mimic
+         * the newer response body style by putting all the top-level
+         * properties inside a `data` object.
+         */
+        if (!body.data) {
+          response.data = body;
+        }
         Object.assign(response, body);
       }
     } catch (error) {
@@ -152,7 +159,7 @@ export class SNHttpService extends PureService {
   private urlForUrlAndParams(url: string, params: HttpParams) {
     const keyValueString = Object.keys(params)
       .map((key) => {
-        return key + '=' + encodeURIComponent(params[key]);
+        return key + '=' + encodeURIComponent(params[key] as string);
       })
       .join('&');
 

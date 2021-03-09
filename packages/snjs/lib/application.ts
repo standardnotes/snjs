@@ -102,7 +102,9 @@ import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
+import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
+import { Permission } from '@standardnotes/auth';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
@@ -123,19 +125,9 @@ type ObserverRemover = () => void;
 
 /** The main entrypoint of an application. */
 export class SNApplication {
-  public environment: Environment;
-  public platform: Platform;
-  public identifier: ApplicationIdentifier;
-  private swapClasses?: any[];
-  private skipClasses?: any[];
-  private defaultHost?: string;
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void;
 
-  private crypto?: SNPureCrypto;
-  public deviceInterface: DeviceInterface;
-
   private migrationService!: SNMigrationService;
-  public alertService!: SNAlertService;
   private httpService!: SNHttpService;
   private payloadManager!: PayloadManager;
   public protocolService!: SNProtocolService;
@@ -152,9 +144,10 @@ export class SNApplication {
   private itemManager!: ItemManager;
   private keyRecoveryService!: SNKeyRecoveryService;
   private preferencesService!: SNPreferencesService;
+  private permissionsService!: SNPermissionsService;
 
   private eventHandlers: ApplicationObserver[] = [];
-  private services: PureService<any>[] = [];
+  private services: PureService<any, any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
   private managedSubscribers: ObserverRemover[] = [];
@@ -190,15 +183,14 @@ export class SNApplication {
    * @param defaultHost Default host to use in ApiService.
    */
   constructor(
-    environment: Environment,
-    platform: Platform,
-    deviceInterface: DeviceInterface,
-    crypto: SNPureCrypto,
-    alertService: SNAlertService,
-    identifier: ApplicationIdentifier,
-    swapClasses?: { swap: any; with: any }[],
-    skipClasses?: any[],
-    defaultHost?: string
+    public environment: Environment,
+    public platform: Platform,
+    public deviceInterface: DeviceInterface,
+    private crypto: SNPureCrypto,
+    public alertService: SNAlertService,
+    public identifier: ApplicationIdentifier,
+    private swapClasses: { swap: any; with: any }[],
+    private defaultHost: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -223,15 +215,19 @@ export class SNApplication {
         'AlertService must be supplied when creating an application.'
       );
     }
-    this.environment = environment;
-    this.platform = platform;
-    this.identifier = identifier;
-    this.deviceInterface = deviceInterface;
-    this.crypto = crypto;
-    this.alertService = alertService;
-    this.swapClasses = swapClasses;
-    this.skipClasses = skipClasses;
-    this.defaultHost = defaultHost;
+    if (!identifier) {
+      throw Error(
+        'ApplicationIdentifier must be supplied when creating an application.'
+      );
+    }
+    if (!swapClasses) {
+      throw Error(
+        'SwapClasses array must be supplied when creating an application.'
+      );
+    }
+    if (!defaultHost) {
+      throw Error('defaultHost must be supplied when creating an application.');
+    }
     this.constructServices();
   }
 
@@ -524,7 +520,7 @@ export class SNApplication {
     return this.syncService!.getStatus()!;
   }
 
-  public getSessions(): Promise<RemoteSession[] | HttpResponse> {
+  public getSessions(): Promise<HttpResponse<RemoteSession[]>> {
     return this.sessionManager.getSessionsList();
   }
 
@@ -1092,7 +1088,9 @@ export class SNApplication {
           return payload;
         }
       });
-    const affectedUuids = await this.payloadManager.importPayloads(validPayloads);
+    const affectedUuids = await this.payloadManager.importPayloads(
+      validPayloads
+    );
     const promise = this.sync();
     if (awaitSync) {
       await promise;
@@ -1187,6 +1185,10 @@ export class SNApplication {
     return this.preferencesService.setValue(key, value);
   }
 
+  public hasPermission(permission: Permission): boolean {
+    return this.permissionsService.hasPermission(permission);
+  }
+
   /**
    * Deletes all payloads from storage.
    */
@@ -1271,7 +1273,7 @@ export class SNApplication {
     }
     this.onDeinit && this.onDeinit!(this, source);
     this.onDeinit = undefined;
-    this.crypto = undefined;
+    (this.crypto as unknown) = undefined;
     this.createdNewDatabase = false;
     this.services.length = 0;
     this.serviceObservers.length = 0;
@@ -1681,6 +1683,7 @@ export class SNApplication {
   }
 
   private constructServices() {
+    this.createPermissionsService();
     this.createPayloadManager();
     this.createItemManager();
     this.createStorageManager();
@@ -1732,6 +1735,16 @@ export class SNApplication {
     this.services = [];
   }
 
+  private createPermissionsService() {
+    this.permissionsService = new SNPermissionsService();
+    this.serviceObservers.push(
+      this.permissionsService.addEventObserver((_event, permissions) => {
+        void this.notifyEvent(ApplicationEvent.PermissionsChanged, permissions);
+      })
+    );
+    this.services.push(this.permissionsService);
+  }
+
   private createMigrationService() {
     this.migrationService = new SNMigrationService({
       protocolService: this.protocolService,
@@ -1750,6 +1763,7 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
+      this.permissionsService,
       this.defaultHost
     );
     this.services.push(this.apiService);
@@ -1761,9 +1775,6 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    if (this.shouldSkipClass(SNComponentManager)) {
-      return;
-    }
     const MaybeSwappedComponentManager = this.getClass<
       typeof SNComponentManager
     >(SNComponentManager);
@@ -1960,14 +1971,10 @@ export class SNApplication {
     this.services.push(this.preferencesService);
   }
 
-  private shouldSkipClass(classCandidate: any) {
-    return this.skipClasses && this.skipClasses.includes(classCandidate);
-  }
-
   private getClass<T>(base: T) {
-    const swapClass =
-      this.swapClasses &&
-      this.swapClasses.find((candidate) => candidate.swap === base);
+    const swapClass = this.swapClasses.find(
+      (candidate) => candidate.swap === base
+    );
     if (swapClass) {
       return swapClass.with as T;
     } else {

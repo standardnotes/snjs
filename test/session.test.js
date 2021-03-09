@@ -34,7 +34,7 @@ describe('server session', function () {
     application,
     basedOnAccessToken = true
   ) {
-    const currentSession = application.apiService.getSession();
+    const currentSession = application.apiService.session;
     const timestamp = basedOnAccessToken
       ? currentSession.accessExpiration
       : currentSession.refreshExpiration;
@@ -602,12 +602,12 @@ describe('server session', function () {
     await app2.signIn(this.email, this.password);
 
     const response = await this.application.apiService.getSessionsList();
-    expect(response.object.length).to.equal(2);
+    expect(response.data.length).to.equal(2);
 
     await app2.signOut();
 
     const response2 = await this.application.apiService.getSessionsList();
-    expect(response2.object.length).to.equal(1);
+    expect(response2.data.length).to.equal(1);
   });
 
   it('revoking a session should destroy local data @syncing-server-js-only', async function () {
@@ -641,7 +641,7 @@ describe('server session', function () {
     }),
       await app2.signIn(this.email, this.password);
 
-    const sessions = await this.application.getSessions();
+    const { data: sessions } = await this.application.getSessions();
     const app2session = sessions.find((session) => !session.current);
     await this.application.revokeSession(app2session.uuid);
     void app2.sync();

@@ -48,17 +48,15 @@ type PasswordRequestHandler = () => Promise<string>;
  *       to allow publishing a note to a user's blog.
  */
 export class SNActionsService extends PureService {
-  private alertService?: SNAlertService;
   private httpService?: SNHttpService;
   private payloadManager?: PayloadManager;
-  private itemManager?: ItemManager;
   private protocolService?: SNProtocolService;
   private syncService?: SNSyncService;
   private previousPasswords: string[] = [];
 
   constructor(
-    itemManager: ItemManager,
-    alertService: SNAlertService,
+    private itemManager: ItemManager,
+    private alertService: SNAlertService,
     deviceInterface: DeviceInterface,
     httpService: SNHttpService,
     payloadManager: PayloadManager,
@@ -77,9 +75,9 @@ export class SNActionsService extends PureService {
   }
 
   /** @override */
-  public deinit() {
-    this.itemManager = undefined;
-    this.alertService = undefined;
+  public deinit(): void {
+    (this.itemManager as unknown) = undefined;
+    (this.alertService as unknown) = undefined;
     this.deviceInterface = undefined;
     this.httpService = undefined;
     this.payloadManager = undefined;

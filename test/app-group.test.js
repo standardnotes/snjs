@@ -5,21 +5,21 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('application group', () => {
+describe('application group', function () {
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
   );
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     localStorage.clear();
   });
 
-  afterEach(async () => {
+  afterEach(async function () {
     localStorage.clear();
   });
 
-  it('initializing a group should result with primary application', async () => {
+  it('initializing a group should result with primary application', async function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
@@ -33,7 +33,7 @@ describe('application group', () => {
     expect(group.primaryApplication.identifier).to.be.ok;
   });
 
-  it('initializing a group should result with proper descriptor setup', async () => {
+  it('initializing a group should result with proper descriptor setup', async function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
@@ -47,7 +47,7 @@ describe('application group', () => {
     expect(group.descriptorRecord[identifier].identifier).to.equal(identifier);
   });
 
-  it('should persist descriptor record after changes', async () => {
+  it('should persist descriptor record after changes', async function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
@@ -77,7 +77,7 @@ describe('application group', () => {
     ).to.equal(true);
   });
 
-  it('adding new application should incrememnt total descriptor count', async () => {
+  it('adding new application should incrememnt total descriptor count', async function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
@@ -94,7 +94,7 @@ describe('application group', () => {
     expect(group.primaryApplication.identifier).to.not.equal(currentIdentifier);
   });
 
-  it('signing out of application should remove from group and create new', async () => {
+  it('signing out of application should remove from group and create new', async function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
@@ -119,7 +119,7 @@ describe('application group', () => {
     expect(group.applications[0].identifier).to.not.equal(identifier);
   });
 
-  it('should be notified when application changes', async () => {
+  it('should be notified when application changes', async function () {
     const group = new SNApplicationGroup(deviceInterface);
     let notifyCount = 0;
     const expectedCount = 2;

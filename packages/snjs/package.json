@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.0.64",
+  "version": "2.0.65",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
@@ -18,7 +18,9 @@
     "build": "webpack --config webpack.prod.js && yarn tsc",
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
-    "lint": "eslint . --ext .ts"
+    "lint": "yarn lint:tsc && yarn lint:eslint",
+    "lint:eslint": "eslint . --ext .ts",
+    "lint:tsc": "tsc --noEmit --emitDeclarationOnly false --project lib/tsconfig.json"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -58,6 +60,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@standardnotes/auth": "^2.0.0",
     "@standardnotes/sncrypto-common": "^1.2.9"
   }
 }

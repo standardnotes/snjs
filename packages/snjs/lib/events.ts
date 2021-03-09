@@ -27,7 +27,6 @@ export enum ApplicationEvent {
    * to begin streaming data like notes and tags.
    */
   Launched = 11,
-
   LocalDataLoaded = 12,
 
   /**
@@ -61,6 +60,7 @@ export enum ApplicationEvent {
 
   PreferencesChanged = 25,
   ProtectionSessionExpiryDateChanged = 26,
+  PermissionsChanged = 27,
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {

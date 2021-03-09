@@ -26,8 +26,7 @@ export function createApplication(identifier, environment, platform) {
       blockingDialog: () => () => {},
     },
     identifier,
-    undefined,
-    undefined,
+    [],
     'http://localhost:3123'
   );
 }

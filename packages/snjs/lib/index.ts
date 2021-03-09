@@ -196,3 +196,5 @@ export { BaseMigration } from '@Lib/migrations/base';
 export { ProtectionSessionDurations } from '@Lib/services/protection_service';
 
 export { SNLog } from './log';
+
+export { Permission } from '@standardnotes/auth';

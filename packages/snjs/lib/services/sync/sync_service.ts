@@ -116,7 +116,10 @@ const NonEncryptedTypes = Object.freeze([
  * After each sync request, any changes made or retrieved are also persisted locally.
  * The sync service largely does not perform any task unless it is called upon.
  */
-export class SNSyncService extends PureService<SyncEvent> {
+export class SNSyncService extends PureService<
+  SyncEvent,
+  SyncResponse | { source: SyncSources }
+> {
   private sessionManager?: SNSessionManager;
   private protocolService?: SNProtocolService;
   private storageService?: SNStorageService;
@@ -378,7 +381,10 @@ export class SNSyncService extends PureService<SyncEvent> {
       payload,
       this.payloadManager!.getMasterCollection()
     );
-    await this.payloadManager!.emitPayloads(results, PayloadSource.LocalChanged);
+    await this.payloadManager!.emitPayloads(
+      results,
+      PayloadSource.LocalChanged
+    );
     await this.persistPayloads(results);
     return this.itemManager!.findItem(results[0].uuid!);
   }
@@ -408,7 +414,10 @@ export class SNSyncService extends PureService<SyncEvent> {
         dirtiedDate: new Date(),
       });
     });
-    await this.payloadManager!.emitPayloads(payloads, PayloadSource.LocalChanged);
+    await this.payloadManager!.emitPayloads(
+      payloads,
+      PayloadSource.LocalChanged
+    );
     await this.persistPayloads(payloads);
   }
 
@@ -923,7 +932,10 @@ export class SNSyncService extends PureService<SyncEvent> {
         dirty: false,
       });
     });
-    await this.payloadManager!.emitPayloads(payloads, PayloadSource.LocalChanged);
+    await this.payloadManager!.emitPayloads(
+      payloads,
+      PayloadSource.LocalChanged
+    );
     await this.persistPayloads(payloads);
   }
 

@@ -1,4 +1,3 @@
-import { SNLog } from './../../log';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
@@ -34,7 +33,6 @@ import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
 import * as messages from './messages';
 import {
-  ErrorAlertStrings,
   PromptTitles,
   RegisterStrings,
   SessionStrings,
@@ -557,23 +555,20 @@ export class SNSessionManager extends PureService<SessionEvent> {
     };
   }
 
-  public async getSessionsList(): Promise<RemoteSession[] | HttpResponse> {
+  public async getSessionsList(): Promise<HttpResponse<RemoteSession[]>> {
     const response = await this.apiService.getSessionsList();
-    if (response.error) {
+    if (response.error || isNullOrUndefined(response.data)) {
       return response;
     }
-    return (
-      response.object
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((session: any) => ({
-          ...session,
-          updated_at: new Date(session.updated_at),
-        }))
-        .sort(
-          (s1: RemoteSession, s2: RemoteSession) =>
-            s1.updated_at < s2.updated_at
-        )
-    );
+    response.data = response.data
+      .map<RemoteSession>((session) => ({
+        ...session,
+        updated_at: new Date(session.updated_at),
+      }))
+      .sort((s1: RemoteSession, s2: RemoteSession) =>
+        s1.updated_at < s2.updated_at ? 1 : -1
+      );
+    return response;
   }
 
   public async revokeSession(sessionId: UuidString): Promise<HttpResponse> {
