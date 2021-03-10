@@ -178,7 +178,11 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return this.validateOrRenewSession(ChallengeReason.AccessProtectedNote);
   }
 
-  async authorizeFileImport(): Promise<boolean> {
+  authorizeSearchingProtectedNotesText(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.SearchProtectedNotesText);
+  }
+
+  authorizeFileImport(): Promise<boolean> {
     return this.validateOrRenewSession(ChallengeReason.ImportFile);
   }
 
