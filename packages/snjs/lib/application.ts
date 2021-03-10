@@ -991,6 +991,10 @@ export class SNApplication {
     return this.protectionService.authorizeBatchManagerAccess();
   }
 
+  public authorizeSearchingProtectedNotesText(): Promise<boolean> {
+    return this.protectionService.authorizeSearchingProtectedNotesText();
+  }
+
   /**
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
