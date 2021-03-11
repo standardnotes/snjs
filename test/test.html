@@ -30,9 +30,6 @@
 
     mocha.setup('bdd');
     mocha.timeout(5000);
-    if (urlParams.has('skip')) {
-      mocha.grep('@' + urlParams.get('skip')).invert();
-    }
     mocha.bail(bail);
   </script>
   <script type="module" src="session.test.js"></script>

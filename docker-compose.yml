@@ -36,8 +36,6 @@ services:
     image: nginx:alpine
     volumes:
       - ./test/proxy.conf.template:/etc/nginx/templates/default.conf.template
-    environment:
-      NGINX_REROUTE_HOST: '${NGINX_REROUTE_HOST}'
     ports:
       - 3123:3123
     restart: always
@@ -48,20 +46,10 @@ services:
     depends_on:
       - syncing-server-proxy
       - db
-    image: standardnotes/syncing-server
-    entrypoint: ["/tools/wait-for.sh", "db", "3306", "/tools/wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
-    environment:
-      SECRET_KEY_BASE: s3cr3tK3y
-      RAILS_ENV: test
-      RAILS_LOG_TO_STDOUT: 1
-      RAILS_LOG_LEVEL: debug
-      PSEUDO_KEY_PARAMS_KEY: secret_key
-      REDIS_URL: redis://cache:6379
-      DB_PORT: 3306
-      DB_HOST: db
-      DB_DATABASE: testdb
-      DB_USERNAME: testuser
-      DB_PASSWORD: testpassword
+    image: standardnotes/syncing-server:3.20.6
+    entrypoint: ["./wait-for.sh", "db", "3306", "./wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
+    env_file: docker/syncing-server.env
+    restart: unless-stopped
     expose:
       - 3000
     restart: unless-stopped
@@ -71,38 +59,41 @@ services:
       - snjs
 
   syncing-server-js:
-    depends_on:
-      - syncing-server-proxy
-      - syncing-server-ruby
-    image: standardnotes/syncing-server-js
-    entrypoint: ["/tools/wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
+    image: standardnotes/syncing-server-js:1.15.11
+    entrypoint: ["./wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
+    env_file: docker/syncing-server-js.env
+    networks:
+      - snjs
+
+  syncing-server-js-worker:
+    image: standardnotes/syncing-server-js:1.15.11
+    entrypoint: ["./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-worker"]
+    env_file: docker/syncing-server-js.env
+    networks:
+      - snjs
+
+  api-gateway:
+    image: standardnotes/api-gateway:1.3.1
+    env_file: docker/api-gateway.env
     environment:
-      LOG_LEVEL: debug
-      NODE_ENV: development
-      JWT_SECRET: s3cr3tK3y
-      ACCESS_TOKEN_AGE: 4
-      REFRESH_TOKEN_AGE: 7
-      EPHEMERAL_SESSION_AGE: 300
-      MAX_LOGIN_ATTEMPTS: 6
-      FAILED_LOGIN_LOCKOUT: 3600
-      LEGACY_JWT_SECRET: legacy_jwt_secret
-      PSEUDO_KEY_PARAMS_KEY: secret_key
       PORT: 3000
-      DB_HOST: db
-      DB_REPLICA_HOST: db
-      DB_PORT: 3306
-      DB_USERNAME: testuser
-      DB_PASSWORD: testpassword
-      DB_DATABASE: testdb
-      DB_DEBUG_LEVEL: all
-      DB_MIGRATIONS_PATH: dist/migrations/*.js
-      REDIS_URL: redis://cache
-      DD_TRACE_ENABLED: 'false'
-    expose:
-      - 3000
-    restart: unless-stopped
-    volumes:
-      - ./wait-for.sh:/tools/wait-for.sh
+    entrypoint: ["./wait-for.sh", "syncing-server-ruby", "3000", "./wait-for.sh", "auth", "3000", "./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-web"]
+    ports:
+      - 3124:3000
+    networks:
+      - snjs
+
+  auth:
+    image: standardnotes/auth:1.3.5
+    entrypoint: ["./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-web"]
+    env_file: docker/auth.env
+    networks:
+      - snjs
+
+  auth-worker:
+    image: standardnotes/auth:1.3.5
+    entrypoint: ["./wait-for.sh", "auth", "3000", "./docker/entrypoint.sh", "start-worker"]
+    env_file: docker/auth.env
     networks:
       - snjs
 
