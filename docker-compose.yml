@@ -9,16 +9,6 @@ services:
     ports:
       - 9001:9001
 
-  syncing-server-proxy:
-    image: nginx:alpine
-    volumes:
-      - ./test/proxy.conf.template:/etc/nginx/templates/default.conf.template
-    ports:
-      - 3123:3123
-    restart: always
-    networks:
-      - snjs
-
   db:
     image: mysql:5.6
     environment:
@@ -42,7 +32,20 @@ services:
     networks:
       - snjs
 
-  syncing-server:
+  syncing-server-proxy:
+    image: nginx:alpine
+    volumes:
+      - ./test/proxy.conf.template:/etc/nginx/templates/default.conf.template
+    ports:
+      - 3123:3123
+    restart: always
+    networks:
+      - snjs
+
+  syncing-server-ruby:
+    depends_on:
+      - syncing-server-proxy
+      - db
     image: standardnotes/syncing-server
     entrypoint: ["./wait-for.sh", "db", "3306", "./wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
     env_file: docker/syncing-server.env
@@ -57,7 +60,7 @@ services:
 
   syncing-server-js:
     image: standardnotes/syncing-server-js
-    entrypoint: ["./wait-for.sh", "syncing-server", "3000", "./docker/entrypoint.sh", "start-web"]
+    entrypoint: ["./wait-for.sh", "syncing-server-ruby", "3000", "./docker/entrypoint.sh", "start-web"]
     env_file: docker/syncing-server-js.env
     networks:
       - snjs
@@ -74,7 +77,7 @@ services:
     env_file: docker/api-gateway.env
     environment:
       PORT: 3000
-    entrypoint: ["./wait-for.sh", "syncing-server", "3000", "./wait-for.sh", "auth", "3000", "./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-web"]
+    entrypoint: ["./wait-for.sh", "syncing-server-ruby", "3000", "./wait-for.sh", "auth", "3000", "./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-web"]
     ports:
       - 3124:3000
     networks:

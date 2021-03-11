@@ -16,7 +16,7 @@ echo "# Pulling latest versions"
 docker-compose pull
 
 echo "# Building Docker images"
-docker-compose build
+# docker-compose build
 
 echo "# Starting all containers for Test Suite"
 docker-compose up -d
