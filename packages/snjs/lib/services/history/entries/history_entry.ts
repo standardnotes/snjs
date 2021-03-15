@@ -1,3 +1,4 @@
+import { SNItem } from '@Models/core/item';
 import { isNullOrUndefined } from '@Lib/utils';
 import { CopyPayload } from '@Payloads/generator';
 import { CreateItemFromPayload } from '@Lib/models';
@@ -11,7 +12,7 @@ export class HistoryEntry {
   protected readonly hasPreviousEntry: boolean;
 
   constructor(payload: SurePayload, previousEntry?: HistoryEntry) {
-    const updated_at = payload.updated_at ?? new Date();
+    const updated_at = payload.serverUpdatedAt ?? new Date();
     this.payload = CopyPayload(payload, {
       updated_at: updated_at,
     }) as SurePayload;
@@ -35,13 +36,17 @@ export class HistoryEntry {
     }
   }
 
+  public itemFromPayload(): SNItem {
+    return CreateItemFromPayload(this.payload);
+  }
+
   public isSameAsEntry(entry: HistoryEntry): boolean {
     if (!entry) {
       return false;
     }
-    const lhs = CreateItemFromPayload(this.payload);
-    const rhs = CreateItemFromPayload(entry.payload);
-    return lhs.userModifiedDate === rhs.userModifiedDate;
+    const lhs = this.itemFromPayload();
+    const rhs = entry.itemFromPayload();
+    return lhs.userModifiedDate.getTime() === rhs.userModifiedDate.getTime();
   }
 
   public operationVector(): number {

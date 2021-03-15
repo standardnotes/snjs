@@ -97,7 +97,7 @@ export class SNItem {
       this.archived = this.getAppDomainValue(AppDataField.Archived);
       this.locked = this.getAppDomainValue(AppDataField.Locked);
     } else {
-      this.userModifiedDate = this.updated_at;
+      this.userModifiedDate = this.updated_at || new Date();
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
@@ -148,8 +148,16 @@ export class SNItem {
     return this.payload.created_at!;
   }
 
-  get updated_at() {
-    return this.payload.updated_at!;
+  get updated_at(): Date | undefined {
+    return this.payload.serverUpdatedAt;
+  }
+
+  /**
+   * The date timestamp the server set for this item upon it being synced
+   * Undefined if never synced to a remote server.
+   */
+  public get serverUpdatedAt(): Date | undefined {
+    return this.updated_at;
   }
 
   get dirtiedDate() {
@@ -418,7 +426,7 @@ export class ItemMutator {
         const currentValue = this.item.userModifiedDate;
         if (!currentValue) {
           // if we don't have an explcit raw value, we initialize client_updated_at.
-          this.userModifiedDate = new Date(this.item.updated_at!);
+          this.userModifiedDate = new Date(this.item.serverUpdatedAt!);
         }
       }
     }

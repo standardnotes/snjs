@@ -86,11 +86,30 @@ export class SNHistoryManager extends PureService {
     super.deinit();
   }
 
-  async getPersistedHistory(): Promise<Record<UuidString, HistoryEntry[]>> {
+  /** For local session history */
+  async initializeFromDisk(): Promise<void> {
+    this.persistable = await this.storageService.getValue(
+      StorageKey.SessionHistoryPersistable
+    );
+    this.history = await this.getPersistedHistory();
+    this.autoOptimize = await this.storageService.getValue(
+      StorageKey.SessionHistoryOptimize,
+      undefined,
+      true
+    );
+    this.addChangeObserver();
+  }
+
+  private async getPersistedHistory(): Promise<
+    Record<UuidString, HistoryEntry[]>
+  > {
+    const historyMap: Record<UuidString, HistoryEntry[]> = {};
     const rawHistory: PersistableHistory = await this.storageService.getValue(
       StorageKey.SessionHistoryRevisions
     );
-    const historyMap: Record<UuidString, HistoryEntry[]> = {};
+    if (!rawHistory) {
+      return historyMap;
+    }
     for (const [uuid, rawHistoryArray] of Object.entries(rawHistory)) {
       const entries: HistoryEntry[] = [];
       for (const [index, rawEntry] of rawHistoryArray.entries()) {
@@ -105,20 +124,6 @@ export class SNHistoryManager extends PureService {
       historyMap[uuid] = entries;
     }
     return historyMap;
-  }
-
-  /** For local session history */
-  async initializeFromDisk(): Promise<void> {
-    this.persistable = await this.storageService.getValue(
-      StorageKey.SessionHistoryPersistable
-    );
-    this.history = await this.getPersistedHistory();
-    this.autoOptimize = await this.storageService.getValue(
-      StorageKey.SessionHistoryOptimize,
-      undefined,
-      true
-    );
-    this.addChangeObserver();
   }
 
   private addChangeObserver() {
@@ -168,14 +173,9 @@ export class SNHistoryManager extends PureService {
       }
       needsPersist = true;
     }
-
     if (needsPersist) {
       this.saveToDisk();
     }
-  }
-
-  public historyForUuid(uuid: UuidString): HistoryEntry[] {
-    return this.history[uuid] || [];
   }
 
   /** For local session history */

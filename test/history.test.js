@@ -53,11 +53,11 @@ describe('history manager', () => {
       const item = await Factory.createSyncedNote(this.application);
       const itemHistory = this.historyManager.sessionHistoryForItem(item);
       expect(itemHistory).to.be.ok;
-      expect(itemHistory.entries.length).to.equal(1);
+      expect(itemHistory.length).to.equal(1);
 
       /** Sync with same contents, should not create new entry */
       await this.application.saveItem(item.uuid);
-      expect(itemHistory.entries.length).to.equal(1);
+      expect(itemHistory.length).to.equal(1);
 
       /** Sync with different contents, should create new entry */
       await this.application.changeAndSaveItem(
@@ -69,26 +69,29 @@ describe('history manager', () => {
         undefined,
         syncOptions
       );
-      expect(itemHistory.entries.length).to.equal(2);
+      expect(itemHistory.length).to.equal(2);
 
       this.historyManager.clearHistoryForItem(item);
       const newItemHistory = this.historyManager.sessionHistoryForItem(item);
-      expect(newItemHistory.entries.length).to.equal(0);
+      expect(newItemHistory.length).to.equal(0);
 
       await this.application.saveItem(item.uuid);
-      expect(newItemHistory.entries.length).to.equal(1);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        1
+      );
 
       this.historyManager.clearAllHistory();
-      expect(
-        this.historyManager.sessionHistoryForItem(item).entries.length
-      ).to.equal(0);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        0
+      );
     });
 
     it('should optimize basic entries', async function () {
       let item = await Factory.createSyncedNote(this.application);
-      const itemHistory = this.historyManager.sessionHistoryForItem(item);
       /** It should keep the first revision, regardless of character delta. */
-      expect(itemHistory.entries.length).to.equal(1);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        1
+      );
       /**
        * Add 1 character. This typically would be discarded as an entry, but it
        * won't here because it's the last one, which we want to keep.
@@ -98,7 +101,9 @@ describe('history manager', () => {
         item,
         item.content.text + Factory.randomString(1)
       );
-      expect(itemHistory.entries.length).to.equal(2);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        2
+      );
 
       /**
        * Now changing it by one character should discard this entry,
@@ -109,7 +114,9 @@ describe('history manager', () => {
         item,
         item.content.text + Factory.randomString(1)
       );
-      expect(itemHistory.entries.length).to.equal(2);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        2
+      );
       /**
        * Change it over the largeCharacterChange threshold. It should keep this
        * revision, but now remove the previous revision, since it's no longer
@@ -120,7 +127,9 @@ describe('history manager', () => {
         item,
         item.content.text + Factory.randomString(largeCharacterChange + 1)
       );
-      expect(itemHistory.entries.length).to.equal(2);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        2
+      );
       /**
        * Change it again over the delta threshhold. It should keep this revision,
        * and the last one, totaling 3.
@@ -130,7 +139,9 @@ describe('history manager', () => {
         item,
         item.content.text + Factory.randomString(largeCharacterChange + 1)
       );
-      expect(itemHistory.entries.length).to.equal(3);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        3
+      );
 
       /** Delete over threshold text. It should keep this revision. */
       item = await setTextAndSync(
@@ -138,7 +149,9 @@ describe('history manager', () => {
         item,
         deleteCharsFromString(item.content.text, largeCharacterChange + 1)
       );
-      expect(itemHistory.entries.length).to.equal(4);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        4
+      );
       /**
        * Delete just 1 character. It should keep this entry, because it's the
        * last, upping the total to 5. However, the next small revision after that
@@ -149,13 +162,17 @@ describe('history manager', () => {
         item,
         deleteCharsFromString(item.content.text, 1)
       );
-      expect(itemHistory.entries.length).to.equal(5);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        5
+      );
       item = await setTextAndSync(
         this.application,
         item,
         deleteCharsFromString(item.content.text, 1)
       );
-      expect(itemHistory.entries.length).to.equal(5);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        5
+      );
     });
 
     it('should keep the entry right before a large deletion, regardless of its delta', async function () {
@@ -170,7 +187,6 @@ describe('history manager', () => {
       );
       await this.application.itemManager.setItemDirty(item.uuid);
       await this.application.syncService.sync(syncOptions);
-      const itemHistory = this.historyManager.sessionHistoryForItem(item);
       /** It should keep the first and last by default */
       item = await setTextAndSync(this.application, item, item.content.text);
       item = await setTextAndSync(
@@ -178,7 +194,9 @@ describe('history manager', () => {
         item,
         item.content.text + Factory.randomString(1)
       );
-      expect(itemHistory.entries.length).to.equal(2);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        2
+      );
       /**
        * We want to delete a large number of characters. The revision right before
        * this one was a small negligible revision of +1 char. This would typically
@@ -197,7 +215,9 @@ describe('history manager', () => {
         item,
         deleteCharsFromString(item.content.text, largeCharacterChange + 1)
       );
-      expect(itemHistory.entries.length).to.equal(3);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        3
+      );
       /**
        * Now we're going to make sure that the rule above only applies to large
        * negative deltas, and not large positive deltas. We don't care about
@@ -210,7 +230,9 @@ describe('history manager', () => {
         item,
         item.content.text + Factory.randomString(1)
       );
-      expect(itemHistory.entries.length).to.equal(4);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        4
+      );
       /**
        * Make a large positive change. The previous small positive change should
        * now be discarded, keeping a total of 4.
@@ -220,7 +242,9 @@ describe('history manager', () => {
         item,
         item.content.text + Factory.randomString(largeCharacterChange + 1)
       );
-      expect(itemHistory.entries.length).to.equal(4);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        4
+      );
     });
 
     it('entries should be ordered from newest to oldest', async function () {
@@ -237,54 +261,57 @@ describe('history manager', () => {
 
       await this.application.itemManager.setItemDirty(item.uuid);
       await this.application.syncService.sync(syncOptions);
-      await Factory.sleep(0.5);
-
-      const itemHistory = this.historyManager.sessionHistoryForItem(item);
+      await Factory.sleep(0.1);
 
       item = await setTextAndSync(
         this.application,
         item,
         item.content.text + Factory.randomString(1)
       );
-      await Factory.sleep(0.5);
+      await Factory.sleep(0.1);
 
       item = await setTextAndSync(
         this.application,
         item,
         deleteCharsFromString(item.content.text, largeCharacterChange + 1)
       );
-      await Factory.sleep(0.5);
+      await Factory.sleep(0.1);
 
       item = await setTextAndSync(
         this.application,
         item,
         item.content.text + Factory.randomString(1)
       );
-      await Factory.sleep(0.5);
+      await Factory.sleep(0.1);
 
       item = await setTextAndSync(
         this.application,
         item,
         item.content.text + Factory.randomString(largeCharacterChange + 1)
       );
-      await Factory.sleep(0.5);
+      await Factory.sleep(0.1);
 
       /** We should have a total of 4 revisions. */
-      expect(itemHistory.entries.length).to.equal(4);
+      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(
+        4
+      );
 
       /** First entry should be the latest revision. */
-      const latestRevision = itemHistory.entries[0];
+      const latestRevision = this.historyManager.sessionHistoryForItem(item)[0];
       /** Last entry should be the initial revision. */
-      const initialRevision =
-        itemHistory.entries[itemHistory.entries.length - 1];
+      const initialRevision = this.historyManager.sessionHistoryForItem(item)[
+        this.historyManager.sessionHistoryForItem(item).length - 1
+      ];
+
+      expect(latestRevision).to.not.equal(initialRevision);
 
       /** The latest entry should have the latest change of 16 characters. */
       expect(latestRevision.textCharDiffLength).to.equal(16);
       /** The oldest entry should have the initial text length of 200 characters. */
       expect(initialRevision.textCharDiffLength).to.equal(200);
       /** Finally, the latest revision updated_at value date should be more recent than the initial revision one. */
-      expect(latestRevision.payload.updated_at).to.be.greaterThan(
-        initialRevision.payload.updated_at
+      expect(latestRevision.itemFromPayload().userModifiedDate).to.be.greaterThan(
+        initialRevision.itemFromPayload().userModifiedDate
       );
     }).timeout(10000);
   });

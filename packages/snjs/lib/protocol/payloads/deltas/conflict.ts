@@ -56,8 +56,8 @@ export class ConflictDelta {
     }
     if (strategy === ConflictStrategy.KeepLeft) {
       const updatedAt = greaterOfTwoDates(
-        this.basePayload.updated_at!,
-        this.applyPayload.updated_at!
+        this.basePayload.serverUpdatedAt!,
+        this.applyPayload.serverUpdatedAt!
       );
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
@@ -79,8 +79,8 @@ export class ConflictDelta {
     }
     if (strategy === ConflictStrategy.KeepLeftDuplicateRight) {
       const updatedAt = greaterOfTwoDates(
-        this.basePayload.updated_at!,
-        this.applyPayload.updated_at!
+        this.basePayload.serverUpdatedAt!,
+        this.applyPayload.serverUpdatedAt!
       );
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
@@ -119,8 +119,8 @@ export class ConflictDelta {
         ['uuid', 'content_type']
       );
       const updatedAt = greaterOfTwoDates(
-        this.basePayload.updated_at!,
-        this.applyPayload.updated_at!
+        this.basePayload.serverUpdatedAt!,
+        this.applyPayload.serverUpdatedAt!
       );
       const payload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,

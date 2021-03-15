@@ -609,7 +609,11 @@ export class SNApplication {
       throw Error('Attempting to save non-inserted item');
     }
     if (!item.dirty) {
-      await this.itemManager!.changeItem(uuid);
+      await this.itemManager!.changeItem(
+        uuid,
+        undefined,
+        MutationType.Internal
+      );
     }
     await this.syncService!.sync();
   }
@@ -1484,8 +1488,8 @@ export class SNApplication {
       /** Sync the newly created items key. Roll back on failure */
       await this.protocolService.reencryptItemsKeys();
       await this.syncService.sync({ awaitAll: true });
-      const itemsKeyWasSynced =
-        this.protocolService.getDefaultItemsKey()!.updated_at.getTime() > 0;
+      const itemsKeyWasSynced = !this.protocolService.getDefaultItemsKey()!
+        .neverSynced;
       if (!itemsKeyWasSynced) {
         await this.sessionManager.changePassword(
           newRootKey.serverPassword!,
