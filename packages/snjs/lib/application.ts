@@ -1739,6 +1739,7 @@ export class SNApplication {
     (this.itemManager as unknown) = undefined;
     (this.keyRecoveryService as unknown) = undefined;
     (this.preferencesService as unknown) = undefined;
+    (this.permissionsService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1832,7 +1833,7 @@ export class SNApplication {
       this.deviceInterface,
       this.storageService,
       this.identifier,
-      this.crypto!
+      this.crypto
     );
     this.protocolService.onKeyStatusChange(async () => {
       await this.notifyEvent(ApplicationEvent.KeyStatusChanged);
@@ -1946,8 +1947,7 @@ export class SNApplication {
       this.storageService,
       this.apiService,
       this.protocolService,
-      [ContentType.Note],
-      this.deviceInterface.timeout
+      this.deviceInterface
     );
     this.services.push(this.historyManager);
   }
