@@ -25,7 +25,7 @@ export function createApplication(identifier, environment, platform) {
       alert: async () => {},
       blockingDialog: () => () => {},
     },
-    identifier,
+    identifier || `${Math.random()}`,
     [],
     'http://localhost:3123'
   );

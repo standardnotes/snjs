@@ -623,4 +623,128 @@ describe('note display criteria', function () {
       ).to.equal(0);
     });
   });
+
+  describe.skip('multiple tags', function () {
+    it.only('normal note', async function () {
+      const systemTags = this.itemManager.systemSmartTags;
+      const allTag = systemTags.find((t) => t.isAllTag);
+      const trashTag = systemTags.find((t) => t.isTrashTag);
+      const archivedTag = systemTags.find((t) => t.isArchiveTag);
+
+      await this.createNote();
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [allTag, trashTag, archivedTag],
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(1);
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [trashTag],
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(0);
+    });
+
+    it('archived note', async function () {
+      const systemTags = this.itemManager.systemSmartTags;
+      const allTag = systemTags.find((t) => t.isAllTag);
+      const trashTag = systemTags.find((t) => t.isTrashTag);
+      const archivedTag = systemTags.find((t) => t.isArchiveTag);
+
+      const normal = await this.createNote();
+      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+        mutator.archived = true;
+      });
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [allTag],
+            includeArchived: false,
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(0);
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [allTag],
+            includeArchived: true,
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(1);
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [trashTag],
+            includeArchived: true,
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(0);
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [archivedTag],
+            includeArchived: false,
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(1);
+    });
+
+    it('archived + trashed note', async function () {
+      const systemTags = this.itemManager.systemSmartTags;
+      const allTag = systemTags.find((t) => t.isAllTag);
+      const trashTag = systemTags.find((t) => t.isTrashTag);
+      const archivedTag = systemTags.find((t) => t.isArchiveTag);
+
+      const normal = await this.createNote();
+      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+        mutator.trashed = true;
+        mutator.archived = true;
+      });
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [allTag],
+            includeArchived: true,
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(0);
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [trashTag],
+            includeArchived: true,
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(1);
+
+      expect(
+        notesMatchingCriteria(
+          NotesDisplayCriteria.Create({
+            tags: [archivedTag],
+            includeArchived: true,
+          }),
+          this.itemManager.collection
+        ).length
+      ).to.equal(0);
+    });
+  });
 });
