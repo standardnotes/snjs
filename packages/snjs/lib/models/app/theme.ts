@@ -2,18 +2,22 @@ import { AppDataField } from './../core/item';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { ComponentArea, SNComponent } from '@Models/app/component';
+import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
 
 export class SNTheme extends SNComponent {
   public area: ComponentArea = ComponentArea.Themes;
 
-  isLayerable() {
+  isLayerable(): boolean {
     return this.package_info && this.package_info.layerable;
   }
 
   /** Do not duplicate under most circumstances. Always keep original */
-  strategyWhenConflictingWithItem(item: SNItem) {
+  strategyWhenConflictingWithItem(
+    item: SNItem,
+    history?: HistoryEntry[]
+  ): ConflictStrategy {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item);
+      return super.strategyWhenConflictingWithItem(item, history);
     }
 
     return ConflictStrategy.KeepLeft;

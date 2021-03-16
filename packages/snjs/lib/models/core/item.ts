@@ -1,3 +1,5 @@
+import { HistoryEntry } from '@Services/history/entries/history_entry';
+import { historyMapFunctions } from './../../services/history/history_map';
 import { SNLog } from './../../log';
 import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
@@ -11,7 +13,8 @@ import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { PayloadSource } from '@Lib/protocol/payloads/sources';
-import { PrefKey, PrefValue } from '../app/userPrefs';
+import { PrefKey } from '../app/userPrefs';
+import { HistoryMap } from '@Lib/services/history/history_map';
 
 export enum MutationType {
   /**
@@ -291,8 +294,13 @@ export class SNItem {
    *
    * In the default implementation, we create a duplicate if content differs.
    * However, if they only differ by references, we KEEP_LEFT_MERGE_REFS.
+   *
+   * Left returns to our current item, and Right refers to the incoming item.
    */
-  public strategyWhenConflictingWithItem(item: SNItem) {
+  public strategyWhenConflictingWithItem(
+    item: SNItem,
+    history?: HistoryEntry[]
+  ): ConflictStrategy {
     if (this.errorDecrypting) {
       return ConflictStrategy.KeepLeftDuplicateRight;
     }
@@ -318,6 +326,21 @@ export class SNItem {
     ]);
     if (itemsAreDifferentExcludingRefs) {
       const twentySeconds = 20_000;
+      if (history) {
+        const previousRevision = historyMapFunctions.getLatestEntry(history);
+        if (previousRevision) {
+          /**
+           * If previousRevision.content === incomingValue.content, this means the
+           * change that was rejected by the server is in fact a legitimate change,
+           * because the value the client had previously matched with the server's,
+           * and this new change is being built on top of that state, and should therefore
+           * be chosen as the winner, with no need for a conflict.
+           */
+          if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
+            return ConflictStrategy.KeepLeft;
+          }
+        }
+      }
       if (
         /**
          * If the incoming item comes from an import, treat it as

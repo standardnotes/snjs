@@ -1714,12 +1714,12 @@ export class SNApplication {
     this.createApiService();
     this.createSessionManager();
     this.createMigrationService();
+    this.createHistoryManager();
     this.createSyncManager();
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createComponentManager();
     this.createProtectionService();
-    this.createHistoryManager();
     this.createActionsManager();
     this.createPreferencesService();
   }
@@ -1904,6 +1904,7 @@ export class SNApplication {
       this.storageService,
       this.payloadManager,
       this.apiService,
+      this.historyManager,
       this.deviceInterface.interval
     );
     const syncEventCallback = async (eventName: SyncEvent) => {

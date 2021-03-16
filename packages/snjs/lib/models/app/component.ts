@@ -5,6 +5,7 @@ import { AppDataField } from './../core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
+import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
 
 export enum ComponentArea {
   Editor = 'editor-editor',
@@ -124,9 +125,12 @@ export class SNComponent extends SNItem implements ComponentContent {
   }
 
   /** Do not duplicate components under most circumstances. Always keep original */
-  public strategyWhenConflictingWithItem(item: SNItem) {
+  public strategyWhenConflictingWithItem(
+    item: SNItem,
+    history?: HistoryEntry[]
+  ): ConflictStrategy {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item);
+      return super.strategyWhenConflictingWithItem(item, history);
     }
     return ConflictStrategy.KeepLeft;
   }

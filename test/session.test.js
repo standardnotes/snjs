@@ -5,7 +5,7 @@ import WebDeviceInterface from './lib/web_device_interface.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.skip('server session', function () {
+describe('server session', function () {
   this.timeout(Factory.TestTimeout);
 
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */

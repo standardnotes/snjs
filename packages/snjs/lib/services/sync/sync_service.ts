@@ -1,3 +1,4 @@
+import { SNHistoryManager } from './../history/history_manager';
 import { SyncEvent } from '@Services/sync/events';
 import { StorageKey } from '@Lib/storage_keys';
 import { UuidString } from './../../types';
@@ -35,7 +36,6 @@ import { Uuids } from '@Models/functions';
 import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
-import { SNAlertService } from '../alert_service';
 import { SNLog } from '@Lib/log';
 
 const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
@@ -156,6 +156,7 @@ export class SNSyncService extends PureService<
     private storageService: SNStorageService,
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
+    private historyService: SNHistoryManager,
     interval: any
   ) {
     super();
@@ -375,10 +376,7 @@ export class SNSyncService extends PureService<
       payload,
       this.payloadManager.getMasterCollection()
     );
-    await this.payloadManager.emitPayloads(
-      results,
-      PayloadSource.LocalChanged
-    );
+    await this.payloadManager.emitPayloads(results, PayloadSource.LocalChanged);
     await this.persistPayloads(results);
     return this.itemManager.findItem(results[0].uuid!);
   }
@@ -890,11 +888,13 @@ export class SNSyncService extends PureService<
       decryptedPayloads.push(decrypted);
     }
     const masterCollection = this.payloadManager.getMasterCollection();
+    const historyMap = this.historyService.getHistoryMapCopy();
     const resolver = new SyncResponseResolver(
       response,
       decryptedPayloads,
       masterCollection,
-      operation.payloadsSavedOrSaving
+      operation.payloadsSavedOrSaving,
+      historyMap
     );
 
     const collections = await resolver.collectionsByProcessingResponse();
@@ -987,7 +987,9 @@ export class SNSyncService extends PureService<
       ImmutablePayloadCollection.WithPayloads(
         payloads,
         PayloadSource.RemoteRetrieved
-      )
+      ),
+      undefined,
+      this.historyService.getHistoryMapCopy()
     );
     const collection = await delta.resultingCollection();
     await this.payloadManager.emitCollection(collection);

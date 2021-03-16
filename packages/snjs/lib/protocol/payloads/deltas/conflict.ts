@@ -11,29 +11,24 @@ import {
 } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
 import { PayloadField } from '../fields';
+import { HistoryMap } from '@Lib/services/history/history_map';
 
 export class ConflictDelta {
-  protected readonly baseCollection: ImmutablePayloadCollection;
-  protected readonly basePayload: PurePayload;
-  protected readonly applyPayload: PurePayload;
-  protected readonly source: PayloadSource;
-
   constructor(
-    baseCollection: ImmutablePayloadCollection,
-    basePayload: PurePayload,
-    applyPayload: PurePayload,
-    source: PayloadSource
-  ) {
-    this.baseCollection = baseCollection;
-    this.basePayload = basePayload;
-    this.applyPayload = applyPayload;
-    this.source = source;
-  }
+    protected readonly baseCollection: ImmutablePayloadCollection,
+    protected readonly basePayload: PurePayload,
+    protected readonly applyPayload: PurePayload,
+    protected readonly source: PayloadSource,
+    protected readonly historyMap?: HistoryMap
+  ) {}
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
-    const strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem);
+    const strategy = tmpBaseItem.strategyWhenConflictingWithItem(
+      tmpApplyItem,
+      this.historyMap?.[this.basePayload.uuid]
+    );
     const results = await this.payloadsByHandlingStrategy(strategy);
     return ImmutablePayloadCollection.WithPayloads(results, this.source);
   }

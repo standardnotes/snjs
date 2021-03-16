@@ -24,6 +24,7 @@ import { concatArrays } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
+import { HistoryMap } from './history_map';
 
 const PersistTimeout = 2000;
 let saveTimeout: NodeJS.Timeout;
@@ -58,7 +59,7 @@ export class SNHistoryManager extends PureService {
   private removeChangeObserver!: () => void;
 
   /** A map of UUIDs to an array of PayloadHistoryEntry objects */
-  private history: Record<UuidString, HistoryEntry[]> = {};
+  private history: HistoryMap = {};
   /** The content types for which to record history */
   public readonly historyTypes: ContentType[] = [ContentType.Note];
 
@@ -131,7 +132,12 @@ export class SNHistoryManager extends PureService {
       this.historyTypes,
       (changed, inserted, discarded, _ignored, source) => {
         const items = concatArrays(changed, inserted, discarded) as SNItem[];
-        if (source === PayloadSource.LocalChanged) {
+        if (
+          source &&
+          [PayloadSource.LocalChanged, PayloadSource.PreSyncSave].includes(
+            source
+          )
+        ) {
           return;
         }
         this.recordNewHistoryForItems(items);
@@ -267,6 +273,14 @@ export class SNHistoryManager extends PureService {
     } else {
       this.storageService.setValue(StorageKey.SessionHistoryOptimize, false);
     }
+  }
+
+  getHistoryMapCopy(): HistoryMap {
+    const copy = Object.assign({}, this.history);
+    for (const [key, value] of Object.entries(copy)) {
+      copy[key] = value.slice();
+    }
+    return Object.freeze(copy);
   }
 
   /**

@@ -376,6 +376,7 @@ describe('basic auth', () => {
 
     /** Create conflict for a note */
     const note = this.application.itemManager.notes[0];
+    Factory.createConflictEnvironment(this.application);
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
@@ -412,35 +413,38 @@ describe('basic auth', () => {
 
   it('successfully changes password', changePassword).timeout(20000);
 
-  it.skip('successfully changes password when passcode is set', async function () {
-    const passcode = 'passcode';
-    const promptValueReply = (prompts) => {
-      const values = [];
-      for (const prompt of prompts) {
-        if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, passcode));
-        } else {
-          values.push(new ChallengeValue(prompt, this.password));
+  it.skip(
+    'successfully changes password when passcode is set',
+    async function () {
+      const passcode = 'passcode';
+      const promptValueReply = (prompts) => {
+        const values = [];
+        for (const prompt of prompts) {
+          if (prompt.validation === ChallengeValidation.LocalPasscode) {
+            values.push(new ChallengeValue(prompt, passcode));
+          } else {
+            values.push(new ChallengeValue(prompt, this.password));
+          }
         }
-      }
-      return values;
-    };
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        this.application.addChallengeObserver(challenge, {
-          onInvalidValue: (value) => {
-            const values = promptValueReply([value.prompt]);
-            this.application.submitValuesForChallenge(challenge, values);
-            numPasscodeAttempts++;
-          },
-        });
-        const initialValues = promptValueReply(challenge.prompts);
-        this.application.submitValuesForChallenge(challenge, initialValues);
-      },
-    });
-    await this.application.setPasscode(passcode);
-    await changePassword.bind(this)();
-  }).timeout(20000);
+        return values;
+      };
+      this.application.setLaunchCallback({
+        receiveChallenge: (challenge) => {
+          this.application.addChallengeObserver(challenge, {
+            onInvalidValue: (value) => {
+              const values = promptValueReply([value.prompt]);
+              this.application.submitValuesForChallenge(challenge, values);
+              numPasscodeAttempts++;
+            },
+          });
+          const initialValues = promptValueReply(challenge.prompts);
+          this.application.submitValuesForChallenge(challenge, initialValues);
+        },
+      });
+      await this.application.setPasscode(passcode);
+      await changePassword.bind(this)();
+    }
+  ).timeout(20000);
 
   it('changes password many times', async function () {
     await this.application.register(this.email, this.password);
