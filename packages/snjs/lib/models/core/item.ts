@@ -14,7 +14,6 @@ import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { PrefKey } from '../app/userPrefs';
-import { HistoryMap } from '@Lib/services/history/history_map';
 
 export enum MutationType {
   /**
@@ -327,8 +326,8 @@ export class SNItem {
     if (itemsAreDifferentExcludingRefs) {
       const twentySeconds = 20_000;
       if (history) {
-        const previousRevision = historyMapFunctions.getLatestEntry(history);
-        if (previousRevision) {
+        const latestRevision = historyMapFunctions.getLatestEntry(history);
+        if (latestRevision) {
           /**
            * If previousRevision.content === incomingValue.content, this means the
            * change that was rejected by the server is in fact a legitimate change,
@@ -336,7 +335,7 @@ export class SNItem {
            * and this new change is being built on top of that state, and should therefore
            * be chosen as the winner, with no need for a conflict.
            */
-          if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
+          if (!ItemContentsDiffer(latestRevision.itemFromPayload(), item)) {
             return ConflictStrategy.KeepLeft;
           }
         }
@@ -442,13 +441,13 @@ export class ItemMutator {
       });
     }
     if (!this.payload.deleted) {
-      if (this.type === MutationType.UserInteraction) {
-        // Set the user modified date to now if marking the item as dirty
+      if (
+        this.type === MutationType.UserInteraction
+      ) {
         this.userModifiedDate = new Date();
       } else {
         const currentValue = this.item.userModifiedDate;
         if (!currentValue) {
-          // if we don't have an explcit raw value, we initialize client_updated_at.
           this.userModifiedDate = new Date(this.item.serverUpdatedAt!);
         }
       }

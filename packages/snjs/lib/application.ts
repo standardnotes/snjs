@@ -624,7 +624,7 @@ export class SNApplication {
   public async changeAndSaveItem<M extends ItemMutator = ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    isUserModified = false,
+    isUserModified = true,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
   ) {
@@ -647,7 +647,7 @@ export class SNApplication {
   public async changeAndSaveItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    isUserModified = false,
+    isUserModified = true,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
   ) {
@@ -666,7 +666,7 @@ export class SNApplication {
   public async changeItem<M extends ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    isUserModified = false
+    isUserModified = true
   ) {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
@@ -685,7 +685,7 @@ export class SNApplication {
   public async changeItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    isUserModified = false
+    isUserModified = true
   ) {
     return this.itemManager!.changeItems(
       uuids,

@@ -31,17 +31,6 @@ export function createApplication(identifier, environment, platform) {
   );
 }
 
-/**
- * History must be cleared in order to force conflict
- * This is because before we create a conflict, we check the previous
- * revision of an item to see if it matches with the server value. If it does,
- * it means that prior to the conflicting change, the client and server were in sync,
- * so any change made subsequently must have been made by the user.
- */
-export function createConflictEnvironment(application) {
-  application.historyManager.clearAllHistory();
-}
-
 export async function createAppWithRandNamespace(environment, platform) {
   const namespace = Math.random().toString(36).substring(2, 15);
   return createApplication(namespace, environment, platform);

@@ -108,6 +108,14 @@ describe('mutator', () => {
     expect(payload.dirty).to.equal(true);
   });
 
+  it('get result should always have userModifiedDate', function () {
+    const item = this.createNote();
+    const mutator = new ItemMutator(item);
+    const payload = mutator.getResult();
+    const resultItem = CreateItemFromPayload(payload);
+    expect(resultItem.userModifiedDate).to.be.ok;
+  });
+
   it('mutate set deleted', function () {
     const item = this.createNote();
     const mutator = new ItemMutator(item);

@@ -46,7 +46,14 @@ export class HistoryEntry {
     }
     const lhs = this.itemFromPayload();
     const rhs = entry.itemFromPayload();
-    return lhs.userModifiedDate.getTime() === rhs.userModifiedDate.getTime();
+    const datesEqual =
+      lhs.userModifiedDate.getTime() === rhs.userModifiedDate.getTime();
+    if (!datesEqual) {
+      return false;
+    }
+    /** Dates are the same, but because JS is only accurate to milliseconds,
+     * items have different content but same dates */
+    return lhs.isItemContentEqualWith(rhs);
   }
 
   public operationVector(): number {

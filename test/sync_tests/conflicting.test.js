@@ -24,16 +24,6 @@ describe('online conflict handling', function () {
       email: this.email,
       password: this.password,
     });
-    this.createConflictEnvironment = () => {
-      /**
-       * History must be cleared in order to force conflict
-       * This is because before we create a conflict, we check the previous
-       * revision of an item to see if it matches with the server value. If it does,
-       * it means that prior to the conflicting change, the client and server were in sync,
-       * so any change made subsequently must have been made by the user.
-       */
-      this.application.historyManager.clearAllHistory();
-    };
   });
 
   afterEach(async function () {
@@ -69,7 +59,11 @@ describe('online conflict handling', function () {
     );
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(item.uuid, (mutator) => {
+      mutator.content.foo = `${Math.random()}`;
+    });
     await this.application.changeAndSaveItem(
       item.uuid,
       (mutator) => {
@@ -94,7 +88,11 @@ describe('online conflict handling', function () {
     );
     this.expectedItemCount++;
     await this.application.syncService.sync(syncOptions);
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(item.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     await this.application.changeAndSaveItem(
       item.uuid,
       (mutator) => {
@@ -141,7 +139,11 @@ describe('online conflict handling', function () {
     expect(this.application.componentManager.editorForNote(note)).to.be.ok;
 
     /** Conflict the note */
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
@@ -217,7 +219,11 @@ describe('online conflict handling', function () {
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
@@ -244,8 +250,11 @@ describe('online conflict handling', function () {
     const note = await Factory.createMappedNote(this.application);
     await this.application.saveItem(note.uuid);
     this.expectedItemCount += 1;
-
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
@@ -282,7 +291,11 @@ describe('online conflict handling', function () {
     this.expectedItemCount++;
 
     const newTitle = `${Math.random()}`;
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
       // modify this item to have stale values
       mutator.title = newTitle;
@@ -369,7 +382,11 @@ describe('online conflict handling', function () {
       undefined,
       syncOptions
     );
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     // client B
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.changeAndSaveItem(
@@ -465,7 +482,11 @@ describe('online conflict handling', function () {
     note = this.application.findItem(note.uuid);
     expect(note.dirty).to.equal(false);
     this.expectedItemCount++;
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     note = await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
@@ -527,16 +548,19 @@ describe('online conflict handling', function () {
      * gives us everything it has.
      */
     const yesterday = Factory.yesterday();
-    Factory.createConflictEnvironment(this.application);
     for (const note of this.application.itemManager.notes) {
+      /** First modify the item without saving so that
+       * our local contents digress from the server's */
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-        mutator.text = `${Math.random()}`;
+        mutator.text = `1`;
+      });
+      await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+        mutator.text = `2`;
         mutator.updated_at = yesterday;
       });
       // We expect all the notes to be duplicated.
       this.expectedItemCount++;
     }
-
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync(syncOptions);
     expect(this.application.itemManager.notes.length).to.equal(
@@ -658,7 +682,11 @@ describe('online conflict handling', function () {
 
     // conflict the note
     const newText = `${Math.random()}`;
-    Factory.createConflictEnvironment(this.application);
+    /** First modify the item without saving so that
+     * our local contents digress from the server's */
+    await this.application.changeItem(note.uuid, (mutator) => {
+      mutator.title = `${Math.random()}`;
+    });
     note = await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
@@ -702,8 +730,8 @@ describe('online conflict handling', function () {
     const note = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;
 
-    const baseTitle = `${Math.random()}`;
-    /** Change the note, but drop the server response */
+    const baseTitle = 'base title';
+    /** Change the note */
     const noteAfterChange = await this.application.itemManager.changeItem(
       note.uuid,
       (mutator) => {
@@ -721,7 +749,7 @@ describe('online conflict handling', function () {
     );
 
     /** Change the item to its final title and sync */
-    const finalTitle = `${Math.random()}`;
+    const finalTitle = 'final title';
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
       mutator.title = finalTitle;
     });

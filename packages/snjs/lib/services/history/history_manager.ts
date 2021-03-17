@@ -20,7 +20,7 @@ import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { concatArrays } from '@Lib/utils';
+import { concatArrays, removeFromArray } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
@@ -58,7 +58,16 @@ export class SNHistoryManager extends PureService {
   public autoOptimize = false;
   private removeChangeObserver!: () => void;
 
-  /** A map of UUIDs to an array of PayloadHistoryEntry objects */
+  /**
+   * When no history exists for an item yet, we first put it in the staging map.
+   * Then, the next time the item changes and it has no history, we check the staging map.
+   * If the entry from the staging map differs from the incoming change, we now add the incoming
+   * change to the history map and remove it from staging. This is a way to detect when the first
+   * actual change of an item occurs (especially new items), rather than tracking a change
+   * as an item propagating through the different PayloadSource
+   * lifecycles (created, local saved, presyncsave, etc)
+   */
+  private historyStaging: Partial<Record<UuidString, HistoryEntry>> = {};
   private history: HistoryMap = {};
   /** The content types for which to record history */
   public readonly historyTypes: ContentType[] = [ContentType.Note];
@@ -130,17 +139,10 @@ export class SNHistoryManager extends PureService {
   private addChangeObserver() {
     this.removeChangeObserver = this.itemManager.addObserver(
       this.historyTypes,
-      (changed, inserted, discarded, _ignored, source) => {
-        const items = concatArrays(changed, inserted, discarded) as SNItem[];
-        if (
-          source &&
-          [PayloadSource.LocalChanged, PayloadSource.PreSyncSave].includes(
-            source
-          )
-        ) {
-          return;
+      (changed) => {
+        if (changed.length > 0) {
+          this.recordNewHistoryForItems(changed);
         }
-        this.recordNewHistoryForItems(items);
       }
     );
   }
@@ -158,21 +160,34 @@ export class SNHistoryManager extends PureService {
       ) {
         continue;
       }
+      const itemHistory = this.history[item.uuid] || [];
+      const latestEntry = itemHistory.length > 0 ? itemHistory[0] : undefined;
       const historyPayload = CreateSourcedPayloadFromObject(
         item,
         PayloadSource.SessionHistory
       ) as SurePayload;
-      const itemHistory = this.history[item.uuid] || [];
-      /** First element in the array should be the last entry. */
-      const previousEntry = itemHistory[0];
-      const prospectiveEntry = CreateHistoryEntryForPayload(
+      const currentValueEntry = CreateHistoryEntryForPayload(
         historyPayload,
-        previousEntry
+        latestEntry
       );
-      if (prospectiveEntry.isSameAsEntry(previousEntry)) {
+      /**
+       * For every change that comes in, first add it to the staging area.
+       * Then, only on the next subsequent change do we add this previously
+       * staged entry
+       */
+      const stagedEntry = this.historyStaging[item.uuid];
+      /** Add prospective to staging, and consider now adding previously staged as new revision */
+      this.historyStaging[item.uuid] = currentValueEntry;
+      if (!stagedEntry) {
         continue;
       }
-      itemHistory.unshift(prospectiveEntry);
+      if (stagedEntry.isSameAsEntry(currentValueEntry)) {
+        continue;
+      }
+      if (latestEntry && stagedEntry.isSameAsEntry(latestEntry)) {
+        continue;
+      }
+      itemHistory.unshift(stagedEntry);
       this.history[item.uuid] = itemHistory;
       if (this.autoOptimize) {
         this.optimizeHistoryForItem(item.uuid);
@@ -340,57 +355,57 @@ export class SNHistoryManager extends PureService {
      * determine what it should keep and what it shouldn't. So, it is possible
      * to have a threshold of 60 but have 600 entries, if the item history deems
      * those worth keeping.
+     *
+     * Rules:
+     * - Keep an entry if it is the oldest entry
+     * - Keep an entry if it is the latest entry
+     * - Keep an entry if it is Significant
+     * - If an entry is Significant and it is a deletion change, keep the entry before this entry.
      */
     const entries = this.history[uuid] || [];
-    if (entries.length > this.itemRevisionThreshold) {
-      const keepEntries: HistoryEntry[] = [];
-      const isEntrySignificant = (entry: HistoryEntry) => {
-        return entry.deltaSize() > LargeEntryDeltaThreshold;
-      };
-      const processEntry = (
-        entry: HistoryEntry,
-        index: number,
-        keep: boolean
-      ) => {
-        /**
-         * Entries may be processed retrospectively, meaning it can be
-         * decided to be deleted, then an upcoming processing can change that.
-         */
-        if (keep) {
-          keepEntries.unshift(entry);
-        } else {
-          /** Remove if in keep */
-          const index = keepEntries.indexOf(entry);
-          if (index !== -1) {
-            keepEntries.splice(index, 1);
-          }
-        }
-        if (
-          keep &&
-          isEntrySignificant(entry) &&
-          entry.operationVector() === -1
-        ) {
+    if (entries.length <= this.itemRevisionThreshold) {
+      return;
+    }
+
+    const isEntrySignificant = (entry: HistoryEntry) => {
+      return entry.deltaSize() > LargeEntryDeltaThreshold;
+    };
+    const keepEntries: HistoryEntry[] = [];
+    const processEntry = (
+      entry: HistoryEntry,
+      index: number,
+      keep: boolean
+    ) => {
+      /**
+       * Entries may be processed retrospectively, meaning it can be
+       * decided to be deleted, then an upcoming processing can change that.
+       */
+      if (keep) {
+        keepEntries.unshift(entry);
+        if (isEntrySignificant(entry) && entry.operationVector() === -1) {
           /** This is a large negative change. Hang on to the previous entry. */
           const previousEntry = entries[index + 1];
           if (previousEntry) {
             keepEntries.unshift(previousEntry);
           }
         }
-      };
-      for (let index = entries.length; index--; ) {
-        const entry = entries[index];
-        if (index === 0 || index === entries.length - 1) {
-          /** Keep the first and last */
-          processEntry(entry, index, true);
-        } else {
-          const significant = isEntrySignificant(entry);
-          processEntry(entry, index, significant);
-        }
+      } else {
+        /** Don't keep, remove if in keep */
+        removeFromArray(keepEntries, entry);
       }
-      const filtered = entries.filter((entry) => {
-        return keepEntries.indexOf(entry) !== -1;
-      });
-      this.history[uuid] = filtered;
+    };
+    for (let index = entries.length; index--; ) {
+      const entry = entries[index];
+      if (index === 0 || index === entries.length - 1) {
+        /** Keep the first and last */
+        processEntry(entry, index, true);
+      } else {
+        processEntry(entry, index, isEntrySignificant(entry));
+      }
     }
+    const filtered = entries.filter((entry) => {
+      return keepEntries.includes(entry);
+    });
+    this.history[uuid] = filtered;
   }
 }
