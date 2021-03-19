@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('history manager', () => {
-  const largeCharacterChange = 15;
+  const largeCharacterChange = 25;
 
   const syncOptions = {
     checkIntegrity: true,

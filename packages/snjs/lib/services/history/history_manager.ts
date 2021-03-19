@@ -20,7 +20,7 @@ import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { concatArrays, removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
@@ -35,14 +35,14 @@ type PersistableHistoryEntry = {
 
 type PersistableHistory = Record<UuidString, PersistableHistoryEntry[]>;
 
-/** The amount of revisions which above, call for an optimization. */
-const DefaultItemRevisionsThreshold = 60;
+/** The amount of revisions per item above which should call for an optimization. */
+const DefaultItemRevisionsThreshold = 20;
 
 /**
  * The amount of characters added or removed that
  * constitute a keepable entry after optimization.
  */
-const LargeEntryDeltaThreshold = 15;
+const LargeEntryDeltaThreshold = 25;
 
 /**
  * The history manager is responsible for:
