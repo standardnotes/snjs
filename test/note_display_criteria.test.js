@@ -625,7 +625,7 @@ describe('note display criteria', function () {
   });
 
   describe.skip('multiple tags', function () {
-    it.only('normal note', async function () {
+    it('normal note', async function () {
       const systemTags = this.itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
