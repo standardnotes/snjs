@@ -46,7 +46,7 @@ services:
     depends_on:
       - syncing-server-proxy
       - db
-    image: standardnotes/syncing-server:3.20.6
+    image: standardnotes/syncing-server:dev
     entrypoint: ["./wait-for.sh", "db", "3306", "./wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
     env_file: docker/syncing-server.env
     restart: unless-stopped
