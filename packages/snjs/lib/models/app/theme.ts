@@ -14,10 +14,10 @@ export class SNTheme extends SNComponent {
   /** Do not duplicate under most circumstances. Always keep original */
   strategyWhenConflictingWithItem(
     item: SNItem,
-    history?: HistoryEntry[]
+    previousRevision?: HistoryEntry
   ): ConflictStrategy {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, history);
+      return super.strategyWhenConflictingWithItem(item, previousRevision);
     }
 
     return ConflictStrategy.KeepLeft;

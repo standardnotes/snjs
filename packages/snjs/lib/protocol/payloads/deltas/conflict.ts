@@ -1,3 +1,4 @@
+import { historyMapFunctions } from './../../../services/history/history_map';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { PayloadSource } from './../sources';
 import { PurePayload } from './../pure_payload';
@@ -27,7 +28,10 @@ export class ConflictDelta {
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
     const strategy = tmpBaseItem.strategyWhenConflictingWithItem(
       tmpApplyItem,
-      this.historyMap?.[this.basePayload.uuid]
+      this.historyMap &&
+        historyMapFunctions.getLatestEntry(
+          this.historyMap?.[this.basePayload.uuid]
+        )
     );
     const results = await this.payloadsByHandlingStrategy(strategy);
     return ImmutablePayloadCollection.WithPayloads(results, this.source);

@@ -1,5 +1,4 @@
 import { HistoryEntry } from '@Services/history/entries/history_entry';
-import { historyMapFunctions } from './../../services/history/history_map';
 import { SNLog } from './../../log';
 import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
@@ -300,7 +299,7 @@ export class SNItem {
    */
   public strategyWhenConflictingWithItem(
     item: SNItem,
-    history?: HistoryEntry[]
+    previousRevision?: HistoryEntry
   ): ConflictStrategy {
     if (this.errorDecrypting) {
       return ConflictStrategy.KeepLeftDuplicateRight;
@@ -328,8 +327,7 @@ export class SNItem {
     if (itemsAreDifferentExcludingRefs) {
       const twentySeconds = 20_000;
       if (history) {
-        const latestRevision = historyMapFunctions.getLatestEntry(history);
-        if (latestRevision) {
+        if (previousRevision) {
           /**
            * If previousRevision.content === incomingValue.content, this means the
            * change that was rejected by the server is in fact a legitimate change,
@@ -337,7 +335,7 @@ export class SNItem {
            * and this new change is being built on top of that state, and should therefore
            * be chosen as the winner, with no need for a conflict.
            */
-          if (!ItemContentsDiffer(latestRevision.itemFromPayload(), item)) {
+          if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
             return ConflictStrategy.KeepLeft;
           }
         }

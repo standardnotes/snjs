@@ -10,10 +10,10 @@ export class SNItemsKey extends SNItem {
   /** Do not duplicate items keys. Always keep original */
   strategyWhenConflictingWithItem(
     item: SNItem,
-    history?: HistoryEntry[]
+    previousRevision?: HistoryEntry
   ): ConflictStrategy {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, history);
+      return super.strategyWhenConflictingWithItem(item, previousRevision);
     }
 
     return ConflictStrategy.KeepLeft;

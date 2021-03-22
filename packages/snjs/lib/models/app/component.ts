@@ -127,10 +127,10 @@ export class SNComponent extends SNItem implements ComponentContent {
   /** Do not duplicate components under most circumstances. Always keep original */
   public strategyWhenConflictingWithItem(
     item: SNItem,
-    history?: HistoryEntry[]
+    previousRevision?: HistoryEntry
   ): ConflictStrategy {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, history);
+      return super.strategyWhenConflictingWithItem(item, previousRevision);
     }
     return ConflictStrategy.KeepLeft;
   }
