@@ -27,7 +27,6 @@ import { PayloadFormat } from '@Lib/protocol/payloads';
 import { HistoryMap } from './history_map';
 
 const PersistTimeout = 2000;
-let saveTimeout: NodeJS.Timeout;
 
 type PersistableHistoryEntry = {
   payload: RawPayload;
@@ -56,7 +55,8 @@ const LargeEntryDeltaThreshold = 25;
 export class SNHistoryManager extends PureService {
   private persistable = false;
   public autoOptimize = false;
-  private removeChangeObserver!: () => void;
+  private removeChangeObserver: () => void;
+  private saveTimeout!: number;
 
   /**
    * When no history exists for an item yet, we first put it in the staging map.
@@ -82,6 +82,14 @@ export class SNHistoryManager extends PureService {
     public deviceInterface: DeviceInterface
   ) {
     super();
+    this.removeChangeObserver = this.itemManager.addObserver(
+      this.historyTypes,
+      (changed) => {
+        if (changed.length > 0) {
+          this.recordNewHistoryForItems(changed);
+        }
+      }
+    );
   }
 
   public deinit(): void {
@@ -107,7 +115,6 @@ export class SNHistoryManager extends PureService {
       undefined,
       true
     );
-    this.addChangeObserver();
   }
 
   private async getPersistedHistory(): Promise<
@@ -134,17 +141,6 @@ export class SNHistoryManager extends PureService {
       historyMap[uuid] = entries;
     }
     return historyMap;
-  }
-
-  private addChangeObserver() {
-    this.removeChangeObserver = this.itemManager.addObserver(
-      this.historyTypes,
-      (changed) => {
-        if (changed.length > 0) {
-          this.recordNewHistoryForItems(changed);
-        }
-      }
-    );
   }
 
   private recordNewHistoryForItems(items: SNItem[]) {
@@ -210,11 +206,11 @@ export class SNHistoryManager extends PureService {
   }
 
   cancelPendingPersist(): void {
-    if (saveTimeout) {
+    if (this.saveTimeout) {
       if ('cancel' in this.deviceInterface.timeout) {
-        this.deviceInterface.timeout.cancel(saveTimeout);
+        this.deviceInterface.timeout.cancel(this.saveTimeout);
       } else {
-        clearTimeout(saveTimeout);
+        clearTimeout(this.saveTimeout);
       }
     }
   }
@@ -226,7 +222,7 @@ export class SNHistoryManager extends PureService {
     }
     this.cancelPendingPersist();
     const persistableValue = this.persistableHistoryValue();
-    saveTimeout = this.deviceInterface.timeout(() => {
+    this.saveTimeout = this.deviceInterface.timeout(() => {
       this.storageService.setValue(
         StorageKey.SessionHistoryRevisions,
         persistableValue
@@ -347,21 +343,21 @@ export class SNHistoryManager extends PureService {
     return new HistoryEntry(decryptedPayload as SurePayload);
   }
 
+  /**
+   * Clean up if there are too many revisions. Note itemRevisionThreshold
+   * is the amount of revisions which above, call for an optimization. An
+   * optimization may not remove entries above this threshold. It will
+   * determine what it should keep and what it shouldn't. So, it is possible
+   * to have a threshold of 60 but have 600 entries, if the item history deems
+   * those worth keeping.
+   *
+   * Rules:
+   * - Keep an entry if it is the oldest entry
+   * - Keep an entry if it is the latest entry
+   * - Keep an entry if it is Significant
+   * - If an entry is Significant and it is a deletion change, keep the entry before this entry.
+   */
   optimizeHistoryForItem(uuid: string): void {
-    /**
-     * Clean up if there are too many revisions. Note itemRevisionThreshold
-     * is the amount of revisions which above, call for an optimization. An
-     * optimization may not remove entries above this threshold. It will
-     * determine what it should keep and what it shouldn't. So, it is possible
-     * to have a threshold of 60 but have 600 entries, if the item history deems
-     * those worth keeping.
-     *
-     * Rules:
-     * - Keep an entry if it is the oldest entry
-     * - Keep an entry if it is the latest entry
-     * - Keep an entry if it is Significant
-     * - If an entry is Significant and it is a deletion change, keep the entry before this entry.
-     */
     const entries = this.history[uuid] || [];
     if (entries.length <= this.itemRevisionThreshold) {
       return;
@@ -394,14 +390,13 @@ export class SNHistoryManager extends PureService {
         removeFromArray(keepEntries, entry);
       }
     };
-    for (let index = entries.length; index--; ) {
+    for (let index = entries.length - 1; index >= 0; index--) {
       const entry = entries[index];
-      if (index === 0 || index === entries.length - 1) {
-        /** Keep the first and last */
-        processEntry(entry, index, true);
-      } else {
-        processEntry(entry, index, isEntrySignificant(entry));
-      }
+      const isSignificant =
+        index === 0 ||
+        index === entries.length - 1 ||
+        isEntrySignificant(entry);
+      processEntry(entry, index, isSignificant);
     }
     const filtered = entries.filter((entry) => {
       return keepEntries.includes(entry);

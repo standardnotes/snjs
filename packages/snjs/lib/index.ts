@@ -87,6 +87,7 @@ export {
 } from './services/sync/sync_service';
 export { SyncOpStatus } from './services/sync/sync_op_status';
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
+export { SyncUpDownLimit } from './services/sync/account/operation';
 export { SNSessionManager } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
 export { ButtonType } from './services/alert_service';

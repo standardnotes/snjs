@@ -37,7 +37,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
   /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
    * an array of sorted elements, based on the current displaySortBy */
   private sortedMap: Partial<
-    Record<ContentType, Array<SNItem | undefined>>
+    Record<ContentType, SNItem[]>
   > = {};
 
   public set(elements: SNItem | SNItem[]): void {
@@ -100,7 +100,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
 
   /** Returns the filtered and sorted list of elements for this content type,
    * according to the options set via `setDisplayOptions` */
-  public displayElements(contentType: ContentType): Array<SNItem | undefined> {
+  public displayElements(contentType: ContentType): SNItem[] {
     const elements = this.sortedMap[contentType];
     if (!elements) {
       throw Error(

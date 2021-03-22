@@ -26,12 +26,12 @@ export class ConflictDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
+    const historyEntries =
+      (this.historyMap && this.historyMap?.[this.basePayload.uuid]) || [];
+    const previousRevision = historyMapFunctions.getLatestEntry(historyEntries);
     const strategy = tmpBaseItem.strategyWhenConflictingWithItem(
       tmpApplyItem,
-      this.historyMap &&
-        historyMapFunctions.getLatestEntry(
-          this.historyMap?.[this.basePayload.uuid]
-        )
+      previousRevision
     );
     const results = await this.payloadsByHandlingStrategy(strategy);
     return ImmutablePayloadCollection.WithPayloads(results, this.source);

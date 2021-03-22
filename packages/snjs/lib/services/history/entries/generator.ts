@@ -10,12 +10,9 @@ export function CreateHistoryEntryForPayload(
 ): HistoryEntry {
   const type = payload[PayloadField.ContentType] as ContentType;
   const historyItemClass = historyClassForContentType(type);
-  if (!historyItemClass) {
-    throw 'Invalid item history class';
-  }
   // eslint-disable-next-line new-cap
   const entry = new historyItemClass(payload, previousEntry);
-  return entry as HistoryEntry;
+  return entry;
 }
 
 function historyClassForContentType(contentType: ContentType) {

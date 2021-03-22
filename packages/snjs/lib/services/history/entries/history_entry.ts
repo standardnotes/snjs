@@ -52,7 +52,7 @@ export class HistoryEntry {
       return false;
     }
     /** Dates are the same, but because JS is only accurate to milliseconds,
-     * items have different content but same dates */
+     * items can have different content but same dates */
     return lhs.isItemContentEqualWith(rhs);
   }
 

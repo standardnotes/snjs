@@ -24,17 +24,20 @@ describe('online conflict handling', function () {
       email: this.email,
       password: this.password,
     });
+    this.sharedFinalAssertions = async function () {
+      expect(this.application.syncService.isOutOfSync()).to.equal(false);
+      const items = this.application.itemManager.items;
+      expect(items.length).to.equal(this.expectedItemCount);
+      const rawPayloads = await this.application.storageService.getAllRawPayloads();
+      expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    }
   });
 
   afterEach(async function () {
-    expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    const items = this.application.itemManager.items;
-    expect(items.length).to.equal(this.expectedItemCount);
-    const rawPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
     await this.application.deinit();
     localStorage.clear();
   });
+
 
   function createDirtyPayload(contentType) {
     const params = {
@@ -78,6 +81,7 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+    this.sharedFinalAssertions();
   });
 
   it('items keys should not be duplicated under any circumstances', async function () {
@@ -107,6 +111,7 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+    this.sharedFinalAssertions();
   });
 
   it('duplicating note should maintain editor ref', async function () {
@@ -161,6 +166,7 @@ describe('online conflict handling', function () {
     });
     expect(duplicate).to.be.ok;
     expect(this.application.componentManager.editorForNote(duplicate)).to.be.ok;
+    this.sharedFinalAssertions();
   });
 
   it('should create conflicted copy if incoming server item attempts to overwrite local dirty item', async function () {
@@ -209,6 +215,7 @@ describe('online conflict handling', function () {
 
     const newRawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(newRawPayloads.length).to.equal(this.expectedItemCount);
+    this.sharedFinalAssertions();
   });
 
   it('should handle sync conflicts by duplicating differing data', async function () {
@@ -244,6 +251,7 @@ describe('online conflict handling', function () {
     const note1 = this.application.itemManager.notes[0];
     const note2 = this.application.itemManager.notes[1];
     expect(note1.content.title).to.not.equal(note2.content.title);
+    this.sharedFinalAssertions();
   });
 
   it('basic conflict with clearing local state', async function () {
@@ -282,6 +290,7 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+    this.sharedFinalAssertions();
   });
 
   it('should duplicate item if saving a modified item and clearing our sync token', async function () {
@@ -314,6 +323,7 @@ describe('online conflict handling', function () {
 
     const allItems = this.application.itemManager.items;
     expect(allItems.length).to.equal(this.expectedItemCount);
+    this.sharedFinalAssertions();
   });
 
   it('should handle sync conflicts by not duplicating same data', async function () {
@@ -332,6 +342,7 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+    this.sharedFinalAssertions();
   });
 
   it('clearing conflict_of on two clients simultaneously should keep us in sync', async function () {
@@ -365,6 +376,7 @@ describe('online conflict handling', function () {
     // conflict_of is a key to ignore when comparing content, so item should
     // not be duplicated.
     await this.application.syncService.sync(syncOptions);
+    this.sharedFinalAssertions();
   });
 
   it('setting property on two clients simultaneously should create conflict', async function () {
@@ -400,6 +412,7 @@ describe('online conflict handling', function () {
       syncOptions
     );
     this.expectedItemCount++;
+    this.sharedFinalAssertions();
   });
 
   it('if server says deleted but client says not deleted, keep server state', async function () {
@@ -440,6 +453,7 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+    this.sharedFinalAssertions();
   });
 
   it('if server says not deleted but client says deleted, keep server state', async function () {
@@ -473,6 +487,7 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+    this.sharedFinalAssertions();
   });
 
   it('should create conflict if syncing an item that is stale', async function () {
@@ -507,6 +522,7 @@ describe('online conflict handling', function () {
     for (const payload of rawPayloads) {
       expect(payload.dirty).to.not.be.ok;
     }
+    this.sharedFinalAssertions();
   });
 
   it('creating conflict with exactly equal content should keep us in sync', async function () {
@@ -529,13 +545,14 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+    this.sharedFinalAssertions();
   });
 
   it('handles stale data in bulk', async function () {
     /** This number must be greater than the pagination limit per sync request.
      * For example if the limit per request is 150 items sent/received, this number should
      * be something like 160. */
-    const largeItemCount = 160;
+    const largeItemCount = SyncUpDownLimit + 10;
     await Factory.createManyMappedNotes(this.application, largeItemCount);
     /** Upload */
     await this.application.syncService.sync(syncOptions);
@@ -566,6 +583,7 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.notes.length).to.equal(
       largeItemCount * 2
     );
+    this.sharedFinalAssertions();
   }).timeout(60000);
 
   it('duplicating an item should maintian its relationships', async function () {
@@ -655,6 +673,7 @@ describe('online conflict handling', function () {
     for (const item of this.application.itemManager.items) {
       expect(item.dirty).to.not.be.ok;
     }
+    this.sharedFinalAssertions();
   });
 
   it('when a note is conflicted, its tags should not be duplicated.', async function () {
@@ -717,6 +736,7 @@ describe('online conflict handling', function () {
       this.expectedItemCount
     );
     expect(tag.content.references.length).to.equal(2);
+    this.sharedFinalAssertions();
   });
 
   it('succesful server side saving but dropped packet response should not create sync conflict', async function () {
@@ -759,5 +779,6 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.notes.length).to.equal(1);
     const finalNote = this.application.findItem(note.uuid);
     expect(finalNote.title).to.equal(finalTitle);
+    this.sharedFinalAssertions();
   });
 });
