@@ -90,7 +90,8 @@ export class SNItem {
       this.created_at && this.dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.userModifiedDate = new Date(
-        this.getAppDomainValue(AppDataField.UserModifiedDate) || this.updated_at
+        this.getAppDomainValue(AppDataField.UserModifiedDate) ||
+          this.serverUpdatedAt
       );
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
       this.protected = this.payload.safeContent.protected;
@@ -99,7 +100,7 @@ export class SNItem {
       this.archived = this.getAppDomainValue(AppDataField.Archived);
       this.locked = this.getAppDomainValue(AppDataField.Locked);
     } else {
-      this.userModifiedDate = this.updated_at || new Date();
+      this.userModifiedDate = this.serverUpdatedAt || new Date();
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
@@ -150,16 +151,17 @@ export class SNItem {
     return this.payload.created_at!;
   }
 
-  get updated_at(): Date | undefined {
-    return this.payload.serverUpdatedAt;
-  }
-
   /**
    * The date timestamp the server set for this item upon it being synced
    * Undefined if never synced to a remote server.
    */
   public get serverUpdatedAt(): Date | undefined {
-    return this.updated_at;
+    return this.payload.serverUpdatedAt;
+  }
+
+  /** @deprecated Use serverUpdatedAt instead */
+  public get updated_at(): Date | undefined {
+    return this.serverUpdatedAt;
   }
 
   get dirtiedDate() {
@@ -264,7 +266,7 @@ export class SNItem {
 
   /** Whether the item has never been synced to a server */
   public get neverSynced() {
-    return !this.updated_at || this.updated_at.getTime() === 0;
+    return !this.serverUpdatedAt || this.serverUpdatedAt.getTime() === 0;
   }
 
   /**
@@ -376,7 +378,7 @@ export class SNItem {
   }
 
   public updatedAtTimestamp() {
-    return this.updated_at?.getTime();
+    return this.serverUpdatedAt?.getTime();
   }
 
   private dateToLocalizedString(date: Date) {

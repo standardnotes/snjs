@@ -46,7 +46,7 @@ describe('app models', () => {
     const params = Factory.createNotePayload();
     const item = CreateItemFromPayload(params);
     const epoch = new Date(0);
-    expect(item.updated_at - epoch).to.equal(0);
+    expect(item.serverUpdatedAt - epoch).to.equal(0);
     expect(item.created_at - epoch).to.be.above(0);
     expect(new Date() - item.created_at).to.be.below(5); // < 5ms
   });

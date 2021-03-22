@@ -689,7 +689,7 @@ describe('notes and tags', () => {
         await this.application.createTemplateItem(ContentType.SmartTag, {
           title: 'One day ago',
           predicate: {
-            keypath: 'updated_at',
+            keypath: 'serverUpdatedAt',
             operator: '>',
             value: '1.days.ago',
           },

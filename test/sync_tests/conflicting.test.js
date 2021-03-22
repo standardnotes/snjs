@@ -744,8 +744,8 @@ describe('online conflict handling', function () {
     const retroNote = await this.application.itemManager.emitItemFromPayload(
       noteAfterChange.payload
     );
-    expect(retroNote.updated_at.getTime()).to.equal(
-      noteAfterChange.updated_at.getTime()
+    expect(retroNote.serverUpdatedAt.getTime()).to.equal(
+      noteAfterChange.serverUpdatedAt.getTime()
     );
 
     /** Change the item to its final title and sync */
