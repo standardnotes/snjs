@@ -178,8 +178,22 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return this.validateOrRenewSession(ChallengeReason.AccessProtectedNote);
   }
 
+  authorizeAddingPasscode(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.AddPasscode);
+  }
+
+  authorizeChangingPasscode(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.ChangePasscode);
+  }
+
+  authorizeRemovingPasscode(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.RemovePasscode);
+  }
+
   authorizeSearchingProtectedNotesText(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.SearchProtectedNotesText);
+    return this.validateOrRenewSession(
+      ChallengeReason.SearchProtectedNotesText
+    );
   }
 
   authorizeFileImport(): Promise<boolean> {

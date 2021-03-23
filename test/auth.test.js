@@ -438,7 +438,7 @@ describe('basic auth', () => {
         this.application.submitValuesForChallenge(challenge, initialValues);
       },
     });
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     await changePassword.bind(this)();
   }).timeout(20000);
 

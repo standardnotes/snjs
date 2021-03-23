@@ -121,7 +121,7 @@ describe('storage manager', function () {
 
   it('storage aftering adding passcode should be encrypted', async function () {
     await this.application.setValue('foo', 'bar');
-    await this.application.setPasscode('123');
+    await this.application.addPasscode('123');
     const wrappedValue = this.application.storageService.values[
       ValueModesKeys.Wrapped
     ];
@@ -131,18 +131,9 @@ describe('storage manager', function () {
 
   it('storage after adding passcode then removing passcode should not be encrypted', async function () {
     const passcode = '123🌂';
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        this.application.submitValuesForChallenge(
-          challenge,
-          challenge.prompts.map(
-            (prompt) => new ChallengeValue(prompt, passcode)
-          )
-        );
-      },
-    });
+    Factory.handlePasswordChallenges(this.application, passcode);
     await this.application.setValue('foo', 'bar');
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     await this.application.setValue('bar', 'foo');
     await this.application.removePasscode();
     const wrappedValue = this.application.storageService.values[
@@ -154,16 +145,6 @@ describe('storage manager', function () {
 
   it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
     const passcode = '123🌂';
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        this.application.submitValuesForChallenge(
-          challenge,
-          challenge.prompts.map(
-            (prompt) => new ChallengeValue(prompt, passcode)
-          )
-        );
-      },
-    });
     /**
      * After setting passcode, we expect that the keychain has been cleared, as the account keys
      * are now wrapped in storage with the passcode. Once the passcode is removed, we expect
@@ -180,13 +161,15 @@ describe('storage manager', function () {
       )
     ).to.be.ok;
     await this.application.setValue('foo', 'bar');
-    await this.application.setPasscode(passcode);
+    Factory.handlePasswordChallenges(this.application, this.password);
+    await this.application.addPasscode(passcode);
     expect(
       await this.application.deviceInterface.getNamespacedKeychainValue(
         this.application.identifier
       )
     ).to.not.be.ok;
     await this.application.setValue('bar', 'foo');
+    Factory.handlePasswordChallenges(this.application, passcode);
     await this.application.removePasscode();
     expect(
       await this.application.deviceInterface.getNamespacedKeychainValue(
@@ -249,7 +232,8 @@ describe('storage manager', function () {
       .ok;
 
     const passcode = '123';
-    await this.application.setPasscode(passcode);
+    Factory.handlePasswordChallenges(this.application, this.password);
+    await this.application.addPasscode(passcode);
     await this.application.setValue('bar', 'foo');
 
     /** Root key should now be wrapped */
@@ -303,7 +287,7 @@ describe('storage manager', function () {
   });
 
   it('stored payloads should not contain metadata fields', async function () {
-    await this.application.setPasscode('123');
+    await this.application.addPasscode('123');
     await Factory.createSyncedNote(this.application);
     const payloads = await this.application.storageService.getAllRawPayloads();
     const payload = payloads[0];
