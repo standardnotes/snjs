@@ -909,7 +909,8 @@ export class SNApplication {
       }
       if (hasPasscode) {
         /* Upgrade passcode version */
-        await this.changePasscode(
+        await this.removePasscodeWithoutWarning();
+        await this.setPasscodeWithoutWarning(
           passcode!,
           KeyParamsOrigination.ProtocolUpgrade
         );
@@ -1624,10 +1625,7 @@ export class SNApplication {
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(
-        newPasscode,
-        KeyParamsOrigination.PasscodeChange
-      );
+      await this.setPasscodeWithoutWarning(newPasscode, origination);
       return true;
     } finally {
       dismissBlockingDialog();
