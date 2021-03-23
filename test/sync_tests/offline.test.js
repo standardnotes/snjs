@@ -63,7 +63,7 @@ describe('offline syncing', () => {
   });
 
   it('should sync item encrypted with passcode', async function () {
-    await this.application.setPasscode('foobar');
+    await this.application.addPasscode('foobar');
     await Factory.createMappedNote(this.application);
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1);
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads();

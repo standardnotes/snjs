@@ -183,7 +183,7 @@ describe('key recovery service', function () {
     });
 
     /** Set a passcode to expect it to be validated later */
-    await appA.setPasscode(passcode);
+    await appA.addPasscode(passcode);
 
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
 

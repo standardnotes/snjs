@@ -93,7 +93,7 @@ describe('protections', function () {
     });
     await this.application.launch(true);
 
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     let note = await Factory.createMappedNote(this.application);
     note = await this.application.protectNote(note);
 
@@ -129,7 +129,7 @@ describe('protections', function () {
     });
     await this.application.launch(true);
 
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     let note = await Factory.createMappedNote(this.application);
     const uuid = note.uuid;
     note = await this.application.protectNote(note);
@@ -152,7 +152,7 @@ describe('protections', function () {
     });
     await this.application.launch(true);
 
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     let note = await Factory.createMappedNote(this.application);
     note = await this.application.protectNote(note);
     const result = await this.application.unprotectNote(note);
@@ -188,7 +188,7 @@ describe('protections', function () {
     });
     await this.application.launch(true);
 
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     let note = await Factory.createMappedNote(this.application);
     note = await this.application.protectNote(note);
 
@@ -232,7 +232,7 @@ describe('protections', function () {
     });
     await this.application.launch(true);
 
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
 
     expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
   });
@@ -263,7 +263,7 @@ describe('protections', function () {
     });
     await this.application.launch(true);
 
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
 
     expect(await this.application.authorizeAutolockIntervalChange()).to.be.true;
   });
@@ -300,13 +300,13 @@ describe('protections', function () {
 
     it('no account, passcode, no biometrics', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
-      await this.application.setPasscode('passcode');
+      await this.application.addPasscode('passcode');
       expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('no account, passcode, biometrics', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
-      await this.application.setPasscode('passcode');
+      await this.application.addPasscode('passcode');
       await this.application.enableBiometrics();
       expect(this.application.hasProtectionSources()).to.be.true;
     });
@@ -339,7 +339,7 @@ describe('protections', function () {
         email: Uuid.GenerateUuidSynchronously(),
         password: Uuid.GenerateUuidSynchronously(),
       });
-      await this.application.setPasscode('passcode');
+      await this.application.addPasscode('passcode');
       expect(this.application.hasProtectionSources()).to.be.true;
     });
 
@@ -350,7 +350,7 @@ describe('protections', function () {
         email: Uuid.GenerateUuidSynchronously(),
         password: Uuid.GenerateUuidSynchronously(),
       });
-      await this.application.setPasscode('passcode');
+      await this.application.addPasscode('passcode');
       await this.application.enableBiometrics();
       expect(this.application.hasProtectionSources()).to.be.true;
     });
@@ -359,13 +359,13 @@ describe('protections', function () {
   describe('areProtectionsEnabled', async function () {
     it('should return true when session length has not been set', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
-      await this.application.setPasscode('passcode');
+      await this.application.addPasscode('passcode');
       expect(this.application.areProtectionsEnabled()).to.be.true;
     });
 
     it('should return false when session length has been set', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
-      await this.application.setPasscode('passcode');
+      await this.application.addPasscode('passcode');
       await this.application.protectionService.setSessionLength(300);
       expect(this.application.areProtectionsEnabled()).to.be.false;
     });

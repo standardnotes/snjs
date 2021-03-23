@@ -34,7 +34,7 @@ describe('backups', function () {
     expect(data.version).to.equal(
       this.application.protocolService.getLatestVersion()
     );
-    await this.application.setPasscode('passcode');
+    await this.application.addPasscode('passcode');
     data = await this.application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
@@ -56,7 +56,7 @@ describe('backups', function () {
 
   it('passcode + no account backup file should have correct number of items', async function () {
     const passcode = 'passcode';
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     await Promise.all([
       Factory.createSyncedNote(this.application),
       Factory.createSyncedNote(this.application),
@@ -117,7 +117,7 @@ describe('backups', function () {
     this.timeout(10000);
     const passcode = 'passcode';
     await this.application.register(this.email, this.password);
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     await Promise.all([
       Factory.createSyncedNote(this.application),
       Factory.createSyncedNote(this.application),
@@ -217,7 +217,7 @@ describe('backups', function () {
   });
 
   it('encrypted backup file should have keyParams', async function () {
-    await this.application.setPasscode('passcode');
+    await this.application.addPasscode('passcode');
     const backup = await this.application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
@@ -234,7 +234,7 @@ describe('backups', function () {
   });
 
   it('encrypted backup file should have itemsKeys', async function () {
-    await this.application.setPasscode('passcode');
+    await this.application.addPasscode('passcode');
     const backup = await this.application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );

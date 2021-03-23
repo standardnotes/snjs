@@ -152,7 +152,7 @@ describe('keys', function () {
       KeyParamsOrigination.Registration
     );
     await this.application.protocolService.setRootKey(key);
-    await this.application.setPasscode(password);
+    await this.application.addPasscode(password);
 
     /** We should be able to decrypt wrapped root key with passcode */
     const wrappingKeyParams = await this.application.protocolService.getRootKeyWrapperKeyParams();
@@ -349,7 +349,7 @@ describe('keys', function () {
   });
 
   it('When setting passcode, should encrypt items keys', async function () {
-    await this.application.setPasscode('foo');
+    await this.application.addPasscode('foo');
     const itemsKey = this.application.itemManager.itemsKeys()[0];
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find(
@@ -360,7 +360,7 @@ describe('keys', function () {
   });
 
   it('items key encrypted payload should contain root key params', async function () {
-    await this.application.setPasscode('foo');
+    await this.application.addPasscode('foo');
     const itemsKey = this.application.itemManager.itemsKeys()[0];
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find(
@@ -388,7 +388,7 @@ describe('keys', function () {
 
   it('correctly validates local passcode', async function () {
     const passcode = 'foo';
-    await this.application.setPasscode('foo');
+    await this.application.addPasscode('foo');
     expect(
       (await this.application.protocolService.validatePasscode('wrong')).valid
     ).to.equal(false);
@@ -471,7 +471,7 @@ describe('keys', function () {
       },
     });
 
-    await this.application.setPasscode(passcode);
+    await this.application.addPasscode(passcode);
     await Factory.createSyncedNote(this.application);
     const itemsKeys = this.application.itemManager.itemsKeys();
     expect(itemsKeys.length).to.equal(1);
