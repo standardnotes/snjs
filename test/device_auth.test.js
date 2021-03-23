@@ -141,6 +141,7 @@ describe('device authentication', function () {
     );
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
     const passcode = 'foobar';
+    Factory.handlePasswordChallenges(application, password);
     await application.addPasscode(passcode);
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyPlusWrapper

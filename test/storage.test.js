@@ -131,16 +131,7 @@ describe('storage manager', function () {
 
   it('storage after adding passcode then removing passcode should not be encrypted', async function () {
     const passcode = '123🌂';
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        this.application.submitValuesForChallenge(
-          challenge,
-          challenge.prompts.map(
-            (prompt) => new ChallengeValue(prompt, passcode)
-          )
-        );
-      },
-    });
+    Factory.handlePasswordChallenges(this.application, passcode);
     await this.application.setValue('foo', 'bar');
     await this.application.addPasscode(passcode);
     await this.application.setValue('bar', 'foo');
@@ -154,16 +145,6 @@ describe('storage manager', function () {
 
   it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
     const passcode = '123🌂';
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        this.application.submitValuesForChallenge(
-          challenge,
-          challenge.prompts.map(
-            (prompt) => new ChallengeValue(prompt, passcode)
-          )
-        );
-      },
-    });
     /**
      * After setting passcode, we expect that the keychain has been cleared, as the account keys
      * are now wrapped in storage with the passcode. Once the passcode is removed, we expect
@@ -180,6 +161,7 @@ describe('storage manager', function () {
       )
     ).to.be.ok;
     await this.application.setValue('foo', 'bar');
+    Factory.handlePasswordChallenges(this.application, this.password);
     await this.application.addPasscode(passcode);
     expect(
       await this.application.deviceInterface.getNamespacedKeychainValue(
@@ -187,6 +169,7 @@ describe('storage manager', function () {
       )
     ).to.not.be.ok;
     await this.application.setValue('bar', 'foo');
+    Factory.handlePasswordChallenges(this.application, passcode);
     await this.application.removePasscode();
     expect(
       await this.application.deviceInterface.getNamespacedKeychainValue(
@@ -249,6 +232,7 @@ describe('storage manager', function () {
       .ok;
 
     const passcode = '123';
+    Factory.handlePasswordChallenges(this.application, this.password);
     await this.application.addPasscode(passcode);
     await this.application.setValue('bar', 'foo');
 

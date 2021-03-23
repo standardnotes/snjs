@@ -334,22 +334,26 @@ describe('protections', function () {
 
     it('account, passcode, no biometrics', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
+      const password = Uuid.GenerateUuidSynchronously();
       await Factory.registerUserToApplication({
         application: this.application,
         email: Uuid.GenerateUuidSynchronously(),
-        password: Uuid.GenerateUuidSynchronously(),
+        password,
       });
+      Factory.handlePasswordChallenges(this.application, password);
       await this.application.addPasscode('passcode');
       expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('account, passcode, biometrics', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
+      const password = Uuid.GenerateUuidSynchronously();
       await Factory.registerUserToApplication({
         application: this.application,
         email: Uuid.GenerateUuidSynchronously(),
-        password: Uuid.GenerateUuidSynchronously(),
+        password,
       });
+      Factory.handlePasswordChallenges(this.application, password);
       await this.application.addPasscode('passcode');
       await this.application.enableBiometrics();
       expect(this.application.hasProtectionSources()).to.be.true;
