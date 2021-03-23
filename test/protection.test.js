@@ -197,6 +197,33 @@ describe('protections', function () {
     expect(challengePrompts).to.equal(1);
   });
 
+  it('prompts for password when adding a passcode', async function () {
+    this.application = await Factory.createInitAppWithRandNamespace();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: Uuid.GenerateUuidSynchronously(),
+      password,
+    });
+    const promise = new Promise((resolve, reject) => {
+      this.application.setLaunchCallback({
+        receiveChallenge(challenge) {
+          if (
+            challenge.reason === ChallengeReason.AddPasscode &&
+            challenge.prompts[0].validation ===
+              ChallengeValidation.AccountPassword
+          ) {
+            resolve();
+          } else {
+            reject(Error('Received unknown challenge.'));
+          }
+        },
+      });
+    });
+    this.application.addPasscode('passcode');
+    return promise;
+  });
+
   it('authorizes note access when no password or passcode are set', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
 
