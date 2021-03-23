@@ -179,7 +179,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
   }
 
   authorizeAddingPasscode(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.RemovePasscode);
+    return this.validateOrRenewSession(ChallengeReason.AddPasscode);
   }
 
   authorizeChangingPasscode(): Promise<boolean> {
