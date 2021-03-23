@@ -28,6 +28,7 @@ export enum ChallengeReason {
   Custom,
   AccessProtectedNote,
   ImportFile,
+  AddPasscode,
   RemovePasscode,
   ChangePasscode,
   ChangeAutolockInterval,
@@ -93,6 +94,8 @@ export class Challenge {
           return ChallengeStrings.NoteAccess;
         case ChallengeReason.ImportFile:
           return ChallengeStrings.ImportFile;
+        case ChallengeReason.AddPasscode:
+          return ChallengeStrings.AddPasscode;
         case ChallengeReason.RemovePasscode:
           return ChallengeStrings.RemovePasscode;
         case ChallengeReason.ChangePasscode:
@@ -105,7 +108,6 @@ export class Challenge {
           return ChallengeStrings.RevokeSession;
         case ChallengeReason.AccessBatchManager:
           return ChallengeStrings.AccessBatchManager;
-          return ChallengeStrings.RevokeSession;
         case ChallengeReason.AccessCloudLink:
           return ChallengeStrings.AccessCloudLink;
         case ChallengeReason.ImportEncryptedFile:
