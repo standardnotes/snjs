@@ -117,6 +117,7 @@ describe('backups', function () {
     this.timeout(10000);
     const passcode = 'passcode';
     await this.application.register(this.email, this.password);
+    Factory.handlePasswordChallenges(this.application, this.password);
     await this.application.addPasscode(passcode);
     await Promise.all([
       Factory.createSyncedNote(this.application),

@@ -152,6 +152,7 @@ describe('keys', function () {
       KeyParamsOrigination.Registration
     );
     await this.application.protocolService.setRootKey(key);
+    Factory.handlePasswordChallenges(this.application, password);
     await this.application.addPasscode(password);
 
     /** We should be able to decrypt wrapped root key with passcode */
@@ -459,18 +460,6 @@ describe('keys', function () {
 
   it('When root key changes, all items keys must be re-encrypted', async function () {
     const passcode = 'foo';
-
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        this.application.submitValuesForChallenge(
-          challenge,
-          challenge.prompts.map(
-            (prompt) => new ChallengeValue(prompt, passcode)
-          )
-        );
-      },
-    });
-
     await this.application.addPasscode(passcode);
     await Factory.createSyncedNote(this.application);
     const itemsKeys = this.application.itemManager.itemsKeys();
@@ -493,6 +482,7 @@ describe('keys', function () {
     expect(decrypted.content).to.eql(originalItemsKey.content);
 
     /** Change passcode */
+    Factory.handlePasswordChallenges(this.application, passcode);
     await this.application.changePasscode('bar');
 
     const newRootKey = await this.application.protocolService.getRootKey();
