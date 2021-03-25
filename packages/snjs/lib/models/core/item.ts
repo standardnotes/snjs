@@ -326,18 +326,16 @@ export class SNItem {
     ]);
     if (itemsAreDifferentExcludingRefs) {
       const twentySeconds = 20_000;
-      if (history) {
-        if (previousRevision) {
-          /**
-           * If previousRevision.content === incomingValue.content, this means the
-           * change that was rejected by the server is in fact a legitimate change,
-           * because the value the client had previously matched with the server's,
-           * and this new change is being built on top of that state, and should therefore
-           * be chosen as the winner, with no need for a conflict.
-           */
-          if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
-            return ConflictStrategy.KeepLeft;
-          }
+      if (previousRevision) {
+        /**
+         * If previousRevision.content === incomingValue.content, this means the
+         * change that was rejected by the server is in fact a legitimate change,
+         * because the value the client had previously matched with the server's,
+         * and this new change is being built on top of that state, and should therefore
+         * be chosen as the winner, with no need for a conflict.
+         */
+        if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
+          return ConflictStrategy.KeepLeft;
         }
       }
       if (
@@ -441,9 +439,7 @@ export class ItemMutator {
       });
     }
     if (!this.payload.deleted) {
-      if (
-        this.type === MutationType.UserInteraction
-      ) {
+      if (this.type === MutationType.UserInteraction) {
         this.userModifiedDate = new Date();
       } else {
         const currentValue = this.item.userModifiedDate;
