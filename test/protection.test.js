@@ -17,11 +17,10 @@ describe('protections', function () {
   });
 
   it('prompts for password when accessing protected note', async function () {
-    const password = Uuid.GenerateUuidSynchronously();
-
     let challengePrompts = 0;
 
     this.application = await Factory.createApplication(Factory.randomString());
+    const password = Uuid.GenerateUuidSynchronously();
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1;

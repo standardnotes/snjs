@@ -101,7 +101,7 @@ import { ProtectionEvent } from './services/protection_service';
 import { Permission } from '@standardnotes/auth';
 
 /** How often to automatically sync, in milliseconds */
-const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
+const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
 
 type LaunchCallback = {
   receiveChallenge: (challenge: Challenge) => void;
@@ -146,7 +146,7 @@ export class SNApplication {
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
   private managedSubscribers: ObserverRemover[] = [];
-  private autoSyncInterval: any;
+  private autoSyncInterval!: number;
 
   /** True if the result of deviceInterface.openDatabase yields a new database being created */
   private createdNewDatabase = false;
@@ -1283,8 +1283,8 @@ export class SNApplication {
     return this.deinit(DeinitSource.Lock);
   }
 
-  public async setPasscode(passcode: string): Promise<void> {
-    return this.credentialService.setPasscode(passcode);
+  public addPasscode(passcode: string): Promise<boolean> {
+    return this.credentialService.addPasscode(passcode);
   }
 
   /**
@@ -1365,11 +1365,11 @@ export class SNApplication {
     this.createMigrationService();
     this.createHistoryManager();
     this.createSyncManager();
-    this.createAccountSerivce();
+    this.createProtectionService();
+    this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createComponentManager();
-    this.createProtectionService();
     this.createActionsManager();
     this.createPreferencesService();
   }
@@ -1423,7 +1423,7 @@ export class SNApplication {
     this.services.push(this.migrationService);
   }
 
-  private createAccountSerivce(): void {
+  private createCredentialService(): void {
     this.credentialService = new SNCredentialService(
       this.sessionManager,
       this.syncService,
@@ -1431,7 +1431,8 @@ export class SNApplication {
       this.itemManager,
       this.protocolService,
       this.alertService,
-      this.challengeService
+      this.challengeService,
+      this.protectionService
     );
     this.services.push(this.credentialService);
   }

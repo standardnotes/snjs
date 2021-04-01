@@ -35,7 +35,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
         continue;
       }
       const base = this.findBasePayload(received.uuid!);
-      if (base && base.dirty) {
+      if (base?.dirty && !base.errorDecrypting) {
         conflicted.push(decrypted);
         continue;
       }

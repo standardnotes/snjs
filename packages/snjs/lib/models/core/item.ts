@@ -325,7 +325,6 @@ export class SNItem {
       'references',
     ]);
     if (itemsAreDifferentExcludingRefs) {
-      const twentySeconds = 20_000;
       if (previousRevision) {
         /**
          * If previousRevision.content === incomingValue.content, this means the
@@ -338,6 +337,7 @@ export class SNItem {
           return ConflictStrategy.KeepLeft;
         }
       }
+      const twentySeconds = 20_000;
       if (
         /**
          * If the incoming item comes from an import, treat it as

@@ -128,7 +128,7 @@ describe('online syncing', function () {
     expect(notes[0].uuid).to.not.equal(note.uuid);
   });
 
-  it('having offline data then signing in should alternate uuid and merge with account', async function () {
+  it('having offline data then signing in should not alternate uuid and merge with account', async function () {
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
@@ -144,7 +144,7 @@ describe('online syncing', function () {
     const notes = this.application.itemManager.notes;
     expect(notes.length).to.equal(1);
     /** uuid should have been alternated */
-    expect(notes[0].uuid).to.not.equal(note.uuid);
+    expect(notes[0].uuid).to.equal(note.uuid);
   });
 
   it('server extensions should not be encrypted for sync', async function () {

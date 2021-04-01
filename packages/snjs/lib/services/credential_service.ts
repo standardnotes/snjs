@@ -1,3 +1,4 @@
+import { SNProtectionService } from './protection_service';
 import { Uuid } from '@Lib/uuid';
 import { isNullOrUndefined } from '@Lib/utils';
 import {
@@ -58,7 +59,8 @@ export class SNCredentialService extends PureService<AccountEvent> {
     private itemManager: ItemManager,
     private protocolService: SNProtocolService,
     private alertService: SNAlertService,
-    private challengeService: ChallengeService
+    private challengeService: ChallengeService,
+    private protectionService: SNProtectionService
   ) {
     super();
   }
@@ -72,6 +74,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
     (this.protocolService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
     (this.challengeService as unknown) = undefined;
+    (this.protectionService as unknown) = undefined;
   }
 
   /**
@@ -160,22 +163,26 @@ export class SNCredentialService extends PureService<AccountEvent> {
             : StoragePersistencePolicies.Default
         );
         if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync(true);
+          await this.syncService.markAllItemsAsNeedingSync(false);
         } else {
           void this.itemManager.removeAllItemsFromMemory();
           await this.clearDatabase();
         }
         await this.notifyEvent(AccountEvent.SignedInOrRegistered);
         this.unlockSyncing();
-        const syncPromise = this.syncService.downloadFirstSync(1_000, {
-          checkIntegrity: true,
-          awaitAll: awaitSync,
-        });
+        const syncPromise = this.syncService
+          .downloadFirstSync(1_000, {
+            checkIntegrity: true,
+            awaitAll: awaitSync,
+          })
+          .then(() => {
+            if (!awaitSync) {
+              this.protocolService.decryptErroredItems();
+            }
+          });
         if (awaitSync) {
           await syncPromise;
           await this.protocolService.decryptErroredItems();
-        } else {
-          this.protocolService.decryptErroredItems();
         }
       } else {
         this.unlockSyncing();
@@ -380,7 +387,8 @@ export class SNCredentialService extends PureService<AccountEvent> {
       }
       if (hasPasscode) {
         /* Upgrade passcode version */
-        await this.changePasscode(
+        await this.removePasscodeWithoutWarning();
+        await this.setPasscodeWithoutWarning(
           passcode as string,
           KeyParamsOrigination.ProtocolUpgrade
         );
@@ -393,7 +401,11 @@ export class SNCredentialService extends PureService<AccountEvent> {
     }
   }
 
-  public async setPasscode(passcode: string): Promise<void> {
+  public async addPasscode(passcode: string): Promise<boolean> {
+    if (!(await this.protectionService.authorizeAddingPasscode())) {
+      return false;
+    }
+
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       SETTING_PASSCODE
@@ -403,16 +415,16 @@ export class SNCredentialService extends PureService<AccountEvent> {
         passcode,
         KeyParamsOrigination.PasscodeCreate
       );
+      return true;
     } finally {
       dismissBlockingDialog();
     }
   }
 
   public async removePasscode(): Promise<boolean> {
-    const passcode = await this.challengeService.promptForCorrectPasscode(
-      ChallengeReason.RemovePasscode
-    );
-    if (isNullOrUndefined(passcode)) return false;
+    if (!(await this.protectionService.authorizeRemovingPasscode())) {
+      return false;
+    }
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
@@ -433,10 +445,9 @@ export class SNCredentialService extends PureService<AccountEvent> {
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
-    const passcode = await this.challengeService.promptForCorrectPasscode(
-      ChallengeReason.ChangePasscode
-    );
-    if (isNullOrUndefined(passcode)) return false;
+    if (!(await this.protectionService.authorizeChangingPasscode())) {
+      return false;
+    }
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
@@ -446,10 +457,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(
-        newPasscode,
-        KeyParamsOrigination.PasscodeChange
-      );
+      await this.setPasscodeWithoutWarning(newPasscode, origination);
       return true;
     } finally {
       dismissBlockingDialog();

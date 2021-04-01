@@ -1,3 +1,4 @@
+import { SNItemsKey } from '@Models/app/items_key';
 import { SNHistoryManager } from './../history/history_manager';
 import { SyncEvent } from '@Services/sync/events';
 import { StorageKey } from '@Lib/storage_keys';
@@ -140,6 +141,7 @@ export class SNSyncService extends PureService<
 
   private syncLock = false;
   private _simulate_latency?: any;
+  private dealloced = false;
 
   /** Content types appearing first are always mapped first */
   private readonly localLoadPriorty = [
@@ -176,13 +178,14 @@ export class SNSyncService extends PureService<
    * If the database has been newly created (because its new or was previously destroyed)
    * we want to reset any sync tokens we have.
    */
-  public async onNewDatabaseCreated() {
+  public async onNewDatabaseCreated(): Promise<void> {
     if (await this.getLastSyncToken()) {
       await this.clearSyncPositionTokens();
     }
   }
 
   public deinit() {
+    this.dealloced = true;
     (this.sessionManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
     (this.protocolService as unknown) = undefined;
@@ -193,7 +196,7 @@ export class SNSyncService extends PureService<
     this.state!.reset();
     this.opStatus!.reset();
     this.state = undefined;
-    (this.opStatus as any) = undefined;
+    (this.opStatus as unknown) = undefined;
     this.resolveQueue.length = 0;
     this.spawnQueue.length = 0;
     super.deinit();
@@ -388,7 +391,9 @@ export class SNSyncService extends PureService<
    * to avoid overwriting data a user may retrieve that has the same UUID.
    * Alternating here forces us to to create duplicates of the items instead.
    */
-  public async markAllItemsAsNeedingSync(alternateUuids: boolean) {
+  public async markAllItemsAsNeedingSync(
+    alternateUuids: boolean
+  ): Promise<void> {
     this.log('Marking all items as needing sync');
     if (alternateUuids) {
       /** Make a copy of the array, as alternating uuid will affect array */
@@ -585,6 +590,9 @@ export class SNSyncService extends PureService<
       } else {
         throw Error(`Unhandled timing strategy ${useStrategy}`);
       }
+    }
+    if (this.dealloced) {
+      return;
     }
     /** Lock syncing immediately after checking in progress above */
     this.opStatus!.setDidBegin();
@@ -872,19 +880,30 @@ export class SNSyncService extends PureService<
     this.log('Online Sync Response', response.rawResponse);
     this.setLastSyncToken(response.lastSyncToken!);
     this.setPaginationToken(response.paginationToken!);
-    this.opStatus!.clearError();
-    this.opStatus!.setDownloadStatus(response.retrievedPayloads.length);
+    this.opStatus.clearError();
+    this.opStatus.setDownloadStatus(response.retrievedPayloads.length);
 
     const decryptedPayloads = [];
-    for (const payload of response.allProcessedPayloads) {
+    const processedPayloads = response.allProcessedPayloads;
+    const processedItemsKeys: Record<UuidString, PurePayload> = {};
+    for (const payload of processedPayloads) {
       if (payload.deleted || !payload.fields.includes(PayloadField.Content)) {
         /* Deleted payloads, and some payload types
           do not contiain content (like remote saved) */
         continue;
       }
-      const decrypted = await this.protocolService!.payloadByDecryptingPayload(
-        payload
+      const itemsKeyPayload: PurePayload | undefined =
+        processedItemsKeys[payload.items_key_id as string];
+      const itemsKey = itemsKeyPayload
+        ? (CreateItemFromPayload(itemsKeyPayload) as SNItemsKey)
+        : undefined;
+      const decrypted = await this.protocolService.payloadByDecryptingPayload(
+        payload,
+        itemsKey
       );
+      if (decrypted.content_type === ContentType.ItemsKey) {
+        processedItemsKeys[decrypted.uuid] = decrypted;
+      }
       decryptedPayloads.push(decrypted);
     }
     const masterCollection = this.payloadManager.getMasterCollection();

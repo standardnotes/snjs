@@ -152,6 +152,7 @@ export class SNProtocolService
       enumerable: false,
       writable: true,
     });
+
     this.removeItemsObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
       (changed, inserted) => {
@@ -1229,9 +1230,12 @@ export class SNProtocolService
     }
     const payloadVersion = payload.version!;
     if (payloadVersion === this.getLatestVersion()) {
-      throw Error(
-        'No associated key found for item encrypted with latest protocol version.'
+      SNLog.error(
+        Error(
+          'No associated key found for item encrypted with latest protocol version.'
+        )
       );
+      return undefined;
     }
     return this.defaultItemsKeyForItemVersion(payloadVersion);
   }
