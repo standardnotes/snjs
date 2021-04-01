@@ -1,3 +1,4 @@
+import { SNHistoryManager } from './../history/history_manager';
 import { SyncEvent } from '@Services/sync/events';
 import { StorageKey } from '@Lib/storage_keys';
 import { UuidString } from './../../types';
@@ -35,7 +36,6 @@ import { Uuids } from '@Models/functions';
 import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
-import { SNAlertService } from '../alert_service';
 import { SNLog } from '@Lib/log';
 
 const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
@@ -120,12 +120,6 @@ export class SNSyncService extends PureService<
   SyncEvent,
   SyncResponse | { source: SyncSources }
 > {
-  private sessionManager?: SNSessionManager;
-  private protocolService?: SNProtocolService;
-  private storageService?: SNStorageService;
-  private payloadManager?: PayloadManager;
-  private itemManager?: ItemManager;
-  private apiService?: SNApiService;
   private interval: any;
   private state?: SyncState;
   private opStatus!: SyncOpStatus;
@@ -156,12 +150,13 @@ export class SNSyncService extends PureService<
   ];
 
   constructor(
-    itemManager: ItemManager,
-    sessionManager: SNSessionManager,
-    protocolService: SNProtocolService,
-    storageService: SNStorageService,
-    payloadManager: PayloadManager,
-    apiService: SNApiService,
+    private itemManager: ItemManager,
+    private sessionManager: SNSessionManager,
+    private protocolService: SNProtocolService,
+    private storageService: SNStorageService,
+    private payloadManager: PayloadManager,
+    private apiService: SNApiService,
+    private historyService: SNHistoryManager,
     interval: any
   ) {
     super();
@@ -188,12 +183,12 @@ export class SNSyncService extends PureService<
   }
 
   public deinit() {
-    this.sessionManager = undefined;
-    this.itemManager = undefined;
-    this.protocolService = undefined;
-    this.payloadManager = undefined;
-    this.storageService = undefined;
-    this.apiService = undefined;
+    (this.sessionManager as unknown) = undefined;
+    (this.itemManager as unknown) = undefined;
+    (this.protocolService as unknown) = undefined;
+    (this.payloadManager as unknown) = undefined;
+    (this.storageService as unknown) = undefined;
+    (this.apiService as unknown) = undefined;
     this.interval = undefined;
     this.state!.reset();
     this.opStatus!.reset();
@@ -255,7 +250,7 @@ export class SNSyncService extends PureService<
    * Used in tandem with `loadDatabasePayloads`
    */
   public async getDatabasePayloads() {
-    return this.storageService!.getAllRawPayloads().catch((error) => {
+    return this.storageService.getAllRawPayloads().catch((error) => {
       this.notifyEvent(SyncEvent.DatabaseReadError, error);
       throw error;
     });
@@ -298,7 +293,7 @@ export class SNSyncService extends PureService<
     const decryptedItemsKeys = await this.protocolService!.payloadsByDecryptingPayloads(
       itemsKeysPayloads
     );
-    await this.payloadManager!.emitPayloads(
+    await this.payloadManager.emitPayloads(
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
     );
@@ -315,7 +310,7 @@ export class SNSyncService extends PureService<
       const decrypted = await this.protocolService!.payloadsByDecryptingPayloads(
         batch
       );
-      await this.payloadManager!.emitPayloads(
+      await this.payloadManager.emitPayloads(
         decrypted,
         PayloadSource.LocalRetrieved
       );
@@ -332,21 +327,21 @@ export class SNSyncService extends PureService<
 
   private async setLastSyncToken(token: string) {
     this.syncToken = token;
-    return this.storageService!.setValue(StorageKey.LastSyncToken, token);
+    return this.storageService.setValue(StorageKey.LastSyncToken, token);
   }
 
   private async setPaginationToken(token: string) {
     this.cursorToken = token;
     if (token) {
-      return this.storageService!.setValue(StorageKey.PaginationToken, token);
+      return this.storageService.setValue(StorageKey.PaginationToken, token);
     } else {
-      return this.storageService!.removeValue(StorageKey.PaginationToken);
+      return this.storageService.removeValue(StorageKey.PaginationToken);
     }
   }
 
   private async getLastSyncToken() {
     if (!this.syncToken) {
-      this.syncToken = await this.storageService!.getValue(
+      this.syncToken = await this.storageService.getValue(
         StorageKey.LastSyncToken
       );
     }
@@ -355,7 +350,7 @@ export class SNSyncService extends PureService<
 
   private async getPaginationToken() {
     if (!this.cursorToken) {
-      this.cursorToken = await this.storageService!.getValue(
+      this.cursorToken = await this.storageService.getValue(
         StorageKey.PaginationToken
       );
     }
@@ -365,28 +360,25 @@ export class SNSyncService extends PureService<
   private async clearSyncPositionTokens() {
     this.syncToken = undefined;
     this.cursorToken = undefined;
-    await this.storageService!.removeValue(StorageKey.LastSyncToken);
-    await this.storageService!.removeValue(StorageKey.PaginationToken);
+    await this.storageService.removeValue(StorageKey.LastSyncToken);
+    await this.storageService.removeValue(StorageKey.PaginationToken);
   }
 
   private async itemsNeedingSync() {
-    const items = this.itemManager!.getDirtyItems();
+    const items = this.itemManager.getDirtyItems();
     return items;
   }
 
   private async alternateUuidForItem(uuid: UuidString) {
-    const item = this.itemManager!.findItem(uuid)!;
+    const item = this.itemManager.findItem(uuid)!;
     const payload = CreateMaxPayloadFromAnyObject(item);
     const results = await PayloadsByAlternatingUuid(
       payload,
-      this.payloadManager!.getMasterCollection()
+      this.payloadManager.getMasterCollection()
     );
-    await this.payloadManager!.emitPayloads(
-      results,
-      PayloadSource.LocalChanged
-    );
+    await this.payloadManager.emitPayloads(results, PayloadSource.LocalChanged);
     await this.persistPayloads(results);
-    return this.itemManager!.findItem(results[0].uuid!);
+    return this.itemManager.findItem(results[0].uuid!);
   }
 
   /**
@@ -400,21 +392,23 @@ export class SNSyncService extends PureService<
     this.log('Marking all items as needing sync');
     if (alternateUuids) {
       /** Make a copy of the array, as alternating uuid will affect array */
-      const items = this.itemManager!.items.filter((item) => {
-        return !item.errorDecrypting;
-      }).slice();
+      const items = this.itemManager.items
+        .filter((item) => {
+          return !item.errorDecrypting;
+        })
+        .slice();
       for (const item of items) {
         await this.alternateUuidForItem(item.uuid);
       }
     }
-    const items = this.itemManager!.items;
+    const items = this.itemManager.items;
     const payloads = items.map((item) => {
       return CreateMaxPayloadFromAnyObject(item, {
         dirty: true,
         dirtiedDate: new Date(),
       });
     });
-    await this.payloadManager!.emitPayloads(
+    await this.payloadManager.emitPayloads(
       payloads,
       PayloadSource.LocalChanged
     );
@@ -603,7 +597,7 @@ export class SNSyncService extends PureService<
      * Setting this value means the item was 100% sent to the server. */
     const beginDate = new Date();
     if (items.length > 0) {
-      await this.itemManager!.changeItems(
+      await this.itemManager.changeItems(
         Uuids(items),
         (mutator) => {
           mutator.lastSyncBegan = beginDate;
@@ -837,11 +831,11 @@ export class SNSyncService extends PureService<
     this.log('Offline Sync Response', response.rawResponse);
     const payloadsToEmit = response.savedPayloads;
     if (payloadsToEmit.length > 0) {
-      await this.payloadManager!.emitPayloads(
+      await this.payloadManager.emitPayloads(
         payloadsToEmit,
         PayloadSource.LocalSaved
       );
-      const payloadsToPersist = this.payloadManager!.find(
+      const payloadsToPersist = this.payloadManager.find(
         Uuids(payloadsToEmit)
       ) as PurePayload[];
       await this.persistPayloads(payloadsToPersist);
@@ -893,17 +887,19 @@ export class SNSyncService extends PureService<
       );
       decryptedPayloads.push(decrypted);
     }
-    const masterCollection = this.payloadManager!.getMasterCollection();
+    const masterCollection = this.payloadManager.getMasterCollection();
+    const historyMap = this.historyService.getHistoryMapCopy();
     const resolver = new SyncResponseResolver(
       response,
       decryptedPayloads,
       masterCollection,
-      operation.payloadsSavedOrSaving
+      operation.payloadsSavedOrSaving,
+      historyMap
     );
 
     const collections = await resolver.collectionsByProcessingResponse();
     for (const collection of collections) {
-      const payloadsToPersist = await this.payloadManager!.emitCollection(
+      const payloadsToPersist = await this.payloadManager.emitCollection(
         collection
       );
       await this.persistPayloads(payloadsToPersist);
@@ -932,7 +928,7 @@ export class SNSyncService extends PureService<
         dirty: false,
       });
     });
-    await this.payloadManager!.emitPayloads(
+    await this.payloadManager.emitPayloads(
       payloads,
       PayloadSource.LocalChanged
     );
@@ -946,7 +942,7 @@ export class SNSyncService extends PureService<
     if (payloads.length === 0) {
       return;
     }
-    return this.storageService!.savePayloads(payloads).catch((error) => {
+    return this.storageService.savePayloads(payloads).catch((error) => {
       this.notifyEvent(SyncEvent.DatabaseWriteError, error);
       throw error;
     });
@@ -963,8 +959,8 @@ export class SNSyncService extends PureService<
    */
   private async computeDataIntegrityHash() {
     try {
-      const items = this.itemManager!.nonDeletedItems.sort((a, b) => {
-        return b.updated_at!.getTime() - a.updated_at!.getTime();
+      const items = this.itemManager.nonDeletedItems.sort((a, b) => {
+        return b.serverUpdatedAt!.getTime() - a.serverUpdatedAt!.getTime();
       });
       const dates = items.map((item) => item.updatedAtTimestamp());
       const string = dates.join(',');
@@ -987,14 +983,16 @@ export class SNSyncService extends PureService<
     );
     const payloads = await downloader.run();
     const delta = new DeltaOutOfSync(
-      this.payloadManager!.getMasterCollection(),
+      this.payloadManager.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(
         payloads,
         PayloadSource.RemoteRetrieved
-      )
+      ),
+      undefined,
+      this.historyService.getHistoryMapCopy()
     );
     const collection = await delta.resultingCollection();
-    await this.payloadManager!.emitCollection(collection);
+    await this.payloadManager.emitCollection(collection);
     await this.persistPayloads(collection.payloads);
     return this.sync({
       checkIntegrity: true,

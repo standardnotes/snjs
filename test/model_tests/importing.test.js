@@ -741,6 +741,9 @@ describe('importing', function () {
       },
       identifier
     );
+    /**
+     * Note that this storage contains "sync.standardnotes.org" as the API Host param.
+     */
     await application.deviceInterface.setRawStorageValue(
       'standardnotes-storage',
       JSON.stringify({
@@ -790,7 +793,7 @@ describe('importing', function () {
         }
       },
     });
-    await application.launch(true);
+    await application.launch(false);
 
     const backupFile = {
       items: [

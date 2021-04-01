@@ -1,11 +1,14 @@
+import { RawPayload } from './../../protocol/payloads/generator';
+import { DeviceInterface } from '@Lib/device_interface';
+import { HistoryEntry } from '@Services/history/entries/history_entry';
+import { CreateHistoryEntryForPayload } from '@Services/history/entries/generator';
+import { SurePayload } from './../../protocol/payloads/sure_payload';
 import { UuidString } from './../../types';
 import {
   RevisionListEntry,
   SingleRevision,
   SingleRevisionResponse,
 } from './../api/responses';
-import { SessionHistoryMap } from '@Services/history/session/session_history_map';
-import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 import { SNStorageService } from '@Services/storage_service';
 import { ItemManager } from '@Services/item_manager';
 import {
@@ -17,11 +20,28 @@ import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { concatArrays, isNullOrUndefined } from '@Lib/utils';
+import { removeFromArray } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
+import { PayloadFormat } from '@Lib/protocol/payloads';
+import { HistoryMap } from './history_map';
 
-const PERSIST_TIMEOUT = 2000;
+const PersistTimeout = 2000;
+
+type PersistableHistoryEntry = {
+  payload: RawPayload;
+};
+
+type PersistableHistory = Record<UuidString, PersistableHistoryEntry[]>;
+
+/** The amount of revisions per item above which should call for an optimization. */
+const DefaultItemRevisionsThreshold = 20;
+
+/**
+ * The amount of characters added or removed that
+ * constitute a keepable entry after optimization.
+ */
+const LargeEntryDeltaThreshold = 25;
 
 /**
  * The history manager is responsible for:
@@ -33,180 +53,245 @@ const PERSIST_TIMEOUT = 2000;
  *    retrieved per item via an API call.
  */
 export class SNHistoryManager extends PureService {
-  private itemManager?: ItemManager;
-  private storageService?: SNStorageService;
-  private apiService: SNApiService;
-  private protocolService: SNProtocolService;
-  private contentTypes: ContentType[] = [];
-  private timeout: any;
-  private sessionHistory?: SessionHistoryMap;
-  private removeChangeObserver: any;
   private persistable = false;
   public autoOptimize = false;
-  private saveTimeout: any;
+  private removeChangeObserver: () => void;
+  private saveTimeout!: number;
+
+  /**
+   * When no history exists for an item yet, we first put it in the staging map.
+   * Then, the next time the item changes and it has no history, we check the staging map.
+   * If the entry from the staging map differs from the incoming change, we now add the incoming
+   * change to the history map and remove it from staging. This is a way to detect when the first
+   * actual change of an item occurs (especially new items), rather than tracking a change
+   * as an item propagating through the different PayloadSource
+   * lifecycles (created, local saved, presyncsave, etc)
+   */
+  private historyStaging: Partial<Record<UuidString, HistoryEntry>> = {};
+  private history: HistoryMap = {};
+  /** The content types for which to record history */
+  public readonly historyTypes: ContentType[] = [ContentType.Note];
+
+  private itemRevisionThreshold = DefaultItemRevisionsThreshold;
 
   constructor(
-    itemManager: ItemManager,
-    storageService: SNStorageService,
-    apiService: SNApiService,
-    protocolService: SNProtocolService,
-    contentTypes: ContentType[],
-    timeout: any
+    private itemManager: ItemManager,
+    private storageService: SNStorageService,
+    private apiService: SNApiService,
+    private protocolService: SNProtocolService,
+    public deviceInterface: DeviceInterface
   ) {
     super();
-    this.itemManager = itemManager;
-    this.storageService = storageService;
-    this.contentTypes = contentTypes;
-    this.timeout = timeout;
-    this.apiService = apiService;
-    this.protocolService = protocolService;
+    this.removeChangeObserver = this.itemManager.addObserver(
+      this.historyTypes,
+      (changed) => {
+        if (changed.length > 0) {
+          this.recordNewHistoryForItems(changed);
+        }
+      }
+    );
   }
 
-  public deinit() {
-    this.itemManager = undefined;
-    this.storageService = undefined;
-    this.contentTypes.length = 0;
-    this.sessionHistory = undefined;
-    this.timeout = null;
+  public deinit(): void {
+    this.cancelPendingPersist();
+    (this.itemManager as unknown) = undefined;
+    (this.storageService as unknown) = undefined;
+    (this.history as unknown) = undefined;
     if (this.removeChangeObserver) {
       this.removeChangeObserver();
-      this.removeChangeObserver = null;
+      (this.removeChangeObserver as unknown) = undefined;
     }
     super.deinit();
   }
 
   /** For local session history */
-  async initializeFromDisk() {
-    this.persistable = await this.storageService!.getValue(
+  async initializeFromDisk(): Promise<void> {
+    this.persistable = await this.storageService.getValue(
       StorageKey.SessionHistoryPersistable
     );
-    this.sessionHistory = SessionHistoryMap.FromJson(
-      this.storageService!.getValue(StorageKey.SessionHistoryRevisions)
+    this.history = await this.getPersistedHistory();
+    this.autoOptimize = await this.storageService.getValue(
+      StorageKey.SessionHistoryOptimize,
+      undefined,
+      true
     );
-    const autoOptimize = await this.storageService!.getValue(
-      StorageKey.SessionHistoryOptimize
-    );
-    if (isNullOrUndefined(autoOptimize)) {
-      /** Default to true */
-      this.autoOptimize = true;
-    } else {
-      this.autoOptimize = autoOptimize;
-    }
-    this.addChangeObserver();
   }
 
-  addChangeObserver() {
-    this.removeChangeObserver = this.itemManager!.addObserver(
-      this.contentTypes,
-      (changed, inserted, discarded, _ignored, source) => {
-        const items = concatArrays(changed, inserted, discarded) as SNItem[];
-        if (source === PayloadSource.LocalChanged) {
-          return;
-        }
-        for (const item of items) {
-          try {
-            if (!item.deleted && !item.errorDecrypting) {
-              this.addHistoryEntryForItem(item);
-            }
-          } catch (e) {
-            console.error('Unable to add item history entry:', e);
-          }
-        }
-      }
+  private async getPersistedHistory(): Promise<
+    Record<UuidString, HistoryEntry[]>
+  > {
+    const historyMap: Record<UuidString, HistoryEntry[]> = {};
+    const rawHistory: PersistableHistory = await this.storageService.getValue(
+      StorageKey.SessionHistoryRevisions
     );
+    if (!rawHistory) {
+      return historyMap;
+    }
+    for (const [uuid, rawHistoryArray] of Object.entries(rawHistory)) {
+      const entries: HistoryEntry[] = [];
+      for (const [index, rawEntry] of rawHistoryArray.entries()) {
+        const payload = CreateSourcedPayloadFromObject(
+          rawEntry.payload,
+          PayloadSource.SessionHistory
+        ) as SurePayload;
+        const previousEntry = entries[index + 1];
+        const entry = CreateHistoryEntryForPayload(payload, previousEntry);
+        entries.unshift(entry);
+      }
+      historyMap[uuid] = entries;
+    }
+    return historyMap;
+  }
+
+  private recordNewHistoryForItems(items: SNItem[]) {
+    let needsPersist = false;
+    for (const item of items) {
+      if (!this.historyTypes.includes(item.content_type)) {
+        continue;
+      }
+      const payload = item.payload;
+      if (
+        item.deleted ||
+        payload.format !== PayloadFormat.DecryptedBareObject
+      ) {
+        continue;
+      }
+      const itemHistory = this.history[item.uuid] || [];
+      const latestEntry = itemHistory.length > 0 ? itemHistory[0] : undefined;
+      const historyPayload = CreateSourcedPayloadFromObject(
+        item,
+        PayloadSource.SessionHistory
+      ) as SurePayload;
+      const currentValueEntry = CreateHistoryEntryForPayload(
+        historyPayload,
+        latestEntry
+      );
+      /**
+       * For every change that comes in, first add it to the staging area.
+       * Then, only on the next subsequent change do we add this previously
+       * staged entry
+       */
+      const stagedEntry = this.historyStaging[item.uuid];
+      /** Add prospective to staging, and consider now adding previously staged as new revision */
+      this.historyStaging[item.uuid] = currentValueEntry;
+      if (!stagedEntry) {
+        continue;
+      }
+      if (stagedEntry.isSameAsEntry(currentValueEntry)) {
+        continue;
+      }
+      if (latestEntry && stagedEntry.isSameAsEntry(latestEntry)) {
+        continue;
+      }
+      itemHistory.unshift(stagedEntry);
+      this.history[item.uuid] = itemHistory;
+      if (this.autoOptimize) {
+        this.optimizeHistoryForItem(item.uuid);
+      }
+      needsPersist = true;
+    }
+    if (needsPersist) {
+      this.saveToDisk();
+    }
   }
 
   /** For local session history */
-  isDiskEnabled() {
+  isDiskEnabled(): boolean {
     return this.persistable;
   }
 
   /** For local session history */
-  isAutoOptimizeEnabled() {
+  isAutoOptimizeEnabled(): boolean {
     return this.autoOptimize;
   }
 
+  cancelPendingPersist(): void {
+    if (this.saveTimeout) {
+      if ('cancel' in this.deviceInterface.timeout) {
+        this.deviceInterface.timeout.cancel(this.saveTimeout);
+      } else {
+        clearTimeout(this.saveTimeout);
+      }
+    }
+  }
+
   /** For local session history */
-  async saveToDisk() {
+  saveToDisk(): void {
     if (!this.persistable) {
       return;
     }
-    this.storageService!.setValue(
-      StorageKey.SessionHistoryRevisions,
-      this.sessionHistory
-    );
+    this.cancelPendingPersist();
+    const persistableValue = this.persistableHistoryValue();
+    this.saveTimeout = this.deviceInterface.timeout(() => {
+      this.storageService.setValue(
+        StorageKey.SessionHistoryRevisions,
+        persistableValue
+      );
+    }, PersistTimeout);
   }
 
-  /** For local session history */
-  setSessionItemRevisionThreshold(threshold: number) {
-    this.sessionHistory!.setItemRevisionThreshold(threshold);
-  }
-
-  async addHistoryEntryForItem(item: SNItem) {
-    const payload = CreateSourcedPayloadFromObject(
-      item,
-      PayloadSource.SessionHistory
-    );
-    const entry = this.sessionHistory!.addEntryForPayload(payload);
-    if (this.autoOptimize) {
-      this.sessionHistory!.optimizeHistoryForItem(item.uuid);
+  private persistableHistoryValue(): PersistableHistory {
+    const persistedObject: PersistableHistory = {};
+    for (const [uuid, historyArray] of Object.entries(this.history)) {
+      const entries = historyArray.map((entry) => {
+        return { payload: entry.payload } as PersistableHistoryEntry;
+      });
+      persistedObject[uuid] = entries;
     }
-    if (entry && this.persistable) {
-      /** Debounce, clear existing timeout */
-      if (this.saveTimeout) {
-        if ('cancel' in this.timeout) {
-          this.timeout.cancel(this.saveTimeout);
-        } else {
-          clearTimeout(this.saveTimeout);
-        }
-      }
-      this.saveTimeout = this.timeout(() => {
-        this.saveToDisk();
-      }, PERSIST_TIMEOUT);
-    }
-  }
-
-  sessionHistoryForItem(item: SNItem) {
-    return this.sessionHistory!.historyForItem(item.uuid);
+    return persistedObject;
   }
 
   /** For local session history */
-  async clearHistoryForItem(item: SNItem) {
-    this.sessionHistory!.clearItemHistory(item);
-    return this.saveToDisk();
+  setSessionItemRevisionThreshold(threshold: number): void {
+    this.itemRevisionThreshold = threshold;
+  }
+
+  sessionHistoryForItem(item: SNItem): HistoryEntry[] {
+    return this.history[item.uuid] || [];
   }
 
   /** For local session history */
-  async clearAllHistory() {
-    this.sessionHistory!.clearAllHistory();
-    return this.storageService!.removeValue(StorageKey.SessionHistoryRevisions);
+  clearHistoryForItem(item: SNItem): void {
+    delete this.history[item.uuid];
+    this.saveToDisk();
   }
 
   /** For local session history */
-  async toggleDiskSaving() {
+  async clearAllHistory(): Promise<void> {
+    this.history = {};
+    return this.storageService.removeValue(StorageKey.SessionHistoryRevisions);
+  }
+
+  /** For local session history */
+  async toggleDiskSaving(): Promise<void> {
     this.persistable = !this.persistable;
     if (this.persistable) {
-      this.storageService!.setValue(StorageKey.SessionHistoryPersistable, true);
+      this.storageService.setValue(StorageKey.SessionHistoryPersistable, true);
       this.saveToDisk();
     } else {
-      this.storageService!.setValue(
-        StorageKey.SessionHistoryPersistable,
-        false
-      );
-      return this.storageService!.removeValue(
+      this.storageService.setValue(StorageKey.SessionHistoryPersistable, false);
+      return this.storageService.removeValue(
         StorageKey.SessionHistoryRevisions
       );
     }
   }
 
   /** For local session history */
-  async toggleAutoOptimize() {
+  toggleAutoOptimize(): void {
     this.autoOptimize = !this.autoOptimize;
     if (this.autoOptimize) {
-      this.storageService!.setValue(StorageKey.SessionHistoryOptimize, true);
+      this.storageService.setValue(StorageKey.SessionHistoryOptimize, true);
     } else {
-      this.storageService!.setValue(StorageKey.SessionHistoryOptimize, false);
+      this.storageService.setValue(StorageKey.SessionHistoryOptimize, false);
     }
+  }
+
+  getHistoryMapCopy(): HistoryMap {
+    const copy = Object.assign({}, this.history);
+    for (const [key, value] of Object.entries(copy)) {
+      copy[key] = value.slice();
+    }
+    return Object.freeze(copy);
   }
 
   /**
@@ -214,8 +299,10 @@ export class SNHistoryManager extends PureService {
    * include the item's content. Instead, each revision's content must be fetched
    * individually upon selection via `fetchRemoteRevision`.
    */
-  async remoteHistoryForItem(item: SNItem) {
-    const response = await this.apiService!.getItemRevisions(item.uuid);
+  async remoteHistoryForItem(
+    item: SNItem
+  ): Promise<RevisionListEntry[] | undefined> {
+    const response = await this.apiService.getItemRevisions(item.uuid);
     if (response.error) {
       return undefined;
     }
@@ -226,24 +313,94 @@ export class SNHistoryManager extends PureService {
    * Expands on a revision fetched via `remoteHistoryForItem` by getting a revision's
    * complete fields (including encrypted content).
    */
-  async fetchRemoteRevision(itemUuid: UuidString, entry: RevisionListEntry) {
-    const revision = (await this.apiService!.getRevision(
+  async fetchRemoteRevision(
+    itemUuid: UuidString,
+    entry: RevisionListEntry
+  ): Promise<HistoryEntry | undefined> {
+    const revision = (await this.apiService.getRevision(
       entry,
       itemUuid
     )) as SingleRevision;
     if ((revision as SingleRevisionResponse).error) {
       return undefined;
     }
-    const payload = CreateMaxPayloadFromAnyObject(revision as any, {
-      uuid: revision.item_uuid,
-    });
+    const payload = CreateMaxPayloadFromAnyObject(
+      (revision as unknown) as RawPayload,
+      {
+        uuid: revision.item_uuid,
+      }
+    );
     const encryptedPayload = CreateSourcedPayloadFromObject(
       payload,
       PayloadSource.RemoteHistory
     );
-    const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(
+    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
       encryptedPayload
     );
-    return new ItemHistoryEntry(decryptedPayload);
+    if (decryptedPayload.errorDecrypting) {
+      return undefined;
+    }
+    return new HistoryEntry(decryptedPayload as SurePayload);
+  }
+
+  /**
+   * Clean up if there are too many revisions. Note itemRevisionThreshold
+   * is the amount of revisions which above, call for an optimization. An
+   * optimization may not remove entries above this threshold. It will
+   * determine what it should keep and what it shouldn't. So, it is possible
+   * to have a threshold of 60 but have 600 entries, if the item history deems
+   * those worth keeping.
+   *
+   * Rules:
+   * - Keep an entry if it is the oldest entry
+   * - Keep an entry if it is the latest entry
+   * - Keep an entry if it is Significant
+   * - If an entry is Significant and it is a deletion change, keep the entry before this entry.
+   */
+  optimizeHistoryForItem(uuid: string): void {
+    const entries = this.history[uuid] || [];
+    if (entries.length <= this.itemRevisionThreshold) {
+      return;
+    }
+
+    const isEntrySignificant = (entry: HistoryEntry) => {
+      return entry.deltaSize() > LargeEntryDeltaThreshold;
+    };
+    const keepEntries: HistoryEntry[] = [];
+    const processEntry = (
+      entry: HistoryEntry,
+      index: number,
+      keep: boolean
+    ) => {
+      /**
+       * Entries may be processed retrospectively, meaning it can be
+       * decided to be deleted, then an upcoming processing can change that.
+       */
+      if (keep) {
+        keepEntries.unshift(entry);
+        if (isEntrySignificant(entry) && entry.operationVector() === -1) {
+          /** This is a large negative change. Hang on to the previous entry. */
+          const previousEntry = entries[index + 1];
+          if (previousEntry) {
+            keepEntries.unshift(previousEntry);
+          }
+        }
+      } else {
+        /** Don't keep, remove if in keep */
+        removeFromArray(keepEntries, entry);
+      }
+    };
+    for (let index = entries.length - 1; index >= 0; index--) {
+      const entry = entries[index];
+      const isSignificant =
+        index === 0 ||
+        index === entries.length - 1 ||
+        isEntrySignificant(entry);
+      processEntry(entry, index, isSignificant);
+    }
+    const filtered = entries.filter((entry) => {
+      return keepEntries.includes(entry);
+    });
+    this.history[uuid] = filtered;
   }
 }

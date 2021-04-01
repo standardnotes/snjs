@@ -6,9 +6,7 @@ import { ContentType } from '@Models/content_types';
 import { UuidString } from './../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 
-type Payloadable = PurePayload | SNItem;
-
-export class MutableCollection<T extends Payloadable> {
+export class MutableCollection<T extends PurePayload | SNItem> {
   readonly map: Partial<Record<UuidString, T>> = {};
   readonly typedMap: Partial<Record<ContentType, T[]>> = {};
 
@@ -112,7 +110,7 @@ export class MutableCollection<T extends Payloadable> {
     return results;
   }
 
-  public set(elements: T | T[]) {
+  public set(elements: T | T[]): void {
     elements = Array.isArray(elements) ? elements : [elements];
     if (elements.length === 0) {
       console.warn('Attempting to set 0 elements onto collection');
@@ -153,7 +151,7 @@ export class MutableCollection<T extends Payloadable> {
     }
   }
 
-  public discard(elements: T | T[]) {
+  public discard(elements: T | T[]): void {
     elements = Array.isArray(elements) ? elements : [elements];
     for (const element of elements) {
       this.conflictMap.removeFromMap(element.uuid);
@@ -163,7 +161,7 @@ export class MutableCollection<T extends Payloadable> {
     }
   }
 
-  private setToTypedMap(element: T) {
+  private setToTypedMap(element: T): void {
     const array = this.typedMap[element.content_type!] || ([] as T[]);
     remove(array, { uuid: element.uuid! as any });
     array.push(element);

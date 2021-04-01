@@ -1,10 +1,5 @@
 import { MutableCollection } from './collection';
-import {
-  compareValues,
-  isNullOrUndefined,
-  uniqueArray,
-  uniqueArrayByKey,
-} from '@Lib/utils';
+import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import { ContentType } from '@Models/content_types';
 import { UuidString } from './../../types';
@@ -42,7 +37,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
   /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
    * an array of sorted elements, based on the current displaySortBy */
   private sortedMap: Partial<
-    Record<ContentType, Array<SNItem | undefined>>
+    Record<ContentType, SNItem[]>
   > = {};
 
   public set(elements: SNItem | SNItem[]): void {
@@ -54,7 +49,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
     this.filterSortElements(elements);
   }
 
-  public discard(elements: SNItem | SNItem[]) {
+  public discard(elements: SNItem | SNItem[]): void {
     elements = Array.isArray(elements) ? elements : [elements];
     super.discard(elements);
     this.filterSortElements(elements);
@@ -73,7 +68,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
   public setDisplayOptions(
     contentType: ContentType,
     sortBy?: CollectionSort,
-    direction?: SortDirection,
+    direction: SortDirection = 'asc',
     filter?: (element: SNItem) => boolean
   ): void {
     const existingSortBy = this.displaySortBy[contentType];
@@ -90,7 +85,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
       return;
     }
     this.displaySortBy[contentType] = sortBy
-      ? { key: sortBy, dir: direction! }
+      ? { key: sortBy, dir: direction }
       : undefined;
     this.displayFilter[contentType] = filter;
     /** Reset existing maps */
@@ -105,7 +100,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
 
   /** Returns the filtered and sorted list of elements for this content type,
    * according to the options set via `setDisplayOptions` */
-  public displayElements(contentType: ContentType) {
+  public displayElements(contentType: ContentType): SNItem[] {
     const elements = this.sortedMap[contentType];
     if (!elements) {
       throw Error(
