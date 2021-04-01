@@ -20,7 +20,7 @@ describe('device authentication', function () {
     const wrongPasscode = 'barfoo';
     expect(await application.protectionService.createLaunchChallenge()).to.not
       .be.ok;
-    await application.setPasscode(passcode);
+    await application.addPasscode(passcode);
     expect(await application.hasPasscode()).to.equal(true);
     expect(await application.protectionService.createLaunchChallenge()).to.be
       .ok;
@@ -70,7 +70,7 @@ describe('device authentication', function () {
     const application = await Factory.createAndInitializeApplication(namespace);
     const passcode = 'foobar';
     const wrongPasscode = 'barfoo';
-    await application.setPasscode(passcode);
+    await application.addPasscode(passcode);
     await application.protectionService.enableBiometrics();
     expect(await application.hasPasscode()).to.equal(true);
     expect(
@@ -141,7 +141,8 @@ describe('device authentication', function () {
     );
     expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
     const passcode = 'foobar';
-    await application.setPasscode(passcode);
+    Factory.handlePasswordChallenges(application, password);
+    await application.addPasscode(passcode);
     expect(application.protocolService.keyMode).to.equal(
       KeyMode.RootKeyPlusWrapper
     );

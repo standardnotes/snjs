@@ -96,7 +96,7 @@ describe('protocol', function () {
   });
 
   it('ejected payload should not have meta fields', async function () {
-    await this.application.setPasscode('123');
+    await this.application.addPasscode('123');
     const payload = Factory.createNotePayload();
     const result = await this.application.protocolService.payloadByEncryptingPayload(
       payload,

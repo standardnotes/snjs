@@ -913,7 +913,8 @@ export class SNApplication {
       }
       if (hasPasscode) {
         /* Upgrade passcode version */
-        await this.changePasscode(
+        await this.removePasscodeWithoutWarning();
+        await this.setPasscodeWithoutWarning(
           passcode!,
           KeyParamsOrigination.ProtocolUpgrade
         );
@@ -1566,7 +1567,14 @@ export class SNApplication {
     return this.deinit(DeinitSource.Lock);
   }
 
-  public async setPasscode(passcode: string): Promise<void> {
+  /**
+   * @returns whether the passcode was successfuly added or not
+   */
+  public async addPasscode(passcode: string): Promise<boolean> {
+    if (!(await this.protectionService.authorizeAddingPasscode())) {
+      return false;
+    }
+
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
       SETTING_PASSCODE
@@ -1576,6 +1584,7 @@ export class SNApplication {
         passcode,
         KeyParamsOrigination.PasscodeCreate
       );
+      return true;
     } finally {
       dismissBlockingDialog();
     }
@@ -1585,10 +1594,9 @@ export class SNApplication {
    * @returns whether the passcode was successfuly removed or not
    */
   public async removePasscode(): Promise<boolean> {
-    const passcode = await this.challengeService.promptForCorrectPasscode(
-      ChallengeReason.RemovePasscode
-    );
-    if (isNullOrUndefined(passcode)) return false;
+    if (!(await this.protectionService.authorizeRemovingPasscode())) {
+      return false;
+    }
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
@@ -1609,10 +1617,9 @@ export class SNApplication {
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
-    const passcode = await this.challengeService.promptForCorrectPasscode(
-      ChallengeReason.ChangePasscode
-    );
-    if (isNullOrUndefined(passcode)) return false;
+    if (!(await this.protectionService.authorizeChangingPasscode())) {
+      return false;
+    }
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
@@ -1622,10 +1629,7 @@ export class SNApplication {
     );
     try {
       await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(
-        newPasscode,
-        KeyParamsOrigination.PasscodeChange
-      );
+      await this.setPasscodeWithoutWarning(newPasscode, origination);
       return true;
     } finally {
       dismissBlockingDialog();
