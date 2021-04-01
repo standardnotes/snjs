@@ -72,11 +72,16 @@ export type KeyParamsResponse = HttpResponse & {
   created?: string;
 };
 
+export type User = {
+  uuid: string;
+  email: string;
+};
+
 export type RegistrationResponse = HttpResponse & {
   session?: SessionBody;
   /** Represents legacy JWT token */
   token?: string;
-  user?: { email: string; uuid: string };
+  user?: User;
 };
 
 export type SignInResponse = RegistrationResponse & {

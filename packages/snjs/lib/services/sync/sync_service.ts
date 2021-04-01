@@ -944,7 +944,7 @@ export class SNSyncService extends PureService<
     }
     return this.storageService.savePayloads(payloads).catch((error) => {
       this.notifyEvent(SyncEvent.DatabaseWriteError, error);
-      throw error;
+      SNLog.error(error);
     });
   }
 
