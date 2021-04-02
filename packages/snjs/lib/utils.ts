@@ -33,9 +33,10 @@ interface IEDocument {
  * @returns true if WebCrypto is available
  */
 export function isWebCryptoAvailable(): boolean {
-  const isIE = document && (document as IEDocument).documentMode;
   return (
-    (isWebEnvironment() && !isReactNativeEnvironment() && !isIE) ||
+    (isWebEnvironment() &&
+      !isReactNativeEnvironment() &&
+      !(document && (document as IEDocument).documentMode)) ||
     (/Edge/.test(navigator.userAgent) &&
       window.crypto &&
       !!window.crypto.subtle)
