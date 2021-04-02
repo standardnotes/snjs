@@ -92,7 +92,7 @@ export type SyncOptions = {
 };
 
 type SyncPromise = {
-  resolve: (value?: any) => void;
+  resolve: (value?: unknown) => void;
   reject: () => void;
   options?: SyncOptions;
 };
@@ -140,7 +140,7 @@ export class SNSyncService extends PureService<
   private cursorToken?: string;
 
   private syncLock = false;
-  private _simulate_latency?: any;
+  private _simulate_latency?: { latency: number; enabled: boolean };
   private dealloced = false;
 
   /** Content types appearing first are always mapped first */
@@ -184,7 +184,7 @@ export class SNSyncService extends PureService<
     }
   }
 
-  public deinit() {
+  public deinit(): void {
     this.dealloced = true;
     (this.sessionManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
@@ -194,7 +194,7 @@ export class SNSyncService extends PureService<
     (this.apiService as unknown) = undefined;
     this.interval = undefined;
     this.state!.reset();
-    this.opStatus!.reset();
+    this.opStatus.reset();
     this.state = undefined;
     (this.opStatus as unknown) = undefined;
     this.resolveQueue.length = 0;
@@ -218,34 +218,34 @@ export class SNSyncService extends PureService<
     }, this.maxDiscordance);
   }
 
-  public lockSyncing() {
+  public lockSyncing(): void {
     this.locked = true;
   }
 
-  public unlockSyncing() {
+  public unlockSyncing(): void {
     this.locked = false;
   }
 
-  public isOutOfSync() {
+  public isOutOfSync(): boolean {
     return this.state!.isOutOfSync();
   }
 
-  public getLastSyncDate() {
+  public getLastSyncDate(): Date | undefined {
     return this.state!.lastSyncDate;
   }
 
-  public getStatus() {
+  public getStatus(): SyncOpStatus {
     return this.opStatus;
   }
 
   /**
    * Called by application when sign in or registration occurs.
    */
-  public resetSyncState() {
+  public resetSyncState(): void {
     this.state!.reset();
   }
 
-  public isDatabaseLoaded() {
+  public isDatabaseLoaded(): boolean {
     return this.databaseLoaded;
   }
 
@@ -293,7 +293,7 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
-    const decryptedItemsKeys = await this.protocolService!.payloadsByDecryptingPayloads(
+    const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
       itemsKeysPayloads
     );
     await this.payloadManager.emitPayloads(
@@ -310,7 +310,7 @@ export class SNSyncService extends PureService<
         currentPosition,
         currentPosition + batchSize
       );
-      const decrypted = await this.protocolService!.payloadsByDecryptingPayloads(
+      const decrypted = await this.protocolService.payloadsByDecryptingPayloads(
         batch
       );
       await this.payloadManager.emitPayloads(
@@ -479,7 +479,7 @@ export class SNSyncService extends PureService<
    * such as server extensions
    */
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
-    return this.protocolService!.payloadsByEncryptingPayloads(
+    return this.protocolService.payloadsByEncryptingPayloads(
       payloads,
       (payload) => {
         return NonEncryptedTypes.includes(payload.content_type!)
@@ -616,7 +616,7 @@ export class SNSyncService extends PureService<
     }
 
     const erroredState =
-      this.protocolService!.hasAccount() !== this.sessionManager!.online();
+      this.protocolService.hasAccount() !== this.sessionManager!.online();
     if (erroredState) {
       this.handleInvalidSessionState();
     }
@@ -805,7 +805,7 @@ export class SNSyncService extends PureService<
       await this.getLastSyncToken(),
       await this.getPaginationToken(),
       checkIntegrity,
-      this.apiService!
+      this.apiService
     );
     return operation;
   }
@@ -983,7 +983,7 @@ export class SNSyncService extends PureService<
       });
       const dates = items.map((item) => item.updatedAtTimestamp());
       const string = dates.join(',');
-      return this.protocolService!.crypto!.sha256(string);
+      return this.protocolService.crypto.sha256(string);
     } catch (e) {
       console.error('Error computing data integrity hash', e);
       return undefined;
@@ -995,8 +995,8 @@ export class SNSyncService extends PureService<
    */
   public async resolveOutOfSync() {
     const downloader = new AccountDownloader(
-      this.apiService!,
-      this.protocolService!,
+      this.apiService,
+      this.protocolService,
       undefined,
       'resolve-out-of-sync'
     );
@@ -1022,10 +1022,10 @@ export class SNSyncService extends PureService<
   public async statelessDownloadAllItems(
     contentType?: ContentType,
     customEvent?: string
-  ) {
+  ): Promise<SNItem[]> {
     const downloader = new AccountDownloader(
-      this.apiService!,
-      this.protocolService!,
+      this.apiService,
+      this.protocolService,
       contentType,
       customEvent
     );
@@ -1038,19 +1038,19 @@ export class SNSyncService extends PureService<
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_setDatabaseLoaded(loaded: boolean) {
+  ut_setDatabaseLoaded(loaded: boolean): void {
     this.databaseLoaded = loaded;
   }
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_clearLastSyncDate() {
+  ut_clearLastSyncDate(): void {
     this.state!.lastSyncDate = undefined;
   }
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_beginLatencySimulator(latency: number) {
+  ut_beginLatencySimulator(latency: number): void {
     this._simulate_latency = {
       latency: latency || 1000,
       enabled: true,
@@ -1059,7 +1059,7 @@ export class SNSyncService extends PureService<
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_endLatencySimulator() {
-    this._simulate_latency = null;
+  ut_endLatencySimulator(): void {
+    this._simulate_latency = undefined;
   }
 }

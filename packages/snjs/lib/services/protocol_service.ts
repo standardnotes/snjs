@@ -636,7 +636,7 @@ export class SNProtocolService
    * Here we find such items, and attempt to decrypt them again.
    */
   public async decryptErroredItems() {
-    const items = this.itemManager!.invalidItems.filter(
+    const items = this.itemManager.invalidItems.filter(
       (i) => i.content_type !== ContentType.ItemsKey
     );
     if (items.length === 0) {
@@ -1270,24 +1270,28 @@ export class SNProtocolService
     const neverSyncedKeys = itemsKeys.filter((key) => {
       return key.neverSynced;
     });
+    const syncedKeys = itemsKeys.filter((key) => {
+      return !key.neverSynced;
+    });
     /**
      * Find isDefault items key that have been previously synced.
      * If we find one, this means we can delete any non-synced keys.
      */
-    const defaultSyncedKey = itemsKeys.find((key) => {
-      return !key.neverSynced && key.isDefault;
+    const defaultSyncedKey = syncedKeys.find((key) => {
+      return key.isDefault;
     });
     const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSyncedKeys));
+      await this.itemManager.setItemsToBeDeleted(Uuids(neverSyncedKeys));
     } else {
       /**
        * No previous synced items key.
-       * We can keep the one(s) we have, only if their version is equal to our root key version.
-       * If their version is not equal to our root key version, delete them. If we end up with 0
-       * items keys, create a new one. This covers the case when you open the app offline and it creates
-       * an 004 key, and then you sign into an 003 account. */
+       * We can keep the one(s) we have, only if their version is equal to our root key
+       * version. If their version is not equal to our root key version, delete them. If
+       * we end up with 0 items keys, create a new one. This covers the case when you open
+       * the app offline and it creates an 004 key, and then you sign into an 003 account.
+       */
       const rootKey = this.getRootKey();
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
@@ -1295,12 +1299,20 @@ export class SNProtocolService
           return itemsKey.keyVersion !== rootKey.keyVersion;
         });
         if (toDelete.length > 0) {
-          await this.itemManager!.setItemsToBeDeleted(Uuids(toDelete));
+          await this.itemManager.setItemsToBeDeleted(Uuids(toDelete));
         }
         if (this.latestItemsKeys().length === 0) {
           await this.createNewDefaultItemsKey();
         }
       }
+    }
+    /** If we do not have an items key for our current account version, create one */
+    const userVersion = await this.getUserVersion();
+    const accountVersionedKey = this.latestItemsKeys().find(
+      (key) => key.keyVersion === userVersion
+    );
+    if (isNullOrUndefined(accountVersionedKey)) {
+      await this.createNewDefaultItemsKey();
     }
   }
 
@@ -1322,7 +1334,7 @@ export class SNProtocolService
    * @access public
    */
   async repersistAllItems() {
-    const items = this.itemManager!.items;
+    const items = this.itemManager.items;
     const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item));
     return this.storageService!.savePayloads(payloads);
   }
@@ -1331,7 +1343,7 @@ export class SNProtocolService
    * @returns All SN|ItemsKey objects synced to the account.
    */
   private latestItemsKeys() {
-    return this.itemManager!.itemsKeys();
+    return this.itemManager.itemsKeys();
   }
 
   /**
@@ -1346,7 +1358,7 @@ export class SNProtocolService
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
-  public getDefaultItemsKey() {
+  public getDefaultItemsKey(): SNItemsKey | undefined {
     const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length === 1) {
       return itemsKeys[0];
@@ -1384,7 +1396,7 @@ export class SNProtocolService
    * When the root key changes (non-null only), we must re-encrypt all items
    * keys with this new root key (by simply re-syncing).
    */
-  public async reencryptItemsKeys() {
+  public async reencryptItemsKeys(): Promise<void> {
     const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length > 0) {
       /**
@@ -1392,7 +1404,7 @@ export class SNProtocolService
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
        */
-      await this.itemManager!.setItemsDirty(Uuids(itemsKeys));
+      await this.itemManager.setItemsDirty(Uuids(itemsKeys));
     }
   }
 
@@ -1422,7 +1434,7 @@ export class SNProtocolService
    * A new root key based items key is needed if a user changes their account password
    * on an 003 client and syncs on a signed in 004 client.
    */
-  public async needsNewRootKeyBasedItemsKey(): Promise<boolean> {
+  public needsNewRootKeyBasedItemsKey(): boolean {
     if (!this.hasAccount()) {
       return false;
     }
@@ -1490,7 +1502,7 @@ export class SNProtocolService
     return itemsKey;
   }
 
-  public async createNewItemsKeyWithRollback() {
+  public async createNewItemsKeyWithRollback(): Promise<() => Promise<void>> {
     const currentDefaultItemsKey = this.getDefaultItemsKey();
     const newDefaultItemsKey = await this.createNewDefaultItemsKey();
     const rollback = async () => {

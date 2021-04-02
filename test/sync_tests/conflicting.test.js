@@ -807,7 +807,7 @@ describe('online conflict handling', function () {
     );
 
     /**
-     * Retrieve this note from the server by clearing sync toksn
+     * Retrieve this note from the server by clearing sync token
      */
     await this.application.syncService.clearSyncPositionTokens();
     await this.application.syncService.sync({

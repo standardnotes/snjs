@@ -838,4 +838,41 @@ describe('keys', function () {
       refreshedApp.deinit();
     });
   });
+
+  it('importing 003 account backup, then registering for account, should properly reconcile keys', async function () {
+    /**
+     * When importing a backup of an 003 account into an offline state, ItemsKeys imported
+     * will have an updated_at value, which tell our protocol service that this key has been
+     * synced before, which sort of "lies" to the protocol service because now it thinks it doesnt
+     * need to create a new items key because one has already been synced with the account.
+     * The corrective action was to do a final check in protocolService.handleDownloadFirstSyncCompletion
+     * to ensure there exists an items key corresponding to the user's account version.
+     */
+    await this.application.itemManager.removeAllItemsFromMemory();
+    const note = await Factory.createMappedNote(this.application);
+    expect(this.application.protocolService.getDefaultItemsKey()).to.not.be.ok;
+    const protocol003 = new SNProtocolOperator003(new SNWebCrypto());
+    const key = await protocol003.createItemsKey();
+    await this.application.itemManager.emitItemFromPayload(
+      CopyPayload(key.payload, {
+        content: {
+          ...key.payload.content,
+          isDefault: true,
+        },
+        dirty: true,
+        /** Important to indicate that the key has been synced with a server */
+        updated_at: Date.now(),
+      })
+    );
+    const defaultKey = this.application.protocolService.getDefaultItemsKey();
+    expect(defaultKey.keyVersion).to.equal(ProtocolVersion.V003);
+    expect(defaultKey.uuid).to.equal(key.uuid);
+    await Factory.registerUserToApplication({ application: this.application });
+    expect(
+      await this.application.protocolService.keyToUseForEncryptionOfPayload(
+        note.payload,
+        EncryptionIntent.Sync
+      )
+    ).to.be.ok;
+  });
 });

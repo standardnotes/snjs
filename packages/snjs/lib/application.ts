@@ -309,7 +309,7 @@ export class SNApplication {
         }
         await this.handleStage(ApplicationStage.LoadedDatabase_12);
         this.beginAutoSyncTimer();
-        return this.syncService.sync({
+        await this.syncService.sync({
           mode: SyncModes.DownloadFirst,
         });
       });
@@ -1183,7 +1183,12 @@ export class SNApplication {
     ephemeral = false,
     mergeLocal = true
   ): Promise<AccountServiceResponse> {
-    return this.credentialService.register(email, password, ephemeral, mergeLocal);
+    return this.credentialService.register(
+      email,
+      password,
+      ephemeral,
+      mergeLocal
+    );
   }
 
   /**
@@ -1539,7 +1544,7 @@ export class SNApplication {
           case SessionEvent.Restored: {
             void (async () => {
               await this.sync();
-              if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
+              if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
                 void this.protocolService.createNewDefaultItemsKey();
               }
             })();
