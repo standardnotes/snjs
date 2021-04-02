@@ -5,7 +5,7 @@ export enum PayloadField {
   EncItemKey = 'enc_item_key',
   Content = 'content',
   CreatedAt = 'created_at',
-  ServerUpdatedAt = 'updated_at',
+  UpdatedAt = 'updated_at',
   Deleted = 'deleted',
   Legacy003AuthHash = 'auth_hash',
   Legacy003AuthParams = 'auth_params',

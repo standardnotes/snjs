@@ -1,4 +1,3 @@
-import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { ProtocolVersion } from '@Protocol/versions';
@@ -8,12 +7,9 @@ import { ProtocolVersion } from '@Protocol/versions';
  */
 export class SNItemsKey extends SNItem {
   /** Do not duplicate items keys. Always keep original */
-  strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntry
-  ): ConflictStrategy {
+  strategyWhenConflictingWithItem(item: SNItem): ConflictStrategy {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision);
+      return super.strategyWhenConflictingWithItem(item);
     }
 
     return ConflictStrategy.KeepLeft;

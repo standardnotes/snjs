@@ -1,11 +1,11 @@
-import { HistoryEntry } from '@Services/history/entries/history_entry';
+import { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 
-export class NoteHistoryEntry extends HistoryEntry {
-  previewTitle(): string {
+export class NoteHistoryEntry extends ItemHistoryEntry {
+  previewTitle() {
     return this.payload.updated_at!.toLocaleString();
   }
 
-  previewSubTitle(): string {
+  previewSubTitle() {
     if (!this.hasPreviousEntry) {
       return `${this.textCharDiffLength} characters loaded`;
     } else if (this.textCharDiffLength < 0) {

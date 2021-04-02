@@ -260,8 +260,8 @@ describe('payload collections', () => {
     );
     const displayed = collection.displayElements(ContentType.Note);
     expect(displayed.length).to.equal(3);
-    expect(displayed[0].errorDecrypting).to.equal(true);
-    expect(displayed[1].text).to.equal('noteText');
+    expect(displayed[0].text).to.equal('noteText');
+    expect(displayed[1].errorDecrypting).to.equal(true);
     expect(displayed[2].text).to.equal('noteText2');
   });
 });

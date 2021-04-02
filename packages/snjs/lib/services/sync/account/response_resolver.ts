@@ -5,7 +5,6 @@ import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
 import { CopyPayload } from '@Payloads/generator';
-import { HistoryMap } from '@Lib/services/history/history_map';
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -14,15 +13,18 @@ import { HistoryMap } from '@Lib/services/history/history_map';
  * offers the 'recommended' new global state given a sync response and a current base state.
  */
 export class SyncResponseResolver {
+  private response: SyncResponse;
+  private baseCollection: ImmutablePayloadCollection;
   private relatedCollectionSet: ImmutablePayloadCollectionSet;
 
   constructor(
-    private response: SyncResponse,
+    response: SyncResponse,
     decryptedResponsePayloads: PurePayload[],
-    private baseCollection: ImmutablePayloadCollection,
-    payloadsSavedOrSaving: PurePayload[],
-    private historyMap: HistoryMap
+    baseCollection: ImmutablePayloadCollection,
+    payloadsSavedOrSaving: PurePayload[]
   ) {
+    this.response = response;
+    this.baseCollection = baseCollection;
     this.relatedCollectionSet = new ImmutablePayloadCollectionSet([
       ImmutablePayloadCollection.WithPayloads(
         decryptedResponsePayloads,
@@ -35,9 +37,7 @@ export class SyncResponseResolver {
     ]);
   }
 
-  public async collectionsByProcessingResponse(): Promise<
-    ImmutablePayloadCollection[]
-  > {
+  public async collectionsByProcessingResponse() {
     const collections = [];
 
     const collectionRetrieved = await this.collectionByProcessingPayloads(
@@ -82,7 +82,7 @@ export class SyncResponseResolver {
   private async collectionByProcessingPayloads(
     payloads: PurePayload[],
     source: PayloadSource
-  ): Promise<ImmutablePayloadCollection> {
+  ) {
     const collection = ImmutablePayloadCollection.WithPayloads(
       payloads,
       source
@@ -92,8 +92,7 @@ export class SyncResponseResolver {
     const delta = new deltaClass(
       this.baseCollection,
       collection,
-      this.relatedCollectionSet,
-      this.historyMap,
+      this.relatedCollectionSet
     );
     const resultCollection = await delta.resultingCollection();
     const updatedDirtyPayloads = resultCollection.all().map((payload) => {
@@ -109,7 +108,7 @@ export class SyncResponseResolver {
     );
   }
 
-  private finalDirtyStateForPayload(payload: PurePayload): boolean | undefined {
+  private finalDirtyStateForPayload(payload: PurePayload) {
     const current = this.baseCollection.find(payload.uuid!);
     /**
      * `current` can be null in the case of new

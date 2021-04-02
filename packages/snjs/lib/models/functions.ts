@@ -1,4 +1,3 @@
-import { AppDataField } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
 import { DefaultAppDomain } from './content_types';
 /**
@@ -14,7 +13,7 @@ export function Uuids(items: any[]): string[] {
  * Modifies the input object to fill in any missing required values from the
  * content body.
  */
-export function FillItemContent(content: Record<string, any>): PayloadContent {
+export function FillItemContent(content: Record<string, any>) {
   if (!content.references) {
     content.references = [];
   }
@@ -23,11 +22,6 @@ export function FillItemContent(content: Record<string, any>): PayloadContent {
   }
   if (!content.appData[DefaultAppDomain]) {
     content.appData[DefaultAppDomain] = {};
-  }
-  if (!content.appData[DefaultAppDomain][AppDataField.UserModifiedDate]) {
-    content.appData[DefaultAppDomain][
-      AppDataField.UserModifiedDate
-    ] = `${new Date()}`;
   }
   return content as PayloadContent;
 }

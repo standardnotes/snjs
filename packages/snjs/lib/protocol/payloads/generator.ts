@@ -83,7 +83,7 @@ const MaxPayloadFields = [
   PayloadField.EncItemKey,
   PayloadField.Content,
   PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
+  PayloadField.UpdatedAt,
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
   PayloadField.Legacy003AuthParams,
@@ -115,7 +115,7 @@ const FilePayloadFields = [
   PayloadField.EncItemKey,
   PayloadField.Content,
   PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
+  PayloadField.UpdatedAt,
   PayloadField.Legacy003AuthHash,
   PayloadField.DuplicateOf,
 ];
@@ -127,7 +127,7 @@ const StoragePayloadFields = [
   PayloadField.EncItemKey,
   PayloadField.Content,
   PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
+  PayloadField.UpdatedAt,
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
   PayloadField.Legacy003AuthParams,
@@ -145,7 +145,7 @@ const ServerPayloadFields = [
   PayloadField.EncItemKey,
   PayloadField.Content,
   PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
+  PayloadField.UpdatedAt,
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
   PayloadField.DuplicateOf,
@@ -155,7 +155,7 @@ const SessionHistoryPayloadFields = [
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.Content,
-  PayloadField.ServerUpdatedAt,
+  PayloadField.UpdatedAt,
 ];
 
 /** Represents a payload with permissible fields for when a
@@ -185,7 +185,7 @@ const ComponentCreatedPayloadFields = [
 const ServerSavedPayloadFields = [
   PayloadField.Uuid,
   PayloadField.ContentType,
-  PayloadField.ServerUpdatedAt,
+  PayloadField.UpdatedAt,
   PayloadField.Deleted,
   PayloadField.Dirty,
   PayloadField.LastSyncEnd,
@@ -197,7 +197,7 @@ export function CreateMaxPayloadFromAnyObject(
   object: RawPayload,
   override?: PayloadOverride,
   source?: PayloadSource
-): PurePayload {
+) {
   return CreatePayload(object, MaxPayloadFields.slice(), source, override);
 }
 

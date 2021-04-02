@@ -699,9 +699,9 @@ export class SNProtocolService
             if (candidate) {
               itemsKey = CreateItemFromPayload(candidate) as SNItemsKey;
             } else if (
-              /**
-               * Payloads with versions <= 003 use root key directly for encryption.
-               */
+            /**
+             * Payloads with versions <= 003 use root key directly for encryption.
+             */
               compareVersions(payloadVersion, ProtocolVersion.V003) <= 0
             ) {
               itemsKey = key;

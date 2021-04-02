@@ -41,17 +41,6 @@ describe('item manager', function () {
     expect(item.title).to.equal('hello');
   });
 
-  it('emitting item through payload and marking dirty should have userModifiedDate', async function () {
-    const payload = Factory.createNotePayload();
-    this.itemManager.emitItemFromPayload(
-      payload,
-      PayloadSource.LocalChanged
-    );
-    const result = await this.itemManager.setItemDirty(payload.uuid);
-    const appData = result.payload.content.appData;
-    expect(appData[SNItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok;
-  });
-
   it('find items with valid uuid', async function () {
     const item = await this.createNote();
 

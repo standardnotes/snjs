@@ -39,8 +39,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         this.baseCollection,
         current,
         decrypted || payload,
-        PayloadSource.ConflictData,
-        this.historyMap
+        PayloadSource.ConflictData
       );
       const deltaCollection = await delta.resultingCollection();
       const payloads = deltaCollection.all();

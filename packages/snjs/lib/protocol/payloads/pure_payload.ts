@@ -37,7 +37,6 @@ export class PurePayload {
   readonly items_key_id?: string;
   readonly enc_item_key?: string;
   readonly created_at?: Date;
-  /** Server modified only */
   readonly updated_at?: Date;
   readonly dirtiedDate?: Date;
   readonly dirty?: boolean;
@@ -205,9 +204,5 @@ export class PurePayload {
    */
   get discardable() {
     return this.deleted && !this.dirty;
-  }
-
-  public get serverUpdatedAt(): Date | undefined {
-    return this.updated_at;
   }
 }

@@ -12,7 +12,7 @@ export function SortPayloadsByRecentAndContentPriority(
 ) {
   return payloads.sort((a: PurePayload, b: PurePayload) => {
     const dateResult =
-      new Date(b.serverUpdatedAt!).getTime() - new Date(a.serverUpdatedAt!).getTime();
+      new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime();
     let aPriority = 0;
     let bPriority = 0;
     if (priorityList) {

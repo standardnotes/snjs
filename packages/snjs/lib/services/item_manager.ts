@@ -263,7 +263,7 @@ export class ItemManager extends PureService {
     return this.findItems(uuids) as SNItem[];
   }
 
-  private setPayloads(
+  private async setPayloads(
     changed: PurePayload[],
     inserted: PurePayload[],
     discarded: PurePayload[],
@@ -283,7 +283,7 @@ export class ItemManager extends PureService {
       this.collection.discard(item);
     }
     this.notesView.setNeedsRebuilding();
-    this.notifyObservers(
+    await this.notifyObservers(
       changedItems,
       insertedItems,
       discardedItems,
@@ -293,7 +293,7 @@ export class ItemManager extends PureService {
     );
   }
 
-  private notifyObservers(
+  private async notifyObservers(
     changed: SNItem[],
     inserted: SNItem[],
     discarded: SNItem[],
@@ -348,7 +348,7 @@ export class ItemManager extends PureService {
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ): Promise<SNItem | undefined> {
+  ) {
     if (!isString(uuid)) {
       throw Error('Invalid uuid for changeItem');
     }

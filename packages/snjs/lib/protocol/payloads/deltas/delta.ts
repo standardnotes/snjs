@@ -1,4 +1,3 @@
-import { HistoryMap } from '@Lib/services/history/history_map';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
 import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
@@ -19,6 +18,10 @@ import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collect
  * the end state of the data should look like.
  */
 export class PayloadsDelta {
+  protected readonly baseCollection: ImmutablePayloadCollection;
+  protected readonly applyCollection: ImmutablePayloadCollection;
+  protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet;
+
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
@@ -26,12 +29,13 @@ export class PayloadsDelta {
    *                             that may be neccessary to carry out computation.
    */
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection,
-    protected readonly applyCollection: ImmutablePayloadCollection,
-    protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
-    protected readonly historyMap?: HistoryMap,
+    baseCollection: ImmutablePayloadCollection,
+    applyCollection: ImmutablePayloadCollection,
+    relatedCollectionSet?: ImmutablePayloadCollectionSet
   ) {
-
+    this.baseCollection = baseCollection;
+    this.applyCollection = applyCollection;
+    this.relatedCollectionSet = relatedCollectionSet;
   }
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
@@ -39,7 +43,7 @@ export class PayloadsDelta {
   }
 
   /**
-   * @param id  - The uuid of the payload to find
+   * @param {string} id  - The uuid of the payload to find
    */
   protected findBasePayload(id: string) {
     return this.baseCollection.find(id);

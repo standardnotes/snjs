@@ -56,7 +56,9 @@ export { LiveItem } from './models/live_item';
 
 export type { PermissionDialog } from './services/component_manager';
 export { SNComponentManager } from './services/component_manager';
-export { HistoryEntry } from '@Services/history/entries/history_entry';
+export { SessionHistoryMap } from './services/history/session/session_history_map';
+export { ItemSessionHistory } from './services/history/session/item_session_history';
+export { ItemHistoryEntry } from '@Services/history/entries/item_history_entry';
 export { PayloadManager } from './services/payload_manager';
 export { ItemManager } from './services/item_manager';
 export { SNHttpService } from './services/api/http_service';
@@ -87,7 +89,6 @@ export {
 } from './services/sync/sync_service';
 export { SyncOpStatus } from './services/sync/sync_op_status';
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
-export { SyncUpDownLimit } from './services/sync/account/operation';
 export { SNSessionManager } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
 export { ButtonType } from './services/alert_service';

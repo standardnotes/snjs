@@ -153,19 +153,19 @@ describe('backups', function () {
     let backupData = await this.application.createBackupFile(
       EncryptionIntent.FileDecrypted
     );
-    let rawItem = backupData.items.find(
+    let item = backupData.items.find(
       (i) => i.content_type === ContentType.Note
     );
 
-    expect(rawItem.fields).to.not.be.ok;
-    expect(rawItem.source).to.not.be.ok;
-    expect(rawItem.dirtiedDate).to.not.be.ok;
-    expect(rawItem.format).to.not.be.ok;
-    expect(rawItem.uuid).to.be.ok;
-    expect(rawItem.content_type).to.be.ok;
-    expect(rawItem.content).to.be.ok;
-    expect(rawItem.created_at).to.be.ok;
-    expect(rawItem.updated_at).to.be.ok;
+    expect(item.fields).to.not.be.ok;
+    expect(item.source).to.not.be.ok;
+    expect(item.dirtiedDate).to.not.be.ok;
+    expect(item.format).to.not.be.ok;
+    expect(item.uuid).to.be.ok;
+    expect(item.content_type).to.be.ok;
+    expect(item.content).to.be.ok;
+    expect(item.created_at).to.be.ok;
+    expect(item.updated_at).to.be.ok;
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -176,17 +176,17 @@ describe('backups', function () {
     backupData = await this.application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
-    rawItem = backupData.items.find((i) => i.content_type === ContentType.Note);
+    item = backupData.items.find((i) => i.content_type === ContentType.Note);
 
-    expect(rawItem.fields).to.not.be.ok;
-    expect(rawItem.source).to.not.be.ok;
-    expect(rawItem.dirtiedDate).to.not.be.ok;
-    expect(rawItem.format).to.not.be.ok;
-    expect(rawItem.uuid).to.be.ok;
-    expect(rawItem.content_type).to.be.ok;
-    expect(rawItem.content).to.be.ok;
-    expect(rawItem.created_at).to.be.ok;
-    expect(rawItem.updated_at).to.be.ok;
+    expect(item.fields).to.not.be.ok;
+    expect(item.source).to.not.be.ok;
+    expect(item.dirtiedDate).to.not.be.ok;
+    expect(item.format).to.not.be.ok;
+    expect(item.uuid).to.be.ok;
+    expect(item.content_type).to.be.ok;
+    expect(item.content).to.be.ok;
+    expect(item.created_at).to.be.ok;
+    expect(item.updated_at).to.be.ok;
   });
 
   it('downloading backup if item is error decrypting should succeed', async function () {
