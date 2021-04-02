@@ -534,7 +534,7 @@ export class SNSyncService extends PureService<
       this.syncLock = false;
     };
 
-    const syncInProgress = this.opStatus!.syncInProgress;
+    const syncInProgress = this.opStatus.syncInProgress;
     const databaseLoaded = this.databaseLoaded;
     const canExecuteSync = !syncLocked();
     if (canExecuteSync && databaseLoaded && !syncInProgress) {

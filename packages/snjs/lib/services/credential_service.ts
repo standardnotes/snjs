@@ -195,7 +195,8 @@ export class SNCredentialService extends PureService<AccountEvent> {
 
   /**
    * A sign in request that occurs while the user was previously signed in, to correct
-   * for missing keys or storage values.
+   * for missing keys or storage values. Unlike regular sign in, this doesn't worry about
+   * performing one of marking all items as needing sync or deleting all local data.
    */
   public async correctiveSignIn(rootKey: SNRootKey): Promise<SignInResponse> {
     this.lockSyncing();
@@ -206,10 +207,10 @@ export class SNCredentialService extends PureService<AccountEvent> {
     if (!response.error) {
       await this.notifyEvent(AccountEvent.SignedInOrRegistered);
       this.unlockSyncing();
-      this.syncService.downloadFirstSync(1_000, {
+      void this.syncService.downloadFirstSync(1_000, {
         checkIntegrity: true,
       });
-      this.protocolService.decryptErroredItems();
+      void this.protocolService.decryptErroredItems();
     }
     this.unlockSyncing();
     return response;

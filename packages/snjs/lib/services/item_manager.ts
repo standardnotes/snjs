@@ -540,12 +540,10 @@ export class ItemManager extends PureService {
   /**
    * Returns an array of items that need to be synced.
    */
-  public getDirtyItems() {
+  public getDirtyItems(): SNItem[] {
     const dirty = this.collection.dirtyElements();
     return dirty.filter((item) => {
-      /* An item that has an error decrypting can be synced only if it is being deleted.
-        Otherwise, we don't want to send corrupt content up to the server. */
-      return !item.errorDecrypting || item.deleted;
+      return item.isSyncable;
     });
   }
 

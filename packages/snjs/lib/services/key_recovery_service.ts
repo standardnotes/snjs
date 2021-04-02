@@ -356,9 +356,9 @@ export class SNKeyRecoveryService extends PureService {
 
     const hasAccount = this.protocolService.hasAccount();
     const hasPasscode = this.protocolService.hasPasscode();
-    const localStorageMissing = !hasAccount && !hasPasscode;
+    const credentialsMissing = !hasAccount && !hasPasscode;
     let queueItem = this.decryptionQueue[0];
-    if (localStorageMissing) {
+    if (credentialsMissing) {
       const rootKey = await this.performServerSignIn(queueItem.keyParams);
       if (rootKey) {
         await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
