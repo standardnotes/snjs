@@ -30,14 +30,13 @@ describe('online conflict handling', function () {
       expect(items.length).to.equal(this.expectedItemCount);
       const rawPayloads = await this.application.storageService.getAllRawPayloads();
       expect(rawPayloads.length).to.equal(this.expectedItemCount);
-    }
+    };
   });
 
   afterEach(async function () {
     await this.application.deinit();
     localStorage.clear();
   });
-
 
   function createDirtyPayload(contentType) {
     const params = {
@@ -779,6 +778,49 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.notes.length).to.equal(1);
     const finalNote = this.application.findItem(note.uuid);
     expect(finalNote.title).to.equal(finalTitle);
+    await this.sharedFinalAssertions();
+  });
+
+  it('receiving a decrypted item while the current local item is errored and dirty should overwrite local value', async function () {
+    /**
+     * An item can be marked as dirty (perhaps via a bulk dirtying operation) even if it is errored,
+     * but it can never be sent to the server if errored. If we retrieve an item from the server
+     * that we're able to decrypt, and the current base value is errored and dirty, we don't want to
+     * create a conflict, but instead just have the server value replace the client value.
+     */
+    /**
+     * Create a note and sync it with the server while its valid
+     */
+    const note = await Factory.createSyncedNote(this.application);
+    this.expectedItemCount++;
+
+    /**
+     * Mark the item as dirty and errored
+     */
+    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+      errorDecrypting: true,
+      dirty: true,
+    });
+    await this.application.itemManager.emitItemsFromPayloads(
+      [errorred],
+      PayloadSource.LocalChanged
+    );
+
+    /**
+     * Retrieve this note from the server by clearing sync toksn
+     */
+    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.sync({
+      ...syncOptions,
+      awaitAll: true,
+    });
+
+    /**
+     * Expect that the final result is just 1 note that is not errored
+     */
+    const resultNote = await this.application.findItem(note.uuid);
+    expect(resultNote.errorDecrypting).to.not.be.ok;
+    expect(this.application.itemManager.notes.length).to.equal(1);
     await this.sharedFinalAssertions();
   });
 });

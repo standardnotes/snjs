@@ -72,7 +72,8 @@ describe('auth fringe cases', () => {
         context.application
       );
       console.warn(
-        "Expecting errors 'No associated key found for item encrypted with latest protocol version.'"
+        "Expecting errors 'No associated key found for item encrypted with latest protocol version.'",
+        "and 'Unable to find operator for version undefined'"
       );
       await restartedApplication.signIn(
         context.email,
@@ -86,6 +87,7 @@ describe('auth fringe cases', () => {
         note.uuid
       );
       expect(refreshedNote.errorDecrypting).to.equal(false);
+      expect(restartedApplication.itemManager.notes.length).to.equal(1);
       restartedApplication.deinit();
     }).timeout(10000);
   });
