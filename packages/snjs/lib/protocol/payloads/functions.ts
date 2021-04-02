@@ -59,7 +59,7 @@ export async function PayloadsByDuplicating(
   baseCollection: ImmutablePayloadCollection,
   isConflict: boolean,
   additionalContent?: Partial<PayloadContent>
-): Promise<PurePayload> {
+): Promise<PurePayload[]> {
   if (payload.errorDecrypting) {
     throw Error('Attempting to duplicate errored payload');
   }
