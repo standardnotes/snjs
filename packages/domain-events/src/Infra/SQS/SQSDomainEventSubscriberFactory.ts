@@ -21,7 +21,7 @@ export class SQSDomainEventSubscriberFactory implements DomainEventSubscriberFac
       sqs: this.sqs,
       handleMessage:
         /* istanbul ignore next */
-        async (message: SQSMessage) => await this.domainEventMessageHandler.handleMessage(<string> message.Body)
+        async (message: SQSMessage) => await this.domainEventMessageHandler.handleMessage(<string> message.Body),
     })
 
     sqsConsumer.on('error', this.domainEventMessageHandler.handleError.bind(this.domainEventMessageHandler))
