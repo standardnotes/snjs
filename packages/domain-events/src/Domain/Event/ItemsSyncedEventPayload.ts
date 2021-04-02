@@ -1,7 +1,7 @@
 export interface ItemsSyncedEventPayload {
   userUuid: string
   extensionsServerUrl: string
-  extensionUuid: string
+  extensionId: string
   itemUuids: Array<string>
   forceMute: boolean
 }
