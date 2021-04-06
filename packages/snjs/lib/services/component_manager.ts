@@ -1514,16 +1514,16 @@ export class SNComponentManager extends PureService {
    */
   private deregisterComponent(uuid: UuidString) {
     this.log('Degregistering component', uuid);
-    const component = this.findComponent(uuid);
     delete this.componentState[uuid];
-    const area = component.area;
     this.streamObservers = this.streamObservers.filter((o) => {
       return o.componentUuid !== uuid;
     });
     this.contextStreamObservers = this.contextStreamObservers.filter((o) => {
       return o.componentUuid !== uuid;
     });
-    if (area === ComponentArea.Themes) {
+
+    const component = this.findComponent(uuid);
+    if (component?.area === ComponentArea.Themes) {
       this.postActiveThemesToAllComponents();
     }
   }

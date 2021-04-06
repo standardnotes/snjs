@@ -961,7 +961,7 @@ export class SNApplication {
             true
           ),
         ],
-        ChallengeReason.ImportEncryptedFile,
+        ChallengeReason.DecryptEncryptedFile,
         true
       );
       const passwordResponse = await this.challengeService.promptForChallengeResponse(
@@ -978,7 +978,6 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
       data,
       password

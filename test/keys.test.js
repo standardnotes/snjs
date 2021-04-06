@@ -218,14 +218,14 @@ describe('keys', function () {
     expect(typeof rawNotePayload.content).to.equal('string');
   });
 
-  it('should create a new items key upon registration', async function () {
+  it('should keep offline created items key upon registration', async function () {
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     const originalItemsKey = this.application.itemManager.itemsKeys()[0];
     await this.application.register(this.email, this.password);
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     const newestItemsKey = this.application.itemManager.itemsKeys()[0];
-    expect(newestItemsKey.uuid).to.not.equal(originalItemsKey.uuid);
+    expect(newestItemsKey.uuid).to.equal(originalItemsKey.uuid);
   });
 
   it('should use items key for encryption of note', async function () {

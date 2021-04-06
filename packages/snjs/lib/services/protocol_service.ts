@@ -561,7 +561,7 @@ export class SNProtocolService
       return payload;
     }
     if (!key && format === PayloadFormat.EncryptedString) {
-      key = await this.keyToUseForDecryptionOfPayload(payload);
+      key = this.keyToUseForDecryptionOfPayload(payload);
       if (!key) {
         return CreateMaxPayloadFromAnyObject(payload, {
           waitingForKey: true,
@@ -861,7 +861,7 @@ export class SNProtocolService
    * @returns Key params object containing root key wrapper key params
    */
   public async getRootKeyWrapperKeyParams() {
-    const rawKeyParams = await this.storageService!.getValue(
+    const rawKeyParams = await this.storageService.getValue(
       StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -875,7 +875,7 @@ export class SNProtocolService
    * @returns Object containing persisted wrapped (encrypted) root key
    */
   private async getWrappedRootKey() {
-    return this.storageService!.getValue(
+    return this.storageService.getValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
@@ -904,7 +904,7 @@ export class SNProtocolService
    *           keyMode. This function however strictly returns only account params.
    */
   public async getAccountKeyParams() {
-    const rawKeyParams = await this.storageService!.getValue(
+    const rawKeyParams = await this.storageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -922,7 +922,7 @@ export class SNProtocolService
     const wrappedRootKey = await this.getWrappedRootKey();
     /** If wrapper only, storage is encrypted directly with wrappingKey */
     if (this.keyMode === KeyMode.WrapperOnly) {
-      return this.storageService!.canDecryptWithKey(wrappingKey);
+      return this.storageService.canDecryptWithKey(wrappingKey);
     } else if (
       this.keyMode === KeyMode.RootKeyOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
@@ -1009,7 +1009,7 @@ export class SNProtocolService
       } else {
         await this.wrapAndPersistRootKey(wrappingKey);
       }
-      await this.storageService!.setValue(
+      await this.storageService.setValue(
         StorageKey.RootKeyWrapperKeyParams,
         wrappingKey.keyParams.getPortableValue(),
         StorageValueModes.Nonwrapped
@@ -1033,7 +1033,7 @@ export class SNProtocolService
       EncryptionIntent.LocalStorageEncrypted,
       wrappingKey
     );
-    await this.storageService!.setValue(
+    await this.storageService.setValue(
       StorageKey.WrappedRootKey,
       wrappedKey.ejected(),
       StorageValueModes.Nonwrapped
@@ -1043,7 +1043,7 @@ export class SNProtocolService
   /**
    * Removes root key wrapper from local storage and stores root key bare in secure keychain.
    */
-  public async removeRootKeyWrapper() {
+  public async removeRootKeyWrapper(): Promise<void> {
     if (
       this.keyMode !== KeyMode.WrapperOnly &&
       this.keyMode !== KeyMode.RootKeyPlusWrapper
@@ -1056,11 +1056,11 @@ export class SNProtocolService
     } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
       this.keyMode = KeyMode.RootKeyOnly;
     }
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -1098,7 +1098,7 @@ export class SNProtocolService
       throw Error(`Unhandled key mode for setNewRootKey ${this.keyMode}`);
     }
     this.rootKey = key;
-    await this.storageService!.setValue(
+    await this.storageService.setValue(
       StorageKey.RootKeyParams,
       key.keyParams.getPortableValue(),
       StorageValueModes.Nonwrapped
@@ -1126,15 +1126,15 @@ export class SNProtocolService
    */
   public async clearLocalKeyState() {
     await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier);
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -1220,7 +1220,9 @@ export class SNProtocolService
    * to the version of this payload.
    * @returns The key object to use for decrypting this payload.
    */
-  private async keyToUseForDecryptionOfPayload(payload: PurePayload) {
+  private keyToUseForDecryptionOfPayload(
+    payload: PurePayload
+  ): SNRootKey | SNItemsKey | undefined {
     if (ContentTypeUsesRootKeyEncryption(payload.content_type!)) {
       return this.getRootKey();
     }
@@ -1262,10 +1264,6 @@ export class SNProtocolService
     if (!this.hasAccount()) {
       return;
     }
-    /**
-     * Find items keys with null or epoch updated_at value, indicating
-     * that they haven't been synced yet.
-     */
     const itemsKeys = this.latestItemsKeys();
     const neverSyncedKeys = itemsKeys.filter((key) => {
       return key.neverSynced;
@@ -1336,7 +1334,7 @@ export class SNProtocolService
   async repersistAllItems() {
     const items = this.itemManager.items;
     const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item));
-    return this.storageService!.savePayloads(payloads);
+    return this.storageService.savePayloads(payloads);
   }
 
   /**
@@ -1351,7 +1349,9 @@ export class SNProtocolService
    */
   public itemsKeyForPayload(payload: PurePayload) {
     return this.latestItemsKeys().find(
-      (key) => key.uuid === payload.items_key_id
+      (key) =>
+        key.uuid === payload.items_key_id ||
+        key.duplicateOf === payload.items_key_id
     );
   }
 

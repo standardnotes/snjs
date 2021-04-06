@@ -326,6 +326,41 @@ describe('app models', () => {
     expect(alternatedItem.dirty).to.equal(true);
   });
 
+  it('alterating uuid of item should fill its duplicateOf value', async function () {
+    const item1 = await Factory.createMappedNote(this.application);
+    const alternatedItem = await this.application.syncService.alternateUuidForItem(
+      item1.uuid
+    );
+    expect(alternatedItem.duplicateOf).to.equal(item1.uuid);
+  });
+
+  it('alterating itemskey uuid should update errored items encrypted with that key', async function () {
+    const item1 = await Factory.createMappedNote(this.application);
+    const itemsKey = this.application.itemManager.itemsKeys()[0];
+    /** Encrypt item1 and emit as errored so it persists with items_key_id */
+    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+      item1.payload,
+      EncryptionIntent.Sync
+    );
+    const errored = CopyPayload(encrypted, {
+      errorDecrypting: true,
+      waitingForKey: true,
+    });
+    await this.application.itemManager.emitItemFromPayload(errored);
+    expect(this.application.findItem(item1.uuid).errorDecrypting).to.equal(
+      true
+    );
+    expect(this.application.findItem(item1.uuid).payload.items_key_id).to.equal(
+      itemsKey.uuid
+    );
+    const alternatedKey = await this.application.syncService.alternateUuidForItem(
+      itemsKey.uuid
+    );
+    expect(this.application.findItem(item1.uuid).payload.items_key_id).to.equal(
+      alternatedKey.uuid
+    );
+  });
+
   it('properly handles mutli item uuid alternation', async function () {
     const item1 = await Factory.createMappedNote(this.application);
     const item2 = await Factory.createMappedNote(this.application);

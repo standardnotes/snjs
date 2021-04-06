@@ -109,7 +109,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
             : StoragePersistencePolicies.Default
         );
         if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync(true);
+          await this.syncService.markAllItemsAsNeedingSync();
         } else {
           this.itemManager.removeAllItemsFromMemory();
           await this.clearDatabase();
@@ -163,7 +163,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
             : StoragePersistencePolicies.Default
         );
         if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync(false);
+          await this.syncService.markAllItemsAsNeedingSync();
         } else {
           void this.itemManager.removeAllItemsFromMemory();
           await this.clearDatabase();

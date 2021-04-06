@@ -386,26 +386,9 @@ export class SNSyncService extends PureService<
 
   /**
    * Mark all items as dirty and needing sync, then persist to storage.
-   * @param alternateUuids
-   * In the case of signing in and merging local data, we alternate UUIDs
-   * to avoid overwriting data a user may retrieve that has the same UUID.
-   * Alternating here forces us to to create duplicates of the items instead.
    */
-  public async markAllItemsAsNeedingSync(
-    alternateUuids: boolean
-  ): Promise<void> {
+  public async markAllItemsAsNeedingSync(): Promise<void> {
     this.log('Marking all items as needing sync');
-    if (alternateUuids) {
-      /** Make a copy of the array, as alternating uuid will affect array */
-      const items = this.itemManager.items
-        .filter((item) => {
-          return !item.errorDecrypting;
-        })
-        .slice();
-      for (const item of items) {
-        await this.alternateUuidForItem(item.uuid);
-      }
-    }
     const items = this.itemManager.items;
     const payloads = items.map((item) => {
       return CreateMaxPayloadFromAnyObject(item, {
@@ -474,10 +457,6 @@ export class SNSyncService extends PureService<
       });
   }
 
-  /**
-   * Certain content types should not be encrypted when sending to server,
-   * such as server extensions
-   */
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
     return this.protocolService.payloadsByEncryptingPayloads(
       payloads,
@@ -772,17 +751,6 @@ export class SNSyncService extends PureService<
     source: SyncSources,
     mode: SyncModes
   ) {
-    this.log(
-      'Syncing online user',
-      'source:',
-      source,
-      'integrity check',
-      checkIntegrity,
-      'mode:',
-      mode,
-      'payloads:',
-      payloads
-    );
     const operation = new AccountSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
@@ -806,6 +774,19 @@ export class SNSyncService extends PureService<
       await this.getPaginationToken(),
       checkIntegrity,
       this.apiService
+    );
+    this.log(
+      'Syncing online user',
+      'source:',
+      source,
+      'operation id',
+      operation.id,
+      'integrity check',
+      checkIntegrity,
+      'mode:',
+      mode,
+      'payloads:',
+      payloads
     );
     return operation;
   }
@@ -877,7 +858,12 @@ export class SNSyncService extends PureService<
     if (this._simulate_latency) {
       await sleep(this._simulate_latency.latency);
     }
-    this.log('Online Sync Response', response.rawResponse);
+    this.log(
+      'Online Sync Response',
+      'operation id',
+      operation.id,
+      response.rawResponse
+    );
     this.setLastSyncToken(response.lastSyncToken!);
     this.setPaginationToken(response.paginationToken!);
     this.opStatus.clearError();

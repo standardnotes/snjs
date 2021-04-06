@@ -68,9 +68,8 @@ describe('preferences', function () {
     await Factory.sleep(0); /** Await next tick */
     expect(callTimes).to.equal(1); /** App start */
     await register.call(this);
-    expect(callTimes).to.equal(2);
     await this.application.setPreference('editorLeft', 300);
-    expect(callTimes).to.equal(3);
+    expect(callTimes).to.equal(2);
   });
 
   it('discards existing preferences when signing in', async function () {

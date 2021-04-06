@@ -36,7 +36,7 @@ export enum ChallengeReason {
   RevokeSession,
   AccessBatchManager,
   AccessCloudLink,
-  ImportEncryptedFile,
+  DecryptEncryptedFile,
   ExportBackup,
   DisableBiometrics,
   UnprotectNote,
@@ -110,8 +110,8 @@ export class Challenge {
           return ChallengeStrings.AccessBatchManager;
         case ChallengeReason.AccessCloudLink:
           return ChallengeStrings.AccessCloudLink;
-        case ChallengeReason.ImportEncryptedFile:
-          return ChallengeStrings.ImportEncryptedFile;
+        case ChallengeReason.DecryptEncryptedFile:
+          return ChallengeStrings.DecryptEncryptedFile;
         case ChallengeReason.ExportBackup:
           return ChallengeStrings.ExportBackup;
         case ChallengeReason.DisableBiometrics:
