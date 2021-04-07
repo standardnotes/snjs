@@ -516,7 +516,7 @@ describe('keys', function () {
     expect(decrypted3.errorDecrypting).to.not.be.ok;
   });
 
-  it('changing account password should create new items key', async function () {
+  it('changing account password should create new items key and encrypt items with that key', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -526,11 +526,22 @@ describe('keys', function () {
     expect(itemsKeys.length).to.equal(1);
     const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
 
-    await this.application.changePassword(this.password, 'foobarfoo');
+    const result = await this.application.changePassword(
+      this.password,
+      'foobarfoo'
+    );
+    expect(result.error).to.not.be.ok;
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(2);
     const newDefaultItemsKey = await this.application.protocolService.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
+
+    const note = await Factory.createSyncedNote(this.application);
+    const payload = await this.application.protocolService.payloadByEncryptingPayload(
+      note.payload,
+      EncryptionIntent.Sync
+    );
+    expect(payload.items_key_id).to.equal(newDefaultItemsKey.uuid);
   });
 
   it('compares root keys', async function () {

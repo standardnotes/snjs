@@ -10,6 +10,51 @@ const syncOptions = {
   awaitAll: true,
 };
 
+export async function createAppContext(namespace) {
+  const application = await createApplication(namespace);
+  const email = Uuid.GenerateUuidSynchronously();
+  const password = Uuid.GenerateUuidSynchronously();
+  const passcode = 'mypasscode';
+  return {
+    application: application,
+    email,
+    password,
+    passcode,
+    awaitNextSucessfulSync: () => {
+      return new Promise((resolve) => {
+        const removeObserver = application.syncService.addEventObserver((event) => {
+          if (event === SyncEvent.FullSyncCompleted) {
+            removeObserver();
+            resolve();
+          }
+        });
+      })
+    },
+    handleChallenge: (challenge) => {
+      const responses = [];
+      for (const prompt of challenge.prompts) {
+        if (prompt.validation === ChallengeValidation.LocalPasscode) {
+          responses.push(new ChallengeValue(prompt, passcode));
+        } else if (prompt.validation === ChallengeValidation.AccountPassword) {
+          responses.push(new ChallengeValue(prompt, password));
+        } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
+          responses.push(new ChallengeValue(prompt, 0));
+        } else if (prompt.placeholder === 'Email') {
+          responses.push(new ChallengeValue(prompt, email));
+        }  else if (prompt.placeholder === 'Password') {
+          responses.push(new ChallengeValue(prompt, password));
+        } else {
+          throw Error(`Unhandled custom challenge in Factory.createAppContext`);
+        }
+      }
+      application.submitValuesForChallenge(challenge, responses);
+    },
+    deinit: () => {
+      application.deinit();
+    },
+  };
+}
+
 export function createApplication(identifier, environment, platform) {
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),

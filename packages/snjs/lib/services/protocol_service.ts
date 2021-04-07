@@ -1487,9 +1487,12 @@ export class SNProtocolService
         operatorVersion
       ).createItemsKey();
     }
-    const currentDefault = this.getDefaultItemsKey();
-    if (currentDefault) {
-      await this.itemManager.changeItemsKey(currentDefault.uuid, (mutator) => {
+    const itemsKeys = this.latestItemsKeys();
+    const defaultKeys = itemsKeys.filter((key) => {
+      return key.isDefault;
+    });
+    for (const key of defaultKeys) {
+      await this.itemManager.changeItemsKey(key.uuid, (mutator) => {
         mutator.isDefault = false;
       });
     }

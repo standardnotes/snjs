@@ -275,7 +275,9 @@ export class SNKeyRecoveryService extends PureService {
       password,
       keyParams
     );
-    const signInResponse = await this.credentialService.correctiveSignIn(rootKey);
+    const signInResponse = await this.credentialService.correctiveSignIn(
+      rootKey
+    );
     if (!signInResponse.error) {
       this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
       return rootKey;

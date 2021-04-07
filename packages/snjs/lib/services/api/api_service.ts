@@ -29,7 +29,7 @@ import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
-import { isNullOrUndefined, joinPaths } from '@Lib/utils';
+import { joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { SNPermissionsService } from '../permissions_service';
 
