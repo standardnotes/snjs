@@ -566,7 +566,7 @@ export class SNComponentManager extends PureService {
       uuid: item.uuid,
       content_type: item.content_type!,
       created_at: item.created_at!,
-      updated_at: item.updated_at!,
+      updated_at: item.serverUpdatedAt!,
       deleted: item.deleted!,
       isMetadataUpdate: isMetadatUpdate,
       content: item.content,

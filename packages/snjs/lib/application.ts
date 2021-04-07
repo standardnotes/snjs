@@ -609,7 +609,11 @@ export class SNApplication {
       throw Error('Attempting to save non-inserted item');
     }
     if (!item.dirty) {
-      await this.itemManager!.changeItem(uuid);
+      await this.itemManager!.changeItem(
+        uuid,
+        undefined,
+        MutationType.Internal
+      );
     }
     await this.syncService!.sync();
   }
@@ -620,7 +624,7 @@ export class SNApplication {
   public async changeAndSaveItem<M extends ItemMutator = ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    isUserModified = false,
+    isUserModified = true,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
   ) {
@@ -643,7 +647,7 @@ export class SNApplication {
   public async changeAndSaveItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    isUserModified = false,
+    isUserModified = true,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
   ) {
@@ -662,7 +666,7 @@ export class SNApplication {
   public async changeItem<M extends ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    isUserModified = false
+    isUserModified = true
   ) {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
@@ -681,7 +685,7 @@ export class SNApplication {
   public async changeItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    isUserModified = false
+    isUserModified = true
   ) {
     return this.itemManager!.changeItems(
       uuids,
@@ -1485,8 +1489,8 @@ export class SNApplication {
       /** Sync the newly created items key. Roll back on failure */
       await this.protocolService.reencryptItemsKeys();
       await this.syncService.sync({ awaitAll: true });
-      const itemsKeyWasSynced =
-        this.protocolService.getDefaultItemsKey()!.updated_at.getTime() > 0;
+      const itemsKeyWasSynced = !this.protocolService.getDefaultItemsKey()!
+        .neverSynced;
       if (!itemsKeyWasSynced) {
         await this.sessionManager.changePassword(
           newRootKey.serverPassword!,
@@ -1714,12 +1718,12 @@ export class SNApplication {
     this.createApiService();
     this.createSessionManager();
     this.createMigrationService();
+    this.createHistoryManager();
     this.createSyncManager();
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createComponentManager();
     this.createProtectionService();
-    this.createHistoryManager();
     this.createActionsManager();
     this.createPreferencesService();
   }
@@ -1743,6 +1747,7 @@ export class SNApplication {
     (this.itemManager as unknown) = undefined;
     (this.keyRecoveryService as unknown) = undefined;
     (this.preferencesService as unknown) = undefined;
+    (this.permissionsService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1836,7 +1841,7 @@ export class SNApplication {
       this.deviceInterface,
       this.storageService,
       this.identifier,
-      this.crypto!
+      this.crypto
     );
     this.protocolService.onKeyStatusChange(async () => {
       await this.notifyEvent(ApplicationEvent.KeyStatusChanged);
@@ -1903,6 +1908,7 @@ export class SNApplication {
       this.storageService,
       this.payloadManager,
       this.apiService,
+      this.historyManager,
       this.deviceInterface.interval
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
@@ -1950,8 +1956,7 @@ export class SNApplication {
       this.storageService,
       this.apiService,
       this.protocolService,
-      [ContentType.Note],
-      this.deviceInterface.timeout
+      this.deviceInterface
     );
     this.services.push(this.historyManager);
   }

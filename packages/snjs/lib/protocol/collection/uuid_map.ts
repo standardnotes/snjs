@@ -1,6 +1,10 @@
 import { addIfUnique, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
 
+/**
+ * Maps a UUID to an array of UUIDS to establish either direct or inverse
+ * relationships between UUID strings (represantative of items or payloads).
+ */
 export class UuidMap {
   /** uuid to uuids that we have a relationship with */
   private directMap: Partial<Record<UuidString, UuidString[]>> = {};

@@ -1,3 +1,4 @@
+import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { SNLog } from './../../log';
 import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
@@ -11,7 +12,7 @@ import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { PayloadSource } from '@Lib/protocol/payloads/sources';
-import { PrefKey, PrefValue } from '../app/userPrefs';
+import { PrefKey } from '../app/userPrefs';
 
 export enum MutationType {
   /**
@@ -88,7 +89,8 @@ export class SNItem {
       this.created_at && this.dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.userModifiedDate = new Date(
-        this.getAppDomainValue(AppDataField.UserModifiedDate) || this.updated_at
+        this.getAppDomainValue(AppDataField.UserModifiedDate) ||
+          this.serverUpdatedAt
       );
       this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
       this.protected = this.payload.safeContent.protected;
@@ -97,7 +99,7 @@ export class SNItem {
       this.archived = this.getAppDomainValue(AppDataField.Archived);
       this.locked = this.getAppDomainValue(AppDataField.Locked);
     } else {
-      this.userModifiedDate = this.updated_at;
+      this.userModifiedDate = this.serverUpdatedAt || new Date();
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setImmediate(() => {
@@ -148,8 +150,17 @@ export class SNItem {
     return this.payload.created_at!;
   }
 
-  get updated_at() {
-    return this.payload.updated_at!;
+  /**
+   * The date timestamp the server set for this item upon it being synced
+   * Undefined if never synced to a remote server.
+   */
+  public get serverUpdatedAt(): Date | undefined {
+    return this.payload.serverUpdatedAt;
+  }
+
+  /** @deprecated Use serverUpdatedAt instead */
+  public get updated_at(): Date | undefined {
+    return this.serverUpdatedAt;
   }
 
   get dirtiedDate() {
@@ -254,7 +265,7 @@ export class SNItem {
 
   /** Whether the item has never been synced to a server */
   public get neverSynced() {
-    return !this.updated_at || this.updated_at.getTime() === 0;
+    return !this.serverUpdatedAt || this.serverUpdatedAt.getTime() === 0;
   }
 
   /**
@@ -283,8 +294,13 @@ export class SNItem {
    *
    * In the default implementation, we create a duplicate if content differs.
    * However, if they only differ by references, we KEEP_LEFT_MERGE_REFS.
+   *
+   * Left returns to our current item, and Right refers to the incoming item.
    */
-  public strategyWhenConflictingWithItem(item: SNItem) {
+  public strategyWhenConflictingWithItem(
+    item: SNItem,
+    previousRevision?: HistoryEntry
+  ): ConflictStrategy {
     if (this.errorDecrypting) {
       return ConflictStrategy.KeepLeftDuplicateRight;
     }
@@ -310,6 +326,18 @@ export class SNItem {
     ]);
     if (itemsAreDifferentExcludingRefs) {
       const twentySeconds = 20_000;
+      if (previousRevision) {
+        /**
+         * If previousRevision.content === incomingValue.content, this means the
+         * change that was rejected by the server is in fact a legitimate change,
+         * because the value the client had previously matched with the server's,
+         * and this new change is being built on top of that state, and should therefore
+         * be chosen as the winner, with no need for a conflict.
+         */
+        if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
+          return ConflictStrategy.KeepLeft;
+        }
+      }
       if (
         /**
          * If the incoming item comes from an import, treat it as
@@ -346,7 +374,7 @@ export class SNItem {
   }
 
   public updatedAtTimestamp() {
-    return this.updated_at?.getTime();
+    return this.serverUpdatedAt?.getTime();
   }
 
   private dateToLocalizedString(date: Date) {
@@ -412,13 +440,11 @@ export class ItemMutator {
     }
     if (!this.payload.deleted) {
       if (this.type === MutationType.UserInteraction) {
-        // Set the user modified date to now if marking the item as dirty
         this.userModifiedDate = new Date();
       } else {
         const currentValue = this.item.userModifiedDate;
         if (!currentValue) {
-          // if we don't have an explcit raw value, we initialize client_updated_at.
-          this.userModifiedDate = new Date(this.item.updated_at!);
+          this.userModifiedDate = new Date(this.item.serverUpdatedAt!);
         }
       }
     }

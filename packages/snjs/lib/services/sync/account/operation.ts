@@ -4,7 +4,7 @@ import { SyncResponse } from '@Services/sync/response';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';
 
-const DEFAULT_UP_DOWN_LIMIT = 150;
+export const SyncUpDownLimit = 150;
 
 /**
  * A long running operation that handles multiple roundtrips from a server,
@@ -96,11 +96,11 @@ export class AccountSyncOperation {
   }
 
   private get upLimit() {
-    return DEFAULT_UP_DOWN_LIMIT;
+    return SyncUpDownLimit;
   }
 
   private get downLimit() {
-    return DEFAULT_UP_DOWN_LIMIT;
+    return SyncUpDownLimit;
   }
 
   get numberOfItemsInvolved() {

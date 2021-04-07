@@ -269,7 +269,8 @@ export class PayloadManager extends PureService {
       ImmutablePayloadCollection.WithPayloads(
         payloads,
         PayloadSource.FileImport
-      )
+      ),
+      undefined
     );
     const collection = await delta.resultingCollection();
     await this.emitCollection(collection);
