@@ -17,7 +17,8 @@
         "vars": "all",
         "args": "after-used",
         "ignoreRestSiblings": false,
-        "argsIgnorePattern": "^_"
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
       }
     ],
     "@typescript-eslint/no-explicit-any": ["error", { "ignoreRestArgs": true }],
@@ -26,6 +27,7 @@
     "quotes": ["error", "single"],
     "object-curly-spacing": ["error", "always"],
     "indent": ["error", 2],
-    "comma-dangle": ["error", "always-multiline"]
+    "comma-dangle": ["error", "always-multiline"],
+    "curly": ["error", "all"]
   }
 }
