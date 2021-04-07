@@ -264,7 +264,7 @@ export class SNItem {
   }
 
   /** Whether the item has never been synced to a server */
-  public get neverSynced() {
+  public get neverSynced(): boolean {
     return !this.serverUpdatedAt || this.serverUpdatedAt.getTime() === 0;
   }
 
@@ -272,7 +272,7 @@ export class SNItem {
    * Subclasses can override this getter to return true if they want only
    * one of this item to exist, depending on custom criteria.
    */
-  public get isSingleton() {
+  public get isSingleton(): boolean {
     return false;
   }
 
@@ -281,8 +281,16 @@ export class SNItem {
     throw 'Must override SNItem.singletonPredicate';
   }
 
-  public get singletonStrategy() {
+  public get singletonStrategy(): SingletonStrategy {
     return SingletonStrategy.KeepEarliest;
+  }
+
+  /**
+   * An item is syncable if it not errored. If it is, it is only syncable if it is being deleted.
+   * Otherwise, we don't want to save corrupted content locally or send it to the server.
+   */
+  public get isSyncable(): boolean {
+    return !this.errorDecrypting || this.deleted === true;
   }
 
   /**
@@ -325,7 +333,6 @@ export class SNItem {
       'references',
     ]);
     if (itemsAreDifferentExcludingRefs) {
-      const twentySeconds = 20_000;
       if (previousRevision) {
         /**
          * If previousRevision.content === incomingValue.content, this means the
@@ -338,6 +345,7 @@ export class SNItem {
           return ConflictStrategy.KeepLeft;
         }
       }
+      const twentySeconds = 20_000;
       if (
         /**
          * If the incoming item comes from an import, treat it as

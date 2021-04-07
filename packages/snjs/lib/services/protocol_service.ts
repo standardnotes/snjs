@@ -152,6 +152,7 @@ export class SNProtocolService
       enumerable: false,
       writable: true,
     });
+
     this.removeItemsObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
       (changed, inserted) => {
@@ -560,7 +561,7 @@ export class SNProtocolService
       return payload;
     }
     if (!key && format === PayloadFormat.EncryptedString) {
-      key = await this.keyToUseForDecryptionOfPayload(payload);
+      key = this.keyToUseForDecryptionOfPayload(payload);
       if (!key) {
         return CreateMaxPayloadFromAnyObject(payload, {
           waitingForKey: true,
@@ -635,7 +636,7 @@ export class SNProtocolService
    * Here we find such items, and attempt to decrypt them again.
    */
   public async decryptErroredItems() {
-    const items = this.itemManager!.invalidItems.filter(
+    const items = this.itemManager.invalidItems.filter(
       (i) => i.content_type !== ContentType.ItemsKey
     );
     if (items.length === 0) {
@@ -860,7 +861,7 @@ export class SNProtocolService
    * @returns Key params object containing root key wrapper key params
    */
   public async getRootKeyWrapperKeyParams() {
-    const rawKeyParams = await this.storageService!.getValue(
+    const rawKeyParams = await this.storageService.getValue(
       StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -874,7 +875,7 @@ export class SNProtocolService
    * @returns Object containing persisted wrapped (encrypted) root key
    */
   private async getWrappedRootKey() {
-    return this.storageService!.getValue(
+    return this.storageService.getValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
@@ -903,7 +904,7 @@ export class SNProtocolService
    *           keyMode. This function however strictly returns only account params.
    */
   public async getAccountKeyParams() {
-    const rawKeyParams = await this.storageService!.getValue(
+    const rawKeyParams = await this.storageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -921,7 +922,7 @@ export class SNProtocolService
     const wrappedRootKey = await this.getWrappedRootKey();
     /** If wrapper only, storage is encrypted directly with wrappingKey */
     if (this.keyMode === KeyMode.WrapperOnly) {
-      return this.storageService!.canDecryptWithKey(wrappingKey);
+      return this.storageService.canDecryptWithKey(wrappingKey);
     } else if (
       this.keyMode === KeyMode.RootKeyOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
@@ -1008,7 +1009,7 @@ export class SNProtocolService
       } else {
         await this.wrapAndPersistRootKey(wrappingKey);
       }
-      await this.storageService!.setValue(
+      await this.storageService.setValue(
         StorageKey.RootKeyWrapperKeyParams,
         wrappingKey.keyParams.getPortableValue(),
         StorageValueModes.Nonwrapped
@@ -1032,7 +1033,7 @@ export class SNProtocolService
       EncryptionIntent.LocalStorageEncrypted,
       wrappingKey
     );
-    await this.storageService!.setValue(
+    await this.storageService.setValue(
       StorageKey.WrappedRootKey,
       wrappedKey.ejected(),
       StorageValueModes.Nonwrapped
@@ -1042,7 +1043,7 @@ export class SNProtocolService
   /**
    * Removes root key wrapper from local storage and stores root key bare in secure keychain.
    */
-  public async removeRootKeyWrapper() {
+  public async removeRootKeyWrapper(): Promise<void> {
     if (
       this.keyMode !== KeyMode.WrapperOnly &&
       this.keyMode !== KeyMode.RootKeyPlusWrapper
@@ -1055,11 +1056,11 @@ export class SNProtocolService
     } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
       this.keyMode = KeyMode.RootKeyOnly;
     }
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -1097,7 +1098,7 @@ export class SNProtocolService
       throw Error(`Unhandled key mode for setNewRootKey ${this.keyMode}`);
     }
     this.rootKey = key;
-    await this.storageService!.setValue(
+    await this.storageService.setValue(
       StorageKey.RootKeyParams,
       key.keyParams.getPortableValue(),
       StorageValueModes.Nonwrapped
@@ -1125,15 +1126,15 @@ export class SNProtocolService
    */
   public async clearLocalKeyState() {
     await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier);
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.WrappedRootKey,
       StorageValueModes.Nonwrapped
     );
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.RootKeyWrapperKeyParams,
       StorageValueModes.Nonwrapped
     );
-    await this.storageService!.removeValue(
+    await this.storageService.removeValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
@@ -1219,7 +1220,9 @@ export class SNProtocolService
    * to the version of this payload.
    * @returns The key object to use for decrypting this payload.
    */
-  private async keyToUseForDecryptionOfPayload(payload: PurePayload) {
+  private keyToUseForDecryptionOfPayload(
+    payload: PurePayload
+  ): SNRootKey | SNItemsKey | undefined {
     if (ContentTypeUsesRootKeyEncryption(payload.content_type!)) {
       return this.getRootKey();
     }
@@ -1229,9 +1232,12 @@ export class SNProtocolService
     }
     const payloadVersion = payload.version!;
     if (payloadVersion === this.getLatestVersion()) {
-      throw Error(
-        'No associated key found for item encrypted with latest protocol version.'
+      SNLog.error(
+        Error(
+          'No associated key found for item encrypted with latest protocol version.'
+        )
       );
+      return undefined;
     }
     return this.defaultItemsKeyForItemVersion(payloadVersion);
   }
@@ -1258,32 +1264,32 @@ export class SNProtocolService
     if (!this.hasAccount()) {
       return;
     }
-    /**
-     * Find items keys with null or epoch updated_at value, indicating
-     * that they haven't been synced yet.
-     */
     const itemsKeys = this.latestItemsKeys();
     const neverSyncedKeys = itemsKeys.filter((key) => {
       return key.neverSynced;
+    });
+    const syncedKeys = itemsKeys.filter((key) => {
+      return !key.neverSynced;
     });
     /**
      * Find isDefault items key that have been previously synced.
      * If we find one, this means we can delete any non-synced keys.
      */
-    const defaultSyncedKey = itemsKeys.find((key) => {
-      return !key.neverSynced && key.isDefault;
+    const defaultSyncedKey = syncedKeys.find((key) => {
+      return key.isDefault;
     });
     const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager!.setItemsToBeDeleted(Uuids(neverSyncedKeys));
+      await this.itemManager.setItemsToBeDeleted(Uuids(neverSyncedKeys));
     } else {
       /**
        * No previous synced items key.
-       * We can keep the one(s) we have, only if their version is equal to our root key version.
-       * If their version is not equal to our root key version, delete them. If we end up with 0
-       * items keys, create a new one. This covers the case when you open the app offline and it creates
-       * an 004 key, and then you sign into an 003 account. */
+       * We can keep the one(s) we have, only if their version is equal to our root key
+       * version. If their version is not equal to our root key version, delete them. If
+       * we end up with 0 items keys, create a new one. This covers the case when you open
+       * the app offline and it creates an 004 key, and then you sign into an 003 account.
+       */
       const rootKey = this.getRootKey();
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
@@ -1291,12 +1297,20 @@ export class SNProtocolService
           return itemsKey.keyVersion !== rootKey.keyVersion;
         });
         if (toDelete.length > 0) {
-          await this.itemManager!.setItemsToBeDeleted(Uuids(toDelete));
+          await this.itemManager.setItemsToBeDeleted(Uuids(toDelete));
         }
         if (this.latestItemsKeys().length === 0) {
           await this.createNewDefaultItemsKey();
         }
       }
+    }
+    /** If we do not have an items key for our current account version, create one */
+    const userVersion = await this.getUserVersion();
+    const accountVersionedKey = this.latestItemsKeys().find(
+      (key) => key.keyVersion === userVersion
+    );
+    if (isNullOrUndefined(accountVersionedKey)) {
+      await this.createNewDefaultItemsKey();
     }
   }
 
@@ -1318,16 +1332,16 @@ export class SNProtocolService
    * @access public
    */
   async repersistAllItems() {
-    const items = this.itemManager!.items;
+    const items = this.itemManager.items;
     const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item));
-    return this.storageService!.savePayloads(payloads);
+    return this.storageService.savePayloads(payloads);
   }
 
   /**
    * @returns All SN|ItemsKey objects synced to the account.
    */
   private latestItemsKeys() {
-    return this.itemManager!.itemsKeys();
+    return this.itemManager.itemsKeys();
   }
 
   /**
@@ -1335,14 +1349,16 @@ export class SNProtocolService
    */
   public itemsKeyForPayload(payload: PurePayload) {
     return this.latestItemsKeys().find(
-      (key) => key.uuid === payload.items_key_id
+      (key) =>
+        key.uuid === payload.items_key_id ||
+        key.duplicateOf === payload.items_key_id
     );
   }
 
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
-  public getDefaultItemsKey() {
+  public getDefaultItemsKey(): SNItemsKey | undefined {
     const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length === 1) {
       return itemsKeys[0];
@@ -1380,7 +1396,7 @@ export class SNProtocolService
    * When the root key changes (non-null only), we must re-encrypt all items
    * keys with this new root key (by simply re-syncing).
    */
-  public async reencryptItemsKeys() {
+  public async reencryptItemsKeys(): Promise<void> {
     const itemsKeys = this.latestItemsKeys();
     if (itemsKeys.length > 0) {
       /**
@@ -1388,7 +1404,7 @@ export class SNProtocolService
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
        */
-      await this.itemManager!.setItemsDirty(Uuids(itemsKeys));
+      await this.itemManager.setItemsDirty(Uuids(itemsKeys));
     }
   }
 
@@ -1418,7 +1434,7 @@ export class SNProtocolService
    * A new root key based items key is needed if a user changes their account password
    * on an 003 client and syncs on a signed in 004 client.
    */
-  public async needsNewRootKeyBasedItemsKey(): Promise<boolean> {
+  public needsNewRootKeyBasedItemsKey(): boolean {
     if (!this.hasAccount()) {
       return false;
     }
@@ -1486,7 +1502,7 @@ export class SNProtocolService
     return itemsKey;
   }
 
-  public async createNewItemsKeyWithRollback() {
+  public async createNewItemsKeyWithRollback(): Promise<() => Promise<void>> {
     const currentDefaultItemsKey = this.getDefaultItemsKey();
     const newDefaultItemsKey = await this.createNewDefaultItemsKey();
     const rollback = async () => {

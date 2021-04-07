@@ -102,15 +102,13 @@ describe('notes + tags syncing', async function () {
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.
     await this.application.storageService.clearAllPayloads();
-    await this.application.syncService.markAllItemsAsNeedingSync(true);
+    await this.application.syncService.markAllItemsAsNeedingSync();
 
     expect(this.application.itemManager.notes.length).to.equal(1);
     expect(this.application.itemManager.tags.length).to.equal(1);
 
     const note = this.application.itemManager.notes[0];
     const tag = this.application.itemManager.tags[0];
-    expect(note.uuid).to.not.equal(originalNote.uuid);
-    expect(tag.uuid).to.not.equal(originalTag.uuid);
 
     expect(tag.content.references.length).to.equal(1);
     expect(note.content.references.length).to.equal(0);

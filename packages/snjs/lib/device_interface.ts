@@ -26,8 +26,8 @@ export abstract class DeviceInterface {
   }
 
   public deinit() {
-    this.timeout = null;
-    this.interval = null;
+    this.timeout = undefined;
+    this.interval = undefined;
   }
 
   abstract getRawStorageValue(key: string): Promise<string | undefined>;

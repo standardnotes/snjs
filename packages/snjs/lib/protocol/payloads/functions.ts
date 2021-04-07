@@ -59,7 +59,10 @@ export async function PayloadsByDuplicating(
   baseCollection: ImmutablePayloadCollection,
   isConflict: boolean,
   additionalContent?: Partial<PayloadContent>
-) {
+): Promise<PurePayload[]> {
+  if (payload.errorDecrypting) {
+    throw Error('Attempting to duplicate errored payload');
+  }
   const results = [];
   const override: PayloadOverride = {
     uuid: await Uuid.GenerateUuid(),
@@ -112,7 +115,7 @@ export async function PayloadsByDuplicating(
 export async function PayloadsByAlternatingUuid(
   payload: PurePayload,
   baseCollection: ImmutablePayloadCollection
-) {
+): Promise<PurePayload[]> {
   const results = [];
   /**
    * We need to clone payload and give it a new uuid,
@@ -124,6 +127,7 @@ export async function PayloadsByAlternatingUuid(
     dirtiedDate: new Date(),
     lastSyncBegan: null,
     lastSyncEnd: null,
+    duplicate_of: payload.uuid,
   });
   results.push(copy);
 
@@ -143,6 +147,21 @@ export async function PayloadsByAlternatingUuid(
     [payload.uuid!]
   );
   extendArray(results, updatedReferencing);
+
+  if (payload.content_type === ContentType.ItemsKey) {
+    /**
+     * Update any payloads who are still encrypted and whose items_key_id point to this uuid
+     */
+    const matchingPayloads = baseCollection
+      .all()
+      .filter((p) => p.items_key_id === payload.uuid);
+    const adjustedPayloads = matchingPayloads.map((a) =>
+      CopyPayload(a, { items_key_id: copy.uuid })
+    );
+    if (adjustedPayloads.length > 0) {
+      extendArray(results, adjustedPayloads);
+    }
+  }
 
   const updatedSelf = CopyPayload(payload, {
     deleted: true,

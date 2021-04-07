@@ -43,13 +43,11 @@ describe('item manager', function () {
 
   it('emitting item through payload and marking dirty should have userModifiedDate', async function () {
     const payload = Factory.createNotePayload();
-    this.itemManager.emitItemFromPayload(
-      payload,
-      PayloadSource.LocalChanged
-    );
+    this.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged);
     const result = await this.itemManager.setItemDirty(payload.uuid);
     const appData = result.payload.content.appData;
-    expect(appData[SNItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok;
+    expect(appData[SNItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to
+      .be.ok;
   });
 
   it('find items with valid uuid', async function () {
@@ -234,6 +232,37 @@ describe('item manager', function () {
     expect(dirtyItems.length).to.equal(1);
     expect(dirtyItems[0].uuid).to.equal(note.uuid);
     expect(dirtyItems[0].dirty).to.equal(true);
+  });
+
+  it('dirty items should not include errored items', async function () {
+    const note = await this.itemManager.setItemDirty(
+      (await this.createNote()).uuid
+    );
+    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+      errorDecrypting: true,
+    });
+    await this.itemManager.emitItemsFromPayloads(
+      [errorred],
+      PayloadSource.LocalChanged
+    );
+    const dirtyItems = this.itemManager.getDirtyItems();
+    expect(dirtyItems.length).to.equal(0);
+  });
+
+  it('dirty items should include errored items if they are being deleted', async function () {
+    const note = await this.itemManager.setItemDirty(
+      (await this.createNote()).uuid
+    );
+    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+      errorDecrypting: true,
+      deleted: true
+    });
+    await this.itemManager.emitItemsFromPayloads(
+      [errorred],
+      PayloadSource.LocalChanged
+    );
+    const dirtyItems = this.itemManager.getDirtyItems();
+    expect(dirtyItems.length).to.equal(1);
   });
 
   describe('duplicateItem', async function () {

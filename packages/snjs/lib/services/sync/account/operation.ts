@@ -11,12 +11,7 @@ export const SyncUpDownLimit = 150;
  * emitting a stream of values that should be acted upon in real time.
  */
 export class AccountSyncOperation {
-  private payloads: PurePayload[];
-  private receiver: ResponseSignalReceiver;
-  private lastSyncToken: string;
-  private paginationToken: string;
-  public checkIntegrity: boolean;
-  private apiService: SNApiService;
+  public id = Math.random();
 
   private pendingPayloads: PurePayload[];
   private responses: SyncResponse[] = [];
@@ -26,12 +21,12 @@ export class AccountSyncOperation {
    * @param receiver   A function that receives callback multiple times during the operation
    */
   constructor(
-    payloads: PurePayload[],
-    receiver: ResponseSignalReceiver,
-    lastSyncToken: string,
-    paginationToken: string,
-    checkIntegrity: boolean,
-    apiService: SNApiService
+    private payloads: PurePayload[],
+    private receiver: ResponseSignalReceiver,
+    private lastSyncToken: string,
+    private paginationToken: string,
+    public checkIntegrity: boolean,
+    private apiService: SNApiService
   ) {
     this.payloads = payloads;
     this.lastSyncToken = lastSyncToken;

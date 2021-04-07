@@ -81,7 +81,7 @@ export class SyncOpStatus {
   /**
    * Notifies receiver if current sync request is taking too long to complete.
    */
-  startTimingMonitor() {
+  startTimingMonitor(): void {
     if (this.timingMonitor) {
       this.stopTimingMonitor();
     }
@@ -93,7 +93,7 @@ export class SyncOpStatus {
     }, TIMING_MONITOR_POLL_FREQUENCY_MS);
   }
 
-  stopTimingMonitor() {
+  stopTimingMonitor(): void {
     if (Object.prototype.hasOwnProperty.call(this.interval, 'cancel')) {
       this.interval.cancel(this.timingMonitor);
     } else {
@@ -102,11 +102,11 @@ export class SyncOpStatus {
     this.timingMonitor = null;
   }
 
-  hasError() {
+  hasError(): boolean {
     return !!this.error;
   }
 
-  setError(error: any) {
+  setError(error: any): void {
     this.error = error;
   }
 

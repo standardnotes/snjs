@@ -203,7 +203,7 @@ export const ChallengeStrings = {
     'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode',
-  ImportEncryptedFile:
+  DecryptEncryptedFile:
     'Enter the account password associated with the import file',
   ExportBackup: 'Authentication is required to export a backup',
   DisableBiometrics: 'Authentication is required to disable biometrics',

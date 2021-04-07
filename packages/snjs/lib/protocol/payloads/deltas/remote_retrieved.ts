@@ -6,7 +6,7 @@ import { extendArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteRetrieved extends PayloadsDelta {
-  public async resultingCollection() {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const filtered = [];
     const conflicted = [];
     /**
@@ -15,11 +15,11 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
      */
     for (const received of this.applyCollection.all()) {
       const savedOrSaving = this.findRelatedPayload(
-        received.uuid!,
+        received.uuid as string,
         PayloadSource.SavedOrSaving
       );
       const decrypted = this.findRelatedPayload(
-        received.uuid!,
+        received.uuid as string,
         PayloadSource.DecryptedTransient
       );
       if (!decrypted) {
@@ -34,8 +34,8 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
         conflicted.push(decrypted);
         continue;
       }
-      const base = this.findBasePayload(received.uuid!);
-      if (base && base.dirty) {
+      const base = this.findBasePayload(received.uuid as string);
+      if (base?.dirty && !base.errorDecrypting) {
         conflicted.push(decrypted);
         continue;
       }

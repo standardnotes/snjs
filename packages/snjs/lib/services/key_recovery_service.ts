@@ -1,3 +1,5 @@
+import { SNCredentialService } from './credential_service';
+import { PurePayload } from '@Payloads/pure_payload';
 import { SNSyncService } from './sync/sync_service';
 import { PayloadField } from './../protocol/payloads/fields';
 import { CreateItemFromPayload } from '@Models/generator';
@@ -7,7 +9,6 @@ import { CreateMaxPayloadFromAnyObject, RawPayload } from '@Payloads/generator';
 import { KeyRecoveryStrings } from './api/messages';
 import { SNStorageService, StorageValueModes } from './storage_service';
 import { SNRootKeyParams } from './../protocol/key_params';
-import { SNSessionManager } from './api/session_manager';
 import { PayloadManager } from './payload_manager';
 import {
   Challenge,
@@ -92,12 +93,12 @@ export class SNKeyRecoveryService extends PureService {
     private itemManager: ItemManager,
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
-    private sessionManager: SNSessionManager,
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
     private alertService: SNAlertService,
     private storageService: SNStorageService,
-    private syncService: SNSyncService
+    private syncService: SNSyncService,
+    private credentialService: SNCredentialService
   ) {
     super();
     this.removeItemObserver = this.itemManager.addObserver(
@@ -119,14 +120,16 @@ export class SNKeyRecoveryService extends PureService {
     );
   }
 
-  public deinit() {
-    (this.itemManager as any) = undefined;
-    (this.payloadManager as any) = undefined;
-    (this.apiService as any) = undefined;
-    (this.sessionManager as any) = undefined;
-    (this.protocolService as any) = undefined;
-    (this.challengeService as any) = undefined;
-    (this.alertService as any) = undefined;
+  public deinit(): void {
+    (this.itemManager as unknown) = undefined;
+    (this.payloadManager as unknown) = undefined;
+    (this.apiService as unknown) = undefined;
+    (this.protocolService as unknown) = undefined;
+    (this.challengeService as unknown) = undefined;
+    (this.alertService as unknown) = undefined;
+    (this.credentialService as unknown) = undefined;
+    (this.syncService as unknown) = undefined;
+    (this.storageService as unknown) = undefined;
     this.removeItemObserver();
     this.removeItemObserver = undefined;
     super.deinit();
@@ -241,7 +244,9 @@ export class SNKeyRecoveryService extends PureService {
     );
   }
 
-  private async performServerSignIn(keyParams: SNRootKeyParams): Promise<void> {
+  private async performServerSignIn(
+    keyParams: SNRootKeyParams
+  ): Promise<SNRootKey | undefined> {
     /** Get the user's account password */
     const challenge = new Challenge(
       [
@@ -261,7 +266,7 @@ export class SNKeyRecoveryService extends PureService {
       challenge
     );
     if (!challengeResponse) {
-      return;
+      return undefined;
     }
     this.challengeService.completeChallenge(challenge);
     const password = challengeResponse.values[0].value as string;
@@ -270,12 +275,10 @@ export class SNKeyRecoveryService extends PureService {
       password,
       keyParams
     );
-    const signInResponse = await this.sessionManager.bypassChecksAndSignInWithRootKey(
-      keyParams.identifier,
-      rootKey
-    );
+    const signInResponse = await this.credentialService.correctiveSignIn(rootKey);
     if (!signInResponse.error) {
       this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
+      return rootKey;
     } else {
       await this.alertService.alert(
         KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword
@@ -351,7 +354,21 @@ export class SNKeyRecoveryService extends PureService {
       }
     }
 
+    const hasAccount = this.protocolService.hasAccount();
+    const hasPasscode = this.protocolService.hasPasscode();
+    const credentialsMissing = !hasAccount && !hasPasscode;
     let queueItem = this.decryptionQueue[0];
+    if (credentialsMissing) {
+      const rootKey = await this.performServerSignIn(queueItem.keyParams);
+      if (rootKey) {
+        await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
+          rootKey,
+          true
+        );
+        removeFromArray(this.decryptionQueue, queueItem);
+        queueItem = this.decryptionQueue[0];
+      }
+    }
     while (queueItem) {
       this.popQueueItem(queueItem);
       await queueItem.promise!;
@@ -390,6 +407,7 @@ export class SNKeyRecoveryService extends PureService {
     const keyParams = queueItem.keyParams;
     const key = queueItem.key;
     const resolve = queueItem.resolve!;
+
     /**
      * We replace our current root key if the server params differ from our own params,
      * and if we can validate the params based on this items key's params.
@@ -456,27 +474,11 @@ export class SNKeyRecoveryService extends PureService {
     /** If it succeeds, re-emit this items key */
     if (!decryptedPayload.errorDecrypting) {
       /** Decrypt and remove from queue any other items keys who share these key params */
-      const matching = this.popQueueForKeyParams(keyParams);
-      const decryptedMatching = await this.protocolService.payloadsByDecryptingPayloads(
-        matching.map((m) => m.key.payload),
-        rootKey
+      const matching = await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
+        rootKey,
+        replacesRootKey,
+        [decryptedPayload]
       );
-      const allRelevantKeyPayloads = [decryptedPayload].concat(
-        decryptedMatching
-      );
-      this.payloadManager.emitPayloads(
-        allRelevantKeyPayloads,
-        PayloadSource.DecryptedTransient
-      );
-      await this.storageService.savePayloads(allRelevantKeyPayloads);
-      if (replacesRootKey) {
-        /** Replace our root key with the generated root key */
-        const wrappingKey = await this.getWrappingKeyIfApplicable();
-        await this.protocolService.setRootKey(rootKey, wrappingKey);
-        this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
-      } else {
-        this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);
-      }
       const result = { success: true };
       resolve(result);
       queueItem.callback?.(key, result);
@@ -492,6 +494,33 @@ export class SNKeyRecoveryService extends PureService {
       this.readdQueueItem(queueItem);
       resolve({ success: false });
     }
+  }
+
+  private async handleDecryptionOfAllKeysMatchingCorrectRootKey(
+    rootKey: SNRootKey,
+    replacesRootKey: boolean,
+    additionalKeys: PurePayload[] = []
+  ) {
+    const matching = this.popQueueForKeyParams(rootKey.keyParams);
+    const decryptedMatching = await this.protocolService.payloadsByDecryptingPayloads(
+      matching.map((m) => m.key.payload),
+      rootKey
+    );
+    const allRelevantKeyPayloads = additionalKeys.concat(decryptedMatching);
+    this.payloadManager.emitPayloads(
+      allRelevantKeyPayloads,
+      PayloadSource.DecryptedTransient
+    );
+    await this.storageService.savePayloads(allRelevantKeyPayloads);
+    if (replacesRootKey) {
+      /** Replace our root key with the generated root key */
+      const wrappingKey = await this.getWrappingKeyIfApplicable();
+      await this.protocolService.setRootKey(rootKey, wrappingKey);
+      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
+    } else {
+      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);
+    }
+    return matching;
   }
 
   private popQueueForKeyParams(keyParams: SNRootKeyParams) {

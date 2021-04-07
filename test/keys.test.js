@@ -218,14 +218,14 @@ describe('keys', function () {
     expect(typeof rawNotePayload.content).to.equal('string');
   });
 
-  it('should create a new items key upon registration', async function () {
+  it('should keep offline created items key upon registration', async function () {
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     const originalItemsKey = this.application.itemManager.itemsKeys()[0];
     await this.application.register(this.email, this.password);
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     const newestItemsKey = this.application.itemManager.itemsKeys()[0];
-    expect(newestItemsKey.uuid).to.not.equal(originalItemsKey.uuid);
+    expect(newestItemsKey.uuid).to.equal(originalItemsKey.uuid);
   });
 
   it('should use items key for encryption of note', async function () {
@@ -837,5 +837,42 @@ describe('keys', function () {
       expect(refreshedApp.itemManager.itemsKeys().length).to.equal(2);
       refreshedApp.deinit();
     });
+  });
+
+  it('importing 003 account backup, then registering for account, should properly reconcile keys', async function () {
+    /**
+     * When importing a backup of an 003 account into an offline state, ItemsKeys imported
+     * will have an updated_at value, which tell our protocol service that this key has been
+     * synced before, which sort of "lies" to the protocol service because now it thinks it doesnt
+     * need to create a new items key because one has already been synced with the account.
+     * The corrective action was to do a final check in protocolService.handleDownloadFirstSyncCompletion
+     * to ensure there exists an items key corresponding to the user's account version.
+     */
+    await this.application.itemManager.removeAllItemsFromMemory();
+    const note = await Factory.createMappedNote(this.application);
+    expect(this.application.protocolService.getDefaultItemsKey()).to.not.be.ok;
+    const protocol003 = new SNProtocolOperator003(new SNWebCrypto());
+    const key = await protocol003.createItemsKey();
+    await this.application.itemManager.emitItemFromPayload(
+      CopyPayload(key.payload, {
+        content: {
+          ...key.payload.content,
+          isDefault: true,
+        },
+        dirty: true,
+        /** Important to indicate that the key has been synced with a server */
+        updated_at: Date.now(),
+      })
+    );
+    const defaultKey = this.application.protocolService.getDefaultItemsKey();
+    expect(defaultKey.keyVersion).to.equal(ProtocolVersion.V003);
+    expect(defaultKey.uuid).to.equal(key.uuid);
+    await Factory.registerUserToApplication({ application: this.application });
+    expect(
+      await this.application.protocolService.keyToUseForEncryptionOfPayload(
+        note.payload,
+        EncryptionIntent.Sync
+      )
+    ).to.be.ok;
   });
 });

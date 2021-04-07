@@ -173,14 +173,7 @@ export class SNSingletonManager extends PureService {
      * of a download-first request.
      */
     if (handled.length > 0 && eventSource === SyncEvent.FullSyncCompleted) {
-      /**
-       * Do not await. We want any local-side changes to
-       * be awaited but the actual sync shouldn't be since it's non-essential
-       * Perform after timeout so that we can yield to event notifier that triggered us
-       */
-      setTimeout(() => {
-        this.syncService?.sync();
-      });
+      await this.syncService?.sync();
     }
   }
 

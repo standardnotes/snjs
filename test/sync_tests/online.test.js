@@ -114,13 +114,13 @@ describe('online syncing', function () {
     await Factory.sleep(0.5);
   }).timeout(20000);
 
-  it('marking all items as needing sync with alternation should delete original payload', async function () {
+  it('uuid alternation should delete original payload', async function () {
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
-    await this.application.syncService.markAllItemsAsNeedingSync(true);
+    await this.application.syncService.alternateUuidForItem(note.uuid);
     await this.application.sync(syncOptions);
 
     const notes = this.application.itemManager.notes;
@@ -128,7 +128,7 @@ describe('online syncing', function () {
     expect(notes[0].uuid).to.not.equal(note.uuid);
   });
 
-  it('having offline data then signing in should alternate uuid and merge with account', async function () {
+  it('having offline data then signing in should not alternate uuid and merge with account', async function () {
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
@@ -144,7 +144,7 @@ describe('online syncing', function () {
     const notes = this.application.itemManager.notes;
     expect(notes.length).to.equal(1);
     /** uuid should have been alternated */
-    expect(notes[0].uuid).to.not.equal(note.uuid);
+    expect(notes[0].uuid).to.equal(note.uuid);
   });
 
   it('server extensions should not be encrypted for sync', async function () {
@@ -502,7 +502,7 @@ describe('online syncing', function () {
   it('marking an item dirty then saving to disk should retain that dirty state when restored', async function () {
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
-    await this.application.syncService.markAllItemsAsNeedingSync(false);
+    await this.application.syncService.markAllItemsAsNeedingSync();
 
     this.application.itemManager.resetState();
     this.application.payloadManager.resetState();

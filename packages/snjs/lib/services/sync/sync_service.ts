@@ -1,3 +1,4 @@
+import { SNItemsKey } from '@Models/app/items_key';
 import { SNHistoryManager } from './../history/history_manager';
 import { SyncEvent } from '@Services/sync/events';
 import { StorageKey } from '@Lib/storage_keys';
@@ -91,7 +92,7 @@ export type SyncOptions = {
 };
 
 type SyncPromise = {
-  resolve: (value?: any) => void;
+  resolve: (value?: unknown) => void;
   reject: () => void;
   options?: SyncOptions;
 };
@@ -139,7 +140,8 @@ export class SNSyncService extends PureService<
   private cursorToken?: string;
 
   private syncLock = false;
-  private _simulate_latency?: any;
+  private _simulate_latency?: { latency: number; enabled: boolean };
+  private dealloced = false;
 
   /** Content types appearing first are always mapped first */
   private readonly localLoadPriorty = [
@@ -176,13 +178,14 @@ export class SNSyncService extends PureService<
    * If the database has been newly created (because its new or was previously destroyed)
    * we want to reset any sync tokens we have.
    */
-  public async onNewDatabaseCreated() {
+  public async onNewDatabaseCreated(): Promise<void> {
     if (await this.getLastSyncToken()) {
       await this.clearSyncPositionTokens();
     }
   }
 
-  public deinit() {
+  public deinit(): void {
+    this.dealloced = true;
     (this.sessionManager as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
     (this.protocolService as unknown) = undefined;
@@ -191,9 +194,9 @@ export class SNSyncService extends PureService<
     (this.apiService as unknown) = undefined;
     this.interval = undefined;
     this.state!.reset();
-    this.opStatus!.reset();
+    this.opStatus.reset();
     this.state = undefined;
-    (this.opStatus as any) = undefined;
+    (this.opStatus as unknown) = undefined;
     this.resolveQueue.length = 0;
     this.spawnQueue.length = 0;
     super.deinit();
@@ -215,34 +218,34 @@ export class SNSyncService extends PureService<
     }, this.maxDiscordance);
   }
 
-  public lockSyncing() {
+  public lockSyncing(): void {
     this.locked = true;
   }
 
-  public unlockSyncing() {
+  public unlockSyncing(): void {
     this.locked = false;
   }
 
-  public isOutOfSync() {
+  public isOutOfSync(): boolean {
     return this.state!.isOutOfSync();
   }
 
-  public getLastSyncDate() {
+  public getLastSyncDate(): Date | undefined {
     return this.state!.lastSyncDate;
   }
 
-  public getStatus() {
+  public getStatus(): SyncOpStatus {
     return this.opStatus;
   }
 
   /**
    * Called by application when sign in or registration occurs.
    */
-  public resetSyncState() {
+  public resetSyncState(): void {
     this.state!.reset();
   }
 
-  public isDatabaseLoaded() {
+  public isDatabaseLoaded(): boolean {
     return this.databaseLoaded;
   }
 
@@ -290,7 +293,7 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
-    const decryptedItemsKeys = await this.protocolService!.payloadsByDecryptingPayloads(
+    const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
       itemsKeysPayloads
     );
     await this.payloadManager.emitPayloads(
@@ -307,7 +310,7 @@ export class SNSyncService extends PureService<
         currentPosition,
         currentPosition + batchSize
       );
-      const decrypted = await this.protocolService!.payloadsByDecryptingPayloads(
+      const decrypted = await this.protocolService.payloadsByDecryptingPayloads(
         batch
       );
       await this.payloadManager.emitPayloads(
@@ -383,24 +386,9 @@ export class SNSyncService extends PureService<
 
   /**
    * Mark all items as dirty and needing sync, then persist to storage.
-   * @param alternateUuids
-   * In the case of signing in and merging local data, we alternate UUIDs
-   * to avoid overwriting data a user may retrieve that has the same UUID.
-   * Alternating here forces us to to create duplicates of the items instead.
    */
-  public async markAllItemsAsNeedingSync(alternateUuids: boolean) {
+  public async markAllItemsAsNeedingSync(): Promise<void> {
     this.log('Marking all items as needing sync');
-    if (alternateUuids) {
-      /** Make a copy of the array, as alternating uuid will affect array */
-      const items = this.itemManager.items
-        .filter((item) => {
-          return !item.errorDecrypting;
-        })
-        .slice();
-      for (const item of items) {
-        await this.alternateUuidForItem(item.uuid);
-      }
-    }
     const items = this.itemManager.items;
     const payloads = items.map((item) => {
       return CreateMaxPayloadFromAnyObject(item, {
@@ -469,12 +457,8 @@ export class SNSyncService extends PureService<
       });
   }
 
-  /**
-   * Certain content types should not be encrypted when sending to server,
-   * such as server extensions
-   */
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
-    return this.protocolService!.payloadsByEncryptingPayloads(
+    return this.protocolService.payloadsByEncryptingPayloads(
       payloads,
       (payload) => {
         return NonEncryptedTypes.includes(payload.content_type!)
@@ -529,7 +513,7 @@ export class SNSyncService extends PureService<
       this.syncLock = false;
     };
 
-    const syncInProgress = this.opStatus!.syncInProgress;
+    const syncInProgress = this.opStatus.syncInProgress;
     const databaseLoaded = this.databaseLoaded;
     const canExecuteSync = !syncLocked();
     if (canExecuteSync && databaseLoaded && !syncInProgress) {
@@ -586,6 +570,9 @@ export class SNSyncService extends PureService<
         throw Error(`Unhandled timing strategy ${useStrategy}`);
       }
     }
+    if (this.dealloced) {
+      return;
+    }
     /** Lock syncing immediately after checking in progress above */
     this.opStatus!.setDidBegin();
     this.notifyEvent(SyncEvent.SyncWillBegin);
@@ -608,7 +595,7 @@ export class SNSyncService extends PureService<
     }
 
     const erroredState =
-      this.protocolService!.hasAccount() !== this.sessionManager!.online();
+      this.protocolService.hasAccount() !== this.sessionManager!.online();
     if (erroredState) {
       this.handleInvalidSessionState();
     }
@@ -764,17 +751,6 @@ export class SNSyncService extends PureService<
     source: SyncSources,
     mode: SyncModes
   ) {
-    this.log(
-      'Syncing online user',
-      'source:',
-      source,
-      'integrity check',
-      checkIntegrity,
-      'mode:',
-      mode,
-      'payloads:',
-      payloads
-    );
     const operation = new AccountSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
@@ -797,7 +773,20 @@ export class SNSyncService extends PureService<
       await this.getLastSyncToken(),
       await this.getPaginationToken(),
       checkIntegrity,
-      this.apiService!
+      this.apiService
+    );
+    this.log(
+      'Syncing online user',
+      'source:',
+      source,
+      'operation id',
+      operation.id,
+      'integrity check',
+      checkIntegrity,
+      'mode:',
+      mode,
+      'payloads:',
+      payloads
     );
     return operation;
   }
@@ -869,22 +858,38 @@ export class SNSyncService extends PureService<
     if (this._simulate_latency) {
       await sleep(this._simulate_latency.latency);
     }
-    this.log('Online Sync Response', response.rawResponse);
+    this.log(
+      'Online Sync Response',
+      'operation id',
+      operation.id,
+      response.rawResponse
+    );
     this.setLastSyncToken(response.lastSyncToken!);
     this.setPaginationToken(response.paginationToken!);
-    this.opStatus!.clearError();
-    this.opStatus!.setDownloadStatus(response.retrievedPayloads.length);
+    this.opStatus.clearError();
+    this.opStatus.setDownloadStatus(response.retrievedPayloads.length);
 
     const decryptedPayloads = [];
-    for (const payload of response.allProcessedPayloads) {
+    const processedPayloads = response.allProcessedPayloads;
+    const processedItemsKeys: Record<UuidString, PurePayload> = {};
+    for (const payload of processedPayloads) {
       if (payload.deleted || !payload.fields.includes(PayloadField.Content)) {
         /* Deleted payloads, and some payload types
           do not contiain content (like remote saved) */
         continue;
       }
-      const decrypted = await this.protocolService!.payloadByDecryptingPayload(
-        payload
+      const itemsKeyPayload: PurePayload | undefined =
+        processedItemsKeys[payload.items_key_id as string];
+      const itemsKey = itemsKeyPayload
+        ? (CreateItemFromPayload(itemsKeyPayload) as SNItemsKey)
+        : undefined;
+      const decrypted = await this.protocolService.payloadByDecryptingPayload(
+        payload,
+        itemsKey
       );
+      if (decrypted.content_type === ContentType.ItemsKey) {
+        processedItemsKeys[decrypted.uuid] = decrypted;
+      }
       decryptedPayloads.push(decrypted);
     }
     const masterCollection = this.payloadManager.getMasterCollection();
@@ -944,7 +949,7 @@ export class SNSyncService extends PureService<
     }
     return this.storageService.savePayloads(payloads).catch((error) => {
       this.notifyEvent(SyncEvent.DatabaseWriteError, error);
-      throw error;
+      SNLog.error(error);
     });
   }
 
@@ -964,7 +969,7 @@ export class SNSyncService extends PureService<
       });
       const dates = items.map((item) => item.updatedAtTimestamp());
       const string = dates.join(',');
-      return this.protocolService!.crypto!.sha256(string);
+      return this.protocolService.crypto.sha256(string);
     } catch (e) {
       console.error('Error computing data integrity hash', e);
       return undefined;
@@ -976,8 +981,8 @@ export class SNSyncService extends PureService<
    */
   public async resolveOutOfSync() {
     const downloader = new AccountDownloader(
-      this.apiService!,
-      this.protocolService!,
+      this.apiService,
+      this.protocolService,
       undefined,
       'resolve-out-of-sync'
     );
@@ -1003,10 +1008,10 @@ export class SNSyncService extends PureService<
   public async statelessDownloadAllItems(
     contentType?: ContentType,
     customEvent?: string
-  ) {
+  ): Promise<SNItem[]> {
     const downloader = new AccountDownloader(
-      this.apiService!,
-      this.protocolService!,
+      this.apiService,
+      this.protocolService,
       contentType,
       customEvent
     );
@@ -1019,19 +1024,19 @@ export class SNSyncService extends PureService<
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_setDatabaseLoaded(loaded: boolean) {
+  ut_setDatabaseLoaded(loaded: boolean): void {
     this.databaseLoaded = loaded;
   }
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_clearLastSyncDate() {
+  ut_clearLastSyncDate(): void {
     this.state!.lastSyncDate = undefined;
   }
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_beginLatencySimulator(latency: number) {
+  ut_beginLatencySimulator(latency: number): void {
     this._simulate_latency = {
       latency: latency || 1000,
       enabled: true,
@@ -1040,7 +1045,7 @@ export class SNSyncService extends PureService<
 
   /** @unit_testing */
   // eslint-disable-next-line camelcase
-  ut_endLatencySimulator() {
-    this._simulate_latency = null;
+  ut_endLatencySimulator(): void {
+    this._simulate_latency = undefined;
   }
 }

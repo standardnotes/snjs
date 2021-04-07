@@ -1,3 +1,9 @@
+import {
+  SNCredentialService,
+  PasswordChangeFunctionResponse,
+  AccountServiceResponse,
+  AccountEvent,
+} from './services/credential_service';
 import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria';
 import { SNKeyRecoveryService } from './services/key_recovery_service';
 import {
@@ -75,25 +81,13 @@ import {
 import { DeviceInterface } from './device_interface';
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
-  CHANGING_PASSCODE,
-  ChallengeStrings,
-  DO_NOT_CLOSE_APPLICATION,
   ErrorAlertStrings,
-  INVALID_PASSWORD,
-  InsufficientPasswordMessage,
-  PasswordChangeStrings,
   ProtocolUpgradeStrings,
-  REMOVING_PASSCODE,
-  SETTING_PASSCODE,
   UNSUPPORTED_BACKUP_FILE_VERSION,
-  UPGRADING_ENCRYPTION,
   SessionStrings,
   ImportStrings,
 } from './services/api/messages';
-import {
-  MINIMUM_PASSWORD_LENGTH,
-  SessionEvent,
-} from './services/api/session_manager';
+import { SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
 import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
@@ -107,7 +101,7 @@ import { ProtectionEvent } from './services/protection_service';
 import { Permission } from '@standardnotes/auth';
 
 /** How often to automatically sync, in milliseconds */
-const DEFAULT_AUTO_SYNC_INTERVAL = 30000;
+const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
 
 type LaunchCallback = {
   receiveChallenge: (challenge: Challenge) => void;
@@ -145,13 +139,14 @@ export class SNApplication {
   private keyRecoveryService!: SNKeyRecoveryService;
   private preferencesService!: SNPreferencesService;
   private permissionsService!: SNPermissionsService;
+  private credentialService!: SNCredentialService;
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService<any, any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
   private managedSubscribers: ObserverRemover[] = [];
-  private autoSyncInterval: any;
+  private autoSyncInterval!: number;
 
   /** True if the result of deviceInterface.openDatabase yields a new database being created */
   private createdNewDatabase = false;
@@ -161,8 +156,6 @@ export class SNApplication {
   private launched = false;
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false;
-  private signingIn = false;
-  private registering = false;
 
   /**
    * @param environment The Environment that identifies your application.
@@ -316,7 +309,7 @@ export class SNApplication {
         }
         await this.handleStage(ApplicationStage.LoadedDatabase_12);
         this.beginAutoSyncTimer();
-        return this.syncService.sync({
+        await this.syncService.sync({
           mode: SyncModes.DownloadFirst,
         });
       });
@@ -545,29 +538,29 @@ export class SNApplication {
    * sees of the item.
    */
   public async setItemNeedsSync(item: SNItem, isUserModified = false) {
-    return this.itemManager!.setItemDirty(item.uuid, isUserModified);
+    return this.itemManager.setItemDirty(item.uuid, isUserModified);
   }
 
   public async setItemsNeedsSync(items: SNItem[]) {
-    return this.itemManager!.setItemsDirty(Uuids(items));
+    return this.itemManager.setItemsDirty(Uuids(items));
   }
 
   public async deleteItem(item: SNItem) {
-    await this.itemManager!.setItemToBeDeleted(item.uuid);
+    await this.itemManager.setItemToBeDeleted(item.uuid);
     return this.sync();
   }
 
   public async deleteItemLocally(item: SNItem) {
-    this.itemManager!.removeItemLocally(item);
+    this.itemManager.removeItemLocally(item);
   }
 
   public async emptyTrash() {
-    await this.itemManager!.emptyTrash();
+    await this.itemManager.emptyTrash();
     return this.sync();
   }
 
   public getTrashedItems() {
-    return this.itemManager!.trashedItems;
+    return this.itemManager.trashedItems;
   }
 
   public setDisplayOptions<T extends SNItem>(
@@ -575,16 +568,16 @@ export class SNApplication {
     sortBy?: CollectionSort,
     direction?: SortDirection,
     filter?: (element: T) => boolean
-  ) {
-    this.itemManager!.setDisplayOptions(contentType, sortBy, direction, filter);
+  ): void {
+    this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
   public setNotesDisplayCriteria(criteria: NotesDisplayCriteria) {
-    this.itemManager!.setNotesDisplayCriteria(criteria);
+    this.itemManager.setNotesDisplayCriteria(criteria);
   }
 
   public getDisplayableItems(contentType: ContentType) {
-    return this.itemManager!.getDisplayableItems(contentType);
+    return this.itemManager.getDisplayableItems(contentType);
   }
 
   /**
@@ -593,9 +586,9 @@ export class SNApplication {
    */
   public async insertItem(item: SNItem) {
     /* First insert the item */
-    const insertedItem = await this.itemManager!.insertItem(item);
+    const insertedItem = await this.itemManager.insertItem(item);
     /* Now change the item so that it's marked as dirty */
-    await this.itemManager!.changeItems([insertedItem.uuid]);
+    await this.itemManager.changeItems([insertedItem.uuid]);
     return this.findItem(item.uuid)!;
   }
 
@@ -604,16 +597,12 @@ export class SNApplication {
    * and performing a sync request.
    */
   public async saveItem(uuid: UuidString) {
-    const item = this.itemManager!.findItem(uuid);
+    const item = this.itemManager.findItem(uuid);
     if (!item) {
       throw Error('Attempting to save non-inserted item');
     }
     if (!item.dirty) {
-      await this.itemManager!.changeItem(
-        uuid,
-        undefined,
-        MutationType.Internal
-      );
+      await this.itemManager.changeItem(uuid, undefined, MutationType.Internal);
     }
     await this.syncService!.sync();
   }
@@ -631,7 +620,7 @@ export class SNApplication {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
     }
-    await this.itemManager!.changeItems(
+    await this.itemManager.changeItems(
       [uuid],
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined,
@@ -651,7 +640,7 @@ export class SNApplication {
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
   ) {
-    await this.itemManager!.changeItems(
+    await this.itemManager.changeItems(
       uuids,
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined,
@@ -671,7 +660,7 @@ export class SNApplication {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
     }
-    await this.itemManager!.changeItems(
+    await this.itemManager.changeItems(
       [uuid],
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined
@@ -687,7 +676,7 @@ export class SNApplication {
     mutate?: (mutator: M) => void,
     isUserModified = true
   ) {
-    return this.itemManager!.changeItems(
+    return this.itemManager.changeItems(
       uuids,
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined
@@ -709,16 +698,16 @@ export class SNApplication {
   }
 
   public getItems(contentType: ContentType | ContentType[]) {
-    return this.itemManager!.getItems(contentType);
+    return this.itemManager.getItems(contentType);
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    return this.itemManager!.notesMatchingSmartTag(smartTag);
+    return this.itemManager.notesMatchingSmartTag(smartTag);
   }
 
   /** Returns an item's direct references */
   public referencesForItem(item: SNItem, contentType?: ContentType) {
-    let references = this.itemManager!.referencesForItem(item.uuid);
+    let references = this.itemManager.referencesForItem(item.uuid);
     if (contentType) {
       references = references.filter((ref) => {
         return ref?.content_type === contentType;
@@ -729,7 +718,7 @@ export class SNApplication {
 
   /** Returns items referencing an item */
   public referencingForItem(item: SNItem, contentType?: ContentType): SNItem[] {
-    let references = this.itemManager!.itemsReferencingItem(item.uuid);
+    let references = this.itemManager.itemsReferencingItem(item.uuid);
     if (contentType) {
       references = references.filter((ref) => {
         return ref?.content_type === contentType;
@@ -752,19 +741,19 @@ export class SNApplication {
   }
 
   public findTagByTitle(title: string): SNTag | undefined {
-    return this.itemManager!.findTagByTitle(title);
+    return this.itemManager.findTagByTitle(title);
   }
 
   public async findOrCreateTag(title: string): Promise<SNTag> {
-    return this.itemManager!.findOrCreateTagByTitle(title);
+    return this.itemManager.findOrCreateTagByTitle(title);
   }
 
   public getSmartTags(): SNSmartTag[] {
-    return this.itemManager!.getSmartTags();
+    return this.itemManager.getSmartTags();
   }
 
   public getNoteCount(): number {
-    return this.itemManager!.noteCount;
+    return this.itemManager.noteCount;
   }
 
   /**
@@ -776,7 +765,7 @@ export class SNApplication {
     contentType: ContentType | ContentType[],
     stream: ItemStream
   ): () => void {
-    const observer = this.itemManager!.addObserver(
+    const observer = this.itemManager.addObserver(
       contentType,
       (changed, inserted, discarded, _ignored, source) => {
         const all = changed.concat(inserted).concat(discarded);
@@ -784,7 +773,7 @@ export class SNApplication {
       }
     );
     /** Push current values now */
-    const matches = this.itemManager!.getItems(contentType);
+    const matches = this.itemManager.getItems(contentType);
     if (matches.length > 0) {
       stream(matches);
     }
@@ -844,89 +833,6 @@ export class SNApplication {
     return this.hasAccount() || this.hasPasscode();
   }
 
-  private async performProtocolUpgrade(): Promise<{
-    success?: true;
-    canceled?: true;
-    error?: { message: string };
-  }> {
-    const hasPasscode = this.hasPasscode();
-    const hasAccount = this.hasAccount();
-    const prompts = [];
-    if (hasPasscode) {
-      prompts.push(
-        new ChallengePrompt(
-          ChallengeValidation.LocalPasscode,
-          undefined,
-          ChallengeStrings.LocalPasscodePlaceholder
-        )
-      );
-    }
-    if (hasAccount) {
-      prompts.push(
-        new ChallengePrompt(
-          ChallengeValidation.AccountPassword,
-          undefined,
-          ChallengeStrings.AccountPasswordPlaceholder
-        )
-      );
-    }
-    const challenge = new Challenge(
-      prompts,
-      ChallengeReason.ProtocolUpgrade,
-      true
-    );
-    const response = await this.challengeService.promptForChallengeResponse(
-      challenge
-    );
-    if (!response) {
-      return { canceled: true };
-    }
-    const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
-      UPGRADING_ENCRYPTION
-    );
-    try {
-      let passcode: string | undefined;
-      if (hasPasscode) {
-        /* Upgrade passcode version */
-        const value = response.getValueForType(
-          ChallengeValidation.LocalPasscode
-        );
-        passcode = value.value as string;
-      }
-      if (hasAccount) {
-        /* Upgrade account version */
-        const value = response.getValueForType(
-          ChallengeValidation.AccountPassword
-        );
-        const password = value.value as string;
-        const changeResponse = await this.changePassword(
-          password,
-          password,
-          passcode,
-          KeyParamsOrigination.ProtocolUpgrade,
-          { validatePasswordStrength: false }
-        );
-        if (changeResponse?.error) {
-          return { error: changeResponse.error };
-        }
-      }
-      if (hasPasscode) {
-        /* Upgrade passcode version */
-        await this.removePasscodeWithoutWarning();
-        await this.setPasscodeWithoutWarning(
-          passcode!,
-          KeyParamsOrigination.ProtocolUpgrade
-        );
-      }
-      return { success: true };
-    } catch (error) {
-      return { error };
-    } finally {
-      dismissBlockingDialog();
-    }
-  }
-
   public async upgradeProtocolVersion(): Promise<{
     success?: true;
     canceled?: true;
@@ -934,7 +840,7 @@ export class SNApplication {
       message: string;
     };
   }> {
-    const result = await this.performProtocolUpgrade();
+    const result = await this.credentialService.performProtocolUpgrade();
     if (result.success) {
       if (this.hasAccount()) {
         void this.alertService.alert(ProtocolUpgradeStrings.SuccessAccount);
@@ -1055,7 +961,7 @@ export class SNApplication {
             true
           ),
         ],
-        ChallengeReason.ImportEncryptedFile,
+        ChallengeReason.DecryptEncryptedFile,
         true
       );
       const passwordResponse = await this.challengeService.promptForChallengeResponse(
@@ -1072,7 +978,6 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
       data,
       password
@@ -1136,16 +1041,8 @@ export class SNApplication {
     return this.protocolService.createBackupFile(intent);
   }
 
-  public isEphemeralSession() {
-    return this.storageService!.isEphemeralSession();
-  }
-
-  private lockSyncing() {
-    this.syncService!.lockSyncing();
-  }
-
-  private unlockSyncing() {
-    this.syncService!.unlockSyncing();
+  public isEphemeralSession(): boolean {
+    return this.storageService.isEphemeralSession();
   }
 
   public sync(options?: SyncOptions): Promise<any> {
@@ -1200,28 +1097,6 @@ export class SNApplication {
 
   public hasPermission(permission: Permission): boolean {
     return this.permissionsService.hasPermission(permission);
-  }
-
-  /**
-   * Deletes all payloads from storage.
-   */
-  public async clearDatabase(): Promise<void> {
-    return this.storageService.clearAllPayloads();
-  }
-
-  /**
-   * Allows items keys to be rewritten to local db on local credential status change,
-   * such as if passcode is added, changed, or removed.
-   * This allows IndexedDB unencrypted logs to be deleted
-   * `deletePayloads` will remove data from backing store,
-   * but not from working memory See:
-   * https://github.com/standardnotes/desktop/issues/131
-   */
-  private async rewriteItemsKeys() {
-    const itemsKeys = this.itemManager.itemsKeys();
-    const payloads = itemsKeys.map((key) => key.payloadRepresentation());
-    await this.storageService.deletePayloads(payloads);
-    await this.syncService.persistPayloads(payloads);
   }
 
   /**
@@ -1295,7 +1170,6 @@ export class SNApplication {
     this.clearServices();
     this.dealloced = true;
     this.started = false;
-    this.signingIn = false;
   }
 
   /**
@@ -1307,45 +1181,13 @@ export class SNApplication {
     password: string,
     ephemeral = false,
     mergeLocal = true
-  ) {
-    if (this.hasAccount()) {
-      throw Error('Tried to register when an account already exists.');
-    }
-    if (this.registering) {
-      throw Error('Already registering.');
-    }
-    this.registering = true;
-    try {
-      this.lockSyncing();
-      const result = await this.sessionManager.register(
-        email,
-        password,
-        ephemeral
-      );
-      if (!result.response.error) {
-        this.syncService!.resetSyncState();
-        await this.storageService!.setPersistencePolicy(
-          ephemeral
-            ? StoragePersistencePolicies.Ephemeral
-            : StoragePersistencePolicies.Default
-        );
-        if (mergeLocal) {
-          await this.syncService!.markAllItemsAsNeedingSync(true);
-        } else {
-          this.itemManager!.removeAllItemsFromMemory();
-          await this.clearDatabase();
-        }
-        await this.notifyEvent(ApplicationEvent.SignedIn);
-        this.unlockSyncing();
-        await this.syncService.downloadFirstSync(300);
-        this.protocolService.decryptErroredItems();
-      } else {
-        this.unlockSyncing();
-      }
-      return result.response;
-    } finally {
-      this.registering = false;
-    }
+  ): Promise<AccountServiceResponse> {
+    return this.credentialService.register(
+      email,
+      password,
+      ephemeral,
+      mergeLocal
+    );
   }
 
   /**
@@ -1359,157 +1201,35 @@ export class SNApplication {
     ephemeral = false,
     mergeLocal = true,
     awaitSync = false
-  ) {
-    if (this.hasAccount()) {
-      throw Error('Tried to sign in when an account already exists.');
-    }
-    if (this.signingIn) {
-      throw Error('Already signing in.');
-    }
-    this.signingIn = true;
-    try {
-      /** Prevent a timed sync from occuring while signing in. */
-      this.lockSyncing();
-      const result = await this.sessionManager.signIn(
-        email,
-        password,
-        strict,
-        ephemeral
-      );
-      if (!result.response.error) {
-        this.syncService.resetSyncState();
-        await this.storageService.setPersistencePolicy(
-          ephemeral
-            ? StoragePersistencePolicies.Ephemeral
-            : StoragePersistencePolicies.Default
-        );
-        if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync(true);
-        } else {
-          void this.itemManager.removeAllItemsFromMemory();
-          await this.clearDatabase();
-        }
-        await this.notifyEvent(ApplicationEvent.SignedIn);
-        this.unlockSyncing();
-        const syncPromise = this.syncService.downloadFirstSync(1_000, {
-          checkIntegrity: true,
-          awaitAll: awaitSync,
-        });
-        if (awaitSync) {
-          await syncPromise;
-          await this.protocolService.decryptErroredItems();
-        } else {
-          this.protocolService.decryptErroredItems();
-        }
-      } else {
-        this.unlockSyncing();
-      }
-      return result.response;
-    } finally {
-      this.signingIn = false;
-    }
+  ): Promise<AccountServiceResponse> {
+    return this.credentialService.signIn(
+      email,
+      password,
+      strict,
+      ephemeral,
+      mergeLocal,
+      awaitSync
+    );
   }
 
-  /**
-   * @param passcode - Changing the account password requires the local
-   * passcode if configured (to rewrap the account key with passcode). If the passcode
-   * is not passed in, the user will be prompted for the passcode. However if the consumer
-   * already has reference to the passcode, they can pass it in here so that the user
-   * is not prompted again.
-   */
   public async changePassword(
     currentPassword: string,
     newPassword: string,
     passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
     { validatePasswordStrength = true } = {}
-  ) {
-    const result = await this.performPasswordChange(
+  ): Promise<PasswordChangeFunctionResponse> {
+    return this.credentialService.changePassword(
       currentPassword,
       newPassword,
       passcode,
       origination,
       { validatePasswordStrength }
     );
-    if (result.error) {
-      void this.alertService.alert(result.error.message);
-    }
-    return result;
-  }
-
-  private async performPasswordChange(
-    currentPassword: string,
-    newPassword: string,
-    passcode?: string,
-    origination = KeyParamsOrigination.PasswordChange,
-    { validatePasswordStrength = true } = {}
-  ): Promise<{ error?: { message: string } }> {
-    const {
-      wrappingKey,
-      canceled,
-    } = await this.challengeService.getWrappingKeyIfApplicable(passcode);
-    if (canceled) {
-      return { error: Error(PasswordChangeStrings.PasscodeRequired) };
-    }
-    if (validatePasswordStrength) {
-      if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
-        return {
-          error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)),
-        };
-      }
-    }
-    const accountPasswordValidation = await this.protocolService.validateAccountPassword(
-      currentPassword
-    );
-    if (!accountPasswordValidation.valid) {
-      return {
-        error: Error(INVALID_PASSWORD),
-      };
-    }
-    /** Current root key must be recomputed as persisted value does not contain server password */
-    const currentRootKey = await this.protocolService.computeRootKey(
-      currentPassword,
-      (await this.protocolService.getRootKeyParams())!
-    );
-    const newRootKey = await this.protocolService.createRootKey(
-      this.getUser()!.email!,
-      newPassword,
-      origination
-    );
-    this.lockSyncing();
-    /** Now, change the password on the server. Roll back on failure */
-    const result = await this.sessionManager.changePassword(
-      currentRootKey.serverPassword!,
-      newRootKey,
-      wrappingKey
-    );
-    this.unlockSyncing();
-    if (!result.response.error) {
-      const rollback = await this.protocolService.createNewItemsKeyWithRollback();
-      /** Sync the newly created items key. Roll back on failure */
-      await this.protocolService.reencryptItemsKeys();
-      await this.syncService.sync({ awaitAll: true });
-      const itemsKeyWasSynced = !this.protocolService.getDefaultItemsKey()!
-        .neverSynced;
-      if (!itemsKeyWasSynced) {
-        await this.sessionManager.changePassword(
-          newRootKey.serverPassword!,
-          currentRootKey,
-          wrappingKey
-        );
-        await this.protocolService.reencryptItemsKeys();
-        await rollback();
-        await this.syncService.sync({ awaitAll: true });
-        return { error: Error(PasswordChangeStrings.Failed) };
-      }
-    }
-    return result.response;
   }
 
   public async signOut(): Promise<void> {
-    await this.sessionManager.signOut();
-    await this.protocolService.clearLocalKeyState();
-    await this.storageService.clearAllData();
+    await this.credentialService.signOut();
     await this.notifyEvent(ApplicationEvent.SignedOut);
     await this.prepareForDeinit();
     this.deinit(DeinitSource.SignOut);
@@ -1567,93 +1287,22 @@ export class SNApplication {
     return this.deinit(DeinitSource.Lock);
   }
 
-  /**
-   * @returns whether the passcode was successfuly added or not
-   */
-  public async addPasscode(passcode: string): Promise<boolean> {
-    if (!(await this.protectionService.authorizeAddingPasscode())) {
-      return false;
-    }
-
-    const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
-      SETTING_PASSCODE
-    );
-    try {
-      await this.setPasscodeWithoutWarning(
-        passcode,
-        KeyParamsOrigination.PasscodeCreate
-      );
-      return true;
-    } finally {
-      dismissBlockingDialog();
-    }
+  public addPasscode(passcode: string): Promise<boolean> {
+    return this.credentialService.addPasscode(passcode);
   }
 
   /**
-   * @returns whether the passcode was successfuly removed or not
+   * @returns whether the passcode was successfuly removed
    */
   public async removePasscode(): Promise<boolean> {
-    if (!(await this.protectionService.authorizeRemovingPasscode())) {
-      return false;
-    }
-
-    const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
-      REMOVING_PASSCODE
-    );
-    try {
-      await this.removePasscodeWithoutWarning();
-      return true;
-    } finally {
-      dismissBlockingDialog();
-    }
+    return this.credentialService.removePasscode();
   }
 
-  /**
-   * @returns whether the passcode was successfuly changed or not
-   */
   public async changePasscode(
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
-    if (!(await this.protectionService.authorizeChangingPasscode())) {
-      return false;
-    }
-
-    const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
-      origination === KeyParamsOrigination.ProtocolUpgrade
-        ? ProtocolUpgradeStrings.UpgradingPasscode
-        : CHANGING_PASSCODE
-    );
-    try {
-      await this.removePasscodeWithoutWarning();
-      await this.setPasscodeWithoutWarning(newPasscode, origination);
-      return true;
-    } finally {
-      dismissBlockingDialog();
-    }
-  }
-
-  private async setPasscodeWithoutWarning(
-    passcode: string,
-    origination: KeyParamsOrigination
-  ) {
-    const identifier = await this.generateUuid();
-    const key = await this.protocolService.createRootKey(
-      identifier,
-      passcode,
-      origination
-    );
-    await this.protocolService.setNewRootKeyWrapper(key);
-    await this.rewriteItemsKeys();
-    await this.syncService.sync();
-  }
-
-  private async removePasscodeWithoutWarning() {
-    await this.protocolService.removeRootKeyWrapper();
-    await this.rewriteItemsKeys();
+    return this.credentialService.changePasscode(newPasscode, origination);
   }
 
   public getStorageEncryptionPolicy(): StorageEncryptionPolicies {
@@ -1720,10 +1369,11 @@ export class SNApplication {
     this.createMigrationService();
     this.createHistoryManager();
     this.createSyncManager();
+    this.createProtectionService();
+    this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createComponentManager();
-    this.createProtectionService();
     this.createActionsManager();
     this.createPreferencesService();
   }
@@ -1748,6 +1398,7 @@ export class SNApplication {
     (this.keyRecoveryService as unknown) = undefined;
     (this.preferencesService as unknown) = undefined;
     (this.permissionsService as unknown) = undefined;
+    (this.credentialService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1774,6 +1425,20 @@ export class SNApplication {
       identifier: this.identifier,
     });
     this.services.push(this.migrationService);
+  }
+
+  private createCredentialService(): void {
+    this.credentialService = new SNCredentialService(
+      this.sessionManager,
+      this.syncService,
+      this.storageService,
+      this.itemManager,
+      this.protocolService,
+      this.alertService,
+      this.challengeService,
+      this.protectionService
+    );
+    this.services.push(this.credentialService);
   }
 
   private createApiService() {
@@ -1854,12 +1519,12 @@ export class SNApplication {
       this.itemManager,
       this.payloadManager,
       this.apiService,
-      this.sessionManager,
       this.protocolService,
       this.challengeService,
       this.alertService,
       this.storageService,
-      this.syncService
+      this.syncService,
+      this.credentialService
     );
     this.services.push(this.keyRecoveryService);
   }
@@ -1878,7 +1543,7 @@ export class SNApplication {
           case SessionEvent.Restored: {
             void (async () => {
               await this.sync();
-              if (await this.protocolService.needsNewRootKeyBasedItemsKey()) {
+              if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
                 void this.protocolService.createNewDefaultItemsKey();
               }
             })();
@@ -1970,6 +1635,19 @@ export class SNApplication {
       this.payloadManager,
       this.protocolService,
       this.syncService
+    );
+    this.serviceObservers.push(
+      this.credentialService.addEventObserver((event) => {
+        switch (event) {
+          case AccountEvent.SignedInOrRegistered: {
+            void this.notifyEvent(ApplicationEvent.SignedIn);
+            break;
+          }
+          default: {
+            assertUnreachable(event);
+          }
+        }
+      })
     );
     this.services.push(this.actionsManager);
   }

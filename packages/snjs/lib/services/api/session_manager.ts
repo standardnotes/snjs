@@ -15,10 +15,13 @@ import {
   RegistrationResponse,
   SignInResponse,
   StatusCode,
+  User,
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
-import { SNStorageService } from './../storage_service';
+import {
+  SNStorageService,
+} from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import {
   AnyKeyParamsContent,
@@ -47,11 +50,6 @@ type SessionManagerResponse = {
   response: HttpResponse;
   rootKey?: SNRootKey;
   keyParams?: AnyKeyParamsContent;
-};
-
-type User = {
-  uuid: string;
-  email?: string;
 };
 
 const cleanedEmailString = (email: string) => {
@@ -104,7 +102,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       /** @legacy Check for uuid. */
       const uuid = await this.storageService!.getValue(StorageKey.LegacyUuid);
       if (uuid) {
-        this.user = { uuid: uuid };
+        this.user = { uuid: uuid, email: uuid };
       }
     }
 

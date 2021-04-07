@@ -87,7 +87,7 @@ export async function setOldVersionPasscode({
     KeyParamsOrigination.PasscodeCreate
   );
   await application.protocolService.setNewRootKeyWrapper(key);
-  await application.rewriteItemsKeys();
+  await application.credentialService.rewriteItemsKeys();
   await application.syncService.sync(syncOptions);
 }
 
@@ -166,8 +166,8 @@ export function createMappedTag(application) {
   );
 }
 
-export async function createSyncedNote(application) {
-  const payload = createNotePayload();
+export async function createSyncedNote(application, title, text) {
+  const payload = createNotePayload(title, text);
   await application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
@@ -231,6 +231,13 @@ export async function signOutAndBackIn(application, email, password) {
     email,
     password,
   });
+  return newApplication;
+}
+
+export async function restartApplication(application) {
+  const id = application.identifier;
+  await application.deinit();
+  const newApplication = await createAndInitializeApplication(id);
   return newApplication;
 }
 
