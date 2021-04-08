@@ -1,4 +1,3 @@
-export * from './Event/DomainEventFactoryInterface'
 export * from './Event/DomainEventInterface'
 export * from './Event/DropboxBackupFailedEvent'
 export * from './Event/DropboxBackupFailedEventPayload'
