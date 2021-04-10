@@ -84,10 +84,8 @@ export class SNHistoryManager extends PureService {
     super();
     this.removeChangeObserver = this.itemManager.addObserver(
       this.historyTypes,
-      (changed) => {
-        if (changed.length > 0) {
-          this.recordNewHistoryForItems(changed);
-        }
+      (changed, inserted) => {
+        this.recordNewHistoryForItems(changed.concat(inserted));
       }
     );
   }

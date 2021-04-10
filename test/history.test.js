@@ -97,6 +97,32 @@ describe('history manager', () => {
       );
     });
 
+    it('first change should create revision with previous value', async function () {
+      const identifier = this.application.identifier;
+      const item = await Factory.createSyncedNote(this.application);
+      this.application.deinit();
+
+      /** Simulate loading new application session */
+      const context = await Factory.createAppContext(identifier);
+      await context.launch();
+      expect(context.application.historyManager.sessionHistoryForItem(item).length).to.equal(
+        0
+      );
+      await context.application.changeAndSaveItem(
+        item.uuid,
+        (mutator) => {
+          mutator.title = Math.random();
+        },
+        undefined,
+        undefined,
+        syncOptions
+      );
+      const entries = context.application.historyManager.sessionHistoryForItem(item);
+      expect(entries.length).to.equal(1);
+      expect(entries[0].payload.content.title).to.equal(item.content.title);
+      context.deinit();
+    });
+
     it('should optimize basic entries', async function () {
       let item = await Factory.createSyncedNote(this.application);
       /**
