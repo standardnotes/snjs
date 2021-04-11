@@ -1,3 +1,5 @@
+import { SyncOpStatus } from './services/sync/sync_op_status';
+import { createMutatorForItem } from '@Lib/models/mutator';
 import {
   SNCredentialService,
   PasswordChangeFunctionResponse,
@@ -93,7 +95,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { HttpResponse } from './services/api/responses';
+import { HttpResponse, User } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
@@ -478,7 +480,6 @@ export class SNApplication {
 
   /**
    * Creates an unmanaged item that can be added later.
-   * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
   public async createTemplateItem(
     contentType: ContentType,
@@ -505,12 +506,12 @@ export class SNApplication {
   /**
    * @returns The date of last sync
    */
-  public getLastSyncDate() {
-    return this.syncService!.getLastSyncDate();
+  public getLastSyncDate(): Date | undefined {
+    return this.syncService.getLastSyncDate();
   }
 
-  public getSyncStatus() {
-    return this.syncService!.getStatus()!;
+  public getSyncStatus(): SyncOpStatus {
+    return this.syncService.getStatus();
   }
 
   public getSessions(): Promise<HttpResponse<RemoteSession[]>> {
@@ -537,29 +538,34 @@ export class SNApplication {
    * @param isUserModified  Whether to change the modified date the user
    * sees of the item.
    */
-  public async setItemNeedsSync(item: SNItem, isUserModified = false) {
+  public async setItemNeedsSync(
+    item: SNItem,
+    isUserModified = false
+  ): Promise<SNItem | undefined> {
     return this.itemManager.setItemDirty(item.uuid, isUserModified);
   }
 
-  public async setItemsNeedsSync(items: SNItem[]) {
+  public async setItemsNeedsSync(
+    items: SNItem[]
+  ): Promise<(SNItem | undefined)[]> {
     return this.itemManager.setItemsDirty(Uuids(items));
   }
 
-  public async deleteItem(item: SNItem) {
+  public async deleteItem(item: SNItem): Promise<void> {
     await this.itemManager.setItemToBeDeleted(item.uuid);
-    return this.sync();
+    await this.sync();
   }
 
-  public async deleteItemLocally(item: SNItem) {
+  public deleteItemLocally(item: SNItem): void {
     this.itemManager.removeItemLocally(item);
   }
 
-  public async emptyTrash() {
+  public async emptyTrash(): Promise<void> {
     await this.itemManager.emptyTrash();
-    return this.sync();
+    await this.sync();
   }
 
-  public getTrashedItems() {
+  public getTrashedItems(): SNNote[] {
     return this.itemManager.trashedItems;
   }
 
@@ -572,11 +578,11 @@ export class SNApplication {
     this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
-  public setNotesDisplayCriteria(criteria: NotesDisplayCriteria) {
+  public setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void {
     this.itemManager.setNotesDisplayCriteria(criteria);
   }
 
-  public getDisplayableItems(contentType: ContentType) {
+  public getDisplayableItems(contentType: ContentType): SNItem[] {
     return this.itemManager.getDisplayableItems(contentType);
   }
 
@@ -584,19 +590,20 @@ export class SNApplication {
    * Inserts the input item by its payload properties, and marks the item as dirty.
    * A sync is not performed after an item is inserted. This must be handled by the caller.
    */
-  public async insertItem(item: SNItem) {
-    /* First insert the item */
-    const insertedItem = await this.itemManager.insertItem(item);
-    /* Now change the item so that it's marked as dirty */
-    await this.itemManager.changeItems([insertedItem.uuid]);
-    return this.findItem(item.uuid)!;
+  public async insertItem(item: SNItem): Promise<SNItem> {
+    const mutator = createMutatorForItem(item, MutationType.UserInteraction);
+    const dirtiedPayload = mutator.getResult();
+    const insertedItem = await this.itemManager.emitItemFromPayload(
+      dirtiedPayload
+    );
+    return insertedItem;
   }
 
   /**
    * Saves the item by uuid by finding it, setting it as dirty if its not already,
    * and performing a sync request.
    */
-  public async saveItem(uuid: UuidString) {
+  public async saveItem(uuid: UuidString): Promise<void> {
     const item = this.itemManager.findItem(uuid);
     if (!item) {
       throw Error('Attempting to save non-inserted item');
@@ -604,7 +611,7 @@ export class SNApplication {
     if (!item.dirty) {
       await this.itemManager.changeItem(uuid, undefined, MutationType.Internal);
     }
-    await this.syncService!.sync();
+    await this.syncService.sync();
   }
 
   /**
@@ -616,7 +623,7 @@ export class SNApplication {
     isUserModified = true,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
-  ) {
+  ): Promise<SNItem | undefined> {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
     }
@@ -626,7 +633,7 @@ export class SNApplication {
       isUserModified ? MutationType.UserInteraction : undefined,
       payloadSource
     );
-    await this.syncService!.sync(syncOptions);
+    await this.syncService.sync(syncOptions);
     return this.findItem(uuid);
   }
 
@@ -639,14 +646,14 @@ export class SNApplication {
     isUserModified = true,
     payloadSource?: PayloadSource,
     syncOptions?: SyncOptions
-  ) {
+  ): Promise<void> {
     await this.itemManager.changeItems(
       uuids,
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined,
       payloadSource
     );
-    await this.syncService!.sync(syncOptions);
+    await this.syncService.sync(syncOptions);
   }
 
   /**
@@ -656,7 +663,7 @@ export class SNApplication {
     uuid: UuidString,
     mutate?: (mutator: M) => void,
     isUserModified = true
-  ) {
+  ): Promise<SNItem | undefined> {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
     }
@@ -675,7 +682,7 @@ export class SNApplication {
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
     isUserModified = true
-  ) {
+  ): Promise<(SNItem | undefined)[]> {
     return this.itemManager.changeItems(
       uuids,
       mutate,
@@ -697,16 +704,16 @@ export class SNApplication {
     return unprotectedNote;
   }
 
-  public getItems(contentType: ContentType | ContentType[]) {
+  public getItems(contentType: ContentType | ContentType[]): SNItem[] {
     return this.itemManager.getItems(contentType);
   }
 
-  public notesMatchingSmartTag(smartTag: SNSmartTag) {
+  public notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[] {
     return this.itemManager.notesMatchingSmartTag(smartTag);
   }
 
   /** Returns an item's direct references */
-  public referencesForItem(item: SNItem, contentType?: ContentType) {
+  public referencesForItem(item: SNItem, contentType?: ContentType): SNItem[] {
     let references = this.itemManager.referencesForItem(item.uuid);
     if (contentType) {
       references = references.filter((ref) => {
@@ -788,31 +795,31 @@ export class SNApplication {
    * Activates or deactivates a component, depending on its
    * current state, and syncs.
    */
-  public async toggleComponent(component: SNComponent) {
-    await this.componentManager!.toggleComponent(component);
-    return this.syncService!.sync();
+  public async toggleComponent(component: SNComponent): Promise<void> {
+    await this.componentManager.toggleComponent(component);
+    await this.syncService.sync();
   }
 
   /**
    * Set the server's URL
    */
   public async setHost(host: string): Promise<void> {
-    return this.apiService!.setHost(host);
+    return this.apiService.setHost(host);
   }
 
-  public async getHost(): Promise<string | undefined> {
-    return this.apiService!.getHost();
+  public getHost(): string | undefined {
+    return this.apiService.getHost();
   }
 
-  public getUser() {
+  public getUser(): User | undefined {
     if (!this.launched) {
       throw Error('Attempting to access user before application unlocked');
     }
     return this.sessionManager.getUser();
   }
 
-  public async getProtocolEncryptionDisplayName() {
-    return this.protocolService!.getEncryptionDisplayName();
+  public async getProtocolEncryptionDisplayName(): Promise<string | undefined> {
+    return this.protocolService.getEncryptionDisplayName();
   }
 
   public getUserVersion(): Promise<ProtocolVersion | undefined> {
@@ -1116,32 +1123,34 @@ export class SNApplication {
     }
   }
 
-  public promptForCustomChallenge(challenge: Challenge) {
+  public promptForCustomChallenge(
+    challenge: Challenge
+  ): Promise<ChallengeResponse | undefined> {
     return this.challengeService?.promptForChallengeResponse(challenge);
   }
 
   public addChallengeObserver(
     challenge: Challenge,
     observer: ChallengeObserver
-  ) {
-    return this.challengeService!.addChallengeObserver(challenge, observer);
+  ): () => void {
+    return this.challengeService.addChallengeObserver(challenge, observer);
   }
 
   public submitValuesForChallenge(
     challenge: Challenge,
     values: ChallengeValue[]
-  ) {
-    return this.challengeService!.submitValuesForChallenge(challenge, values);
+  ): Promise<void> {
+    return this.challengeService.submitValuesForChallenge(challenge, values);
   }
 
-  public cancelChallenge(challenge: Challenge) {
-    this.challengeService!.cancelChallenge(challenge);
+  public cancelChallenge(challenge: Challenge): void {
+    this.challengeService.cancelChallenge(challenge);
   }
 
   /** Set a function to be called when this application deinits */
   public setOnDeinit(
     onDeinit: (app: SNApplication, source: DeinitSource) => void
-  ) {
+  ): void {
     this.onDeinit = onDeinit;
   }
 
@@ -1159,7 +1168,7 @@ export class SNApplication {
     for (const service of this.services) {
       service.deinit();
     }
-    this.onDeinit && this.onDeinit!(this, source);
+    this.onDeinit?.(this, source);
     this.onDeinit = undefined;
     (this.crypto as unknown) = undefined;
     this.createdNewDatabase = false;
@@ -1659,7 +1668,7 @@ export class SNApplication {
       this.syncService
     );
     this.serviceObservers.push(
-      this.preferencesService.addEventObserver(async () => {
+      this.preferencesService.addEventObserver(() => {
         void this.notifyEvent(ApplicationEvent.PreferencesChanged);
       })
     );

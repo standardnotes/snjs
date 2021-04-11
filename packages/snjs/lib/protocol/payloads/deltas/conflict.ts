@@ -27,7 +27,7 @@ export class ConflictDelta {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
     const historyEntries = this.historyMap?.[this.basePayload.uuid] || [];
-    const previousRevision = historyMapFunctions.getLatestEntry(historyEntries);
+    const previousRevision = historyMapFunctions.getNewestRevision(historyEntries);
     const strategy = tmpBaseItem.strategyWhenConflictingWithItem(
       tmpApplyItem,
       previousRevision

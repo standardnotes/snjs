@@ -105,9 +105,9 @@ describe('history manager', () => {
       /** Simulate loading new application session */
       const context = await Factory.createAppContext(identifier);
       await context.launch();
-      expect(context.application.historyManager.sessionHistoryForItem(item).length).to.equal(
-        0
-      );
+      expect(
+        context.application.historyManager.sessionHistoryForItem(item).length
+      ).to.equal(0);
       await context.application.changeAndSaveItem(
         item.uuid,
         (mutator) => {
@@ -117,9 +117,40 @@ describe('history manager', () => {
         undefined,
         syncOptions
       );
-      const entries = context.application.historyManager.sessionHistoryForItem(item);
+      const entries = context.application.historyManager.sessionHistoryForItem(
+        item
+      );
       expect(entries.length).to.equal(1);
       expect(entries[0].payload.content.title).to.equal(item.content.title);
+      context.deinit();
+    });
+
+    it('creating new item and making 1 change should create 0 revisions', async function () {
+      const context = await Factory.createAppContext();
+      await context.launch();
+      const item = await context.application.createTemplateItem(
+        ContentType.Note,
+        {
+          references: [],
+        }
+      );
+      await context.application.insertItem(item);
+      expect(
+        context.application.historyManager.sessionHistoryForItem(item).length
+      ).to.equal(0);
+
+      await context.application.changeAndSaveItem(
+        item.uuid,
+        (mutator) => {
+          mutator.title = Math.random();
+        },
+        undefined,
+        undefined,
+        syncOptions
+      );
+      expect(
+        context.application.historyManager.sessionHistoryForItem(item).length
+      ).to.equal(0);
       context.deinit();
     });
 

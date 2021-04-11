@@ -1,3 +1,4 @@
+import { isEmpty } from '@Lib/utils';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 
 export class NoteHistoryEntry extends HistoryEntry {
@@ -16,4 +17,9 @@ export class NoteHistoryEntry extends HistoryEntry {
       return 'Title or metadata changed';
     }
   }
+
+  public isDiscardable(): boolean {
+    return isEmpty(this.payload.safeContent.text);
+  }
+
 }

@@ -24,7 +24,7 @@ import { removeFromArray } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
-import { HistoryMap } from './history_map';
+import { HistoryMap, historyMapFunctions } from './history_map';
 
 const PersistTimeout = 2000;
 
@@ -125,14 +125,15 @@ export class SNHistoryManager extends PureService {
     if (!rawHistory) {
       return historyMap;
     }
-    for (const [uuid, rawHistoryArray] of Object.entries(rawHistory)) {
+    for (const [uuid, historyDescending] of Object.entries(rawHistory)) {
+      const historyAscending = historyDescending.slice().reverse();
       const entries: HistoryEntry[] = [];
-      for (const [index, rawEntry] of rawHistoryArray.entries()) {
+      for (const rawEntry of historyAscending) {
         const payload = CreateSourcedPayloadFromObject(
           rawEntry.payload,
           PayloadSource.SessionHistory
         ) as SurePayload;
-        const previousEntry = entries[index + 1];
+        const previousEntry = historyMapFunctions.getNewestRevision(entries);
         const entry = CreateHistoryEntryForPayload(payload, previousEntry);
         entries.unshift(entry);
       }
@@ -155,7 +156,7 @@ export class SNHistoryManager extends PureService {
         continue;
       }
       const itemHistory = this.history[item.uuid] || [];
-      const latestEntry = itemHistory.length > 0 ? itemHistory[0] : undefined;
+      const latestEntry = historyMapFunctions.getNewestRevision(itemHistory);
       const historyPayload = CreateSourcedPayloadFromObject(
         item,
         PayloadSource.SessionHistory
@@ -164,6 +165,9 @@ export class SNHistoryManager extends PureService {
         historyPayload,
         latestEntry
       );
+      if (currentValueEntry.isDiscardable()) {
+        continue;
+      }
       /**
        * For every change that comes in, first add it to the staging area.
        * Then, only on the next subsequent change do we add this previously

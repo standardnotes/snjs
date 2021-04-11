@@ -56,6 +56,10 @@ export class HistoryEntry {
     return lhs.isItemContentEqualWith(rhs);
   }
 
+  public isDiscardable(): boolean {
+    return false;
+  }
+
   public operationVector(): number {
     /**
      * We'll try to use the value of `textCharDiffLength`

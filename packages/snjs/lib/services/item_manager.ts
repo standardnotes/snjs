@@ -34,6 +34,7 @@ import { ContentType } from '../models/content_types';
 import { ThemeMutator } from '@Lib/models';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
+import { createMutatorForItem } from '@Lib/models/mutator';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -362,27 +363,6 @@ export class ItemManager extends PureService {
     return results[0];
   }
 
-  private createMutatorForItem(item: SNItem, type: MutationType) {
-    switch (item.content_type) {
-      case ContentType.Note:
-        return new NoteMutator(item, type);
-      case ContentType.Tag:
-        return new TagMutator(item, type);
-      case ContentType.Component:
-        return new ComponentMutator(item, type);
-      case ContentType.ActionsExtension:
-        return new ActionsExtensionMutator(item, type);
-      case ContentType.ItemsKey:
-        return new ItemsKeyMutator(item, type);
-      case ContentType.UserPrefs:
-        return new UserPrefsMutator(item, type);
-      case ContentType.Theme:
-        return new ThemeMutator(item, type);
-      default:
-        return new ItemMutator(item, type);
-    }
-  }
-
   /**
    * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
    */
@@ -392,21 +372,21 @@ export class ItemManager extends PureService {
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ) {
+  ): Promise<(SNItem | undefined)[]> {
     const items = this.findItems(uuids as UuidString[], true);
     const payloads = [];
     for (const item of items) {
       if (!item) {
         throw Error('Attempting to change non-existant item');
       }
-      const mutator = this.createMutatorForItem(item, mutationType);
+      const mutator = createMutatorForItem(item, mutationType);
       if (mutate) {
         mutate(mutator as M);
       }
       const payload = mutator.getResult();
       payloads.push(payload);
     }
-    await this.payloadManager!.emitPayloads(
+    await this.payloadManager.emitPayloads(
       payloads,
       payloadSource,
       payloadSourceKey
@@ -548,17 +528,6 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * Inserts the item as-is by reading its payload value. This function will not
-   * modify item in any way (such as marking it as dirty). It is up to the caller
-   * to pass in a dirtied item if that is their intention.
-   */
-  public async insertItem(item: SNItem) {
-    const payload = item.payload;
-    const insertedItem = await this.emitItemFromPayload(payload);
-    return insertedItem;
-  }
-
-  /**
    * Duplicates an item and maps it, thus propagating the item to observers.
    * @param isConflict - Whether to mark the duplicate as a conflict of the original.
    */
@@ -609,16 +578,30 @@ export class ItemManager extends PureService {
     return this.findItem(payload.uuid!)!;
   }
 
+  /**
+   * Create an unmanaged item that can later be inserted via `insertItem`
+   */
   public async createTemplateItem(
     contentType: ContentType,
     content?: PayloadContent
-  ) {
+  ): Promise<SNItem> {
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: await Uuid.GenerateUuid(),
       content_type: contentType,
       content: FillItemContent(content || {}),
     });
     return CreateItemFromPayload(payload);
+  }
+
+  /**
+   * Inserts the item as-is by reading its payload value. This function will not
+   * modify item in any way (such as marking it as dirty). It is up to the caller
+   * to pass in a dirtied item if that is their intention.
+   */
+  public async insertItem(item: SNItem): Promise<SNItem> {
+    const payload = item.payload;
+    const insertedItem = await this.emitItemFromPayload(payload);
+    return insertedItem;
   }
 
   public async emitItemFromPayload(

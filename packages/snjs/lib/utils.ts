@@ -115,6 +115,13 @@ export function isNullOrUndefined(value: unknown): value is null | undefined {
 }
 
 /**
+ * @returns True if the string is empty or undefined
+ */
+ export function isEmpty(string: string): boolean {
+  return !string || string.length === 0;
+}
+
+/**
  * @returns Whether the value is a string
  */
 export function isString(value: any) {
