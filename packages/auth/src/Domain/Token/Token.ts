@@ -1,22 +1,23 @@
+import { Uuid } from "../Uuid/Uuid";
+
 export type Token = {
   user: {
-    uuid: string,
+    uuid: Uuid,
     email: string
   },
   session: {
-    uuid: string,
+    uuid: Uuid,
     api_version: string,
     created_at: string,
     updated_at: string,
     device_info: string
   },
   roles: Array<{
-    uuid: string
+    uuid: Uuid
     name: string
   }>,
   permissions: Array<{
-    uuid: string
+    uuid: Uuid
     name: string
   }>,
 }
-  
