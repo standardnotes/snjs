@@ -48,6 +48,9 @@ services:
 
   api-gateway:
     image: standardnotes/api-gateway:1.4.1
+    depends_on:
+      - syncing-server-ruby
+      - auth
     env_file: docker/api-gateway.env
     environment:
       PORT: 3000

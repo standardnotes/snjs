@@ -6,6 +6,11 @@ upstream syncing-server-js {
     server syncing-server-js:3000;
 }
 
+upstream api-gateway {
+    server api-gateway:3000;
+}
+
+
 server {
     listen 3123;
 
@@ -21,6 +26,10 @@ server {
 
     location ~ ^/session.* {
         proxy_pass http://syncing-server-js;
+    }
+
+    location ~ ^/(auth/methods.*) {
+        proxy_pass http://api-gateway/v1/$1$is_args$args;
     }
 
     location ~ ^/auth.* {
