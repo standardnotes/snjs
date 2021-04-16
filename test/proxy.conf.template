@@ -10,7 +10,6 @@ upstream api-gateway {
     server api-gateway:3000;
 }
 
-
 server {
     listen 3123;
 
