@@ -780,6 +780,8 @@ export class SNComponentManager extends PureService {
       this.handleInstallLocalComponentMessage(component, message);
     } else if (message.action === ComponentAction.DuplicateItem) {
       this.handleDuplicateItemMessage(component, message);
+    } else if (message.action === ComponentAction.ThemesActivated) {
+      this.handleThemesActivatedMessage(component, message);
     }
     for (const handler of this.handlers) {
       if (
@@ -1266,6 +1268,13 @@ export class SNComponentManager extends PureService {
     }
     const targetComponent = this.itemManager!.findItem(message.data.uuid!);
     this.desktopManager.installComponent(targetComponent);
+  }
+
+  handleThemesActivatedMessage(
+    _sourceComponent: SNComponent,
+    _message: ComponentMessage
+  ) {
+    throw 'Must override SNComponentManager.handleThemesActivatedMessage';
   }
 
   runWithPermissions(

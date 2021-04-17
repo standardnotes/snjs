@@ -41,6 +41,7 @@ export enum ComponentAction {
   Reply = 'reply',
   SaveSuccess = 'save-success',
   SaveError = 'save-error',
+  ThemesActivated = 'themes-activated'
 }
 
 export type ComponentPermission = {
