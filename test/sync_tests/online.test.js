@@ -878,6 +878,81 @@ describe('online syncing', function () {
     expect(note.text).to.equal(newText);
   });
 
+  it('marking item dirty after dirty items are prepared for sync but before they are synced should sync again', async function () {
+    /** There is a twilight zone where items needing sync are popped, and then say about 100ms of processing before
+     * we set those items lastSyncBegan. If the item is dirtied in between these times, then item.dirtiedDate will be less than
+     * item.lastSyncBegan, and it will not by synced again.
+     */
+    const expectedSaveCount = 2;
+    let actualSaveCount = 0;
+    /** Create an item and sync it */
+    let note = await Factory.createMappedNote(this.application);
+    this.application.itemManager.addObserver(
+      ContentType.Note,
+      (_changed, _inserted, _discarded, _ignored, source) => {
+        if (source === PayloadSource.RemoteSaved) {
+          actualSaveCount++;
+        }
+      }
+    );
+    this.expectedItemCount++;
+    /** Dont await */
+    const syncRequest = this.application.syncService.sync(syncOptions);
+    /** Dirty the item before lastSyncBegan is set */
+    let didPerformMutatation = false;
+    const newText = `${Math.random()}`;
+    this.application.syncService.addEventObserver(async (eventName) => {
+      if (eventName === SyncEvent.SyncWillBegin && !didPerformMutatation) {
+        didPerformMutatation = true;
+        await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+          mutator.text = newText;
+        });
+      }
+    });
+    await syncRequest;
+    expect(actualSaveCount).to.equal(expectedSaveCount);
+    note = this.application.findItem(note.uuid);
+    expect(note.text).to.equal(newText);
+  });
+
+  it('marking item dirty at exact same time as lastSyncBegan should sync again', async function () {
+    /** Due to lack of nanosecond support in JS, it's possible that two operations complete
+     * within the same millisecond cycle. What happens if you mark an item as dirty at time A and also begin
+     * syncing at time A? It should sync again. */
+    const expectedSaveCount = 2;
+    let actualSaveCount = 0;
+    /** Create an item and sync it */
+    let note = await Factory.createMappedNote(this.application);
+    let didPerformMutatation = false;
+    const newText = `${Math.random()}`;
+    this.application.itemManager.addObserver(
+      ContentType.Note,
+      async (changed, _inserted, _discarded, _ignored, source) => {
+        if (source === PayloadSource.RemoteSaved) {
+          actualSaveCount++;
+        } else if (
+          source === PayloadSource.PreSyncSave &&
+          !didPerformMutatation
+        ) {
+          didPerformMutatation = true;
+          const mutated = CopyPayload(changed[0].payload, {
+            content: { ...note.payload.content, text: newText },
+            dirty: true,
+            dirtiedDate: changed[0].lastSyncBegan,
+          });
+          await this.application.itemManager.emitItemFromPayload(mutated);
+        }
+      }
+    );
+    this.expectedItemCount++;
+    /** Dont await */
+    const syncRequest = this.application.syncService.sync(syncOptions);
+    await syncRequest;
+    expect(actualSaveCount).to.equal(expectedSaveCount);
+    note = this.application.findItem(note.uuid);
+    expect(note.text).to.equal(newText);
+  });
+
   it('retreiving a remote deleted item should succeed', async function () {
     const note = await Factory.createSyncedNote(this.application);
     const preDeleteSyncToken = await this.application.syncService.getLastSyncToken();
