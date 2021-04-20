@@ -4,7 +4,6 @@ echo "# Copying the sample configuration files"
 cp docker/api-gateway.env.sample docker/api-gateway.env
 cp docker/auth.env.sample docker/auth.env
 cp docker/syncing-server-js.env.sample docker/syncing-server-js.env
-cp docker/syncing-server.env.sample docker/syncing-server.env
 
 echo "# Installing project dependecies (Host Machine)"
 yarn install --pure-lockfile
