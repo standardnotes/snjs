@@ -525,6 +525,9 @@ export class SNSyncService extends PureService<
     }
 
     const items = await this.itemsNeedingSync();
+    /** Freeze the begin date immediately after getting items needing sync. This way an
+     * item dirtied at any point after this date is marked as needing another sync */
+    const beginDate = new Date();
     /** Items that have never been synced and marked as deleted should not be
      * uploaded to server, and instead deleted directly after sync completion. */
     const neverSyncedDeleted = items.filter((item) => {
@@ -574,15 +577,14 @@ export class SNSyncService extends PureService<
       return;
     }
     /** Lock syncing immediately after checking in progress above */
-    this.opStatus!.setDidBegin();
-    this.notifyEvent(SyncEvent.SyncWillBegin);
+    this.opStatus.setDidBegin();
+    await this.notifyEvent(SyncEvent.SyncWillBegin);
     /* Subtract from array as soon as we're sure they'll be called.
     resolves are triggered at the end of this function call */
     subtractFromArray(this.resolveQueue, inTimeResolveQueue);
 
     /** lastSyncBegan must be set *after* any point we may have returned above.
      * Setting this value means the item was 100% sent to the server. */
-    const beginDate = new Date();
     if (items.length > 0) {
       await this.itemManager.changeItems(
         Uuids(items),

@@ -698,6 +698,9 @@ describe('importing', function () {
      * In SNJS 2.0.12, this file import would fail with "incorrect password" on file.
      * The reason was that we would use the default items key we had for the current account
      * instead of using the password generated root key for the file.
+     *
+     * Note this test will not be able to properly sync as the credentials are invalid.
+     * This test is only meant to test successful local importing.
      */
     const identifier = 'standardnotes';
     const application = await Factory.createApplication(identifier);
@@ -794,6 +797,7 @@ describe('importing', function () {
       },
     });
     await application.launch(false);
+    await application.setHost(Factory.getDefaultHost());
 
     const backupFile = {
       items: [
@@ -819,6 +823,7 @@ describe('importing', function () {
     };
     const result = await application.importData(backupFile, true);
     expect(result.errorCount).to.equal(0);
+    application.deinit();
   });
 
   it('importing another accounts notes/tags should correctly keep relationships', async function () {

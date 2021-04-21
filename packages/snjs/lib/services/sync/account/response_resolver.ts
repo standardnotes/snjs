@@ -130,8 +130,9 @@ export class SyncResponseResolver {
            * This occurs when alternating a uuid for a payload */
           stillDirty = false;
         } else {
-          /** Marking items dirty after lastSyncBegan will cause them to sync again. */
-          stillDirty = current.dirtiedDate! > current.lastSyncBegan!;
+          /** Marking items dirty after or within the same millisecond cycle of lastSyncBegan
+           * should cause them to sync again. */
+          stillDirty = current.dirtiedDate! >= current.lastSyncBegan!;
         }
       }
     } else {
