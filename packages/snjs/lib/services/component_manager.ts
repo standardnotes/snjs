@@ -281,12 +281,7 @@ export class SNComponentManager extends PureService {
             this.deactivateComponent(component.uuid);
           }
         }
-        /* LocalChanged is not interesting to send to observers. For local changes,
-        we wait until the item is set to dirty before notifying observers, where the mapping
-        source would be PayloadSource.LocalChanged */
-        if (source !== PayloadSource.LocalChanged) {
-          this.notifyStreamObservers(items, source, sourceKey);
-        }
+        this.notifyStreamObservers(items, source, sourceKey);
       }
     );
   }
@@ -650,6 +645,14 @@ export class SNComponentManager extends PureService {
       );
       return;
     }
+    if (!componentState.window && message.action === ComponentAction.Reply) {
+      this.log(
+        'Component has been deallocated in between message send and reply',
+        component,
+        message
+      );
+      return;
+    }
     this.log('Component manager send message to component', component, message);
     let origin = this.urlForComponent(component);
     if (!origin || !componentState.window) {
@@ -733,7 +736,7 @@ export class SNComponentManager extends PureService {
     if (!component) {
       this.log('Component not defined for message, returning', message);
       this.alertService!.alert(
-        'An extension is trying to communicate with Standard Notes,' +
+        'An extension is trying to communicate with Standard Notes, ' +
           'but there is an error establishing a bridge. Please restart the app and try again.'
       );
       return;
