@@ -57,7 +57,7 @@ export async function createAppContext(identifier) {
         );
       });
     },
-    launch: async ({awaitDatabaseLoad = true} = {}) => {
+    launch: async ({ awaitDatabaseLoad = true } = {}) => {
       await application.prepareForLaunch({
         receiveChallenge: handleChallenge,
       });
@@ -68,6 +68,10 @@ export async function createAppContext(identifier) {
       application.deinit();
     },
   };
+}
+
+export function getDefaultHost() {
+  return 'http://localhost:3123';
 }
 
 export function createApplication(identifier, environment, platform) {
@@ -87,7 +91,7 @@ export function createApplication(identifier, environment, platform) {
     },
     identifier || `${Math.random()}`,
     [],
-    'http://localhost:3123'
+    getDefaultHost()
   );
 }
 
