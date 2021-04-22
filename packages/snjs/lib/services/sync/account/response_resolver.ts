@@ -22,14 +22,13 @@ export const NonEncryptedTypes = Object.freeze([
 
 function filterDisallowedPayloads(payloads: PurePayload[]): PurePayload[] {
   return payloads.filter((payload) => {
-    const isDecrypted =
-      payload.format === PayloadFormat.DecryptedBareObject ||
-      payload.format === PayloadFormat.DecryptedBase64String;
-    const allowedToBeDecrypted = NonEncryptedTypes.includes(
-      payload.content_type
-    );
+    const isEncrypted = ![
+      PayloadFormat.DecryptedBareObject,
+      PayloadFormat.DecryptedBase64String,
+    ].includes(payload.format);
+    const isAllowedDecrypted = NonEncryptedTypes.includes(payload.content_type);
 
-    return !isDecrypted || (isDecrypted && allowedToBeDecrypted);
+    return isEncrypted || isAllowedDecrypted;
   });
 }
 
