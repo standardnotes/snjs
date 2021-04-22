@@ -67,7 +67,7 @@ export class SyncResponseResolver {
     const collections = [];
 
     const collectionRetrieved = await this.collectionByProcessingPayloads(
-      filterDisallowedPayloads(this.response.retrievedPayloads),
+      this.response.retrievedPayloads,
       PayloadSource.RemoteRetrieved
     );
     if (collectionRetrieved.all().length > 0) {
@@ -75,7 +75,7 @@ export class SyncResponseResolver {
     }
 
     const collectionSaved = await this.collectionByProcessingPayloads(
-      filterDisallowedPayloads(this.response.savedPayloads),
+      this.response.savedPayloads,
       PayloadSource.RemoteSaved
     );
     if (collectionSaved.all().length > 0) {
@@ -84,7 +84,7 @@ export class SyncResponseResolver {
 
     if (this.response.uuidConflictPayloads.length > 0) {
       const collectionUuidConflicts = await this.collectionByProcessingPayloads(
-        filterDisallowedPayloads(this.response.uuidConflictPayloads),
+        this.response.uuidConflictPayloads,
         PayloadSource.ConflictUuid
       );
       if (collectionUuidConflicts.all().length > 0) {
@@ -94,7 +94,7 @@ export class SyncResponseResolver {
 
     if (this.response.dataConflictPayloads.length > 0) {
       const collectionDataConflicts = await this.collectionByProcessingPayloads(
-        filterDisallowedPayloads(this.response.dataConflictPayloads),
+        this.response.dataConflictPayloads,
         PayloadSource.ConflictData
       );
       if (collectionDataConflicts.all().length > 0) {
@@ -110,7 +110,7 @@ export class SyncResponseResolver {
     source: PayloadSource
   ): Promise<ImmutablePayloadCollection> {
     const collection = ImmutablePayloadCollection.WithPayloads(
-      payloads,
+      filterDisallowedPayloads(payloads),
       source
     );
     const deltaClass = DeltaClassForSource(source)!;
@@ -119,7 +119,7 @@ export class SyncResponseResolver {
       this.baseCollection,
       collection,
       this.relatedCollectionSet,
-      this.historyMap
+      this.historyMap,
     );
     const resultCollection = await delta.resultingCollection();
     const updatedDirtyPayloads = resultCollection.all().map((payload) => {
