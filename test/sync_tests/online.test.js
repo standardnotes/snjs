@@ -1012,4 +1012,29 @@ describe('online syncing', function () {
     expect(this.application.apiService.session.accessToken).to.be.ok;
     expect(this.application.apiService.session.refreshToken).to.be.ok;
   });
+
+  it('should not allow receiving decrypted payloads from server', async function () {
+    const masterCollection = this.application.payloadManager.getMasterCollection();
+    const historyMap = this.application.historyManager.getHistoryMapCopy();
+    const note = await Factory.createSyncedNote(this.application);
+    this.expectedItemCount++;
+    const decryptedPayload = note.payload;
+    const decryptedPayloads = [decryptedPayload];
+    const response = new SyncResponse({
+      retrieved_items: [decryptedPayload],
+    });
+    const resolver = new SyncResponseResolver(
+      response,
+      decryptedPayloads,
+      masterCollection,
+      [],
+      historyMap
+    );
+    const collections = await resolver.collectionsByProcessingResponse();
+    for (const collection of collections) {
+      if (collection.source === PayloadSource.RemoteRetrieved) {
+        expect(collection.all().length).to.equal(0);
+      }
+    }
+  });
 });

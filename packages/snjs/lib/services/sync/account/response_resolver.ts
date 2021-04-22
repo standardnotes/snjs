@@ -1,3 +1,4 @@
+import { ContentType } from './../../../models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SyncResponse } from '@Services/sync/response';
 import { DeltaClassForSource } from '@Payloads/deltas/generator';
@@ -6,6 +7,31 @@ import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collect
 import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
 import { CopyPayload } from '@Payloads/generator';
 import { HistoryMap } from '@Lib/services/history/history_map';
+import { PayloadFormat } from '@Lib/protocol/payloads';
+
+/**
+ * Non-encrypted types are items whose values a server must be able to read.
+ * These include server extensions (such as a note history endpoint), and
+ * multi-factor authentication items, which include a secret value that the server
+ * needs to be able to read in order to enforce.
+ */
+export const NonEncryptedTypes = Object.freeze([
+  ContentType.Mfa,
+  ContentType.ServerExtension,
+]);
+
+function filterDisallowedPayloads(payloads: PurePayload[]): PurePayload[] {
+  return payloads.filter((payload) => {
+    const isDecrypted =
+      payload.format === PayloadFormat.DecryptedBareObject ||
+      payload.format === PayloadFormat.DecryptedBase64String;
+    const allowedToBeDecrypted = NonEncryptedTypes.includes(
+      payload.content_type
+    );
+
+    return !isDecrypted || (isDecrypted && allowedToBeDecrypted);
+  });
+}
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -41,7 +67,7 @@ export class SyncResponseResolver {
     const collections = [];
 
     const collectionRetrieved = await this.collectionByProcessingPayloads(
-      this.response.retrievedPayloads,
+      filterDisallowedPayloads(this.response.retrievedPayloads),
       PayloadSource.RemoteRetrieved
     );
     if (collectionRetrieved.all().length > 0) {
@@ -49,7 +75,7 @@ export class SyncResponseResolver {
     }
 
     const collectionSaved = await this.collectionByProcessingPayloads(
-      this.response.savedPayloads,
+      filterDisallowedPayloads(this.response.savedPayloads),
       PayloadSource.RemoteSaved
     );
     if (collectionSaved.all().length > 0) {
@@ -58,7 +84,7 @@ export class SyncResponseResolver {
 
     if (this.response.uuidConflictPayloads.length > 0) {
       const collectionUuidConflicts = await this.collectionByProcessingPayloads(
-        this.response.uuidConflictPayloads,
+        filterDisallowedPayloads(this.response.uuidConflictPayloads),
         PayloadSource.ConflictUuid
       );
       if (collectionUuidConflicts.all().length > 0) {
@@ -68,7 +94,7 @@ export class SyncResponseResolver {
 
     if (this.response.dataConflictPayloads.length > 0) {
       const collectionDataConflicts = await this.collectionByProcessingPayloads(
-        this.response.dataConflictPayloads,
+        filterDisallowedPayloads(this.response.dataConflictPayloads),
         PayloadSource.ConflictData
       );
       if (collectionDataConflicts.all().length > 0) {
@@ -93,7 +119,7 @@ export class SyncResponseResolver {
       this.baseCollection,
       collection,
       this.relatedCollectionSet,
-      this.historyMap,
+      this.historyMap
     );
     const resultCollection = await delta.resultingCollection();
     const updatedDirtyPayloads = resultCollection.all().map((payload) => {
