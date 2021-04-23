@@ -1,3 +1,4 @@
+import { ContentType } from './../../../models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SyncResponse } from '@Services/sync/response';
 import { DeltaClassForSource } from '@Payloads/deltas/generator';
@@ -6,6 +7,30 @@ import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collect
 import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
 import { CopyPayload } from '@Payloads/generator';
 import { HistoryMap } from '@Lib/services/history/history_map';
+import { PayloadFormat } from '@Lib/protocol/payloads';
+
+/**
+ * Non-encrypted types are items whose values a server must be able to read.
+ * These include server extensions (such as a note history endpoint), and
+ * multi-factor authentication items, which include a secret value that the server
+ * needs to be able to read in order to enforce.
+ */
+export const NonEncryptedTypes = Object.freeze([
+  ContentType.Mfa,
+  ContentType.ServerExtension,
+]);
+
+function filterDisallowedPayloads(payloads: PurePayload[]): PurePayload[] {
+  return payloads.filter((payload) => {
+    const isEncrypted = ![
+      PayloadFormat.DecryptedBareObject,
+      PayloadFormat.DecryptedBase64String,
+    ].includes(payload.format);
+    const isAllowedDecrypted = NonEncryptedTypes.includes(payload.content_type);
+
+    return isEncrypted || isAllowedDecrypted;
+  });
+}
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -84,7 +109,7 @@ export class SyncResponseResolver {
     source: PayloadSource
   ): Promise<ImmutablePayloadCollection> {
     const collection = ImmutablePayloadCollection.WithPayloads(
-      payloads,
+      filterDisallowedPayloads(payloads),
       source
     );
     const deltaClass = DeltaClassForSource(source)!;

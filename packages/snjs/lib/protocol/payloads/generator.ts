@@ -76,7 +76,7 @@ export type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
 export type LegacyAttachedData = AnyKeyParamsContent & Record<string, unknown>;
 
 /** The MaxItemPayload represents a payload with all possible fields */
-const MaxPayloadFields = [
+const MaxPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -95,9 +95,9 @@ const MaxPayloadFields = [
   PayloadField.LastSyncBegan,
   PayloadField.LastSyncEnd,
   PayloadField.DuplicateOf,
-];
+]);
 
-const EncryptionParametersFields = [
+const EncryptionParametersFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ItemsKeyId,
   PayloadField.EncItemKey,
@@ -106,9 +106,9 @@ const EncryptionParametersFields = [
   PayloadField.ErrorDecrypting,
   PayloadField.ErrorDecryptingChanged,
   PayloadField.WaitingForKey,
-];
+]);
 
-const FilePayloadFields = [
+const FilePayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -118,9 +118,9 @@ const FilePayloadFields = [
   PayloadField.ServerUpdatedAt,
   PayloadField.Legacy003AuthHash,
   PayloadField.DuplicateOf,
-];
+]);
 
-const StoragePayloadFields = [
+const StoragePayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -136,9 +136,9 @@ const StoragePayloadFields = [
   PayloadField.ErrorDecrypting,
   PayloadField.WaitingForKey,
   PayloadField.DuplicateOf,
-];
+]);
 
-const ServerPayloadFields = [
+const ServerPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -149,32 +149,32 @@ const ServerPayloadFields = [
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
   PayloadField.DuplicateOf,
-];
+]);
 
-const SessionHistoryPayloadFields = [
+const SessionHistoryPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.Content,
   PayloadField.ServerUpdatedAt,
-];
+]);
 
 /** Represents a payload with permissible fields for when a
  * payload is retrieved from a component for saving */
-const ComponentRetrievedPayloadFields = [
+const ComponentRetrievedPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.Content,
   PayloadField.ContentType,
   PayloadField.CreatedAt,
-];
+]);
 
 /** Represents a payload with permissible fields for when a
  * component wants to create a new item */
-const ComponentCreatedPayloadFields = [
+const ComponentCreatedPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.Content,
   PayloadField.ContentType,
   PayloadField.CreatedAt,
-];
+]);
 
 /**
  * The saved server item payload represents the payload we want to map
@@ -182,16 +182,16 @@ const ComponentCreatedPayloadFields = [
  * updated_at value the server returns for the item, and basically
  * nothing else.
  */
-const ServerSavedPayloadFields = [
+const ServerSavedPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ServerUpdatedAt,
   PayloadField.Deleted,
   PayloadField.Dirty,
   PayloadField.LastSyncEnd,
-];
+]);
 
-const RemoteHistoryPayloadFields = ServerPayloadFields.slice();
+const RemoteHistoryPayloadFields = Object.freeze(ServerPayloadFields.slice());
 
 export function CreateMaxPayloadFromAnyObject(
   object: RawPayload,
@@ -212,7 +212,7 @@ export function PayloadByMerging(
   mergeWith: PurePayload,
   fields?: PayloadField[],
   override?: PayloadOverride
-) {
+): PurePayload {
   const resultOverride: PayloadOverride = {};
   const useFields = fields || mergeWith.fields;
   for (const field of useFields) {
@@ -231,7 +231,7 @@ export function CreateIntentPayloadFromObject(
   object: RawPayload,
   intent: EncryptionIntent,
   override?: PayloadOverride
-) {
+): PurePayload {
   const payloadFields = payloadFieldsForIntent(intent);
   return CreatePayload(
     object,
@@ -245,7 +245,7 @@ export function CreateSourcedPayloadFromObject(
   object: RawPayload,
   source: PayloadSource,
   override?: PayloadOverride
-) {
+): PurePayload {
   const payloadFields = payloadFieldsForSource(source);
   return CreatePayload(object, payloadFields, source, override);
 }
@@ -327,7 +327,7 @@ function payloadFieldsForIntent(intent: EncryptionIntent) {
   }
 }
 
-export function payloadFieldsForSource(source: PayloadSource) {
+export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
   if (source === PayloadSource.FileImport) {
     return FilePayloadFields.slice();
   }

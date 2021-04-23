@@ -21,7 +21,10 @@ import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils';
 import { SyncOpStatus } from '@Services/sync/sync_op_status';
 import { SyncState } from '@Services/sync/sync_state';
 import { AccountDownloader } from '@Services/sync/account/downloader';
-import { SyncResponseResolver } from '@Services/sync/account/response_resolver';
+import {
+  SyncResponseResolver,
+  NonEncryptedTypes,
+} from '@Services/sync/account/response_resolver';
 import { AccountSyncOperation } from '@Services/sync/account/operation';
 import { OfflineSyncOperation } from '@Services/sync/offline/operation';
 import { DeltaOutOfSync } from '@Payloads/deltas';
@@ -96,17 +99,6 @@ type SyncPromise = {
   reject: () => void;
   options?: SyncOptions;
 };
-
-/**
- * Non-encrypted types are items whose values a server must be able to read.
- * These include server extensions (such as a note history endpoint), and
- * multi-factor authentication items, which include a secret value that the server
- * needs to be able to read in order to enforce.
- */
-const NonEncryptedTypes = Object.freeze([
-  ContentType.Mfa,
-  ContentType.ServerExtension,
-]);
 
 /**
  * The sync service orchestrates with the model manager, api service, and storage service
