@@ -14,3 +14,4 @@ auth.env
 api-gateway.env
 syncing-server-js.env
 syncing-server.env
+codeqldb
