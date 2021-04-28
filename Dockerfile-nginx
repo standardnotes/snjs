@@ -1,9 +1,0 @@
-FROM nginx:alpine
-
-RUN apk add --no-cache bash
-COPY wait-for.sh /wait-for.sh
-RUN chmod +x /wait-for.sh
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
-CMD ["nginx", "-g", "daemon off;"]

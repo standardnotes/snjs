@@ -58,7 +58,6 @@ services:
   api-gateway:
     image: standardnotes/api-gateway:1.4.1
     depends_on:
-      - syncing-server-ruby
       - syncing-server-js
       - auth
     entrypoint: [
