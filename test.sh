@@ -4,19 +4,24 @@ echo "# Copying the sample configuration files"
 cp docker/api-gateway.env.sample docker/api-gateway.env
 cp docker/auth.env.sample docker/auth.env
 cp docker/syncing-server-js.env.sample docker/syncing-server-js.env
-cp docker/syncing-server.env.sample docker/syncing-server.env
 
 echo "# Installing project dependecies (Host Machine)"
 yarn install --pure-lockfile
 
 function cleanup {
+  local output_logs=$1
+  if [ $output_logs == 1 ]
+  then
+    echo "Outputing last 100 lines of logs"
+    docker-compose logs --tail=100
+  fi
   echo "# Killing all containers"
   docker-compose kill
   echo "# Removing all containers"
   docker-compose rm -vf
 }
 
-cleanup
+cleanup 0
 
 echo "# Pulling latest versions"
 docker-compose pull
@@ -56,7 +61,7 @@ echo "# Starting Test Suite"
 npx mocha-headless-chrome --timeout 1200000 -f http://localhost:9001/test/test.html
 test_result=$?
 
-cleanup
+cleanup $test_result
 
 if [ $test_result == 0 ]
 then
