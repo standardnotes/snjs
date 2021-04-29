@@ -58,14 +58,14 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.6.0
+    image: standardnotes/auth:1.6.1
     entrypoint: ["./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-web"]
     env_file: docker/auth.env
     networks:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.6.0
+    image: standardnotes/auth:1.6.1
     entrypoint: ["./wait-for.sh", "auth", "3000", "./docker/entrypoint.sh", "start-worker"]
     env_file: docker/auth.env
     networks:
