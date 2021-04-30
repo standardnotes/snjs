@@ -29,7 +29,11 @@ export class LiveItem<T extends SNItem> {
   }
 
   public deinit() {
-    this.removeObserver();
-    this.removeObserver = undefined;
+    if (!this.removeObserver) {
+      console.error('A LiveItem is attempting to be deinited more than once.');
+    } else {
+      this.removeObserver();
+      this.removeObserver = undefined;
+    }
   }
 }
