@@ -995,8 +995,8 @@ export class SNComponentManager extends PureService {
       }
       if (lockedNoteCount === 1) {
         this.alertService!.alert(
-          `The note you are attempting to save is locked and cannot be edited.`,
-          'Note Locked'
+          `The note you are attempting to save has editing disabled`,
+          'Note has Editing Disabled'
         );
         return;
       } else if (lockedCount > 0) {
@@ -1006,10 +1006,10 @@ export class SNComponentManager extends PureService {
             : lockedNoteCount === lockedCount
             ? 'notes'
             : 'items';
-        const auxVerb = lockedCount === 1 ? 'is' : 'are';
+        const auxVerb = lockedCount === 1 ? 'has' : 'have';
         this.alertService!.alert(
-          `${lockedCount} ${itemNoun} you are attempting to save ${auxVerb} locked and cannot be edited.`,
-          'Items Locked'
+          `${lockedCount} ${itemNoun} you are attempting to save ${auxVerb} editing disabled.`,
+          'Items have Editing Disabled'
         );
         return;
       }
