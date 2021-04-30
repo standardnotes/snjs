@@ -32,7 +32,7 @@ export class LiveItem<T extends SNItem> {
     if (!this.removeObserver) {
       console.error('LiveItem removeObserver is undefined');
     } else {
-      this.removeObserver?.();
+      this.removeObserver();
       this.removeObserver = undefined;
     }
   }
