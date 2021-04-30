@@ -32,7 +32,11 @@ services:
 
   syncing-server-js:
     image: standardnotes/syncing-server-js:1.17.0
-    entrypoint: ["./wait-for.sh", "db", "3306", "./wait-for.sh", "cache", "6379", "./docker/entrypoint.sh", "start-web"]
+    entrypoint: [
+      "./wait-for.sh", "db", "3306", 
+      "./wait-for.sh", "cache", "6379", 
+      "./docker/entrypoint.sh", "start-web"
+    ]
     ports:
       - 3123:3000
     env_file: docker/syncing-server-js.env
@@ -41,17 +45,29 @@ services:
 
   syncing-server-js-worker:
     image: standardnotes/syncing-server-js:1.17.0
-    entrypoint: ["./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-worker"]
+    depends_on:
+      - syncing-server-js
+    entrypoint: [
+      "./wait-for.sh", "syncing-server-js", "3000", 
+      "./docker/entrypoint.sh", "start-worker"
+    ]
     env_file: docker/syncing-server-js.env
     networks:
       - snjs
 
   api-gateway:
     image: standardnotes/api-gateway:1.4.1
+    depends_on:
+      - syncing-server-js
+      - auth
+    entrypoint: [
+      "./wait-for.sh", "syncing-server-js", "3000", 
+      "./wait-for.sh", "auth", "3000", 
+      "./docker/entrypoint.sh", "start-web"
+    ]
     env_file: docker/api-gateway.env
     environment:
       PORT: 3000
-    entrypoint: ["./wait-for.sh", "auth", "3000", "./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-web"]
     ports:
       - 3124:3000
     networks:
@@ -59,14 +75,24 @@ services:
 
   auth:
     image: standardnotes/auth:1.6.1
-    entrypoint: ["./wait-for.sh", "syncing-server-js", "3000", "./docker/entrypoint.sh", "start-web"]
+    depends_on:
+      - syncing-server-js
+    entrypoint: [
+      "./wait-for.sh", "syncing-server-js", "3000", 
+      "./docker/entrypoint.sh", "start-web"
+    ]
     env_file: docker/auth.env
     networks:
       - snjs
 
   auth-worker:
     image: standardnotes/auth:1.6.1
-    entrypoint: ["./wait-for.sh", "auth", "3000", "./docker/entrypoint.sh", "start-worker"]
+    depends_on:
+      - auth
+    entrypoint: [
+      "./wait-for.sh", "auth", "3000", 
+      "./docker/entrypoint.sh", "start-worker"
+    ]
     env_file: docker/auth.env
     networks:
       - snjs
