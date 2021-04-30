@@ -30,7 +30,7 @@ export class LiveItem<T extends SNItem> {
 
   public deinit() {
     if (!this.removeObserver) {
-      console.error('LiveItem removeObserver is undefined');
+      console.error('A LiveItem is attempting to be deinited more than once.');
     } else {
       this.removeObserver();
       this.removeObserver = undefined;
