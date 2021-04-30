@@ -29,7 +29,7 @@ export class LiveItem<T extends SNItem> {
   }
 
   public deinit() {
-    this.removeObserver();
+    this.removeObserver?.();
     this.removeObserver = undefined;
   }
 }
