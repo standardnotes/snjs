@@ -31,10 +31,10 @@ services:
       - snjs
 
   syncing-server-js:
-    image: standardnotes/syncing-server-js:1.17.0
+    image: standardnotes/syncing-server-js:1.9.4
     entrypoint: [
-      "./wait-for.sh", "db", "3306", 
-      "./wait-for.sh", "cache", "6379", 
+      "./wait-for.sh", "db", "3306",
+      "./wait-for.sh", "cache", "6379",
       "./docker/entrypoint.sh", "start-web"
     ]
     ports:
@@ -44,11 +44,11 @@ services:
       - snjs
 
   syncing-server-js-worker:
-    image: standardnotes/syncing-server-js:1.17.0
+    image: standardnotes/syncing-server-js:1.9.4
     depends_on:
       - syncing-server-js
     entrypoint: [
-      "./wait-for.sh", "syncing-server-js", "3000", 
+      "./wait-for.sh", "syncing-server-js", "3000",
       "./docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/syncing-server-js.env
@@ -56,13 +56,13 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.4.1
+    image: standardnotes/api-gateway:1.4.4
     depends_on:
       - syncing-server-js
       - auth
     entrypoint: [
-      "./wait-for.sh", "syncing-server-js", "3000", 
-      "./wait-for.sh", "auth", "3000", 
+      "./wait-for.sh", "syncing-server-js", "3000",
+      "./wait-for.sh", "auth", "3000",
       "./docker/entrypoint.sh", "start-web"
     ]
     env_file: docker/api-gateway.env
@@ -74,11 +74,11 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.6.1
+    image: standardnotes/auth:1.6.4
     depends_on:
       - syncing-server-js
     entrypoint: [
-      "./wait-for.sh", "syncing-server-js", "3000", 
+      "./wait-for.sh", "syncing-server-js", "3000",
       "./docker/entrypoint.sh", "start-web"
     ]
     env_file: docker/auth.env
@@ -86,11 +86,11 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.6.1
+    image: standardnotes/auth:1.6.4
     depends_on:
       - auth
     entrypoint: [
-      "./wait-for.sh", "auth", "3000", 
+      "./wait-for.sh", "auth", "3000",
       "./docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/auth.env
