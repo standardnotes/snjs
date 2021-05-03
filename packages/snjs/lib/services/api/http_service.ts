@@ -5,13 +5,10 @@ import { isNullOrUndefined } from '@Lib/utils';
 
 export enum HttpVerb {
   Get = 'get',
+  Put = 'put',
   Post = 'post',
   Patch = 'patch',
   Delete = 'delete',
-}
-
-export enum ErrorTag {
-  RevokedSession = 'revoked-session',
 }
 
 const REQUEST_READY_STATE_COMPLETED = 4;
@@ -20,8 +17,8 @@ export type HttpParams = Record<string, unknown>;
 
 export type HttpRequest = {
   url: string;
-  params?: HttpParams;
   verb: HttpVerb;
+  params?: HttpParams;
   authentication?: string;
 };
 
@@ -101,7 +98,8 @@ export class SNHttpService extends PureService {
       if (
         verb === HttpVerb.Post ||
         verb === HttpVerb.Patch ||
-        verb === HttpVerb.Delete
+        verb === HttpVerb.Delete ||
+        verb === HttpVerb.Put
       ) {
         request.send(JSON.stringify(params));
       } else {

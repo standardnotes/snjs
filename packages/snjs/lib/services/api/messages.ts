@@ -62,6 +62,11 @@ export const DO_NOT_CLOSE_APPLICATION =
 
 export const UNKNOWN_ERROR = 'Unknown error.';
 
+export const MFA_ENABLE_ERROR =
+  'An error occured when trying to enable multi-factor authentication. Please try again.';
+export const MFA_DISABLE_ERROR =
+  'An error occured when trying to disable multi-factor authentication. Please try again.';
+
 export function InsufficientPasswordMessage(minimum: number): string {
   return `Your password must be at least ${minimum} characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.`;
 }
@@ -99,6 +104,8 @@ export const SignInStrings = {
     'Your passcode is required in order to sign in to your account.',
   IncorrectMfa: 'Incorrect two-factor authentication code. Please try again.',
   SignInCanceledMissingMfa: 'Your sign in request has been canceled.',
+  ErrorFetchingAuthMethods:
+    'An error occurred while trying to fetch authentication methods for your account. Please try again.',
 };
 
 export const ProtocolUpgradeStrings = {

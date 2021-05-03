@@ -2004,7 +2004,7 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@standardnotes/auth@^2.0.0":
+"@standardnotes/auth@^2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-2.3.0.tgz#b8ef5d896619ba4eebcaa8bbe829649038fd505e"
   integrity sha512-D1tlxQFXZ4kW8X90YcOmAiozYZb2IJtJa6tPnbu+vXOFvipbW2z2grN2zcYEdUpW6m819+/yczzICEd63xYAAQ==

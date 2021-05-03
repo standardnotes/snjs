@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
@@ -60,7 +60,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@standardnotes/auth": "^2.0.0",
+    "@standardnotes/auth": "^2.3.0",
     "@standardnotes/sncrypto-common": "^1.2.9"
   }
 }
