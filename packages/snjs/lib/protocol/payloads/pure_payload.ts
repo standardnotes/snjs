@@ -37,8 +37,11 @@ export class PurePayload {
   readonly items_key_id?: string;
   readonly enc_item_key?: string;
   readonly created_at?: Date;
-  /** Server modified only */
+  /** updated_at is set by the server only, and not the client.
+   * For user modification date, see userModifiedAt */
   readonly updated_at?: Date;
+  readonly created_at_timestamp?: number;
+  readonly updated_at_timestamp?: number;
   readonly dirtiedDate?: Date;
   readonly dirty?: boolean;
   readonly errorDecrypting?: boolean;
@@ -92,6 +95,8 @@ export class PurePayload {
     this.created_at = new Date(rawPayload.created_at || new Date());
     /** Fallback to initializing with 0 epoch date */
     this.updated_at = new Date(rawPayload.updated_at || new Date(0));
+    this.created_at_timestamp = rawPayload.created_at_timestamp;
+    this.updated_at_timestamp = rawPayload.updated_at_timestamp;
     if (rawPayload.dirtiedDate) {
       this.dirtiedDate = new Date(rawPayload.dirtiedDate);
     }
