@@ -1038,17 +1038,16 @@ describe('online syncing', function () {
     }
   });
 
-  it.only('retrieved items should have both updated_at and updated_at_timestamps', async function () {
-    this.application.syncService.loggingEnabled = true;
+  it('retrieved items should have both updated_at and updated_at_timestamps', async function () {
     const note = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;
-    expect(note.created_at_timestamp).to.be.ok;
-    expect(note.created_at).to.be.ok;
-    expect(note.updated_at_timestamp).to.be.ok;
-    expect(note.updated_at).to.be.ok;
+    expect(note.payload.created_at_timestamp).to.be.ok;
+    expect(note.payload.created_at).to.be.ok;
+    expect(note.payload.updated_at_timestamp).to.be.ok;
+    expect(note.payload.updated_at).to.be.ok;
   });
 
-  it.only('server should prioritize updated_at_timestamp over updated_at for sync, if provided', async function () {
+  it('server should prioritize updated_at_timestamp over updated_at for sync, if provided', async function () {
     /**
      * As part of SSRB to SSJS migration, server should prefer to use updated_at_timestamp
      * over updated_at for sync conflict logic. The timestamps are more accurate and support
@@ -1070,9 +1069,8 @@ describe('online syncing', function () {
       },
       dirty: true,
     });
-    await this.application.emitItemFromPayload(modified);
+    await this.application.itemManager.emitItemFromPayload(modified);
     await this.application.sync();
     expect(this.application.itemManager.notes.length).to.equal(1);
-    await this.sharedFinalAssertions();
   });
 });

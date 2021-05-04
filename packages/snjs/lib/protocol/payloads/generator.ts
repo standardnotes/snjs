@@ -197,6 +197,7 @@ const ServerSavedPayloadFields = Object.freeze([
   PayloadField.ContentType,
   PayloadField.ServerUpdatedAt,
   PayloadField.ServerUpdatedAtTimestamp,
+  PayloadField.CreatedAtTimestamp,
   PayloadField.Deleted,
   PayloadField.Dirty,
   PayloadField.LastSyncEnd,
