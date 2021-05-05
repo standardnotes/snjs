@@ -44,6 +44,10 @@ export type GetAuthMethodsResponse = {
   methods: AuthMethods;
 }
 
+export type MfaQueryParams = {
+  mfa_key: string,
+}
+
 export class SNMfaService extends PureService {
   constructor(private challengeService: ChallengeService) {
     super();
@@ -87,9 +91,10 @@ export class SNMfaService extends PureService {
 
   public getMfaQueryParams(
     mfaResult: MfaResultSuccess,
-  ): MfaPayload | Record<string, never> {
+  ): MfaQueryParams | Record<string, never> {
     if (mfaResult.status === MfaStatus.EnteredCode) {
-      return mfaResult.payload;
+      const mfa_key = mfaResult.payload.enteredTotp
+      return { mfa_key };
     }
     if (mfaResult.status === MfaStatus.NotRequired) {
       return {};

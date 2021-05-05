@@ -68,7 +68,7 @@ type PathsV1 = {
   }) => string;
 };
 
-type DisableMfaDto = {
+type DeleteSettingDto = {
   userUuid: Uuid;
   settingName: string;
 };
@@ -77,7 +77,7 @@ type SettingProps = {
   value: string;
   serverEncryptionVersion?: number;
 };
-type EnableMfaDto = {
+type PutSettingDto = {
   userUuid: Uuid;
   props: SettingProps;
 };
@@ -104,18 +104,16 @@ const Paths: {
   // todo: add more
   v1: {
     authMethods: '/v1/auth/methods',
-    // todo: use
     keyParams: '/v1/login-params',
-    // todo: use
     register: '/v1/users',
     signIn: '/v1/login',
     signOut: '/v1/logout',
+    putSetting: (userUuid: Uuid) => `/v1/users/${userUuid}/settings`,
+    deleteSetting: ({ userUuid, settingName }: DeleteSettingDto) =>
+      `/v1/users/${userUuid}/settings/${settingName}`,
     // note: not sure about what userId is
     // todo: use
     changePassword: (userId: string) => `/v1/users/${userId}/password`,
-    putSetting: (userUuid: Uuid) => `/v1/users/${userUuid}/settings`,
-    deleteSetting: ({ userUuid, settingName }: DisableMfaDto) =>
-      `/v1/users/${userUuid}/settings/${settingName}`,
   },
 };
 
@@ -330,7 +328,7 @@ export class SNApiService extends PureService {
   public enableMfa({
     userUuid,
     props,
-  }: EnableMfaDto): Promise<HttpResponse<unknown>> {
+  }: PutSettingDto): Promise<HttpResponse<unknown>> {
     return this.request({
       verb: HttpVerb.Put,
       url: joinPaths(this.host, Paths.v1.putSetting(userUuid)),
@@ -340,7 +338,7 @@ export class SNApiService extends PureService {
     });
   }
 
-  public disableMfa(dto: DisableMfaDto): Promise<HttpResponse<unknown>> {
+  public disableMfa(dto: DeleteSettingDto): Promise<HttpResponse<unknown>> {
     return this.request({
       verb: HttpVerb.Put,
       url: joinPaths(this.host, Paths.v1.deleteSetting(dto)),
@@ -357,7 +355,7 @@ export class SNApiService extends PureService {
     return this.requestWithMfa({
       identifier: email,
       verb: HttpVerb.Get,
-      url: joinPaths(this.host, Paths.v0.keyParams),
+      url: joinPaths(this.host, Paths.v1.keyParams),
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
       /** A session is optional here, if valid, endpoint returns extra params */
@@ -377,7 +375,7 @@ export class SNApiService extends PureService {
       ) as RegistrationResponse;
     }
     this.registering = true;
-    const url = joinPaths(this.host, Paths.v0.register);
+    const url = joinPaths(this.host, Paths.v1.register);
     const params = this.params({
       password: serverPassword,
       email,
