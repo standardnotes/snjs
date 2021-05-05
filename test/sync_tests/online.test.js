@@ -1046,31 +1046,4 @@ describe('online syncing', function () {
     expect(note.payload.updated_at_timestamp).to.be.ok;
     expect(note.payload.updated_at).to.be.ok;
   });
-
-  it('server should prioritize updated_at_timestamp over updated_at for sync, if provided', async function () {
-    /**
-     * As part of SSRB to SSJS migration, server should prefer to use updated_at_timestamp
-     * over updated_at for sync conflict logic. The timestamps are more accurate and support
-     * microsecond precision, versus date objects which only go up to milliseconds.
-     */
-    const note = await Factory.createSyncedNote(this.application);
-    this.expectedItemCount++;
-
-    /**
-     * Create a modified payload that has updated_at set to old value, but updated_at_timestamp
-     * set to new value. Then send to server. If the server conflicts, it means it's incorrectly ignoring
-     * updated_at_timestamp and looking at updated_at.
-     */
-    const modified = CopyPayload(note.payload, {
-      updated_at: new Date(0),
-      content: {
-        ...note.content,
-        title: Math.random(),
-      },
-      dirty: true,
-    });
-    await this.application.itemManager.emitItemFromPayload(modified);
-    await this.application.sync();
-    expect(this.application.itemManager.notes.length).to.equal(1);
-  });
 });

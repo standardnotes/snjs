@@ -27,7 +27,9 @@ export class ConflictDelta {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload);
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
     const historyEntries = this.historyMap?.[this.basePayload.uuid] || [];
-    const previousRevision = historyMapFunctions.getNewestRevision(historyEntries);
+    const previousRevision = historyMapFunctions.getNewestRevision(
+      historyEntries
+    );
     const strategy = tmpBaseItem.strategyWhenConflictingWithItem(
       tmpApplyItem,
       previousRevision
@@ -57,8 +59,13 @@ export class ConflictDelta {
         this.basePayload.serverUpdatedAt!,
         this.applyPayload.serverUpdatedAt!
       );
+      const updatedAtTimestamp = Math.max(
+        this.basePayload.updated_at_timestamp!,
+        this.applyPayload.updated_at_timestamp!
+      );
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
+        updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
         dirtiedDate: new Date(),
       });
@@ -80,8 +87,13 @@ export class ConflictDelta {
         this.basePayload.serverUpdatedAt!,
         this.applyPayload.serverUpdatedAt!
       );
+      const updatedAtTimestamp = Math.max(
+        this.basePayload.updated_at_timestamp!,
+        this.applyPayload.updated_at_timestamp!
+      );
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
+        updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
         dirtiedDate: new Date(),
       });
@@ -120,8 +132,13 @@ export class ConflictDelta {
         this.basePayload.serverUpdatedAt!,
         this.applyPayload.serverUpdatedAt!
       );
+      const updatedAtTimestamp = Math.max(
+        this.basePayload.updated_at_timestamp!,
+        this.applyPayload.updated_at_timestamp!
+      );
       const payload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
+        updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
         dirtiedDate: new Date(),
         content: {
