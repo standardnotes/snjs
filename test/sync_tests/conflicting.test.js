@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('online conflict handling', function () {
+describe.only('online conflict handling', function () {
   this.timeout(Factory.TestTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
