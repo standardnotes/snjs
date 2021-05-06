@@ -150,7 +150,7 @@ describe('notes + tags syncing', async function () {
       tag.uuid,
       (mutator) => {
         mutator.title = `${Math.random()}`;
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,

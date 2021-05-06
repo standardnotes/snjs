@@ -385,7 +385,7 @@ describe('basic auth', () => {
       note.uuid,
       (mutator) => {
         mutator.title = `${Math.random()}`;
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,

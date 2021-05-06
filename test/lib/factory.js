@@ -374,6 +374,10 @@ export function yesterday() {
   return new Date(new Date().setDate(new Date().getDate() - 1));
 }
 
+export function dateToMicroseconds(date) {
+  return date.getTime() * 1_000;
+}
+
 export function tomorrow() {
   return new Date(new Date().setDate(new Date().getDate() + 1));
 }
