@@ -87,6 +87,7 @@ export {
 } from './services/sync/sync_service';
 export { SyncResponse } from './services/sync/response';
 export { SyncResponseResolver } from '@Services/sync/account/response_resolver';
+export { AccountSyncOperation } from '@Services/sync/account/operation';
 export { SyncOpStatus } from './services/sync/sync_op_status';
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
 export { SyncUpDownLimit } from './services/sync/account/operation';

@@ -1,3 +1,8 @@
+import { EncryptionIntent } from './../../../protocol/intents';
+import { NonEncryptedTypes } from './response_resolver';
+import { SNProtocolService } from './../../protocol_service';
+import { PayloadManager } from './../../payload_manager';
+import { UuidString } from './../../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { arrayByDifference, subtractFromArray } from '@Lib/utils';
 import { SyncResponse } from '@Services/sync/response';
@@ -13,41 +18,42 @@ export const SyncUpDownLimit = 150;
 export class AccountSyncOperation {
   public id = Math.random();
 
-  private pendingPayloads: PurePayload[];
+  private pendingUuids: UuidString[];
   private responses: SyncResponse[] = [];
+
+  static UpdownLimit = SyncUpDownLimit;
 
   /**
    * @param payloads   An array of payloads to send to the server
    * @param receiver   A function that receives callback multiple times during the operation
    */
   constructor(
-    private payloads: PurePayload[],
+    private uuids: UuidString[],
     private receiver: ResponseSignalReceiver,
     private lastSyncToken: string,
     private paginationToken: string,
     public checkIntegrity: boolean,
-    private apiService: SNApiService
+    private apiService: SNApiService,
+    private payloadManager: PayloadManager,
+    private protocolService: SNProtocolService
   ) {
-    this.payloads = payloads;
-    this.lastSyncToken = lastSyncToken;
-    this.paginationToken = paginationToken;
-    this.checkIntegrity = checkIntegrity;
-    this.apiService = apiService;
-    this.receiver = receiver;
-    this.pendingPayloads = payloads.slice();
+    this.pendingUuids = uuids.slice();
   }
 
   /**
    * Read the payloads that have been saved, or are currently in flight.
    */
-  get payloadsSavedOrSaving() {
-    return arrayByDifference(this.payloads, this.pendingPayloads);
+  get payloadsSavedOrSaving(): PurePayload[] {
+    return arrayByDifference(
+      this.payloadManager.find(this.uuids),
+      this.payloadManager.find(this.pendingUuids)
+    );
   }
 
-  popPayloads(count: number) {
-    const payloads = this.pendingPayloads.slice(0, count);
-    subtractFromArray(this.pendingPayloads, payloads);
-    return payloads;
+  popPayloads(count: number): PurePayload[] {
+    const uuids = this.pendingUuids.slice(0, count);
+    subtractFromArray(this.pendingUuids, uuids);
+    return this.payloadManager.find(uuids);
   }
 
   async run(): Promise<void> {
@@ -55,7 +61,14 @@ export class AccountSyncOperation {
       completedUploadCount: this.totalUploadCount - this.pendingUploadCount,
       totalUploadCount: this.totalUploadCount,
     });
-    const payloads = this.popPayloads(this.upLimit);
+    const payloads = await this.protocolService.payloadsByEncryptingPayloads(
+      this.popPayloads(this.upLimit),
+      (payload) => {
+        return NonEncryptedTypes.includes(payload.content_type!)
+          ? EncryptionIntent.SyncDecrypted
+          : EncryptionIntent.Sync;
+      }
+    );
     const rawResponse = await this.apiService.sync(
       payloads,
       this.lastSyncToken,
@@ -78,27 +91,27 @@ export class AccountSyncOperation {
     }
   }
 
-  get done() {
-    return this.pendingPayloads.length === 0 && !this.paginationToken;
+  get done(): boolean {
+    return this.pendingUuids.length === 0 && !this.paginationToken;
   }
 
   private get pendingUploadCount() {
-    return this.pendingPayloads.length;
+    return this.pendingUuids.length;
   }
 
   private get totalUploadCount() {
-    return this.payloads.length;
+    return this.uuids.length;
   }
 
   private get upLimit() {
-    return SyncUpDownLimit;
+    return AccountSyncOperation.UpdownLimit;
   }
 
   private get downLimit() {
-    return SyncUpDownLimit;
+    return AccountSyncOperation.UpdownLimit;
   }
 
-  get numberOfItemsInvolved() {
+  get numberOfItemsInvolved(): number {
     let total = 0;
     for (const response of this.responses) {
       total += response.numberOfItemsInvolved;
