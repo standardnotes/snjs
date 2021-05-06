@@ -1,3 +1,4 @@
+import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { SNItemsKey } from '@Models/app/items_key';
 import { SNHistoryManager } from './../history/history_manager';
 import { SyncEvent } from '@Services/sync/events';
@@ -110,6 +111,9 @@ export class SNSyncService extends PureService<
   SyncEvent,
   SyncResponse | { source: SyncSources }
 > {
+
+  public upDownLimit = 150;
+
   private interval: any;
   private state?: SyncState;
   private opStatus!: SyncOpStatus;
@@ -354,6 +358,18 @@ export class SNSyncService extends PureService<
     this.cursorToken = undefined;
     await this.storageService.removeValue(StorageKey.LastSyncToken);
     await this.storageService.removeValue(StorageKey.PaginationToken);
+  }
+
+  public async alternateUuidForItem(uuid: UuidString) {
+    const item = this.itemManager.findItem(uuid)!;
+    const payload = CreateMaxPayloadFromAnyObject(item);
+    const results = await PayloadsByAlternatingUuid(
+      payload,
+      this.payloadManager.getMasterCollection()
+    );
+    await this.payloadManager.emitPayloads(results, PayloadSource.LocalChanged);
+    await this.persistPayloads(results);
+    return this.itemManager.findItem(results[0].uuid!);
   }
 
   private itemsNeedingSync() {
@@ -736,6 +752,7 @@ export class SNSyncService extends PureService<
       },
       await this.getLastSyncToken(),
       await this.getPaginationToken(),
+      this.upDownLimit,
       checkIntegrity,
       this.apiService,
       this.payloadManager,
@@ -751,7 +768,7 @@ export class SNSyncService extends PureService<
       checkIntegrity,
       'mode:',
       mode,
-      'payloads:',
+      'unprocessed payloads:',
       payloads
     );
     return operation;
