@@ -31,7 +31,7 @@ services:
       - snjs
 
   syncing-server-js:
-    image: standardnotes/syncing-server-js:1.22.1
+    image: standardnotes/syncing-server-js:1.22.0
     entrypoint: [
       "./wait-for.sh", "db", "3306",
       "./wait-for.sh", "cache", "6379",
@@ -44,7 +44,7 @@ services:
       - snjs
 
   syncing-server-js-worker:
-    image: standardnotes/syncing-server-js:1.22.1
+    image: standardnotes/syncing-server-js:1.22.0
     depends_on:
       - syncing-server-js
     entrypoint: [
