@@ -71,7 +71,7 @@ describe('online conflict handling', function () {
       (mutator) => {
         /** Conflict the item */
         mutator.content.foo = 'zar';
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -101,7 +101,7 @@ describe('online conflict handling', function () {
       (mutator) => {
         /** Conflict the item */
         mutator.content.foo = 'zar';
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -152,7 +152,7 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.content.title = 'zar';
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -235,7 +235,7 @@ describe('online conflict handling', function () {
       (mutator) => {
         // modify this item to have stale values
         mutator.title = `${Math.random()}`;
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -267,7 +267,7 @@ describe('online conflict handling', function () {
       (mutator) => {
         /** Create conflict for a note */
         mutator.title = `${Math.random()}`;
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -307,7 +307,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
       // modify this item to have stale values
       mutator.title = newTitle;
-      mutator.updated_at = Factory.yesterday();
+      mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
     });
 
     // We expect this item to be duplicated
@@ -404,7 +404,7 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.content.foo = 'bar';
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -475,7 +475,7 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.setDeleted();
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -505,7 +505,7 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.text = 'Stale text';
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -534,7 +534,7 @@ describe('online conflict handling', function () {
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
@@ -572,7 +572,7 @@ describe('online conflict handling', function () {
       });
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
         mutator.text = `2`;
-        mutator.updated_at = yesterday;
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(yesterday);
       });
       // We expect all the notes to be duplicated.
       this.expectedItemCount++;
@@ -631,7 +631,7 @@ describe('online conflict handling', function () {
       serverExt.uuid,
       (mutator) => {
         mutator.content.title = `${Math.random()}`;
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       }
     );
     await this.application.syncService.sync({ ...syncOptions, awaitAll: true });
@@ -708,7 +708,7 @@ describe('online conflict handling', function () {
     note = await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
         mutator.text = newText;
       },
       undefined,
@@ -720,7 +720,7 @@ describe('online conflict handling', function () {
     tag = await this.application.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
-        mutator.updated_at = Factory.yesterday();
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
       },
       undefined,
       undefined,
