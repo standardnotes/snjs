@@ -155,7 +155,8 @@ describe('online syncing', function () {
         secret: '123',
       },
     });
-    const results = await this.application.syncService.payloadsByPreparingForServer(
+    const results = await payloadsByPreparingForServer(
+      this.application.protocolService,
       [payload]
     );
     const processed = results[0];
@@ -1048,7 +1049,6 @@ describe('online syncing', function () {
   });
 
   it('should use latest value of item when performing second page of sync', async function () {
-    // this.application.syncService.loggingEnabled = true;
     /**
      * If 151 items are set to sync, and the per page limit is 150, then the 151st item
      * will be queued to sync after the first page completes. We want to make sure that
@@ -1058,7 +1058,7 @@ describe('online syncing', function () {
     const noteCount = 3;
     await Factory.createManyMappedNotes(this.application, noteCount);
     this.expectedItemCount += noteCount;
-    AccountSyncOperation.UpdownLimit = noteCount - 1;
+    this.application.syncService.upDownLimit = noteCount - 1;
     const dirtyItems = this.application.syncService.itemsNeedingSync();
     expect(dirtyItems.length).to.equal(noteCount);
     const lastItemUuid = dirtyItems[dirtyItems.length - 1].uuid;

@@ -9,7 +9,16 @@ import { SyncResponse } from '@Services/sync/response';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';
 
-export const SyncUpDownLimit = 150;
+export async function payloadsByPreparingForServer(
+  protocolService: SNProtocolService,
+  payloads: PurePayload[]
+): Promise<PurePayload[]> {
+  return protocolService.payloadsByEncryptingPayloads(payloads, (payload) => {
+    return NonEncryptedTypes.includes(payload.content_type!)
+      ? EncryptionIntent.SyncDecrypted
+      : EncryptionIntent.Sync;
+  });
+}
 
 /**
  * A long running operation that handles multiple roundtrips from a server,
@@ -21,8 +30,6 @@ export class AccountSyncOperation {
   private pendingUuids: UuidString[];
   private responses: SyncResponse[] = [];
 
-  static UpdownLimit = SyncUpDownLimit;
-
   /**
    * @param payloads   An array of payloads to send to the server
    * @param receiver   A function that receives callback multiple times during the operation
@@ -32,6 +39,7 @@ export class AccountSyncOperation {
     private receiver: ResponseSignalReceiver,
     private lastSyncToken: string,
     private paginationToken: string,
+    private upDownLimit: number,
     public checkIntegrity: boolean,
     private apiService: SNApiService,
     private payloadManager: PayloadManager,
@@ -61,13 +69,9 @@ export class AccountSyncOperation {
       completedUploadCount: this.totalUploadCount - this.pendingUploadCount,
       totalUploadCount: this.totalUploadCount,
     });
-    const payloads = await this.protocolService.payloadsByEncryptingPayloads(
-      this.popPayloads(this.upLimit),
-      (payload) => {
-        return NonEncryptedTypes.includes(payload.content_type!)
-          ? EncryptionIntent.SyncDecrypted
-          : EncryptionIntent.Sync;
-      }
+    const payloads = await payloadsByPreparingForServer(
+      this.protocolService,
+      this.popPayloads(this.upLimit)
     );
     const rawResponse = await this.apiService.sync(
       payloads,
@@ -104,11 +108,11 @@ export class AccountSyncOperation {
   }
 
   private get upLimit() {
-    return AccountSyncOperation.UpdownLimit;
+    return this.upDownLimit;
   }
 
   private get downLimit() {
-    return AccountSyncOperation.UpdownLimit;
+    return this.upDownLimit;
   }
 
   get numberOfItemsInvolved(): number {
