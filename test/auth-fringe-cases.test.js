@@ -93,7 +93,7 @@ describe('auth fringe cases', () => {
   });
 
   describe('having offline item matching remote item uuid', function () {
-    it('offline item should not overwrite recently updated server item and conflict should be created', async function () {
+    it.skip('offline item should not overwrite recently updated server item and conflict should be created', async function () {
       const context = await createContext();
       await context.application.register(context.email, context.password);
       const staleText = 'stale text';
