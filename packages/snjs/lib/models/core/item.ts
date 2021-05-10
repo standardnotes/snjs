@@ -507,6 +507,13 @@ export class ItemMutator {
     });
   }
 
+  public set updated_at_timestamp(updated_at_timestamp: number) {
+    this.payload = CopyPayload(this.payload, {
+      updated_at_timestamp,
+    });
+  }
+
+
   public set userModifiedDate(date: Date) {
     this.setAppDataItem(AppDataField.UserModifiedDate, date);
   }

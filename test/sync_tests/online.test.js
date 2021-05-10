@@ -1037,4 +1037,13 @@ describe('online syncing', function () {
       }
     }
   });
+
+  it('retrieved items should have both updated_at and updated_at_timestamps', async function () {
+    const note = await Factory.createSyncedNote(this.application);
+    this.expectedItemCount++;
+    expect(note.payload.created_at_timestamp).to.be.ok;
+    expect(note.payload.created_at).to.be.ok;
+    expect(note.payload.updated_at_timestamp).to.be.ok;
+    expect(note.payload.updated_at).to.be.ok;
+  });
 });
