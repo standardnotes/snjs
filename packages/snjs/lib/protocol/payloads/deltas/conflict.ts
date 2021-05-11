@@ -52,7 +52,7 @@ export class ConflictDelta {
       PayloadContentsEqual(existingConflict, this.applyPayload)
     ) {
       /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
-      return [];
+      strategy = ConflictStrategy.KeepLeft;
     }
     if (strategy === ConflictStrategy.KeepLeft) {
       const updatedAt = greaterOfTwoDates(

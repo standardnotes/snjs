@@ -41,7 +41,7 @@ describe('preferences', function () {
     );
     const editorLeft = this.application.getPreference('editorLeft');
     expect(editorLeft).to.equal(300);
-  });
+  }).timeout(10000);
 
   it('clears preferences on signout', async function () {
     await register.call(this);
