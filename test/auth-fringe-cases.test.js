@@ -7,6 +7,11 @@ const expect = chai.expect;
 describe('auth fringe cases', () => {
   const BASE_ITEM_COUNT = ['default items key', 'user prefs'].length;
 
+  const syncOptions = {
+    checkIntegrity: true,
+    awaitAll: true,
+  };
+
   const createContext = async () => {
     const application = await Factory.createInitAppWithRandNamespace();
     return {
