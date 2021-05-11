@@ -1,3 +1,4 @@
+import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { SNLog } from './../log';
 import {
   LegacyAttachedData,
@@ -668,7 +669,7 @@ export class SNProtocolService
     let decryptedPayloads: PurePayload[] = [];
     if (keyParamsData) {
       const keyParams = this.createKeyParams(keyParamsData);
-      const key = await this.computeRootKey(password!, keyParams);
+      const rootKey = await this.computeRootKey(password!, keyParams);
       const itemsKeysPayloads = encryptedPayloads.filter((payload) => {
         return payload.content_type === ContentType.ItemsKey;
       });
@@ -678,7 +679,10 @@ export class SNProtocolService
        */
       const decryptedItemsKeysPayloads = await this.payloadsByDecryptingPayloads(
         itemsKeysPayloads,
-        key
+        rootKey
+      );
+      const decryptedItemsKeys = decryptedItemsKeysPayloads.map(
+        (p) => CreateItemFromPayload(p) as SNItemsKey
       );
       extendArray(decryptedPayloads, decryptedItemsKeysPayloads);
       for (const encryptedPayload of encryptedPayloads) {
@@ -699,13 +703,28 @@ export class SNProtocolService
             const payloadVersion = encryptedPayload.version as ProtocolVersion;
             if (candidate) {
               itemsKey = CreateItemFromPayload(candidate) as SNItemsKey;
-            } else if (
+            } else {
               /**
                * Payloads with versions <= 003 use root key directly for encryption.
+               * However, if the incoming key params are >= 004, this means we should
+               * have an items key based off the 003 root key. We can't use the 004
+               * root key directly because it's missing dataAuthenticationKey.
                */
-              compareVersions(payloadVersion, ProtocolVersion.V003) <= 0
-            ) {
-              itemsKey = key;
+              if (
+                leftVersionGreaterThanOrEqualToRight(
+                  keyParams.version,
+                  ProtocolVersion.V004
+                )
+              ) {
+                itemsKey = this.defaultItemsKeyForItemVersion(
+                  payloadVersion,
+                  decryptedItemsKeys
+                );
+              } else if (
+                compareVersions(payloadVersion, ProtocolVersion.V003) <= 0
+              ) {
+                itemsKey = rootKey;
+              }
             }
           }
           const decryptedPayload = await this.payloadByDecryptingPayload(
@@ -1416,16 +1435,18 @@ export class SNProtocolService
    * with previous protocol version.
    */
   public defaultItemsKeyForItemVersion(
-    version: ProtocolVersion
+    version: ProtocolVersion,
+    fromKeys?: SNItemsKey[]
   ): SNItemsKey | undefined {
     /** Try to find one marked default first */
-    const priorityKey = this.latestItemsKeys().find((key) => {
+    const searchKeys = fromKeys || this.latestItemsKeys();
+    const priorityKey = searchKeys.find((key) => {
       return key.isDefault && key.keyVersion === version;
     });
     if (priorityKey) {
       return priorityKey;
     }
-    return this.latestItemsKeys().find((key) => {
+    return searchKeys.find((key) => {
       return key.keyVersion === version;
     });
   }

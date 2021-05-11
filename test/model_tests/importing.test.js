@@ -449,7 +449,7 @@ describe('importing', function () {
     expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport);
   });
 
-  it('should import data from 003 encrypted payload', async function () {
+  it('should import data from 003 encrypted payload using client generated backup', async function () {
     const oldVersion = ProtocolVersion.V003;
     await Factory.registerOldUser({
       application: this.application,
@@ -483,6 +483,57 @@ describe('importing', function () {
     expect(decryptedNote.title).to.be.eq('Encrypted note');
     expect(decryptedNote.text).to.be.eq('On protocol version 003.');
     expect(this.application.itemManager.notes.length).to.equal(1);
+  });
+
+  it('should import data from 003 encrypted payload using server generated backup with 004 key params', async function () {
+    const backupData = {
+      items: [
+        {
+          uuid: 'eb1b7eed-e43d-48dd-b257-b7fc8ccba3da',
+          duplicate_of: null,
+          items_key_id: null,
+          content:
+            '003:618138e365a13f8aed17d4f52e3da47d4b5d6e02004a0f827118e8a981a57c35:eb1b7eed-e43d-48dd-b257-b7fc8ccba3da:9f38642b7a3f57546520a9e32aa7c0ad:qa9rUcaD904m1Knv63dnATEHwfHJjsbq9bWb06zGTsyQxzLaAYT7uRGp2KB2g1eo5Aqxc5FqhvuF0+dE1f4+uQOeiRFNX73V2pJJY0w5Qq7l7ZuhB08ZtOMY4Ctq7evBBSIVZ+PEIfFnACelNJhsB5Uhn3kS4ZBx6qtvQ6ciSQGfYAwc6wSKhjUm1umEINeb08LNgwbP6XAm8U/la1bdtdMO112XjUW7ixkWi3POWcM=:eyJpZGVudGlmaWVyIjoicGxheWdyb3VuZEBiaXRhci5pbyIsInB3X2Nvc3QiOjExMDAwMCwicHdfbm9uY2UiOiJhZmIwYjE3NGJlYjViMmJmZTIyNTk1NDlmMTgxNDI1NzlkMDE1ZmE3ZTBhMjE4YzVmNDIxNmU0Mzg2ZGI3OWFiIiwidmVyc2lvbiI6IjAwMyJ9',
+          content_type: 'Note',
+          enc_item_key:
+            '003:5a01e913c52899ba10c16dbe7e713dd9caf9b9554c82176ddfcf1424f5bfd94f:eb1b7eed-e43d-48dd-b257-b7fc8ccba3da:14721ff8dbdd36fb57ae4bf7414c5eab:odmq91dfaTZG/zeSUA09fD/PdB2OkiDxcQZ0FL06GPstxdvxnU17k1rtsWoA7HoNNnd5494BZ/b7YiKqUb76ddd8x3/+cTZgCa4tYxNINmb1T3wwUX0Ebxc8xynAhg6nTY/BGq+ba6jTyl8zw12dL3kBEGGglRCHnO0ZTeylwQW7asfONN8s0BwrvHdonRlx:eyJpZGVudGlmaWVyIjoicGxheWdyb3VuZEBiaXRhci5pbyIsInB3X2Nvc3QiOjExMDAwMCwicHdfbm9uY2UiOiJhZmIwYjE3NGJlYjViMmJmZTIyNTk1NDlmMTgxNDI1NzlkMDE1ZmE3ZTBhMjE4YzVmNDIxNmU0Mzg2ZGI3OWFiIiwidmVyc2lvbiI6IjAwMyJ9',
+          auth_hash: null,
+          created_at: '2019-05-12T02:29:21.789000Z',
+          updated_at: '2019-11-12T21:47:48.382708Z',
+          deleted: false,
+        },
+        {
+          uuid: '10051be7-4ca2-4af3-aae9-021939df4fab',
+          duplicate_of: null,
+          items_key_id: null,
+          content:
+            '004:77a986823b8ffdd87164b6f541de6ed420b70ac67e055774:+8cjww1QbyXNX+PSKeCwmnysv0rAoEaKh409VWQJpDbEy/pPZCT6c0rKxLzvyMiSq6EwkOiduZMzokRgCKP7RuRqNPJceWsxNnpIUwa40KR1IP2tdreW4J8v9pFEzPMec1oq40u+c+UI/Y6ChOLV/4ozyWmpQCK3y8Ugm7B1/FzaeDs9Ie6Mvf98+XECoi0fWv9SO2TeBvq1G24LXd4zf0j8jd0sKZbLPXH0+gaUXtBH7A56lHvB0ED9NuiHI8xopTBd9ogKlz/b5+JB4zA2zQCQ3WMEE1qz6WeB2S4FMomgeO1e3trabdU0ICu0WMvDVii4qNlQo/inD41oHXKeV5QwnYoGjPrLJIaP0hiLKhDURTHygCdvWdp63OWI+aGxv0/HI+nfcRsqSE+aYECrWB/kp/c5yTrEqBEafuWZkw==:eyJrcCI6eyJpZGVudGlmaWVyIjoicGxheWdyb3VuZEBiaXRhci5pbyIsInB3X25vbmNlIjoiNjUxYWUxZWM5NTgwMzM5YTM1NjdlZTdmMGY4NjcyNDkyZGUyYzE2NmE1NTZjMTNkMTE5NzI4YTAzYzYwZjc5MyIsInZlcnNpb24iOiIwMDQiLCJvcmlnaW5hdGlvbiI6InByb3RvY29sLXVwZ3JhZGUiLCJjcmVhdGVkIjoiMTYxNDc4NDE5MjQ5NyJ9LCJ1IjoiMTAwNTFiZTctNGNhMi00YWYzLWFhZTktMDIxOTM5ZGY0ZmFiIiwidiI6IjAwNCJ9',
+          content_type: 'SN|ItemsKey',
+          enc_item_key:
+            '004:d25deb224251b4705a44d8ce125a62f6a2f0e0e856603e8f:FEv1pfU/VfY7XhJrTfpcdhaSBfmNySTQtHohFYDm8V84KlyF5YaXRKV7BfXsa77DKTjOCU/EHHsWwhBEEfsNnzNySHxTHNc26bpoz0V8h50=:eyJrcCI6eyJpZGVudGlmaWVyIjoicGxheWdyb3VuZEBiaXRhci5pbyIsInB3X25vbmNlIjoiNjUxYWUxZWM5NTgwMzM5YTM1NjdlZTdmMGY4NjcyNDkyZGUyYzE2NmE1NTZjMTNkMTE5NzI4YTAzYzYwZjc5MyIsInZlcnNpb24iOiIwMDQiLCJvcmlnaW5hdGlvbiI6InByb3RvY29sLXVwZ3JhZGUiLCJjcmVhdGVkIjoiMTYxNDc4NDE5MjQ5NyJ9LCJ1IjoiMTAwNTFiZTctNGNhMi00YWYzLWFhZTktMDIxOTM5ZGY0ZmFiIiwidiI6IjAwNCJ9',
+          auth_hash: null,
+          created_at: '2020-09-07T12:22:06.562000Z',
+          updated_at: '2021-03-03T15:09:55.741107Z',
+          deleted: false,
+        },
+      ],
+      auth_params: {
+        identifier: 'playground@bitar.io',
+        pw_nonce:
+          '651ae1ec9580339a3567ee7f0f8672492de2c166a556c13d119728a03c60f793',
+        version: '004',
+      },
+    };
+
+    const password = 'password';
+
+    this.application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(this.application, password);
+
+    const result = await this.application.importData(backupData, true);
+    expect(result).to.not.be.undefined;
+    expect(result.affectedItems.length).to.be.eq(backupData.items.length);
+    expect(result.errorCount).to.be.eq(0);
   });
 
   it('should import data from 004 encrypted payload', async function () {
