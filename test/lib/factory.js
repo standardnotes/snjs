@@ -365,6 +365,12 @@ export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
   ];
 }
 
+export async function createSyncedNoteWithTag(application) {
+  const payloads = createRelatedNoteTagPairPayload();
+  await application.itemManager.emitItemsFromPayloads(payloads);
+  return application.sync(syncOptions);
+}
+
 export async function storagePayloadCount(application) {
   const payloads = await application.storageService.getAllRawPayloads();
   return payloads.length;
