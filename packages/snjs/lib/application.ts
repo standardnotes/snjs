@@ -704,11 +704,11 @@ export class SNApplication {
     return unprotectedNote;
   }
 
-  public async getAuthorizedNotesForProtectedAction(
+  public async authorizeProtectedActionForNotes(
     notes: SNNote[],
     challengeReason: ChallengeReason
   ): Promise<SNNote[]> {
-    return await this.protectionService.getAuthorizedNotesForProtectedAction(
+    return await this.protectionService.authorizeProtectedActionForNotes(
       notes,
       challengeReason
     );

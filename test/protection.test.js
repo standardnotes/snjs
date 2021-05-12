@@ -406,7 +406,7 @@ describe('protections', function () {
     });
   });
 
-  describe('getAuthorizedNotesForProtectedAction', async function () {
+  describe('authorizeProtectedActionForNotes', async function () {
     it('prompts for password once with the right challenge reason when one or more notes are protected', async function () {
       let challengePrompts = 0;
       this.application = await Factory.createApplication(Factory.randomString());
@@ -447,7 +447,7 @@ describe('protections', function () {
       notes[0] = await this.application.protectNote(notes[0]);
       notes[1] = await this.application.protectNote(notes[1]);
 
-      expect(await this.application.getAuthorizedNotesForProtectedAction(
+      expect(await this.application.authorizeProtectedActionForNotes(
         notes,
         ChallengeReason.SelectProtectedNote
       )).lengthOf(NOTE_COUNT);
@@ -489,7 +489,7 @@ describe('protections', function () {
       notes[0] = await this.application.protectNote(notes[0]);
       notes[1] = await this.application.protectNote(notes[1]);
 
-      expect(await this.application.getAuthorizedNotesForProtectedAction(
+      expect(await this.application.authorizeProtectedActionForNotes(
         notes,
         ChallengeReason.SelectProtectedNote
       )).lengthOf(NOTE_COUNT);
@@ -515,7 +515,7 @@ describe('protections', function () {
       notes[0] = await this.application.protectNote(notes[0]);
       notes[1] = await this.application.protectNote(notes[1]);
 
-      expect(await this.application.getAuthorizedNotesForProtectedAction(
+      expect(await this.application.authorizeProtectedActionForNotes(
         notes,
         ChallengeReason.SelectProtectedNote
       )).lengthOf(1);

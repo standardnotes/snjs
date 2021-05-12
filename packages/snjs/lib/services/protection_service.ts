@@ -171,7 +171,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     }
   }
 
-  async getAuthorizedNotesForProtectedAction(
+  async authorizeProtectedActionForNotes(
     notes: SNNote[],
     challengeReason: ChallengeReason
   ): Promise<SNNote[]> {
@@ -199,7 +199,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
   }
 
   async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
-    const authorizedNotes = await this.getAuthorizedNotesForProtectedAction(
+    const authorizedNotes = await this.authorizeProtectedActionForNotes(
       notes,
       ChallengeReason.UnprotectNote
     );
