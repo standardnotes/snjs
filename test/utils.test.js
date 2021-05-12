@@ -140,6 +140,13 @@ describe('utils', () => {
     expect(result.length).to.equal(2);
   });
 
+  it('filterFromArray function predicate', () => {
+    const array = [{ uuid: 1 }, { uuid: 2 }, { uuid: 3 }];
+
+    filterFromArray(array, (o) => o.uuid === 1);
+    expect(array.length).to.equal(2);
+  });
+
   it('lodash merge should behave as expected', () => {
     const a = {
       content: {

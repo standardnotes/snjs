@@ -113,6 +113,7 @@ export {
   deepMerge,
   dictToArray,
   extendArray,
+  filterFromArray,
   findInArray,
   getGlobalScope,
   greaterOfTwoDates,

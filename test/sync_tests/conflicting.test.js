@@ -71,7 +71,9 @@ describe('online conflict handling', function () {
       (mutator) => {
         /** Conflict the item */
         mutator.content.foo = 'zar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -101,7 +103,9 @@ describe('online conflict handling', function () {
       (mutator) => {
         /** Conflict the item */
         mutator.content.foo = 'zar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -152,7 +156,9 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.content.title = 'zar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -235,7 +241,9 @@ describe('online conflict handling', function () {
       (mutator) => {
         // modify this item to have stale values
         mutator.title = `${Math.random()}`;
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -267,7 +275,9 @@ describe('online conflict handling', function () {
       (mutator) => {
         /** Create conflict for a note */
         mutator.title = `${Math.random()}`;
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -307,7 +317,9 @@ describe('online conflict handling', function () {
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
       // modify this item to have stale values
       mutator.title = newTitle;
-      mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+      mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+        Factory.yesterday()
+      );
     });
 
     // We expect this item to be duplicated
@@ -404,7 +416,9 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.content.foo = 'bar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -475,7 +489,9 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.setDeleted();
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -505,7 +521,9 @@ describe('online conflict handling', function () {
       note.uuid,
       (mutator) => {
         mutator.text = 'Stale text';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -534,7 +552,9 @@ describe('online conflict handling', function () {
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -631,7 +651,9 @@ describe('online conflict handling', function () {
       serverExt.uuid,
       (mutator) => {
         mutator.content.title = `${Math.random()}`;
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       }
     );
     await this.application.syncService.sync({ ...syncOptions, awaitAll: true });
@@ -708,7 +730,9 @@ describe('online conflict handling', function () {
     note = await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
         mutator.text = newText;
       },
       undefined,
@@ -720,7 +744,9 @@ describe('online conflict handling', function () {
     tag = await this.application.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday());
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+          Factory.yesterday()
+        );
       },
       undefined,
       undefined,
@@ -824,46 +850,113 @@ describe('online conflict handling', function () {
     await this.sharedFinalAssertions();
   });
 
-  it(
-    'registering for account with bulk offline data belonging to another account should be error-free',
-    async function () {
-      /**
-       * When performing a multi-page sync request where we are uploading data imported from a backup,
-       * if the first page of the sync request returns conflicted items keys, we rotate their UUID.
-       * The second page of sync waiting to be sent up is still encrypted with the old items key UUID.
-       * This causes a problem because when that second page is returned as conflicts, we will be looking
-       * for an items_key_id that no longer exists (has been rotated). Rather than modifying the entire
-       * sync paradigm to allow multi-page requests to consider side-effects of each page, we will instead
-       * take the approach of making sure the decryption function is liberal with regards to searching
-       * for the right items key. It will now consider (as a result of this test) an items key as being
-       * the correct key to decrypt an item if the itemskey.uuid == item.items_key_id OR if the itemsKey.duplicateOf
-       * value is equal to item.items_key_id.
-       */
+  it('registering for account with bulk offline data belonging to another account should be error-free', async function () {
+    /**
+     * When performing a multi-page sync request where we are uploading data imported from a backup,
+     * if the first page of the sync request returns conflicted items keys, we rotate their UUID.
+     * The second page of sync waiting to be sent up is still encrypted with the old items key UUID.
+     * This causes a problem because when that second page is returned as conflicts, we will be looking
+     * for an items_key_id that no longer exists (has been rotated). Rather than modifying the entire
+     * sync paradigm to allow multi-page requests to consider side-effects of each page, we will instead
+     * take the approach of making sure the decryption function is liberal with regards to searching
+     * for the right items key. It will now consider (as a result of this test) an items key as being
+     * the correct key to decrypt an item if the itemskey.uuid == item.items_key_id OR if the itemsKey.duplicateOf
+     * value is equal to item.items_key_id.
+     */
 
-      /** Create bulk data belonging to another account and sync */
-      const largeItemCount = SyncUpDownLimit + 10;
-      await Factory.createManyMappedNotes(this.application, largeItemCount);
-      await this.application.syncService.sync(syncOptions);
-      const priorData = this.application.itemManager.items;
+    /** Create bulk data belonging to another account and sync */
+    const largeItemCount = SyncUpDownLimit + 10;
+    await Factory.createManyMappedNotes(this.application, largeItemCount);
+    await this.application.syncService.sync(syncOptions);
+    const priorData = this.application.itemManager.items;
 
-      /** Register new account and import this same data */
-      const newApp = await Factory.signOutApplicationAndReturnNew(
-        this.application
-      );
-      await Factory.registerUserToApplication({
-        application: newApp,
-        email: await Factory.generateUuid(),
-        password: await Factory.generateUuid(),
-      });
-      await newApp.itemManager.emitItemsFromPayloads(
-        priorData.map((i) => i.payload)
-      );
-      await newApp.syncService.markAllItemsAsNeedingSync();
-      await newApp.syncService.sync(syncOptions);
-      expect(newApp.itemManager.invalidItems.length).to.equal(0);
-      newApp.deinit();
-    }
-  ).timeout(60000);
+    /** Register new account and import this same data */
+    const newApp = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    await Factory.registerUserToApplication({
+      application: newApp,
+      email: await Factory.generateUuid(),
+      password: await Factory.generateUuid(),
+    });
+    await newApp.itemManager.emitItemsFromPayloads(
+      priorData.map((i) => i.payload)
+    );
+    await newApp.syncService.markAllItemsAsNeedingSync();
+    await newApp.syncService.sync(syncOptions);
+    expect(newApp.itemManager.invalidItems.length).to.equal(0);
+    newApp.deinit();
+  }).timeout(60000);
+
+  it('importing data belonging to another account should not result in duplication', async function () {
+    /** Create primary account and export data */
+    await Factory.createSyncedNoteWithTag(this.application);
+    let backupFile = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    /** Sort matters, and is the cause of the original issue, where tag comes before the note */
+    backupFile.items = [
+      backupFile.items.find((i) => i.content_type === ContentType.ItemsKey),
+      backupFile.items.find((i) => i.content_type === ContentType.Tag),
+      backupFile.items.find((i) => i.content_type === ContentType.Note),
+    ];
+    backupFile = JSON.parse(JSON.stringify(backupFile));
+    /** Register new account and import this same data */
+    const newApp = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    const password = this.password;
+    await Factory.registerUserToApplication({
+      application: newApp,
+      email: await Factory.generateUuid(),
+      password: password,
+    });
+    Factory.handlePasswordChallenges(newApp, password);
+    await newApp.importData(backupFile, true);
+    expect(newApp.itemManager.tags.length).to.equal(1);
+    expect(newApp.itemManager.notes.length).to.equal(1);
+    newApp.deinit();
+  }).timeout(10000);
+
+  it('importing notes + tags belonging to another account should keep correct associations', async function () {
+    /**
+     * The original issue can be replicated when an export contains a tag with two notes,
+     * where the two notes are first listed in the backup, then the tag.
+     */
+    /** Create primary account and export data */
+    await Factory.createSyncedNoteWithTag(this.application);
+    const tag = this.application.itemManager.tags[0];
+    const note2 = await Factory.createMappedNote(this.application);
+    await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
+      mutator.addItemAsRelationship(note2);
+    });
+    let backupFile = await this.application.createBackupFile(
+      EncryptionIntent.FileEncrypted
+    );
+    backupFile.items = [
+      backupFile.items.find((i) => i.content_type === ContentType.ItemsKey),
+      backupFile.items.filter((i) => i.content_type === ContentType.Note)[0],
+      backupFile.items.filter((i) => i.content_type === ContentType.Note)[1],
+      backupFile.items.find((i) => i.content_type === ContentType.Tag),
+    ];
+    backupFile = JSON.parse(JSON.stringify(backupFile));
+    /** Register new account and import this same data */
+    const newApp = await Factory.signOutApplicationAndReturnNew(
+      this.application
+    );
+    const password = this.password;
+    await Factory.registerUserToApplication({
+      application: newApp,
+      email: await Factory.generateUuid(),
+      password: password,
+    });
+    Factory.handlePasswordChallenges(newApp, password);
+    await newApp.importData(backupFile, true);
+    const newTag = newApp.itemManager.tags[0];
+    const notes = newApp.referencesForItem(newTag);
+    expect(notes.length).to.equal(2);
+    newApp.deinit();
+  }).timeout(10000);
 
   it('server should prioritize updated_at_timestamp over updated_at for sync, if provided', async function () {
     /**

@@ -1,10 +1,11 @@
+import { Uuids } from '@Models/functions';
 import { SNLog } from './../../../log';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
-import { extendArray } from '@Lib/utils';
+import { extendArray, filterFromArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteConflicts extends PayloadsDelta {
@@ -59,6 +60,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
    */
   private async collectionsByHandlingUuidConflicts() {
     const results: Array<PurePayload> = [];
+    const collection = this.baseCollection.mutableCopy();
     for (const payload of this.applyCollection.all()) {
       /**
        * The payload in question may have been modified as part of alternating a uuid for
@@ -85,8 +87,10 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       }
       const alternateResults = await PayloadsByAlternatingUuid(
         decrypted,
-        this.baseCollection
+        ImmutablePayloadCollection.FromCollection(collection)
       );
+      collection.set(alternateResults);
+      filterFromArray(results, (r) => Uuids(alternateResults).includes(r.uuid));
       extendArray(results, alternateResults);
     }
 

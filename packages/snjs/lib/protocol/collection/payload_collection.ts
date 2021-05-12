@@ -42,6 +42,21 @@ export class ImmutablePayloadCollection extends MutableCollection<PurePayload> {
     return result;
   }
 
+  mutableCopy(): MutableCollection<PurePayload> {
+    const mapCopy = Object.assign({}, this.map);
+    const typedMapCopy = Object.assign({}, this.typedMap);
+    const referenceMapCopy = this.referenceMap.makeCopy() as UuidMap;
+    const conflictMapCopy = this.conflictMap.makeCopy() as UuidMap;
+    const result = new MutableCollection(
+      true,
+      mapCopy as Partial<Record<UuidString, PurePayload>>,
+      typedMapCopy as Partial<Record<ContentType, PurePayload[]>>,
+      referenceMapCopy,
+      conflictMapCopy
+    );
+    return result;
+  }
+
   public get payloads() {
     return this.all();
   }

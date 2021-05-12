@@ -87,7 +87,7 @@ export async function PayloadsByDuplicating(
    * Get the payloads that make reference to payload and add the copy.
    */
   const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = await PayloadsByUpdatingReferences(referencing, [
+  const updatedReferencing = PayloadsByUpdatingReferences(referencing, [
     {
       uuid: copy.uuid!,
       content_type: copy.content_type!,
@@ -116,7 +116,7 @@ export async function PayloadsByAlternatingUuid(
   payload: PurePayload,
   baseCollection: ImmutablePayloadCollection
 ): Promise<PurePayload[]> {
-  const results = [];
+  const results: PurePayload[] = [];
   /**
    * We need to clone payload and give it a new uuid,
    * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
@@ -136,7 +136,7 @@ export async function PayloadsByAlternatingUuid(
    * payload as a relationship, instead adding the new copy.
    */
   const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = await PayloadsByUpdatingReferences(
+  const updatedReferencing = PayloadsByUpdatingReferences(
     referencing,
     [
       {
@@ -175,11 +175,11 @@ export async function PayloadsByAlternatingUuid(
   return results;
 }
 
-async function PayloadsByUpdatingReferences(
+function PayloadsByUpdatingReferences(
   payloads: PurePayload[],
   add: ContentReference[],
   removeIds?: string[]
-) {
+): PurePayload[] {
   const results = [];
   for (const payload of payloads) {
     const references = payload.contentObject.references.slice();
