@@ -90,7 +90,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         ImmutablePayloadCollection.FromCollection(collection)
       );
       collection.set(alternateResults);
-      filterFromArray(results, (r) => Uuids(alternateResults).includes(r.uuid))
+      filterFromArray(results, (r) => Uuids(alternateResults).includes(r.uuid));
       extendArray(results, alternateResults);
     }
 
