@@ -405,4 +405,244 @@ describe('protections', function () {
       expect(this.application.areProtectionsEnabled()).to.be.false;
     });
   });
+
+  describe('getAuthorizedNotesForProtectedAction', async function () {
+    it('prompts for password once with the right challenge reason when one or more notes are protected', async function () {
+      let challengePrompts = 0;
+      this.application = await Factory.createApplication(Factory.randomString());
+      const password = Uuid.GenerateUuidSynchronously();
+
+      await this.application.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          challengePrompts += 1;
+          expect(
+            challenge.prompts.find(
+              (prompt) =>
+                prompt.validation === ChallengeValidation.AccountPassword
+            )
+          ).to.be.ok;
+          expect(challenge.reason).to.equal(ChallengeReason.SelectProtectedNote);
+          const values = challenge.prompts.map(
+            (prompt) =>
+              new ChallengeValue(
+                prompt,
+                prompt.validation === ChallengeValidation.AccountPassword
+                  ? password
+                  : 0
+              )
+          );
+          this.application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      await this.application.launch(true);
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: Uuid.GenerateUuidSynchronously(),
+        password,
+      });
+
+      const NOTE_COUNT = 3;
+      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
+
+      notes[0] = await this.application.protectNote(notes[0]);
+      notes[1] = await this.application.protectNote(notes[1]);
+
+      expect(await this.application.getAuthorizedNotesForProtectedAction(
+        notes,
+        ChallengeReason.SelectProtectedNote
+      )).lengthOf(NOTE_COUNT);
+      expect(challengePrompts).to.equal(1);
+    });
+
+    it('prompts for passcode once with the right challenge reason when one or more notes are protected', async function () {
+      let challengePrompts = 0;
+      this.application = await Factory.createApplication(Factory.randomString());
+      const passcode = 'passcode🌂';
+
+      await this.application.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          challengePrompts += 1;
+          expect(
+            challenge.prompts.find(
+              (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+            )
+          ).to.be.ok;
+          expect(challenge.reason).to.equal(ChallengeReason.SelectProtectedNote);
+          const values = challenge.prompts.map(
+            (prompt) =>
+              new ChallengeValue(
+                prompt,
+                prompt.validation === ChallengeValidation.LocalPasscode
+                  ? passcode
+                  : 0
+              )
+          );
+
+          this.application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      await this.application.launch(true);
+      await this.application.addPasscode(passcode);
+
+      const NOTE_COUNT = 3;
+      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
+      notes[0] = await this.application.protectNote(notes[0]);
+      notes[1] = await this.application.protectNote(notes[1]);
+
+      expect(await this.application.getAuthorizedNotesForProtectedAction(
+        notes,
+        ChallengeReason.SelectProtectedNote
+      )).lengthOf(NOTE_COUNT);
+      expect(challengePrompts).to.equal(1);
+    });
+
+    it('does not return protected notes if challenge is canceled', async function () {
+      const passcode = 'passcode🌂';
+      let challengePrompts = 0;
+
+      this.application = await Factory.createApplication(Factory.randomString());
+      await this.application.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          challengePrompts++;
+          this.application.cancelChallenge(challenge);
+        },
+      });
+      await this.application.launch(true);
+      await this.application.addPasscode(passcode);
+
+      const NOTE_COUNT = 3;
+      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
+      notes[0] = await this.application.protectNote(notes[0]);
+      notes[1] = await this.application.protectNote(notes[1]);
+
+      expect(await this.application.getAuthorizedNotesForProtectedAction(
+        notes,
+        ChallengeReason.SelectProtectedNote
+      )).lengthOf(1);
+      expect(challengePrompts).to.equal(1);
+    });
+  });
+
+  describe('protectNotes', async function () {
+    it('protects all notes', async function () {
+      this.application = await Factory.createApplication(Factory.randomString());
+
+      const NOTE_COUNT = 3;
+      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
+      notes = await this.application.protectNotes(notes);
+
+      for (const note of notes) {
+        expect(note.protected).to.be.true;
+      }
+    })
+  });
+
+  describe('unprotect notes', async function () {
+    it('prompts for password and unprotects all notes if challenge is succesful', async function () {
+      let challengePrompts = 0;
+      this.application = await Factory.createApplication(Factory.randomString());
+      const passcode = 'passcode🌂';
+
+      await this.application.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          challengePrompts += 1;
+          expect(
+            challenge.prompts.find(
+              (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+            )
+          ).to.be.ok;
+          expect(challenge.reason).to.equal(ChallengeReason.UnprotectNote);
+          const values = challenge.prompts.map(
+            (prompt) =>
+              new ChallengeValue(
+                prompt,
+                prompt.validation === ChallengeValidation.LocalPasscode
+                  ? passcode
+                  : 0
+              )
+          );
+
+          this.application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      await this.application.launch(true);
+      await this.application.addPasscode(passcode);
+
+      const NOTE_COUNT = 3;
+      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
+      notes = await this.application.protectNotes(notes);
+      notes = await this.application.unprotectNotes(notes);
+      
+      for (const note of notes) {
+        expect(note.protected).to.be.false;
+      }
+      expect(challengePrompts).to.equal(1);
+    });
+
+    it('prompts for passcode and unprotects all notes if challenge is succesful', async function () {
+      let challengePrompts = 0;
+      this.application = await Factory.createApplication(Factory.randomString());
+      const passcode = 'passcode🌂';
+
+      await this.application.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          challengePrompts += 1;
+          expect(
+            challenge.prompts.find(
+              (prompt) => prompt.validation === ChallengeValidation.LocalPasscode
+            )
+          ).to.be.ok;
+          expect(challenge.reason).to.equal(ChallengeReason.UnprotectNote);
+          const values = challenge.prompts.map(
+            (prompt) =>
+              new ChallengeValue(
+                prompt,
+                prompt.validation === ChallengeValidation.LocalPasscode
+                  ? passcode
+                  : 0
+              )
+          );
+
+          this.application.submitValuesForChallenge(challenge, values);
+        },
+      });
+      await this.application.launch(true);
+      await this.application.addPasscode(passcode);
+
+      const NOTE_COUNT = 3;
+      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
+      notes = await this.application.protectNotes(notes);
+      notes = await this.application.unprotectNotes(notes);
+      
+      for (const note of notes) {
+        expect(note.protected).to.be.false;
+      }
+      expect(challengePrompts).to.equal(1);
+    });
+
+    it('does not unprotect any notes if challenge is canceled', async function () {
+      const passcode = 'passcode🌂';
+      let challengePrompts = 0;
+
+      this.application = await Factory.createApplication(Factory.randomString());
+      await this.application.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          challengePrompts++;
+          this.application.cancelChallenge(challenge);
+        },
+      });
+      await this.application.launch(true);
+      await this.application.addPasscode(passcode);
+
+      const NOTE_COUNT = 3;
+      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
+      notes = await this.application.protectNotes(notes);
+      notes = await this.application.unprotectNotes(notes);
+      
+      for (const note of notes) {
+        expect(note.protected).to.be(true);
+      }
+      expect(challengePrompts).to.equal(1);
+    })
+  })
 });
