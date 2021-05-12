@@ -15,6 +15,7 @@ import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { ItemManager } from './item_manager';
 import { MutationType } from '@Lib/models/core/item';
+import { Uuids } from '@Lib/models/functions';
 
 export enum ProtectionEvent {
   SessionExpiryDateChanged = 'SessionExpiryDateChanged',
@@ -168,6 +169,46 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
         mutator.protected = false;
       }) as Promise<SNNote>;
     }
+  }
+
+  async authorizeProtectedActionForNotes(
+    notes: SNNote[],
+    challengeReason: ChallengeReason
+  ): Promise<SNNote[]> {
+    let sessionValidation: Promise<boolean> | undefined;
+    const authorizedNotes = [];
+    for (const note of notes) {
+      const isProtected = note.protected && this.areProtectionsEnabled();
+      if (isProtected && !sessionValidation) {
+        sessionValidation = this.validateOrRenewSession(challengeReason);
+      }
+      if (!isProtected || (await sessionValidation)) {
+        authorizedNotes.push(note);
+      }
+    }
+    return authorizedNotes;
+  }
+
+  protectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    return this.itemManager.changeItems<NoteMutator>(
+      Uuids(notes),
+      (mutator) => {
+        mutator.protected = true;
+      }
+    ) as Promise<SNNote[]>;
+  }
+
+  async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const authorizedNotes = await this.authorizeProtectedActionForNotes(
+      notes,
+      ChallengeReason.UnprotectNote
+    );
+    return this.itemManager.changeItems<NoteMutator>(
+      Uuids(authorizedNotes),
+      (mutator) => {
+        mutator.protected = false;
+      }
+    ) as Promise<SNNote[]>;
   }
 
   async authorizeNoteAccess(note: SNNote): Promise<boolean> {
