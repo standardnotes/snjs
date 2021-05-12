@@ -237,8 +237,8 @@ export function addIfUnique<T>(array: T[], value: T): boolean {
  */
 export function filterFromArray<T>(
   array: T[],
-  predicate: Partial<Record<keyof T, any>>
-) {
+  predicate: Partial<Record<keyof T, any>> | ((object: T) => boolean)
+): void {
   remove(array, predicate);
 }
 
