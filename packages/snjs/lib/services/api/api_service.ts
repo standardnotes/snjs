@@ -127,7 +127,7 @@ export class SNApiService extends PureService {
     private permissionsService: SNPermissionsService,
     private host: string,
     private mfaService: SNMfaService,
-    private alertService: SNAlertService,
+    private alertService: SNAlertService
   ) {
     super();
   }
@@ -221,7 +221,9 @@ export class SNApiService extends PureService {
   }
 
   private processMetaObject(meta: ResponseMeta) {
-    const {auth: {role, permissions}} = meta
+    const {
+      auth: { role, permissions },
+    } = meta;
     if (role === undefined || permissions === undefined) return;
 
     this.permissionsService.update(meta.auth.role, meta.auth.permissions);
@@ -234,7 +236,7 @@ export class SNApiService extends PureService {
   }
 
   private async request(
-    params: HttpRequestWithFallbackError,
+    params: HttpRequestWithFallbackError
   ): Promise<HttpResponse<unknown>> {
     try {
       const response = await this.httpService.runHttp(params);
@@ -249,7 +251,7 @@ export class SNApiService extends PureService {
   }
 
   private async getAuthMethods(
-    email: string,
+    email: string
   ): Promise<HttpResponse<GetAuthMethodsResponse>> {
     const params = this.params({ email });
 
@@ -317,8 +319,8 @@ export class SNApiService extends PureService {
     userUuid,
     secret,
   }: {
-    userUuid: Uuid,
-    secret: string,
+    userUuid: Uuid;
+    secret: string;
   }): Promise<HttpResponse<unknown>> {
     return this.request({
       verb: HttpVerb.Put,
@@ -336,16 +338,21 @@ export class SNApiService extends PureService {
   public async disableMfa(userUuid: Uuid): Promise<HttpResponse<unknown>> {
     return this.request({
       verb: HttpVerb.Delete,
-      url: joinPaths(this.host, Paths.v1.deleteSetting({
-        settingName: MfaSetting.MfaSecret,
-        userUuid,
-      })),
+      url: joinPaths(
+        this.host,
+        Paths.v1.deleteSetting({
+          settingName: MfaSetting.MfaSecret,
+          userUuid,
+        })
+      ),
       fallbackErrorMessage: messages.MFA_DISABLE_ERROR,
       authentication: this.session?.authorizationValue,
     });
   }
 
-  public async getAccountKeyParams(email: string): Promise<HttpResponse<KeyParamsResponse>> {
+  public async getAccountKeyParams(
+    email: string
+  ): Promise<HttpResponse<KeyParamsResponse>> {
     const params = this.params({
       email,
     });
@@ -358,9 +365,9 @@ export class SNApiService extends PureService {
       params,
       /** A session is optional here, if valid, endpoint returns extra params */
       authentication: this.session?.authorizationValue,
-    })
+    });
 
-    return this.responseV1toV0(response) as HttpResponse<KeyParamsResponse>
+    return this.responseV1toV0(response) as HttpResponse<KeyParamsResponse>;
   }
 
   public async register(
@@ -429,7 +436,7 @@ export class SNApiService extends PureService {
       .postAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse) => {
         return errorResponse;
-      })
+      });
 
     return this.responseV1toV0(response) as SignOutResponse;
   }
@@ -716,10 +723,10 @@ export class SNApiService extends PureService {
   /**
    * A workaround that allows using v1 responses without rewriting downstream logic that expects v0 responses.
    */
-   private responseV1toV0<T>(response: HttpResponse<T>): HttpResponse<T> {
+  private responseV1toV0<T>(response: HttpResponse<T>): HttpResponse<T> {
     return {
       ...response,
       ...response.data,
-    }
+    };
   }
 }

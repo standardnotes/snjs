@@ -42,11 +42,11 @@ export type MfaResultError =
 export type GetAuthMethodsResponse = {
   success: true;
   methods: AuthMethods;
-}
+};
 
 export type MfaQueryParams = {
-  mfa_key: string,
-}
+  mfa_key: string;
+};
 
 export class SNMfaService extends PureService {
   constructor(private challengeService: ChallengeService) {
@@ -54,7 +54,7 @@ export class SNMfaService extends PureService {
   }
 
   public async handleMfa(
-    authMethodsResponse: HttpResponse<GetAuthMethodsResponse>,
+    authMethodsResponse: HttpResponse<GetAuthMethodsResponse>
   ): Promise<MfaResult> {
     if (authMethodsResponse.data?.success) {
       const { totp } = authMethodsResponse.data.methods;
@@ -88,7 +88,7 @@ export class SNMfaService extends PureService {
   }
 
   public getMfaQueryParams(
-    mfaResult: MfaResultSuccess,
+    mfaResult: MfaResultSuccess
   ): MfaQueryParams | Record<string, never> {
     if (mfaResult.status === MfaStatus.EnteredCode) {
       return mfaResult.payload;

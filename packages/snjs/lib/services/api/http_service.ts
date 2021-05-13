@@ -97,12 +97,10 @@ export class SNHttpService extends PureService {
       };
       if (
         params !== undefined &&
-        (
-          verb === HttpVerb.Post ||
+        (verb === HttpVerb.Post ||
           verb === HttpVerb.Patch ||
           verb === HttpVerb.Delete ||
-          verb === HttpVerb.Put
-        )
+          verb === HttpVerb.Put)
       ) {
         request.send(JSON.stringify(params));
       } else {

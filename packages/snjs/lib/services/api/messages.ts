@@ -218,7 +218,8 @@ export const ChallengeStrings = {
   ExportBackup: 'Authentication is required to export a backup',
   DisableBiometrics: 'Authentication is required to disable biometrics',
   UnprotectNote: 'Authentication is required to unprotect a note',
-  SearchProtectedNotesText: 'Authentication is required to search protected contents',
+  SearchProtectedNotesText:
+    'Authentication is required to search protected contents',
   SelectProtectedNote: 'Authentication is required to select a protected note',
 };
 
