@@ -12,6 +12,7 @@ import {
   StatusCode,
   isErrorResponseExpiredToken,
   ResponseMeta,
+  KeyParamsResponse,
 } from './responses';
 import { RemoteSession, Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -34,10 +35,9 @@ import { SNPermissionsService } from '../permissions_service';
 import { GetAuthMethodsResponse, MfaStatus, SNMfaService } from './mfa_service';
 import { SNAlertService } from '@Lib/index';
 import { ErrorTag } from '@standardnotes/auth';
-import { Uuid } from '@standardnotes/auth';
+import { Uuid, MfaSetting } from '@standardnotes/auth';
 
 type PathsV0 = {
-  authMethods: string;
   keyParams: string;
   register: string;
   signIn: string;
@@ -57,7 +57,6 @@ type PathsV1 = {
   register: string;
   signIn: string;
   signOut: string;
-  changePassword: (userId: string) => string;
   putSetting: (userUuid: Uuid) => string;
   deleteSetting: ({
     userUuid,
@@ -72,22 +71,12 @@ type DeleteSettingDto = {
   userUuid: Uuid;
   settingName: string;
 };
-type SettingProps = {
-  name: string;
-  value: string;
-  serverEncryptionVersion?: number;
-};
-type PutSettingDto = {
-  userUuid: Uuid;
-  props: SettingProps;
-};
 
 const Paths: {
   v0: PathsV0;
   v1: PathsV1;
 } = {
   v0: {
-    authMethods: '/auth/methods',
     keyParams: '/auth/params',
     register: '/auth',
     signIn: '/auth/sign_in',
@@ -101,7 +90,6 @@ const Paths: {
     itemRevision: (itemId: string, revisionId: string) =>
       `/items/${itemId}/revisions/${revisionId}`,
   },
-  // todo: add more
   v1: {
     authMethods: '/v1/auth/methods',
     keyParams: '/v1/login-params',
@@ -111,9 +99,6 @@ const Paths: {
     putSetting: (userUuid: Uuid) => `/v1/users/${userUuid}/settings`,
     deleteSetting: ({ userUuid, settingName }: DeleteSettingDto) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
-    // note: not sure about what userId is
-    // todo: use
-    changePassword: (userId: string) => `/v1/users/${userId}/password`,
   },
 };
 
@@ -236,6 +221,9 @@ export class SNApiService extends PureService {
   }
 
   private processMetaObject(meta: ResponseMeta) {
+    const {auth: {role, permissions}} = meta
+    if (role === undefined || permissions === undefined) return;
+
     this.permissionsService.update(meta.auth.role, meta.auth.permissions);
   }
 
@@ -268,7 +256,7 @@ export class SNApiService extends PureService {
     return this.request({
       verb: HttpVerb.Get,
       url: joinPaths(this.host, Paths.v1.authMethods),
-      fallbackErrorMessage: messages.UNKNOWN_ERROR,
+      fallbackErrorMessage: messages.AUTH_METHODS_ERROR,
       params,
     }) as Promise<HttpResponse<GetAuthMethodsResponse>>;
   }
@@ -325,34 +313,44 @@ export class SNApiService extends PureService {
     }
   }
 
-  public enableMfa({
+  public async enableMfa({
     userUuid,
-    props,
-  }: PutSettingDto): Promise<HttpResponse<unknown>> {
+    secret,
+  }: {
+    userUuid: Uuid,
+    secret: string,
+  }): Promise<HttpResponse<unknown>> {
     return this.request({
       verb: HttpVerb.Put,
       url: joinPaths(this.host, Paths.v1.putSetting(userUuid)),
       fallbackErrorMessage: messages.MFA_ENABLE_ERROR,
       authentication: this.session?.authorizationValue,
-      params: props,
+      params: {
+        name: MfaSetting.MfaSecret,
+        value: secret,
+        serverEncryptionVersion: 1,
+      },
     });
   }
 
-  public disableMfa(dto: DeleteSettingDto): Promise<HttpResponse<unknown>> {
+  public async disableMfa(userUuid: Uuid): Promise<HttpResponse<unknown>> {
     return this.request({
-      verb: HttpVerb.Put,
-      url: joinPaths(this.host, Paths.v1.deleteSetting(dto)),
+      verb: HttpVerb.Delete,
+      url: joinPaths(this.host, Paths.v1.deleteSetting({
+        settingName: MfaSetting.MfaSecret,
+        userUuid,
+      })),
       fallbackErrorMessage: messages.MFA_DISABLE_ERROR,
       authentication: this.session?.authorizationValue,
     });
   }
 
-  public getAccountKeyParams(email: string): Promise<HttpResponse> {
+  public async getAccountKeyParams(email: string): Promise<HttpResponse<KeyParamsResponse>> {
     const params = this.params({
       email,
     });
 
-    return this.requestWithMfa({
+    const response = await this.requestWithMfa({
       identifier: email,
       verb: HttpVerb.Get,
       url: joinPaths(this.host, Paths.v1.keyParams),
@@ -360,10 +358,12 @@ export class SNApiService extends PureService {
       params,
       /** A session is optional here, if valid, endpoint returns extra params */
       authentication: this.session?.authorizationValue,
-    });
+    })
+
+    return this.responseV1toV0(response) as HttpResponse<KeyParamsResponse>
   }
 
-  async register(
+  public async register(
     email: string,
     serverPassword: string,
     keyParams: SNRootKeyParams,
@@ -389,10 +389,11 @@ export class SNApiService extends PureService {
       params,
     });
     this.registering = false;
-    return response as RegistrationResponse;
+
+    return this.responseV1toV0(response) as RegistrationResponse;
   }
 
-  async signIn(
+  public async signIn(
     email: string,
     serverPassword: string,
     ephemeral = false
@@ -418,16 +419,19 @@ export class SNApiService extends PureService {
     });
 
     this.authenticating = false;
-    return response as SignInResponse;
+
+    return this.responseV1toV0(response) as SignInResponse;
   }
 
-  signOut(): Promise<SignOutResponse> {
+  public async signOut(): Promise<SignOutResponse> {
     const url = joinPaths(this.host, Paths.v1.signOut);
-    return this.httpService
+    const response = await this.httpService
       .postAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse) => {
         return errorResponse;
-      }) as Promise<SignOutResponse>;
+      })
+
+    return this.responseV1toV0(response) as SignOutResponse;
   }
 
   async changePassword(
@@ -706,6 +710,16 @@ export class SNApiService extends PureService {
       this.invalidSessionObserver?.(
         response.error?.tag === ErrorTag.RevokedSession
       );
+    }
+  }
+
+  /**
+   * A workaround that allows using v1 responses without rewriting downstream logic that expects v0 responses.
+   */
+   private responseV1toV0<T>(response: HttpResponse<T>): HttpResponse<T> {
+    return {
+      ...response,
+      ...response.data,
     }
   }
 }

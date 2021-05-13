@@ -96,10 +96,13 @@ export class SNHttpService extends PureService {
         this.stateChangeHandlerForRequest(request, resolve, reject);
       };
       if (
-        verb === HttpVerb.Post ||
-        verb === HttpVerb.Patch ||
-        verb === HttpVerb.Delete ||
-        verb === HttpVerb.Put
+        params !== undefined &&
+        (
+          verb === HttpVerb.Post ||
+          verb === HttpVerb.Patch ||
+          verb === HttpVerb.Delete ||
+          verb === HttpVerb.Put
+        )
       ) {
         request.send(JSON.stringify(params));
       } else {

@@ -67,6 +67,9 @@ export const MFA_ENABLE_ERROR =
 export const MFA_DISABLE_ERROR =
   'An error occured when trying to disable multi-factor authentication. Please try again.';
 
+export const AUTH_METHODS_ERROR =
+  'An error occured when trying to fetch authentication methods. Please try again.';
+
 export function InsufficientPasswordMessage(minimum: number): string {
   return `Your password must be at least ${minimum} characters in length. For your security, please choose a longer password or, ideally, a passphrase, and try again.`;
 }

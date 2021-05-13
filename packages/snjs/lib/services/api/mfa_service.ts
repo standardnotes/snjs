@@ -60,7 +60,6 @@ export class SNMfaService extends PureService {
       const { totp } = authMethodsResponse.data.methods;
 
       if (totp) {
-        const { mfaSecretUuid } = totp;
         const enteredMfaCode = await this.promptForMfaValue();
 
         if (enteredMfaCode === undefined) {
@@ -72,8 +71,7 @@ export class SNMfaService extends PureService {
         return {
           status: MfaStatus.EnteredCode,
           payload: {
-            enteredTotp: enteredMfaCode,
-            mfaSecretUuid,
+            mfa_key: enteredMfaCode,
           },
         };
       }
@@ -93,8 +91,7 @@ export class SNMfaService extends PureService {
     mfaResult: MfaResultSuccess,
   ): MfaQueryParams | Record<string, never> {
     if (mfaResult.status === MfaStatus.EnteredCode) {
-      const mfa_key = mfaResult.payload.enteredTotp
-      return { mfa_key };
+      return mfaResult.payload;
     }
     if (mfaResult.status === MfaStatus.NotRequired) {
       return {};
