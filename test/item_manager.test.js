@@ -491,4 +491,23 @@ describe('item manager', function () {
     await this.itemManager.emitItemFromPayload(payload);
     expect(latestVersion.title).to.equal(changedTitle);
   });
+
+  describe('searchTags', async function() {
+    it('should return tag with query matching title', async function() {
+      const tag = await this.itemManager.findOrCreateTagByTitle('tag');
+
+      const results = this.itemManager.searchTags('tag');
+      expect(results).lengthOf(1);
+      expect(results[0].title).to.equal(tag.title);
+    });
+    it('should return all tags with query partially matching title', async function() {
+      const firstTag = await this.itemManager.findOrCreateTagByTitle('tag one');
+      const secondTag = await this.itemManager.findOrCreateTagByTitle('tag two');
+
+      const results = this.itemManager.searchTags('tag');
+      expect(results).lengthOf(2);
+      expect(results[0].title).to.equal(firstTag.title);
+      expect(results[1].title).to.equal(secondTag.title);
+    });
+  })
 });

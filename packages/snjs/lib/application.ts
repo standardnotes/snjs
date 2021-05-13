@@ -751,6 +751,10 @@ export class SNApplication {
     return this.itemManager.findTagByTitle(title);
   }
 
+  public searchTags(searchQuery: string): SNTag[] {
+    return this.itemManager.searchTags(searchQuery);
+  }
+
   public async findOrCreateTag(title: string): Promise<SNTag> {
     return this.itemManager.findOrCreateTagByTitle(title);
   }

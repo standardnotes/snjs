@@ -722,6 +722,15 @@ export class ItemManager extends PureService {
   }
 
   /**
+   * Finds tags with titles starting with a search query
+   */
+  public searchTags(searchQuery: string): SNTag[] {
+    return this.tags.filter((tag) =>
+      tag.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+    );
+  }
+
+  /**
    * Finds or creates a tag with a given title
    */
   public async findOrCreateTagByTitle(title: string) {
