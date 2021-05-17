@@ -200,3 +200,5 @@ export { ProtectionSessionDurations } from '@Lib/services/protection_service';
 export { SNLog } from './log';
 
 export { Permission } from '@standardnotes/auth';
+
+export type { ItemMessagePayload } from './services/component_manager';
