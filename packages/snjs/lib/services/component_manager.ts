@@ -128,7 +128,7 @@ type MessageReply = {
   data: MessageReplyData;
 };
 
-type ItemMessagePayload = {
+export type ItemMessagePayload = {
   uuid: string;
   content_type: ContentType;
   created_at: Date;
