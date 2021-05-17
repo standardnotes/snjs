@@ -3,9 +3,7 @@ import {
   ItemCollection,
   SortDirection,
 } from '@Protocol/collection/item_collection';
-import { UserPrefsMutator } from './../models/app/userPrefs';
 import { SNItemsKey } from '@Models/app/items_key';
-import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
 import { NoteMutator } from './../models/app/note';
@@ -31,7 +29,6 @@ import { PayloadSource } from './../protocol/payloads/sources';
 import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadManager } from './payload_manager';
 import { ContentType } from '../models/content_types';
-import { ThemeMutator } from '@Lib/models';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
 import { createMutatorForItem } from '@Lib/models/mutator';
@@ -725,9 +722,23 @@ export class ItemManager extends PureService {
    * Finds tags with titles starting with a search query
    */
   public searchTags(searchQuery: string): SNTag[] {
-    return this.tags.filter((tag) =>
-      tag.title.toLowerCase().startsWith(searchQuery.toLowerCase())
-    );
+    const delimiter = '.';
+    return this.tags
+      .filter((tag) =>
+        tag.title
+          .toLowerCase()
+          .split(delimiter)
+          .some((component) => component.startsWith(searchQuery.toLowerCase()))
+      )
+      .sort(
+        typeof Intl !== 'undefined'
+          ? (a, b) =>
+              new Intl.Collator('en', { numeric: true }).compare(
+                a.title,
+                b.title
+              )
+          : (a, b) => (a.title > b.title ? 1 : -1)
+      );
   }
 
   /**

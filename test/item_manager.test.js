@@ -509,5 +509,32 @@ describe('item manager', function () {
       expect(results[0].title).to.equal(firstTag.title);
       expect(results[1].title).to.equal(secondTag.title);
     });
+    it('should be case insensitive', async function() {
+      const tag = await this.itemManager.findOrCreateTagByTitle('Tag');
+
+      const results = this.itemManager.searchTags('tag');
+      expect(results).lengthOf(1);
+      expect(results[0].title).to.equal(tag.title);
+    });
+    it('should return tag with query matching delimiter separated component', async function() {
+      const tag = await this.itemManager.findOrCreateTagByTitle('parent.child');
+
+      const results = this.itemManager.searchTags('child');
+      expect(results).lengthOf(1);
+      expect(results[0].title).to.equal(tag.title);
+    });
+    it.only('should return tags in natural order', async function() {
+      const firstTag = await this.itemManager.findOrCreateTagByTitle('tag 100');
+      const secondTag = await this.itemManager.findOrCreateTagByTitle('tag 2');
+      const thirdTag = await this.itemManager.findOrCreateTagByTitle('tag b');
+      const fourthTag = await this.itemManager.findOrCreateTagByTitle('tag a');
+
+      const results = this.itemManager.searchTags('tag');
+      expect(results).lengthOf(4);
+      expect(results[0].title).to.equal(secondTag.title);
+      expect(results[1].title).to.equal(firstTag.title);
+      expect(results[2].title).to.equal(fourthTag.title);
+      expect(results[3].title).to.equal(thirdTag.title);
+    });
   })
 });
