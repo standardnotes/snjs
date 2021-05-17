@@ -34,3 +34,4 @@ export {
   StorageEncryptionPolicies,
   StoragePersistencePolicies,
 } from '@Services/storage_service';
+export type { ItemMessagePayload } from '@Services/component_manager';
