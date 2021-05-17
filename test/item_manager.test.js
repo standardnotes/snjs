@@ -523,7 +523,7 @@ describe('item manager', function () {
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(tag.title);
     });
-    it.only('should return tags in natural order', async function() {
+    it('should return tags in natural order', async function() {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag 100');
       const secondTag = await this.itemManager.findOrCreateTagByTitle('tag 2');
       const thirdTag = await this.itemManager.findOrCreateTagByTitle('tag b');
