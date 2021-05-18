@@ -51,6 +51,11 @@ type Observer = {
   callback: ObserverCallback;
 };
 
+const collator =
+  typeof Intl !== 'undefined'
+    ? new Intl.Collator('en', { numeric: true })
+    : undefined;
+
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
  * more user-friendly or item-specific interface to creating and updating data.
@@ -731,13 +736,13 @@ export class ItemManager extends PureService {
           .some((component) => component.startsWith(searchQuery.toLowerCase()))
       )
       .sort(
-        typeof Intl !== 'undefined'
+        collator
           ? (a, b) =>
-              new Intl.Collator('en', { numeric: true }).compare(
+              collator.compare(
                 a.title,
                 b.title
               )
-          : (a, b) => (a.title > b.title ? 1 : -1)
+          : (a, b) => a.title.localeCompare(b.title)
       );
   }
 
