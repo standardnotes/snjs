@@ -90,20 +90,36 @@ export type PermissionDialog = {
   callback: (approved: boolean) => void;
 };
 
-type MessageData = Partial<{
-  content_types: ContentType[];
-  item: RawPayload & { clientData: any };
-  items: (RawPayload & { clientData: any })[];
-  permissions: ComponentPermission[];
-  componentData: any;
-  uuid: UuidString;
-  environment: string;
-  platform: string;
-  activeThemeUrls: string[];
-  width: string | number;
-  height: string | number;
-  /** Related to setSize action */
-  type: 'container';
+enum KeyboardModifier {
+  Shift = 'Shift',
+  Ctrl = 'Control',
+  Meta = 'Meta'
+}
+
+export type MessageData = Partial<{
+  /** Related to the stream-item-context action */
+  item?: ItemMessagePayload
+  /** Related to the stream-items action */
+  content_types?: ContentType[]
+  items?: ItemMessagePayload[]
+  /** Related to the request-permission action */
+  permissions?: ComponentPermission[]
+  /** Related to the component-registered action */
+  componentData?: any
+  uuid?: UuidString
+  environment?: string
+  platform?: string
+  activeThemeUrls?: string[]
+  /** Related to set-size action */
+  width?: string | number
+  height?: string | number
+  type?: string
+  /** Related to themes action */
+  themes?: string[]
+  /** Related to clear-selection action */
+  content_type?: ContentType
+  /** Related to key-pressed action */
+  keyboardModifier?: KeyboardModifier
 }>;
 
 type ComponentMessage = {
@@ -128,7 +144,7 @@ type MessageReply = {
   data: MessageReplyData;
 };
 
-type ItemMessagePayload = {
+export type ItemMessagePayload = {
   uuid: string;
   content_type: ContentType;
   created_at: Date;

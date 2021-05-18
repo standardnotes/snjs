@@ -209,6 +209,7 @@ export const ChallengeStrings = {
   DisableBiometrics: 'Authentication is required to disable biometrics',
   UnprotectNote: 'Authentication is required to unprotect a note',
   SearchProtectedNotesText: 'Authentication is required to search protected contents',
+  SelectProtectedNote: 'Authentication is required to select a protected note',
 };
 
 export const PromptTitles = {

@@ -704,6 +704,28 @@ export class SNApplication {
     return unprotectedNote;
   }
 
+  public async authorizeProtectedActionForNotes(
+    notes: SNNote[],
+    challengeReason: ChallengeReason
+  ): Promise<SNNote[]> {
+    return await this.protectionService.authorizeProtectedActionForNotes(
+      notes,
+      challengeReason
+    );
+  }
+
+  public async protectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const protectedNotes = await this.protectionService.protectNotes(notes);
+    void this.syncService.sync();
+    return protectedNotes;
+  }
+
+  public async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const unprotectedNotes = await this.protectionService.unprotectNotes(notes);
+    void this.syncService.sync();
+    return unprotectedNotes;
+  }
+
   public getItems(contentType: ContentType | ContentType[]): SNItem[] {
     return this.itemManager.getItems(contentType);
   }

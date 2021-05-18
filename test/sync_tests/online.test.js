@@ -755,11 +755,12 @@ describe('online syncing', function () {
         mutator.text = `${Math.random()}`;
       }
     );
-    const sync = this.application.sync();
+    const sync = this.application.sync(syncOptions);
     await Factory.sleep(0.1);
     note = this.application.findItem(note.uuid);
     expect(note.lastSyncBegan).to.be.below(new Date());
     await sync;
+    note = this.application.findItem(note.uuid);
     expect(note.dirty).to.equal(false);
     expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan);
   });
