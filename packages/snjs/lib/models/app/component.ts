@@ -42,7 +42,8 @@ export enum ComponentAction {
   SaveSuccess = 'save-success',
   SaveError = 'save-error',
   ThemesActivated = 'themes-activated',
-  KeyPressed = 'key-pressed'
+  KeyPressed = 'key-pressed',
+  KeyUp = 'key-up'
 }
 
 export type ComponentPermission = {
