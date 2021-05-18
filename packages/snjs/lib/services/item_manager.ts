@@ -742,7 +742,7 @@ export class ItemManager extends PureService {
                 a.title,
                 b.title
               )
-          : (a, b) => a.title.localeCompare(b.title)
+          : (a, b) => a.title.localeCompare(b.title, 'en', { numeric: true })
       );
   }
 
