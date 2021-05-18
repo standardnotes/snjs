@@ -35,3 +35,4 @@ export {
   StoragePersistencePolicies,
 } from '@Services/storage_service';
 export type { ItemMessagePayload } from '@Services/component_manager';
+export type { MessageData } from '@Services/component_manager';

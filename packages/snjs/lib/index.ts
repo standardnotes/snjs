@@ -202,3 +202,4 @@ export { SNLog } from './log';
 export { Permission } from '@standardnotes/auth';
 
 export type { ItemMessagePayload } from './services/component_manager';
+export type { MessageData } from './services/component_manager';
