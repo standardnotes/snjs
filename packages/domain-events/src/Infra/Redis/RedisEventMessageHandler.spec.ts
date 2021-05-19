@@ -20,7 +20,7 @@ describe('RedisEventMessageHandler', () => {
     handlers = new Map([['TEST', handler]])
 
     logger = {} as jest.Mocked<Logger>
-    logger.warn = jest.fn()
+    logger.debug = jest.fn()
     logger.error = jest.fn()
   })
 
@@ -45,7 +45,7 @@ describe('RedisEventMessageHandler', () => {
   it('should tell if there is no handler for an event', async () => {
     await createHandler().handleMessage('eJyrViqpLEhVslIKcQ0OMVLSUSpIrMzJT0xRsqpWSsvPB0okJRYp1dYCAABHDLY=')
 
-    expect(logger.warn).toHaveBeenCalledWith('Event handler for event type TEST2 does not exist')
+    expect(logger.debug).toHaveBeenCalledWith('Event handler for event type TEST2 does not exist')
 
     expect(handler.handle).not.toHaveBeenCalled()
   })

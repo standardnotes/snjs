@@ -21,7 +21,7 @@ describe('SQSEventMessageHandler', () => {
 
     logger = {} as jest.Mocked<Logger>
     logger.info = jest.fn()
-    logger.warn = jest.fn()
+    logger.debug = jest.fn()
     logger.error = jest.fn()
   })
 
@@ -53,7 +53,7 @@ describe('SQSEventMessageHandler', () => {
 
     await createHandler().handleMessage(sqsMessage)
 
-    expect(logger.warn).toHaveBeenCalledWith('Event handler for event type TEST2 does not exist')
+    expect(logger.debug).toHaveBeenCalledWith('Event handler for event type TEST2 does not exist')
 
     expect(handler.handle).not.toHaveBeenCalled()
   })
