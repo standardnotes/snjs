@@ -26,7 +26,7 @@ export class SQSEventMessageHandler implements DomainEventMessageHandlerInterfac
       return
     }
 
-    this.logger.info(`Received event: ${domainEvent.type}`)
+    this.logger.debug(`Received event: ${domainEvent.type}`)
 
     await handler.handle(domainEvent)
   }

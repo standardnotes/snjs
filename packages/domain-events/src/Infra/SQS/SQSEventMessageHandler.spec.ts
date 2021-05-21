@@ -20,7 +20,6 @@ describe('SQSEventMessageHandler', () => {
     handlers = new Map([['TEST', handler]])
 
     logger = {} as jest.Mocked<Logger>
-    logger.info = jest.fn()
     logger.debug = jest.fn()
     logger.error = jest.fn()
   })
