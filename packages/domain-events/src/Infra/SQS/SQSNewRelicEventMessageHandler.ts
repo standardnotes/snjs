@@ -1,14 +1,14 @@
 import { Logger } from 'winston'
 import * as zlib from 'zlib'
+import * as newrelic from 'newrelic'
 
 import { DomainEventHandlerInterface } from '../../Domain/Handler/DomainEventHandlerInterface'
 import { DomainEventInterface } from '../../Domain/Event/DomainEventInterface'
 import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainEventMessageHandlerInterface'
 
-export class SQSWrappedEventMessageHandler implements DomainEventMessageHandlerInterface {
+export class SQSNewRelicEventMessageHandler implements DomainEventMessageHandlerInterface {
   constructor(
     private handlers: Map<string, DomainEventHandlerInterface>,
-    private wrapperFunction: <T>(name: string, handle: Promise<T>) => Promise<T>,
     private logger: Logger
   ) {
   }
@@ -29,7 +29,14 @@ export class SQSWrappedEventMessageHandler implements DomainEventMessageHandlerI
 
     this.logger.debug(`Received event: ${domainEvent.type}`)
 
-    await this.wrapperFunction(domainEvent.type, Promise.resolve(handler.handle(domainEvent)))
+    await newrelic.startBackgroundTransaction(
+      domainEvent.type,
+      /* istanbul ignore next */
+      () => {
+        newrelic.getTransaction()
+
+        return handler.handle(domainEvent)
+      })
   }
 
   async handleError (error: Error): Promise<void> {
