@@ -724,7 +724,10 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * Finds tags with titles starting with a search query
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
    */
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
     const delimiter = '.';
