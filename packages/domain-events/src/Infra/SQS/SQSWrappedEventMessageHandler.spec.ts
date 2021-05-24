@@ -10,7 +10,7 @@ describe('SQSWrappedEventMessageHandler', () => {
   let handler: DomainEventHandlerInterface
   let handlers: Map<string, DomainEventHandlerInterface>
   let logger: Logger
-  let wrapperFunction: (name: string, handle: Promise<any>) => Promise<any>
+  let wrapperFunction: <T>(name: string, handle: Promise<T>) => Promise<T>
 
   const createHandler = () => new SQSWrappedEventMessageHandler(handlers, wrapperFunction, logger)
 
