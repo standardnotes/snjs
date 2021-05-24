@@ -42,7 +42,7 @@
   "jest": {
     "preset": "../../node_modules/@standardnotes/config/src/jest.json",
     "setupFilesAfterEnv": [
-      "<rootDir>/test-setup.ts"
+      "<rootDir>/src/test-setup.ts"
     ]
   }
 }
