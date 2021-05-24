@@ -523,6 +523,13 @@ describe('item manager', function () {
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(tag.title);
     });
+    it('should return tags with matching query including delimiter', async function() {
+      const tag = await this.itemManager.findOrCreateTagByTitle('parent.child');
+
+      const results = this.itemManager.searchTags('parent.chi');
+      expect(results).lengthOf(1);
+      expect(results[0].title).to.equal(tag.title);
+    });
     it('should return tags in natural order', async function() {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag 100');
       const secondTag = await this.itemManager.findOrCreateTagByTitle('tag 2');
@@ -536,5 +543,18 @@ describe('item manager', function () {
       expect(results[2].title).to.equal(fourthTag.title);
       expect(results[3].title).to.equal(thirdTag.title);
     });
+    it('should not return tags associated with note', async function () {
+      const firstTag = await this.itemManager.findOrCreateTagByTitle('tag one');
+      const secondTag = await this.itemManager.findOrCreateTagByTitle('tag two');
+
+      const note = await this.createNote();
+      await this.itemManager.changeItem(firstTag.uuid, (mutator) => {
+        mutator.addItemAsRelationship(note);
+      });
+
+      const results = this.itemManager.searchTags('tag', note);
+      expect(results).lengthOf(1);
+      expect(results[0].title).to.equal(secondTag.title);
+    })
   })
 });
