@@ -773,8 +773,14 @@ export class SNApplication {
     return this.itemManager.findTagByTitle(title);
   }
 
-  public searchTags(searchQuery: string): SNTag[] {
-    return this.itemManager.searchTags(searchQuery);
+  /**
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
+   */
+  public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
+    return this.itemManager.searchTags(searchQuery, note);
   }
 
   public async findOrCreateTag(title: string): Promise<SNTag> {

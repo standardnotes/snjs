@@ -6,7 +6,7 @@ import {
 import { SNItemsKey } from '@Models/app/items_key';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
-import { NoteMutator } from './../models/app/note';
+import { NoteMutator, SNNote } from './../models/app/note';
 import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
@@ -724,24 +724,29 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * Finds tags with titles starting with a search query
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
    */
-  public searchTags(searchQuery: string): SNTag[] {
+  public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
     const delimiter = '.';
+    const lowerCaseQuery = searchQuery.toLowerCase();
     return this.tags
-      .filter((tag) =>
-        tag.title
-          .toLowerCase()
-          .split(delimiter)
-          .some((component) => component.startsWith(searchQuery.toLowerCase()))
-      )
+      .filter((tag) => {
+        const lowerCaseTitle = tag.title.toLowerCase();
+        const regex = new RegExp(
+          `^${lowerCaseQuery}|${delimiter}${lowerCaseQuery}`
+        );
+        const matchesQuery = regex.test(lowerCaseTitle);
+        const tagInNote = note
+          ? this.itemsReferencingItem(note.uuid).some((item) => item === tag)
+          : false;
+        return matchesQuery && !tagInNote;
+      })
       .sort(
         collator
-          ? (a, b) =>
-              collator.compare(
-                a.title,
-                b.title
-              )
+          ? (a, b) => collator.compare(a.title, b.title)
           : (a, b) => a.title.localeCompare(b.title, 'en', { numeric: true })
       );
   }
