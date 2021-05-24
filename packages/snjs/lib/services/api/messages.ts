@@ -63,7 +63,7 @@ export const DO_NOT_CLOSE_APPLICATION =
 export const UNKNOWN_ERROR = 'Unknown error.';
 
 export const MFA_ENABLE_ERROR =
-  'An error occured when trying to enable multi-factor authentication. Please try again.';
+  'An error occurred while trying to enable multi-factor authentication. Please try again.';
 export const MFA_DISABLE_ERROR =
   'An error occured when trying to disable multi-factor authentication. Please try again.';
 
