@@ -8,7 +8,7 @@ import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainE
 export class SQSWrappedEventMessageHandler implements DomainEventMessageHandlerInterface {
   constructor(
     private handlers: Map<string, DomainEventHandlerInterface>,
-    private wrapperFunction: (name: string, handle: Promise<any>) => Promise<any>,
+    private wrapperFunction: <T>(name: string, handle: Promise<T>) => Promise<T>,
     private logger: Logger
   ) {
   }
