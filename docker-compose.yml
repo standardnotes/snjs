@@ -37,8 +37,6 @@ services:
       "./wait-for.sh", "cache", "6379",
       "./docker/entrypoint.sh", "start-web"
     ]
-    ports:
-      - 3123:3000
     env_file: docker/syncing-server-js.env
     networks:
       - snjs
@@ -69,7 +67,7 @@ services:
     environment:
       PORT: 3000
     ports:
-      - 3124:3000
+      - 3123:3000
     networks:
       - snjs
 
