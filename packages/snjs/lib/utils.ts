@@ -6,6 +6,11 @@ import uniqWith from 'lodash/uniqWith';
 import uniq from 'lodash/uniq';
 import { AnyRecord } from './types';
 
+const collator =
+  typeof Intl !== 'undefined'
+    ? new Intl.Collator('en', { numeric: true })
+    : undefined;
+
 export function getGlobalScope(): Window | unknown | null {
   return typeof window !== 'undefined'
     ? window
@@ -539,4 +544,28 @@ export function isSameDay(dateA: Date, dateB: Date) {
     dateA.getMonth() === dateB.getMonth() &&
     dateA.getDate() === dateB.getDate()
   );
+}
+
+ /**
+   * Sorts an array of objects in natural order
+   * @param items - The array of objects to sort
+   * @param property - The objects' property to sort by
+   * @param direction - The sorting direction, either ascending (default) or descending
+   * @returns Array of objects sorted in natural order
+   */
+export function naturalSort(items: any[], property: string, direction: 'asc' | 'desc' = 'asc'): any[] {
+  switch (direction) {
+    case 'asc':
+      return [...items].sort(
+        collator
+          ? (a, b) => collator.compare(a[property], b[property])
+          : (a, b) => a[property].localeCompare(b[property], 'en', { numeric: true })
+      );
+    case 'desc':
+      return [...items].sort(
+        collator
+          ? (a, b) => collator.compare(b[property], a[property])
+          : (a, b) => b[property].localeCompare(a[property], 'en', { numeric: true })
+      );
+  }
 }
