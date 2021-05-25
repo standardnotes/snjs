@@ -51,11 +51,6 @@ type Observer = {
   callback: ObserverCallback;
 };
 
-const collator =
-  typeof Intl !== 'undefined'
-    ? new Intl.Collator('en', { numeric: true })
-    : undefined;
-
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
  * more user-friendly or item-specific interface to creating and updating data.
@@ -746,6 +741,19 @@ export class ItemManager extends PureService {
       'title'
     );
   }
+
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  public getSortedTagsForNote(note: SNNote): SNTag[] {
+    return naturalSort(
+      this.itemsReferencingItem(note.uuid).filter((ref) => {
+        return ref?.content_type === ContentType.Tag;
+      }) as SNTag[],
+      'title'
+    );
   }
 
   /**
