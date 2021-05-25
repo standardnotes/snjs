@@ -333,6 +333,28 @@ describe('history manager', () => {
         latestRevision.itemFromPayload().userModifiedDate
       ).to.be.greaterThan(initialRevision.itemFromPayload().userModifiedDate);
     }).timeout(10000);
+
+    it('unsynced entries should use payload created_at for preview titles', async function () {
+      const payload = Factory.createNotePayload();
+      await this.application.itemManager.emitItemFromPayload(
+        payload,
+        PayloadSource.LocalChanged
+      );
+      const item = this.application.findItem(payload.uuid);
+      await this.application.changeAndSaveItem(
+        item.uuid,
+        (mutator) => {
+          mutator.title = Math.random();
+        },
+        undefined,
+        undefined,
+        syncOptions
+      );
+      const historyItem = this.historyManager.sessionHistoryForItem(item)[0];
+      expect(historyItem.previewTitle()).to.equal(
+        historyItem.payload.created_at.toLocaleString()
+      );
+    });
   });
 
   describe('remote', async function () {

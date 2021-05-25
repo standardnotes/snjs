@@ -12,10 +12,7 @@ export class HistoryEntry {
   protected readonly hasPreviousEntry: boolean;
 
   constructor(payload: SurePayload, previousEntry?: HistoryEntry) {
-    const updated_at = payload.serverUpdatedAt ?? new Date();
-    this.payload = CopyPayload(payload, {
-      updated_at: updated_at,
-    }) as SurePayload;
+    this.payload = CopyPayload(payload) as SurePayload;
     this.previousEntry = previousEntry;
     this.hasPreviousEntry = !isNullOrUndefined(previousEntry);
     /** We'll try to compute the delta based on an assumed
