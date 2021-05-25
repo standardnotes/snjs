@@ -37,8 +37,6 @@ services:
       "./wait-for.sh", "cache", "6379",
       "./docker/entrypoint.sh", "start-web"
     ]
-    ports:
-      - 3123:3000
     env_file: docker/syncing-server-js.env
     networks:
       - snjs
@@ -56,7 +54,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.4.4
+    image: standardnotes/api-gateway:1.5.0
     depends_on:
       - syncing-server-js
       - auth
@@ -69,7 +67,7 @@ services:
     environment:
       PORT: 3000
     ports:
-      - 3124:3000
+      - 3123:3000
     networks:
       - snjs
 
