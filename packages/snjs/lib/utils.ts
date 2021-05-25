@@ -553,19 +553,25 @@ export function isSameDay(dateA: Date, dateB: Date) {
    * @param direction - The sorting direction, either ascending (default) or descending
    * @returns Array of objects sorted in natural order
    */
-export function naturalSort(items: any[], property: string, direction: 'asc' | 'desc' = 'asc'): any[] {
+export function naturalSort<T extends AnyRecord>(
+  items: T[],
+  property: keyof T,
+  direction: 'asc' | 'desc' = 'asc'
+): T[] {
   switch (direction) {
     case 'asc':
       return [...items].sort(
         collator
           ? (a, b) => collator.compare(a[property], b[property])
-          : (a, b) => a[property].localeCompare(b[property], 'en', { numeric: true })
+          : (a, b) =>
+              a[property].localeCompare(b[property], 'en', { numeric: true })
       );
     case 'desc':
       return [...items].sort(
         collator
           ? (a, b) => collator.compare(b[property], a[property])
-          : (a, b) => b[property].localeCompare(a[property], 'en', { numeric: true })
+          : (a, b) =>
+              b[property].localeCompare(a[property], 'en', { numeric: true })
       );
   }
 }
