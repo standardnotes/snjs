@@ -18,7 +18,7 @@ import { FillItemContent, Uuids } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import { isString, removeFromArray, searchArray } from '@Lib/utils';
+import { isString, naturalSort, removeFromArray, searchArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   PayloadContent,
@@ -731,24 +731,21 @@ export class ItemManager extends PureService {
    */
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
     const delimiter = '.';
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return this.tags
-      .filter((tag) => {
-        const lowerCaseTitle = tag.title.toLowerCase();
+    return naturalSort(
+      this.tags.filter((tag) => {
         const regex = new RegExp(
-          `^${lowerCaseQuery}|${delimiter}${lowerCaseQuery}`
+          `^${searchQuery}|${delimiter}${searchQuery}`,
+          'i'
         );
-        const matchesQuery = regex.test(lowerCaseTitle);
+        const matchesQuery = regex.test(tag.title);
         const tagInNote = note
           ? this.itemsReferencingItem(note.uuid).some((item) => item === tag)
           : false;
         return matchesQuery && !tagInNote;
-      })
-      .sort(
-        collator
-          ? (a, b) => collator.compare(a.title, b.title)
-          : (a, b) => a.title.localeCompare(b.title, 'en', { numeric: true })
-      );
+      }),
+      'title'
+    );
+  }
   }
 
   /**
