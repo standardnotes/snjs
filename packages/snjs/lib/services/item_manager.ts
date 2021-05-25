@@ -739,7 +739,7 @@ export class ItemManager extends PureService {
         );
         const matchesQuery = regex.test(tag.title);
         const tagInNote = note
-          ? this.itemsReferencingItem(note.uuid).some((item) => item === tag)
+          ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
           : false;
         return matchesQuery && !tagInNote;
       }),
