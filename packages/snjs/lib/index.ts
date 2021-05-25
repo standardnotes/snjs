@@ -120,6 +120,7 @@ export {
   isNullOrUndefined,
   isSameDay,
   jsonParseEmbeddedKeys,
+  naturalSort,
   omitInPlace,
   omitUndefinedCopy,
   removeFromArray,

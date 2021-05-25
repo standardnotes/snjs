@@ -783,6 +783,15 @@ export class SNApplication {
     return this.itemManager.searchTags(searchQuery, note);
   }
 
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  public getSortedTagsForNote(note: SNNote): SNTag[] {
+    return this.itemManager.getSortedTagsForNote(note);
+  }
+
   public async findOrCreateTag(title: string): Promise<SNTag> {
     return this.itemManager.findOrCreateTagByTitle(title);
   }

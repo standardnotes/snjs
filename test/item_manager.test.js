@@ -556,5 +556,31 @@ describe('item manager', function () {
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(secondTag.title);
     })
+  });
+
+  describe('getSortedTagsForNote', async function () {
+    it('should return tags associated with a note in natural order', async function () {
+      const tags = [
+        await this.itemManager.findOrCreateTagByTitle('tag 100'),
+        await this.itemManager.findOrCreateTagByTitle('tag 2'),
+        await this.itemManager.findOrCreateTagByTitle('tag b'),
+        await this.itemManager.findOrCreateTagByTitle('tag a'),
+      ];
+
+      const note = await this.createNote();
+
+      tags.map(async tag => {
+        await this.itemManager.changeItem(tag.uuid, (mutator) => {
+          mutator.addItemAsRelationship(note);
+        });
+      });
+
+      const results = this.itemManager.getSortedTagsForNote(note);
+      expect(results).lengthOf(tags.length);
+      expect(results[0].title).to.equal(tags[1].title);
+      expect(results[1].title).to.equal(tags[0].title);
+      expect(results[2].title).to.equal(tags[3].title);
+      expect(results[3].title).to.equal(tags[2].title);
+    })
   })
 });
