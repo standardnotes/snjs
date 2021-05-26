@@ -140,8 +140,8 @@ describe('mapping performance', () => {
      * Locally, best case should be around 3.3s and worst case should be 5s.
      * However on CI this can sometimes take up to 10s.
      */
-    const EXPECTED_RUN_TIME = 10.0; // seconds
-    expect(seconds).to.be.at.most(EXPECTED_RUN_TIME);
+    const MAX_RUN_TIME = 15.0; // seconds
+    expect(seconds).to.be.at.most(MAX_RUN_TIME);
 
     application.itemManager.nonErroredItemsForContentType(ContentType.Tag)[0];
     for (const note of application.itemManager.nonErroredItemsForContentType(

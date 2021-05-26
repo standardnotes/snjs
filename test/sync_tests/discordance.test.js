@@ -65,6 +65,63 @@ describe('sync discordance', () => {
     expect(this.application.syncService.state.discordance).to.equal(0);
   }).timeout(10000);
 
+  it('should abort integrity computation if any single item is missing updated_at_timestamp', async function () {
+    /**
+     * As part of the May 2021 server migration from SSRB to SSJS, the server in essence
+     * had phased out updated_at by returning it as a conversion from updated_at_timestamp (
+     * instead of its raw value).
+     * To conform to the server's state, clients must transition integrity hash computation
+     * to use updated_at_timestamp locally (by first converting microseconds to milliseconds)
+     * instead of updated_at. Because previously signed in clients may not yet have
+     * this value for all items, if we are missing updated_at_timestamp for any item, we
+     * will have to abort performing integrity computation. This is to prevent false
+     * positives for users who may not have signed out and back in to redownload all new timestamps.
+     */
+    await this.application.syncService.sync(syncOptions);
+
+    const payload = Factory.createNotePayload();
+    await this.application.itemManager.emitItemFromPayload(
+      payload,
+      PayloadSource.LocalChanged
+    );
+    this.expectedItemCount++;
+
+    await this.application.syncService.sync({ checkIntegrity: true });
+
+    // Expect no discordance
+    expect(this.application.syncService.state.discordance).to.equal(0);
+
+    // Set an updated_at_timestamp that's incorrect, and expect out of sync
+    await this.application.itemManager.emitItemFromPayload(
+      CopyPayload(this.application.itemManager.findItem(payload.uuid).payload, {
+        updated_at_timestamp: 1234,
+      }),
+      PayloadSource.LocalChanged
+    );
+
+    // wait for integrity check interval
+    await this.application.syncService.sync({ checkIntegrity: true });
+
+    // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
+    await Factory.sleep(0.2);
+
+    expect(this.application.syncService.isOutOfSync()).to.equal(true);
+    expect(this.application.syncService.state.getLastClientIntegrityHash()).to
+      .be.ok;
+
+    // Simulate not having updated_at_timestamp altogether. We should be in sync after that
+    await this.application.itemManager.emitItemFromPayload(
+      CopyPayload(this.application.itemManager.findItem(payload.uuid).payload, {
+        updated_at_timestamp: undefined,
+      }),
+      PayloadSource.LocalChanged
+    );
+
+    await this.application.syncService.sync({ checkIntegrity: true });
+
+    expect(this.application.syncService.isOutOfSync()).to.equal(false);
+  }).timeout(10000);
+
   it('should increase discordance as client server mismatches', async function () {
     await this.application.syncService.sync(syncOptions);
 
