@@ -225,7 +225,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
         vector *= -1;
       }
       if (sortBy.key === CollectionSort.Title) {
-        return vector * aValue.localeCompare(bValue);
+        return vector * aValue.localeCompare(bValue, 'en', { numeric: true });
       } else if (aValue > bValue) {
         return -1 * vector;
       } else if (aValue < bValue) {

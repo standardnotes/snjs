@@ -18,7 +18,7 @@ import { FillItemContent, Uuids } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import { isString, removeFromArray, searchArray } from '@Lib/utils';
+import { isString, naturalSort, removeFromArray, searchArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   PayloadContent,
@@ -50,11 +50,6 @@ type Observer = {
   contentType: ContentType[];
   callback: ObserverCallback;
 };
-
-const collator =
-  typeof Intl !== 'undefined'
-    ? new Intl.Collator('en', { numeric: true })
-    : undefined;
 
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
@@ -731,24 +726,34 @@ export class ItemManager extends PureService {
    */
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
     const delimiter = '.';
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return this.tags
-      .filter((tag) => {
-        const lowerCaseTitle = tag.title.toLowerCase();
+    return naturalSort(
+      this.tags.filter((tag) => {
         const regex = new RegExp(
-          `^${lowerCaseQuery}|${delimiter}${lowerCaseQuery}`
+          `^${searchQuery}|${delimiter}${searchQuery}`,
+          'i'
         );
-        const matchesQuery = regex.test(lowerCaseTitle);
+        const matchesQuery = regex.test(tag.title);
         const tagInNote = note
-          ? this.itemsReferencingItem(note.uuid).some((item) => item === tag)
+          ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
           : false;
         return matchesQuery && !tagInNote;
-      })
-      .sort(
-        collator
-          ? (a, b) => collator.compare(a.title, b.title)
-          : (a, b) => a.title.localeCompare(b.title, 'en', { numeric: true })
-      );
+      }),
+      'title'
+    );
+  }
+
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  public getSortedTagsForNote(note: SNNote): SNTag[] {
+    return naturalSort(
+      this.itemsReferencingItem(note.uuid).filter((ref) => {
+        return ref?.content_type === ContentType.Tag;
+      }) as SNTag[],
+      'title'
+    );
   }
 
   /**
