@@ -956,13 +956,24 @@ export class SNSyncService extends PureService<
    * The server will also do the same, to determine whether the client values match server values.
    * @returns A SHA256 digest string (hex).
    */
-  private async computeDataIntegrityHash() {
+  private async computeDataIntegrityHash(): Promise<string | undefined> {
     try {
       const items = this.itemManager.nonDeletedItems.sort((a, b) => {
-        return b.serverUpdatedAt!.getTime() - a.serverUpdatedAt!.getTime();
+        return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
       });
-      const dates = items.map((item) => item.updatedAtTimestamp());
-      const string = dates.join(',');
+      const timestamps: number[] = [];
+      const MicrosecondsInMillisecond = 1_000;
+      for (const item of items) {
+        const updatedAtTimestamp = item.serverUpdatedAtTimestamp;
+        if (!updatedAtTimestamp) {
+          return undefined;
+        }
+        const toMilliseconds = Math.floor(
+          updatedAtTimestamp / MicrosecondsInMillisecond
+        );
+        timestamps.push(toMilliseconds);
+      }
+      const string = timestamps.join(',');
       return this.protocolService.crypto.sha256(string);
     } catch (e) {
       console.error('Error computing data integrity hash', e);
