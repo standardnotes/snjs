@@ -7,11 +7,13 @@ import {
 } from '@Payloads/functions';
 
 import { extendArray } from '@Lib/utils';
+import { filterDisallowedRemotePayloads } from '@Lib/services/sync/filter';
 
 export class DeltaOutOfSync extends PayloadsDelta {
-  public async resultingCollection() {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const results = [];
-    for (const payload of this.applyCollection.all()) {
+    const payloads = filterDisallowedRemotePayloads(this.applyCollection.all());
+    for (const payload of payloads) {
       /**
        * Map the server payload as authoritive content. If client copy differs,
        * we will create a duplicate of it below.
