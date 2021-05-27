@@ -11,8 +11,7 @@ import { extendArray } from '@Lib/utils';
 export class DeltaOutOfSync extends PayloadsDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const results = [];
-    const payloads = this.applyCollection.all();
-    for (const payload of payloads) {
+    for (const payload of this.applyCollection.all()) {
       /**
        * Map the server payload as authoritive content. If client copy differs,
        * we will create a duplicate of it below.
