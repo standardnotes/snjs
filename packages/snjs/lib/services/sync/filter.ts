@@ -18,6 +18,10 @@ export function filterDisallowedRemotePayloads(
       PayloadFormat.DecryptedBase64String,
     ].includes(payload.format);
     const isAllowedDecrypted = NonEncryptedTypes.includes(payload.content_type);
-    return isEncrypted || isAllowedDecrypted;
+    const allowed = isEncrypted || isAllowedDecrypted;
+    if (!allowed) {
+      console.error('Filtering disallowed payload', payload);
+    }
+    return allowed;
   });
 }

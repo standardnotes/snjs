@@ -1040,27 +1040,6 @@ describe('online syncing', function () {
     expect(this.application.itemManager.notes.length).to.equal(0);
   });
 
-  it('should not allow out of sync resolution to accept decrypted payloads from server', async function () {
-    const payload = CreateMaxPayloadFromAnyObject(
-      Factory.createNotePayload(),
-      undefined,
-      PayloadSource.RemoteRetrieved
-    );
-    const delta = new DeltaOutOfSync(
-      this.application.payloadManager.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(
-        [payload],
-        PayloadSource.RemoteRetrieved
-      ),
-      undefined,
-      this.application.historyManager.getHistoryMapCopy()
-    );
-    const collection = await delta.resultingCollection();
-    await this.application.payloadManager.emitCollection(collection);
-
-    expect(this.application.itemManager.notes.length).to.equal(0);
-  });
-
   it('retrieved items should have both updated_at and updated_at_timestamps', async function () {
     const note = await Factory.createSyncedNote(this.application);
     this.expectedItemCount++;

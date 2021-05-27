@@ -7,10 +7,9 @@ import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collect
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { extendArray, filterFromArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
-import { filterDisallowedRemotePayloads } from '@Lib/services/sync/filter';
 
 export class DeltaRemoteConflicts extends PayloadsDelta {
-  public async resultingCollection() {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     if (this.applyCollection.source === PayloadSource.ConflictUuid) {
       return this.collectionsByHandlingUuidConflicts();
     } else if (this.applyCollection.source === PayloadSource.ConflictData) {
@@ -22,8 +21,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
 
   private async collectionsByHandlingDataConflicts() {
     const results = [];
-    const payloads = filterDisallowedRemotePayloads(this.applyCollection.all());
-    for (const payload of payloads) {
+    for (const payload of this.applyCollection.all()) {
       const current = this.findBasePayload(payload.uuid!);
       /** Could be deleted */
       if (!current) {
@@ -63,8 +61,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
   private async collectionsByHandlingUuidConflicts() {
     const results: Array<PurePayload> = [];
     const collection = this.baseCollection.mutableCopy();
-    const payloads = filterDisallowedRemotePayloads(this.applyCollection.all());
-    for (const payload of payloads) {
+    for (const payload of this.applyCollection.all()) {
       /**
        * The payload in question may have been modified as part of alternating a uuid for
        * another item. For example, alternating a uuid for a note will also affect the
