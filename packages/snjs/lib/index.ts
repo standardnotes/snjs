@@ -175,6 +175,7 @@ export {
   isPayloadSourceRetrieved,
   isPayloadSourceInternalChange,
 } from '@Lib/protocol/payloads/sources';
+export { DeltaOutOfSync } from '@Payloads/deltas';
 export { ProtocolVersion } from '@Lib/protocol/versions';
 export { PayloadFormat } from '@Payloads/formats';
 export { PurePayload } from '@Payloads/pure_payload';

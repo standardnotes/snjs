@@ -9,7 +9,7 @@ import { extendArray, filterFromArray } from '@Lib/utils';
 import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteConflicts extends PayloadsDelta {
-  public async resultingCollection() {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     if (this.applyCollection.source === PayloadSource.ConflictUuid) {
       return this.collectionsByHandlingUuidConflicts();
     } else if (this.applyCollection.source === PayloadSource.ConflictData) {

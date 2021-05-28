@@ -1,6 +1,10 @@
+import { filterDisallowedRemotePayloads } from '@Lib/services/sync/filter';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ContentType } from '@Models/content_types';
-import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import {
+  RawPayload,
+  CreateSourcedPayloadFromObject,
+} from '@Payloads/generator';
 import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { SNApiService } from '../../api/api_service';
 import { SNProtocolService } from '../../protocol_service';
@@ -49,18 +53,18 @@ export class AccountDownloader {
       this.contentType,
       this.customEvent
     )) as RawSyncResponse;
-    const encryptedPayloads = response.retrieved_items!.map(
-      (rawPayload: any) => {
+
+    const encryptedPayloads = filterDisallowedRemotePayloads(
+      response.retrieved_items!.map((rawPayload: RawPayload) => {
         return CreateSourcedPayloadFromObject(
           rawPayload,
           PayloadSource.RemoteRetrieved
         );
-      }
+      })
     );
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingPayloads(
       encryptedPayloads
     );
-
     this.progress.retrievedPayloads = this.progress.retrievedPayloads.concat(
       decryptedPayloads
     );

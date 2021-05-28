@@ -1017,26 +1017,27 @@ describe('online syncing', function () {
   it('should not allow receiving decrypted payloads from server', async function () {
     const masterCollection = this.application.payloadManager.getMasterCollection();
     const historyMap = this.application.historyManager.getHistoryMapCopy();
-    const note = await Factory.createSyncedNote(this.application);
-    this.expectedItemCount++;
-    const decryptedPayload = note.payload;
-    const decryptedPayloads = [decryptedPayload];
+    const payload = CreateMaxPayloadFromAnyObject(
+      Factory.createNotePayload(),
+      undefined,
+      PayloadSource.RemoteRetrieved
+    );
     const response = new SyncResponse({
-      retrieved_items: [decryptedPayload],
+      retrieved_items: [payload],
     });
     const resolver = new SyncResponseResolver(
       response,
-      decryptedPayloads,
+      [payload],
       masterCollection,
       [],
       historyMap
     );
     const collections = await resolver.collectionsByProcessingResponse();
     for (const collection of collections) {
-      if (collection.source === PayloadSource.RemoteRetrieved) {
-        expect(collection.all().length).to.equal(0);
-      }
+      await this.application.payloadManager.emitCollection(collection);
     }
+
+    expect(this.application.itemManager.notes.length).to.equal(0);
   });
 
   it('retrieved items should have both updated_at and updated_at_timestamps', async function () {

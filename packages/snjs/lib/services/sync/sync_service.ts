@@ -21,10 +21,7 @@ import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils';
 import { SyncOpStatus } from '@Services/sync/sync_op_status';
 import { SyncState } from '@Services/sync/sync_state';
 import { AccountDownloader } from '@Services/sync/account/downloader';
-import {
-  SyncResponseResolver,
-  NonEncryptedTypes,
-} from '@Services/sync/account/response_resolver';
+import { SyncResponseResolver } from '@Services/sync/account/response_resolver';
 import { AccountSyncOperation } from '@Services/sync/account/operation';
 import { OfflineSyncOperation } from '@Services/sync/offline/operation';
 import { DeltaOutOfSync } from '@Payloads/deltas';
@@ -41,6 +38,7 @@ import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 import { SNLog } from '@Lib/log';
+import { NonEncryptedTypes } from './filter';
 
 const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
@@ -463,7 +461,7 @@ export class SNSyncService extends PureService<
   public async downloadFirstSync(
     waitTimeOnFailureMs: number,
     otherSyncOptions?: SyncOptions
-  ) {
+  ): Promise<void> {
     const maxTries = 5;
     for (let i = 0; i < maxTries; i++) {
       await this.sync({
