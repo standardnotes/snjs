@@ -52,7 +52,7 @@ describe('server session', function () {
     return application.storageService.getValue(StorageKey.Session);
   }
 
-  it('should succeed when a sync request is perfomed with an expired access token', async function () {
+  it.only('should succeed when a sync request is perfomed with an expired access token', async function () {
     this.timeout(Factory.LongTestTimeout);
 
     await Factory.registerUserToApplication({
