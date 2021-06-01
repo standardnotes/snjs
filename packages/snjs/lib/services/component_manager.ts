@@ -901,7 +901,7 @@ export class SNComponentManager extends PureService {
     const requiredPermissions = [
       {
         name: ComponentAction.StreamItems,
-        content_types: types.sort(),
+        content_types: types,
       },
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, () => {
