@@ -585,7 +585,7 @@ describe('item manager', function () {
   });
 
   describe('getTagParentChain', async function () {
-    it.only('should return parent tags for a tag', async function () {
+    it('should return parent tags for a tag', async function () {
       const parentTags = [
         await this.itemManager.findOrCreateTagByTitle('parent'),
         await this.itemManager.findOrCreateTagByTitle('parent.child'),
