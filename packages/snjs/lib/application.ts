@@ -788,8 +788,8 @@ export class SNApplication {
    * @param tag - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
-  public getParentTags(tag: SNTag): SNTag[] {
-    return this.itemManager.getParentTags(tag);
+  public getTagParentChain(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagParentChain(tag);
   }
 
   /**

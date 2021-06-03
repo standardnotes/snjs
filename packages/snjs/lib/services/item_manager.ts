@@ -734,7 +734,9 @@ export class ItemManager extends PureService {
         );
         const matchesQuery = regex.test(tag.title);
         const tagInNote = note
-          ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
+          ? this.itemsReferencingItem(note.uuid).some(
+              (item) => item?.uuid === tag.uuid
+            )
           : false;
         return matchesQuery && !tagInNote;
       }),
@@ -747,16 +749,30 @@ export class ItemManager extends PureService {
    * @param tag - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
-  public getParentTags(tag: SNTag): SNTag[] {
+  public getTagParentChain(tag: SNTag): SNTag[] {
     const delimiter = '.';
     const tagComponents = tag.title.split(delimiter);
-    const childTagTitle = tagComponents[tagComponents.length - 1];
-    return this.tags.filter((t) => {
-      const regex = new RegExp(
-        `${delimiter}${childTagTitle}$`
-      );
-      return regex.test(t.title);
-    });
+    const parents: SNTag[] = [];
+
+    const getImmediateParent = () => {
+      if (tagComponents.length > 1) {
+        // Remove last component
+        tagComponents.splice(-1, 1);
+        // Get immediate parent and add it to chain
+        const immediateParentTitle = tagComponents.join(delimiter);
+        const immediateParent = this.tags.find(
+          (tag) => tag.title === immediateParentTitle
+        );
+        if (immediateParent) {
+          parents.push(immediateParent);
+        }
+        // Get parent of this parent recursively
+        getImmediateParent();
+      }
+    };
+
+    getImmediateParent();
+    return parents;
   }
 
   /**

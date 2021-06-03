@@ -584,16 +584,16 @@ describe('item manager', function () {
     })
   });
 
-  describe('getParentTags', async function () {
-    it('should return parent tags for a tag', async function () {
+  describe('getTagParentChain', async function () {
+    it.only('should return parent tags for a tag', async function () {
       const parentTags = [
-        await this.itemManager.findOrCreateTagByTitle('parent.child.grandchild'),
-        await this.itemManager.findOrCreateTagByTitle('child.grandchild'),
+        await this.itemManager.findOrCreateTagByTitle('parent'),
+        await this.itemManager.findOrCreateTagByTitle('parent.child'),
       ];
-      const grandchildTag = await this.itemManager.findOrCreateTagByTitle('grandchild');
+      const grandchildTag = await this.itemManager.findOrCreateTagByTitle('parent.child.grandchild');
       await this.itemManager.findOrCreateTagByTitle('some other tag');
 
-      const results = this.itemManager.getParentTags(grandchildTag);
+      const results = this.itemManager.getTagParentChain(grandchildTag);
       expect(results).lengthOf(parentTags.length);
       expect(results).to.contain(parentTags[0]);
       expect(results).to.contain(parentTags[1]);
