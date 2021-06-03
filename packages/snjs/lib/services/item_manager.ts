@@ -749,30 +749,28 @@ export class ItemManager extends PureService {
    * @param tag - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
-  public getTagParentChain(tag: SNTag): SNTag[] {
+   public getTagParentChain(tag: SNTag): SNTag[] {
     const delimiter = '.';
     const tagComponents = tag.title.split(delimiter);
-    const parents: SNTag[] = [];
+    const parentTagsTitles: string[] = [];
 
     const getImmediateParent = () => {
       if (tagComponents.length > 1) {
         // Remove last component
         tagComponents.splice(-1, 1);
-        // Get immediate parent and add it to chain
+        // Get immediate parent title and add it to chain
         const immediateParentTitle = tagComponents.join(delimiter);
-        const immediateParent = this.tags.find(
-          (tag) => tag.title === immediateParentTitle
-        );
-        if (immediateParent) {
-          parents.push(immediateParent);
-        }
+        parentTagsTitles.push(immediateParentTitle);
         // Get parent of this parent recursively
         getImmediateParent();
       }
     };
 
     getImmediateParent();
-    return parents;
+    const parentTags = this.tags.filter((tag) =>
+      parentTagsTitles.some((title) => title === tag.title)
+    );
+    return parentTags;
   }
 
   /**
