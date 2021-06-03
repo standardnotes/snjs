@@ -743,6 +743,23 @@ export class ItemManager extends PureService {
   }
 
   /**
+   * Returns all parents for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns Array containing all parent tags
+   */
+  public getParentTags(tag: SNTag): SNTag[] {
+    const delimiter = '.';
+    const tagComponents = tag.title.split(delimiter);
+    const childTagTitle = tagComponents[tagComponents.length - 1];
+    return this.tags.filter((t) => {
+      const regex = new RegExp(
+        `${delimiter}${childTagTitle}$`
+      );
+      return regex.test(t.title);
+    });
+  }
+
+  /**
    * Get tags for a note sorted in natural order
    * @param note - The note whose tags will be returned
    * @returns Array containing tags associated with a note

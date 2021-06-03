@@ -582,5 +582,21 @@ describe('item manager', function () {
       expect(results[2].title).to.equal(tags[3].title);
       expect(results[3].title).to.equal(tags[2].title);
     })
+  });
+
+  describe('getParentTags', async function () {
+    it('should return parent tags for a tag', async function () {
+      const parentTags = [
+        await this.itemManager.findOrCreateTagByTitle('parent.child.grandchild'),
+        await this.itemManager.findOrCreateTagByTitle('child.grandchild'),
+      ];
+      const grandchildTag = await this.itemManager.findOrCreateTagByTitle('grandchild');
+      await this.itemManager.findOrCreateTagByTitle('some other tag');
+
+      const results = this.itemManager.getParentTags(grandchildTag);
+      expect(results).lengthOf(parentTags.length);
+      expect(results).to.contain(parentTags[0]);
+      expect(results).to.contain(parentTags[1]);
+    })
   })
 });
