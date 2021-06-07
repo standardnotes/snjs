@@ -756,12 +756,9 @@ export class ItemManager extends PureService {
 
     const getImmediateParent = () => {
       if (tagComponents.length > 1) {
-        // Remove last component
         tagComponents.splice(-1, 1);
-        // Get immediate parent title and add it to chain
         const immediateParentTitle = tagComponents.join(delimiter);
         parentTagsTitles.push(immediateParentTitle);
-        // Get parent of this parent recursively
         getImmediateParent();
       }
     };
