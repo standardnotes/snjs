@@ -37,18 +37,19 @@ type PathNames = {
   keyParams: string;
   register: string;
   signIn: string;
-  changePassword: string;
+  changePassword: string | ((userUuid: string) => string);
   sync: string;
   signOut: string;
   refreshSession: string;
   sessions: string;
-  session: string;
+  session: string | ((sessionUuid: string) => string);
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
 };
 
 const Paths: {
   v0: PathNames;
+  v1: PathNames;
 } = {
   v0: {
     keyParams: '/auth/params',
@@ -64,6 +65,20 @@ const Paths: {
     itemRevision: (itemId: string, revisionId: string) =>
       `/items/${itemId}/revisions/${revisionId}`,
   },
+  v1: {
+    keyParams: '/v1/login-params',
+    register: '/v1/users',
+    signIn: '/v1/login',
+    changePassword: (userUuid: string) => `/v1/users/${userUuid}/password`,
+    sync: '/v1/items',
+    signOut: '/v1/logout',
+    refreshSession: '/v1/sessions/refresh',
+    sessions: '/v1/sessions',
+    session: (sessionUuid: string) => `/v1/sessions/${sessionUuid}`,
+    itemRevisions: (itemUuid: string) => `/v1/items/${itemUuid}/revisions`,
+    itemRevision: (itemUuid: string, revisionUuid: string) =>
+      `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
+  }
 };
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
@@ -85,7 +100,8 @@ export class SNApiService extends PureService {
     private httpService: SNHttpService,
     private storageService: SNStorageService,
     private permissionsService: SNPermissionsService,
-    private host: string
+    private host: string,
+    private nextVersionHost: string
   ) {
     super();
   }
@@ -121,6 +137,17 @@ export class SNApiService extends PureService {
       (window as {
         _default_sync_server?: string;
       })._default_sync_server;
+
+    const storedNextVersionValue = await this.storageService.getValue(
+      StorageKey.NextVersionServerHost
+    );
+
+    this.nextVersionHost =
+      storedNextVersionValue ||
+      this.nextVersionHost ||
+      (window as {
+        _next_version_sync_server?: string;
+      })._next_version_sync_server;
   }
 
   public async setHost(host: string): Promise<void> {
@@ -130,6 +157,15 @@ export class SNApiService extends PureService {
 
   public getHost(): string | undefined {
     return this.host;
+  }
+
+  public async setNextVersionHost(nextVersionHost: string): Promise<void> {
+    this.nextVersionHost = nextVersionHost;
+    await this.storageService.setValue(StorageKey.NextVersionServerHost, nextVersionHost);
+  }
+
+  public getNextVersionHost(): string | undefined {
+    return this.nextVersionHost;
   }
 
   public async setSession(session: Session, persist = true): Promise<void> {
@@ -297,7 +333,7 @@ export class SNApiService extends PureService {
   }
 
   signOut(): Promise<SignOutResponse> {
-    const url = joinPaths(this.host, Paths.v0.signOut);
+    const url = joinPaths(this.nextVersionHost, Paths.v1.signOut);
     return this.httpService
       .postAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse) => {
@@ -320,7 +356,7 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     this.changing = true;
-    const url = joinPaths(this.host, Paths.v0.changePassword);
+    const url = joinPaths(this.host, <string> Paths.v0.changePassword);
     const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
@@ -474,7 +510,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.host, Paths.v0.session);
+    const url = joinPaths(this.host, <string> Paths.v0.session);
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
