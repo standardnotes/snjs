@@ -734,12 +734,40 @@ export class ItemManager extends PureService {
         );
         const matchesQuery = regex.test(tag.title);
         const tagInNote = note
-          ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
+          ? this.itemsReferencingItem(note.uuid).some(
+              (item) => item?.uuid === tag.uuid
+            )
           : false;
         return matchesQuery && !tagInNote;
       }),
       'title'
     );
+  }
+
+  /**
+   * Returns all parents for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns Array containing all parent tags
+   */
+   public getTagParentChain(tag: SNTag): SNTag[] {
+    const delimiter = '.';
+    const tagComponents = tag.title.split(delimiter);
+    const parentTagsTitles: string[] = [];
+
+    const getImmediateParent = () => {
+      if (tagComponents.length > 1) {
+        tagComponents.splice(-1, 1);
+        const immediateParentTitle = tagComponents.join(delimiter);
+        parentTagsTitles.push(immediateParentTitle);
+        getImmediateParent();
+      }
+    };
+
+    getImmediateParent();
+    const parentTags = this.tags.filter((tag) =>
+      parentTagsTitles.some((title) => title === tag.title)
+    );
+    return parentTags;
   }
 
   /**

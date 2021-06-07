@@ -789,6 +789,15 @@ export class SNApplication {
   }
 
   /**
+   * Returns all parents for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns Array containing all parent tags
+   */
+  public getTagParentChain(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagParentChain(tag);
+  }
+
+  /**
    * Get tags for a note sorted in natural order
    * @param note - The note whose tags will be returned
    * @returns Array containing tags associated with a note
