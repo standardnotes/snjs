@@ -857,10 +857,7 @@ export class SNApplication {
     return this.apiService.getHost();
   }
 
-  /**
-   * Set the alternative server's URL
-   */
-   public async setAlternativeHost(alternativeHost: string): Promise<void> {
+  public async setAlternativeHost(alternativeHost: string): Promise<void> {
     return this.apiService.setAlternativeHost(alternativeHost);
   }
 
