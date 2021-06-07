@@ -101,7 +101,7 @@ export class SNApiService extends PureService {
     private storageService: SNStorageService,
     private permissionsService: SNPermissionsService,
     private host: string,
-    private alternativeHost: string
+    private nextVersionHost: string
   ) {
     super();
   }
@@ -138,16 +138,16 @@ export class SNApiService extends PureService {
         _default_sync_server?: string;
       })._default_sync_server;
 
-    const storedAlternativeValue = await this.storageService.getValue(
-      StorageKey.AlternativeServerHost
+    const storedNextVersionValue = await this.storageService.getValue(
+      StorageKey.NextVersionServerHost
     );
 
-    this.alternativeHost =
-      storedAlternativeValue ||
-      this.alternativeHost ||
+    this.nextVersionHost =
+      storedNextVersionValue ||
+      this.nextVersionHost ||
       (window as {
-        _alternative_sync_server?: string;
-      })._alternative_sync_server;
+        _next_version_sync_server?: string;
+      })._next_version_sync_server;
   }
 
   public async setHost(host: string): Promise<void> {
@@ -159,13 +159,13 @@ export class SNApiService extends PureService {
     return this.host;
   }
 
-  public async setAlternativeHost(alternativeHost: string): Promise<void> {
-    this.alternativeHost = alternativeHost;
-    await this.storageService.setValue(StorageKey.AlternativeServerHost, alternativeHost);
+  public async setNextVersionHost(nextVersionHost: string): Promise<void> {
+    this.nextVersionHost = nextVersionHost;
+    await this.storageService.setValue(StorageKey.NextVersionServerHost, nextVersionHost);
   }
 
-  public getAlternativeHost(): string | undefined {
-    return this.alternativeHost;
+  public getNextVersionHost(): string | undefined {
+    return this.nextVersionHost;
   }
 
   public async setSession(session: Session, persist = true): Promise<void> {
@@ -333,7 +333,7 @@ export class SNApiService extends PureService {
   }
 
   signOut(): Promise<SignOutResponse> {
-    const url = joinPaths(this.alternativeHost, Paths.v1.signOut);
+    const url = joinPaths(this.nextVersionHost, Paths.v1.signOut);
     return this.httpService
       .postAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse) => {

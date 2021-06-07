@@ -176,7 +176,7 @@ export class SNApplication {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
-   * @param alternativeHost alternative host used for upgrading API versions in ApiService.
+   * @param nextVersionHost next version host used for upgrading API versions in ApiService.
    */
   constructor(
     public environment: Environment,
@@ -187,7 +187,7 @@ export class SNApplication {
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
-    private alternativeHost: string
+    private nextVersionHost: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -225,8 +225,8 @@ export class SNApplication {
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
     }
-    if (!alternativeHost) {
-      throw Error('alternativeHost must be supplied when creating an application.');
+    if (!nextVersionHost) {
+      throw Error('nextVersionHost must be supplied when creating an application.');
     }
     this.constructServices();
   }
@@ -857,12 +857,12 @@ export class SNApplication {
     return this.apiService.getHost();
   }
 
-  public async setAlternativeHost(alternativeHost: string): Promise<void> {
-    return this.apiService.setAlternativeHost(alternativeHost);
+  public async setNextVersionHost(nextVersionHost: string): Promise<void> {
+    return this.apiService.setNextVersionHost(nextVersionHost);
   }
 
-  public getAlternativeHost(): string | undefined {
-    return this.apiService.getAlternativeHost();
+  public getNextVersionHost(): string | undefined {
+    return this.apiService.getNextVersionHost();
   }
 
   public getUser(): User | undefined {
@@ -1510,7 +1510,7 @@ export class SNApplication {
       this.storageService,
       this.permissionsService,
       this.defaultHost,
-      this.alternativeHost
+      this.nextVersionHost
     );
     this.services.push(this.apiService);
   }
