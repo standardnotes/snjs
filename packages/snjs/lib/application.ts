@@ -176,6 +176,7 @@ export class SNApplication {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
+   * @param alternativeHost alternative host used for upgrading API versions in ApiService.
    */
   constructor(
     public environment: Environment,
@@ -185,7 +186,8 @@ export class SNApplication {
     public alertService: SNAlertService,
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
-    private defaultHost: string
+    private defaultHost: string,
+    private alternativeHost: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -222,6 +224,9 @@ export class SNApplication {
     }
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
+    }
+    if (!alternativeHost) {
+      throw Error('alternativeHost must be supplied when creating an application.');
     }
     this.constructServices();
   }
@@ -850,6 +855,17 @@ export class SNApplication {
 
   public getHost(): string | undefined {
     return this.apiService.getHost();
+  }
+
+  /**
+   * Set the alternative server's URL
+   */
+   public async setAlternativeHost(alternativeHost: string): Promise<void> {
+    return this.apiService.setAlternativeHost(alternativeHost);
+  }
+
+  public getAlternativeHost(): string | undefined {
+    return this.apiService.getAlternativeHost();
   }
 
   public getUser(): User | undefined {
@@ -1496,7 +1512,8 @@ export class SNApplication {
       this.httpService,
       this.storageService,
       this.permissionsService,
-      this.defaultHost
+      this.defaultHost,
+      this.alternativeHost
     );
     this.services.push(this.apiService);
   }
