@@ -146,8 +146,8 @@ export class SNApiService extends PureService {
       storedAlternativeValue ||
       this.alternativeHost ||
       (window as {
-        _default_alternative_sync_server?: string;
-      })._default_alternative_sync_server;
+        _alternative_sync_server?: string;
+      })._alternative_sync_server;
   }
 
   public async setHost(host: string): Promise<void> {
