@@ -29,7 +29,7 @@ describe('migrations', () => {
   it('should return correct required migrations if stored version is 2.0.0', async function () {
     expect(
       (await SNMigrationService.getRequiredMigrations('2.0.0')).length
-    ).to.equal(1);
+    ).to.equal(2);
   });
 
   it('should return 0 required migrations if stored version is futuristic', async function () {
@@ -122,7 +122,7 @@ describe('migrations', () => {
     const pendingMigrations = await SNMigrationService.getRequiredMigrations(
       await application.migrationService.getStoredSnjsVersion()
     );
-    expect(pendingMigrations.length).to.equal(2);
+    expect(pendingMigrations.length).to.equal(3);
     expect(pendingMigrations[0].version()).to.equal('2.0.0');
     await application.prepareForLaunch({
       receiveChallenge: () => {},
