@@ -1048,7 +1048,7 @@ export class SNComponentManager extends PureService {
       }
       if (lockedNoteCount === 1) {
         this.alertService.alert(
-          `The note you are attempting to save has editing disabled`,
+          'The note you are attempting to save has editing disabled',
           'Note has Editing Disabled'
         );
         return;
