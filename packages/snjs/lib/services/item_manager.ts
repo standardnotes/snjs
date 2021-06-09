@@ -729,8 +729,7 @@ export class ItemManager extends PureService {
     return naturalSort(
       this.tags.filter((tag) => {
         const regex = new RegExp(
-          `^${searchQuery}|${delimiter}${searchQuery}`,
-          'i'
+          `^${searchQuery}|${delimiter}${searchQuery}`
         );
         const matchesQuery = regex.test(tag.title);
         const tagInNote = note
