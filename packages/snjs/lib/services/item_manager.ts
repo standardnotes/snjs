@@ -714,8 +714,8 @@ export class ItemManager extends PureService {
   /**
    * Finds the first tag matching a given title
    */
-  public findTagByTitle(title: string) {
-    return searchArray(this.tags, { title: title });
+  public findTagByTitle(title: string): SNTag | undefined {
+    return this.tags.find((tag) => tag.title.toLowerCase() === title.toLowerCase());
   }
 
   /**
