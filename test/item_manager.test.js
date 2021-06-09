@@ -509,13 +509,6 @@ describe('item manager', function () {
       expect(results[0].title).to.equal(firstTag.title);
       expect(results[1].title).to.equal(secondTag.title);
     });
-    it('should be case insensitive', async function() {
-      const tag = await this.itemManager.findOrCreateTagByTitle('Tag');
-
-      const results = this.itemManager.searchTags('tag');
-      expect(results).lengthOf(1);
-      expect(results[0].title).to.equal(tag.title);
-    });
     it('should return tag with query matching delimiter separated component', async function() {
       const tag = await this.itemManager.findOrCreateTagByTitle('parent.child');
 
