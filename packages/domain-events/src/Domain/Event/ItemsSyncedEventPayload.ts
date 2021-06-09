@@ -4,4 +4,5 @@ export interface ItemsSyncedEventPayload {
   extensionId: string
   itemUuids: Array<string>
   forceMute: boolean
+  skipFileBackup: boolean
 }

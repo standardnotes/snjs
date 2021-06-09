@@ -91,6 +91,7 @@ export function createApplication(identifier, environment, platform) {
     },
     identifier || `${Math.random()}`,
     [],
+    getDefaultHost(),
     getDefaultHost()
   );
 }
@@ -365,6 +366,12 @@ export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
   ];
 }
 
+export async function createSyncedNoteWithTag(application) {
+  const payloads = createRelatedNoteTagPairPayload();
+  await application.itemManager.emitItemsFromPayloads(payloads);
+  return application.sync(syncOptions);
+}
+
 export async function storagePayloadCount(application) {
   const payloads = await application.storageService.getAllRawPayloads();
   return payloads.length;
@@ -372,6 +379,10 @@ export async function storagePayloadCount(application) {
 
 export function yesterday() {
   return new Date(new Date().setDate(new Date().getDate() - 1));
+}
+
+export function dateToMicroseconds(date) {
+  return date.getTime() * 1_000;
 }
 
 export function tomorrow() {

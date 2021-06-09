@@ -176,6 +176,7 @@ export class SNApplication {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
+   * @param nextVersionHost next version host used for upgrading API versions in ApiService.
    */
   constructor(
     public environment: Environment,
@@ -185,7 +186,8 @@ export class SNApplication {
     public alertService: SNAlertService,
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
-    private defaultHost: string
+    private defaultHost: string,
+    private nextVersionHost: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -222,6 +224,9 @@ export class SNApplication {
     }
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
+    }
+    if (!nextVersionHost) {
+      throw Error('nextVersionHost must be supplied when creating an application.');
     }
     this.constructServices();
   }
@@ -704,6 +709,28 @@ export class SNApplication {
     return unprotectedNote;
   }
 
+  public async authorizeProtectedActionForNotes(
+    notes: SNNote[],
+    challengeReason: ChallengeReason
+  ): Promise<SNNote[]> {
+    return await this.protectionService.authorizeProtectedActionForNotes(
+      notes,
+      challengeReason
+    );
+  }
+
+  public async protectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const protectedNotes = await this.protectionService.protectNotes(notes);
+    void this.syncService.sync();
+    return protectedNotes;
+  }
+
+  public async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const unprotectedNotes = await this.protectionService.unprotectNotes(notes);
+    void this.syncService.sync();
+    return unprotectedNotes;
+  }
+
   public getItems(contentType: ContentType | ContentType[]): SNItem[] {
     return this.itemManager.getItems(contentType);
   }
@@ -749,6 +776,34 @@ export class SNApplication {
 
   public findTagByTitle(title: string): SNTag | undefined {
     return this.itemManager.findTagByTitle(title);
+  }
+
+  /**
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
+   */
+  public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
+    return this.itemManager.searchTags(searchQuery, note);
+  }
+
+  /**
+   * Returns all parents for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns Array containing all parent tags
+   */
+  public getTagParentChain(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagParentChain(tag);
+  }
+
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  public getSortedTagsForNote(note: SNNote): SNTag[] {
+    return this.itemManager.getSortedTagsForNote(note);
   }
 
   public async findOrCreateTag(title: string): Promise<SNTag> {
@@ -809,6 +864,14 @@ export class SNApplication {
 
   public getHost(): string | undefined {
     return this.apiService.getHost();
+  }
+
+  public async setNextVersionHost(nextVersionHost: string): Promise<void> {
+    return this.apiService.setNextVersionHost(nextVersionHost);
+  }
+
+  public getNextVersionHost(): string | undefined {
+    return this.apiService.getNextVersionHost();
   }
 
   public getUser(): User | undefined {
@@ -1455,7 +1518,8 @@ export class SNApplication {
       this.httpService,
       this.storageService,
       this.permissionsService,
-      this.defaultHost
+      this.defaultHost,
+      this.nextVersionHost
     );
     this.services.push(this.apiService);
   }

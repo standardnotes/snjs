@@ -141,6 +141,6 @@ describe('auth fringe cases', () => {
       expect(conflictedCopy.text).to.equal(serverText);
       expect(conflictedCopy.duplicate_of).to.equal(firstVersionOfNote.uuid);
       newApplication.deinit();
-    });
+    }).timeout(10000);
   });
 });

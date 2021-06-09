@@ -5,7 +5,7 @@ export type Token = {
     uuid: Uuid,
     email: string
   },
-  session: {
+  session?: {
     uuid: Uuid,
     api_version: string,
     created_at: string,

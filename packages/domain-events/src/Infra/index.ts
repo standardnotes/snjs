@@ -7,3 +7,4 @@ export * from './SNS/SNSDomainEventPublisher'
 
 export * from './SQS/SQSDomainEventSubscriberFactory'
 export * from './SQS/SQSEventMessageHandler'
+export * from './SQS/SQSNewRelicEventMessageHandler'

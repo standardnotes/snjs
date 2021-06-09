@@ -113,12 +113,14 @@ export {
   deepMerge,
   dictToArray,
   extendArray,
+  filterFromArray,
   findInArray,
   getGlobalScope,
   greaterOfTwoDates,
   isNullOrUndefined,
   isSameDay,
   jsonParseEmbeddedKeys,
+  naturalSort,
   omitInPlace,
   omitUndefinedCopy,
   removeFromArray,
@@ -173,6 +175,7 @@ export {
   isPayloadSourceRetrieved,
   isPayloadSourceInternalChange,
 } from '@Lib/protocol/payloads/sources';
+export { DeltaOutOfSync } from '@Payloads/deltas';
 export { ProtocolVersion } from '@Lib/protocol/versions';
 export { PayloadFormat } from '@Payloads/formats';
 export { PurePayload } from '@Payloads/pure_payload';
@@ -199,3 +202,6 @@ export { ProtectionSessionDurations } from '@Lib/services/protection_service';
 export { SNLog } from './log';
 
 export { Permission } from '@standardnotes/auth';
+
+export type { ItemMessagePayload } from './services/component_manager';
+export type { MessageData } from './services/component_manager';

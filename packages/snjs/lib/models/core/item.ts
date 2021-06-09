@@ -158,6 +158,10 @@ export class SNItem {
     return this.payload.serverUpdatedAt;
   }
 
+  public get serverUpdatedAtTimestamp(): number | undefined {
+    return this.payload.updated_at_timestamp;
+  }
+
   /** @deprecated Use serverUpdatedAt instead */
   public get updated_at(): Date | undefined {
     return this.serverUpdatedAt;
@@ -381,10 +385,6 @@ export class SNItem {
     return SNPredicate.ItemSatisfiesPredicate(this, predicate);
   }
 
-  public updatedAtTimestamp() {
-    return this.serverUpdatedAt?.getTime();
-  }
-
   private dateToLocalizedString(date: Date) {
     if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
       if (!SNItem.sharedDateFormatter) {
@@ -506,6 +506,13 @@ export class ItemMutator {
       updated_at: updated_at,
     });
   }
+
+  public set updated_at_timestamp(updated_at_timestamp: number) {
+    this.payload = CopyPayload(this.payload, {
+      updated_at_timestamp,
+    });
+  }
+
 
   public set userModifiedDate(date: Date) {
     this.setAppDataItem(AppDataField.UserModifiedDate, date);

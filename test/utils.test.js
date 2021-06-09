@@ -140,6 +140,13 @@ describe('utils', () => {
     expect(result.length).to.equal(2);
   });
 
+  it('filterFromArray function predicate', () => {
+    const array = [{ uuid: 1 }, { uuid: 2 }, { uuid: 3 }];
+
+    filterFromArray(array, (o) => o.uuid === 1);
+    expect(array.length).to.equal(2);
+  });
+
   it('lodash merge should behave as expected', () => {
     const a = {
       content: {
@@ -182,4 +189,45 @@ describe('utils', () => {
       expect(result).to.equal(false);
     });
   });
+
+  describe('naturalSort', () => {
+    let items;
+    beforeEach(() => {
+      items = [
+        {
+          someProperty: 'a',
+        },
+        {
+          someProperty: 'b',
+        },
+        {
+          someProperty: '2',
+        },
+        {
+          someProperty: 'A',
+        },
+        {
+          someProperty: '1',
+        }
+      ]
+    });
+    it('sorts elements in natural order in ascending direction by default', () => {
+      const result = naturalSort(items, 'someProperty');
+      expect(result).lengthOf(items.length);
+      expect(result[0]).to.equal(items[4]);
+      expect(result[1]).to.equal(items[2]);
+      expect(result[2]).to.equal(items[0]);
+      expect(result[3]).to.equal(items[3]);
+      expect(result[4]).to.equal(items[1]);
+    });
+    it('sorts elements in natural order in descending direction', () => {
+      const result = naturalSort(items, 'someProperty', 'desc');
+      expect(result).lengthOf(items.length);
+      expect(result[0]).to.equal(items[1]);
+      expect(result[1]).to.equal(items[3]);
+      expect(result[2]).to.equal(items[0]);
+      expect(result[3]).to.equal(items[2]);
+      expect(result[4]).to.equal(items[4]);
+    });
+  })
 });

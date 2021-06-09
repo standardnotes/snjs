@@ -1,4 +1,3 @@
 export type MfaPayload = {
-  mfaSecretUuid: string,
-  enteredTotp: string,
+  mfa_key: string,
 }

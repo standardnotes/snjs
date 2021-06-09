@@ -3,12 +3,10 @@ import {
   ItemCollection,
   SortDirection,
 } from '@Protocol/collection/item_collection';
-import { UserPrefsMutator } from './../models/app/userPrefs';
 import { SNItemsKey } from '@Models/app/items_key';
-import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
-import { NoteMutator } from './../models/app/note';
+import { NoteMutator, SNNote } from './../models/app/note';
 import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
@@ -20,7 +18,7 @@ import { FillItemContent, Uuids } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import { isString, removeFromArray, searchArray } from '@Lib/utils';
+import { isString, naturalSort, removeFromArray, searchArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   PayloadContent,
@@ -31,7 +29,6 @@ import { PayloadSource } from './../protocol/payloads/sources';
 import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadManager } from './payload_manager';
 import { ContentType } from '../models/content_types';
-import { ThemeMutator } from '@Lib/models';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
 import { createMutatorForItem } from '@Lib/models/mutator';
@@ -719,6 +716,72 @@ export class ItemManager extends PureService {
    */
   public findTagByTitle(title: string) {
     return searchArray(this.tags, { title: title });
+  }
+
+  /**
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
+   */
+  public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
+    const delimiter = '.';
+    return naturalSort(
+      this.tags.filter((tag) => {
+        const regex = new RegExp(
+          `^${searchQuery}|${delimiter}${searchQuery}`,
+          'i'
+        );
+        const matchesQuery = regex.test(tag.title);
+        const tagInNote = note
+          ? this.itemsReferencingItem(note.uuid).some(
+              (item) => item?.uuid === tag.uuid
+            )
+          : false;
+        return matchesQuery && !tagInNote;
+      }),
+      'title'
+    );
+  }
+
+  /**
+   * Returns all parents for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns Array containing all parent tags
+   */
+   public getTagParentChain(tag: SNTag): SNTag[] {
+    const delimiter = '.';
+    const tagComponents = tag.title.split(delimiter);
+    const parentTagsTitles: string[] = [];
+
+    const getImmediateParent = () => {
+      if (tagComponents.length > 1) {
+        tagComponents.splice(-1, 1);
+        const immediateParentTitle = tagComponents.join(delimiter);
+        parentTagsTitles.push(immediateParentTitle);
+        getImmediateParent();
+      }
+    };
+
+    getImmediateParent();
+    const parentTags = this.tags.filter((tag) =>
+      parentTagsTitles.some((title) => title === tag.title)
+    );
+    return parentTags;
+  }
+
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  public getSortedTagsForNote(note: SNNote): SNTag[] {
+    return naturalSort(
+      this.itemsReferencingItem(note.uuid).filter((ref) => {
+        return ref?.content_type === ContentType.Tag;
+      }) as SNTag[],
+      'title'
+    );
   }
 
   /**

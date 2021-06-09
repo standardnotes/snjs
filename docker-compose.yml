@@ -31,20 +31,18 @@ services:
       - snjs
 
   syncing-server-js:
-    image: standardnotes/syncing-server-js:1.19.5
+    image: standardnotes/syncing-server-js:1.34.1
     entrypoint: [
       "./wait-for.sh", "db", "3306",
       "./wait-for.sh", "cache", "6379",
       "./docker/entrypoint.sh", "start-web"
     ]
-    ports:
-      - 3123:3000
     env_file: docker/syncing-server-js.env
     networks:
       - snjs
 
   syncing-server-js-worker:
-    image: standardnotes/syncing-server-js:1.19.5
+    image: standardnotes/syncing-server-js:1.34.1
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -56,7 +54,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.4.4
+    image: standardnotes/api-gateway:1.16.0
     depends_on:
       - syncing-server-js
       - auth
@@ -69,12 +67,12 @@ services:
     environment:
       PORT: 3000
     ports:
-      - 3124:3000
+      - 3123:3000
     networks:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.6.4
+    image: standardnotes/auth:1.9.0
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -86,7 +84,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.6.4
+    image: standardnotes/auth:1.9.0
     depends_on:
       - auth
     entrypoint: [

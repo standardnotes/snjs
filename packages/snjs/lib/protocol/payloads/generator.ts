@@ -33,6 +33,8 @@ export type RawPayload = {
   enc_item_key?: string;
   created_at?: Date;
   updated_at?: Date;
+  created_at_timestamp?: number;
+  updated_at_timestamp?: number;
   dirtiedDate?: Date;
   dirty?: boolean;
   errorDecrypting?: boolean;
@@ -84,6 +86,8 @@ const MaxPayloadFields = Object.freeze([
   PayloadField.Content,
   PayloadField.CreatedAt,
   PayloadField.ServerUpdatedAt,
+  PayloadField.CreatedAtTimestamp,
+  PayloadField.ServerUpdatedAtTimestamp,
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
   PayloadField.Legacy003AuthParams,
@@ -116,6 +120,8 @@ const FilePayloadFields = Object.freeze([
   PayloadField.Content,
   PayloadField.CreatedAt,
   PayloadField.ServerUpdatedAt,
+  PayloadField.CreatedAtTimestamp,
+  PayloadField.ServerUpdatedAtTimestamp,
   PayloadField.Legacy003AuthHash,
   PayloadField.DuplicateOf,
 ]);
@@ -128,6 +134,8 @@ const StoragePayloadFields = Object.freeze([
   PayloadField.Content,
   PayloadField.CreatedAt,
   PayloadField.ServerUpdatedAt,
+  PayloadField.CreatedAtTimestamp,
+  PayloadField.ServerUpdatedAtTimestamp,
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
   PayloadField.Legacy003AuthParams,
@@ -146,6 +154,8 @@ const ServerPayloadFields = Object.freeze([
   PayloadField.Content,
   PayloadField.CreatedAt,
   PayloadField.ServerUpdatedAt,
+  PayloadField.CreatedAtTimestamp,
+  PayloadField.ServerUpdatedAtTimestamp,
   PayloadField.Deleted,
   PayloadField.Legacy003AuthHash,
   PayloadField.DuplicateOf,
@@ -186,6 +196,8 @@ const ServerSavedPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ServerUpdatedAt,
+  PayloadField.ServerUpdatedAtTimestamp,
+  PayloadField.CreatedAtTimestamp,
   PayloadField.Deleted,
   PayloadField.Dirty,
   PayloadField.LastSyncEnd,

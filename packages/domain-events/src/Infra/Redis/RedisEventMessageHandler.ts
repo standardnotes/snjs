@@ -20,7 +20,7 @@ export class RedisEventMessageHandler implements DomainEventMessageHandlerInterf
 
       const handler = this.handlers.get(domainEvent.type)
       if (!handler) {
-        this.logger.warn(`Event handler for event type ${domainEvent.type} does not exist`)
+        this.logger.debug(`Event handler for event type ${domainEvent.type} does not exist`)
 
         return
       }

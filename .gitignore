@@ -7,6 +7,7 @@ coverage
 yarn-error.log
 package-lock.json
 lerna-debug.log
+newrelic_agent.log
 
 # Ignore ENV variables config
 .env

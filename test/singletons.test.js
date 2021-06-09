@@ -172,10 +172,10 @@ describe('singletons', function () {
     this.application.singletonManager.registerPredicate(this.extPred);
     await this.createExtMgr();
     await this.application.sync(syncOptions);
-    this.application.sync(syncOptions);
+    const extraSync = this.application.sync(syncOptions);
     await this.signIn();
-    await Factory.sleep(0.5);
-  });
+    await extraSync;
+  }).timeout(15000);
 
   it('singletons that are deleted after download first sync should not sync to server', async function () {
     await this.registerUser();

@@ -136,7 +136,7 @@ Running packages/snjs tests:
 ```
 yarn run start:test-server:dev
 
-# Spins up Ruby and JS server
+# Spins up server
 yarn run test:e2e:dev-setup
 ```
 
