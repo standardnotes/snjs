@@ -499,6 +499,9 @@ export class SNProtocolService
     if (!payload.uuid) {
       throw Error('Attempting to encrypt payload with no uuid.');
     }
+    if (key?.errorDecrypting || key?.waitingForKey) {
+      throw Error('Attempting to encrypt payload with encrypted key.');
+    }
     const version = key ? key.keyVersion : this.getLatestVersion();
     const format = this.payloadContentFormatForIntent(intent, key);
     const operator = this.operatorForVersion(version);
