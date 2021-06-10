@@ -2,9 +2,9 @@ import { ApplicationStage } from '../stages';
 import { Migration } from '@Lib/migrations/migration';
 import { ContentType, SNPredicate } from '@Lib/models';
 
-export class Migration3_0_0 extends Migration {
+export class Migration2_7_0 extends Migration {
   static version(): string {
-    return '3.0.0';
+    return '2.7.0';
   }
 
   protected registerStageHandlers(): void {
