@@ -607,7 +607,7 @@ describe('item manager', function () {
   });
 
   describe('getTagDescendants', async function () {
-    it.only('should return descendant tags for a tag', async function () {
+    it('should return descendant tags for a tag', async function () {
       const parentTag = await this.itemManager.findOrCreateTagByTitle('parent');
       const childrenTags = [
         await this.itemManager.findOrCreateTagByTitle('parent.firstChild'),
