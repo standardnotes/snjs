@@ -20,7 +20,19 @@ global.window.alert = jest.fn();
 global.window.confirm = jest.fn();
 global.window.open = jest.fn();
 
+/**
+ * window.setImmediate is non-standard, so we substitute it with setTimeout.
+ * See https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate
+ */
 //@ts-ignore
 global.window.setImmediate = global.window.setTimeout;
+
+/**
+ * Setting native extensions location:
+ * - _extensions_manager_location for the Extension manager
+ * - _batch_manager_location for the Batch manager
+ */
+global.window['_extensions_manager_location'] = 'http://localhost/extensions/extension_manager';
+global.window['_batch_manager_location'] = 'http://localhost/extensions/batch_manager';
 
 global.document = window.document;
