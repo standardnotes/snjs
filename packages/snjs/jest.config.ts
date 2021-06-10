@@ -43,11 +43,9 @@ export default {
   // A set of global variables that need to be available in all test environments
   globals: {
     'ts-jest': {
-      tsConfig: 'lib/tsconfig.json',
+      tsconfig: '<rootDir>/lib/tsconfig.json',
       isolatedModules: true,
-      diagnostics: {
-        ignoreCodes: [151001]
-      }
+      esModuleInterop: true
     }
   },
 
@@ -56,11 +54,11 @@ export default {
    * Paths obtained from lib/tsconfig.json
    */
   moduleNameMapper: {
-    '@Lib/(.*)': '<rootDir>/lib/$1',
-    '@Services/(.*)': '<rootDir>/lib/services/$1',
-    '@Models/(.*)': '<rootDir>/lib/models/$1',
-    '@Protocol/(.*)': '<rootDir>/lib/protocol/$1',
-    '@Payloads/(.*)': '<rootDir>/lib/protocol/payloads/$1'
+    '^@Lib/(.*)': '<rootDir>/lib/$1',
+    '^@Services/(.*)': '<rootDir>/lib/services/$1',
+    '^@Models/(.*)': '<rootDir>/lib/models/$1',
+    '^@Protocol/(.*)': '<rootDir>/lib/protocol/$1',
+    '^@Payloads/(.*)': '<rootDir>/lib/protocol/payloads/$1'
   },
 
   // A preset that is used as a base for Jest's configuration

@@ -21,6 +21,7 @@ module.exports = {
     'no-restricted-globals': ['error', 'history'],
   },
   include: [
-    'lib/**/*.ts'
+    'lib/**/*.ts',
+    '__tests__/**/*.ts'
   ],
 };

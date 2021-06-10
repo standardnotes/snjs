@@ -19,4 +19,8 @@ const { window } = new JSDOM(htmlTemplate, {
 global.window.alert = jest.fn();
 global.window.confirm = jest.fn();
 global.window.open = jest.fn();
+
+//@ts-ignore
+global.window.setImmediate = global.window.setTimeout;
+
 global.document = window.document;
