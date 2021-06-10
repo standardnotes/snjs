@@ -393,6 +393,12 @@ describe('item manager', function () {
     expect(this.itemManager.findTagByTitle(tag.title)).to.be.ok;
   });
 
+  it('find tag by title should be case insensitive', async function () {
+    const tag = await this.createTag();
+
+    expect(this.itemManager.findTagByTitle(tag.title.toUpperCase())).to.be.ok;    
+  })
+
   it('find or create tag by title', async function () {
     const title = 'foo';
 
