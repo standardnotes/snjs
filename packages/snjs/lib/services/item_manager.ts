@@ -772,6 +772,22 @@ export class ItemManager extends PureService {
   }
 
   /**
+   * Returns all descendants for a tag
+   * @param tag - The tag for which descendants need to be found
+   * @returns Array containing all descendant tags
+   */
+   public getTagDescendants(tag: SNTag): SNTag[] {
+    const delimiter = '.';
+    return this.tags.filter((t) => {
+      const regex = new RegExp(
+        `^${tag.title}${delimiter}`,
+        'i'
+      );
+      return regex.test(t.title);
+    });
+  }
+
+  /**
    * Get tags for a note sorted in natural order
    * @param note - The note whose tags will be returned
    * @returns Array containing tags associated with a note

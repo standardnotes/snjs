@@ -604,5 +604,22 @@ describe('item manager', function () {
       expect(results).to.contain(parentTags[0]);
       expect(results).to.contain(parentTags[1]);
     })
+  });
+
+  describe('getTagDescendants', async function () {
+    it.only('should return descendant tags for a tag', async function () {
+      const parentTag = await this.itemManager.findOrCreateTagByTitle('parent');
+      const childrenTags = [
+        await this.itemManager.findOrCreateTagByTitle('parent.firstChild'),
+        await this.itemManager.findOrCreateTagByTitle('parent.firstChild.grandchild'),
+        await this.itemManager.findOrCreateTagByTitle('parent.secondChild'),
+      ];
+      await this.itemManager.findOrCreateTagByTitle('some other tag');
+
+      const results = this.itemManager.getTagDescendants(parentTag);
+      expect(results).lengthOf(childrenTags.length);
+      expect(results).to.contain(childrenTags[0]);
+      expect(results).to.contain(childrenTags[1]);
+    })
   })
 });
