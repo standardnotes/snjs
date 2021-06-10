@@ -780,7 +780,7 @@ export class ItemManager extends PureService {
     const delimiter = '.';
     return this.tags.filter((t) => {
       const regex = new RegExp(
-        `^${tag.title}${delimiter}`,
+        `^${tag.title}${delimiter}|${delimiter}${tag.title}${delimiter}`,
         'i'
       );
       return regex.test(t.title);
