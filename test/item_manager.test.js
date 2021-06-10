@@ -609,7 +609,7 @@ describe('item manager', function () {
   describe('getTagDescendants', async function () {
     it('should return descendant tags for a tag', async function () {
       const parentTag = await this.itemManager.findOrCreateTagByTitle('parent');
-      const childrenTags = [
+      const descendantTags = [
         await this.itemManager.findOrCreateTagByTitle('parent.firstChild'),
         await this.itemManager.findOrCreateTagByTitle('parent.firstChild.grandchild'),
         await this.itemManager.findOrCreateTagByTitle('parent.secondChild'),
@@ -617,9 +617,10 @@ describe('item manager', function () {
       await this.itemManager.findOrCreateTagByTitle('some other tag');
 
       const results = this.itemManager.getTagDescendants(parentTag);
-      expect(results).lengthOf(childrenTags.length);
-      expect(results).to.contain(childrenTags[0]);
-      expect(results).to.contain(childrenTags[1]);
+      expect(results).lengthOf(descendantTags.length);
+      expect(results).to.contain(descendantTags[0]);
+      expect(results).to.contain(descendantTags[1]);
+      expect(results).to.contain(descendantTags[2]);
     })
   })
 });
