@@ -558,7 +558,7 @@ export class SNComponentManager extends PureService {
 
   public isComponentHidden(component: SNComponent): boolean {
     const componentState = this.findOrCreateDataForComponent(component.uuid);
-    return componentState.hidden;
+    return componentState.hidden === true;
   }
 
   public setComponentHidden(component: SNComponent, hidden: boolean): void {
