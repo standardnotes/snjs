@@ -90,7 +90,6 @@ export const getRawTestComponentItem = (componentPackage: any) => {
       name: componentPackage.name,
       hosted_url: componentPackage.url,
       url: componentPackage.url,
-      local_url: null,
       area: componentPackage.area,
       package_info: componentPackage,
       valid_until: new Date(today.setFullYear(today.getFullYear() + 5)),
@@ -134,7 +133,9 @@ export const createNoteItem = async (
   const testNoteItem = getTestNoteItem(overrides);
   return await application.createManagedItem(
     testNoteItem.content_type as ContentType,
-    testNoteItem,
+    {
+      ...testNoteItem.content
+    },
     needsSync
   ) as SNNote;
 };
@@ -162,8 +163,8 @@ export const createComponentItem = async (
   return await application.createManagedItem(
     rawTestComponentItem.content_type as ContentType,
     {
-      ...overrides,
-      ...rawTestComponentItem.content
+      ...rawTestComponentItem.content,
+      ...overrides
     },
     false
   ) as SNComponent;
@@ -184,24 +185,3 @@ export const registerComponentHandler = (
     contextRequestHandler: () => itemInContext
   });
 };
-
-export const jsonForItem = (item: SNItem, component: SNComponent) => {
-  const isMetadatUpdate =
-    item.payload.source === PayloadSource.RemoteSaved ||
-    item.payload.source === PayloadSource.LocalSaved ||
-    item.payload.source === PayloadSource.PreSyncSave;
-
-  const componentData = item.getDomainData('org.standardnotes.sn') || {};
-  const clientData = componentData[component.getClientDataKey()!] || {};
-
-  return {
-    uuid: item.uuid,
-    content_type: item.content_type!,
-    created_at: item.created_at!,
-    updated_at: item.serverUpdatedAt!,
-    deleted: item.deleted!,
-    isMetadataUpdate: isMetadatUpdate,
-    content: item.content,
-    clientData: clientData,
-  };
-}
