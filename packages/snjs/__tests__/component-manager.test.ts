@@ -17,9 +17,22 @@ import {
   testThemeDefaultPackage,
   testThemeDarkPackage,
   testExtensionForTagsPackage,
-  createNoteItem
+  createNoteItem,
+  registerComponent,
+  registerComponentHandler,
+  sleep
 } from './helpers';
 import { createApplication } from './lib/appFactory';
+
+// To prevent conflicts with Mocha
+import {
+  describe,
+  expect,
+  test,
+  it,
+  beforeEach,
+  afterEach
+} from '@jest/globals';
 
 describe('Component Manager', () => {
   /** The global Standard Notes application. */
@@ -43,19 +56,19 @@ describe('Component Manager', () => {
   });
 
   describe('isDesktop', () => {
-    it('should return false if in a Web app', async () => {
+    it('returns false if in a Web app', async () => {
       testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
       const { isDesktop } = testSNApp.componentManager;
       expect(isDesktop).toBe(false);
     });
 
-    it('should return false if in a Mobile app', async () => {
+    it('returns false if in a Mobile app', async () => {
       testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
       const { isDesktop } = testSNApp.componentManager;
       expect(isDesktop).toBe(false);
     });
 
-    it('should return true if in a Desktop app', async () => {
+    it('returns true if in a Desktop app', async () => {
       testSNApp = await createApplication('test-application', Environment.Desktop, Platform.LinuxDesktop);
       const { isDesktop } = testSNApp.componentManager;
       expect(isDesktop).toBe(true);
@@ -63,19 +76,19 @@ describe('Component Manager', () => {
   });
 
   describe('isMobile', () => {
-    it('should return false if in a Web app', async () => {
+    it('returns false if in a Web app', async () => {
       testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
       const { isMobile } = testSNApp.componentManager;
       expect(isMobile).toBe(false);
     });
 
-    it('should return false if in a Desktop app', async () => {
+    it('returns false if in a Desktop app', async () => {
       testSNApp = await createApplication('test-application', Environment.Desktop, Platform.LinuxDesktop);
       const { isMobile } = testSNApp.componentManager;
       expect(isMobile).toBe(false);
     });
 
-    it('should return true if in a Mobile app', async () => {
+    it('returns true if in a Mobile app', async () => {
       testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
       const { isMobile } = testSNApp.componentManager;
       expect(isMobile).toBe(true);
@@ -83,12 +96,12 @@ describe('Component Manager', () => {
   });
 
   describe('components', () => {
-    it('should return an empty array if no items of type Component or Theme exist', async () => {
+    it('returns an empty array if no items of type Component or Theme exist', async () => {
       const testApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
       expect(testApp.componentManager.components).toHaveLength(0);
     });
 
-    it('should return an array of items of type Component and Theme', async () => {
+    it('returns an array of items of type Component and Theme', async () => {
       const testApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
 
       await createComponentItem(testApp, testExtensionEditorPackage);
@@ -103,7 +116,7 @@ describe('Component Manager', () => {
   });
 
   describe('componentsForArea()', () => {
-    it('should return an array of Component items', async () => {
+    it('returns an array of Component items', async () => {
       const testApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
 
       await createComponentItem(testApp, testExtensionEditorPackage);
@@ -123,7 +136,7 @@ describe('Component Manager', () => {
   });
 
   describe('isNativeExtension()', () => {
-    it('should return false if hosted_url or local_url do not match any of the native extensions location', async () => {
+    it('returns false if hosted_url or local_url do not match any of the native extensions location', async () => {
       let isNativeExtension = testSNApp.componentManager.isNativeExtension(testComponent);
       expect(isNativeExtension).toBe(false);
 
@@ -131,7 +144,7 @@ describe('Component Manager', () => {
       expect(isNativeExtension).toBe(false);
     });
 
-    it('should return true if location matches the Extensions manager location', async () => {
+    it('returns true if location matches the Extensions manager location', async () => {
       const extensionsManagerPackage = {
         identifier: "test.standardnotes.extensions-manager-extension",
         name: "Extensions manager",
@@ -147,7 +160,7 @@ describe('Component Manager', () => {
     });
 
     // Will be removed soon.
-    it('should return true if location matches the Batch manager location', async () => {
+    it('returns true if location matches the Batch manager location', async () => {
       const batchManagerPackage = {
         identifier: "test.standardnotes.batch-manager-extension",
         name: "Batch manager",
@@ -165,7 +178,7 @@ describe('Component Manager', () => {
 
   describe('getActiveThemes()', () => {
     describe('Web/Desktop', () => {
-      it('should return all active themes', async () => {
+      it('returns all active themes', async () => {
         await createComponentItem(testSNApp, testThemeDefaultPackage);
 
         let activeThemes = testSNApp.componentManager.getActiveThemes();
@@ -186,7 +199,7 @@ describe('Component Manager', () => {
     });
 
     describe('Mobile', () => {
-      it('should return just one theme', async () => {
+      it('returns just one theme', async () => {
         testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
         await createComponentItem(testSNApp, testThemeDefaultPackage, {
           active: true
@@ -206,13 +219,13 @@ describe('Component Manager', () => {
   });
 
   describe('urlsForActiveThemes()', () => {
-    it('should return an empty array if there are no active themes', async () => {
+    it('returns an empty array if there are no active themes', async () => {
       const testApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
       const urlsForActiveThemes = testApp.componentManager.urlsForActiveThemes();
       expect(urlsForActiveThemes).toHaveLength(0);
     });
 
-    it('should return an array of URLs from the active themes', async () => {
+    it('returns an array of URLs from the active themes', async () => {
       await createComponentItem(testSNApp, testThemeDefaultPackage);
 
       const defaultTheme = await createComponentItem(testSNApp, testThemeDefaultPackage, {
@@ -501,7 +514,7 @@ describe('Component Manager', () => {
 
   describe('urlForComponent()', () => {
     describe('Desktop', () => {
-      it('should return null because offlineOnly is available on desktop, and not on web or mobile', async () => {
+      it('returns null because offlineOnly is available on desktop, and not on web or mobile', async () => {
         testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
         testComponent = await createComponentItem(testSNApp, testExtensionEditorPackage, {
           offlineOnly: true
@@ -511,7 +524,7 @@ describe('Component Manager', () => {
         expect(urlForComponent).toBeNull();
       });
 
-      it('should replace sn:// with the extensions server host', async () => {
+      it('replaces sn:// with the extensions server host', async () => {
         testSNApp = await createApplication('test-application', Environment.Desktop, Platform.LinuxDesktop);
 
         const extServerHost = 'https://127.0.0.1:45653/'
@@ -533,7 +546,7 @@ describe('Component Manager', () => {
     });
 
     describe('Mobile', () => {
-      it('should replace localhost or sn.local with localhost on iOS', async () => {
+      it('replaces localhost or sn.local with localhost on iOS', async () => {
         testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Ios);
 
         const localhostComponent = await createComponentItem(testSNApp, testExtensionEditorPackage, {
@@ -555,7 +568,7 @@ describe('Component Manager', () => {
         expect(urlForComponent).toBe('https://remote-host.sn.org/my-extension-for-ios');
       });
 
-      it('should replace localhost or sn.local with 10.0.2.2 on Android', async () => {
+      it('replaces localhost or sn.local with 10.0.2.2 on Android', async () => {
         testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
 
         const localhostComponent = await createComponentItem(testSNApp, testExtensionEditorPackage, {
@@ -578,14 +591,14 @@ describe('Component Manager', () => {
       });
     });
 
-    it('should return the hosted_url as-is', async () => {
+    it('returns the hosted_url as-is', async () => {
       const urlForComponent = testSNApp.componentManager.urlForComponent(testComponent);
       expect(urlForComponent).toBe(testComponent.hosted_url);
     });
   });
 
   describe('componentForUrl()', () => {
-    it('should return the first component that matches the url', async () => {
+    it('returns the first component that matches the url', async () => {
       const firstComponentSameUrl = await createComponentItem(testSNApp, testExtensionEditorPackage, {
         hosted_url: 'http://localhost/my-extension'
       });
@@ -600,6 +613,346 @@ describe('Component Manager', () => {
       componentForUrl = testSNApp.componentManager.componentForUrl('http://localhost/my-extension');
       expect(componentForUrl).not.toBe(secondComponentSameUrl);
       expect(componentForUrl).toBe(firstComponentSameUrl);
+    });
+  });
+
+  describe('sessionKeyForComponent()', () => {
+    it('returns undefined if the component has not been registered', () => {
+      const sessionKey = testSNApp.componentManager.sessionKeyForComponent(testComponent);
+      expect(sessionKey).toBeUndefined();
+    });
+
+    it('returns a valid value if the component is registered', async () => {
+      const componentIframe = document.createElement('iframe');
+      await registerComponent(testSNApp, componentIframe.contentWindow, testComponent);
+
+      const sessionKey = testSNApp.componentManager.sessionKeyForComponent(testComponent);
+      expect(sessionKey).toBeDefined();
+    });
+  });
+
+  describe('componentForSessionKey()', () => {
+    it('returns undefined if the session key does not exist', () => {
+      const component = testSNApp.componentManager.componentForSessionKey('a-session-key');
+      expect(component).toBeUndefined();
+    });
+
+    it('returns a valid component if the session key exists', async () => {
+      const componentIframe = document.createElement('iframe');
+      await registerComponent(testSNApp, componentIframe.contentWindow, testComponent);
+
+      const sessionKey = testSNApp.componentManager.sessionKeyForComponent(testComponent);
+      const component = testSNApp.componentManager.componentForSessionKey(sessionKey);
+      expect(component).toBeDefined();
+    });
+
+    it('finds a component that was registered via registerHandler', () => {
+      const customActionHandler = jest.fn();
+      const componentForSessionKeyHandler = jest.fn((key: string) => {
+        if (key === 'my-component-key') {
+          return testComponent;
+        }
+      });
+      registerComponentHandler(
+        testSNApp,
+        [testComponent.area],
+        undefined,
+        customActionHandler,
+        componentForSessionKeyHandler
+      );
+
+      const component = testSNApp.componentManager.componentForSessionKey('my-component-key');
+      expect(component).toBeDefined();
+      expect(component).toBe(testComponent);
+    });
+  });
+
+  describe('handleMessage()', () => {
+    let alertSpy;
+
+    beforeEach(() => {
+      alertSpy = jest.spyOn(testSNApp.componentManager.alertService, 'alert');
+    });
+
+    it('shows an alert if the passed component is not valid', () => {
+      const componentMessage = {
+        action: ComponentAction.StreamItems
+      };
+
+      testSNApp.componentManager.handleMessage(undefined, componentMessage);
+      expect(alertSpy).toBeCalledTimes(1);
+      expect(alertSpy).lastCalledWith(
+        'An extension is trying to communicate with Standard Notes, ' +
+        'but there is an error establishing a bridge. Please restart the app and try again.'
+      );
+    });
+
+    const readwriteActions = [
+      ComponentAction.SaveItems,
+      ComponentAction.AssociateItem,
+      ComponentAction.DeassociateItem,
+      ComponentAction.CreateItem,
+      ComponentAction.CreateItems,
+      ComponentAction.DeleteItems,
+      ComponentAction.SetComponentData,
+    ];
+
+    test.each(readwriteActions)(
+      'shows an alert if the component is in read-only state and the message action is %s',
+      (messageAction: ComponentAction) => {
+        const componentMessage = {
+          action: messageAction
+        };
+        testSNApp.componentManager.setReadonlyStateForComponent(testComponent, true);
+
+        testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+        expect(alertSpy).toBeCalledTimes(1);
+        expect(alertSpy).lastCalledWith(
+          `The extension ${testComponent.name} is trying to save, but it is in a locked state and cannot accept changes.`
+        );
+      });
+
+    it('calls the handler function for StreamItems action', () => {
+      const componentMessage = {
+        action: ComponentAction.StreamItems,
+        data: {
+          content_types: [ContentType.Note]
+        }
+      };
+      const handleStreamItemsMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleStreamItemsMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleStreamItemsMessage).toBeCalledTimes(1);
+      expect(handleStreamItemsMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for StreamContextItem action', () => {
+      const componentMessage = {
+        action: ComponentAction.StreamContextItem
+      };
+      const handleStreamContextItemMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleStreamContextItemMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleStreamContextItemMessage).toBeCalledTimes(1);
+      expect(handleStreamContextItemMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for SetComponentData action', () => {
+      const componentMessage = {
+        action: ComponentAction.SetComponentData,
+        data: {}
+      };
+      const handleSetComponentDataMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleSetComponentDataMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleSetComponentDataMessage).toBeCalledTimes(1);
+      expect(handleSetComponentDataMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for DeleteItems action', () => {
+      const componentMessage = {
+        action: ComponentAction.DeleteItems,
+        data: {
+          items: []
+        }
+      };
+      const handleDeleteItemsMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleDeleteItemsMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleDeleteItemsMessage).toBeCalledTimes(1);
+      expect(handleDeleteItemsMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for CreateItem action', () => {
+      const componentMessage = {
+        action: ComponentAction.CreateItem,
+        data: {
+          item: {}
+        }
+      };
+      const handleCreateItemsMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleCreateItemsMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleCreateItemsMessage).toBeCalledTimes(1);
+      expect(handleCreateItemsMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for CreateItems action', () => {
+      const componentMessage = {
+        action: ComponentAction.CreateItems,
+        data: {
+          items: []
+        }
+      };
+      const handleCreateItemsMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleCreateItemsMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleCreateItemsMessage).toBeCalledTimes(1);
+      expect(handleCreateItemsMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for SaveItems action', async () => {
+      const noteItem = await createNoteItem(testSNApp, {
+        title: 'Note 1',
+        text: 'This is a test note :7'
+      });
+      const componentMessage = {
+        action: ComponentAction.SaveItems,
+        data: {
+          items: [noteItem]
+        }
+      };
+      const handleSaveItemsMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleSaveItemsMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleSaveItemsMessage).toBeCalledTimes(1);
+      expect(handleSaveItemsMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for ToggleActivateComponent action', async () => {
+      const componentMessage = {
+        action: ComponentAction.ToggleActivateComponent,
+        data: {
+          uuid: (testComponent as SNItem).uuid
+        }
+      };
+      const handleToggleComponentMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleToggleComponentMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleToggleComponentMessage).toBeCalledTimes(1);
+      expect(handleToggleComponentMessage).lastCalledWith(testComponent);
+    });
+
+    it('calls the handler function for RequestPermissions action', () => {
+      const componentMessage = {
+        action: ComponentAction.RequestPermissions,
+        data: {
+          permissions: []
+        }
+      };
+      const handleRequestPermissionsMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleRequestPermissionsMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleRequestPermissionsMessage).toBeCalledTimes(1);
+      expect(handleRequestPermissionsMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for InstallLocalComponent action', () => {
+      const componentMessage = {
+        action: ComponentAction.InstallLocalComponent
+      };
+      const handleInstallLocalComponentMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleInstallLocalComponentMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleInstallLocalComponentMessage).toBeCalledTimes(1);
+      expect(handleInstallLocalComponentMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for DuplicateItem action', async () => {
+      const noteItem = await createNoteItem(testSNApp, {
+        title: 'Note 1',
+        text: 'This is a test note that needs to be duplicated.'
+      });
+      const componentMessage = {
+        action: ComponentAction.DuplicateItem,
+        data: {
+          item: {
+            uuid: noteItem.uuid
+          }
+        }
+      };
+      const handleDuplicateItemMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'handleDuplicateItemMessage'
+      );
+
+      testSNApp.componentManager.handleMessage(testComponent, componentMessage);
+      expect(handleDuplicateItemMessage).toBeCalledTimes(1);
+      expect(handleDuplicateItemMessage).lastCalledWith(testComponent, componentMessage);
+    });
+
+    it('calls the handler function for the handlers in the same area', async () => {
+      const customActionHandler = jest.fn();
+      const editorComponent = await createComponentItem(testSNApp, testExtensionEditorPackage);
+      registerComponentHandler(
+        testSNApp,
+        [editorComponent.area],
+        undefined,
+        customActionHandler
+      );
+
+      const componentMessage = {
+        action: ComponentAction.StreamItems,
+        data: {
+          content_types: [ContentType.Note]
+        }
+      };
+
+      testSNApp.componentManager.handleMessage(editorComponent, componentMessage);
+      await sleep(0.001);
+
+      expect(customActionHandler).toBeCalledTimes(1);
+      expect(customActionHandler).lastCalledWith(
+        editorComponent,
+        componentMessage.action,
+        componentMessage.data
+      );
+    });
+  });
+
+  describe('responseItemsByRemovingPrivateProperties()', () => {
+    it('returns responseItems as-is if the component is a native extension', async () => {
+      const batchManagerPackage = {
+        identifier: "test.standardnotes.batch-manager-extension",
+        name: "Batch manager",
+        content_type: "SN|Component",
+        area: "modal",
+        version: "1.0.0",
+        url: "http://localhost/extensions/batch_manager"
+      };
+      const batchManagerComponent = await createComponentItem(testSNApp, batchManagerPackage);
+      const responseItems = [
+        {
+          foo: 'bar',
+          test: 'testing'
+        }
+      ];
+      
+      const returnedItems = testSNApp.componentManager.responseItemsByRemovingPrivateProperties(
+        responseItems,
+        batchManagerComponent
+      );
+      expect(returnedItems).toEqual(responseItems);
     });
   });
 });
