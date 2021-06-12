@@ -2,7 +2,6 @@ import {
   ComponentAction,
   ComponentArea,
   ContentType,
-  PayloadSource,
   SNApplication,
   SNComponent,
   SNItem,
@@ -175,6 +174,7 @@ export const registerComponentHandler = (
   areas: ComponentArea[],
   itemInContext?: SNItem,
   customActionHandler?: (currentComponent: SNComponent, action: ComponentAction, data: any) => void,
+  componentForSessionKeyHandler?: (sessionKey: string) => SNComponent
 ) => {
   application.componentManager.registerHandler({
     identifier: 'generic-view-' + Math.random(),
@@ -182,6 +182,7 @@ export const registerComponentHandler = (
     actionHandler: (currentComponent, action, data) => {
       customActionHandler && customActionHandler(currentComponent, action, data);
     },
-    contextRequestHandler: () => itemInContext
+    contextRequestHandler: () => itemInContext,
+    componentForSessionKeyHandler
   });
 };
