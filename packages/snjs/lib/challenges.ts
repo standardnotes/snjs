@@ -34,7 +34,6 @@ export enum ChallengeReason {
   ChangeAutolockInterval,
   CreateDecryptedBackupWithProtectedItems,
   RevokeSession,
-  AccessBatchManager,
   AccessCloudLink,
   DecryptEncryptedFile,
   ExportBackup,
@@ -107,8 +106,6 @@ export class Challenge {
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         case ChallengeReason.RevokeSession:
           return ChallengeStrings.RevokeSession;
-        case ChallengeReason.AccessBatchManager:
-          return ChallengeStrings.AccessBatchManager;
         case ChallengeReason.AccessCloudLink:
           return ChallengeStrings.AccessCloudLink;
         case ChallengeReason.DecryptEncryptedFile:

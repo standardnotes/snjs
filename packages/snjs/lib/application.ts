@@ -977,10 +977,6 @@ export class SNApplication {
     return this.protectionService.authorizeAutolockIntervalChange();
   }
 
-  public authorizeBatchManagerAccess(): Promise<boolean> {
-    return this.protectionService.authorizeBatchManagerAccess();
-  }
-
   public authorizeCloudLinkAccess(): Promise<boolean> {
     return this.protectionService.authorizeCloudLinkAccess();
   }
@@ -1447,13 +1443,13 @@ export class SNApplication {
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
-    this.createMigrationService();
     this.createHistoryManager();
     this.createSyncManager();
     this.createProtectionService();
     this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
+    this.createMigrationService();
     this.createComponentManager();
     this.createActionsManager();
     this.createPreferencesService();
@@ -1502,6 +1498,7 @@ export class SNApplication {
       sessionManager: this.sessionManager,
       challengeService: this.challengeService,
       itemManager: this.itemManager,
+      singletonManager: this.singletonManager,
       environment: this.environment,
       identifier: this.identifier,
     });

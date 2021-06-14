@@ -206,6 +206,10 @@ describe('2020-01-15 mobile migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
+
+    /** Full sync completed event will not trigger due to mocked credentials,
+     * thus we manually need to mark any sync dependent migrations as complete. */
+    await application.migrationService.markMigrationsAsDone();
     await application.deinit();
 
     /** Recreate application and ensure storage values are consistent */
@@ -1379,6 +1383,9 @@ describe('2020-01-15 mobile migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
+    /** Full sync completed event will not trigger due to mocked credentials,
+     * thus we manually need to mark any sync dependent migrations as complete. */
+    await application.migrationService.markMigrationsAsDone();
     await application.deinit();
 
     /** Recreate application and ensure storage values are consistent */
