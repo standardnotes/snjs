@@ -190,7 +190,6 @@ export const ChallengeStrings = {
   ChangeAutolockInterval:
     'Authentication is required to change autolock timer duration',
   RevokeSession: 'Authentication is required to revoke a session',
-  AccessBatchManager: 'Authentication is required to access the batch manager',
   AccessCloudLink: 'Authentication is required to access CloudLink',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',

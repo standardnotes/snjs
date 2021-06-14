@@ -661,7 +661,7 @@ describe('keys', function () {
     expect(keyParams.origination).to.equal(KeyParamsOrigination.Registration);
   });
 
-  it('encryption name should be dependant on key params version', async function () {
+  it('encryption name should be dependent on key params version', async function () {
     /** Register with 003 account */
     await Factory.registerOldUser({
       application: this.application,

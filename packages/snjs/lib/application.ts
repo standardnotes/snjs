@@ -798,6 +798,15 @@ export class SNApplication {
   }
 
   /**
+   * Returns all descendants for a tag
+   * @param tag - The tag for which descendants need to be found
+   * @returns Array containing all descendant tags
+   */
+   public getTagDescendants(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagDescendants(tag);
+  }
+
+  /**
    * Get tags for a note sorted in natural order
    * @param note - The note whose tags will be returned
    * @returns Array containing tags associated with a note
@@ -966,10 +975,6 @@ export class SNApplication {
 
   public authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.protectionService.authorizeAutolockIntervalChange();
-  }
-
-  public authorizeBatchManagerAccess(): Promise<boolean> {
-    return this.protectionService.authorizeBatchManagerAccess();
   }
 
   public authorizeCloudLinkAccess(): Promise<boolean> {
@@ -1438,13 +1443,13 @@ export class SNApplication {
     this.createHttpManager();
     this.createApiService();
     this.createSessionManager();
-    this.createMigrationService();
     this.createHistoryManager();
     this.createSyncManager();
     this.createProtectionService();
     this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
+    this.createMigrationService();
     this.createComponentManager();
     this.createActionsManager();
     this.createPreferencesService();
@@ -1493,6 +1498,7 @@ export class SNApplication {
       sessionManager: this.sessionManager,
       challengeService: this.challengeService,
       itemManager: this.itemManager,
+      singletonManager: this.singletonManager,
       environment: this.environment,
       identifier: this.identifier,
     });
