@@ -798,6 +798,15 @@ export class SNApplication {
   }
 
   /**
+   * Returns all descendants for a tag
+   * @param tag - The tag for which descendants need to be found
+   * @returns Array containing all descendant tags
+   */
+   public getTagDescendants(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagDescendants(tag);
+  }
+
+  /**
    * Get tags for a note sorted in natural order
    * @param note - The note whose tags will be returned
    * @returns Array containing tags associated with a note
