@@ -11,6 +11,10 @@ export class WebComponentManager extends SNComponentManager {
     const approved = window.confirm(text);
     dialog.callback(approved);
   }
+
+  openModalComponent(component: SNComponent): void {
+    window.alert(component.name);
+  }
 }
 
 export class MobileComponentManager extends SNComponentManager {
