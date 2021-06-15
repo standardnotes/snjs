@@ -104,7 +104,7 @@ export const sleep = async (seconds: number) => {
 /**
  * A short amount of time to wait for messages to propagate via the postMessage API.
  */
-export const SHORT_DELAY_TIME = 0.05;
+export const SHORT_DELAY_TIME = 0.0001;
 
 export const registerComponent = async (
   application: SNApplication,
