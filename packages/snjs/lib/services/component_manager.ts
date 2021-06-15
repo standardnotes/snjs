@@ -1485,7 +1485,7 @@ export class SNComponentManager extends PureService {
   }
 
   openModalComponent(_component: SNComponent): void {
-    throw 'Must override SNComponentManager.presentPermissionsDialog';
+    throw 'Must override SNComponentManager.openModalComponent';
   }
 
   public registerHandler(handler: ComponentHandler): () => void {
