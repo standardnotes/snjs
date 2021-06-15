@@ -18,8 +18,10 @@ import {
   testThemeDarkPackage,
   testExtensionForTagsPackage,
   createNoteItem,
+  createTagItem,
   registerComponent,
   registerComponentHandler,
+  SHORT_DELAY_TIME,
   sleep
 } from './helpers';
 import { createApplication } from './lib/appFactory';
@@ -919,7 +921,7 @@ describe('Component Manager', () => {
       };
 
       testSNApp.componentManager.handleMessage(editorComponent, componentMessage);
-      await sleep(0.001);
+      await sleep(SHORT_DELAY_TIME);
 
       expect(customActionHandler).toBeCalledTimes(1);
       expect(customActionHandler).lastCalledWith(
@@ -953,6 +955,669 @@ describe('Component Manager', () => {
         batchManagerComponent
       );
       expect(returnedItems).toEqual(responseItems);
+    });
+
+    it('does not include private content properties', async () => {
+      const responseItems = [
+        {
+          foo: 'bar',
+          test: 'testing',
+          content: {
+            text: 'test',
+            active: true,
+            permissions: [],
+            autoupdateDisabled: true
+          }
+        }
+      ];
+      
+      const returnedItems = testSNApp.componentManager.responseItemsByRemovingPrivateProperties(
+        responseItems,
+        testComponent
+      );
+      expect(returnedItems).toEqual([
+        {
+          foo: 'bar',
+          test: 'testing',
+          content: {
+            text: 'test'
+          }
+        }
+      ]);
+    });
+
+    it('returns the item as-is if the content key is a string', async () => {
+      const responseItems = [
+        {
+          foo: 'bar',
+          test: 'testing',
+          content: 'this is a string'
+        }
+      ];
+      
+      const returnedItems = testSNApp.componentManager.responseItemsByRemovingPrivateProperties(
+        responseItems,
+        testComponent
+      );
+      expect(returnedItems).toEqual(responseItems);
+    });
+
+    it('returns the item as-is if the content key is not present', async () => {
+      const responseItems = [
+        {
+          foo: 'bar',
+          test: 'testing'
+        }
+      ];
+      
+      const returnedItems = testSNApp.componentManager.responseItemsByRemovingPrivateProperties(
+        responseItems,
+        testComponent
+      );
+      expect(returnedItems).toEqual(responseItems);
+    });
+
+    it('includes hosted_url, local_url or url properties when includeUrls is true', async () => {
+      const responseItems = [
+        {
+          foo: 'bar',
+          test: 'testing',
+          content: {
+            text: 'test',
+            active: true,
+            permissions: [],
+            autoupdateDisabled: true,
+            hosted_url: 'test',
+            local_url: 'test',
+            url: 'test'
+          }
+        }
+      ];
+      
+      const returnedItems = testSNApp.componentManager.responseItemsByRemovingPrivateProperties(
+        responseItems,
+        testComponent,
+        true
+      );
+      expect(returnedItems).toEqual([
+        {
+          foo: 'bar',
+          test: 'testing',
+          content: {
+            text: 'test'
+          }
+        }
+      ]);
+    });
+  });
+
+  describe('handleStreamItemsMessage()', () => {
+    let runWithPermissions;
+    let sendItemsInReply;
+
+    beforeEach(() => {
+      runWithPermissions = jest.spyOn(
+        testSNApp.componentManager,
+        'runWithPermissions'
+      );
+      sendItemsInReply = jest.spyOn(
+        testSNApp.componentManager,
+        'sendItemsInReply'
+      );
+
+      /**
+       * Components prompts for permissions via the presentPermissionsDialog function, which
+       * has been implemented to use window.confirm to approve these requests.
+       */
+       window.confirm = jest.fn((message) => true);
+    });
+
+    const AllowedContentTypesInBulk = [
+      ContentType.ActionsExtension,
+      ContentType.Editor,
+      ContentType.ExtensionRepo,
+      ContentType.FilesafeCredentials,
+      ContentType.FilesafeFileMetadata,
+      ContentType.FilesafeIntegration,
+      ContentType.Mfa,
+      ContentType.ServerExtension,
+      ContentType.SmartTag,
+      ContentType.Tag,
+      ContentType.Theme,
+    ];
+
+    test('only allow content types that can be streamed in bulk by the component', async () => {
+      const componentMessage = {
+        action: ComponentAction.StreamItems,
+        data: {
+          content_types: AllowedContentTypesInBulk
+        }
+      };
+
+      testSNApp.componentManager.handleStreamItemsMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(runWithPermissions).toBeCalledTimes(1);
+      expect(runWithPermissions).lastCalledWith(
+        (testComponent as SNItem).uuid,
+        [
+          {
+            name: ComponentAction.StreamItems,
+            content_types: AllowedContentTypesInBulk.sort()
+          },
+        ],
+        expect.any(Function)
+      );
+
+      expect(sendItemsInReply).toBeCalledTimes(1);
+      expect(sendItemsInReply).lastCalledWith(
+        (testComponent as SNItem).uuid,
+        expect.any(Array),
+        componentMessage
+      );
+    });
+
+    it('do not allow a content type to be streamed in bulk by if not in the allow list', async () => {
+      await createNoteItem(testSNApp);
+      await createNoteItem(testSNApp);
+      await createNoteItem(testSNApp);
+
+      const componentMessage = {
+        action: ComponentAction.StreamItems,
+        data: {
+          content_types: [ContentType.Note]
+        }
+      };
+
+      testSNApp.componentManager.handleStreamItemsMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(runWithPermissions).toBeCalledTimes(1);
+      expect(runWithPermissions).lastCalledWith(
+        (testComponent as SNItem).uuid,
+        [
+          {
+            name: ComponentAction.StreamItems,
+            content_types: []
+          },
+        ],
+        expect.any(Function)
+      );
+
+      expect(sendItemsInReply).toBeCalledTimes(1);
+      expect(sendItemsInReply).lastCalledWith(
+        (testComponent as SNItem).uuid,
+        [],
+        componentMessage
+      );
+    });
+
+    test('stream all items with the selected content types', async () => {
+      const tag1 = await createTagItem(testSNApp, 'Tag 1');
+      const tag2 = await createTagItem(testSNApp, 'Tag 2');
+      const tag3 = await createTagItem(testSNApp, 'Tag 3');
+
+      const componentMessage = {
+        action: ComponentAction.StreamItems,
+        data: {
+          content_types: [ContentType.Tag]
+        }
+      };
+
+      testSNApp.componentManager.handleStreamItemsMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(runWithPermissions).toBeCalledTimes(1);
+      expect(runWithPermissions).lastCalledWith(
+        (testComponent as SNItem).uuid,
+        [
+          {
+            name: ComponentAction.StreamItems,
+            content_types: componentMessage.data.content_types
+          },
+        ],
+        expect.any(Function)
+      );
+
+      expect(sendItemsInReply).toBeCalledTimes(1);
+      expect(sendItemsInReply).lastCalledWith(
+        (testComponent as SNItem).uuid,
+        [ tag1, tag2, tag3 ],
+        componentMessage
+      );
+    });
+
+    test('streamed items should be non errored items', async () => {
+      await createTagItem(testSNApp, 'Tag 1');
+
+      const componentMessage = {
+        action: ComponentAction.StreamItems,
+        data: {
+          content_types: [ContentType.Tag]
+        }
+      };
+
+      const nonErroredItemsForContentType = jest.spyOn(
+        testSNApp.itemManager,
+        'nonErroredItemsForContentType'
+      );
+
+      testSNApp.componentManager.handleStreamItemsMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(nonErroredItemsForContentType).toBeCalledTimes(1);
+      expect(nonErroredItemsForContentType).lastCalledWith(ContentType.Tag);
+    });
+  });
+
+  describe('handleStreamContextItemMessage()', () => {
+    let runWithPermissions;
+    let sendContextItemInReply;
+
+    beforeEach(() => {
+      runWithPermissions = jest.spyOn(
+        testSNApp.componentManager,
+        'runWithPermissions'
+      );
+      sendContextItemInReply = jest.spyOn(
+        testSNApp.componentManager,
+        'sendContextItemInReply'
+      );
+
+      /**
+       * Components prompts for permissions via the presentPermissionsDialog function, which
+       * has been implemented to use window.confirm to approve these requests.
+       */
+       window.confirm = jest.fn((message) => true);
+    });
+
+    test('push to context stream observers if the observer does not exist', async () => {
+      const contextStreamObservers = testSNApp.componentManager['contextStreamObservers'];
+
+      expect(contextStreamObservers).toHaveLength(0);
+
+      testSNApp.componentManager.handleStreamContextItemMessage(testComponent, {
+        action: ComponentAction.StreamContextItem
+      });
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(runWithPermissions).toBeCalledTimes(1);
+      expect(runWithPermissions).toBeCalledWith(
+        (testComponent as SNItem).uuid,
+        [
+          {
+            name: ComponentAction.StreamContextItem
+          },
+        ],
+        expect.any(Function)
+      );
+
+      expect(contextStreamObservers).toContainEqual({
+        identifier: (testComponent as SNItem).uuid,
+        componentUuid: (testComponent as SNItem).uuid,
+        area: testComponent.area,
+        originalMessage: {
+          action: ComponentAction.StreamContextItem
+        },
+      });
+    });
+
+    test('send context item in reply', async () => {
+      const itemInContext = await createNoteItem(testSNApp, { title: 'Note 1' });
+      const customActionHandler = jest.fn();
+      registerComponentHandler(
+        testSNApp,
+        [testComponent.area],
+        itemInContext,
+        customActionHandler
+      );
+
+      const componentMessage = {
+        action: ComponentAction.StreamContextItem
+      };
+      testSNApp.componentManager.handleStreamContextItemMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(sendContextItemInReply).toBeCalledTimes(1);
+      expect(sendContextItemInReply).toBeCalledWith(
+        (testComponent as SNItem).uuid,
+        itemInContext,
+        componentMessage
+      );
+    });
+  });
+
+  describe('itemIdsInContextJurisdictionForComponent()', () => {
+    it('returns an empty array if no handler is registered', () => {
+      const itemIds = testSNApp.componentManager.itemIdsInContextJurisdictionForComponent(testComponent);
+      expect(itemIds).toHaveLength(0);
+    });
+
+    it('returns item ids in context for the component', async () => {
+      const itemInContext = await createNoteItem(testSNApp, { title: 'Note 1' });
+      await createNoteItem(testSNApp, { title: 'Note 2' });
+
+      const customActionHandler = jest.fn();
+      registerComponentHandler(
+        testSNApp,
+        [testComponent.area],
+        itemInContext,
+        customActionHandler
+      );
+
+      const itemIds = testSNApp.componentManager.itemIdsInContextJurisdictionForComponent(testComponent);
+      expect(itemIds).toHaveLength(1);
+      expect(itemIds[0]).toEqual(itemInContext.uuid);
+    });
+
+    it('checks if the item is in jurisdiction of component', async () => {
+      const itemInContext = await createNoteItem(testSNApp, { title: 'Note 1' });
+      const anotherNote = await createNoteItem(testSNApp, { title: 'Note 2' });
+
+      const customActionHandler = jest.fn();
+      registerComponentHandler(
+        testSNApp,
+        [testComponent.area],
+        itemInContext,
+        customActionHandler
+      );
+
+      let isItemInJurisdiction = testSNApp.componentManager.isItemIdWithinComponentContextJurisdiction(
+        itemInContext.uuid,
+        testComponent
+      );
+      expect(isItemInJurisdiction).toBe(true);
+
+      isItemInJurisdiction = testSNApp.componentManager.isItemIdWithinComponentContextJurisdiction(
+        anotherNote.uuid,
+        testComponent
+      );
+      expect(isItemInJurisdiction).toBe(false);
+    });
+  });
+
+  test('handlersForArea() returns handlers in the specified area', () => {
+    const customActionHandler = jest.fn();
+    registerComponentHandler(
+      testSNApp,
+      [ComponentArea.Editor, ComponentArea.Rooms],
+      undefined,
+      customActionHandler
+    );
+
+    const handlersInEditorArea = testSNApp.componentManager.handlersForArea(ComponentArea.Editor);
+    expect(handlersInEditorArea).toHaveLength(1);
+
+    const handlersInRoomsArea = testSNApp.componentManager.handlersForArea(ComponentArea.Rooms);
+    expect(handlersInRoomsArea).toHaveLength(1);
+
+    let handlersInTagsListArea = testSNApp.componentManager.handlersForArea(ComponentArea.TagsList);
+    expect(handlersInTagsListArea).toHaveLength(0);
+
+    registerComponentHandler(
+      testSNApp,
+      [ComponentArea.TagsList],
+      undefined,
+      customActionHandler
+    );
+
+    handlersInTagsListArea = testSNApp.componentManager.handlersForArea(ComponentArea.TagsList);
+    expect(handlersInTagsListArea).toHaveLength(1);
+  });
+
+  describe.skip('handleSaveItemsMessage()', () => { });
+
+  describe('handleDuplicateItemMessage()', () => {
+    let runWithPermissions;
+    let replyToMessage;
+
+    beforeEach(() => {
+      runWithPermissions = jest.spyOn(
+        testSNApp.componentManager,
+        'runWithPermissions'
+      );
+      replyToMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'replyToMessage'
+      );
+
+      /**
+       * Components prompts for permissions via the presentPermissionsDialog function, which
+       * has been implemented to use window.confirm to approve these requests.
+       */
+       window.confirm = jest.fn((message) => true);
+    });
+
+    test('duplicates an item by uuid', async () => {
+      const someNote = await createNoteItem(testSNApp, { title: 'Some note that will be duplicated' });
+      expect(testSNApp.itemManager.noteCount).toBe(1);
+
+      const componentMessage = {
+        data: {
+          item: {
+            uuid: someNote.uuid
+          },
+        },
+      };
+
+      testSNApp.componentManager.handleDuplicateItemMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(runWithPermissions).toBeCalledTimes(1);
+      expect(runWithPermissions).toBeCalledWith(
+        (testComponent as SNItem).uuid,
+        [
+          {
+            name: ComponentAction.StreamItems,
+            content_types: [someNote.content_type]
+          }
+        ],
+        expect.any(Function)
+      );
+      expect(testSNApp.itemManager.noteCount).toBe(2);
+      expect(replyToMessage).toBeCalledTimes(1);
+      expect(replyToMessage).toBeCalledWith(
+        testComponent,
+        componentMessage,
+        {
+          item: expect.objectContaining({
+            content: expect.objectContaining({
+              title: someNote.title,
+              text: someNote.text
+            })
+          })
+        }
+      );
+    });
+  });
+
+  describe.skip('handleCreateItemsMessage()', () => { });
+
+  describe.skip('handleDeleteItemsMessage()', () => { });
+
+  describe('handleRequestPermissionsMessage()', () => {
+    let runWithPermissions;
+    let replyToMessage;
+
+    beforeEach(() => {
+      runWithPermissions = jest.spyOn(
+        testSNApp.componentManager,
+        'runWithPermissions'
+      );
+      replyToMessage = jest.spyOn(
+        testSNApp.componentManager,
+        'replyToMessage'
+      );
+
+      /**
+       * Components prompts for permissions via the presentPermissionsDialog function, which
+       * has been implemented to use window.confirm to approve these requests.
+       */
+       window.confirm = jest.fn((message) => true);
+    });
+
+    test('approves the given permissions', async () => {
+      const componentMessage = {
+        data: {
+          permissions: [ ComponentAction.StreamItems ]
+        }
+      };
+
+      testSNApp.componentManager.handleRequestPermissionsMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(runWithPermissions).toBeCalledTimes(1);
+      expect(runWithPermissions).toBeCalledWith(
+        (testComponent as SNItem).uuid,
+        componentMessage.data.permissions,
+        expect.any(Function)
+      );
+      expect(replyToMessage).toBeCalledTimes(1);
+      expect(replyToMessage).toBeCalledWith(
+        testComponent,
+        componentMessage,
+        {
+          approved: true
+        }
+      );
+    });
+  });
+
+  describe('handleSetComponentDataMessage()', () => {
+    let runWithPermissions;
+
+    beforeEach(() => {
+      runWithPermissions = jest.spyOn(
+        testSNApp.componentManager,
+        'runWithPermissions'
+      );
+
+      /**
+       * Components prompts for permissions via the presentPermissionsDialog function, which
+       * has been implemented to use window.confirm to approve these requests.
+       */
+       window.confirm = jest.fn((message) => true);
+    });
+
+    test('changes the componentData for the component', async () => {
+      const componentMessage = {
+        data: {
+          componentData: {
+            foo: 'test',
+            bar: 'test'
+          }
+        }
+      };
+
+      testSNApp.componentManager.handleSetComponentDataMessage(testComponent, componentMessage);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(runWithPermissions).toBeCalledTimes(1);
+      expect(runWithPermissions).toBeCalledWith(
+        (testComponent as SNItem).uuid,
+        [],
+        expect.any(Function)
+      );
+
+      testComponent = testSNApp.itemManager.findItem(
+        (testComponent as SNItem).uuid
+      );
+      expect(testComponent.componentData).toEqual(componentMessage.data.componentData);
+    });
+  });
+
+  describe('handleToggleComponentMessage()', () => {
+    test('opens a modal component', async () => {
+      const modalComponent = await createComponentItem(testSNApp, {
+        identifier: "test.standardnotes.my-modal-extension",
+        name: "My Modal Extension",
+        content_type: "SN|Component",
+        area: "modal",
+        version: "1.0.0",
+        url: "http://localhost"
+      });
+
+      const alertMessage = jest.spyOn(window, 'alert');
+
+      await testSNApp.componentManager.handleToggleComponentMessage(modalComponent);
+      expect(alertMessage).toBeCalledTimes(1);
+      expect(alertMessage).toBeCalledWith(modalComponent.name);
+    });
+
+    test.skip('deactivate component if active', async () => {
+      const activeComponent = await createComponentItem(testSNApp, testExtensionEditorPackage, {
+        active: true
+      });
+      const deactivateComponent = jest.spyOn(
+        testSNApp.componentManager,
+        'deactivateComponent'
+      );
+
+      await testSNApp.componentManager.handleToggleComponentMessage(activeComponent);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(deactivateComponent).toBeCalledTimes(1);
+      expect(deactivateComponent).toBeCalledWith(
+        (activeComponent as SNItem).uuid
+      );
+    });
+
+    test.skip('current active theme is activated before desactivating others', async () => {
+      const currentThemeComponent = await createComponentItem(testSNApp, testThemeDefaultPackage);
+      const activateComponent = jest.spyOn(
+        testSNApp.componentManager,
+        'activateComponent'
+      );
+
+      await testSNApp.componentManager.handleToggleComponentMessage(currentThemeComponent);
+      await sleep(SHORT_DELAY_TIME);
+
+      expect(activateComponent).toBeCalledTimes(1);
+      expect(activateComponent).toBeCalledWith(
+        (currentThemeComponent as SNItem).uuid
+      );
+    });
+  });
+
+  describe('handleInstallLocalComponentMessage()', () => {
+    let desktopManager;
+
+    beforeEach(() => {
+      const extServerHost = 'https://127.0.0.1:45653/'
+      desktopManager = {
+        getExtServerHost: jest.fn(() => extServerHost),
+        registerUpdateObserver: jest.fn(),
+        syncComponentsInstallation: jest.fn(),
+        installComponent: jest.fn()
+      };
+      testSNApp.componentManager.setDesktopManager(desktopManager);
+    });
+
+    test('only native extensions can install local components', async () => {
+      const themeComponent = await createComponentItem(testSNApp, testThemeDefaultPackage);
+
+      testSNApp.componentManager.handleInstallLocalComponentMessage(themeComponent);
+      expect(desktopManager.installComponent).toBeCalledTimes(0);
+    });
+
+    test('installComponent is called with the provided component uuid', async () => {
+      const extensionsManagerPackage = {
+        identifier: "test.standardnotes.extensions-manager-extension",
+        name: "Extensions manager",
+        content_type: "SN|Component",
+        area: "modal",
+        version: "1.0.0",
+        url: "http://localhost/extensions/extension_manager"
+      };
+      const nativeExtension = await createComponentItem(testSNApp, extensionsManagerPackage);
+
+      testSNApp.componentManager.handleInstallLocalComponentMessage(nativeExtension, {
+        data: {
+          uuid: (testComponent as SNItem).uuid
+        }
+      });
+      expect(desktopManager.installComponent).toBeCalledTimes(1);
+      expect(desktopManager.installComponent).toBeCalledWith(testComponent);
     });
   });
 });
