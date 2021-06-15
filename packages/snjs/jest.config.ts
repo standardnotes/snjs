@@ -77,7 +77,8 @@ export default {
   // The paths to modules that run some code to configure or set up the testing environment before each test
   setupFiles: [
     '<rootDir>/__tests__/setup/global.ts',
-    '<rootDir>/__tests__/setup/jsdom.ts'
+    '<rootDir>/__tests__/setup/jsdom.ts',
+    '<rootDir>/__tests__/setup/mock.ts'
   ],
 
   // The test environment that will be used for testing
