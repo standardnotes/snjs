@@ -35,6 +35,7 @@ import {
   beforeEach,
   afterEach
 } from '@jest/globals';
+import { environmentToString, platformToString } from '../lib/platforms';
 
 describe('Component Manager', () => {
   /** The global Standard Notes application. */
@@ -511,7 +512,158 @@ describe('Component Manager', () => {
   });
 
   describe('sendMessageToComponent()', () => {
+    let iframeWindow;
+    let logSpy;
 
+    beforeEach(async () => {
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframeWindow = iframe.contentWindow;
+
+      logSpy = jest.spyOn(
+        testSNApp.componentManager,
+        'log'
+      );
+
+      await testSNApp.componentManager.registerComponentWindow(
+        testComponent,
+        iframeWindow
+      );
+    });
+
+    test('return if component is hidden and action is not allowed while hidden', async () => {
+      const componentMessage = {
+        action: ComponentAction.Reply
+      };
+
+      const postMessage = jest.spyOn(
+        iframeWindow,
+        'postMessage'
+      );
+
+      testSNApp.componentManager.setComponentHidden(testComponent, true);
+      testSNApp.componentManager.sendMessageToComponent(
+        testComponent,
+        componentMessage
+      );
+
+      expect(postMessage).toBeCalledTimes(0);
+      expect(logSpy).toBeCalledWith(
+        'Component disabled for current item, ignoring messages.',
+        testComponent.name
+      );
+    });
+
+    test('return if component does not have a window and the message is a reply', async () => {
+      await testSNApp.componentManager.registerComponentWindow(
+        testComponent,
+        undefined
+      );
+
+      const componentMessage = {
+        action: ComponentAction.Reply
+      };
+
+      const postMessage = jest.spyOn(
+        iframeWindow,
+        'postMessage'
+      );
+
+      testSNApp.componentManager.sendMessageToComponent(
+        testComponent,
+        componentMessage
+      );
+
+      expect(postMessage).toBeCalledTimes(0);
+      expect(logSpy).toBeCalledWith(
+        'Component has been deallocated in between message send and reply',
+        testComponent,
+        componentMessage
+      );
+    });
+
+    test('show an alert if origin is not defined', async () => {
+      await testSNApp.componentManager.registerComponentWindow(
+        testComponent,
+        undefined
+      );
+
+      const componentMessage = {
+        action: ComponentAction.ActivateThemes
+      };
+
+      const alertSpy = jest.spyOn(
+        testSNApp.componentManager.alertService,
+        'alert'
+      );
+
+      const postMessage = jest.spyOn(
+        iframeWindow,
+        'postMessage'
+      );
+
+      testSNApp.componentManager.sendMessageToComponent(
+        testComponent,
+        componentMessage
+      );
+
+      expect(postMessage).toBeCalledTimes(0);
+      expect(alertSpy).toBeCalledTimes(1);
+      expect(alertSpy).toBeCalledWith(
+        `Standard Notes is trying to communicate with ${testComponent.name}, ` +
+        'but an error is occurring. Please restart this extension and try again.'
+      );
+    });
+
+    test('post message as-is on web or desktop', async () => {
+      const componentMessage = {
+        action: ComponentAction.ComponentRegistered
+      };
+
+      const postMessage = jest.spyOn(
+        iframeWindow,
+        'postMessage'
+      );
+
+      testSNApp.componentManager.sendMessageToComponent(
+        testComponent,
+        componentMessage
+      );
+
+      expect(postMessage).toBeCalledTimes(1);
+      expect(postMessage).toBeCalledWith(
+        componentMessage,
+        testSNApp.componentManager.urlForComponent(testComponent)
+      );
+    });
+
+    test('post message as json on mobile', async () => {
+      testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
+      await testSNApp.componentManager.registerComponentWindow(
+        testComponent,
+        iframeWindow
+      );
+
+      const componentMessage = {
+        action: ComponentAction.ComponentRegistered
+      };
+
+      const postMessage = jest.spyOn(
+        iframeWindow,
+        'postMessage'
+      );
+
+      testSNApp.componentManager.sendMessageToComponent(
+        testComponent,
+        componentMessage
+      );
+
+      expect(postMessage).toBeCalledTimes(1);
+      expect(postMessage).toBeCalledWith(
+        JSON.stringify(componentMessage),
+        testSNApp.componentManager.urlForComponent(testComponent)
+      );
+    });
   });
 
   describe('urlForComponent()', () => {
@@ -625,8 +777,9 @@ describe('Component Manager', () => {
     });
 
     it('returns a valid value if the component is registered', async () => {
-      const componentIframe = document.createElement('iframe');
-      await registerComponent(testSNApp, componentIframe.contentWindow, testComponent);
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      await registerComponent(testSNApp, iframe.contentWindow, testComponent);
 
       const sessionKey = testSNApp.componentManager.sessionKeyForComponent(testComponent);
       expect(sessionKey).toBeDefined();
@@ -640,8 +793,9 @@ describe('Component Manager', () => {
     });
 
     it('returns a valid component if the session key exists', async () => {
-      const componentIframe = document.createElement('iframe');
-      await registerComponent(testSNApp, componentIframe.contentWindow, testComponent);
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      await registerComponent(testSNApp, iframe.contentWindow, testComponent);
 
       const sessionKey = testSNApp.componentManager.sessionKeyForComponent(testComponent);
       const component = testSNApp.componentManager.componentForSessionKey(sessionKey);
@@ -1069,7 +1223,7 @@ describe('Component Manager', () => {
        * Components prompts for permissions via the presentPermissionsDialog function, which
        * has been implemented to use window.confirm to approve these requests.
        */
-       window.confirm = jest.fn((message) => true);
+       window.confirm = (message) => true;
     });
 
     const AllowedContentTypesInBulk = [
@@ -1228,7 +1382,7 @@ describe('Component Manager', () => {
        * Components prompts for permissions via the presentPermissionsDialog function, which
        * has been implemented to use window.confirm to approve these requests.
        */
-       window.confirm = jest.fn((message) => true);
+       window.confirm = (message) => true;
     });
 
     test('push to context stream observers if the observer does not exist', async () => {
@@ -1385,7 +1539,7 @@ describe('Component Manager', () => {
        * Components prompts for permissions via the presentPermissionsDialog function, which
        * has been implemented to use window.confirm to approve these requests.
        */
-       window.confirm = jest.fn((message) => true);
+       window.confirm = (message) => true;
     });
 
     test('duplicates an item by uuid', async () => {
@@ -1453,7 +1607,7 @@ describe('Component Manager', () => {
        * Components prompts for permissions via the presentPermissionsDialog function, which
        * has been implemented to use window.confirm to approve these requests.
        */
-       window.confirm = jest.fn((message) => true);
+       window.confirm = (message) => true;
     });
 
     test('approves the given permissions', async () => {
@@ -1496,7 +1650,7 @@ describe('Component Manager', () => {
        * Components prompts for permissions via the presentPermissionsDialog function, which
        * has been implemented to use window.confirm to approve these requests.
        */
-       window.confirm = jest.fn((message) => true);
+       window.confirm = (message) => true;
     });
 
     test('changes the componentData for the component', async () => {
@@ -1544,7 +1698,7 @@ describe('Component Manager', () => {
       expect(alertMessage).toBeCalledWith(modalComponent.name);
     });
 
-    test.skip('deactivate component if active', async () => {
+    test('deactivate component if active', async () => {
       const activeComponent = await createComponentItem(testSNApp, testExtensionEditorPackage, {
         active: true
       });
@@ -1554,7 +1708,6 @@ describe('Component Manager', () => {
       );
 
       await testSNApp.componentManager.handleToggleComponentMessage(activeComponent);
-      await sleep(SHORT_DELAY_TIME);
 
       expect(deactivateComponent).toBeCalledTimes(1);
       expect(deactivateComponent).toBeCalledWith(
@@ -1562,7 +1715,7 @@ describe('Component Manager', () => {
       );
     });
 
-    test.skip('current active theme is activated before desactivating others', async () => {
+    test('current active theme is activated before desactivating others', async () => {
       const currentThemeComponent = await createComponentItem(testSNApp, testThemeDefaultPackage);
       const activateComponent = jest.spyOn(
         testSNApp.componentManager,
@@ -1570,7 +1723,6 @@ describe('Component Manager', () => {
       );
 
       await testSNApp.componentManager.handleToggleComponentMessage(currentThemeComponent);
-      await sleep(SHORT_DELAY_TIME);
 
       expect(activateComponent).toBeCalledTimes(1);
       expect(activateComponent).toBeCalledWith(
@@ -1618,6 +1770,481 @@ describe('Component Manager', () => {
       });
       expect(desktopManager.installComponent).toBeCalledTimes(1);
       expect(desktopManager.installComponent).toBeCalledWith(testComponent);
+    });
+  });
+
+  describe('runWithPermissions()', () => {
+    let runFunction;
+
+    beforeEach(async () => {
+      testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+      testComponent = await createComponentItem(testSNApp, testExtensionEditorPackage);
+      runFunction = jest.fn();
+    });
+
+    test('the specified function will be executed if no required permissions', () => {
+      /**
+       * Rejecting any permission prompts, since we are expecting to execute the function
+       * without any explicit permissions.
+       */
+      window.confirm = (message) => false;
+
+      testSNApp.componentManager.runWithPermissions(
+        (testComponent as SNItem).uuid,
+        [],
+        runFunction
+      );
+      expect(runFunction).toBeCalledTimes(1);
+    });
+
+    test.skip('the specified function will be executed only if the permission prompt is approved', async () => {
+      /**
+       * Initially rejecting any permission prompts.
+       */
+      window.confirm = (message) => false;
+
+      const requiredPermissions = [
+        {
+          name: ComponentAction.CreateItem,
+        }
+      ];
+
+      testSNApp.componentManager.runWithPermissions(
+        (testComponent as SNItem).uuid,
+        requiredPermissions,
+        runFunction
+      );
+      await sleep(SHORT_DELAY_TIME);
+      expect(runFunction).toBeCalledTimes(0);
+
+      /**
+       * Approving any subsequent permission prompts.
+       */
+      window.confirm = (message) => true;
+
+      testSNApp.componentManager.runWithPermissions(
+        (testComponent as SNItem).uuid,
+        requiredPermissions,
+        runFunction
+      );
+      await sleep(SHORT_DELAY_TIME);
+      expect(runFunction).toBeCalledTimes(1);
+    });
+
+    test.skip('already adquired permissions should not be requested again', async () => {
+      const promptForPermissions = jest.spyOn(
+        testSNApp.componentManager,
+        'promptForPermissions'
+      );
+
+      /**
+       * Approving all permission prompts.
+       */
+      window.confirm = (message) => true;
+
+      const requiredPermissions1 = [
+        {
+          name: ComponentAction.CreateItems,
+          content_types: [ContentType.Tag]
+        }
+      ];
+
+      testSNApp.componentManager.runWithPermissions(
+        (testComponent as SNItem).uuid,
+        requiredPermissions1,
+        runFunction
+      );
+      await sleep(SHORT_DELAY_TIME);
+      expect(runFunction).toBeCalledTimes(1);
+
+      expect(promptForPermissions).toBeCalledTimes(1);
+      expect(promptForPermissions).toHaveBeenLastCalledWith(
+        testComponent,
+        requiredPermissions1,
+        expect.any(Function)
+      );
+ 
+      const requiredPermissions2 = [
+        {
+          name: ComponentAction.CreateItems,
+          content_types: [ContentType.Tag]
+        },
+        {
+          name: ComponentAction.StreamContextItem
+        }
+      ];
+ 
+      testSNApp.componentManager.runWithPermissions(
+        (testComponent as SNItem).uuid,
+        requiredPermissions2,
+        runFunction
+      );
+      await sleep(SHORT_DELAY_TIME);
+      expect(runFunction).toBeCalledTimes(2);
+
+      expect(promptForPermissions).toBeCalledTimes(2);
+      expect(promptForPermissions).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          uuid: (testComponent as SNItem).uuid
+        }),
+        [
+          {
+            name: ComponentAction.StreamContextItem
+          }
+        ],
+        expect.any(Function)
+      );
+    });
+  });
+
+  test('findOrCreateDataForComponent()', async () => {
+    /**
+     * Creating a new test component should have an empty componentData object.
+     */
+    testComponent = await createComponentItem(testSNApp, testExtensionEditorPackage);
+
+    const componentUuid = (testComponent as SNItem).uuid;
+    const { componentState } = testSNApp.componentManager;
+
+    expect(componentState[componentUuid]).toBeUndefined();
+
+    let componentData = testSNApp.componentManager.findOrCreateDataForComponent(componentUuid);
+    expect(componentData).toEqual({});
+
+    componentState[componentUuid] = {
+      foo: 'bar'
+    };
+    componentData = testSNApp.componentManager.findOrCreateDataForComponent(componentUuid);
+    expect(componentData).toEqual({
+      foo: 'bar'
+    });
+  });
+
+  test('getReadonlyStateForComponent() and setReadonlyStateForComponent()', () => {
+    let readonlyState = testSNApp.componentManager.getReadonlyStateForComponent(
+      testComponent
+    );
+    expect(readonlyState).toEqual({
+      readonly: undefined,
+      lockReadonly: undefined
+    });
+
+    testSNApp.componentManager.setReadonlyStateForComponent(
+      testComponent,
+      true
+    );
+    readonlyState = testSNApp.componentManager.getReadonlyStateForComponent(
+      testComponent
+    );
+    expect(readonlyState).toEqual({
+      readonly: true,
+      lockReadonly: false
+    });
+
+    testSNApp.componentManager.setReadonlyStateForComponent(
+      testComponent,
+      true,
+      true
+    );
+    readonlyState = testSNApp.componentManager.getReadonlyStateForComponent(
+      testComponent
+    );
+    expect(readonlyState).toEqual({
+      readonly: true,
+      lockReadonly: true
+    });
+
+    testSNApp.componentManager.setReadonlyStateForComponent(
+      testComponent,
+      false
+    );
+    readonlyState = testSNApp.componentManager.getReadonlyStateForComponent(
+      testComponent
+    );
+    expect(readonlyState).toEqual({
+      readonly: false,
+      lockReadonly: false
+    });
+
+    testSNApp.componentManager.setReadonlyStateForComponent(
+      testComponent,
+      false,
+      true
+    );
+    readonlyState = testSNApp.componentManager.getReadonlyStateForComponent(
+      testComponent
+    );
+    expect(readonlyState).toEqual({
+      readonly: false,
+      lockReadonly: true
+    });
+  });
+
+  describe('registerComponentWindow()', () => {
+    const iframe = document.createElement('iframe');
+    document.body.appendChild(iframe);
+
+    it('sends ComponentRegistered message to component', async () => {
+      const sendMessageToComponent = jest.spyOn(
+        testSNApp.componentManager,
+        'sendMessageToComponent'
+      );
+
+      await testSNApp.componentManager.registerComponentWindow(
+        testComponent,
+        iframe.contentWindow
+      );
+      expect(sendMessageToComponent).nthCalledWith(1,
+        testComponent,
+        {
+          action: ComponentAction.ComponentRegistered,
+          sessionKey: expect.any(String),
+          componentData: testComponent.componentData,
+          data: {
+            uuid: (testComponent as SNItem).uuid,
+            environment: environmentToString(testSNApp.componentManager.environment),
+            platform: platformToString(testSNApp.componentManager.platform),
+            activeThemeUrls: testSNApp.componentManager.urlsForActiveThemes()
+          }
+        }
+      );
+    });
+
+    it('posts active themes to component', async () => {
+      const postActiveThemesToComponent = jest.spyOn(
+        testSNApp.componentManager,
+        'postActiveThemesToComponent'
+      );
+
+      await testSNApp.componentManager.registerComponentWindow(
+        testComponent,
+        iframe.contentWindow
+      );
+      expect(postActiveThemesToComponent).toBeCalledTimes(1);
+      expect(postActiveThemesToComponent).toBeCalledWith(testComponent);
+    });
+
+    it('notifies component activate through desktopManagerr', async () => {
+      const extServerHost = 'https://127.0.0.1:45653/'
+      const desktopManager = {
+        getExtServerHost: jest.fn(() => extServerHost),
+        registerUpdateObserver: jest.fn(),
+        syncComponentsInstallation: jest.fn(),
+        notifyComponentActivation: jest.fn()
+      };
+      testSNApp.componentManager.setDesktopManager(desktopManager);
+
+      await testSNApp.componentManager.registerComponentWindow(
+        testComponent,
+        iframe.contentWindow
+      );
+      expect(desktopManager.notifyComponentActivation).toBeCalledTimes(1);
+      expect(desktopManager.notifyComponentActivation).toBeCalledWith(testComponent);
+    });
+  });
+
+  test('isComponentActive() returns the active property from the component', () => {
+    const isComponentActive = testSNApp.componentManager.isComponentActive(
+      testComponent
+    );
+    expect(isComponentActive).toBe(testComponent.active);
+  });
+
+  describe('editorForNote()', () => {
+    let testNote;
+    let editorComponent;
+
+    beforeEach(async () => {
+      testNote = await createNoteItem(testSNApp, {
+        title: 'Note 1'
+      });
+      editorComponent = await createComponentItem(
+        testSNApp,
+        testExtensionEditorPackage
+      );
+    });
+
+    it('returns the explicit enabled editor for a note', async () => {
+      await testSNApp.itemManager.changeComponent(
+        editorComponent.uuid,
+        (mutator) => {
+          mutator.associateWithItem(testNote.uuid);
+        }
+      );
+
+      const editorForNote = testSNApp.componentManager.editorForNote(
+        testNote
+      );
+      expect(editorForNote.uuid).toBe(editorComponent.uuid);
+    });
+
+    test('if no editor for note found, return undefined', async () => {
+      const editorForNote = testSNApp.componentManager.editorForNote(
+        testNote
+      );
+      expect(editorForNote).toBeUndefined();
+    });
+
+    it('returns the default editor for note', async () => {
+      await testSNApp.itemManager.changeComponent(
+        editorComponent.uuid,
+        (mutator) => {
+          mutator.defaultEditor = true;
+        }
+      );
+
+      const editorForNote = testSNApp.componentManager.editorForNote(
+        testNote
+      );
+      expect(editorForNote.uuid).toBe(editorComponent.uuid);
+    });
+
+    test('on mobile, return default editor if plain editor is not prefered', async () => {
+      testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
+      testNote = await createNoteItem(testSNApp, {
+        title: 'Note 1'
+      });
+      editorComponent = await createComponentItem(
+        testSNApp,
+        testExtensionEditorPackage
+      );
+      await testSNApp.itemManager.changeComponent(
+        editorComponent.uuid,
+        (mutator) => {
+          mutator.isMobileDefault = true;
+        }
+      );
+
+      const editorForNote = testSNApp.componentManager.editorForNote(
+        testNote
+      );
+      expect(editorForNote.uuid).toBe(editorComponent.uuid);
+    });
+  });
+
+  describe('getDefaultEditor()', () => {
+    it('returns the first default editor', async () => {
+      await testSNApp.itemManager.changeComponent(
+        (testComponent as SNItem).uuid,
+        (mutator) => {
+          mutator.defaultEditor = true;
+        }
+      );
+
+      const defaultEditor = testSNApp.componentManager.getDefaultEditor();
+      expect(defaultEditor.uuid).toBe(
+        (testComponent as SNItem).uuid
+      );
+    });
+
+    it('returns the first default editor on mobile', async () => {
+      testSNApp = await createApplication('test-application', Environment.Mobile, Platform.Android);
+      const editorComponent = await createComponentItem(
+        testSNApp,
+        testExtensionEditorPackage
+      );
+      await testSNApp.itemManager.changeComponent(
+        (editorComponent as SNItem).uuid,
+        (mutator) => {
+          mutator.isMobileDefault = true;
+        }
+      );
+
+      const anotherEditorComponent = await createComponentItem(
+        testSNApp,
+        testExtensionEditorPackage
+      );
+      await testSNApp.itemManager.changeComponent(
+        (anotherEditorComponent as SNItem).uuid,
+        (mutator) => {
+          mutator.defaultEditor = true;
+        }
+      );
+
+      const defaultEditor = testSNApp.componentManager.getDefaultEditor();
+      expect(defaultEditor.uuid).toBe(
+        (editorComponent as SNItem).uuid
+      );
+    });
+  });
+
+  describe('permissionsStringForPermissions()', () => {
+    test('StreamItems with a single content type', () => {
+      const permissionString = testSNApp.componentManager.permissionsStringForPermissions(
+        [
+          {
+            name: ComponentAction.StreamItems,
+            content_types: [ContentType.Tag]
+          }
+        ],
+        testComponent
+      );
+      expect(permissionString).toBe('tags.');
+    });
+
+    test('StreamItems with more than a content type', () => {
+      const permissionString = testSNApp.componentManager.permissionsStringForPermissions(
+        [
+          {
+            name: ComponentAction.StreamItems,
+            content_types: [ContentType.Tag, ContentType.SmartTag]
+          }
+        ],
+        testComponent
+      );
+      expect(permissionString).toBe('tags, smart tags.');
+    });
+
+    test('StreamContextItem returns "working note"', () => {
+      const permissionString = testSNApp.componentManager.permissionsStringForPermissions(
+        [
+          {
+            name: ComponentAction.StreamContextItem
+          }
+        ],
+        testComponent
+      );
+      expect(permissionString).toBe('working note.');
+    });
+
+    test('a permission array with StreamItems with two content types and then StreamContextItem', () => {
+      const permissionString = testSNApp.componentManager.permissionsStringForPermissions(
+        [
+          {
+            name: ComponentAction.StreamItems,
+            content_types: [ContentType.Tag, ContentType.SmartTag]
+          },
+          {
+            name: ComponentAction.StreamContextItem
+          }
+        ],
+        testComponent
+      );
+      expect(permissionString).toBe('tags, smart tags, working note.');
+    });
+
+    test('a permission array with StreamContextItem and then StreamItems with two content types', () => {
+      const permissionString = testSNApp.componentManager.permissionsStringForPermissions(
+        [
+          {
+            name: ComponentAction.StreamContextItem
+          },
+          {
+            name: ComponentAction.StreamItems,
+            content_types: [ContentType.Tag, ContentType.SmartTag]
+          }
+        ],
+        testComponent
+      );
+      expect(permissionString).toBe('tags, smart tags, working note.');
+    });
+
+    test('an empty permission array returns "."', () => {
+      const permissionString = testSNApp.componentManager.permissionsStringForPermissions(
+        [],
+        testComponent
+      );
+      expect(permissionString).toBe('.');
     });
   });
 });

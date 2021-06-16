@@ -703,8 +703,8 @@ export class SNComponentManager extends PureService {
     let origin = this.urlForComponent(component);
     if (!origin || !componentState.window) {
       void this.alertService.alert(
-        `Standard Notes is trying to communicate with ${component.name},
-        but an error is occurring. Please restart this extension and try again.`
+        `Standard Notes is trying to communicate with ${component.name}, ` +
+        'but an error is occurring. Please restart this extension and try again.'
       );
       return;
     }
@@ -1727,58 +1727,45 @@ export class SNComponentManager extends PureService {
     permissions: ComponentPermission[],
     component: SNComponent
   ): string {
-    let finalString = '';
-    const permissionsCount = permissions.length;
-    const addSeparator = (index: number, length: number) => {
-      if (index > 0) {
-        if (index === length - 1) {
-          if (length === 2) {
-            return ' and ';
-          } else {
-            return ', and ';
+    if (permissions.length === 0) {
+      return '.';
+    }
+
+    let contentTypeStrings: string[] = [];
+    let contextAreaStrings: string[] = [];
+
+    permissions.forEach((permission) => {
+      switch (permission.name) {
+        case ComponentAction.StreamItems:
+          if (!permission.content_types) {
+            return;
           }
-        } else {
-          return ', ';
-        }
-      }
-      return '';
-    };
-    permissions.forEach((permission, index) => {
-      if (permission.name === ComponentAction.StreamItems) {
-        const types = permission.content_types!.map((type) => {
-          const desc = displayStringForContentType(type);
-          if (desc) {
-            return desc + 's';
-          } else {
-            return 'items of type ' + type;
-          }
-        });
-        let typesString = '';
-        for (let i = 0; i < types.length; i++) {
-          const type = types[i];
-          typesString += addSeparator(
-            i,
-            types.length + permissionsCount - index - 1
-          );
-          typesString += type;
-        }
-        finalString += addSeparator(index, permissionsCount);
-        finalString += typesString;
-        if (types.length >= 2 && index < permissionsCount - 1) {
-          /* If you have a list of types, and still an additional root-level
-             permission coming up, add a comma */
-          finalString += ', ';
-        }
-      } else if (permission.name === ComponentAction.StreamContextItem) {
-        const mapping = {
-          [ComponentArea.EditorStack]: 'working note',
-          [ComponentArea.NoteTags]: 'working note',
-          [ComponentArea.Editor]: 'working note',
-        };
-        finalString += addSeparator(index, permissionsCount);
-        finalString += (mapping as any)[component.area];
+          permission.content_types.forEach((contentType) => {
+            const desc = displayStringForContentType(contentType);
+            if (desc) {
+              contentTypeStrings.push(`${desc}s`);
+            } else {
+              contentTypeStrings.push(`items of type ${contentType}`);
+            }
+          });
+          break;
+        case ComponentAction.StreamContextItem:
+          const componentAreaMapping = {
+            [ComponentArea.EditorStack]: 'working note',
+            [ComponentArea.NoteTags]: 'working note',
+            [ComponentArea.Editor]: 'working note',
+          };
+          contextAreaStrings.push((componentAreaMapping as any)[component.area]);
+          break;
       }
     });
-    return finalString + '.';
+
+    contentTypeStrings = uniq(contentTypeStrings);
+    contextAreaStrings = uniq(contextAreaStrings);
+
+    if (contentTypeStrings.length === 0 && contextAreaStrings.length === 0) {
+      return '.';
+    }
+    return contentTypeStrings.concat(contextAreaStrings).join(', ') + '.';
   }
 }
