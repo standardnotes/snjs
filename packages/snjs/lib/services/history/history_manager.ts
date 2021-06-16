@@ -319,13 +319,14 @@ export class SNHistoryManager extends PureService {
     itemUuid: UuidString,
     entry: RevisionListEntry
   ): Promise<HistoryEntry | undefined> {
-    const revision = (await this.apiService.getRevision(
+    const revisionResponse = (await this.apiService.getRevision(
       entry,
       itemUuid
-    )) as SingleRevision;
-    if ((revision as SingleRevisionResponse).error) {
+    ));
+    if (revisionResponse.error) {
       return undefined;
     }
+    const revision = revisionResponse.data as SingleRevision;
     const payload = CreateMaxPayloadFromAnyObject(
       (revision as unknown) as RawPayload,
       {
