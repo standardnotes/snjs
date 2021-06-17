@@ -883,6 +883,11 @@ export class SNApplication {
     return this.apiService.getNextVersionHost();
   }
 
+  public async setCustomHost(host: string): Promise<void> {
+    await this.apiService.setHost(host);
+    await this.apiService.setNextVersionHost(host);
+  }
+
   public getUser(): User | undefined {
     if (!this.launched) {
       throw Error('Attempting to access user before application unlocked');
