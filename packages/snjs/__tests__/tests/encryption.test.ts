@@ -6,9 +6,9 @@ import {
   KeyParamsOrigination,
   SNProtocolOperator004,
   ProtocolVersion
-} from '../lib';
-import { createApplication } from './lib/appFactory';
-import SNCrypto from './lib/snCrypto';
+} from '../../lib';
+import { createApplication } from '../lib/appFactory';
+import SNCrypto from '../lib/snCrypto';
 
 describe('Test encryption', () => {
   /** The global Standard Notes application. */

@@ -85,7 +85,7 @@ export default {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    '<rootDir>/__tests__/?(*.)+(test).ts'
+    '<rootDir>/__tests__/tests/**/?(*.)+(test).ts'
   ],
 
   // A map from regular expressions to paths to transformers
