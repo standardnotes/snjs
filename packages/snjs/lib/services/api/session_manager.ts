@@ -547,11 +547,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
       newRootKey.keyParams
     );
     if (!response.error) {
-      await this.handleSuccessApiV1AuthResponse(response, newRootKey, wrappingKey);
+      await this.handleSuccessApiV1AuthResponse(response as ChangePasswordResponse, newRootKey, wrappingKey);
     }
     return {
       response: response,
-      keyParams: response.data.key_params,
+      keyParams: (response as ChangePasswordResponse).data.key_params,
     };
   }
 
