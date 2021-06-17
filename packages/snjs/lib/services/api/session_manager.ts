@@ -539,7 +539,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
     newRootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ): Promise<SessionManagerResponse> {
+    const userUuid = this.user!.uuid;
     const response = await this.apiService.changePassword(
+      userUuid,
       currentServerPassword,
       newRootKey.serverPassword!,
       newRootKey.keyParams
