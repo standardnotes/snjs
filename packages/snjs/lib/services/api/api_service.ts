@@ -12,6 +12,7 @@ import {
   StatusCode,
   isErrorResponseExpiredToken,
   ResponseMeta,
+  KeyParamsResponse,
 } from './responses';
 import { RemoteSession, Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -215,7 +216,9 @@ export class SNApiService extends PureService {
   }
 
   private processMetaObject(meta: ResponseMeta) {
-    this.permissionsService.update(meta.auth.role, meta.auth.permissions);
+    if (meta.auth && meta.auth.role && meta.auth.permissions) {
+      this.permissionsService.update(meta.auth.role, meta.auth.permissions);
+    }
   }
 
   private processResponse(response: HttpResponse) {
@@ -253,7 +256,7 @@ export class SNApiService extends PureService {
     email: string,
     mfaKeyPath?: string,
     mfaCode?: string
-  ): Promise<HttpResponse> {
+  ): Promise<KeyParamsResponse | HttpResponse> {
     const params = this.params({
       email: email,
     });
@@ -262,7 +265,7 @@ export class SNApiService extends PureService {
     }
     return this.request({
       verb: HttpVerb.Get,
-      url: joinPaths(this.host, Paths.v0.keyParams),
+      url: joinPaths(this.nextVersionHost, Paths.v1.keyParams),
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
       /** A session is optional here, if valid, endpoint returns extra params */

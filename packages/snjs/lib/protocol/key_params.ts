@@ -1,7 +1,7 @@
 import { V002Algorithm } from './operator/algorithms';
 import { V001Algorithm } from '@Protocol/operator/algorithms';
-import { KeyParamsResponse } from './../services/api/responses';
-import { ProtocolVersion, compareVersions } from '@Protocol/versions';
+import { KeyParamsData, KeyParamsResponse } from './../services/api/responses';
+import { ProtocolVersion } from '@Protocol/versions';
 import { pickByCopy } from '@Lib/utils';
 
 /**
@@ -99,7 +99,7 @@ export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
 }
 
 function protocolVersionForKeyParams(
-  response: KeyParamsResponse | AnyKeyParamsContent
+  response: KeyParamsData | AnyKeyParamsContent
 ): ProtocolVersion {
   if (response.version) {
     return response.version;
@@ -151,13 +151,13 @@ export function KeyParamsFromApiResponse(
   identifier?: string
 ) {
   const rawKeyParams: AnyKeyParamsContent = {
-    identifier: identifier || response.identifier!,
-    pw_cost: response.pw_cost!,
-    pw_nonce: response.pw_nonce!,
-    pw_salt: response.pw_salt!,
-    version: protocolVersionForKeyParams(response),
-    origination: response.origination,
-    created: response.created,
+    identifier: identifier || response.data.identifier!,
+    pw_cost: response.data.pw_cost!,
+    pw_nonce: response.data.pw_nonce!,
+    pw_salt: response.data.pw_salt!,
+    version: protocolVersionForKeyParams(response.data),
+    origination: response.data.origination,
+    created: response.data.created,
   };
   return CreateAnyKeyParams(rawKeyParams);
 }
