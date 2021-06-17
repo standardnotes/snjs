@@ -357,7 +357,7 @@ export class SNApiService extends PureService {
     currentServerPassword: string,
     newServerPassword: string,
     newKeyParams: SNRootKeyParams
-  ): Promise<ChangePasswordResponse> {
+  ): Promise<ChangePasswordResponse | HttpResponse> {
     if (this.changing) {
       return this.createErrorResponse(
         messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS
