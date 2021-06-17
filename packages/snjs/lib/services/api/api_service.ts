@@ -33,23 +33,31 @@ import { joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { SNPermissionsService } from '../permissions_service';
 
-type PathNames = {
+type CommonPathNames = {
   keyParams: string;
   register: string;
   signIn: string;
-  changePassword: string | ((userUuid: string) => string);
   sync: string;
   signOut: string;
   refreshSession: string;
   sessions: string;
-  session: string | ((sessionUuid: string) => string);
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
+}
+
+type PathNamesV0 = CommonPathNames & {
+  changePassword: string;
+  session: string;
+};
+
+type PathNamesV1 = CommonPathNames & {
+  changePassword: (userUuid: string) => string;
+  session: (sessionUuid: string) => string;
 };
 
 const Paths: {
-  v0: PathNames;
-  v1: PathNames;
+  v0: PathNamesV0;
+  v1: PathNamesV1;
 } = {
   v0: {
     keyParams: '/auth/params',
@@ -342,6 +350,7 @@ export class SNApiService extends PureService {
   }
 
   async changePassword(
+    userUuid: UuidString,
     currentServerPassword: string,
     newServerPassword: string,
     newKeyParams: SNRootKeyParams
@@ -356,14 +365,14 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     this.changing = true;
-    const url = joinPaths(this.host, <string> Paths.v0.changePassword);
+    const url = joinPaths(this.nextVersionHost, <string> Paths.v1.changePassword(userUuid));
     const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
       ...newKeyParams.getPortableValue(),
     });
     const response = await this.httpService
-      .postAbsolute(url, params, this.session!.authorizationValue)
+      .putAbsolute(url, params, this.session!.authorizationValue)
       .catch(async (errorResponse) => {
         if (isErrorResponseExpiredToken(errorResponse)) {
           return this.refreshSessionThenRetryRequest({
