@@ -44,8 +44,7 @@ export default {
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/lib/tsconfig.json',
-      isolatedModules: true,
-      esModuleInterop: true
+      isolatedModules: true
     }
   },
 
