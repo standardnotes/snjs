@@ -47,6 +47,11 @@ describe('Component Manager', () => {
 
   beforeEach(async () => {
     testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+    /**
+     * Lock syncing so that there aren't any sync requests that may affect new application instances.
+     */
+    testSNApp.syncService.lockSyncing();
+
     testComponent = await createComponentItem(testSNApp, testExtensionEditorPackage);
     testTheme = await createComponentItem(testSNApp, testThemeDefaultPackage);
   });
@@ -1797,7 +1802,7 @@ describe('Component Manager', () => {
       expect(runFunction).toBeCalledTimes(1);
     });
 
-    test.skip('the specified function will be executed only if the permission prompt is approved', async () => {
+    test('the specified function will be executed only if the permission prompt is approved', async () => {
       /**
        * Initially rejecting any permission prompts.
        */
@@ -1831,7 +1836,7 @@ describe('Component Manager', () => {
       expect(runFunction).toBeCalledTimes(1);
     });
 
-    test.skip('already adquired permissions should not be requested again', async () => {
+    test('already adquired permissions should not be requested again', async () => {
       const promptForPermissions = jest.spyOn(
         testSNApp.componentManager,
         'promptForPermissions'
