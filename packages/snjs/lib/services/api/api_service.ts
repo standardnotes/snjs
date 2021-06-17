@@ -574,7 +574,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.host, Paths.v0.itemRevision(itemId, entry.uuid));
+    const url = joinPaths(this.nextVersionHost, Paths.v1.itemRevision(itemId, entry.uuid));
     const response:
       | SingleRevisionResponse
       | HttpResponse = await this.httpService

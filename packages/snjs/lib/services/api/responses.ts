@@ -112,7 +112,7 @@ export type RevisionListEntry = {
   uuid: string;
 };
 
-export type RevisionListResponse = HttpResponse & RevisionListEntry[];
+export type RevisionListResponse = HttpResponse & { data: RevisionListEntry[] };
 
 export type SingleRevision = {
   auth_hash?: string;
@@ -128,7 +128,7 @@ export type SingleRevision = {
   uuid: string;
 };
 
-export type SingleRevisionResponse = HttpResponse & Partial<SingleRevision>;
+export type SingleRevisionResponse = HttpResponse & { data: Partial<SingleRevision> };
 
 export enum ConflictType {
   ConflictingData = 'sync_conflict',
