@@ -868,15 +868,12 @@ export class SNApplication {
    * Set the server's URL
    */
   public async setHost(host: string): Promise<void> {
-    return this.apiService.setHost(host);
+    await this.apiService.setHost(host);
+    await this.apiService.setNextVersionHost(host);
   }
 
   public getHost(): string | undefined {
     return this.apiService.getHost();
-  }
-
-  public async setNextVersionHost(nextVersionHost: string): Promise<void> {
-    return this.apiService.setNextVersionHost(nextVersionHost);
   }
 
   public getNextVersionHost(): string | undefined {
