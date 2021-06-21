@@ -57,7 +57,7 @@ type SessionBody = {
   refresh_expiration: number;
 };
 
-export type KeyParamsResponse = HttpResponse & {
+export type KeyParamsData = {
   identifier?: string;
   pw_cost?: number;
   pw_nonce?: string;
@@ -70,6 +70,10 @@ export type KeyParamsResponse = HttpResponse & {
   pw_key_size?: number;
   origination?: KeyParamsOrigination;
   created?: string;
+};
+
+export type KeyParamsResponse = HttpResponse & {
+  data: KeyParamsData;
 };
 
 export type User = {

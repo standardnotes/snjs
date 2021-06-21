@@ -516,7 +516,7 @@ describe('keys', function () {
     expect(decrypted3.errorDecrypting).to.not.be.ok;
   });
 
-  it('changing account password should create new items key and encrypt items with that key', async function () {
+  it.only('changing account password should create new items key and encrypt items with that key', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -530,6 +530,7 @@ describe('keys', function () {
       this.password,
       'foobarfoo'
     );
+    console.log(result);
     expect(result.error).to.not.be.ok;
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(2);
