@@ -198,7 +198,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
    * for missing keys or storage values. Unlike regular sign in, this doesn't worry about
    * performing one of marking all items as needing sync or deleting all local data.
    */
-  public async correctiveSignIn(rootKey: SNRootKey): Promise<SignInResponse> {
+  public async correctiveSignIn(rootKey: SNRootKey): Promise<HttpResponse | SignInResponse> {
     this.lockSyncing();
     const response = await this.sessionManager.bypassChecksAndSignInWithRootKey(
       rootKey.keyParams.identifier,

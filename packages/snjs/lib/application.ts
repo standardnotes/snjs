@@ -95,7 +95,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { HttpResponse, User } from './services/api/responses';
+import { HttpResponse, SignInResponse, User } from './services/api/responses';
 import { RemoteSession } from './services/api/session';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
@@ -1283,7 +1283,7 @@ export class SNApplication {
     ephemeral = false,
     mergeLocal = true,
     awaitSync = false
-  ): Promise<AccountServiceResponse> {
+  ): Promise<HttpResponse | SignInResponse> {
     return this.credentialService.signIn(
       email,
       password,

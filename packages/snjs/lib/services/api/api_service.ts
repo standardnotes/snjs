@@ -316,14 +316,14 @@ export class SNApiService extends PureService {
     mfaKeyPath?: string,
     mfaCode?: string,
     ephemeral = false
-  ): Promise<SignInResponse> {
+  ): Promise<SignInResponse | HttpResponse> {
     if (this.authenticating) {
       return this.createErrorResponse(
         messages.API_MESSAGE_LOGIN_IN_PROGRESS
       ) as SignInResponse;
     }
     this.authenticating = true;
-    const url = joinPaths(this.host, Paths.v0.signIn);
+    const url = joinPaths(this.nextVersionHost, Paths.v1.signIn);
     const params = this.params({
       email,
       password: serverPassword,
@@ -340,7 +340,7 @@ export class SNApiService extends PureService {
     });
 
     this.authenticating = false;
-    return response as SignInResponse;
+    return response;
   }
 
   signOut(): Promise<SignOutResponse> {

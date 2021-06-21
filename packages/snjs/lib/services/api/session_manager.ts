@@ -478,7 +478,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaKeyPath?: string,
     mfaCode?: string,
     ephemeral = false
-  ): Promise<SignInResponse> {
+  ): Promise<SignInResponse | HttpResponse> {
     const {
       wrappingKey,
       canceled,
@@ -499,10 +499,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
     if (!signInResponse.error) {
       const expandedRootKey = await SNRootKey.ExpandedCopy(
         rootKey,
-        signInResponse.key_params
+        (signInResponse as SignInResponse).data.key_params
       );
-      await this.handleSuccessAuthResponse(
-        signInResponse,
+      await this.handleSuccessApiV1AuthResponse(
+        signInResponse as SignInResponse,
         expandedRootKey,
         wrappingKey
       );
@@ -579,7 +579,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   // TODO: Remove once all endpoints are migrated
   private async handleSuccessAuthResponse(
-    response: RegistrationResponse | SignInResponse,
+    response: RegistrationResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ) {
@@ -601,7 +601,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
 
   // TODO: Rename once all endpoints are migrated
   private async handleSuccessApiV1AuthResponse(
-    response: ChangePasswordResponse,
+    response: SignInResponse | ChangePasswordResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ) {
