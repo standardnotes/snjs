@@ -30,7 +30,6 @@ describe('Test 004 encryption', () => {
 
   afterEach(() => {
     testSNApp.deinit(DeinitSource.SignOut);
-    testSNApp = undefined;
   });
 
   it('should properly encrypt and decrypt a piece of text', async () => {

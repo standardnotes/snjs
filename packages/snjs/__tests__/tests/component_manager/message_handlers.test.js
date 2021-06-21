@@ -48,10 +48,7 @@ describe('Component Manager', () => {
   });
 
   afterEach(() => {
-    testComponent = undefined;
-
     testSNApp.deinit(DeinitSource.SignOut);
-    testSNApp = undefined;
   });
 
   describe('sendItemsInReply()', () => {
