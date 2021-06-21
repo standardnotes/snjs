@@ -19,5 +19,5 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 'warn',
     quotes: ['warn', 'single'],
     'no-restricted-globals': ['error', 'history'],
-  }
+  },
 };
