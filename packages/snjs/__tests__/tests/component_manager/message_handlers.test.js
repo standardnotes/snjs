@@ -4,7 +4,6 @@ import {
   Platform,
   Environment,
   DeinitSource,
-  SNTheme,
   ContentType,
   ComponentAction,
   SNItem
@@ -33,21 +32,19 @@ import {
 
 describe('Component Manager', () => {
   /** The global Standard Notes application. */
-  let testSNApp: SNApplication;
+  let testSNApp;
   /** The global test component. */
-  let testComponent: SNComponent;
-  /** The global test theme. */
-  let testTheme: SNTheme;
+  let testComponent;
 
   beforeEach(async () => {
     testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
     /**
      * Lock syncing so that there aren't any sync requests that may affect new application instances.
      */
+    //@ts-ignore
     testSNApp.syncService.lockSyncing();
 
     testComponent = await createComponentItem(testSNApp, testExtensionEditorPackage);
-    testTheme = await createComponentItem(testSNApp, testThemeDefaultPackage);
   });
 
   afterEach(() => {
@@ -77,7 +74,7 @@ describe('Component Manager', () => {
       };
 
       testSNApp.componentManager.sendItemsInReply(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [noteItem],
         message
       );
@@ -112,7 +109,7 @@ describe('Component Manager', () => {
       };
 
       testSNApp.componentManager.sendContextItemInReply(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         noteItem,
         message
       );
@@ -345,7 +342,7 @@ describe('Component Manager', () => {
 
     test.each(readwriteActions)(
       'shows an alert if the component is in read-only state and the message action is %s',
-      (messageAction: ComponentAction) => {
+      (messageAction) => {
         const componentMessage = {
           action: messageAction
         };
@@ -480,7 +477,7 @@ describe('Component Manager', () => {
       const componentMessage = {
         action: ComponentAction.ToggleActivateComponent,
         data: {
-          uuid: (testComponent as SNItem).uuid
+          uuid: testComponent.uuid
         }
       };
       const handleToggleComponentMessage = jest.spyOn(
@@ -624,7 +621,7 @@ describe('Component Manager', () => {
 
       expect(runWithPermissions).toBeCalledTimes(1);
       expect(runWithPermissions).lastCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [
           {
             name: ComponentAction.StreamItems,
@@ -636,7 +633,7 @@ describe('Component Manager', () => {
 
       expect(sendItemsInReply).toBeCalledTimes(1);
       expect(sendItemsInReply).lastCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         expect.any(Array),
         componentMessage
       );
@@ -659,7 +656,7 @@ describe('Component Manager', () => {
 
       expect(runWithPermissions).toBeCalledTimes(1);
       expect(runWithPermissions).lastCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [
           {
             name: ComponentAction.StreamItems,
@@ -671,7 +668,7 @@ describe('Component Manager', () => {
 
       expect(sendItemsInReply).toBeCalledTimes(1);
       expect(sendItemsInReply).lastCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [],
         componentMessage
       );
@@ -694,7 +691,7 @@ describe('Component Manager', () => {
 
       expect(runWithPermissions).toBeCalledTimes(1);
       expect(runWithPermissions).lastCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [
           {
             name: ComponentAction.StreamItems,
@@ -706,7 +703,7 @@ describe('Component Manager', () => {
 
       expect(sendItemsInReply).toBeCalledTimes(1);
       expect(sendItemsInReply).lastCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [ tag1, tag2, tag3 ],
         componentMessage
       );
@@ -768,7 +765,7 @@ describe('Component Manager', () => {
 
       expect(runWithPermissions).toBeCalledTimes(1);
       expect(runWithPermissions).toBeCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [
           {
             name: ComponentAction.StreamContextItem
@@ -778,8 +775,8 @@ describe('Component Manager', () => {
       );
 
       expect(contextStreamObservers).toContainEqual({
-        identifier: (testComponent as SNItem).uuid,
-        componentUuid: (testComponent as SNItem).uuid,
+        identifier: testComponent.uuid,
+        componentUuid: testComponent.uuid,
         area: testComponent.area,
         originalMessage: {
           action: ComponentAction.StreamContextItem
@@ -805,7 +802,7 @@ describe('Component Manager', () => {
 
       expect(sendContextItemInReply).toBeCalledTimes(1);
       expect(sendContextItemInReply).toBeCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         itemInContext,
         componentMessage
       );
@@ -852,7 +849,7 @@ describe('Component Manager', () => {
 
       expect(runWithPermissions).toBeCalledTimes(1);
       expect(runWithPermissions).toBeCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [
           {
             name: ComponentAction.StreamItems,
@@ -915,7 +912,7 @@ describe('Component Manager', () => {
 
       expect(runWithPermissions).toBeCalledTimes(1);
       expect(runWithPermissions).toBeCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         componentMessage.data.permissions,
         expect.any(Function)
       );
@@ -961,13 +958,13 @@ describe('Component Manager', () => {
 
       expect(runWithPermissions).toBeCalledTimes(1);
       expect(runWithPermissions).toBeCalledWith(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [],
         expect.any(Function)
       );
 
       testComponent = testSNApp.itemManager.findItem(
-        (testComponent as SNItem).uuid
+        testComponent.uuid
       );
       expect(testComponent.componentData).toEqual(componentMessage.data.componentData);
     });
@@ -1004,7 +1001,7 @@ describe('Component Manager', () => {
 
       expect(deactivateComponent).toBeCalledTimes(1);
       expect(deactivateComponent).toBeCalledWith(
-        (activeComponent as SNItem).uuid
+        activeComponent.uuid
       );
     });
 
@@ -1019,7 +1016,7 @@ describe('Component Manager', () => {
 
       expect(activateComponent).toBeCalledTimes(1);
       expect(activateComponent).toBeCalledWith(
-        (currentThemeComponent as SNItem).uuid
+        currentThemeComponent.uuid
       );
     });
   });
@@ -1058,7 +1055,7 @@ describe('Component Manager', () => {
 
       testSNApp.componentManager.handleInstallLocalComponentMessage(nativeExtension, {
         data: {
-          uuid: (testComponent as SNItem).uuid
+          uuid: testComponent.uuid
         }
       });
       expect(desktopManager.installComponent).toBeCalledTimes(1);

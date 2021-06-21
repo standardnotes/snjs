@@ -38,11 +38,11 @@ import { environmentToString, platformToString } from '../../../lib/platforms';
 
 describe('Component Manager', () => {
   /** The global Standard Notes application. */
-  let testSNApp: SNApplication;
+  let testSNApp;
   /** The global test component. */
-  let testComponent: SNComponent;
+  let testComponent;
   /** The global test theme. */
-  let testTheme: SNTheme;
+  let testTheme;
 
   beforeEach(async () => {
     testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
@@ -552,7 +552,7 @@ describe('Component Manager', () => {
 
     it('finds a component that was registered via registerHandler', () => {
       const customActionHandler = jest.fn();
-      const componentForSessionKeyHandler = jest.fn((key: string) => {
+      const componentForSessionKeyHandler = jest.fn((key) => {
         if (key === 'my-component-key') {
           return testComponent;
         }
@@ -785,7 +785,7 @@ describe('Component Manager', () => {
       window.confirm = (message) => false;
 
       testSNApp.componentManager.runWithPermissions(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         [],
         runFunction
       );
@@ -805,7 +805,7 @@ describe('Component Manager', () => {
       ];
 
       testSNApp.componentManager.runWithPermissions(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         requiredPermissions,
         runFunction
       );
@@ -818,7 +818,7 @@ describe('Component Manager', () => {
       window.confirm = (message) => true;
 
       testSNApp.componentManager.runWithPermissions(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         requiredPermissions,
         runFunction
       );
@@ -845,7 +845,7 @@ describe('Component Manager', () => {
       ];
 
       testSNApp.componentManager.runWithPermissions(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         requiredPermissions1,
         runFunction
       );
@@ -870,7 +870,7 @@ describe('Component Manager', () => {
       ];
  
       testSNApp.componentManager.runWithPermissions(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         requiredPermissions2,
         runFunction
       );
@@ -880,7 +880,7 @@ describe('Component Manager', () => {
       expect(promptForPermissions).toBeCalledTimes(2);
       expect(promptForPermissions).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          uuid: (testComponent as SNItem).uuid
+          uuid: testComponent.uuid
         }),
         [
           {
@@ -898,7 +898,7 @@ describe('Component Manager', () => {
      */
     testComponent = await createComponentItem(testSNApp, testExtensionEditorPackage);
 
-    const componentUuid = (testComponent as SNItem).uuid;
+    const componentUuid = testComponent.uuid;
     const { componentState } = testSNApp.componentManager;
 
     expect(componentState[componentUuid]).toBeUndefined();
@@ -996,7 +996,7 @@ describe('Component Manager', () => {
           sessionKey: expect.any(String),
           componentData: testComponent.componentData,
           data: {
-            uuid: (testComponent as SNItem).uuid,
+            uuid: testComponent.uuid,
             environment: environmentToString(testSNApp.componentManager.environment),
             platform: platformToString(testSNApp.componentManager.platform),
             activeThemeUrls: testSNApp.componentManager.urlsForActiveThemes()
@@ -1120,7 +1120,7 @@ describe('Component Manager', () => {
   describe('getDefaultEditor()', () => {
     it('returns the first default editor', async () => {
       await testSNApp.itemManager.changeComponent(
-        (testComponent as SNItem).uuid,
+        testComponent.uuid,
         (mutator) => {
           mutator.defaultEditor = true;
         }
@@ -1128,7 +1128,7 @@ describe('Component Manager', () => {
 
       const defaultEditor = testSNApp.componentManager.getDefaultEditor();
       expect(defaultEditor.uuid).toBe(
-        (testComponent as SNItem).uuid
+        testComponent.uuid
       );
     });
 
@@ -1139,7 +1139,7 @@ describe('Component Manager', () => {
         testExtensionEditorPackage
       );
       await testSNApp.itemManager.changeComponent(
-        (editorComponent as SNItem).uuid,
+        editorComponent.uuid,
         (mutator) => {
           mutator.isMobileDefault = true;
         }
@@ -1150,7 +1150,7 @@ describe('Component Manager', () => {
         testExtensionEditorPackage
       );
       await testSNApp.itemManager.changeComponent(
-        (anotherEditorComponent as SNItem).uuid,
+        anotherEditorComponent.uuid,
         (mutator) => {
           mutator.defaultEditor = true;
         }
@@ -1158,7 +1158,7 @@ describe('Component Manager', () => {
 
       const defaultEditor = testSNApp.componentManager.getDefaultEditor();
       expect(defaultEditor.uuid).toBe(
-        (editorComponent as SNItem).uuid
+        editorComponent.uuid
       );
     });
   });

@@ -1,28 +1,26 @@
 import {
-  SNApplication,
   Platform,
   Environment,
   DeinitSource,
   KeyParamsOrigination,
-  SNProtocolOperator004,
-  ProtocolVersion
+  SNProtocolOperator003
 } from '../../lib';
 import { createApplication } from '../lib/appFactory';
 import SNCrypto from '../lib/snCrypto';
 
-describe('Test 004 encryption', () => {
+describe('Test 003 encryption', () => {
   /** The global Standard Notes application. */
-  let testSNApp: SNApplication;
+  let testSNApp;
 
   const identifier = 'hello-test@sn.org';
   const password = 'this-is-a-password-1234';
   let rootKey;
 
-  const protocol004 = new SNProtocolOperator004(new SNCrypto());
+  const protocol003 = new SNProtocolOperator003(new SNCrypto());
 
   beforeEach(async () => {
     testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
-    rootKey = await protocol004.createRootKey(
+    rootKey = await protocol003.createRootKey(
       identifier,
       password,
       KeyParamsOrigination.Registration
@@ -31,27 +29,22 @@ describe('Test 004 encryption', () => {
 
   afterEach(() => {
     testSNApp.deinit(DeinitSource.SignOut);
-    testSNApp = undefined;
   });
 
   it('should properly encrypt and decrypt a piece of text', async () => {
     const simpleText = 'This is a simple text. It should be encrypted and decrypted successfully.';
     const rawKey = rootKey.masterKey;
-    const nonce = await testSNApp.protocolService.crypto.generateRandomKey(192);
-    const operator = testSNApp.protocolService.operatorForVersion(ProtocolVersion.V004);
-    const authenticatedData = { foo: 'bar' };
+    const nonce = await protocol003.crypto.generateRandomKey(128);
 
-    const encString = await operator.encryptString004(
+    const encString = await protocol003.encryptString002(
       simpleText,
       rawKey,
-      nonce,
-      authenticatedData
+      nonce
     );
-    const decString = await operator.decryptString004(
+    const decString = await protocol003.decryptString002(
       encString,
       rawKey,
-      nonce,
-      await operator.authenticatedDataToString(authenticatedData)
+      nonce
     );
 
     expect(decString).toEqual(simpleText);
