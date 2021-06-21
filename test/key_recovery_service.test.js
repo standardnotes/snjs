@@ -214,7 +214,6 @@ describe('key recovery service', function () {
 
       /** Change password on appB */
       const result = await appB.changePassword(contextA.password, newPassword);
-      console.log(result);
       expect(result.error).to.not.be.ok;
       const note = await Factory.createSyncedNote(appB);
       expect(appB.getItems(ContentType.ItemsKey).length).to.equal(2);
