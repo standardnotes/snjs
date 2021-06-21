@@ -10,7 +10,7 @@ import {
 import { createApplication } from '../lib/appFactory';
 import SNCrypto from '../lib/snCrypto';
 
-describe('Test encryption', () => {
+describe('Test 004 encryption', () => {
   /** The global Standard Notes application. */
   let testSNApp: SNApplication;
 

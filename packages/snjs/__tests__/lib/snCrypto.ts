@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const CryptoJS = require('crypto-js');
 const sodium = require('libsodium-wrappers');
+const NodeCrypto = require('crypto');
 
 /**
  * An SNPureCrypto implementation. Required to create a new SNApplication instance.
@@ -34,11 +35,8 @@ export default class SNCrypto implements SNPureCrypto {
     iterations: number,
     length: number
   ): Promise<HexString | null> {
-    const key = CryptoJS.PBKDF2(password, salt, {
-      iterations,
-      keySize: length
-    });
-    return key.toString(CryptoJS.enc.Hex);
+    const key = NodeCrypto.pbkdf2Sync(password, salt, iterations, length, "sha256");
+    return key.toString("hex");
   }
 
   public async generateRandomKey(bits: number): Promise<string> {
@@ -52,6 +50,7 @@ export default class SNCrypto implements SNPureCrypto {
     iv: HexString,
     key: HexString
   ): Promise<Base64String> {
+    key = CryptoJS.enc.Hex.parse(key);
     const encrypted = CryptoJS.AES.encrypt(plaintext, key, {
       iv: CryptoJS.enc.Hex.parse(iv)
     });
@@ -64,10 +63,11 @@ export default class SNCrypto implements SNPureCrypto {
     key: HexString
   ): Promise<Utf8String | null> {
     try {
-      const decrypted = CryptoJS.AES.encrypt(ciphertext, key, {
+      key = CryptoJS.enc.Hex.parse(key);
+      const decrypted = CryptoJS.AES.decrypt(ciphertext, key, {
         iv: CryptoJS.enc.Hex.parse(iv)
       });
-      return decrypted.ciphertext.toString(CryptoJS.enc.Utf8);
+      return decrypted.toString(CryptoJS.enc.Utf8);
     } catch (e) {
       return null;
     }
