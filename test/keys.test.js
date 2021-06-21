@@ -530,6 +530,7 @@ describe('keys', function () {
       this.password,
       'foobarfoo'
     );
+    console.log(result);
     expect(result.error).to.not.be.ok;
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(2);
