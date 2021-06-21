@@ -286,7 +286,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaCode?: string
   ): Promise<{
     keyParams?: SNRootKeyParams;
-    response: KeyParamsResponse;
+    response: KeyParamsResponse | HttpResponse;
     mfaKeyPath?: string;
     mfaCode?: string;
   }> {
@@ -321,7 +321,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       }
     }
     /** Make sure to use client value for identifier/email */
-    const keyParams = KeyParamsFromApiResponse(response, email);
+    const keyParams = KeyParamsFromApiResponse(response as KeyParamsResponse, email);
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService.createErrorResponse(
