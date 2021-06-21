@@ -1,8 +1,10 @@
+const { pathsToModuleNameMapper } = require('ts-jest/utils');
+const { compilerOptions } = require('./lib/tsconfig');
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
  */
-
 export default {
   // Automatically clear mock calls and instances between every test
   clearMocks: true,
@@ -52,13 +54,9 @@ export default {
    * A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module.
    * Paths obtained from lib/tsconfig.json
    */
-  moduleNameMapper: {
-    '^@Lib/(.*)': '<rootDir>/lib/$1',
-    '^@Services/(.*)': '<rootDir>/lib/services/$1',
-    '^@Models/(.*)': '<rootDir>/lib/models/$1',
-    '^@Protocol/(.*)': '<rootDir>/lib/protocol/$1',
-    '^@Payloads/(.*)': '<rootDir>/lib/protocol/payloads/$1'
-  },
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+    prefix: '<rootDir>/lib'
+  }),
 
   // A preset that is used as a base for Jest's configuration
   preset: 'ts-jest',
@@ -85,12 +83,12 @@ export default {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    '<rootDir>/__tests__/tests/**/?(*.)+(test).ts'
+    '<rootDir>/__tests__/tests/**/?(*.)+(test).(ts|js)'
   ],
 
   // A map from regular expressions to paths to transformers
   transform: {
-    '^.+\\.ts?$': 'ts-jest'
+    '^.+\\.(ts|js)?$': 'ts-jest'
   },
 
   verbose: true
