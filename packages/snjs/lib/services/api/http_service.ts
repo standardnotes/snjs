@@ -6,6 +6,7 @@ import { isNullOrUndefined } from '@Lib/utils';
 export enum HttpVerb {
   Get = 'get',
   Post = 'post',
+  Put = 'put',
   Patch = 'patch',
   Delete = 'delete',
 }
@@ -43,6 +44,14 @@ export class SNHttpService extends PureService {
     authentication?: string
   ): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Post, authentication });
+  }
+
+  public async putAbsolute(
+    url: string,
+    params?: HttpParams,
+    authentication?: string
+  ): Promise<HttpResponse> {
+    return this.runHttp({ url, params, verb: HttpVerb.Put, authentication });
   }
 
   public async patchAbsolute(
@@ -100,6 +109,7 @@ export class SNHttpService extends PureService {
       };
       if (
         verb === HttpVerb.Post ||
+        verb === HttpVerb.Put ||
         verb === HttpVerb.Patch ||
         verb === HttpVerb.Delete
       ) {
