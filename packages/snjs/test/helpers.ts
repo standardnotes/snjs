@@ -7,8 +7,8 @@ import {
   SNItem,
   SNNote,
   SNTag
-} from './../lib';
-import { Uuid } from './../lib/uuid'
+} from '@Lib/index';
+import { Uuid } from '@Lib/uuid'
 
 export const htmlTemplate = `<!doctype html>
   <html>

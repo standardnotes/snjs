@@ -1,4 +1,4 @@
-import { SNApplication, Environment, Platform, SNLog, SNComponentManager } from '../../lib';
+import { SNApplication, Environment, Platform, SNLog, SNComponentManager } from '@Lib/index';
 import { WebComponentManager, MobileComponentManager } from './componentManager';
 import DeviceInterface from './deviceInterface';
 import SNCrypto from './snCrypto';

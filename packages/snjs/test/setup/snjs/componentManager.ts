@@ -3,7 +3,7 @@ import {
   SNComponent,
   SNComponentManager,
   SNTheme,
-} from '../../lib';
+} from '@Lib/index';
 
 export class WebComponentManager extends SNComponentManager {
   presentPermissionsDialog(dialog: PermissionDialog) {

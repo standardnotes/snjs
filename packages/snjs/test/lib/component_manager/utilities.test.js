@@ -6,7 +6,7 @@ import {
   ComponentArea,
   ComponentAction,
   PayloadSource
-} from '../../../lib';
+} from '@Lib/index';
 import {
   createComponentItem,
   testExtensionEditorPackage,
@@ -19,7 +19,7 @@ import {
   SHORT_DELAY_TIME,
   sleep
 } from '../../helpers';
-import { createApplication } from '../../lib/appFactory';
+import { createApplication } from '../../setup/snjs/appFactory';
 
 // To prevent conflicts with Mocha
 import {

@@ -31,7 +31,9 @@ global.window.setImmediate = global.window.setTimeout;
  * - _extensions_manager_location for the Extension manager
  * - _batch_manager_location for the Batch manager
  */
+//@ts-ignore
 global.window['_extensions_manager_location'] = 'http://localhost/extensions/extension_manager';
+//@ts-ignore
 global.window['_batch_manager_location'] = 'http://localhost/extensions/batch_manager';
 
 global.document = window.document;

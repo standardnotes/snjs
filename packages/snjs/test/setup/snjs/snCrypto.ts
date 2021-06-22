@@ -131,7 +131,7 @@ export default class SNCrypto implements SNPureCrypto {
         'base64'
       );
     } catch (e) {
-      return null;
+      return "";
     }
   }
 

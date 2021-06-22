@@ -4,9 +4,9 @@ import {
   DeinitSource,
   KeyParamsOrigination,
   SNProtocolOperator003
-} from '../../lib';
-import { createApplication } from '../lib/appFactory';
-import SNCrypto from '../lib/snCrypto';
+} from '@Lib/index';
+import { createApplication } from '../setup/snjs/appFactory';
+import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('Test 003 encryption', () => {
   /** The global Standard Notes application. */

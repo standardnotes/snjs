@@ -3,7 +3,7 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "tsconfig.json",
-    "tsconfigRootDir": "lib",
+    "tsconfigRootDir": "./lib",
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint"],
@@ -21,6 +21,9 @@
     "no-restricted-globals": ["error", "history"]
   },
   "ignorePatterns": [
-    "__tests__"
+    "test",
+    "jest.config.ts",
+    "babel.config.js",
+    "webpack.*"
   ]
 }

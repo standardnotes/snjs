@@ -1,5 +1,5 @@
-import { DeviceInterface as SNDeviceInterface } from '../../lib';
-import { LocalStorage } from './localStorage';
+import { DeviceInterface as SNDeviceInterface } from '@Lib/index';
+import { LocalStorage, StorageObject } from './localStorage';
 
 const KEYCHAIN_STORAGE_KEY = 'keychain';
 
@@ -7,7 +7,7 @@ const KEYCHAIN_STORAGE_KEY = 'keychain';
  * The DeviceInterface implementation to handle storage and keychain operations.
  */
 export default class DeviceInterface extends SNDeviceInterface {
-  private storage = {};
+  private storage: StorageObject = {};
   private localStorage: LocalStorage;
 
   constructor(timeout: any, interval: any) {
@@ -15,7 +15,7 @@ export default class DeviceInterface extends SNDeviceInterface {
     this.localStorage = new LocalStorage(this.storage);
   }
 
-  async getRawStorageValue(key) {
+  async getRawStorageValue(key: string) {
     return this.localStorage.getItem(key);
   }
 
@@ -30,11 +30,11 @@ export default class DeviceInterface extends SNDeviceInterface {
     return results;
   }
 
-  async setRawStorageValue(key, value) {
+  async setRawStorageValue(key: string, value: any) {
     this.localStorage.setItem(key, value);
   }
 
-  async removeRawStorageValue(key) {
+  async removeRawStorageValue(key: string) {
     this.localStorage.removeItem(key);
   }
 
@@ -42,11 +42,11 @@ export default class DeviceInterface extends SNDeviceInterface {
     this.localStorage.clear();
   }
 
-  async openDatabase(_identifier) {
+  async openDatabase(_identifier: string) {
     return {};
   }
 
-  getDatabaseKeyPrefix(identifier) {
+  getDatabaseKeyPrefix(identifier: string) {
     if (identifier) {
       return `${identifier}-item-`;
     } else {
@@ -54,11 +54,11 @@ export default class DeviceInterface extends SNDeviceInterface {
     }
   }
 
-  keyForPayloadId(id, identifier) {
+  keyForPayloadId(id: string, identifier: string) {
     return `${this.getDatabaseKeyPrefix(identifier)}${id}`;
   }
 
-  async getAllRawDatabasePayloads(identifier) {
+  async getAllRawDatabasePayloads(identifier: string) {
     const models = [];
     for (const key in this.storage) {
       if (key.startsWith(this.getDatabaseKeyPrefix(identifier))) {
@@ -68,24 +68,24 @@ export default class DeviceInterface extends SNDeviceInterface {
     return models;
   }
 
-  async saveRawDatabasePayload(payload, identifier) {
+  async saveRawDatabasePayload(payload: any, identifier: string) {
     this.localStorage.setItem(
       this.keyForPayloadId(payload.uuid, identifier),
       JSON.stringify(payload)
     );
   }
 
-  async saveRawDatabasePayloads(payloads, identifier) {
+  async saveRawDatabasePayloads(payloads: any, identifier: string) {
     for (const payload of payloads) {
       await this.saveRawDatabasePayload(payload, identifier);
     }
   }
 
-  async removeRawDatabasePayloadWithId(id, identifier) {
+  async removeRawDatabasePayloadWithId(id: string, identifier: string) {
     this.localStorage.removeItem(this.keyForPayloadId(id, identifier));
   }
 
-  async removeAllRawDatabasePayloads(identifier) {
+  async removeAllRawDatabasePayloads(identifier: string) {
     for (const key in this.storage) {
       if (key.startsWith(this.getDatabaseKeyPrefix(identifier))) {
         delete this.storage[key];
@@ -93,7 +93,7 @@ export default class DeviceInterface extends SNDeviceInterface {
     }
   }
 
-  async getNamespacedKeychainValue(identifier) {
+  async getNamespacedKeychainValue(identifier: string) {
     const keychain = await this.getRawKeychainValue();
     if (!keychain) {
       return;
@@ -101,7 +101,7 @@ export default class DeviceInterface extends SNDeviceInterface {
     return keychain[identifier];
   }
 
-  async setNamespacedKeychainValue(value, identifier) {
+  async setNamespacedKeychainValue(value: any, identifier: string) {
     let keychain = await this.getRawKeychainValue();
     if (!keychain) {
       keychain = {};
@@ -112,7 +112,7 @@ export default class DeviceInterface extends SNDeviceInterface {
     }));
   }
 
-  async clearNamespacedKeychainValue(identifier) {
+  async clearNamespacedKeychainValue(identifier: string) {
     const keychain = await this.getRawKeychainValue();
     if (!keychain) {
       return;
@@ -122,7 +122,7 @@ export default class DeviceInterface extends SNDeviceInterface {
   }
 
   /** Allows unit tests to set legacy keychain structure as it was <= 003 */
-  async legacy_setRawKeychainValue(value) {
+  async legacy_setRawKeychainValue(value: any) {
     this.localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(value));
   }
 
@@ -135,7 +135,7 @@ export default class DeviceInterface extends SNDeviceInterface {
     this.localStorage.removeItem(KEYCHAIN_STORAGE_KEY);
   }
 
-  async openUrl(url) {
+  async openUrl(url: string) {
     window.open(url);
   }
 }
