@@ -3,8 +3,7 @@ import {
   Environment,
   DeinitSource,
   ContentType,
-  ComponentAction,
-  SNItem
+  ComponentAction
 } from '../../../lib';
 import {
   createComponentItem,
