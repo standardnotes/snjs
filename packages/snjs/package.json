@@ -19,7 +19,7 @@
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
     "lint": "yarn lint:tsc && yarn lint:eslint",
-    "lint:eslint": "eslint . --ext .ts",
+    "lint:eslint": "eslint --ext .ts lib/",
     "lint:tsc": "tsc --noEmit --emitDeclarationOnly false --project lib/tsconfig.json",
     "test": "jest"
   },
