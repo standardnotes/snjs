@@ -115,8 +115,8 @@ describe('003 protocol operations', () => {
     const text = 'hello world';
     const rawKey = _key.masterKey;
     const iv = await protocol003.crypto.generateRandomKey(128);
-    const encString = await protocol003.encryptString(text, rawKey, iv);
-    const decString = await protocol003.decryptString(encString, rawKey, iv);
+    const encString = await protocol003.encryptString002(text, rawKey, iv);
+    const decString = await protocol003.decryptString002(encString, rawKey, iv);
     expect(decString).to.equal(text);
   });
 
