@@ -84,7 +84,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.10.0
+    image: standardnotes/auth:1.11.0
     depends_on:
       - auth
     entrypoint: [
