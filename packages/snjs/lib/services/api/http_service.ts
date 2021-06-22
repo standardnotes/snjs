@@ -113,7 +113,7 @@ export class SNHttpService extends PureService {
   private stateChangeHandlerForRequest(
     request: XMLHttpRequest,
     resolve: (response: HttpResponse) => void,
-    reject: (response: HttpResponse) => void,
+    reject: (response: HttpResponse) => void
   ) {
     if (request.readyState !== REQUEST_READY_STATE_COMPLETED) {
       return;
@@ -150,7 +150,7 @@ export class SNHttpService extends PureService {
           status: httpStatus,
         };
       } else if (isNullOrUndefined(response.error)) {
-        if (!response.data || !response.data.error) {
+        if (isNullOrUndefined(response.data) || isNullOrUndefined(response.data.error)) {
           response.error = { message: UNKNOWN_ERROR, status: httpStatus };
         } else {
           // Ensure error handling compatibility on both APis
