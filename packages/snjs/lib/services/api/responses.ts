@@ -24,7 +24,7 @@ export enum StatusCode {
 }
 
 export type HttpResponse<T = unknown> = {
-  status: StatusCode;
+  status: StatusCode,
   error?: {
     message: string;
     status: number;
@@ -32,12 +32,12 @@ export type HttpResponse<T = unknown> = {
     /** In the case of MFA required responses,
      * the required prompt is returned as part of the error */
     payload?: {
-      mfa_key?: string;
-    };
-  };
-  data?: T;
-  meta?: ResponseMeta;
-};
+      mfa_key?: string
+    }
+  }
+  data?: T,
+  meta?: ResponseMeta
+}
 
 export type ResponseMeta = {
   auth: {
@@ -92,23 +92,9 @@ export type SignInResponse = RegistrationResponse & {
   key_params?: AnyKeyParamsContent;
 };
 
-export type ChangePasswordData = {
-  session?: SessionBody;
-  /** Represents legacy JWT token */
-  token?: string;
-  user?: User;
-  key_params?: AnyKeyParamsContent;
-};
-
-export type ChangePasswordResponse = HttpResponse & {
-  data: ChangePasswordData;
-};
+export type ChangePasswordResponse = SignInResponse;
 
 export type SignOutResponse = HttpResponse & Record<string, unknown>;
-
-export type SessionRenewalData = {
-  session?: SessionBody;
-}
 
 export type SessionRenewalResponse = HttpResponse & {
   session?: SessionBody;
@@ -146,9 +132,7 @@ export type SingleRevision = {
   uuid: string;
 };
 
-export type SingleRevisionResponse = HttpResponse & {
-  data: Partial<SingleRevision>;
-};
+export type SingleRevisionResponse = HttpResponse & { data: Partial<SingleRevision> };
 
 export enum ConflictType {
   ConflictingData = 'sync_conflict',

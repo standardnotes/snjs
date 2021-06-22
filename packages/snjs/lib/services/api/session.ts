@@ -1,4 +1,4 @@
-import { ChangePasswordData, SessionRenewalData, SessionRenewalResponse } from './responses';
+import { SessionRenewalResponse } from './responses';
 import { UuidString } from '@Lib/types';
 
 type RawJwtPayload = {
@@ -65,25 +65,11 @@ export class TokenSession extends Session {
   public refreshToken: string;
   public refreshExpiration: number;
 
-  // TODO: Remove once all endpoints are migrated
   static FromApiResponse(response: SessionRenewalResponse) {
     const accessToken: string = response.session!.access_token;
     const refreshToken: string = response.session!.refresh_token;
     const accessExpiration: number = response.session!.access_expiration;
     const refreshExpiration: number = response.session!.refresh_expiration;
-    return new TokenSession(
-      accessToken,
-      accessExpiration,
-      refreshToken,
-      refreshExpiration
-    );
-  }
-
-  static FromApiData(data: SessionRenewalData) {
-    const accessToken: string = data.session!.access_token;
-    const refreshToken: string = data.session!.refresh_token;
-    const accessExpiration: number = data.session!.access_expiration;
-    const refreshExpiration: number = data.session!.refresh_expiration;
     return new TokenSession(
       accessToken,
       accessExpiration,

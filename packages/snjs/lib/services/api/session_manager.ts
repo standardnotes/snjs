@@ -539,19 +539,17 @@ export class SNSessionManager extends PureService<SessionEvent> {
     newRootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ): Promise<SessionManagerResponse> {
-    const userUuid = this.user!.uuid;
     const response = await this.apiService.changePassword(
-      userUuid,
       currentServerPassword,
       newRootKey.serverPassword!,
       newRootKey.keyParams
     );
     if (!response.error) {
-      await this.handleSuccessApiV1AuthResponse(response as ChangePasswordResponse, newRootKey, wrappingKey);
+      await this.handleSuccessAuthResponse(response, newRootKey, wrappingKey);
     }
     return {
       response: response,
-      keyParams: (response as ChangePasswordResponse).data.key_params,
+      keyParams: response.key_params,
     };
   }
 
@@ -576,10 +574,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
     return response;
   }
 
-
-  // TODO: Remove once all endpoints are migrated
   private async handleSuccessAuthResponse(
-    response: RegistrationResponse | SignInResponse,
+    response: RegistrationResponse | SignInResponse | ChangePasswordResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ) {
@@ -595,29 +591,6 @@ export class SNSessionManager extends PureService<SessionEvent> {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response);
-      await this.setSession(session);
-    }
-  }
-
-  // TODO: Rename once all endpoints are migrated
-  private async handleSuccessApiV1AuthResponse(
-    response: ChangePasswordResponse,
-    rootKey: SNRootKey,
-    wrappingKey?: SNRootKey
-  ) {
-    await this.protocolService.setRootKey(rootKey, wrappingKey);
-    const { data } = response;
-    const user = data.user;
-    this.user = user;
-    await this.storageService.setValue(StorageKey.User, user);
-    if (data.token) {
-      /** Legacy JWT response */
-      const session = new JwtSession(data.token);
-      await this.setSession(session);
-    } else if (data.session) {
-      /** Note that change password requests do not resend the exiting session object, so we
-       * only overwrite our current session if the value is explicitely present */
-      const session = TokenSession.FromApiData(response.data);
       await this.setSession(session);
     }
   }
