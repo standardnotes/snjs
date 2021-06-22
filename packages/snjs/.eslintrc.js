@@ -20,4 +20,8 @@ module.exports = {
     quotes: ['warn', 'single'],
     'no-restricted-globals': ['error', 'history'],
   },
+  include: [
+    'lib/**/*.ts',
+    '__tests__/**'
+  ]
 };
