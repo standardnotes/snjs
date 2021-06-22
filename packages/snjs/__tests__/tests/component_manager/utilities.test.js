@@ -1,15 +1,11 @@
 import {
-  SNApplication,
-  SNComponent,
   Platform,
   Environment,
   DeinitSource,
-  SNTheme,
   ContentType,
   ComponentArea,
   ComponentAction,
-  PayloadSource,
-  SNItem
+  PayloadSource
 } from '../../../lib';
 import {
   createComponentItem,

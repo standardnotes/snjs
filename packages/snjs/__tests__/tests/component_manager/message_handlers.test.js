@@ -1,6 +1,4 @@
 import {
-  SNApplication,
-  SNComponent,
   Platform,
   Environment,
   DeinitSource,
