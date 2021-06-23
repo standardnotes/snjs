@@ -23,19 +23,23 @@ export enum StatusCode {
   HttpStatusForbidden = 403,
 }
 
+type Error = {
+  message: string;
+  status: number;
+  tag?: string;
+  /** In the case of MFA required responses,
+   * the required prompt is returned as part of the error */
+  payload?: {
+    mfa_key?: string;
+  };
+};
+
 export type HttpResponse<T = unknown> = {
   status: StatusCode;
-  error?: {
-    message: string;
-    status: number;
-    tag?: string;
-    /** In the case of MFA required responses,
-     * the required prompt is returned as part of the error */
-    payload?: {
-      mfa_key?: string;
-    };
+  error?: Error;
+  data?: T & {
+    error?: Error;
   };
-  data?: T;
   meta?: ResponseMeta;
 };
 

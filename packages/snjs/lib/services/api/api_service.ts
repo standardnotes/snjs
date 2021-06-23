@@ -379,7 +379,7 @@ export class SNApiService extends PureService {
       .catch(async (errorResponse) => {
         if (isErrorResponseExpiredToken(errorResponse)) {
           return this.refreshSessionThenRetryRequest({
-            verb: HttpVerb.Post,
+            verb: HttpVerb.Put,
             url,
             params,
           });

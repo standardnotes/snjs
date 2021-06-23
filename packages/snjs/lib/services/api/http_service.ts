@@ -4,11 +4,11 @@ import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
 
 export enum HttpVerb {
-  Get = 'get',
-  Post = 'post',
-  Put = 'put',
-  Patch = 'patch',
-  Delete = 'delete',
+  Get = 'GET',
+  Post = 'POST',
+  Put = 'PUT',
+  Patch = 'PATCH',
+  Delete = 'DELETE',
 }
 
 export enum ErrorTag {
@@ -160,7 +160,13 @@ export class SNHttpService extends PureService {
           status: httpStatus,
         };
       } else if (isNullOrUndefined(response.error)) {
-        response.error = { message: UNKNOWN_ERROR, status: httpStatus };
+        if (isNullOrUndefined(response.data) || isNullOrUndefined(response.data.error)) {
+          response.error = { message: UNKNOWN_ERROR, status: httpStatus };
+        } else {
+          // Ensure error handling compatibility on both APis
+          // TODO: Check for response.data.error in callers once all endpoints are migrated
+          response.error = response.data.error;
+        }
       }
       reject(response);
     }
