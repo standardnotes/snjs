@@ -1749,13 +1749,14 @@ export class SNComponentManager extends PureService {
             }
           });
           break;
-        case ComponentAction.StreamContextItem:
-          const componentAreaMapping = {
-            [ComponentArea.EditorStack]: 'working note',
-            [ComponentArea.NoteTags]: 'working note',
-            [ComponentArea.Editor]: 'working note',
-          };
-          contextAreaStrings.push((componentAreaMapping as any)[component.area]);
+        case ComponentAction.StreamContextItem: {
+            const componentAreaMapping = {
+              [ComponentArea.EditorStack]: 'working note',
+              [ComponentArea.NoteTags]: 'working note',
+              [ComponentArea.Editor]: 'working note',
+            };
+            contextAreaStrings.push((componentAreaMapping as any)[component.area]);
+          }
           break;
       }
     });
