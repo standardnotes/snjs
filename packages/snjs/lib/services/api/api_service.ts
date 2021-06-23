@@ -494,7 +494,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.host, Paths.v0.sessions);
+    const url = joinPaths(this.nextVersionHost, Paths.v1.sessions);
     const response = await this.httpService
       .getAbsolute(url, {}, this.session!.authorizationValue)
       .catch(async (errorResponse) => {
