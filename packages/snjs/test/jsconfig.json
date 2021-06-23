@@ -1,0 +1,9 @@
+{
+  "extends": "./../lib/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "checkJs": false,
+    "resolveJsonModule": true
+  }
+}
