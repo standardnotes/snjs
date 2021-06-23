@@ -96,9 +96,23 @@ export type SignInResponse = RegistrationResponse & {
   key_params?: AnyKeyParamsContent;
 };
 
-export type ChangePasswordResponse = SignInResponse;
+export type ChangePasswordData = {
+  session?: SessionBody;
+  /** Represents legacy JWT token */
+  token?: string;
+  user?: User;
+  key_params?: AnyKeyParamsContent;
+};
+
+export type ChangePasswordResponse = HttpResponse & {
+  data: ChangePasswordData;
+};
 
 export type SignOutResponse = HttpResponse & Record<string, unknown>;
+
+export type SessionRenewalData = {
+  session?: SessionBody;
+}
 
 export type SessionRenewalResponse = HttpResponse & {
   session?: SessionBody;
@@ -136,7 +150,9 @@ export type SingleRevision = {
   uuid: string;
 };
 
-export type SingleRevisionResponse = HttpResponse & { data: Partial<SingleRevision> };
+export type SingleRevisionResponse = HttpResponse & {
+  data: Partial<SingleRevision>;
+};
 
 export enum ConflictType {
   ConflictingData = 'sync_conflict',

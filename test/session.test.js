@@ -221,7 +221,7 @@ describe('server session', function () {
     );
 
     expect(changePasswordResponse.status).to.equal(200);
-    expect(changePasswordResponse.user).to.be.ok;
+    expect(changePasswordResponse.data.user).to.be.ok;
 
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
