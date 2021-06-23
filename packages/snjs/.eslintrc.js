@@ -1,18 +1,18 @@
-{
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "tsconfig.json",
-    "tsconfigRootDir": "./lib",
-    "sourceType": "module"
+module.exports = {
+  root: true,
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "tsconfig.json",
+    tsconfigRootDir: __dirname + "/lib",
+    sourceType: "module"
   },
-  "plugins": ["@typescript-eslint"],
-  "extends": [
+  plugins: ["@typescript-eslint"],
+  extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"
   ],
-  "rules": {
+  rules: {
     "sort-imports": "off",
     "require-await": "off",
     "@typescript-eslint/require-await": "warn",
@@ -20,10 +20,11 @@
     "quotes": ["warn", "single"],
     "no-restricted-globals": ["error", "history"]
   },
-  "ignorePatterns": [
+  ignorePatterns: [
     "test",
+    ".eslintrc.js",
     "jest.config.ts",
     "babel.config.js",
     "webpack.*"
   ]
-}
+};
