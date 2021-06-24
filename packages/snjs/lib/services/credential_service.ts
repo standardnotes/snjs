@@ -42,7 +42,7 @@ import { ChallengeService } from './challenge/challenge_service';
 import { SNItemsKey } from '@Lib/models';
 
 export type PasswordChangeFunctionResponse = { error?: { message: string } };
-export type AccountServiceResponse = HttpResponse<unknown>;
+export type AccountServiceResponse = HttpResponse;
 
 export const enum AccountEvent {
   SignedInOrRegistered = 'SignedInOrRegistered',

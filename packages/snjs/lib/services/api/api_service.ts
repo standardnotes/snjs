@@ -13,6 +13,7 @@ import {
   isErrorResponseExpiredToken,
   ResponseMeta,
   KeyParamsResponse,
+  SessionListResponse,
 } from './responses';
 import { RemoteSession, Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -202,11 +203,11 @@ export class SNApiService extends PureService {
     return params;
   }
 
-  public createErrorResponse<T = unknown>(
+  public createErrorResponse(
     message: string,
     status?: StatusCode
-  ): HttpResponse<T> {
-    return { error: { message, status } } as HttpResponse<T>;
+  ): HttpResponse {
+    return { error: { message, status } } as HttpResponse;
   }
 
   private errorResponseWithFallbackMessage(
@@ -489,8 +490,8 @@ export class SNApiService extends PureService {
     return result as SessionRenewalResponse;
   }
 
-  async getSessionsList(): Promise<HttpResponse<RemoteSession[]>> {
-    const preprocessingError = this.preprocessingError<RemoteSession[]>();
+  async getSessionsList(): Promise<SessionListResponse | HttpResponse> {
+    const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
     }
@@ -608,14 +609,14 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private preprocessingError<T = unknown>() {
+  private preprocessingError() {
     if (this.refreshingSession) {
-      return this.createErrorResponse<T>(
+      return this.createErrorResponse(
         messages.API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS
       );
     }
     if (!this.session) {
-      return this.createErrorResponse<T>(messages.API_MESSAGE_INVALID_SESSION);
+      return this.createErrorResponse(messages.API_MESSAGE_INVALID_SESSION);
     }
     return undefined;
   }

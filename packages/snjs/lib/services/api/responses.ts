@@ -34,10 +34,10 @@ type Error = {
   };
 };
 
-export type HttpResponse<T = unknown> = {
+export type HttpResponse = {
   status: StatusCode;
   error?: Error;
-  data?: T & {
+  data?: {
     error?: Error;
   };
   meta?: ResponseMeta;
@@ -128,11 +128,14 @@ export type SessionRenewalResponse = HttpResponse & {
 
 export type SessionListEntry = {
   uuid: string;
+  current: boolean;
   api_version: string;
   created_at: string;
   updated_at: string;
   device_info: string;
 };
+
+export type SessionListResponse = HttpResponse & { data: SessionListEntry[] };
 
 export type RevisionListEntry = {
   content_type: string;
