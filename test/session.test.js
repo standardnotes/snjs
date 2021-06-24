@@ -586,8 +586,8 @@ describe('server session', function () {
       password: this.password,
     });
 
-    const sessions = await this.application.apiService.getSessionsList();
-    expect(sessions[0].current).to.equal(true);
+    const response = await this.application.apiService.getSessionsList();
+    expect(response.data[0].current).to.equal(true);
   });
 
   it('signing out should delete session from all list', async function () {
