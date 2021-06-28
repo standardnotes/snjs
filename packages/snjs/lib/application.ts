@@ -95,8 +95,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { HttpResponse, SignInResponse, User } from './services/api/responses';
-import { RemoteSession } from './services/api/session';
+import { HttpResponse, SessionListResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
@@ -519,7 +518,7 @@ export class SNApplication {
     return this.syncService.getStatus();
   }
 
-  public getSessions(): Promise<HttpResponse<RemoteSession[]>> {
+public getSessions(): Promise<SessionListResponse | HttpResponse> {
     return this.sessionManager.getSessionsList();
   }
 

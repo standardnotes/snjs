@@ -13,6 +13,8 @@ import {
   HttpResponse,
   KeyParamsResponse,
   RegistrationResponse,
+  SessionListEntry,
+  SessionListResponse,
   SignInResponse,
   StatusCode,
   User,
@@ -321,7 +323,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
       }
     }
     /** Make sure to use client value for identifier/email */
-    const keyParams = KeyParamsFromApiResponse(response as KeyParamsResponse, email);
+    const keyParams = KeyParamsFromApiResponse(
+      response as KeyParamsResponse,
+      email
+    );
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService.createErrorResponse(
@@ -555,12 +560,16 @@ export class SNSessionManager extends PureService<SessionEvent> {
     };
   }
 
-  public async getSessionsList(): Promise<HttpResponse<RemoteSession[]>> {
+  public async getSessionsList(): Promise<
+    (HttpResponse & { data: RemoteSession[] }) | HttpResponse
+  > {
     const response = await this.apiService.getSessionsList();
     if (response.error || isNullOrUndefined(response.data)) {
       return response;
     }
-    response.data = response.data
+    (response as HttpResponse & {
+      data: RemoteSession[];
+    }).data = (response as SessionListResponse).data
       .map<RemoteSession>((session) => ({
         ...session,
         updated_at: new Date(session.updated_at),
@@ -575,7 +584,6 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const response = await this.apiService.deleteSession(sessionId);
     return response;
   }
-
 
   // TODO: Remove once all endpoints are migrated
   private async handleSuccessAuthResponse(
