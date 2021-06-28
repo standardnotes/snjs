@@ -518,12 +518,12 @@ export class SNApiService extends PureService {
 
   async deleteSession(
     sessionId: UuidString
-  ): Promise<RevisionListResponse | HttpResponse> {
+  ): Promise<HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.host, <string> Paths.v0.session);
+    const url = joinPaths(this.nextVersionHost, <string> Paths.v1.session(sessionId));
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
@@ -537,7 +537,7 @@ export class SNApiService extends PureService {
         this.preprocessAuthenticatedErrorResponse(errorResponse);
         if (isErrorResponseExpiredToken(errorResponse)) {
           return this.refreshSessionThenRetryRequest({
-            verb: HttpVerb.Get,
+            verb: HttpVerb.Delete,
             url,
           });
         }
