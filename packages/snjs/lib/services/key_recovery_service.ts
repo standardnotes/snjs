@@ -352,7 +352,7 @@ export class SNKeyRecoveryService extends PureService {
       const paramsResponse = await this.apiService.getAccountKeyParams(
         clientParams.identifier
       );
-      if (!paramsResponse.error) {
+      if (!paramsResponse.error && paramsResponse.data) {
         this.serverParams = KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse);
       }
     }

@@ -297,11 +297,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
       mfaKeyPath,
       mfaCode
     );
-    if (response.error) {
+    if (response.error || isNullOrUndefined(response.data)) {
       if (mfaCode) {
         await this.alertService.alert(SignInStrings.IncorrectMfa);
       }
-      if (response.error.payload?.mfa_key) {
+      if (response.error?.payload?.mfa_key) {
         /** Prompt for MFA code and try again */
         const inputtedCode = await this.promptForMfaValue();
         if (!inputtedCode) {
@@ -501,7 +501,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       mfaCode,
       ephemeral
     );
-    if (!signInResponse.error) {
+    if (!signInResponse.error && signInResponse.data) {
       const expandedRootKey = await SNRootKey.ExpandedCopy(
         rootKey,
         (signInResponse as SignInResponse).data.key_params
@@ -513,7 +513,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       );
       return signInResponse;
     } else {
-      if (signInResponse.error.payload?.mfa_key) {
+      if (signInResponse.error?.payload?.mfa_key) {
         if (mfaCode) {
           await this.alertService.alert(SignInStrings.IncorrectMfa);
         }
@@ -556,7 +556,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
     return {
       response: response,
-      keyParams: (response as ChangePasswordResponse).data.key_params,
+      keyParams: (response as ChangePasswordResponse).data?.key_params,
     };
   }
 
