@@ -47,6 +47,11 @@ export enum ComponentAction {
   Click = 'click'
 }
 
+enum ComponentFlag {
+  New = 'new',
+  Deprecated = 'deprecated'
+}
+
 export type ComponentPermission = {
   name: ComponentAction;
   content_types?: ContentType[];
@@ -70,6 +75,7 @@ interface ComponentContent {
   active: boolean;
   legacy_url: string;
   isMobileDefault: boolean;
+  isDeprecated: boolean;
 }
 
 /**
@@ -203,6 +209,12 @@ export class SNComponent extends SNItem implements ComponentContent {
 
   public isExplicitlyDisabledForItem(uuid: UuidString) {
     return this.disassociatedItemIds.indexOf(uuid) !== -1;
+  }
+
+  public get isDeprecated() {
+    let flags: string[] = this.package_info.flags ?? [];
+    flags = flags.map((flag: string) => flag.toLowerCase());
+    return flags.includes(ComponentFlag.Deprecated);
   }
 }
 
