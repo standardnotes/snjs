@@ -15,7 +15,7 @@ import {
   KeyParamsResponse,
   SessionListResponse,
 } from './responses';
-import { RemoteSession, Session, TokenSession } from './session';
+import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
@@ -31,7 +31,7 @@ import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
-import { joinPaths } from '@Lib/utils';
+import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { SNPermissionsService } from '../permissions_service';
 
@@ -45,7 +45,7 @@ type CommonPathNames = {
   sessions: string;
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
-}
+};
 
 type PathNamesV0 = CommonPathNames & {
   changePassword: string;
@@ -88,7 +88,7 @@ const Paths: {
     itemRevisions: (itemUuid: string) => `/v1/items/${itemUuid}/revisions`,
     itemRevision: (itemUuid: string, revisionUuid: string) =>
       `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
-  }
+  },
 };
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
@@ -171,7 +171,10 @@ export class SNApiService extends PureService {
 
   public async setNextVersionHost(nextVersionHost: string): Promise<void> {
     this.nextVersionHost = nextVersionHost;
-    await this.storageService.setValue(StorageKey.NextVersionServerHost, nextVersionHost);
+    await this.storageService.setValue(
+      StorageKey.NextVersionServerHost,
+      nextVersionHost
+    );
   }
 
   public getNextVersionHost(): string | undefined {
@@ -369,7 +372,10 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     this.changing = true;
-    const url = joinPaths(this.nextVersionHost, <string> Paths.v1.changePassword(userUuid));
+    const url = joinPaths(
+      this.nextVersionHost,
+      <string>Paths.v1.changePassword(userUuid)
+    );
     const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
@@ -441,9 +447,11 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private async refreshSessionThenRetryRequest(httpRequest: HttpRequest) {
+  private async refreshSessionThenRetryRequest(
+    httpRequest: HttpRequest
+  ): Promise<HttpResponse> {
     const sessionResponse = await this.refreshSession();
-    if (sessionResponse?.error) {
+    if (sessionResponse.error || isNullOrUndefined(sessionResponse.data)) {
       return sessionResponse;
     } else {
       return this.httpService
@@ -457,13 +465,13 @@ export class SNApiService extends PureService {
     }
   }
 
-  async refreshSession() {
+  async refreshSession(): Promise<SessionRenewalResponse | HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
-      return preprocessingError as SessionRenewalResponse;
+      return preprocessingError;
     }
     this.refreshingSession = true;
-    const url = joinPaths(this.host, Paths.v0.refreshSession);
+    const url = joinPaths(this.nextVersionHost, Paths.v1.refreshSession);
     const session = this.session! as TokenSession;
     const params = this.params({
       access_token: session.accessToken,
@@ -487,7 +495,7 @@ export class SNApiService extends PureService {
         );
       });
     this.refreshingSession = false;
-    return result as SessionRenewalResponse;
+    return result;
   }
 
   async getSessionsList(): Promise<SessionListResponse | HttpResponse> {
@@ -516,14 +524,15 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  async deleteSession(
-    sessionId: UuidString
-  ): Promise<HttpResponse> {
+  async deleteSession(sessionId: UuidString): Promise<HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.nextVersionHost, <string> Paths.v1.session(sessionId));
+    const url = joinPaths(
+      this.nextVersionHost,
+      <string>Paths.v1.session(sessionId)
+    );
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
@@ -587,7 +596,10 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.nextVersionHost, Paths.v1.itemRevision(itemId, entry.uuid));
+    const url = joinPaths(
+      this.nextVersionHost,
+      Paths.v1.itemRevision(itemId, entry.uuid)
+    );
     const response:
       | SingleRevisionResponse
       | HttpResponse = await this.httpService
