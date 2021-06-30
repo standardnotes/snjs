@@ -15,7 +15,7 @@ import {
   KeyParamsResponse,
   SessionListResponse,
 } from './responses';
-import { RemoteSession, Session, TokenSession } from './session';
+import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
@@ -287,14 +287,14 @@ export class SNApiService extends PureService {
     serverPassword: string,
     keyParams: SNRootKeyParams,
     ephemeral: boolean
-  ): Promise<RegistrationResponse> {
+  ): Promise<RegistrationResponse | HttpResponse> {
     if (this.registering) {
       return this.createErrorResponse(
         messages.API_MESSAGE_REGISTRATION_IN_PROGRESS
       ) as RegistrationResponse;
     }
     this.registering = true;
-    const url = joinPaths(this.host, Paths.v0.register);
+    const url = joinPaths(this.nextVersionHost, Paths.v1.register);
     const params = this.params({
       password: serverPassword,
       email,
@@ -308,7 +308,7 @@ export class SNApiService extends PureService {
       params,
     });
     this.registering = false;
-    return response as RegistrationResponse;
+    return response;
   }
 
   async signIn(

@@ -85,11 +85,15 @@ export type User = {
   email: string;
 };
 
-export type RegistrationResponse = HttpResponse & {
+export type RegistrationData = {
   session?: SessionBody;
   /** Represents legacy JWT token */
   token?: string;
   user?: User;
+};
+
+export type RegistrationResponse = HttpResponse & {
+  data: RegistrationData;
 };
 
 export type SignInData = {
