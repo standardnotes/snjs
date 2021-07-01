@@ -530,7 +530,7 @@ describe('basic auth', () => {
       expect(result).to.be.true;
     });
 
-    it.only('should fail when attempting to set 0 character passcode', async function () {
+    it('should fail when attempting to set 0 character passcode', async function () {
       const passcode = '';
       const result = await this.application.addPasscode(passcode);
       expect(result).to.be.false;
