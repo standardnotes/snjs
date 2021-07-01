@@ -534,7 +534,13 @@ describe('basic auth', () => {
       const passcode = '';
       const result = await this.application.addPasscode(passcode);
       expect(result).to.be.false;
-    })
+    });
+
+    it('should fail when attempting to set undefined passcode', async function () {
+      const passcode = undefined;
+      const result = await this.application.addPasscode(passcode);
+      expect(result).to.be.false;
+    });
   });
 
   describe('change passcode', async function () {
@@ -547,9 +553,18 @@ describe('basic auth', () => {
       expect(result).to.be.true;
     });
 
-    it('should fail when attempting to change to a 0 character passcode', async function () {
+    it('should fail when attempting to change to 0 character passcode', async function () {
       const passcode = 'passcode';
       const newPasscode = '';
+      await this.application.addPasscode(passcode);
+      Factory.handlePasswordChallenges(this.application, passcode);
+      const result = await this.application.changePasscode(newPasscode);
+      expect(result).to.be.false;
+    });
+
+    it('should fail when attempting to change to undefined character passcode', async function () {
+      const passcode = 'passcode';
+      const newPasscode = undefined;
       await this.application.addPasscode(passcode);
       Factory.handlePasswordChallenges(this.application, passcode);
       const result = await this.application.changePasscode(newPasscode);

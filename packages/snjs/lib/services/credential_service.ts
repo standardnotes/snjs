@@ -404,7 +404,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
   }
 
   public async addPasscode(passcode: string): Promise<boolean> {
-    if (passcode.length < MINIMUM_PASSCODE_LENGTH) {
+    if (!passcode || passcode.length < MINIMUM_PASSCODE_LENGTH) {
       return false;
     }
     if (!(await this.protectionService.authorizeAddingPasscode())) {
@@ -450,7 +450,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
-    if (newPasscode.length < MINIMUM_PASSCODE_LENGTH) {
+    if (!newPasscode || newPasscode.length < MINIMUM_PASSCODE_LENGTH) {
       return false;
     }
     if (!(await this.protectionService.authorizeChangingPasscode())) {
