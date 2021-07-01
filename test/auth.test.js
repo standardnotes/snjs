@@ -555,5 +555,5 @@ describe('basic auth', () => {
       const result = await this.application.changePasscode(newPasscode);
       expect(result).to.be.false;
     });
-  })
+  });
 });
