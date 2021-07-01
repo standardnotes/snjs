@@ -522,4 +522,38 @@ describe('basic auth', () => {
     );
     expect(performSignIn.callCount).to.equal(1);
   });
+
+  describe('add passcode', async function () {
+    it('should set passcode successfully', async function () {
+      const passcode = 'passcode';
+      const result = await this.application.addPasscode(passcode);
+      expect(result).to.be.true;
+    });
+
+    it('should fail when attempting to set 0 character passcode', async function () {
+      const passcode = '';
+      const result = await this.application.addPasscode(passcode);
+      expect(result).to.be.false;
+    })
+  });
+
+  describe('change passcode', async function () {
+    it('should change passcode successfully', async function () {
+      const passcode = 'passcode';
+      const newPasscode = 'newPasscode';
+      await this.application.addPasscode(passcode);
+      Factory.handlePasswordChallenges(this.application, passcode);
+      const result = await this.application.changePasscode(newPasscode);
+      expect(result).to.be.true;
+    });
+
+    it('should fail when attempting to change to a 0 character passcode', async function () {
+      const passcode = 'passcode';
+      const newPasscode = '';
+      await this.application.addPasscode(passcode);
+      Factory.handlePasswordChallenges(this.application, passcode);
+      const result = await this.application.changePasscode(newPasscode);
+      expect(result).to.be.false;
+    });
+  });
 });
