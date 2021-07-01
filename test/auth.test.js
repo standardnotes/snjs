@@ -525,7 +525,7 @@ describe('basic auth', () => {
 
   describe('add passcode', async function () {
     it('should set passcode successfully', async function () {
-      const passcode = 'passcode'
+      const passcode = 'passcode';
       const result = await this.application.addPasscode(passcode);
       expect(result).to.be.true;
     });
