@@ -1310,13 +1310,18 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     );
   }
 
-  public async signOut(): Promise<void> {
+  public async signOut(force = false): Promise<void> {
     const performSignOut = async () => {
       await this.credentialService.signOut();
       await this.notifyEvent(ApplicationEvent.SignedOut);
       await this.prepareForDeinit();
       this.deinit(DeinitSource.SignOut);
     };
+
+    if (force) {
+      await performSignOut();
+      return;
+    }
 
     const dirtyItems = this.itemManager.getDirtyItems();
     if (dirtyItems.length > 0) {
@@ -1651,7 +1656,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
           case SessionEvent.Revoked: {
             /** Keep a reference to the soon-to-be-cleared alertService */
             const alertService = this.alertService;
-            await this.signOut();
+            await this.signOut(true);
             void alertService.alert(SessionStrings.CurrentSessionRevoked);
             break;
           }
