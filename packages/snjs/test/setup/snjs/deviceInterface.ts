@@ -128,7 +128,9 @@ export default class DeviceInterface extends SNDeviceInterface {
 
   async getRawKeychainValue() {
     const keychain = this.localStorage.getItem(KEYCHAIN_STORAGE_KEY);
-    return JSON.parse(keychain);
+    if (keychain) {
+      return JSON.parse(keychain);
+    }
   }
 
   async clearRawKeychainValue() {
