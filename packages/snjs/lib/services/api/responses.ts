@@ -126,11 +126,6 @@ export type SessionRenewalData = {
   session?: SessionBody;
 }
 
-// TODO: Remove once all endpoints are migrated
-export type SessionRenewalLegacyResponse = HttpResponse & {
-  session?: SessionBody;
-};
-
 export type SessionRenewalResponse = HttpResponse & {
   data: SessionRenewalData;
 };

@@ -1,4 +1,4 @@
-import { SessionRenewalLegacyResponse, SessionRenewalResponse } from './responses';
+import { SessionRenewalResponse } from './responses';
 import { UuidString } from '@Lib/types';
 
 type RawJwtPayload = {
@@ -64,20 +64,6 @@ export class TokenSession extends Session {
   public accessExpiration: number;
   public refreshToken: string;
   public refreshExpiration: number;
-
-  // TODO: Remove once all endpoints are migrated
-  static FromLegacyApiResponse(response: SessionRenewalLegacyResponse) {
-    const accessToken: string = response.session!.access_token;
-    const refreshToken: string = response.session!.refresh_token;
-    const accessExpiration: number = response.session!.access_expiration;
-    const refreshExpiration: number = response.session!.refresh_expiration;
-    return new TokenSession(
-      accessToken,
-      accessExpiration,
-      refreshToken,
-      refreshExpiration
-    );
-  }
 
   static FromApiResponse(response: SessionRenewalResponse) {
     const accessToken: string = response.data.session!.access_token;
