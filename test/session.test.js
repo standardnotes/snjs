@@ -78,10 +78,10 @@ describe('server session', function () {
     const response = await this.application.apiService.refreshSession();
 
     expect(response.status).to.equal(200);
-    expect(response.session.access_token).to.be.a('string');
-    expect(response.session.access_token).to.not.be.empty;
-    expect(response.session.refresh_expiration).to.be.a('number');
-    expect(response.session.refresh_token).to.not.be.empty;
+    expect(response.data.session.access_token).to.be.a('string');
+    expect(response.data.session.access_token).to.not.be.empty;
+    expect(response.data.session.refresh_expiration).to.be.a('number');
+    expect(response.data.session.refresh_token).to.not.be.empty;
   });
 
   it('should be refreshed on any api call if access token is expired', async function () {
