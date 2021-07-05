@@ -37,7 +37,6 @@ describe('Application', () => {
       });
 
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
-
       await testSNApp.signOut();
 
       expect(confirmAlert).toBeCalledTimes(1);
@@ -53,6 +52,18 @@ describe('Application', () => {
       });
 
       await testSNApp.signOut();
+
+      expect(confirmAlert).toBeCalledTimes(0);
+    });
+
+    it('does not show confirmation dialog when there are unsaved changes and the "force" option is set to true', async () => {
+      const testNote1 = await createNoteItem(testSNApp, {
+        title: 'Note 1',
+        text: 'This is a test note!'
+      });
+
+      await testSNApp.itemManager.setItemDirty(testNote1.uuid);
+      await testSNApp.signOut(true);
 
       expect(confirmAlert).toBeCalledTimes(0);
     });
