@@ -22,8 +22,13 @@ describe('Application', () => {
     let deinit;
 
     const signOutConfirmMessage = (numberOfItems) => {
-      return `There are ${numberOfItems} items with unsynced changes. ` +
+      const singular = numberOfItems === 1;
+      return (
+        `There ${singular ? 'is' : 'are'} ${numberOfItems} ${
+          singular ? 'item' : 'items'
+        } with unsynced changes. ` +
         'If you sign out, these changes will be lost forever. Are you sure you want to sign out?'
+      );
     };
 
     beforeEach(async () => {
