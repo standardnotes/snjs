@@ -1311,10 +1311,25 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
   }
 
   public async signOut(): Promise<void> {
-    await this.credentialService.signOut();
-    await this.notifyEvent(ApplicationEvent.SignedOut);
-    await this.prepareForDeinit();
-    this.deinit(DeinitSource.SignOut);
+    const performSignOut = async () => {
+      await this.credentialService.signOut();
+      await this.notifyEvent(ApplicationEvent.SignedOut);
+      await this.prepareForDeinit();
+      this.deinit(DeinitSource.SignOut);
+    };
+
+    const dirtyItems = this.itemManager.getDirtyItems();
+    if (dirtyItems.length > 0) {
+      const didConfirm = await this.alertService.confirm(
+        `There are ${dirtyItems.length} unsynced items. Are you sure you want to sign out?`
+      );
+
+      if (didConfirm) {
+        await performSignOut();
+      }
+    } else {
+      await performSignOut();
+    }
   }
 
   public async validateAccountPassword(password: string): Promise<boolean> {
