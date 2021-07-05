@@ -16,10 +16,6 @@ describe('Application', () => {
     testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
   });
 
-  afterEach(() => {
-    testSNApp.deinit(DeinitSource.SignOut);
-  });
-
   describe('signOut()', () => {
     let testNote1;
     let confirmAlert;
