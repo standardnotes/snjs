@@ -1328,7 +1328,6 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       const didConfirm = await this.alertService.confirm(
         `There are ${dirtyItems.length} items with unsynced changes. If you sign out, these changes will be forever lost. Are you sure you want to sign out?`
       );
-
       if (didConfirm) {
         await performSignOut();
       }
