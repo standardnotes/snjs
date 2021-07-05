@@ -606,7 +606,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     } else if (data.session) {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
-      const session = TokenSession.FromApiData(response.data);
+      const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
     }
   }
