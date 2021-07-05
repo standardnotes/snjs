@@ -1310,11 +1310,30 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     );
   }
 
-  public async signOut(): Promise<void> {
-    await this.credentialService.signOut();
-    await this.notifyEvent(ApplicationEvent.SignedOut);
-    await this.prepareForDeinit();
-    this.deinit(DeinitSource.SignOut);
+  public async signOut(force = false): Promise<void> {
+    const performSignOut = async () => {
+      await this.credentialService.signOut();
+      await this.notifyEvent(ApplicationEvent.SignedOut);
+      await this.prepareForDeinit();
+      this.deinit(DeinitSource.SignOut);
+    };
+
+    if (force) {
+      await performSignOut();
+      return;
+    }
+
+    const dirtyItems = this.itemManager.getDirtyItems();
+    if (dirtyItems.length > 0) {
+      const didConfirm = await this.alertService.confirm(
+        `There are ${dirtyItems.length} items with unsynced changes. If you sign out, these changes will be lost forever. Are you sure you want to sign out?`
+      );
+      if (didConfirm) {
+        await performSignOut();
+      }
+    } else {
+      await performSignOut();
+    }
   }
 
   public async validateAccountPassword(password: string): Promise<boolean> {
@@ -1636,7 +1655,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
           case SessionEvent.Revoked: {
             /** Keep a reference to the soon-to-be-cleared alertService */
             const alertService = this.alertService;
-            await this.signOut();
+            await this.signOut(true);
             void alertService.alert(SessionStrings.CurrentSessionRevoked);
             break;
           }
