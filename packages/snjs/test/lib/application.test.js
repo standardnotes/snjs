@@ -70,7 +70,6 @@ describe('Application', () => {
     });
 
     it('cancels sign out if confirmation dialog is rejected', async () => {
-      // Rejecting all confirmation prompts via the presentPermissionsDialog
       confirmAlert.mockImplementation((message) => false);
 
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
