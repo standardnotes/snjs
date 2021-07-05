@@ -1326,7 +1326,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     const dirtyItems = this.itemManager.getDirtyItems();
     if (dirtyItems.length > 0) {
       const didConfirm = await this.alertService.confirm(
-        `There are ${dirtyItems.length} items with unsynced changes. If you sign out, these changes will be forever lost. Are you sure you want to sign out?`
+        `There are ${dirtyItems.length} items with unsynced changes. If you sign out, these changes will be lost forever. Are you sure you want to sign out?`
       );
       if (didConfirm) {
         await performSignOut();
