@@ -1,6 +1,5 @@
 import { SNProtectionService } from './protection_service';
 import { Uuid } from '@Lib/uuid';
-import { isNullOrUndefined } from '@Lib/utils';
 import {
   Challenge,
   ChallengeReason,
@@ -40,6 +39,8 @@ import {
 import { PureService } from '@Services/pure_service';
 import { ChallengeService } from './challenge/challenge_service';
 import { SNItemsKey } from '@Lib/models';
+
+const MINIMUM_PASSCODE_LENGTH = 1;
 
 export type PasswordChangeFunctionResponse = { error?: { message: string } };
 export type AccountServiceResponse = HttpResponse;
@@ -403,6 +404,9 @@ export class SNCredentialService extends PureService<AccountEvent> {
   }
 
   public async addPasscode(passcode: string): Promise<boolean> {
+    if (passcode.length < MINIMUM_PASSCODE_LENGTH) {
+      return false;
+    }
     if (!(await this.protectionService.authorizeAddingPasscode())) {
       return false;
     }
@@ -446,6 +450,9 @@ export class SNCredentialService extends PureService<AccountEvent> {
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
+    if (newPasscode.length < MINIMUM_PASSCODE_LENGTH) {
+      return false;
+    }
     if (!(await this.protectionService.authorizeChangingPasscode())) {
       return false;
     }
