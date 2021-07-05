@@ -21,6 +21,11 @@ describe('Application', () => {
     let confirmAlert;
     let deinit;
 
+    const signOutConfirmMessage = (numberOfItems) => {
+      return `There are ${numberOfItems} items with unsynced changes. ` +
+        'If you sign out, these changes will be lost forever. Are you sure you want to sign out?'
+    };
+
     beforeEach(async () => {
       testNote1 = await createNoteItem(testSNApp, {
         title: 'Note 1',
@@ -40,10 +45,10 @@ describe('Application', () => {
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
       await testSNApp.signOut();
 
+      const expectedConfirmMessage = signOutConfirmMessage(1);
+
       expect(confirmAlert).toBeCalledTimes(1);
-      expect(confirmAlert).toBeCalledWith(
-        `There are 1 items with unsynced changes. If you sign out, these changes will be forever lost. Are you sure you want to sign out?`
-      );
+      expect(confirmAlert).toBeCalledWith(expectedConfirmMessage);
       expect(deinit).toBeCalledTimes(1);
       expect(deinit).toBeCalledWith(DeinitSource.SignOut);
     });
@@ -71,10 +76,10 @@ describe('Application', () => {
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
       await testSNApp.signOut();
 
+      const expectedConfirmMessage = signOutConfirmMessage(1);
+
       expect(confirmAlert).toBeCalledTimes(1);
-      expect(confirmAlert).toBeCalledWith(
-        `There are 1 items with unsynced changes. If you sign out, these changes will be forever lost. Are you sure you want to sign out?`
-      );
+      expect(confirmAlert).toBeCalledWith(expectedConfirmMessage);
       expect(deinit).toBeCalledTimes(0);
     });
   });
