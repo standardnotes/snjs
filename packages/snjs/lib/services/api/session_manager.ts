@@ -270,7 +270,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       ephemeral
     );
     if (!registerResponse.error) {
-      await this.handleSuccessAuthResponse(
+      await this.handleSuccessLegacyAuthResponse(
         registerResponse,
         rootKey,
         wrappingKey
@@ -506,7 +506,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
         rootKey,
         (signInResponse as SignInResponse).data.key_params
       );
-      await this.handleSuccessApiV1AuthResponse(
+      await this.handleSuccessAuthResponse(
         signInResponse as SignInResponse,
         expandedRootKey,
         wrappingKey
@@ -552,7 +552,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
       newRootKey.keyParams
     );
     if (!response.error) {
-      await this.handleSuccessApiV1AuthResponse(response as ChangePasswordResponse, newRootKey, wrappingKey);
+      await this.handleSuccessAuthResponse(response as ChangePasswordResponse, newRootKey, wrappingKey);
     }
     return {
       response: response,
@@ -586,7 +586,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   // TODO: Remove once all endpoints are migrated
-  private async handleSuccessAuthResponse(
+  private async handleSuccessLegacyAuthResponse(
     response: RegistrationResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
@@ -602,13 +602,12 @@ export class SNSessionManager extends PureService<SessionEvent> {
     } else if (response.session) {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
-      const session = TokenSession.FromApiResponse(response);
+      const session = TokenSession.FromLegacyApiResponse(response);
       await this.setSession(session);
     }
   }
 
-  // TODO: Rename once all endpoints are migrated
-  private async handleSuccessApiV1AuthResponse(
+  private async handleSuccessAuthResponse(
     response: SignInResponse | ChangePasswordResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
@@ -625,7 +624,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     } else if (data.session) {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
-      const session = TokenSession.FromApiData(response.data);
+      const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
     }
   }
