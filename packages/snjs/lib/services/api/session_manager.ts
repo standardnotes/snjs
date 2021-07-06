@@ -269,9 +269,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
       keyParams,
       ephemeral
     );
-    if (!registerResponse.error) {
-      await this.handleSuccessLegacyAuthResponse(
-        registerResponse,
+    if (!registerResponse.error && registerResponse.data) {
+      await this.handleSuccessAuthResponse(
+        registerResponse as RegistrationResponse,
         rootKey,
         wrappingKey
       );
@@ -551,8 +551,12 @@ export class SNSessionManager extends PureService<SessionEvent> {
       newRootKey.serverPassword!,
       newRootKey.keyParams
     );
-    if (!response.error) {
-      await this.handleSuccessAuthResponse(response as ChangePasswordResponse, newRootKey, wrappingKey);
+    if (!response.error && response.data) {
+      await this.handleSuccessAuthResponse(
+        response as ChangePasswordResponse,
+        newRootKey,
+        wrappingKey
+      );
     }
     return {
       response: response,
@@ -585,30 +589,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
     return response;
   }
 
-  // TODO: Remove once all endpoints are migrated
-  private async handleSuccessLegacyAuthResponse(
-    response: RegistrationResponse,
-    rootKey: SNRootKey,
-    wrappingKey?: SNRootKey
-  ) {
-    await this.protocolService.setRootKey(rootKey, wrappingKey);
-    const user = response.user;
-    this.user = user;
-    await this.storageService.setValue(StorageKey.User, user);
-    if (response.token) {
-      /** Legacy JWT response */
-      const session = new JwtSession(response.token);
-      await this.setSession(session);
-    } else if (response.session) {
-      /** Note that change password requests do not resend the exiting session object, so we
-       * only overwrite our current session if the value is explicitely present */
-      const session = TokenSession.FromLegacyApiResponse(response);
-      await this.setSession(session);
-    }
-  }
-
   private async handleSuccessAuthResponse(
-    response: SignInResponse | ChangePasswordResponse,
+    response: RegistrationResponse | SignInResponse | ChangePasswordResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ) {

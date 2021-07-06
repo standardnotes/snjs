@@ -85,11 +85,15 @@ export type User = {
   email: string;
 };
 
-export type RegistrationResponse = HttpResponse & {
+export type RegistrationData = {
   session?: SessionBody;
   /** Represents legacy JWT token */
   token?: string;
   user?: User;
+};
+
+export type RegistrationResponse = HttpResponse & {
+  data: RegistrationData;
 };
 
 export type SignInData = {
@@ -121,11 +125,6 @@ export type SignOutResponse = HttpResponse & Record<string, unknown>;
 export type SessionRenewalData = {
   session?: SessionBody;
 }
-
-// TODO: Remove once all endpoints are migrated
-export type SessionRenewalLegacyResponse = HttpResponse & {
-  session?: SessionBody;
-};
 
 export type SessionRenewalResponse = HttpResponse & {
   data: SessionRenewalData;
