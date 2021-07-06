@@ -54,7 +54,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.19.7
+    image: standardnotes/api-gateway:1.20.0
     depends_on:
       - syncing-server-js
       - auth
