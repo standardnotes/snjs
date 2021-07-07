@@ -55,7 +55,7 @@ export class AccountDownloader {
     )) as RawSyncResponse;
 
     const encryptedPayloads = filterDisallowedRemotePayloads(
-      response.retrieved_items!.map((rawPayload: RawPayload) => {
+      response.data.retrieved_items!.map((rawPayload: RawPayload) => {
         return CreateSourcedPayloadFromObject(
           rawPayload,
           PayloadSource.RemoteRetrieved
@@ -68,10 +68,10 @@ export class AccountDownloader {
     this.progress.retrievedPayloads = this.progress.retrievedPayloads.concat(
       decryptedPayloads
     );
-    this.progress.lastSyncToken = response.sync_token;
-    this.progress.paginationToken = response.cursor_token;
+    this.progress.lastSyncToken = response.data.sync_token;
+    this.progress.paginationToken = response.data.cursor_token;
 
-    if (response.cursor_token) {
+    if (response.data.cursor_token) {
       return this.run();
     } else {
       return this.progress.retrievedPayloads;

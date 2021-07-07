@@ -182,7 +182,7 @@ export type ConflictParams = {
   item?: RawPayload;
 };
 
-export type RawSyncResponse = {
+export type RawSyncData = {
   error?: any;
   [ApiEndpointParam.LastSyncToken]?: string;
   [ApiEndpointParam.PaginationToken]?: string;
@@ -193,3 +193,5 @@ export type RawSyncResponse = {
   unsaved?: ConflictParams[];
   status?: number;
 };
+
+export type RawSyncResponse = HttpResponse & { data: RawSyncData };
