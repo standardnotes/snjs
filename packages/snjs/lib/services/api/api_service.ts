@@ -228,8 +228,8 @@ export class SNApiService extends PureService {
   }
 
   private processMetaObject(meta: ResponseMeta) {
-    if (meta.auth && meta.auth.role && meta.auth.permissions) {
-      this.permissionsService.update(meta.auth.role, meta.auth.permissions);
+    if (meta.auth && meta.auth.roles && meta.auth.permissions) {
+      this.permissionsService.update(meta.auth.roles, meta.auth.permissions);
     }
   }
 

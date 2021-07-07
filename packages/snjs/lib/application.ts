@@ -177,6 +177,7 @@ export class SNApplication {
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
    * @param nextVersionHost next version host used for upgrading API versions in ApiService.
+   * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
   constructor(
     public environment: Environment,
@@ -187,7 +188,8 @@ export class SNApplication {
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
-    private nextVersionHost: string
+    private nextVersionHost: string,
+    private webSocketUrl: string,
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -290,6 +292,7 @@ export class SNApplication {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
+    await this.permissionsService.loadWebSocketUrl();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
 
@@ -886,6 +889,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
   public async setCustomHost(host: string): Promise<void> {
     await this.apiService.setHost(host);
     await this.apiService.setNextVersionHost(host);
+    await this.permissionsService.setWebSocketUrl(undefined);
   }
 
   public getUser(): User | undefined {
@@ -1452,10 +1456,10 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
   }
 
   private constructServices() {
-    this.createPermissionsService();
     this.createPayloadManager();
     this.createItemManager();
     this.createStorageManager();
+    this.createPermissionsService();
     this.createProtocolService();
     const encryptionDelegate = {
       payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
@@ -1508,10 +1512,13 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
   }
 
   private createPermissionsService() {
-    this.permissionsService = new SNPermissionsService();
+    this.permissionsService = new SNPermissionsService(
+      this.storageService,
+      this.webSocketUrl
+    );
     this.serviceObservers.push(
-      this.permissionsService.addEventObserver((_event, permissions) => {
-        void this.notifyEvent(ApplicationEvent.PermissionsChanged, permissions);
+      this.permissionsService.addEventObserver((_event, eventData) => {
+        void this.notifyEvent(ApplicationEvent.PermissionsChanged, eventData);
       })
     );
     this.services.push(this.permissionsService);
@@ -1641,7 +1648,8 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       this.apiService,
       this.alertService,
       this.protocolService,
-      this.challengeService
+      this.challengeService,
+      this.permissionsService,
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
