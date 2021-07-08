@@ -130,14 +130,14 @@ app.streamItems(
 
 - On [test](test) you will find most unit tests and e2e tests for the core functionality. It is currently using Mocha as the test framework.
 - On [packages/snjs/test](packages/snjs/test) you will find unit tests for the component manager and new features.
-It is encouraged to place new tests on this folder, since the [test](test) directory will be migrated 
+It is encouraged to place new tests on this location, since the [test](test) directory will be migrated 
 to [packages/snjs/test](packages/snjs/test) in the future. The tests are powered by Jest + JSDOM.
 
 ### Running tests
 #### Tests on [test](test)
 Please make sure you have [Docker](https://www.docker.com) installed before running tests.
 
-From the root of the repository, run:
+From the root of this repository, run:
 
 ```
 yarn run start:test-server:dev
