@@ -77,9 +77,9 @@ export class SNPermissionsService extends PureService<
 
   private onWebSocketMessage(event: MessageEvent) {
     const {
-      auth: { role, permissions },
+      auth: { roles, permissions },
     } = JSON.parse(event.data);
-    this.update(role, permissions);
+    this.update(roles, permissions);
   }
 
   private onWebSocketClose() {
