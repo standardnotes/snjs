@@ -2,7 +2,7 @@
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
-SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.org) that contains shared logic for all Standard Notes clients.
+SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.com) that contains shared logic for all Standard Notes clients.
 
 ## Introduction
 
@@ -166,4 +166,4 @@ yarn test
 - Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
 ## Help
-Join the #dev channel in [our Slack group](https://standardnotes.org/slack) for help and discussion.
+Join the #dev channel in [our Slack group](https://standardnotes.com/slack) for help and discussion.
