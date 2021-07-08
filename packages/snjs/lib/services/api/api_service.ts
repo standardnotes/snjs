@@ -227,15 +227,15 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private processMetaObject(meta: ResponseMeta) {
+  private async processMetaObject(meta: ResponseMeta) {
     if (meta.auth && meta.auth.roles && meta.auth.permissions) {
-      this.permissionsService.update(meta.auth.roles, meta.auth.permissions);
+      await this.permissionsService.update(meta.auth.roles, meta.auth.permissions);
     }
   }
 
-  private processResponse(response: HttpResponse) {
+  private async processResponse(response: HttpResponse) {
     if (response.meta) {
-      this.processMetaObject(response.meta);
+      await this.processMetaObject(response.meta);
     }
   }
 
@@ -248,7 +248,7 @@ export class SNApiService extends PureService {
   }) {
     try {
       const response = await this.httpService.runHttp(params);
-      this.processResponse(response);
+      await this.processResponse(response);
       return response;
     } catch (errorResponse) {
       return this.errorResponseWithFallbackMessage(

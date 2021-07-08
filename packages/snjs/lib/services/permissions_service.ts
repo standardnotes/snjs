@@ -1,5 +1,5 @@
 import { StorageKey } from '@Lib/storage_keys';
-import { Permission, Role } from '@standardnotes/auth';
+import { Permission, Role, PermissionName } from '@standardnotes/auth';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 
@@ -8,59 +8,59 @@ export enum PermissionsEvent {
 }
 
 export type PermissionsEventData = {
-  roles: Set<Role>;
-  permissions: Set<Permission>;
+  roles: Role[];
+  permissions: Permission[];
 };
 export class SNPermissionsService extends PureService<
   PermissionsEvent.PermissionsChanged,
   PermissionsEventData
 > {
-  private roles = new Set<Role>();
-  private permissions = new Set<Permission>();
+  private roles: Role[] = [];
+  private permissions: Permission[] = [];
   private webSocket?: WebSocket;
 
   constructor(
     private storageService: SNStorageService,
-    private webSocketUrl: string | undefined,
+    private webSocketUrl: string | undefined
   ) {
     super();
   }
 
-  private setRoles(roles: Role[]): void {
-    this.roles = new Set(roles);
-    this.storageService.setValue(StorageKey.UserRoles, this.roles);
+  private async setRoles(roles: Role[]): Promise<void> {
+    this.roles = roles;
+    await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  private setPermissions(permissions: Permission[]): void {
-    this.permissions = new Set(permissions);
-    this.storageService.setValue(StorageKey.UserPermissions, this.permissions);
+  private async setPermissions(permissions: Permission[]): Promise<void> {
+    this.permissions = permissions;
+    await this.storageService.setValue(
+      StorageKey.UserPermissions,
+      this.permissions
+    );
   }
 
-  public hasPermission(permission: Permission): boolean {
-    const storedPermissions = this.storageService.getValue(StorageKey.UserPermissions);
-    return storedPermissions?.has(permission) || this.permissions.has(permission);
+  public hasPermission(permissionName: PermissionName): boolean {
+    const storedPermissions = this.storageService.getValue(
+      StorageKey.UserPermissions
+    );
+    return (
+      this.permissions.some((p) => p.name === permissionName) ||
+      storedPermissions?.some((p: Permission) => p.name === permissionName)
+    );
   }
 
-  public update(roles: Role[], permissions: Permission[]): void {
-    this.setRoles(roles);
-    if (
-      this.permissions.size !== permissions.length ||
-      permissions.some((permission) => !this.permissions.has(permission))
-    ) {
-      this.setPermissions(permissions);
-      this.notifyEvent(PermissionsEvent.PermissionsChanged, {
-        roles: this.roles,
-        permissions: this.permissions,
-      });
-    }
+  public async update(roles: Role[], permissions: Permission[]): Promise<void> {
+    await this.setRoles(roles);
+    await this.setPermissions(permissions);
+    void this.notifyEvent(PermissionsEvent.PermissionsChanged, {
+      roles: this.roles,
+      permissions: this.permissions,
+    });
   }
 
   public async setWebSocketUrl(url: string | undefined): Promise<void> {
     this.webSocketUrl = url;
-    await this.storageService.setValue(
-      StorageKey.WebSocketUrl,
-      url
-    );
+    await this.storageService.setValue(StorageKey.WebSocketUrl, url);
   }
 
   public async loadWebSocketUrl(): Promise<void> {
@@ -75,11 +75,11 @@ export class SNPermissionsService extends PureService<
       })._websocket_url;
   }
 
-  private onWebSocketMessage(event: MessageEvent) {
+  private async onWebSocketMessage(event: MessageEvent) {
     const {
       auth: { roles, permissions },
     } = JSON.parse(event.data);
-    this.update(roles, permissions);
+    await this.update(roles, permissions);
   }
 
   private onWebSocketClose() {

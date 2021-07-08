@@ -99,7 +99,7 @@ import { HttpResponse, SessionListResponse, SignInResponse, User } from './servi
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
-import { Permission } from '@standardnotes/auth';
+import { Permission, PermissionName } from '@standardnotes/auth';
 import { RemoteSession } from '.';
 
 /** How often to automatically sync, in milliseconds */
@@ -1179,8 +1179,8 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     return this.preferencesService.setValue(key, value);
   }
 
-  public hasPermission(permission: Permission): boolean {
-    return this.permissionsService.hasPermission(permission);
+  public hasPermission(permissionName: PermissionName): boolean {
+    return this.permissionsService.hasPermission(permissionName);
   }
 
   /**
