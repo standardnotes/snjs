@@ -1,4 +1,4 @@
-import { Uuid } from "../Uuid/Uuid";
+import { Uuid } from '../Uuid/Uuid'
 
 export enum PermissionName {
   SyncItems = 'SYNC_ITEMS',
