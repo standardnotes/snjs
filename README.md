@@ -126,12 +126,18 @@ app.streamItems(
 
 ## Tests
 
-Please make sure you have [Docker](https://www.docker.com) installed before running tests:
-```
-yarn test
-```
+[SNJS](packages/snjs) has two directories containing tests: [test](test) and [packages/snjs/test](packages/snjs/test)
 
-Running packages/snjs tests:
+- On [test](test) you will find most unit tests and e2e tests for the core functionality. It is currently using Mocha as the test framework.
+- On [packages/snjs/test](packages/snjs/test) you will find unit tests for the component manager and new features.
+It is encouraged to place new tests on this folder, since the [test](test) directory will be migrated 
+to [packages/snjs/test](packages/snjs/test) in the future. The tests are powered by Jest + JSDOM.
+
+### Running tests
+#### Tests on [test](test)
+Please make sure you have [Docker](https://www.docker.com) installed before running tests.
+
+From the root of the repository, run:
 
 ```
 yarn run start:test-server:dev
@@ -148,6 +154,14 @@ yarn run test:e2e:dev
 
 Or open browser to `localhost:9002/test/test.html`.
 
+---
+
+#### Tests on [packages/snjs/test](packages/snjs/test)
+From the [packages/snjs/test](packages/snjs/test) directory, run:
+
+```
+yarn test
+```
 ## Notes
 - Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
