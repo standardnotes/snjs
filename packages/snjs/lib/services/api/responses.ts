@@ -35,7 +35,7 @@ type Error = {
 };
 
 export type HttpResponse = {
-  status: StatusCode;
+  status?: StatusCode;
   error?: Error;
   data?: {
     error?: Error;
