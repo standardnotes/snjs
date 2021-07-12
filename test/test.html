@@ -18,7 +18,6 @@
     const bail = urlParams.get('bail') === 'false' ? false : true;
 
     window._default_sync_server = `http://${syncServerHostName}:3123`;
-    window._next_version_sync_server = `http://${syncServerHostName}:3123`;
 
     Object.assign(window, SNCrypto);
     Object.assign(window, SNLibrary);
