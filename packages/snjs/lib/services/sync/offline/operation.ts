@@ -27,7 +27,7 @@ export class OfflineSyncOperation {
     });
     /* Since we are simulating a server response, they should be pure JS objects */
     const savedItems = Copy(responsePayloads) as any[];
-    const response = new SyncResponse({ saved_items: savedItems });
+    const response = new SyncResponse({ data: { saved_items: savedItems }});
     await this.receiver(SyncSignal.Response, response);
   }
 }

@@ -1023,7 +1023,9 @@ describe('online syncing', function () {
       PayloadSource.RemoteRetrieved
     );
     const response = new SyncResponse({
-      retrieved_items: [payload],
+      data: {
+        retrieved_items: [payload],
+      },
     });
     const resolver = new SyncResponseResolver(
       response,

@@ -14,6 +14,7 @@ import {
   ResponseMeta,
   KeyParamsResponse,
   SessionListResponse,
+  RawSyncResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -411,12 +412,12 @@ export class SNApiService extends PureService {
     checkIntegrity = false,
     contentType?: ContentType,
     customEvent?: string
-  ): Promise<HttpResponse> {
+  ): Promise<RawSyncResponse | HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.host, Paths.v0.sync);
+    const url = joinPaths(this.nextVersionHost, Paths.v1.sync);
     const params = this.params({
       [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
       [ApiEndpointParam.LastSyncToken]: lastSyncToken,
