@@ -1,7 +1,7 @@
 import { Uuid } from '../Uuid/Uuid'
 
 export enum RoleName {
-  User = 'USER',
+  BasicUser = 'BASIC_USER',
   CoreUser = 'CORE_USER',
   PlusUser = 'PLUS_USER',
   ProUser = 'PRO_USER'
