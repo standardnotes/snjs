@@ -13,7 +13,7 @@ describe('2020-01-15 mobile migration', () => {
     localStorage.clear();
   });
 
-  it.only('2020-01-15 migration with passcode and account', async function () {
+  it('2020-01-15 migration with passcode and account', async function () {
     let application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,
       Platform.Ios
