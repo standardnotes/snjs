@@ -86,15 +86,15 @@ export class SyncResponse {
   }
 
   public get lastSyncToken() {
-    return this.rawResponse.data[ApiEndpointParam.LastSyncToken];
+    return this.rawResponse.data?.[ApiEndpointParam.LastSyncToken];
   }
 
   public get paginationToken() {
-    return this.rawResponse.data[ApiEndpointParam.PaginationToken];
+    return this.rawResponse.data?.[ApiEndpointParam.PaginationToken];
   }
 
   public get integrityHash() {
-    return this.rawResponse.data[ApiEndpointParam.IntegrityResult];
+    return this.rawResponse.data?.[ApiEndpointParam.IntegrityResult];
   }
 
   get checkIntegrity() {

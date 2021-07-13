@@ -41,7 +41,7 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
     );
-    const customServer = 'http://api-dev.standardnotes.org';
+    const customServer = 'http://server-dev.standardnotes.org';
     await application.deviceInterface.setRawStorageValue(
       'user',
       JSON.stringify({ email: identifier, server: customServer })
