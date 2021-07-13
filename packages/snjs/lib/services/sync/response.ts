@@ -75,7 +75,7 @@ export class SyncResponse {
   }
 
   public get error() {
-    return this.rawResponse.error;
+    return this.rawResponse.error || this.rawResponse.data?.error;
   }
 
   /**
