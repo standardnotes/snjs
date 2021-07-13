@@ -19,7 +19,7 @@ export class SyncResponse {
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse;
-    this.savedPayloads = this.filterRawItemArray(rawResponse.data.saved_items).map(
+    this.savedPayloads = this.filterRawItemArray(rawResponse.data?.saved_items).map(
       (rawItem) => {
         return CreateSourcedPayloadFromObject(
           rawItem,
@@ -28,7 +28,7 @@ export class SyncResponse {
       }
     );
     this.retrievedPayloads = this.filterRawItemArray(
-      rawResponse.data.retrieved_items
+      rawResponse.data?.retrieved_items
     ).map((rawItem) => {
       return CreateSourcedPayloadFromObject(
         rawItem,
@@ -75,7 +75,7 @@ export class SyncResponse {
   }
 
   public get error() {
-    return this.rawResponse.data.error;
+    return this.rawResponse.error || this.rawResponse.data?.error;
   }
 
   /**
@@ -86,15 +86,15 @@ export class SyncResponse {
   }
 
   public get lastSyncToken() {
-    return this.rawResponse.data[ApiEndpointParam.LastSyncToken];
+    return this.rawResponse.data?.[ApiEndpointParam.LastSyncToken];
   }
 
   public get paginationToken() {
-    return this.rawResponse.data[ApiEndpointParam.PaginationToken];
+    return this.rawResponse.data?.[ApiEndpointParam.PaginationToken];
   }
 
   public get integrityHash() {
-    return this.rawResponse.data[ApiEndpointParam.IntegrityResult];
+    return this.rawResponse.data?.[ApiEndpointParam.IntegrityResult];
   }
 
   get checkIntegrity() {
@@ -134,8 +134,8 @@ export class SyncResponse {
   }
 
   private get rawConflictObjects() {
-    const conflicts = this.rawResponse.data.conflicts || [];
-    const legacyConflicts = this.rawResponse.data.unsaved || [];
+    const conflicts = this.rawResponse.data?.conflicts || [];
+    const legacyConflicts = this.rawResponse.data?.unsaved || [];
     return conflicts.concat(legacyConflicts);
   }
 

@@ -95,7 +95,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { HttpResponse, SessionListResponse, SignInResponse, User } from './services/api/responses';
+import { HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
@@ -176,7 +176,6 @@ export class SNApplication {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
-   * @param nextVersionHost next version host used for upgrading API versions in ApiService.
    */
   constructor(
     public environment: Environment,
@@ -187,7 +186,6 @@ export class SNApplication {
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
-    private nextVersionHost: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -224,9 +222,6 @@ export class SNApplication {
     }
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
-    }
-    if (!nextVersionHost) {
-      throw Error('nextVersionHost must be supplied when creating an application.');
     }
     this.constructServices();
   }
@@ -875,17 +870,8 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     return this.apiService.getHost();
   }
 
-  public async setNextVersionHost(nextVersionHost: string): Promise<void> {
-    return this.apiService.setNextVersionHost(nextVersionHost);
-  }
-
-  public getNextVersionHost(): string | undefined {
-    return this.apiService.getNextVersionHost();
-  }
-
   public async setCustomHost(host: string): Promise<void> {
     await this.apiService.setHost(host);
-    await this.apiService.setNextVersionHost(host);
   }
 
   public getUser(): User | undefined {
@@ -1552,7 +1538,6 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       this.storageService,
       this.permissionsService,
       this.defaultHost,
-      this.nextVersionHost
     );
     this.services.push(this.apiService);
   }

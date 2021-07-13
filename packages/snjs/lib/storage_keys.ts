@@ -19,7 +19,6 @@ export enum StorageKey {
   Session = 'session',
   User = 'user',
   ServerHost = 'server',
-  NextVersionServerHost = 'next_version_server',
   LegacyUuid = 'uuid',
   LastSyncToken = 'syncToken',
   PaginationToken = 'cursorToken',
