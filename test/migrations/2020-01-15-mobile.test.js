@@ -13,7 +13,7 @@ describe('2020-01-15 mobile migration', () => {
     localStorage.clear();
   });
 
-  it('2020-01-15 migration with passcode and account', async function () {
+  it.only('2020-01-15 migration with passcode and account', async function () {
     let application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,
       Platform.Ios
@@ -41,7 +41,7 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue())
     );
-    const customServer = 'http://server-dev.standardnotes.org';
+    const customServer = 'http://api-dev.standardnotes.org';
     await application.deviceInterface.setRawStorageValue(
       'user',
       JSON.stringify({ email: identifier, server: customServer })

@@ -68,10 +68,10 @@ export class AccountDownloader {
     this.progress.retrievedPayloads = this.progress.retrievedPayloads.concat(
       decryptedPayloads
     );
-    this.progress.lastSyncToken = response.data.sync_token;
-    this.progress.paginationToken = response.data.cursor_token;
+    this.progress.lastSyncToken = response.data?.sync_token;
+    this.progress.paginationToken = response.data?.cursor_token;
 
-    if (response.data.cursor_token) {
+    if (response.data?.cursor_token) {
       return this.run();
     } else {
       return this.progress.retrievedPayloads;
