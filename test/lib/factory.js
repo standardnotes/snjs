@@ -74,6 +74,10 @@ export function getDefaultHost() {
   return 'http://localhost:3123';
 }
 
+export function getDefaultWebSocketUrl() {
+  return 'ws://localhost';
+}
+
 export function createApplication(identifier, environment, platform) {
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),
@@ -91,7 +95,8 @@ export function createApplication(identifier, environment, platform) {
     },
     identifier || `${Math.random()}`,
     [],
-    getDefaultHost()
+    getDefaultHost(),
+    getDefaultWebSocketUrl(),
   );
 }
 
