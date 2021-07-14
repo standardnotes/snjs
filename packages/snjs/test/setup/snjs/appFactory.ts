@@ -39,7 +39,6 @@ export const createApplication = async (identifier: string, environment: Environ
     },
     identifier,
     getSwappedClasses(environment),
-    'http://syncing.localhost',
     'http://api.localhost',
     'ws://localhost'
   );

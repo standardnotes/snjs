@@ -515,7 +515,6 @@ describe('2020-01-15 web migration', () => {
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       jwt: 'anything',
-      server: 'anything',
       /** Legacy versions would store json strings inside of embedded storage */
       auth_params: JSON.stringify(accountKey.keyParams.getPortableValue()),
       user: JSON.stringify({ uuid: 'anything', email: 'anything' }),

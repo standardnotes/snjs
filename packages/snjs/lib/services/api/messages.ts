@@ -36,16 +36,16 @@ export const UNSUPPORTED_PROTOCOL_VERSION =
   'This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.';
 
 export const EXPIRED_PROTOCOL_VERSION =
-  'The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security for more information.';
+  'The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.com/help/security for more information.';
 
 export const OUTDATED_PROTOCOL_VERSION =
-  'The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.';
+  'The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.com/help/security for more information.';
 
 export const UNSUPPORTED_KEY_DERIVATION =
   'Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.';
 
 export const INVALID_PASSWORD_COST =
-  'Unable to sign in due to insecure password parameters. Please visit standardnotes.org/help/security for more information.';
+  'Unable to sign in due to insecure password parameters. Please visit standardnotes.com/help/security for more information.';
 export const INVALID_PASSWORD = 'Invalid password.';
 
 export const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';

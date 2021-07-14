@@ -3,6 +3,7 @@ import { arrayByDifference, subtractFromArray } from '@Lib/utils';
 import { SyncResponse } from '@Services/sync/response';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';
+import { RawSyncResponse } from '@Lib/services/api/responses';
 
 export const SyncUpDownLimit = 150;
 
@@ -56,7 +57,7 @@ export class AccountSyncOperation {
       totalUploadCount: this.totalUploadCount,
     });
     const payloads = this.popPayloads(this.upLimit);
-    const rawResponse = await this.apiService.sync(
+    const rawResponse = (await this.apiService.sync(
       payloads,
       this.lastSyncToken,
       this.paginationToken,
@@ -64,7 +65,7 @@ export class AccountSyncOperation {
       this.checkIntegrity,
       undefined,
       undefined
-    );
+    ) as RawSyncResponse);
     const response = new SyncResponse(rawResponse);
 
     this.responses.push(response);

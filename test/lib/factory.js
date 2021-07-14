@@ -96,7 +96,6 @@ export function createApplication(identifier, environment, platform) {
     identifier || `${Math.random()}`,
     [],
     getDefaultHost(),
-    getDefaultHost(),
     getDefaultWebSocketUrl(),
   );
 }

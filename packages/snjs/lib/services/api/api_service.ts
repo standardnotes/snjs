@@ -14,6 +14,7 @@ import {
   ResponseMeta,
   KeyParamsResponse,
   SessionListResponse,
+  RawSyncResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -35,46 +36,23 @@ import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { SNPermissionsService } from '../permissions_service';
 
-type CommonPathNames = {
+type PathNamesV1 = {
   keyParams: string;
   register: string;
   signIn: string;
+  changePassword: (userUuid: string) => string;
   sync: string;
   signOut: string;
   refreshSession: string;
   sessions: string;
+  session: (sessionUuid: string) => string;
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
 };
 
-type PathNamesV0 = CommonPathNames & {
-  changePassword: string;
-  session: string;
-};
-
-type PathNamesV1 = CommonPathNames & {
-  changePassword: (userUuid: string) => string;
-  session: (sessionUuid: string) => string;
-};
-
 const Paths: {
-  v0: PathNamesV0;
   v1: PathNamesV1;
 } = {
-  v0: {
-    keyParams: '/auth/params',
-    register: '/auth',
-    signIn: '/auth/sign_in',
-    changePassword: '/auth/change_pw',
-    sync: '/items/sync',
-    signOut: '/auth/sign_out',
-    refreshSession: '/session/refresh',
-    sessions: '/sessions',
-    session: '/session',
-    itemRevisions: (itemId: string) => `/items/${itemId}/revisions`,
-    itemRevision: (itemId: string, revisionId: string) =>
-      `/items/${itemId}/revisions/${revisionId}`,
-  },
   v1: {
     keyParams: '/v1/login-params',
     register: '/v1/users',
@@ -111,7 +89,6 @@ export class SNApiService extends PureService {
     private storageService: SNStorageService,
     private permissionsService: SNPermissionsService,
     private host: string,
-    private nextVersionHost: string
   ) {
     super();
   }
@@ -147,17 +124,6 @@ export class SNApiService extends PureService {
       (window as {
         _default_sync_server?: string;
       })._default_sync_server;
-
-    const storedNextVersionValue = await this.storageService.getValue(
-      StorageKey.NextVersionServerHost
-    );
-
-    this.nextVersionHost =
-      storedNextVersionValue ||
-      this.nextVersionHost ||
-      (window as {
-        _next_version_sync_server?: string;
-      })._next_version_sync_server;
   }
 
   public async setHost(host: string): Promise<void> {
@@ -167,18 +133,6 @@ export class SNApiService extends PureService {
 
   public getHost(): string | undefined {
     return this.host;
-  }
-
-  public async setNextVersionHost(nextVersionHost: string): Promise<void> {
-    this.nextVersionHost = nextVersionHost;
-    await this.storageService.setValue(
-      StorageKey.NextVersionServerHost,
-      nextVersionHost
-    );
-  }
-
-  public getNextVersionHost(): string | undefined {
-    return this.nextVersionHost;
   }
 
   public async setSession(session: Session, persist = true): Promise<void> {
@@ -277,7 +231,7 @@ export class SNApiService extends PureService {
     }
     return this.request({
       verb: HttpVerb.Get,
-      url: joinPaths(this.nextVersionHost, Paths.v1.keyParams),
+      url: joinPaths(this.host, Paths.v1.keyParams),
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
       /** A session is optional here, if valid, endpoint returns extra params */
@@ -297,7 +251,7 @@ export class SNApiService extends PureService {
       ) as RegistrationResponse;
     }
     this.registering = true;
-    const url = joinPaths(this.nextVersionHost, Paths.v1.register);
+    const url = joinPaths(this.host, Paths.v1.register);
     const params = this.params({
       password: serverPassword,
       email,
@@ -327,7 +281,7 @@ export class SNApiService extends PureService {
       ) as SignInResponse;
     }
     this.authenticating = true;
-    const url = joinPaths(this.nextVersionHost, Paths.v1.signIn);
+    const url = joinPaths(this.host, Paths.v1.signIn);
     const params = this.params({
       email,
       password: serverPassword,
@@ -348,7 +302,7 @@ export class SNApiService extends PureService {
   }
 
   signOut(): Promise<SignOutResponse> {
-    const url = joinPaths(this.nextVersionHost, Paths.v1.signOut);
+    const url = joinPaths(this.host, Paths.v1.signOut);
     return this.httpService
       .postAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse) => {
@@ -373,7 +327,7 @@ export class SNApiService extends PureService {
     }
     this.changing = true;
     const url = joinPaths(
-      this.nextVersionHost,
+      this.host,
       <string>Paths.v1.changePassword(userUuid)
     );
     const params = this.params({
@@ -411,12 +365,12 @@ export class SNApiService extends PureService {
     checkIntegrity = false,
     contentType?: ContentType,
     customEvent?: string
-  ): Promise<HttpResponse> {
+  ): Promise<RawSyncResponse | HttpResponse> {
     const preprocessingError = this.preprocessingError();
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.host, Paths.v0.sync);
+    const url = joinPaths(this.host, Paths.v1.sync);
     const params = this.params({
       [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
       [ApiEndpointParam.LastSyncToken]: lastSyncToken,
@@ -471,7 +425,7 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     this.refreshingSession = true;
-    const url = joinPaths(this.nextVersionHost, Paths.v1.refreshSession);
+    const url = joinPaths(this.host, Paths.v1.refreshSession);
     const session = this.session! as TokenSession;
     const params = this.params({
       access_token: session.accessToken,
@@ -503,7 +457,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.nextVersionHost, Paths.v1.sessions);
+    const url = joinPaths(this.host, Paths.v1.sessions);
     const response = await this.httpService
       .getAbsolute(url, {}, this.session!.authorizationValue)
       .catch(async (errorResponse) => {
@@ -530,7 +484,7 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     const url = joinPaths(
-      this.nextVersionHost,
+      this.host,
       <string>Paths.v1.session(sessionId)
     );
     const response:
@@ -566,7 +520,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(this.nextVersionHost, Paths.v1.itemRevisions(itemId));
+    const url = joinPaths(this.host, Paths.v1.itemRevisions(itemId));
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
@@ -597,7 +551,7 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     const url = joinPaths(
-      this.nextVersionHost,
+      this.host,
       Paths.v1.itemRevision(itemId, entry.uuid)
     );
     const response:
