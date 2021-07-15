@@ -187,7 +187,7 @@ export class SNApplication {
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
-    private webSocketUrl: string,
+    private webSocketUrl?: string,
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
