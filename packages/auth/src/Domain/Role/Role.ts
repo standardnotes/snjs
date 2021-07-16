@@ -1,13 +1,7 @@
 import { Uuid } from '../Uuid/Uuid'
-
-export enum RoleName {
-  BasicUser = 'BASIC_USER',
-  CoreUser = 'CORE_USER',
-  PlusUser = 'PLUS_USER',
-  ProUser = 'PRO_USER'
-}
+import { RoleName } from './RoleName'
 
 export type Role = {
-  uuid: Uuid;
-  name: RoleName;
+  uuid: Uuid
+  name: RoleName
 }
