@@ -35,12 +35,12 @@ export enum FeatureName {
 
 enum DockIconType {
   Circle = 'circle',
-  Svg = 'svg'
+  Svg = 'svg',
 }
 
 enum Flag {
   New = 'New',
-  Deprecated = 'Deprecated'
+  Deprecated = 'Deprecated',
 }
 
 export type Feature = {
@@ -64,4 +64,4 @@ export type Feature = {
     border_color: string;
   };
   expires_at: number;
-}
+};
