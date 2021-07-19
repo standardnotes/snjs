@@ -1,7 +1,7 @@
-import { ComponentArea, ContentType } from '@standardnotes/snjs';
-import { DockIconType } from './DockIconType';
-import { FeatureName } from './FeatureName';
-import { Flag } from './Flag';
+import { ComponentArea, ContentType } from '@standardnotes/snjs'
+import { DockIconType } from './DockIconType'
+import { FeatureName } from './FeatureName'
+import { Flag } from './Flag'
 
 export type Feature = {
   name: FeatureName;
