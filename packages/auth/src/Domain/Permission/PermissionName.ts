@@ -1,4 +1,4 @@
-export enum FeatureName {
+export enum PermissionName {
   MidnightTheme = 'theme:midnight',
   FuturaTheme = 'theme:futura',
   SolarizedDarkTheme = 'theme:solarized-dark',

@@ -1,10 +1,10 @@
 import { ComponentArea, ContentType } from '@standardnotes/snjs'
+import { PermissionName } from '../Permission/PermissionName';
 import { DockIconType } from './DockIconType'
-import { FeatureName } from './FeatureName'
 import { Flag } from './Flag'
 
 export type Feature = {
-  name: FeatureName;
+  name: PermissionName;
   identifier: string;
   contentType: ContentType;
   area: ComponentArea;
