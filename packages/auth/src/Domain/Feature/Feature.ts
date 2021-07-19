@@ -1,6 +1,6 @@
-import { PermissionName } from '../Permission/PermissionName';
-import { ComponentArea } from './ComponentArea';
-import { ContentType } from './ContentType';
+import { PermissionName } from '../Permission/PermissionName'
+import { ComponentArea } from './ComponentArea'
+import { ContentType } from './ContentType'
 import { DockIconType } from './DockIconType'
 import { Flag } from './Flag'
 
