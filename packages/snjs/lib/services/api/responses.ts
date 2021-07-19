@@ -45,8 +45,8 @@ export type HttpResponse = {
 
 export type ResponseMeta = {
   auth: {
-    role: Role;
-    permissions: Permission[];
+    roles?: Role[];
+    permissions?: Permission[];
   };
 };
 
