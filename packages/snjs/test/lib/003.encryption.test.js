@@ -5,7 +5,7 @@ import {
   KeyParamsOrigination,
   SNProtocolOperator003
 } from '@Lib/index';
-import { createApplication } from '../setup/snjs/appFactory';
+import { createApplication } from '../factory';
 import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('Test 003 encryption', () => {
@@ -19,7 +19,7 @@ describe('Test 003 encryption', () => {
   const protocol003 = new SNProtocolOperator003(new SNCrypto());
 
   beforeEach(async () => {
-    testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+    testSNApp = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
     rootKey = await protocol003.createRootKey(
       identifier,
       password,

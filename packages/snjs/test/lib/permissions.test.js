@@ -5,14 +5,14 @@ import {
   DeinitSource,
   StorageKey
 } from '@Lib/index';
-import { createApplication } from '../setup/snjs/appFactory';
+import { createApplication } from '../factory';
 
 describe('permissions', () => {
   let testSNApp;
   let roles, permissions;
 
   beforeEach(async () => {
-    testSNApp = await createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+    testSNApp = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
     roles = [{
       uuid: Uuid.GenerateUuidSynchronously(),
       name: "USER",
