@@ -150,15 +150,34 @@ describe('application instances', () => {
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
       await testSNApp.signOut(true);
 
+      expect(confirmAlert).toBeCalledTimes(0);
+      expect(deinit).toBeCalledTimes(1);
+      expect(deinit).toBeCalledWith(DeinitSource.SignOut);
+    });
+
+    it('cancels sign out if confirmation dialog is rejected', async () => {
+      confirmAlert.mockImplementation((message) => false);
+
+      await testSNApp.itemManager.setItemDirty(testNote1.uuid);
+      await testSNApp.signOut();
+
+      const expectedConfirmMessage = signOutConfirmMessage(1);
+
+      expect(confirmAlert).toBeCalledTimes(1);
+      expect(confirmAlert).toBeCalledWith(expectedConfirmMessage);
+      expect(deinit).toBeCalledTimes(0);
+    });
+  });
+
   it('two distinct applications should not share model manager state', async () => {
     const app1 = await Factory.createAndInitializeApplication('app1');
     const app2 = await Factory.createAndInitializeApplication('app2');
-    expect(app1.payloadManager).to.equal(app1.payloadManager);
-    expect(app1.payloadManager).to.not.equal(app2.payloadManager);
+    expect(app1.payloadManager).toEqual(app1.payloadManager);
+    expect(app1.payloadManager).not.toEqual(app2.payloadManager);
 
     await Factory.createMappedNote(app1);
-    expect(app1.itemManager.items.length).length.to.equal(BASE_ITEM_COUNT + 1);
-    expect(app2.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
+    expect(app1.itemManager.items.length).toEqual(BASE_ITEM_COUNT + 1);
+    expect(app2.itemManager.items.length).toEqual(BASE_ITEM_COUNT);
     app1.deinit();
     app2.deinit();
   });
@@ -172,20 +191,20 @@ describe('application instances', () => {
 
     expect(
       (await app1.storageService.getAllRawPayloads()).length
-    ).length.to.equal(BASE_ITEM_COUNT + 1);
+    ).toEqual(BASE_ITEM_COUNT + 1);
     expect(
       (await app2.storageService.getAllRawPayloads()).length
-    ).length.to.equal(BASE_ITEM_COUNT);
+    ).toEqual(BASE_ITEM_COUNT);
 
     await Factory.createMappedNote(app2);
     await app2.syncService.sync(syncOptions);
 
     expect(
       (await app1.storageService.getAllRawPayloads()).length
-    ).length.to.equal(BASE_ITEM_COUNT + 1);
+    ).toEqual(BASE_ITEM_COUNT + 1);
     expect(
       (await app2.storageService.getAllRawPayloads()).length
-    ).length.to.equal(BASE_ITEM_COUNT + 1);
+    ).toEqual(BASE_ITEM_COUNT + 1);
     app1.deinit();
     app2.deinit();
   });
@@ -202,9 +221,9 @@ describe('application instances', () => {
   it('signing out application should delete snjs_version', async () => {
     const identifier = 'app';
     const app = await Factory.createAndInitializeApplication(identifier);
-    expect(localStorage.getItem(`${identifier}-snjs_version`)).to.be.ok;
+    expect(localStorage.getItem(`${identifier}-snjs_version`)).toBeTruthy;
     await app.signOut();
-    expect(localStorage.getItem(`${identifier}-snjs_version`)).to.not.be.ok;
+    expect(localStorage.getItem(`${identifier}-snjs_version`)).toBeFalsy;
   });
 
   it('locking application while critical func in progress should wait up to a limit', async () => {
