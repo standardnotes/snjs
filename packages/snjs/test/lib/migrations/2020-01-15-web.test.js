@@ -137,7 +137,7 @@ describe('2020-01-15 web migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).toEqual(JSON.parse(embeddedStorage.auth_params));
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     expect(rootKey.masterKey).toBe(accountKey.masterKey);
     expect(rootKey.dataAuthenticationKey).toBe(accountKey.dataAuthenticationKey);
     /** Application should not retain server password from legacy versions */
@@ -160,7 +160,7 @@ describe('2020-01-15 web migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
+    application.deinit();
   });
 
   it('2020-01-15 migration with passcode only', async function () {
@@ -259,7 +259,7 @@ describe('2020-01-15 web migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).toEqual(embeddedStorage.auth_params);
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     expect(rootKey.masterKey).toBe(passcodeKey.masterKey);
     expect(rootKey.dataAuthenticationKey).toBe(passcodeKey.dataAuthenticationKey);
     /** Root key is in memory with passcode only, so server password can be defined */
@@ -278,7 +278,7 @@ describe('2020-01-15 web migration', () => {
       const value = await application.storageService.getValue(key);
       expect(arbitraryValues[key]).toBe(value);
     }
-    await application.deinit();
+    application.deinit();
   });
 
   /**
@@ -373,7 +373,7 @@ describe('2020-01-15 web migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).toEqual(accountKey.keyParams.getPortableValue());
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     expect(rootKey).toBeTruthy();
 
     expect(await application.deviceInterface.getRawStorageValue('migrations')).toBeFalsy();
@@ -411,7 +411,7 @@ describe('2020-01-15 web migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
+    application.deinit();
   });
 
   it('2020-01-15 migration with no account and no passcode', async function () {
@@ -463,7 +463,7 @@ describe('2020-01-15 web migration', () => {
     );
     const valueStore = application.storageService.values[storageMode];
     expect(valueStore.content_type).toBeFalsy();
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     expect(rootKey).toBeFalsy();
     expect(application.protocolService.keyMode).toBe(KeyMode.RootKeyNone);
 
@@ -481,7 +481,7 @@ describe('2020-01-15 web migration', () => {
       expect(storage[key]).toBe(value);
     }
 
-    await application.deinit();
+    application.deinit();
   });
 
   /**
@@ -570,7 +570,7 @@ describe('2020-01-15 web migration', () => {
       StorageValueModes.Nonwrapped
     );
     expect(migratedKeyParams).toEqual(accountKey.keyParams.getPortableValue());
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     expect(rootKey).toBeTruthy();
 
     expect(await application.deviceInterface.getRawStorageValue('migrations')).toBeFalsy();
@@ -610,7 +610,7 @@ describe('2020-01-15 web migration', () => {
         expect(storage[key]).toBe(value);
       }
     }
-    await application.deinit();
+    application.deinit();
   });
 
   it('2020-01-15 migration from 002 app with account and passcode but missing offlineParams.version', async function () {

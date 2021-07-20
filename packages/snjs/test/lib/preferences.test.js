@@ -13,7 +13,7 @@ describe('preferences', function () {
   });
 
   afterEach(async function () {
-    await application.deinit();
+    application.deinit();
   });
 
   function register() {

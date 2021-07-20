@@ -16,7 +16,7 @@ describe('002 protocol operations', () => {
 
   // runs once before all tests in this block
   beforeAll(async () => {
-    application = await Factory.createApplication();
+    application = Factory.createApplication();
     await Factory.initializeApplication(application);
     _key = await protocol002.createRootKey(
       _identifier,

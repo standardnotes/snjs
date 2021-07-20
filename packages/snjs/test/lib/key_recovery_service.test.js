@@ -220,8 +220,8 @@ describe('key recovery service', function () {
       }
 
       /** appA's root key should now match appB's. */
-      const aKey = await appA.protocolService.getRootKey();
-      const bKey = await appB.protocolService.getRootKey();
+      const aKey = appA.protocolService.getRootKey();
+      const bKey = appB.protocolService.getRootKey();
       expect(aKey.compare(bKey)).toBe(true);
 
       /** Expect appB note to be decrypted */
@@ -239,7 +239,7 @@ describe('key recovery service', function () {
   it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
-    const appA = await Factory.createApplication(namespace);
+    const appA = Factory.createApplication(namespace);
     const receiveChallenge = async (challenge) => {
       const prompt = challenge.prompts[0];
       /** Give newPassword when prompted */
@@ -259,7 +259,7 @@ describe('key recovery service', function () {
     expect(appA.getItems(ContentType.ItemsKey).length).toBe(1);
 
     /** Create simultaneous appB signed into same account */
-    const appB = await Factory.createApplication('another-namespace');
+    const appB = Factory.createApplication('another-namespace');
     await appB.prepareForLaunch({ receiveChallenge: () => {} });
     await appB.launch(true);
     await Factory.loginToApplication({
@@ -282,7 +282,7 @@ describe('key recovery service', function () {
     appA.deinit();
     appB.deinit();
 
-    const recreatedAppA = await Factory.createApplication(namespace);
+    const recreatedAppA = Factory.createApplication(namespace);
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} });
     await recreatedAppA.launch(true);
 
@@ -322,7 +322,7 @@ describe('key recovery service', function () {
       password: context.password,
     });
 
-    const correctRootKey = await application.protocolService.getRootKey();
+    const correctRootKey = application.protocolService.getRootKey();
 
     /**
      * 1. Change our root key locally so that its keys params doesn't match the server's
@@ -358,7 +358,7 @@ describe('key recovery service', function () {
      * but will also prompt for detached recovery of this key, so we must await both */
     await Factory.sleep(5.0);
 
-    const clientRootKey = await application.protocolService.getRootKey();
+    const clientRootKey = application.protocolService.getRootKey();
     expect(clientRootKey.compare(correctRootKey)).toBe(true);
 
     expect(application.syncService.isOutOfSync()).toBe(false);
@@ -384,7 +384,7 @@ describe('key recovery service', function () {
     });
 
     /** Create and emit errored encrypted items key payload */
-    const itemsKey = await application.protocolService.getDefaultItemsKey();
+    const itemsKey = application.protocolService.getDefaultItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       itemsKey.payload,
       EncryptionIntent.Sync
@@ -439,7 +439,7 @@ describe('key recovery service', function () {
     });
 
     /** Create and emit errored encrypted items key payload */
-    const itemsKey = await application.protocolService.getDefaultItemsKey();
+    const itemsKey = application.protocolService.getDefaultItemsKey();
     const encrypted = await application.protocolService.payloadByEncryptingPayload(
       itemsKey.payload,
       EncryptionIntent.Sync
@@ -460,7 +460,7 @@ describe('key recovery service', function () {
     context.deinit();
 
     /** Recreate application, and expect key recovery wizard to complete */
-    const recreatedApp = await Factory.createApplication(namespace);
+    const recreatedApp = Factory.createApplication(namespace);
     let didReceivePasswordPrompt = false;
     const receiveChallenge = async (challenge) => {
       didReceivePasswordPrompt = true;

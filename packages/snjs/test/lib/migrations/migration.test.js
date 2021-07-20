@@ -9,7 +9,7 @@ describe('migrations', () => {
     const application = await Factory.createInitAppWithRandNamespace();
     const version = await application.migrationService.getStoredSnjsVersion();
     expect(typeof version).toEqual('string');
-    await application.deinit();
+    application.deinit();
   });
 
   it('should return correct required migrations if stored version is 1.0.0', async function () {

@@ -47,7 +47,7 @@ describe.skip('online syncing', function () {
     expect(items.length).toBe(expectedItemCount);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    await application.deinit();
+    application.deinit();
   });
 
   function noteObjectsFromObjects(items) {

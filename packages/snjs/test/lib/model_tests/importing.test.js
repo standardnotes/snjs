@@ -23,7 +23,7 @@ describe.skip('importing', function () {
   });
 
   afterEach(async function () {
-    await application.deinit();
+    application.deinit();
     localStorage.clear();
   });
 
@@ -408,7 +408,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -436,7 +436,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -469,7 +469,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -554,7 +554,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -588,7 +588,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -626,7 +626,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -665,7 +665,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -700,7 +700,7 @@ describe.skip('importing', function () {
     );
     delete backupData.keyParams;
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
 
     const result = await application.importData(backupData);
@@ -731,7 +731,7 @@ describe.skip('importing', function () {
       (payload) => payload.content_type !== ContentType.ItemsKey
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application);
 
@@ -753,7 +753,7 @@ describe.skip('importing', function () {
      * This test is only meant to test successful local importing.
      */
     const identifier = 'standardnotes';
-    const application = await Factory.createApplication(identifier);
+    const application = Factory.createApplication(identifier);
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'keychain',
@@ -896,7 +896,7 @@ describe.skip('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.deinit();
+    application.deinit();
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 

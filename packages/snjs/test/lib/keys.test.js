@@ -719,7 +719,7 @@ describe('keys', function () {
     await application.deviceInterface.clearRawKeychainValue();
     application.deinit();
 
-    const recreatedApp = await Factory.createApplication(id);
+    const recreatedApp = Factory.createApplication(id);
     let totalChallenges = 0;
     const expectedChallenges = 1;
     const receiveChallenge = async (challenge) => {
@@ -861,7 +861,7 @@ describe('keys', function () {
       );
       application.deinit();
 
-      const refreshedApp = await Factory.createApplication(identifier);
+      const refreshedApp = Factory.createApplication(identifier);
       await Factory.initializeApplication(refreshedApp);
 
       /** Expect a new items key to be created based on the new root key */

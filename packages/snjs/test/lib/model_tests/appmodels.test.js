@@ -24,7 +24,7 @@ describe('app models', () => {
   });
 
   afterEach(async function () {
-    await application.deinit();
+    application.deinit();
   });
 
   it('payloadManager should be defined', () => {

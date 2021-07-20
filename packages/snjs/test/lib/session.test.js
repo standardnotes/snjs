@@ -445,14 +445,14 @@ describe('server session', function () {
     );
 
     const expectedNotesUuids = notesBeforeSync.map((n) => n.uuid);
-    const notesResults = await application.itemManager.findItems(
+    const notesResults = application.itemManager.findItems(
       expectedNotesUuids
     );
 
     expect(notesResults.length).toBe(notesBeforeSync.length);
 
     for (const aNoteBeforeSync of notesBeforeSync) {
-      const noteResult = await application.itemManager.findItem(
+      const noteResult = application.itemManager.findItem(
         aNoteBeforeSync.uuid
       );
       expect(aNoteBeforeSync.isItemContentEqualWith(noteResult)).toBe(true);
@@ -466,7 +466,7 @@ describe('server session', function () {
       password: password,
     });
 
-    const appA = await Factory.createApplication(Factory.randomString());
+    const appA = Factory.createApplication(Factory.randomString());
     await appA.prepareForLaunch({});
     await appA.launch(true);
 
@@ -480,7 +480,7 @@ describe('server session', function () {
     });
 
     /** Create simultaneous appB signed into same account */
-    const appB = await Factory.createApplication('another-namespace');
+    const appB = Factory.createApplication('another-namespace');
     await appB.prepareForLaunch({});
     await appB.launch(true);
     await Factory.loginToApplication({
@@ -531,7 +531,7 @@ describe('server session', function () {
       password: password,
     });
 
-    const oldRootKey = await appA.protocolService.getRootKey();
+    const oldRootKey = appA.protocolService.getRootKey();
 
     /** Set the session as nonsense */
     appA.apiService.session.accessToken = 'foo';
@@ -548,7 +548,7 @@ describe('server session', function () {
     expect(appA.apiService.session.refreshToken).not.toBe('bar');
 
     /** Expect that the session recovery replaces the global root key */
-    const newRootKey = await appA.protocolService.getRootKey();
+    const newRootKey = appA.protocolService.getRootKey();
     expect(oldRootKey).not.toBe(newRootKey);
 
     appA.deinit();

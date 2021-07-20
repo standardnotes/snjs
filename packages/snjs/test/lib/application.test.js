@@ -25,8 +25,8 @@ describe('application instances', () => {
     await Factory.createMappedNote(app1);
     expect(app1.itemManager.items.length).toBe(BASE_ITEM_COUNT + 1);
     expect(app2.itemManager.items.length).toBe(BASE_ITEM_COUNT);
-    await app1.deinit();
-    await app2.deinit();
+    app1.deinit();
+    app2.deinit();
   });
 
   it('two distinct applications should not share storage manager state', async () => {
@@ -52,8 +52,8 @@ describe('application instances', () => {
     expect(
       (await app2.storageService.getAllRawPayloads()).length
     ).toBe(BASE_ITEM_COUNT + 1);
-    await app1.deinit();
-    await app2.deinit();
+    app1.deinit();
+    app2.deinit();
   });
 
   it('deinit application while storage persisting should be handled gracefully', async () => {
@@ -159,8 +159,8 @@ describe('application instances', () => {
     await Factory.createMappedNote(app1);
     expect(app1.itemManager.items.length).length.to.equal(BASE_ITEM_COUNT + 1);
     expect(app2.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
-    await app1.deinit();
-    await app2.deinit();
+    app1.deinit();
+    app2.deinit();
   });
 
   it('two distinct applications should not share storage manager state', async () => {
@@ -186,8 +186,8 @@ describe('application instances', () => {
     expect(
       (await app2.storageService.getAllRawPayloads()).length
     ).length.to.equal(BASE_ITEM_COUNT + 1);
-    await app1.deinit();
-    await app2.deinit();
+    app1.deinit();
+    app2.deinit();
   });
 
   it('deinit application while storage persisting should be handled gracefully', async () => {

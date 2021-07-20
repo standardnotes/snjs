@@ -23,7 +23,7 @@ describe.skip('notes + tags syncing', function () {
   });
 
   afterEach(async function () {
-    await application.deinit();
+    application.deinit();
   });
 
   it('syncing an item then downloading it should include items_key_id', async function () {

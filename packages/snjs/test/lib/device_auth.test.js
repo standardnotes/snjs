@@ -135,7 +135,7 @@ describe('device authentication', function () {
     const wrongPasscode = 'barfoo';
     let numPasscodeAttempts = 1;
     /** Recreate application and initialize */
-    const tmpApplication = await Factory.createApplication(namespace);
+    const tmpApplication = Factory.createApplication(namespace);
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {

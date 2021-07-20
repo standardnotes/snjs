@@ -25,7 +25,7 @@ describe('history manager', () => {
     });
 
     afterEach(async function () {
-      await application.deinit();
+      application.deinit();
     });
 
     async function setTextAndSync(application, item, text) {

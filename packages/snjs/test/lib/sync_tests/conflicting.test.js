@@ -38,7 +38,7 @@ describe.skip('online conflict handling', function () {
   });
 
   afterEach(async function () {
-    await application.deinit();
+    application.deinit();
   });
 
   function createDirtyPayload(contentType) {

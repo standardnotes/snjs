@@ -14,7 +14,7 @@ describe('model manager mapping', () => {
   });
 
   afterEach(async function () {
-    await application.deinit();
+    application.deinit();
   });
 
   it('mapping nonexistent item creates it', async function () {

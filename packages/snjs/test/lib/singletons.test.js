@@ -89,7 +89,7 @@ describe('singletons', function () {
     expect(application.itemManager.items.length).toBe(expectedItemCount);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    await application.deinit();
+    application.deinit();
   });
 
   it(`only resolves to ${BASE_ITEM_COUNT} items`, async function () {

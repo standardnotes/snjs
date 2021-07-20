@@ -95,7 +95,7 @@ describe('application group', function () {
     });
     const application = group.primaryApplication;
     const identifier = application.identifier;
-    await application.deinit(DeinitSource.SignOut);
+    application.deinit(DeinitSource.SignOut);
 
     /**
      * On Safari 14.0.1 the new app instance will only be created on the
