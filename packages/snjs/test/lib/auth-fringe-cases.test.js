@@ -1,16 +1,8 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { Uuid } from '@Lib/uuid';
+import * as Factory from './../factory';
 
 describe('auth fringe cases', () => {
   const BASE_ITEM_COUNT = ['default items key', 'user prefs'].length;
-
-  const syncOptions = {
-    checkIntegrity: true,
-    awaitAll: true,
-  };
 
   const createContext = async () => {
     const application = await Factory.createInitAppWithRandNamespace();
@@ -25,19 +17,11 @@ describe('auth fringe cases', () => {
     };
   };
 
-  beforeEach(async function () {
-    localStorage.clear();
-  });
-
-  afterEach(async function () {
-    localStorage.clear();
-  });
-
-  const clearApplicationLocalStorage = function () {
-    const keys = Object.keys(localStorage);
-    for (const key of keys) {
+  const clearApplicationLocalStorage = async function (application) {
+    const localStorageItems = await application.deviceInterface.getAllRawStorageKeyValues();
+    for (const { key } of localStorageItems) {
       if (!key.toLowerCase().includes('item')) {
-        localStorage.removeItem(key);
+        application.deviceInterface.removeRawStorageValue(key);
       }
     }
   };
@@ -45,11 +29,13 @@ describe('auth fringe cases', () => {
   const awaitSync = true;
 
   describe('localStorage improperly cleared with 1 item', function () {
+    jest.setTimeout(10000);
+
     it('item should be errored', async function () {
       const context = await createContext();
       await context.application.register(context.email, context.password);
       const note = await Factory.createSyncedNote(context.application);
-      clearApplicationLocalStorage();
+      await clearApplicationLocalStorage(context.application);
       console.warn(
         "Expecting errors 'Unable to find operator for version undefined'"
       );
@@ -59,7 +45,7 @@ describe('auth fringe cases', () => {
       const refreshedNote = restartedApplication.itemManager.findItem(
         note.uuid
       );
-      expect(refreshedNote.errorDecrypting).to.equal(true);
+      expect(refreshedNote.errorDecrypting).toBe(true);
       restartedApplication.deinit();
     });
 
@@ -67,7 +53,7 @@ describe('auth fringe cases', () => {
       const context = await createContext();
       await context.application.register(context.email, context.password);
       const note = await Factory.createSyncedNote(context.application);
-      clearApplicationLocalStorage();
+      await clearApplicationLocalStorage(context.application);
       const restartedApplication = await Factory.restartApplication(
         context.application
       );
@@ -86,13 +72,15 @@ describe('auth fringe cases', () => {
       const refreshedNote = restartedApplication.itemManager.findItem(
         note.uuid
       );
-      expect(refreshedNote.errorDecrypting).to.equal(false);
-      expect(restartedApplication.itemManager.notes.length).to.equal(1);
+      expect(refreshedNote.errorDecrypting).toBe(false);
+      expect(restartedApplication.itemManager.notes.length).toBe(1);
       restartedApplication.deinit();
-    }).timeout(10000);
+    });
   });
 
   describe('having offline item matching remote item uuid', function () {
+    jest.setTimeout(10000);
+
     it('offline item should not overwrite recently updated server item and conflict should be created', async function () {
       const context = await createContext();
       await context.application.register(context.email, context.password);
@@ -127,20 +115,20 @@ describe('auth fringe cases', () => {
         true
       );
 
-      expect(newApplication.itemManager.notes.length).to.equal(2);
+      expect(newApplication.itemManager.notes.length).toBe(2);
 
       expect(
         newApplication.itemManager.notes.find(
           (n) => n.uuid === firstVersionOfNote.uuid
         ).text
-      ).to.equal(staleText);
+      ).toBe(staleText);
 
       const conflictedCopy = newApplication.itemManager.notes.find(
         (n) => n.uuid !== firstVersionOfNote.uuid
       );
-      expect(conflictedCopy.text).to.equal(serverText);
-      expect(conflictedCopy.duplicate_of).to.equal(firstVersionOfNote.uuid);
+      expect(conflictedCopy.text).toBe(serverText);
+      expect(conflictedCopy.duplicate_of).toBe(firstVersionOfNote.uuid);
       newApplication.deinit();
-    }).timeout(10000);
+    });
   });
 });
