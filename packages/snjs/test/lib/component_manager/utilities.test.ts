@@ -5,7 +5,9 @@ import {
   ContentType,
   ComponentArea,
   ComponentAction,
-  PayloadSource
+  PayloadSource,
+  SNApplication,
+  SNComponent
 } from '@Lib/index';
 import {
   createComponentItem,
@@ -19,7 +21,7 @@ import {
   SHORT_DELAY_TIME,
   sleep
 } from '../../helpers';
-import { createAndInitializeApplication } from './../../factory';
+import { createAndInitializeApplication } from '../../factory';
 
 // To prevent conflicts with Mocha
 import {
@@ -34,11 +36,11 @@ import { environmentToString, platformToString } from '../../../lib/platforms';
 
 describe('Component Manager', () => {
   /** The global Standard Notes application. */
-  let testSNApp;
+  let testSNApp: SNApplication;
   /** The global test component. */
-  let testComponent;
+  let testComponent: SNComponent;
   /** The global test theme. */
-  let testTheme;
+  let testTheme: SNComponent;
 
   beforeEach(async () => {
     testSNApp = await createAndInitializeApplication('test-application', Environment.Web, Platform.LinuxWeb);
@@ -851,7 +853,7 @@ describe('Component Manager', () => {
         requiredPermissions1,
         expect.any(Function)
       );
- 
+
       const requiredPermissions2 = [
         {
           name: ComponentAction.CreateItems,

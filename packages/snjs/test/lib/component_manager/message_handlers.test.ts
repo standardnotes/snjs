@@ -3,7 +3,9 @@ import {
   Environment,
   DeinitSource,
   ContentType,
-  ComponentAction
+  ComponentAction,
+  SNApplication,
+  SNComponent
 } from '@Lib/index';
 import {
   createComponentItem,
@@ -29,9 +31,9 @@ import {
 
 describe('Component Manager', () => {
   /** The global Standard Notes application. */
-  let testSNApp;
+  let testSNApp: SNApplication;
   /** The global test component. */
-  let testComponent;
+  let testComponent: SNComponent;
 
   beforeEach(async () => {
     testSNApp = await createAndInitializeApplication('test-application', Environment.Web, Platform.LinuxWeb);

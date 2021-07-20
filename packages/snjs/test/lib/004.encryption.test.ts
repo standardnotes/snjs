@@ -1,7 +1,6 @@
 import {
   Platform,
   Environment,
-  DeinitSource,
   KeyParamsOrigination,
   SNProtocolOperator004,
   ProtocolVersion
@@ -10,33 +9,21 @@ import { createApplication } from '../factory';
 import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('Test 004 encryption', () => {
-  /** The global Standard Notes application. */
-  let testSNApp;
-
   const identifier = 'hello-test@sn.org';
   const password = 'this-is-a-password-1234';
-  let rootKey;
-
   const protocol004 = new SNProtocolOperator004(new SNCrypto());
 
-  beforeEach(async () => {
-    testSNApp = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
-    rootKey = await protocol004.createRootKey(
+  it('should properly encrypt and decrypt a piece of text', async () => {
+    const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+    const rootKey = await protocol004.createRootKey(
       identifier,
       password,
       KeyParamsOrigination.Registration
     );
-  });
-
-  afterEach(() => {
-    testSNApp.deinit(DeinitSource.SignOut);
-  });
-
-  it('should properly encrypt and decrypt a piece of text', async () => {
     const simpleText = 'This is a simple text. It should be encrypted and decrypted successfully.';
     const rawKey = rootKey.masterKey;
-    const nonce = await testSNApp.protocolService.crypto.generateRandomKey(192);
-    const operator = testSNApp.protocolService.operatorForVersion(ProtocolVersion.V004);
+    const nonce = await application.protocolService.crypto.generateRandomKey(192);
+    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004);
     const authenticatedData = { foo: 'bar' };
 
     const encString = await operator.encryptString004(

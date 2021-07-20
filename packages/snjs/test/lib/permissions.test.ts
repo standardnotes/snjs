@@ -2,17 +2,15 @@ import {
   Platform,
   Environment,
   Uuid,
-  DeinitSource,
   StorageKey
 } from '@Lib/index';
+import { Permission, Role } from '@standardnotes/auth';
 import { createApplication } from '../factory';
 
 describe('permissions', () => {
-  let testSNApp;
-  let roles, permissions;
+  let roles: Role[], permissions: Permission[];
 
   beforeEach(async () => {
-    testSNApp = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
     roles = [{
       uuid: Uuid.GenerateUuidSynchronously(),
       name: "USER",
@@ -23,19 +21,16 @@ describe('permissions', () => {
     }];
   });
 
-  afterEach(() => {
-    testSNApp.deinit(DeinitSource.SignOut);
-  });
-
   describe('update()', () => {
     it('updates roles and permissions and saves them in local storage', async () => {
-      await testSNApp.permissionsService.update(roles, permissions);
+      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+      await application.permissionsService.update(roles, permissions);
 
-      const storedRoles = testSNApp.storageService.getValue(StorageKey.UserRoles);
+      const storedRoles = application.storageService.getValue(StorageKey.UserRoles);
       expect(storedRoles).toHaveLength(1);
       expect(storedRoles.some(r => r.name === roles[0].name)).toBe(true);
 
-      const storedPermissions = testSNApp.storageService.getValue(StorageKey.UserPermissions);
+      const storedPermissions = application.storageService.getValue(StorageKey.UserPermissions);
       expect(storedPermissions).toHaveLength(1)
       expect(storedPermissions.some(p => p.name === permissions[0].name)).toBe(true);
     });
@@ -43,23 +38,26 @@ describe('permissions', () => {
 
   describe('hasPermission()', () => {
     it('returns true if user has permission', async () => {
-      await testSNApp.permissionsService.update(roles, permissions);
-      expect(testSNApp.hasPermission(permissions[0].name)).toBe(true);
+      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+      await application.permissionsService.update(roles, permissions);
+      expect(application.hasPermission(permissions[0].name)).toBe(true);
     });
 
     it('returns false if user does not have permission', async () => {
+      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
       const MISSING_PERMISSION_NAME = "EXTENDED_NOTE_HISTORY";
-      await testSNApp.permissionsService.update(roles, permissions);
-      expect(testSNApp.hasPermission(MISSING_PERMISSION_NAME)).toBe(false);
+      await application.permissionsService.update(roles, permissions);
+      expect(application.hasPermission(MISSING_PERMISSION_NAME)).toBe(false);
     });
   });
 
   describe('setWebSocketUrl()', () => {
     it('saves url in local storage', () => {
+      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
       const webSocketUrl = 'ws://test-websocket';
-      testSNApp.permissionsService.setWebSocketUrl(webSocketUrl);
+      application.permissionsService.setWebSocketUrl(webSocketUrl);
       
-      const storedUrl = testSNApp.storageService.getValue(StorageKey.WebSocketUrl);
+      const storedUrl = application.storageService.getValue(StorageKey.WebSocketUrl);
       expect(storedUrl).toBe(webSocketUrl);
     }); 
   });

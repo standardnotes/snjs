@@ -1,9 +1,7 @@
 import {
-  Platform,
-  Environment,
   DeinitSource,
 } from '@Lib/index';
-import * as Factory from './../factory';
+import * as Factory from '../factory';
 import {
   createNoteItem,
 } from '../helpers';
