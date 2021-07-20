@@ -1,38 +1,41 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { ItemCollection, CollectionSort, NotesDisplayCriteria, notesMatchingCriteria } from '@Lib/index';
+import { ContentType, CreateItemFromPayload } from '@Lib/models';
+import { PayloadManager, ItemManager } from '@Lib/services';
+import { Uuid } from '@Lib/uuid';
+import SNCrypto from '../setup/snjs/snCrypto';
+import * as Factory from '../factory';
 
 describe('note display criteria', function () {
-  before(async function () {
-    const crypto = new SNWebCrypto();
+  let payloadManager, itemManager;
+
+  const createNote = async (title = 'hello', text = 'world') => {
+    return itemManager.createItem(ContentType.Note, {
+      title: title,
+      text: text,
+    });
+  };
+
+  const createTag = async (notes = [], title = 'thoughts') => {
+    const references = notes.map((note) => {
+      return {
+        uuid: note.uuid,
+        content_type: note.content_type,
+      };
+    });
+    return itemManager.createItem(ContentType.Tag, {
+      title: title,
+      references: references,
+    });
+  };
+
+  beforeAll(async function () {
+    const crypto = new SNCrypto();
     Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
   });
 
   beforeEach(function () {
-    this.payloadManager = new PayloadManager();
-    this.itemManager = new ItemManager(this.payloadManager);
-
-    this.createNote = async (title = 'hello', text = 'world') => {
-      return this.itemManager.createItem(ContentType.Note, {
-        title: title,
-        text: text,
-      });
-    };
-
-    this.createTag = async (notes = [], title = 'thoughts') => {
-      const references = notes.map((note) => {
-        return {
-          uuid: note.uuid,
-          content_type: note.content_type,
-        };
-      });
-      return this.itemManager.createItem(ContentType.Tag, {
-        title: title,
-        references: references,
-      });
-    };
+    payloadManager = new PayloadManager();
+    itemManager = new ItemManager(payloadManager);
   });
 
   const emptyCollection = function () {
@@ -60,8 +63,8 @@ describe('note display criteria', function () {
   it('display criteria copying', async function () {
     const criteria = NotesDisplayCriteria.Create({ includeArchived: true });
     const copy = NotesDisplayCriteria.Copy(criteria, { includeTrashed: true });
-    expect(copy.includeArchived).to.equal(true);
-    expect(copy.includeTrashed).to.equal(true);
+    expect(copy.includeArchived).toBe(true);
+    expect(copy.includeTrashed).toBe(true);
   });
 
   it('string query title', async function () {
@@ -70,7 +73,7 @@ describe('note display criteria', function () {
       searchQuery: { query: query },
     });
     const collection = collectionWithNotes(['hello', 'fobar', 'foobar', 'foo']);
-    expect(notesMatchingCriteria(criteria, collection).length).to.equal(2);
+    expect(notesMatchingCriteria(criteria, collection).length).toBe(2);
   });
 
   it('string query text', async function () {
@@ -82,7 +85,7 @@ describe('note display criteria', function () {
       [undefined, undefined, undefined, undefined],
       ['hello', 'fobar', 'foobar', 'foo']
     );
-    expect(notesMatchingCriteria(criteria, collection).length).to.equal(2);
+    expect(notesMatchingCriteria(criteria, collection).length).toBe(2);
   });
 
   it('string query title and text', async function () {
@@ -94,175 +97,175 @@ describe('note display criteria', function () {
       ['hello', 'foobar'],
       ['foo', 'fobar']
     );
-    expect(notesMatchingCriteria(criteria, collection).length).to.equal(2);
+    expect(notesMatchingCriteria(criteria, collection).length).toBe(2);
   });
 
   it('includePinned off', async function () {
-    await this.createNote();
-    const pendingPin = await this.createNote();
-    await this.itemManager.changeItem(pendingPin.uuid, (mutator) => {
+    await createNote();
+    const pendingPin = await createNote();
+    await itemManager.changeItem(pendingPin.uuid, (mutator) => {
       mutator.pinned = true;
     });
     const criteria = NotesDisplayCriteria.Create({ includePinned: false });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(1);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(1);
   });
 
   it('includePinned on', async function () {
-    await this.createNote();
-    const pendingPin = await this.createNote();
-    await this.itemManager.changeItem(pendingPin.uuid, (mutator) => {
+    await createNote();
+    const pendingPin = await createNote();
+    await itemManager.changeItem(pendingPin.uuid, (mutator) => {
       mutator.pinned = true;
     });
     const criteria = NotesDisplayCriteria.Create({ includePinned: true });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(2);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(2);
   });
 
   it('includeTrashed off', async function () {
-    await this.createNote();
-    const pendingTrash = await this.createNote();
-    await this.itemManager.changeItem(pendingTrash.uuid, (mutator) => {
+    await createNote();
+    const pendingTrash = await createNote();
+    await itemManager.changeItem(pendingTrash.uuid, (mutator) => {
       mutator.trashed = true;
     });
     const criteria = NotesDisplayCriteria.Create({ includeTrashed: false });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(1);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(1);
   });
 
   it('includeTrashed on', async function () {
-    await this.createNote();
-    const pendingTrash = await this.createNote();
-    await this.itemManager.changeItem(pendingTrash.uuid, (mutator) => {
+    await createNote();
+    const pendingTrash = await createNote();
+    await itemManager.changeItem(pendingTrash.uuid, (mutator) => {
       mutator.trashed = true;
     });
     const criteria = NotesDisplayCriteria.Create({ includeTrashed: true });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(2);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(2);
   });
 
   it('includeArchived off', async function () {
-    await this.createNote();
-    const pendingArchive = await this.createNote();
-    await this.itemManager.changeItem(pendingArchive.uuid, (mutator) => {
+    await createNote();
+    const pendingArchive = await createNote();
+    await itemManager.changeItem(pendingArchive.uuid, (mutator) => {
       mutator.archived = true;
     });
     const criteria = NotesDisplayCriteria.Create({ includeArchived: false });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(1);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(1);
   });
 
   it('includeArchived on', async function () {
-    await this.createNote();
-    const pendingArchive = await this.createNote();
-    await this.itemManager.changeItem(pendingArchive.uuid, (mutator) => {
+    await createNote();
+    const pendingArchive = await createNote();
+    await itemManager.changeItem(pendingArchive.uuid, (mutator) => {
       mutator.archived = true;
     });
     const criteria = NotesDisplayCriteria.Create({
       includeArchived: true,
     });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(2);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(2);
   });
 
   it('protectedSearchEnabled false', async function () {
-    const normal = await this.createNote('hello', 'world');
-    await this.itemManager.changeItem(normal.uuid, (mutator) => {
+    const normal = await createNote('hello', 'world');
+    await itemManager.changeItem(normal.uuid, (mutator) => {
       mutator.protected = true;
     });
     const criteria = NotesDisplayCriteria.Create({
       searchQuery: { query: 'world', includeProtectedNoteText: false },
     });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(0);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(0);
   });
 
   it('protectedSearchEnabled true', async function () {
-    const normal = await this.createNote();
-    await this.itemManager.changeItem(normal.uuid, (mutator) => {
+    const normal = await createNote();
+    await itemManager.changeItem(normal.uuid, (mutator) => {
       mutator.protected = true;
     });
     const criteria = NotesDisplayCriteria.Create({
       searchQuery: { query: 'world', includeProtectedNoteText: true },
     });
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection).length
-    ).to.equal(1);
+      notesMatchingCriteria(criteria, itemManager.collection).length
+    ).toBe(1);
   });
 
   it('tags', async function () {
-    const note = await this.createNote();
-    const tag = await this.createTag([note]);
-    const looseTag = await this.createTag([], 'loose');
+    const note = await createNote();
+    const tag = await createTag([note]);
+    const looseTag = await createTag([], 'loose');
 
     const matchingCriteria = NotesDisplayCriteria.Create({
       tags: [tag],
     });
     expect(
-      notesMatchingCriteria(matchingCriteria, this.itemManager.collection)
+      notesMatchingCriteria(matchingCriteria, itemManager.collection)
         .length
-    ).to.equal(1);
+    ).toBe(1);
 
     const nonmatchingCriteria = NotesDisplayCriteria.Create({
       tags: [looseTag],
     });
     expect(
-      notesMatchingCriteria(nonmatchingCriteria, this.itemManager.collection)
+      notesMatchingCriteria(nonmatchingCriteria, itemManager.collection)
         .length
-    ).to.equal(0);
+    ).toBe(0);
   });
 
   describe('smart tags', function () {
     it('normal note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      await this.createNote();
+      await createNote();
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [allTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [trashTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [archivedTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
 
     it('trashed note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      const normal = await createNote();
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.trashed = true;
       });
 
@@ -271,37 +274,37 @@ describe('note display criteria', function () {
           NotesDisplayCriteria.Create({
             tags: [allTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [trashTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [archivedTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
 
     it('archived note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      const normal = await createNote();
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.trashed = false;
         mutator.archived = true;
       });
@@ -310,37 +313,37 @@ describe('note display criteria', function () {
           NotesDisplayCriteria.Create({
             tags: [allTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [trashTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [archivedTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
     });
 
     it('archived + trashed note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      const normal = await createNote();
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.trashed = true;
         mutator.archived = true;
       });
@@ -349,37 +352,37 @@ describe('note display criteria', function () {
           NotesDisplayCriteria.Create({
             tags: [allTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [trashTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [archivedTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
   });
 
   describe('includeTrash', function () {
     it('normal note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
 
-      await this.createNote();
+      await createNote();
 
       expect(
         notesMatchingCriteria(
@@ -387,9 +390,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -397,20 +400,20 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
 
     it('trashed note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
+      const normal = await createNote();
 
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.trashed = true;
       });
 
@@ -420,9 +423,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeTrashed: false,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -430,9 +433,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -440,9 +443,9 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -450,20 +453,20 @@ describe('note display criteria', function () {
             tags: [archivedTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
 
     it('archived + trashed note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
+      const normal = await createNote();
 
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.trashed = true;
         mutator.archived = true;
       });
@@ -473,9 +476,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -483,9 +486,9 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -493,19 +496,19 @@ describe('note display criteria', function () {
             tags: [archivedTag],
             includeTrashed: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
     });
   });
 
   describe('includeArchived', function () {
     it('normal note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
 
-      await this.createNote();
+      await createNote();
 
       expect(
         notesMatchingCriteria(
@@ -513,9 +516,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -523,19 +526,19 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
 
     it('archived note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      const normal = await createNote();
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.archived = true;
       });
 
@@ -545,9 +548,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeArchived: false,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -555,9 +558,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -565,9 +568,9 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -575,19 +578,19 @@ describe('note display criteria', function () {
             tags: [archivedTag],
             includeArchived: false,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
     });
 
     it('archived + trashed note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      const normal = await createNote();
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.trashed = true;
         mutator.archived = true;
       });
@@ -598,9 +601,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -608,9 +611,9 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -618,48 +621,48 @@ describe('note display criteria', function () {
             tags: [archivedTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
   });
 
   describe.skip('multiple tags', function () {
     it('normal note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      await this.createNote();
+      await createNote();
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [allTag, trashTag, archivedTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
           NotesDisplayCriteria.Create({
             tags: [trashTag],
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
 
     it('archived note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      const normal = await createNote();
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.archived = true;
       });
 
@@ -669,9 +672,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeArchived: false,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -679,9 +682,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -689,9 +692,9 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -699,19 +702,19 @@ describe('note display criteria', function () {
             tags: [archivedTag],
             includeArchived: false,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
     });
 
     it('archived + trashed note', async function () {
-      const systemTags = this.itemManager.systemSmartTags;
+      const systemTags = itemManager.systemSmartTags;
       const allTag = systemTags.find((t) => t.isAllTag);
       const trashTag = systemTags.find((t) => t.isTrashTag);
       const archivedTag = systemTags.find((t) => t.isArchiveTag);
 
-      const normal = await this.createNote();
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      const normal = await createNote();
+      await itemManager.changeItem(normal.uuid, (mutator) => {
         mutator.trashed = true;
         mutator.archived = true;
       });
@@ -722,9 +725,9 @@ describe('note display criteria', function () {
             tags: [allTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
 
       expect(
         notesMatchingCriteria(
@@ -732,9 +735,9 @@ describe('note display criteria', function () {
             tags: [trashTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(1);
+      ).toBe(1);
 
       expect(
         notesMatchingCriteria(
@@ -742,9 +745,9 @@ describe('note display criteria', function () {
             tags: [archivedTag],
             includeArchived: true,
           }),
-          this.itemManager.collection
+          itemManager.collection
         ).length
-      ).to.equal(0);
+      ).toBe(0);
     });
   });
 });
