@@ -1,8 +1,5 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from '../lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { PayloadSource } from '@Lib/index';
+import * as Factory from './../../factory';
 
 describe('items', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
@@ -12,55 +9,58 @@ describe('items', () => {
     awaitAll: true,
   };
 
+  let expectedItemCount;
+  let application;
+
   beforeEach(async function () {
-    this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    expectedItemCount = BASE_ITEM_COUNT;
+    application = await Factory.createInitAppWithRandNamespace();
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await application.deinit();
   });
 
   it('setting an item as dirty should update its client updated at', async function () {
     const params = Factory.createNotePayload();
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       [params],
       PayloadSource.LocalChanged
     );
-    const item = this.application.itemManager.items[0];
+    const item = application.itemManager.items[0];
     const prevDate = item.userModifiedDate.getTime();
     await Factory.sleep(0.1);
-    await this.application.itemManager.setItemDirty(item.uuid, true);
-    const refreshedItem = this.application.itemManager.findItem(item.uuid);
+    await application.itemManager.setItemDirty(item.uuid, true);
+    const refreshedItem = application.itemManager.findItem(item.uuid);
     const newDate = refreshedItem.userModifiedDate.getTime();
-    expect(prevDate).to.not.equal(newDate);
+    expect(prevDate).not.toBe(newDate);
   });
 
   it('setting an item as dirty with option to skip client updated at', async function () {
     const params = Factory.createNotePayload();
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       [params],
       PayloadSource.LocalChanged
     );
-    const item = this.application.itemManager.items[0];
+    const item = application.itemManager.items[0];
     const prevDate = item.userModifiedDate.getTime();
     await Factory.sleep(0.1);
-    await this.application.itemManager.setItemDirty(item.uuid);
+    await application.itemManager.setItemDirty(item.uuid);
     const newDate = item.userModifiedDate.getTime();
-    expect(prevDate).to.equal(newDate);
+    expect(prevDate).toBe(newDate);
   });
 
   it('properly pins, archives, and locks', async function () {
     const params = Factory.createNotePayload();
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       [params],
       PayloadSource.LocalChanged
     );
 
-    const item = this.application.itemManager.items[0];
-    expect(item.pinned).to.not.be.ok;
+    const item = application.itemManager.items[0];
+    expect(item.pinned).toBeFalsy();
 
-    const refreshedItem = await this.application.changeAndSaveItem(
+    const refreshedItem = await application.changeAndSaveItem(
       item.uuid,
       (mutator) => {
         mutator.pinned = true;
@@ -71,26 +71,26 @@ describe('items', () => {
       undefined,
       syncOptions
     );
-    expect(refreshedItem.pinned).to.equal(true);
-    expect(refreshedItem.archived).to.equal(true);
-    expect(refreshedItem.locked).to.equal(true);
+    expect(refreshedItem.pinned).toBe(true);
+    expect(refreshedItem.archived).toBe(true);
+    expect(refreshedItem.locked).toBe(true);
   });
 
   it('properly compares item equality', async function () {
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       [params1, params2],
       PayloadSource.LocalChanged
     );
 
-    let item1 = this.application.itemManager.notes[0];
-    let item2 = this.application.itemManager.notes[1];
+    let item1 = application.itemManager.notes[0];
+    let item2 = application.itemManager.notes[1];
 
-    expect(item1.isItemContentEqualWith(item2)).to.equal(true);
+    expect(item1.isItemContentEqualWith(item2)).toBe(true);
 
     // items should ignore this field when checking for equality
-    item1 = await this.application.changeAndSaveItem(
+    item1 = await application.changeAndSaveItem(
       item1.uuid,
       (mutator) => {
         mutator.userModifiedDate = new Date();
@@ -99,7 +99,7 @@ describe('items', () => {
       undefined,
       syncOptions
     );
-    item2 = await this.application.changeAndSaveItem(
+    item2 = await application.changeAndSaveItem(
       item2.uuid,
       (mutator) => {
         mutator.userModifiedDate = undefined;
@@ -109,9 +109,9 @@ describe('items', () => {
       syncOptions
     );
 
-    expect(item1.isItemContentEqualWith(item2)).to.equal(true);
+    expect(item1.isItemContentEqualWith(item2)).toBe(true);
 
-    item1 = await this.application.changeAndSaveItem(
+    item1 = await application.changeAndSaveItem(
       item1.uuid,
       (mutator) => {
         mutator.content.foo = 'bar';
@@ -121,9 +121,9 @@ describe('items', () => {
       syncOptions
     );
 
-    expect(item1.isItemContentEqualWith(item2)).to.equal(false);
+    expect(item1.isItemContentEqualWith(item2)).toBe(false);
 
-    item2 = await this.application.changeAndSaveItem(
+    item2 = await application.changeAndSaveItem(
       item2.uuid,
       (mutator) => {
         mutator.content.foo = 'bar';
@@ -133,10 +133,10 @@ describe('items', () => {
       syncOptions
     );
 
-    expect(item1.isItemContentEqualWith(item2)).to.equal(true);
-    expect(item2.isItemContentEqualWith(item1)).to.equal(true);
+    expect(item1.isItemContentEqualWith(item2)).toBe(true);
+    expect(item2.isItemContentEqualWith(item1)).toBe(true);
 
-    item1 = await this.application.changeAndSaveItem(
+    item1 = await application.changeAndSaveItem(
       item1.uuid,
       (mutator) => {
         mutator.addItemAsRelationship(item2);
@@ -145,7 +145,7 @@ describe('items', () => {
       undefined,
       syncOptions
     );
-    item2 = await this.application.changeAndSaveItem(
+    item2 = await application.changeAndSaveItem(
       item2.uuid,
       (mutator) => {
         mutator.addItemAsRelationship(item1);
@@ -155,12 +155,12 @@ describe('items', () => {
       syncOptions
     );
 
-    expect(item1.content.references.length).to.equal(1);
-    expect(item2.content.references.length).to.equal(1);
+    expect(item1.content.references.length).toBe(1);
+    expect(item2.content.references.length).toBe(1);
 
-    expect(item1.isItemContentEqualWith(item2)).to.equal(false);
+    expect(item1.isItemContentEqualWith(item2)).toBe(false);
 
-    item1 = await this.application.changeAndSaveItem(
+    item1 = await application.changeAndSaveItem(
       item1.uuid,
       (mutator) => {
         mutator.removeItemAsRelationship(item2);
@@ -169,7 +169,7 @@ describe('items', () => {
       undefined,
       syncOptions
     );
-    item2 = await this.application.changeAndSaveItem(
+    item2 = await application.changeAndSaveItem(
       item2.uuid,
       (mutator) => {
         mutator.removeItemAsRelationship(item1);
@@ -179,23 +179,23 @@ describe('items', () => {
       syncOptions
     );
 
-    expect(item1.isItemContentEqualWith(item2)).to.equal(true);
-    expect(item1.content.references.length).to.equal(0);
-    expect(item2.content.references.length).to.equal(0);
+    expect(item1.isItemContentEqualWith(item2)).toBe(true);
+    expect(item1.content.references.length).toBe(0);
+    expect(item2.content.references.length).toBe(0);
   });
 
   it('content equality should not have side effects', async function () {
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       [params1, params2],
       PayloadSource.LocalChanged
     );
 
-    let item1 = this.application.itemManager.notes[0];
-    const item2 = this.application.itemManager.notes[1];
+    let item1 = application.itemManager.notes[0];
+    const item2 = application.itemManager.notes[1];
 
-    item1 = await this.application.changeAndSaveItem(
+    item1 = await application.changeAndSaveItem(
       item1.uuid,
       (mutator) => {
         mutator.content.foo = 'bar';
@@ -205,7 +205,7 @@ describe('items', () => {
       syncOptions
     );
 
-    expect(item1.content.foo).to.equal('bar');
+    expect(item1.content.foo).toBe('bar');
 
     item1.contentKeysToIgnoreWhenCheckingEquality = () => {
       return ['foo'];
@@ -219,17 +219,17 @@ describe('items', () => {
     // There was an issue where calling that function would modify values directly to omit keys
     // in contentKeysToIgnoreWhenCheckingEquality.
 
-    await this.application.itemManager.setItemsDirty([item1.uuid, item2.uuid]);
+    await application.itemManager.setItemsDirty([item1.uuid, item2.uuid]);
 
-    expect(item1.userModifiedDate).to.be.ok;
-    expect(item2.userModifiedDate).to.be.ok;
+    expect(item1.userModifiedDate).toBeTruthy();
+    expect(item2.userModifiedDate).toBeTruthy();
 
-    expect(item1.isItemContentEqualWith(item2)).to.equal(true);
-    expect(item2.isItemContentEqualWith(item1)).to.equal(true);
+    expect(item1.isItemContentEqualWith(item2)).toBe(true);
+    expect(item2.isItemContentEqualWith(item1)).toBe(true);
 
-    expect(item1.userModifiedDate).to.be.ok;
-    expect(item2.userModifiedDate).to.be.ok;
+    expect(item1.userModifiedDate).toBeTruthy();
+    expect(item2.userModifiedDate).toBeTruthy();
 
-    expect(item1.content.foo).to.equal('bar');
+    expect(item1.content.foo).toBe('bar');
   });
 });

@@ -1,11 +1,12 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from '../lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { CreateMaxPayloadFromAnyObject, PayloadSource } from '@Lib/index';
+import { ContentType } from '@Lib/models';
+import { Uuid } from '@Lib/uuid';
+import * as Factory from './../../factory';
 
 describe('mapping performance', () => {
   it('shouldnt take a long time', async () => {
+    jest.setTimeout(20000);
+
     /*
     There was an issue with mapping where we were using arrays for everything instead of hashes (like items, missedReferences),
     which caused searching to be really expensive and caused a huge slowdown.
@@ -66,19 +67,21 @@ describe('mapping performance', () => {
     const t1 = performance.now();
     const seconds = (t1 - t0) / 1000;
     const expectedRunTime = 3; // seconds
-    expect(seconds).to.be.at.most(expectedRunTime);
+    expect(seconds).toBeLessThanOrEqual(expectedRunTime);
 
     for (const note of application.itemManager.nonErroredItemsForContentType(
       ContentType.Note
     )) {
       expect(
         application.itemManager.itemsReferencingItem(note.uuid).length
-      ).to.be.above(0);
+      ).toBeGreaterThan(0);
     }
     await application.deinit();
-  }).timeout(20000);
+  });
 
   it('mapping a tag with thousands of notes should be quick', async () => {
+    jest.setTimeout(20000);
+
     /*
       There was an issue where if you have a tag with thousands of notes, it will take minutes to resolve.
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
@@ -141,7 +144,7 @@ describe('mapping performance', () => {
      * However on CI this can sometimes take up to 10s.
      */
     const MAX_RUN_TIME = 15.0; // seconds
-    expect(seconds).to.be.at.most(MAX_RUN_TIME);
+    expect(seconds).toBeLessThanOrEqual(MAX_RUN_TIME);
 
     application.itemManager.nonErroredItemsForContentType(ContentType.Tag)[0];
     for (const note of application.itemManager.nonErroredItemsForContentType(
@@ -149,8 +152,8 @@ describe('mapping performance', () => {
     )) {
       expect(
         application.itemManager.itemsReferencingItem(note.uuid).length
-      ).to.equal(1);
+      ).toBe(1);
     }
     await application.deinit();
-  }).timeout(20000);
+  });
 });

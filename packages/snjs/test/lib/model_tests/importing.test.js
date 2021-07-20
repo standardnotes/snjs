@@ -1,45 +1,52 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from '../lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { ChallengeValue, ChallengeValidation } from '@Lib/challenges';
+import { PayloadSource, CreateMaxPayloadFromAnyObject } from '@Lib/index';
+import { ContentType } from '@Lib/models';
+import { ProtocolVersion, EncryptionIntent } from '@Lib/protocol';
+import { Uuid } from '@Lib/uuid';
+import * as Factory from '../../factory';
 
-describe('importing', function () {
-  this.timeout(Factory.TestTimeout);
+describe.skip('importing', function () {
+  jest.setTimeout(Factory.TestTimeout);
+
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
+  let expectedItemCount;
+  let application;
+  let email, password;
+
   beforeEach(async function () {
-    this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
-    Factory.handlePasswordChallenges(this.application, this.password);
-    localStorage.clear();
+    expectedItemCount = BASE_ITEM_COUNT;
+    application = await Factory.createInitAppWithRandNamespace();
+    email = Uuid.GenerateUuidSynchronously();
+    password = Uuid.GenerateUuidSynchronously();
+    Factory.handlePasswordChallenges(application, password);
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await application.deinit();
     localStorage.clear();
   });
 
   it('should not import backups made from unsupported versions', async function () {
-    const result = await this.application.importData({
+    const result = await application.importData({
       version: '-1',
       items: [],
     });
-    expect(result.error).to.exist;
+    expect(result.error).toBeDefined();
   });
 
   it('should not import backups made from 004 into 003 account', async function () {
     await Factory.registerOldUser({
-      ...this,
+      application,
+      email,
+      password,
       version: ProtocolVersion.V003,
     });
-    const result = await this.application.importData({
+    const result = await application.importData({
       version: ProtocolVersion.V004,
       items: [],
     });
-    expect(result.error).to.exist;
+    expect(result.error).toBeDefined();
   });
 
   it('importing existing data should keep relationships valid', async function () {
@@ -47,40 +54,38 @@ describe('importing', function () {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
       PayloadSource.LocalChanged
     );
-    this.expectedItemCount += 2;
-    const note = this.application.itemManager.getItems([ContentType.Note])[0];
-    const tag = this.application.itemManager.getItems([ContentType.Tag])[0];
+    expectedItemCount += 2;
+    const note = application.itemManager.getItems([ContentType.Note])[0];
+    const tag = application.itemManager.getItems([ContentType.Tag])[0];
 
-    expect(tag.content.references.length).to.equal(1);
-    expect(tag.noteCount).to.equal(1);
+    expect(tag.content.references.length).toBe(1);
+    expect(tag.noteCount).toBe(1);
 
-    expect(note.content.references.length).to.equal(0);
+    expect(note.content.references.length).toBe(0);
     expect(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(1);
+      application.itemManager.itemsReferencingItem(note.uuid).length
+    ).toBe(1);
 
-    await this.application.importData(
+    await application.importData(
       {
         items: [notePayload, tagPayload],
       },
       true
     );
 
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    expect(application.itemManager.items.length).toBe(expectedItemCount);
 
-    expect(tag.content.references.length).to.equal(1);
-    expect(tag.noteCount).to.equal(1);
+    expect(tag.content.references.length).toBe(1);
+    expect(tag.noteCount).toBe(1);
 
-    expect(note.content.references.length).to.equal(0);
+    expect(note.content.references.length).toBe(0);
     expect(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(1);
+      application.itemManager.itemsReferencingItem(note.uuid).length
+    ).toBe(1);
   });
 
   it('importing same note many times should create only one duplicate', async function () {
@@ -89,35 +94,35 @@ describe('importing', function () {
      * which means that new right items will be created with different
      */
     const notePayload = Factory.createNotePayload();
-    await this.application.itemManager.emitItemFromPayload(
+    await application.itemManager.emitItemFromPayload(
       notePayload,
       PayloadSource.LocalSaved
     );
-    this.expectedItemCount++;
+    expectedItemCount++;
     const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
       content: {
         ...notePayload.content,
         title: `${Math.random()}`,
       },
     });
-    await this.application.importData(
+    await application.importData(
       {
         items: [mutatedNote, mutatedNote, mutatedNote],
       },
       true
     );
-    this.expectedItemCount++;
-    expect(this.application.itemManager.notes.length).to.equal(2);
-    const imported = this.application.itemManager.notes.find(
+    expectedItemCount++;
+    expect(application.itemManager.notes.length).toBe(2);
+    const imported = application.itemManager.notes.find(
       (n) => n.uuid !== notePayload.uuid
     );
-    expect(imported.content.title).to.equal(mutatedNote.content.title);
+    expect(imported.content.title).toBe(mutatedNote.content.title);
   });
 
   it('importing a tag with lesser references should not create duplicate', async function () {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const tagPayload = pair[1];
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       pair,
       PayloadSource.LocalChanged
     );
@@ -127,30 +132,30 @@ describe('importing', function () {
         references: [],
       },
     });
-    await this.application.importData(
+    await application.importData(
       {
         items: [mutatedTag],
       },
       true
     );
-    expect(this.application.itemManager.tags.length).to.equal(1);
+    expect(application.itemManager.tags.length).toBe(1);
     expect(
-      this.application.itemManager.findItem(tagPayload.uuid).content.references
+      application.itemManager.findItem(tagPayload.uuid).content.references
         .length
-    ).to.equal(1);
+    ).toBe(1);
   });
 
   it('importing data with differing content should create duplicates', async function () {
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       pair,
       PayloadSource.LocalChanged
     );
-    this.expectedItemCount += 2;
-    const note = this.application.itemManager.notes[0];
-    const tag = this.application.itemManager.tags[0];
+    expectedItemCount += 2;
+    const note = application.itemManager.notes[0];
+    const tag = application.itemManager.tags[0];
     const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
       content: {
         ...notePayload.safeContent,
@@ -163,45 +168,43 @@ describe('importing', function () {
         title: `${Math.random()}`,
       },
     });
-    await this.application.importData(
+    await application.importData(
       {
         items: [mutatedNote, mutatedTag],
       },
       true
     );
-    this.expectedItemCount += 2;
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    expectedItemCount += 2;
+    expect(application.itemManager.items.length).toBe(expectedItemCount);
 
-    const newNote = this.application.itemManager.notes.find(
+    const newNote = application.itemManager.notes.find(
       (n) => n.uuid !== notePayload.uuid
     );
-    const newTag = this.application.itemManager.tags.find(
+    const newTag = application.itemManager.tags.find(
       (t) => t.uuid !== tagPayload.uuid
     );
 
-    expect(newNote.uuid).to.not.equal(note.uuid);
-    expect(newTag.uuid).to.not.equal(tag.uuid);
+    expect(newNote.uuid).not.toBe(note.uuid);
+    expect(newTag.uuid).not.toBe(tag.uuid);
 
-    const refreshedTag = this.application.itemManager.findItem(tag.uuid);
-    expect(refreshedTag.content.references.length).to.equal(2);
-    expect(refreshedTag.noteCount).to.equal(2);
+    const refreshedTag = application.itemManager.findItem(tag.uuid);
+    expect(refreshedTag.content.references.length).toBe(2);
+    expect(refreshedTag.noteCount).toBe(2);
 
-    const refreshedNote = this.application.itemManager.findItem(note.uuid);
-    expect(refreshedNote.content.references.length).to.equal(0);
+    const refreshedNote = application.itemManager.findItem(note.uuid);
+    expect(refreshedNote.content.references.length).toBe(0);
     expect(
-      this.application.itemManager.itemsReferencingItem(refreshedNote.uuid)
+      application.itemManager.itemsReferencingItem(refreshedNote.uuid)
         .length
-    ).to.equal(2);
+    ).toBe(2);
 
-    expect(newTag.content.references.length).to.equal(1);
-    expect(newTag.noteCount).to.equal(1);
+    expect(newTag.content.references.length).toBe(1);
+    expect(newTag.noteCount).toBe(1);
 
-    expect(newNote.content.references.length).to.equal(0);
+    expect(newNote.content.references.length).toBe(0);
     expect(
-      this.application.itemManager.itemsReferencingItem(newNote.uuid).length
-    ).to.equal(1);
+      application.itemManager.itemsReferencingItem(newNote.uuid).length
+    ).toBe(1);
   });
 
   it('when importing items, imported values should not be used to determine if changed', async function () {
@@ -215,11 +218,11 @@ describe('importing', function () {
      * value now doesn't match what's coming in. The solution is to get all values
      * ahead of time before any changes are made.
      */
-    const note = await Factory.createMappedNote(this.application);
-    const tag = await Factory.createMappedTag(this.application);
-    this.expectedItemCount += 2;
+    const note = await Factory.createMappedNote(application);
+    const tag = await Factory.createMappedTag(application);
+    expectedItemCount += 2;
 
-    await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
+    await application.itemManager.changeItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note);
     });
 
@@ -242,223 +245,219 @@ describe('importing', function () {
       }
     );
 
-    await this.application.importData(
+    await application.importData(
       {
         items: [externalNote, externalTag],
       },
       true
     );
-    this.expectedItemCount += 1;
+    expectedItemCount += 1;
 
     /** We expect now that the total item count is 3, not 4. */
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    expect(application.itemManager.items.length).toBe(expectedItemCount);
 
-    const refreshedTag = this.application.itemManager.findItem(tag.uuid);
+    const refreshedTag = application.itemManager.findItem(tag.uuid);
     /** References from both items have merged. */
-    expect(refreshedTag.content.references.length).to.equal(2);
+    expect(refreshedTag.content.references.length).toBe(2);
   });
 
   it('should import decrypted data and keep items that were previously deleted', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
-    Factory.handlePasswordChallenges(this.application, this.password);
+    Factory.handlePasswordChallenges(application, password);
     const [note, tag] = await Promise.all([
-      Factory.createMappedNote(this.application),
-      Factory.createMappedTag(this.application),
+      Factory.createMappedNote(application),
+      Factory.createMappedTag(application),
     ]);
-    await this.application.sync({ awaitAll: true });
+    await application.sync({ awaitAll: true });
 
-    await this.application.deleteItem(note);
-    expect(this.application.findItem(note.uuid)).to.not.exist;
+    await application.deleteItem(note);
+    expect(application.findItem(note.uuid)).toBeFalsy();
 
-    await this.application.deleteItem(tag);
-    expect(this.application.findItem(tag.uuid)).to.not.exist;
+    await application.deleteItem(tag);
+    expect(application.findItem(tag.uuid)).toBeFalsy();
 
-    await this.application.importData(
+    await application.importData(
       {
         items: [note, tag],
       },
       true
     );
-    expect(this.application.itemManager.notes.length).to.equal(1);
-    expect(this.application.findItem(tag.uuid).deleted).to.be.false;
-    expect(this.application.itemManager.tags.length).to.equal(1);
-    expect(this.application.findItem(note.uuid).deleted).to.be.false;
+    expect(application.itemManager.notes.length).toBe(1);
+    expect(application.findItem(tag.uuid).deleted).toBe(false);
+    expect(application.itemManager.tags.length).toBe(1);
+    expect(application.findItem(note.uuid).deleted).toBe(false);
   });
 
   it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
-    const note = await Factory.createSyncedNote(this.application);
+    const note = await Factory.createSyncedNote(application);
 
     /** Sign into another account and import the same item. It should get a different UUID. */
-    this.application = await Factory.signOutApplicationAndReturnNew(
-      this.application
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
     );
-    this.email = Uuid.GenerateUuidSynchronously();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    email = Uuid.GenerateUuidSynchronously();
+    Factory.handlePasswordChallenges(application, password);
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
-    await this.application.importData(
+    await application.importData(
       {
         items: [note],
       },
       true
     );
 
-    expect(this.application.itemManager.notes.length).to.equal(1);
-    expect(this.application.itemManager.notes[0].uuid).to.not.equal(note.uuid);
+    expect(application.itemManager.notes.length).toBe(1);
+    expect(application.itemManager.notes[0].uuid).not.toBe(note.uuid);
   });
 
   it('should maintain consistency between storage and PayloadManager after an import with conflicts', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
-    const note = await Factory.createSyncedNote(this.application);
+    const note = await Factory.createSyncedNote(application);
 
     /** Sign into another account and import the same items. They should get a different UUID. */
-    this.application = await Factory.signOutApplicationAndReturnNew(
-      this.application
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
     );
-    this.email = Uuid.GenerateUuidSynchronously();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    email = Uuid.GenerateUuidSynchronously();
+    Factory.handlePasswordChallenges(application, password);
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
-    await this.application.importData(
+    await application.importData(
       {
         items: [note],
       },
       true
     );
 
-    const storedPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(this.application.itemManager.items.length).to.equal(
-      storedPayloads.length
-    );
+    const storedPayloads = await application.storageService.getAllRawPayloads();
+    expect(application.itemManager.items.length).toBe(storedPayloads.length);
     const notes = storedPayloads.filter(
       (p) => p.content_type === ContentType.Note
     );
     const itemsKeys = storedPayloads.filter(
       (p) => p.content_type === ContentType.ItemsKey
     );
-    expect(notes.length).to.equal(1);
-    expect(itemsKeys.length).to.equal(1);
+    expect(notes.length).toBe(1);
+    expect(itemsKeys.length).toBe(1);
   });
 
   it('should import encrypted data and keep items that were previously deleted', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
     const [note, tag] = await Promise.all([
-      Factory.createMappedNote(this.application),
-      Factory.createMappedTag(this.application),
+      Factory.createMappedNote(application),
+      Factory.createMappedTag(application),
     ]);
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.sync({ awaitAll: true });
+    await application.sync({ awaitAll: true });
 
-    await this.application.deleteItem(note);
-    expect(this.application.findItem(note.uuid)).to.not.exist;
+    await application.deleteItem(note);
+    expect(application.findItem(note.uuid)).toBeFalsy();
 
-    await this.application.deleteItem(tag);
-    expect(this.application.findItem(tag.uuid)).to.not.exist;
+    await application.deleteItem(tag);
+    expect(application.findItem(tag.uuid)).toBeFalsy();
 
-    await this.application.importData(backupData, true);
-    expect(this.application.itemManager.notes.length).to.equal(1);
-    expect(this.application.findItem(tag.uuid).deleted).to.be.false;
-    expect(this.application.itemManager.tags.length).to.equal(1);
-    expect(this.application.findItem(note.uuid).deleted).to.be.false;
+    await application.importData(backupData, true);
+    expect(application.itemManager.notes.length).toBe(1);
+    expect(application.findItem(tag.uuid).deleted).toBe(false);
+    expect(application.itemManager.tags.length).toBe(1);
+    expect(application.findItem(note.uuid).deleted).toBe(false);
   });
 
   it('should import decrypted data and all items payload source should be FileImport', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
     const [note, tag] = await Promise.all([
-      Factory.createMappedNote(this.application),
-      Factory.createMappedTag(this.application),
+      Factory.createMappedNote(application),
+      Factory.createMappedTag(application),
     ]);
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application, password);
 
-    await this.application.importData(backupData, true);
+    await application.importData(backupData, true);
 
-    const importedNote = this.application.findItem(note.uuid);
-    const importedTag = this.application.findItem(tag.uuid);
-    expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport);
-    expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport);
+    const importedNote = application.findItem(note.uuid);
+    const importedTag = application.findItem(tag.uuid);
+    expect(importedNote.payload.source).toBe(PayloadSource.FileImport);
+    expect(importedTag.payload.source).toBe(PayloadSource.FileImport);
   });
 
   it('should import encrypted data and all items payload source should be FileImport', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
     const [note, tag] = await Promise.all([
-      Factory.createMappedNote(this.application),
-      Factory.createMappedTag(this.application),
+      Factory.createMappedNote(application),
+      Factory.createMappedTag(application),
     ]);
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application, password);
 
-    await this.application.importData(backupData, true);
+    await application.importData(backupData, true);
 
-    const importedNote = this.application.findItem(note.uuid);
-    const importedTag = this.application.findItem(tag.uuid);
-    expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport);
-    expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport);
+    const importedNote = application.findItem(note.uuid);
+    const importedTag = application.findItem(tag.uuid);
+    expect(importedNote.payload.source).toBe(PayloadSource.FileImport);
+    expect(importedTag.payload.source).toBe(PayloadSource.FileImport);
   });
 
   it('should import data from 003 encrypted payload using client generated backup', async function () {
     const oldVersion = ProtocolVersion.V003;
     await Factory.registerOldUser({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
       version: oldVersion,
     });
 
-    const noteItem = await this.application.itemManager.createItem(
+    const noteItem = await application.itemManager.createItem(
       ContentType.Note,
       {
         title: 'Encrypted note',
@@ -466,23 +465,23 @@ describe('importing', function () {
       }
     );
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application, password);
 
-    const result = await this.application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length);
-    expect(result.errorCount).to.be.eq(0);
+    const result = await application.importData(backupData, true);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(backupData.items.length);
+    expect(result.errorCount).toBe(0);
 
-    const decryptedNote = this.application.itemManager.findItem(noteItem.uuid);
-    expect(decryptedNote.title).to.be.eq('Encrypted note');
-    expect(decryptedNote.text).to.be.eq('On protocol version 003.');
-    expect(this.application.itemManager.notes.length).to.equal(1);
+    const decryptedNote = application.itemManager.findItem(noteItem.uuid);
+    expect(decryptedNote.title).toBe('Encrypted note');
+    expect(decryptedNote.text).toBe('On protocol version 003.');
+    expect(application.itemManager.notes.length).toBe(1);
   });
 
   it('should import data from 003 encrypted payload using server generated backup with 004 key params', async function () {
@@ -527,23 +526,23 @@ describe('importing', function () {
 
     const password = 'password';
 
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application, password);
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application, password);
 
-    const result = await this.application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length);
-    expect(result.errorCount).to.be.eq(0);
+    const result = await application.importData(backupData, true);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(backupData.items.length);
+    expect(result.errorCount).toBe(0);
   });
 
   it('should import data from 004 encrypted payload', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
-    const noteItem = await this.application.itemManager.createItem(
+    const noteItem = await application.itemManager.createItem(
       ContentType.Note,
       {
         title: 'Encrypted note',
@@ -551,33 +550,33 @@ describe('importing', function () {
       }
     );
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application, password);
 
-    const result = await this.application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length);
-    expect(result.errorCount).to.be.eq(0);
+    const result = await application.importData(backupData, true);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(backupData.items.length);
+    expect(result.errorCount).toBe(0);
 
-    const decryptedNote = this.application.itemManager.findItem(noteItem.uuid);
-    expect(decryptedNote.title).to.be.eq('Encrypted note');
-    expect(decryptedNote.text).to.be.eq('On protocol version 004.');
-    expect(this.application.itemManager.notes.length).to.equal(1);
+    const decryptedNote = application.itemManager.findItem(noteItem.uuid);
+    expect(decryptedNote.title).toBe('Encrypted note');
+    expect(decryptedNote.text).toBe('On protocol version 004.');
+    expect(application.itemManager.notes.length).toBe(1);
   });
 
   it('should return correct errorCount', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
-    const noteItem = await this.application.itemManager.createItem(
+    const noteItem = await application.itemManager.createItem(
       ContentType.Note,
       {
         title: 'This is a valid, encrypted note',
@@ -585,13 +584,13 @@ describe('importing', function () {
       }
     );
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application, password);
 
     const madeUpPayload = JSON.parse(JSON.stringify(noteItem));
 
@@ -603,33 +602,33 @@ describe('importing', function () {
 
     backupData.items = [...backupData.items, madeUpPayload];
 
-    const result = await this.application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length - 1);
-    expect(result.errorCount).to.be.eq(1);
+    const result = await application.importData(backupData, true);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(backupData.items.length - 1);
+    expect(result.errorCount).toBe(1);
   });
 
   it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
     const oldVersion = ProtocolVersion.V003;
     await Factory.registerOldUser({
-      application: this.application,
-      email: this.email,
+      application: application,
+      email: email,
       password: Uuid.GenerateUuidSynchronously(),
       version: oldVersion,
     });
 
-    await this.application.itemManager.createItem(ContentType.Note, {
+    await application.itemManager.createItem(ContentType.Note, {
       title: 'Encrypted note',
       text: 'On protocol version 003.',
     });
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.application.setLaunchCallback({
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    application.setLaunchCallback({
       receiveChallenge: (challenge) => {
         const values = challenge.prompts.map(
           (prompt) =>
@@ -637,111 +636,111 @@ describe('importing', function () {
               prompt,
               prompt.validation === ChallengeValidation.None
                 ? 'incorrect password'
-                : this.password
+                : password
             )
         );
-        this.application.submitValuesForChallenge(challenge, values);
+        application.submitValuesForChallenge(challenge, values);
       },
     });
-    const result = await this.application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(this.application.itemManager.notes.length).to.equal(0);
+    const result = await application.importData(backupData, true);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(0);
+    expect(result.errorCount).toBe(backupData.items.length);
+    expect(application.itemManager.notes.length).toBe(0);
   });
 
   it('should not import data from 004 encrypted payload if an invalid password is provided', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
-    await this.application.itemManager.createItem(ContentType.Note, {
+    await application.itemManager.createItem(ContentType.Note, {
       title: 'This is a valid, encrypted note',
       text: 'On protocol version 004.',
     });
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.application.setLaunchCallback({
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    application.setLaunchCallback({
       receiveChallenge: (challenge) => {
         const values = challenge.prompts.map(
           (prompt) => new ChallengeValue(prompt, 'incorrect password')
         );
-        this.application.submitValuesForChallenge(challenge, values);
+        application.submitValuesForChallenge(challenge, values);
       },
     });
 
-    const result = await this.application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(this.application.itemManager.notes.length).to.equal(0);
+    const result = await application.importData(backupData, true);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(0);
+    expect(result.errorCount).toBe(backupData.items.length);
+    expect(application.itemManager.notes.length).toBe(0);
   });
 
   it('should not import encrypted data with no keyParams or auth_params', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
 
-    await this.application.itemManager.createItem(ContentType.Note, {
+    await application.itemManager.createItem(ContentType.Note, {
       title: 'Encrypted note',
       text: 'On protocol version 004.',
     });
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
     delete backupData.keyParams;
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
 
-    const result = await this.application.importData(backupData);
+    const result = await application.importData(backupData);
 
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(this.application.itemManager.notes.length).to.equal(0);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(0);
+    expect(result.errorCount).toBe(backupData.items.length);
+    expect(application.itemManager.notes.length).toBe(0);
   });
 
   it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
-    Factory.handlePasswordChallenges(this.application);
+    Factory.handlePasswordChallenges(application);
 
-    await this.application.itemManager.createItem(ContentType.Note, {
+    await application.itemManager.createItem(ContentType.Note, {
       title: 'Encrypted note',
       text: 'On protocol version 004.⭐️',
     });
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
     backupData.items = backupData.items.filter(
       (payload) => payload.content_type !== ContentType.ItemsKey
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application);
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application);
 
-    const result = await this.application.importData(backupData, true);
+    const result = await application.importData(backupData, true);
 
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(this.application.itemManager.notes.length).to.equal(0);
+    expect(result).toBeDefined();
+    expect(result.affectedItems.length).toBe(0);
+    expect(result.errorCount).toBe(backupData.items.length);
+    expect(application.itemManager.notes.length).toBe(0);
   });
 
   it('importing data with no items key should use the root key generated by the file password', async function () {
@@ -873,53 +872,53 @@ describe('importing', function () {
       },
     };
     const result = await application.importData(backupFile, true);
-    expect(result.errorCount).to.equal(0);
+    expect(result.errorCount).toBe(0);
     application.deinit();
   });
 
   it('importing another accounts notes/tags should correctly keep relationships', async function () {
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application: application,
+      email: email,
+      password: password,
     });
-    Factory.handlePasswordChallenges(this.application, this.password);
+    Factory.handlePasswordChallenges(application, password);
 
     const pair = Factory.createRelatedNoteTagPairPayload();
-    await this.application.itemManager.emitItemsFromPayloads(
+    await application.itemManager.emitItemsFromPayloads(
       pair,
       PayloadSource.LocalChanged
     );
 
-    await this.application.sync();
+    await application.sync();
 
-    const backupData = await this.application.createBackupFile(
+    const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    Factory.handlePasswordChallenges(this.application, this.password);
+    await application.deinit();
+    application = await Factory.createInitAppWithRandNamespace();
+    Factory.handlePasswordChallenges(application, password);
 
     await Factory.registerUserToApplication({
-      application: this.application,
+      application: application,
       email: `${Math.random()}`,
-      password: this.password,
+      password: password,
     });
 
-    await this.application.importData(backupData, true);
+    await application.importData(backupData, true);
 
-    expect(this.application.itemManager.notes.length).to.equal(1);
-    expect(this.application.itemManager.tags.length).to.equal(1);
+    expect(application.itemManager.notes.length).toBe(1);
+    expect(application.itemManager.tags.length).toBe(1);
 
-    const importedNote = this.application.itemManager.notes[0];
-    const importedTag = this.application.itemManager.tags[0];
+    const importedNote = application.itemManager.notes[0];
+    const importedTag = application.itemManager.tags[0];
     expect(
-      this.application.itemManager.referencesForItem(importedTag.uuid).length
-    ).to.equal(1);
+      application.itemManager.referencesForItem(importedTag.uuid).length
+    ).toBe(1);
     expect(
-      this.application.itemManager.itemsReferencingItem(importedNote.uuid)
+      application.itemManager.itemsReferencingItem(importedNote.uuid)
         .length
-    ).to.equal(1);
+    ).toBe(1);
   });
 });
