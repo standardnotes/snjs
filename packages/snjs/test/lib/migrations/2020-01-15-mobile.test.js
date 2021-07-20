@@ -1,18 +1,25 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from '../lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import * as Factory from './../../factory';
+import {
+  CreateMaxPayloadFromAnyObject,
+  Environment,
+  Platform,
+  SNProtocolOperator003,
+  PayloadFormat,
+  NonwrappedStorageKey,
+  ChallengeValidation,
+  ChallengeValue,
+  KeyMode,
+  ProtocolVersion,
+  SessionStrings,
+  SNProtocolOperator001,
+  SNProtocolOperator002,
+  StorageKey,
+  StorageValueModes,
+  Uuid
+} from '@Lib/index';
+import SNCrypto from './../../setup/snjs/snCrypto';
 
 describe('2020-01-15 mobile migration', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  afterEach(() => {
-    localStorage.clear();
-  });
-
   it('2020-01-15 migration with passcode and account', async function () {
     let application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,
@@ -23,7 +30,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -143,7 +150,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
 
-    expect(application.protocolService.keyMode).to.equal(
+    expect(application.protocolService.keyMode).toEqual(
       KeyMode.RootKeyPlusWrapper
     );
 
@@ -152,55 +159,55 @@ describe('2020-01-15 mobile migration', () => {
       StorageValueModes.Default
     );
     const valueStore = application.storageService.values[storageMode];
-    expect(valueStore.content_type).to.not.be.ok;
+    expect(valueStore.content_type).toBeUndefined;
 
     const keyParams = await application.storageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
-    expect(typeof keyParams).to.equal('object');
-    const rootKey = await application.protocolService.getRootKey();
-    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(
+    expect(typeof keyParams).toEqual('object');
+    const rootKey = application.protocolService.getRootKey();
+    expect(rootKey.masterKey).toEqual(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).toEqual(
       accountKey.dataAuthenticationKey
     );
-    expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
-    expect(application.protocolService.keyMode).to.equal(
+    expect(rootKey.serverPassword).toBeUndefined;
+    expect(rootKey.keyVersion).toEqual(ProtocolVersion.V003);
+    expect(application.protocolService.keyMode).toEqual(
       KeyMode.RootKeyPlusWrapper
     );
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
       application.identifier
     );
-    expect(keychainValue).to.not.be.ok;
+    expect(keychainValue).toBeUndefined;
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
 
     expect(
       await application.storageService.getValue(
         NonwrappedStorageKey.MobileFirstRun,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(false);
+    ).toEqual(false);
 
     expect(
       await application.storageService.getValue(
         StorageKey.BiometricsState,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.enabled);
+    ).toEqual(biometricPrefs.enabled);
     expect(
       await application.storageService.getValue(
         StorageKey.MobileBiometricsTiming,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.timing);
-    expect(await application.getUser().email).to.equal(identifier);
+    ).toEqual(biometricPrefs.timing);
+    expect(application.getUser().email).toEqual(identifier);
 
     const appId = application.identifier;
     console.warn(
@@ -210,7 +217,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Full sync completed event will not trigger due to mocked credentials,
      * thus we manually need to mark any sync dependent migrations as complete. */
     await application.migrationService.markMigrationsAsDone();
-    await application.deinit();
+    application.deinit();
 
     /** Recreate application and ensure storage values are consistent */
     application = Factory.createApplication(appId);
@@ -218,18 +225,18 @@ describe('2020-01-15 mobile migration', () => {
       receiveChallenge,
     });
     await application.launch(true);
-    expect(await application.getUser().email).to.equal(identifier);
-    expect(await application.getHost()).to.equal(customServer);
+    expect(application.getUser().email).toEqual(identifier);
+    expect(application.getHost()).toEqual(customServer);
     const preferences = await application.storageService.getValue(
       'preferences'
     );
-    expect(preferences.sortBy).to.equal('userModifiedAt');
-    expect(preferences.sortReverse).to.be.false;
-    expect(preferences.hideDate).to.be.false;
-    expect(preferences.hideTags).to.be.false;
-    expect(preferences.hideNotePreview).to.be.true;
-    expect(preferences.lastExportDate).to.equal(lastExportDate);
-    expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
+    expect(preferences.sortBy).toEqual('userModifiedAt');
+    expect(preferences.sortReverse).toEqual(false);
+    expect(preferences.hideDate).toEqual(false);
+    expect(preferences.hideTags).toEqual(false);
+    expect(preferences.hideNotePreview).toEqual(true);
+    expect(preferences.lastExportDate).toEqual(lastExportDate);
+    expect(preferences.doNotShowAgainUnsupportedEditors).toEqual(false);
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
@@ -246,7 +253,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -337,76 +344,76 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     });
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.WrapperOnly);
     await application.launch(true);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
     const valueStore = application.storageService.values[storageMode];
-    expect(valueStore.content_type).to.not.be.ok;
+    expect(valueStore.content_type).toBeUndefined;
 
-    const rootKey = await application.protocolService.getRootKey();
-    expect(rootKey.masterKey).to.equal(passcodeKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(
+    const rootKey = application.protocolService.getRootKey();
+    expect(rootKey.masterKey).toEqual(passcodeKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).toEqual(
       passcodeKey.dataAuthenticationKey
     );
     /** Root key is in memory with passcode only, so server password can be defined */
-    expect(rootKey.serverPassword).to.be.ok;
-    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
+    expect(rootKey.serverPassword).toBeDefined;
+    expect(rootKey.keyVersion).toEqual(ProtocolVersion.V003);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.WrapperOnly);
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
       application.identifier
     );
-    expect(keychainValue).to.not.be.ok;
+    expect(keychainValue).toBeUndefined;
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
     expect(
       await application.storageService.getValue(
         NonwrappedStorageKey.MobileFirstRun,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(false);
+    ).toEqual(false);
     expect(
       await application.storageService.getValue(
         StorageKey.BiometricsState,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.enabled);
+    ).toEqual(biometricPrefs.enabled);
     expect(
       await application.storageService.getValue(
         StorageKey.MobileBiometricsTiming,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.timing);
+    ).toEqual(biometricPrefs.timing);
     expect(
       await application.storageService.getValue(
         StorageKey.MobilePasscodeTiming,
         StorageValueModes.Nonwrapped
       )
-    ).to.eql(passcodeTiming);
+    ).toEqual(passcodeTiming);
     expect(
       await application.storageService.getValue(
         StorageKey.MobilePasscodeKeyboardType,
         StorageValueModes.Nonwrapped
       )
-    ).to.eql(passcodeKeyboardType);
+    ).toEqual(passcodeKeyboardType);
     const preferences = await application.storageService.getValue(
       'preferences'
     );
-    expect(preferences.sortBy).to.equal(undefined);
-    expect(preferences.sortReverse).to.be.false;
-    expect(preferences.hideNotePreview).to.be.false;
-    expect(preferences.hideDate).to.be.false;
-    expect(preferences.hideTags).to.be.true;
-    expect(preferences.lastExportDate).to.equal(undefined);
-    expect(preferences.doNotShowAgainUnsupportedEditors).to.be.true;
-    await application.deinit();
+    expect(preferences.sortBy).toEqual(undefined);
+    expect(preferences.sortReverse).toEqual(false);
+    expect(preferences.hideNotePreview).toEqual(false);
+    expect(preferences.hideDate).toEqual(false);
+    expect(preferences.hideTags).toEqual(true);
+    expect(preferences.lastExportDate).toEqual(undefined);
+    expect(preferences.doNotShowAgainUnsupportedEditors).toEqual(true);
+    application.deinit();
   });
 
   it('2020-01-15 migration with passcode-only missing keychain', async function () {
@@ -419,7 +426,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -502,14 +509,14 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     });
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.WrapperOnly);
     await application.launch(true);
 
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.errorDecrypting).to.not.be.ok;
+    expect(retrievedNote.errorDecrypting).toBeUndefined;
 
     /** application should not crash */
-    await application.deinit();
+    application.deinit();
   });
 
   it('2020-01-15 migration with account only', async function () {
@@ -522,7 +529,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
@@ -535,7 +542,7 @@ describe('2020-01-15 mobile migration', () => {
       'user',
       JSON.stringify({ email: identifier })
     );
-    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V003);
+    expect(accountKey.keyVersion).toEqual(ProtocolVersion.V003);
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -617,66 +624,66 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
 
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.RootKeyOnly);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
     const valueStore = application.storageService.values[storageMode];
-    expect(valueStore.content_type).to.not.be.ok;
-    const rootKey = await application.protocolService.getRootKey();
-    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(
+    expect(valueStore.content_type).toBeUndefined;
+    const rootKey = application.protocolService.getRootKey();
+    expect(rootKey.masterKey).toEqual(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).toEqual(
       accountKey.dataAuthenticationKey
     );
-    expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
+    expect(rootKey.serverPassword).toBeUndefined;
+    expect(rootKey.keyVersion).toEqual(ProtocolVersion.V003);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.RootKeyOnly);
 
     const keyParams = await application.storageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
-    expect(typeof keyParams).to.equal('object');
+    expect(typeof keyParams).toEqual('object');
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
     expect(
       await application.storageService.getValue(
         NonwrappedStorageKey.MobileFirstRun,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(false);
+    ).toEqual(false);
     expect(
       await application.storageService.getValue(
         StorageKey.BiometricsState,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.enabled);
+    ).toEqual(biometricPrefs.enabled);
     expect(
       await application.storageService.getValue(
         StorageKey.MobileBiometricsTiming,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.timing);
-    expect(await application.getUser().email).to.equal(identifier);
+    ).toEqual(biometricPrefs.timing);
+    expect(application.getUser().email).toEqual(identifier);
     const preferences = await application.storageService.getValue(
       'preferences'
     );
-    expect(preferences.sortBy).to.equal('created_at');
-    expect(preferences.sortReverse).to.be.false;
-    expect(preferences.hideDate).to.be.false;
-    expect(preferences.hideNotePreview).to.be.true;
-    expect(preferences.lastExportDate).to.equal(lastExportDate);
-    expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
+    expect(preferences.sortBy).toEqual('created_at');
+    expect(preferences.sortReverse).toEqual(false);
+    expect(preferences.hideDate).toEqual(false);
+    expect(preferences.hideNotePreview).toEqual(true);
+    expect(preferences.lastExportDate).toEqual(lastExportDate);
+    expect(preferences.doNotShowAgainUnsupportedEditors).toEqual(false);
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
-  }).timeout(10000);
+    application.deinit();
+  }, 10000);
 
   it('2020-01-15 launching with account but missing keychain', async function () {
     /**
@@ -712,7 +719,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     /** Create old version account parameters */
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
@@ -722,7 +729,7 @@ describe('2020-01-15 mobile migration', () => {
       'user',
       JSON.stringify({ email: email })
     );
-    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V003);
+    expect(accountKey.keyVersion).toEqual(ProtocolVersion.V003);
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
@@ -777,32 +784,32 @@ describe('2020-01-15 mobile migration', () => {
     /** Recovery migration is non-blocking, so let's block for it */
     await Factory.sleep(1.0);
 
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.RootKeyOnly);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
     const valueStore = application.storageService.values[storageMode];
-    expect(valueStore.content_type).to.not.be.ok;
-    const rootKey = await application.protocolService.getRootKey();
-    expect(rootKey).to.be.ok;
-    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(
+    expect(valueStore.content_type).toBeUndefined;
+    const rootKey = application.protocolService.getRootKey();
+    expect(rootKey).toBeDefined;
+    expect(rootKey.masterKey).toEqual(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).toEqual(
       accountKey.dataAuthenticationKey
     );
-    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
+    expect(rootKey.keyVersion).toEqual(ProtocolVersion.V003);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.RootKeyOnly);
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
-    expect(await application.getUser().email).to.equal(email);
-    expect(await application.apiService.getSession()).to.be.ok;
-    expect(totalChallenges).to.equal(expectedChallenges);
-    await application.deinit();
-  }).timeout(10000);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
+    expect(application.getUser().email).toEqual(email);
+    expect(application.apiService.getSession()).toBeDefined;
+    expect(totalChallenges).toEqual(expectedChallenges);
+    application.deinit();
+  }, 10000);
 
   it('2020-01-15 migration with 002 account should not create 003 data', async function () {
     /** There was an issue where 002 account loading new app would create new default items key
@@ -816,7 +823,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator002 = new SNProtocolOperator002(new SNWebCrypto());
+    const operator002 = new SNProtocolOperator002(new SNCrypto());
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
@@ -829,7 +836,7 @@ describe('2020-01-15 mobile migration', () => {
       'user',
       JSON.stringify({ email: identifier })
     );
-    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V002);
+    expect(accountKey.keyVersion).toEqual(ProtocolVersion.V002);
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -878,20 +885,20 @@ describe('2020-01-15 mobile migration', () => {
     await application.launch(true);
 
     const itemsKey = application.itemManager.itemsKeys()[0];
-    expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V002);
+    expect(itemsKey.keyVersion).toEqual(ProtocolVersion.V002);
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
 
-    expect(await application.getUser().email).to.equal(identifier);
+    expect(application.getUser().email).toEqual(identifier);
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
-  }).timeout(10000);
+    application.deinit();
+  }, 10000);
 
   it('2020-01-15 migration with 001 account detect 001 version even with missing info', async function () {
     /** If 001 account, and for some reason we dont have version stored, the migrations
@@ -905,7 +912,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator001 = new SNProtocolOperator001(new SNWebCrypto());
+    const operator001 = new SNProtocolOperator001(new SNCrypto());
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
@@ -921,7 +928,7 @@ describe('2020-01-15 mobile migration', () => {
       'user',
       JSON.stringify({ email: identifier })
     );
-    expect(accountKey.keyVersion).to.equal(ProtocolVersion.V001);
+    expect(accountKey.keyVersion).toEqual(ProtocolVersion.V001);
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -969,20 +976,20 @@ describe('2020-01-15 mobile migration', () => {
     await application.launch(true);
 
     const itemsKey = application.itemManager.itemsKeys()[0];
-    expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V001);
+    expect(itemsKey.keyVersion).toEqual(ProtocolVersion.V001);
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
 
-    expect(await application.getUser().email).to.equal(identifier);
+    expect(application.getUser().email).toEqual(identifier);
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
-  }).timeout(10000);
+    application.deinit();
+  }, 10000);
 
   it('2020-01-15 successfully creates session if jwt is stored in keychain', async function () {
     const application = await Factory.createAppWithRandNamespace(
@@ -994,7 +1001,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const identifier = 'foo';
     const password = 'tar';
     const accountKey = await operator003.createRootKey(identifier, password);
@@ -1017,10 +1024,10 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({ receiveChallenge: () => {} });
     await application.launch(true);
 
-    expect(application.apiService.getSession()).to.be.ok;
+    expect(application.apiService.getSession()).toBeDefined;
 
-    await application.deinit();
-  }).timeout(10000);
+    application.deinit();
+  }, 10000);
 
   it('2020-01-15 successfully creates session if jwt is stored in storage', async function () {
     const application = await Factory.createAppWithRandNamespace(
@@ -1032,7 +1039,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const identifier = 'foo';
     const password = 'tar';
     const accountKey = await operator003.createRootKey(identifier, password);
@@ -1054,10 +1061,10 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({ receiveChallenge: () => {} });
     await application.launch(true);
 
-    expect(application.apiService.getSession()).to.be.ok;
+    expect(application.apiService.getSession()).toBeDefined;
 
-    await application.deinit();
-  }).timeout(10000);
+    application.deinit();
+  }, 10000);
 
   it('2020-01-15 migration with no account and no passcode', async function () {
     const application = await Factory.createAppWithRandNamespace(
@@ -1069,7 +1076,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const biometricPrefs = {
       enabled: true,
       timing: 'immediately',
@@ -1141,52 +1148,52 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
 
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone);
+    expect(application.protocolService.keyMode).toEqual(KeyMode.RootKeyNone);
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(
       StorageValueModes.Default
     );
     const valueStore = application.storageService.values[storageMode];
-    expect(valueStore.content_type).to.not.be.ok;
+    expect(valueStore.content_type).toBeUndefined;
 
-    const rootKey = await application.protocolService.getRootKey();
-    expect(rootKey).to.not.be.ok;
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone);
+    const rootKey = application.protocolService.getRootKey();
+    expect(rootKey).toBeUndefined;
+    expect(application.protocolService.keyMode).toEqual(KeyMode.RootKeyNone);
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
     expect(
       await application.storageService.getValue(
         NonwrappedStorageKey.MobileFirstRun,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(false);
+    ).toEqual(false);
     expect(
       await application.storageService.getValue(
         StorageKey.BiometricsState,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.enabled);
+    ).toEqual(biometricPrefs.enabled);
     expect(
       await application.storageService.getValue(
         StorageKey.MobileBiometricsTiming,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.timing);
+    ).toEqual(biometricPrefs.timing);
     const preferences = await application.storageService.getValue(
       'preferences'
     );
-    expect(preferences.sortBy).to.equal('created_at');
-    expect(preferences.sortReverse).to.be.false;
-    expect(preferences.hideDate).to.be.false;
-    expect(preferences.hideNotePreview).to.be.true;
-    expect(preferences.lastExportDate).to.equal(undefined);
-    expect(preferences.doNotShowAgainUnsupportedEditors).to.be.true;
-    await application.deinit();
-  });
+    expect(preferences.sortBy).toEqual('created_at');
+    expect(preferences.sortReverse).toEqual(false);
+    expect(preferences.hideDate).toEqual(false);
+    expect(preferences.hideNotePreview).toEqual(true);
+    expect(preferences.lastExportDate).toEqual(undefined);
+    expect(preferences.doNotShowAgainUnsupportedEditors).toEqual(true);
+    application.deinit();
+  }, 10000);
 
   it('2020-01-15 migration from mobile version 3.0.16', async function () {
     /**
@@ -1203,7 +1210,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new SNCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -1320,7 +1327,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     await application.launch(true);
 
-    expect(application.protocolService.keyMode).to.equal(
+    expect(application.protocolService.keyMode).toEqual(
       KeyMode.RootKeyPlusWrapper
     );
 
@@ -1329,55 +1336,55 @@ describe('2020-01-15 mobile migration', () => {
       StorageValueModes.Default
     );
     const valueStore = application.storageService.values[storageMode];
-    expect(valueStore.content_type).to.not.be.ok;
+    expect(valueStore.content_type).toBeUndefined;
 
     const keyParams = await application.storageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
     );
-    expect(typeof keyParams).to.equal('object');
-    const rootKey = await application.protocolService.getRootKey();
-    expect(rootKey.masterKey).to.equal(accountKey.masterKey);
-    expect(rootKey.dataAuthenticationKey).to.equal(
+    expect(typeof keyParams).toEqual('object');
+    const rootKey = application.protocolService.getRootKey();
+    expect(rootKey.masterKey).toEqual(accountKey.masterKey);
+    expect(rootKey.dataAuthenticationKey).toEqual(
       accountKey.dataAuthenticationKey
     );
-    expect(rootKey.serverPassword).to.not.be.ok;
-    expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003);
-    expect(application.protocolService.keyMode).to.equal(
+    expect(rootKey.serverPassword).toBeUndefined;
+    expect(rootKey.keyVersion).toEqual(ProtocolVersion.V003);
+    expect(application.protocolService.keyMode).toEqual(
       KeyMode.RootKeyPlusWrapper
     );
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
       application.identifier
     );
-    expect(keychainValue).to.not.be.ok;
+    expect(keychainValue).toBeUndefined;
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1);
+    expect(application.itemManager.notes.length).toEqual(1);
     const retrievedNote = application.itemManager.notes[0];
-    expect(retrievedNote.uuid).to.equal(notePayload.uuid);
-    expect(retrievedNote.content.text).to.equal(notePayload.content.text);
+    expect(retrievedNote.uuid).toEqual(notePayload.uuid);
+    expect(retrievedNote.content.text).toEqual(notePayload.content.text);
 
     expect(
       await application.storageService.getValue(
         NonwrappedStorageKey.MobileFirstRun,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(false);
+    ).toEqual(false);
 
     expect(
       await application.storageService.getValue(
         StorageKey.BiometricsState,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.enabled);
+    ).toEqual(biometricPrefs.enabled);
     expect(
       await application.storageService.getValue(
         StorageKey.MobileBiometricsTiming,
         StorageValueModes.Nonwrapped
       )
-    ).to.equal(biometricPrefs.timing);
-    expect(await application.getUser().email).to.equal(identifier);
+    ).toEqual(biometricPrefs.timing);
+    expect(application.getUser().email).toEqual(identifier);
 
     const appId = application.identifier;
     console.warn(
@@ -1386,7 +1393,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Full sync completed event will not trigger due to mocked credentials,
      * thus we manually need to mark any sync dependent migrations as complete. */
     await application.migrationService.markMigrationsAsDone();
-    await application.deinit();
+    application.deinit();
 
     /** Recreate application and ensure storage values are consistent */
     application = Factory.createApplication(appId);
@@ -1394,18 +1401,18 @@ describe('2020-01-15 mobile migration', () => {
       receiveChallenge,
     });
     await application.launch(true);
-    expect(await application.getUser().email).to.equal(identifier);
-    expect(await application.getHost()).to.equal(customServer);
+    expect(application.getUser().email).toEqual(identifier);
+    expect(application.getHost()).toEqual(customServer);
     const preferences = await application.storageService.getValue(
       'preferences'
     );
-    expect(preferences.sortBy).to.equal('userModifiedAt');
-    expect(preferences.sortReverse).to.be.false;
-    expect(preferences.hideDate).to.be.false;
-    expect(preferences.hideTags).to.be.false;
-    expect(preferences.hideNotePreview).to.be.true;
-    expect(preferences.lastExportDate).to.equal(lastExportDate);
-    expect(preferences.doNotShowAgainUnsupportedEditors).to.be.false;
+    expect(preferences.sortBy).toEqual('userModifiedAt');
+    expect(preferences.sortReverse).toEqual(false);
+    expect(preferences.hideDate).toEqual(false);
+    expect(preferences.hideTags).toEqual(false);
+    expect(preferences.hideNotePreview).toEqual(true);
+    expect(preferences.lastExportDate).toEqual(lastExportDate);
+    expect(preferences.doNotShowAgainUnsupportedEditors).toEqual(false);
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
