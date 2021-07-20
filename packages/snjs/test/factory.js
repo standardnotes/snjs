@@ -1,6 +1,21 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import WebDeviceInterface from './web_device_interface.js';
+import { SNApplication } from '@Lib/application';
+import { ChallengeValidation, ChallengeValue, ChallengeReason } from '@Lib/challenges';
+import { SyncEvent, ApplicationEvent } from '@Lib/events';
+import { KeyParamsOrigination, Uuids, CreateMaxPayloadFromAnyObject, PayloadSource, SNLog, SNComponentManager } from '@Lib/index';
+import { ContentType } from '@Lib/models';
+import { Environment, Platform } from '@Lib/platforms';
+import { SyncModes } from '@Lib/services';
+import { Uuid } from '@Lib/uuid';
+import DeviceInterface from './setup/snjs/deviceInterface';
+import SNCrypto from './setup/snjs/snCrypto';
+import { WebComponentManager, MobileComponentManager } from './setup/snjs/componentManager';
+
+SNLog.onLog = (message) => {
+  console.log(message);
+};
+SNLog.onError = (error) => {
+  console.error(error);
+};
 
 export const TestTimeout = 10000;
 export const LongTestTimeout = 20000;
@@ -78,8 +93,21 @@ export function getDefaultWebSocketUrl() {
   return 'ws://localhost';
 }
 
+const getSwappedClasses = (environment) => {
+  const classMap = {
+    swap: SNComponentManager,
+    with: WebComponentManager
+  };
+  switch (environment) {
+    case Environment.Mobile:
+      classMap.with = MobileComponentManager;
+      break;
+  }
+  return [classMap];
+};
+
 export function createApplication(identifier, environment, platform) {
-  const deviceInterface = new WebDeviceInterface(
+  const deviceInterface = new DeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
   );
@@ -87,16 +115,15 @@ export function createApplication(identifier, environment, platform) {
     environment || Environment.Web,
     platform || Platform.MacWeb,
     deviceInterface,
-    new SNWebCrypto(),
+    new SNCrypto(),
     {
       confirm: async () => true,
       alert: async () => {},
       blockingDialog: () => () => {},
     },
     identifier || `${Math.random()}`,
-    [],
-    getDefaultHost(),
-    getDefaultWebSocketUrl(),
+    getSwappedClasses(environment),
+    getDefaultHost()
   );
 }
 
@@ -295,7 +322,7 @@ export async function signOutApplicationAndReturnNew(application) {
 export async function signOutAndBackIn(application, email, password) {
   await application.signOut();
   const newApplication = await createInitAppWithRandNamespace();
-  await this.loginToApplication({
+  await loginToApplication({
     application: newApplication,
     email,
     password,
@@ -323,7 +350,7 @@ export function createItemParams(contentType) {
 }
 
 export function generateUuid() {
-  const crypto = new SNWebCrypto();
+  const crypto = new SNCrypto();
   return crypto.generateUUIDSync();
 }
 
@@ -422,7 +449,7 @@ export function randomString(length = 10) {
 }
 
 export function generateUuidish() {
-  return this.randomString(32);
+  return randomString(32);
 }
 
 export function randomArrayValue(array) {
@@ -436,12 +463,10 @@ export async function expectThrowsAsync(method, errorMessage) {
   } catch (err) {
     error = err;
   }
-  const expect = chai.expect;
-  expect(error).to.be.an('Error');
+  expect(error).toBeInstanceOf(Error);
   if (errorMessage) {
-    expect(error.message)
-      .to.be.a('string')
-      .and.satisfy((msg) => msg.startsWith(errorMessage));
+    expect(typeof error.message).toBe("string");
+    expect(error.message.startsWith(errorMessage)).toBe(true);
   }
 }
 
