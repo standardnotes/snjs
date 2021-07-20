@@ -16,7 +16,7 @@ import { SyncQueueStrategy, SyncModes } from '@Lib/services';
 import { Uuid } from '@Lib/uuid';
 import * as Factory from '../../factory';
 
-describe.skip('online syncing', function () {
+describe('online syncing', function () {
   jest.setTimeout(Factory.TestTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 

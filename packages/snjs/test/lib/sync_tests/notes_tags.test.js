@@ -3,7 +3,7 @@ import { ContentType } from '@Lib/models';
 import { Uuid } from '@Lib/uuid';
 import * as Factory from '../../factory';
 
-describe.skip('notes + tags syncing', function () {
+describe('notes + tags syncing', function () {
   const syncOptions = {
     checkIntegrity: true,
     awaitAll: true,

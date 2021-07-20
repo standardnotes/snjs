@@ -2,7 +2,7 @@ import { PayloadSource, CopyPayload } from '@Lib/index';
 import { Uuid } from '@Lib/uuid';
 import * as Factory from '../../factory';
 
-describe.skip('sync discordance', () => {
+describe('sync discordance', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {

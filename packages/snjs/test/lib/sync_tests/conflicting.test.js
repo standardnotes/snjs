@@ -4,7 +4,7 @@ import { EncryptionIntent } from '@Lib/protocol';
 import { Uuid } from '@Lib/uuid';
 import * as Factory from '../../factory';
 
-describe.skip('online conflict handling', function () {
+describe('online conflict handling', function () {
   jest.setTimeout(Factory.TestTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
