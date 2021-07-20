@@ -1,24 +1,16 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { ChallengeValue, ChallengeValidation } from '@Lib/challenges';
+import { KeyParamsOrigination, PayloadSource, KeyRecoveryStrings, CopyPayload } from '@Lib/index';
+import { ContentType } from '@Lib/models';
+import { EncryptionIntent, ProtocolVersion } from '@Lib/protocol';
+import * as Factory from '../factory';
 
 describe('key recovery service', function () {
-  this.timeout(Factory.LongTestTimeout);
+  jest.setTimeout(Factory.LongTestTimeout);
 
   const syncOptions = {
     checkIntegrity: true,
     awaitAll: true,
   };
-
-  beforeEach(async function () {
-    localStorage.clear();
-  });
-
-  afterEach(function () {
-    localStorage.clear();
-  });
 
   it('when encountering an undecryptable items key, should recover through recovery wizard', async function () {
     const namespace = Factory.randomString();
@@ -62,7 +54,7 @@ describe('key recovery service', function () {
       encrypted
     );
     /** Expect to be errored */
-    expect(decrypted.errorDecrypting).to.equal(true);
+    expect(decrypted.errorDecrypting).toBe(true);
 
     /** Insert into rotation */
     await application.payloadManager.emitPayload(
@@ -74,11 +66,9 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3);
 
     /** Should be decrypted now */
-    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(
-      false
-    );
+    expect(application.findItem(encrypted.uuid).errorDecrypting).toBe(false);
 
-    expect(application.syncService.isOutOfSync()).to.equal(false);
+    expect(application.syncService.isOutOfSync()).toBe(false);
     context.deinit();
   });
 
@@ -138,22 +128,20 @@ describe('key recovery service', function () {
     await Factory.sleep(1.5);
 
     /** Should be decrypted now */
-    expect(application.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(
-      false
-    );
-    expect(application.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(
-      false
-    );
+    expect(application.findItem(randomItemsKey.uuid).errorDecrypting).toBe(false);
+    expect(application.findItem(randomItemsKey2.uuid).errorDecrypting).toBe(false);
 
-    expect(totalPromptCount).to.equal(1);
+    expect(totalPromptCount).toBe(1);
 
-    expect(application.syncService.isOutOfSync()).to.equal(false);
+    expect(application.syncService.isOutOfSync()).toBe(false);
     context.deinit();
   });
 
   it(
     'when changing password on another client, it should prompt us for new account password',
     async function () {
+      jest.setTimeout(80000);
+
       /**
        * This test takes way too long due to all the key generation occuring
        * from registering, changing pw, logging in, verifying protections, reauthenticating expired sessions, etc,
@@ -199,7 +187,7 @@ describe('key recovery service', function () {
         password: contextA.password,
       });
 
-      expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
+      expect(appA.getItems(ContentType.ItemsKey).length).toBe(1);
 
       /** Create simultaneous appB signed into same account */
       const contextB = await Factory.createAppContext('another-namespace');
@@ -214,13 +202,13 @@ describe('key recovery service', function () {
 
       /** Change password on appB */
       const result = await appB.changePassword(contextA.password, newPassword);
-      expect(result.error).to.not.be.ok;
+      expect(result.error).toBeFalsy();
       const note = await Factory.createSyncedNote(appB);
-      expect(appB.getItems(ContentType.ItemsKey).length).to.equal(2);
+      expect(appB.getItems(ContentType.ItemsKey).length).toBe(2);
       await appB.sync(syncOptions);
 
       /** Sync appA and expect a new items key to be downloaded and errored */
-      expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
+      expect(appA.getItems(ContentType.ItemsKey).length).toBe(1);
       await appA.sync(syncOptions);
       await contextA.awaitNextSucessfulSync();
       // await Factory.sleep(4);
@@ -228,25 +216,25 @@ describe('key recovery service', function () {
       /** Same previously errored key should now no longer be errored, */
       const keys = appA.itemManager.itemsKeys();
       for (const key of keys) {
-        expect(key.errorDecrypting).to.not.be.ok;
+        expect(key.errorDecrypting).toBeFalsy();
       }
 
       /** appA's root key should now match appB's. */
       const aKey = await appA.protocolService.getRootKey();
       const bKey = await appB.protocolService.getRootKey();
-      expect(aKey.compare(bKey)).to.equal(true);
+      expect(aKey.compare(bKey)).toBe(true);
 
       /** Expect appB note to be decrypted */
-      expect(appA.findItem(note.uuid).errorDecrypting).to.not.be.ok;
-      expect(appB.findItem(note.uuid).errorDecrypting).to.not.be.ok;
+      expect(appA.findItem(note.uuid).errorDecrypting).toBeFalsy();
+      expect(appB.findItem(note.uuid).errorDecrypting).toBeFalsy();
 
-      expect(appA.syncService.isOutOfSync()).to.equal(false);
-      expect(appB.syncService.isOutOfSync()).to.equal(false);
+      expect(appA.syncService.isOutOfSync()).toBe(false);
+      expect(appB.syncService.isOutOfSync()).toBe(false);
 
       contextA.deinit();
       contextB.deinit();
     }
-  ).timeout(80000);
+  );
 
   it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
     const namespace = Factory.randomString();
@@ -268,7 +256,7 @@ describe('key recovery service', function () {
       password: this.password,
     });
 
-    expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
+    expect(appA.getItems(ContentType.ItemsKey).length).toBe(1);
 
     /** Create simultaneous appB signed into same account */
     const appB = await Factory.createApplication('another-namespace');
@@ -287,7 +275,7 @@ describe('key recovery service', function () {
 
     /** We expect the item in appA to be errored at this point, but we do not want it to recover */
     await appA.sync();
-    expect(appA.findItem(note.uuid).waitingForKey).to.equal(true);
+    expect(appA.findItem(note.uuid).waitingForKey).toBe(true);
     console.warn(
       'Expecting exceptions below as we destroy app during key recovery'
     );
@@ -298,8 +286,8 @@ describe('key recovery service', function () {
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} });
     await recreatedAppA.launch(true);
 
-    expect(recreatedAppA.findItem(note.uuid).errorDecrypting).to.equal(true);
-    expect(recreatedAppA.findItem(note.uuid).waitingForKey).to.equal(true);
+    expect(recreatedAppA.findItem(note.uuid).errorDecrypting).toBe(true);
+    expect(recreatedAppA.findItem(note.uuid).waitingForKey).toBe(true);
     recreatedAppA.deinit();
   });
 
@@ -371,9 +359,9 @@ describe('key recovery service', function () {
     await Factory.sleep(5.0);
 
     const clientRootKey = await application.protocolService.getRootKey();
-    expect(clientRootKey.compare(correctRootKey)).to.equal(true);
+    expect(clientRootKey.compare(correctRootKey)).toBe(true);
 
-    expect(application.syncService.isOutOfSync()).to.equal(false);
+    expect(application.syncService.isOutOfSync()).toBe(false);
     context.deinit();
   });
 
@@ -412,34 +400,28 @@ describe('key recovery service', function () {
 
     /** Our current items key should not be overwritten */
     const currentItemsKey = application.findItem(itemsKey.uuid);
-    expect(currentItemsKey.errorDecrypting).to.not.be.ok;
-    expect(currentItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
-    expect(currentItemsKey.serverUpdatedAt.getTime()).to.equal(
-      itemsKey.serverUpdatedAt.getTime()
-    );
+    expect(currentItemsKey.errorDecrypting).toBeFalsy();
+    expect(currentItemsKey.itemsKey).toBe(itemsKey.itemsKey);
+    expect(currentItemsKey.serverUpdatedAt.getTime()).toBe(itemsKey.serverUpdatedAt.getTime());
 
     /** Payload should be persisted as unrecoverable */
     const undecryptables = await application.keyRecoveryService.getUndecryptables();
-    expect(Object.keys(undecryptables).length).to.equal(1);
+    expect(Object.keys(undecryptables).length).toBe(1);
 
     /** Allow key recovery wizard to finish its processes */
     await Factory.sleep(1.5);
 
     /** Unrecoverable should be cleared, and key recovered and emitted */
     const latestUndecryptables = await application.keyRecoveryService.getUndecryptables();
-    expect(Object.keys(latestUndecryptables).length).to.equal(0);
+    expect(Object.keys(latestUndecryptables).length).toBe(0);
 
     const latestItemsKey = application.findItem(itemsKey.uuid);
-    expect(latestItemsKey.errorDecrypting).to.not.be.ok;
-    expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
-    expect(latestItemsKey.serverUpdatedAt.getTime()).to.not.equal(
-      currentItemsKey.serverUpdatedAt.getTime()
-    );
-    expect(latestItemsKey.serverUpdatedAt.getTime()).to.equal(
-      newUpdated.getTime()
-    );
+    expect(latestItemsKey.errorDecrypting).toBeFalsy();
+    expect(latestItemsKey.itemsKey).toBe(itemsKey.itemsKey);
+    expect(latestItemsKey.serverUpdatedAt.getTime()).not.toBe(currentItemsKey.serverUpdatedAt.getTime());
+    expect(latestItemsKey.serverUpdatedAt.getTime()).toBe(newUpdated.getTime());
 
-    expect(application.syncService.isOutOfSync()).to.equal(false);
+    expect(application.syncService.isOutOfSync()).toBe(false);
     application.deinit();
   });
 
@@ -474,7 +456,7 @@ describe('key recovery service', function () {
       'Expecting some error below because we are destroying app in the middle of processing.'
     );
     await Factory.sleep(0.1);
-    expect(application.syncService.isOutOfSync()).to.equal(false);
+    expect(application.syncService.isOutOfSync()).toBe(false);
     context.deinit();
 
     /** Recreate application, and expect key recovery wizard to complete */
@@ -493,15 +475,15 @@ describe('key recovery service', function () {
     await Factory.sleep(1.5);
 
     /** Unrecoverable should be cleared, and key recovered and emitted */
-    expect(didReceivePasswordPrompt).to.equal(true);
+    expect(didReceivePasswordPrompt).toBe(true);
     const latestUndecryptables = await recreatedApp.keyRecoveryService.getUndecryptables();
-    expect(Object.keys(latestUndecryptables).length).to.equal(0);
+    expect(Object.keys(latestUndecryptables).length).toBe(0);
 
     const latestItemsKey = recreatedApp.findItem(itemsKey.uuid);
-    expect(latestItemsKey.errorDecrypting).to.not.be.ok;
-    expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
+    expect(latestItemsKey.errorDecrypting).toBeFalsy();
+    expect(latestItemsKey.itemsKey).toBe(itemsKey.itemsKey);
 
-    expect(recreatedApp.syncService.isOutOfSync()).to.equal(false);
+    expect(recreatedApp.syncService.isOutOfSync()).toBe(false);
     recreatedApp.deinit();
   });
 
@@ -549,7 +531,7 @@ describe('key recovery service', function () {
       encrypted
     );
     /** Expect to be errored */
-    expect(decrypted.errorDecrypting).to.equal(true);
+    expect(decrypted.errorDecrypting).toBe(true);
 
     /** Insert into rotation */
     await application.payloadManager.emitPayload(
@@ -561,11 +543,9 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3);
 
     /** Should be decrypted now */
-    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(
-      false
-    );
+    expect(application.findItem(encrypted.uuid).errorDecrypting).toBe(false);
 
-    expect(application.syncService.isOutOfSync()).to.equal(false);
+    expect(application.syncService.isOutOfSync()).toBe(false);
     context.deinit();
   });
 });
