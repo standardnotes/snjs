@@ -5,8 +5,6 @@ import * as Factory from './../../factory';
 
 describe('mapping performance', () => {
   it('shouldnt take a long time', async () => {
-    jest.setTimeout(20000);
-
     /*
     There was an issue with mapping where we were using arrays for everything instead of hashes (like items, missedReferences),
     which caused searching to be really expensive and caused a huge slowdown.
@@ -77,7 +75,7 @@ describe('mapping performance', () => {
       ).toBeGreaterThan(0);
     }
     application.deinit();
-  });
+  }, 20000);
 
   it('mapping a tag with thousands of notes should be quick', async () => {
     /*
