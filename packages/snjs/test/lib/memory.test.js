@@ -5,13 +5,14 @@ import * as Factory from './../factory';
  * Then check browser Memory tool to make sure there are no leaks.
  */
 describe('memory', function () {
+  let application;
+
   beforeEach(async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    application = await Factory.createInitAppWithRandNamespace();
   });
 
   afterEach(function () {
-    this.application.deinit();
-    this.application = null;
+    application.deinit();
   });
 
   it('passes', async function () {
