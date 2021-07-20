@@ -1,18 +1,8 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { CopyPayload, ImmutablePayloadCollection, ItemCollection, CollectionSort } from '@Lib/index';
+import { ContentType, CreateItemFromPayload, SNItem } from '@Lib/models';
+import * as Factory from './../factory';
 
 describe('payload collections', () => {
-  before(async () => {
-    localStorage.clear();
-  });
-
-  after(async () => {
-    localStorage.clear();
-  });
-
   const copyPayload = (payload, timestamp, changeUuid) => {
     return CopyPayload(payload, {
       uuid: changeUuid ? Factory.generateUuidish() : payload.uuid,
@@ -23,7 +13,7 @@ describe('payload collections', () => {
   it('find', async () => {
     const payload = Factory.createNotePayload();
     const collection = ImmutablePayloadCollection.WithPayloads([payload]);
-    expect(collection.find(payload.uuid)).to.be.ok;
+    expect(collection.find(payload.uuid)).toBeTruthy();
   });
 
   it('references', async () => {
@@ -35,7 +25,7 @@ describe('payload collections', () => {
       tagPayload,
     ]);
     const referencing = collection.elementsReferencingElement(notePayload);
-    expect(referencing.length).to.equal(1);
+    expect(referencing.length).toBe(1);
   });
 
   it('conflict map', async () => {
@@ -50,12 +40,12 @@ describe('payload collections', () => {
     });
     collection.set([conflict]);
 
-    expect(collection.conflictsOf(payload.uuid)).to.eql([conflict]);
+    expect(collection.conflictsOf(payload.uuid)).toEqual([conflict]);
 
     const manualResults = collection.all().find((p) => {
       return p.safeContent.conflict_of === payload.uuid;
     });
-    expect(collection.conflictsOf(payload.uuid)).to.eql([manualResults]);
+    expect(collection.conflictsOf(payload.uuid)).toEqual([manualResults]);
   });
 
   it('setting same element twice should not yield duplicates', async () => {
@@ -73,7 +63,7 @@ describe('payload collections', () => {
     collection.set([payload, copy]);
 
     const sorted = collection.displayElements(ContentType.Note);
-    expect(sorted.length).to.equal(1);
+    expect(sorted.length).toBe(1);
   });
 
   it('display sort asc', async () => {
@@ -95,9 +85,9 @@ describe('payload collections', () => {
     collection.set([newest, oldest, present]);
     const sorted = collection.displayElements(ContentType.Note);
 
-    expect(sorted[0].uuid).to.equal(oldest.uuid);
-    expect(sorted[1].uuid).to.equal(present.uuid);
-    expect(sorted[2].uuid).to.equal(newest.uuid);
+    expect(sorted[0].uuid).toBe(oldest.uuid);
+    expect(sorted[1].uuid).toBe(present.uuid);
+    expect(sorted[2].uuid).toBe(newest.uuid);
   });
 
   it('display sort dsc', async () => {
@@ -119,9 +109,9 @@ describe('payload collections', () => {
     collection.set([oldest, newest, present]);
     const sorted = collection.displayElements(ContentType.Note);
 
-    expect(sorted[0].uuid).to.equal(newest.uuid);
-    expect(sorted[1].uuid).to.equal(present.uuid);
-    expect(sorted[2].uuid).to.equal(oldest.uuid);
+    expect(sorted[0].uuid).toBe(newest.uuid);
+    expect(sorted[1].uuid).toBe(present.uuid);
+    expect(sorted[2].uuid).toBe(oldest.uuid);
   });
 
   it('display sort filter asc', async () => {
@@ -141,10 +131,10 @@ describe('payload collections', () => {
 
     collection.set([passes1, passes2, fails]);
     const filtered = collection.displayElements(ContentType.Note);
-    expect(filtered.length).to.equal(2);
+    expect(filtered.length).toBe(2);
 
-    expect(filtered[0].content.title.includes(filterFor)).to.equal(true);
-    expect(filtered[1].content.title.includes(filterFor)).to.equal(true);
+    expect(filtered[0].content.title.includes(filterFor)).toBe(true);
+    expect(filtered[1].content.title.includes(filterFor)).toBe(true);
   });
 
   it('deleting should remove from displayed elements', async () => {
@@ -157,8 +147,8 @@ describe('payload collections', () => {
     const present = Factory.createNotePayload();
     collection.set([present]);
 
-    expect(collection.all(ContentType.Note).length).to.equal(1);
-    expect(collection.displayElements(ContentType.Note).length).to.equal(1);
+    expect(collection.all(ContentType.Note).length).toBe(1);
+    expect(collection.displayElements(ContentType.Note).length).toBe(1);
 
     const deleted = CopyPayload(present, {
       deleted: true,
@@ -167,8 +157,8 @@ describe('payload collections', () => {
 
     expect(
       collection.all(ContentType.Note).filter((n) => !n.deleted).length
-    ).to.equal(0);
-    expect(collection.displayElements(ContentType.Note).length).to.equal(0);
+    ).toBe(0);
+    expect(collection.displayElements(ContentType.Note).length).toBe(0);
   });
 
   it('changing element should update sort order', async () => {
@@ -186,19 +176,19 @@ describe('payload collections', () => {
     collection.set([payload2, payload1, payload3]);
     let displayed = collection.displayElements(ContentType.Note);
 
-    expect(displayed[0].uuid).to.equal(payload1.uuid);
-    expect(displayed[1].uuid).to.equal(payload2.uuid);
-    expect(displayed[2].uuid).to.equal(payload3.uuid);
+    expect(displayed[0].uuid).toBe(payload1.uuid);
+    expect(displayed[1].uuid).toBe(payload2.uuid);
+    expect(displayed[2].uuid).toBe(payload3.uuid);
 
     const changed2 = copyPayload(payload2, 4000, false);
     collection.set([changed2]);
 
     displayed = collection.displayElements(ContentType.Note);
-    expect(displayed.length).to.equal(3);
+    expect(displayed.length).toBe(3);
 
-    expect(displayed[0].uuid).to.equal(payload1.uuid);
-    expect(displayed[1].uuid).to.equal(payload3.uuid);
-    expect(displayed[2].uuid).to.equal(payload2.uuid);
+    expect(displayed[0].uuid).toBe(payload1.uuid);
+    expect(displayed[1].uuid).toBe(payload3.uuid);
+    expect(displayed[2].uuid).toBe(payload2.uuid);
   });
 
   it('pinning note should update sort', async () => {
@@ -214,8 +204,8 @@ describe('payload collections', () => {
     collection.set([unpinned1, unpinned2]);
     const sorted = collection.displayElements(ContentType.Note);
 
-    expect(sorted[0].uuid).to.equal(unpinned1.uuid);
-    expect(sorted[1].uuid).to.equal(unpinned2.uuid);
+    expect(sorted[0].uuid).toBe(unpinned1.uuid);
+    expect(sorted[1].uuid).toBe(unpinned2.uuid);
 
     const pinned2 = CreateItemFromPayload(
       CopyPayload(unpinned2.payload, {
@@ -232,8 +222,8 @@ describe('payload collections', () => {
     collection.set(pinned2);
     const resorted = collection.displayElements(ContentType.Note);
 
-    expect(resorted[0].uuid).to.equal(unpinned2.uuid);
-    expect(resorted[1].uuid).to.equal(unpinned1.uuid);
+    expect(resorted[0].uuid).toBe(unpinned2.uuid);
+    expect(resorted[1].uuid).toBe(unpinned1.uuid);
   });
 
   it('setDisplayOptions should not fail for encrypted items', async () => {
@@ -259,9 +249,9 @@ describe('payload collections', () => {
       'asc'
     );
     const displayed = collection.displayElements(ContentType.Note);
-    expect(displayed.length).to.equal(3);
-    expect(displayed[0].errorDecrypting).to.equal(true);
-    expect(displayed[1].text).to.equal('noteText');
-    expect(displayed[2].text).to.equal('noteText2');
+    expect(displayed.length).toBe(3);
+    expect(displayed[0].errorDecrypting).toBe(true);
+    expect(displayed[1].text).toBe('noteText');
+    expect(displayed[2].text).toBe('noteText2');
   });
 });
