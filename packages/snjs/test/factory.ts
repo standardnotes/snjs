@@ -1,7 +1,7 @@
 import { SNApplication } from '@Lib/application';
-import { ChallengeValidation, ChallengeValue, ChallengeReason } from '@Lib/challenges';
+import { ChallengeValidation, ChallengeValue, ChallengeReason, Challenge } from '@Lib/challenges';
 import { SyncEvent, ApplicationEvent } from '@Lib/events';
-import { KeyParamsOrigination, Uuids, CreateMaxPayloadFromAnyObject, PayloadSource, SNLog, SNComponentManager } from '@Lib/index';
+import { KeyParamsOrigination, Uuids, CreateMaxPayloadFromAnyObject, PayloadSource, SNLog, SNComponentManager, DeinitSource, ProtocolVersion } from '@Lib/index';
 import { ContentType } from '@Lib/models';
 import { Environment, Platform } from '@Lib/platforms';
 import { SyncModes } from '@Lib/services';
@@ -9,6 +9,7 @@ import { Uuid } from '@Lib/uuid';
 import DeviceInterface from './setup/snjs/deviceInterface';
 import SNCrypto from './setup/snjs/snCrypto';
 import { WebComponentManager, MobileComponentManager } from './setup/snjs/componentManager';
+import { RawPayload } from '@Lib/protocol/payloads/generator';
 
 SNLog.onLog = (message) => {
   console.log(message);
@@ -25,7 +26,7 @@ const syncOptions = {
   awaitAll: true,
 };
 
-export async function createAppContext(identifier) {
+export async function createAppContext(identifier: string) {
   if (!identifier) {
     identifier = `${Math.random()}`;
   }
@@ -33,7 +34,7 @@ export async function createAppContext(identifier) {
   const email = Uuid.GenerateUuidSynchronously();
   const password = Uuid.GenerateUuidSynchronously();
   const passcode = 'mypasscode';
-  const handleChallenge = (challenge) => {
+  const handleChallenge = (challenge: Challenge) => {
     const responses = [];
     for (const prompt of challenge.prompts) {
       if (prompt.validation === ChallengeValidation.LocalPasscode) {
@@ -61,7 +62,7 @@ export async function createAppContext(identifier) {
     password,
     passcode,
     awaitNextSucessfulSync: () => {
-      return new Promise((resolve) => {
+      return new Promise<void>((resolve) => {
         const removeObserver = application.syncService.addEventObserver(
           (event) => {
             if (event === SyncEvent.FullSyncCompleted) {
@@ -80,7 +81,7 @@ export async function createAppContext(identifier) {
     },
     handleChallenge,
     deinit: () => {
-      application.deinit();
+      application.deinit(DeinitSource.SignOut);
     },
   };
 }
@@ -93,7 +94,7 @@ export function getDefaultWebSocketUrl() {
   return 'ws://localhost';
 }
 
-const getSwappedClasses = (environment) => {
+const getSwappedClasses = (environment?: Environment) => {
   const classMap = {
     swap: SNComponentManager,
     with: WebComponentManager
@@ -102,11 +103,14 @@ const getSwappedClasses = (environment) => {
     case Environment.Mobile:
       classMap.with = MobileComponentManager;
       break;
+    default:
+      classMap.with = WebComponentManager;
+      break;
   }
   return [classMap];
 };
 
-export function createApplication(identifier, environment, platform) {
+export function createApplication(identifier: string, environment?: Environment, platform?: Platform) {
   const deviceInterface = new DeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
@@ -128,27 +132,27 @@ export function createApplication(identifier, environment, platform) {
   );
 }
 
-export async function createAppWithRandNamespace(environment, platform) {
+export async function createAppWithRandNamespace(environment: Environment, platform: Platform) {
   const namespace = Math.random().toString(36).substring(2, 15);
   return createApplication(namespace, environment, platform);
 }
 
-export async function createInitAppWithRandNamespace(environment, platform) {
+export async function createInitAppWithRandNamespace(environment?: Environment, platform?: Platform) {
   const namespace = Math.random().toString(36).substring(2, 15);
   return createAndInitializeApplication(namespace, environment, platform);
 }
 
 export async function createAndInitializeApplication(
-  namespace,
-  environment,
-  platform
+  namespace: string,
+  environment?: Environment,
+  platform?: Platform
 ) {
   const application = createApplication(namespace, environment, platform);
   await initializeApplication(application);
   return application;
 }
 
-export async function initializeApplication(application) {
+export async function initializeApplication(application: SNApplication) {
   await application.prepareForLaunch({
     receiveChallenge: (challenge) => {
       if (challenge.reason !== ChallengeReason.Custom) {
@@ -159,23 +163,37 @@ export async function initializeApplication(application) {
   await application.launch(true);
 }
 
+type RegisterUserToApplication = {
+  application: SNApplication;
+  email: string;
+  password: string;
+  ephemeral?: boolean;
+  mergeLocal?: boolean;
+};
+
 export async function registerUserToApplication({
   application,
   email,
   password,
-  ephemeral,
+  ephemeral = false,
   mergeLocal = true,
-}) {
+}: RegisterUserToApplication) {
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   return application.register(email, password, ephemeral, mergeLocal);
 }
 
+type SetOldVersionPasscode = {
+  application: SNApplication;
+  passcode: string;
+  version: ProtocolVersion;
+};
+
 export async function setOldVersionPasscode({
   application,
   passcode,
   version,
-}) {
+}: SetOldVersionPasscode) {
   const identifier = await application.protocolService.crypto.generateUUID();
   const operator = application.protocolService.operatorForVersion(version);
   const key = await operator.createRootKey(
@@ -188,6 +206,13 @@ export async function setOldVersionPasscode({
   await application.syncService.sync(syncOptions);
 }
 
+type RegisterOldUser = {
+  application: SNApplication;
+  email: string;
+  password: string;
+  version: ProtocolVersion;
+};
+
 /**
  * Using application.register will always use latest version of protocol.
  * To use older version, use this method.
@@ -197,7 +222,7 @@ export async function registerOldUser({
   email,
   password,
   version,
-}) {
+}: RegisterOldUser) {
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
   const operator = application.protocolService.operatorForVersion(version);
@@ -209,8 +234,9 @@ export async function registerOldUser({
 
   const response = await application.apiService.register(
     email,
-    accountKey.serverPassword,
-    accountKey.keyParams
+    accountKey.serverPassword!,
+    accountKey.keyParams,
+    false
   );
   /** Mark all existing items as dirty. */
   await application.itemManager.changeItems(
@@ -231,11 +257,11 @@ export async function registerOldUser({
   await application.protocolService.decryptErroredItems();
 }
 
-export function createStorageItemPayload(contentType) {
+export function createStorageItemPayload(contentType: ContentType) {
   return CreateMaxPayloadFromAnyObject(createItemParams(contentType));
 }
 
-export function createNotePayload(title, text = undefined) {
+export function createNotePayload(title: string, text = undefined) {
   return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text }));
 }
 
@@ -243,19 +269,19 @@ export function createStorageItemTagPayload() {
   return CreateMaxPayloadFromAnyObject(createTagParams());
 }
 
-export function itemToStoragePayload(item) {
+export function itemToStoragePayload(item: RawPayload) {
   return CreateMaxPayloadFromAnyObject(item);
 }
 
-export function createMappedNote(application) {
-  const payload = createNotePayload();
+export function createMappedNote(application: SNApplication) {
+  const payload = createNotePayload('test');
   return application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
   );
 }
 
-export function createMappedTag(application) {
+export function createMappedTag(application: SNApplication) {
   const payload = createStorageItemTagPayload();
   return application.itemManager.emitItemFromPayload(
     payload,
@@ -263,7 +289,7 @@ export function createMappedTag(application) {
   );
 }
 
-export async function createSyncedNote(application, title, text) {
+export async function createSyncedNote(application: SNApplication, title: string, text: string) {
   const payload = createNotePayload(title, text);
   await application.itemManager.emitItemFromPayload(
     payload,
@@ -275,7 +301,7 @@ export async function createSyncedNote(application, title, text) {
   return note;
 }
 
-export async function getStoragePayloadsOfType(application, type) {
+export async function getStoragePayloadsOfType(application: SNApplication, type: ContentType) {
   const rawPayloads = await application.storageService.getAllRawPayloads();
   return rawPayloads
     .filter((rp) => rp.content_type === type)
@@ -284,7 +310,7 @@ export async function getStoragePayloadsOfType(application, type) {
     });
 }
 
-export async function createManyMappedNotes(application, count) {
+export async function createManyMappedNotes(application: SNApplication, count: number) {
   const createdNotes = [];
   for (let i = 0; i < count; i++) {
     const note = await createMappedNote(application);
@@ -294,13 +320,15 @@ export async function createManyMappedNotes(application, count) {
   return createdNotes;
 }
 
+type LoginToApplication = RegisterUserToApplication;
+
 export async function loginToApplication({
   application,
   email,
   password,
-  ephemeral,
+  ephemeral = false,
   mergeLocal = true,
-}) {
+}: LoginToApplication) {
   return application.signIn(
     email,
     password,
@@ -315,30 +343,31 @@ export async function loginToApplication({
  * Signing out of an application deinits it.
  * A new one must be created.
  */
-export async function signOutApplicationAndReturnNew(application) {
+export async function signOutApplicationAndReturnNew(application: SNApplication) {
   await application.signOut();
   return createInitAppWithRandNamespace();
 }
 
-export async function signOutAndBackIn(application, email, password) {
+export async function signOutAndBackIn(application: SNApplication, email: string, password: string) {
   await application.signOut();
   const newApplication = await createInitAppWithRandNamespace();
   await loginToApplication({
     application: newApplication,
     email,
     password,
+    ephemeral: false,
   });
   return newApplication;
 }
 
-export async function restartApplication(application) {
+export async function restartApplication(application: SNApplication) {
   const id = application.identifier;
-  await application.deinit();
+  application.deinit(DeinitSource.SignOut);
   const newApplication = await createAndInitializeApplication(id);
   return newApplication;
 }
 
-export function createItemParams(contentType) {
+export function createItemParams(contentType: ContentType) {
   const params = {
     uuid: generateUuid(),
     content_type: contentType,
@@ -347,7 +376,7 @@ export function createItemParams(contentType) {
       text: 'world',
     },
   };
-  return params;
+  return (params as unknown) as RawPayload;
 }
 
 export function generateUuid() {
@@ -355,7 +384,13 @@ export function generateUuid() {
   return crypto.generateUUIDSync();
 }
 
-export function createNoteParams({ title, text, dirty = true } = {}) {
+type CreateNoteParams = {
+  title?: string;
+  text?: string;
+  dirty?: boolean;
+};
+
+export function createNoteParams({ title, text, dirty = true }: CreateNoteParams) {
   const params = {
     uuid: generateUuid(),
     content_type: ContentType.Note,
@@ -398,13 +433,13 @@ export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
   ];
 }
 
-export async function createSyncedNoteWithTag(application) {
+export async function createSyncedNoteWithTag(application: SNApplication) {
   const payloads = createRelatedNoteTagPairPayload();
   await application.itemManager.emitItemsFromPayloads(payloads);
   return application.sync(syncOptions);
 }
 
-export async function storagePayloadCount(application) {
+export async function storagePayloadCount(application: SNApplication) {
   const payloads = await application.storageService.getAllRawPayloads();
   return payloads.length;
 }
@@ -413,7 +448,7 @@ export function yesterday() {
   return new Date(new Date().setDate(new Date().getDate() - 1));
 }
 
-export function dateToMicroseconds(date) {
+export function dateToMicroseconds(date: Date) {
   return date.getTime() * 1_000;
 }
 
@@ -421,9 +456,9 @@ export function tomorrow() {
   return new Date(new Date().setDate(new Date().getDate() + 1));
 }
 
-export async function sleep(seconds) {
+export async function sleep(seconds: number) {
   console.warn(`Test sleeping for ${seconds}s`);
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     setTimeout(function () {
       resolve();
     }, seconds * 1000);
@@ -453,11 +488,11 @@ export function generateUuidish() {
   return randomString(32);
 }
 
-export function randomArrayValue(array) {
+export function randomArrayValue(array: Array<any>) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-export async function expectThrowsAsync(method, errorMessage) {
+export async function expectThrowsAsync(method: () => void, errorMessage?: string) {
   let error = null;
   try {
     await method();
@@ -471,7 +506,7 @@ export async function expectThrowsAsync(method, errorMessage) {
   }
 }
 
-export function ignoreChallenges(application) {
+export function ignoreChallenges(application: SNApplication) {
   application.setLaunchCallback({
     receiveChallenge() {
       /** no-op */
@@ -479,7 +514,7 @@ export function ignoreChallenges(application) {
   });
 }
 
-export function handlePasswordChallenges(application, password) {
+export function handlePasswordChallenges(application: SNApplication, password: string) {
   application.setLaunchCallback({
     receiveChallenge: (challenge) => {
       const values = challenge.prompts.map(
