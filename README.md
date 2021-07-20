@@ -125,42 +125,13 @@ app.streamItems(
 2. `yarn start` to start Webpack in development mode (watches changes), or `yarn build` to create dist files.
 
 ## Tests
-
-[SNJS](packages/snjs) has two directories containing tests: [test](test) and [packages/snjs/test](packages/snjs/test)
-
-- On [test](test) you will find most unit tests and e2e tests for the core functionality. It is currently using Mocha as the test framework.
-- On [packages/snjs/test](packages/snjs/test) you will find unit tests for the component manager and new features.
-It is encouraged to place new tests on this location, since the [test](test) directory will be migrated 
-to [packages/snjs/test](packages/snjs/test) in the future. The tests are powered by Jest + JSDOM.
-
 ### Running tests
-#### Tests on [test](test)
-Please make sure you have [Docker](https://www.docker.com) installed before running tests.
+Please make sure you have [Docker](https://www.docker.com) and [Docker Compose](https://docs.docker.com/compose/install/) installed before running tests.
 
-From the root of this repository, run:
-
-```
-yarn run start:test-server:dev
-
-# Spins up server
-yarn run test:e2e:dev-setup
-```
-
-Then either run
+Then, from the root of this repository, run:
 
 ```
-yarn run test:e2e:dev
-```
-
-Or open browser to `localhost:9002/test/test.html`.
-
----
-
-#### Tests on [packages/snjs/test](packages/snjs/test)
-From the [packages/snjs/test](packages/snjs/test) directory, run:
-
-```
-yarn test
+yarn test:e2e
 ```
 ## Notes
 - Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
