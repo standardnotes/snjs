@@ -77,6 +77,10 @@ export default {
     '<rootDir>/test/setup/mock.ts'
   ],
 
+  setupFilesAfterEnv: [
+    '<rootDir>/test/setup/jest.ts',
+  ],
+
   // The test environment that will be used for testing
   testEnvironment: 'jsdom',
 

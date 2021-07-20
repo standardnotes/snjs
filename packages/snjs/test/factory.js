@@ -29,7 +29,7 @@ export async function createAppContext(identifier) {
   if (!identifier) {
     identifier = `${Math.random()}`;
   }
-  const application = await createApplication(identifier);
+  const application = createApplication(identifier);
   const email = Uuid.GenerateUuidSynchronously();
   const password = Uuid.GenerateUuidSynchronously();
   const passcode = 'mypasscode';
