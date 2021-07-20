@@ -1,6 +1,6 @@
 import { PermissionName } from '@standardnotes/auth'
-import { ComponentArea } from '../Component/ComponentArea'
-import { ContentType } from '../Content/ContentType'
+import { ComponentArea } from '@standardnotes/snjs'
+import { ContentType } from '@standardnotes/snjs'
 import { DockIconType } from './DockIconType'
 import { Flag } from './Flag'
 

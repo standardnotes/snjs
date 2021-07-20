@@ -74,7 +74,6 @@
   },
   "dependencies": {
     "@standardnotes/auth": "3.1.1",
-    "@standardnotes/sncrypto-common": "^1.2.9",
-    "@standardnotes/features": "1.0.0"
+    "@standardnotes/sncrypto-common": "^1.2.9"
   }
 }
