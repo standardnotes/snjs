@@ -1,35 +1,40 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import {
+  PurePayload,
+  PayloadField,
+  PayloadSource,
+  PayloadFormat,
+  PayloadByMerging,
+  CreateIntentPayloadFromObject,
+  CreateEncryptionParameters
+} from "@Lib/index";
+import { ContentType } from "@Lib/models";
+import { EncryptionIntent } from "@Lib/protocol";
 
 describe('payload', () => {
-  beforeEach(function () {
-    this.createBarePayload = () => {
-      return new PurePayload({
-        uuid: '123',
-        content_type: ContentType.Note,
-        content: {
-          title: 'hello',
-        },
-      });
-    };
+  const createBarePayload = () => {
+    return new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      content: {
+        title: 'hello',
+      },
+    });
+  };
 
-    this.createEncryptedPayload = () => {
-      return new PurePayload({
-        uuid: '123',
-        content_type: ContentType.Note,
-        content: '004:foo:bar',
-      });
-    };
-  });
+  const createEncryptedPayload = () => {
+    return new PurePayload({
+      uuid: '123',
+      content_type: ContentType.Note,
+      content: '004:foo:bar',
+    });
+  };
 
   it('constructor should set expected fields', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
 
-    expect(payload.uuid).to.be.ok;
-    expect(payload.content_type).to.be.ok;
-    expect(payload.content).to.be.ok;
+    expect(payload.uuid).toBeTruthy();
+    expect(payload.content_type).toBeTruthy();
+    expect(payload.content).toBeTruthy();
   });
 
   it('not supplying fields should infer them', function () {
@@ -47,7 +52,7 @@ describe('payload', () => {
       PayloadField.Content,
     ];
 
-    expect(payload.fields).to.eql(expectedFields);
+    expect(payload.fields).toEqual(expectedFields);
   });
 
   it('not supplying source should default to constructor source', function () {
@@ -59,31 +64,31 @@ describe('payload', () => {
       },
     });
 
-    expect(payload.source).to.equal(PayloadSource.Constructor);
+    expect(payload.source).toBe(PayloadSource.Constructor);
   });
 
   it('created at should default to present', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
 
-    expect(payload.created_at - new Date()).to.be.below(1);
+    expect(payload.created_at - new Date()).toBeLessThan(1);
   });
 
   it('updated at should default to epoch', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
 
-    expect(payload.updated_at.getTime()).to.equal(0);
+    expect(payload.updated_at.getTime()).toBe(0);
   });
 
   it('payload format bare', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
 
-    expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject);
+    expect(payload.format).toBe(PayloadFormat.DecryptedBareObject);
   });
 
   it('payload format encrypted string', function () {
-    const payload = this.createEncryptedPayload();
+    const payload = createEncryptedPayload();
 
-    expect(payload.format).to.equal(PayloadFormat.EncryptedString);
+    expect(payload.format).toBe(PayloadFormat.EncryptedString);
   });
 
   it('payload format base64 string', function () {
@@ -93,7 +98,7 @@ describe('payload', () => {
       content: '000:somebase64string',
     });
 
-    expect(payload.format).to.equal(PayloadFormat.DecryptedBase64String);
+    expect(payload.format).toBe(PayloadFormat.DecryptedBase64String);
   });
 
   it('payload format deleted', function () {
@@ -103,17 +108,17 @@ describe('payload', () => {
       deleted: true,
     });
 
-    expect(payload.format).to.equal(PayloadFormat.Deleted);
+    expect(payload.format).toBe(PayloadFormat.Deleted);
   });
 
   it('payload version 004', function () {
-    const payload = this.createEncryptedPayload();
+    const payload = createEncryptedPayload();
 
-    expect(payload.version).to.equal('004');
+    expect(payload.version).toBe('004');
   });
 
   it('merged with absent content', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
     const otherPayload = new PurePayload({
       uuid: '123',
       content_type: ContentType.Note,
@@ -123,21 +128,21 @@ describe('payload', () => {
     });
     const merged = PayloadByMerging(payload, otherPayload);
 
-    expect(merged.content).to.eql(payload.content);
-    expect(merged.uuid).to.equal(payload.uuid);
-    expect(merged.dirty).to.equal(true);
-    expect(merged.updated_at.getTime()).to.be.above(1);
+    expect(merged.content).toEqual(payload.content);
+    expect(merged.uuid).toBe(payload.uuid);
+    expect(merged.dirty).toBe(true);
+    expect(merged.updated_at.getTime()).toBeGreaterThan(1);
   });
 
   it('merged with undefined content', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
     const otherPayload = new PurePayload({
       content: undefined,
     });
     const merged = PayloadByMerging(payload, otherPayload);
 
-    expect(merged.uuid).to.equal(payload.uuid);
-    expect(merged.content).to.not.be.ok;
+    expect(merged.uuid).toBe(payload.uuid);
+    expect(merged.content).toBeFalsy();
   });
 
   it('deleted and not dirty should be discardable', function () {
@@ -148,20 +153,20 @@ describe('payload', () => {
       dirty: false,
     });
 
-    expect(payload.discardable).to.equal(true);
+    expect(payload.discardable).toBe(true);
   });
 
   it('should be immutable', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
 
     const changeFn = () => {
       payload.foo = 'bar';
     };
-    expect(changeFn).to.throw();
+    expect(changeFn).toThrowError();
   });
 
   it('CreateIntentPayloadFromObject', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
     const override = new PurePayload(
       {
         content: '004:...',
@@ -174,11 +179,11 @@ describe('payload', () => {
       override
     );
 
-    expect(intentPayload.content_type).to.be.ok;
+    expect(intentPayload.content_type).toBeTruthy();
   });
 
   it('Encryption params with override of select fields should only merge provided fields', function () {
-    const payload = this.createBarePayload();
+    const payload = createBarePayload();
     const override = CreateEncryptionParameters({
       waitingForKey: true,
       errorDecrypting: true,
@@ -189,8 +194,8 @@ describe('payload', () => {
       override
     );
 
-    expect(intentPayload.uuid).to.be.ok;
-    expect(intentPayload.content).to.be.ok;
-    expect(intentPayload.content_type).to.be.ok;
+    expect(intentPayload.uuid).toBeTruthy();
+    expect(intentPayload.content).toBeTruthy();
+    expect(intentPayload.content_type).toBeTruthy();
   });
 });
