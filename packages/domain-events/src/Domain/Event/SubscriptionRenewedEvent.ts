@@ -1,8 +1,8 @@
 import { DomainEventInterface } from './DomainEventInterface'
 
-import { SubscriptionCancelledEventPayload } from './SubscriptionCancelledEventPayload'
+import { SubscriptionRenewedEventPayload } from './SubscriptionRenewedEventPayload'
 
-export interface SubscriptionCancelledEvent extends DomainEventInterface {
-  type: 'SUBSCRIPTION_CANCELLED'
-  payload: SubscriptionCancelledEventPayload
+export interface SubscriptionRenewedEvent extends DomainEventInterface {
+  type: 'SUBSCRIPTION_RENEWED'
+  payload: SubscriptionRenewedEventPayload
 }
