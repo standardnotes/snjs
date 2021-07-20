@@ -27,6 +27,8 @@ export * from './Event/SubscriptionRenewedEvent'
 export * from './Event/SubscriptionRenewedEventPayload'
 export * from './Event/UserRegisteredEvent'
 export * from './Event/UserRegisteredEventPayload'
+export * from './Event/UserRoleChangedEvent'
+export * from './Event/UserRoleChangedEventPayload'
 
 export * from './Handler/DomainEventHandlerInterface'
 export * from './Handler/DomainEventMessageHandlerInterface'
