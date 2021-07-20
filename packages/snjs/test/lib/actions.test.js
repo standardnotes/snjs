@@ -6,6 +6,9 @@ import { EncryptionIntent } from '@Lib/protocol';
 import { Uuid } from '@Lib/uuid';
 
 describe('actions service', () => {
+  // Set timeout for all tests.
+  jest.setTimeout(20000);
+
   const errorProcessingActionMessage =
     'An issue occurred while processing this action. Please try again.';
   const errorDecryptingRevisionMessage =
@@ -20,11 +23,6 @@ describe('actions service', () => {
   let fakeServer, actionsExtension, extensionItemUuid;
 
   beforeAll(async function () {
-    // Set timeout for all tests.
-    jest.setTimeout(20000);
-
-    localStorage.clear();
-
     application = await Factory.createInitAppWithRandNamespace();
     itemManager = application.itemManager;
     actionsManager = application.actionsManager;

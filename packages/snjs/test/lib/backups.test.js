@@ -94,8 +94,6 @@ describe('backups', function () {
   });
 
   it('passcode + account backup file should have correct number of items', async function () {
-    jest.setTimeout(10000);
-
     const application = await Factory.createInitAppWithRandNamespace();
     const email = Uuid.GenerateUuidSynchronously();
     const password = Uuid.GenerateUuidSynchronously();
@@ -129,7 +127,7 @@ describe('backups', function () {
       true
     );
     expect(authorizedEncryptedData.items.length).toBe(BASE_ITEM_COUNT_ENCRYPTED + 2);
-  });
+  }, 10000);
 
   it('backup file item should have correct fields', async function () {
     const application = await Factory.createInitAppWithRandNamespace();

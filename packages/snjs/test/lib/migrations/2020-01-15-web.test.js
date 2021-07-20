@@ -22,8 +22,6 @@ describe('2020-01-15 web migration', () => {
    * as we are using a random value for the legacy session token
    */
   it('2020-01-15 migration with passcode and account', async function () {
-    jest.setTimeout(15000);
-
     const application = await Factory.createAppWithRandNamespace();
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
@@ -161,7 +159,7 @@ describe('2020-01-15 web migration', () => {
       'Expecting exception due to deiniting application while trying to renew session'
     );
     application.deinit();
-  });
+  }, 15000);
 
   it('2020-01-15 migration with passcode only', async function () {
     const application = await Factory.createAppWithRandNamespace();

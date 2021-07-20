@@ -4,12 +4,12 @@ import { Uuid } from '@Lib/uuid';
 import * as Factory from '../factory';
 
 describe('payload encryption', function () {
+  jest.setTimeout(Factory.TestTimeout);
+
   let application;
   let email, password;
 
   beforeEach(async function () {
-    jest.setTimeout(Factory.TestTimeout);
-    localStorage.clear();
     application = await Factory.createInitAppWithRandNamespace();
     email = Uuid.GenerateUuidSynchronously();
     password = Uuid.GenerateUuidSynchronously();

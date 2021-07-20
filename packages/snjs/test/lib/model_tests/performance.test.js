@@ -80,8 +80,6 @@ describe('mapping performance', () => {
   });
 
   it('mapping a tag with thousands of notes should be quick', async () => {
-    jest.setTimeout(20000);
-
     /*
       There was an issue where if you have a tag with thousands of notes, it will take minutes to resolve.
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
@@ -155,5 +153,5 @@ describe('mapping performance', () => {
       ).toBe(1);
     }
     application.deinit();
-  });
+  }, 20000);
 });
