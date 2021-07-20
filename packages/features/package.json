@@ -1,0 +1,32 @@
+{
+  "name": "@standardnotes/features",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=14.0.0 <16.0.0"
+  },
+  "description": "Features SDK for Standard Notes projects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "clean": "rm -fr dist",
+    "prestart": "yarn clean",
+    "start": "tsc -p tsconfig.json --watch",
+    "prebuild": "yarn clean",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --ext .ts",
+    "test": "yarn lint"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@standardnotes/config": "^2.0.0",
+    "@standardnotes/auth": "3.2.0",
+    "typescript": "^4.0.5"
+  }
+}

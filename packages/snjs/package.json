@@ -21,7 +21,7 @@
     "lint": "yarn lint:tsc && yarn lint:eslint",
     "lint:eslint": "eslint --ext .ts lib/",
     "lint:tsc": "tsc --noEmit --emitDeclarationOnly false --project lib/tsconfig.json",
-    "test": "jest"
+    "test": "jest"  
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -74,6 +74,7 @@
   },
   "dependencies": {
     "@standardnotes/auth": "3.1.1",
-    "@standardnotes/sncrypto-common": "^1.2.9"
+    "@standardnotes/sncrypto-common": "^1.2.9",
+    "@standardnotes/features": "1.0.0"
   }
 }

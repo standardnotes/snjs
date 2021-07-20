@@ -6,17 +6,9 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
+import { ComponentArea } from '@standardnotes/features';
 
-export enum ComponentArea {
-  Editor = 'editor-editor',
-  Themes = 'themes',
-  TagsList = 'tags-list',
-  EditorStack = 'editor-stack',
-  NoteTags = 'note-tags',
-  Rooms = 'rooms',
-  Modal = 'modal',
-  Any = '*',
-}
+export { ComponentArea };
 
 export enum ComponentAction {
   SetSize = 'set-size',
