@@ -1643,7 +1643,9 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
             void (async () => {
               await this.sync();
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-                void this.protocolService.createNewDefaultItemsKey();
+                void this.protocolService.createNewDefaultItemsKey().then(() => {
+                  void this.sync();
+                })
               }
             })();
             break;
