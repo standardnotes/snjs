@@ -906,4 +906,21 @@ describe('keys', function () {
       )
     ).toBeTruthy();
   });
+
+  it('having unsynced items keys should resync them upon download first sync completion', async function () {
+    await Factory.registerUserToApplication({ application: this.application });
+    const itemsKey = this.application.itemManager.itemsKeys()[0];
+    await this.application.itemManager.emitItemFromPayload(
+      CopyPayload(itemsKey.payload, {
+        dirty: false,
+        updated_at: new Date(0),
+        deleted: false
+      })
+    );
+    await this.application.syncService.sync({
+      mode: SyncModes.DownloadFirst,
+    });
+    const updatedKey = this.application.findItem(itemsKey.uuid);
+    expect(updatedKey.neverSynced).to.equal(false);
+  });
 });
