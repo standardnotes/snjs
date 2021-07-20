@@ -1334,6 +1334,8 @@ export class SNProtocolService
     if (isNullOrUndefined(accountVersionedKey)) {
       await this.createNewDefaultItemsKey();
     }
+
+    this.syncUnsycnedItemsKeys();
   }
 
   private async handleFullSyncCompletion() {
@@ -1344,6 +1346,25 @@ export class SNProtocolService
       if (this.keyMode === KeyMode.WrapperOnly) {
         return this.repersistAllItems();
       }
+    }
+  }
+
+  /**
+   * There is presently an issue where an items key created while signed out of account (
+   * or possibly signed in but with invalid session), then signing into account, results in that
+   * items key never syncing to the account even though it is being used to encrypt synced items.
+   * Until we can determine its cause, this corrective function will find any such keys and sync them.
+   */
+  private syncUnsycnedItemsKeys(): void {
+    if (!this.hasAccount()) {
+      return;
+    }
+
+    const unsyncedKeys = this.latestItemsKeys().filter(
+      (key) => key.neverSynced && !key.dirty && !key.deleted
+    );
+    if (unsyncedKeys.length > 0) {
+      void this.itemManager.setItemsDirty(Uuids(unsyncedKeys));
     }
   }
 
@@ -1488,7 +1509,7 @@ export class SNProtocolService
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
   public async createNewDefaultItemsKey(): Promise<SNItemsKey> {
-    const rootKey = this.getRootKey()!;
+    const rootKey = this.getRootKey() as SNRootKey;
     const operatorVersion = rootKey
       ? rootKey.keyVersion
       : this.getLatestVersion();
