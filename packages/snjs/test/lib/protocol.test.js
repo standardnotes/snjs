@@ -1,29 +1,27 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { CreateMaxPayloadFromAnyObject } from '@Lib/index';
+import { ContentType } from '@Lib/models';
+import { EncryptionIntent } from '@Lib/protocol';
+import { Uuid } from '@Lib/uuid';
+import * as Factory from '../factory';
 
 describe('protocol', function () {
+  let application;
+
   beforeEach(async function () {
-    localStorage.clear();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    application = await Factory.createInitAppWithRandNamespace();
   });
 
   afterEach(function () {
-    this.application.deinit();
-    this.application = null;
-    localStorage.clear();
+    application.deinit();
+    application = null;
   });
 
   it('checks version to make sure its 004', function () {
-    expect(this.application.protocolService.getLatestVersion()).to.equal('004');
+    expect(application.protocolService.getLatestVersion()).toBe('004');
   });
 
   it('checks supported versions to make sure it includes 001, 002, 003, 004', function () {
-    expect(this.application.protocolService.supportedVersions()).to.eql([
+    expect(application.protocolService.supportedVersions()).toEqual([
       '001',
       '002',
       '003',
@@ -33,80 +31,80 @@ describe('protocol', function () {
 
   it('platform derivation support', function () {
     expect(
-      this.application.protocolService.platformSupportsKeyDerivation({
+      application.protocolService.platformSupportsKeyDerivation({
         version: '001',
       })
-    ).to.equal(true);
+    ).toBe(true);
     expect(
-      this.application.protocolService.platformSupportsKeyDerivation({
+      application.protocolService.platformSupportsKeyDerivation({
         version: '002',
       })
-    ).to.equal(true);
+    ).toBe(true);
     expect(
-      this.application.protocolService.platformSupportsKeyDerivation({
+      application.protocolService.platformSupportsKeyDerivation({
         version: '003',
       })
-    ).to.equal(true);
+    ).toBe(true);
     expect(
-      this.application.protocolService.platformSupportsKeyDerivation({
+      application.protocolService.platformSupportsKeyDerivation({
         version: '004',
       })
-    ).to.equal(true);
+    ).toBe(true);
     expect(
-      this.application.protocolService.platformSupportsKeyDerivation({
+      application.protocolService.platformSupportsKeyDerivation({
         version: '005',
       })
-    ).to.equal(true);
+    ).toBe(true);
   });
 
   it('key params versions <= 002 should include pw_cost in portable value', function () {
-    const keyParams002 = this.application.protocolService.createKeyParams({
+    const keyParams002 = application.protocolService.createKeyParams({
       version: '002',
       pw_cost: 5000,
     });
-    expect(keyParams002.getPortableValue().pw_cost).to.be.ok;
+    expect(keyParams002.getPortableValue().pw_cost).toBeTruthy();
   });
 
   it('version comparison of 002 should be older than library version', function () {
     expect(
-      this.application.protocolService.isVersionNewerThanLibraryVersion('002')
-    ).to.equal(false);
+      application.protocolService.isVersionNewerThanLibraryVersion('002')
+    ).toBe(false);
   });
 
   it('version comparison of 005 should be newer than library version', function () {
     expect(
-      this.application.protocolService.isVersionNewerThanLibraryVersion('005')
-    ).to.equal(true);
+      application.protocolService.isVersionNewerThanLibraryVersion('005')
+    ).toBe(true);
   });
 
   it('library version should not be outdated', function () {
-    var currentVersion = this.application.protocolService.getLatestVersion();
+    var currentVersion = application.protocolService.getLatestVersion();
     expect(
-      this.application.protocolService.isProtocolVersionOutdated(currentVersion)
-    ).to.equal(false);
+      application.protocolService.isProtocolVersionOutdated(currentVersion)
+    ).toBe(false);
   });
 
   it('decrypting already decrypted payload should return same payload', async function () {
     const payload = Factory.createNotePayload();
-    const result = await this.application.protocolService.payloadByDecryptingPayload(
+    const result = await application.protocolService.payloadByDecryptingPayload(
       payload
     );
-    expect(payload).to.equal(result);
-    expect(result.errorDecrypting).to.not.be.ok;
+    expect(payload).toBe(result);
+    expect(result.errorDecrypting).toBeFalsy();
   });
 
   it('ejected payload should not have meta fields', async function () {
-    await this.application.addPasscode('123');
+    await application.addPasscode('123');
     const payload = Factory.createNotePayload();
-    const result = await this.application.protocolService.payloadByEncryptingPayload(
+    const result = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.Sync
     );
     const ejected = result.ejected();
-    expect(ejected.fields).to.not.be.ok;
-    expect(ejected.source).to.not.be.ok;
-    expect(ejected.format).to.not.be.ok;
-    expect(ejected.dirtiedDate).to.not.be.ok;
+    expect(ejected.fields).toBeFalsy();
+    expect(ejected.source).toBeFalsy();
+    expect(ejected.format).toBeFalsy();
+    expect(ejected.dirtiedDate).toBeFalsy();
   });
 
   it('decrypting 000 payload should succeed', async function () {
@@ -117,78 +115,78 @@ describe('protocol', function () {
         secret: '123',
       },
     });
-    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+    const encrypted = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.SyncDecrypted
     );
-    expect(encrypted.content.startsWith('000')).to.equal(true);
-    const decrypted = await this.application.protocolService.payloadByDecryptingPayload(
+    expect(encrypted.content.startsWith('000')).toBe(true);
+    const decrypted = await application.protocolService.payloadByDecryptingPayload(
       encrypted
     );
-    expect(decrypted.errorDecrypting).to.not.be.ok;
-    expect(decrypted.content.secret).to.equal(payload.content.secret);
+    expect(decrypted.errorDecrypting).toBeFalsy();
+    expect(decrypted.content.secret).toBe(payload.content.secret);
   });
 
   it('encrypted payload for server should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test');
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.Sync
     );
-    expect(encryptedPayload).to.be.ok;
-    expect(encryptedPayload).to.contain.keys('duplicate_of');
+    expect(encryptedPayload).toBeTruthy();
+    expect(encryptedPayload).toHaveProperty('duplicate_of');
   });
 
   it('ejected payload for server should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test');
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.Sync
     );
     const ejected = encryptedPayload.ejected();
-    expect(ejected).to.be.ok;
-    expect(ejected).to.contain.keys('duplicate_of');
+    expect(ejected).toBeTruthy();
+    expect(ejected).toHaveProperty('duplicate_of');
   });
 
   it('encrypted payload for storage should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test');
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.LocalStorageEncrypted
     );
-    expect(encryptedPayload).to.be.ok;
-    expect(encryptedPayload).to.contain.keys('duplicate_of');
+    expect(encryptedPayload).toBeTruthy();
+    expect(encryptedPayload).toHaveProperty('duplicate_of');
   });
 
   it('ejected payload for storage should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test');
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.LocalStorageEncrypted
     );
     const ejected = encryptedPayload.ejected();
-    expect(ejected).to.be.ok;
-    expect(ejected).to.contain.keys('duplicate_of');
+    expect(ejected).toBeTruthy();
+    expect(ejected).toHaveProperty('duplicate_of');
   });
 
   it('encrypted payload for file should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test');
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.FileEncrypted
     );
-    expect(encryptedPayload).to.be.ok;
-    expect(encryptedPayload).to.contain.keys('duplicate_of');
+    expect(encryptedPayload).toBeTruthy();
+    expect(encryptedPayload).toHaveProperty('duplicate_of');
   });
 
   it('ejected payload for file should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test');
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.FileEncrypted
     );
     const ejected = encryptedPayload.ejected();
-    expect(ejected).to.be.ok;
-    expect(ejected).to.contain.keys('duplicate_of');
+    expect(ejected).toBeTruthy();
+    expect(ejected).toHaveProperty('duplicate_of');
   });
 });
