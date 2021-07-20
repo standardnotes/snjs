@@ -23,6 +23,7 @@ COPY --chown=$UID:$GID packages/domain-events/package.json /var/www/packages/dom
 COPY --chown=$UID:$GID packages/snjs/package.json /var/www/packages/snjs/package.json
 COPY --chown=$UID:$GID packages/auth/package.json /var/www/packages/auth/package.json
 COPY --chown=$UID:$GID packages/time/package.json /var/www/packages/time/package.json
+COPY --chown=$UID:$GID packages/features/package.json /var/www/packages/features/package.json
 
 RUN yarn install --pure-lockfile
 
