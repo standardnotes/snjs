@@ -1,44 +1,42 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { CreateMaxPayloadFromAnyObject } from '@Lib/index';
+import { EncryptionIntent } from '@Lib/protocol';
+import { Uuid } from '@Lib/uuid';
+import * as Factory from '../factory';
 
 describe('payload encryption', function () {
+  let application;
+  let email, password;
+
   beforeEach(async function () {
-    this.timeout(Factory.TestTimeout);
+    jest.setTimeout(Factory.TestTimeout);
     localStorage.clear();
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    application = await Factory.createInitAppWithRandNamespace();
+    email = Uuid.GenerateUuidSynchronously();
+    password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
+      application,
+      email,
+      password,
     });
   });
 
   afterEach(async function () {
-    this.application.deinit();
+    application.deinit();
     localStorage.clear();
   });
 
   it('creating payload from item should create copy not by reference', async function () {
-    const item = await Factory.createMappedNote(this.application);
+    const item = await Factory.createMappedNote(application);
     const payload = CreateMaxPayloadFromAnyObject(item);
-    expect(item.content === payload.content).to.equal(false);
-    expect(item.content.references === payload.content.references).to.equal(
-      false
-    );
+    expect(item.content === payload.content).toBe(false);
+    expect(item.content.references === payload.content.references).toBe(false);
   });
 
   it('creating payload from item should preserve appData', async function () {
-    const item = await Factory.createMappedNote(this.application);
+    const item = await Factory.createMappedNote(application);
     const payload = CreateMaxPayloadFromAnyObject(item);
-    expect(item.content.appData).to.be.ok;
-    expect(JSON.stringify(item.content)).to.equal(
-      JSON.stringify(payload.content)
-    );
+    expect(item.content.appData).toBeTruthy();
+    expect(JSON.stringify(item.content)).toBe(JSON.stringify(payload.content));
   });
 
   it('server payloads should not contain client values', async function () {
@@ -51,16 +49,16 @@ describe('payload encryption', function () {
       errorDecrypting: false,
     });
 
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       notePayload,
       EncryptionIntent.Sync
     );
 
-    expect(encryptedPayload.dirty).to.not.be.ok;
-    expect(encryptedPayload.errorDecrypting).to.not.be.ok;
-    expect(encryptedPayload.errorDecryptingValueChanged).to.not.be.ok;
-    expect(encryptedPayload.waitingForKey).to.not.be.ok;
-    expect(encryptedPayload.lastSyncBegan).to.not.be.ok;
+    expect(encryptedPayload.dirty).toBeFalsy();
+    expect(encryptedPayload.errorDecrypting).toBeFalsy();
+    expect(encryptedPayload.errorDecryptingValueChanged).toBeFalsy();
+    expect(encryptedPayload.waitingForKey).toBeFalsy();
+    expect(encryptedPayload.lastSyncBegan).toBeFalsy();
   });
 
   it('creating payload with override properties', async function () {
@@ -71,8 +69,8 @@ describe('payload encryption', function () {
       uuid: changedUuid,
     });
 
-    expect(payload.uuid).to.equal(uuid);
-    expect(changedPayload.uuid).to.equal(changedUuid);
+    expect(payload.uuid).toBe(uuid);
+    expect(changedPayload.uuid).toBe(changedUuid);
   });
 
   it('creating payload with deep override properties', async function () {
@@ -86,28 +84,28 @@ describe('payload encryption', function () {
       },
     });
 
-    expect(payload.content === changedPayload.content).to.equal(false);
-    expect(payload.content.text).to.equal(text);
-    expect(changedPayload.content.text).to.equal(changedText);
+    expect(payload.content === changedPayload.content).toBe(false);
+    expect(payload.content.text).toBe(text);
+    expect(changedPayload.content.text).toBe(changedText);
   });
 
   it('copying payload with override content should override completely', async function () {
-    const item = await Factory.createMappedNote(this.application);
+    const item = await Factory.createMappedNote(application);
     const payload = CreateMaxPayloadFromAnyObject(item);
     const mutated = CreateMaxPayloadFromAnyObject(payload, {
       content: {
         foo: 'bar',
       },
     });
-    expect(mutated.content.text).to.not.be.ok;
+    expect(mutated.content.text).toBeFalsy();
   });
 
   it('copying payload with override should copy empty arrays', async function () {
     const pair = await Factory.createRelatedNoteTagPairPayload(
-      this.application.payloadManager
+      application.payloadManager
     );
     const tagPayload = pair[1];
-    expect(tagPayload.content.references.length).to.equal(1);
+    expect(tagPayload.content.references.length).toBe(1);
 
     const mutated = CreateMaxPayloadFromAnyObject(tagPayload, {
       content: {
@@ -115,80 +113,82 @@ describe('payload encryption', function () {
         references: [],
       },
     });
-    expect(mutated.content.references.length).to.equal(0);
+    expect(mutated.content.references.length).toBe(0);
   });
 
   it('returns valid encrypted params for syncing', async function () {
+    jest.setTimeout(5000);
+
     const payload = Factory.createNotePayload();
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.Sync
     );
-    expect(encryptedPayload.enc_item_key).to.be.ok;
-    expect(encryptedPayload.uuid).to.be.ok;
-    expect(encryptedPayload.auth_hash).to.not.be.ok;
-    expect(encryptedPayload.content_type).to.be.ok;
-    expect(encryptedPayload.created_at).to.be.ok;
+    expect(encryptedPayload.enc_item_key).toBeTruthy();
+    expect(encryptedPayload.uuid).toBeTruthy();
+    expect(encryptedPayload.auth_hash).toBeFalsy();
+    expect(encryptedPayload.content_type).toBeTruthy();
+    expect(encryptedPayload.created_at).toBeTruthy();
     expect(encryptedPayload.content).to.satisfy((string) => {
       return string.startsWith(
-        this.application.protocolService.getLatestVersion()
+        application.protocolService.getLatestVersion()
       );
     });
-  }).timeout(5000);
+  });
 
   it('returns unencrypted params with no keys', async function () {
     const payload = Factory.createNotePayload();
-    const encodedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encodedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.FileDecrypted
     );
 
-    expect(encodedPayload.enc_item_key).to.not.be.ok;
-    expect(encodedPayload.auth_hash).to.not.be.ok;
-    expect(encodedPayload.uuid).to.be.ok;
-    expect(encodedPayload.content_type).to.be.ok;
-    expect(encodedPayload.created_at).to.be.ok;
+    expect(encodedPayload.enc_item_key).toBeFalsy();
+    expect(encodedPayload.auth_hash).toBeFalsy();
+    expect(encodedPayload.uuid).toBeTruthy();
+    expect(encodedPayload.content_type).toBeTruthy();
+    expect(encodedPayload.created_at).toBeTruthy();
     /** File decrypted will result in bare object */
-    expect(encodedPayload.content.title).to.equal(payload.content.title);
+    expect(encodedPayload.content.title).toBe(payload.content.title);
   });
 
   it('returns additional fields for local storage', async function () {
     const payload = Factory.createNotePayload();
 
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.LocalStorageEncrypted
     );
 
-    expect(encryptedPayload.enc_item_key).to.be.ok;
-    expect(encryptedPayload.auth_hash).to.not.be.ok;
-    expect(encryptedPayload.uuid).to.be.ok;
-    expect(encryptedPayload.content_type).to.be.ok;
-    expect(encryptedPayload.created_at).to.be.ok;
-    expect(encryptedPayload.updated_at).to.be.ok;
-    expect(encryptedPayload.deleted).to.not.be.ok;
-    expect(encryptedPayload.errorDecrypting).to.not.be.ok;
+    expect(encryptedPayload.enc_item_key).toBeTruthy();
+    expect(encryptedPayload.auth_hash).toBeFalsy();
+    expect(encryptedPayload.uuid).toBeTruthy();
+    expect(encryptedPayload.content_type).toBeTruthy();
+    expect(encryptedPayload.created_at).toBeTruthy();
+    expect(encryptedPayload.updated_at).toBeTruthy();
+    expect(encryptedPayload.deleted).toBeFalsy();
+    expect(encryptedPayload.errorDecrypting).toBeFalsy();
     expect(encryptedPayload.content).to.satisfy((string) => {
       return string.startsWith(
-        this.application.protocolService.getLatestVersion()
+        application.protocolService.getLatestVersion()
       );
     });
   });
 
   it('omits deleted for export file', async function () {
     const payload = Factory.createNotePayload();
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.FileEncrypted
     );
-    expect(encryptedPayload.enc_item_key).to.be.ok;
-    expect(encryptedPayload.uuid).to.be.ok;
-    expect(encryptedPayload.content_type).to.be.ok;
-    expect(encryptedPayload.created_at).to.be.ok;
-    expect(encryptedPayload.deleted).to.not.be.ok;
+    expect(encryptedPayload.enc_item_key).toBeTruthy();
+    expect(encryptedPayload.uuid).toBeTruthy();
+    expect(encryptedPayload.content_type).toBeTruthy();
+    expect(encryptedPayload.created_at).toBeTruthy();
+    expect(encryptedPayload.deleted).toBeFalsy();
     expect(encryptedPayload.content).to.satisfy((string) => {
       return string.startsWith(
-        this.application.protocolService.getLatestVersion()
+        application.protocolService.getLatestVersion()
       );
     });
   });
@@ -199,14 +199,14 @@ describe('payload encryption', function () {
       enc_item_key: 'foo',
       errorDecrypting: true,
     });
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       mutatedPayload,
       EncryptionIntent.Sync
     );
-    expect(encryptedPayload.content).to.eql(payload.content);
-    expect(encryptedPayload.enc_item_key).to.be.ok;
-    expect(encryptedPayload.uuid).to.be.ok;
-    expect(encryptedPayload.content_type).to.be.ok;
-    expect(encryptedPayload.created_at).to.be.ok;
+    expect(encryptedPayload.content).toEqual(payload.content);
+    expect(encryptedPayload.enc_item_key).toBeTruthy();
+    expect(encryptedPayload.uuid).toBeTruthy();
+    expect(encryptedPayload.content_type).toBeTruthy();
+    expect(encryptedPayload.created_at).toBeTruthy();
   });
 });
