@@ -12,6 +12,7 @@
     "start": "lerna run start --parallel",
     "test": "lerna run test --parallel --ignore @standardnotes/snjs",
     "test:e2e": "bash test.sh",
+    "test:e2e:dev": "docker-compose up -d",
     "build": "lerna run build",
     "lint": "lerna run lint",
     "publish-packages": "lerna publish from-package --yes"
