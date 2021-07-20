@@ -21,7 +21,7 @@
     "lint": "yarn lint:tsc && yarn lint:eslint",
     "lint:eslint": "eslint --ext .ts lib/",
     "lint:tsc": "tsc --noEmit --emitDeclarationOnly false --project lib/tsconfig.json",
-    "test": "jest"  
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
