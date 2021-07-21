@@ -1,4 +1,5 @@
 export * from './Permission/Permission'
+export * from './Permission/PermissionName'
 export * from './Role/Role'
 export * from './Role/RoleName'
 export * from './Subscription/SubscriptionName'
