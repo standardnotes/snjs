@@ -9,7 +9,7 @@ global['__VERSION__'] = global['SnjsVersion'] = version;
  */
 if (!process.env.LISTENING_TO_UNHANDLED_REJECTION) {
   process.on('unhandledRejection', reason => {
-    throw reason;
+    console.error(reason);
   });
   // @ts-ignore
   // Avoid memory leak by adding too many listeners.
