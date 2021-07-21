@@ -111,6 +111,11 @@ const getSwappedClasses = (environment?: Environment) => {
 };
 
 export function createApplication(identifier: string, environment?: Environment, platform?: Platform) {
+  /**
+   * Stops loading any resources or network requests.
+   */
+  window.stop();
+
   const deviceInterface = new DeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
@@ -165,21 +170,19 @@ export async function initializeApplication(application: SNApplication) {
 
 type RegisterUserToApplication = {
   application: SNApplication;
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
   ephemeral?: boolean;
   mergeLocal?: boolean;
 };
 
 export async function registerUserToApplication({
   application,
-  email,
-  password,
+  email = generateUuid(),
+  password = generateUuid(),
   ephemeral = false,
   mergeLocal = true,
 }: RegisterUserToApplication) {
-  if (!email) email = generateUuid();
-  if (!password) password = generateUuid();
   return application.register(email, password, ephemeral, mergeLocal);
 }
 
@@ -261,7 +264,7 @@ export function createStorageItemPayload(contentType: ContentType) {
   return CreateMaxPayloadFromAnyObject(createItemParams(contentType));
 }
 
-export function createNotePayload(title: string, text = undefined) {
+export function createNotePayload(title?: string, text = undefined) {
   return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text }));
 }
 
@@ -345,6 +348,7 @@ export async function loginToApplication({
  */
 export async function signOutApplicationAndReturnNew(application: SNApplication) {
   await application.signOut();
+  application.deinit(DeinitSource.SignOut);
   return createInitAppWithRandNamespace();
 }
 
@@ -390,7 +394,7 @@ type CreateNoteParams = {
   dirty?: boolean;
 };
 
-export function createNoteParams({ title, text, dirty = true }: CreateNoteParams) {
+export function createNoteParams({ title, text, dirty = true }: CreateNoteParams = {}) {
   const params = {
     uuid: generateUuid(),
     content_type: ContentType.Note,
