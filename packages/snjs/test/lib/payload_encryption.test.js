@@ -117,8 +117,6 @@ describe('payload encryption', function () {
   });
 
   it('returns valid encrypted params for syncing', async function () {
-    jest.setTimeout(5000);
-
     const payload = Factory.createNotePayload();
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -129,12 +127,11 @@ describe('payload encryption', function () {
     expect(encryptedPayload.auth_hash).toBeFalsy();
     expect(encryptedPayload.content_type).toBeTruthy();
     expect(encryptedPayload.created_at).toBeTruthy();
-    expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(
-        application.protocolService.getLatestVersion()
-      );
-    });
-  });
+    const startsWithLatestVersion = encryptedPayload.content.startsWith(
+      application.protocolService.getLatestVersion()
+    );
+    expect(startsWithLatestVersion).toBe(true);
+  }, 5000);
 
   it('returns unencrypted params with no keys', async function () {
     const payload = Factory.createNotePayload();
@@ -168,11 +165,10 @@ describe('payload encryption', function () {
     expect(encryptedPayload.updated_at).toBeTruthy();
     expect(encryptedPayload.deleted).toBeFalsy();
     expect(encryptedPayload.errorDecrypting).toBeFalsy();
-    expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(
-        application.protocolService.getLatestVersion()
-      );
-    });
+    const startsWithLatestVersion = encryptedPayload.content.startsWith(
+      application.protocolService.getLatestVersion()
+    );
+    expect(startsWithLatestVersion).toBe(true);
   });
 
   it('omits deleted for export file', async function () {
@@ -186,11 +182,10 @@ describe('payload encryption', function () {
     expect(encryptedPayload.content_type).toBeTruthy();
     expect(encryptedPayload.created_at).toBeTruthy();
     expect(encryptedPayload.deleted).toBeFalsy();
-    expect(encryptedPayload.content).to.satisfy((string) => {
-      return string.startsWith(
-        application.protocolService.getLatestVersion()
-      );
-    });
+    const startsWithLatestVersion = encryptedPayload.content.startsWith(
+      application.protocolService.getLatestVersion()
+    );
+    expect(startsWithLatestVersion).toBe(true);
   });
 
   it('items with error decrypting should remain as is', async function () {
