@@ -11,7 +11,7 @@ describe('app models', () => {
     await Factory.initializeApplication(sharedApplication);
   });
 
-  afterAll(async function () {
+  afterAll(function () {
     sharedApplication.deinit();
   });
 
