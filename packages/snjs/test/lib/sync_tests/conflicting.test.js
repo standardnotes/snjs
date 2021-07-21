@@ -874,7 +874,6 @@ describe('online conflict handling', function () {
     const newApp = await Factory.signOutApplicationAndReturnNew(
       application
     );
-    const password = password;
     await Factory.registerUserToApplication({
       application: newApp,
       email: await Factory.generateUuid(),
@@ -913,7 +912,6 @@ describe('online conflict handling', function () {
     const newApp = await Factory.signOutApplicationAndReturnNew(
       application
     );
-    const password = password;
     await Factory.registerUserToApplication({
       application: newApp,
       email: await Factory.generateUuid(),
