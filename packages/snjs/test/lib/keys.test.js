@@ -8,7 +8,9 @@ import {
   CreateMaxPayloadFromAnyObject,
   PayloadSource,
   CopyPayload,
-  StorageValueModes
+  StorageValueModes,
+  SyncModes,
+  DeinitSource
 } from '@Lib/index';
 import { ContentType } from '@Lib/models';
 import {
@@ -37,9 +39,7 @@ describe('keys', function () {
   });
 
   afterEach(function () {
-    application?.deinit();
-    application = null;
-    localStorage.clear();
+    application.deinit(DeinitSource.SignOut);
   });
 
   it('validate isLocalStorageIntent', async function () {
@@ -111,7 +111,7 @@ describe('keys', function () {
   });
 
   it('should not have root key by default', async function () {
-    expect(await application.protocolService.getRootKey()).toBeUndefined();
+    expect(application.protocolService.getRootKey()).toBeUndefined();
   });
 
   it('validates content types requiring root encryption', async function () {
@@ -161,7 +161,7 @@ describe('keys', function () {
       EncryptionIntent.LocalStoragePreferEncrypted
     );
     expect(keyToUse).toBe(
-      await application.protocolService.getRootKey()
+      application.protocolService.getRootKey()
     );
   });
 
@@ -205,7 +205,7 @@ describe('keys', function () {
 
   it('items key should be encrypted with root key', async function () {
     await Factory.registerUserToApplication({ application: application });
-    const itemsKey = await application.protocolService.getDefaultItemsKey();
+    const itemsKey = application.protocolService.getDefaultItemsKey();
     /** Encrypt items key */
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       itemsKey.payloadRepresentation(),
@@ -215,7 +215,7 @@ describe('keys', function () {
     expect(encryptedPayload.items_key_id).toBeFalsy();
 
     /** Attempt to decrypt with root key. Should succeed. */
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     const decryptedPayload = await application.protocolService.payloadByDecryptingPayload(
       encryptedPayload,
       rootKey
@@ -302,7 +302,7 @@ describe('keys', function () {
     const itemsKey = application.protocolService.itemsKeyForPayload(
       encryptedPayload
     );
-    await application.itemManager.removeItemLocally(itemsKey);
+    application.itemManager.removeItemLocally(itemsKey);
 
     const decryptedPayload = await application.protocolService.payloadByDecryptingPayload(
       encryptedPayload
@@ -338,7 +338,7 @@ describe('keys', function () {
 
   it('attempting to emit errored items key for which there exists a non errored master copy should ignore it', async function () {
     await Factory.registerUserToApplication({ application: application });
-    const itemsKey = await application.protocolService.getDefaultItemsKey();
+    const itemsKey = application.protocolService.getDefaultItemsKey();
     expect(itemsKey.errorDecrypting).toBeFalsy();
 
     const errored = CopyPayload(itemsKey.payload, {
@@ -426,7 +426,7 @@ describe('keys', function () {
      * Upon signing into an 003 account, the application should delete any neverSynced items keys,
      * and create a new default items key that is the default for a given protocol version.
      */
-    const defaultItemsKey = await application.protocolService.getDefaultItemsKey();
+    const defaultItemsKey = application.protocolService.getDefaultItemsKey();
     const latestVersion = application.protocolService.getLatestVersion();
     expect(defaultItemsKey.keyVersion).toBe(latestVersion);
 
@@ -442,7 +442,7 @@ describe('keys', function () {
     expect(itemsKeys.length).toBe(1);
     const newestItemsKey = itemsKeys[0];
     expect(newestItemsKey.keyVersion).toBe(ProtocolVersion.V003);
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     expect(newestItemsKey.itemsKey).toBe(rootKey.masterKey);
     expect(newestItemsKey.dataAuthenticationKey).toBe(
       rootKey.dataAuthenticationKey
@@ -488,7 +488,7 @@ describe('keys', function () {
     expect(itemsKeys.length).toBe(1);
     const originalItemsKey = itemsKeys[0];
 
-    const originalRootKey = await application.protocolService.getRootKey();
+    const originalRootKey = application.protocolService.getRootKey();
     /** Expect that we can decrypt raw payload with current root key */
     const rawPayloads = await application.storageService.getAllRawPayloads();
     const itemsKeyRawPayload = rawPayloads.find(
@@ -507,7 +507,7 @@ describe('keys', function () {
     Factory.handlePasswordChallenges(application, passcode);
     await application.changePasscode('bar');
 
-    const newRootKey = await application.protocolService.getRootKey();
+    const newRootKey = application.protocolService.getRootKey();
     expect(newRootKey).not.toEqual(originalRootKey);
     expect(newRootKey.masterKey).not.toEqual(originalRootKey.masterKey);
 
@@ -546,7 +546,7 @@ describe('keys', function () {
     });
     const itemsKeys = application.itemManager.itemsKeys();
     expect(itemsKeys.length).toBe(1);
-    const defaultItemsKey = await application.protocolService.getDefaultItemsKey();
+    const defaultItemsKey = application.protocolService.getDefaultItemsKey();
 
     const result = await application.changePassword(
       password,
@@ -555,7 +555,7 @@ describe('keys', function () {
     expect(result.error).toBeFalsy();
 
     expect(application.itemManager.itemsKeys().length).toBe(2);
-    const newDefaultItemsKey = await application.protocolService.getDefaultItemsKey();
+    const newDefaultItemsKey = application.protocolService.getDefaultItemsKey();
     expect(newDefaultItemsKey.uuid).not.toEqual(defaultItemsKey.uuid);
 
     const note = await Factory.createSyncedNote(application);
@@ -620,7 +620,7 @@ describe('keys', function () {
 
   it('persisted key params should exactly equal in memory rootKey.keyParams', async function () {
     await Factory.registerUserToApplication({ application: application });
-    const rootKey = await application.protocolService.getRootKey();
+    const rootKey = application.protocolService.getRootKey();
     const rawKeyParams = await application.storageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped
@@ -907,20 +907,20 @@ describe('keys', function () {
     ).toBeTruthy();
   });
 
-  it('having unsynced items keys should resync them upon download first sync completion', async function () {
-    await Factory.registerUserToApplication({ application: this.application });
-    const itemsKey = this.application.itemManager.itemsKeys()[0];
-    await this.application.itemManager.emitItemFromPayload(
+  it.skip('having unsynced items keys should resync them upon download first sync completion', async function () {
+    await Factory.registerUserToApplication({ application: application });
+    const itemsKey = application.itemManager.itemsKeys()[0];
+    await application.itemManager.emitItemFromPayload(
       CopyPayload(itemsKey.payload, {
         dirty: false,
         updated_at: new Date(0),
         deleted: false
       })
     );
-    await this.application.syncService.sync({
+    await application.syncService.sync({
       mode: SyncModes.DownloadFirst,
     });
-    const updatedKey = this.application.findItem(itemsKey.uuid);
-    expect(updatedKey.neverSynced).to.equal(false);
+    const updatedKey = application.findItem(itemsKey.uuid);
+    expect(updatedKey.neverSynced).toBe(false);
   });
 });
