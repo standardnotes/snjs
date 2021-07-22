@@ -1,34 +1,14 @@
-import { CreateMaxPayloadFromAnyObject, PayloadSource, CopyPayload, ComponentArea } from '@Lib/index';
+import { CreateMaxPayloadFromAnyObject, PayloadSource, CopyPayload, ComponentArea, Environment, Platform } from '@Lib/index';
 import { SNItem, CreateItemFromPayload, ContentType } from '@Lib/models';
 import { EncryptionIntent } from '@Lib/protocol';
 import * as Factory from '../../factory';
 
 describe('app models', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
-  const sharedApplication = Factory.createApplication();
-
-  beforeAll(async function () {
-    await Factory.initializeApplication(sharedApplication);
-  });
-
-  afterAll(function () {
-    sharedApplication.deinit();
-  });
-
-  let expectedItemCount;
-  let application;
-
-  beforeEach(async function () {
-    expectedItemCount = BASE_ITEM_COUNT;
-    application = await Factory.createInitAppWithRandNamespace();
-  });
-
-  afterEach(async function () {
-    application.deinit();
-  });
 
   it('payloadManager should be defined', () => {
-    expect(sharedApplication.payloadManager).toBeTruthy();
+    const application = Factory.createApplication();
+    expect(application.payloadManager).toBeTruthy();
   });
 
   it('item should be defined', () => {
@@ -51,6 +31,7 @@ describe('app models', () => {
   });
 
   it('handles delayed mapping', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
 
@@ -90,6 +71,7 @@ describe('app models', () => {
   });
 
   it('mapping an item twice shouldnt cause problems', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload();
     const mutated = CreateMaxPayloadFromAnyObject(payload, {
       content: {
@@ -116,6 +98,7 @@ describe('app models', () => {
   });
 
   it('mapping item twice should preserve references', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const item1 = await Factory.createMappedNote(application);
     const item2 = await Factory.createMappedNote(application);
 
@@ -131,8 +114,9 @@ describe('app models', () => {
   });
 
   it('fixes relationship integrity', async function () {
-    var item1 = await Factory.createMappedNote(application);
-    var item2 = await Factory.createMappedNote(application);
+    const application = await Factory.createInitAppWithRandNamespace();
+    const item1 = await Factory.createMappedNote(application);
+    const item2 = await Factory.createMappedNote(application);
 
     await application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
@@ -167,8 +151,9 @@ describe('app models', () => {
   });
 
   it('creating and removing relationships between two items should have valid references', async function () {
-    var item1 = await Factory.createMappedNote(application);
-    var item2 = await Factory.createMappedNote(application);
+    const application = await Factory.createInitAppWithRandNamespace();
+    const item1 = await Factory.createMappedNote(application);
+    const item2 = await Factory.createMappedNote(application);
     await application.itemManager.changeItem(item1.uuid, (mutator) => {
       mutator.addItemAsRelationship(item2);
     });
@@ -207,6 +192,7 @@ describe('app models', () => {
   });
 
   it('properly duplicates item with no relationships', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const item = await Factory.createMappedNote(application);
     const duplicate = await application.itemManager.duplicateItem(
       item.uuid
@@ -218,6 +204,7 @@ describe('app models', () => {
   });
 
   it('properly duplicates item with relationships', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const item1 = await Factory.createMappedNote(application);
     const item2 = await Factory.createMappedNote(application);
 
@@ -250,6 +237,7 @@ describe('app models', () => {
   });
 
   it('removing references should update cross-refs', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const item1 = await Factory.createMappedNote(application);
     const item2 = await Factory.createMappedNote(application);
     const refreshedItem1 = await application.itemManager.changeItem(
@@ -280,6 +268,7 @@ describe('app models', () => {
   });
 
   it('properly handles single item uuid alternation', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const item1 = await Factory.createMappedNote(application);
     const item2 = await Factory.createMappedNote(application);
 
@@ -318,6 +307,7 @@ describe('app models', () => {
   });
 
   it('alterating uuid of item should fill its duplicateOf value', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const item1 = await Factory.createMappedNote(application);
     const alternatedItem = await application.syncService.alternateUuidForItem(
       item1.uuid
@@ -326,6 +316,7 @@ describe('app models', () => {
   });
 
   it('alterating itemskey uuid should update errored items encrypted with that key', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const item1 = await Factory.createMappedNote(application);
     const itemsKey = application.itemManager.itemsKeys()[0];
     /** Encrypt item1 and emit as errored so it persists with items_key_id */
@@ -347,6 +338,8 @@ describe('app models', () => {
   });
 
   it('properly handles mutli item uuid alternation', async function () {
+    let expectedItemCount = BASE_ITEM_COUNT;
+    const application = await Factory.createInitAppWithRandNamespace();
     const item1 = await Factory.createMappedNote(application);
     const item2 = await Factory.createMappedNote(application);
     expectedItemCount += 2;
@@ -389,6 +382,7 @@ describe('app models', () => {
   });
 
   it('maintains referencing relationships when duplicating', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const tag = await Factory.createMappedTag(application);
     const note = await Factory.createMappedNote(application);
     const refreshedTag = await application.itemManager.changeItem(
@@ -415,6 +409,7 @@ describe('app models', () => {
   });
 
   it('maintains editor reference when duplicating note', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     const note = await Factory.createMappedNote(application);
     const editor = await application.createManagedItem(
       ContentType.Component,
