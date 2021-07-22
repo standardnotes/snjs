@@ -1,7 +1,9 @@
 import { version } from '../../package.json';
+const Storage = require('dom-storage');
 
 //@ts-ignore
 global['__VERSION__'] = global['SnjsVersion'] = version;
+global['localStorage'] = new Storage('./db.json', { strict: false });
 
 /*
  * Handling uncaught exceptions.

@@ -40,6 +40,7 @@
     "connect": "^3.7.0",
     "crypto-js": "^4.0.0",
     "docdash": "^1.2.0",
+    "dom-storage": "^2.1.0",
     "eslint": "^7.18.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-config-semistandard": "^15.0.0",
