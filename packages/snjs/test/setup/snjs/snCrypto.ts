@@ -86,12 +86,12 @@ export default class SNCrypto implements SNPureCrypto {
   }
 
   public async sha256(text: string): Promise<string> {
-    const result = CryptoJS.SHA256(sodium.to_hex(text));
+    const result = CryptoJS.SHA256(text);
     return result.toString(CryptoJS.enc.Hex);
   }
 
   public async unsafeSha1(text: string): Promise<string> {
-    const result = CryptoJS.SHA1(sodium.to_hex(text));
+    const result = CryptoJS.SHA1(text);
     return result.toString(CryptoJS.enc.Hex);
   }
 
