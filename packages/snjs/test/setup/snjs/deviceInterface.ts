@@ -1,15 +1,14 @@
 import { DeviceInterface as SNDeviceInterface } from '@Lib/index';
 
+const Storage = require('dom-storage');
+const localStorage = new Storage(null, { strict: false });
+
 const KEYCHAIN_STORAGE_KEY = 'keychain';
 
 /**
  * The DeviceInterface implementation to handle storage and keychain operations.
  */
 export default class DeviceInterface extends SNDeviceInterface {
-  constructor(timeout: any, interval: any) {
-    super(timeout, interval);
-  }
-
   async getRawStorageValue(key: string) {
     return localStorage.getItem(key) || undefined;
   }

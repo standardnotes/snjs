@@ -1,9 +1,8 @@
-import { version } from '../../package.json';
 const Storage = require('dom-storage');
 
 //@ts-ignore
-global['__VERSION__'] = global['SnjsVersion'] = version;
-global['localStorage'] = new Storage('./db.json', { strict: false });
+global['__VERSION__'] = global['SnjsVersion'] = require('./../../package.json').version;
+global['localStorage'] = new Storage(null, { strict: false });
 
 /*
  * Handling uncaught exceptions.
@@ -17,3 +16,5 @@ if (!process.env.LISTENING_TO_UNHANDLED_REJECTION) {
   // Avoid memory leak by adding too many listeners.
   process.env.LISTENING_TO_UNHANDLED_REJECTION = true;
 }
+
+export {};

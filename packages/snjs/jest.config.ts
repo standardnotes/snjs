@@ -45,7 +45,8 @@ export default {
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/lib/tsconfig.json',
-      isolatedModules: true
+      isolatedModules: true,
+      babelConfig: 'babel.config.js'
     }
   },
 
@@ -73,8 +74,7 @@ export default {
   // The paths to modules that run some code to configure or set up the testing environment before each test
   setupFiles: [
     '<rootDir>/test/setup/global.ts',
-    '<rootDir>/test/setup/jsdom.ts',
-    '<rootDir>/test/setup/mock.ts'
+    '<rootDir>/test/setup/jsdom.ts'
   ],
 
   setupFilesAfterEnv: [

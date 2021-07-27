@@ -24,7 +24,9 @@ global.window.confirm = (message) => false;
  * See https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate
  */
 //@ts-ignore
-global.window.setImmediate = global.window.setTimeout;
+global.window.setImmediate = (func) => {
+  setTimeout(func, 0);
+};
 
 /**
  * Setting native extensions location:
