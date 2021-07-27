@@ -939,7 +939,7 @@ describe('online syncing', function () {
     await application.syncService.loadDatabasePayloads(databasePayloads);
     await application.syncService.sync(syncOptions);
 
-    const items = await application.itemManager.items;
+    const items = application.itemManager.items;
     expect(items.length).toBe(expectedItemCount);
   }, 20000);
 
@@ -969,11 +969,11 @@ describe('online syncing', function () {
     const sync = application.sync(syncOptions);
     await Factory.sleep(0.1);
     note = application.findItem(note.uuid);
-    expect(note.lastSyncBegan).toBeLessThan(new Date());
+    expect(note.lastSyncBegan.getTime()).toBeLessThan(new Date().getTime());
     await sync;
     note = application.findItem(note.uuid);
     expect(note.dirty).toBe(false);
-    expect(note.lastSyncEnd).toBeGreaterThanOrEqual(note.lastSyncBegan);
+    expect(note.lastSyncEnd.getTime()).toBeGreaterThanOrEqual(note.lastSyncBegan.getTime());
   });
 
   it('syncing twice without waiting should only execute 1 online sync', async function () {
@@ -1052,12 +1052,12 @@ describe('online syncing', function () {
 
     note = application.findItem(note.uuid);
     expect(note.dirty).toBe(false);
-    expect(note.lastSyncEnd).toBeGreaterThan(note.lastSyncBegan);
+    expect(note.lastSyncEnd.getTime()).toBeGreaterThan(note.lastSyncBegan.getTime());
     expect(note.content.text).toBe(text);
 
     // client B
-    await application.payloadManager.resetState();
-    await application.itemManager.resetState();
+    application.payloadManager.resetState();
+    application.itemManager.resetState();
     await application.syncService.clearSyncPositionTokens();
     await application.syncService.sync(syncOptions);
 

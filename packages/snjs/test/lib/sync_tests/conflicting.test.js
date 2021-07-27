@@ -13,11 +13,7 @@ describe('online conflict handling', function () {
     awaitAll: true,
   };
 
-  let expectedItemCount;
-  let application;
-  let email, password;
-
-  const sharedFinalAssertions = async function () {
+  const sharedFinalAssertions = async function (application, expectedItemCount) {
     expect(application.syncService.isOutOfSync()).toBe(false);
     const items = application.itemManager.items;
     expect(items.length).toBe(expectedItemCount);
@@ -25,21 +21,24 @@ describe('online conflict handling', function () {
     expect(rawPayloads.length).toBe(expectedItemCount);
   };
 
-  beforeEach(async function () {
-    expectedItemCount = BASE_ITEM_COUNT;
-    application = await Factory.createInitAppWithRandNamespace();
-    email = Uuid.GenerateUuidSynchronously();
-    password = Uuid.GenerateUuidSynchronously();
+  async function setupApplication() {
+    const expectedItemCount = BASE_ITEM_COUNT;
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     });
-  });
 
-  afterEach(async function () {
-    application.deinit();
-  });
+    return {
+      expectedItemCount,
+      application,
+      email,
+      password
+    };
+  }
 
   function createDirtyPayload(contentType) {
     const params = {
@@ -57,6 +56,7 @@ describe('online conflict handling', function () {
   }
 
   it('components should not be duplicated under any circumstances', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const payload = createDirtyPayload(ContentType.Component);
     const item = await application.itemManager.emitItemFromPayload(
       payload,
@@ -83,10 +83,11 @@ describe('online conflict handling', function () {
       syncOptions
     );
     expect(application.itemManager.items.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('items keys should not be duplicated under any circumstances', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const payload = createDirtyPayload(ContentType.ItemsKey);
     const item = await application.itemManager.emitItemFromPayload(
       payload,
@@ -113,10 +114,11 @@ describe('online conflict handling', function () {
       syncOptions
     );
     expect(application.itemManager.items.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('duplicating note should maintain editor ref', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createSyncedNote(application);
     expectedItemCount++;
     const basePayload = createDirtyPayload(ContentType.Component);
@@ -170,10 +172,11 @@ describe('online conflict handling', function () {
     });
     expect(duplicate).toBeTruthy();
     expect(application.componentManager.editorForNote(duplicate)).toBeTruthy();
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('should create conflicted copy if incoming server item attempts to overwrite local dirty item', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     // create an item and sync it
     const note = await Factory.createMappedNote(application);
     expectedItemCount++;
@@ -219,10 +222,11 @@ describe('online conflict handling', function () {
 
     const newRawPayloads = await application.storageService.getAllRawPayloads();
     expect(newRawPayloads.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('should handle sync conflicts by duplicating differing data', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     // create an item and sync it
     const note = await Factory.createMappedNote(application);
     await application.saveItem(note.uuid);
@@ -257,10 +261,11 @@ describe('online conflict handling', function () {
     const note1 = application.itemManager.notes[0];
     const note2 = application.itemManager.notes[1];
     expect(note1.content.title).not.toBe(note2.content.title);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('basic conflict with clearing local state', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createMappedNote(application);
     await application.saveItem(note.uuid);
     expectedItemCount += 1;
@@ -289,15 +294,16 @@ describe('online conflict handling', function () {
     // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
     await application.syncService.clearSyncPositionTokens();
     await application.storageService.clearAllPayloads();
-    await application.payloadManager.resetState();
-    await application.itemManager.resetState();
+    application.payloadManager.resetState();
+    application.itemManager.resetState();
     await application.syncService.sync(syncOptions);
 
     expect(application.itemManager.items.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('should duplicate item if saving a modified item and clearing our sync token', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     let note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     await application.syncService.sync(syncOptions);
@@ -329,10 +335,11 @@ describe('online conflict handling', function () {
 
     const allItems = application.itemManager.items;
     expect(allItems.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('should handle sync conflicts by not duplicating same data', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createMappedNote(application);
     expectedItemCount++;
     await application.itemManager.setItemDirty(note.uuid);
@@ -346,10 +353,11 @@ describe('online conflict handling', function () {
 
     await application.syncService.sync(syncOptions);
     expect(application.itemManager.items.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('clearing conflict_of on two clients simultaneously should keep us in sync', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     expectedItemCount++;
@@ -380,10 +388,11 @@ describe('online conflict handling', function () {
     // conflict_of is a key to ignore when comparing content, so item should
     // not be duplicated.
     await application.syncService.sync(syncOptions);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('setting property on two clients simultaneously should create conflict', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     expectedItemCount++;
@@ -418,10 +427,11 @@ describe('online conflict handling', function () {
       syncOptions
     );
     expectedItemCount++;
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('if server says deleted but client says not deleted, keep server state', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createMappedNote(application);
     const originalPayload = note.payloadRepresentation();
     expectedItemCount++;
@@ -453,10 +463,11 @@ describe('online conflict handling', function () {
 
     // We expect that this item is now gone for good, and a duplicate has not been created.
     expect(application.itemManager.items.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('if server says not deleted but client says deleted, keep server state', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     expectedItemCount++;
@@ -485,10 +496,11 @@ describe('online conflict handling', function () {
 
     // We expect that this item maintained.
     expect(application.itemManager.items.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('should create conflict if syncing an item that is stale', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     let note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     await application.syncService.sync(syncOptions);
@@ -522,10 +534,11 @@ describe('online conflict handling', function () {
     for (const payload of rawPayloads) {
       expect(payload.dirty).toBeFalsy();
     }
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('creating conflict with exactly equal content should keep us in sync', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     expectedItemCount++;
@@ -545,10 +558,11 @@ describe('online conflict handling', function () {
     );
 
     expect(application.itemManager.items.length).toBe(expectedItemCount);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('handles stale data in bulk', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /** This number must be greater than the pagination limit per sync request.
      * For example if the limit per request is 150 items sent/received, this number should
      * be something like 160. */
@@ -581,10 +595,11 @@ describe('online conflict handling', function () {
     await application.syncService.clearSyncPositionTokens();
     await application.syncService.sync(syncOptions);
     expect(application.itemManager.notes.length).toBe(largeItemCount * 2);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   }, 60000);
 
   it('duplicating an item should maintian its relationships', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const payload1 = Factory.createStorageItemPayload(
       ContentType.ServerExtension
     );
@@ -667,10 +682,11 @@ describe('online conflict handling', function () {
     for (const item of application.itemManager.items) {
       expect(item.dirty).toBeFalsy();
     }
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('when a note is conflicted, its tags should not be duplicated.', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /**
      * If you have a note and a tag, and the tag has 1 reference to the note,
      * and you import the same two items, except modify the note value so that
@@ -732,10 +748,11 @@ describe('online conflict handling', function () {
     expectedItemCount += 1;
     expect(application.itemManager.items.length).toBe(expectedItemCount);
     expect(tag.content.references.length).toBe(2);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('succesful server side saving but dropped packet response should not create sync conflict', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /**
      * 1. Initiate a change locally that is successfully saved by the server, but the client
      * drops the server response.
@@ -773,10 +790,11 @@ describe('online conflict handling', function () {
     expect(application.itemManager.notes.length).toBe(1);
     const finalNote = application.findItem(note.uuid);
     expect(finalNote.title).toBe(finalTitle);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('receiving a decrypted item while the current local item is errored and dirty should overwrite local value', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /**
      * An item can be marked as dirty (perhaps via a bulk dirtying operation) even if it is errored,
      * but it can never be sent to the server if errored. If we retrieve an item from the server
@@ -813,13 +831,14 @@ describe('online conflict handling', function () {
     /**
      * Expect that the final result is just 1 note that is not errored
      */
-    const resultNote = await application.findItem(note.uuid);
+    const resultNote = application.findItem(note.uuid);
     expect(resultNote.errorDecrypting).toBeFalsy();
     expect(application.itemManager.notes.length).toBe(1);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('registering for account with bulk offline data belonging to another account should be error-free', async function () {
+    const { application } = await setupApplication();
     /**
      * When performing a multi-page sync request where we are uploading data imported from a backup,
      * if the first page of the sync request returns conflicted items keys, we rotate their UUID.
@@ -858,6 +877,7 @@ describe('online conflict handling', function () {
   }, 60000);
 
   it('importing data belonging to another account should not result in duplication', async function () {
+    const { application, password } = await setupApplication();
     /** Create primary account and export data */
     await Factory.createSyncedNoteWithTag(application);
     let backupFile = await application.createBackupFile(
@@ -887,6 +907,7 @@ describe('online conflict handling', function () {
   }, 10000);
 
   it('importing notes + tags belonging to another account should keep correct associations', async function () {
+    const { application, password } = await setupApplication();
     /**
      * The original issue can be replicated when an export contains a tag with two notes,
      * where the two notes are first listed in the backup, then the tag.
@@ -926,6 +947,7 @@ describe('online conflict handling', function () {
   }, 10000);
 
   it('server should prioritize updated_at_timestamp over updated_at for sync, if provided', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /**
      * As part of SSRB to SSJS migration, server should prefer to use updated_at_timestamp
      * over updated_at for sync conflict logic. The timestamps are more accurate and support
@@ -955,10 +977,11 @@ describe('online conflict handling', function () {
     await application.itemManager.emitItemFromPayload(modified);
     await application.sync();
     expect(application.itemManager.notes.length).toBe(1);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 
   it('conflict should be created if updated_at_timestamp is not exactly equal to servers', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const note = await Factory.createSyncedNote(application);
     expectedItemCount++;
 
@@ -979,6 +1002,6 @@ describe('online conflict handling', function () {
     await application.itemManager.emitItemFromPayload(modified);
     await application.sync();
     expect(application.itemManager.notes.length).toBe(2);
-    await sharedFinalAssertions();
+    await sharedFinalAssertions(application, expectedItemCount);
   });
 });

@@ -10,30 +10,27 @@ describe('sync discordance', () => {
     awaitAll: true,
   };
 
-  let expectedItemCount;
-  let application;
-  let email, password;
-
-  beforeEach(async function () {
-    expectedItemCount = BASE_ITEM_COUNT;
-    application = await Factory.createInitAppWithRandNamespace();
-    email = Uuid.GenerateUuidSynchronously();
-    password = Uuid.GenerateUuidSynchronously();
+  async function setupApplication() {
+    const expectedItemCount = BASE_ITEM_COUNT;
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     });
-  });
 
-  afterEach(async function () {
-    expect(application.syncService.isOutOfSync()).toBe(false);
-    const rawPayloads = await application.storageService.getAllRawPayloads();
-    expect(rawPayloads.length).toBe(expectedItemCount);
-    application.deinit();
-  });
+    return {
+      expectedItemCount,
+      application,
+      email,
+      password
+    };
+  }
 
   it('should begin discordance upon instructions', async function () {
+    const { application, expectedItemCount } = await setupApplication();
     await application.syncService.sync({ checkIntegrity: false });
     expect(application.syncService.state.getLastClientIntegrityHash()).toBeFalsy();
 
@@ -53,9 +50,14 @@ describe('sync discordance', () => {
 
     // integrity should be valid
     expect(application.syncService.state.discordance).toBe(0);
+
+    expect(application.syncService.isOutOfSync()).toBe(false);
+    const rawPayloads = await application.storageService.getAllRawPayloads();
+    expect(rawPayloads.length).toBe(expectedItemCount);
   }, 10000);
 
   it('should abort integrity computation if any single item is missing updated_at_timestamp', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /**
      * As part of the May 2021 server migration from SSRB to SSJS, the server in essence
      * had phased out updated_at by returning it as a conversion from updated_at_timestamp (
@@ -109,9 +111,13 @@ describe('sync discordance', () => {
     await application.syncService.sync({ checkIntegrity: true });
 
     expect(application.syncService.isOutOfSync()).toBe(false);
-  }, 10000);
+
+    const rawPayloads = await application.storageService.getAllRawPayloads();
+    expect(rawPayloads.length).toBe(expectedItemCount);
+  }, 12000);
 
   it('should increase discordance as client server mismatches', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     await application.syncService.sync(syncOptions);
 
     const payload = Factory.createNotePayload();
@@ -127,7 +133,7 @@ describe('sync discordance', () => {
     expect(application.syncService.state.discordance).toBe(0);
 
     // Delete item locally only without notifying server. We should then be in discordance.
-    await application.itemManager.removeItemLocally(item);
+    application.itemManager.removeItemLocally(item);
 
     // wait for integrity check interval
     await application.syncService.sync({ checkIntegrity: true });
@@ -156,9 +162,13 @@ describe('sync discordance', () => {
 
     expect(application.syncService.isOutOfSync()).toBe(false);
     expect(application.syncService.state.discordance).toBe(0);
+
+    const rawPayloads = await application.storageService.getAllRawPayloads();
+    expect(rawPayloads.length).toBe(expectedItemCount);
   }, 10000);
 
   it('should perform sync resolution in which differing items are duplicated instead of merged', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const payload = Factory.createNotePayload();
     const item = await application.itemManager.emitItemFromPayload(
       payload,
@@ -169,7 +179,7 @@ describe('sync discordance', () => {
     await application.syncService.sync(syncOptions);
 
     // Delete item locally only without notifying server. We should then be in discordance.
-    await application.itemManager.removeItemLocally(item);
+    application.itemManager.removeItemLocally(item);
     expectedItemCount--;
 
     expect(application.itemManager.items.length).toBe(expectedItemCount);
@@ -209,5 +219,8 @@ describe('sync discordance', () => {
     await application.syncService.sync({ checkIntegrity: true });
     expect(application.syncService.isOutOfSync()).toBe(false);
     expect(application.itemManager.items.length).toBe(expectedItemCount);
+
+    const rawPayloads = await application.storageService.getAllRawPayloads();
+    expect(rawPayloads.length).toBe(expectedItemCount);
   });
 });

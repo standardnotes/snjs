@@ -22,7 +22,7 @@ describe('notes + tags syncing', function () {
     });
   });
 
-  afterEach(async function () {
+  afterEach(function () {
     application.deinit();
   });
 
