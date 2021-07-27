@@ -907,7 +907,8 @@ describe('keys', function () {
     ).toBeTruthy();
   });
 
-  it.skip('having unsynced items keys should resync them upon download first sync completion', async function () {
+  it.only('having unsynced items keys should resync them upon download first sync completion', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
     await Factory.registerUserToApplication({ application: application });
     const itemsKey = application.itemManager.itemsKeys()[0];
     await application.itemManager.emitItemFromPayload(

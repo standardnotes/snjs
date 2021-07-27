@@ -1,4 +1,4 @@
-import { CreateMaxPayloadFromAnyObject, PayloadSource, CopyPayload, ComponentArea, Environment, Platform } from '@Lib/index';
+import { CreateMaxPayloadFromAnyObject, PayloadSource, CopyPayload, ComponentArea } from '@Lib/index';
 import { SNItem, CreateItemFromPayload, ContentType } from '@Lib/models';
 import { EncryptionIntent } from '@Lib/protocol';
 import * as Factory from '../../factory';
@@ -334,7 +334,7 @@ describe('app models', () => {
     const alternatedKey = await application.syncService.alternateUuidForItem(
       itemsKey.uuid
     );
-    expect(application.findItem(item1.uuid).payload.items_key_id).toBe(alternatedKey.uuid); // <--- This is failing somehow...
+    expect(application.findItem(item1.uuid).payload.items_key_id).toBe(alternatedKey.uuid);
   });
 
   it('properly handles mutli item uuid alternation', async function () {

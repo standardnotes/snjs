@@ -2,7 +2,7 @@ import { ChallengeValidation, ChallengeValue, ChallengeReason } from '@Lib/chall
 import { Uuid } from '@Lib/uuid';
 import * as Factory from '../factory';
 
-describe.skip('protections', function () {
+describe('protections', function () {
   jest.setTimeout(Factory.TestTimeout);
 
   let application;
