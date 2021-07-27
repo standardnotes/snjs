@@ -10,19 +10,23 @@ describe('importing', function () {
 
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
-  let expectedItemCount;
-  let application;
-  let email, password;
-
-  beforeEach(async function () {
-    expectedItemCount = BASE_ITEM_COUNT;
-    application = await Factory.createInitAppWithRandNamespace();
-    email = Uuid.GenerateUuidSynchronously();
-    password = Uuid.GenerateUuidSynchronously();
+  async function setupApplication() {
+    const expectedItemCount = BASE_ITEM_COUNT;
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
     Factory.handlePasswordChallenges(application, password);
-  });
+
+    return {
+      expectedItemCount,
+      application,
+      email,
+      password
+    };
+  }
 
   it('should not import backups made from unsupported versions', async function () {
+    const { application } = await setupApplication();
     const result = await application.importData({
       version: '-1',
       items: [],
@@ -31,6 +35,7 @@ describe('importing', function () {
   });
 
   it('should not import backups made from 004 into 003 account', async function () {
+    const { application, email, password } = await setupApplication();
     await Factory.registerOldUser({
       application,
       email,
@@ -45,6 +50,7 @@ describe('importing', function () {
   });
 
   it('importing existing data should keep relationships valid', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -84,6 +90,7 @@ describe('importing', function () {
   });
 
   it('importing same note many times should create only one duplicate', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /**
      * Used strategy here will be KEEP_LEFT_DUPLICATE_RIGHT
      * which means that new right items will be created with different
@@ -115,6 +122,7 @@ describe('importing', function () {
   });
 
   it('importing a tag with lesser references should not create duplicate', async function () {
+    const { application } = await setupApplication();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const tagPayload = pair[1];
     await application.itemManager.emitItemsFromPayloads(
@@ -141,6 +149,7 @@ describe('importing', function () {
   });
 
   it('importing data with differing content should create duplicates', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -203,6 +212,7 @@ describe('importing', function () {
   });
 
   it('when importing items, imported values should not be used to determine if changed', async function () {
+    let { application, expectedItemCount } = await setupApplication();
     /**
      * If you have a note and a tag, and the tag has 1 reference to the note,
      * and you import the same two items, except modify the note value so that
@@ -257,6 +267,7 @@ describe('importing', function () {
   });
 
   it('should import decrypted data and keep items that were previously deleted', async function () {
+    const { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -288,6 +299,7 @@ describe('importing', function () {
   });
 
   it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -319,6 +331,7 @@ describe('importing', function () {
   });
 
   it('should maintain consistency between storage and PayloadManager after an import with conflicts', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -358,6 +371,7 @@ describe('importing', function () {
   });
 
   it('should import encrypted data and keep items that were previously deleted', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -388,6 +402,7 @@ describe('importing', function () {
   });
 
   it('should import decrypted data and all items payload source should be FileImport', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -416,6 +431,7 @@ describe('importing', function () {
   });
 
   it('should import encrypted data and all items payload source should be FileImport', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -444,6 +460,7 @@ describe('importing', function () {
   });
 
   it('should import data from 003 encrypted payload using client generated backup', async function () {
+    let { application, email, password } = await setupApplication();
     const oldVersion = ProtocolVersion.V003;
     await Factory.registerOldUser({
       application: application,
@@ -480,6 +497,7 @@ describe('importing', function () {
   });
 
   it('should import data from 003 encrypted payload using server generated backup with 004 key params', async function () {
+    let { application, password } = await setupApplication();
     const backupData = {
       items: [
         {
@@ -519,7 +537,7 @@ describe('importing', function () {
       },
     };
 
-    const password = 'password';
+    password = 'password';
 
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
@@ -531,6 +549,7 @@ describe('importing', function () {
   });
 
   it('should import data from 004 encrypted payload', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -565,6 +584,7 @@ describe('importing', function () {
   });
 
   it('should return correct errorCount', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -604,6 +624,7 @@ describe('importing', function () {
   });
 
   it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
+    let { application, email, password } = await setupApplication();
     const oldVersion = ProtocolVersion.V003;
     await Factory.registerOldUser({
       application: application,
@@ -645,6 +666,7 @@ describe('importing', function () {
   });
 
   it('should not import data from 004 encrypted payload if an invalid password is provided', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -679,6 +701,7 @@ describe('importing', function () {
   });
 
   it('should not import encrypted data with no keyParams or auth_params', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -707,6 +730,7 @@ describe('importing', function () {
   });
 
   it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -872,6 +896,7 @@ describe('importing', function () {
   });
 
   it('importing another accounts notes/tags should correctly keep relationships', async function () {
+    let { application, email, password } = await setupApplication();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
