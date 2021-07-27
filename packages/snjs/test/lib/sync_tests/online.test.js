@@ -26,28 +26,18 @@ describe('online syncing', function () {
   };
 
   let expectedItemCount;
-  let application;
-  let email, password;
 
   beforeEach(async function () {
     expectedItemCount = BASE_ITEM_COUNT;
-    application = await Factory.createInitAppWithRandNamespace();
-    email = Uuid.GenerateUuidSynchronously();
-    password = Uuid.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({
-      application: application,
-      email: email,
-      password: password,
-    });
   });
 
   afterEach(async function () {
-    expect(application.syncService.isOutOfSync()).toBe(false);
+    /*expect(application.syncService.isOutOfSync()).toBe(false);
     const items = application.itemManager.items;
     expect(items.length).toBe(expectedItemCount);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    application.deinit();
+    application.deinit();*/
   });
 
   function noteObjectsFromObjects(items) {
@@ -55,6 +45,14 @@ describe('online syncing', function () {
   }
 
   it('should register and sync basic model online', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
     let note = await Factory.createSyncedNote(application);
     expectedItemCount++;
     expect(application.itemManager.getDirtyItems().length).toBe(0);
@@ -70,6 +68,14 @@ describe('online syncing', function () {
   });
 
   it('should login and retrieve synced item', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
     const note = await Factory.createSyncedNote(application);
     expectedItemCount++;
     application = await Factory.signOutApplicationAndReturnNew(
@@ -88,6 +94,14 @@ describe('online syncing', function () {
   });
 
   it('can complete multipage sync on sign in', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
     const count = 0;
     await Factory.createManyMappedNotes(application, count);
     expectedItemCount += count;
@@ -114,6 +128,14 @@ describe('online syncing', function () {
   }, 20000);
 
   it('uuid alternation should delete original payload', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
     application = await Factory.signOutApplicationAndReturnNew(
       application
     );
@@ -128,6 +150,14 @@ describe('online syncing', function () {
   });
 
   it('having offline data then signing in should not alternate uuid and merge with account', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
     application = await Factory.signOutApplicationAndReturnNew(
       application
     );
@@ -147,6 +177,15 @@ describe('online syncing', function () {
   });
 
   it('server extensions should not be encrypted for sync', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: await Uuid.GenerateUuid(),
       content_type: ContentType.Mfa,
@@ -162,6 +201,15 @@ describe('online syncing', function () {
   });
 
   it('resolve on next timing strategy', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const syncCount = 7;
     let successes = 0;
     let events = 0;
@@ -198,6 +246,15 @@ describe('online syncing', function () {
   });
 
   it('force spawn new timing strategy', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const syncCount = 7;
     let successes = 0;
     let events = 0;
@@ -229,6 +286,15 @@ describe('online syncing', function () {
   });
 
   it('retrieving new items should not mark them as dirty', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const originalNote = await Factory.createSyncedNote(application);
     expectedItemCount++;
     application = await Factory.signOutApplicationAndReturnNew(
@@ -251,6 +317,15 @@ describe('online syncing', function () {
   });
 
   it('allows me to save data after Ive signed out', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     expect(application.itemManager.itemsKeys().length).toBe(1);
     application = await Factory.signOutApplicationAndReturnNew(
       application
@@ -294,6 +369,15 @@ describe('online syncing', function () {
   });
 
   it('mapping should not mutate items with error decrypting state', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     expectedItemCount++;
     const originalTitle = note.content.title;
@@ -327,6 +411,15 @@ describe('online syncing', function () {
   });
 
   it('signing into account with pre-existing items', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     await application.saveItem(note.uuid);
     expectedItemCount += 1;
@@ -347,6 +440,15 @@ describe('online syncing', function () {
   });
 
   it('removes item from storage upon deletion', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     let note = await Factory.createMappedNote(application);
     expectedItemCount++;
     await application.itemManager.setItemDirty(note.uuid);
@@ -373,6 +475,15 @@ describe('online syncing', function () {
   });
 
   it('retrieving item with no content should correctly map local state', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     await application.syncService.sync(syncOptions);
@@ -398,6 +509,15 @@ describe('online syncing', function () {
   });
 
   it('deleting an item while it is being synced should keep deletion state', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     expectedItemCount++;
 
@@ -418,6 +538,15 @@ describe('online syncing', function () {
   });
 
   it('items that are never synced and deleted should not be uploaded to server', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     await application.itemManager.setItemToBeDeleted(note.uuid);
@@ -452,6 +581,15 @@ describe('online syncing', function () {
   });
 
   it('items that are deleted after download first sync complete should not be uploaded to server', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     /** The singleton manager may delete items are download first. We dont want those uploaded to server. */
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
@@ -487,6 +625,15 @@ describe('online syncing', function () {
   });
 
   it('marking an item dirty then saving to disk should retain that dirty state when restored', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     expectedItemCount++;
     await application.syncService.markAllItemsAsNeedingSync();
@@ -520,6 +667,15 @@ describe('online syncing', function () {
   });
 
   it('should handle uploading with sync pagination', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const largeItemCount = 160;
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(application);
@@ -534,6 +690,15 @@ describe('online syncing', function () {
   }, 15000);
 
   it('should handle downloading with sync pagination', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const largeItemCount = 160;
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(application);
@@ -544,8 +709,8 @@ describe('online syncing', function () {
     expectedItemCount += largeItemCount;
 
     /** Clear local data */
-    await application.payloadManager.resetState();
-    await application.itemManager.resetState();
+    application.payloadManager.resetState();
+    application.itemManager.resetState();
     await application.syncService.clearSyncPositionTokens();
     await application.storageService.clearAllPayloads();
     expect(application.itemManager.items.length).toBe(0);
@@ -558,6 +723,15 @@ describe('online syncing', function () {
   }, 20000);
 
   it('should be able to download all items separate of sync', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const largeItemCount = 20;
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(application);
@@ -576,6 +750,15 @@ describe('online syncing', function () {
   });
 
   it('syncing an item should storage it encrypted', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     await application.syncService.sync(syncOptions);
@@ -588,6 +771,15 @@ describe('online syncing', function () {
   });
 
   it('syncing an item before data load should storage it encrypted', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     expectedItemCount++;
@@ -606,6 +798,15 @@ describe('online syncing', function () {
   });
 
   it('saving an item after sync should persist it with content property', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createMappedNote(application);
     const text = Factory.randomString(10000);
     await application.changeAndSaveItem(
@@ -627,6 +828,15 @@ describe('online syncing', function () {
   });
 
   it('syncing a new item before local data has loaded should still persist the item to disk', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     application.syncService.ut_setDatabaseLoaded(false);
     /** You don't want to clear model manager state as we'll lose encrypting items key */
     // await application.payloadManager.resetState();
@@ -659,8 +869,8 @@ describe('online syncing', function () {
 
     /** Clear state data and upload item from storage to server */
     await application.syncService.clearSyncPositionTokens();
-    await application.payloadManager.resetState();
-    await application.itemManager.resetState();
+    application.payloadManager.resetState();
+    application.itemManager.resetState();
     const databasePayloads = await application.storageService.getAllRawPayloads();
     await application.syncService.loadDatabasePayloads(databasePayloads);
     await application.syncService.sync(syncOptions);
@@ -695,6 +905,15 @@ describe('online syncing', function () {
   });
 
   it('should sign in and retrieve large number of items', async function () {
+    let application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const largeItemCount = 50;
     await Factory.createManyMappedNotes(application, largeItemCount);
     expectedItemCount += largeItemCount;
@@ -725,12 +944,21 @@ describe('online syncing', function () {
   }, 20000);
 
   it('valid sync date tracking', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     let note = await Factory.createMappedNote(application);
     note = await application.itemManager.setItemDirty(note.uuid);
     expectedItemCount++;
 
     expect(note.dirty).toBe(true);
-    expect(note.dirtiedDate).toBeLessThanOrEqual(new Date());
+    expect(note.dirtiedDate.getTime()).toBeLessThanOrEqual(new Date().getTime());
 
     note = await application.itemManager.changeItem(
       note.uuid,
@@ -749,6 +977,15 @@ describe('online syncing', function () {
   });
 
   it('syncing twice without waiting should only execute 1 online sync', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const expectedEvents = 1;
     let actualEvents = 0;
     application.syncService.addEventObserver((event, data) => {
@@ -768,6 +1005,15 @@ describe('online syncing', function () {
   });
 
   it('should keep an item dirty thats been modified after low latency sync request began', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     /**
      * If you begin a sync request that takes 20s to complete, then begin modifying an item
      * many times and attempt to sync, it will await the initial sync to complete.
@@ -795,7 +1041,7 @@ describe('online syncing', function () {
     await application.itemManager.setItemDirty(note.uuid);
     await application.itemManager.setItemDirty(note.uuid);
     await application.itemManager.setItemDirty(note.uuid);
-    expect(note.dirtiedDate).toBeGreaterThan(note.lastSyncBegan);
+    expect(note.dirtiedDate.getTime()).toBeGreaterThan(note.lastSyncBegan.getTime());
 
     // Now do a regular sync with no latency.
     application.syncService.ut_endLatencySimulator();
@@ -823,6 +1069,14 @@ describe('online syncing', function () {
   });
 
   it('should sync an item twice if its marked dirty while a sync is ongoing', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
     /** We can't track how many times an item is synced, only how many times its mapped */
     const expectedSaveCount = 2;
     let actualSaveCount = 0;
@@ -847,7 +1101,7 @@ describe('online syncing', function () {
         await application.itemManager.changeItem(note.uuid, (mutator) => {
           mutator.text = newText;
         });
-      }.bind(this),
+      },
       100
     );
     /**
@@ -861,6 +1115,15 @@ describe('online syncing', function () {
   });
 
   it('marking item dirty after dirty items are prepared for sync but before they are synced should sync again', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     /** There is a twilight zone where items needing sync are popped, and then say about 100ms of processing before
      * we set those items lastSyncBegan. If the item is dirtied in between these times, then item.dirtiedDate will be less than
      * item.lastSyncBegan, and it will not by synced again.
@@ -898,6 +1161,15 @@ describe('online syncing', function () {
   });
 
   it('marking item dirty at exact same time as lastSyncBegan should sync again', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     /** Due to lack of nanosecond support in JS, it's possible that two operations complete
      * within the same millisecond cycle. What happens if you mark an item as dirty at time A and also begin
      * syncing at time A? It should sync again. */
@@ -936,6 +1208,15 @@ describe('online syncing', function () {
   });
 
   it('retreiving a remote deleted item should succeed', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createSyncedNote(application);
     const preDeleteSyncToken = await application.syncService.getLastSyncToken();
     await application.deleteItem(note);
@@ -945,6 +1226,15 @@ describe('online syncing', function () {
   });
 
   it('errored items should not be synced', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createSyncedNote(application);
     expectedItemCount++;
     const lastSyncBegan = note.lastSyncBegan;
@@ -966,6 +1256,15 @@ describe('online syncing', function () {
   });
 
   it('syncing with missing session object should prompt for re-auth', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     /**
      * This covers the temporary function syncService.handleInvalidSessionState
      * where mobile could be missing storage/session object
@@ -992,6 +1291,15 @@ describe('online syncing', function () {
   });
 
   it('should not allow receiving decrypted payloads from server', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const masterCollection = application.payloadManager.getMasterCollection();
     const historyMap = application.historyManager.getHistoryMapCopy();
     const payload = CreateMaxPayloadFromAnyObject(
@@ -1020,6 +1328,15 @@ describe('online syncing', function () {
   });
 
   it('retrieved items should have both updated_at and updated_at_timestamps', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
     const note = await Factory.createSyncedNote(application);
     expectedItemCount++;
     expect(note.payload.created_at_timestamp).toBeTruthy();
