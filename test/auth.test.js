@@ -337,6 +337,41 @@ describe('basic auth', () => {
     );
   }).timeout(20000);
 
+  it.only('registering for new account and completing first after download sync should not put us out of sync', async function () {
+    this.email = Uuid.GenerateUuidSynchronously();
+    this.password = Uuid.GenerateUuidSynchronously();
+
+    let outOfSync = true;
+    let didCompletePostDownloadFirstSync = false;
+    let didCompleteDownloadFirstSync = false;
+    this.application.syncService.addEventObserver(async (eventName, data) => {
+      if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
+        didCompleteDownloadFirstSync = true;
+      }
+      if (!didCompleteDownloadFirstSync) {
+        return;
+      }
+      if (
+        !didCompletePostDownloadFirstSync &&
+        eventName === SyncEvent.SingleSyncCompleted
+      ) {
+        didCompletePostDownloadFirstSync = true;
+        /** Should be in sync */
+        outOfSync = this.application.syncService.isOutOfSync();
+      }
+    });
+
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
+    expect(didCompleteDownloadFirstSync).to.equal(true);
+    expect(didCompletePostDownloadFirstSync).to.equal(true);
+    expect(outOfSync).to.equal(false);
+  });
+
   async function changePassword() {
     await this.application.register(this.email, this.password);
 
