@@ -337,7 +337,7 @@ describe('basic auth', () => {
     );
   }).timeout(20000);
 
-  it.only('registering for new account and completing first after download sync should not put us out of sync', async function () {
+  it('registering for new account and completing first after download sync should not put us out of sync', async function () {
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
 
