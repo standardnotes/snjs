@@ -8,6 +8,7 @@ function setup {
 
   echo "# Installing project dependecies (Host Machine)"
   yarn install --pure-lockfile
+  yarn build
 }
 
 function cleanup {
