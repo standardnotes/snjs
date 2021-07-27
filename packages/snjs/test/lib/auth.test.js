@@ -1,5 +1,5 @@
 import { ChallengeValidation, ChallengeValue } from '@Lib/challenges';
-import { KeyMode } from '@Lib/services';
+import { KeyMode, SyncEvent } from '@Lib/services';
 import { Uuid } from '@Lib/uuid';
 import * as Factory from './../factory';
 import sinon from 'sinon';
@@ -337,6 +337,41 @@ describe('basic auth', () => {
       password
     );
   }, 20000);
+
+  it('registering for new account and completing first after download sync should not put us out of sync', async function () {
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+
+    let outOfSync = true;
+    let didCompletePostDownloadFirstSync = false;
+    let didCompleteDownloadFirstSync = false;
+    application.syncService.addEventObserver(async (eventName, data) => {
+      if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
+        didCompleteDownloadFirstSync = true;
+      }
+      if (!didCompleteDownloadFirstSync) {
+        return;
+      }
+      if (
+        !didCompletePostDownloadFirstSync &&
+        eventName === SyncEvent.SingleSyncCompleted
+      ) {
+        didCompletePostDownloadFirstSync = true;
+        /** Should be in sync */
+        outOfSync = application.syncService.isOutOfSync();
+      }
+    });
+
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
+    expect(didCompleteDownloadFirstSync).toEqual(true);
+    expect(didCompletePostDownloadFirstSync).toEqual(true);
+    expect(outOfSync).toEqual(false);
+  });
 
   async function changePassword() {
     await application.register(email, password);
