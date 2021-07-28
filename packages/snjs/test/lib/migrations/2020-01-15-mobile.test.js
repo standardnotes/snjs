@@ -20,6 +20,10 @@ import {
 import SNCrypto from './../../setup/snjs/snCrypto';
 
 describe('2020-01-15 mobile migration', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('2020-01-15 migration with passcode and account', async function () {
     let application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,

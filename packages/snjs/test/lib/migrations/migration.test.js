@@ -5,6 +5,10 @@ import {
 } from '@Lib/index';
 
 describe('migrations', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('version number is stored as string', async function () {
     const application = await Factory.createInitAppWithRandNamespace();
     const version = await application.migrationService.getStoredSnjsVersion();

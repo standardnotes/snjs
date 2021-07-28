@@ -17,6 +17,10 @@ import {
 import SNCrypto from './../../setup/snjs/snCrypto';
 
 describe('2020-01-15 web migration', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   /**
    * This test will pass but sync afterwards will not be successful
    * as we are using a random value for the legacy session token
