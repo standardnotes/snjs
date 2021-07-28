@@ -341,5 +341,5 @@ describe('upgrading', () => {
     );
     const refreshedNotePayload = refreshedNotePayloads[0];
     expect(refreshedNotePayload.version).toBe(latestVersion);
-  }, 5000);
+  }, 10000);
 });
