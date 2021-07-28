@@ -1,7 +1,7 @@
 import { CreateMaxPayloadFromAnyObject, PayloadSource } from '@Lib/index';
 import { ContentType } from '@Lib/models';
 import { Uuid } from '@Lib/uuid';
-import * as Factory from './../factory';
+import * as Factory from '../factory';
 
 describe('history manager', () => {
   const largeCharacterChange = 25;
@@ -11,22 +11,20 @@ describe('history manager', () => {
     awaitAll: true,
   };
 
-  let application;
-  let historyManager;
-  let payloadManager;
-
   describe('session', function () {
-    beforeEach(async function () {
-      application = await Factory.createInitAppWithRandNamespace();
-      historyManager = application.historyManager;
-      payloadManager = application.payloadManager;
+    async function setupApplication() {
+      const application = await Factory.createInitAppWithRandNamespace();
+      const historyManager = application.historyManager;
+      const payloadManager = application.payloadManager;
       /** Automatically optimize after every revision by setting this to 0 */
       historyManager.setSessionItemRevisionThreshold(0);
-    });
 
-    afterEach(async function () {
-      application.deinit();
-    });
+      return {
+        application,
+        historyManager,
+        payloadManager,
+      };
+    };
 
     async function setTextAndSync(application, item, text) {
       return application.changeAndSaveItem(
@@ -45,6 +43,7 @@ describe('history manager', () => {
     }
 
     it('create basic history entries', async function () {
+      const { application, historyManager } = await setupApplication();
       const item = await Factory.createSyncedNote(application);
       expect(historyManager.sessionHistoryForItem(item).length).toBe(0);
 
@@ -83,6 +82,7 @@ describe('history manager', () => {
     });
 
     it('first change should create revision with previous value', async function () {
+      const { application } = await setupApplication();
       const identifier = application.identifier;
       const item = await Factory.createSyncedNote(application);
       application.deinit();
@@ -140,6 +140,7 @@ describe('history manager', () => {
     });
 
     it('should optimize basic entries', async function () {
+      const { application, historyManager } = await setupApplication();
       let item = await Factory.createSyncedNote(application);
       /**
        * Add 1 character. This typically would be discarded as an entry, but it
@@ -202,6 +203,7 @@ describe('history manager', () => {
     });
 
     it('should keep the entry right before a large deletion, regardless of its delta', async function () {
+      const { application, historyManager } = await setupApplication();
       const payload = CreateMaxPayloadFromAnyObject(
         Factory.createNoteParams({
           text: Factory.randomString(100),
@@ -242,8 +244,7 @@ describe('history manager', () => {
     });
 
     it('entries should be ordered from newest to oldest', async function () {
-      jest.setTimeout(10000);
-
+      const { application, historyManager } = await setupApplication();
       const payload = CreateMaxPayloadFromAnyObject(
         Factory.createNoteParams({
           text: Factory.randomString(200),
@@ -295,11 +296,12 @@ describe('history manager', () => {
       expect(initialRevision.textCharDiffLength).toBe(200);
       /** Finally, the latest revision updated_at value date should be more recent than the initial revision one. */
       expect(
-        latestRevision.itemFromPayload().userModifiedDate
-      ).toBeGreaterThan(initialRevision.itemFromPayload().userModifiedDate);
-    });
+        latestRevision.itemFromPayload().userModifiedDate.getTime()
+      ).toBeGreaterThan(initialRevision.itemFromPayload().userModifiedDate.getTime());
+    }, 10000);
 
     it('unsynced entries should use payload created_at for preview titles', async function () {
+      const { application, historyManager } = await setupApplication();
       const payload = Factory.createNotePayload();
       await application.itemManager.emitItemFromPayload(
         payload,
@@ -321,26 +323,32 @@ describe('history manager', () => {
   });
 
   describe('remote', function () {
-    let email, password;
+    async function setupApplication() {
+      const application = await Factory.createInitAppWithRandNamespace();
+      const email = Uuid.GenerateUuidSynchronously();
+      const password = Uuid.GenerateUuidSynchronously();
+      const historyManager = application.historyManager;
+      const payloadManager = application.payloadManager;
+      /** Automatically optimize after every revision by setting this to 0 */
+      historyManager.setSessionItemRevisionThreshold(0);
 
-    beforeEach(async function () {
-      application = await Factory.createInitAppWithRandNamespace();
-      historyManager = application.historyManager;
-      payloadManager = application.payloadManager;
-      email = Uuid.GenerateUuidSynchronously();
-      password = Uuid.GenerateUuidSynchronously();
       await Factory.registerUserToApplication({
         application: application,
         email: email,
         password: password,
       });
-    });
 
-    afterEach(async function () {
-      await application.deinit();
-    });
+      return {
+        application,
+        historyManager,
+        payloadManager,
+        email,
+        password,
+      };
+    };
 
     it('response from server should be empty if not signed in', async function () {
+      let { application, historyManager, payloadManager } = await setupApplication();
       await application.signOut();
       application = await Factory.createInitAppWithRandNamespace();
       historyManager = application.historyManager;
@@ -352,6 +360,7 @@ describe('history manager', () => {
     });
 
     it('create basic history entries', async function () {
+      let { application, historyManager } = await setupApplication();
       const item = await Factory.createSyncedNote(application);
       let itemHistory = await historyManager.remoteHistoryForItem(item);
 
@@ -481,6 +490,7 @@ describe('history manager', () => {
     });
 
     it('can decrypt revisions for duplicate_of items', async function () {
+      let { application, historyManager } = await setupApplication();
       const note = await Factory.createSyncedNote(application);
       const changedText = `${Math.random()}`;
       /** Make a few changes to note */
