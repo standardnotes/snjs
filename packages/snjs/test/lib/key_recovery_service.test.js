@@ -21,7 +21,7 @@ describe('key recovery service', function () {
     const application = context.application;
     const receiveChallenge = async (challenge) => {
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [
+      await application.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], unassociatedPassword),
       ]);
     };
@@ -83,7 +83,7 @@ describe('key recovery service', function () {
     const receiveChallenge = async (challenge) => {
       totalPromptCount++;
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [
+      await application.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], unassociatedPassword),
       ]);
     };
@@ -172,7 +172,7 @@ describe('key recovery service', function () {
           );
         }
       }
-      appA.submitValuesForChallenge(challenge, responses);
+      await appA.submitValuesForChallenge(challenge, responses);
     };
     await appA.prepareForLaunch({ receiveChallenge });
     await appA.launch(true);
@@ -188,7 +188,7 @@ describe('key recovery service', function () {
     /** Create simultaneous appB signed into same account */
     const contextB = await Factory.createAppContext('another-namespace');
     const appB = contextB.application;
-    await appB.prepareForLaunch({});
+    await appB.prepareForLaunch({ receiveChallenge: () => {} });
     await appB.launch(true);
     await Factory.loginToApplication({
       application: appB,
@@ -226,9 +226,6 @@ describe('key recovery service', function () {
 
     expect(appA.syncService.isOutOfSync()).toBe(false);
     expect(appB.syncService.isOutOfSync()).toBe(false);
-
-    contextA.deinit();
-    contextB.deinit();
   }, 80000);
 
   it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
@@ -238,7 +235,7 @@ describe('key recovery service', function () {
     const receiveChallenge = async (challenge) => {
       const prompt = challenge.prompts[0];
       /** Give newPassword when prompted */
-      appA.submitValuesForChallenge(challenge, [
+      await appA.submitValuesForChallenge(challenge, [
         new ChallengeValue(prompt, newPassword),
       ]);
     };
@@ -297,7 +294,7 @@ describe('key recovery service', function () {
     const application = context.application;
     const receiveChallenge = async (challenge) => {
       /** This is the sign in prompt, return proper value */
-      application.submitValuesForChallenge(challenge, [
+      await application.submitValuesForChallenge(challenge, [
         new ChallengeValue(
           challenge.prompts[0],
           challenge.subheading.includes(
@@ -424,7 +421,7 @@ describe('key recovery service', function () {
     const namespace = Factory.randomString();
     const context = await Factory.createAppContext(namespace);
     const application = context.application;
-    await application.prepareForLaunch({});
+    await application.prepareForLaunch({ receiveChallenge: () => {} });
     await application.launch(true);
 
     await Factory.registerUserToApplication({
@@ -459,7 +456,7 @@ describe('key recovery service', function () {
     let didReceivePasswordPrompt = false;
     const receiveChallenge = async (challenge) => {
       didReceivePasswordPrompt = true;
-      recreatedApp.submitValuesForChallenge(challenge, [
+      await recreatedApp.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], context.password),
       ]);
     };
@@ -491,7 +488,7 @@ describe('key recovery service', function () {
     const application = context.application;
     const receiveChallenge = async (challenge) => {
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [
+      await application.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], unassociatedPassword),
       ]);
     };
