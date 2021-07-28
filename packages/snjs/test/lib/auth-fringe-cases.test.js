@@ -46,7 +46,6 @@ describe('auth fringe cases', () => {
         note.uuid
       );
       expect(refreshedNote.errorDecrypting).toBe(true);
-      restartedApplication.deinit();
     });
 
     it('signing in again should decrypt item', async function () {
@@ -74,7 +73,6 @@ describe('auth fringe cases', () => {
       );
       expect(refreshedNote.errorDecrypting).toBe(false);
       expect(restartedApplication.itemManager.notes.length).toBe(1);
-      restartedApplication.deinit();
     });
   });
 
@@ -114,6 +112,7 @@ describe('auth fringe cases', () => {
         true,
         true
       );
+      await Factory.sleep(1);
 
       expect(newApplication.itemManager.notes.length).toBe(2);
 
@@ -128,7 +127,6 @@ describe('auth fringe cases', () => {
       );
       expect(conflictedCopy.text).toBe(serverText);
       expect(conflictedCopy.duplicate_of).toBe(firstVersionOfNote.uuid);
-      newApplication.deinit();
     });
   });
 });
