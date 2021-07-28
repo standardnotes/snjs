@@ -1,8 +1,5 @@
 import { DeviceInterface as SNDeviceInterface } from '@Lib/index';
 
-const Storage = require('dom-storage');
-const localStorage = new Storage(null, { strict: false });
-
 const KEYCHAIN_STORAGE_KEY = 'keychain';
 
 /**

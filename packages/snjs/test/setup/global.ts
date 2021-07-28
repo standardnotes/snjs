@@ -1,8 +1,9 @@
 const Storage = require('dom-storage');
+// @ts-ignore
+global.window.localStorage = new Storage(null, { strict: false });
 
 //@ts-ignore
 global['__VERSION__'] = global['SnjsVersion'] = require('./../../package.json').version;
-global['localStorage'] = new Storage(null, { strict: false });
 
 /*
  * Handling uncaught exceptions.
