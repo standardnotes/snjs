@@ -8,6 +8,10 @@ describe('application group', function () {
     setInterval.bind(window)
   );
 
+  beforeEach(() => {
+    deviceInterface.removeAllRawStorageValues();
+  });
+
   it('initializing a group should result with primary application', async function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
