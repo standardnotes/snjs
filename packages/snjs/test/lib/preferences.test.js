@@ -3,34 +3,34 @@ import { Uuid } from '@Lib/uuid';
 import * as Factory from '../factory';
 
 describe('preferences', function () {
-  let application;
-  let email, password;
+  async function setupApplication(registerUser = false) {
+    const application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
 
-  beforeEach(async function () {
-    application = await Factory.createInitAppWithRandNamespace();
-    email = Uuid.GenerateUuidSynchronously();
-    password = Uuid.GenerateUuidSynchronously();
-  });
+    if (registerUser) {
+      await Factory.registerUserToApplication({
+        application: application,
+        email: email,
+        password: password,
+      });
+    }
 
-  afterEach(async function () {
-    application.deinit();
-  });
-
-  function register() {
-    return Factory.registerUserToApplication({
-      application: application,
-      email: email,
-      password: password,
-    });
+    return {
+      application,
+      email,
+      password
+    };
   }
 
   it('sets preference', async function () {
+    const { application } = await setupApplication();
     await application.setPreference('editorLeft', 300);
     expect(application.getPreference('editorLeft')).toBe(300);
   });
 
   it('saves preference', async function () {
-    await register();
+    let { application, email, password } = await setupApplication(true);
     await application.setPreference('editorLeft', 300);
     await application.sync();
     application = await Factory.signOutAndBackIn(
@@ -43,7 +43,7 @@ describe('preferences', function () {
   }, 10000);
 
   it('clears preferences on signout', async function () {
-    await register();
+    let { application } = await setupApplication(true);
     await application.setPreference('editorLeft', 300);
     await application.sync();
     application = await Factory.signOutApplicationAndReturnNew(
@@ -53,12 +53,13 @@ describe('preferences', function () {
   });
 
   it('returns default value for non-existent preference', async function () {
-    await register();
+    const { application } = await setupApplication(true);
     const editorLeft = application.getPreference('editorLeft', 100);
     expect(editorLeft).toBe(100);
   });
 
   it('emits an event when preferences change', async function () {
+    const { application, email, password } = await setupApplication();
     let callTimes = 0;
     application.addEventObserver(() => {
       callTimes++;
@@ -66,13 +67,17 @@ describe('preferences', function () {
     callTimes += 1;
     await Factory.sleep(0); /** Await next tick */
     expect(callTimes).toBe(1); /** App start */
-    await register();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
     await application.setPreference('editorLeft', 300);
     expect(callTimes).toBe(2);
   });
 
   it('discards existing preferences when signing in', async function () {
-    await register();
+    let { application, email, password } = await setupApplication(true);
     await application.setPreference('editorLeft', 300);
     await application.sync();
     application = await Factory.signOutApplicationAndReturnNew(
