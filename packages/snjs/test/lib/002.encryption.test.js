@@ -55,7 +55,7 @@ describe('002 protocol operations', () => {
 
   it('generates valid keys from existing params and decrypts', async () => {
     const password = 'password';
-    const keyParams = await application.protocolService.createKeyParams({
+    const keyParams = application.protocolService.createKeyParams({
       pw_salt: '8d381ef44cdeab1489194f87066b747b46053a833ee24956e846e7b40440f5f4',
       pw_cost: 101000,
       version: '002',
