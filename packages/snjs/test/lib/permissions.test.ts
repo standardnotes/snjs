@@ -1,29 +1,28 @@
 import {
   Platform,
   Environment,
-  Uuid,
   StorageKey
 } from '@Lib/index';
 import { Permission, Role } from '@standardnotes/auth';
-import { createApplication } from '../factory';
+import { createInitAppWithRandNamespace, generateUuid } from '../factory';
 
 describe('permissions', () => {
   let roles: Role[], permissions: Permission[];
 
   beforeEach(async () => {
     roles = [{
-      uuid: Uuid.GenerateUuidSynchronously(),
+      uuid: generateUuid(),
       name: "USER",
     }];
     permissions = [{
-      uuid: Uuid.GenerateUuidSynchronously(),
+      uuid: generateUuid(),
       name: "UNLIMITED_NOTE_HISTORY",
     }];
   });
 
   describe('update()', () => {
     it('updates roles and permissions and saves them in local storage', async () => {
-      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+      const application = await createInitAppWithRandNamespace(Environment.Web, Platform.LinuxWeb);
       await application.permissionsService.update(roles, permissions);
 
       const storedRoles = application.storageService.getValue(StorageKey.UserRoles);
@@ -38,13 +37,13 @@ describe('permissions', () => {
 
   describe('hasPermission()', () => {
     it('returns true if user has permission', async () => {
-      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+      const application = await createInitAppWithRandNamespace(Environment.Web, Platform.LinuxWeb);
       await application.permissionsService.update(roles, permissions);
       expect(application.hasPermission(permissions[0].name)).toBe(true);
     });
 
     it('returns false if user does not have permission', async () => {
-      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+      const application = await createInitAppWithRandNamespace(Environment.Web, Platform.LinuxWeb);
       const MISSING_PERMISSION_NAME = "EXTENDED_NOTE_HISTORY";
       await application.permissionsService.update(roles, permissions);
       expect(application.hasPermission(MISSING_PERMISSION_NAME)).toBe(false);
@@ -52,8 +51,8 @@ describe('permissions', () => {
   });
 
   describe('setWebSocketUrl()', () => {
-    it('saves url in local storage', () => {
-      const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+    it('saves url in local storage', async () => {
+      const application = await createInitAppWithRandNamespace(Environment.Web, Platform.LinuxWeb);
       const webSocketUrl = 'ws://test-websocket';
       application.permissionsService.setWebSocketUrl(webSocketUrl);
       
