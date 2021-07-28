@@ -26,7 +26,7 @@ const syncOptions = {
   awaitAll: true,
 };
 
-export async function createAppContext(identifier: string) {
+export async function createAppContext(identifier?: string) {
   if (!identifier) {
     identifier = `${Math.random()}`;
   }
@@ -264,7 +264,7 @@ export function createStorageItemPayload(contentType: ContentType) {
   return CreateMaxPayloadFromAnyObject(createItemParams(contentType));
 }
 
-export function createNotePayload(title?: string, text = undefined) {
+export function createNotePayload(title?: string, text?: string) {
   return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text }));
 }
 
@@ -292,7 +292,7 @@ export function createMappedTag(application: SNApplication) {
   );
 }
 
-export async function createSyncedNote(application: SNApplication, title: string, text: string) {
+export async function createSyncedNote(application: SNApplication, title?: string, text?: string) {
   const payload = createNotePayload(title, text);
   await application.itemManager.emitItemFromPayload(
     payload,
