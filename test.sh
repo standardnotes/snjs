@@ -57,7 +57,7 @@ waitForServices
 
 echo "# Starting test suite ..."
 cd packages/snjs
-npm run test -- --runInBand --maxWorkers=2
+npm run test -- --runInBand
 test_result=$?
 
 cleanup $test_result
