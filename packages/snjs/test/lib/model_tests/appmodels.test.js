@@ -6,6 +6,10 @@ import * as Factory from '../../factory';
 describe('app models', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('payloadManager should be defined', () => {
     const application = Factory.createApplication();
     expect(application.payloadManager).toBeTruthy();
@@ -327,6 +331,7 @@ describe('app models', () => {
     const errored = CopyPayload(encrypted, {
       errorDecrypting: true,
       waitingForKey: true,
+      content: '004:123'
     });
     await application.itemManager.emitItemFromPayload(errored);
     expect(application.findItem(item1.uuid).errorDecrypting).toBe(true);
