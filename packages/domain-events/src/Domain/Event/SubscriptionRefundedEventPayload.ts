@@ -2,6 +2,7 @@ import { SubscriptionName } from '@standardnotes/auth'
 
 export interface SubscriptionRefundedEventPayload {
   userEmail: string
-  subscriptionName: SubscriptionName
+  fromSubscriptionName: SubscriptionName
+  toSubscriptionName: SubscriptionName
   timestamp: number
 }
