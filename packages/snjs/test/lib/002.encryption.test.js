@@ -8,40 +8,44 @@ import {
 import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('002 protocol operations', () => {
-  const _identifier = 'hello@test.com';
-  const _password = 'password';
-  let _keyParams, _key;
-  let application;
+  const identifier = 'hello@test.com';
+  const password = 'password';
   const protocol002 = new SNProtocolOperator002(new SNCrypto());
 
   // runs once before all tests in this block
-  beforeAll(async () => {
-    application = Factory.createApplication();
-    await Factory.initializeApplication(application);
-    _key = await protocol002.createRootKey(
-      _identifier,
-      _password,
+  const setupApplication = async () => {
+    const application = await Factory.createAndInitializeApplication();
+    const key = await protocol002.createRootKey(
+      identifier,
+      password,
       KeyParamsOrigination.Registration
     );
-    _keyParams = _key.keyParams;
-  });
+    return {
+      application,
+      key,
+      keyParams: key.keyParams
+    };
+  };
 
   it('generates random key', async () => {
+    await setupApplication();
     const length = 128;
     const key = await protocol002.crypto.generateRandomKey(length);
     expect(key.length).toEqual(length / 4);
   });
 
-  it('cost minimum', () => {
+  it('cost minimum', async () => {
+    const { application } = await setupApplication();
     expect(application.protocolService.costMinimumForVersion('002')).toEqual(
       3000
     );
   });
 
   it('generates valid keys for registration', async () => {
+    await setupApplication();
     const key = await protocol002.createRootKey(
-      _identifier,
-      _password,
+      identifier,
+      password,
       KeyParamsOrigination.Registration
     );
     expect(key.dataAuthenticationKey).toBeDefined;
@@ -54,7 +58,7 @@ describe('002 protocol operations', () => {
   });
 
   it('generates valid keys from existing params and decrypts', async () => {
-    const password = 'password';
+    const { application } = await setupApplication();
     const keyParams = application.protocolService.createKeyParams({
       pw_salt: '8d381ef44cdeab1489194f87066b747b46053a833ee24956e846e7b40440f5f4',
       pw_cost: 101000,
@@ -88,17 +92,19 @@ describe('002 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts strings', async () => {
+    const { key } = await setupApplication();
     const text = 'hello world';
-    const key = _key.masterKey;
+    const masterKey = key.masterKey;
     const iv = await protocol002.crypto.generateRandomKey(128);
-    const encString = await protocol002.encryptString002(text, key, iv);
-    const decString = await protocol002.decryptString002(encString, key, iv);
+    const encString = await protocol002.encryptString002(text, masterKey, iv);
+    const decString = await protocol002.decryptString002(encString, masterKey, iv);
     expect(decString).toEqual(text);
   });
 
   it('generates existing keys for key params', async () => {
-    const key = await protocol002.computeRootKey(_password, _keyParams);
-    expect(key.compare(_key)).toBeDefined;
+    const { keyParams, key } = await setupApplication();
+    const rootKey = await protocol002.computeRootKey(password, keyParams);
+    expect(rootKey.compare(key)).toBeDefined;
   });
 
   it('generating encryption params includes items_key_id', async () => {

@@ -53,7 +53,6 @@ describe('001 protocol operations', () => {
 
   it('generates valid keys from existing params and decrypts', async () => {
     const { application } = await setupApplication();
-    const password = 'password';
     const keyParams = application.protocolService.createKeyParams({
       pw_func: 'pbkdf2',
       pw_alg: 'sha512',
