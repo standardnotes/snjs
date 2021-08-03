@@ -5,24 +5,26 @@ import { DockIconType } from './DockIconType'
 import { Flag } from './Flag'
 
 export type Feature = {
-  name: PermissionName;
-  identifier: string;
+  name: string;
+  identifier: PermissionName;
   contentType: ContentType
-  area: ComponentArea;
-  layerable: boolean;
-  noMobile: boolean;
+  area?: ComponentArea;
+  layerable?: boolean;
+  noMobile?: boolean;
   version: string;
   description: string;
   url: string;
   downloadUrl: string;
   marketingUrl: string;
-  thumbnailUrl: string;
-  flags: Flag[];
-  dockIcon: {
+  thumbnailUrl?: string;
+  flags?: Flag[];
+  noExpire?: boolean;
+  dockIcon?: {
     type: DockIconType;
     backgroundColor: string;
     foregroundColor: string;
     borderColor: string;
   };
-  expiresAt: number;
+  deletionWarning?: string;
+  expiresAt?: number;
 };
