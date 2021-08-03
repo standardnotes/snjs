@@ -320,7 +320,7 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.DailyOneDriveBackup,
+  identifier: PermissionName.Files25GB,
   name: '',
   description: '',
   version: '',
