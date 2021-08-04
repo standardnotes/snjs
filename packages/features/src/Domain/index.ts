@@ -1,5 +1,6 @@
 export * from './Feature/DockIconType'
 export * from './Feature/Feature'
+export * from './Feature/Features'
 export * from './Feature/Flag'
 export * from './Component/ComponentArea'
 export * from './Content/ContentType'
