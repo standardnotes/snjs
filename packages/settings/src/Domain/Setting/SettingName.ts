@@ -1,3 +1,3 @@
-export enum MfaSetting {
+export enum SettingName {
   MfaSecret = 'MFA_SECRET',
 }
