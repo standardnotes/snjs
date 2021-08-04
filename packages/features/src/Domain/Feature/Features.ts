@@ -1,9 +1,9 @@
-import { PermissionName } from '@standardnotes/auth'
 import { Feature } from './Feature'
 import { DockIconType } from './DockIconType'
 import { ComponentArea } from '../Component/ComponentArea'
 import { ContentType } from '../Content/ContentType'
 import { Flag } from './Flag'
+import { PermissionName } from '../Permission/PermissionName'
 
 export const Features: Feature[] = [{
   name: 'Midnight',

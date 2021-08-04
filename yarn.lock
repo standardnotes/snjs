@@ -2491,6 +2491,11 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
+"@standardnotes/features@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.0.0.tgz#906af029b6e58241689ca37436982c37a888a418"
+  integrity sha512-PEQyP/p/TQLVcNYcbu9jEIWNRqBrFFG1Qyy8QIcvNUt5o4lpLZGEY1T+PJUsPSisnuKKNpQrgVLc9LjhUKpuYw==
+
 "@standardnotes/sncrypto-common@^1.2.7", "@standardnotes/sncrypto-common@^1.2.9":
   version "1.2.10"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.2.10.tgz#c806a397446239676cda55dd8cc53f3636bf2c0b"
