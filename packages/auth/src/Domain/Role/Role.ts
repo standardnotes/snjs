@@ -1,4 +1,5 @@
-import { Uuid } from '../Uuid/Uuid'
+import { Uuid } from '@standardnotes/common'
+
 import { RoleName } from './RoleName'
 
 export type Role = {

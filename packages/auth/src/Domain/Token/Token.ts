@@ -1,4 +1,7 @@
-import { Uuid } from '../Uuid/Uuid'
+import { Uuid } from '@standardnotes/common'
+import { Feature } from '@standardnotes/features'
+
+import { Role } from '../Role/Role'
 
 export type Token = {
   user: {
@@ -12,12 +15,6 @@ export type Token = {
     updated_at: string,
     device_info: string
   },
-  roles: Array<{
-    uuid: Uuid
-    name: string
-  }>,
-  permissions: Array<{
-    uuid: Uuid
-    name: string
-  }>,
+  roles: Array<Role>,
+  features: Array<Feature>,
 }
