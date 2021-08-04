@@ -1,10 +1,10 @@
 {
-  "name": "@standardnotes/auth",
-  "version": "3.3.0",
+  "name": "@standardnotes/settings",
+  "version": "1.0.0",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
-  "description": "Auth SDK for Standard Notes projects",
+  "description": "Settings SDK for Standard Notes projects",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -13,7 +13,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Karol Sójko <karol@standardnotes.org>",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "clean": "rm -fr dist",
@@ -21,8 +20,7 @@
     "start": "tsc -p tsconfig.json --watch",
     "prebuild": "yarn clean",
     "build": "tsc -p tsconfig.json",
-    "lint": "eslint . --ext .ts",
-    "test": "yarn lint"
+    "lint": "eslint . --ext .ts"
   },
   "dependencies": {},
   "devDependencies": {
