@@ -1,4 +1,4 @@
-import { SettingName } from './SettingName';
+import { SettingName } from './SettingName'
 
 /**
  * Describe Setting payloads (contents) matched with Setting enum keys
