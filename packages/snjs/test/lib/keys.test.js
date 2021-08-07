@@ -9,8 +9,7 @@ import {
   PayloadSource,
   CopyPayload,
   StorageValueModes,
-  SyncModes,
-  DeinitSource
+  SyncModes
 } from '@Lib/index';
 import { ContentType } from '@Lib/models';
 import {
@@ -22,24 +21,11 @@ import {
   SNProtocolOperator003
 } from '@Lib/protocol';
 import { StorageKey } from '@Lib/storage_keys';
-import { Uuid } from '@Lib/uuid';
 import * as Factory from '../factory';
 import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('keys', function () {
   jest.setTimeout(Factory.TestTimeout);
-
-  async function setupApplication() {
-    const application = await Factory.createInitAppWithRandNamespace();
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
-
-    return {
-      application,
-      email,
-      password
-    };
-  }
 
   it('validate isLocalStorageIntent', async function () {
     expect(isLocalStorageIntent(EncryptionIntent.Sync)).toBe(false);
@@ -110,7 +96,7 @@ describe('keys', function () {
   });
 
   it('should not have root key by default', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     expect(application.protocolService.getRootKey()).toBeUndefined();
   });
 
@@ -126,7 +112,7 @@ describe('keys', function () {
   });
 
   it('generating export params with no account or passcode should produce encrypted payload', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     /** Items key available by default */
     const payload = Factory.createNotePayload();
     const processedPayload = await application.protocolService.payloadByEncryptingPayload(
@@ -137,14 +123,14 @@ describe('keys', function () {
   });
 
   it('has root key and one items key after registering user', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     expect(application.protocolService.getRootKey()).toBeDefined();
     expect(application.itemManager.itemsKeys().length).toBe(1);
   });
 
   it('should use root key for encryption of storage', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const email = 'foo';
     const password = 'bar';
     const key = await application.protocolService.createRootKey(
@@ -169,7 +155,7 @@ describe('keys', function () {
   });
 
   it('changing root key with passcode should re-wrap root key', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const email = 'foo';
     const password = 'bar';
     const key = await application.protocolService.createRootKey(
@@ -208,7 +194,7 @@ describe('keys', function () {
   });
 
   it('items key should be encrypted with root key', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     const itemsKey = application.protocolService.getDefaultItemsKey();
     /** Encrypt items key */
@@ -233,7 +219,7 @@ describe('keys', function () {
   });
 
   it('should create random items key if no account and no passcode', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const itemsKeys = application.itemManager.itemsKeys();
     expect(itemsKeys.length).toBe(1);
     const notePayload = Factory.createNotePayload();
@@ -247,7 +233,7 @@ describe('keys', function () {
   });
 
   it('should keep offline created items key upon registration', async function () {
-    const { application, email, password } = await setupApplication();
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     expect(application.itemManager.itemsKeys().length).toBe(1);
     const originalItemsKey = application.itemManager.itemsKeys()[0];
     await application.register(email, password);
@@ -258,7 +244,7 @@ describe('keys', function () {
   });
 
   it('should use items key for encryption of note', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const note = Factory.createNotePayload();
     const keyToUse = await application.protocolService.keyToUseForEncryptionOfPayload(
       note,
@@ -268,7 +254,7 @@ describe('keys', function () {
   });
 
   it('encrypting an item should associate an items key to it', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const note = Factory.createNotePayload();
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       note,
@@ -281,7 +267,7 @@ describe('keys', function () {
   });
 
   it('decrypt encrypted item with associated key', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const note = Factory.createNotePayload();
     const title = note.content.title;
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
@@ -302,7 +288,7 @@ describe('keys', function () {
   });
 
   it('decrypts items waiting for keys', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const notePayload = Factory.createNotePayload();
     const title = notePayload.content.title;
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
@@ -348,7 +334,7 @@ describe('keys', function () {
   });
 
   it('attempting to emit errored items key for which there exists a non errored master copy should ignore it', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     const itemsKey = application.protocolService.getDefaultItemsKey();
     expect(itemsKey.errorDecrypting).toBeFalsy();
@@ -371,7 +357,7 @@ describe('keys', function () {
   });
 
   it('generating export params with logged in account should produce encrypted payload', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     const payload = Factory.createNotePayload();
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
@@ -385,7 +371,7 @@ describe('keys', function () {
   });
 
   it('When setting passcode, should encrypt items keys', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await application.addPasscode('foo');
     const itemsKey = application.itemManager.itemsKeys()[0];
     const rawPayloads = await application.storageService.getAllRawPayloads();
@@ -397,7 +383,7 @@ describe('keys', function () {
   });
 
   it('items key encrypted payload should contain root key params', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await application.addPasscode('foo');
     const itemsKey = application.itemManager.itemsKeys()[0];
     const rawPayloads = await application.storageService.getAllRawPayloads();
@@ -425,7 +411,7 @@ describe('keys', function () {
   });
 
   it('correctly validates local passcode', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const passcode = 'foo';
     await application.addPasscode('foo');
     expect(
@@ -437,7 +423,7 @@ describe('keys', function () {
   });
 
   it('signing into 003 account should delete latest offline items key and create 003 items key', async function () {
-    const { application, email, password } = await setupApplication();
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     /**
      * When starting the application it will create an items key with the latest protocol version (004).
      * Upon signing into an 003 account, the application should delete any neverSynced items keys,
@@ -467,7 +453,7 @@ describe('keys', function () {
   });
 
   it('reencrypts existing notes when logging into an 003 account', async function () {
-    let { application, email, password } = await setupApplication();
+    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await Factory.createManyMappedNotes(application, 10);
     await Factory.registerOldUser({
       application: application,
@@ -499,7 +485,7 @@ describe('keys', function () {
   });
 
   it('When root key changes, all items keys must be re-encrypted', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const passcode = 'foo';
     await application.addPasscode(passcode);
     await Factory.createSyncedNote(application);
@@ -558,7 +544,7 @@ describe('keys', function () {
   });
 
   it('changing account password should create new items key and encrypt items with that key', async function () {
-    const { application, email, password } = await setupApplication();
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -620,14 +606,14 @@ describe('keys', function () {
   });
 
   it('loading the keychain root key should also load its key params', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     const rootKey = await application.protocolService.getRootKeyFromKeychain();
     expect(rootKey.keyParams).toBeTruthy();
   });
 
   it('key params should be persisted separately and not as part of root key', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     const rawKey = await application.deviceInterface.getNamespacedKeychainValue(
       application.identifier
@@ -641,7 +627,7 @@ describe('keys', function () {
   });
 
   it('persisted key params should exactly equal in memory rootKey.keyParams', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     const rootKey = application.protocolService.getRootKey();
     const rawKeyParams = await application.storageService.getValue(
@@ -652,7 +638,7 @@ describe('keys', function () {
   });
 
   it('key params should have expected values', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({ application: application });
     const keyParamsObject = await application.protocolService.getRootKeyParams();
     const keyParams = keyParamsObject.content;
@@ -667,7 +653,7 @@ describe('keys', function () {
   });
 
   it('key params obtained when signing in should have created and origination', async function () {
-    let { application, email, password } = await setupApplication();
+    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({
       application: application,
       email,
@@ -689,7 +675,7 @@ describe('keys', function () {
   });
 
   it('key params for 003 account should still have origination and created', async function () {
-    const { application, email, password } = await setupApplication();
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     /** origination and created are new properties since 004, but they can be added retroactively
      * to previous versions. They are not essential to <= 003, but are for >= 004 */
 
@@ -708,7 +694,7 @@ describe('keys', function () {
   });
 
   it('encryption name should be dependent on key params version', async function () {
-    let { application, email, password } = await setupApplication();
+    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     /** Register with 003 account */
     await Factory.registerOldUser({
       application: application,
@@ -731,7 +717,7 @@ describe('keys', function () {
   });
 
   it('when launching app with no keychain but data, should present account recovery challenge', async function () {
-    const { application, email, password } = await setupApplication();
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     /**
      * On iOS (and perhaps other platforms where keychains are not included in device backups),
      * when setting up a new device from restore, the keychain is deleted, but the data persists.
@@ -838,7 +824,7 @@ describe('keys', function () {
     });
 
     it('add new items key from migration if pw change already happened', async function () {
-      let { application, email, password } = await setupApplication();
+      let { application, email, password } = await Factory.createAndInitSimpleAppContext();
       /** Register an 003 account */
       await Factory.registerOldUser({
         application: application,
@@ -898,7 +884,7 @@ describe('keys', function () {
   });
 
   it('importing 003 account backup, then registering for account, should properly reconcile keys', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext();
     /**
      * When importing a backup of an 003 account into an offline state, ItemsKeys imported
      * will have an updated_at value, which tell our protocol service that this key has been

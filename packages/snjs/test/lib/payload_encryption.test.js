@@ -6,26 +6,12 @@ import * as Factory from '../factory';
 describe('payload encryption', function () {
   jest.setTimeout(Factory.TestTimeout);
 
-  let application;
-  let email, password;
-
-  beforeEach(async function () {
-    application = await Factory.createInitAppWithRandNamespace();
-    email = Uuid.GenerateUuidSynchronously();
-    password = Uuid.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({
-      application,
-      email,
-      password,
-    });
-  });
-
   afterEach(async function () {
-    application.deinit();
     localStorage.clear();
   });
 
   it('creating payload from item should create copy not by reference', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const item = await Factory.createMappedNote(application);
     const payload = CreateMaxPayloadFromAnyObject(item);
     expect(item.content === payload.content).toBe(false);
@@ -33,6 +19,7 @@ describe('payload encryption', function () {
   });
 
   it('creating payload from item should preserve appData', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const item = await Factory.createMappedNote(application);
     const payload = CreateMaxPayloadFromAnyObject(item);
     expect(item.content.appData).toBeTruthy();
@@ -40,6 +27,7 @@ describe('payload encryption', function () {
   });
 
   it('server payloads should not contain client values', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const rawPayload = Factory.createNotePayload();
     const notePayload = CreateMaxPayloadFromAnyObject(rawPayload, {
       dirty: true,
@@ -90,6 +78,7 @@ describe('payload encryption', function () {
   });
 
   it('copying payload with override content should override completely', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const item = await Factory.createMappedNote(application);
     const payload = CreateMaxPayloadFromAnyObject(item);
     const mutated = CreateMaxPayloadFromAnyObject(payload, {
@@ -101,7 +90,8 @@ describe('payload encryption', function () {
   });
 
   it('copying payload with override should copy empty arrays', async function () {
-    const pair = await Factory.createRelatedNoteTagPairPayload(
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
+    const pair = Factory.createRelatedNoteTagPairPayload(
       application.payloadManager
     );
     const tagPayload = pair[1];
@@ -117,6 +107,7 @@ describe('payload encryption', function () {
   });
 
   it('returns valid encrypted params for syncing', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const payload = Factory.createNotePayload();
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -134,6 +125,7 @@ describe('payload encryption', function () {
   }, 5000);
 
   it('returns unencrypted params with no keys', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const payload = Factory.createNotePayload();
     const encodedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -150,6 +142,7 @@ describe('payload encryption', function () {
   });
 
   it('returns additional fields for local storage', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const payload = Factory.createNotePayload();
 
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
@@ -172,6 +165,7 @@ describe('payload encryption', function () {
   });
 
   it('omits deleted for export file', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const payload = Factory.createNotePayload();
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -189,6 +183,7 @@ describe('payload encryption', function () {
   });
 
   it('items with error decrypting should remain as is', async function () {
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const payload = Factory.createNotePayload();
     const mutatedPayload = CreateMaxPayloadFromAnyObject(payload, {
       enc_item_key: 'foo',

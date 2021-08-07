@@ -14,28 +14,6 @@ describe('server session', function () {
     awaitAll: true,
   };
 
-  async function setupApplication () {
-    const expectedItemCount = BASE_ITEM_COUNT;
-    const application = await Factory.createInitAppWithRandNamespace();
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
-    const newPassword = Factory.randomString();
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: email,
-      password: password,
-    });
-
-    return {
-      expectedItemCount,
-      application,
-      email,
-      password,
-      newPassword
-    };
-  }
-
   async function sleepUntilSessionExpires(
     application,
     basedOnAccessToken = true
@@ -59,8 +37,9 @@ describe('server session', function () {
   }
 
   it('should succeed when a sync request is perfomed with an expired access token', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     await sleepUntilSessionExpires(application);
 
     const response = await application.apiService.sync([]);
@@ -69,8 +48,9 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('should return the new session in the response when refreshed', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const response = await application.apiService.refreshSession();
 
     expect(response.status).toBe(200);
@@ -81,8 +61,9 @@ describe('server session', function () {
   });
 
   it('should be refreshed on any api call if access token is expired', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     // Saving the current session information for later...
     const sessionBeforeSync = application.apiService.getSession();
 
@@ -104,7 +85,9 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('should succeed when a sync request is perfomed after signing into an ephemeral session', async function () {
-    let { application, email, password } = await setupApplication();
+    let { application, email, password } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     application = await Factory.signOutApplicationAndReturnNew(
       application
     );
@@ -116,15 +99,17 @@ describe('server session', function () {
   });
 
   it('should succeed when a sync request is perfomed after registering into an ephemeral session', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const response = await application.apiService.sync([]);
     expect(response.status).toBe(200);
   });
 
   it('should be consistent between storage and apiService', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const sessionFromStorage = await getSessionFromStorage(application);
     const sessionFromApiService = application.apiService.getSession();
 
@@ -141,8 +126,9 @@ describe('server session', function () {
   });
 
   it('should be performed successfully and terminate session with a valid access token', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const signOutResponse = await application.apiService.signOut();
     expect(signOutResponse.status).toBe(204);
 
@@ -154,8 +140,9 @@ describe('server session', function () {
   });
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     // Waiting enough time for the access token to expire, before performing a sign out request.
     await sleepUntilSessionExpires(application);
 
@@ -170,8 +157,9 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('change password request should be successful with a valid access token', async function () {
-    let { application, email, password, newPassword } = await setupApplication();
-
+    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const changePasswordResponse = await application.changePassword(
       password,
       newPassword
@@ -227,8 +215,9 @@ describe('server session', function () {
   });
 
   it('change password request should fail with an invalid access token', async function () {
-    let { application, email, password, newPassword } = await setupApplication();
-
+    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const fakeSession = application.apiService.getSession();
     fakeSession.accessToken = 'this-is-a-fake-token-1234';
     Factory.ignoreChallenges(application);
@@ -252,8 +241,9 @@ describe('server session', function () {
   });
 
   it('change password request should fail with an expired refresh token', async function () {
-    let { application, email, password, newPassword } = await setupApplication();
-
+    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     /** Waiting for the refresh token to expire. */
     await sleepUntilSessionExpires(application, false);
 
@@ -289,8 +279,9 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('should sign in successfully after signing out', async function () {
-    const { application, email, password } = await setupApplication();
-
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     await application.apiService.signOut();
     application.apiService.session = undefined;
 
@@ -305,8 +296,9 @@ describe('server session', function () {
   });
 
   it('should fail when renewing a session with an expired refresh token', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     await sleepUntilSessionExpires(application, false);
 
     const refreshSessionResponse = await application.apiService.refreshSession();
@@ -327,8 +319,9 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('should fail when renewing a session with an invalid refresh token', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const fakeSession = application.apiService.getSession();
     fakeSession.refreshToken = 'this-is-a-fake-token-1234';
 
@@ -346,8 +339,9 @@ describe('server session', function () {
   });
 
   it('should fail if syncing while a session refresh is in progress', async function () {
-    const { application } = await setupApplication();
-
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const refreshPromise = application.apiService.refreshSession();
     const syncResponse = await application.apiService.sync([]);
 
@@ -361,8 +355,9 @@ describe('server session', function () {
   });
 
   it('notes should be synced as expected after refreshing a session', async function () {
-    let { application, email, password } = await setupApplication();
-
+    let { application, email, password } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const notesBeforeSync = await Factory.createManyMappedNotes(
       application,
       5
@@ -478,14 +473,17 @@ describe('server session', function () {
   });
 
   it('should return current session in list of sessions', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     const response = await application.apiService.getSessionsList();
     expect(response.data[0].current).toBe(true);
   });
 
   it('signing out should delete session from all list', async function () {
-    const { application, email, password } = await setupApplication();
-
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
     /** Create new session aside from existing one */
     const app2 = await Factory.createInitAppWithRandNamespace();
     await app2.signIn(email, password);
@@ -548,7 +546,9 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('signing out with invalid session token should still delete local data', async function () {
-    const { application } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
 
     const invalidSession = application.apiService.getSession();
     invalidSession.accessToken = undefined;

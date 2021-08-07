@@ -10,27 +10,9 @@ describe('sync discordance', () => {
     awaitAll: true,
   };
 
-  async function setupApplication() {
-    const expectedItemCount = BASE_ITEM_COUNT;
-    const application = await Factory.createInitAppWithRandNamespace();
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
-    await Factory.registerUserToApplication({
-      application: application,
-      email: email,
-      password: password,
-    });
-
-    return {
-      expectedItemCount,
-      application,
-      email,
-      password
-    };
-  }
-
   it('should begin discordance upon instructions', async function () {
-    const { application, expectedItemCount } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
+    let expectedItemCount = BASE_ITEM_COUNT;
     await application.syncService.sync({ checkIntegrity: false });
     expect(application.syncService.state.getLastClientIntegrityHash()).toBeFalsy();
 
@@ -57,7 +39,8 @@ describe('sync discordance', () => {
   }, 10000);
 
   it('should abort integrity computation if any single item is missing updated_at_timestamp', async function () {
-    let { application, expectedItemCount } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
+    let expectedItemCount = BASE_ITEM_COUNT;
     /**
      * As part of the May 2021 server migration from SSRB to SSJS, the server in essence
      * had phased out updated_at by returning it as a conversion from updated_at_timestamp (
@@ -117,7 +100,8 @@ describe('sync discordance', () => {
   }, 12000);
 
   it('should increase discordance as client server mismatches', async function () {
-    let { application, expectedItemCount } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
+    let expectedItemCount = BASE_ITEM_COUNT;
     await application.syncService.sync(syncOptions);
 
     const payload = Factory.createNotePayload();
@@ -168,7 +152,8 @@ describe('sync discordance', () => {
   }, 10000);
 
   it('should perform sync resolution in which differing items are duplicated instead of merged', async function () {
-    let { application, expectedItemCount } = await setupApplication();
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
+    let expectedItemCount = BASE_ITEM_COUNT;
     const payload = Factory.createNotePayload();
     const item = await application.itemManager.emitItemFromPayload(
       payload,

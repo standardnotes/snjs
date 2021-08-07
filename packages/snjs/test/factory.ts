@@ -26,6 +26,28 @@ const syncOptions = {
   awaitAll: true,
 };
 
+export async function createAndInitSimpleAppContext({ registerUser, environment } = { registerUser: false, environment: Environment.Web }) {
+  const application = await createInitAppWithRandNamespace(environment);
+  const email = Uuid.GenerateUuidSynchronously();
+  const password = Uuid.GenerateUuidSynchronously();
+  const newPassword = randomString();
+
+  if (registerUser) {
+    await registerUserToApplication({
+      application,
+      email,
+      password
+    });
+  }
+
+  return {
+    application,
+    email,
+    password,
+    newPassword
+  };
+};
+
 export async function createAppContext(identifier?: string) {
   if (!identifier) {
     identifier = `${Math.random()}`;
