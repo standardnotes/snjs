@@ -16,7 +16,9 @@ export class SNMfaService extends PureService {
   }
 
   async mfaActivated() {
-    const mfaSetting = await this.settingsService.getSetting(SettingName.MfaSecret);
+    const mfaSetting = await this.settingsService.getSetting(
+      SettingName.MfaSecret
+    );
     if (mfaSetting == null) return false;
     if (mfaSetting.secret == null) return false;
   }

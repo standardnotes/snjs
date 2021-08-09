@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.7.22",
+  "version": "2.8.0",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
@@ -76,6 +76,7 @@
     "@standardnotes/auth": "3.1.1",
     "@standardnotes/features": "1.0.0",
     "@standardnotes/settings": "1.0.1",
-    "@standardnotes/sncrypto-common": "^1.2.9"
+    "@standardnotes/sncrypto-common": "^1.2.9",
+    "jssha": "^3.2.0"
   }
 }

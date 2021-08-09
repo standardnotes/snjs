@@ -100,7 +100,7 @@ import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
 import { PermissionName } from '@standardnotes/auth';
-import {SettingPayload} from '@standardnotes/settings';
+import { SettingPayload } from '@standardnotes/settings';
 import { RemoteSession } from '.';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';

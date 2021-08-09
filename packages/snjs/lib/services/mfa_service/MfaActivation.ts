@@ -1,4 +1,5 @@
 import * as messages from '../api/messages';
+import jsSHA from 'jssha';
 
 function randomBase32(length: number) {
   let text = '';
@@ -41,19 +42,6 @@ function leftpad(str: string, len: number, pad: string) {
   return str;
 }
 
-function calcOTP(secretKey: string) {
-  const secret = base32tohex(secretKey);
-  const epoch = Math.round(new Date().getTime() / 1000.0);
-  const time = leftpad(dec2hex(Math.floor(epoch / 30)), 16, '0');
-  const shaObj = new jsSHA('SHA-1', 'HEX');
-  shaObj.setHMACKey(secret, 'HEX');
-  shaObj.update(time);
-  const hmac = shaObj.getHMAC('HEX');
-  const offset = hex2dec(hmac.substring(hmac.length - 1));
-  const otp = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec('7fffffff')) + '';
-  return otp.substr(otp.length - 6, 6);
-}
-
 export const newSecret = () => randomBase32(16);
 
 const qrCodeUrlFromSecret = (secret: string) =>
@@ -73,12 +61,24 @@ export class MfaActivation {
     return this._secret;
   }
 
-  getOtp() {
-    return calcOTP(this._secret);
+  async getOtp() {
+    const secret = base32tohex(this._secret);
+    const epoch = Math.round(new Date().getTime() / 1000.0);
+    const time = leftpad(dec2hex(Math.floor(epoch / 30)), 16, '0');
+
+    const shaObj = new jsSHA('SHA-1', 'HEX');
+    shaObj.setHMACKey(secret, 'HEX');
+    shaObj.update(time);
+    const hmac = shaObj.getHMAC('HEX');
+
+    const offset = hex2dec(hmac.substring(hmac.length - 1));
+    const otp =
+      (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec('7fffffff')) + '';
+    return otp.substr(otp.length - 6, 6);
   }
 
   async enableMfa(secret: string, authCode: string) {
-    if (secret !== this._secret || authCode !== this.getOtp()) {
+    if (secret !== this._secret || authCode !== (await this.getOtp())) {
       throw new Error(
         messages.KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword
       );
