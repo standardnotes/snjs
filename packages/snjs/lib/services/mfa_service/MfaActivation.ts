@@ -1,10 +1,4 @@
-import jsSHA from 'jssha';
-
-import { SettingName } from '@standardnotes/settings';
-
-import * as messages from './api/messages';
-import { SNSettingsService } from './settings_service';
-import { PureService } from './pure_service';
+import * as messages from '../api/messages';
 
 function randomBase32(length: number) {
   let text = '';
@@ -60,7 +54,7 @@ function calcOTP(secretKey: string) {
   return otp.substr(otp.length - 6, 6);
 }
 
-const newSecret = () => randomBase32(16);
+export const newSecret = () => randomBase32(16);
 
 const qrCodeUrlFromSecret = (secret: string) =>
   `otpauth://totp/2FA?secret=${secret}&issuer=Standard%20Notes`;
@@ -90,27 +84,5 @@ export class MfaActivation {
       );
     }
     return this.saveMfa(secret);
-  }
-}
-
-export class SNMfaService extends PureService {
-  constructor(private settingsService: SNSettingsService) {
-    super();
-  }
-
-  private async saveMfa(secret: string): Promise<void> {
-    await this.settingsService.updateSetting(SettingName.MfaSecret, {
-      secret: secret,
-    });
-  }
-
-  async mfaActivated() {
-    const mfaSetting = await this.settingsService.getSetting(SettingName.MfaSecret);
-    if (mfaSetting == null) return false;
-    if (mfaSetting.secret == null) return false;
-  }
-
-  startMfaActivation(): MfaActivation {
-    return new MfaActivation(newSecret(), (secret) => this.saveMfa(secret));
   }
 }
