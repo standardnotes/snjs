@@ -3,6 +3,8 @@ import { Uuid } from '@Lib/uuid';
 import * as Factory from '../../factory';
 
 describe('sync discordance', () => {
+  jest.setTimeout(12000);
+
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {
@@ -36,7 +38,7 @@ describe('sync discordance', () => {
     expect(application.syncService.isOutOfSync()).toBe(false);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-  }, 10000);
+  });
 
   it('should abort integrity computation if any single item is missing updated_at_timestamp', async function () {
     const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
@@ -78,7 +80,7 @@ describe('sync discordance', () => {
     await application.syncService.sync({ checkIntegrity: true });
 
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
-    await Factory.sleep(0.2);
+    await Factory.sleep(1.2);
 
     expect(application.syncService.isOutOfSync()).toBe(true);
     expect(application.syncService.state.getLastClientIntegrityHash()).toBeTruthy();
@@ -97,7 +99,7 @@ describe('sync discordance', () => {
 
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-  }, 12000);
+  });
 
   it('should increase discordance as client server mismatches', async function () {
     const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
@@ -123,7 +125,7 @@ describe('sync discordance', () => {
     await application.syncService.sync({ checkIntegrity: true });
 
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
-    await Factory.sleep(0.2);
+    await Factory.sleep(1.2);
 
     // We expect now to be in discordance. What the client has is different from what the server has
     // The above sync will not resolve until it syncs enough time to meet discordance threshold
@@ -149,7 +151,7 @@ describe('sync discordance', () => {
 
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-  }, 10000);
+  });
 
   it('should perform sync resolution in which differing items are duplicated instead of merged', async function () {
     const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
@@ -171,7 +173,7 @@ describe('sync discordance', () => {
 
     await application.syncService.sync({ checkIntegrity: true });
     // repeat syncs for sync discordance are not waited for, so we have to sleep for a bit here
-    await Factory.sleep(0.2);
+    await Factory.sleep(1.2);
     expect(application.syncService.isOutOfSync()).toBe(true);
 
     // lets resolve sync where content does not differ

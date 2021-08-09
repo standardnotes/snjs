@@ -63,7 +63,7 @@ describe('key recovery service', function () {
     );
 
     /** Wait and allow recovery wizard to complete */
-    await Factory.sleep(0.3);
+    await Factory.sleep(1.3);
 
     /** Should be decrypted now */
     expect(application.findItem(encrypted.uuid).errorDecrypting).toBe(false);
@@ -532,7 +532,7 @@ describe('key recovery service', function () {
     );
 
     /** Wait and allow recovery wizard to complete */
-    await Factory.sleep(0.3);
+    await Factory.sleep(1.3);
 
     /** Should be decrypted now */
     expect(application.findItem(encrypted.uuid).errorDecrypting).toBe(false);

@@ -179,7 +179,7 @@ describe('server session', function () {
 
     expect(loginResponse).toBeTruthy();
     expect(loginResponse.status).toBe(200);
-  });
+  }, Factory.LongTestTimeout);
 
   it.skip('change password request should be successful after the expired access token is refreshed', async function () {
     timeout(Factory.LongTestTimeout);

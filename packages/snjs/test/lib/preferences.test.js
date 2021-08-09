@@ -67,7 +67,7 @@ describe('preferences', function () {
     await application.sync({ awaitAll: true });
     const editorLeft = application.getPreference('editorLeft');
     expect(editorLeft).toBe(300);
-  });
+  }, 10000);
 
   it.skip('reads stored preferences on start without waiting for syncing to complete', async function () {
     const prefKey = 'editorLeft';
