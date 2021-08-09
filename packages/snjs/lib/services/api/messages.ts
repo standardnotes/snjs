@@ -32,6 +32,9 @@ export const API_MESSAGE_RATE_LIMITED =
 export const API_MESSAGE_INVALID_SESSION =
   'Please sign in to an account in order to continue with your request.';
 
+export const API_MESSAGE_FAILED_GET_SETTINGS = 'Failed to get settings.';
+export const API_MESSAGE_FAILED_UPDATE_SETTINGS = 'Failed to update settings.';
+
 export const UNSUPPORTED_PROTOCOL_VERSION =
   'This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.';
 
@@ -207,7 +210,8 @@ export const ChallengeStrings = {
   ExportBackup: 'Authentication is required to export a backup',
   DisableBiometrics: 'Authentication is required to disable biometrics',
   UnprotectNote: 'Authentication is required to unprotect a note',
-  SearchProtectedNotesText: 'Authentication is required to search protected contents',
+  SearchProtectedNotesText:
+    'Authentication is required to search protected contents',
   SelectProtectedNote: 'Authentication is required to select a protected note',
 };
 

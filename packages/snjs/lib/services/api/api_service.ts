@@ -15,6 +15,11 @@ import {
   KeyParamsResponse,
   SessionListResponse,
   RawSyncResponse,
+  ListSettingsResponse,
+  UpdateSettingResponse,
+  GetSettingResponse,
+  DeleteSettingResponse,
+  MinimalHttpResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -48,6 +53,8 @@ type PathNamesV1 = {
   session: (sessionUuid: string) => string;
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
+  settings: (userUuid: string) => string;
+  setting: (userUuid: string, settingName: string) => string;
 };
 
 const Paths: {
@@ -66,6 +73,9 @@ const Paths: {
     itemRevisions: (itemUuid: string) => `/v1/items/${itemUuid}/revisions`,
     itemRevision: (itemUuid: string, revisionUuid: string) =>
       `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
+    settings: (userUuid) => `/v1/${userUuid}/settings`,
+    setting: (userUuid, settingName) =>
+      `/v1/${userUuid}/settings/${settingName}`,
   },
 };
 
@@ -88,7 +98,7 @@ export class SNApiService extends PureService {
     private httpService: SNHttpService,
     private storageService: SNStorageService,
     private permissionsService: SNPermissionsService,
-    private host: string,
+    private host: string
   ) {
     super();
   }
@@ -183,7 +193,10 @@ export class SNApiService extends PureService {
 
   private async processMetaObject(meta: ResponseMeta) {
     if (meta.auth && meta.auth.roles && meta.auth.permissions) {
-      await this.permissionsService.update(meta.auth.roles, meta.auth.permissions);
+      await this.permissionsService.update(
+        meta.auth.roles,
+        meta.auth.permissions
+      );
     }
   }
 
@@ -326,10 +339,7 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     this.changing = true;
-    const url = joinPaths(
-      this.host,
-      <string>Paths.v1.changePassword(userUuid)
-    );
+    const url = joinPaths(this.host, <string>Paths.v1.changePassword(userUuid));
     const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
@@ -483,10 +493,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(
-      this.host,
-      <string>Paths.v1.session(sessionId)
-    );
+    const url = joinPaths(this.host, <string>Paths.v1.session(sessionId));
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
@@ -550,10 +557,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(
-      this.host,
-      Paths.v1.itemRevision(itemId, entry.uuid)
-    );
+    const url = joinPaths(this.host, Paths.v1.itemRevision(itemId, entry.uuid));
     const response:
       | SingleRevisionResponse
       | HttpResponse = await this.httpService
@@ -573,6 +577,83 @@ export class SNApiService extends PureService {
       });
     this.processResponse(response);
     return response;
+  }
+
+  private async tokenRefreshableRequest<T extends MinimalHttpResponse>(
+    params: HttpRequest & { fallbackErrorMessage: string }
+  ): Promise<T> {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError as T;
+    }
+    const response: T | HttpResponse = await this.httpService
+      .runHttp(params)
+      .catch((errorResponse: HttpResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest(params);
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          params.fallbackErrorMessage
+        );
+      });
+    this.processResponse(response);
+    return response as T;
+  }
+
+  async listSettings(userUuid: UuidString): Promise<ListSettingsResponse> {
+    return this.tokenRefreshableRequest<ListSettingsResponse>({
+      verb: HttpVerb.Get,
+      url: joinPaths(this.host, Paths.v1.settings(userUuid)),
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+      authentication: this.session?.authorizationValue,
+    });
+  }
+
+  async updateSetting(
+    userUuid: UuidString,
+    settingName: string,
+    settingValue: string | null
+  ): Promise<UpdateSettingResponse> {
+    const params = {
+      userUuid,
+      props: {
+        name: settingName,
+        value: settingValue,
+      },
+    };
+    return this.tokenRefreshableRequest<UpdateSettingResponse>({
+      verb: HttpVerb.Put,
+      url: joinPaths(this.host, Paths.v1.settings(userUuid)),
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+      params,
+    });
+  }
+
+  async getSetting(
+    userUuid: UuidString,
+    settingName: string
+  ): Promise<GetSettingResponse> {
+    return this.tokenRefreshableRequest<GetSettingResponse>({
+      verb: HttpVerb.Get,
+      url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+    });
+  }
+
+  async deleteSetting(
+    userUuid: UuidString,
+    settingName: string
+  ): Promise<DeleteSettingResponse> {
+    return this.tokenRefreshableRequest<DeleteSettingResponse>({
+      verb: HttpVerb.Delete,
+      url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+    });
   }
 
   private preprocessingError() {

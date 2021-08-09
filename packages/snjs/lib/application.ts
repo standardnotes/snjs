@@ -100,7 +100,10 @@ import { PayloadFormat } from './protocol/payloads';
 import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
 import { PermissionName } from '@standardnotes/auth';
+import {SettingPayload} from '@standardnotes/settings';
 import { RemoteSession } from '.';
+import { SNSettingsService } from './services/settings_service';
+import { SNMfaService } from './services/mfa_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -142,6 +145,8 @@ export class SNApplication {
   private preferencesService!: SNPreferencesService;
   private permissionsService!: SNPermissionsService;
   private credentialService!: SNCredentialService;
+  private settingsService!: SNSettingsService;
+  private mfaService!: SNMfaService;
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService<any, any>[] = [];
@@ -187,7 +192,7 @@ export class SNApplication {
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
-    private webSocketUrl?: string,
+    private webSocketUrl?: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -290,6 +295,7 @@ export class SNApplication {
     await this.permissionsService.loadWebSocketUrl();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
+    await this.settingsService.initializeFromDisk();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
@@ -449,7 +455,7 @@ export class SNApplication {
   /**
    * Finds an item by predicate.
    */
-  public getAll(uuids: UuidString[]): (SNItem | undefined)[] {
+  public getAll(uuids: UuidString[]): (SNItem | PurePayload | undefined)[] {
     return this.itemManager.findItems(uuids);
   }
 
@@ -517,7 +523,9 @@ export class SNApplication {
     return this.syncService.getStatus();
   }
 
-public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpResponse> {
+  public getSessions(): Promise<
+    (HttpResponse & { data: RemoteSession[] }) | HttpResponse
+  > {
     return this.sessionManager.getSessionsList();
   }
 
@@ -800,7 +808,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
    * @param tag - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-   public getTagDescendants(tag: SNTag): SNTag[] {
+  public getTagDescendants(tag: SNTag): SNTag[] {
     return this.itemManager.getTagDescendants(tag);
   }
 
@@ -1441,6 +1449,33 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     }
   }
 
+  public async listSettings(): Promise<Partial<SettingPayload>> {
+    return this.settingsService.listSettings();
+  }
+
+  public async getSetting<Key extends keyof SettingPayload>(name: Key) {
+    return this.settingsService.getSetting(name);
+  }
+
+  public async updateSetting<Key extends keyof SettingPayload>(
+    name: Key,
+    payload: SettingPayload[Key]
+  ) {
+    return this.settingsService.updateSetting(name, payload);
+  }
+
+  public async deleteSetting<Key extends keyof SettingPayload>(name: Key) {
+    return this.settingsService.deleteSetting(name);
+  }
+
+  public async mfaActivated() {
+    return this.mfaService.mfaActivated();
+  }
+
+  public startMfaActivation() {
+    return this.mfaService.startMfaActivation();
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();
@@ -1470,6 +1505,8 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createComponentManager();
     this.createActionsManager();
     this.createPreferencesService();
+    this.createSettingsService();
+    this.createMfaService();
   }
 
   private clearServices() {
@@ -1493,6 +1530,8 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     (this.preferencesService as unknown) = undefined;
     (this.permissionsService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
+    (this.settingsService as unknown) = undefined;
+    (this.mfaService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1544,7 +1583,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       this.httpService,
       this.storageService,
       this.permissionsService,
-      this.defaultHost,
+      this.defaultHost
     );
     this.services.push(this.apiService);
   }
@@ -1634,7 +1673,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       this.alertService,
       this.protocolService,
       this.challengeService,
-      this.permissionsService,
+      this.permissionsService
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
@@ -1643,9 +1682,11 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
             void (async () => {
               await this.sync();
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-                void this.protocolService.createNewDefaultItemsKey().then(() => {
-                  void this.sync();
-                })
+                void this.protocolService
+                  .createNewDefaultItemsKey()
+                  .then(() => {
+                    void this.sync();
+                  });
               }
             })();
             break;
@@ -1765,6 +1806,19 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       })
     );
     this.services.push(this.preferencesService);
+  }
+
+  private createSettingsService() {
+    this.settingsService = new SNSettingsService(
+      this.storageService,
+      this.apiService
+    );
+    this.services.push(this.settingsService);
+  }
+
+  private createMfaService() {
+    this.mfaService = new SNMfaService(this.settingsService);
+    this.services.push(this.mfaService);
   }
 
   private getClass<T>(base: T) {
