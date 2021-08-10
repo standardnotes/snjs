@@ -202,13 +202,8 @@ type SettingData = {
   value: string | null;
 };
 
-type SettingHttpError = {
-  tag?: string;
-  message: string;
-};
-
 export type MinimalHttpResponse = {
-  error?: SettingHttpError;
+  error?: Error;
 };
 
 export type ListSettingsResponse = MinimalHttpResponse & {

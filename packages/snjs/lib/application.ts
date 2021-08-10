@@ -1476,6 +1476,10 @@ export class SNApplication {
     return this.mfaService.startMfaActivation();
   }
 
+  public disableMfa() {
+    return this.mfaService.disableMfa();
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();
@@ -1817,7 +1821,7 @@ export class SNApplication {
   }
 
   private createMfaService() {
-    this.mfaService = new SNMfaService(this.settingsService);
+    this.mfaService = new SNMfaService(this.settingsService, this.crypto);
     this.services.push(this.mfaService);
   }
 

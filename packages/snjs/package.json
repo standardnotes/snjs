@@ -76,7 +76,6 @@
     "@standardnotes/auth": "3.1.1",
     "@standardnotes/features": "1.0.0",
     "@standardnotes/settings": "1.0.1",
-    "@standardnotes/sncrypto-common": "^1.2.9",
-    "jssha": "^3.2.0"
+    "@standardnotes/sncrypto-common": "^1.4.0"
   }
 }

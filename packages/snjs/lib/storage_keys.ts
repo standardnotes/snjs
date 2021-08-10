@@ -37,7 +37,8 @@ export enum StorageKey {
   StorageEncryptionPolicy = 'storage_policy',
   WebSocketUrl = 'webSocket_url',
   UserRoles = 'user_roles',
-  UserPermissions = 'user_permissions'
+  UserPermissions = 'user_permissions',
+  UserSettings = 'user_settings',
 }
 
 export enum NonwrappedStorageKey {

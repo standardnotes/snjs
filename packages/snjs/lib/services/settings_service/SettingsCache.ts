@@ -1,29 +1,34 @@
 import { SettingPayload } from '@standardnotes/settings';
 import { SettingsProvider } from './SettingsProvider';
 
+interface SettingsPersist {
+  saveSettings(payload: Partial<SettingPayload>): Promise<void>;
+  loadSettings(): Promise<Partial<SettingPayload>>;
+}
+
 export class SettingsCache implements SettingsProvider {
   private lastUpdate = 0;
   private lastUpdateMap: Map<keyof SettingPayload, number> = new Map();
-  private cache: Partial<SettingPayload> = {};
 
   constructor(
     private readonly provider: SettingsProvider,
+    private readonly storage: SettingsPersist,
     private readonly cacheFreshnessMS: number,
     private readonly currentTime: () => number
   ) {}
 
-  private setSingle<Key extends keyof SettingPayload>(
+  private async saveSingle<Key extends keyof SettingPayload>(
     name: Key,
     payload: SettingPayload[Key] | null
   ) {
-    this.cache[name] = payload ?? undefined;
+    const settings = await this.storage.loadSettings();
+    settings[name] = payload ?? undefined;
+    await this.storage.saveSettings(settings);
     this.lastUpdateMap.set(name, this.currentTime());
   }
 
-  private async setAll(payload: Partial<SettingPayload>) {
-    this.cache = payload;
-    this.cache = await this.provider.listSettings();
-
+  private async saveAll(payload: Partial<SettingPayload>) {
+    this.storage.saveSettings(payload);
     const now = this.currentTime();
     this.lastUpdate = now;
     for (const key of this.lastUpdateMap.keys()) {
@@ -43,21 +48,28 @@ export class SettingsCache implements SettingsProvider {
   }
 
   async listSettings(): Promise<Partial<SettingPayload>> {
-    if (this.shouldRebuildAll()) {
+    if (!this.shouldRebuildAll()) return this.storage.loadSettings();
+
+    try {
       const payload = await this.provider.listSettings();
-      this.setAll(payload);
+      await this.saveAll(payload);
+      return payload;
+    } catch (_) {
+      return this.storage.loadSettings();
     }
-    return this.cache;
   }
 
   async getSetting<Key extends keyof SettingPayload>(
     name: Key
   ): Promise<SettingPayload[Key] | null> {
-    if (this.shouldRebuildSingle(name)) {
-      const payload = await this.provider.getSetting(name);
-      this.setSingle(name, payload);
+    if (!this.shouldRebuildSingle(name)) {
+      const settings = await this.storage.loadSettings();
+      return settings[name] ?? null;
     }
-    return this.cache[name] ?? null;
+
+    const payload = await this.provider.getSetting(name);
+    await this.saveSingle(name, payload);
+    return payload;
   }
 
   async updateSetting<Key extends keyof SettingPayload>(
@@ -65,7 +77,7 @@ export class SettingsCache implements SettingsProvider {
     payload: SettingPayload[Key]
   ): Promise<SettingPayload[Key] | null> {
     const updated = await this.provider.updateSetting(name, payload);
-    this.setSingle(name, updated);
+    this.saveSingle(name, updated);
     return updated;
   }
 
@@ -73,6 +85,6 @@ export class SettingsCache implements SettingsProvider {
     name: Key
   ): Promise<void> {
     await this.provider.deleteSetting(name);
-    this.setSingle(name, null);
+    this.saveSingle(name, null);
   }
 }

@@ -3,9 +3,13 @@ import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from '../settings_service';
 import { PureService } from '../pure_service';
 import { MfaActivation, newSecret } from './MfaActivation';
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 
 export class SNMfaService extends PureService {
-  constructor(private settingsService: SNSettingsService) {
+  constructor(
+    private settingsService: SNSettingsService,
+    private crypto: SNPureCrypto
+  ) {
     super();
   }
 
@@ -24,6 +28,14 @@ export class SNMfaService extends PureService {
   }
 
   startMfaActivation(): MfaActivation {
-    return new MfaActivation(newSecret(), (secret) => this.saveMfa(secret));
+    return new MfaActivation(
+      newSecret(),
+      (secret) => this.saveMfa(secret),
+      (m, k) => this.crypto.hmac1(m, k)
+    );
+  }
+
+  async disableMfa(): Promise<void> {
+    await this.settingsService.deleteSetting(SettingName.MfaSecret);
   }
 }

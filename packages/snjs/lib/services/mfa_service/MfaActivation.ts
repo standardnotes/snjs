@@ -1,5 +1,5 @@
 import * as messages from '../api/messages';
-import jsSHA from 'jssha';
+import { HexString, Utf8String } from '@standardnotes/sncrypto-common';
 
 function randomBase32(length: number) {
   let text = '';
@@ -50,7 +50,11 @@ const qrCodeUrlFromSecret = (secret: string) =>
 export class MfaActivation {
   constructor(
     private readonly _secret: string,
-    private readonly saveMfa: (secret: string) => Promise<void>
+    private readonly saveMfa: (secret: string) => Promise<void>,
+    private readonly calcHmacSha1: (
+      message: Utf8String,
+      key: HexString
+    ) => Promise<HexString | null>
   ) {}
 
   getQrCodeUrl() {
@@ -63,13 +67,12 @@ export class MfaActivation {
 
   async getOtp() {
     const secret = base32tohex(this._secret);
+
     const epoch = Math.round(new Date().getTime() / 1000.0);
     const time = leftpad(dec2hex(Math.floor(epoch / 30)), 16, '0');
 
-    const shaObj = new jsSHA('SHA-1', 'HEX');
-    shaObj.setHMACKey(secret, 'HEX');
-    shaObj.update(time);
-    const hmac = shaObj.getHMAC('HEX');
+    const hmac = await this.calcHmacSha1(time, secret);
+    if (hmac == null) throw new Error(messages.SignInStrings.IncorrectMfa);
 
     const offset = hex2dec(hmac.substring(hmac.length - 1));
     const otp =
