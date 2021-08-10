@@ -8,6 +8,8 @@ export type Token = {
     uuid: Uuid,
     email: string
   },
+  roles: Array<Role>,
+  features: Array<Feature>,
   session?: {
     uuid: Uuid,
     api_version: string,
@@ -15,6 +17,5 @@ export type Token = {
     updated_at: string,
     device_info: string
   },
-  roles: Array<Role>,
-  features: Array<Feature>,
+  extensionKey?: string,
 }
