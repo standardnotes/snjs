@@ -34,7 +34,7 @@ import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
 import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
-import { SNPermissionsService } from '../permissions_service';
+import { SNFeaturesService } from '../features_service';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -87,7 +87,7 @@ export class SNApiService extends PureService {
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private permissionsService: SNPermissionsService,
+    private featuresService: SNFeaturesService,
     private host: string,
   ) {
     super();
@@ -182,8 +182,8 @@ export class SNApiService extends PureService {
   }
 
   private async processMetaObject(meta: ResponseMeta) {
-    if (meta.auth && meta.auth.roles && meta.auth.permissions) {
-      await this.permissionsService.update(meta.auth.roles, meta.auth.permissions);
+    if (meta.auth && meta.auth.roles) {
+      await this.featuresService.updateRoles(meta.auth.roles);
     }
   }
 

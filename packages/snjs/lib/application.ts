@@ -97,7 +97,7 @@ import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import { SNPermissionsService } from './services/permissions_service';
+import { SNFeaturesService } from './services/features_service';
 import { ProtectionEvent } from './services/protection_service';
 import { PermissionName } from '@standardnotes/auth';
 import { RemoteSession } from '.';
@@ -140,7 +140,7 @@ export class SNApplication {
   private itemManager!: ItemManager;
   private keyRecoveryService!: SNKeyRecoveryService;
   private preferencesService!: SNPreferencesService;
-  private permissionsService!: SNPermissionsService;
+  private featuresService!: SNFeaturesService;
   private credentialService!: SNCredentialService;
 
   private eventHandlers: ApplicationObserver[] = [];
@@ -287,7 +287,8 @@ export class SNApplication {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
-    await this.permissionsService.loadWebSocketUrl();
+    await this.featuresService.loadWebSocketUrl();
+    await this.featuresService.loadUserRoles();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
 
@@ -875,7 +876,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
 
   public async setCustomHost(host: string): Promise<void> {
     await this.apiService.setHost(host);
-    await this.permissionsService.setWebSocketUrl(undefined);
+    await this.featuresService.setWebSocketUrl(undefined);
   }
 
   public getUser(): User | undefined {
@@ -1165,10 +1166,6 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     return this.preferencesService.setValue(key, value);
   }
 
-  public hasPermission(permissionName: PermissionName): boolean {
-    return this.permissionsService.hasPermission(permissionName);
-  }
-
   /**
    * Gives services a chance to complete any sensitive operations before yielding
    * @param maxWait The maximum number of milliseconds to wait for services
@@ -1445,7 +1442,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createPayloadManager();
     this.createItemManager();
     this.createStorageManager();
-    this.createPermissionsService();
+    this.createFeaturesService();
     this.createProtocolService();
     const encryptionDelegate = {
       payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
@@ -1491,23 +1488,18 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     (this.itemManager as unknown) = undefined;
     (this.keyRecoveryService as unknown) = undefined;
     (this.preferencesService as unknown) = undefined;
-    (this.permissionsService as unknown) = undefined;
+    (this.featuresService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
 
     this.services = [];
   }
 
-  private createPermissionsService() {
-    this.permissionsService = new SNPermissionsService(
+  private createFeaturesService() {
+    this.featuresService = new SNFeaturesService(
       this.storageService,
       this.webSocketUrl
     );
-    this.serviceObservers.push(
-      this.permissionsService.addEventObserver((_event, eventData) => {
-        void this.notifyEvent(ApplicationEvent.PermissionsChanged, eventData);
-      })
-    );
-    this.services.push(this.permissionsService);
+    this.services.push(this.featuresService);
   }
 
   private createMigrationService() {
@@ -1543,7 +1535,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.permissionsService,
+      this.featuresService,
       this.defaultHost,
     );
     this.services.push(this.apiService);
@@ -1634,7 +1626,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       this.alertService,
       this.protocolService,
       this.challengeService,
-      this.permissionsService,
+      this.featuresService,
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {

@@ -43,7 +43,7 @@ import {
   SignInStrings,
 } from './messages';
 import { UuidString } from '@Lib/types';
-import { SNPermissionsService } from '../permissions_service';
+import { SNFeaturesService } from '../features_service';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MissingAccountParams = 'missing-params';
@@ -78,7 +78,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     private alertService: SNAlertService,
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
-    private permissionsService: SNPermissionsService,
+    private featuresService: SNFeaturesService,
   ) {
     super();
     apiService.setInvalidSessionObserver((revoked) => {
@@ -96,7 +96,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     (this.apiService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
     (this.challengeService as unknown) = undefined;
-    (this.permissionsService as unknown) = undefined;
+    (this.featuresService as unknown) = undefined;
     this.user = undefined;
     super.deinit();
   }
@@ -115,7 +115,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     if (rawSession) {
       const session = Session.FromRawStorageValue(rawSession);
       await this.setSession(session, false);
-      this.permissionsService.startWebSocketConnection(session.authorizationValue);
+      this.featuresService.startWebSocketConnection(session.authorizationValue);
     }
   }
 
@@ -144,7 +144,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const session = this.apiService.getSession();
     if (session && session.canExpire()) {
       await this.apiService.signOut();
-      this.permissionsService.closeWebSocketConnection();
+      this.featuresService.closeWebSocketConnection();
     }
   }
 
@@ -609,13 +609,13 @@ export class SNSessionManager extends PureService<SessionEvent> {
       /** Legacy JWT response */
       const session = new JwtSession(data.token);
       await this.setSession(session);
-      this.permissionsService.startWebSocketConnection(session.authorizationValue);
+      this.featuresService.startWebSocketConnection(session.authorizationValue);
     } else if (data.session) {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
-      this.permissionsService.startWebSocketConnection(session.authorizationValue);
+      this.featuresService.startWebSocketConnection(session.authorizationValue);
     }
   }
 }

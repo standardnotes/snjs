@@ -5,7 +5,8 @@ import {
   KeyParamsOrigination,
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-import { Role, Permission } from '@standardnotes/auth';
+import { Role } from '@standardnotes/auth';
+import { Feature } from '@standardnotes/features';
 
 export enum StatusCode {
   LocalValidationError = 10,
@@ -46,7 +47,7 @@ export type HttpResponse = {
 export type ResponseMeta = {
   auth: {
     roles?: Role[];
-    permissions?: Permission[];
+    features?: Feature[];
   };
 };
 
