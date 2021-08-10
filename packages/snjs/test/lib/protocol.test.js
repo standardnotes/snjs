@@ -5,13 +5,22 @@ import { Uuid } from '@Lib/uuid';
 import * as Factory from '../factory';
 
 describe('protocol', function () {
-  it('checks version to make sure its 004', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+  let application;
+
+  beforeEach(async function () {
+    application = await Factory.createInitAppWithRandNamespace();
+  });
+
+  afterEach(function () {
+    application.deinit();
+    application = null;
+  });
+
+  it('checks version to make sure its 004', function () {
     expect(application.protocolService.getLatestVersion()).toBe('004');
   });
 
-  it('checks supported versions to make sure it includes 001, 002, 003, 004', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+  it('checks supported versions to make sure it includes 001, 002, 003, 004', function () {
     expect(application.protocolService.supportedVersions()).toEqual([
       '001',
       '002',
@@ -20,8 +29,7 @@ describe('protocol', function () {
     ]);
   });
 
-  it('platform derivation support', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+  it('platform derivation support', function () {
     expect(
       application.protocolService.platformSupportsKeyDerivation({
         version: '001',
@@ -49,8 +57,7 @@ describe('protocol', function () {
     ).toBe(true);
   });
 
-  it('key params versions <= 002 should include pw_cost in portable value', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+  it('key params versions <= 002 should include pw_cost in portable value', function () {
     const keyParams002 = application.protocolService.createKeyParams({
       version: '002',
       pw_cost: 5000,
@@ -58,30 +65,26 @@ describe('protocol', function () {
     expect(keyParams002.getPortableValue().pw_cost).toBeTruthy();
   });
 
-  it('version comparison of 002 should be older than library version', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+  it('version comparison of 002 should be older than library version', function () {
     expect(
       application.protocolService.isVersionNewerThanLibraryVersion('002')
     ).toBe(false);
   });
 
-  it('version comparison of 005 should be newer than library version', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+  it('version comparison of 005 should be newer than library version', function () {
     expect(
       application.protocolService.isVersionNewerThanLibraryVersion('005')
     ).toBe(true);
   });
 
-  it('library version should not be outdated', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
-    const currentVersion = application.protocolService.getLatestVersion();
+  it('library version should not be outdated', function () {
+    var currentVersion = application.protocolService.getLatestVersion();
     expect(
       application.protocolService.isProtocolVersionOutdated(currentVersion)
     ).toBe(false);
   });
 
   it('decrypting already decrypted payload should return same payload', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload();
     const result = await application.protocolService.payloadByDecryptingPayload(
       payload
@@ -91,7 +94,6 @@ describe('protocol', function () {
   });
 
   it('ejected payload should not have meta fields', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     await application.addPasscode('123');
     const payload = Factory.createNotePayload();
     const result = await application.protocolService.payloadByEncryptingPayload(
@@ -106,7 +108,6 @@ describe('protocol', function () {
   });
 
   it('decrypting 000 payload should succeed', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: await Uuid.GenerateUuid(),
       content_type: ContentType.Mfa,
@@ -127,7 +128,6 @@ describe('protocol', function () {
   });
 
   it('encrypted payload for server should include duplicate_of field', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload('Test');
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -138,7 +138,6 @@ describe('protocol', function () {
   });
 
   it('ejected payload for server should include duplicate_of field', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload('Test');
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -150,7 +149,6 @@ describe('protocol', function () {
   });
 
   it('encrypted payload for storage should include duplicate_of field', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload('Test');
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -161,7 +159,6 @@ describe('protocol', function () {
   });
 
   it('ejected payload for storage should include duplicate_of field', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload('Test');
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -173,7 +170,6 @@ describe('protocol', function () {
   });
 
   it('encrypted payload for file should include duplicate_of field', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload('Test');
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,
@@ -184,7 +180,6 @@ describe('protocol', function () {
   });
 
   it('ejected payload for file should include duplicate_of field', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload('Test');
     const encryptedPayload = await application.protocolService.payloadByEncryptingPayload(
       payload,

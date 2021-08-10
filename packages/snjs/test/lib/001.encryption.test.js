@@ -3,44 +3,40 @@ import { SNProtocolOperator001, KeyParamsOrigination, PayloadFormat, CreateMaxPa
 import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('001 protocol operations', () => {
+  let application;
   const protocol001 = new SNProtocolOperator001(new SNCrypto());
 
-  const identifier = 'hello@test.com';
-  const password = 'password';
+  const _identifier = 'hello@test.com';
+  const _password = 'password';
+  let _keyParams, _key;
 
-  const setupApplication = async () => {
-    const application = await Factory.createAndInitializeApplication();
-    const key = await protocol001.createRootKey(
-      identifier,
-      password,
+  // runs once before all tests in this block
+  beforeAll(async () => {
+    application = await Factory.createAndInitializeApplication();
+    _key = await protocol001.createRootKey(
+      _identifier,
+      _password,
       KeyParamsOrigination.Registration
     );
-    return {
-      application,
-      key,
-      keyParams: key.keyParams
-    };
-  };
+    _keyParams = _key.keyParams;
+  });
 
   it('generates random key', async () => {
-    await setupApplication();
     const length = 128;
     const key = await protocol001.crypto.generateRandomKey(length);
     expect(key.length).toEqual(length / 4);
   });
 
-  it('cost minimum', async () => {
-    const { application } = await setupApplication();
+  it('cost minimum', () => {
     expect(application.protocolService.costMinimumForVersion('001')).toEqual(
       3000
     );
   });
 
   it('generates valid keys for registration', async () => {
-    await setupApplication();
     const key = await protocol001.createRootKey(
-      identifier,
-      password,
+      _identifier,
+      _password,
       KeyParamsOrigination.Registration
     );
     expect(key.serverPassword).toBeDefined;
@@ -52,8 +48,8 @@ describe('001 protocol operations', () => {
   });
 
   it('generates valid keys from existing params and decrypts', async () => {
-    const { application } = await setupApplication();
-    const keyParams = application.protocolService.createKeyParams({
+    const password = 'password';
+    const keyParams = await application.protocolService.createKeyParams({
       pw_func: 'pbkdf2',
       pw_alg: 'sha512',
       pw_key_size: 512,
@@ -88,24 +84,21 @@ describe('001 protocol operations', () => {
   });
 
   it('properly encrypts and decrypts', async () => {
-    const { key } = await setupApplication();
     const text = 'hello world';
-    const masterKey = key.masterKey;
-    const encString = await protocol001.encryptString(text, masterKey);
-    const decString = await protocol001.decryptString(encString, masterKey);
+    const key = _key.masterKey;
+    const encString = await protocol001.encryptString(text, key);
+    const decString = await protocol001.decryptString(encString, key);
     expect(decString).toEqual(text);
   });
 
   it('generates existing keys for key params', async () => {
-    const { keyParams } = await setupApplication();
-    const key = await protocol001.computeRootKey(password, keyParams);
+    const key = await protocol001.computeRootKey(_password, _keyParams);
     expect(key.content).toHaveProperty('serverPassword');
     expect(key.content).toHaveProperty('masterKey');
-    expect(key.compare(key)).toEqual(true);
+    expect(key.compare(_key)).toEqual(true);
   });
 
   it('generating encryption params includes items_key_id', async () => {
-    await setupApplication();
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
     const params = await protocol001.generateEncryptedParameters(
@@ -120,7 +113,6 @@ describe('001 protocol operations', () => {
   });
 
   it('can decrypt encrypted params', async () => {
-    await setupApplication();
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
     const params = await protocol001.generateEncryptedParameters(
@@ -137,7 +129,6 @@ describe('001 protocol operations', () => {
   });
 
   it('payloads missing enc_item_key should decrypt as errorDecrypting', async () => {
-    await setupApplication();
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
     const params = await protocol001.generateEncryptedParameters(

@@ -10,8 +10,19 @@ describe('notes and tags', () => {
     awaitAll: true,
   };
 
+  let expectedItemCount;
+  let application;
+
+  beforeEach(async function () {
+    expectedItemCount = BASE_ITEM_COUNT;
+    application = await Factory.createInitAppWithRandNamespace();
+  });
+
+  afterEach(async function () {
+    await application.deinit();
+  });
+
   it('uses proper class for note', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const payload = Factory.createNotePayload();
     await application.itemManager.emitItemFromPayload(
       payload,
@@ -22,7 +33,6 @@ describe('notes and tags', () => {
   });
 
   it('properly constructs syncing params', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const title = 'Foo';
     const text = 'Bar';
     const note = await application.createTemplateItem(ContentType.Note, {
@@ -41,7 +51,6 @@ describe('notes and tags', () => {
   });
 
   it('properly handles legacy relationships', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     // legacy relationships are when a note has a reference to a tag
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
@@ -78,7 +87,6 @@ describe('notes and tags', () => {
   });
 
   it('creates relationship between note and tag', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const pair = Factory.createRelatedNoteTagPairPayload({ dirty: false });
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -127,7 +135,6 @@ describe('notes and tags', () => {
   });
 
   it('handles remote deletion of relationship', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -171,20 +178,17 @@ describe('notes and tags', () => {
   });
 
   it('creating basic note should have text set', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const note = await Factory.createMappedNote(application);
     expect(note.title).toBeTruthy();
     expect(note.text).toBeTruthy();
   });
 
   it('creating basic tag should have title', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const tag = await Factory.createMappedTag(application);
     expect(tag.title).toBeTruthy();
   });
 
   it('handles removing relationship between note and tag', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -216,7 +220,6 @@ describe('notes and tags', () => {
   });
 
   it('properly handles tag duplication', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const pair = Factory.createRelatedNoteTagPairPayload();
     await application.itemManager.emitItemsFromPayloads(
       pair,
@@ -255,7 +258,6 @@ describe('notes and tags', () => {
   });
 
   it('duplicating a note should maintain its tag references', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -277,7 +279,6 @@ describe('notes and tags', () => {
   });
 
   it('deleting a note should update tag references', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -302,7 +303,6 @@ describe('notes and tags', () => {
   });
 
   it('modifying item content should not modify payload content', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const notePayload = Factory.createNotePayload();
     await application.itemManager.emitItemsFromPayloads(
       [notePayload],
@@ -322,7 +322,6 @@ describe('notes and tags', () => {
   });
 
   it('deleting a tag should not dirty notes', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     // Tags now reference notes, but it used to be that tags referenced notes and notes referenced tags.
     // After the change, there was an issue where removing an old tag relationship from a note would only
     // remove one way, and thus keep it intact on the visual level.
@@ -348,7 +347,6 @@ describe('notes and tags', () => {
   });
 
   it('should sort notes', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     await Promise.all(
       ['Y', 'Z', 'A', 'B'].map(async (title) => {
         return application.insertItem(
@@ -369,7 +367,6 @@ describe('notes and tags', () => {
   });
 
   it('setting a note dirty should collapse its properties into content', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     let note = await application.createTemplateItem(ContentType.Note, {
       title: 'Foo',
     });
@@ -380,7 +377,6 @@ describe('notes and tags', () => {
 
   describe('Tags', function () {
     it('should sort tags in ascending alphabetical order by default', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const titles = ['1', 'A', 'a', 'b', '1', '2', 'B'];
       const sortedTitles = titles.sort((a, b) => a.localeCompare(b));
       await Promise.all(
@@ -394,7 +390,6 @@ describe('notes and tags', () => {
     });
 
     it('should sort tags in reverse alphabetical order', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const titles = ['1', 'A', 'a', 'b', '1', '2', 'B'];
       const sortedTitles = titles.sort((a, b) => b.localeCompare(a));
       await Promise.all(
@@ -409,7 +404,6 @@ describe('notes and tags', () => {
     });
 
     it('should match a tag', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const taggedNote = await Factory.createMappedNote(application);
       const tag = await application.findOrCreateTag('A');
       await application.changeItem(tag.uuid, (mutator) => {
@@ -435,7 +429,6 @@ describe('notes and tags', () => {
     });
 
     it('should not show trashed notes when displaying a tag', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const taggedNote = await Factory.createMappedNote(application);
       const trashedNote = await Factory.createMappedNote(application);
       const tag = await application.findOrCreateTag('A');
@@ -461,7 +454,6 @@ describe('notes and tags', () => {
     });
 
     it('should sort notes when displaying tag', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       await Promise.all(
         ['Y', 'Z', 'A', 'B'].map(async (title) => {
           return application.insertItem(
@@ -503,7 +495,6 @@ describe('notes and tags', () => {
 
   describe('Smart tags', function () {
     it('"title", "startsWith", "Foo"', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const note = await application.insertItem(
         await application.createTemplateItem(ContentType.Note, {
           title: 'Foo 🎲',
@@ -542,7 +533,6 @@ describe('notes and tags', () => {
     });
 
     it('"pinned", "=", true', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const note = await application.insertItem(
         await application.createTemplateItem(ContentType.Note, {
           title: 'A',
@@ -585,7 +575,6 @@ describe('notes and tags', () => {
     });
 
     it('"pinned", "=", false', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const pinnedNote = await application.insertItem(
         await application.createTemplateItem(ContentType.Note, {
           title: 'A',
@@ -627,7 +616,6 @@ describe('notes and tags', () => {
     });
 
     it('"text.length", ">", 500', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const longNote = await application.insertItem(
         await application.createTemplateItem(ContentType.Note, {
           title: 'A',
@@ -667,7 +655,6 @@ describe('notes and tags', () => {
     });
 
     it('"updated_at", ">", "1.days.ago"', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       await Factory.registerUserToApplication({
         application: application,
         email: Factory.generateUuid(),
@@ -724,7 +711,6 @@ describe('notes and tags', () => {
     });
 
     it('"tags.length", "=", 0', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const untaggedNote = await application.insertItem(
         await application.createTemplateItem(ContentType.Note, {
           title: 'A',
@@ -763,7 +749,6 @@ describe('notes and tags', () => {
     });
 
     it('"tags", "includes", ["title", "startsWith", "b"]', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const taggedNote = await Factory.createMappedNote(application);
       const tag = await application.findOrCreateTag('B');
       await application.changeItem(tag.uuid, (mutator) => {
@@ -802,7 +787,6 @@ describe('notes and tags', () => {
     });
 
     it('"ignored", "and", [["pinned", "=", true], ["locked", "=", true]]', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const pinnedAndLockedNote = await Factory.createMappedNote(
         application
       );
@@ -859,7 +843,6 @@ describe('notes and tags', () => {
     });
 
     it('"ignored", "or", [["content.protected", "=", true], ["pinned", "=", true]]', async function () {
-      const application = await Factory.createInitAppWithRandNamespace();
       const protectedNote = await Factory.createMappedNote(application);
       await application.changeItem(protectedNote.uuid, (mutator) => {
         mutator.protected = true;

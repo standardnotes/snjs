@@ -9,8 +9,19 @@ describe('items', () => {
     awaitAll: true,
   };
 
+  let expectedItemCount;
+  let application;
+
+  beforeEach(async function () {
+    expectedItemCount = BASE_ITEM_COUNT;
+    application = await Factory.createInitAppWithRandNamespace();
+  });
+
+  afterEach(async function () {
+    application.deinit();
+  });
+
   it('setting an item as dirty should update its client updated at', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const params = Factory.createNotePayload();
     await application.itemManager.emitItemsFromPayloads(
       [params],
@@ -26,7 +37,6 @@ describe('items', () => {
   });
 
   it('setting an item as dirty with option to skip client updated at', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const params = Factory.createNotePayload();
     await application.itemManager.emitItemsFromPayloads(
       [params],
@@ -41,7 +51,6 @@ describe('items', () => {
   });
 
   it('properly pins, archives, and locks', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const params = Factory.createNotePayload();
     await application.itemManager.emitItemsFromPayloads(
       [params],
@@ -68,7 +77,6 @@ describe('items', () => {
   });
 
   it('properly compares item equality', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
     await application.itemManager.emitItemsFromPayloads(
@@ -177,7 +185,6 @@ describe('items', () => {
   });
 
   it('content equality should not have side effects', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     const params1 = Factory.createNotePayload();
     const params2 = Factory.createNotePayload();
     await application.itemManager.emitItemsFromPayloads(

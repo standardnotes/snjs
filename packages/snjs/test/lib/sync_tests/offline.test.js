@@ -9,12 +9,23 @@ describe('offline syncing', () => {
     awaitAll: true,
   };
 
+  let expectedItemCount;
+  let application;
+
+  beforeEach(async function () {
+    expectedItemCount = BASE_ITEM_COUNT;
+    application = await Factory.createInitAppWithRandNamespace();
+  });
+
+  afterEach(function () {
+    expect(application.syncService.isOutOfSync()).toBe(false);
+    application.deinit();
+  });
+
   it('should sync item with no passcode', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     let note = await Factory.createMappedNote(application);
     expect(application.itemManager.getDirtyItems().length).toBe(1);
     const rawPayloads1 = await application.storageService.getAllRawPayloads();
-    let expectedItemCount = BASE_ITEM_COUNT;
     expect(rawPayloads1.length).toBe(expectedItemCount);
 
     await application.syncService.sync(syncOptions);
@@ -41,16 +52,13 @@ describe('offline syncing', () => {
     expect(typeof noteRP.content).toBe('string');
     /** Not encrypted as no passcode/root key */
     expect(typeof itemsKeyRP.content).toBe('object');
-    expect(application.syncService.isOutOfSync()).toBe(false);
   });
 
   it('should sync item encrypted with passcode', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
     await application.addPasscode('foobar');
     await Factory.createMappedNote(application);
     expect(application.itemManager.getDirtyItems().length).toBe(1);
     const rawPayloads1 = await application.storageService.getAllRawPayloads();
-    let expectedItemCount = BASE_ITEM_COUNT;
     expect(rawPayloads1.length).toBe(expectedItemCount);
 
     await application.syncService.sync(syncOptions);
@@ -67,18 +75,16 @@ describe('offline syncing', () => {
         application.protocolService.getLatestVersion()
       )
     ).toBe(true);
-    expect(application.syncService.isOutOfSync()).toBe(false);
   });
 
   it('signing out while offline should succeed', async function () {
-    let application = await Factory.createInitAppWithRandNamespace();
     await Factory.createMappedNote(application);
+    expectedItemCount++;
     await application.syncService.sync(syncOptions);
     application = await Factory.signOutApplicationAndReturnNew(
       application
     );
     expect(application.noAccount()).toBe(true);
     expect(application.getUser()).toBeFalsy();
-    expect(application.syncService.isOutOfSync()).toBe(false);
   });
 });

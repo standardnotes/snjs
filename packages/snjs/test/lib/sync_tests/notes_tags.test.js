@@ -9,15 +9,29 @@ describe('notes + tags syncing', function () {
     awaitAll: true,
   };
 
-  it('syncing an item then downloading it should include items_key_id', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: true
+  let application;
+
+  beforeEach(async function () {
+    application = await Factory.createInitAppWithRandNamespace();
+    const email = Uuid.GenerateUuidSynchronously();
+    const password = Uuid.GenerateUuidSynchronously();
+    await Factory.registerUserToApplication({
+      application: application,
+      email,
+      password,
     });
+  });
+
+  afterEach(function () {
+    application.deinit();
+  });
+
+  it('syncing an item then downloading it should include items_key_id', async function () {
     const note = await Factory.createMappedNote(application);
     await application.itemManager.setItemDirty(note.uuid);
     await application.syncService.sync(syncOptions);
-    application.payloadManager.resetState();
-    application.itemManager.resetState();
+    await application.payloadManager.resetState();
+    await application.itemManager.resetState();
     await application.syncService.clearSyncPositionTokens();
     await application.syncService.sync(syncOptions);
     const downloadedNote = application.itemManager.notes[0];
@@ -29,9 +43,6 @@ describe('notes + tags syncing', function () {
   });
 
   it('syncing a note many times does not cause duplication', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: true
-    });
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -62,9 +73,6 @@ describe('notes + tags syncing', function () {
   }, 20000);
 
   it('handles signing in and merging data', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: true
-    });
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];
@@ -109,9 +117,6 @@ describe('notes + tags syncing', function () {
   });
 
   it('duplicating a tag should maintian its relationships', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: true
-    });
     const pair = Factory.createRelatedNoteTagPairPayload();
     const notePayload = pair[0];
     const tagPayload = pair[1];

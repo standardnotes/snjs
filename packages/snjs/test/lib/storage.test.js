@@ -1,6 +1,7 @@
 import { ValueModesKeys, CreateMaxPayloadFromAnyObject, PayloadFormat } from '@Lib/index';
 import { Environment } from '@Lib/platforms';
 import { StorageEncryptionPolicies } from '@Lib/services';
+import { Uuid } from '@Lib/uuid';
 import * as Factory from '../factory';
 
 describe('storage manager', function () {
@@ -12,10 +13,24 @@ describe('storage manager', function () {
   const BASE_KEY_COUNT = 3;
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
+  let expectedKeyCount;
+  let application;
+  let email, password;
+
+  beforeEach(async function () {
+    expectedKeyCount = BASE_KEY_COUNT;
+    application = await Factory.createInitAppWithRandNamespace(
+      Environment.Mobile
+    );
+    email = Uuid.GenerateUuidSynchronously();
+    password = Uuid.GenerateUuidSynchronously();
+  });
+
+  afterEach(function () {
+    application.deinit();
+  });
+
   it('should set and retrieve values', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     const key = 'foo';
     const value = 'bar';
     await application.storageService.setValue(key, value);
@@ -23,9 +38,6 @@ describe('storage manager', function () {
   });
 
   it('should set and retrieve items', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     const payload = Factory.createNotePayload();
     await application.storageService.savePayload(payload);
     const payloads = await application.storageService.getAllRawPayloads();
@@ -33,9 +45,6 @@ describe('storage manager', function () {
   });
 
   it('should clear values', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     const key = 'foo';
     const value = 'bar';
     await application.storageService.setValue(key, value);
@@ -44,9 +53,6 @@ describe('storage manager', function () {
   });
 
   it('serverPassword should not be saved to keychain', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -78,9 +84,6 @@ describe('storage manager', function () {
   });
 
   it('ephemeral session should not persist data', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -96,9 +99,6 @@ describe('storage manager', function () {
   });
 
   it('ephemeral session should not persist to database', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -111,9 +111,6 @@ describe('storage manager', function () {
   });
 
   it('storage with no account and no passcode should not be encrypted', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await application.setValue('foo', 'bar');
     const wrappedValue = application.storageService.values[
       ValueModesKeys.Wrapped
@@ -123,9 +120,6 @@ describe('storage manager', function () {
   });
 
   it('storage aftering adding passcode should be encrypted', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await application.setValue('foo', 'bar');
     await application.addPasscode('123');
     const wrappedValue = application.storageService.values[
@@ -136,9 +130,6 @@ describe('storage manager', function () {
   });
 
   it('storage after adding passcode then removing passcode should not be encrypted', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     const passcode = '123🌂';
     Factory.handlePasswordChallenges(application, passcode);
     await application.setValue('foo', 'bar');
@@ -153,9 +144,6 @@ describe('storage manager', function () {
   });
 
   it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     const passcode = '123🌂';
     /**
      * After setting passcode, we expect that the keychain has been cleared, as the account keys
@@ -197,9 +185,6 @@ describe('storage manager', function () {
   });
 
   it('adding account should encrypt storage with account keys', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await application.setValue('foo', 'bar');
     await Factory.registerUserToApplication({
       application: application,
@@ -207,16 +192,13 @@ describe('storage manager', function () {
       password: password,
       ephemeral: true,
     });
-    const accountKey = application.protocolService.getRootKey();
+    const accountKey = await application.protocolService.getRootKey();
     expect(
       await application.storageService.canDecryptWithKey(accountKey)
     ).toBe(true);
   });
 
   it('signing out of account should decrypt storage', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await application.setValue('foo', 'bar');
     await Factory.registerUserToApplication({
       application: application,
@@ -236,9 +218,6 @@ describe('storage manager', function () {
   });
 
   it('adding account then passcode should encrypt storage with account keys', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     /** Should encrypt storage with account keys and encrypt account keys with passcode */
     await application.setValue('foo', 'bar');
     await Factory.registerUserToApplication({
@@ -278,9 +257,6 @@ describe('storage manager', function () {
   });
 
   it('disabling storage encryption should store items without encryption', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -308,9 +284,6 @@ describe('storage manager', function () {
   });
 
   it('stored payloads should not contain metadata fields', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await application.addPasscode('123');
     await Factory.createSyncedNote(application);
     const payloads = await application.storageService.getAllRawPayloads();
@@ -322,9 +295,6 @@ describe('storage manager', function () {
   });
 
   it('signing out should clear unwrapped value store', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -342,9 +312,6 @@ describe('storage manager', function () {
   });
 
   it('signing out should clear payloads', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext({
-      registerUser: false, environment: Environment.Mobile
-    });
     await Factory.registerUserToApplication({
       application: application,
       email: email,

@@ -12,15 +12,28 @@ describe('basic auth', () => {
     awaitAll: true,
   };
 
+  let application;
+  let email, password;
+  let expectedItemCount;
+
+  beforeEach(async function () {
+    expectedItemCount = BASE_ITEM_COUNT;
+    application = await Factory.createInitAppWithRandNamespace();
+    email = Uuid.GenerateUuidSynchronously();
+    password = Uuid.GenerateUuidSynchronously();
+  });
+
+  afterEach(async function () {
+    await application.signOut(true);
+  });
+
   it('successfully register new account', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     const response = await application.register(email, password);
     expect(response).toBeTruthy();
     expect(application.protocolService.getRootKey()).toBeTruthy();
   }, 5000);
 
   it('fails register new account with short password', async function () {
-    const { application, email } = await Factory.createAndInitSimpleAppContext();
     const password = '123456';
 
     const response = await application.register(email, password);
@@ -29,7 +42,6 @@ describe('basic auth', () => {
   }, 5000);
 
   it('successfully signs out of account', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
 
     expect(application.protocolService.getRootKey()).toBeTruthy();
@@ -43,7 +55,6 @@ describe('basic auth', () => {
   });
 
   it('successfully signs in to registered account', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     application = await Factory.signOutApplicationAndReturnNew(
       application
@@ -62,7 +73,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('cannot sign while already signed in', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     await Factory.createSyncedNote(application);
     application = await Factory.signOutApplicationAndReturnNew(
@@ -97,7 +107,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('cannot register while already signed in', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     let error;
     try {
@@ -110,7 +119,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('cannot perform two sign-ins at the same time', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     application = await Factory.signOutApplicationAndReturnNew(
       application
@@ -153,7 +161,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('cannot perform two register operations at the same time', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await Promise.all([
       (async () => {
         const response = await application.register(
@@ -180,7 +187,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('successfuly signs in after failing once', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     application = await Factory.signOutApplicationAndReturnNew(
       application
@@ -211,7 +217,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('server retrieved key params should use our client inputted value for identifier', async function () {
-    const { application, password } = await Factory.createAndInitSimpleAppContext();
     /**
      * We should ensure that when we retrieve key params from the server, in order to generate a root
      * key server password for login, that the identifier used in the key params is the client side entered
@@ -240,7 +245,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('can sign into account regardless of email case', async function () {
-    let { application, password } = await Factory.createAndInitSimpleAppContext();
     const rand = `${Math.random()}`;
     const uppercase = `FOO@BAR.COM${rand}`;
     const lowercase = `foo@bar.com${rand}`;
@@ -266,7 +270,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('can sign into account regardless of whitespace', async function () {
-    let { application, password } = await Factory.createAndInitSimpleAppContext();
     const rand = `${Math.random()}`;
     const withspace = `FOO@BAR.COM${rand}   `;
     const nospace = `foo@bar.com${rand}`;
@@ -292,7 +295,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('fails login with wrong password', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     application = await Factory.signOutApplicationAndReturnNew(
       application
@@ -311,7 +313,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('fails to change to short password', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     const newPassword = '123456';
     const response = await application.changePassword(
@@ -322,7 +323,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('fails to change password when current password is incorrect', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
     const response = await application.changePassword(
       'Invalid password',
@@ -339,7 +339,6 @@ describe('basic auth', () => {
   }, 20000);
 
   it('registering for new account and completing first after download sync should not put us out of sync', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext();
     const email = Uuid.GenerateUuidSynchronously();
     const password = Uuid.GenerateUuidSynchronously();
 
@@ -375,12 +374,10 @@ describe('basic auth', () => {
   });
 
   async function changePassword() {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
 
     const noteCount = 10;
     await Factory.createManyMappedNotes(application, noteCount);
-    let expectedItemCount = BASE_ITEM_COUNT;
     expectedItemCount += noteCount;
     await application.syncService.sync(syncOptions);
 
@@ -479,12 +476,10 @@ describe('basic auth', () => {
     }, 20000);
 
   it('changes password many times', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await application.register(email, password);
 
     const noteCount = 10;
     await Factory.createManyMappedNotes(application, noteCount);
-    let expectedItemCount = BASE_ITEM_COUNT;
     expectedItemCount += noteCount;
     await application.syncService.sync(syncOptions);
 
@@ -526,7 +521,6 @@ describe('basic auth', () => {
   }, 60000);
 
   it('signing in with a clean email string should only try once', async function () {
-    let { application, email, password } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -552,14 +546,12 @@ describe('basic auth', () => {
 
   describe('add passcode', function () {
     it('should set passcode successfully', async function () {
-      const { application } = await Factory.createAndInitSimpleAppContext();
       const passcode = 'passcode';
       const result = await application.addPasscode(passcode);
       expect(result).toBe(true);
     });
 
     it('should fail when attempting to set 0 character passcode', async function () {
-      const { application } = await Factory.createAndInitSimpleAppContext();
       const passcode = '';
       const result = await application.addPasscode(passcode);
       expect(result).toBe(false);
@@ -568,7 +560,6 @@ describe('basic auth', () => {
 
   describe('change passcode', function () {
     it('should change passcode successfully', async function () {
-      const { application } = await Factory.createAndInitSimpleAppContext();
       const passcode = 'passcode';
       const newPasscode = 'newPasscode';
       await application.addPasscode(passcode);
@@ -578,7 +569,6 @@ describe('basic auth', () => {
     });
 
     it('should fail when attempting to change to a 0 character passcode', async function () {
-      const { application } = await Factory.createAndInitSimpleAppContext();
       const passcode = 'passcode';
       const newPasscode = '';
       await application.addPasscode(passcode);
