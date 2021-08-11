@@ -1,10 +1,9 @@
 import {
-  Platform,
-  Environment,
   KeyParamsOrigination,
-  SNProtocolOperator003
+  SNProtocolOperator003,
+  DeinitSource
 } from '@Lib/index';
-import { createApplication } from '../factory';
+import * as Factory from '../factory';
 import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('Test 003 encryption', () => {
@@ -13,7 +12,7 @@ describe('Test 003 encryption', () => {
   const protocol003 = new SNProtocolOperator003(new SNCrypto());
 
   it('should properly encrypt and decrypt a piece of text', async () => {
-    createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+    const { application } = await Factory.createAndInitSimpleAppContext();
 
     const rootKey = await protocol003.createRootKey(
       identifier,
@@ -36,5 +35,7 @@ describe('Test 003 encryption', () => {
     );
 
     expect(decString).toEqual(simpleText);
+
+    application.deinit(DeinitSource.SignOut);
   });
 });
