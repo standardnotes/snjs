@@ -14,7 +14,7 @@ export enum FeatureIdentifier {
   CodeEditor = 'org.standardnotes.code-editor',
   TokenVaultEditor = 'org.standardnotes.token-vault',
   SheetsEditor = 'org.standardnotes.standard-sheets',
-  TwoFactorAuth = 'org.standardnotes.mfa-manager',
+  TwoFactorAuth = 'org.standardnotes.two-factor-auth',
   NoteHistoryUnlimited = 'org.standardnotes.note-history-unlimited',
   NoteHistory365Days = 'org.standardnotes.note-history-365',
   NoteHistory30Days = 'org.standardnotes.note-history-30',
