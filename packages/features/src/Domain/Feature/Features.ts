@@ -4,10 +4,12 @@ import { ComponentArea } from '../Component/ComponentArea'
 import { ContentType } from '../Content/ContentType'
 import { Flag } from './Flag'
 import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from './FeatureIdentifier'
 
 export const Features: Feature[] = [{
   name: 'Midnight',
-  identifier: PermissionName.MidnightTheme,
+  identifier: FeatureIdentifier.MidnightTheme,
+  permissionName: PermissionName.MidnightTheme,
   contentType: ContentType.Theme,
   version: '1.2.2',
   description: 'Elegant utilitarianism.',
@@ -24,7 +26,8 @@ export const Features: Feature[] = [{
 },
 {
   name: 'Futura',
-  identifier: PermissionName.FuturaTheme,
+  identifier: FeatureIdentifier.FuturaTheme,
+  permissionName: PermissionName.FuturaTheme,
   contentType: ContentType.Theme,
   version: '1.2.2',
   description: 'Calm and relaxed. Take some time off.',
@@ -41,7 +44,8 @@ export const Features: Feature[] = [{
 },
 {
   name: 'Solarized Dark',
-  identifier: PermissionName.SolarizedDarkTheme,
+  identifier: FeatureIdentifier.SolarizedDarkTheme,
+  permissionName: PermissionName.SolarizedDarkTheme,
   contentType: ContentType.Theme,
   version: '1.2.1',
   description: 'The perfect theme for any time.',
@@ -58,7 +62,8 @@ export const Features: Feature[] = [{
 },
 {
   name: 'Autobiography',
-  identifier: PermissionName.AutobiographyTheme,
+  identifier: FeatureIdentifier.AutobiographyTheme,
+  permissionName: PermissionName.AutobiographyTheme,
   contentType: ContentType.Theme,
   version: '1.0.0',
   description: 'A theme for writers and readers.',
@@ -76,7 +81,8 @@ export const Features: Feature[] = [{
 },
 {
   name: 'Focus',
-  identifier: PermissionName.FocusedTheme,
+  identifier: FeatureIdentifier.FocusedTheme,
+  permissionName: PermissionName.FocusedTheme,
   contentType: ContentType.Theme,
   version: '1.2.3',
   description: 'For when you need to go in.',
@@ -92,7 +98,8 @@ export const Features: Feature[] = [{
   },
 },
 {
-  identifier: PermissionName.TitaniumTheme,
+  identifier: FeatureIdentifier.TitaniumTheme,
+  permissionName: PermissionName.TitaniumTheme,
   name: 'Titanium',
   contentType: ContentType.Theme,
   version: '1.2.2',
@@ -110,7 +117,8 @@ export const Features: Feature[] = [{
 },
 {
   name: 'Bold Editor',
-  identifier: PermissionName.BoldEditor,
+  identifier: FeatureIdentifier.BoldEditor,
+  permissionName: PermissionName.BoldEditor,
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
   version: '1.2.1',
@@ -122,7 +130,8 @@ export const Features: Feature[] = [{
   flags: [Flag.New],
 },
 {
-  identifier: PermissionName.PlusEditor,
+  identifier: FeatureIdentifier.PlusEditor,
+  permissionName: PermissionName.PlusEditor,
   name: 'Plus Editor',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -134,7 +143,8 @@ export const Features: Feature[] = [{
   thumbnailUrl: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/plus-editor.jpg',
 },
 {
-  identifier: PermissionName.MarkdownBasicEditor,
+  identifier: FeatureIdentifier.MarkdownBasicEditor,
+  permissionName: PermissionName.MarkdownBasicEditor,
   name: 'Markdown Basic',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -146,7 +156,8 @@ export const Features: Feature[] = [{
   thumbnailUrl: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg',
 },
 {
-  identifier: PermissionName.MarkdownProEditor,
+  identifier: FeatureIdentifier.MarkdownProEditor,
+  permissionName: PermissionName.MarkdownProEditor,
   name: 'Markdown Pro',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -158,7 +169,8 @@ export const Features: Feature[] = [{
   thumbnailUrl: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
 },
 {
-  identifier: PermissionName.MarkdownMinimistEditor,
+  identifier: FeatureIdentifier.MarkdownMinimistEditor,
+  permissionName: PermissionName.MarkdownMinimistEditor,
   name: 'Markdown Minimist',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -170,7 +182,8 @@ export const Features: Feature[] = [{
   thumbnailUrl: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
 },
 {
-  identifier: PermissionName.TaskEditor,
+  identifier: FeatureIdentifier.TaskEditor,
+  permissionName: PermissionName.TaskEditor,
   name: 'Task Editor',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -182,7 +195,8 @@ export const Features: Feature[] = [{
   thumbnailUrl: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/task-editor.jpg',
 },
 {
-  identifier: PermissionName.CodeEditor,
+  identifier: FeatureIdentifier.CodeEditor,
+  permissionName: PermissionName.CodeEditor,
   name: 'Code Editor',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -194,7 +208,8 @@ export const Features: Feature[] = [{
   thumbnailUrl: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/code.jpg',
 },
 {
-  identifier: PermissionName.TokenVaultEditor,
+  identifier: FeatureIdentifier.TokenVaultEditor,
+  permissionName: PermissionName.TokenVaultEditor,
   name: 'TokenVault',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -207,7 +222,8 @@ export const Features: Feature[] = [{
   flags: [Flag.New],
 },
 {
-  identifier: PermissionName.SheetsEditor,
+  identifier: FeatureIdentifier.SheetsEditor,
+  permissionName: PermissionName.SheetsEditor,
   name: 'Secure Spreadsheets',
   contentType: ContentType.Component,
   area: ComponentArea.Editor,
@@ -219,7 +235,8 @@ export const Features: Feature[] = [{
   thumbnailUrl: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png',
 },
 {
-  identifier: PermissionName.TwoFactorAuthManager,
+  identifier: FeatureIdentifier.TwoFactorAuthManager,
+  permissionName: PermissionName.TwoFactorAuthManager,
   name: '2FA Manager',
   description: 'Configure two-factor authentication to add an extra level of security to your account.',
   version: '1.2.4',
@@ -232,7 +249,8 @@ export const Features: Feature[] = [{
   deletionWarning: 'Deleting 2FA Manager will not disable 2FA from your account. To disable 2FA, first open 2FA Manager, then follow the prompts.',
 },
 {
-  identifier: PermissionName.TwoFactorAuth,
+  identifier: FeatureIdentifier.TwoFactorAuth,
+  permissionName: PermissionName.TwoFactorAuth,
   name: '',
   description: '',
   version: '',
@@ -243,7 +261,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.NoteHistoryUnlimited,
+  identifier: FeatureIdentifier.NoteHistoryUnlimited,
+  permissionName: PermissionName.NoteHistoryUnlimited,
   name: '',
   description: '',
   version: '',
@@ -254,7 +273,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.NoteHistory365Days,
+  identifier: FeatureIdentifier.NoteHistory365Days,
+  permissionName: PermissionName.NoteHistory365Days,
   name: '',
   description: '',
   version: '',
@@ -265,7 +285,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.NoteHistory30Days,
+  identifier: FeatureIdentifier.NoteHistory30Days,
+  permissionName: PermissionName.NoteHistory30Days,
   name: '',
   description: '',
   version: '',
@@ -276,7 +297,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.DailyEmailBackup,
+  identifier: FeatureIdentifier.DailyEmailBackup,
+  permissionName: PermissionName.DailyEmailBackup,
   name: '',
   description: '',
   version: '',
@@ -287,7 +309,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.DailyDropboxBackup,
+  identifier: FeatureIdentifier.DailyDropboxBackup,
+  permissionName: PermissionName.DailyDropboxBackup,
   name: '',
   description: '',
   version: '',
@@ -298,7 +321,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.DailyGDriveBackup,
+  identifier: FeatureIdentifier.DailyGDriveBackup,
+  permissionName: PermissionName.DailyGDriveBackup,
   name: '',
   description: '',
   version: '',
@@ -309,7 +333,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.DailyOneDriveBackup,
+  identifier: FeatureIdentifier.DailyOneDriveBackup,
+  permissionName: PermissionName.DailyOneDriveBackup,
   name: '',
   description: '',
   version: '',
@@ -320,7 +345,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.Files25GB,
+  identifier: FeatureIdentifier.Files25GB,
+  permissionName: PermissionName.Files25GB,
   name: '',
   description: '',
   version: '',
@@ -331,7 +357,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.Files5GB,
+  identifier: FeatureIdentifier.Files5GB,
+  permissionName: PermissionName.Files5GB,
   name: '',
   description: '',
   version: '',
@@ -342,7 +369,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.TagNesting,
+  identifier: FeatureIdentifier.TagNesting,
+  permissionName: PermissionName.TagNesting,
   name: '',
   description: '',
   version: '',
@@ -353,7 +381,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.Files,
+  identifier: FeatureIdentifier.Files,
+  permissionName: PermissionName.Files,
   name: '',
   description: '',
   version: '',
@@ -364,7 +393,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.CloudLink,
+  identifier: FeatureIdentifier.CloudLink,
+  permissionName: PermissionName.CloudLink,
   name: '',
   description: '',
   version: '',
@@ -375,7 +405,8 @@ export const Features: Feature[] = [{
   area: ComponentArea.Modal,
 },
 {
-  identifier: PermissionName.ListedCustomDomain,
+  identifier: FeatureIdentifier.ListedCustomDomain,
+  permissionName: PermissionName.ListedCustomDomain,
   name: '',
   description: '',
   version: '',
