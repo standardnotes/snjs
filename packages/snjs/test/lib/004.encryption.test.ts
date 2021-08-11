@@ -1,11 +1,10 @@
 import {
-  Platform,
-  Environment,
   KeyParamsOrigination,
   SNProtocolOperator004,
-  ProtocolVersion
+  ProtocolVersion,
+  DeinitSource
 } from '@Lib/index';
-import { createApplication } from '../factory';
+import * as Factory from '../factory';
 import SNCrypto from '../setup/snjs/snCrypto';
 
 describe('Test 004 encryption', () => {
@@ -14,7 +13,7 @@ describe('Test 004 encryption', () => {
   const protocol004 = new SNProtocolOperator004(new SNCrypto());
 
   it('should properly encrypt and decrypt a piece of text', async () => {
-    const application = createApplication('test-application', Environment.Web, Platform.LinuxWeb);
+    const { application } = await Factory.createAndInitSimpleAppContext();
     const rootKey = await protocol004.createRootKey(
       identifier,
       password,
@@ -40,5 +39,7 @@ describe('Test 004 encryption', () => {
     );
 
     expect(decString).toEqual(simpleText);
+
+    application.deinit(DeinitSource.SignOut);
   });
 });

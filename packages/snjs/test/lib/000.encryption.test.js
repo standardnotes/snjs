@@ -1,4 +1,3 @@
-import * as Factory from './../factory';
 import { SNProtocolOperator004, CreateMaxPayloadFromAnyObject } from '@Lib/index';
 import SNCrypto from '../setup/snjs/snCrypto';
 
