@@ -78,7 +78,7 @@ describe('protocol', function () {
   });
 
   it('library version should not be outdated', function () {
-    var currentVersion = application.protocolService.getLatestVersion();
+    const currentVersion = application.protocolService.getLatestVersion();
     expect(
       application.protocolService.isProtocolVersionOutdated(currentVersion)
     ).toBe(false);
