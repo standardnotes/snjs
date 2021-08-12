@@ -1,19 +1,22 @@
 import {
   StorageKey,
   SNStorageService,
-  Uuid
+  Uuid,
+  SNApiService
 } from '@Lib/index';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { Role, RoleName } from '@standardnotes/auth';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
+  let apiService: SNApiService;
   let webSocketUrl = '';
   let roles: RoleName[];
 
   const createService = () => {
     return new SNFeaturesService(
       storageService,
+      apiService,
       webSocketUrl,
     );
   };
@@ -21,11 +24,15 @@ describe('featuresService', () => {
   beforeEach(() => {
     roles = [
       RoleName.BasicUser,
+      RoleName.CoreUser,
     ];
 
     storageService = {} as jest.Mocked<SNStorageService>;
     storageService.setValue = jest.fn();
     storageService.getValue = jest.fn();
+
+    apiService = {} as jest.Mocked<SNApiService>
+    apiService.addEventObserver = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
@@ -36,10 +43,22 @@ describe('featuresService', () => {
   })
 
   describe('updateRoles()', () => {  
-    it('saves new roles to storage if they have changed', async () => {
+    it('saves new roles to storage if a role has been added', async () => {
       const newRoles = [
         ...roles,
-        RoleName.CoreUser,
+        RoleName.PlusUser,
+      ];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      const featuresService = createService();
+      await featuresService.loadUserRoles();
+      await featuresService.updateRoles(newRoles);
+      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles);
+    });
+
+    it('saves new roles to storage if a role has been removed', async () => {
+      const newRoles = [
+        RoleName.BasicUser,
       ];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
