@@ -19,6 +19,7 @@ describe('online conflict handling', function () {
     expect(items.length).toBe(expectedItemCount);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
+    application.deinit();
   };
 
   function createDirtyPayload(contentType) {
