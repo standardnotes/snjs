@@ -2,11 +2,13 @@ import { ComponentArea } from '../Component/ComponentArea'
 import { ContentType } from '../Content/ContentType'
 import { PermissionName } from '../Permission/PermissionName'
 import { DockIconType } from './DockIconType'
+import { FeatureIdentifier } from './FeatureIdentifier'
 import { Flag } from './Flag'
 
 export type Feature = {
   name: string;
-  identifier: PermissionName;
+  identifier: FeatureIdentifier;
+  permissionName: PermissionName;
   contentType: ContentType
   area?: ComponentArea;
   layerable?: boolean;

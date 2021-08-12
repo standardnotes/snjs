@@ -1,8 +1,8 @@
 import { RoleName } from '@standardnotes/auth'
 
-export interface UserRoleChangedEventPayload {
+export interface UserRolesChangedEventPayload {
   userUuid: string
   email: string
-  role: RoleName
+  currentRoles: RoleName[]
   timestamp: number
 }

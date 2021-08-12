@@ -4,22 +4,27 @@ import { ComponentArea } from '../Component/ComponentArea'
 import { ContentType } from '../Content/ContentType'
 import { Flag } from './Flag'
 import { PermissionName } from '../Permission/PermissionName'
-
+import { FeatureIdentifier } from './FeatureIdentifier'
 import featuresFromJson from './features.json'
-const features: Feature[] = []
 
 type TFeatureItemFromJson = typeof featuresFromJson[0]
 
+const features: Feature[] = []
+
 const validateFeatureItem = (featureItem: TFeatureItemFromJson) => {
-  const { identifier, contentType, area, flags, dockIcon } = featureItem
+  const { identifier, permissionName, contentType, area, flags, dockIcon } = featureItem
   const permissionNames = Object.values(PermissionName)
+  const featureIdentifiers = Object.values(FeatureIdentifier)
   const contentTypes = Object.values(ContentType)
   const componentArea = Object.values(ComponentArea)
   const flagTypes = Object.values(Flag)
   const dockIconTypes = Object.values(DockIconType)
 
-  if (!permissionNames.includes(identifier as PermissionName)) {
+  if (!featureIdentifiers.includes(identifier as FeatureIdentifier)) {
     throw Error('Invalid feature identifier')
+  }
+  if (!permissionNames.includes(permissionName as PermissionName)) {
+    throw Error('Invalid permission name')
   }
   if (!contentTypes.includes(contentType as ContentType)) {
     throw Error('Invalid feature content type')
