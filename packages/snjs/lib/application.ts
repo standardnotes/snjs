@@ -78,6 +78,7 @@ import {
   SNSingletonManager,
   SNStorageService,
   SNSyncService,
+  SNFeaturesService,
   SyncModes,
 } from './services';
 import { DeviceInterface } from './device_interface';
@@ -97,7 +98,6 @@ import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import { SNFeaturesService } from './services/features_service';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
 
@@ -1441,7 +1441,6 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createPayloadManager();
     this.createItemManager();
     this.createStorageManager();
-    this.createFeaturesService();
     this.createProtocolService();
     const encryptionDelegate = {
       payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
@@ -1455,6 +1454,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createChallengeService();
     this.createHttpManager();
     this.createApiService();
+    this.createFeaturesService();
     this.createSessionManager();
     this.createHistoryManager();
     this.createSyncManager();
@@ -1497,6 +1497,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.featuresService = new SNFeaturesService(
       this.storageService,
       this.apiService,
+      this.itemManager,
       this.webSocketUrl
     );
     this.services.push(this.featuresService);
