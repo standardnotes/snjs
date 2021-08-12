@@ -47,7 +47,6 @@ export type HttpResponse = {
 export type ResponseMeta = {
   auth: {
     roles?: Role[];
-    features?: Feature[];
   };
 };
 
@@ -196,3 +195,11 @@ export type RawSyncData = {
 };
 
 export type RawSyncResponse = HttpResponse & { data: RawSyncData };
+
+export type UserFeaturesData = {
+  features: Feature[];
+};
+
+export type UserFeaturesResponse = HttpResponse & {
+  data: UserFeaturesData;
+};

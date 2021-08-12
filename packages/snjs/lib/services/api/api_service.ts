@@ -15,6 +15,7 @@ import {
   KeyParamsResponse,
   SessionListResponse,
   RawSyncResponse,
+  UserFeaturesResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -48,6 +49,7 @@ type PathNamesV1 = {
   session: (sessionUuid: string) => string;
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
+  userFeatures: (userUuid: string) => string;
 };
 
 const Paths: {
@@ -66,6 +68,7 @@ const Paths: {
     itemRevisions: (itemUuid: string) => `/v1/items/${itemUuid}/revisions`,
     itemRevision: (itemUuid: string, revisionUuid: string) =>
       `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
+    userFeatures: (userUuid: string) => `/v1/users/${userUuid}/features`,
   },
 };
 
@@ -560,6 +563,32 @@ export class SNApiService extends PureService<
     const response:
       | SingleRevisionResponse
       | HttpResponse = await this.httpService
+      .getAbsolute(url, undefined, this.session!.authorizationValue)
+      .catch((errorResponse: HttpResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Get,
+            url,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SYNC_FAIL
+        );
+      });
+    this.processResponse(response);
+    return response;
+  }
+
+  async getUserFeatures(
+    userUuid: UuidString,
+  ): Promise<HttpResponse | UserFeaturesResponse> {
+    const url = joinPaths(
+      this.host,
+      Paths.v1.userFeatures(userUuid)
+    );
+    const response = await this.httpService
       .getAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse: HttpResponse) => {
         this.preprocessAuthenticatedErrorResponse(errorResponse);
