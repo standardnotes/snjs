@@ -9,7 +9,7 @@ import { Role, RoleName } from '@standardnotes/auth';
 describe('featuresService', () => {
   let storageService: SNStorageService;
   let webSocketUrl = '';
-  let roles: Role[];
+  let roles: RoleName[];
 
   const createService = () => {
     return new SNFeaturesService(
@@ -19,10 +19,9 @@ describe('featuresService', () => {
   };
 
   beforeEach(() => {
-    roles = [{
-      uuid: '1',
-      name: RoleName.BasicUser,
-    }];
+    roles = [
+      RoleName.BasicUser,
+    ];
 
     storageService = {} as jest.Mocked<SNStorageService>;
     storageService.setValue = jest.fn();
@@ -40,10 +39,7 @@ describe('featuresService', () => {
     it('saves new roles to storage if they have changed', async () => {
       const newRoles = [
         ...roles,
-        {
-          uuid: '2',
-          name: RoleName.CoreUser,
-        }
+        RoleName.CoreUser,
       ];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
