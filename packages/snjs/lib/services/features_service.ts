@@ -76,9 +76,9 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   private haveRolesChanged(roles: RoleName[]): boolean {
-    return roles.some(
-      (role) =>
-        !this.roles.includes(role)
+    return (
+      roles.some((role) => !this.roles.includes(role)) ||
+      this.roles.some((role) => !roles.includes(role))
     );
   }
 
