@@ -6,6 +6,7 @@ describe('preferences', function () {
     const { application } = await Factory.createAndInitSimpleAppContext();
     await application.setPreference('editorLeft', 300);
     expect(application.getPreference('editorLeft')).toBe(300);
+    application.deinit();
   });
 
   it('saves preference', async function () {
@@ -19,6 +20,7 @@ describe('preferences', function () {
     );
     const editorLeft = application.getPreference('editorLeft');
     expect(editorLeft).toBe(300);
+    application.deinit();
   }, 10000);
 
   it('clears preferences on signout', async function () {
@@ -29,12 +31,14 @@ describe('preferences', function () {
       application
     );
     expect(application.getPreference('editorLeft')).toBeUndefined();
+    application.deinit();
   });
 
   it('returns default value for non-existent preference', async function () {
     const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const editorLeft = application.getPreference('editorLeft', 100);
     expect(editorLeft).toBe(100);
+    application.deinit();
   });
 
   it('emits an event when preferences change', async function () {
@@ -53,6 +57,7 @@ describe('preferences', function () {
     });
     await application.setPreference('editorLeft', 300);
     expect(callTimes).toBe(2);
+    application.deinit();
   });
 
   it('discards existing preferences when signing in', async function () {
@@ -67,6 +72,7 @@ describe('preferences', function () {
     await application.sync({ awaitAll: true });
     const editorLeft = application.getPreference('editorLeft');
     expect(editorLeft).toBe(300);
+    application.deinit();
   }, 10000);
 
   it.skip('reads stored preferences on start without waiting for syncing to complete', async function () {
@@ -89,5 +95,6 @@ describe('preferences', function () {
 
     expect(application.preferencesService.preferences).toBeDefined();
     expect(application.getPreference(prefKey)).toBe(prefValue);
+    application.deinit();
   });
 });
