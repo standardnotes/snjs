@@ -19,6 +19,7 @@ describe('backups', function () {
       EncryptionIntent.FileEncrypted
     );
     expect(data.version).toBe(application.protocolService.getLatestVersion());
+    application.deinit();
   });
 
   it('no passcode + no account backup file should have correct number of items', async function () {
@@ -31,6 +32,7 @@ describe('backups', function () {
       EncryptionIntent.FileDecrypted
     );
     expect(data.items.length).toBe(BASE_ITEM_COUNT_DECRYPTED + 2);
+    application.deinit();
   });
 
   it('passcode + no account backup file should have correct number of items', async function () {
@@ -55,6 +57,7 @@ describe('backups', function () {
       true
     );
     expect(authorizedEncryptedData.items.length).toBe(BASE_ITEM_COUNT_ENCRYPTED + 2);
+    application.deinit();
   });
 
   it('no passcode + account backup file should have correct number of items', async function () {
@@ -91,6 +94,7 @@ describe('backups', function () {
       true
     );
     expect(authorizedEncryptedData.items.length).toBe(BASE_ITEM_COUNT_ENCRYPTED + 2);
+    application.deinit();
   });
 
   it('passcode + account backup file should have correct number of items', async function () {
@@ -127,6 +131,7 @@ describe('backups', function () {
       true
     );
     expect(authorizedEncryptedData.items.length).toBe(BASE_ITEM_COUNT_ENCRYPTED + 2);
+    application.deinit();
   }, 10000);
 
   it('backup file item should have correct fields', async function () {
@@ -172,6 +177,7 @@ describe('backups', function () {
     expect(rawItem.content).toBeTruthy();
     expect(rawItem.created_at).toBeTruthy();
     expect(rawItem.updated_at).toBeTruthy();
+    application.deinit();
   });
 
   it('downloading backup if item is error decrypting should succeed', async function () {
@@ -195,6 +201,7 @@ describe('backups', function () {
     );
 
     expect(backupData.items.length).toBe(BASE_ITEM_COUNT_DECRYPTED + 2);
+    application.deinit();
   });
 
   it('decrypted backup file should not have keyParams', async function () {
@@ -203,6 +210,7 @@ describe('backups', function () {
       EncryptionIntent.FileDecrypted
     );
     expect(backup).not.toHaveProperty('keyParams');
+    application.deinit();
   });
 
   it('encrypted backup file should have keyParams', async function () {
@@ -212,6 +220,7 @@ describe('backups', function () {
       EncryptionIntent.FileEncrypted
     );
     expect(backup).toHaveProperty('keyParams');
+    application.deinit();
   });
 
   it('decrypted backup file should not have itemsKeys', async function () {
@@ -222,6 +231,7 @@ describe('backups', function () {
     expect(
       backup.items.some((item) => item.content_type === ContentType.ItemsKey)
     ).toBe(false);
+    application.deinit();
   });
 
   it('encrypted backup file should have itemsKeys', async function () {
@@ -233,6 +243,7 @@ describe('backups', function () {
     expect(
       backup.items.some((item) => item.content_type === ContentType.ItemsKey)
     ).toBe(true);
+    application.deinit();
   });
 
   it('backup file with no account and no passcode should be decrypted', async function () {
@@ -255,5 +266,6 @@ describe('backups', function () {
       error = e;
     }
     expect(error).toBeTruthy();
+    application.deinit();
   });
 });
