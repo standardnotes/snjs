@@ -60,7 +60,8 @@ describe('featuresService', () => {
       items
     )
     itemManager.createItem = jest.fn()
-    itemManager.changeItem = jest.fn()
+    itemManager.changeComponent = jest.fn()
+    itemManager.setItemsToBeDeleted = jest.fn()
   });
 
   describe('loadUserRoles()', () => {
@@ -119,6 +120,35 @@ describe('featuresService', () => {
         },
       );
     });
+
+    it('deletes items for features that are no longer present', async () => {
+      const existingItem = {
+        uuid: '456',
+        content: {
+          package_info: {
+            identifier: FeatureIdentifier.MidnightTheme,
+          }
+        }
+      };
+
+      const newRoles = [
+        ...roles,
+        RoleName.PlusUser,
+      ];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
+      apiService.getUserFeatures = jest.fn().mockReturnValue({ 
+        data: {
+          features: [] 
+        }
+      });
+
+      const featuresService = createService();
+      await featuresService.loadUserRoles();
+      await featuresService.updateRoles('123', newRoles);
+      expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith(['456']);
+    })
 
     it('does nothing if roles have not changed', async () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);

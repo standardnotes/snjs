@@ -138,7 +138,8 @@ export class SNFeaturesService extends PureService<void> {
           typeof item.content !== 'string' &&
           item.content.package_info
         ) {
-          return item.content.package_info.identifier === feature.identifier && !item.deleted;
+          const itemIdentifier = item.content.package_info.identifier;
+          return itemIdentifier === feature.identifier && !item.deleted;
         }
         return false;
       });
@@ -150,6 +151,20 @@ export class SNFeaturesService extends PureService<void> {
         await this.itemManager.createItem(feature.contentType, itemData);
       }
     }
+
+    const itemsToDelete = currentItems.filter((item) => {
+      if (
+        item.content &&
+        typeof item.content !== 'string' &&
+        item.content.package_info
+      ) {
+        const itemIdentifier = item.content.package_info.identifier;
+        return !features.find(feature => itemIdentifier === feature.identifier) && !item.deleted;
+      }
+      return false;
+    })
+
+    await this.itemManager.setItemsToBeDeleted(itemsToDelete.map(item => item.uuid));
   }
 
   private async onWebSocketMessage(event: MessageEvent) {
