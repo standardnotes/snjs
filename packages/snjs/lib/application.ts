@@ -99,7 +99,6 @@ import { HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { SNFeaturesService } from './services/features_service';
 import { ProtectionEvent } from './services/protection_service';
-import { PermissionName } from '@standardnotes/auth';
 import { RemoteSession } from '.';
 
 /** How often to automatically sync, in milliseconds */
@@ -1497,6 +1496,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
   private createFeaturesService() {
     this.featuresService = new SNFeaturesService(
       this.storageService,
+      this.apiService,
       this.webSocketUrl
     );
     this.services.push(this.featuresService);
@@ -1535,7 +1535,6 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.featuresService,
       this.defaultHost,
     );
     this.services.push(this.apiService);
