@@ -13,6 +13,7 @@ describe('app models', () => {
   it('payloadManager should be defined', () => {
     const application = Factory.createApplication();
     expect(application.payloadManager).toBeTruthy();
+    application.deinit();
   });
 
   it('item should be defined', () => {
@@ -72,6 +73,7 @@ describe('app models', () => {
     expect(
       application.itemManager.itemsReferencingItem(item2.uuid).length
     ).toBe(1);
+    application.deinit();
   });
 
   it('mapping an item twice shouldnt cause problems', async function () {
@@ -99,6 +101,7 @@ describe('app models', () => {
 
     expect(item.content.foo).toBe('bar');
     expect(application.itemManager.notes.length).toBe(1);
+    application.deinit();
   });
 
   it('mapping item twice should preserve references', async function () {
@@ -115,6 +118,7 @@ describe('app models', () => {
 
     const refreshedItem = application.itemManager.findItem(item1.uuid);
     expect(refreshedItem.content.references.length).toBe(1);
+    application.deinit();
   });
 
   it('fixes relationship integrity', async function () {
@@ -152,6 +156,7 @@ describe('app models', () => {
 
     expect(refreshedItem1_2.content.references.length).toBe(0);
     expect(refreshedItem2_2.content.references.length).toBe(1);
+    application.deinit();
   });
 
   it('creating and removing relationships between two items should have valid references', async function () {
@@ -193,6 +198,7 @@ describe('app models', () => {
     expect(
       application.itemManager.itemsReferencingItem(item2.uuid).length
     ).toBe(0);
+    application.deinit();
   });
 
   it('properly duplicates item with no relationships', async function () {
@@ -205,6 +211,7 @@ describe('app models', () => {
     expect(item.isItemContentEqualWith(duplicate)).toBe(true);
     expect(item.created_at.toISOString()).toBe(duplicate.created_at.toISOString());
     expect(item.content_type).toBe(duplicate.content_type);
+    application.deinit();
   });
 
   it('properly duplicates item with relationships', async function () {
@@ -238,6 +245,7 @@ describe('app models', () => {
     expect(refreshedItem1_2.isItemContentEqualWith(duplicate)).toBe(true);
     expect(refreshedItem1_2.created_at.toISOString()).toBe(duplicate.created_at.toISOString());
     expect(refreshedItem1_2.content_type).toBe(duplicate.content_type);
+    application.deinit();
   });
 
   it('removing references should update cross-refs', async function () {
@@ -269,6 +277,7 @@ describe('app models', () => {
       application.itemManager.itemsReferencingItem(item1.uuid).length
     ).toBe(0);
     expect(refreshedItem1_2.content.references.length).toBe(0);
+    application.deinit();
   });
 
   it('properly handles single item uuid alternation', async function () {
@@ -308,6 +317,7 @@ describe('app models', () => {
 
     expect(alternatedItem.hasRelationshipWithItem(item2)).toBe(true);
     expect(alternatedItem.dirty).toBe(true);
+    application.deinit();
   });
 
   it('alterating uuid of item should fill its duplicateOf value', async function () {
@@ -317,6 +327,7 @@ describe('app models', () => {
       item1.uuid
     );
     expect(alternatedItem.duplicateOf).toBe(item1.uuid);
+    application.deinit();
   });
 
   it('alterating itemskey uuid should update errored items encrypted with that key', async function () {
@@ -340,6 +351,7 @@ describe('app models', () => {
       itemsKey.uuid
     );
     expect(application.findItem(item1.uuid).payload.items_key_id).toBe(alternatedKey.uuid);
+    application.deinit();
   });
 
   it('properly handles mutli item uuid alternation', async function () {
@@ -384,6 +396,7 @@ describe('app models', () => {
     expect(refreshedAltItem1.hasRelationshipWithItem(alternatedItem2)).toBe(true);
     expect(alternatedItem2.hasRelationshipWithItem(refreshedAltItem1)).toBe(false);
     expect(refreshedAltItem1.dirty).toBe(true);
+    application.deinit();
   });
 
   it('maintains referencing relationships when duplicating', async function () {
@@ -411,6 +424,7 @@ describe('app models', () => {
     expect(noteCopy.content.references.length).toBe(0);
     const refreshedTag_2 = application.itemManager.findItem(tag.uuid);
     expect(refreshedTag_2.content.references.length).toBe(2);
+    application.deinit();
   });
 
   it('maintains editor reference when duplicating note', async function () {
@@ -437,5 +451,6 @@ describe('app models', () => {
     expect(
       application.componentManager.editorForNote(duplicate).uuid
     ).toBe(editor.uuid);
+    application.deinit();
   });
 });
