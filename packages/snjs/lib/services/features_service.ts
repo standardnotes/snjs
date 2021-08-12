@@ -138,7 +138,7 @@ export class SNFeaturesService extends PureService<void> {
           typeof item.content !== 'string' &&
           item.content.package_info
         ) {
-          return item.content.package_info.identifier === feature.identifier;
+          return item.content.package_info.identifier === feature.identifier && !item.deleted;
         }
         return false;
       });
