@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@standardnotes/common": "^1.0.0",
-    "@standardnotes/features": "1.2.3"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.0.0",
