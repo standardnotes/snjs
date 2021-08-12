@@ -34,7 +34,7 @@ import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
 import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
-import { SNFeaturesService } from '../features_service';
+import { Role } from '@standardnotes/auth';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -74,7 +74,18 @@ const V0_API_VERSION = '20200115';
 
 type InvalidSessionObserver = (revoked: boolean) => void;
 
-export class SNApiService extends PureService {
+export enum ApiServiceEvent {
+  MetaReceived = 'MetaReceived'
+}
+
+export type MetaReceivedData = {
+  userRoles: Role[];
+}
+
+export class SNApiService extends PureService<
+  ApiServiceEvent.MetaReceived,
+  MetaReceivedData
+> {
   private session?: Session;
 
   private registering = false;
@@ -87,8 +98,7 @@ export class SNApiService extends PureService {
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private featuresService: SNFeaturesService,
-    private host: string,
+    private host: string
   ) {
     super();
   }
@@ -181,15 +191,17 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private async processMetaObject(meta: ResponseMeta) {
+  private processMetaObject(meta: ResponseMeta) {
     if (meta.auth && meta.auth.roles) {
-      await this.featuresService.updateRoles(meta.auth.roles);
+      this.notifyEvent(ApiServiceEvent.MetaReceived, {
+        userRoles: meta.auth.roles,
+      });
     }
   }
 
-  private async processResponse(response: HttpResponse) {
+  private processResponse(response: HttpResponse) {
     if (response.meta) {
-      await this.processMetaObject(response.meta);
+      this.processMetaObject(response.meta);
     }
   }
 
@@ -202,7 +214,7 @@ export class SNApiService extends PureService {
   }) {
     try {
       const response = await this.httpService.runHttp(params);
-      await this.processResponse(response);
+      this.processResponse(response);
       return response;
     } catch (errorResponse) {
       return this.errorResponseWithFallbackMessage(
@@ -326,10 +338,7 @@ export class SNApiService extends PureService {
       return preprocessingError;
     }
     this.changing = true;
-    const url = joinPaths(
-      this.host,
-      <string>Paths.v1.changePassword(userUuid)
-    );
+    const url = joinPaths(this.host, <string>Paths.v1.changePassword(userUuid));
     const params = this.params({
       current_password: currentServerPassword,
       new_password: newServerPassword,
@@ -483,10 +492,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(
-      this.host,
-      <string>Paths.v1.session(sessionId)
-    );
+    const url = joinPaths(this.host, <string>Paths.v1.session(sessionId));
     const response:
       | RevisionListResponse
       | HttpResponse = await this.httpService
@@ -550,10 +556,7 @@ export class SNApiService extends PureService {
     if (preprocessingError) {
       return preprocessingError;
     }
-    const url = joinPaths(
-      this.host,
-      Paths.v1.itemRevision(itemId, entry.uuid)
-    );
+    const url = joinPaths(this.host, Paths.v1.itemRevision(itemId, entry.uuid));
     const response:
       | SingleRevisionResponse
       | HttpResponse = await this.httpService

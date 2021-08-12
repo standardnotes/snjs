@@ -3,16 +3,27 @@ import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 import { RoleName } from '@standardnotes/auth';
+import { ApiServiceEvent, SNApiService } from './api/api_service';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
   private webSocket?: WebSocket;
+  private removeApiServiceObserver?: () => void;
 
   constructor(
     private storageService: SNStorageService,
+    private apiService: SNApiService,
     private webSocketUrl: string | undefined
   ) {
     super();
+
+    this.removeApiServiceObserver = this.apiService.addEventObserver(
+      (eventName, data) => {
+        if (eventName === ApiServiceEvent.MetaReceived) {
+          this.updateRoles(data!.userRoles.map((role) => role.name));
+        }
+      }
+    );
   }
 
   public async loadUserRoles(): Promise<void> {
@@ -88,7 +99,9 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   deinit(): void {
-    (this.roles as unknown) = undefined;
+    this.removeApiServiceObserver?.();
     this.closeWebSocketConnection();
+    (this.removeApiServiceObserver as unknown) = undefined;
+    (this.roles as unknown) = undefined;
   }
 }
