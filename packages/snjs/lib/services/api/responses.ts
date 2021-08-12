@@ -7,6 +7,7 @@ import {
 import { ProtocolVersion } from './../../protocol/versions';
 import { Role } from '@standardnotes/auth';
 import { Feature } from '@standardnotes/features';
+import { UuidString } from '@Lib/types';
 
 export enum StatusCode {
   LocalValidationError = 10,
@@ -46,6 +47,7 @@ export type HttpResponse = {
 
 export type ResponseMeta = {
   auth: {
+    userUuid?: UuidString;
     roles?: Role[];
   };
 };

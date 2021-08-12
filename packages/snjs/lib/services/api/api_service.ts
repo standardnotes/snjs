@@ -82,6 +82,7 @@ export enum ApiServiceEvent {
 }
 
 export type MetaReceivedData = {
+  userUuid: UuidString;
   userRoles: Role[];
 }
 
@@ -195,8 +196,9 @@ export class SNApiService extends PureService<
   }
 
   private processMetaObject(meta: ResponseMeta) {
-    if (meta.auth && meta.auth.roles) {
+    if (meta.auth && meta.auth.userUuid && meta.auth.roles) {
       this.notifyEvent(ApiServiceEvent.MetaReceived, {
+        userUuid: meta.auth.userUuid,
         userRoles: meta.auth.roles,
       });
     }

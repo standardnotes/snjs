@@ -3,7 +3,16 @@ import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 import { RoleName } from '@standardnotes/auth';
-import { ApiServiceEvent, SNApiService } from './api/api_service';
+import {
+  ApiServiceEvent,
+  MetaReceivedData,
+  SNApiService,
+} from './api/api_service';
+import { UuidString } from '@Lib/types';
+import { ContentType, Feature } from '@standardnotes/features';
+import { ItemManager } from './item_manager';
+import { SNComponentManager } from './component_manager';
+import { UserFeaturesResponse } from './api/responses';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
@@ -13,6 +22,7 @@ export class SNFeaturesService extends PureService<void> {
   constructor(
     private storageService: SNStorageService,
     private apiService: SNApiService,
+    private itemManager: ItemManager,
     private webSocketUrl: string | undefined
   ) {
     super();
@@ -20,7 +30,11 @@ export class SNFeaturesService extends PureService<void> {
     this.removeApiServiceObserver = this.apiService.addEventObserver(
       (eventName, data) => {
         if (eventName === ApiServiceEvent.MetaReceived) {
-          this.updateRoles(data!.userRoles.map((role) => role.name));
+          const { userUuid, userRoles } = data as MetaReceivedData;
+          this.updateRoles(
+            userUuid,
+            userRoles.map((role) => role.name)
+          );
         }
       }
     );
@@ -31,11 +45,14 @@ export class SNFeaturesService extends PureService<void> {
       (await this.storageService.getValue(StorageKey.UserRoles)) || [];
   }
 
-  public async updateRoles(roles: RoleName[]): Promise<void> {
+  public async updateRoles(
+    userUuid: UuidString,
+    roles: RoleName[]
+  ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
     if (userRolesChanged) {
       this.setRoles(roles);
-      await this.updateFeatures();
+      await this.updateFeatures(userUuid);
     }
   }
 
@@ -82,16 +99,55 @@ export class SNFeaturesService extends PureService<void> {
     );
   }
 
-  private async updateFeatures(): Promise<void> {
-    // Request new features and map them to items
+  private async updateFeatures(userUuid: UuidString): Promise<void> {
+    const featuresResponse = await this.apiService.getUserFeatures(userUuid);
+    if (!featuresResponse.error && featuresResponse.data) {
+      await this.mapFeaturesToItems(
+        (featuresResponse as UserFeaturesResponse).data.features
+      );
+    }
+  }
+
+  private async mapFeaturesToItems(features: Feature[]): Promise<void> {
+    const currentItems = this.itemManager.getItems([
+      ContentType.Component,
+      ContentType.Theme,
+    ]);
+
+    for (const feature of features) {
+      const itemContent = {
+        contentType: feature.contentType,
+        content: {
+          ...feature,
+        },
+        references: [],
+      };
+      const existingItem = currentItems.find((item) => {
+        if (
+          item.content &&
+          typeof item.content !== 'string' &&
+          item.content.package_info
+        ) {
+          return item.content.package_info.identifier === feature.identifier;
+        }
+        return false;
+      });
+      if (existingItem) {
+        await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
+          mutator.setContent(itemContent);
+        });
+      } else {
+        await this.itemManager.createItem(feature.contentType, itemContent);
+      }
+    }
   }
 
   private async onWebSocketMessage(event: MessageEvent) {
     const {
-      payload: { currentRoles },
+      payload: { userUuid, currentRoles },
     }: UserRolesChangedEvent = JSON.parse(event.data);
     this.setRoles(currentRoles);
-    await this.updateFeatures();
+    await this.updateFeatures(userUuid);
   }
 
   private onWebSocketClose() {
