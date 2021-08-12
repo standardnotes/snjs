@@ -11,7 +11,6 @@ import {
 import { UuidString } from '@Lib/types';
 import { ContentType, Feature } from '@standardnotes/features';
 import { ItemManager } from './item_manager';
-import { SNComponentManager } from './component_manager';
 import { UserFeaturesResponse } from './api/responses';
 
 export class SNFeaturesService extends PureService<void> {
