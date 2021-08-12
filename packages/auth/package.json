@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/auth",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@standardnotes/common": "^1.0.0",
-    "@standardnotes/features": "^1.2.0"
+    "@standardnotes/features": "1.2.3"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.0.0",
