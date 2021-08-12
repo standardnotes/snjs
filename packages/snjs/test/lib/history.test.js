@@ -79,6 +79,7 @@ describe('history manager', () => {
 
       historyManager.clearAllHistory();
       expect(historyManager.sessionHistoryForItem(item).length).toBe(0);
+      application.deinit();
     });
 
     it('first change should create revision with previous value', async function () {
@@ -200,6 +201,7 @@ describe('history manager', () => {
         deleteCharsFromString(item.content.text, 1)
       );
       expect(historyManager.sessionHistoryForItem(item).length).toBe(5);
+      application.deinit();
     });
 
     it('should keep the entry right before a large deletion, regardless of its delta', async function () {
@@ -241,6 +243,7 @@ describe('history manager', () => {
         item.content.text + Factory.randomString(largeCharacterChange + 1)
       );
       expect(historyManager.sessionHistoryForItem(item).length).toBe(4);
+      application.deinit();
     });
 
     it('entries should be ordered from newest to oldest', async function () {
@@ -298,6 +301,7 @@ describe('history manager', () => {
       expect(
         latestRevision.itemFromPayload().userModifiedDate.getTime()
       ).toBeGreaterThan(initialRevision.itemFromPayload().userModifiedDate.getTime());
+      application.deinit();
     }, 10000);
 
     it('unsynced entries should use payload created_at for preview titles', async function () {
@@ -319,6 +323,7 @@ describe('history manager', () => {
       );
       const historyItem = historyManager.sessionHistoryForItem(item)[0];
       expect(historyItem.previewTitle()).toBe(historyItem.payload.created_at.toLocaleString());
+      application.deinit();
     });
   });
 
@@ -357,6 +362,7 @@ describe('history manager', () => {
       await application.syncService.sync(syncOptions);
       const itemHistory = await historyManager.remoteHistoryForItem(item);
       expect(itemHistory).toBeUndefined();
+      application.deinit();
     });
 
     it('create basic history entries', async function () {
@@ -385,6 +391,7 @@ describe('history manager', () => {
       );
       itemHistory = await historyManager.remoteHistoryForItem(item);
       expect(itemHistory.length).toBe(1);
+      application.deinit();
     });
 
     it.skip('create consecutive history entries', async function () {
@@ -513,6 +520,7 @@ describe('history manager', () => {
       );
       expect(fetched.payload.errorDecrypting).toBeFalsy();
       expect(fetched.payload.content.title).toBe(changedText);
+      application.deinit();
     });
   });
 });
