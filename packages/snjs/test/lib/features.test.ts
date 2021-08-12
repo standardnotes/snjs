@@ -38,6 +38,7 @@ describe('featuresService', () => {
       {
         identifier: FeatureIdentifier.MidnightTheme,
         contentType: ContentType.Theme,
+        expiresAt: new Date(),
       }
     ] as jest.Mocked<Feature[]>;
 
@@ -99,7 +100,7 @@ describe('featuresService', () => {
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123');
     });
 
-    it('creates items for features if they do not exist', async () => {
+    it('creates items for non-expired features if they do not exist', async () => {
       const newRoles = [
         ...roles,
         RoleName.PlusUser,
@@ -121,7 +122,7 @@ describe('featuresService', () => {
       );
     });
 
-    it('deletes items for features that are no longer present', async () => {
+    it('deletes items for expired features', async () => {
       const existingItem = {
         uuid: '456',
         content: {
@@ -136,11 +137,17 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ];
 
+      const today = new Date();
+      const yesterday = today.setDate(today.getDate() - 1);
+
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
       apiService.getUserFeatures = jest.fn().mockReturnValue({ 
         data: {
-          features: [] 
+          features: [{
+            ...features[0],
+            expiresAt: yesterday,
+          }] 
         }
       });
 

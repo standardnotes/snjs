@@ -30,7 +30,7 @@ export class SNFeaturesService extends PureService<void> {
       (eventName, data) => {
         if (eventName === ApiServiceEvent.MetaReceived) {
           const { userUuid, userRoles } = data as MetaReceivedData;
-          this.updateRoles(
+          void this.updateRoles(
             userUuid,
             userRoles.map((role) => role.name)
           );
@@ -50,7 +50,7 @@ export class SNFeaturesService extends PureService<void> {
   ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
     if (userRolesChanged) {
-      this.setRoles(roles);
+      await this.setRoles(roles);
       await this.updateFeatures(userUuid);
     }
   }
@@ -129,6 +129,8 @@ export class SNFeaturesService extends PureService<void> {
       ContentType.Component,
       ContentType.Theme,
     ]);
+    const itemsToDeleteUuids = [];
+    const today = new Date();
 
     for (const feature of features) {
       const itemData = this.createItemDataForFeature(feature);
@@ -144,34 +146,25 @@ export class SNFeaturesService extends PureService<void> {
         return false;
       });
       if (existingItem) {
-        await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
-          mutator.setContent(itemData);
-        });
-      } else {
+        if (feature.expiresAt < today) {
+          itemsToDeleteUuids.push(existingItem.uuid);
+        } else {
+          await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
+            mutator.setContent(itemData);
+          });
+        }
+      } else if (feature.expiresAt >= today) {
         await this.itemManager.createItem(feature.contentType, itemData);
       }
     }
-
-    const itemsToDelete = currentItems.filter((item) => {
-      if (
-        item.content &&
-        typeof item.content !== 'string' &&
-        item.content.package_info
-      ) {
-        const itemIdentifier = item.content.package_info.identifier;
-        return !features.find(feature => itemIdentifier === feature.identifier) && !item.deleted;
-      }
-      return false;
-    })
-
-    await this.itemManager.setItemsToBeDeleted(itemsToDelete.map(item => item.uuid));
+    await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
   }
 
   private async onWebSocketMessage(event: MessageEvent) {
     const {
       payload: { userUuid, currentRoles },
     }: UserRolesChangedEvent = JSON.parse(event.data);
-    this.setRoles(currentRoles);
+    await this.setRoles(currentRoles);
     await this.updateFeatures(userUuid);
   }
 
