@@ -95,10 +95,6 @@ describe('application instances', () => {
     let deinit;
     let testSNApp;
 
-    beforeEach(async () => {
-      testSNApp = await Factory.createAndInitializeApplication('test-application');
-    });
-
     const signOutConfirmMessage = (numberOfItems) => {
       const singular = numberOfItems === 1;
       return (
@@ -110,6 +106,7 @@ describe('application instances', () => {
     };
 
     beforeEach(async () => {
+      testSNApp = await Factory.createAndInitializeApplication('test-application');
       testNote1 = await createNoteItem(testSNApp, {
         title: 'Note 1',
         text: 'This is a test note!'
