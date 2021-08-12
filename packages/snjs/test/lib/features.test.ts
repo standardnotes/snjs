@@ -2,21 +2,28 @@ import {
   StorageKey,
   SNStorageService,
   Uuid,
-  SNApiService
+  SNApiService,
+  ItemManager,
+  SNItem
 } from '@Lib/index';
 import { SNFeaturesService } from '@Lib/services/features_service';
-import { Role, RoleName } from '@standardnotes/auth';
+import { RoleName } from '@standardnotes/auth';
+import { ContentType, Feature, FeatureIdentifier } from '@standardnotes/features';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
   let apiService: SNApiService;
+  let itemManager: ItemManager;
   let webSocketUrl = '';
   let roles: RoleName[];
+  let features: Feature[];
+  let items: SNItem[];
 
   const createService = () => {
     return new SNFeaturesService(
       storageService,
       apiService,
+      itemManager,
       webSocketUrl,
     );
   };
@@ -27,12 +34,33 @@ describe('featuresService', () => {
       RoleName.CoreUser,
     ];
 
+    features = [
+      {
+        identifier: FeatureIdentifier.MidnightTheme,
+        contentType: ContentType.Theme,
+      }
+    ] as jest.Mocked<Feature[]>;
+
+    items = [] as jest.Mocked<SNItem[]>
+
     storageService = {} as jest.Mocked<SNStorageService>;
     storageService.setValue = jest.fn();
     storageService.getValue = jest.fn();
 
     apiService = {} as jest.Mocked<SNApiService>
     apiService.addEventObserver = jest.fn();
+    apiService.getUserFeatures = jest.fn().mockReturnValue({
+      data: {
+        features,        
+      }
+    })
+
+    itemManager = {} as jest.Mocked<ItemManager>
+    itemManager.getItems = jest.fn().mockReturnValue(
+      items
+    )
+    itemManager.createItem = jest.fn()
+    itemManager.changeItem = jest.fn()
   });
 
   describe('loadUserRoles()', () => {
@@ -43,7 +71,7 @@ describe('featuresService', () => {
   })
 
   describe('updateRoles()', () => {  
-    it('saves new roles to storage if a role has been added', async () => {
+    it('saves new roles to storage and fetches features if a role has been added', async () => {
       const newRoles = [
         ...roles,
         RoleName.PlusUser,
@@ -52,11 +80,12 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.loadUserRoles();
-      await featuresService.updateRoles(newRoles);
+      await featuresService.updateRoles('123', newRoles);
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles);
+      expect(apiService.getUserFeatures).toHaveBeenCalledWith('123');
     });
 
-    it('saves new roles to storage if a role has been removed', async () => {
+    it('saves new roles to storage and fetches features if a role has been removed', async () => {
       const newRoles = [
         RoleName.BasicUser,
       ];
@@ -64,15 +93,38 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.loadUserRoles();
-      await featuresService.updateRoles(newRoles);
+      await featuresService.updateRoles('123', newRoles);
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles);
+      expect(apiService.getUserFeatures).toHaveBeenCalledWith('123');
+    });
+
+    it('creates items for features if they do not exist', async () => {
+      const newRoles = [
+        ...roles,
+        RoleName.PlusUser,
+      ];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      const featuresService = createService();
+      await featuresService.loadUserRoles();
+      await featuresService.updateRoles('123', newRoles);
+      expect(itemManager.createItem).toHaveBeenCalledWith(
+        ContentType.Theme,
+        {
+          content_type: ContentType.Theme,
+          content: expect.objectContaining({
+            identifier: FeatureIdentifier.MidnightTheme,
+          }),
+          references: [],
+        },
+      );
     });
 
     it('does nothing if roles have not changed', async () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.loadUserRoles();
-      await featuresService.updateRoles(roles);
+      await featuresService.updateRoles('123', roles);
       expect(storageService.setValue).not.toHaveBeenCalled();
     });
   });
