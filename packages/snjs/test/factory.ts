@@ -133,11 +133,6 @@ const getSwappedClasses = (environment?: Environment) => {
 };
 
 export function createApplication(identifier: string, environment?: Environment, platform?: Platform) {
-  /**
-   * Stops loading any resources or network requests.
-   */
-  window.stop();
-
   const deviceInterface = new DeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
