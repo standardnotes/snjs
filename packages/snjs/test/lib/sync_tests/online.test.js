@@ -31,14 +31,14 @@ describe('online syncing', function () {
     expectedItemCount = BASE_ITEM_COUNT;
   });
 
-  afterEach(async function () {
-    /*expect(application.syncService.isOutOfSync()).toBe(false);
+  async function sharedFinalAssertions(application) {
+    expect(application.syncService.isOutOfSync()).toBe(false);
     const items = application.itemManager.items;
     expect(items.length).toBe(expectedItemCount);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    application.deinit();*/
-  });
+    application.deinit();
+  };
 
   function noteObjectsFromObjects(items) {
     return items.filter((item) => item.content_type === ContentType.Note);
@@ -65,6 +65,7 @@ describe('online syncing', function () {
     for (const rawNote of notePayloads) {
       expect(rawNote.dirty).toBeFalsy();
     }
+    await sharedFinalAssertions(application);
   });
 
   it('should login and retrieve synced item', async function () {
@@ -91,6 +92,7 @@ describe('online syncing', function () {
     const notes = application.itemManager.notes;
     expect(notes.length).toBe(1);
     expect(notes[0].title).toBe(note.title);
+    await sharedFinalAssertions(application);
   });
 
   it('can complete multipage sync on sign in', async function () {
@@ -125,6 +127,7 @@ describe('online syncing', function () {
     expect(promise).resolves.toBeTruthy();
     /** Allow any unwaited syncs in for loop to complete */
     await Factory.sleep(0.5);
+    await sharedFinalAssertions(application);
   }, 20000);
 
   it('uuid alternation should delete original payload', async function () {
@@ -147,6 +150,7 @@ describe('online syncing', function () {
     const notes = application.itemManager.notes;
     expect(notes.length).toBe(1);
     expect(notes[0].uuid).not.toBe(note.uuid);
+    await sharedFinalAssertions(application);
   });
 
   it('having offline data then signing in should not alternate uuid and merge with account', async function () {
@@ -174,6 +178,7 @@ describe('online syncing', function () {
     expect(notes.length).toBe(1);
     /** uuid should have been alternated */
     expect(notes[0].uuid).toBe(note.uuid);
+    await sharedFinalAssertions(application);
   });
 
   it('server extensions should not be encrypted for sync', async function () {
@@ -198,6 +203,7 @@ describe('online syncing', function () {
     );
     const processed = results[0];
     expect(processed.format).toBe(PayloadFormat.DecryptedBase64String);
+    await sharedFinalAssertions(application);
   });
 
   it('resolve on next timing strategy', async function () {
@@ -243,6 +249,7 @@ describe('online syncing', function () {
     application.syncService.ut_endLatencySimulator();
     // Since the syncs all happen after one another, extra syncs may be queued on that we are not awaiting.
     await Factory.sleep(0.5);
+    await sharedFinalAssertions(application);
   });
 
   it('force spawn new timing strategy', async function () {
@@ -283,6 +290,7 @@ describe('online syncing', function () {
     expect(successes).toBe(syncCount);
     expect(events).toBe(syncCount);
     application.syncService.ut_endLatencySimulator();
+    await sharedFinalAssertions(application);
   });
 
   it('retrieving new items should not mark them as dirty', async function () {
@@ -314,6 +322,7 @@ describe('online syncing', function () {
       undefined,
       true
     );
+    await sharedFinalAssertions(application);
   });
 
   it('allows me to save data after Ive signed out', async function () {
@@ -366,6 +375,7 @@ describe('online syncing', function () {
       // if an item comes back from the server, it is saved to disk immediately without a dirty value.
       expect(payload.dirty).toBeFalsy();
     }
+    await sharedFinalAssertions(application);
   });
 
   it('mapping should not mutate items with error decrypting state', async function () {
@@ -408,6 +418,7 @@ describe('online syncing', function () {
     const mappedItem2 = mappedItems2[0];
     expect(typeof mappedItem2.content).toBe('object');
     expect(mappedItem2.content.title).toBe(originalTitle);
+    await sharedFinalAssertions(application);
   });
 
   it('signing into account with pre-existing items', async function () {
@@ -437,6 +448,7 @@ describe('online syncing', function () {
     );
 
     expect(application.itemManager.items.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   });
 
   it('removes item from storage upon deletion', async function () {
@@ -472,6 +484,7 @@ describe('online syncing', function () {
     await Factory.sleep(0.5);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   });
 
   it('retrieving item with no content should correctly map local state', async function () {
@@ -506,6 +519,7 @@ describe('online syncing', function () {
     await application.syncService.sync(syncOptions);
 
     expect(application.itemManager.items.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   });
 
   it('deleting an item while it is being synced should keep deletion state', async function () {
@@ -535,6 +549,7 @@ describe('online syncing', function () {
     /** We expect that item has been deleted */
     const allItems = application.itemManager.items;
     expect(allItems.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   });
 
   it('items that are never synced and deleted should not be uploaded to server', async function () {
@@ -578,6 +593,7 @@ describe('online syncing', function () {
     await application.syncService.sync({ mode: SyncModes.DownloadFirst });
     expect(didCompleteRelevantSync).toBe(true);
     expect(success).toBe(true);
+    await sharedFinalAssertions(application);
   });
 
   it('items that are deleted after download first sync complete should not be uploaded to server', async function () {
@@ -622,6 +638,7 @@ describe('online syncing', function () {
     await application.syncService.sync({ mode: SyncModes.DownloadFirst });
     expect(didCompleteRelevantSync).toBe(true);
     expect(success).toBe(true);
+    await sharedFinalAssertions(application);
   });
 
   it('marking an item dirty then saving to disk should retain that dirty state when restored', async function () {
@@ -664,6 +681,7 @@ describe('online syncing', function () {
     const foundNote = application.itemManager.findItem(note.uuid);
     expect(foundNote.dirty).toBe(true);
     await application.syncService.sync(syncOptions);
+    await sharedFinalAssertions(application);
   });
 
   it('should handle uploading with sync pagination', async function () {
@@ -687,6 +705,7 @@ describe('online syncing', function () {
     await application.syncService.sync(syncOptions);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   }, 15000);
 
   it('should handle downloading with sync pagination', async function () {
@@ -720,6 +739,7 @@ describe('online syncing', function () {
     expect(application.itemManager.items.length).toBe(expectedItemCount);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   }, 20000);
 
   it('should be able to download all items separate of sync', async function () {
@@ -747,6 +767,7 @@ describe('online syncing', function () {
     // ensure it's decrypted
     expect(downloadedItems[10].content.text.length).toBeGreaterThan(1);
     expect(downloadedItems[10].text.length).toBeGreaterThan(1);
+    await sharedFinalAssertions(application);
   });
 
   it('syncing an item should storage it encrypted', async function () {
@@ -768,6 +789,7 @@ describe('online syncing', function () {
       (p) => p.content_type === ContentType.Note
     );
     expect(typeof notePayload.content).toBe('string');
+    await sharedFinalAssertions(application);
   });
 
   it('syncing an item before data load should storage it encrypted', async function () {
@@ -795,6 +817,7 @@ describe('online syncing', function () {
       (p) => p.content_type === ContentType.Note
     );
     expect(typeof notePayload.content).toBe('string');
+    await sharedFinalAssertions(application);
   });
 
   it('saving an item after sync should persist it with content property', async function () {
@@ -825,6 +848,7 @@ describe('online syncing', function () {
     );
     expect(typeof notePayload.content).toBe('string');
     expect(notePayload.content.length).toBeGreaterThan(text.length);
+    await sharedFinalAssertions(application);
   });
 
   it('syncing a new item before local data has loaded should still persist the item to disk', async function () {
@@ -882,6 +906,7 @@ describe('online syncing', function () {
     expect(currentItem.content.text).toBe(note.content.text);
     expect(currentItem.text).toBe(note.text);
     expect(currentItem.dirty).toBeFalsy();
+    await sharedFinalAssertions(application);
   });
 
   it('load local items should respect sort priority', async function () {
@@ -941,6 +966,7 @@ describe('online syncing', function () {
 
     const items = application.itemManager.items;
     expect(items.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   }, 20000);
 
   it('valid sync date tracking', async function () {
@@ -974,6 +1000,7 @@ describe('online syncing', function () {
     note = application.findItem(note.uuid);
     expect(note.dirty).toBe(false);
     expect(note.lastSyncEnd.getTime()).toBeGreaterThanOrEqual(note.lastSyncBegan.getTime());
+    await sharedFinalAssertions(application);
   });
 
   it('syncing twice without waiting should only execute 1 online sync', async function () {
@@ -1002,6 +1029,7 @@ describe('online syncing', function () {
     /** Sleep so that any automatic syncs that are triggered are also sent to handler above */
     await Factory.sleep(0.5);
     expect(actualEvents).toBe(expectedEvents);
+    await sharedFinalAssertions(application);
   });
 
   it('should keep an item dirty thats been modified after low latency sync request began', async function () {
@@ -1066,6 +1094,7 @@ describe('online syncing', function () {
     const foundItem = application.itemManager.findItem(note.uuid);
     expect(foundItem.content.text).toBe(text);
     expect(foundItem.text).toBe(text);
+    await sharedFinalAssertions(application);
   });
 
   it('should sync an item twice if its marked dirty while a sync is ongoing', async function () {
@@ -1112,6 +1141,7 @@ describe('online syncing', function () {
     expect(actualSaveCount).toBe(expectedSaveCount);
     note = application.findItem(note.uuid);
     expect(note.text).toBe(newText);
+    await sharedFinalAssertions(application);
   });
 
   it('marking item dirty after dirty items are prepared for sync but before they are synced should sync again', async function () {
@@ -1158,6 +1188,7 @@ describe('online syncing', function () {
     expect(actualSaveCount).toBe(expectedSaveCount);
     note = application.findItem(note.uuid);
     expect(note.text).toBe(newText);
+    await sharedFinalAssertions(application);
   });
 
   it('marking item dirty at exact same time as lastSyncBegan should sync again', async function () {
@@ -1205,6 +1236,7 @@ describe('online syncing', function () {
     expect(actualSaveCount).toBe(expectedSaveCount);
     note = application.findItem(note.uuid);
     expect(note.text).toBe(newText);
+    await sharedFinalAssertions(application);
   });
 
   it('retreiving a remote deleted item should succeed', async function () {
@@ -1223,6 +1255,7 @@ describe('online syncing', function () {
     await application.syncService.setLastSyncToken(preDeleteSyncToken);
     await application.sync(syncOptions);
     expect(application.itemManager.items.length).toBe(expectedItemCount);
+    await sharedFinalAssertions(application);
   });
 
   it('errored items should not be synced', async function () {
@@ -1253,6 +1286,7 @@ describe('online syncing', function () {
     const updatedNote = application.findItem(note.uuid);
     expect(updatedNote.lastSyncBegan.getTime()).toBe(lastSyncBegan.getTime());
     expect(updatedNote.lastSyncEnd.getTime()).toBe(lastSyncEnd.getTime());
+    await sharedFinalAssertions(application);
   });
 
   it('syncing with missing session object should prompt for re-auth', async function () {
@@ -1288,6 +1322,7 @@ describe('online syncing', function () {
     expect(didPromptForSignIn).toBe(true);
     expect(application.apiService.session.accessToken).toBeTruthy();
     expect(application.apiService.session.refreshToken).toBeTruthy();
+    await sharedFinalAssertions(application);
   });
 
   it('should not allow receiving decrypted payloads from server', async function () {
@@ -1325,6 +1360,7 @@ describe('online syncing', function () {
     }
 
     expect(application.itemManager.notes.length).toBe(0);
+    await sharedFinalAssertions(application);
   });
 
   it('retrieved items should have both updated_at and updated_at_timestamps', async function () {
@@ -1343,5 +1379,6 @@ describe('online syncing', function () {
     expect(note.payload.created_at).toBeTruthy();
     expect(note.payload.updated_at_timestamp).toBeTruthy();
     expect(note.payload.updated_at).toBeTruthy();
+    await sharedFinalAssertions(application);
   });
 });
