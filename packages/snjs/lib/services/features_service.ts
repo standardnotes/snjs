@@ -26,7 +26,7 @@ export class SNFeaturesService extends PureService<void> {
   ) {
     super();
 
-    this.removeApiServiceObserver = this.apiService.addEventObserver(
+    this.removeApiServiceObserver = apiService.addEventObserver(
       (eventName, data) => {
         if (eventName === ApiServiceEvent.MetaReceived) {
           const { userUuid, userRoles } = data as MetaReceivedData;
@@ -107,6 +107,23 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
+  private createItemDataForFeature(feature: Feature) {
+    return {
+      content_type: feature.contentType,
+      content: {
+        identifier: feature.identifier,
+        name: feature.name,
+        hosted_url: feature.url,
+        url: feature.url,
+        local_url: null,
+        area: feature.area,
+        package_info: feature,
+        valid_until: feature.expiresAt,
+      },
+      references: [],
+    };
+  }
+
   private async mapFeaturesToItems(features: Feature[]): Promise<void> {
     const currentItems = this.itemManager.getItems([
       ContentType.Component,
@@ -114,13 +131,7 @@ export class SNFeaturesService extends PureService<void> {
     ]);
 
     for (const feature of features) {
-      const itemContent = {
-        contentType: feature.contentType,
-        content: {
-          ...feature,
-        },
-        references: [],
-      };
+      const itemData = this.createItemDataForFeature(feature);
       const existingItem = currentItems.find((item) => {
         if (
           item.content &&
@@ -133,10 +144,10 @@ export class SNFeaturesService extends PureService<void> {
       });
       if (existingItem) {
         await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
-          mutator.setContent(itemContent);
+          mutator.setContent(itemData);
         });
       } else {
-        await this.itemManager.createItem(feature.contentType, itemContent);
+        await this.itemManager.createItem(feature.contentType, itemData);
       }
     }
   }
