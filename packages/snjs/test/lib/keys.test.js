@@ -98,6 +98,7 @@ describe('keys', function () {
   it('should not have root key by default', async function () {
     const { application } = await Factory.createAndInitSimpleAppContext();
     expect(application.protocolService.getRootKey()).toBeUndefined();
+    application.deinit();
   });
 
   it('validates content types requiring root encryption', async function () {
@@ -120,6 +121,7 @@ describe('keys', function () {
       EncryptionIntent.LocalStoragePreferEncrypted
     );
     expect(processedPayload.format).toBe(PayloadFormat.EncryptedString);
+    application.deinit();
   });
 
   it('has root key and one items key after registering user', async function () {
@@ -127,6 +129,7 @@ describe('keys', function () {
     await Factory.registerUserToApplication({ application: application });
     expect(application.protocolService.getRootKey()).toBeDefined();
     expect(application.itemManager.itemsKeys().length).toBe(1);
+    application.deinit();
   });
 
   it('should use root key for encryption of storage', async function () {
@@ -152,6 +155,8 @@ describe('keys', function () {
     expect(keyToUse).toBe(
       application.protocolService.getRootKey()
     );
+    await Factory.sleep(2);
+    application.deinit();
   });
 
   it('changing root key with passcode should re-wrap root key', async function () {
@@ -191,6 +196,8 @@ describe('keys', function () {
       .catch((error) => {
         expect(error).toBeFalsy();
       });
+    await Factory.sleep(2);
+    application.deinit();
   });
 
   it('items key should be encrypted with root key', async function () {
@@ -216,6 +223,7 @@ describe('keys', function () {
     expect(decryptedPayload.content.itemsKey).toBe(
       itemsKey.content.itemsKey
     );
+    application.deinit();
   });
 
   it('should create random items key if no account and no passcode', async function () {
@@ -230,6 +238,7 @@ describe('keys', function () {
       (r) => r.content_type === ContentType.Note
     );
     expect(typeof rawNotePayload.content).toBe('string');
+    application.deinit();
   });
 
   it('should keep offline created items key upon registration', async function () {
@@ -241,6 +250,7 @@ describe('keys', function () {
     expect(application.itemManager.itemsKeys().length).toBe(1);
     const newestItemsKey = application.itemManager.itemsKeys()[0];
     expect(newestItemsKey.uuid).toBe(originalItemsKey.uuid);
+    application.deinit();
   });
 
   it('should use items key for encryption of note', async function () {
@@ -251,6 +261,7 @@ describe('keys', function () {
       EncryptionIntent.Sync
     );
     expect(keyToUse.content_type).toBe(ContentType.ItemsKey);
+    application.deinit();
   });
 
   it('encrypting an item should associate an items key to it', async function () {
@@ -264,6 +275,7 @@ describe('keys', function () {
       encryptedPayload
     );
     expect(itemsKey).toBeTruthy();
+    application.deinit();
   });
 
   it('decrypt encrypted item with associated key', async function () {
@@ -285,6 +297,7 @@ describe('keys', function () {
     );
 
     expect(decryptedPayload.content.title).toBe(title);
+    application.deinit();
   });
 
   it('decrypts items waiting for keys', async function () {
@@ -331,11 +344,11 @@ describe('keys', function () {
     expect(updatedNote.errorDecrypting).toBe(false);
     expect(updatedNote.waitingForKey).toBe(false);
     expect(updatedNote.content.title).toBe(title);
+    application.deinit();
   });
 
   it('attempting to emit errored items key for which there exists a non errored master copy should ignore it', async function () {
-    const { application } = await Factory.createAndInitSimpleAppContext();
-    await Factory.registerUserToApplication({ application: application });
+    const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const itemsKey = application.protocolService.getDefaultItemsKey();
     expect(itemsKey.errorDecrypting).toBeFalsy();
 
@@ -350,10 +363,12 @@ describe('keys', function () {
       errored,
       PayloadSource.Constructor
     );
+    await Factory.sleep(2);
 
     const refreshedKey = application.findItem(itemsKey.uuid);
     expect(refreshedKey.errorDecrypting).toBeFalsy();
     expect(refreshedKey.content.foo).toBeFalsy();
+    application.deinit();
   });
 
   it('generating export params with logged in account should produce encrypted payload', async function () {
@@ -368,6 +383,7 @@ describe('keys', function () {
     expect(encryptedPayload.content.substring(0, 3)).toBe(
       application.protocolService.getLatestVersion()
     );
+    application.deinit();
   });
 
   it('When setting passcode, should encrypt items keys', async function () {
@@ -380,6 +396,7 @@ describe('keys', function () {
     );
     const itemsKeyPayload = CreateMaxPayloadFromAnyObject(itemsKeyRawPayload);
     expect(itemsKeyPayload.format).toBe(PayloadFormat.EncryptedString);
+    application.deinit();
   });
 
   it('items key encrypted payload should contain root key params', async function () {
@@ -408,6 +425,7 @@ describe('keys', function () {
     expect(authenticatedData.kp.origination).toBe(
       KeyParamsOrigination.PasscodeCreate
     );
+    application.deinit();
   });
 
   it('correctly validates local passcode', async function () {
@@ -420,6 +438,7 @@ describe('keys', function () {
     expect(
       (await application.protocolService.validatePasscode(passcode)).valid
     ).toBe(true);
+    application.deinit();
   });
 
   it('signing into 003 account should delete latest offline items key and create 003 items key', async function () {
@@ -450,6 +469,7 @@ describe('keys', function () {
     expect(newestItemsKey.dataAuthenticationKey).toBe(
       rootKey.dataAuthenticationKey
     );
+    application.deinit();
   });
 
   it('reencrypts existing notes when logging into an 003 account', async function () {
@@ -482,6 +502,7 @@ describe('keys', function () {
     expect(application.itemManager.itemsKeys().length).toBe(1);
     expect(application.itemManager.notes.length).toBe(10);
     expect(application.itemManager.invalidItems.length).toBe(0);
+    application.deinit();
   });
 
   it('When root key changes, all items keys must be re-encrypted', async function () {
@@ -541,6 +562,7 @@ describe('keys', function () {
       newRootKey
     );
     expect(decrypted3.errorDecrypting).toBeFalsy();
+    application.deinit();
   });
 
   it('changing account password should create new items key and encrypt items with that key', async function () {
@@ -610,6 +632,7 @@ describe('keys', function () {
     await Factory.registerUserToApplication({ application: application });
     const rootKey = await application.protocolService.getRootKeyFromKeychain();
     expect(rootKey.keyParams).toBeTruthy();
+    application.deinit();
   });
 
   it('key params should be persisted separately and not as part of root key', async function () {
@@ -624,6 +647,7 @@ describe('keys', function () {
       StorageValueModes.Nonwrapped
     );
     expect(rawKeyParams).toBeTruthy();
+    application.deinit();
   });
 
   it('persisted key params should exactly equal in memory rootKey.keyParams', async function () {
@@ -635,6 +659,7 @@ describe('keys', function () {
       StorageValueModes.Nonwrapped
     );
     expect(rootKey.keyParams.content).toEqual(rawKeyParams);
+    application.deinit();
   });
 
   it('key params should have expected values', async function () {
@@ -650,6 +675,7 @@ describe('keys', function () {
     expect(keyParams.email).toBeFalsy();
     expect(keyParams.pw_cost).toBeFalsy();
     expect(keyParams.pw_salt).toBeFalsy();
+    application.deinit();
   });
 
   it('key params obtained when signing in should have created and origination', async function () {
@@ -672,6 +698,7 @@ describe('keys', function () {
 
     expect(keyParams.created).toBeTruthy();
     expect(keyParams.origination).toBe(KeyParamsOrigination.Registration);
+    application.deinit();
   });
 
   it('key params for 003 account should still have origination and created', async function () {
@@ -691,6 +718,7 @@ describe('keys', function () {
 
     expect(keyParams.created).toBeTruthy();
     expect(keyParams.origination).toBe(KeyParamsOrigination.Registration);
+    application.deinit();
   });
 
   it('encryption name should be dependent on key params version', async function () {
@@ -714,6 +742,7 @@ describe('keys', function () {
     expect(
       await application.protocolService.getEncryptionDisplayName()
     ).toBe('XChaCha20-Poly1305');
+    application.deinit();
   });
 
   it('when launching app with no keychain but data, should present account recovery challenge', async function () {
@@ -747,6 +776,7 @@ describe('keys', function () {
 
     expect(recreatedApp.protocolService.rootKey).toBeTruthy();
     expect(totalChallenges).toBe(expectedChallenges);
+    application.deinit();
   });
 
   describe('changing password on 003 client while signed into 004 client should', function () {
@@ -880,6 +910,7 @@ describe('keys', function () {
 
       /** Expect a new items key to be created based on the new root key */
       expect(refreshedApp.itemManager.itemsKeys().length).toBe(2);
+      application.deinit();
     });
   });
 
@@ -919,6 +950,7 @@ describe('keys', function () {
         EncryptionIntent.Sync
       )
     ).toBeTruthy();
+    application.deinit();
   });
 
   it('having unsynced items keys should resync them upon download first sync completion', async function () {
@@ -937,5 +969,6 @@ describe('keys', function () {
     });
     const updatedKey = application.findItem(itemsKey.uuid);
     expect(updatedKey.neverSynced).toBe(false);
+    application.deinit();
   });
 });
