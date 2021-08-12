@@ -28,5 +28,5 @@ export type Feature = {
     borderColor: string;
   };
   deletionWarning?: string;
-  expiresAt?: number;
+  expiresAt?: Date;
 };
