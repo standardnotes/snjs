@@ -2,10 +2,10 @@ import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
-import { Role } from '@standardnotes/auth';
+import { RoleName } from '@standardnotes/auth';
 
 export class SNFeaturesService extends PureService<void> {
-  private roles: Role[] = [];
+  private roles: RoleName[] = [];
   private webSocket?: WebSocket;
 
   constructor(
@@ -20,7 +20,7 @@ export class SNFeaturesService extends PureService<void> {
       (await this.storageService.getValue(StorageKey.UserRoles)) || [];
   }
 
-  public async updateRoles(roles: Role[]): Promise<void> {
+  public async updateRoles(roles: RoleName[]): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
     if (userRolesChanged) {
       this.setRoles(roles);
@@ -59,15 +59,15 @@ export class SNFeaturesService extends PureService<void> {
     this.webSocket?.close();
   }
 
-  private async setRoles(roles: Role[]): Promise<void> {
+  private async setRoles(roles: RoleName[]): Promise<void> {
     this.roles = roles;
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  private haveRolesChanged(roles: Role[]): boolean {
+  private haveRolesChanged(roles: RoleName[]): boolean {
     return roles.some(
       (role) =>
-        !this.roles.find((existingRole) => existingRole.uuid === role.uuid)
+        !this.roles.includes(role)
     );
   }
 
@@ -77,9 +77,9 @@ export class SNFeaturesService extends PureService<void> {
 
   private async onWebSocketMessage(event: MessageEvent) {
     const {
-      payload: { roles },
+      payload: { currentRoles },
     }: UserRolesChangedEvent = JSON.parse(event.data);
-    this.setRoles(roles);
+    this.setRoles(currentRoles);
     await this.updateFeatures();
   }
 
