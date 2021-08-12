@@ -1,7 +1,8 @@
 import {
   Platform,
   Environment,
-  StorageKey
+  StorageKey,
+  DeinitSource
 } from '@Lib/index';
 import { Permission, Role } from '@standardnotes/auth';
 import { createInitAppWithRandNamespace, generateUuid } from '../factory';
@@ -32,6 +33,7 @@ describe('permissions', () => {
       const storedPermissions = application.storageService.getValue(StorageKey.UserPermissions);
       expect(storedPermissions).toHaveLength(1)
       expect(storedPermissions.some(p => p.name === permissions[0].name)).toBe(true);
+      application.deinit(DeinitSource.SignOut);
     });
   });
 
@@ -40,6 +42,7 @@ describe('permissions', () => {
       const application = await createInitAppWithRandNamespace(Environment.Web, Platform.LinuxWeb);
       await application.permissionsService.update(roles, permissions);
       expect(application.hasPermission(permissions[0].name)).toBe(true);
+      application.deinit(DeinitSource.SignOut);
     });
 
     it('returns false if user does not have permission', async () => {
@@ -47,6 +50,7 @@ describe('permissions', () => {
       const MISSING_PERMISSION_NAME = "EXTENDED_NOTE_HISTORY";
       await application.permissionsService.update(roles, permissions);
       expect(application.hasPermission(MISSING_PERMISSION_NAME)).toBe(false);
+      application.deinit(DeinitSource.SignOut);
     });
   });
 
@@ -58,6 +62,7 @@ describe('permissions', () => {
       
       const storedUrl = application.storageService.getValue(StorageKey.WebSocketUrl);
       expect(storedUrl).toBe(webSocketUrl);
+      application.deinit(DeinitSource.SignOut);
     }); 
   });
 });
