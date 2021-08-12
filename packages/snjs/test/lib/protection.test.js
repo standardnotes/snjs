@@ -44,6 +44,7 @@ describe('protections', function () {
 
     expect(await application.authorizeNoteAccess(note)).toBe(true);
     expect(challengePrompts).toBe(1);
+    application.deinit();
   });
 
   it('sets `note.protected` to true', async function () {
@@ -51,6 +52,7 @@ describe('protections', function () {
     let note = await Factory.createMappedNote(application);
     note = await application.protectNote(note);
     expect(note.protected).toBe(true);
+    application.deinit();
   });
 
   it('prompts for passcode when accessing protected note', async function () {
@@ -87,6 +89,7 @@ describe('protections', function () {
 
     expect(await application.authorizeNoteAccess(note)).toBe(true);
     expect(challengePrompts).toBe(1);
+    application.deinit();
   });
 
   it('prompts for passcode when unprotecting a note', async function () {
@@ -125,6 +128,7 @@ describe('protections', function () {
     expect(note.uuid).toBe(uuid);
     expect(note.protected).toBe(false);
     expect(challengePrompts).toBe(1);
+    application.deinit();
   });
 
   it('does not unprotect note if challenge is canceled', async function () {
@@ -146,6 +150,7 @@ describe('protections', function () {
     const result = await application.unprotectNote(note);
     expect(result).toBeUndefined();
     expect(challengePrompts).toBe(1);
+    application.deinit();
   });
 
   it('does not prompt for passcode again after setting a remember duration', async function () {
@@ -183,6 +188,7 @@ describe('protections', function () {
     expect(await application.authorizeNoteAccess(note)).toBe(true);
     expect(await application.authorizeNoteAccess(note)).toBe(true);
     expect(challengePrompts).toBe(1);
+    application.deinit();
   });
 
   it('prompts for password when adding a passcode', async function () {
@@ -209,6 +215,7 @@ describe('protections', function () {
       });
     });
     application.addPasscode('passcode');
+    await Factory.sleep(2);
     return promise;
   });
 
@@ -219,6 +226,7 @@ describe('protections', function () {
     note = await application.protectNote(note);
 
     expect(await application.authorizeNoteAccess(note)).toBe(true);
+    application.deinit();
   });
 
   it('authorizes autolock interval change', async function () {
@@ -249,6 +257,7 @@ describe('protections', function () {
     await application.addPasscode(passcode);
 
     expect(await application.authorizeAutolockIntervalChange()).toBe(true);
+    application.deinit();
   });
 
   it('authorizes batch manager access', async function () {
@@ -279,6 +288,7 @@ describe('protections', function () {
     await application.addPasscode(passcode);
 
     expect(await application.authorizeAutolockIntervalChange()).toBe(true);
+    application.deinit();
   });
 
   it('handles session length', async function () {
@@ -288,6 +298,7 @@ describe('protections', function () {
     expect(length).toBe(300);
     const expirey = application.getProtectionSessionExpiryDate();
     expect(expirey).toBeTruthy();
+    application.deinit();
   });
 
   it('handles session length', async function () {
@@ -297,24 +308,28 @@ describe('protections', function () {
     expect(length).toBe(300);
     const expirey = application.getProtectionSessionExpiryDate();
     expect(expirey).toBeTruthy();
+    application.deinit();
   });
 
   describe('hasProtectionSources', function () {
     it('no account, no passcode, no biometrics', async function () {
       const application = await Factory.createInitAppWithRandNamespace();
       expect(application.hasProtectionSources()).toBe(false);
+      application.deinit();
     });
 
     it('no account, no passcode, biometrics', async function () {
       const application = await Factory.createInitAppWithRandNamespace();
       await application.enableBiometrics();
       expect(application.hasProtectionSources()).toBe(true);
+      application.deinit();
     });
 
     it('no account, passcode, no biometrics', async function () {
       const application = await Factory.createInitAppWithRandNamespace();
       await application.addPasscode('passcode');
       expect(application.hasProtectionSources()).toBe(true);
+      application.deinit();
     });
 
     it('no account, passcode, biometrics', async function () {
@@ -322,6 +337,7 @@ describe('protections', function () {
       await application.addPasscode('passcode');
       await application.enableBiometrics();
       expect(application.hasProtectionSources()).toBe(true);
+      application.deinit();
     });
 
     it('account, no passcode, no biometrics', async function () {
@@ -332,6 +348,7 @@ describe('protections', function () {
         password: Uuid.GenerateUuidSynchronously(),
       });
       expect(application.hasProtectionSources()).toBe(true);
+      application.deinit();
     });
 
     it('account, no passcode, biometrics', async function () {
@@ -343,6 +360,7 @@ describe('protections', function () {
       });
       await application.enableBiometrics();
       expect(application.hasProtectionSources()).toBe(true);
+      application.deinit();
     });
 
     it('account, passcode, no biometrics', async function () {
@@ -356,6 +374,7 @@ describe('protections', function () {
       Factory.handlePasswordChallenges(application, password);
       await application.addPasscode('passcode');
       expect(application.hasProtectionSources()).toBe(true);
+      application.deinit();
     });
 
     it('account, passcode, biometrics', async function () {
@@ -370,6 +389,7 @@ describe('protections', function () {
       await application.addPasscode('passcode');
       await application.enableBiometrics();
       expect(application.hasProtectionSources()).toBe(true);
+      application.deinit();
     });
   });
 
@@ -378,6 +398,7 @@ describe('protections', function () {
       const application = await Factory.createInitAppWithRandNamespace();
       await application.addPasscode('passcode');
       expect(application.areProtectionsEnabled()).toBe(true);
+      application.deinit();
     });
 
     it('should return false when session length has been set', async function () {
@@ -385,11 +406,13 @@ describe('protections', function () {
       await application.addPasscode('passcode');
       await application.protectionService.setSessionLength(300);
       expect(application.areProtectionsEnabled()).toBe(false);
+      application.deinit();
     });
 
     it('should return false when there are no protection sources', async function () {
       const application = await Factory.createInitAppWithRandNamespace();
       expect(application.areProtectionsEnabled()).toBe(false);
+      application.deinit();
     });
   });
 
@@ -439,6 +462,7 @@ describe('protections', function () {
         ChallengeReason.SelectProtectedNote
       )).toHaveLength(NOTE_COUNT);
       expect(challengePrompts).toBe(1);
+      application.deinit();
     });
 
     it('prompts for passcode once with the right challenge reason when one or more notes are protected', async function () {
@@ -481,6 +505,7 @@ describe('protections', function () {
         ChallengeReason.SelectProtectedNote
       )).toHaveLength(NOTE_COUNT);
       expect(challengePrompts).toBe(1);
+      application.deinit();
     });
 
     it('does not return protected notes if challenge is canceled', async function () {
@@ -507,6 +532,7 @@ describe('protections', function () {
         ChallengeReason.SelectProtectedNote
       )).toHaveLength(1);
       expect(challengePrompts).toBe(1);
+      application.deinit();
     });
   });
 
@@ -521,6 +547,7 @@ describe('protections', function () {
       for (const note of notes) {
         expect(note.protected).toBe(true);
       }
+      application.deinit();
     })
   });
 
@@ -564,6 +591,7 @@ describe('protections', function () {
         expect(note.protected).toBe(false);
       }
       expect(challengePrompts).toBe(1);
+      application.deinit();
     });
 
     it('prompts for passcode and unprotects all notes if challenge is succesful', async function () {
@@ -605,6 +633,7 @@ describe('protections', function () {
         expect(note.protected).toBe(false);
       }
       expect(challengePrompts).toBe(1);
+      application.deinit();
     });
 
     it('does not unprotect any notes if challenge is canceled', async function () {
@@ -630,6 +659,7 @@ describe('protections', function () {
         expect(note.protected).toBe(true);
       }
       expect(challengePrompts).toBe(1);
+      application.deinit();
     })
   })
 });
