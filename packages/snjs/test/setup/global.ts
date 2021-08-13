@@ -1,4 +1,5 @@
-const Storage = require('dom-storage');
+import Storage from 'dom-storage';
+
 // @ts-ignore
 global.window.localStorage = new Storage(null, { strict: false });
 
@@ -17,5 +18,3 @@ if (!process.env.LISTENING_TO_UNHANDLED_REJECTION) {
   // Avoid memory leak by adding too many listeners.
   process.env.LISTENING_TO_UNHANDLED_REJECTION = true;
 }
-
-export {};
