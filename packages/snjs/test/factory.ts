@@ -108,6 +108,11 @@ export async function createAppContext(identifier?: string) {
   };
 }
 
+export async function safeDeinit(application: SNApplication) {
+  await application.prepareForDeinit();
+  application.deinit(DeinitSource.SignOut);
+}
+
 export function getDefaultHost() {
   return 'http://localhost:3123';
 }
@@ -535,19 +540,21 @@ export function ignoreChallenges(application: SNApplication) {
   });
 }
 
-export function handlePasswordChallenges(application: SNApplication, password: string) {
-  application.setLaunchCallback({
-    receiveChallenge: (challenge) => {
-      const values = challenge.prompts.map(
-        (prompt) =>
-          new ChallengeValue(
-            prompt,
-            prompt.validation === ChallengeValidation.ProtectionSessionDuration
-              ? 0
-              : password
-          )
-      );
-      application.submitValuesForChallenge(challenge, values);
-    },
-  });
+export async function handlePasswordChallenges(application: SNApplication, password: string) {
+  return new Promise((resolve) => {
+    application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.ProtectionSessionDuration
+                ? 0
+                : password
+            )
+        );
+        application.submitValuesForChallenge(challenge, values).then(resolve);
+      },
+    });
+  })
 }

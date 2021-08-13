@@ -89,7 +89,7 @@ describe('protections', function () {
 
     expect(await application.authorizeNoteAccess(note)).toBe(true);
     expect(challengePrompts).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('prompts for passcode when unprotecting a note', async function () {
@@ -128,7 +128,7 @@ describe('protections', function () {
     expect(note.uuid).toBe(uuid);
     expect(note.protected).toBe(false);
     expect(challengePrompts).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('does not unprotect note if challenge is canceled', async function () {
@@ -150,7 +150,7 @@ describe('protections', function () {
     const result = await application.unprotectNote(note);
     expect(result).toBeUndefined();
     expect(challengePrompts).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('does not prompt for passcode again after setting a remember duration', async function () {
@@ -188,7 +188,7 @@ describe('protections', function () {
     expect(await application.authorizeNoteAccess(note)).toBe(true);
     expect(await application.authorizeNoteAccess(note)).toBe(true);
     expect(challengePrompts).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('prompts for password when adding a passcode', async function () {
@@ -371,10 +371,11 @@ describe('protections', function () {
         email: Uuid.GenerateUuidSynchronously(),
         password,
       });
-      Factory.handlePasswordChallenges(application, password);
+      const challengePromise = Factory.handlePasswordChallenges(application, password);
       await application.addPasscode('passcode');
       expect(application.hasProtectionSources()).toBe(true);
-      application.deinit();
+      await challengePromise;
+      await Factory.safeDeinit(application);
     });
 
     it('account, passcode, biometrics', async function () {
@@ -385,11 +386,12 @@ describe('protections', function () {
         email: Uuid.GenerateUuidSynchronously(),
         password,
       });
-      Factory.handlePasswordChallenges(application, password);
+      const challengePromise = Factory.handlePasswordChallenges(application, password);
       await application.addPasscode('passcode');
       await application.enableBiometrics();
       expect(application.hasProtectionSources()).toBe(true);
-      application.deinit();
+      await challengePromise;
+      await Factory.safeDeinit(application);
     });
   });
 
@@ -586,7 +588,7 @@ describe('protections', function () {
       let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT);
       notes = await application.protectNotes(notes);
       notes = await application.unprotectNotes(notes);
-      
+
       for (const note of notes) {
         expect(note.protected).toBe(false);
       }
@@ -628,7 +630,7 @@ describe('protections', function () {
       let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT);
       notes = await application.protectNotes(notes);
       notes = await application.unprotectNotes(notes);
-      
+
       for (const note of notes) {
         expect(note.protected).toBe(false);
       }
@@ -654,7 +656,7 @@ describe('protections', function () {
       let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT);
       notes = await application.protectNotes(notes);
       notes = await application.unprotectNotes(notes);
-      
+
       for (const note of notes) {
         expect(note.protected).toBe(true);
       }
