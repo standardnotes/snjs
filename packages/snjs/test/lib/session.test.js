@@ -45,7 +45,7 @@ describe('server session', function () {
     const response = await application.apiService.sync([]);
 
     expect(response.status).toBe(200);
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it('should return the new session in the response when refreshed', async function () {
@@ -59,7 +59,7 @@ describe('server session', function () {
     expect(response.data.session.access_token).not.toHaveLength(0);
     expect(typeof response.data.session.refresh_expiration).toBe('number');
     expect(response.data.session.refresh_token).not.toHaveLength(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should be refreshed on any api call if access token is expired', async function () {
@@ -84,7 +84,7 @@ describe('server session', function () {
     expect(sessionBeforeSync.accessExpiration).toBeLessThan(sessionAfterSync.accessExpiration);
     // New token should expire in the future.
     expect(sessionAfterSync.accessExpiration).toBeGreaterThan(Date.now());
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it('should succeed when a sync request is perfomed after signing into an ephemeral session', async function () {
@@ -99,7 +99,7 @@ describe('server session', function () {
 
     const response = await application.apiService.sync([]);
     expect(response.status).toBe(200);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should succeed when a sync request is perfomed after registering into an ephemeral session', async function () {
@@ -108,7 +108,7 @@ describe('server session', function () {
     });
     const response = await application.apiService.sync([]);
     expect(response.status).toBe(200);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should be consistent between storage and apiService', async function () {
@@ -128,7 +128,7 @@ describe('server session', function () {
     const updatedSessionFromApiService = application.apiService.getSession();
 
     expect(updatedSessionFromStorage).toBe(updatedSessionFromApiService);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should be performed successfully and terminate session with a valid access token', async function () {
@@ -143,7 +143,7 @@ describe('server session', function () {
     expect(syncResponse.status).toBe(401);
     expect(syncResponse.error.tag).toBe('invalid-auth');
     expect(syncResponse.error.message).toBe('Invalid login credentials.');
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('sign out request should be performed successfully and terminate session with expired access token', async function () {
@@ -161,7 +161,7 @@ describe('server session', function () {
     expect(syncResponse.status).toBe(401);
     expect(syncResponse.error.tag).toBe('invalid-auth');
     expect(syncResponse.error.message).toBe('Invalid login credentials.');
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it('change password request should be successful with a valid access token', async function () {
@@ -187,7 +187,7 @@ describe('server session', function () {
 
     expect(loginResponse).toBeTruthy();
     expect(loginResponse.status).toBe(200);
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it.skip('change password request should be successful after the expired access token is refreshed', async function () {
@@ -247,7 +247,7 @@ describe('server session', function () {
 
     expect(loginResponse).toBeTruthy();
     expect(loginResponse.status).toBe(401);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('change password request should fail with an expired refresh token', async function () {
@@ -286,7 +286,7 @@ describe('server session', function () {
 
     expect(loginResponseWithOldPassword).toBeTruthy();
     expect(loginResponseWithOldPassword.status).toBe(200);
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it('should sign in successfully after signing out', async function () {
@@ -304,7 +304,7 @@ describe('server session', function () {
     expect(currentSession.accessToken).toBeTruthy();
     expect(currentSession.refreshToken).toBeTruthy();
     expect(currentSession.accessExpiration).toBeGreaterThan(Date.now());
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should fail when renewing a session with an expired refresh token', async function () {
@@ -328,7 +328,7 @@ describe('server session', function () {
     expect(syncResponse.status).toBe(401);
     expect(syncResponse.error.tag).toBe('invalid-auth');
     expect(syncResponse.error.message).toBe('Invalid login credentials.');
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it('should fail when renewing a session with an invalid refresh token', async function () {
@@ -349,7 +349,7 @@ describe('server session', function () {
     // Access token should remain valid.
     const syncResponse = await application.apiService.sync([]);
     expect(syncResponse.status).toBe(200);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should fail if syncing while a session refresh is in progress', async function () {
@@ -366,7 +366,7 @@ describe('server session', function () {
     expect(syncResponse.error.message).toBe(errorMessage);
     /** Wait for finish so that test cleans up properly */
     await refreshPromise;
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('notes should be synced as expected after refreshing a session', async function () {
@@ -407,7 +407,7 @@ describe('server session', function () {
       );
       expect(aNoteBeforeSync.isItemContentEqualWith(noteResult)).toBe(true);
     }
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it('changing password on one client should not invalidate other sessions', async function () {
@@ -497,7 +497,7 @@ describe('server session', function () {
     });
     const response = await application.apiService.getSessionsList();
     expect(response.data[0].current).toBe(true);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('signing out should delete session from all list', async function () {
@@ -516,7 +516,7 @@ describe('server session', function () {
 
     const response2 = await application.apiService.getSessionsList();
     expect(response2.data.length).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('revoking a session should destroy local data', async function () {
@@ -564,7 +564,7 @@ describe('server session', function () {
       app2identifier
     );
     expect(Object.keys(payloads)).toHaveLength(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
     app2.deinit();
   }, Factory.LongTestTimeout);
 
@@ -584,6 +584,6 @@ describe('server session', function () {
     await application.signOut();
     storageValue = await application.deviceInterface.getRawStorageValue(storageKey);
     expect(storageValue).toBeFalsy();
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 });

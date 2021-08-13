@@ -14,7 +14,7 @@ describe('device authentication', function () {
     expect(application.hasPasscode()).toBe(true);
     expect(application.protectionService.createLaunchChallenge()).toBeTruthy();
     expect(application.protocolService.keyMode).toBe(KeyMode.WrapperOnly);
-    application.deinit();
+    await Factory.safeDeinit(application);
 
     /** Recreate application and initialize */
     const tmpApplication = Factory.createApplication(namespace);
@@ -49,7 +49,7 @@ describe('device authentication', function () {
     await tmpApplication.launch(true);
     expect(tmpApplication.protocolService.getRootKey()).toBeTruthy();
     expect(tmpApplication.protocolService.keyMode).toBe(KeyMode.WrapperOnly);
-    tmpApplication.deinit();
+    await Factory.safeDeinit(tmpApplication);
   }, 10000);
 
   it('handles application launch with passcode and biometrics', async function () {
@@ -65,7 +65,7 @@ describe('device authentication', function () {
         .length
     ).toBe(2);
     expect(application.protocolService.keyMode).toBe(KeyMode.WrapperOnly);
-    application.deinit();
+    await Factory.safeDeinit(application);
 
     /** Recreate application and initialize */
     const tmpApplication = Factory.createApplication(namespace);
@@ -105,7 +105,7 @@ describe('device authentication', function () {
     await tmpApplication.launch(true);
     expect(tmpApplication.protocolService.getRootKey()).toBeTruthy();
     expect(tmpApplication.protocolService.keyMode).toBe(KeyMode.WrapperOnly);
-    tmpApplication.deinit();
+    await Factory.safeDeinit(tmpApplication);
   }, 20000);
 
   it('handles application launch with passcode and account', async function () {
@@ -130,7 +130,7 @@ describe('device authentication', function () {
     await application.addPasscode(passcode);
     expect(application.protocolService.keyMode).toBe(KeyMode.RootKeyPlusWrapper);
     expect(application.hasPasscode()).toBe(true);
-    application.deinit();
+    await Factory.safeDeinit(application);
 
     const wrongPasscode = 'barfoo';
     let numPasscodeAttempts = 1;
@@ -171,6 +171,6 @@ describe('device authentication', function () {
     ).toBe(sampleStorageValue);
     expect(tmpApplication.protocolService.getRootKey()).toBeTruthy();
     expect(tmpApplication.protocolService.keyMode).toBe(KeyMode.RootKeyPlusWrapper);
-    tmpApplication.deinit();
+    await Factory.safeDeinit(tmpApplication);
   }, 10000);
 });

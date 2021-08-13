@@ -69,7 +69,7 @@ describe('key recovery service', function () {
     expect(application.findItem(encrypted.uuid).errorDecrypting).toBe(false);
 
     expect(application.syncService.isOutOfSync()).toBe(false);
-    context.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('when encountering many undecryptable items key with same key params, should only prompt once', async function () {
@@ -134,7 +134,7 @@ describe('key recovery service', function () {
     expect(totalPromptCount).toBe(1);
 
     expect(application.syncService.isOutOfSync()).toBe(false);
-    context.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('when changing password on another client, it should prompt us for new account password', async function () {
@@ -226,6 +226,8 @@ describe('key recovery service', function () {
 
     expect(appA.syncService.isOutOfSync()).toBe(false);
     expect(appB.syncService.isOutOfSync()).toBe(false);
+    await Factory.safeDeinit(appA);
+    await Factory.safeDeinit(appB);
   }, 80000);
 
   it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
@@ -271,8 +273,8 @@ describe('key recovery service', function () {
     console.warn(
       'Expecting exceptions below as we destroy app during key recovery'
     );
-    appA.deinit();
-    appB.deinit();
+    await Factory.safeDeinit(appA);
+    await Factory.safeDeinit(appB);
 
     const recreatedAppA = Factory.createApplication(namespace);
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} });
@@ -280,7 +282,7 @@ describe('key recovery service', function () {
 
     expect(recreatedAppA.findItem(note.uuid).errorDecrypting).toBe(true);
     expect(recreatedAppA.findItem(note.uuid).waitingForKey).toBe(true);
-    recreatedAppA.deinit();
+    await Factory.safeDeinit(recreatedAppA);
   });
 
   it('when client key params differ from server, and no matching items key exists, should perform sign in flow', async function () {
@@ -354,7 +356,7 @@ describe('key recovery service', function () {
     expect(clientRootKey.compare(correctRootKey)).toBe(true);
 
     expect(application.syncService.isOutOfSync()).toBe(false);
-    context.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it(`when encountering an items key that cannot be decrypted, for which we already have a decrypted value,
@@ -414,7 +416,7 @@ describe('key recovery service', function () {
     expect(latestItemsKey.serverUpdatedAt.getTime()).toBe(newUpdated.getTime());
 
     expect(application.syncService.isOutOfSync()).toBe(false);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('application should prompt to recover undecryptables on launch', async function () {
@@ -449,7 +451,7 @@ describe('key recovery service', function () {
     );
     await Factory.sleep(0.1);
     expect(application.syncService.isOutOfSync()).toBe(false);
-    context.deinit();
+    await Factory.safeDeinit(application);
 
     /** Recreate application, and expect key recovery wizard to complete */
     const recreatedApp = Factory.createApplication(namespace);
@@ -476,7 +478,7 @@ describe('key recovery service', function () {
     expect(latestItemsKey.itemsKey).toBe(itemsKey.itemsKey);
 
     expect(recreatedApp.syncService.isOutOfSync()).toBe(false);
-    recreatedApp.deinit();
+    await Factory.safeDeinit(recreatedApp);
   });
 
   it('when encountering an undecryptable 003 items key, should recover through recovery wizard', async function () {
@@ -538,6 +540,6 @@ describe('key recovery service', function () {
     expect(application.findItem(encrypted.uuid).errorDecrypting).toBe(false);
 
     expect(application.syncService.isOutOfSync()).toBe(false);
-    context.deinit();
+    await Factory.safeDeinit(application);
   });
 });

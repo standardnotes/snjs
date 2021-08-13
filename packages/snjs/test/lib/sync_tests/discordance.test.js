@@ -38,7 +38,7 @@ describe('sync discordance', () => {
     expect(application.syncService.isOutOfSync()).toBe(false);
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should abort integrity computation if any single item is missing updated_at_timestamp', async function () {
@@ -100,7 +100,7 @@ describe('sync discordance', () => {
 
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should increase discordance as client server mismatches', async function () {
@@ -153,7 +153,7 @@ describe('sync discordance', () => {
 
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should perform sync resolution in which differing items are duplicated instead of merged', async function () {
@@ -212,6 +212,6 @@ describe('sync discordance', () => {
 
     const rawPayloads = await application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).toBe(expectedItemCount);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 });
