@@ -75,7 +75,7 @@ describe('preferences', function () {
     application.deinit();
   }, 10000);
 
-  it.skip('reads stored preferences on start without waiting for syncing to complete', async function () {
+  it('reads stored preferences on start without waiting for syncing to complete', async function () {
     const prefKey = 'editorLeft';
     const prefValue = 300;
     const identifier = application.identifier;

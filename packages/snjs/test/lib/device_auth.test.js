@@ -108,7 +108,7 @@ describe('device authentication', function () {
     tmpApplication.deinit();
   }, 20000);
 
-  it.skip('handles application launch with passcode and account', async function () {
+  it('handles application launch with passcode and account', async function () {
     const namespace = Factory.randomString();
     const application = await Factory.createAndInitializeApplication(namespace);
     const email = Uuid.GenerateUuidSynchronously();
