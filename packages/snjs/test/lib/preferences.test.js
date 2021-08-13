@@ -76,11 +76,11 @@ describe('preferences', function () {
   }, 10000);
 
   it('reads stored preferences on start without waiting for syncing to complete', async function () {
+    let { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const prefKey = 'editorLeft';
     const prefValue = 300;
     const identifier = application.identifier;
 
-    await register();
     await application.setPreference(prefKey, prefValue);
     await application.sync();
 
