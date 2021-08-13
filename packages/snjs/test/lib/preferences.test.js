@@ -90,11 +90,12 @@ describe('preferences', function () {
     const willSyncPromise = new Promise((resolve) => {
       application.addEventObserver(resolve, ApplicationEvent.WillSync);
     });
-    Factory.initializeApplication(application);
+    const appInitPromise = Factory.initializeApplication(application);
     await willSyncPromise;
 
     expect(application.preferencesService.preferences).toBeDefined();
     expect(application.getPreference(prefKey)).toBe(prefValue);
+    await appInitPromise;
     application.deinit();
   });
 });
