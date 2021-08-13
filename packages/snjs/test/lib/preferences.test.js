@@ -6,7 +6,7 @@ describe('preferences', function () {
     const { application } = await Factory.createAndInitSimpleAppContext();
     await application.setPreference('editorLeft', 300);
     expect(application.getPreference('editorLeft')).toBe(300);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('saves preference', async function () {
@@ -20,7 +20,7 @@ describe('preferences', function () {
     );
     const editorLeft = application.getPreference('editorLeft');
     expect(editorLeft).toBe(300);
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, 10000);
 
   it('clears preferences on signout', async function () {
@@ -31,14 +31,14 @@ describe('preferences', function () {
       application
     );
     expect(application.getPreference('editorLeft')).toBeUndefined();
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('returns default value for non-existent preference', async function () {
     const { application } = await Factory.createAndInitSimpleAppContext({ registerUser: true });
     const editorLeft = application.getPreference('editorLeft', 100);
     expect(editorLeft).toBe(100);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('emits an event when preferences change', async function () {
@@ -57,7 +57,7 @@ describe('preferences', function () {
     });
     await application.setPreference('editorLeft', 300);
     expect(callTimes).toBe(2);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('discards existing preferences when signing in', async function () {
@@ -72,7 +72,7 @@ describe('preferences', function () {
     await application.sync({ awaitAll: true });
     const editorLeft = application.getPreference('editorLeft');
     expect(editorLeft).toBe(300);
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, 10000);
 
   it('reads stored preferences on start without waiting for syncing to complete', async function () {
@@ -84,7 +84,7 @@ describe('preferences', function () {
     await application.setPreference(prefKey, prefValue);
     await application.sync();
 
-    application.deinit();
+    await Factory.safeDeinit(application);
 
     application = Factory.createApplication(identifier);
     const willSyncPromise = new Promise((resolve) => {
@@ -96,6 +96,6 @@ describe('preferences', function () {
     expect(application.preferencesService.preferences).toBeDefined();
     expect(application.getPreference(prefKey)).toBe(prefValue);
     await appInitPromise;
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 });
