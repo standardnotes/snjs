@@ -30,9 +30,9 @@ describe('importing', function () {
     const result = await application.importData({
       version: '-1',
       items: [],
-    });
+    }, true);
     expect(result.error).toBeDefined();
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should not import backups made from 004 into 003 account', async function () {
@@ -46,9 +46,9 @@ describe('importing', function () {
     const result = await application.importData({
       version: ProtocolVersion.V004,
       items: [],
-    });
+    }, true);
     expect(result.error).toBeDefined();
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('importing existing data should keep relationships valid', async function () {
@@ -89,7 +89,7 @@ describe('importing', function () {
     expect(
       application.itemManager.itemsReferencingItem(note.uuid).length
     ).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('importing same note many times should create only one duplicate', async function () {
@@ -122,7 +122,7 @@ describe('importing', function () {
       (n) => n.uuid !== notePayload.uuid
     );
     expect(imported.content.title).toBe(mutatedNote.content.title);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('importing a tag with lesser references should not create duplicate', async function () {
@@ -150,7 +150,7 @@ describe('importing', function () {
       application.itemManager.findItem(tagPayload.uuid).content.references
         .length
     ).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('importing data with differing content should create duplicates', async function () {
@@ -214,7 +214,7 @@ describe('importing', function () {
     expect(
       application.itemManager.itemsReferencingItem(newNote.uuid).length
     ).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('when importing items, imported values should not be used to determine if changed', async function () {
@@ -270,7 +270,7 @@ describe('importing', function () {
     const refreshedTag = application.itemManager.findItem(tag.uuid);
     /** References from both items have merged. */
     expect(refreshedTag.content.references.length).toBe(2);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should import decrypted data and keep items that were previously deleted', async function () {
@@ -303,7 +303,7 @@ describe('importing', function () {
     expect(application.findItem(tag.uuid).deleted).toBe(false);
     expect(application.itemManager.tags.length).toBe(1);
     expect(application.findItem(note.uuid).deleted).toBe(false);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
@@ -336,7 +336,7 @@ describe('importing', function () {
 
     expect(application.itemManager.notes.length).toBe(1);
     expect(application.itemManager.notes[0].uuid).not.toBe(note.uuid);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should maintain consistency between storage and PayloadManager after an import with conflicts', async function () {
@@ -377,7 +377,7 @@ describe('importing', function () {
     );
     expect(notes.length).toBe(1);
     expect(itemsKeys.length).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should import encrypted data and keep items that were previously deleted', async function () {
@@ -409,7 +409,7 @@ describe('importing', function () {
     expect(application.findItem(tag.uuid).deleted).toBe(false);
     expect(application.itemManager.tags.length).toBe(1);
     expect(application.findItem(note.uuid).deleted).toBe(false);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should import decrypted data and all items payload source should be FileImport', async function () {
@@ -429,7 +429,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -439,7 +439,7 @@ describe('importing', function () {
     const importedTag = application.findItem(tag.uuid);
     expect(importedNote.payload.source).toBe(PayloadSource.FileImport);
     expect(importedTag.payload.source).toBe(PayloadSource.FileImport);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should import encrypted data and all items payload source should be FileImport', async function () {
@@ -459,7 +459,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -469,7 +469,7 @@ describe('importing', function () {
     const importedTag = application.findItem(tag.uuid);
     expect(importedNote.payload.source).toBe(PayloadSource.FileImport);
     expect(importedTag.payload.source).toBe(PayloadSource.FileImport);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should import data from 003 encrypted payload using client generated backup', async function () {
@@ -494,7 +494,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -507,7 +507,7 @@ describe('importing', function () {
     expect(decryptedNote.title).toBe('Encrypted note');
     expect(decryptedNote.text).toBe('On protocol version 003.');
     expect(application.itemManager.notes.length).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should import data from 003 encrypted payload using server generated backup with 004 key params', async function () {
@@ -560,7 +560,7 @@ describe('importing', function () {
     expect(result).toBeDefined();
     expect(result.affectedItems.length).toBe(backupData.items.length);
     expect(result.errorCount).toBe(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should import data from 004 encrypted payload', async function () {
@@ -583,7 +583,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -596,7 +596,7 @@ describe('importing', function () {
     expect(decryptedNote.title).toBe('Encrypted note');
     expect(decryptedNote.text).toBe('On protocol version 004.');
     expect(application.itemManager.notes.length).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should return correct errorCount', async function () {
@@ -619,7 +619,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -637,7 +637,7 @@ describe('importing', function () {
     expect(result).toBeDefined();
     expect(result.affectedItems.length).toBe(backupData.items.length - 1);
     expect(result.errorCount).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
@@ -659,7 +659,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -680,7 +680,7 @@ describe('importing', function () {
     expect(result.affectedItems.length).toBe(0);
     expect(result.errorCount).toBe(backupData.items.length);
     expect(application.itemManager.notes.length).toBe(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should not import data from 004 encrypted payload if an invalid password is provided', async function () {
@@ -700,7 +700,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -716,7 +716,7 @@ describe('importing', function () {
     expect(result.affectedItems.length).toBe(0);
     expect(result.errorCount).toBe(backupData.items.length);
     expect(application.itemManager.notes.length).toBe(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should not import encrypted data with no keyParams or auth_params', async function () {
@@ -737,16 +737,16 @@ describe('importing', function () {
     );
     delete backupData.keyParams;
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
 
-    const result = await application.importData(backupData);
+    const result = await application.importData(backupData, true);
 
     expect(result).toBeDefined();
     expect(result.affectedItems.length).toBe(0);
     expect(result.errorCount).toBe(backupData.items.length);
     expect(application.itemManager.notes.length).toBe(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
@@ -770,7 +770,7 @@ describe('importing', function () {
       (payload) => payload.content_type !== ContentType.ItemsKey
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application);
 
@@ -780,7 +780,7 @@ describe('importing', function () {
     expect(result.affectedItems.length).toBe(0);
     expect(result.errorCount).toBe(backupData.items.length);
     expect(application.itemManager.notes.length).toBe(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('importing data with no items key should use the root key generated by the file password', async function () {
@@ -911,9 +911,9 @@ describe('importing', function () {
         version: '003',
       },
     };
-    const result = await application.importData(backupFile, true);
+    const result = await application.importData(backupFile, false);
     expect(result.errorCount).toBe(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
   it('importing another accounts notes/tags should correctly keep relationships', async function () {
@@ -937,7 +937,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    application.deinit();
+    await Factory.safeDeinit(application);
     application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(application, password);
 
@@ -961,6 +961,6 @@ describe('importing', function () {
       application.itemManager.itemsReferencingItem(importedNote.uuid)
         .length
     ).toBe(1);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 });
