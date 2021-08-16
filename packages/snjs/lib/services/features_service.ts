@@ -193,6 +193,7 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   deinit(): void {
+    super.deinit();
     this.removeApiServiceObserver?.();
     this.closeWebSocketConnection();
     (this.removeApiServiceObserver as unknown) = undefined;
