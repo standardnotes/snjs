@@ -181,15 +181,15 @@ export class SNApiService extends PureService {
     return response;
   }
 
-  private async processMetaObject(meta: ResponseMeta) {
+  private processMetaObject(meta: ResponseMeta) {
     if (meta.auth && meta.auth.roles && meta.auth.permissions) {
-      await this.permissionsService.update(meta.auth.roles, meta.auth.permissions);
+      void this.permissionsService?.update(meta.auth.roles, meta.auth.permissions);
     }
   }
 
-  private async processResponse(response: HttpResponse) {
+  private processResponse(response: HttpResponse) {
     if (response.meta) {
-      await this.processMetaObject(response.meta);
+      this.processMetaObject(response.meta);
     }
   }
 

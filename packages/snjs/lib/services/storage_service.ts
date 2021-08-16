@@ -218,7 +218,7 @@ export class SNStorageService extends PureService {
   private async immediatelyPersistValuesToDisk(): Promise<StorageValuesObject> {
     return this.executeCriticalFunction(async () => {
       const values = await this.generatePersistableValues();
-      await this.deviceInterface!.setRawStorageValue(
+      await this.deviceInterface?.setRawStorageValue(
         this.getPersistenceKey(),
         JSON.stringify(values)
       );
