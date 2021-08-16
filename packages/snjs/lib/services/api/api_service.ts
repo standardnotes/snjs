@@ -351,7 +351,7 @@ export class SNApiService extends PureService {
         );
       });
 
-    await this.processResponse(response);
+    this.processResponse(response);
 
     this.changing = false;
     return response;
@@ -396,7 +396,7 @@ export class SNApiService extends PureService {
           messages.API_MESSAGE_GENERIC_SYNC_FAIL
         );
       });
-    await this.processResponse(response);
+    this.processResponse(response);
 
     return response;
   }
@@ -438,7 +438,7 @@ export class SNApiService extends PureService {
           response as SessionRenewalResponse
         );
         await this.setSession(session);
-        await this.processResponse(response);
+        this.processResponse(response);
         return response;
       })
       .catch((errorResponse) => {
@@ -473,7 +473,7 @@ export class SNApiService extends PureService {
           messages.API_MESSAGE_GENERIC_SYNC_FAIL
         );
       });
-    await this.processResponse(response);
+    this.processResponse(response);
 
     return response;
   }
@@ -509,7 +509,7 @@ export class SNApiService extends PureService {
           messages.API_MESSAGE_GENERIC_SYNC_FAIL
         );
       });
-    await this.processResponse(response);
+    this.processResponse(response);
     return response;
   }
 
@@ -538,7 +538,7 @@ export class SNApiService extends PureService {
           messages.API_MESSAGE_GENERIC_SYNC_FAIL
         );
       });
-    await this.processResponse(response);
+    this.processResponse(response);
     return response;
   }
 
@@ -571,7 +571,7 @@ export class SNApiService extends PureService {
           messages.API_MESSAGE_GENERIC_SYNC_FAIL
         );
       });
-    await this.processResponse(response);
+    this.processResponse(response);
     return response;
   }
 
