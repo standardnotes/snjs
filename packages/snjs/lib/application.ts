@@ -1454,6 +1454,8 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createChallengeService();
     this.createHttpManager();
     this.createApiService();
+    this.createComponentManager();
+    this.createFeaturesService();
     this.createSessionManager();
     this.createHistoryManager();
     this.createSyncManager();
@@ -1462,8 +1464,6 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createMigrationService();
-    this.createComponentManager();
-    this.createFeaturesService();
     this.createActionsManager();
     this.createPreferencesService();
   }
