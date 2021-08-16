@@ -12,6 +12,8 @@ import { UuidString } from '@Lib/types';
 import { ContentType, Feature } from '@standardnotes/features';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
+import { SNComponentManager } from './component_manager';
+import { SNComponent } from '@Lib/models';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
@@ -22,6 +24,7 @@ export class SNFeaturesService extends PureService<void> {
     private storageService: SNStorageService,
     private apiService: SNApiService,
     private itemManager: ItemManager,
+    private componentManager: SNComponentManager,
     private webSocketUrl: string | undefined
   ) {
     super();
@@ -130,10 +133,12 @@ export class SNFeaturesService extends PureService<void> {
       ContentType.Theme,
     ]);
     const itemsToDeleteUuids = [];
+
     const today = new Date();
 
     for (const feature of features) {
-      const itemData = this.createItemDataForFeature(feature);
+      const expired = feature.expiresAt! < today.getTime();
+      const itemData = this.createItemDataForFeature(feature);      
       const existingItem = currentItems.find((item) => {
         if (
           item.content &&
@@ -145,18 +150,33 @@ export class SNFeaturesService extends PureService<void> {
         }
         return false;
       });
-      if (existingItem) {
-        if (feature.expiresAt! < today.getTime()) {
-          itemsToDeleteUuids.push(existingItem.uuid);
-        } else {
-          await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
-            mutator.setContent(itemData);
-          });
-        }
-      } else if (feature.expiresAt! >= today.getTime()) {
-        await this.itemManager.createItem(feature.contentType, itemData);
+
+      switch (feature.contentType) {
+        case ContentType.Component:
+          if (existingItem) {
+            await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
+              mutator.setContent(itemData);
+            });
+          } else {
+            await this.itemManager.createItem(feature.contentType, itemData);
+          }
+          this.componentManager.setReadonlyStateForComponent(existingItem as SNComponent, expired);
+          break;
+        default:
+          if (existingItem) {
+            await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
+              mutator.setContent(itemData);
+            });
+            if (expired) {
+              itemsToDeleteUuids.push(existingItem.uuid);
+            }
+          } else if (!expired) {
+            await this.itemManager.createItem(feature.contentType, itemData);
+          }
+          break;
       }
     }
+
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
   }
 
