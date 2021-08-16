@@ -146,14 +146,14 @@ export class SNFeaturesService extends PureService<void> {
         return false;
       });
       if (existingItem) {
-        if (feature.expiresAt! < today) {
+        if (feature.expiresAt! < today.getTime()) {
           itemsToDeleteUuids.push(existingItem.uuid);
         } else {
           await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
             mutator.setContent(itemData);
           });
         }
-      } else if (feature.expiresAt! >= today) {
+      } else if (feature.expiresAt! >= today.getTime()) {
         await this.itemManager.createItem(feature.contentType, itemData);
       }
     }
