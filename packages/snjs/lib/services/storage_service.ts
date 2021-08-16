@@ -85,6 +85,7 @@ export class SNStorageService extends PureService {
   public deinit() {
     this.deviceInterface = undefined;
     this.encryptionDelegate = undefined;
+    this.storagePersistable = false;
     super.deinit();
   }
 
