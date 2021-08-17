@@ -1,7 +1,7 @@
 import { ApplicationStage } from '../stages';
 import { Migration } from '@Lib/migrations/migration';
 import { ContentType } from '@Lib/models';
-import { SettingName } from '@Lib/../../settings/dist';
+import { SettingName } from '@standardnotes/settings';
 
 export class Migration2_7_23 extends Migration {
   static version(): string {
