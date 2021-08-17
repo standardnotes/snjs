@@ -17,6 +17,7 @@ import { SNComponent } from '@Lib/models';
 import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
 import { PayloadContent } from '@Lib/protocol';
+import { ComponentContent } from '@Lib/models/app/component';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
@@ -28,7 +29,7 @@ export class SNFeaturesService extends PureService<void> {
     private apiService: SNApiService,
     private itemManager: ItemManager,
     private componentManager: SNComponentManager,
-    private webSocketsService: SNWebSocketsService,
+    private webSocketsService: SNWebSocketsService
   ) {
     super();
 
@@ -94,7 +95,9 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private createItemContentForFeature(feature: Feature): PayloadContent {
+  private createItemContentForFeature(
+    feature: Feature
+  ): PayloadContent & Partial<ComponentContent> {
     return FillItemContent({
       identifier: feature.identifier,
       name: feature.name,
@@ -118,11 +121,9 @@ export class SNFeaturesService extends PureService<void> {
 
     for (const feature of features) {
       const expired = feature.expiresAt! < now.getTime();
-      const itemContent = this.createItemContentForFeature(feature);      
+      const itemContent = this.createItemContentForFeature(feature);
       const existingItem = currentItems.find((item) => {
-        if (
-          item.safeContent.package_info
-        ) {
+        if (item.safeContent.package_info) {
           const itemIdentifier = item.safeContent.package_info.identifier;
           return itemIdentifier === feature.identifier && !item.deleted;
         }
@@ -132,19 +133,28 @@ export class SNFeaturesService extends PureService<void> {
       switch (feature.contentType) {
         case ContentType.Component:
           if (existingItem) {
-            await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
-              mutator.setContent(itemContent);
-            });
+            await this.itemManager.changeComponent(
+              existingItem.uuid,
+              (mutator) => {
+                mutator.setContent(itemContent);
+              }
+            );
           } else {
             await this.itemManager.createItem(feature.contentType, itemContent);
           }
-          this.componentManager.setReadonlyStateForComponent(existingItem as SNComponent, expired);
+          this.componentManager.setReadonlyStateForComponent(
+            existingItem as SNComponent,
+            expired
+          );
           break;
         default:
           if (existingItem) {
-            await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
-              mutator.setContent(itemContent);
-            });
+            await this.itemManager.changeComponent(
+              existingItem.uuid,
+              (mutator) => {
+                mutator.setContent(itemContent);
+              }
+            );
             if (expired) {
               itemsToDeleteUuids.push(existingItem.uuid);
             }

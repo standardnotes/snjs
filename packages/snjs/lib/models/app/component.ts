@@ -49,7 +49,7 @@ export type ComponentPermission = {
   content_types?: ContentType[];
 };
 
-interface ComponentContent {
+export interface ComponentContent {
   componentData: Record<string, any>;
   /** Items that have requested a component to be disabled in its context */
   disassociatedItemIds: string[];
