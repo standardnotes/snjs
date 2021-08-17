@@ -17,7 +17,6 @@ import { SNComponent } from '@Lib/models';
 import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
 import { PayloadContent } from '@Lib/protocol';
-import { ComponentContent } from '@Lib/models/app/component';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];

@@ -617,6 +617,7 @@ export class SNApiService extends PureService<
       });
     this.processResponse(response);
     return response;
+  }
 
   private async tokenRefreshableRequest<T extends MinimalHttpResponse>(
     params: HttpRequest & { fallbackErrorMessage: string }
