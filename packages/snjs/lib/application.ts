@@ -100,6 +100,7 @@ import { HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
+import { SNWebSocketsService } from './services/api/websockets_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -141,6 +142,7 @@ export class SNApplication {
   private preferencesService!: SNPreferencesService;
   private featuresService!: SNFeaturesService;
   private credentialService!: SNCredentialService;
+  private webSocketsService!: SNWebSocketsService;
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService<any, any>[] = [];
@@ -286,7 +288,7 @@ export class SNApplication {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
-    await this.featuresService.loadWebSocketUrl();
+    await this.webSocketsService.loadWebSocketUrl();
     await this.featuresService.loadUserRoles();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
@@ -875,7 +877,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
 
   public async setCustomHost(host: string): Promise<void> {
     await this.apiService.setHost(host);
-    await this.featuresService.setWebSocketUrl(undefined);
+    await this.webSocketsService.setWebSocketUrl(undefined);
   }
 
   public getUser(): User | undefined {
@@ -1454,8 +1456,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createChallengeService();
     this.createHttpManager();
     this.createApiService();
-    this.createComponentManager();
-    this.createFeaturesService();
+    this.createWebSocketsService();
     this.createSessionManager();
     this.createHistoryManager();
     this.createSyncManager();
@@ -1464,6 +1465,8 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createKeyRecoveryService();
     this.createSingletonManager();
     this.createMigrationService();
+    this.createComponentManager();
+    this.createFeaturesService();
     this.createActionsManager();
     this.createPreferencesService();
   }
@@ -1489,6 +1492,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     (this.preferencesService as unknown) = undefined;
     (this.featuresService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
+    (this.webSocketsService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1499,9 +1503,17 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       this.apiService,
       this.itemManager,
       this.componentManager,
-      this.webSocketUrl
+      this.webSocketsService,
     );
     this.services.push(this.featuresService);
+  }
+
+  private createWebSocketsService() {
+    this.webSocketsService = new SNWebSocketsService(
+      this.storageService,
+      this.webSocketUrl,
+    );
+    this.services.push(this.webSocketsService);
   }
 
   private createMigrationService() {
@@ -1627,7 +1639,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       this.alertService,
       this.protocolService,
       this.challengeService,
-      this.featuresService,
+      this.webSocketsService,
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {

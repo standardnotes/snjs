@@ -9,14 +9,14 @@ import {
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType, Feature, FeatureIdentifier } from '@standardnotes/features';
+import { SNWebSocketsService } from './api/websockets_service';
 
 describe('featuresService', () => {
-  const webSocketUrl = '';
-
   let storageService: SNStorageService;
   let apiService: SNApiService;
   let itemManager: ItemManager;
   let componentManager: SNComponentManager;
+  let webSocketsService: SNWebSocketsService;
   let roles: RoleName[];
   let features: Feature[];
   let items: SNItem[];
@@ -27,7 +27,7 @@ describe('featuresService', () => {
       apiService,
       itemManager,
       componentManager,
-      webSocketUrl,
+      webSocketsService,
     );
   };
 
@@ -258,13 +258,5 @@ describe('featuresService', () => {
       await featuresService.updateRoles('123', roles);
       expect(storageService.setValue).not.toHaveBeenCalled();
     });
-  });
-
-  describe('setWebSocketUrl()', () => {
-    it('saves url in local storage', async () => {
-      const webSocketUrl = 'wss://test-websocket';
-      await createService().setWebSocketUrl(webSocketUrl);
-      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.WebSocketUrl, webSocketUrl);
-    }); 
   });
 });

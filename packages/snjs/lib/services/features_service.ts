@@ -14,29 +14,42 @@ import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
 import { SNComponent } from '@Lib/models';
+import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
-  private webSocket?: WebSocket;
   private removeApiServiceObserver?: () => void;
+  private removeWebSocketsServiceObserver?: () => void;
 
   constructor(
     private storageService: SNStorageService,
     private apiService: SNApiService,
     private itemManager: ItemManager,
     private componentManager: SNComponentManager,
-    private webSocketUrl: string | undefined
+    private webSocketsService: SNWebSocketsService,
   ) {
     super();
 
     this.removeApiServiceObserver = apiService.addEventObserver(
-      (eventName, data) => {
+      async (eventName, data) => {
         if (eventName === ApiServiceEvent.MetaReceived) {
           const { userUuid, userRoles } = data as MetaReceivedData;
-          void this.updateRoles(
+          await this.updateRoles(
             userUuid,
             userRoles.map((role) => role.name)
           );
+        }
+      }
+    );
+
+    this.removeWebSocketsServiceObserver = webSocketsService.addEventObserver(
+      async (eventName, data) => {
+        if (eventName === WebSocketsServiceEvent.UserRoleMessageReceived) {
+          const {
+            payload: { userUuid, currentRoles },
+          } = data as UserRolesChangedEvent;
+          await this.setRoles(currentRoles);
+          await this.updateFeatures(userUuid);
         }
       }
     );
@@ -56,37 +69,6 @@ export class SNFeaturesService extends PureService<void> {
       await this.setRoles(roles);
       await this.updateFeatures(userUuid);
     }
-  }
-
-  public async setWebSocketUrl(url: string | undefined): Promise<void> {
-    this.webSocketUrl = url;
-    await this.storageService.setValue(StorageKey.WebSocketUrl, url);
-  }
-
-  public async loadWebSocketUrl(): Promise<void> {
-    const storedValue = await this.storageService.getValue(
-      StorageKey.WebSocketUrl
-    );
-    this.webSocketUrl =
-      storedValue ||
-      this.webSocketUrl ||
-      (window as {
-        _websocket_url?: string;
-      })._websocket_url;
-  }
-
-  public startWebSocketConnection(authToken: string): void {
-    if (this.webSocketUrl) {
-      this.webSocket = new WebSocket(
-        `${this.webSocketUrl}?authToken=Bearer+${authToken}`
-      );
-      this.webSocket.onmessage = this.onWebSocketMessage.bind(this);
-      this.webSocket.onclose = this.onWebSocketClose.bind(this);
-    }
-  }
-
-  public closeWebSocketConnection(): void {
-    this.webSocket?.close();
   }
 
   private async setRoles(roles: RoleName[]): Promise<void> {
@@ -180,23 +162,17 @@ export class SNFeaturesService extends PureService<void> {
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
   }
 
-  private async onWebSocketMessage(event: MessageEvent) {
-    const {
-      payload: { userUuid, currentRoles },
-    }: UserRolesChangedEvent = JSON.parse(event.data);
-    await this.setRoles(currentRoles);
-    await this.updateFeatures(userUuid);
-  }
-
-  private onWebSocketClose() {
-    this.webSocket = undefined;
-  }
-
   deinit(): void {
     super.deinit();
     this.removeApiServiceObserver?.();
-    this.closeWebSocketConnection();
     (this.removeApiServiceObserver as unknown) = undefined;
+    this.removeWebSocketsServiceObserver?.();
+    (this.removeWebSocketsServiceObserver as unknown) = undefined;
     (this.roles as unknown) = undefined;
+    (this.storageService as unknown) = undefined;
+    (this.apiService as unknown) = undefined;
+    (this.itemManager as unknown) = undefined;
+    (this.componentManager as unknown) = undefined;
+    (this.webSocketsService as unknown) = undefined;
   }
 }
