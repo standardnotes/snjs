@@ -74,7 +74,6 @@ describe('featuresService', () => {
     itemManager.createItem = jest.fn();
     itemManager.changeComponent = jest.fn();
     itemManager.setItemsToBeDeleted = jest.fn();
-    itemManager.changeItem = jest.fn();
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
     componentManager.setReadonlyStateForComponent = jest.fn();
@@ -142,6 +141,33 @@ describe('featuresService', () => {
         })
       );
     });
+
+    it('if item for a feature exists updates its content', async () => {
+      const existingItem = {
+        uuid: '789',
+        safeContent: {
+          package_info: {
+            identifier: FeatureIdentifier.BoldEditor,
+          }
+        }
+      };
+
+      const newRoles = [
+        ...roles,
+        RoleName.PlusUser,
+      ];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
+      const featuresService = createService();
+      await featuresService.loadUserRoles();
+      await featuresService.updateRoles('123', newRoles);
+
+      expect(itemManager.changeComponent).toHaveBeenCalledWith(
+        '789',
+        expect.any(Function),
+      );
+    })
 
     it('creates items for expired components if they do not exist', async () => {
       const newRoles = [
