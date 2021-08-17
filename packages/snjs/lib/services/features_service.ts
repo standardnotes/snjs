@@ -16,6 +16,8 @@ import { SNComponentManager } from './component_manager';
 import { SNComponent } from '@Lib/models';
 import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
+import { PayloadContent } from '@Lib/protocol';
+import { ComponentContent } from '@Lib/models/app/component';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
@@ -93,20 +95,16 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private createItemDataForFeature(feature: Feature) {
+  private createItemContentForFeature(feature: Feature): PayloadContent {
     return FillItemContent({
-      content_type: feature.contentType,
-      content: {
-        identifier: feature.identifier,
-        name: feature.name,
-        hosted_url: feature.url,
-        url: feature.url,
-        local_url: null,
-        area: feature.area,
-        package_info: feature,
-        valid_until: feature.expiresAt,
-      },
-      references: [],
+      identifier: feature.identifier,
+      name: feature.name,
+      hosted_url: feature.url,
+      url: feature.url,
+      local_url: null,
+      area: feature.area,
+      package_info: feature,
+      valid_until: feature.expiresAt,
     });
   }
 
@@ -121,7 +119,7 @@ export class SNFeaturesService extends PureService<void> {
 
     for (const feature of features) {
       const expired = feature.expiresAt! < now.getTime();
-      const itemData = this.createItemDataForFeature(feature);      
+      const itemContent = this.createItemContentForFeature(feature);      
       const existingItem = currentItems.find((item) => {
         if (
           item.safeContent.package_info
@@ -136,23 +134,23 @@ export class SNFeaturesService extends PureService<void> {
         case ContentType.Component:
           if (existingItem) {
             await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
-              mutator.setContent(itemData);
+              mutator.setContent(itemContent);
             });
           } else {
-            await this.itemManager.createItem(feature.contentType, itemData);
+            await this.itemManager.createItem(feature.contentType, itemContent);
           }
           this.componentManager.setReadonlyStateForComponent(existingItem as SNComponent, expired);
           break;
         default:
           if (existingItem) {
             await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
-              mutator.setContent(itemData);
+              mutator.setContent(itemContent);
             });
             if (expired) {
               itemsToDeleteUuids.push(existingItem.uuid);
             }
           } else if (!expired) {
-            await this.itemManager.createItem(feature.contentType, itemData);
+            await this.itemManager.createItem(feature.contentType, itemContent);
           }
           break;
       }
