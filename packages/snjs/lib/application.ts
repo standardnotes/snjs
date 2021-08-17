@@ -1549,6 +1549,7 @@ export class SNApplication {
       challengeService: this.challengeService,
       itemManager: this.itemManager,
       singletonManager: this.singletonManager,
+      settingsService: this.settingsService,
       environment: this.environment,
       identifier: this.identifier,
     });
