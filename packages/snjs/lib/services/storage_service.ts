@@ -85,6 +85,7 @@ export class SNStorageService extends PureService {
   public deinit() {
     this.deviceInterface = undefined;
     this.encryptionDelegate = undefined;
+    this.storagePersistable = false;
     super.deinit();
   }
 
@@ -218,7 +219,7 @@ export class SNStorageService extends PureService {
   private async immediatelyPersistValuesToDisk(): Promise<StorageValuesObject> {
     return this.executeCriticalFunction(async () => {
       const values = await this.generatePersistableValues();
-      await this.deviceInterface!.setRawStorageValue(
+      await this.deviceInterface?.setRawStorageValue(
         this.getPersistenceKey(),
         JSON.stringify(values)
       );
@@ -238,12 +239,14 @@ export class SNStorageService extends PureService {
       content: valuesToWrap as PayloadContent,
       content_type: ContentType.EncryptedStorage,
     });
-    const encryptedPayload = await this.encryptionDelegate!.payloadByEncryptingPayload(
+    const encryptedPayload = await this.encryptionDelegate?.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.LocalStoragePreferEncrypted
     );
-    rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected();
-    rawContent[ValueModesKeys.Unwrapped] = undefined;
+    if (encryptedPayload) {
+      rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected();
+      rawContent[ValueModesKeys.Unwrapped] = undefined;
+    }
     return rawContent;
   }
 

@@ -1,3 +1,5 @@
+import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies';
+import { HistoryEntry } from './../../services/history/entries/history_entry';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { Action } from './action';
@@ -33,6 +35,18 @@ export class SNActionsExtension extends SNItem {
     return this.actions.filter((action) => {
       return action.context === item.content_type || action.context === 'Item';
     });
+  }
+
+  /** Do not duplicate. Always keep original */
+  strategyWhenConflictingWithItem(
+    item: SNItem,
+    previousRevision?: HistoryEntry
+  ): ConflictStrategy {
+    if (this.errorDecrypting) {
+      return super.strategyWhenConflictingWithItem(item, previousRevision);
+    }
+
+    return ConflictStrategy.KeepLeft;
   }
 }
 

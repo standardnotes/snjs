@@ -6,7 +6,7 @@ COMMAND=$1 && shift 1
 case "$COMMAND" in
   'start-web' )
     echo "Starting Test Server..."
-    yarn start:test-server
+    #yarn start:test-server
     ;;
 
   * )
