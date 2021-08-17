@@ -93,7 +93,7 @@ export class SettingsGateway implements SettingsProvider {
   }
 
   deinit() {
-    (this.settingsApi as unknown) = null;
-    (this.userProvider as unknown) = null;
+    (this.settingsApi as unknown) = undefined;
+    (this.userProvider as unknown) = undefined;
   }
 }
