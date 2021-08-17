@@ -5,23 +5,19 @@ import {
   DeinitSource,
   SNApplication,
 } from '@Lib/index';
-import { createApplication } from '../setup/snjs/appFactory';
-
-const randNamespace = () => Math.random().toString(36).substring(2, 15);
+import { createInitAppWithRandNamespace } from '../factory';
 
 describe('settings', function () {
-  const fakeSetting = 'FAKE_SETTING';
+  const fakeSetting: any = 'FAKE_SETTING';
   const fakePayload = 'Im so meta even this acronym';
   const updatedFakePayload = 'is meta';
 
-  let snApp;
+  let snApp: SNApplication;
 
   beforeEach(async function () {
-    snApp = await createApplication(
-      randNamespace(),
+    snApp = await createInitAppWithRandNamespace(
       Environment.Web,
-      Platform.MacWeb,
-      { hostUrl: 'http://localhost:3123', webSocketUrl: 'ws://localhost' }
+      Platform.MacWeb
     );
     const email = Uuid.GenerateUuidSynchronously();
     const password = Uuid.GenerateUuidSynchronously();
@@ -37,7 +33,7 @@ describe('settings', function () {
   });
 
   afterEach(async function () {
-    await snApp.deinit(DeinitSource.SignOut);
+    await snApp!.deinit(DeinitSource.SignOut);
     localStorage.clear();
   });
 
