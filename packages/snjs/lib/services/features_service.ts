@@ -15,6 +15,7 @@ import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
 import { SNComponent } from '@Lib/models';
 import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
+import { FillItemContent } from '@Lib/models/functions';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
@@ -93,7 +94,7 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   private createItemDataForFeature(feature: Feature) {
-    return {
+    return FillItemContent({
       content_type: feature.contentType,
       content: {
         identifier: feature.identifier,
@@ -106,7 +107,7 @@ export class SNFeaturesService extends PureService<void> {
         valid_until: feature.expiresAt,
       },
       references: [],
-    };
+    });
   }
 
   private async mapFeaturesToItems(features: Feature[]): Promise<void> {
@@ -116,18 +117,16 @@ export class SNFeaturesService extends PureService<void> {
     ]);
     const itemsToDeleteUuids = [];
 
-    const today = new Date();
+    const now = new Date();
 
     for (const feature of features) {
-      const expired = feature.expiresAt! < today.getTime();
+      const expired = feature.expiresAt! < now.getTime();
       const itemData = this.createItemDataForFeature(feature);      
       const existingItem = currentItems.find((item) => {
         if (
-          item.content &&
-          typeof item.content !== 'string' &&
-          item.content.package_info
+          item.safeContent.package_info
         ) {
-          const itemIdentifier = item.content.package_info.identifier;
+          const itemIdentifier = item.safeContent.package_info.identifier;
           return itemIdentifier === feature.identifier && !item.deleted;
         }
         return false;
