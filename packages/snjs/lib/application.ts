@@ -101,6 +101,8 @@ import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
+import { SettingName } from '@standardnotes/settings';
+import { SNSettingsService } from './services/settings_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -143,6 +145,7 @@ export class SNApplication {
   private featuresService!: SNFeaturesService;
   private credentialService!: SNCredentialService;
   private webSocketsService!: SNWebSocketsService;
+  private settingsService!: SNSettingsService;
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService<any, any>[] = [];
@@ -188,7 +191,7 @@ export class SNApplication {
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
-    private webSocketUrl?: string,
+    private webSocketUrl?: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -292,6 +295,7 @@ export class SNApplication {
     await this.featuresService.loadUserRoles();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
+    this.settingsService.initializeFromDisk();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
@@ -519,7 +523,9 @@ export class SNApplication {
     return this.syncService.getStatus();
   }
 
-public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpResponse> {
+  public getSessions(): Promise<
+    (HttpResponse & { data: RemoteSession[] }) | HttpResponse
+  > {
     return this.sessionManager.getSessionsList();
   }
 
@@ -802,7 +808,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
    * @param tag - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-   public getTagDescendants(tag: SNTag): SNTag[] {
+  public getTagDescendants(tag: SNTag): SNTag[] {
     return this.itemManager.getTagDescendants(tag);
   }
 
@@ -1439,6 +1445,22 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     }
   }
 
+  public async listSettings() {
+    return this.settingsService.settings().listSettings();
+  }
+
+  public async getSetting(name: SettingName) {
+    return this.settingsService.settings().getSetting(name);
+  }
+
+  public async updateSetting(name: SettingName, payload: string) {
+    return this.settingsService.settings().updateSetting(name, payload);
+  }
+
+  public async deleteSetting(name: SettingName) {
+    return this.settingsService.settings().deleteSetting(name);
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();
@@ -1469,6 +1491,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     this.createFeaturesService();
     this.createActionsManager();
     this.createPreferencesService();
+    this.createSettingsService();
   }
 
   private clearServices() {
@@ -1493,6 +1516,7 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
     (this.featuresService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
+    (this.settingsService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1648,9 +1672,11 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
             void (async () => {
               await this.sync();
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-                void this.protocolService.createNewDefaultItemsKey().then(() => {
-                  void this.sync();
-                })
+                void this.protocolService
+                  .createNewDefaultItemsKey()
+                  .then(() => {
+                    void this.sync();
+                  });
               }
             })();
             break;
@@ -1770,6 +1796,13 @@ public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpR
       })
     );
     this.services.push(this.preferencesService);
+  }
+
+  private createSettingsService() {
+    this.settingsService = new SNSettingsService(
+      this.sessionManager,
+      this.apiService
+    );
   }
 
   private getClass<T>(base: T) {

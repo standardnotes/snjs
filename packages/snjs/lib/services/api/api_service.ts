@@ -16,6 +16,11 @@ import {
   SessionListResponse,
   RawSyncResponse,
   UserFeaturesResponse,
+  ListSettingsResponse,
+  UpdateSettingResponse,
+  GetSettingResponse,
+  DeleteSettingResponse,
+  MinimalHttpResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -50,6 +55,8 @@ type PathNamesV1 = {
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
   userFeatures: (userUuid: string) => string;
+  settings: (userUuid: string) => string;
+  setting: (userUuid: string, settingName: string) => string;
 };
 
 const Paths: {
@@ -69,6 +76,9 @@ const Paths: {
     itemRevision: (itemUuid: string, revisionUuid: string) =>
       `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
     userFeatures: (userUuid: string) => `/v1/users/${userUuid}/features`,
+    settings: (userUuid) => `/v1/users/${userUuid}/settings`,
+    setting: (userUuid, settingName) =>
+      `/v1/users/${userUuid}/settings/${settingName}`,
   },
 };
 
@@ -607,6 +617,79 @@ export class SNApiService extends PureService<
       });
     this.processResponse(response);
     return response;
+
+  private async tokenRefreshableRequest<T extends MinimalHttpResponse>(
+    params: HttpRequest & { fallbackErrorMessage: string }
+  ): Promise<T> {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError as T;
+    }
+    const response: T | HttpResponse = await this.httpService
+      .runHttp(params)
+      .catch((errorResponse: HttpResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest(params);
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          params.fallbackErrorMessage
+        );
+      });
+    this.processResponse(response);
+    return response as T;
+  }
+
+  async listSettings(userUuid: UuidString): Promise<ListSettingsResponse> {
+    return await this.tokenRefreshableRequest<ListSettingsResponse>({
+      verb: HttpVerb.Get,
+      url: joinPaths(this.host, Paths.v1.settings(userUuid)),
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+      authentication: this.session?.authorizationValue,
+    });
+  }
+
+  async updateSetting(
+    userUuid: UuidString,
+    settingName: string,
+    settingValue: string | null
+  ): Promise<UpdateSettingResponse> {
+    const params = {
+      name: settingName,
+      value: settingValue,
+    };
+    return this.tokenRefreshableRequest<UpdateSettingResponse>({
+      verb: HttpVerb.Put,
+      url: joinPaths(this.host, Paths.v1.settings(userUuid)),
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+      params,
+    });
+  }
+
+  async getSetting(
+    userUuid: UuidString,
+    settingName: string
+  ): Promise<GetSettingResponse> {
+    return await this.tokenRefreshableRequest<GetSettingResponse>({
+      verb: HttpVerb.Get,
+      url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+    });
+  }
+
+  async deleteSetting(
+    userUuid: UuidString,
+    settingName: string
+  ): Promise<DeleteSettingResponse> {
+    return this.tokenRefreshableRequest<DeleteSettingResponse>({
+      verb: HttpVerb.Delete,
+      url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+    });
   }
 
   private preprocessingError() {
