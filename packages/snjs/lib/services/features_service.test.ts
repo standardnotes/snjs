@@ -77,6 +77,9 @@ describe('featuresService', () => {
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
     componentManager.setReadonlyStateForComponent = jest.fn();
+
+    webSocketsService = {} as jest.Mocked<SNWebSocketsService>;
+    webSocketsService.addEventObserver = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
