@@ -14,4 +14,6 @@ export interface SettingsProvider {
   updateSetting(name: SettingName, payload: string): Promise<void>;
 
   deleteSetting(name: SettingName): Promise<void>;
+
+  deinit(): void;
 }
