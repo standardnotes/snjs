@@ -67,7 +67,6 @@ export default {
 
   // A list of paths to directories that Jest should use to search for files in
   roots: [
-    '<rootDir>/lib',
     '<rootDir>/test'
   ],
 
@@ -86,7 +85,6 @@ export default {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    '<rootDir>/lib/**/?(*.)+(test).(ts|js)',
     '<rootDir>/test/**/?(*.)+(test).(ts|js)'
   ],
 
