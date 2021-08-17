@@ -16,8 +16,7 @@ export class SNSettingsService extends PureService {
   }
 
   initializeFromDisk() {
-    const getUser = () => this.sessionManager.getUser();
-    this._provider = new SettingsGateway(this.apiService, getUser);
+    this._provider = new SettingsGateway(this.apiService, this.sessionManager);
   }
 
   settings(): SettingsProvider {

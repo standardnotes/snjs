@@ -37,11 +37,15 @@ interface SettingsAPI {
 export class SettingsGateway implements SettingsProvider {
   constructor(
     private readonly settingsApi: SettingsAPI,
-    private readonly getUser: () => User | undefined
+    private readonly userProvider: { getUser: () => User | undefined }
   ) {}
 
   isReadyForModification() {
     return this.getUser() != null;
+  }
+
+  private getUser() {
+    return this.userProvider.getUser();
   }
 
   private get userUuid() {
@@ -86,5 +90,10 @@ export class SettingsGateway implements SettingsProvider {
   async deleteSetting(name: SettingName): Promise<void> {
     const { error } = await this.settingsApi.deleteSetting(this.userUuid, name);
     if (error != null) throw new Error(error.message);
+  }
+
+  deinit() {
+    (this.settingsApi as unknown) = null;
+    (this.userProvider as unknown) = null;
   }
 }
