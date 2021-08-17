@@ -10,7 +10,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "start": "lerna run start --parallel",
-    "test": "lerna run test --parallel",
+    "test:unit": "lerna run test:unit --parallel",
     "test:e2e": "bash test.sh",
     "test:e2e:dev": "docker-compose up -d",
     "build": "lerna run build",
