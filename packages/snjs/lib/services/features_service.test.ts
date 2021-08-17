@@ -74,6 +74,7 @@ describe('featuresService', () => {
     itemManager.createItem = jest.fn();
     itemManager.changeComponent = jest.fn();
     itemManager.setItemsToBeDeleted = jest.fn();
+    itemManager.changeItem = jest.fn();
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
     componentManager.setReadonlyStateForComponent = jest.fn();
@@ -130,23 +131,15 @@ describe('featuresService', () => {
       expect(itemManager.createItem).toHaveBeenCalledTimes(2);
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Theme,
-        {
-          content_type: ContentType.Theme,
-          content: expect.objectContaining({
-            identifier: FeatureIdentifier.MidnightTheme,
-          }),
-          references: [],
-        },
+        expect.objectContaining({
+          identifier: FeatureIdentifier.MidnightTheme,
+        })
       );
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
-        {
-          content_type: ContentType.Component,
-          content: expect.objectContaining({
-            identifier: FeatureIdentifier.BoldEditor,
-          }),
-          references: [],
-        },
+        expect.objectContaining({
+          identifier: FeatureIdentifier.BoldEditor,
+        })
       );
     });
 
@@ -174,20 +167,16 @@ describe('featuresService', () => {
       await featuresService.updateRoles('123', newRoles);
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
-        {
-          content_type: ContentType.Component,
-          content: expect.objectContaining({
-            identifier: FeatureIdentifier.BoldEditor,
-          }),
-          references: [],
-        },
+        expect.objectContaining({
+          identifier: FeatureIdentifier.BoldEditor,
+        }),
       );
     });
 
     it('marks expired components as read-only', async () => {
       const existingItem = {
         uuid: '789',
-        content: {
+        safeContent: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
           }
@@ -222,7 +211,7 @@ describe('featuresService', () => {
     it('deletes items for expired themes', async () => {
       const existingItem = {
         uuid: '456',
-        content: {
+        safeContent: {
           package_info: {
             identifier: FeatureIdentifier.MidnightTheme,
           }

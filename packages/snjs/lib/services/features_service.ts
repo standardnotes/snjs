@@ -152,7 +152,7 @@ export class SNFeaturesService extends PureService<void> {
           break;
         default:
           if (existingItem) {
-            await this.itemManager.changeComponent(
+            await this.itemManager.changeItem(
               existingItem.uuid,
               (mutator) => {
                 mutator.setContent({
