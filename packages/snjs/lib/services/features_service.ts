@@ -136,7 +136,10 @@ export class SNFeaturesService extends PureService<void> {
             await this.itemManager.changeComponent(
               existingItem.uuid,
               (mutator) => {
-                mutator.setContent(itemContent);
+                mutator.setContent({
+                  ...existingItem.safeContent,
+                  ...itemContent
+                });
               }
             );
           } else {
@@ -152,7 +155,10 @@ export class SNFeaturesService extends PureService<void> {
             await this.itemManager.changeComponent(
               existingItem.uuid,
               (mutator) => {
-                mutator.setContent(itemContent);
+                mutator.setContent({
+                  ...existingItem.safeContent,
+                  ...itemContent
+                });
               }
             );
             if (expired) {
