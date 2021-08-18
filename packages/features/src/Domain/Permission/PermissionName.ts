@@ -10,6 +10,7 @@ export enum PermissionName {
   MarkdownBasicEditor = 'editor:markdown-basic',
   MarkdownProEditor = 'editor:markdown-pro',
   MarkdownMinimistEditor = 'editor:markdown-minimist',
+  MarkdownMathEditor = 'editor:markdown-math',
   TaskEditor = 'editor:task-editor',
   CodeEditor = 'editor:code-editor',
   TokenVaultEditor = 'editor:token-vault',
