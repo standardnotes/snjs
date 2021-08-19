@@ -7,9 +7,9 @@ import {
 } from '@standardnotes/sncrypto-common';
 import { v4 as uuidv4 } from 'uuid';
 
-const CryptoJS = require('crypto-js');
-const sodium = require('libsodium-wrappers');
-const NodeCrypto = require('crypto');
+import CryptoJS from 'crypto-js';
+import sodium, { base64_variants } from 'libsodium-wrappers';
+import NodeCrypto from 'crypto';
 
 /**
  * An SNPureCrypto implementation. Required to create a new SNApplication instance.
@@ -35,7 +35,7 @@ export default class SNCrypto implements SNPureCrypto {
     iterations: number,
     length: number
   ): Promise<HexString | null> {
-    const key = NodeCrypto.pbkdf2Sync(password, salt, iterations, length, "sha256");
+    const key = NodeCrypto.pbkdf2Sync(password, salt, iterations, length / 8, 'sha512');
     return key.toString("hex");
   }
 
@@ -50,8 +50,8 @@ export default class SNCrypto implements SNPureCrypto {
     iv: HexString,
     key: HexString
   ): Promise<Base64String> {
-    key = CryptoJS.enc.Hex.parse(key);
-    const encrypted = CryptoJS.AES.encrypt(plaintext, key, {
+    const hexKeyData = CryptoJS.enc.Hex.parse(key);
+    const encrypted = CryptoJS.AES.encrypt(plaintext, hexKeyData, {
       iv: CryptoJS.enc.Hex.parse(iv)
     });
     return encrypted.ciphertext.toString(CryptoJS.enc.Base64);
@@ -63,8 +63,8 @@ export default class SNCrypto implements SNPureCrypto {
     key: HexString
   ): Promise<Utf8String | null> {
     try {
-      key = CryptoJS.enc.Hex.parse(key);
-      const decrypted = CryptoJS.AES.decrypt(ciphertext, key, {
+      const hexKeyData = CryptoJS.enc.Hex.parse(key);
+      const decrypted = CryptoJS.AES.decrypt(ciphertext, hexKeyData, {
         iv: CryptoJS.enc.Hex.parse(iv)
       });
       return decrypted.toString(CryptoJS.enc.Utf8);
@@ -78,7 +78,8 @@ export default class SNCrypto implements SNPureCrypto {
     key: HexString
   ): Promise<HexString | null> {
     try {
-      const encrypted = CryptoJS.HmacSHA256(message, key);
+      const keyHexData = CryptoJS.enc.Hex.parse(key);
+      const encrypted = CryptoJS.HmacSHA256(message, keyHexData);
       return encrypted.toString(CryptoJS.enc.Hex);
     } catch (e) {
       return null;
@@ -86,12 +87,12 @@ export default class SNCrypto implements SNPureCrypto {
   }
 
   public async sha256(text: string): Promise<string> {
-    const result = CryptoJS.SHA256(sodium.to_hex(text));
+    const result = CryptoJS.SHA256(text);
     return result.toString(CryptoJS.enc.Hex);
   }
 
   public async unsafeSha1(text: string): Promise<string> {
-    const result = CryptoJS.SHA1(sodium.to_hex(text));
+    const result = CryptoJS.SHA1(text);
     return result.toString(CryptoJS.enc.Hex);
   }
 
@@ -122,14 +123,14 @@ export default class SNCrypto implements SNPureCrypto {
   ): Promise<Base64String> {
     await this.ready;
     try {
-      return sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+      const arrayBuffer = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
         plaintext,
         assocData,
         null,
         sodium.from_hex(nonce),
-        sodium.from_hex(key),
-        'base64'
+        sodium.from_hex(key)
       );
+      return sodium.to_base64(arrayBuffer, base64_variants.ORIGINAL);
     } catch (e) {
       return "";
     }
@@ -145,7 +146,7 @@ export default class SNCrypto implements SNPureCrypto {
     try {
       return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         null,
-        sodium.from_base64(ciphertext),
+        sodium.from_base64(ciphertext, base64_variants.ORIGINAL),
         assocData,
         sodium.from_hex(nonce),
         sodium.from_hex(key),

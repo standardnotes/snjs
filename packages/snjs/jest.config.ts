@@ -14,10 +14,7 @@ export default {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
-    //'lib/**/{!(index),}.ts',
-    'lib/services/permissions_service.ts',
-    'lib/services/component_manager.ts',
-    'lib/application.ts',
+    'lib/**/{!(index),}.ts'
   ],
 
   // The directory where Jest should output its coverage files
@@ -48,7 +45,8 @@ export default {
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/lib/tsconfig.json',
-      isolatedModules: true
+      isolatedModules: true,
+      babelConfig: 'babel.config.js'
     }
   },
 
@@ -76,8 +74,11 @@ export default {
   // The paths to modules that run some code to configure or set up the testing environment before each test
   setupFiles: [
     '<rootDir>/test/setup/global.ts',
-    '<rootDir>/test/setup/jsdom.ts',
-    '<rootDir>/test/setup/mock.ts'
+    '<rootDir>/test/setup/jsdom.ts'
+  ],
+
+  setupFilesAfterEnv: [
+    '<rootDir>/test/setup/jest.ts',
   ],
 
   // The test environment that will be used for testing

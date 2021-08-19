@@ -124,7 +124,7 @@ export type SignOutResponse = HttpResponse & Record<string, unknown>;
 
 export type SessionRenewalData = {
   session?: SessionBody;
-}
+};
 
 export type SessionRenewalResponse = HttpResponse & {
   data: SessionRenewalData;
@@ -195,3 +195,26 @@ export type RawSyncData = {
 };
 
 export type RawSyncResponse = HttpResponse & { data: RawSyncData };
+
+type SettingData = {
+  uuid: string;
+  name: string;
+  value: string;
+};
+
+export type MinimalHttpResponse = {
+  error?: Error;
+};
+
+export type ListSettingsResponse = MinimalHttpResponse & {
+  data?: {
+    settings?: SettingData[];
+  };
+};
+export type GetSettingResponse = MinimalHttpResponse & {
+  data?: {
+    setting?: SettingData;
+  };
+};
+export type UpdateSettingResponse = MinimalHttpResponse;
+export type DeleteSettingResponse = MinimalHttpResponse;

@@ -1,14 +1,5 @@
 version: '3.8'
 services:
-  snjs:
-    image: snjs-local
-    build: .
-    restart: unless-stopped
-    networks:
-      snjs: {}
-    ports:
-      - 9001:9001
-
   db:
     image: mysql:5.6
     environment:
@@ -54,7 +45,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.21.3
+    image: standardnotes/api-gateway:1.23.0
     depends_on:
       - syncing-server-js
       - auth
@@ -72,7 +63,7 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.15.0
+    image: standardnotes/auth:1.16.1
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -84,7 +75,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.15.0
+    image: standardnotes/auth:1.16.1
     depends_on:
       - auth
     entrypoint: [
