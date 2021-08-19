@@ -97,8 +97,8 @@ export class SNFeaturesService extends PureService<void> {
 
   private createItemContentForFeature(
     feature: Feature
-  ): PayloadContent & Partial<ComponentContent> {
-    return FillItemContent({
+  ): PayloadContent {
+    const content: Partial<ComponentContent> & { identifier: string, url: string } = {
       identifier: feature.identifier,
       name: feature.name,
       hosted_url: feature.url,
@@ -106,8 +106,9 @@ export class SNFeaturesService extends PureService<void> {
       local_url: null,
       area: feature.area,
       package_info: feature,
-      valid_until: feature.expiresAt,
-    });
+      valid_until: feature.expiresAt!,
+    };
+    return FillItemContent(content);
   }
 
   private async mapFeaturesToItems(features: Feature[]): Promise<void> {
