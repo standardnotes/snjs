@@ -1,4 +1,5 @@
-import { UserRolesChangedEvent } from '@standardnotes/domain-events';
+import { ComponentPackageInfo } from './../models/app/component';
+import { UserRoleChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
@@ -9,7 +10,7 @@ import {
   SNApiService,
 } from './api/api_service';
 import { UuidString } from '@Lib/types';
-import { ContentType, Feature } from '@standardnotes/features';
+import { ContentType, FeatureDescription } from '@standardnotes/features';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
@@ -49,9 +50,9 @@ export class SNFeaturesService extends PureService<void> {
       async (eventName, data) => {
         if (eventName === WebSocketsServiceEvent.UserRoleMessageReceived) {
           const {
-            payload: { userUuid, currentRoles },
-          } = data as UserRolesChangedEvent;
-          await this.setRoles(currentRoles);
+            payload: { userUuid, toRole },
+          } = data as UserRoleChangedEvent;
+          await this.setRoles([toRole]);
           await this.updateFeatures(userUuid);
         }
       }
@@ -95,23 +96,22 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private createItemContentForFeature(
-    feature: Feature
+  private componentContentForFeatureDescription(
+    feature: FeatureDescription
   ): PayloadContent {
     const content: Partial<ComponentContent> & { identifier: string, url: string } = {
       identifier: feature.identifier,
       name: feature.name,
       hosted_url: feature.url,
       url: feature.url,
-      local_url: null,
       area: feature.area,
-      package_info: feature,
-      valid_until: feature.expiresAt!,
+      package_info: feature as ComponentPackageInfo,
+      valid_until: new Date(feature.expires_at || 0),
     };
     return FillItemContent(content);
   }
 
-  private async mapFeaturesToItems(features: Feature[]): Promise<void> {
+  private async mapFeaturesToItems(features: FeatureDescription[]): Promise<void> {
     const currentItems = this.itemManager.getItems([
       ContentType.Component,
       ContentType.Theme,
@@ -121,8 +121,8 @@ export class SNFeaturesService extends PureService<void> {
     const now = new Date();
 
     for (const feature of features) {
-      const expired = feature.expiresAt! < now.getTime();
-      const itemContent = this.createItemContentForFeature(feature);
+      const expired = feature.expires_at! < now.getTime();
+      const itemContent = this.componentContentForFeatureDescription(feature);
       const existingItem = currentItems.find((item) => {
         if (item.safeContent.package_info) {
           const itemIdentifier = item.safeContent.package_info.identifier;
@@ -131,7 +131,7 @@ export class SNFeaturesService extends PureService<void> {
         return false;
       });
 
-      switch (feature.contentType) {
+      switch (feature.content_type) {
         case ContentType.Component:
           if (existingItem) {
             await this.itemManager.changeComponent(
@@ -144,7 +144,7 @@ export class SNFeaturesService extends PureService<void> {
               }
             );
           } else {
-            await this.itemManager.createItem(feature.contentType, itemContent);
+            await this.itemManager.createItem(feature.content_type, itemContent);
           }
           this.componentManager.setReadonlyStateForComponent(
             existingItem as SNComponent,
@@ -166,13 +166,24 @@ export class SNFeaturesService extends PureService<void> {
               itemsToDeleteUuids.push(existingItem.uuid);
             }
           } else if (!expired) {
-            await this.itemManager.createItem(feature.contentType, itemContent);
+            await this.itemManager.createItem(feature.content_type, itemContent);
           }
           break;
       }
     }
 
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
+  }
+
+  public async downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+    const response = await this.apiService.downloadFeatureUrl(url);
+    if(response.error) {
+      return undefined;
+    }
+    const rawFeature = response.data as FeatureDescription;
+    const content = this.componentContentForFeatureDescription(rawFeature);
+    const component = await this.itemManager.createTemplateItem(rawFeature.content_type, content) as SNComponent;
+    return component;
   }
 
   deinit(): void {
