@@ -3,6 +3,7 @@ import { ContentType, FillItemContent, SNApplication, SNComponent } from '@Lib/i
 import { Uuid } from '@Lib/uuid';
 import { Features, FeatureIdentifier, Feature } from '@standardnotes/features';
 import { UserFeaturesResponse } from '@Lib/services/api/responses';
+import { SettingName } from '@Lib/../../settings/dist';
 
 describe('features', () => {
   let application: SNApplication;
@@ -178,6 +179,19 @@ describe('features', () => {
 
       const themeItem = application.getItems(ContentType.Theme)[0];
       expect(themeItem.deleted).toBe(true);
+    });
+  });
+
+  describe('extension repo items observer', () => {
+    it('should update extension key user setting when extension repo is added', async () => {
+      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      await application.itemManager.createItem(ContentType.ExtensionRepo, FillItemContent({
+        package_info: {
+          url: `extensions.standardnotes.org/${extensionKey}`,
+        },
+      }));
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      expect(await application.getSetting(SettingName.ExtensionKey)).toBe(extensionKey);
     });
   });
 });
