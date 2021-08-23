@@ -1486,12 +1486,12 @@ export class SNApplication {
     this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
-    this.createMigrationService();
     this.createComponentManager();
-    this.createFeaturesService();
     this.createActionsManager();
     this.createPreferencesService();
     this.createSettingsService();
+    this.createFeaturesService();
+    this.createMigrationService();
   }
 
   private clearServices() {
@@ -1528,6 +1528,7 @@ export class SNApplication {
       this.itemManager,
       this.componentManager,
       this.webSocketsService,
+      this.settingsService,
     );
     this.services.push(this.featuresService);
   }
@@ -1549,7 +1550,7 @@ export class SNApplication {
       challengeService: this.challengeService,
       itemManager: this.itemManager,
       singletonManager: this.singletonManager,
-      settingsService: this.settingsService,
+      featuresService: this.featuresService,
       environment: this.environment,
       identifier: this.identifier,
     });

@@ -1,15 +1,19 @@
+import { SettingName } from '@Lib/../../settings/dist';
 import {
   StorageKey,
   SNStorageService,
   SNApiService,
   ItemManager,
   SNItem,
-  SNComponentManager
+  SNComponentManager,
+  Uuid
 } from '@Lib/index';
+import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType, Feature, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
+import { SNSettingsService } from './settings_service';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
@@ -17,6 +21,7 @@ describe('featuresService', () => {
   let itemManager: ItemManager;
   let componentManager: SNComponentManager;
   let webSocketsService: SNWebSocketsService;
+  let settingsService: SNSettingsService;
   let roles: RoleName[];
   let features: Feature[];
   let items: SNItem[];
@@ -28,6 +33,7 @@ describe('featuresService', () => {
       itemManager,
       componentManager,
       webSocketsService,
+      settingsService,
     );
   };
 
@@ -80,6 +86,11 @@ describe('featuresService', () => {
 
     webSocketsService = {} as jest.Mocked<SNWebSocketsService>;
     webSocketsService.addEventObserver = jest.fn();
+
+    settingsService = {} as jest.Mocked<SNSettingsService>;
+    settingsService.settings = jest.fn().mockReturnValue({
+      updateSetting: jest.fn(),
+    });
   });
 
   describe('loadUserRoles()', () => {
@@ -277,4 +288,18 @@ describe('featuresService', () => {
       expect(storageService.setValue).not.toHaveBeenCalled();
     });
   });
+
+  describe('updateExtensionKeySetting', () => {
+    it('should extract key from extension repo url and update user setting', async () => {
+      const extensionKey = '129b029707e3470c94a8477a437f9394';
+      const extensionRepoItem = FillItemContent({
+        package_info: {
+          url: `extensions.standardnotes.org/${extensionKey}`,
+        },
+      }) as jest.Mocked<SNItem>;
+      const featuresService = createService();
+      await featuresService.updateExtensionKeySetting([extensionRepoItem]);
+      expect(settingsService.settings().updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey);
+    });
+  })
 });
