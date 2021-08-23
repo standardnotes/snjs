@@ -37,8 +37,8 @@ describe('featuresService', () => {
       RoleName.CoreUser,
     ];
 
-    const today = new Date();
-    const tomorrow = today.setDate(today.getDate() + 1);
+    const now = new Date();
+    const tomorrow = now.setDate(now.getDate() + 1);
 
     features = [
       {
@@ -175,8 +175,8 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ];
 
-      const today = new Date();
-      const yesterday = today.setDate(today.getDate() - 1);
+      const now = new Date();
+      const yesterday = now.setDate(now.getDate() - 1);
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       apiService.getUserFeatures = jest.fn().mockReturnValue({ 
@@ -214,8 +214,8 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ];
 
-      const today = new Date();
-      const yesterday = today.setDate(today.getDate() - 1);
+      const now = new Date();
+      const yesterday = now.setDate(now.getDate() - 1);
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
@@ -249,8 +249,8 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ];
 
-      const today = new Date();
-      const yesterday = today.setDate(today.getDate() - 1);
+      const now = new Date();
+      const yesterday = now.setDate(now.getDate() - 1);
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);

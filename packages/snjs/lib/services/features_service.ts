@@ -143,13 +143,21 @@ export class SNFeaturesService extends PureService<void> {
                 });
               }
             );
+            if (expired) {
+              this.componentManager.setReadonlyStateForComponent(
+                existingItem as SNComponent,
+                expired
+              );
+            }
           } else {
-            await this.itemManager.createItem(feature.contentType, itemContent);
+            const newItem = await this.itemManager.createItem(feature.contentType, itemContent);
+            if (expired) {
+              this.componentManager.setReadonlyStateForComponent(
+                newItem as SNComponent,
+                expired
+              );
+            }
           }
-          this.componentManager.setReadonlyStateForComponent(
-            existingItem as SNComponent,
-            expired
-          );
           break;
         default:
           if (existingItem) {
