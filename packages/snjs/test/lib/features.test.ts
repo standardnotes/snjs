@@ -3,7 +3,7 @@ import { ContentType, FillItemContent, SNApplication, SNComponent } from '@Lib/i
 import { Uuid } from '@Lib/uuid';
 import { Features, FeatureIdentifier, Feature } from '@standardnotes/features';
 import { UserFeaturesResponse } from '@Lib/services/api/responses';
-import { SettingName } from '@Lib/../../settings/dist';
+import { SettingName } from '@standardnotes/settings';
 
 describe('features', () => {
   let application: SNApplication;
