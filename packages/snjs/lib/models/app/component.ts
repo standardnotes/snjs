@@ -65,7 +65,7 @@ export interface ComponentContent {
   disassociatedItemIds: string[];
   /** Items that have requested a component to be enabled in its context */
   associatedItemIds: string[];
-  local_url: string;
+  local_url: string | null;
   hosted_url: string;
   offlineOnly: boolean;
   name: string;
@@ -73,7 +73,7 @@ export interface ComponentContent {
   package_info: ComponentPackageInfo;
   area: ComponentArea;
   permissions: ComponentPermission[];
-  valid_until: Date;
+  valid_until: Date | number;
   active: boolean;
   legacy_url: string;
   isMobileDefault: boolean;
