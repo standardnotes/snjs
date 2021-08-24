@@ -75,6 +75,6 @@
     "@standardnotes/auth": "3.1.1",
     "@standardnotes/domain-events": "1.9.0",
     "@standardnotes/sncrypto-common": "^1.2.9",
-    "@standardnotes/features": "1.3.0"
+    "@standardnotes/features": "1.4.0"
   }
 }
