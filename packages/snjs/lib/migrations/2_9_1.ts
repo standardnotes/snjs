@@ -11,7 +11,7 @@ export class Migration2_9_1 extends Migration {
     this.registerStageHandler(ApplicationStage.FullSyncCompleted_13, async () => {
       await this.updateExtensionKeyUserSetting();
       this.markDone();
-    });a
+    });
   }
 
   private async updateExtensionKeyUserSetting() {
