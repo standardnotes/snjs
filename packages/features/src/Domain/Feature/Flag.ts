@@ -1,4 +1,4 @@
-export enum Flag {
+export enum ComponentFlag {
   New = 'New',
   Deprecated = 'Deprecated',
 }

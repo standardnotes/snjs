@@ -23,7 +23,8 @@ module.exports = {
   ignorePatterns: [
     "test",
     ".eslintrc.js",
-    "jest.config.ts",
+    "jest.unit.config.ts",
+    "jest.e2e.config.ts",
     "babel.config.js",
     "webpack.*"
   ]

@@ -6,7 +6,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
-import { ComponentArea } from '@standardnotes/features';
+import { ComponentArea, ThemeDockIcon, ComponentFlag } from '@standardnotes/features';
 
 export { ComponentArea };
 
@@ -39,31 +39,41 @@ export enum ComponentAction {
   Click = 'click'
 }
 
-enum ComponentFlag {
-  New = 'new',
-  Deprecated = 'deprecated'
-}
-
 export type ComponentPermission = {
   name: ComponentAction;
   content_types?: ContentType[];
 };
 
-interface ComponentContent {
+export type ComponentPackageInfo = {
+  description: string,
+  acceptsThemes?: boolean,
+  layerable?: boolean,
+  url: string,
+  download_url: string,
+  identifier: string,
+  flags?: string[],
+  deprecation_message?: string,
+  name: string,
+  version: string,
+  deletion_warning?: string,
+  dock_icon?: ThemeDockIcon
+}
+
+export interface ComponentContent {
   componentData: Record<string, any>;
   /** Items that have requested a component to be disabled in its context */
   disassociatedItemIds: string[];
   /** Items that have requested a component to be enabled in its context */
   associatedItemIds: string[];
-  local_url: string;
+  local_url: string | null;
   hosted_url: string;
   offlineOnly: boolean;
   name: string;
   autoupdateDisabled: boolean;
-  package_info: any;
+  package_info: ComponentPackageInfo;
   area: ComponentArea;
   permissions: ComponentPermission[];
-  valid_until: Date;
+  valid_until: Date | number;
   active: boolean;
   legacy_url: string;
   isMobileDefault: boolean;
@@ -86,7 +96,7 @@ export class SNComponent extends SNItem implements ComponentContent {
   public readonly offlineOnly: boolean;
   public readonly name: string;
   public readonly autoupdateDisabled: boolean;
-  public readonly package_info: any;
+  public readonly package_info: ComponentPackageInfo;
   public readonly area: ComponentArea;
   public readonly permissions: ComponentPermission[] = [];
   public readonly valid_until: Date;

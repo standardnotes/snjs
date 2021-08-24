@@ -78,6 +78,7 @@ import {
   SNSingletonManager,
   SNStorageService,
   SNSyncService,
+  SNFeaturesService,
   SyncModes,
 } from './services';
 import { DeviceInterface } from './device_interface';
@@ -97,10 +98,9 @@ import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
 import { HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
-import { PermissionName } from '@standardnotes/auth';
 import { RemoteSession } from '.';
+import { SNWebSocketsService } from './services/api/websockets_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 
@@ -142,8 +142,9 @@ export class SNApplication {
   private itemManager!: ItemManager;
   private keyRecoveryService!: SNKeyRecoveryService;
   private preferencesService!: SNPreferencesService;
-  private permissionsService!: SNPermissionsService;
+  private featuresService!: SNFeaturesService;
   private credentialService!: SNCredentialService;
+  private webSocketsService!: SNWebSocketsService;
   private settingsService!: SNSettingsService;
 
   private eventHandlers: ApplicationObserver[] = [];
@@ -290,7 +291,8 @@ export class SNApplication {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
-    await this.permissionsService.loadWebSocketUrl();
+    await this.webSocketsService.loadWebSocketUrl();
+    await this.featuresService.loadUserRoles();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
     this.settingsService.initializeFromDisk();
@@ -881,7 +883,7 @@ export class SNApplication {
 
   public async setCustomHost(host: string): Promise<void> {
     await this.apiService.setHost(host);
-    await this.permissionsService.setWebSocketUrl(undefined);
+    await this.webSocketsService.setWebSocketUrl(undefined);
   }
 
   public getUser(): User | undefined {
@@ -1169,10 +1171,6 @@ export class SNApplication {
     value: PrefValue[K]
   ): Promise<void> {
     return this.preferencesService.setValue(key, value);
-  }
-
-  public hasPermission(permissionName: PermissionName): boolean {
-    return this.permissionsService.hasPermission(permissionName);
   }
 
   /**
@@ -1463,11 +1461,14 @@ export class SNApplication {
     return this.settingsService.settings().deleteSetting(name);
   }
 
+  public downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+    return this.featuresService.downloadExternalFeature(url);
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();
     this.createStorageManager();
-    this.createPermissionsService();
     this.createProtocolService();
     const encryptionDelegate = {
       payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
@@ -1481,6 +1482,7 @@ export class SNApplication {
     this.createChallengeService();
     this.createHttpManager();
     this.createApiService();
+    this.createWebSocketsService();
     this.createSessionManager();
     this.createHistoryManager();
     this.createSyncManager();
@@ -1490,6 +1492,7 @@ export class SNApplication {
     this.createSingletonManager();
     this.createMigrationService();
     this.createComponentManager();
+    this.createFeaturesService();
     this.createActionsManager();
     this.createPreferencesService();
     this.createSettingsService();
@@ -1514,24 +1517,31 @@ export class SNApplication {
     (this.itemManager as unknown) = undefined;
     (this.keyRecoveryService as unknown) = undefined;
     (this.preferencesService as unknown) = undefined;
-    (this.permissionsService as unknown) = undefined;
+    (this.featuresService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
+    (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
 
     this.services = [];
   }
 
-  private createPermissionsService() {
-    this.permissionsService = new SNPermissionsService(
+  private createFeaturesService() {
+    this.featuresService = new SNFeaturesService(
       this.storageService,
-      this.webSocketUrl
+      this.apiService,
+      this.itemManager,
+      this.componentManager,
+      this.webSocketsService,
     );
-    this.serviceObservers.push(
-      this.permissionsService.addEventObserver((_event, eventData) => {
-        void this.notifyEvent(ApplicationEvent.PermissionsChanged, eventData);
-      })
+    this.services.push(this.featuresService);
+  }
+
+  private createWebSocketsService() {
+    this.webSocketsService = new SNWebSocketsService(
+      this.storageService,
+      this.webSocketUrl,
     );
-    this.services.push(this.permissionsService);
+    this.services.push(this.webSocketsService);
   }
 
   private createMigrationService() {
@@ -1567,8 +1577,7 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.permissionsService,
-      this.defaultHost
+      this.defaultHost,
     );
     this.services.push(this.apiService);
   }
@@ -1658,7 +1667,7 @@ export class SNApplication {
       this.alertService,
       this.protocolService,
       this.challengeService,
-      this.permissionsService
+      this.webSocketsService,
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {

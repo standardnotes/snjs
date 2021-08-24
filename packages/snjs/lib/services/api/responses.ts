@@ -5,7 +5,9 @@ import {
   KeyParamsOrigination,
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-import { Role, Permission } from '@standardnotes/auth';
+import { Role } from '@standardnotes/auth';
+import { FeatureDescription } from '@standardnotes/features';
+import { UuidString } from '@Lib/types';
 
 export enum StatusCode {
   LocalValidationError = 10,
@@ -45,8 +47,8 @@ export type HttpResponse = {
 
 export type ResponseMeta = {
   auth: {
+    userUuid?: UuidString;
     roles?: Role[];
-    permissions?: Permission[];
   };
 };
 
@@ -195,6 +197,14 @@ export type RawSyncData = {
 };
 
 export type RawSyncResponse = HttpResponse & { data: RawSyncData };
+
+export type UserFeaturesData = {
+  features: FeatureDescription[];
+};
+
+export type UserFeaturesResponse = HttpResponse & {
+  data: UserFeaturesData;
+};
 
 type SettingData = {
   uuid: string;

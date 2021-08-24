@@ -15,6 +15,7 @@ import {
   KeyParamsResponse,
   SessionListResponse,
   RawSyncResponse,
+  UserFeaturesResponse,
   ListSettingsResponse,
   UpdateSettingResponse,
   GetSettingResponse,
@@ -39,7 +40,7 @@ import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
 import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
-import { SNPermissionsService } from '../permissions_service';
+import { Role } from '@standardnotes/auth';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -53,6 +54,7 @@ type PathNamesV1 = {
   session: (sessionUuid: string) => string;
   itemRevisions: (itemId: string) => string;
   itemRevision: (itemId: string, revisionId: string) => string;
+  userFeatures: (userUuid: string) => string;
   settings: (userUuid: string) => string;
   setting: (userUuid: string, settingName: string) => string;
 };
@@ -73,6 +75,7 @@ const Paths: {
     itemRevisions: (itemUuid: string) => `/v1/items/${itemUuid}/revisions`,
     itemRevision: (itemUuid: string, revisionUuid: string) =>
       `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
+    userFeatures: (userUuid: string) => `/v1/users/${userUuid}/features`,
     settings: (userUuid) => `/v1/users/${userUuid}/settings`,
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
@@ -84,7 +87,19 @@ const V0_API_VERSION = '20200115';
 
 type InvalidSessionObserver = (revoked: boolean) => void;
 
-export class SNApiService extends PureService {
+export enum ApiServiceEvent {
+  MetaReceived = 'MetaReceived',
+}
+
+export type MetaReceivedData = {
+  userUuid: UuidString;
+  userRoles: Role[];
+};
+
+export class SNApiService extends PureService<
+  ApiServiceEvent.MetaReceived,
+  MetaReceivedData
+> {
   private session?: Session;
 
   private registering = false;
@@ -97,7 +112,6 @@ export class SNApiService extends PureService {
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private permissionsService: SNPermissionsService,
     private host: string
   ) {
     super();
@@ -192,11 +206,11 @@ export class SNApiService extends PureService {
   }
 
   private processMetaObject(meta: ResponseMeta) {
-    if (meta.auth && meta.auth.roles && meta.auth.permissions) {
-      void this.permissionsService.update(
-        meta.auth.roles,
-        meta.auth.permissions
-      );
+    if (meta.auth && meta.auth.userUuid && meta.auth.roles) {
+      this.notifyEvent(ApiServiceEvent.MetaReceived, {
+        userUuid: meta.auth.userUuid,
+        userRoles: meta.auth.roles,
+      });
     }
   }
 
@@ -579,6 +593,29 @@ export class SNApiService extends PureService {
     return response;
   }
 
+  async getUserFeatures(
+    userUuid: UuidString
+  ): Promise<HttpResponse | UserFeaturesResponse> {
+    const url = joinPaths(this.host, Paths.v1.userFeatures(userUuid));
+    const response = await this.httpService
+      .getAbsolute(url, undefined, this.session!.authorizationValue)
+      .catch((errorResponse: HttpResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Get,
+            url,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SYNC_FAIL
+        );
+      });
+    this.processResponse(response);
+    return response;
+  }
+
   private async tokenRefreshableRequest<T extends MinimalHttpResponse>(
     params: HttpRequest & { fallbackErrorMessage: string }
   ): Promise<T> {
@@ -650,6 +687,14 @@ export class SNApiService extends PureService {
       url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+    });
+  }
+
+  public downloadFeatureUrl(url: string): Promise<HttpResponse> {
+    return this.request({
+      verb: HttpVerb.Get,
+      url,
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
     });
   }
 

@@ -57,7 +57,7 @@ waitForServices
 
 echo "# Starting test suite ..."
 cd packages/snjs
-npm run test
+npm run test:e2e
 test_result=$?
 
 cleanup $test_result
