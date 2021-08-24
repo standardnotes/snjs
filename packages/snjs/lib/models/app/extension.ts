@@ -1,3 +1,4 @@
+import { SNComponent } from '@Models/app/component';
 import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies';
 import { HistoryEntry } from './../../services/history/entries/history_entry';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
@@ -7,12 +8,10 @@ import { Action } from './action';
 /**
  * Related to the SNActionsService and the local Action model.
  */
-export class SNActionsExtension extends SNItem {
+export class SNActionsExtension extends SNComponent {
   public readonly actions: Action[] = [];
   public readonly description!: string;
-  public readonly name!: string;
   public readonly url!: string;
-  public readonly package_info!: Record<string, any>;
   public readonly supported_types!: string[];
   public readonly deprecation?: string;
 
@@ -20,8 +19,6 @@ export class SNActionsExtension extends SNItem {
     super(payload);
     this.description = payload.safeContent.description;
     this.url = payload.safeContent.url;
-    this.name = payload.safeContent.name;
-    this.package_info = payload.safeContent.package_info;
     this.supported_types = payload.safeContent.supported_types;
     this.deprecation = payload.safeContent.deprecation;
     if (payload.safeContent.actions) {

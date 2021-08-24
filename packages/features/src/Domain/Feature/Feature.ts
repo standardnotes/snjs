@@ -1,32 +1,34 @@
 import { ComponentArea } from '../Component/ComponentArea'
 import { ContentType } from '../Content/ContentType'
 import { PermissionName } from '../Permission/PermissionName'
-import { DockIconType } from './DockIconType'
 import { FeatureIdentifier } from './FeatureIdentifier'
-import { Flag } from './Flag'
+import { ComponentFlag } from './Flag'
 
-export type Feature = {
+export type ThemeDockIcon = {
+  type: 'svg' | 'circle',
+  background_color: string,
+  foreground_color: string,
+  border_color: string,
+  source?: string
+}
+
+export type FeatureDescription = {
   name: string;
   identifier: FeatureIdentifier;
-  permissionName: PermissionName;
-  contentType: ContentType
+  permission_name: PermissionName;
+  content_type: ContentType;
   area?: ComponentArea;
   layerable?: boolean;
-  noMobile?: boolean;
+  no_mobile?: boolean;
   version: string;
   description: string;
   url: string;
-  downloadUrl: string;
-  marketingUrl: string;
-  thumbnailUrl?: string;
-  flags?: Flag[];
-  noExpire?: boolean;
-  dockIcon?: {
-    type: DockIconType;
-    backgroundColor: string;
-    foregroundColor: string;
-    borderColor: string;
-  };
-  deletionWarning?: string;
-  expiresAt?: number;
+  download_url: string;
+  marketing_url: string;
+  thumbnail_url?: string;
+  flags?: ComponentFlag[];
+  no_expire?: boolean;
+  dock_icon?: ThemeDockIcon;
+  deletion_warning?: string;
+  expires_at?: number;
 };

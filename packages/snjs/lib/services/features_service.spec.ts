@@ -8,7 +8,7 @@ import {
 } from '@Lib/index';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
-import { ContentType, Feature, FeatureIdentifier } from '@standardnotes/features';
+import { ContentType, FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 
 describe('featuresService', () => {
@@ -18,7 +18,7 @@ describe('featuresService', () => {
   let componentManager: SNComponentManager;
   let webSocketsService: SNWebSocketsService;
   let roles: RoleName[];
-  let features: Feature[];
+  let features: FeatureDescription[];
   let items: SNItem[];
 
   const createService = () => {
@@ -48,10 +48,10 @@ describe('featuresService', () => {
       },
       {
         identifier: FeatureIdentifier.BoldEditor,
-        contentType: ContentType.Component,
-        expiresAt: tomorrow,
+        content_type: ContentType.Component,
+        expires_at: tomorrow,
       }
-    ] as jest.Mocked<Feature[]>;
+    ] as jest.Mocked<FeatureDescription[]>;
 
     items = [] as jest.Mocked<SNItem[]>;
 
@@ -63,7 +63,7 @@ describe('featuresService', () => {
     apiService.addEventObserver = jest.fn();
     apiService.getUserFeatures = jest.fn().mockReturnValue({
       data: {
-        features,        
+        features,
       }
     });
 
@@ -89,7 +89,7 @@ describe('featuresService', () => {
     })
   })
 
-  describe('updateRoles()', () => {  
+  describe('updateRoles()', () => {
     it('saves new roles to storage and fetches features if a role has been added', async () => {
       const newRoles = [
         ...roles,
@@ -179,12 +179,12 @@ describe('featuresService', () => {
       const yesterday = now.setDate(now.getDate() - 1);
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
-      apiService.getUserFeatures = jest.fn().mockReturnValue({ 
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
           features: [{
             ...features[1],
             expiresAt: yesterday,
-          }] 
+          }]
         }
       });
 
@@ -219,12 +219,12 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
-      apiService.getUserFeatures = jest.fn().mockReturnValue({ 
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
           features: [{
             ...features[1],
             expiresAt: yesterday,
-          }] 
+          }]
         }
       });
 
@@ -254,12 +254,12 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
-      apiService.getUserFeatures = jest.fn().mockReturnValue({ 
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
           features: [{
             ...features[0],
             expiresAt: yesterday,
-          }] 
+          }]
         }
       });
 

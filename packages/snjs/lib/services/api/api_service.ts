@@ -88,13 +88,13 @@ const V0_API_VERSION = '20200115';
 type InvalidSessionObserver = (revoked: boolean) => void;
 
 export enum ApiServiceEvent {
-  MetaReceived = 'MetaReceived'
+  MetaReceived = 'MetaReceived',
 }
 
 export type MetaReceivedData = {
   userUuid: UuidString;
   userRoles: Role[];
-}
+};
 
 export class SNApiService extends PureService<
   ApiServiceEvent.MetaReceived,
@@ -594,12 +594,9 @@ export class SNApiService extends PureService<
   }
 
   async getUserFeatures(
-    userUuid: UuidString,
+    userUuid: UuidString
   ): Promise<HttpResponse | UserFeaturesResponse> {
-    const url = joinPaths(
-      this.host,
-      Paths.v1.userFeatures(userUuid)
-    );
+    const url = joinPaths(this.host, Paths.v1.userFeatures(userUuid));
     const response = await this.httpService
       .getAbsolute(url, undefined, this.session!.authorizationValue)
       .catch((errorResponse: HttpResponse) => {
@@ -690,6 +687,14 @@ export class SNApiService extends PureService<
       url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+    });
+  }
+
+  public downloadFeatureUrl(url: string): Promise<HttpResponse> {
+    return this.request({
+      verb: HttpVerb.Get,
+      url,
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
     });
   }
 

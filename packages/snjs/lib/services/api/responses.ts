@@ -6,7 +6,7 @@ import {
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 import { Role } from '@standardnotes/auth';
-import { Feature } from '@standardnotes/features';
+import { FeatureDescription } from '@standardnotes/features';
 import { UuidString } from '@Lib/types';
 
 export enum StatusCode {
@@ -199,7 +199,7 @@ export type RawSyncData = {
 export type RawSyncResponse = HttpResponse & { data: RawSyncData };
 
 export type UserFeaturesData = {
-  features: Feature[];
+  features: FeatureDescription[];
 };
 
 export type UserFeaturesResponse = HttpResponse & {

@@ -8,7 +8,7 @@ export class SNTheme extends SNComponent {
   public area: ComponentArea = ComponentArea.Themes;
 
   isLayerable(): boolean {
-    return this.package_info && this.package_info.layerable;
+    return this.package_info && this.package_info.layerable!;
   }
 
   /** Do not duplicate under most circumstances. Always keep original */

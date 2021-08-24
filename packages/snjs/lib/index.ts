@@ -140,7 +140,7 @@ export {
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
-export { ContentType } from '@Models/content_types';
+export { ContentType, displayStringForContentType } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
 

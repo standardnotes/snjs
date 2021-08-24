@@ -1461,6 +1461,10 @@ export class SNApplication {
     return this.settingsService.settings().deleteSetting(name);
   }
 
+  public downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+    return this.featuresService.downloadExternalFeature(url);
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();
