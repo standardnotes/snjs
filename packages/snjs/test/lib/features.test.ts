@@ -17,11 +17,11 @@ describe('features', () => {
 
     midnightThemeFeature = {
       ...Features.find(feature => feature.identifier === FeatureIdentifier.MidnightTheme) as Feature,
-      expiresAt: tomorrow,
+      expires_at: tomorrow,
     };
     boldEditorFeature = {
       ...Features.find(feature => feature.identifier === FeatureIdentifier.BoldEditor) as Feature,
-      expiresAt: tomorrow,
+      expires_at: tomorrow,
     };
 
     jest.spyOn(application.itemManager, 'createItem');
@@ -69,7 +69,7 @@ describe('features', () => {
         url: midnightThemeFeature.url,
         local_url: null,
         package_info: midnightThemeFeature,
-        valid_until: midnightThemeFeature.expiresAt,
+        valid_until: midnightThemeFeature.expires_at,
       });
       expect(editorItems[0].content).toMatchObject({
         identifier: boldEditorFeature.identifier,
@@ -79,7 +79,7 @@ describe('features', () => {
         local_url: null,
         area: boldEditorFeature.area,
         package_info: boldEditorFeature,
-        valid_until: midnightThemeFeature.expiresAt,
+        valid_until: midnightThemeFeature.expires_at,
       });
     });
 
@@ -108,7 +108,7 @@ describe('features', () => {
         url: midnightThemeFeature.url,
         local_url: null,
         package_info: midnightThemeFeature,
-        valid_until: midnightThemeFeature.expiresAt,
+        valid_until: midnightThemeFeature.expires_at,
       });
     });
 
@@ -122,7 +122,7 @@ describe('features', () => {
             features: [
               {
                 ...boldEditorFeature,
-                expiresAt: yesterday,
+                expires_at: yesterday,
               }, 
             ],
           },
@@ -150,7 +150,7 @@ describe('features', () => {
             features: [
               {
                 ...midnightThemeFeature,
-                expiresAt: yesterday,
+                expires_at: yesterday,
               }, 
             ],
           },
