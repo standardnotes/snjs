@@ -14,23 +14,27 @@ import { ContentType, FeatureDescription } from '@standardnotes/features';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
-import { SNComponent } from '@Lib/models';
+import { SNComponent, SNItem } from '@Lib/models';
 import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
 import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
+import { SNSettingsService } from './settings_service';
+import { SettingName } from '@standardnotes/settings';
 
 export class SNFeaturesService extends PureService<void> {
   private roles: RoleName[] = [];
   private removeApiServiceObserver?: () => void;
   private removeWebSocketsServiceObserver?: () => void;
+  private removeExtensionRepoItemsObserver?: () => void;
 
   constructor(
     private storageService: SNStorageService,
     private apiService: SNApiService,
     private itemManager: ItemManager,
     private componentManager: SNComponentManager,
-    private webSocketsService: SNWebSocketsService
+    private webSocketsService: SNWebSocketsService,
+    private settingsService: SNSettingsService,
   ) {
     super();
 
@@ -57,6 +61,29 @@ export class SNFeaturesService extends PureService<void> {
         }
       }
     );
+
+    this.removeExtensionRepoItemsObserver = this.itemManager.addObserver(
+      ContentType.ExtensionRepo,
+      async (changed, inserted) => {
+        const items = [...changed, ...inserted];
+        await this.updateExtensionKeySetting(items);
+      }
+    );
+  }
+
+  public async updateExtensionKeySetting(extensionRepoItems: SNItem[]): Promise<void> {
+    for (const item of extensionRepoItems) {
+      if (item.safeContent.package_info) {
+        const repoUrl: string = item.safeContent.package_info.url;
+        const userKeyMatch = repoUrl.match(/\w{32,64}/);
+        if (userKeyMatch && userKeyMatch.length > 0) {
+          const userKey = userKeyMatch[0];
+          await this.settingsService
+            .settings()
+            .updateSetting(SettingName.ExtensionKey, userKey);
+        }
+      }
+    }
   }
 
   public async loadUserRoles(): Promise<void> {
@@ -200,11 +227,14 @@ export class SNFeaturesService extends PureService<void> {
     (this.removeApiServiceObserver as unknown) = undefined;
     this.removeWebSocketsServiceObserver?.();
     (this.removeWebSocketsServiceObserver as unknown) = undefined;
+    this.removeExtensionRepoItemsObserver?.();
+    (this.removeExtensionRepoItemsObserver as unknown) = undefined;
     (this.roles as unknown) = undefined;
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
     (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
+    (this.settingsService as unknown) = undefined;
   }
 }

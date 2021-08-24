@@ -5,7 +5,7 @@ import { Environment } from './../platforms';
 import { SNStorageService } from '@Services/storage_service';
 import { SNProtocolService } from './../services/protocol_service';
 import { DeviceInterface } from '../device_interface';
-import { ChallengeService, SNSingletonManager } from '@Lib/services';
+import { ChallengeService, SNSingletonManager, SNFeaturesService } from '@Lib/services';
 
 /** Services that the migration service needs to function */
 export type MigrationServices = {
@@ -16,6 +16,7 @@ export type MigrationServices = {
   sessionManager: SNSessionManager;
   itemManager: ItemManager;
   singletonManager: SNSingletonManager;
+  featuresService: SNFeaturesService;
   environment: Environment;
   /** The application identifier */
   identifier: ApplicationIdentifier;
