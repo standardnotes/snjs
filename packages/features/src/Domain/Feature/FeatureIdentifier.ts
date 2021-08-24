@@ -10,6 +10,7 @@ export enum FeatureIdentifier {
   MarkdownBasicEditor = 'org.standardnotes.simple-markdown-editor',
   MarkdownProEditor = 'org.standardnotes.advanced-markdown-editor',
   MarkdownMinimistEditor = 'org.standardnotes.minimal-markdown-editor',
+  MarkdownMathEditor = 'org.standardnotes.fancy-markdown-editor',
   TaskEditor = 'org.standardnotes.simple-task-editor',
   CodeEditor = 'org.standardnotes.code-editor',
   TokenVaultEditor = 'org.standardnotes.token-vault',

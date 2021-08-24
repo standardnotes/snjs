@@ -174,6 +174,19 @@
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg"
   },
   {
+    "name": "Markdown Math",
+    "identifier": "org.standardnotes.fancy-markdown-editor",
+    "permissionName": "editor:markdown-math",
+    "contentType": "SN|Component",
+    "area": "editor-editor",
+    "version": "1.3.4",
+    "description": "A beautiful split-pane Markdown editor with synced-scroll, LaTeX support, and colorful syntax.",
+    "url": "#{url_prefix}/components/fancy-markdown-editor",
+    "downloadUrl": "https://github.com/standardnotes/math-editor/archive/1.3.4.zip",
+    "marketingUrl": "https://standardnotes.org/extensions/math-editor",
+    "thumbnailUrl": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg"
+  },
+  {
     "name": "Task Editor",
     "identifier": "org.standardnotes.simple-task-editor",
     "permission_name": "editor:task-editor",
@@ -385,12 +398,12 @@
     "area": "modal"
   },
   {
-    "name": "",
+    "name": "CloudLink",
     "identifier": "org.standardnotes.cloudlink",
     "permission_name": "component:cloud-link",
-    "description": "",
-    "version": "",
-    "url": "",
+    "description": "Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.",
+    "version": "1.2.3",
+    "url": "#{url_prefix}/components/cloudlink",
     "marketing_url": "",
     "download_url": "",
     "content_type": "SN|Component",
