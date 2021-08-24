@@ -4,7 +4,7 @@ import {
 } from '@Lib/index';
 import { SNWebSocketsService } from './websockets_service';
 
-describe('featuresService', () => {
+describe('webSocketsService', () => {
   const webSocketUrl = '';
 
   let storageService: SNStorageService;
