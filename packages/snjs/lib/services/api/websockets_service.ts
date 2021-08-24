@@ -1,4 +1,4 @@
-import { UserRoleChangedEvent } from '@standardnotes/domain-events';
+import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from '../pure_service';
 import { SNStorageService } from '../storage_service';
@@ -9,7 +9,7 @@ export enum WebSocketsServiceEvent {
 
 export class SNWebSocketsService extends PureService<
   WebSocketsServiceEvent,
-  UserRoleChangedEvent
+  UserRolesChangedEvent
 > {
   private webSocket?: WebSocket;
 
@@ -52,7 +52,7 @@ export class SNWebSocketsService extends PureService<
   }
 
   private onWebSocketMessage(event: MessageEvent) {
-    const eventData: UserRoleChangedEvent = JSON.parse(event.data);
+    const eventData: UserRolesChangedEvent = JSON.parse(event.data);
     void this.notifyEvent(
       WebSocketsServiceEvent.UserRoleMessageReceived,
       eventData

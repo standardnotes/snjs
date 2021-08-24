@@ -1,5 +1,5 @@
 import { ComponentPackageInfo } from './../models/app/component';
-import { UserRoleChangedEvent } from '@standardnotes/domain-events';
+import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
@@ -50,9 +50,9 @@ export class SNFeaturesService extends PureService<void> {
       async (eventName, data) => {
         if (eventName === WebSocketsServiceEvent.UserRoleMessageReceived) {
           const {
-            payload: { userUuid, toRole },
-          } = data as UserRoleChangedEvent;
-          await this.setRoles([toRole]);
+            payload: { userUuid, currentRoles },
+          } = data as UserRolesChangedEvent;
+          await this.setRoles(currentRoles);
           await this.updateFeatures(userUuid);
         }
       }
