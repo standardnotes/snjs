@@ -6,9 +6,9 @@ import {
   ItemManager,
   SNItem,
   SNComponentManager,
-  Uuid
 } from '@Lib/index';
 import { FillItemContent } from '@Lib/models/functions';
+import { PurePayload } from '@Lib/protocol/payloads';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType, FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
@@ -80,6 +80,7 @@ describe('featuresService', () => {
     itemManager.createItem = jest.fn();
     itemManager.changeComponent = jest.fn();
     itemManager.setItemsToBeDeleted = jest.fn();
+    itemManager.addObserver = jest.fn();
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
     componentManager.setReadonlyStateForComponent = jest.fn();
@@ -293,9 +294,11 @@ describe('featuresService', () => {
     it('should extract key from extension repo url and update user setting', async () => {
       const extensionKey = '129b029707e3470c94a8477a437f9394';
       const extensionRepoItem = FillItemContent({
-        package_info: {
-          url: `extensions.standardnotes.org/${extensionKey}`,
-        },
+        safeContent: {
+          package_info: {
+            url: `extensions.standardnotes.org/${extensionKey}`,
+          },
+        }
       }) as jest.Mocked<SNItem>;
       const featuresService = createService();
       await featuresService.updateExtensionKeySetting([extensionRepoItem]);
