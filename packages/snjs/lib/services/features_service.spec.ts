@@ -43,8 +43,8 @@ describe('featuresService', () => {
     features = [
       {
         identifier: FeatureIdentifier.MidnightTheme,
-        contentType: ContentType.Theme,
-        expiresAt: tomorrow,
+        content_type: ContentType.Theme,
+        expires_at: tomorrow,
       },
       {
         identifier: FeatureIdentifier.BoldEditor,
@@ -223,7 +223,7 @@ describe('featuresService', () => {
         data: {
           features: [{
             ...features[1],
-            expiresAt: yesterday,
+            expires_at: yesterday,
           }]
         }
       });
@@ -258,7 +258,7 @@ describe('featuresService', () => {
         data: {
           features: [{
             ...features[0],
-            expiresAt: yesterday,
+            expires_at: yesterday,
           }]
         }
       });
