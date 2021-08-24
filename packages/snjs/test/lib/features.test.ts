@@ -62,23 +62,31 @@ describe('features', () => {
       const editorItems = application.getItems(ContentType.Component);
       expect(themeItems).toHaveLength(1);
       expect(editorItems).toHaveLength(1);
-      expect(themeItems[0].content).toMatchObject({
-        identifier: midnightThemeFeature.identifier,
-        name: midnightThemeFeature.name,
-        hosted_url: midnightThemeFeature.url,
-        url: midnightThemeFeature.url,
-        package_info: midnightThemeFeature,
-        valid_until: new Date(midnightThemeFeature.expires_at),
-      });
-      expect(editorItems[0].content).toMatchObject({
-        identifier: boldEditorFeature.identifier,
-        name: boldEditorFeature.name,
-        hosted_url: boldEditorFeature.url,
-        url: boldEditorFeature.url,
-        area: boldEditorFeature.area,
-        package_info: boldEditorFeature,
-        valid_until: new Date(midnightThemeFeature.expires_at),
-      });
+      expect(themeItems[0].content).toMatchObject(
+        JSON.parse(
+          JSON.stringify({
+            identifier: midnightThemeFeature.identifier,
+            name: midnightThemeFeature.name,
+            hosted_url: midnightThemeFeature.url,
+            url: midnightThemeFeature.url,
+            package_info: midnightThemeFeature,
+            valid_until: new Date(midnightThemeFeature.expires_at),
+          })
+        )
+      );
+      expect(editorItems[0].content).toMatchObject(
+        JSON.parse(
+          JSON.stringify({
+            identifier: boldEditorFeature.identifier,
+            name: boldEditorFeature.name,
+            hosted_url: boldEditorFeature.url,
+            url: boldEditorFeature.url,
+            area: boldEditorFeature.area,
+            package_info: boldEditorFeature,
+            valid_until: new Date(midnightThemeFeature.expires_at),
+          })
+        )
+      );
     });
 
     it('should update content for existing feature items', async () => {
@@ -99,14 +107,18 @@ describe('features', () => {
       expect(application.itemManager.changeComponent).toHaveBeenCalledTimes(1);
       const themeItems = application.getItems(ContentType.Theme);
       expect(themeItems).toHaveLength(1);
-      expect(themeItems[0].content).toMatchObject({
-        identifier: midnightThemeFeature.identifier,
-        name: midnightThemeFeature.name,
-        hosted_url: midnightThemeFeature.url,
-        url: midnightThemeFeature.url,
-        package_info: midnightThemeFeature,
-        valid_until: new Date(midnightThemeFeature.expires_at),
-      });
+      expect(themeItems[0].content).toMatchObject(
+        JSON.parse(
+          JSON.stringify({
+            identifier: midnightThemeFeature.identifier,
+            name: midnightThemeFeature.name,
+            hosted_url: midnightThemeFeature.url,
+            url: midnightThemeFeature.url,
+            package_info: midnightThemeFeature,
+            valid_until: new Date(midnightThemeFeature.expires_at),
+          })
+        )
+      );
     });
 
     it('should set component to read only if feature has expired', async () => {
