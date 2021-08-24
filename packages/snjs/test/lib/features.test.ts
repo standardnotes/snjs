@@ -67,19 +67,17 @@ describe('features', () => {
         name: midnightThemeFeature.name,
         hosted_url: midnightThemeFeature.url,
         url: midnightThemeFeature.url,
-        local_url: null,
         package_info: midnightThemeFeature,
-        valid_until: midnightThemeFeature.expires_at,
+        valid_until: new Date(midnightThemeFeature.expires_at),
       });
       expect(editorItems[0].content).toMatchObject({
         identifier: boldEditorFeature.identifier,
         name: boldEditorFeature.name,
         hosted_url: boldEditorFeature.url,
         url: boldEditorFeature.url,
-        local_url: null,
         area: boldEditorFeature.area,
         package_info: boldEditorFeature,
-        valid_until: midnightThemeFeature.expires_at,
+        valid_until: new Date(midnightThemeFeature.expires_at),
       });
     });
 
@@ -106,9 +104,8 @@ describe('features', () => {
         name: midnightThemeFeature.name,
         hosted_url: midnightThemeFeature.url,
         url: midnightThemeFeature.url,
-        local_url: null,
         package_info: midnightThemeFeature,
-        valid_until: midnightThemeFeature.expires_at,
+        valid_until: new Date(midnightThemeFeature.expires_at),
       });
     });
 
