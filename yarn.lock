@@ -2390,6 +2390,44 @@
     "@octokit/openapi-types" "^3.2.0"
     "@types/node" ">= 8"
 
+"@otplib/core@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@otplib/core/-/core-12.0.1.tgz#73720a8cedce211fe5b3f683cd5a9c098eaf0f8d"
+  integrity sha512-4sGntwbA/AC+SbPhbsziRiD+jNDdIzsZ3JUyfZwjtKyc/wufl1pnSIaG4Uqx8ymPagujub0o92kgBnB89cuAMA==
+
+"@otplib/plugin-crypto@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@otplib/plugin-crypto/-/plugin-crypto-12.0.1.tgz#2b42c624227f4f9303c1c041fca399eddcbae25e"
+  integrity sha512-qPuhN3QrT7ZZLcLCyKOSNhuijUi9G5guMRVrxq63r9YNOxxQjPm59gVxLM+7xGnHnM6cimY57tuKsjK7y9LM1g==
+  dependencies:
+    "@otplib/core" "^12.0.1"
+
+"@otplib/plugin-thirty-two@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@otplib/plugin-thirty-two/-/plugin-thirty-two-12.0.1.tgz#5cc9b56e6e89f2a1fe4a2b38900ca4e11c87aa9e"
+  integrity sha512-MtT+uqRso909UkbrrYpJ6XFjj9D+x2Py7KjTO9JDPhL0bJUYVu5kFP4TFZW4NFAywrAtFRxOVY261u0qwb93gA==
+  dependencies:
+    "@otplib/core" "^12.0.1"
+    thirty-two "^1.0.2"
+
+"@otplib/preset-default@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@otplib/preset-default/-/preset-default-12.0.1.tgz#cb596553c08251e71b187ada4a2246ad2a3165ba"
+  integrity sha512-xf1v9oOJRyXfluBhMdpOkr+bsE+Irt+0D5uHtvg6x1eosfmHCsCC6ej/m7FXiWqdo0+ZUI6xSKDhJwc8yfiOPQ==
+  dependencies:
+    "@otplib/core" "^12.0.1"
+    "@otplib/plugin-crypto" "^12.0.1"
+    "@otplib/plugin-thirty-two" "^12.0.1"
+
+"@otplib/preset-v11@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@otplib/preset-v11/-/preset-v11-12.0.1.tgz#4c7266712e7230500b421ba89252963c838fc96d"
+  integrity sha512-9hSetMI7ECqbFiKICrNa4w70deTUfArtwXykPUvSHWOdzOlfa9ajglu7mNCntlvxycTiOAXkQGwjQCzzDEMRMg==
+  dependencies:
+    "@otplib/core" "^12.0.1"
+    "@otplib/plugin-crypto" "^12.0.1"
+    "@otplib/plugin-thirty-two" "^12.0.1"
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -2505,17 +2543,17 @@
   dependencies:
     "@standardnotes/common" "^1.0.0"
 
-"@standardnotes/sncrypto-common@^1.2.7", "@standardnotes/sncrypto-common@^1.2.9":
-  version "1.2.10"
-  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.2.10.tgz#c806a397446239676cda55dd8cc53f3636bf2c0b"
-  integrity sha512-YfPQ4pxlGZOYb62Mu7m9UWduJKn3/txE7tQ6G3qjq6suD0Asdwf9W2h4P5Wa6aYMfHWk2enBfQo9hBg3ScnyOQ==
+"@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
+  integrity sha512-+OQ6gajTcVSHruw33T52MHyBDKL1vRCfQBXQn4tt4+bCfBAe+PFLkEQMHp35bg5twCfg9+wUf2KhmNNSNyBBZw==
 
-"@standardnotes/sncrypto-web@^1.2.9":
-  version "1.2.10"
-  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-web/-/sncrypto-web-1.2.10.tgz#ddda0c8ec92754c1334d9a83be7b320433c55b79"
-  integrity sha512-mmHlXFFovBqOdctpMkyXTpK0zI/k4NuXoV5LRGLKIXUktT9/cZg1pgNNfGPFUP+g4C5M2qxeFmZKFh581ipolQ==
+"@standardnotes/sncrypto-web@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-web/-/sncrypto-web-1.5.2.tgz#b213063149b563a4f57f0144f3c9fe62ad0458c0"
+  integrity sha512-ltfc0EqeCAGvd0+q7iGOcIVNgbPLJHRw5RQaAGdFtAe98VEH3GcyUm9PxEnUN+Q1gk+HJ083gU6q2tJbo5L+3Q==
   dependencies:
-    "@standardnotes/sncrypto-common" "^1.2.7"
+    "@standardnotes/sncrypto-common" "^1.5.2"
     libsodium-wrappers "^0.7.8"
 
 "@tootallnate/once@1":
@@ -9045,6 +9083,15 @@ osenv@^0.1.4, osenv@^0.1.5:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
 
+otplib@^12.0.1:
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/otplib/-/otplib-12.0.1.tgz#c1d3060ab7aadf041ed2960302f27095777d1f73"
+  integrity sha512-xDGvUOQjop7RDgxTQ+o4pOol0/3xSZzawTiPKRrHnQWAy0WjhNs/5HdIDJCrqC4MBynmjXgULc6YfioaxZeFgg==
+  dependencies:
+    "@otplib/core" "^12.0.1"
+    "@otplib/preset-default" "^12.0.1"
+    "@otplib/preset-v11" "^12.0.1"
+
 p-each-series@^2.1.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/p-each-series/-/p-each-series-2.2.0.tgz#105ab0357ce72b202a8a8b94933672657b5e2a9a"
@@ -10975,6 +11022,11 @@ thenify-all@^1.0.0:
   integrity sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==
   dependencies:
     any-promise "^1.0.0"
+
+thirty-two@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/thirty-two/-/thirty-two-1.0.2.tgz#4ca2fffc02a51290d2744b9e3f557693ca6b627a"
+  integrity sha1-TKL//AKlEpDSdEueP1V2k8prYno=
 
 throat@^5.0.0:
   version "5.0.0"

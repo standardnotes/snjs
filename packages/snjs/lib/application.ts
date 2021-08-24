@@ -103,6 +103,8 @@ import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
+import { SNMfaService } from './services/mfa_service';
+import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -146,6 +148,7 @@ export class SNApplication {
   private credentialService!: SNCredentialService;
   private webSocketsService!: SNWebSocketsService;
   private settingsService!: SNSettingsService;
+  private mfaService!: SNMfaService;
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService<any, any>[] = [];
@@ -455,7 +458,7 @@ export class SNApplication {
   /**
    * Finds an item by predicate.
    */
-  public getAll(uuids: UuidString[]): (SNItem | undefined)[] {
+  public getAll(uuids: UuidString[]): (SNItem | PurePayload | undefined)[] {
     return this.itemManager.findItems(uuids);
   }
 
@@ -1446,19 +1449,43 @@ export class SNApplication {
   }
 
   public async listSettings() {
-    return this.settingsService.settings().listSettings();
+    return this.settingsService.listSettings();
   }
 
   public async getSetting(name: SettingName) {
-    return this.settingsService.settings().getSetting(name);
+    return this.settingsService.getSetting(name);
+  }
+
+  public async getSensitiveSetting(name: SensitiveSettingName) {
+    return this.settingsService.getSensitiveSetting(name);
   }
 
   public async updateSetting(name: SettingName, payload: string) {
-    return this.settingsService.settings().updateSetting(name, payload);
+    return this.settingsService.updateSetting(name, payload);
   }
 
   public async deleteSetting(name: SettingName) {
-    return this.settingsService.settings().deleteSetting(name);
+    return this.settingsService.deleteSetting(name);
+  }
+
+  public async isMfaActivated() {
+    return this.mfaService.isMfaActivated();
+  }
+
+  public async generateMfaSecret() {
+    return this.mfaService.generateMfaSecret();
+  }
+
+  public async getOtpToken(secret: string) {
+    return this.mfaService.getOtpToken(secret);
+  }
+
+  public async enableMfa(secret: string, otpToken: string) {
+    return this.mfaService.enableMfa(secret, otpToken);
+  }
+
+  public async disableMfa() {
+    return this.mfaService.disableMfa();
   }
 
   public downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
@@ -1496,6 +1523,7 @@ export class SNApplication {
     this.createSettingsService();
     this.createFeaturesService();
     this.createMigrationService();
+    this.createMfaService();
   }
 
   private clearServices() {
@@ -1521,6 +1549,7 @@ export class SNApplication {
     (this.credentialService as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
+    (this.mfaService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1809,6 +1838,12 @@ export class SNApplication {
       this.sessionManager,
       this.apiService
     );
+    this.services.push(this.settingsService);
+  }
+
+  private createMfaService() {
+    this.mfaService = new SNMfaService(this.settingsService, this.crypto);
+    this.services.push(this.mfaService);
   }
 
   private getClass<T>(base: T) {

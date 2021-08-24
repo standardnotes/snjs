@@ -28,7 +28,7 @@
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
-    "@standardnotes/sncrypto-web": "^1.2.9",
+    "@standardnotes/sncrypto-web": "^1.5.2",
     "@types/crypto-js": "^4.0.1",
     "@types/jest": "^26.0.23",
     "@types/jsdom": "^16.2.11",
@@ -57,6 +57,7 @@
     "libsodium-wrappers": "^0.7.9",
     "lodash": "^4.17.19",
     "nock": "^13.1.0",
+    "otplib": "^12.0.1",
     "regenerator-runtime": "^0.13.5",
     "script-loader": "^0.7.2",
     "serve-static": "^1.14.1",
@@ -74,7 +75,7 @@
   "dependencies": {
     "@standardnotes/auth": "3.1.1",
     "@standardnotes/domain-events": "1.9.0",
-    "@standardnotes/sncrypto-common": "^1.2.9",
-    "@standardnotes/features": "1.4.0"
+    "@standardnotes/features": "1.4.0",
+    "@standardnotes/sncrypto-common": "1.5.2"
   }
 }

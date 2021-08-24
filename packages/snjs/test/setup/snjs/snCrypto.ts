@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import CryptoJS from 'crypto-js';
 import sodium, { base64_variants } from 'libsodium-wrappers';
 import NodeCrypto from 'crypto';
+import {totp, authenticator} from 'otplib';
 
 /**
  * An SNPureCrypto implementation. Required to create a new SNApplication instance.
@@ -35,14 +36,20 @@ export default class SNCrypto implements SNPureCrypto {
     iterations: number,
     length: number
   ): Promise<HexString | null> {
-    const key = NodeCrypto.pbkdf2Sync(password, salt, iterations, length / 8, 'sha512');
-    return key.toString("hex");
+    const key = NodeCrypto.pbkdf2Sync(
+      password,
+      salt,
+      iterations,
+      length / 8,
+      'sha512'
+    );
+    return key.toString('hex');
   }
 
   public async generateRandomKey(bits: number): Promise<string> {
     await this.ready;
     const bytes = bits / 8;
-    return sodium.randombytes_buf(bytes, "hex");
+    return sodium.randombytes_buf(bytes, 'hex');
   }
 
   public async aes256CbcEncrypt(
@@ -52,7 +59,7 @@ export default class SNCrypto implements SNPureCrypto {
   ): Promise<Base64String> {
     const hexKeyData = CryptoJS.enc.Hex.parse(key);
     const encrypted = CryptoJS.AES.encrypt(plaintext, hexKeyData, {
-      iv: CryptoJS.enc.Hex.parse(iv)
+      iv: CryptoJS.enc.Hex.parse(iv),
     });
     return encrypted.ciphertext.toString(CryptoJS.enc.Base64);
   }
@@ -65,7 +72,7 @@ export default class SNCrypto implements SNPureCrypto {
     try {
       const hexKeyData = CryptoJS.enc.Hex.parse(key);
       const decrypted = CryptoJS.AES.decrypt(ciphertext, hexKeyData, {
-        iv: CryptoJS.enc.Hex.parse(iv)
+        iv: CryptoJS.enc.Hex.parse(iv),
       });
       return decrypted.toString(CryptoJS.enc.Utf8);
     } catch (e) {
@@ -132,7 +139,7 @@ export default class SNCrypto implements SNPureCrypto {
       );
       return sodium.to_base64(arrayBuffer, base64_variants.ORIGINAL);
     } catch (e) {
-      return "";
+      return '';
     }
   }
 
@@ -171,5 +178,40 @@ export default class SNCrypto implements SNPureCrypto {
 
   public async base64Decode(base64String: Base64String): Promise<string> {
     return atob(base64String);
+  }
+
+  public async hmac1(
+    message: Utf8String,
+    key: HexString
+  ): Promise<HexString | null> {
+    try {
+      const keyHexData = CryptoJS.enc.Hex.parse(key);
+      const encrypted = CryptoJS.HmacSHA256(message, keyHexData);
+      return encrypted.toString(CryptoJS.enc.Hex);
+    } catch (e) {
+      return null;
+    }
+  }
+  public async generateOtpSecret(): Promise<string> {
+    return authenticator.generateSecret(20);
+  }
+
+  public async hotpToken(
+    _secret: string,
+    _counter: number,
+    _tokenLength = 6
+  ): Promise<string> {
+    throw new Error(
+      'Not implemented for tests, only leveraged for totp in SNWebCrypto'
+    );
+  }
+
+  public async totpToken(
+    secret: string,
+    _timestamp: number,
+    _tokenLength = 6,
+    _step = 30
+  ): Promise<string> {
+    return totp.generate(secret);
   }
 }

@@ -5,10 +5,12 @@ import {
   DeleteSettingResponse,
   GetSettingResponse,
   ListSettingsResponse,
+  StatusCode,
   UpdateSettingResponse,
   User,
 } from '../api/responses';
 import { UuidString } from '@Lib/types';
+import { SensitiveSettingName } from './SensitiveSettingName';
 
 interface SettingsAPI {
   listSettings(userUuid: UuidString): Promise<ListSettingsResponse>;
@@ -69,13 +71,26 @@ export class SettingsGateway implements SettingsProvider {
   }
 
   async getSetting(name: SettingName): Promise<string | null> {
-    const { error, data } = await this.settingsApi.getSetting(
-      this.userUuid,
-      name
-    );
+    const response = await this.settingsApi.getSetting(this.userUuid, name);
 
-    if (error != null) throw new Error(error.message);
-    return data?.setting?.value ?? null;
+    // Backend responds with 400 when setting doesn't exist
+    if (response.status === StatusCode.HttpBadRequest) return null;
+
+    if (response.error != null) throw new Error(response.error.message);
+
+    return response?.data?.setting?.value ?? null;
+  }
+
+  async getSensitiveSetting(name: SensitiveSettingName): Promise<boolean> {
+    const response = await this.settingsApi.getSetting(this.userUuid, name);
+    console.log(JSON.stringify(response));
+
+    // Backend responds with 400 when setting doesn't exist
+    if (response.status === StatusCode.HttpBadRequest) return false;
+
+    if (response.error != null) throw new Error(response.error.message);
+
+    return response.data?.setting?.sensitive ?? false;
   }
 
   async updateSetting(name: SettingName, payload: string): Promise<void> {

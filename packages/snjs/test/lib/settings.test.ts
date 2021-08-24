@@ -1,7 +1,8 @@
+import { SettingName } from '@Lib/../../settings/dist';
 import { Platform, Environment, Uuid, SNApplication } from '@Lib/index';
 import * as Factory from '../factory';
 
-describe('settings', function () {
+describe('settings service', function () {
   const fakeSetting: any = 'FAKE_SETTING';
   const fakePayload = 'Im so meta even this acronym';
   const updatedFakePayload = 'is meta';
@@ -52,5 +53,21 @@ describe('settings', function () {
     await snApp.updateSetting(fakeSetting, updatedFakePayload);
     const responseUpdated = await snApp.getSetting(fakeSetting);
     expect(responseUpdated).toEqual(updatedFakePayload);
+  });
+
+  it('reads a nonexistent setting', async () => {
+    const setting = await snApp.getSetting('MADE_UP_SETTING' as any);
+    expect(setting).toEqual(null);
+  });
+
+  it('reads a nonexistent sensitive setting', async () => {
+    const setting = await snApp.getSensitiveSetting(SettingName.MfaSecret);
+    expect(setting).toEqual(false);
+  });
+
+  it('creates and reads a sensitive setting', async () => {
+    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret');
+    const setting = await snApp.getSensitiveSetting(SettingName.MfaSecret);
+    expect(setting).toEqual(true);
   });
 });
