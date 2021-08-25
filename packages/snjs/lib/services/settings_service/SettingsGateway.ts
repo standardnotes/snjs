@@ -83,7 +83,6 @@ export class SettingsGateway implements SettingsProvider {
 
   async getSensitiveSetting(name: SensitiveSettingName): Promise<boolean> {
     const response = await this.settingsApi.getSetting(this.userUuid, name);
-    console.log(JSON.stringify(response));
 
     // Backend responds with 400 when setting doesn't exist
     if (response.status === StatusCode.HttpBadRequest) return false;
