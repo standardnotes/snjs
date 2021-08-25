@@ -23,6 +23,7 @@ import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 
 export class SNFeaturesService extends PureService<void> {
+  private deinited = false;
   private roles: RoleName[] = [];
   private removeApiServiceObserver?: () => void;
   private removeWebSocketsServiceObserver?: () => void;
@@ -116,7 +117,7 @@ export class SNFeaturesService extends PureService<void> {
 
   private async updateFeatures(userUuid: UuidString): Promise<void> {
     const featuresResponse = await this.apiService.getUserFeatures(userUuid);
-    if (!featuresResponse.error && featuresResponse.data) {
+    if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
       await this.mapFeaturesToItems(
         (featuresResponse as UserFeaturesResponse).data.features
       );
@@ -236,5 +237,6 @@ export class SNFeaturesService extends PureService<void> {
     (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
+    this.deinited = true;
   }
 }
