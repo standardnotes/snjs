@@ -80,7 +80,7 @@ export class SNFeaturesService extends PureService<void> {
         if (userKeyMatch && userKeyMatch.length > 0) {
           const userKey = userKeyMatch[0];
           await this.settingsService
-            .updateSetting(SettingName.ExtensionKey, userKey);
+            .updateSetting(SettingName.ExtensionKey, userKey, true);
         }
       }
     }

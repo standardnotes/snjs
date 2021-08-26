@@ -1465,7 +1465,7 @@ export class SNApplication {
   public async updateSetting(
     name: SettingName,
     payload: string,
-    sensitive: boolean = false
+    sensitive = false
   ) {
     return this.settingsService.updateSetting(name, payload, sensitive);
   }

@@ -300,7 +300,7 @@ describe('featuresService', () => {
       }) as jest.Mocked<SNItem>;
       const featuresService = createService();
       await featuresService.updateExtensionKeySetting([extensionRepoItem]);
-      expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey);
+      expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
     });
   })
 });

@@ -41,7 +41,7 @@ export class SNSettingsService extends PureService {
   }
 
   deinit(): void {
-    this._provider.deinit();
+    this._provider?.deinit();
     (this._provider as unknown) = undefined;
     (this.sessionManager as unknown) = undefined;
     (this.apiService as unknown) = undefined;
