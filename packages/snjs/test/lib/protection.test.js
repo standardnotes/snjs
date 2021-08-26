@@ -199,6 +199,7 @@ describe('protections', function () {
       email: Uuid.GenerateUuidSynchronously(),
       password,
     });
+
     const promise = new Promise((resolve, reject) => {
       application.setLaunchCallback({
         receiveChallenge(challenge) {
@@ -216,7 +217,8 @@ describe('protections', function () {
     });
     application.addPasscode('passcode');
     await Factory.sleep(2);
-    return promise;
+    await promise;
+    await Factory.safeDeinit(application);
   });
 
   it('authorizes note access when no password or passcode are set', async function () {
