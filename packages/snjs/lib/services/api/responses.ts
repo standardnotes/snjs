@@ -20,11 +20,10 @@ export enum StatusCode {
   /** The session's access token is expired, but the refresh token is valid */
   HttpStatusExpiredAccessToken = 498,
   /** The session's access token and refresh token are expired, user must reauthenticate */
-  HttpBadRequest = 400,
-
   HttpStatusInvalidSession = 401,
   /** User's IP is rate-limited. */
   HttpStatusForbidden = 403,
+  HttpBadRequest = 400,
 }
 
 type Error = {
