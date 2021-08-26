@@ -51,5 +51,6 @@ export class SNMfaService extends PureService {
   deinit() {
     (this.settingsService as unknown) = undefined;
     (this.crypto as unknown) = undefined;
+    super.deinit();
   }
 }
