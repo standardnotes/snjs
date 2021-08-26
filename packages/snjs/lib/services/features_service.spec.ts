@@ -89,9 +89,7 @@ describe('featuresService', () => {
     webSocketsService.addEventObserver = jest.fn();
 
     settingsService = {} as jest.Mocked<SNSettingsService>;
-    settingsService.settings = jest.fn().mockReturnValue({
-      updateSetting: jest.fn(),
-    });
+    settingsService.updateSetting = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
@@ -302,7 +300,7 @@ describe('featuresService', () => {
       }) as jest.Mocked<SNItem>;
       const featuresService = createService();
       await featuresService.updateExtensionKeySetting([extensionRepoItem]);
-      expect(settingsService.settings().updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey);
+      expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
     });
   })
 });

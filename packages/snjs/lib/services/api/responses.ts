@@ -23,6 +23,7 @@ export enum StatusCode {
   HttpStatusInvalidSession = 401,
   /** User's IP is rate-limited. */
   HttpStatusForbidden = 403,
+  HttpBadRequest = 400,
 }
 
 type Error = {
@@ -210,9 +211,11 @@ type SettingData = {
   uuid: string;
   name: string;
   value: string;
+  sensitive?: boolean;
 };
 
 export type MinimalHttpResponse = {
+  status?: StatusCode;
   error?: Error;
 };
 
@@ -223,6 +226,7 @@ export type ListSettingsResponse = MinimalHttpResponse & {
 };
 export type GetSettingResponse = MinimalHttpResponse & {
   data?: {
+    success?: boolean;
     setting?: SettingData;
   };
 };
