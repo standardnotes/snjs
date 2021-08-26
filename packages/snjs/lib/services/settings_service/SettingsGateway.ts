@@ -1,6 +1,5 @@
 import { SettingName } from '@standardnotes/settings';
 import * as messages from '../api/messages';
-import { Settings, SettingsProvider } from './SettingsProvider';
 import {
   DeleteSettingResponse,
   GetSettingResponse,
@@ -18,7 +17,8 @@ interface SettingsAPI {
   updateSetting(
     userUuid: UuidString,
     settingName: string,
-    settingValue: string
+    settingValue: string,
+    sensitive: boolean
   ): Promise<UpdateSettingResponse>;
 
   getSetting(
@@ -32,11 +32,15 @@ interface SettingsAPI {
   ): Promise<DeleteSettingResponse>;
 }
 
+export type Settings = {
+  [key in SettingName]: string;
+};
+
 /**
  * SettingsGateway coordinates communication with the API service
  * wrapping the userUuid provision for simpler consumption
  */
-export class SettingsGateway implements SettingsProvider {
+export class SettingsGateway {
   constructor(
     private readonly settingsApi: SettingsAPI,
     private readonly userProvider: { getUser: () => User | undefined }
@@ -89,14 +93,19 @@ export class SettingsGateway implements SettingsProvider {
 
     if (response.error != null) throw new Error(response.error.message);
 
-    return response.data?.setting?.sensitive ?? false;
+    return response.data?.success ?? false;
   }
 
-  async updateSetting(name: SettingName, payload: string): Promise<void> {
+  async updateSetting(
+    name: SettingName,
+    payload: string,
+    sensitive: boolean
+  ): Promise<void> {
     const { error } = await this.settingsApi.updateSetting(
       this.userUuid,
       name,
-      payload
+      payload,
+      sensitive
     );
     if (error != null) throw new Error(error.message);
   }

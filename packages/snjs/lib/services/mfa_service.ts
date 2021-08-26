@@ -1,8 +1,8 @@
 import { SettingName } from '@standardnotes/settings';
 
-import { SNSettingsService } from '../settings_service';
-import { PureService } from '../pure_service';
-import * as messages from '../api/messages';
+import { SNSettingsService } from './settings_service';
+import { PureService } from './pure_service';
+import * as messages from './api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 
 export class SNMfaService extends PureService {
@@ -16,7 +16,8 @@ export class SNMfaService extends PureService {
   private async saveMfaSetting(secret: string): Promise<void> {
     return await this.settingsService.updateSetting(
       SettingName.MfaSecret,
-      secret
+      secret,
+      true
     );
   }
 

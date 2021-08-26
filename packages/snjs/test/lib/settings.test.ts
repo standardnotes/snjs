@@ -56,7 +56,7 @@ describe('settings service', function () {
   });
 
   it('reads a nonexistent setting', async () => {
-    const setting = await snApp.getSetting('MADE_UP_SETTING' as any);
+    const setting = await snApp.getSetting(fakeSetting);
     expect(setting).toEqual(null);
   });
 
@@ -66,8 +66,15 @@ describe('settings service', function () {
   });
 
   it('creates and reads a sensitive setting', async () => {
-    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret');
+    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true);
     const setting = await snApp.getSensitiveSetting(SettingName.MfaSecret);
     expect(setting).toEqual(true);
+  });
+
+  it('creates and lists a sensitive setting', async () => {
+    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true);
+    await snApp.updateSetting('UNSENSITIVE' as any, 'so_unsensitive');
+    const settings = await snApp.listSettings();
+    expect(settings).toEqual({ UNSENSITIVE: 'so_unsensitive' });
   });
 });

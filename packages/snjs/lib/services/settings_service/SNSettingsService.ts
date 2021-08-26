@@ -1,14 +1,13 @@
 import { PureService } from '../pure_service';
 
 import { SNApiService } from '../api/api_service';
-import { SettingsProvider } from './SettingsProvider';
 import { SettingsGateway } from './SettingsGateway';
 import { SNSessionManager } from '../api/session_manager';
 import { SettingName } from '@Lib/../../settings/dist';
 import { SensitiveSettingName } from './SensitiveSettingName';
 
 export class SNSettingsService extends PureService {
-  private _provider!: SettingsProvider;
+  private _provider!: SettingsGateway;
 
   constructor(
     private readonly sessionManager: SNSessionManager,
@@ -29,12 +28,12 @@ export class SNSettingsService extends PureService {
     return this._provider.getSetting(name);
   }
 
-  async getSensitiveSetting(name: SensitiveSettingName) {
-    return this._provider.getSensitiveSetting(name);
+  async updateSetting(name: SettingName, payload: string, sensitive: boolean) {
+    return this._provider.updateSetting(name, payload, sensitive);
   }
 
-  async updateSetting(name: SettingName, payload: string) {
-    return this._provider.updateSetting(name, payload);
+  async getSensitiveSetting(name: SensitiveSettingName) {
+    return this._provider.getSensitiveSetting(name);
   }
 
   async deleteSetting(name: SettingName) {

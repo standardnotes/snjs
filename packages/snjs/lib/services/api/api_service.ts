@@ -651,11 +651,13 @@ export class SNApiService extends PureService<
   async updateSetting(
     userUuid: UuidString,
     settingName: string,
-    settingValue: string | null
+    settingValue: string | null,
+    sensitive: boolean
   ): Promise<UpdateSettingResponse> {
     const params = {
       name: settingName,
       value: settingValue,
+      sensitive: sensitive,
     };
     return this.tokenRefreshableRequest<UpdateSettingResponse>({
       verb: HttpVerb.Put,

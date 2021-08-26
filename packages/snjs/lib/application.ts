@@ -1456,12 +1456,18 @@ export class SNApplication {
     return this.settingsService.getSetting(name);
   }
 
-  public async getSensitiveSetting(name: SensitiveSettingName) {
+  public async getSensitiveSetting(
+    name: SensitiveSettingName
+  ): Promise<boolean> {
     return this.settingsService.getSensitiveSetting(name);
   }
 
-  public async updateSetting(name: SettingName, payload: string) {
-    return this.settingsService.updateSetting(name, payload);
+  public async updateSetting(
+    name: SettingName,
+    payload: string,
+    sensitive: boolean = false
+  ) {
+    return this.settingsService.updateSetting(name, payload, sensitive);
   }
 
   public async deleteSetting(name: SettingName) {
@@ -1488,7 +1494,9 @@ export class SNApplication {
     return this.mfaService.disableMfa();
   }
 
-  public downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+  public downloadExternalFeature(
+    url: string
+  ): Promise<SNComponent | undefined> {
     return this.featuresService.downloadExternalFeature(url);
   }
 
@@ -1561,7 +1569,7 @@ export class SNApplication {
       this.itemManager,
       this.componentManager,
       this.webSocketsService,
-      this.settingsService,
+      this.settingsService
     );
     this.services.push(this.featuresService);
   }
@@ -1569,7 +1577,7 @@ export class SNApplication {
   private createWebSocketsService() {
     this.webSocketsService = new SNWebSocketsService(
       this.storageService,
-      this.webSocketUrl,
+      this.webSocketUrl
     );
     this.services.push(this.webSocketsService);
   }
@@ -1608,7 +1616,7 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.defaultHost,
+      this.defaultHost
     );
     this.services.push(this.apiService);
   }
@@ -1698,7 +1706,7 @@ export class SNApplication {
       this.alertService,
       this.protocolService,
       this.challengeService,
-      this.webSocketsService,
+      this.webSocketsService
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {

@@ -227,6 +227,7 @@ export type ListSettingsResponse = MinimalHttpResponse & {
 };
 export type GetSettingResponse = MinimalHttpResponse & {
   data?: {
+    success?: boolean;
     setting?: SettingData;
   };
 };
