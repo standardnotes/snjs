@@ -191,7 +191,7 @@ describe('features', () => {
         },
       }));
       await new Promise(resolve => setTimeout(resolve, 1000));
-      expect(await application.getSetting(SettingName.ExtensionKey)).toBe(null);
+      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).toBe(true);
     });
   });
 });
