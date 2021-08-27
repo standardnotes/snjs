@@ -245,7 +245,7 @@ describe('2020-01-15 mobile migration', () => {
       'Expecting exception due to deiniting application while trying to renew session'
     );
     application.deinit();
-  });
+  }, Factory.LongTestTimeout);
 
   it('2020-01-15 migration with passcode only', async function () {
     const application = await Factory.createAppWithRandNamespace(
@@ -1421,5 +1421,5 @@ describe('2020-01-15 mobile migration', () => {
       'Expecting exception due to deiniting application while trying to renew session'
     );
     application.deinit();
-  });
+  }, Factory.LongTestTimeout);
 });
