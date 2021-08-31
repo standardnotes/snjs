@@ -2,6 +2,7 @@ import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
 import { HttpResponse, StatusCode } from './responses';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
+import packageJson from '../../../package.json'
 
 export enum HttpVerb {
   Get = 'GET',
@@ -89,6 +90,21 @@ export class SNHttpService extends PureService {
     }
     request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
+
+    // TODO: `localStorage` might not be present in mobile, perhaps need to use the service instead
+    const environmentWithVersion = localStorage.getItem('environmentWithVersion');
+    if (environmentWithVersion) {
+      const [environment, version] = environmentWithVersion.split('::');
+      if (environment && version) {
+        // TODO: move this if/else below to some util; also the separator above - `::`
+        if (environment === 'web') {
+          request.setRequestHeader('X-Web-Version', version)
+        }
+      }
+    }
+    const snjsVersion = packageJson.version;
+    request.setRequestHeader('X-SNJS-Version', snjsVersion)
+
     if (httpRequest.authentication) {
       request.setRequestHeader(
         'Authorization',
