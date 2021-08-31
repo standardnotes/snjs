@@ -1,4 +1,4 @@
-import { SettingName } from '@Lib/../../settings/dist';
+import { SettingName } from '@standardnotes/settings';
 import {
   StorageKey,
   SNStorageService,
