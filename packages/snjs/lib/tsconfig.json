@@ -5,7 +5,6 @@
     "allowJs": true,
     "strict": true,
     "isolatedModules": true,
-    "resolveJsonModule": true,
     "esModuleInterop": true,
     "newLine": "lf",
     "noUnusedParameters": true,

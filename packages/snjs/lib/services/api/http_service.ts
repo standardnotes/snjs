@@ -46,8 +46,8 @@ export class SNHttpService extends PureService {
   }: SNHttpServiceParams) {
     super();
 
-    this.appVersion = appVersion
-    this.environment = environment
+    this.appVersion = appVersion;
+    this.environment = environment;
   }
   public async getAbsolute(
     url: string,
@@ -108,7 +108,7 @@ export class SNHttpService extends PureService {
     }
     request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
-    request.setRequestHeader('X-SNJS-Version', SnjsVersion)
+    request.setRequestHeader('X-SNJS-Version', SnjsVersion);
 
     const environmentHeaderTitle = this.getCorrectHeaderForEnvironment(this.environment);
     request.setRequestHeader(environmentHeaderTitle, this.appVersion);

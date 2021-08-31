@@ -236,7 +236,7 @@ export class SNApplication {
 
     this.appVersion = this.getAppVersion();
     if (this.appVersion === '') {
-      throw Error('`getAppVersion` must be overriden when creating an application')
+      throw Error('`getAppVersion` must be overriden when creating an application');
     }
 
     this.constructServices();
