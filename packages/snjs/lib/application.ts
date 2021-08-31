@@ -149,6 +149,7 @@ export class SNApplication {
   private webSocketsService!: SNWebSocketsService;
   private settingsService!: SNSettingsService;
   private mfaService!: SNMfaService;
+  private appVersion!: string;
 
   private eventHandlers: ApplicationObserver[] = [];
   private services: PureService<any, any>[] = [];
@@ -232,6 +233,12 @@ export class SNApplication {
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
     }
+
+    this.appVersion = this.getAppVersion();
+    if (this.appVersion === '') {
+      throw Error('`getAppVersion` must be overriden when creating an application')
+    }
+
     this.constructServices();
   }
 
@@ -338,6 +345,11 @@ export class SNApplication {
 
   public onLaunch(): void {
     // optional override
+  }
+
+  public getAppVersion(): string {
+    // mandatory override
+    return '';
   }
 
   public getLaunchChallenge(): Challenge | undefined {
@@ -1558,6 +1570,7 @@ export class SNApplication {
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
     (this.mfaService as unknown) = undefined;
+    (this.appVersion as unknown) = undefined;
 
     this.services = [];
   }
@@ -1642,7 +1655,10 @@ export class SNApplication {
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService();
+    this.httpService = new SNHttpService({
+      environment: this.environment,
+      appVersion: this.appVersion,
+    });
     this.services.push(this.httpService);
   }
 

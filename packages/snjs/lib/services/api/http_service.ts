@@ -2,7 +2,8 @@ import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
 import { HttpResponse, StatusCode } from './responses';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
-import packageJson from '../../../package.json'
+import { SnjsVersion } from '@Lib/version';
+import { Environment } from '@Lib/platforms';
 
 export enum HttpVerb {
   Get = 'GET',
@@ -27,10 +28,27 @@ export type HttpRequest = {
   authentication?: string;
 };
 
+type SNHttpServiceParams = {
+  environment: Environment;
+  appVersion: string
+};
+
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export class SNHttpService extends PureService {
+  private readonly appVersion: string;
+  private readonly environment: Environment;
+
+  constructor({
+    environment,
+    appVersion
+  }: SNHttpServiceParams) {
+    super();
+
+    this.appVersion = appVersion
+    this.environment = environment
+  }
   public async getAbsolute(
     url: string,
     params?: HttpParams,
@@ -90,20 +108,10 @@ export class SNHttpService extends PureService {
     }
     request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
+    request.setRequestHeader('X-SNJS-Version', SnjsVersion)
 
-    // TODO: `localStorage` might not be present in mobile, perhaps need to use the service instead
-    const environmentWithVersion = localStorage.getItem('environmentWithVersion');
-    if (environmentWithVersion) {
-      const [environment, version] = environmentWithVersion.split('::');
-      if (environment && version) {
-        // TODO: move this if/else below to some util; also the separator above - `::`
-        if (environment === 'web') {
-          request.setRequestHeader('X-Web-Version', version)
-        }
-      }
-    }
-    const snjsVersion = packageJson.version;
-    request.setRequestHeader('X-SNJS-Version', snjsVersion)
+    const environmentHeaderTitle = this.getCorrectHeaderForEnvironment(this.environment);
+    request.setRequestHeader(environmentHeaderTitle, this.appVersion);
 
     if (httpRequest.authentication) {
       request.setRequestHeader(
@@ -112,6 +120,19 @@ export class SNHttpService extends PureService {
       );
     }
     return request;
+  }
+
+  private getCorrectHeaderForEnvironment(environment: Environment): string {
+    switch (environment) {
+      case Environment.Web:
+        return 'X-Web-Version';
+      case Environment.Mobile:
+        return 'X-Mobile-Version';
+      case Environment.Desktop:
+        return 'X-Desktop-Version';
+      default:
+        throw Error(`'${environment}' is not correct environment value`);
+    }
   }
 
   private async runRequest(
