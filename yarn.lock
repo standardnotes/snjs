@@ -2536,13 +2536,6 @@
   dependencies:
     "@standardnotes/common" "^1.0.0"
 
-"@standardnotes/features@1.2.3":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.3.tgz#253d320bb44ca310d53c46e98ce1609f38ef37db"
-  integrity sha512-AciezLbSU+4ZwrYl7lEBPmc0iaW3ZGVKhve2aea724T0w8mFmCnsREYShlNPd0MDE93uLAlc1QVTsc94yIQWgA==
-  dependencies:
-    "@standardnotes/common" "^1.0.0"
-
 "@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
@@ -2646,9 +2639,9 @@
     "@types/node" "*"
 
 "@types/ioredis@^4.17.10":
-  version "4.19.2"
-  resolved "https://registry.yarnpkg.com/@types/ioredis/-/ioredis-4.19.2.tgz#68215d2fab93dd4f5d1d1225938389c32e7b98a2"
-  integrity sha512-fejSsJ4pYvA8zVLvAgQFI9T2uvxhUW7Ph95KodnNxMZvnUhQrn4ohxjH7fuU+jUw7Q4JCDcaba7JxDmszFmrCA==
+  version "4.27.1"
+  resolved "https://registry.yarnpkg.com/@types/ioredis/-/ioredis-4.27.1.tgz#f1c2d8a4341ed5ff9f4dd7aebfb38e275e3b3197"
+  integrity sha512-+JichYPCtVapxi5Z+7V/8Uhn+4Piz+rkb03JQTQ0kW0pkV71+bmzSTkpwmIqa7FfWIszp0VbRyN8gfgWDNQMdA==
   dependencies:
     "@types/node" "*"
 

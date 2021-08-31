@@ -3,7 +3,7 @@ import { PureService } from '../pure_service';
 import { SNApiService } from '../api/api_service';
 import { SettingsGateway } from './SettingsGateway';
 import { SNSessionManager } from '../api/session_manager';
-import { SettingName } from '@Lib/../../settings/dist';
+import { SettingName } from '@standardnotes/settings';
 import { SensitiveSettingName } from './SensitiveSettingName';
 
 export class SNSettingsService extends PureService {

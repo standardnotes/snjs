@@ -1,4 +1,4 @@
-import { SettingName } from '@Lib/../../settings/dist';
+import { SettingName } from '@standardnotes/settings';
 import { Platform, Environment, Uuid, SNApplication } from '@Lib/index';
 import * as Factory from '../factory';
 
