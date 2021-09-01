@@ -89,10 +89,16 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   public async loadUserRolesAndFeatures(): Promise<void> {
-    this.roles =
-      (await this.storageService.getValue(StorageKey.UserRoles)) || [];
-    this.features =
-      (await this.storageService.getValue(StorageKey.UserFeatures)) || [];
+    this.roles = await this.storageService.getValue(
+      StorageKey.UserRoles,
+      undefined,
+      []
+    );
+    this.features = await this.storageService.getValue(
+      StorageKey.UserFeatures,
+      undefined,
+      []
+    );
   }
 
   public async updateRoles(
