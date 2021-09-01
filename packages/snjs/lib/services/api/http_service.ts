@@ -37,9 +37,6 @@ export class SNHttpService extends PureService {
     private readonly appVersion: string
   ) {
     super();
-
-    this.appVersion = appVersion;
-    this.environment = environment;
   }
   public async getAbsolute(
     url: string,
