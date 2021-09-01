@@ -10,7 +10,8 @@ import {
   SNApiService,
 } from './api/api_service';
 import { UuidString } from '@Lib/types';
-import { ContentType, FeatureDescription } from '@standardnotes/features';
+import { FeatureDescription } from '@standardnotes/features';
+import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
@@ -25,6 +26,7 @@ import { SettingName } from '@standardnotes/settings';
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
   private roles: RoleName[] = [];
+  private features: FeatureDescription[] = [];
   private removeApiServiceObserver?: () => void;
   private removeWebSocketsServiceObserver?: () => void;
   private removeExtensionRepoItemsObserver?: () => void;
@@ -86,9 +88,17 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  public async loadUserRoles(): Promise<void> {
-    this.roles =
-      (await this.storageService.getValue(StorageKey.UserRoles)) || [];
+  public async loadUserRolesAndFeatures(): Promise<void> {
+    this.roles = await this.storageService.getValue(
+      StorageKey.UserRoles,
+      undefined,
+      []
+    );
+    this.features = await this.storageService.getValue(
+      StorageKey.UserFeatures,
+      undefined,
+      []
+    );
   }
 
   public async updateRoles(
@@ -107,6 +117,11 @@ export class SNFeaturesService extends PureService<void> {
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
+  private async setFeatures(features: FeatureDescription[]): Promise<void> {
+    this.features = features;
+    await this.storageService.setValue(StorageKey.UserFeatures, this.features);
+  }
+
   private haveRolesChanged(roles: RoleName[]): boolean {
     return (
       roles.some((role) => !this.roles.includes(role)) ||
@@ -117,9 +132,9 @@ export class SNFeaturesService extends PureService<void> {
   private async updateFeatures(userUuid: UuidString): Promise<void> {
     const featuresResponse = await this.apiService.getUserFeatures(userUuid);
     if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
-      await this.mapFeaturesToItems(
-        (featuresResponse as UserFeaturesResponse).data.features
-      );
+      const features = (featuresResponse as UserFeaturesResponse).data.features
+      await this.setFeatures(features)
+      await this.mapFeaturesToItems(features);
     }
   }
 

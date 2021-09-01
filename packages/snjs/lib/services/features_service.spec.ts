@@ -8,7 +8,6 @@ import {
   SNComponentManager,
 } from '@Lib/index';
 import { FillItemContent } from '@Lib/models/functions';
-import { PurePayload } from '@Lib/protocol/payloads';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType, FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
@@ -93,9 +92,10 @@ describe('featuresService', () => {
   });
 
   describe('loadUserRoles()', () => {
-    it('retrieves user roles from storage', async () => {
-      await createService().loadUserRoles();
-      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserRoles);
+    it('retrieves user roles and features from storage', async () => {
+      await createService().loadUserRolesAndFeatures();
+      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserRoles, undefined, []);
+      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserFeatures, undefined, []);
     })
   })
 
@@ -108,7 +108,7 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles);
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123');
@@ -121,11 +121,25 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles);
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123');
     });
+    
+
+    it('saves features to storage when roles change', async () => {
+      const newRoles = [
+        ...roles,
+        RoleName.PlusUser,
+      ];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      const featuresService = createService();
+      await featuresService.loadUserRolesAndFeatures();
+      await featuresService.updateRoles('123', newRoles);
+      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserFeatures, features);      
+    })
 
     it('creates items for non-expired features if they do not exist', async () => {
       const newRoles = [
@@ -135,7 +149,7 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
       expect(itemManager.createItem).toHaveBeenCalledTimes(2);
       expect(itemManager.createItem).toHaveBeenCalledWith(
@@ -170,7 +184,7 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
 
       expect(itemManager.changeComponent).toHaveBeenCalledWith(
@@ -199,7 +213,7 @@ describe('featuresService', () => {
       });
 
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
@@ -239,7 +253,7 @@ describe('featuresService', () => {
       });
 
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
       expect(componentManager.setReadonlyStateForComponent).toHaveBeenCalledWith(existingItem, true);
     });
@@ -274,7 +288,7 @@ describe('featuresService', () => {
       });
 
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
       expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith(['456']);
     })
@@ -282,7 +296,7 @@ describe('featuresService', () => {
     it('does nothing if roles have not changed', async () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
-      await featuresService.loadUserRoles();
+      await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', roles);
       expect(storageService.setValue).not.toHaveBeenCalled();
     });
