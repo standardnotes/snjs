@@ -1648,10 +1648,7 @@ export class SNApplication {
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService({
-      environment: this.environment,
-      appVersion: this.appVersion,
-    });
+    this.httpService = new SNHttpService(this.environment, this.appVersion);
     this.services.push(this.httpService);
   }
 

@@ -28,22 +28,14 @@ export type HttpRequest = {
   authentication?: string;
 };
 
-type SNHttpServiceParams = {
-  environment: Environment;
-  appVersion: string
-};
-
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export class SNHttpService extends PureService {
-  private readonly appVersion: string;
-  private readonly environment: Environment;
-
-  constructor({
-    environment,
-    appVersion
-  }: SNHttpServiceParams) {
+  constructor(
+    private readonly environment: Environment,
+    private readonly appVersion: string
+  ) {
     super();
 
     this.appVersion = appVersion;
