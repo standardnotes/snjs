@@ -1,9 +1,10 @@
 import * as Factory from '../factory';
-import { ContentType, FillItemContent, SNApplication, SNComponent } from '@Lib/index';
+import { ContentType, FillItemContent, SNApplication, SNComponent, StorageKey } from '@Lib/index';
 import { Uuid } from '@Lib/uuid';
 import { Features, FeatureIdentifier, Feature } from '@standardnotes/features';
 import { UserFeaturesResponse } from '@Lib/services/api/responses';
 import { SettingName } from '@standardnotes/settings';
+import { RoleName } from '@standardnotes/auth';
 
 describe('features', () => {
   let application: SNApplication;
@@ -56,6 +57,26 @@ describe('features', () => {
   });
 
   describe('new user roles received on api response meta', () => {
+    it('should save roles and features', async () => {
+      expect(application.featuresService.roles).toHaveLength(1);
+      expect(application.featuresService.roles[0]).toBe(RoleName.BasicUser);
+
+      expect(application.featuresService.features).toHaveLength(2);
+      expect(application.featuresService.features[0]).toBe(midnightThemeFeature);
+      expect(application.featuresService.features[1]).toBe(boldEditorFeature);
+      
+      const storedRoles = await application.getValue(StorageKey.UserRoles);
+
+      expect(storedRoles).toHaveLength(1);
+      expect(storedRoles[0]).toBe(RoleName.BasicUser);
+
+      const storedFeatures = await application.getValue(StorageKey.UserFeatures);
+
+      expect(storedFeatures).toHaveLength(2);
+      expect(storedFeatures[0]).toBe(midnightThemeFeature);
+      expect(storedFeatures[1]).toBe(boldEditorFeature);
+    });
+
     it('should fetch user features and create items for them', async () => {     
       expect(application.apiService.getUserFeatures).toHaveBeenCalledTimes(1); 
       expect(application.itemManager.createItem).toHaveBeenCalledTimes(2);

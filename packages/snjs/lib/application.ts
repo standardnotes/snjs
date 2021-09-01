@@ -295,7 +295,7 @@ export class SNApplication {
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
     await this.webSocketsService.loadWebSocketUrl();
-    await this.featuresService.loadUserRoles();
+    await this.featuresService.loadUserRolesAndFeatures();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
     this.settingsService.initializeFromDisk();
