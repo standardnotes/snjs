@@ -92,9 +92,10 @@ describe('featuresService', () => {
   });
 
   describe('loadUserRoles()', () => {
-    it('retrieves user roles from storage', async () => {
+    it('retrieves user roles and features from storage', async () => {
       await createService().loadUserRolesAndFeatures();
-      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserRoles);
+      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserRoles, undefined, []);
+      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserFeatures, undefined, []);
     })
   })
 
