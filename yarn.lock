@@ -2536,13 +2536,6 @@
   dependencies:
     "@standardnotes/common" "^1.0.0"
 
-"@standardnotes/features@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.4.0.tgz#64f0149eb94bee8cb7e748ad2dc2f94f5c2932f3"
-  integrity sha512-PQEjDdFjJ+hvGz6rD6LATtlICxNr2YKKwht69qGlDqMPSXQaljrq9bocAdGKuy+YOu+aKFvrmRbezsBK9rRIdw==
-  dependencies:
-    "@standardnotes/common" "^1.0.0"
-
 "@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"

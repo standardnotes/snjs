@@ -25,7 +25,7 @@ const validateFeatureItem = (featureItem: TFeatureItemFromJson) => {
   if (!permissionNames.includes(permission_name as PermissionName)) {
     throw Error('Invalid permission name')
   }
-  if (!contentTypes.includes(content_type as ContentType)) {
+  if (content_type && !contentTypes.includes(content_type as ContentType)) {
     throw Error('Invalid feature content type')
   }
   if (area && !componentArea.includes(area as ComponentArea)) {

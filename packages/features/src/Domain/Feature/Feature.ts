@@ -17,7 +17,7 @@ export type FeatureDescription = {
   name: string;
   identifier: FeatureIdentifier;
   permission_name: PermissionName;
-  content_type: ContentType;
+  content_type?: ContentType;
   area?: ComponentArea;
   layerable?: boolean;
   no_mobile?: boolean;
