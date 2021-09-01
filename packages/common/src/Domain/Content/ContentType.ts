@@ -19,4 +19,5 @@ export enum ContentType {
   FilesafeFileMetadata = 'SN|FileSafe|FileMetadata',
   FilesafeIntegration = 'SN|FileSafe|Integration',
   ExtensionRepo = 'SN|ExtensionRepo',
+  Unknown = 'Unknown',
 }

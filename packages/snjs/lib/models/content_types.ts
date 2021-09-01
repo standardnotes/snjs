@@ -1,4 +1,4 @@
-import { ContentType } from '@standardnotes/features';
+import { ContentType } from '@standardnotes/common';
 
 export const DefaultAppDomain = 'org.standardnotes.sn';
 
