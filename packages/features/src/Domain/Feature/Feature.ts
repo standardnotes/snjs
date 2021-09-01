@@ -1,5 +1,6 @@
+import { ContentType } from '@standardnotes/common'
+
 import { ComponentArea } from '../Component/ComponentArea'
-import { ContentType } from '../Content/ContentType'
 import { PermissionName } from '../Permission/PermissionName'
 import { FeatureIdentifier } from './FeatureIdentifier'
 import { ComponentFlag } from './Flag'
