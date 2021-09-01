@@ -346,11 +346,6 @@ export class SNApplication {
     // optional override
   }
 
-  public getAppVersion(): string {
-    // mandatory override
-    return '';
-  }
-
   public getLaunchChallenge(): Challenge | undefined {
     return this.protectionService.createLaunchChallenge();
   }
@@ -1569,7 +1564,6 @@ export class SNApplication {
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
     (this.mfaService as unknown) = undefined;
-    (this.appVersion as unknown) = undefined;
 
     this.services = [];
   }
