@@ -1,8 +1,8 @@
 import * as IORedis from 'ioredis'
 import * as zlib from 'zlib'
 
-import { DomainEventPublisherInterface } from '../../Domain/Publisher/DomainEventPublisherInterface'
-import { DomainEventInterface } from '../../Domain/Event/DomainEventInterface'
+import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
+import { DomainEventInterface } from '@standardnotes/domain-events'
 
 export class RedisDomainEventPublisher implements DomainEventPublisherInterface{
   constructor (

@@ -1,6 +1,6 @@
 import * as IORedis from 'ioredis'
 
-import { DomainEventSubscriberInterface } from '../../Domain/Subscriber/DomainEventSubscriberInterface'
+import { DomainEventSubscriberInterface } from '@standardnotes/domain-events'
 
 export class RedisDomainEventSubscriber implements DomainEventSubscriberInterface {
   constructor (

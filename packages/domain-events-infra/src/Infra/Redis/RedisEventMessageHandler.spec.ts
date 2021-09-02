@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 import { Logger } from 'winston'
 
-import { DomainEventHandlerInterface } from '../../Domain/Handler/DomainEventHandlerInterface'
+import { DomainEventHandlerInterface } from '@standardnotes/domain-events'
 
 import { RedisEventMessageHandler } from './RedisEventMessageHandler'
 
