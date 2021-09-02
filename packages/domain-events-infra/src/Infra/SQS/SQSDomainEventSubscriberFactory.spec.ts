@@ -3,7 +3,7 @@ import 'reflect-metadata'
 import { SQS } from 'aws-sdk'
 
 import { SQSDomainEventSubscriberFactory } from './SQSDomainEventSubscriberFactory'
-import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainEventMessageHandlerInterface'
+import { DomainEventMessageHandlerInterface } from '@standardnotes/domain-events'
 import { Consumer } from 'sqs-consumer'
 
 describe('SQSDomainEventSubscriberFactory', () => {

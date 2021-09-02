@@ -1,9 +1,9 @@
 import * as zlib from 'zlib'
 import { Logger } from 'winston'
 
-import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainEventMessageHandlerInterface'
-import { DomainEventHandlerInterface } from '../../Domain/Handler/DomainEventHandlerInterface'
-import { DomainEventInterface } from '../../Domain/Event/DomainEventInterface'
+import { DomainEventMessageHandlerInterface } from '@standardnotes/domain-events'
+import { DomainEventHandlerInterface } from '@standardnotes/domain-events'
+import { DomainEventInterface } from '@standardnotes/domain-events'
 
 export class RedisEventMessageHandler implements DomainEventMessageHandlerInterface {
   constructor(

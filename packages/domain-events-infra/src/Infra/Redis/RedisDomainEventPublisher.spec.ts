@@ -3,7 +3,7 @@ import 'reflect-metadata'
 import * as IORedis from 'ioredis'
 
 import { RedisDomainEventPublisher } from './RedisDomainEventPublisher'
-import { DomainEventInterface } from '../../Domain/Event/DomainEventInterface'
+import { DomainEventInterface } from '@standardnotes/domain-events'
 
 describe('RedisDomainEventPublisher', () => {
   let redisClient: IORedis.Redis

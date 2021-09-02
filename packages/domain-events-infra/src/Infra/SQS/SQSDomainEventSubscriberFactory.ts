@@ -1,9 +1,9 @@
 import { SQS } from 'aws-sdk'
 import { Consumer, SQSMessage } from 'sqs-consumer'
 
-import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainEventMessageHandlerInterface'
-import { DomainEventSubscriberFactoryInterface } from '../../Domain/Subscriber/DomainEventSubscriberFactoryInterface'
-import { DomainEventSubscriberInterface } from '../../Domain/Subscriber/DomainEventSubscriberInterface'
+import { DomainEventMessageHandlerInterface } from '@standardnotes/domain-events'
+import { DomainEventSubscriberFactoryInterface } from '@standardnotes/domain-events'
+import { DomainEventSubscriberInterface } from '@standardnotes/domain-events'
 
 export class SQSDomainEventSubscriberFactory implements DomainEventSubscriberFactoryInterface {
   constructor (
