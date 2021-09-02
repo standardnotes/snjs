@@ -1,8 +1,8 @@
 import * as IORedis from 'ioredis'
 
-import { DomainEventSubscriberFactoryInterface } from '../../Domain/Subscriber/DomainEventSubscriberFactoryInterface'
-import { DomainEventSubscriberInterface } from '../../Domain/Subscriber/DomainEventSubscriberInterface'
-import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainEventMessageHandlerInterface'
+import { DomainEventSubscriberFactoryInterface } from '@standardnotes/domain-events'
+import { DomainEventSubscriberInterface } from '@standardnotes/domain-events'
+import { DomainEventMessageHandlerInterface } from '@standardnotes/domain-events'
 
 import { RedisDomainEventSubscriber } from './RedisDomainEventSubscriber'
 

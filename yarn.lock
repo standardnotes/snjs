@@ -2533,6 +2533,7 @@
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.3.tgz#253d320bb44ca310d53c46e98ce1609f38ef37db"
   integrity sha512-AciezLbSU+4ZwrYl7lEBPmc0iaW3ZGVKhve2aea724T0w8mFmCnsREYShlNPd0MDE93uLAlc1QVTsc94yIQWgA==
+
   dependencies:
     "@standardnotes/common" "^1.0.0"
 

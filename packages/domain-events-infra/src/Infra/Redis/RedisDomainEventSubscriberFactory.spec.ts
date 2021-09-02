@@ -3,7 +3,7 @@ import 'reflect-metadata'
 import * as IORedis from 'ioredis'
 
 import { RedisDomainEventSubscriberFactory } from './RedisDomainEventSubscriberFactory'
-import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainEventMessageHandlerInterface'
+import { DomainEventMessageHandlerInterface } from '@standardnotes/domain-events'
 import { RedisDomainEventSubscriber } from './RedisDomainEventSubscriber'
 
 describe('RedisDomainEventSubscriberFactory', () => {

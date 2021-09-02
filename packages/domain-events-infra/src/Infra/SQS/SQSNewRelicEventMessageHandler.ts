@@ -2,9 +2,9 @@ import { Logger } from 'winston'
 import * as zlib from 'zlib'
 import * as newrelic from 'newrelic'
 
-import { DomainEventHandlerInterface } from '../../Domain/Handler/DomainEventHandlerInterface'
-import { DomainEventInterface } from '../../Domain/Event/DomainEventInterface'
-import { DomainEventMessageHandlerInterface } from '../../Domain/Handler/DomainEventMessageHandlerInterface'
+import { DomainEventHandlerInterface } from '@standardnotes/domain-events'
+import { DomainEventInterface } from '@standardnotes/domain-events'
+import { DomainEventMessageHandlerInterface } from '@standardnotes/domain-events'
 
 export class SQSNewRelicEventMessageHandler implements DomainEventMessageHandlerInterface {
   constructor(

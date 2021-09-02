@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 import * as AWS from 'aws-sdk'
 
-import { DomainEventInterface } from '../../Domain/Event/DomainEventInterface'
+import { DomainEventInterface } from '@standardnotes/domain-events'
 
 import { SNSDomainEventPublisher } from './SNSDomainEventPublisher'
 

@@ -1,8 +1,8 @@
 import * as AWS from 'aws-sdk'
 import * as zlib from 'zlib'
 
-import { DomainEventInterface } from '../../Domain/Event/DomainEventInterface'
-import { DomainEventPublisherInterface } from '../../Domain/Publisher/DomainEventPublisherInterface'
+import { DomainEventInterface } from '@standardnotes/domain-events'
+import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
 
 export class SNSDomainEventPublisher implements DomainEventPublisherInterface {
   constructor (
