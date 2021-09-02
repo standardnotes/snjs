@@ -243,12 +243,12 @@
     "name": "2FA Manager",
     "identifier": "org.standardnotes.mfa-link",
     "permission_name": "component:2fa-manager",
+    "content_type": "SN|Component",
     "description": "Configure two-factor authentication to add an extra level of security to your account.",
     "version": "1.2.4",
     "url": "#{url_prefix}/components/mfa-link",
     "marketing_url": "",
     "download_url": "https://github.com/standardnotes/mfa-link/archive/1.2.4.zip",
-    "content_type": "SN|Component",
     "area": "modal",
     "noExpire": true,
     "deletionWarning": "Deleting 2FA Manager will not disable 2FA from your account. To disable 2FA, first open 2FA Manager, then follow the prompts."
@@ -262,7 +262,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -274,7 +273,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -286,7 +284,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -298,7 +295,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -310,7 +306,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -322,7 +317,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -334,7 +328,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -346,7 +339,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -358,7 +350,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -370,7 +361,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -382,7 +372,6 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -394,19 +383,18 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
     "name": "CloudLink",
     "identifier": "org.standardnotes.cloudlink",
     "permission_name": "component:cloud-link",
+    "content_type": "SN|Component",
     "description": "Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.",
     "version": "1.2.3",
     "url": "#{url_prefix}/components/cloudlink",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   },
   {
@@ -418,6 +406,5 @@
     "url": "",
     "marketing_url": "",
     "download_url": "",
-    "content_type": "SN|Component",
     "area": "modal"
   }]

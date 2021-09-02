@@ -10,7 +10,8 @@ import {
 import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
-import { ContentType, FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
+import { ContentType } from '@standardnotes/common';
+import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
 
@@ -24,6 +25,8 @@ describe('featuresService', () => {
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
+  let now: Date;
+  let tomorrow: number;
 
   const createService = () => {
     return new SNFeaturesService(
@@ -42,8 +45,8 @@ describe('featuresService', () => {
       RoleName.CoreUser,
     ];
 
-    const now = new Date();
-    const tomorrow = now.setDate(now.getDate() + 1);
+    now = new Date();
+    tomorrow = now.setDate(now.getDate() + 1);
 
     features = [
       {
@@ -55,7 +58,7 @@ describe('featuresService', () => {
         identifier: FeatureIdentifier.BoldEditor,
         content_type: ContentType.Component,
         expires_at: tomorrow,
-      }
+      },
     ] as jest.Mocked<FeatureDescription[]>;
 
     items = [] as jest.Mocked<SNItem[]>;
@@ -141,7 +144,7 @@ describe('featuresService', () => {
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserFeatures, features);      
     })
 
-    it('creates items for non-expired features if they do not exist', async () => {
+    it('creates items for non-expired features with content type if they do not exist', async () => {
       const newRoles = [
         ...roles,
         RoleName.PlusUser,
@@ -291,7 +294,33 @@ describe('featuresService', () => {
       await featuresService.loadUserRolesAndFeatures();
       await featuresService.updateRoles('123', newRoles);
       expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith(['456']);
-    })
+    });
+
+    it('does not create an item for a feature without content type', async () => {
+      const features = [
+        {
+          identifier: FeatureIdentifier.TagNesting,
+          expires_at: tomorrow,
+        }
+      ];
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      });
+
+      const newRoles = [
+        ...roles,
+        RoleName.PlusUser,
+      ];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      const featuresService = createService();
+      await featuresService.loadUserRolesAndFeatures();
+      await featuresService.updateRoles('123', newRoles);
+      expect(itemManager.createItem).not.toHaveBeenCalled();
+    });
 
     it('does nothing if roles have not changed', async () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);

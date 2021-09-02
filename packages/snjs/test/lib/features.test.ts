@@ -1,15 +1,16 @@
 import * as Factory from '../factory';
 import { ContentType, FillItemContent, SNApplication, SNComponent, StorageKey } from '@Lib/index';
 import { Uuid } from '@Lib/uuid';
-import { Features, FeatureIdentifier, Feature } from '@standardnotes/features';
+import { Features, FeatureIdentifier, FeatureDescription } from '@standardnotes/features';
 import { UserFeaturesResponse } from '@Lib/services/api/responses';
 import { SettingName } from '@standardnotes/settings';
 import { RoleName } from '@standardnotes/auth';
 
 describe('features', () => {
   let application: SNApplication;
-  let midnightThemeFeature: Feature;
-  let boldEditorFeature: Feature;
+  let midnightThemeFeature: FeatureDescription;
+  let boldEditorFeature: FeatureDescription;
+  let tagNestingFeature: FeatureDescription;
 
   beforeEach(async function () {
     application = await Factory.createInitAppWithRandNamespace();
@@ -18,11 +19,15 @@ describe('features', () => {
     const tomorrow = now.setDate(now.getDate() + 1);
 
     midnightThemeFeature = {
-      ...Features.find(feature => feature.identifier === FeatureIdentifier.MidnightTheme) as Feature,
+      ...Features.find(feature => feature.identifier === FeatureIdentifier.MidnightTheme) as FeatureDescription,
       expires_at: tomorrow,
     };
     boldEditorFeature = {
-      ...Features.find(feature => feature.identifier === FeatureIdentifier.BoldEditor) as Feature,
+      ...Features.find(feature => feature.identifier === FeatureIdentifier.BoldEditor) as FeatureDescription,
+      expires_at: tomorrow,
+    };
+    tagNestingFeature = {
+      ...Features.find(feature => feature.identifier === FeatureIdentifier.TagNesting) as FeatureDescription,
       expires_at: tomorrow,
     };
 
@@ -35,7 +40,8 @@ describe('features', () => {
         data: {
           features: [
             midnightThemeFeature,
-            boldEditorFeature, 
+            boldEditorFeature,
+            tagNestingFeature,
           ],
         },
       }) as Promise<UserFeaturesResponse>;      
@@ -61,7 +67,7 @@ describe('features', () => {
       expect(application.featuresService.roles).toHaveLength(1);
       expect(application.featuresService.roles[0]).toBe(RoleName.BasicUser);
 
-      expect(application.featuresService.features).toHaveLength(2);
+      expect(application.featuresService.features).toHaveLength(3);
       expect(application.featuresService.features[0]).toBe(midnightThemeFeature);
       expect(application.featuresService.features[1]).toBe(boldEditorFeature);
       
@@ -72,12 +78,13 @@ describe('features', () => {
 
       const storedFeatures = await application.getValue(StorageKey.UserFeatures);
 
-      expect(storedFeatures).toHaveLength(2);
+      expect(storedFeatures).toHaveLength(3);
       expect(storedFeatures[0]).toBe(midnightThemeFeature);
       expect(storedFeatures[1]).toBe(boldEditorFeature);
+      expect(storedFeatures[2]).toBe(tagNestingFeature);
     });
 
-    it('should fetch user features and create items for them', async () => {     
+    it('should fetch user features and create items for features with content type', async () => {     
       expect(application.apiService.getUserFeatures).toHaveBeenCalledTimes(1); 
       expect(application.itemManager.createItem).toHaveBeenCalledTimes(2);
       const themeItems = application.getItems(ContentType.Theme);

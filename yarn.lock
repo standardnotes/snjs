@@ -2529,10 +2529,11 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
-"@standardnotes/features@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.4.0.tgz#64f0149eb94bee8cb7e748ad2dc2f94f5c2932f3"
-  integrity sha512-PQEjDdFjJ+hvGz6rD6LATtlICxNr2YKKwht69qGlDqMPSXQaljrq9bocAdGKuy+YOu+aKFvrmRbezsBK9rRIdw==
+"@standardnotes/features@1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.3.tgz#253d320bb44ca310d53c46e98ce1609f38ef37db"
+  integrity sha512-AciezLbSU+4ZwrYl7lEBPmc0iaW3ZGVKhve2aea724T0w8mFmCnsREYShlNPd0MDE93uLAlc1QVTsc94yIQWgA==
+
   dependencies:
     "@standardnotes/common" "^1.0.0"
 

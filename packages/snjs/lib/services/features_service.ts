@@ -163,6 +163,10 @@ export class SNFeaturesService extends PureService<void> {
     const now = new Date();
 
     for (const feature of features) {
+      if (!feature.content_type) {
+        continue;
+      }
+
       const expired = feature.expires_at! < now.getTime();
       const itemContent = this.componentContentForFeatureDescription(feature);
       const existingItem = currentItems.find((item) => {
@@ -227,10 +231,13 @@ export class SNFeaturesService extends PureService<void> {
 
   public async downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
     const response = await this.apiService.downloadFeatureUrl(url);
-    if(response.error) {
+    if (response.error) {
       return undefined;
     }
     const rawFeature = response.data as FeatureDescription;
+    if (!rawFeature.content_type) {
+      return;
+    }
     const content = this.componentContentForFeatureDescription(rawFeature);
     const component = await this.itemManager.createTemplateItem(rawFeature.content_type, content) as SNComponent;
     return component;
