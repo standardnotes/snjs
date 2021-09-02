@@ -1,21 +1,17 @@
 import 'reflect-metadata'
 
-import { DomainEventHandlerInterface } from '../../Domain/Handler/DomainEventHandlerInterface'
-
-import { startBackgroundTransaction } from 'newrelic'
-jest.mock('newrelic')
-
 import { Logger } from 'winston'
 
-import { SQSNewRelicEventMessageHandler } from './SQSNewRelicEventMessageHandler'
+import { DomainEventHandlerInterface } from '@standardnotes/domain-events'
 
-describe('SQSNewRelicEventMessageHandler', () => {
+import { SQSEventMessageHandler } from './SQSEventMessageHandler'
+
+describe('SQSEventMessageHandler', () => {
   let handler: DomainEventHandlerInterface
   let handlers: Map<string, DomainEventHandlerInterface>
   let logger: Logger
-  let mockedStartBackgroundTransaction: unknown
 
-  const createHandler = () => new SQSNewRelicEventMessageHandler(handlers, logger)
+  const createHandler = () => new SQSEventMessageHandler(handlers, logger)
 
   beforeEach(() => {
     handler = {} as jest.Mocked<DomainEventHandlerInterface>
@@ -26,8 +22,6 @@ describe('SQSNewRelicEventMessageHandler', () => {
     logger = {} as jest.Mocked<Logger>
     logger.debug = jest.fn()
     logger.error = jest.fn()
-
-    mockedStartBackgroundTransaction = startBackgroundTransaction as jest.Mocked<unknown>
   })
 
   it('should handle messages', async () => {
@@ -37,8 +31,12 @@ describe('SQSNewRelicEventMessageHandler', () => {
 
     await createHandler().handleMessage(sqsMessage)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((<any> mockedStartBackgroundTransaction).mock.calls[0][0]).toBe('TEST')
+    expect(handler.handle).toHaveBeenCalledWith({
+      payload: {
+        foo: 'bar',
+      },
+      type: 'TEST',
+    })
   })
 
   it('should handle errors', async () => {
