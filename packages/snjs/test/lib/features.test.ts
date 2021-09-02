@@ -10,7 +10,7 @@ describe('features', () => {
   let application: SNApplication;
   let midnightThemeFeature: FeatureDescription;
   let boldEditorFeature: FeatureDescription;
-  let twoFactorAuthManagerFeature: FeatureDescription;
+  let tagNestingFeature: FeatureDescription;
 
   beforeEach(async function () {
     application = await Factory.createInitAppWithRandNamespace();
@@ -26,8 +26,8 @@ describe('features', () => {
       ...Features.find(feature => feature.identifier === FeatureIdentifier.BoldEditor) as FeatureDescription,
       expires_at: tomorrow,
     };
-    twoFactorAuthManagerFeature = {
-      ...Features.find(feature => feature.identifier === FeatureIdentifier.TwoFactorAuthManager) as FeatureDescription,
+    tagNestingFeature = {
+      ...Features.find(feature => feature.identifier === FeatureIdentifier.TagNesting) as FeatureDescription,
       expires_at: tomorrow,
     };
 
@@ -41,7 +41,7 @@ describe('features', () => {
           features: [
             midnightThemeFeature,
             boldEditorFeature,
-            twoFactorAuthManagerFeature,
+            tagNestingFeature,
           ],
         },
       }) as Promise<UserFeaturesResponse>;      
@@ -81,7 +81,7 @@ describe('features', () => {
       expect(storedFeatures).toHaveLength(3);
       expect(storedFeatures[0]).toBe(midnightThemeFeature);
       expect(storedFeatures[1]).toBe(boldEditorFeature);
-      expect(storedFeatures[2]).toBe(twoFactorAuthManagerFeature);
+      expect(storedFeatures[2]).toBe(tagNestingFeature);
     });
 
     it('should fetch user features and create items for features with content type', async () => {     
