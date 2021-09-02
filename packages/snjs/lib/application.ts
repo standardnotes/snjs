@@ -183,7 +183,7 @@ export class SNApplication {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
-   * @param appVersion Version of application where SNApplication is instantiated.
+   * @param appVersion Version of client application.
    * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
   constructor(
