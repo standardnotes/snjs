@@ -12,7 +12,8 @@
     "start": "lerna run start --parallel",
     "test:unit": "lerna run test:unit --parallel",
     "test:e2e": "bash test.sh",
-    "test:e2e:dev": "docker-compose up -d",
+    "test:e2e:dev-server": "docker-compose up -d",
+    "test:e2e:dev": "lerna run test:e2e --parallel",
     "build": "lerna run build",
     "lint": "lerna run lint",
     "publish-packages": "lerna publish from-package --yes"
