@@ -183,6 +183,7 @@ export class SNApplication {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
+   * @param appVersion Version of client application.
    * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
   constructor(
@@ -194,6 +195,7 @@ export class SNApplication {
     public identifier: ApplicationIdentifier,
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
+    private appVersion: string,
     private webSocketUrl?: string
   ) {
     if (!SNLog.onLog) {
@@ -232,6 +234,10 @@ export class SNApplication {
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
     }
+    if (!appVersion) {
+      throw Error('appVersion must be supplied when creating an application.');
+    }
+
     this.constructServices();
   }
 
@@ -1642,7 +1648,7 @@ export class SNApplication {
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService();
+    this.httpService = new SNHttpService(this.environment, this.appVersion);
     this.services.push(this.httpService);
   }
 

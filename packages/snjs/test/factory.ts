@@ -121,6 +121,10 @@ export function getDefaultWebSocketUrl() {
   return 'ws://localhost';
 }
 
+function getAppVersion() {
+  return '1.2.3';
+}
+
 const getSwappedClasses = (environment?: Environment) => {
   const classMap = {
     swap: SNComponentManager,
@@ -155,6 +159,7 @@ export function createApplication(identifier: string, environment?: Environment,
     identifier || `${Math.random()}`,
     getSwappedClasses(environment),
     getDefaultHost(),
+    getAppVersion(),
     getDefaultWebSocketUrl(),
   );
 }
