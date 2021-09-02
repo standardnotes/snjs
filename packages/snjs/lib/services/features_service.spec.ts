@@ -299,7 +299,7 @@ describe('featuresService', () => {
     it('does not create an item for a feature without content type', async () => {
       const features = [
         {
-          identifier: FeatureIdentifier.TwoFactorAuthManager,
+          identifier: FeatureIdentifier.TagNesting,
           expires_at: tomorrow,
         }
       ];
