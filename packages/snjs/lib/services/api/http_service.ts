@@ -99,8 +99,8 @@ export class SNHttpService extends PureService {
     request.setRequestHeader('Content-type', 'application/json');
     request.setRequestHeader('X-SNJS-Version', SnjsVersion);
 
-    const environmentVersionHeaderTitle = this.versionHeaderName();
-    request.setRequestHeader(environmentVersionHeaderTitle, this.appVersion);
+    const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
+    request.setRequestHeader('X-Application-Version', appVersionHeaderValue);
 
     if (httpRequest.authentication) {
       request.setRequestHeader(
@@ -109,19 +109,6 @@ export class SNHttpService extends PureService {
       );
     }
     return request;
-  }
-
-  private versionHeaderName(): string {
-    switch (this.environment) {
-      case Environment.Web:
-        return 'X-Web-Version';
-      case Environment.Mobile:
-        return 'X-Mobile-Version';
-      case Environment.Desktop:
-        return 'X-Desktop-Version';
-      default:
-        throw Error(`'${this.environment}' is not correct environment value`);
-    }
   }
 
   private async runRequest(
