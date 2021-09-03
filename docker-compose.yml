@@ -63,7 +63,7 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.17.4
+    image: standardnotes/auth:1.18.0
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -75,7 +75,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.17.4
+    image: standardnotes/auth:1.18.0
     depends_on:
       - auth
     entrypoint: [
