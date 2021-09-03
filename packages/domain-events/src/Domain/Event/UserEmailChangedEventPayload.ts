@@ -1,4 +1,4 @@
-export interface UserChangedEmailEventPayload {
+export interface UserEmailChangedEventPayload {
   userUuid: string
   fromEmail: string
   toEmail: string
