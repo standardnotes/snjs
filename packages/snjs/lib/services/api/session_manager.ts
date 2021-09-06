@@ -10,6 +10,7 @@ import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, RemoteSession, TokenSession } from './session';
 import {
   ChangePasswordResponse,
+  GetSubscriptionResponse,
   HttpResponse,
   KeyParamsResponse,
   RegistrationResponse,
@@ -212,6 +213,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
       });
       this.challengeService.promptForChallengeResponse(challenge);
     });
+  }
+
+  public getSubscription(): Promise<HttpResponse | GetSubscriptionResponse> {
+    return this.apiService.getSubscription(this.user!.uuid)
   }
 
   private async promptForMfaValue() {

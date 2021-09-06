@@ -5,7 +5,7 @@ import {
   KeyParamsOrigination,
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-import { Role } from '@standardnotes/auth';
+import { Role, Subscription } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { UuidString } from '@Lib/types';
 
@@ -232,3 +232,9 @@ export type GetSettingResponse = MinimalHttpResponse & {
 };
 export type UpdateSettingResponse = MinimalHttpResponse;
 export type DeleteSettingResponse = MinimalHttpResponse;
+
+export type GetSubscriptionResponse = MinimalHttpResponse & {
+  data?: {
+    subscription?: Subscription
+  }
+}

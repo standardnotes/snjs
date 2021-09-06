@@ -96,7 +96,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { HttpResponse, SignInResponse, User } from './services/api/responses';
+import { GetSubscriptionResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
@@ -552,6 +552,10 @@ export class SNApplication {
       return false;
     }
     return compareVersions(userVersion, ProtocolVersion.V004) >= 0;
+  }
+
+  public getUserSubscription(): Promise<HttpResponse | GetSubscriptionResponse> {
+    return this.sessionManager.getSubscription();
   }
 
   /**

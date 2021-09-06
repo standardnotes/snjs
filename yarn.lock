@@ -2516,11 +2516,6 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@standardnotes/auth@3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.1.1.tgz#834701c2e14d31eb204bff90457fa05e9183464a"
-  integrity sha512-E9zDYZ1gJkVZBEzd7a1L2haQ4GYeH1lUrY87UmDH1AMYUHW+c0SqZ71af1fBNqGzrx3EZSXk+Qzr7RyOa6N1Mw==
-
 "@standardnotes/config@^1.2.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/config/-/config-1.3.0.tgz#2c4bed8d266ca8e8ea2d8fb2e2d5d000d50289e8"
@@ -2528,14 +2523,6 @@
   dependencies:
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
-
-"@standardnotes/features@1.2.3":
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.2.3.tgz#253d320bb44ca310d53c46e98ce1609f38ef37db"
-  integrity sha512-AciezLbSU+4ZwrYl7lEBPmc0iaW3ZGVKhve2aea724T0w8mFmCnsREYShlNPd0MDE93uLAlc1QVTsc94yIQWgA==
-
-  dependencies:
-    "@standardnotes/common" "^1.0.0"
 
 "@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
   version "1.5.2"
