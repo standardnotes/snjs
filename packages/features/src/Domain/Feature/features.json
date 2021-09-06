@@ -13,7 +13,7 @@
     "type": "circle",
     "background_color": "#086DD6",
     "foreground_color": "#ffffff",
-    "borderColor": "#086DD6"
+    "border_color": "#086DD6"
   }
 },
   {
@@ -31,7 +31,7 @@
       "type": "circle",
       "background_color": "#fca429",
       "foreground_color": "#ffffff",
-      "borderColor": "#fca429"
+      "border_color": "#fca429"
     }
   },
   {
@@ -49,7 +49,7 @@
       "type": "circle",
       "background_color": "#2AA198",
       "foreground_color": "#ffffff",
-      "borderColor": "#2AA198"
+      "border_color": "#2AA198"
     }
   },
   {
@@ -68,7 +68,7 @@
       "type": "circle",
       "background_color": "#9D7441",
       "foreground_color": "#ECE4DB",
-      "borderColor": "#9D7441"
+      "border_color": "#9D7441"
     }
   },
   {
@@ -86,7 +86,7 @@
       "type": "circle",
       "background_color": "#a464c2",
       "foreground_color": "#ffffff",
-      "borderColor": "#a464c2"
+      "border_color": "#a464c2"
     }
   },
   {
@@ -104,7 +104,7 @@
       "type": "circle",
       "background_color": "#6e2b9e",
       "foreground_color": "#ffffff",
-      "borderColor": "#6e2b9e"
+      "border_color": "#6e2b9e"
     }
   },
   {
