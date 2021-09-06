@@ -1,4 +1,4 @@
-import { SubscriptionName } from "./SubscriptionName";
+import { SubscriptionName } from './SubscriptionName'
 
 export type Subscription = {
   planName: SubscriptionName,
