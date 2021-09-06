@@ -164,6 +164,101 @@ describe('server session', function () {
     await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 
+  it('change email request should be successful with a valid access token', async function () {
+    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const changeEmailResponse = await application.changeEmail(
+      newEmail,
+      password
+    );
+
+    expect(changeEmailResponse.status).toBe(200);
+    expect(changeEmailResponse.data.user).toBeTruthy();
+
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
+    );
+    const loginResponse = await Factory.loginToApplication({
+      application: application,
+      email: newEmail,
+      password: newPassword,
+    });
+
+    expect(loginResponse).toBeTruthy();
+    expect(loginResponse.status).toBe(200);
+    await Factory.safeDeinit(application);
+  }, Factory.LongTestTimeout);
+
+  it('change email request should fail with an invalid access token', async function () {
+    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
+    const fakeSession = application.apiService.getSession();
+    fakeSession.accessToken = 'this-is-a-fake-token-1234';
+    Factory.ignoreChallenges(application);
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const changeEmailResponse = await application.changeEmail(
+      newEmail,
+      password
+    );
+    expect(changeEmailResponse.error.message).toBe('Invalid login credentials.');
+
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
+    );
+    const loginResponse = await Factory.loginToApplication({
+      application: application,
+      email: newEmail,
+      password,
+    });
+
+    expect(loginResponse).toBeTruthy();
+    expect(loginResponse.status).toBe(401);
+    await Factory.safeDeinit(application);
+  });
+
+  it('change email request should fail with an expired refresh token', async function () {
+    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
+    /** Waiting for the refresh token to expire. */
+    await sleepUntilSessionExpires(application, false);
+
+    Factory.ignoreChallenges(application);
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const changeEmailResponse = await application.changeEmail(
+      newEmail,
+      password
+    );
+
+    expect(changeEmailResponse).toBeTruthy();
+    expect(changeEmailResponse.error.message).toBe('Invalid login credentials.');
+
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
+    );
+    const loginResponseWithNewEmail = await Factory.loginToApplication({
+      application: application,
+      email: newEmail,
+      password,
+    });
+
+    expect(loginResponseWithNewEmail).toBeTruthy();
+    expect(loginResponseWithNewEmail.status).toBe(401);
+
+    const loginResponseWithOldEmail = await Factory.loginToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
+    expect(loginResponseWithOldEmail).toBeTruthy();
+    expect(loginResponseWithOldEmail.status).toBe(200);
+    await Factory.safeDeinit(application);
+  }, Factory.LongTestTimeout);
+
   it('change password request should be successful with a valid access token', async function () {
     let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
       registerUser: true

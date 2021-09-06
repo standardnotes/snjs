@@ -594,6 +594,36 @@ describe('keys', function () {
     expect(payload.items_key_id).toBe(newDefaultItemsKey.uuid);
   });
 
+  it('changing account email should create new items key and encrypt items with that key', async function () {
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+    const itemsKeys = application.itemManager.itemsKeys();
+    expect(itemsKeys.length).toBe(1);
+    const defaultItemsKey = application.protocolService.getDefaultItemsKey();
+
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const result = await application.changeEmail(
+      newEmail,
+      password,
+    );
+    expect(result.error).toBeFalsy();
+
+    expect(application.itemManager.itemsKeys().length).toBe(2);
+    const newDefaultItemsKey = application.protocolService.getDefaultItemsKey();
+    expect(newDefaultItemsKey.uuid).not.toEqual(defaultItemsKey.uuid);
+
+    const note = await Factory.createSyncedNote(application);
+    const payload = await application.protocolService.payloadByEncryptingPayload(
+      note.payload,
+      EncryptionIntent.Sync
+    );
+    expect(payload.items_key_id).toBe(newDefaultItemsKey.uuid);
+  });
+
   it('compares root keys', async function () {
     const keyParams = {};
     const a1 = await SNRootKey.Create({

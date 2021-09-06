@@ -23,6 +23,7 @@ import {
   REMOVING_PASSCODE,
   CHANGING_PASSCODE,
   ProtocolUpgradeStrings,
+  EmailChangeStrings,
 } from './api/messages';
 import { HttpResponse, SignInResponse, User } from './api/responses';
 import { SNProtocolService } from '@Lib/services/protocol_service';
@@ -43,6 +44,7 @@ import { SNItemsKey } from '@Lib/models';
 const MINIMUM_PASSCODE_LENGTH = 1;
 
 export type PasswordChangeFunctionResponse = { error?: { message: string } };
+export type EmailChangeFunctionResponse = { error?: { message: string } };
 export type AccountServiceResponse = HttpResponse;
 
 export const enum AccountEvent {
@@ -216,6 +218,32 @@ export class SNCredentialService extends PureService<AccountEvent> {
     this.unlockSyncing();
     return response;
   }
+
+  /**
+   * @param passcode - Changing the account email requires the local
+   * passcode if configured (to rewrap the account key with passcode). If the passcode
+   * is not passed in, the user will be prompted for the passcode. However if the consumer
+   * already has reference to the passcode, they can pass it in here so that the user
+   * is not prompted again.
+   */
+   public async changeEmail(
+    newEmail: string,
+    currentPassword: string,
+    passcode?: string,
+    origination = KeyParamsOrigination.EmailChange,
+  ): Promise<EmailChangeFunctionResponse> {
+    const result = await this.performEmailChange(
+      newEmail,
+      currentPassword,
+      passcode,
+      origination,
+    );
+    if (result.error) {
+      void this.alertService.alert(result.error.message);
+    }
+    return result;
+  }
+
 
   /**
    * @param passcode - Changing the account password requires the local
@@ -517,5 +545,63 @@ export class SNCredentialService extends PureService<AccountEvent> {
 
   private async clearDatabase(): Promise<void> {
     return this.storageService.clearAllPayloads();
+  }
+
+  private async performEmailChange(
+    newEmail: string,
+    currentPassword: string,
+    passcode?: string,
+    origination = KeyParamsOrigination.EmailChange,
+  ): Promise<EmailChangeFunctionResponse> {
+    const {
+      wrappingKey,
+      canceled,
+    } = await this.challengeService.getWrappingKeyIfApplicable(passcode);
+
+    if (canceled) {
+      return { error: Error(EmailChangeStrings.PasscodeRequired) };
+    }
+
+    const currentRootKey = await this.protocolService.computeRootKey(
+      currentPassword,
+      (await this.protocolService.getRootKeyParams()) as SNRootKeyParams
+    );
+    const newRootKey = await this.protocolService.createRootKey(
+      newEmail,
+      currentPassword,
+      origination
+    );
+
+    this.lockSyncing();
+    /** Now, change the email on the server. Roll back on failure */
+    const result = await this.sessionManager.changeEmail(
+      newEmail,
+      newRootKey,
+      wrappingKey
+    );
+    this.unlockSyncing();
+
+    if (!result.response.error) {
+      const rollback = await this.protocolService.createNewItemsKeyWithRollback();
+      /** Sync the newly created items key. Roll back on failure */
+      await this.protocolService.reencryptItemsKeys();
+      await this.syncService.sync({ awaitAll: true });
+      const defaultItemsKey = this.protocolService.getDefaultItemsKey() as SNItemsKey;
+      const itemsKeyWasSynced = !defaultItemsKey.neverSynced;
+      if (!itemsKeyWasSynced) {
+        await this.sessionManager.changeEmail(
+          newEmail,
+          currentRootKey,
+          wrappingKey
+        );
+        await this.protocolService.reencryptItemsKeys();
+        await rollback();
+        await this.syncService.sync({ awaitAll: true });
+
+        return { error: Error(EmailChangeStrings.Failed) };
+      }
+    }
+
+    return result.response;
   }
 }

@@ -119,8 +119,20 @@ export type ChangePasswordData = {
   key_params?: AnyKeyParamsContent;
 };
 
+export type UserUpdateData = {
+  session?: SessionBody;
+  /** Represents legacy JWT token */
+  token?: string;
+  user?: User;
+  key_params?: AnyKeyParamsContent;
+};
+
 export type ChangePasswordResponse = HttpResponse & {
   data: ChangePasswordData;
+};
+
+export type UserUpdateResponse = HttpResponse & {
+  data: UserUpdateData;
 };
 
 export type SignOutResponse = HttpResponse & Record<string, unknown>;

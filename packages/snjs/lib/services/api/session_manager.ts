@@ -17,6 +17,7 @@ import {
   SignInResponse,
   StatusCode,
   User,
+  UserUpdateResponse,
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
@@ -546,6 +547,33 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
+  public async changeEmail(
+    newEmail: string,
+    newRootKey: SNRootKey,
+    wrappingKey?: SNRootKey
+  ): Promise<SessionManagerResponse> {
+    const userUuid = this.user!.uuid;
+
+    const response = await this.apiService.changeEmail(
+      userUuid,
+      newEmail,
+      newRootKey.keyParams
+    );
+
+    if (!response.error && response.data) {
+      await this.handleSuccessAuthResponse(
+        response as UserUpdateResponse,
+        newRootKey,
+        wrappingKey
+      );
+    }
+
+    return {
+      response: response,
+      keyParams: (response as UserUpdateResponse).data?.key_params,
+    };
+  }
+
   public async changePassword(
     currentServerPassword: string,
     newRootKey: SNRootKey,
@@ -597,7 +625,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   private async handleSuccessAuthResponse(
-    response: RegistrationResponse | SignInResponse | ChangePasswordResponse,
+    response: RegistrationResponse | SignInResponse | ChangePasswordResponse | UserUpdateResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ) {

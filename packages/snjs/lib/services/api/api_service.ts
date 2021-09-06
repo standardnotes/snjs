@@ -21,6 +21,7 @@ import {
   GetSettingResponse,
   DeleteSettingResponse,
   MinimalHttpResponse,
+  UserUpdateResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -47,6 +48,7 @@ type PathNamesV1 = {
   register: string;
   signIn: string;
   changePassword: (userUuid: string) => string;
+  updateUser: (userUuid: string) => string;
   sync: string;
   signOut: string;
   refreshSession: string;
@@ -67,6 +69,7 @@ const Paths: {
     register: '/v1/users',
     signIn: '/v1/login',
     changePassword: (userUuid: string) => `/v1/users/${userUuid}/password`,
+    updateUser: (userUuid: string) => `/v1/users/${userUuid}`,
     sync: '/v1/items',
     signOut: '/v1/logout',
     refreshSession: '/v1/sessions/refresh',
@@ -335,6 +338,52 @@ export class SNApiService extends PureService<
       .catch((errorResponse) => {
         return errorResponse;
       }) as Promise<SignOutResponse>;
+  }
+
+  async changeEmail(
+    userUuid: UuidString,
+    newEmail: string,
+    newKeyParams: SNRootKeyParams
+  ): Promise<UserUpdateResponse | HttpResponse> {
+    if (this.changing) {
+      return this.createErrorResponse(
+        messages.API_MESSAGE_CHANGE_EMAIL_IN_PROGRESS
+      );
+    }
+
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
+    }
+
+    this.changing = true;
+    const url = joinPaths(this.host, <string>Paths.v1.updateUser(userUuid));
+    const params = this.params({
+      email: newEmail,
+      ...newKeyParams.getPortableValue(),
+    });
+
+    const response = await this.httpService
+      .patchAbsolute(url, params, this.session!.authorizationValue)
+      .catch(async (errorResponse) => {
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Patch,
+            url,
+            params,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_CHANGE_EMAIL_FAIL
+        );
+      });
+
+    this.processResponse(response);
+
+    this.changing = false;
+
+    return response;
   }
 
   async changePassword(

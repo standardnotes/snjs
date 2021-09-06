@@ -6,6 +6,7 @@ import {
   PasswordChangeFunctionResponse,
   AccountServiceResponse,
   AccountEvent,
+  EmailChangeFunctionResponse,
 } from './services/credential_service';
 import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria';
 import { SNKeyRecoveryService } from './services/key_recovery_service';
@@ -1304,6 +1305,20 @@ export class SNApplication {
       ephemeral,
       mergeLocal,
       awaitSync
+    );
+  }
+
+  public async changeEmail(
+    newEmail: string,
+    currentPassword: string,
+    passcode?: string,
+    origination = KeyParamsOrigination.EmailChange,
+  ): Promise<EmailChangeFunctionResponse> {
+    return this.credentialService.changeEmail(
+      currentPassword,
+      newEmail,
+      passcode,
+      origination,
     );
   }
 
