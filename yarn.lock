@@ -2524,6 +2524,13 @@
     "@typescript-eslint/eslint-plugin" "^4.14.0"
     "@typescript-eslint/parser" "^4.14.0"
 
+"@standardnotes/domain-events@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@standardnotes/domain-events/-/domain-events-2.0.0.tgz#6e537485054c6b32cb1d9408fab9cd132ed0fb65"
+  integrity sha512-4rMCGw2Gy1CLfi6SkpsH7QzbT/80g5gVGeicEHhHvLhMolAEsHXCGOjpw5/nA3YKl8B/U8s6wvaee2vIDejFLA==
+  dependencies:
+    "@standardnotes/auth" "^3.2.0"
+
 "@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
