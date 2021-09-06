@@ -12,6 +12,7 @@ import {
   SyncModes
 } from '@Lib/index';
 import { ContentType } from '@Lib/models';
+import { Uuid } from '@Lib/uuid';
 import {
   EncryptionIntent,
   isDecryptedIntent,

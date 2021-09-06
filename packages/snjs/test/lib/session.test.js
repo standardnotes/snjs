@@ -165,7 +165,7 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('change email request should be successful with a valid access token', async function () {
-    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+    let { application, password } = await Factory.createAndInitSimpleAppContext({
       registerUser: true
     });
     const newEmail = Uuid.GenerateUuidSynchronously();
@@ -183,7 +183,7 @@ describe('server session', function () {
     const loginResponse = await Factory.loginToApplication({
       application: application,
       email: newEmail,
-      password: newPassword,
+      password: password,
     });
 
     expect(loginResponse).toBeTruthy();
@@ -192,7 +192,7 @@ describe('server session', function () {
   }, Factory.LongTestTimeout);
 
   it('change email request should fail with an invalid access token', async function () {
-    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+    let { application, password } = await Factory.createAndInitSimpleAppContext({
       registerUser: true
     });
     const fakeSession = application.apiService.getSession();
@@ -220,7 +220,7 @@ describe('server session', function () {
   });
 
   it('change email request should fail with an expired refresh token', async function () {
-    let { application, email, password, newPassword } = await Factory.createAndInitSimpleAppContext({
+    let { application, email, password } = await Factory.createAndInitSimpleAppContext({
       registerUser: true
     });
     /** Waiting for the refresh token to expire. */
