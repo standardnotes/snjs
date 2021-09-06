@@ -173,6 +173,7 @@ describe('server session', function () {
       newEmail,
       password
     );
+    console.log(changeEmailResponse.data)
 
     expect(changeEmailResponse.status).toBe(200);
     expect(changeEmailResponse.data.user).toBeTruthy();
@@ -185,6 +186,7 @@ describe('server session', function () {
       email: newEmail,
       password: password,
     });
+    console.log(loginResponse)
 
     expect(loginResponse).toBeTruthy();
     expect(loginResponse.status).toBe(200);
