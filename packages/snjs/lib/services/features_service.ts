@@ -10,7 +10,7 @@ import {
   SNApiService,
 } from './api/api_service';
 import { UuidString } from '@Lib/types';
-import { FeatureDescription } from '@standardnotes/features';
+import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
@@ -120,6 +120,12 @@ export class SNFeaturesService extends PureService<void> {
   private async setFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
+  }
+
+  public getFeature(
+    featureId: FeatureIdentifier
+  ): FeatureDescription | undefined {
+    return this.features.find((feature) => feature.identifier === featureId);
   }
 
   private haveRolesChanged(roles: RoleName[]): boolean {

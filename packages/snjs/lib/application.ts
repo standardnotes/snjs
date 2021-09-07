@@ -105,6 +105,7 @@ import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
+import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -1508,6 +1509,12 @@ export class SNApplication {
     url: string
   ): Promise<SNComponent | undefined> {
     return this.featuresService.downloadExternalFeature(url);
+  }
+
+  public getFeature(
+    featureId: FeatureIdentifier
+  ): FeatureDescription | undefined {
+    return this.featuresService.getFeature(featureId);
   }
 
   private constructServices() {
