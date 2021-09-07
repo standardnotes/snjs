@@ -244,8 +244,8 @@ export type GetSubscriptionsReponse = MinimalHttpResponse & {
     [key in SubscriptionName]: {
       name: string;
       pricing: {
-        price: number,
-        period: string
+        price: number;
+        period: string;
       }[];
       features: FeatureDescription[];
     }
