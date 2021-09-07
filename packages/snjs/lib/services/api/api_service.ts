@@ -22,6 +22,7 @@ import {
   DeleteSettingResponse,
   MinimalHttpResponse,
   GetSubscriptionResponse,
+  GetSubscriptionsReponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -62,6 +63,7 @@ type PathNamesV1 = {
 
 type PathNamesV2 = {
   subscription: (userUuid: string) => string;
+  subscriptions: string;
 }
 
 const Paths: {
@@ -88,6 +90,7 @@ const Paths: {
   },
   v2: {
     subscription: (userUuid) => `/v2/users/${userUuid}/subscription`,
+    subscriptions: '/v2/subscriptions',
   },
 };
 
@@ -717,6 +720,17 @@ export class SNApiService extends PureService<
       verb: HttpVerb.Get,
       url,
       authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
+    });
+    this.processResponse(response);
+    return response;
+  }
+
+  public async getSubscriptions(): Promise<HttpResponse | GetSubscriptionsReponse> {
+    const url = joinPaths(this.host, Paths.v2.subscriptions);
+    const response = await this.request({
+      verb: HttpVerb.Get,
+      url,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
     });
     this.processResponse(response);
