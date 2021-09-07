@@ -726,7 +726,7 @@ export class SNApiService extends PureService<
     return response;
   }
 
-  public async getSubscriptions(): Promise<HttpResponse | GetSubscriptionsReponse> {
+  public async getSubscriptions(): Promise<HttpResponse | GetSubscriptionsResponse> {
     const url = joinPaths(this.host, Paths.v2.subscriptions);
     const response = await this.request({
       verb: HttpVerb.Get,
