@@ -22,7 +22,7 @@ import {
   DeleteSettingResponse,
   MinimalHttpResponse,
   GetSubscriptionResponse,
-  GetSubscriptionsReponse,
+  GetSubscriptionsResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';

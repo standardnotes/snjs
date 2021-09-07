@@ -96,7 +96,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { GetSubscriptionResponse, GetSubscriptionsReponse, HttpResponse, SignInResponse, User } from './services/api/responses';
+import { GetSubscriptionResponse, GetSubscriptionsResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
@@ -558,7 +558,7 @@ export class SNApplication {
     return this.sessionManager.getSubscription();
   }
 
-  public getSubscriptions(): Promise<HttpResponse | GetSubscriptionsReponse> {
+  public getSubscriptions(): Promise<HttpResponse | GetSubscriptionsResponse> {
     return this.apiService.getSubscriptions();
   }
 
