@@ -242,7 +242,7 @@ export type GetSubscriptionResponse = MinimalHttpResponse & {
 export type GetSubscriptionsReponse = MinimalHttpResponse & {
   data?: {
     [key in SubscriptionName]: {
-      name: SubscriptionName;
+      name: string;
       pricing: {
         price: number,
         period: string
