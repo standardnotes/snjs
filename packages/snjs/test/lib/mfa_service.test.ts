@@ -49,6 +49,4 @@ describe('mfa service', () => {
     const snApp = await createApp().then(registerApp);
     expect(await snApp.isMfaFeatureAvailable()).toBe(false);
   });
-
-  it('allows mfa for subscribed user', async () => {});
 });
