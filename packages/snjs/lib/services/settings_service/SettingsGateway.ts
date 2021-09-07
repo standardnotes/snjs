@@ -10,6 +10,7 @@ import {
 } from '../api/responses';
 import { UuidString } from '@Lib/types';
 import { SensitiveSettingName } from './SensitiveSettingName';
+import { Settings } from './Settings';
 
 interface SettingsAPI {
   listSettings(userUuid: UuidString): Promise<ListSettingsResponse>;
@@ -32,10 +33,6 @@ interface SettingsAPI {
   ): Promise<DeleteSettingResponse>;
 }
 
-export type Settings = {
-  [key in SettingName]: string;
-};
-
 /**
  * SettingsGateway coordinates communication with the API service
  * wrapping the userUuid provision for simpler consumption
@@ -46,7 +43,7 @@ export class SettingsGateway {
     private readonly userProvider: { getUser: () => User | undefined }
   ) {}
 
-  isReadyForModification() {
+  isReadyForModification(): boolean {
     return this.getUser() != null;
   }
 

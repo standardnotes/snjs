@@ -16,7 +16,7 @@ export class SNSettingsService extends PureService {
     super();
   }
 
-  initializeFromDisk() {
+  initializeFromDisk(): void {
     this._provider = new SettingsGateway(this.apiService, this.sessionManager);
   }
 

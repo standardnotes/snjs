@@ -1485,6 +1485,10 @@ export class SNApplication {
     return this.settingsService.deleteSetting(name);
   }
 
+  public isMfaFeatureAvailable(): boolean {
+    return this.mfaService.isMfaFeatureAvailable();
+  }
+
   public async isMfaActivated() {
     return this.mfaService.isMfaActivated();
   }
@@ -1867,7 +1871,11 @@ export class SNApplication {
   }
 
   private createMfaService() {
-    this.mfaService = new SNMfaService(this.settingsService, this.crypto);
+    this.mfaService = new SNMfaService(
+      this.settingsService,
+      this.crypto,
+      this.featuresService
+    );
     this.services.push(this.mfaService);
   }
 

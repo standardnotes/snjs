@@ -44,4 +44,9 @@ describe('mfa service', () => {
 
     Factory.safeDeinit(snApp);
   });
+
+  it('tells whether mfa feature is available for user', async () => {
+    const snApp = await createApp().then(registerApp);
+    expect(await snApp.isMfaFeatureAvailable()).toBe(true);
+  });
 });
