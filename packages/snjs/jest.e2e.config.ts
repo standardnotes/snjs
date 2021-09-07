@@ -80,6 +80,8 @@ export default {
     '<rootDir>/test/setup/jest.ts',
   ],
 
+  silent: true,
+
   // The test environment that will be used for testing
   testEnvironment: 'jsdom',
 
