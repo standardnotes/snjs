@@ -57,7 +57,7 @@ export class SNMfaService extends PureService {
     );
 
     // If the feature is not present in the collection, we don't want to block it
-    if (feature == undefined) return true;
+    if (feature == undefined) return false;
 
     return feature.no_expire === true || (feature.expires_at ?? 0) > Date.now();
   }

@@ -45,8 +45,10 @@ describe('mfa service', () => {
     Factory.safeDeinit(snApp);
   });
 
-  it('tells whether mfa feature is available for user', async () => {
+  it("doesn't allow mfa for basic user", async () => {
     const snApp = await createApp().then(registerApp);
-    expect(await snApp.isMfaFeatureAvailable()).toBe(true);
+    expect(await snApp.isMfaFeatureAvailable()).toBe(false);
   });
+
+  it('allows mfa for subscribed user', async () => {});
 });
