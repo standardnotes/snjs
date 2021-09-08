@@ -192,32 +192,45 @@ describe('protections', function () {
   });
 
   it('prompts for password when adding a passcode', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+    const application = Factory.createApplication(Factory.randomString());
     const password = Uuid.GenerateUuidSynchronously();
+    const passcode = 'passcode';
+    let didPromptForPassword = false;
+    await application.prepareForLaunch({
+      receiveChallenge: (challenge) => {
+        let values;
+        if (
+          challenge.prompts[0].validation ===
+            ChallengeValidation.AccountPassword
+        ) {
+          if(challenge.reason === ChallengeReason.AddPasscode) {
+            didPromptForPassword = true;
+          }
+          values = challenge.prompts.map(
+            (prompt) =>
+              new ChallengeValue(
+                prompt,
+                prompt.validation === ChallengeValidation.AccountPassword
+                  ? password
+                  : 3600
+              )
+          );
+        } else {
+          values = [new ChallengeValue(challenge.prompts[0], passcode)];
+        }
+
+        application.submitValuesForChallenge(challenge, values);
+      },
+    });
+    await application.launch(true);
     await Factory.registerUserToApplication({
       application: application,
       email: Uuid.GenerateUuidSynchronously(),
       password,
     });
 
-    const promise = new Promise((resolve, reject) => {
-      application.setLaunchCallback({
-        receiveChallenge(challenge) {
-          if (
-            challenge.reason === ChallengeReason.AddPasscode &&
-            challenge.prompts[0].validation ===
-              ChallengeValidation.AccountPassword
-          ) {
-            resolve();
-          } else {
-            reject(Error('Received unknown challenge.'));
-          }
-        },
-      });
-    });
-    application.addPasscode('passcode');
-    await Factory.sleep(2);
-    await promise;
+    await application.addPasscode(passcode);
+    expect(didPromptForPassword).toBe(true);
     await Factory.safeDeinit(application);
   });
 
