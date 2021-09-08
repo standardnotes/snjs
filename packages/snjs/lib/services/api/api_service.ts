@@ -22,7 +22,7 @@ import {
   DeleteSettingResponse,
   MinimalHttpResponse,
   GetSubscriptionResponse,
-  GetSubscriptionsResponse,
+  GetAvailableSubscriptionsResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -726,7 +726,7 @@ export class SNApiService extends PureService<
     return response;
   }
 
-  public async getSubscriptions(): Promise<HttpResponse | GetSubscriptionsResponse> {
+  public async getAvailableSubscriptions(): Promise<HttpResponse | GetAvailableSubscriptionsResponse> {
     const url = joinPaths(this.host, Paths.v2.subscriptions);
     const response = await this.request({
       verb: HttpVerb.Get,

@@ -96,7 +96,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { GetSubscriptionResponse, GetSubscriptionsResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
+import { AvailableSubscriptions, GetAvailableSubscriptionsResponse, GetSubscriptionResponse, GetSubscriptionsResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
@@ -105,6 +105,7 @@ import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
+import { Subscription } from '@standardnotes/auth';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -554,12 +555,26 @@ export class SNApplication {
     return compareVersions(userVersion, ProtocolVersion.V004) >= 0;
   }
 
-  public getUserSubscription(): Promise<HttpResponse | GetSubscriptionResponse> {
-    return this.sessionManager.getSubscription();
+  public async getUserSubscription(): Promise<Subscription | undefined> {
+    try {
+      const response = await this.sessionManager.getSubscription();
+      if (!response.error && response.data) {
+        return (response as GetSubscriptionResponse).data!.subscription
+      }
+    } catch (e) {
+      return undefined;
+    }
   }
 
-  public getSubscriptions(): Promise<HttpResponse | GetSubscriptionsResponse> {
-    return this.apiService.getSubscriptions();
+  public async getAvailableSubscriptions(): Promise<AvailableSubscriptions | undefined> {
+    try {
+      const response = await this.apiService.getAvailableSubscriptions();
+      if (!response.error && response.data) {
+        return (response as GetAvailableSubscriptionsResponse).data!
+      }
+    } catch (e) {
+      return undefined;
+    }
   }
 
   /**

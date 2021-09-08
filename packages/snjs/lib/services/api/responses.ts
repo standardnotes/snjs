@@ -239,15 +239,17 @@ export type GetSubscriptionResponse = MinimalHttpResponse & {
   }
 }
 
-export type GetSubscriptionsResponse = MinimalHttpResponse & {
-  data?: {
-    [key in SubscriptionName]: {
-      name: string;
-      pricing: {
-        price: number;
-        period: string;
-      }[];
-      features: FeatureDescription[];
-    }
-  };
+export type AvailableSubscriptions = {
+  [key in SubscriptionName]: {
+    name: string;
+    pricing: {
+      price: number;
+      period: string;
+    }[];
+    features: FeatureDescription[];
+  }
+};
+
+export type GetAvailableSubscriptionsResponse = MinimalHttpResponse & {
+  data?: AvailableSubscriptions;
 }
