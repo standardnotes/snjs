@@ -9,7 +9,7 @@ import {
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, RemoteSession, TokenSession } from './session';
 import {
-  ChangePasswordResponse,
+  ChangeCredentialsResponse,
   HttpResponse,
   KeyParamsResponse,
   RegistrationResponse,
@@ -17,7 +17,6 @@ import {
   SignInResponse,
   StatusCode,
   User,
-  UserUpdateResponse,
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
@@ -547,56 +546,26 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  public async changeEmail(
-    newEmail: string,
-    newRootKey: SNRootKey,
-    wrappingKey?: SNRootKey
-  ): Promise<SessionManagerResponse> {
-    const userUuid = this.user!.uuid;
-
-    const response = await this.apiService.changeEmail(
-      userUuid,
-      newEmail,
-      newRootKey.keyParams
-    );
-
-    if (!response.error && response.data) {
-      await this.handleSuccessAuthResponse(
-        response as UserUpdateResponse,
-        newRootKey,
-        wrappingKey
-      );
-    }
-
-    return {
-      response: response,
-      keyParams: (response as UserUpdateResponse).data?.key_params,
-    };
-  }
-
-  public async changePassword(
+  public async changeCredentials(parameters: {
     currentServerPassword: string,
     newRootKey: SNRootKey,
-    wrappingKey?: SNRootKey
-  ): Promise<SessionManagerResponse> {
+    wrappingKey?: SNRootKey,
+    newEmail?: string
+  }): Promise<SessionManagerResponse> {
     const userUuid = this.user!.uuid;
-    const response = await this.apiService.changePassword(
+    const response = await this.apiService.changeCredentials({
       userUuid,
-      currentServerPassword,
-      newRootKey.serverPassword!,
-      newRootKey.keyParams
-    );
-    if (!response.error && response.data) {
-      await this.handleSuccessAuthResponse(
-        response as ChangePasswordResponse,
-        newRootKey,
-        wrappingKey
-      );
-    }
-    return {
-      response: response,
-      keyParams: (response as ChangePasswordResponse).data?.key_params,
-    };
+      currentServerPassword: parameters.currentServerPassword,
+      newServerPassword: parameters.newRootKey.serverPassword!,
+      newKeyParams: parameters.newRootKey.keyParams,
+      newEmail: parameters.newEmail
+    });
+
+    return this.processChangeCredentialsResponse(
+      response as ChangeCredentialsResponse,
+      parameters.newRootKey,
+      parameters.wrappingKey
+    )
   }
 
   public async getSessionsList(): Promise<
@@ -624,8 +593,26 @@ export class SNSessionManager extends PureService<SessionEvent> {
     return response;
   }
 
+  private async processChangeCredentialsResponse(
+    response: ChangeCredentialsResponse,
+    newRootKey: SNRootKey,
+    wrappingKey?: SNRootKey
+  ): Promise<SessionManagerResponse> {
+    if (!response.error && response.data) {
+      await this.handleSuccessAuthResponse(
+        response as ChangeCredentialsResponse,
+        newRootKey,
+        wrappingKey
+      );
+    }
+    return {
+      response: response,
+      keyParams: (response as ChangeCredentialsResponse).data?.key_params,
+    };
+  }
+
   private async handleSuccessAuthResponse(
-    response: RegistrationResponse | SignInResponse | ChangePasswordResponse | UserUpdateResponse,
+    response: RegistrationResponse | SignInResponse | ChangeCredentialsResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ) {

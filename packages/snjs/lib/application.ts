@@ -3,10 +3,9 @@ import { SyncOpStatus } from './services/sync/sync_op_status';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
   SNCredentialService,
-  PasswordChangeFunctionResponse,
+  CredentialsChangeFunctionResponse,
   AccountServiceResponse,
   AccountEvent,
-  EmailChangeFunctionResponse,
 } from './services/credential_service';
 import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria';
 import { SNKeyRecoveryService } from './services/key_recovery_service';
@@ -1312,14 +1311,15 @@ export class SNApplication {
     newEmail: string,
     currentPassword: string,
     passcode?: string,
-    origination = KeyParamsOrigination.EmailChange,
-  ): Promise<EmailChangeFunctionResponse> {
-    return this.credentialService.changeEmail(
+    origination = KeyParamsOrigination.PasswordChange,
+  ): Promise<CredentialsChangeFunctionResponse> {
+    return this.credentialService.changeCredentials({
       currentPassword,
       newEmail,
       passcode,
       origination,
-    );
+      validateNewPasswordStrength: false,
+    });
   }
 
   public async changePassword(
@@ -1327,15 +1327,15 @@ export class SNApplication {
     newPassword: string,
     passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
-    { validatePasswordStrength = true } = {}
-  ): Promise<PasswordChangeFunctionResponse> {
-    return this.credentialService.changePassword(
+    validateNewPasswordStrength = true
+  ): Promise<CredentialsChangeFunctionResponse> {
+    return this.credentialService.changeCredentials({
       currentPassword,
       newPassword,
       passcode,
       origination,
-      { validatePasswordStrength }
-    );
+      validateNewPasswordStrength,
+    });
   }
 
   public async signOut(force = false): Promise<void> {

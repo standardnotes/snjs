@@ -111,7 +111,7 @@ export type SignInResponse = HttpResponse & {
   data: SignInData;
 };
 
-export type ChangePasswordData = {
+export type ChangeCredentialsData = {
   session?: SessionBody;
   /** Represents legacy JWT token */
   token?: string;
@@ -119,20 +119,8 @@ export type ChangePasswordData = {
   key_params?: AnyKeyParamsContent;
 };
 
-export type UserUpdateData = {
-  session?: SessionBody;
-  /** Represents legacy JWT token */
-  token?: string;
-  user?: User;
-  key_params?: AnyKeyParamsContent;
-};
-
-export type ChangePasswordResponse = HttpResponse & {
-  data: ChangePasswordData;
-};
-
-export type UserUpdateResponse = HttpResponse & {
-  data: UserUpdateData;
+export type ChangeCredentialsResponse = HttpResponse & {
+  data: ChangeCredentialsData;
 };
 
 export type SignOutResponse = HttpResponse & Record<string, unknown>;
