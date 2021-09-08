@@ -249,7 +249,7 @@ describe('upgrading', () => {
     it('rolls back the local protocol upgrade if the server responds with an error', async function () {
       sinon.replace(
         application.sessionManager,
-        'changePassword',
+        'changeCredentials',
         async () => [Error()]
       );
 
