@@ -903,7 +903,7 @@ export class SNApplication {
   }
 
   public getUserPasswordCreationDate(): Date | undefined {
-    return this.sessionManager.getPasswordCreatedDate();
+    return this.protocolService.getPasswordCreatedDate();
   }
 
   public async getProtocolEncryptionDisplayName(): Promise<string | undefined> {

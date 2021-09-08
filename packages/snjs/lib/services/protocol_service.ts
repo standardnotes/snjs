@@ -1566,4 +1566,9 @@ export class SNProtocolService
     };
     return rollback;
   }
+
+  public getPasswordCreatedDate(): Date | undefined {
+    const rootKey = this.getRootKey();
+    return rootKey ? rootKey.keyParams.createdDate : undefined;
+  }
 }
