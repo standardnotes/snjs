@@ -6,6 +6,7 @@ import {
   ItemManager,
   SNItem,
   SNComponentManager,
+  SNSessionManager,
 } from '@Lib/index';
 import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
@@ -22,6 +23,7 @@ describe('featuresService', () => {
   let componentManager: SNComponentManager;
   let webSocketsService: SNWebSocketsService;
   let settingsService: SNSettingsService;
+  let sessionManager: SNSessionManager;
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
@@ -36,6 +38,7 @@ describe('featuresService', () => {
       componentManager,
       webSocketsService,
       settingsService,
+      sessionManager,
     );
   };
 
@@ -92,6 +95,9 @@ describe('featuresService', () => {
 
     settingsService = {} as jest.Mocked<SNSettingsService>;
     settingsService.updateSetting = jest.fn();
+
+    sessionManager = {} as jest.Mocked<SNSessionManager>;
+    sessionManager.getUser = jest.fn();
   });
 
   describe('loadUserRoles()', () => {

@@ -10,7 +10,7 @@ import {
   SNApiService,
 } from './api/api_service';
 import { UuidString } from '@Lib/types';
-import { FeatureDescription } from '@standardnotes/features';
+import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
@@ -22,6 +22,7 @@ import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
+import { SNSessionManager } from './api/session_manager';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -38,6 +39,7 @@ export class SNFeaturesService extends PureService<void> {
     private componentManager: SNComponentManager,
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
+    private sessionManager: SNSessionManager,
   ) {
     super();
 
@@ -94,11 +96,16 @@ export class SNFeaturesService extends PureService<void> {
       undefined,
       []
     );
-    this.features = await this.storageService.getValue(
-      StorageKey.UserFeatures,
-      undefined,
-      []
-    );
+    const userUuid = this.sessionManager.getUser()?.uuid;
+    if (userUuid == undefined) {
+      this.features = await this.storageService.getValue(
+        StorageKey.UserFeatures,
+        undefined,
+        []
+      );
+    } else {
+      await this.updateFeatures(userUuid);
+    }
   }
 
   public async updateRoles(
@@ -120,6 +127,12 @@ export class SNFeaturesService extends PureService<void> {
   private async setFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
+  }
+
+  public getFeature(
+    featureId: FeatureIdentifier
+  ): FeatureDescription | undefined {
+    return this.features.find((feature) => feature.identifier === featureId);
   }
 
   private haveRolesChanged(roles: RoleName[]): boolean {
@@ -258,6 +271,7 @@ export class SNFeaturesService extends PureService<void> {
     (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
+    (this.sessionManager as unknown) = undefined;
     this.deinited = true;
   }
 }
