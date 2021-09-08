@@ -22,6 +22,7 @@ import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
+import { SNSessionManager } from './api/session_manager';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -38,6 +39,7 @@ export class SNFeaturesService extends PureService<void> {
     private componentManager: SNComponentManager,
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
+    private sessionManager: SNSessionManager,
   ) {
     super();
 
@@ -94,11 +96,16 @@ export class SNFeaturesService extends PureService<void> {
       undefined,
       []
     );
-    this.features = await this.storageService.getValue(
-      StorageKey.UserFeatures,
-      undefined,
-      []
-    );
+    const userUuid = this.sessionManager.getUser()?.uuid;
+    if(userUuid==undefined) {
+      this.features = await this.storageService.getValue(
+        StorageKey.UserFeatures,
+        undefined,
+        []
+      );
+    } else {
+      await this.updateFeatures(userUuid);
+    }
   }
 
   public async updateRoles(
@@ -264,6 +271,7 @@ export class SNFeaturesService extends PureService<void> {
     (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
+    (this.sessionManager as unknown) = undefined;
     this.deinited = true;
   }
 }

@@ -302,8 +302,8 @@ export class SNApplication {
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
     await this.webSocketsService.loadWebSocketUrl();
-    await this.featuresService.loadUserRolesAndFeatures();
     await this.sessionManager.initializeFromDisk();
+    await this.featuresService.loadUserRolesAndFeatures();
     this.historyManager.initializeFromDisk();
     this.settingsService.initializeFromDisk();
 
@@ -1590,7 +1590,8 @@ export class SNApplication {
       this.itemManager,
       this.componentManager,
       this.webSocketsService,
-      this.settingsService
+      this.settingsService,
+      this.sessionManager
     );
     this.services.push(this.featuresService);
   }
