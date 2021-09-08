@@ -1,4 +1,4 @@
-import { Settings } from './services/settings_service/settings';
+import { Settings } from './services/settings_service/Settings';
 import { SyncOpStatus } from './services/sync/sync_op_status';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
