@@ -191,7 +191,12 @@ describe('protections', function () {
     await Factory.safeDeinit(application);
   });
 
-  it('prompts for password when adding a passcode', async function () {
+  it.skip('prompts for password when adding a passcode', async function () {
+    /**
+     * This test presently sometimes fails in CI environments due to
+     * sync.handleErrorServerResponse being called after application
+     * is deinited.
+     */
     const application = Factory.createApplication(Factory.randomString());
     const password = Uuid.GenerateUuidSynchronously();
     const passcode = 'passcode';
