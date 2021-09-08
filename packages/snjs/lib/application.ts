@@ -1,3 +1,4 @@
+import { Settings } from './services/settings_service/Settings';
 import { SyncOpStatus } from './services/sync/sync_op_status';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
@@ -13,9 +14,9 @@ import {
   SortDirection,
 } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
-import { PayloadOverride } from './protocol/payloads/generator';
+import { PayloadOverride, RawPayload } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
-import { ApplicationIdentifier, DeinitSource, UuidString } from './types';
+import { ApplicationIdentifier, DeinitSource, UuidString, AnyRecord } from './types';
 import {
   ApplicationEvent,
   SyncEvent,
@@ -106,6 +107,7 @@ import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
 import { Subscription } from '@standardnotes/auth';
+import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -115,7 +117,7 @@ type LaunchCallback = {
 };
 type ApplicationEventCallback = (
   event: ApplicationEvent,
-  data?: any
+  data?: unknown
 ) => Promise<void>;
 type ApplicationObserver = {
   singleEvent?: ApplicationEvent;
@@ -152,6 +154,7 @@ export class SNApplication {
   private mfaService!: SNMfaService;
 
   private eventHandlers: ApplicationObserver[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private services: PureService<any, any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
@@ -194,6 +197,7 @@ export class SNApplication {
     private crypto: SNPureCrypto,
     public alertService: SNAlertService,
     public identifier: ApplicationIdentifier,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
     private appVersion: string,
@@ -302,10 +306,10 @@ export class SNApplication {
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
     await this.webSocketsService.loadWebSocketUrl();
-    await this.featuresService.loadUserRolesAndFeatures();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
     this.settingsService.initializeFromDisk();
+    await this.featuresService.loadUserRolesAndFeatures();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
@@ -401,6 +405,7 @@ export class SNApplication {
     event: ApplicationEvent,
     callback: ApplicationEventCallback
   ): () => void {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const filteredCallback = async (firedEvent: ApplicationEvent) => {
       if (firedEvent === event) {
         void callback(event);
@@ -409,7 +414,7 @@ export class SNApplication {
     return this.addEventObserver(filteredCallback, event);
   }
 
-  private async notifyEvent(event: ApplicationEvent, data?: any) {
+  private async notifyEvent(event: ApplicationEvent, data?: AnyRecord) {
     if (event === ApplicationEvent.Started) {
       this.onStart();
     } else if (event === ApplicationEvent.Launched) {
@@ -518,8 +523,8 @@ export class SNApplication {
    * Creates an unmanaged payload from any object, where the raw object
    * represents the same data a payload would.
    */
-  public createPayloadFromObject(object: any): PurePayload {
-    return CreateMaxPayloadFromAnyObject(object);
+  public createPayloadFromObject(object: AnyRecord): PurePayload {
+    return CreateMaxPayloadFromAnyObject(object as RawPayload);
   }
 
   /**
@@ -1159,6 +1164,7 @@ export class SNApplication {
     return this.storageService.isEphemeralSession();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public sync(options?: SyncOptions): Promise<any> {
     return this.syncService.sync(options);
   }
@@ -1173,13 +1179,13 @@ export class SNApplication {
 
   public async setValue(
     key: string,
-    value: any,
+    value: unknown,
     mode?: StorageValueModes
   ): Promise<void> {
     return this.storageService.setValue(key, value, mode);
   }
 
-  public async getValue(key: string, mode?: StorageValueModes): Promise<any> {
+  public getValue(key: string, mode?: StorageValueModes): Promise<unknown> {
     return this.storageService.getValue(key, mode);
   }
 
@@ -1481,11 +1487,11 @@ export class SNApplication {
     }
   }
 
-  public async listSettings() {
+  public async listSettings(): Promise<Partial<Settings>> {
     return this.settingsService.listSettings();
   }
 
-  public async getSetting(name: SettingName) {
+  public async getSetting(name: SettingName): Promise<string | null> {
     return this.settingsService.getSetting(name);
   }
 
@@ -1499,31 +1505,35 @@ export class SNApplication {
     name: SettingName,
     payload: string,
     sensitive = false
-  ) {
+  ): Promise<void> {
     return this.settingsService.updateSetting(name, payload, sensitive);
   }
 
-  public async deleteSetting(name: SettingName) {
+  public async deleteSetting(name: SettingName): Promise<void> {
     return this.settingsService.deleteSetting(name);
   }
 
-  public async isMfaActivated() {
+  public isMfaFeatureAvailable(): boolean {
+    return this.mfaService.isMfaFeatureAvailable();
+  }
+
+  public async isMfaActivated(): Promise<boolean> {
     return this.mfaService.isMfaActivated();
   }
 
-  public async generateMfaSecret() {
+  public async generateMfaSecret(): Promise<string> {
     return this.mfaService.generateMfaSecret();
   }
 
-  public async getOtpToken(secret: string) {
+  public async getOtpToken(secret: string): Promise<string> {
     return this.mfaService.getOtpToken(secret);
   }
 
-  public async enableMfa(secret: string, otpToken: string) {
+  public async enableMfa(secret: string, otpToken: string): Promise<void> {
     return this.mfaService.enableMfa(secret, otpToken);
   }
 
-  public async disableMfa() {
+  public async disableMfa(): Promise<void> {
     return this.mfaService.disableMfa();
   }
 
@@ -1531,6 +1541,12 @@ export class SNApplication {
     url: string
   ): Promise<SNComponent | undefined> {
     return this.featuresService.downloadExternalFeature(url);
+  }
+
+  public getFeature(
+    featureId: FeatureIdentifier
+  ): FeatureDescription | undefined {
+    return this.featuresService.getFeature(featureId);
   }
 
   private constructServices() {
@@ -1602,7 +1618,8 @@ export class SNApplication {
       this.itemManager,
       this.componentManager,
       this.webSocketsService,
-      this.settingsService
+      this.settingsService,
+      this.sessionManager
     );
     this.services.push(this.featuresService);
   }
@@ -1883,7 +1900,11 @@ export class SNApplication {
   }
 
   private createMfaService() {
-    this.mfaService = new SNMfaService(this.settingsService, this.crypto);
+    this.mfaService = new SNMfaService(
+      this.settingsService,
+      this.crypto,
+      this.featuresService
+    );
     this.services.push(this.mfaService);
   }
 
