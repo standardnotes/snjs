@@ -902,7 +902,7 @@ export class SNApplication {
     return this.sessionManager.getUser();
   }
 
-  public getUserPasswordCreationDate(): number | undefined {
+  public getUserPasswordCreationDate(): Date | undefined {
     return this.sessionManager.getPasswordCreatedDate();
   }
 

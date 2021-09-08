@@ -120,9 +120,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  public getPasswordCreatedDate(): number | undefined {
-    const rootKey = this.protocolService.getRootKey()
-    return rootKey ? Number(rootKey.keyParams.content.created) : undefined;
+  public getPasswordCreatedDate(): Date | undefined {
+    const rootKey = this.protocolService.getRootKey();
+    return rootKey ? rootKey.keyParams.createdDate : undefined;
   }
 
   private async setSession(session: Session, persist = true) {
