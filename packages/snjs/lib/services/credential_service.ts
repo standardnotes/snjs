@@ -480,7 +480,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
     }
     const user = this.sessionManager.getUser() as User;
     const currentEmail = user.email
-    const rootKeys = await this.recomputeRootKeys({
+    const rootKeys = await this.recomputeRootKeysForCredentialChange({
       currentPassword: parameters.currentPassword,
       currentEmail,
       origination: parameters.origination,
@@ -522,7 +522,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
     return result.response;
   }
 
-  private async recomputeRootKeys(parameters: {
+  private async recomputeRootKeysForCredentialChange(parameters: {
     currentPassword: string,
     currentEmail: string,
     origination: KeyParamsOrigination,
