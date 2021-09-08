@@ -97,7 +97,7 @@ export class SNFeaturesService extends PureService<void> {
       []
     );
     const userUuid = this.sessionManager.getUser()?.uuid;
-    if(userUuid==undefined) {
+    if (userUuid == undefined) {
       this.features = await this.storageService.getValue(
         StorageKey.UserFeatures,
         undefined,
