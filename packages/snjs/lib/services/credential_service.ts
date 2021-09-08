@@ -13,7 +13,7 @@ import {
   SNRootKeyParams,
 } from './../protocol/key_params';
 import {
-  PasswordChangeStrings,
+  CredentialsChangeStrings,
   INVALID_PASSWORD,
   InsufficientPasswordMessage,
   ChallengeStrings,
@@ -256,7 +256,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
       canceled,
     } = await this.challengeService.getWrappingKeyIfApplicable(parameters.passcode);
     if (canceled) {
-      return { error: Error(PasswordChangeStrings.PasscodeRequired) };
+      return { error: Error(CredentialsChangeStrings.PasscodeRequired) };
     }
     if (parameters.newPassword !== undefined && parameters.validateNewPasswordStrength) {
       if (parameters.newPassword.length < MINIMUM_PASSWORD_LENGTH) {
@@ -309,7 +309,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
         await rollback();
         await this.syncService.sync({ awaitAll: true });
 
-        return { error: Error(PasswordChangeStrings.Failed) };
+        return { error: Error(CredentialsChangeStrings.Failed) };
       }
     }
 

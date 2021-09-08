@@ -85,18 +85,11 @@ export const ImportStrings = {
   FileAccountPassword: 'File account password',
 };
 
-export const PasswordChangeStrings = {
+export const CredentialsChangeStrings = {
   PasscodeRequired:
-    'Your passcode is required to process your password change.',
+    'Your passcode is required to process your credentials change.',
   Failed:
-    'Unable to change your password due to a sync error. Please try again.',
-};
-
-export const EmailChangeStrings = {
-  PasscodeRequired:
-    'Your passcode is required to process your email change.',
-  Failed:
-    'Unable to change your email due to a sync error. Please try again.',
+    'Unable to change your credentials due to a sync error. Please try again.',
 };
 
 export const RegisterStrings = {
