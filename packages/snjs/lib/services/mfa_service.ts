@@ -42,7 +42,10 @@ export class SNMfaService extends PureService {
   async enableMfa(secret: string, otpToken: string): Promise<void> {
     const otpTokenValid =
       otpToken != null && otpToken === (await this.getOtpToken(secret));
-    if (!otpTokenValid) throw new Error(messages.SignInStrings.IncorrectMfa);
+
+    if (!otpTokenValid) { 
+      throw new Error(messages.SignInStrings.IncorrectMfa);
+    }
 
     return this.saveMfaSetting(secret);
   }
@@ -57,7 +60,9 @@ export class SNMfaService extends PureService {
     );
 
     // If the feature is not present in the collection, we don't want to block it
-    if (feature == undefined) return false;
+    if (feature == undefined) {
+      return false;
+    }
 
     return feature.no_expire === true || (feature.expires_at ?? 0) > Date.now();
   }
