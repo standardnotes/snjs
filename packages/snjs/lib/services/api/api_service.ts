@@ -59,10 +59,10 @@ type PathNamesV1 = {
   userFeatures: (userUuid: string) => string;
   settings: (userUuid: string) => string;
   setting: (userUuid: string, settingName: string) => string;
+  subscription: (userUuid: string) => string;
 };
 
 type PathNamesV2 = {
-  subscription: (userUuid: string) => string;
   subscriptions: string;
 }
 
@@ -87,9 +87,9 @@ const Paths: {
     settings: (userUuid) => `/v1/users/${userUuid}/settings`,
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
+    subscription: (userUuid) => `/v2/users/${userUuid}/subscription`,
   },
   v2: {
-    subscription: (userUuid) => `/v2/users/${userUuid}/subscription`,
     subscriptions: '/v2/subscriptions',
   },
 };
@@ -715,7 +715,7 @@ export class SNApiService extends PureService<
   public async getSubscription(
     userUuid: string
   ): Promise<HttpResponse | GetSubscriptionResponse> {
-    const url = joinPaths(this.host, Paths.v2.subscription(userUuid));
+    const url = joinPaths(this.host, Paths.v1.subscription(userUuid));
     const response = await this.request({
       verb: HttpVerb.Get,
       url,
