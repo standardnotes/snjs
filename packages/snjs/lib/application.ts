@@ -303,9 +303,9 @@ export class SNApplication {
     await this.apiService.loadHost();
     await this.webSocketsService.loadWebSocketUrl();
     await this.sessionManager.initializeFromDisk();
-    await this.featuresService.loadUserRolesAndFeatures();
     this.historyManager.initializeFromDisk();
     this.settingsService.initializeFromDisk();
+    await this.featuresService.loadUserRolesAndFeatures();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
