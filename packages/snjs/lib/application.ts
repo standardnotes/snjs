@@ -97,7 +97,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { AvailableSubscriptions, GetAvailableSubscriptionsResponse, GetSubscriptionResponse, GetSubscriptionsResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
+import { AvailableSubscriptions, GetAvailableSubscriptionsResponse, GetSubscriptionResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
@@ -561,25 +561,25 @@ export class SNApplication {
   }
 
   public async getUserSubscription(): Promise<Subscription | undefined> {
-    try {
-      const response = await this.sessionManager.getSubscription();
-      if (!response.error && response.data) {
-        return (response as GetSubscriptionResponse).data!.subscription
-      }
-    } catch (e) {
-      return undefined;
+    const response = await this.sessionManager.getSubscription();
+    if (response.error) {
+      throw new Error(response.error.message)
     }
+    if (response.data) {
+      return (response as GetSubscriptionResponse).data!.subscription
+    }
+    return undefined;
   }
 
   public async getAvailableSubscriptions(): Promise<AvailableSubscriptions | undefined> {
-    try {
-      const response = await this.apiService.getAvailableSubscriptions();
-      if (!response.error && response.data) {
-        return (response as GetAvailableSubscriptionsResponse).data!
-      }
-    } catch (e) {
-      return undefined;
+    const response = await this.apiService.getAvailableSubscriptions();
+    if (response.error) {
+      throw new Error(response.error.message)
     }
+    if (response.data) {
+      return (response as GetAvailableSubscriptionsResponse).data!
+    }
+    return undefined;
   }
 
   /**
