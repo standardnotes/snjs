@@ -479,14 +479,14 @@ export class SNCredentialService extends PureService<AccountEvent> {
       };
     }
     const user = this.sessionManager.getUser() as User;
-    const currentEmail = user.email
+    const currentEmail = user.email;
     const rootKeys = await this.recomputeRootKeysForCredentialChange({
       currentPassword: parameters.currentPassword,
       currentEmail,
       origination: parameters.origination,
       newEmail: parameters.newEmail,
       newPassword: parameters.newPassword,
-    })
+    });
 
     this.lockSyncing();
     /** Now, change the credentials on the server. Roll back on failure */
@@ -504,7 +504,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
       const defaultItemsKey = this.protocolService.getDefaultItemsKey() as SNItemsKey;
       const itemsKeyWasSynced = !defaultItemsKey.neverSynced;
       if (!itemsKeyWasSynced) {
-        const emailShouldBeRolledBack = parameters.newEmail !== undefined && parameters.newEmail !== currentEmail
+        const emailShouldBeRolledBack = parameters.newEmail !== undefined && parameters.newEmail !== currentEmail;
         await this.sessionManager.changeCredentials({
           currentServerPassword: rootKeys.newRootKey.serverPassword as string,
           newRootKey: rootKeys.currentRootKey,
@@ -542,6 +542,6 @@ export class SNCredentialService extends PureService<AccountEvent> {
     return {
       currentRootKey,
       newRootKey,
-    }
+    };
   }
 }
