@@ -902,6 +902,10 @@ export class SNApplication {
     return this.sessionManager.getUser();
   }
 
+  public getUserPasswordCreationDate(): number | undefined {
+    return this.sessionManager.getPasswordCreatedDate();
+  }
+
   public async getProtocolEncryptionDisplayName(): Promise<string | undefined> {
     return this.protocolService.getEncryptionDisplayName();
   }
