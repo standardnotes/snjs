@@ -210,6 +210,11 @@ describe('features', () => {
     });
   });
 
+  it('should provide feature', async ()=>{
+    const feature = application.getFeature(FeatureIdentifier.BoldEditor);
+    expect(feature).toEqual(boldEditorFeature);
+  });
+
   describe('extension repo items observer', () => {
     it('should update extension key user setting when extension repo is added', async () => {
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');

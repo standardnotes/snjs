@@ -105,6 +105,7 @@ import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
+import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -301,10 +302,10 @@ export class SNApplication {
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
     await this.webSocketsService.loadWebSocketUrl();
-    await this.featuresService.loadUserRolesAndFeatures();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
     this.settingsService.initializeFromDisk();
+    await this.featuresService.loadUserRolesAndFeatures();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
@@ -1484,6 +1485,10 @@ export class SNApplication {
     return this.settingsService.deleteSetting(name);
   }
 
+  public isMfaFeatureAvailable(): boolean {
+    return this.mfaService.isMfaFeatureAvailable();
+  }
+
   public async isMfaActivated() {
     return this.mfaService.isMfaActivated();
   }
@@ -1508,6 +1513,12 @@ export class SNApplication {
     url: string
   ): Promise<SNComponent | undefined> {
     return this.featuresService.downloadExternalFeature(url);
+  }
+
+  public getFeature(
+    featureId: FeatureIdentifier
+  ): FeatureDescription | undefined {
+    return this.featuresService.getFeature(featureId);
   }
 
   private constructServices() {
@@ -1579,7 +1590,8 @@ export class SNApplication {
       this.itemManager,
       this.componentManager,
       this.webSocketsService,
-      this.settingsService
+      this.settingsService,
+      this.sessionManager
     );
     this.services.push(this.featuresService);
   }
@@ -1860,7 +1872,11 @@ export class SNApplication {
   }
 
   private createMfaService() {
-    this.mfaService = new SNMfaService(this.settingsService, this.crypto);
+    this.mfaService = new SNMfaService(
+      this.settingsService,
+      this.crypto,
+      this.featuresService
+    );
     this.services.push(this.mfaService);
   }
 
