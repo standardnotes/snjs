@@ -1,4 +1,4 @@
-import { Settings } from './services/settings_service/SettingsGateway';
+import { Settings } from './services/settings_service/settings';
 import { SyncOpStatus } from './services/sync/sync_op_status';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
@@ -1494,7 +1494,7 @@ export class SNApplication {
     return this.mfaService.isMfaFeatureAvailable();
   }
 
-  public async isMfaActivated() {
+  public async isMfaActivated(): Promise<boolean> {
     return this.mfaService.isMfaActivated();
   }
 
