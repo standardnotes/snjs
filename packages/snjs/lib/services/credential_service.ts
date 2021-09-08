@@ -504,11 +504,12 @@ export class SNCredentialService extends PureService<AccountEvent> {
       const defaultItemsKey = this.protocolService.getDefaultItemsKey() as SNItemsKey;
       const itemsKeyWasSynced = !defaultItemsKey.neverSynced;
       if (!itemsKeyWasSynced) {
+        const emailShouldBeRolledBack = parameters.newEmail !== undefined && parameters.newEmail !== currentEmail
         await this.sessionManager.changeCredentials({
           currentServerPassword: rootKeys.newRootKey.serverPassword as string,
           newRootKey: rootKeys.currentRootKey,
           wrappingKey,
-          newEmail: currentEmail
+          newEmail: emailShouldBeRolledBack ? currentEmail : undefined
         });
         await this.protocolService.reencryptItemsKeys();
         await rollback();
