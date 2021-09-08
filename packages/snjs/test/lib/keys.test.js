@@ -868,10 +868,10 @@ describe('keys', function () {
        */
       await newClient.signIn(email, password);
 
-      await oldClient.sessionManager.changePassword(
-        currentRootKey.serverPassword,
+      await oldClient.sessionManager.changeCredentials({
+        currentServerPassword: currentRootKey.serverPassword,
         newRootKey
-      );
+      });
 
       /** Re-authenticate on other app; allow challenge to complete */
       await newClient.sync();
@@ -920,10 +920,10 @@ describe('keys', function () {
         password
       );
 
-      await application.sessionManager.changePassword(
-        currentRootKey.serverPassword,
+      await application.sessionManager.changeCredentials({
+        currentServerPassword: currentRootKey.serverPassword,
         newRootKey
-      );
+      });
       await application.protocolService.reencryptItemsKeys();
       await application.sync({ awaitAll: true });
 
