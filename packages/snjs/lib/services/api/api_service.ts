@@ -722,7 +722,6 @@ export class SNApiService extends PureService<
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
     });
-    this.processResponse(response);
     return response;
   }
 
@@ -733,7 +732,6 @@ export class SNApiService extends PureService<
       url,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
     });
-    this.processResponse(response);
     return response;
   }
 
