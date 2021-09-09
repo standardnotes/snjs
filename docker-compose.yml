@@ -45,7 +45,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.24.0
+    image: standardnotes/api-gateway:1.25.0
     depends_on:
       - syncing-server-js
       - auth
@@ -63,7 +63,7 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.18.0
+    image: standardnotes/auth:1.19.1
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -75,7 +75,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.18.0
+    image: standardnotes/auth:1.19.1
     depends_on:
       - auth
     entrypoint: [
