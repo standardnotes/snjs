@@ -39,6 +39,7 @@ describe('featuresService', () => {
       webSocketsService,
       settingsService,
       sessionManager,
+      true,
     );
   };
 

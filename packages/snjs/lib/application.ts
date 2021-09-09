@@ -188,6 +188,7 @@ export class SNApplication {
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
    * @param appVersion Version of client application.
+   * @param enableV4 Flag indicating whether V4 features should be enabled.
    * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
   constructor(
@@ -201,7 +202,8 @@ export class SNApplication {
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
     private appVersion: string,
-    private webSocketUrl?: string
+    private enableV4 = false,
+    private webSocketUrl?: string,
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -1634,7 +1636,8 @@ export class SNApplication {
       this.componentManager,
       this.webSocketsService,
       this.settingsService,
-      this.sessionManager
+      this.sessionManager,
+      this.enableV4,
     );
     this.services.push(this.featuresService);
   }

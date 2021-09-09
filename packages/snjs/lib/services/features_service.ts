@@ -40,6 +40,7 @@ export class SNFeaturesService extends PureService<void> {
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
     private sessionManager: SNSessionManager,
+    private enableV4: boolean,
   ) {
     super();
 
@@ -146,8 +147,10 @@ export class SNFeaturesService extends PureService<void> {
     const featuresResponse = await this.apiService.getUserFeatures(userUuid);
     if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
       const features = (featuresResponse as UserFeaturesResponse).data.features
-      await this.setFeatures(features)
-      await this.mapFeaturesToItems(features);
+      await this.setFeatures(features);
+      if (this.enableV4) {
+        await this.mapFeaturesToItems(features);
+      }
     }
   }
 

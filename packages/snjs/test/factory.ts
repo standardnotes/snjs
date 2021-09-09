@@ -160,6 +160,7 @@ export function createApplication(identifier: string, environment?: Environment,
     getSwappedClasses(environment),
     getDefaultHost(),
     getAppVersion(),
+    true,
     getDefaultWebSocketUrl(),
   );
 }
