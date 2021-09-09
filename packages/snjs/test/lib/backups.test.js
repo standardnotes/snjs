@@ -213,6 +213,20 @@ describe('backups', function () {
     application.deinit();
   });
 
+  it('decrypted backup file with account should not have keyParams', async function () {
+    const application = await Factory.createInitAppWithRandNamespace();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: Uuid.GenerateUuidSynchronously(),
+      password: Uuid.GenerateUuidSynchronously(),
+    });
+    const backup = await application.createBackupFile(
+      EncryptionIntent.FileDecrypted
+    );
+    expect(backup).not.toHaveProperty('keyParams');
+    application.deinit();
+  });
+
   it('encrypted backup file should have keyParams', async function () {
     const application = await Factory.createInitAppWithRandNamespace();
     await application.addPasscode('passcode');

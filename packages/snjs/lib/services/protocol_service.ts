@@ -793,14 +793,14 @@ export class SNProtocolService
       })
     );
 
-    const keyParams = await this.getRootKeyParams();
-
     const data: BackupFile = {
       version: this.getLatestVersion(),
       items: await ejectedPayloadsPromise,
     };
-    if (keyParams) {
-      data.keyParams = keyParams.getPortableValue();
+
+    if (intent === EncryptionIntent.FileEncrypted) {
+      const keyParams = await this.getRootKeyParams();
+      data.keyParams = keyParams?.getPortableValue();
     }
     return data;
   }
