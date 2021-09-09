@@ -12,6 +12,7 @@ import {
   SyncModes
 } from '@Lib/index';
 import { ContentType } from '@Lib/models';
+import { Uuid } from '@Lib/uuid';
 import {
   EncryptionIntent,
   isDecryptedIntent,
@@ -594,6 +595,36 @@ describe('keys', function () {
     expect(payload.items_key_id).toBe(newDefaultItemsKey.uuid);
   });
 
+  it('changing account email should create new items key and encrypt items with that key', async function () {
+    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
+    await Factory.registerUserToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+    const itemsKeys = application.itemManager.itemsKeys();
+    expect(itemsKeys.length).toBe(1);
+    const defaultItemsKey = application.protocolService.getDefaultItemsKey();
+
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const result = await application.changeEmail(
+      newEmail,
+      password,
+    );
+    expect(result.error).toBeFalsy();
+
+    expect(application.itemManager.itemsKeys().length).toBe(2);
+    const newDefaultItemsKey = application.protocolService.getDefaultItemsKey();
+    expect(newDefaultItemsKey.uuid).not.toEqual(defaultItemsKey.uuid);
+
+    const note = await Factory.createSyncedNote(application);
+    const payload = await application.protocolService.payloadByEncryptingPayload(
+      note.payload,
+      EncryptionIntent.Sync
+    );
+    expect(payload.items_key_id).toBe(newDefaultItemsKey.uuid);
+  });
+
   it('compares root keys', async function () {
     const keyParams = {};
     const a1 = await SNRootKey.Create({
@@ -837,10 +868,10 @@ describe('keys', function () {
        */
       await newClient.signIn(email, password);
 
-      await oldClient.sessionManager.changePassword(
-        currentRootKey.serverPassword,
+      await oldClient.sessionManager.changeCredentials({
+        currentServerPassword: currentRootKey.serverPassword,
         newRootKey
-      );
+      });
 
       /** Re-authenticate on other app; allow challenge to complete */
       await newClient.sync();
@@ -889,10 +920,10 @@ describe('keys', function () {
         password
       );
 
-      await application.sessionManager.changePassword(
-        currentRootKey.serverPassword,
+      await application.sessionManager.changeCredentials({
+        currentServerPassword: currentRootKey.serverPassword,
         newRootKey
-      );
+      });
       await application.protocolService.reencryptItemsKeys();
       await application.sync({ awaitAll: true });
 

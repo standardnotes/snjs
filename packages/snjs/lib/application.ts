@@ -3,7 +3,7 @@ import { SyncOpStatus } from './services/sync/sync_op_status';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
   SNCredentialService,
-  PasswordChangeFunctionResponse,
+  CredentialsChangeFunctionResponse,
   AccountServiceResponse,
   AccountEvent,
 } from './services/credential_service';
@@ -1307,20 +1307,35 @@ export class SNApplication {
     );
   }
 
+  public async changeEmail(
+    newEmail: string,
+    currentPassword: string,
+    passcode?: string,
+    origination = KeyParamsOrigination.PasswordChange,
+  ): Promise<CredentialsChangeFunctionResponse> {
+    return this.credentialService.changeCredentials({
+      currentPassword,
+      newEmail,
+      passcode,
+      origination,
+      validateNewPasswordStrength: false,
+    });
+  }
+
   public async changePassword(
     currentPassword: string,
     newPassword: string,
     passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
-    { validatePasswordStrength = true } = {}
-  ): Promise<PasswordChangeFunctionResponse> {
-    return this.credentialService.changePassword(
+    validateNewPasswordStrength = true
+  ): Promise<CredentialsChangeFunctionResponse> {
+    return this.credentialService.changeCredentials({
       currentPassword,
       newPassword,
       passcode,
       origination,
-      { validatePasswordStrength }
-    );
+      validateNewPasswordStrength,
+    });
   }
 
   public async signOut(force = false): Promise<void> {

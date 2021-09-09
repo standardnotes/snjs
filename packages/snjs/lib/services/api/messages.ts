@@ -7,16 +7,16 @@ export const API_MESSAGE_GENERIC_INVALID_LOGIN =
   'A server error occurred while trying to sign in. Please try again.';
 export const API_MESSAGE_GENERIC_REGISTRATION_FAIL =
   'A server error occurred while trying to register. Please try again.';
-export const API_MESSAGE_GENERIC_CHANGE_PW_FAIL =
-  'Something went wrong while changing your password. Your password was not changed. Please try again.';
+export const API_MESSAGE_GENERIC_CHANGE_CREDENTIALS_FAIL =
+  'Something went wrong while changing your credentials. Your credentials were not changed. Please try again.';
 export const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.';
 
 export const API_MESSAGE_REGISTRATION_IN_PROGRESS =
   'An existing registration request is already in progress.';
 export const API_MESSAGE_LOGIN_IN_PROGRESS =
   'An existing sign in request is already in progress.';
-export const API_MESSAGE_CHANGE_PW_IN_PROGRESS =
-  'An existing change password request is already in progress.';
+export const API_MESSAGE_CHANGE_CREDENTIALS_IN_PROGRESS =
+  'An existing change credentials request is already in progress.';
 
 export const API_MESSAGE_FALLBACK_LOGIN_FAIL = 'Invalid email or password.';
 
@@ -85,11 +85,11 @@ export const ImportStrings = {
   FileAccountPassword: 'File account password',
 };
 
-export const PasswordChangeStrings = {
+export const CredentialsChangeStrings = {
   PasscodeRequired:
-    'Your passcode is required to process your password change.',
+    'Your passcode is required to process your credentials change.',
   Failed:
-    'Unable to change your password due to a sync error. Please try again.',
+    'Unable to change your credentials due to a sync error. Please try again.',
 };
 
 export const RegisterStrings = {

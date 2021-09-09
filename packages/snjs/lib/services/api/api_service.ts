@@ -1,6 +1,5 @@
 import { UuidString } from './../../types';
 import {
-  ChangePasswordResponse,
   HttpResponse,
   RegistrationResponse,
   RevisionListEntry,
@@ -21,6 +20,7 @@ import {
   GetSettingResponse,
   DeleteSettingResponse,
   MinimalHttpResponse,
+  ChangeCredentialsResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -46,7 +46,7 @@ type PathNamesV1 = {
   keyParams: string;
   register: string;
   signIn: string;
-  changePassword: (userUuid: string) => string;
+  changeCredentials: (userUuid: string) => string;
   sync: string;
   signOut: string;
   refreshSession: string;
@@ -66,7 +66,7 @@ const Paths: {
     keyParams: '/v1/login-params',
     register: '/v1/users',
     signIn: '/v1/login',
-    changePassword: (userUuid: string) => `/v1/users/${userUuid}/password`,
+    changeCredentials: (userUuid: string) => `/v1/users/${userUuid}/attributes/credentials`,
     sync: '/v1/items',
     signOut: '/v1/logout',
     refreshSession: '/v1/sessions/refresh',
@@ -337,15 +337,16 @@ export class SNApiService extends PureService<
       }) as Promise<SignOutResponse>;
   }
 
-  async changePassword(
+  async changeCredentials(parameters: {
     userUuid: UuidString,
     currentServerPassword: string,
     newServerPassword: string,
-    newKeyParams: SNRootKeyParams
-  ): Promise<ChangePasswordResponse | HttpResponse> {
+    newKeyParams: SNRootKeyParams,
+    newEmail?: string
+  }): Promise<ChangeCredentialsResponse | HttpResponse> {
     if (this.changing) {
       return this.createErrorResponse(
-        messages.API_MESSAGE_CHANGE_PW_IN_PROGRESS
+        messages.API_MESSAGE_CHANGE_CREDENTIALS_IN_PROGRESS
       );
     }
     const preprocessingError = this.preprocessingError();
@@ -353,11 +354,12 @@ export class SNApiService extends PureService<
       return preprocessingError;
     }
     this.changing = true;
-    const url = joinPaths(this.host, <string>Paths.v1.changePassword(userUuid));
+    const url = joinPaths(this.host, Paths.v1.changeCredentials(parameters.userUuid) as string);
     const params = this.params({
-      current_password: currentServerPassword,
-      new_password: newServerPassword,
-      ...newKeyParams.getPortableValue(),
+      current_password: parameters.currentServerPassword,
+      new_password: parameters.newServerPassword,
+      new_email: parameters.newEmail,
+      ...parameters.newKeyParams.getPortableValue(),
     });
     const response = await this.httpService
       .putAbsolute(url, params, this.session!.authorizationValue)
@@ -371,7 +373,7 @@ export class SNApiService extends PureService<
         }
         return this.errorResponseWithFallbackMessage(
           errorResponse,
-          messages.API_MESSAGE_GENERIC_CHANGE_PW_FAIL
+          messages.API_MESSAGE_GENERIC_CHANGE_CREDENTIALS_FAIL
         );
       });
 
