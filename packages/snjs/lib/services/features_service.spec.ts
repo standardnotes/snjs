@@ -30,7 +30,7 @@ describe('featuresService', () => {
   let now: Date;
   let tomorrow: number;
 
-  const createService = () => {
+  const createService = (enableV4 = true) => {
     return new SNFeaturesService(
       storageService,
       apiService,
@@ -39,7 +39,7 @@ describe('featuresService', () => {
       webSocketsService,
       settingsService,
       sessionManager,
-      true,
+      enableV4,
     );
   };
 
@@ -336,6 +336,19 @@ describe('featuresService', () => {
       await featuresService.updateRoles('123', roles);
       expect(storageService.setValue).not.toHaveBeenCalled();
     });
+
+    it('does not map features to items if V4 is not enabled', async () => {
+      const newRoles = [
+        ...roles,
+        RoleName.PlusUser,
+      ];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      const featuresService = createService(false);
+      await featuresService.loadUserRolesAndFeatures();
+      await featuresService.updateRoles('123', newRoles);
+      expect(itemManager.createItem).not.toHaveBeenCalled();
+    })
   });
 
   describe('updateExtensionKeySetting', () => {
