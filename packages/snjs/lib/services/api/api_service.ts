@@ -87,7 +87,7 @@ const Paths: {
     settings: (userUuid) => `/v1/users/${userUuid}/settings`,
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
-    subscription: (userUuid) => `/v2/users/${userUuid}/subscription`,
+    subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
   },
   v2: {
     subscriptions: '/v2/subscriptions',
