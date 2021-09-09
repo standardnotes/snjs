@@ -9,7 +9,6 @@ import {
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, RemoteSession, TokenSession } from './session';
 import {
-  ChangePasswordResponse,
   GetSubscriptionResponse,
   ChangeCredentialsResponse,
   HttpResponse,
