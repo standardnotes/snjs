@@ -20,6 +20,8 @@ import {
   GetSettingResponse,
   DeleteSettingResponse,
   MinimalHttpResponse,
+  GetSubscriptionResponse,
+  GetAvailableSubscriptionsResponse,
   ChangeCredentialsResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
@@ -57,10 +59,16 @@ type PathNamesV1 = {
   userFeatures: (userUuid: string) => string;
   settings: (userUuid: string) => string;
   setting: (userUuid: string, settingName: string) => string;
+  subscription: (userUuid: string) => string;
 };
+
+type PathNamesV2 = {
+  subscriptions: string;
+}
 
 const Paths: {
   v1: PathNamesV1;
+  v2: PathNamesV2;
 } = {
   v1: {
     keyParams: '/v1/login-params',
@@ -79,6 +87,10 @@ const Paths: {
     settings: (userUuid) => `/v1/users/${userUuid}/settings`,
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
+    subscription: (userUuid) => `/v2/users/${userUuid}/subscription`,
+  },
+  v2: {
+    subscriptions: '/v2/subscriptions',
   },
 };
 
@@ -665,7 +677,7 @@ export class SNApiService extends PureService<
       verb: HttpVerb.Put,
       url: joinPaths(this.host, Paths.v1.settings(userUuid)),
       authentication: this.session?.authorizationValue,
-      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPDATE_SETTINGS,
       params,
     });
   }
@@ -690,7 +702,7 @@ export class SNApiService extends PureService<
       verb: HttpVerb.Delete,
       url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
       authentication: this.session?.authorizationValue,
-      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPDATE_SETTINGS,
     });
   }
 
@@ -700,6 +712,29 @@ export class SNApiService extends PureService<
       url,
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
     });
+  }
+
+  public async getSubscription(
+    userUuid: string
+  ): Promise<HttpResponse | GetSubscriptionResponse> {
+    const url = joinPaths(this.host, Paths.v1.subscription(userUuid));
+    const response = await this.request({
+      verb: HttpVerb.Get,
+      url,
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
+    });
+    return response;
+  }
+
+  public async getAvailableSubscriptions(): Promise<HttpResponse | GetAvailableSubscriptionsResponse> {
+    const url = joinPaths(this.host, Paths.v2.subscriptions);
+    const response = await this.request({
+      verb: HttpVerb.Get,
+      url,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
+    });
+    return response;
   }
 
   private preprocessingError() {

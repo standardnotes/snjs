@@ -97,7 +97,7 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { HttpResponse, SignInResponse, User } from './services/api/responses';
+import { AvailableSubscriptions, GetAvailableSubscriptionsResponse, GetSubscriptionResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
@@ -106,6 +106,7 @@ import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
+import { Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 
 /** How often to automatically sync, in milliseconds */
@@ -557,6 +558,28 @@ export class SNApplication {
       return false;
     }
     return compareVersions(userVersion, ProtocolVersion.V004) >= 0;
+  }
+
+  public async getUserSubscription(): Promise<Subscription | undefined> {
+    const response = await this.sessionManager.getSubscription();
+    if (response.error) {
+      throw new Error(response.error.message)
+    }
+    if (response.data) {
+      return (response as GetSubscriptionResponse).data!.subscription
+    }
+    return undefined;
+  }
+
+  public async getAvailableSubscriptions(): Promise<AvailableSubscriptions | undefined> {
+    const response = await this.apiService.getAvailableSubscriptions();
+    if (response.error) {
+      throw new Error(response.error.message)
+    }
+    if (response.data) {
+      return (response as GetAvailableSubscriptionsResponse).data!
+    }
+    return undefined;
   }
 
   /**
