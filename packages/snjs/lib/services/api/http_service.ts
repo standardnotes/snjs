@@ -32,12 +32,20 @@ export type HttpRequest = {
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export class SNHttpService extends PureService {
+  private dealloced = false;
+
   constructor(
     private readonly environment: Environment,
     private readonly appVersion: string
   ) {
     super();
   }
+
+  public deinit(): void {
+    this.dealloced = true;
+    super.deinit();
+  }
+
   public async getAbsolute(
     url: string,
     params?: HttpParams,
@@ -99,7 +107,9 @@ export class SNHttpService extends PureService {
     request.setRequestHeader('Content-type', 'application/json');
     request.setRequestHeader('X-SNJS-Version', SnjsVersion);
 
-    const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
+    const appVersionHeaderValue = `${Environment[this.environment]}-${
+      this.appVersion
+    }`;
     request.setRequestHeader('X-Application-Version', appVersionHeaderValue);
 
     if (httpRequest.authentication) {
@@ -118,6 +128,10 @@ export class SNHttpService extends PureService {
   ): Promise<HttpResponse> {
     return new Promise((resolve, reject) => {
       request.onreadystatechange = () => {
+        if (this.dealloced) {
+          console.warn('Network request status change after app was deinited.');
+          return;
+        }
         this.stateChangeHandlerForRequest(request, resolve, reject);
       };
       if (
@@ -173,7 +187,10 @@ export class SNHttpService extends PureService {
           status: httpStatus,
         };
       } else if (isNullOrUndefined(response.error)) {
-        if (isNullOrUndefined(response.data) || isNullOrUndefined(response.data.error)) {
+        if (
+          isNullOrUndefined(response.data) ||
+          isNullOrUndefined(response.data.error)
+        ) {
           response.error = { message: UNKNOWN_ERROR, status: httpStatus };
         } else {
           response.error = response.data.error;
