@@ -748,6 +748,9 @@ export class SNSyncService extends PureService<
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
         switch (type) {
           case SyncSignal.Response:
+            if (this.dealloced) {
+              return;
+            }
             if (response!.hasError) {
               await this.handleErrorServerResponse(response!);
             } else {
