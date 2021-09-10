@@ -31,6 +31,7 @@ export class SNFeaturesService extends PureService<void> {
   private removeApiServiceObserver?: () => void;
   private removeWebSocketsServiceObserver?: () => void;
   private removeExtensionRepoItemsObserver?: () => void;
+  private initialFeaturesUpdateDone = false;
 
   constructor(
     private storageService: SNStorageService,
@@ -110,9 +111,11 @@ export class SNFeaturesService extends PureService<void> {
     roles: RoleName[]
   ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
-    if (userRolesChanged) {
+    const needsInitialFeaturesUpdate = !this.initialFeaturesUpdateDone && this.features.length === 0;
+    if (userRolesChanged || needsInitialFeaturesUpdate) {
       await this.setRoles(roles);
       await this.updateFeatures(userUuid);
+      this.initialFeaturesUpdateDone = true;
     }
   }
 
@@ -137,18 +140,6 @@ export class SNFeaturesService extends PureService<void> {
       roles.some((role) => !this.roles.includes(role)) ||
       this.roles.some((role) => !roles.includes(role))
     );
-  }
-
-  public needsRemoteFetchFeatures(): boolean {
-    return this.features.length === 0;
-  }
-
-  public async fetchRemoteFeatures(): Promise<void> {
-    const user = this.sessionManager.getUser();
-    if (!user) {
-      return;
-    }
-    await this.updateFeatures(user.uuid);
   }
 
   private async updateFeatures(userUuid: UuidString): Promise<void> {

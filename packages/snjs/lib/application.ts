@@ -339,9 +339,6 @@ export class SNApplication {
         await this.syncService.sync({
           mode: SyncModes.DownloadFirst,
         });
-        if (this.featuresService.needsRemoteFetchFeatures()) {
-          await this.featuresService.fetchRemoteFeatures()
-        }
       });
     if (awaitDatabaseLoad) {
       await loadPromise;
