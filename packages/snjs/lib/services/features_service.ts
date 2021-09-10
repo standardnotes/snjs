@@ -139,6 +139,18 @@ export class SNFeaturesService extends PureService<void> {
     );
   }
 
+  public needsRemoteFetchFeatures(): boolean {
+    return this.features.length === 0;
+  }
+
+  public async fetchRemoteFeatures(): Promise<void> {
+    const user = this.sessionManager.getUser();
+    if (!user) {
+      return;
+    }
+    await this.updateFeatures(user.uuid);
+  }
+
   private async updateFeatures(userUuid: UuidString): Promise<void> {
     const featuresResponse = await this.apiService.getUserFeatures(userUuid);
     if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
