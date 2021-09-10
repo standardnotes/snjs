@@ -1336,7 +1336,7 @@ export class SNApplication {
     newEmail: string,
     currentPassword: string,
     passcode?: string,
-    origination = KeyParamsOrigination.PasswordChange,
+    origination = KeyParamsOrigination.EmailChange,
   ): Promise<CredentialsChangeFunctionResponse> {
     return this.credentialService.changeCredentials({
       currentPassword,
