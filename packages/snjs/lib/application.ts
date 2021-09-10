@@ -311,7 +311,7 @@ export class SNApplication {
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
     this.settingsService.initializeFromDisk();
-    await this.featuresService.loadUserRolesAndFeatures();
+    await this.featuresService.initializeFromDisk();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);

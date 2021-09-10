@@ -91,22 +91,18 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  public async loadUserRolesAndFeatures(): Promise<void> {
+  public async initializeFromDisk(): Promise<void> {
     this.roles = await this.storageService.getValue(
       StorageKey.UserRoles,
       undefined,
       []
     );
-    const userUuid = this.sessionManager.getUser()?.uuid;
-    if (userUuid == undefined) {
-      this.features = await this.storageService.getValue(
-        StorageKey.UserFeatures,
-        undefined,
-        []
-      );
-    } else {
-      await this.updateFeatures(userUuid);
-    }
+
+    this.features = await this.storageService.getValue(
+      StorageKey.UserFeatures,
+      undefined,
+      []
+    );
   }
 
   public async updateRoles(
