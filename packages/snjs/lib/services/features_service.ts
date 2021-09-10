@@ -31,6 +31,7 @@ export class SNFeaturesService extends PureService<void> {
   private removeApiServiceObserver?: () => void;
   private removeWebSocketsServiceObserver?: () => void;
   private removeExtensionRepoItemsObserver?: () => void;
+  private initialFeaturesUpdateDone = false;
 
   constructor(
     private storageService: SNStorageService,
@@ -91,22 +92,18 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  public async loadUserRolesAndFeatures(): Promise<void> {
+  public async initializeFromDisk(): Promise<void> {
     this.roles = await this.storageService.getValue(
       StorageKey.UserRoles,
       undefined,
       []
     );
-    const userUuid = this.sessionManager.getUser()?.uuid;
-    if (userUuid == undefined) {
-      this.features = await this.storageService.getValue(
-        StorageKey.UserFeatures,
-        undefined,
-        []
-      );
-    } else {
-      await this.updateFeatures(userUuid);
-    }
+
+    this.features = await this.storageService.getValue(
+      StorageKey.UserFeatures,
+      undefined,
+      []
+    );
   }
 
   public async updateRoles(
@@ -114,9 +111,11 @@ export class SNFeaturesService extends PureService<void> {
     roles: RoleName[]
   ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
-    if (userRolesChanged) {
+    const needsInitialFeaturesUpdate = !this.initialFeaturesUpdateDone && this.features.length === 0;
+    if (userRolesChanged || needsInitialFeaturesUpdate) {
       await this.setRoles(roles);
       await this.updateFeatures(userUuid);
+      this.initialFeaturesUpdateDone = true;
     }
   }
 
