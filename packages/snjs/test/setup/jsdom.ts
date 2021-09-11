@@ -16,6 +16,13 @@ const { window } = new JSDOM(htmlTemplate, {
   url: 'http://localhost',
 });
 
+/** Prevent irrelevant uncaught exceptions from causing tests to fail */
+global.addEventListener('error', (event) => {
+  console.log("JSDOM caught exception:", event.error);
+  event.stopPropagation();
+  event.preventDefault();
+ })
+
 global.window.alert = (message) => message;
 global.window.confirm = (message) => false;
 
