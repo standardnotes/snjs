@@ -133,6 +133,9 @@ export class SNSyncService extends PureService<
   private _simulate_latency?: { latency: number; enabled: boolean };
   private dealloced = false;
 
+  public lastSyncInvokationPromise?: Promise<unknown>;
+  public currentSyncRequestPromise?: Promise<void>;
+
   /** Content types appearing first are always mapped first */
   private readonly localLoadPriorty = [
     ContentType.ItemsKey,
@@ -283,9 +286,10 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
-    const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
-      itemsKeysPayloads
-    );
+    const decryptedItemsKeys =
+      await this.protocolService.payloadsByDecryptingPayloads(
+        itemsKeysPayloads
+      );
     await this.payloadManager.emitPayloads(
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
@@ -411,7 +415,7 @@ export class SNSyncService extends PureService<
     return payloads;
   }
 
-  private queueStrategyResolveOnNext() {
+  private queueStrategyResolveOnNext(): Promise<unknown> {
     return new Promise((resolve, reject) => {
       this.resolveQueue.push({ resolve, reject });
     });
@@ -478,7 +482,17 @@ export class SNSyncService extends PureService<
     console.error(`Failed downloadFirstSync after ${maxTries} tries`);
   }
 
-  public async sync(options: SyncOptions = {}): Promise<any> {
+  public async awaitCurrentSyncs(): Promise<void> {
+    await this.lastSyncInvokationPromise;
+    await this.currentSyncRequestPromise;
+  }
+
+  public async sync(options: SyncOptions = {}): Promise<unknown> {
+    this.lastSyncInvokationPromise = this.performSync(options);
+    return this.lastSyncInvokationPromise;
+  }
+
+  private async performSync(options: SyncOptions = {}): Promise<unknown> {
     /** Hard locking, does not apply to locking modes below */
     if (this.locked) {
       this.log('Sync Locked');
@@ -621,7 +635,7 @@ export class SNSyncService extends PureService<
       uploadPayloads = [];
     }
 
-    let operation;
+    let operation: AccountSyncOperation | OfflineSyncOperation;
     if (online) {
       operation = await this.syncOnlineOperation(
         uploadPayloads,
@@ -636,7 +650,12 @@ export class SNSyncService extends PureService<
         useMode
       );
     }
-    await operation.run();
+    this.currentSyncRequestPromise = operation.run();
+    await this.currentSyncRequestPromise;
+
+    if (this.dealloced) {
+      return;
+    }
     this.opStatus!.setDidEnd();
     releaseLock();
 
@@ -748,6 +767,9 @@ export class SNSyncService extends PureService<
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
         switch (type) {
           case SyncSignal.Response:
+            if (this.dealloced) {
+              return;
+            }
             if (response!.hasError) {
               await this.handleErrorServerResponse(response!);
             } else {
@@ -800,6 +822,9 @@ export class SNSyncService extends PureService<
     const operation = new OfflineSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse) => {
+        if (this.dealloced) {
+          return;
+        }
         if (type === SyncSignal.Response) {
           await this.handleOfflineResponse(response!);
         }
@@ -839,7 +864,7 @@ export class SNSyncService extends PureService<
       this.notifyEvent(SyncEvent.InvalidSession);
     }
 
-    this.opStatus!.setError(response.error);
+    this.opStatus?.setError(response.error);
     this.notifyEvent(SyncEvent.SyncError, response.error);
   }
 
@@ -936,7 +961,7 @@ export class SNSyncService extends PureService<
    * @param payloads The decrypted payloads to persist
    */
   public async persistPayloads(payloads: PurePayload[]) {
-    if (payloads.length === 0) {
+    if (payloads.length === 0 || this.dealloced) {
       return;
     }
     return this.storageService.savePayloads(payloads).catch((error) => {

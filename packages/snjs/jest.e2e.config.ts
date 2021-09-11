@@ -93,5 +93,5 @@ export default {
     '^.+\\.(ts|js)?$': 'ts-jest'
   },
 
-  verbose: true
+  verbose: false
 };

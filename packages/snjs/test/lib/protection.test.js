@@ -560,7 +560,7 @@ describe('protections', function () {
 
   describe('protectNotes', function () {
     it('protects all notes', async function () {
-      const application = Factory.createApplication(Factory.randomString());
+      const application = await Factory.createAndInitializeApplication(Factory.randomString());
 
       const NOTE_COUNT = 3;
       let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT);

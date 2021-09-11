@@ -16,7 +16,12 @@ import {
 import { Uuids } from '@Models/functions';
 import { PayloadOverride, RawPayload } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
-import { ApplicationIdentifier, DeinitSource, UuidString, AnyRecord } from './types';
+import {
+  ApplicationIdentifier,
+  DeinitSource,
+  UuidString,
+  AnyRecord,
+} from './types';
 import {
   ApplicationEvent,
   SyncEvent,
@@ -97,7 +102,14 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { AvailableSubscriptions, GetAvailableSubscriptionsResponse, GetSubscriptionResponse, HttpResponse, SignInResponse, User } from './services/api/responses';
+import {
+  AvailableSubscriptions,
+  GetAvailableSubscriptionsResponse,
+  GetSubscriptionResponse,
+  HttpResponse,
+  SignInResponse,
+  User,
+} from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
@@ -169,6 +181,7 @@ export class SNApplication {
   private launched = false;
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false;
+  private revokingSession = false;
 
   /**
    * @param environment The Environment that identifies your application.
@@ -203,7 +216,7 @@ export class SNApplication {
     private defaultHost: string,
     private appVersion: string,
     private enableV4 = false,
-    private webSocketUrl?: string,
+    private webSocketUrl?: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -565,21 +578,23 @@ export class SNApplication {
   public async getUserSubscription(): Promise<Subscription | undefined> {
     const response = await this.sessionManager.getSubscription();
     if (response.error) {
-      throw new Error(response.error.message)
+      throw new Error(response.error.message);
     }
     if (response.data) {
-      return (response as GetSubscriptionResponse).data!.subscription
+      return (response as GetSubscriptionResponse).data!.subscription;
     }
     return undefined;
   }
 
-  public async getAvailableSubscriptions(): Promise<AvailableSubscriptions | undefined> {
+  public async getAvailableSubscriptions(): Promise<
+    AvailableSubscriptions | undefined
+  > {
     const response = await this.apiService.getAvailableSubscriptions();
     if (response.error) {
-      throw new Error(response.error.message)
+      throw new Error(response.error.message);
     }
     if (response.data) {
-      return (response as GetAvailableSubscriptionsResponse).data!
+      return (response as GetAvailableSubscriptionsResponse).data!;
     }
     return undefined;
   }
@@ -1085,9 +1100,8 @@ export class SNApplication {
         ChallengeReason.DecryptEncryptedFile,
         true
       );
-      const passwordResponse = await this.challengeService.promptForChallengeResponse(
-        challenge
-      );
+      const passwordResponse =
+        await this.challengeService.promptForChallengeResponse(challenge);
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1099,10 +1113,8 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
-      data,
-      password
-    );
+    const decryptedPayloads =
+      await this.protocolService.payloadsByDecryptingBackupFile(data, password);
     const validPayloads = decryptedPayloads
       .filter((payload) => {
         return (
@@ -1336,7 +1348,7 @@ export class SNApplication {
     newEmail: string,
     currentPassword: string,
     passcode?: string,
-    origination = KeyParamsOrigination.EmailChange,
+    origination = KeyParamsOrigination.EmailChange
   ): Promise<CredentialsChangeFunctionResponse> {
     return this.credentialService.changeCredentials({
       currentPassword,
@@ -1390,6 +1402,21 @@ export class SNApplication {
     } else {
       await performSignOut();
     }
+  }
+
+  private async handleRevokedSession(): Promise<void> {
+    /**
+     * Because multiple API requests can come back at the same time
+     * indicating revoked session we only want to do this once.
+     */
+    if(this.revokingSession) {
+      return;
+    }
+    this.revokingSession = true;
+    /** Keep a reference to the soon-to-be-cleared alertService */
+    const alertService = this.alertService;
+    await this.signOut(true);
+    void alertService.alert(SessionStrings.CurrentSessionRevoked);
   }
 
   public async validateAccountPassword(password: string): Promise<boolean> {
@@ -1572,12 +1599,14 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
-        this.protocolService
-      ),
-      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
-        this.protocolService
-      ),
+      payloadByEncryptingPayload:
+        this.protocolService.payloadByEncryptingPayload.bind(
+          this.protocolService
+        ),
+      payloadByDecryptingPayload:
+        this.protocolService.payloadByDecryptingPayload.bind(
+          this.protocolService
+        ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
@@ -1637,7 +1666,7 @@ export class SNApplication {
       this.webSocketsService,
       this.settingsService,
       this.sessionManager,
-      this.enableV4,
+      this.enableV4
     );
     this.services.push(this.featuresService);
   }
@@ -1695,9 +1724,8 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager = this.getClass<
-      typeof SNComponentManager
-    >(SNComponentManager);
+    const MaybeSwappedComponentManager =
+      this.getClass<typeof SNComponentManager>(SNComponentManager);
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
@@ -1793,10 +1821,7 @@ export class SNApplication {
             break;
           }
           case SessionEvent.Revoked: {
-            /** Keep a reference to the soon-to-be-cleared alertService */
-            const alertService = this.alertService;
-            await this.signOut(true);
-            void alertService.alert(SessionStrings.CurrentSessionRevoked);
+            await this.handleRevokedSession();
             break;
           }
           default: {
