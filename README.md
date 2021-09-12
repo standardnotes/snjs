@@ -37,6 +37,11 @@ Object.assign(window, SNLibrary);
 
 ## Usage
 
+---
+
+### **Note:** the below usage examples have not kept up to date with library API changes. It is recommended to examine the source code for these functions for exact usage.
+---
+
 1. Initialize an application:
 
 ```javascript
@@ -125,14 +130,37 @@ app.streamItems(
 2. `yarn start` to start Webpack in development mode (watches changes), or `yarn build` to create dist files.
 
 ## Tests
-### Running tests
+
+### E2E Tests
 Please make sure you have [Docker](https://www.docker.com) and [Docker Compose](https://docs.docker.com/compose/install/) installed before running tests.
 
-Then, from the root of this repository, run:
+From the root of the repository, run:
 
 ```
-yarn test:e2e
+# Starts browser-navigable web page
+yarn run start:test-server:dev
+
+# Starts backend servers
+yarn run test:e2e:dev-setup
 ```
+
+Then choose between the following run options:
+
+- Run tests in the command line:
+  ```
+  yarn run test:e2e:dev
+  ```
+
+- Run tests in the browser: Open `http://localhost:9002/packages/snjs/mocha/test.html`.
+
+### Unit Tests
+
+From the root of the repository, run:
+
+```
+yarn run test:unit
+```
+
 ## Notes
 - Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
