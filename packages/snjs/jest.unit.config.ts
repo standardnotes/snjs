@@ -13,27 +13,19 @@ export default {
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  collectCoverageFrom: [
-    'lib/**/{!(index),}.ts'
-  ],
+  collectCoverageFrom: ['lib/**/{!(index),}.ts'],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: 'coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
-  coveragePathIgnorePatterns: [
-    '/node_modules/'
-  ],
+  coveragePathIgnorePatterns: ['/node_modules/'],
 
   // Indicates which provider should be used to instrument code for coverage
   // coverageProvider: 'babel',
 
   // A list of reporter names that Jest uses when writing coverage reports
-  coverageReporters: [
-    'json',
-    'text',
-    'html'
-  ],
+  coverageReporters: ['json', 'text', 'html'],
 
   // A path to a module which exports an async function that is triggered once before all test suites
   // globalSetup: undefined,
@@ -46,8 +38,8 @@ export default {
     'ts-jest': {
       tsconfig: '<rootDir>/lib/tsconfig.json',
       isolatedModules: true,
-      babelConfig: 'babel.config.js'
-    }
+      babelConfig: 'babel.config.js',
+    },
   },
 
   /**
@@ -55,7 +47,7 @@ export default {
    * Paths obtained from lib/tsconfig.json
    */
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
-    prefix: '<rootDir>/lib'
+    prefix: '<rootDir>/lib',
   }),
 
   // A preset that is used as a base for Jest's configuration
@@ -66,32 +58,20 @@ export default {
   resetModules: true,
 
   // A list of paths to directories that Jest should use to search for files in
-  roots: [
-    '<rootDir>/lib'
-  ],
+  roots: ['<rootDir>/lib'],
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  setupFiles: [
-    '<rootDir>/test/setup/global.ts',
-    '<rootDir>/test/setup/jsdom.ts'
-  ],
+  setupFiles: ['<rootDir>/jest-global.ts'],
 
-  setupFilesAfterEnv: [
-    '<rootDir>/test/setup/jest.ts',
-  ],
-
-  // The test environment that will be used for testing
-  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: [],
 
   // The glob patterns Jest uses to detect test files
-  testMatch: [
-    '<rootDir>/lib/**/?(*.)+(spec).(ts|js)'
-  ],
+  testMatch: ['<rootDir>/lib/**/?(*.)+(spec).(ts|js)'],
 
   // A map from regular expressions to paths to transformers
   transform: {
-    '^.+\\.(ts|js)?$': 'ts-jest'
+    '^.+\\.(ts|js)?$': 'ts-jest',
   },
 
-  verbose: true
+  verbose: true,
 };
