@@ -12,7 +12,7 @@ describe('protocol', function () {
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     await Factory.safeDeinit(this.application);
     this.application = null;
     localStorage.clear();

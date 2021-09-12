@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('importing', function () {
-  this.timeout(Factory.TestTimeout);
+  this.timeout(Factory.TenSecondTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   beforeEach(async function () {
@@ -18,7 +18,7 @@ describe('importing', function () {
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -409,7 +409,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -437,7 +437,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -470,7 +470,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -555,7 +555,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -589,7 +589,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -627,7 +627,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -666,7 +666,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -701,7 +701,7 @@ describe('importing', function () {
     );
     delete backupData.keyParams;
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
 
     const result = await this.application.importData(backupData);
@@ -732,7 +732,7 @@ describe('importing', function () {
       (payload) => payload.content_type !== ContentType.ItemsKey
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application);
 
@@ -897,7 +897,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 

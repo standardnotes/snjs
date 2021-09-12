@@ -31,8 +31,8 @@ describe('003 protocol operations', () => {
     _keyParams = _key.keyParams;
   });
 
-  after(() => {
-    sharedawait Factory.safeDeinit(application);
+  after(async () => {
+    await Factory.safeDeinit(sharedApplication);
   });
 
   it('generates random key', async () => {

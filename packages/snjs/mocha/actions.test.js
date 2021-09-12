@@ -212,7 +212,7 @@ describe('actions service', () => {
     this.extensionItemUuid = extensionItem.uuid;
   });
 
-  after(function () {
+  after(async function () {
     this.fakeServer.restore();
     await Factory.safeDeinit(this.application);
     this.application = null;

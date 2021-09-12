@@ -23,7 +23,7 @@ describe('004 protocol operations', function () {
     _keyParams = _key.keyParams;
   });
 
-  after(function () {
+  after(async function () {
     await Factory.safeDeinit(application);
   });
 

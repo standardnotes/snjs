@@ -2,8 +2,9 @@
 /* eslint-disable no-undef */
 import WebDeviceInterface from './web_device_interface.js';
 
-export const TestTimeout = 10000;
-export const LongTestTimeout = 20000;
+export const TenSecondTimeout = 10_000;
+export const TwentySecondTimeout = 20_000;
+export const ThirtySecondTimeout = 30_000;
 
 const syncOptions = {
   checkIntegrity: true,
@@ -241,8 +242,8 @@ export function createStorageItemPayload(contentType) {
   return CreateMaxPayloadFromAnyObject(createItemParams(contentType));
 }
 
-export function createNotePayload(title, text = undefined) {
-  return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text }));
+export function createNotePayload(title, text = undefined, dirty = true) {
+  return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text, dirty }));
 }
 
 export function createStorageItemTagPayload() {
@@ -253,8 +254,8 @@ export function itemToStoragePayload(item) {
   return CreateMaxPayloadFromAnyObject(item);
 }
 
-export function createMappedNote(application) {
-  const payload = createNotePayload();
+export function createMappedNote(application, title, text, dirty) {
+  const payload = createNotePayload(title, text, dirty);
   return application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
@@ -339,7 +340,7 @@ export async function signOutAndBackIn(application, email, password) {
 
 export async function restartApplication(application) {
   const id = application.identifier;
-  await await Factory.safeDeinit(application);
+  await safeDeinit(application);
   const newApplication = await createAndInitializeApplication(id);
   return newApplication;
 }

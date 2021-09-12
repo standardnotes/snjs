@@ -10,7 +10,7 @@ describe('item manager', function () {
     Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
   });
 
-  beforeEach(function () {
+  beforeEach(async function () {
     this.payloadManager = new PayloadManager();
     this.itemManager = new ItemManager(this.payloadManager);
     this.createNote = async () => {
@@ -275,7 +275,7 @@ describe('item manager', function () {
       );
     });
 
-    afterEach(function () {
+    afterEach(async function () {
       sandbox.restore();
     });
 
@@ -396,7 +396,7 @@ describe('item manager', function () {
   it('find tag by title should be case insensitive', async function () {
     const tag = await this.createTag();
 
-    expect(this.itemManager.findTagByTitle(tag.title.toUpperCase())).to.be.ok;    
+    expect(this.itemManager.findTagByTitle(tag.title.toUpperCase())).to.be.ok;
   })
 
   it('find or create tag by title', async function () {

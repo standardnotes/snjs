@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('online syncing', function () {
-  this.timeout(Factory.TestTimeout);
+  this.timeout(Factory.TenSecondTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {
@@ -47,7 +47,7 @@ describe('online syncing', function () {
     expect(items.length).to.equal(this.expectedItemCount);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -1004,10 +1004,16 @@ describe('online syncing', function () {
     this.application.setLaunchCallback({ receiveChallenge });
     this.application.apiService.setSession(undefined);
 
-    await this.application.sync();
+    const sessionRestored = new Promise((resolve) => {
+      this.application.sessionManager.addEventObserver(async (event) => {
+        if (event === SessionEvent.Restored) {
+          resolve();
+        }
+      });
+    });
 
-    /** Allow session recovery to do its thing */
-    await Factory.sleep(2.0);
+    await this.application.sync();
+    await sessionRestored;
 
     expect(didPromptForSignIn).to.equal(true);
     expect(this.application.apiService.session.accessToken).to.be.ok;

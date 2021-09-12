@@ -40,7 +40,7 @@ describe('upgrading', () => {
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -208,7 +208,7 @@ describe('upgrading', () => {
       });
     });
 
-    afterEach(function () {
+    afterEach(async function () {
       sinon.restore();
     });
 

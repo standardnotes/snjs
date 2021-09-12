@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('storage manager', function () {
-  this.timeout(Factory.TestTimeout);
+  this.timeout(Factory.TenSecondTimeout);
   /**
    * Items are saved in localStorage in tests.
    * Base keys are `storage`, `snjs_version`, and `keychain`
@@ -23,7 +23,7 @@ describe('storage manager', function () {
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     await Factory.safeDeinit(this.application);
     localStorage.clear();
   });

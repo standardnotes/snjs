@@ -30,7 +30,7 @@ describe('history manager', () => {
     });
 
     afterEach(async function () {
-      await await Factory.safeDeinit(this.application);
+      await Factory.safeDeinit(this.application);
     });
 
     async function setTextAndSync(application, item, text) {
@@ -372,7 +372,7 @@ describe('history manager', () => {
     });
 
     afterEach(async function () {
-      await await Factory.safeDeinit(this.application);
+      await Factory.safeDeinit(this.application);
     });
 
     it('response from server should be empty if not signed in', async function () {

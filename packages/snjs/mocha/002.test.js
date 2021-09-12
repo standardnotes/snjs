@@ -23,7 +23,7 @@ describe('002 protocol operations', () => {
     _keyParams = _key.keyParams;
   });
 
-  after(() => {
+  after(async () => {
     await Factory.safeDeinit(application);
   });
 

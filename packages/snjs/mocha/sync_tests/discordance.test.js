@@ -36,7 +36,7 @@ describe.skip('sync discordance', () => {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
   });
 
   it('should begin discordance upon instructions', async function () {

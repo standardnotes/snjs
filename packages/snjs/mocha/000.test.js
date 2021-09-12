@@ -12,7 +12,7 @@ describe('000 protocol operations', () => {
     await Factory.initializeApplication(application);
   });
 
-  after(() => {
+  after(async () => {
     await Factory.safeDeinit(application);
   });
 

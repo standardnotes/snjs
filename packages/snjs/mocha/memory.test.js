@@ -21,7 +21,7 @@ describe('memory', function () {
     this.application = await Factory.createInitAppWithRandNamespace();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     await Factory.safeDeinit(this.application);
     this.application = null;
   });

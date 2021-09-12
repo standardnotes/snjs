@@ -3,7 +3,6 @@
 import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-import sinon from 'sinon';
 
 describe('application instances', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
@@ -30,8 +29,8 @@ describe('application instances', () => {
     await Factory.createMappedNote(app1);
     expect(app1.itemManager.items.length).length.to.equal(BASE_ITEM_COUNT + 1);
     expect(app2.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
-    await await Factory.safeDeinit(app1);
-    await await Factory.safeDeinit(app2);
+    await Factory.safeDeinit(app1);
+    await Factory.safeDeinit(app2);
   });
 
   it('two distinct applications should not share storage manager state', async () => {
@@ -57,8 +56,8 @@ describe('application instances', () => {
     expect(
       (await app2.storageService.getAllRawPayloads()).length
     ).length.to.equal(BASE_ITEM_COUNT + 1);
-    await await Factory.safeDeinit(app1);
-    await await Factory.safeDeinit(app2);
+    await Factory.safeDeinit(app1);
+    await Factory.safeDeinit(app2);
   });
 
   it('deinit application while storage persisting should be handled gracefully', async () => {
@@ -116,10 +115,12 @@ describe('application instances', () => {
       testSNApp = await Factory.createAndInitializeApplication(
         'test-application'
       );
-      testNote1 = await createNoteItem(testSNApp, {
-        title: 'Note 1',
-        text: 'This is a test note!',
-      });
+      testNote1 = await Factory.createMappedNote(
+        testSNApp,
+        'Note 1',
+        'This is a test note!',
+        false
+      );
       confirmAlert = sinon.spy(testSNApp.alertService, 'confirm');
       deinit = sinon.spy(testSNApp, 'deinit');
     });
@@ -164,7 +165,7 @@ describe('application instances', () => {
 
       const expectedConfirmMessage = signOutConfirmMessage(1);
 
-      expect(confirmAlert.callCount).to.equal(2);
+      expect(confirmAlert.callCount).to.equal(1);
       expect(confirmAlert.calledWith(expectedConfirmMessage)).to.be.ok;
       expect(deinit.callCount).to.equal(0);
     });

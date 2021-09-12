@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('keys', function () {
-  this.timeout(Factory.TestTimeout);
+  this.timeout(Factory.TenSecondTimeout);
 
   beforeEach(async function () {
     localStorage.clear();
@@ -756,7 +756,7 @@ describe('keys', function () {
      * because its based on the old root key.
      */
     it.skip('add new items key', async function () {
-      this.timeout(Factory.LongTestTimeout * 3);
+      this.timeout(Factory.TwentySecondTimeout * 3);
       let oldClient = this.application;
 
       /** Register an 003 account */

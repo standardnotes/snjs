@@ -19,7 +19,7 @@ describe('backups', function () {
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     await Factory.safeDeinit(this.application);
     this.application = null;
   });

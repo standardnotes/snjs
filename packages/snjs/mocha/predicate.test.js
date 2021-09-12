@@ -37,7 +37,7 @@ describe('predicates', async function () {
     Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
   });
 
-  beforeEach(function () {
+  beforeEach(async function () {
     localStorage.clear();
     this.itemManager = new PayloadManager();
     this.itemManager = new ItemManager(this.itemManager);

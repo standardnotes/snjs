@@ -54,7 +54,7 @@ describe('features', () => {
     });
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     Factory.safeDeinit(application);
     sinon.restore();
   });
@@ -88,7 +88,7 @@ describe('features', () => {
       const editorItems = application.getItems(ContentType.Component);
       expect(themeItems).to.have.lengthOf(1);
       expect(editorItems).to.have.lengthOf(1);
-      expect(themeItems[0].content).toMatchObject(
+      expect(themeItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
             identifier: midnightThemeFeature.identifier,
@@ -100,7 +100,7 @@ describe('features', () => {
           })
         )
       );
-      expect(editorItems[0].content).toMatchObject(
+      expect(editorItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
             identifier: boldEditorFeature.identifier,
@@ -133,7 +133,7 @@ describe('features', () => {
       expect(application.itemManager.changeComponent.callCount).to.equal(1);
       const themeItems = application.getItems(ContentType.Theme);
       expect(themeItems).to.have.lengthOf(1);
-      expect(themeItems[0].content).toMatchObject(
+      expect(themeItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
             identifier: midnightThemeFeature.identifier,

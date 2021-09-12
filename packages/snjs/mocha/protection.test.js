@@ -5,14 +5,14 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('protections', function () {
-  this.timeout(Factory.TestTimeout);
+  this.timeout(Factory.TenSecondTimeout);
 
   beforeEach(async function () {
     localStorage.clear();
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 

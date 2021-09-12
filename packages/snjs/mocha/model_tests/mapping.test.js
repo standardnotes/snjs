@@ -12,7 +12,7 @@ describe('model manager mapping', () => {
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
   });
 
   it('mapping nonexistent item creates it', async function () {

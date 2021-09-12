@@ -13,7 +13,7 @@ describe('preferences', function () {
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -95,7 +95,7 @@ describe('preferences', function () {
     await this.application.setPreference(prefKey, prefValue);
     await this.application.sync();
 
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
 
     this.application = Factory.createApplication(identifier);
     const willSyncPromise = new Promise((resolve) => {

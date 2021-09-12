@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('mutator', () => {
-  beforeEach(function () {
+  beforeEach(async function () {
     this.createBarePayload = () => {
       return new PurePayload({
         uuid: '123',

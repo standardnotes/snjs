@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('online conflict handling', function () {
-  this.timeout(Factory.TestTimeout);
+  this.timeout(Factory.TenSecondTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 
   const syncOptions = {
@@ -34,7 +34,7 @@ describe('online conflict handling', function () {
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 

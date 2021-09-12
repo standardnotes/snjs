@@ -10,7 +10,7 @@ describe('payload manager', () => {
     Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
   });
 
-  beforeEach(function () {
+  beforeEach(async function () {
     this.payloadManager = new PayloadManager();
     this.createNotePayload = async () => {
       return CreateMaxPayloadFromAnyObject({

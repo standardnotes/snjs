@@ -26,7 +26,7 @@ describe('notes + tags syncing', async function () {
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
   });
 
   it('syncing an item then downloading it should include items_key_id', async function () {

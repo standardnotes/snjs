@@ -580,7 +580,7 @@ describe('basic auth', () => {
       Factory.handlePasswordChallenges(this.application, passcode);
       const result = await this.application.changePasscode(newPasscode);
       expect(result).to.be.true;
-    });
+    }).timeout(Factory.TenSecondTimeout);
 
     it('should fail when attempting to change to a 0 character passcode', async function () {
       const passcode = 'passcode';
@@ -589,6 +589,6 @@ describe('basic auth', () => {
       Factory.handlePasswordChallenges(this.application, passcode);
       const result = await this.application.changePasscode(newPasscode);
       expect(result).to.be.false;
-    });
+    }).timeout(Factory.TenSecondTimeout);
   });
 });

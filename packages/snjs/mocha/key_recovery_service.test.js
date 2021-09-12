@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('key recovery service', function () {
-  this.timeout(Factory.LongTestTimeout);
+  this.timeout(Factory.TwentySecondTimeout);
 
   const syncOptions = {
     checkIntegrity: true,
@@ -16,7 +16,7 @@ describe('key recovery service', function () {
     localStorage.clear();
   });
 
-  afterEach(function () {
+  afterEach(async function () {
     localStorage.clear();
   });
 
@@ -299,7 +299,7 @@ describe('key recovery service', function () {
 
     expect(recreatedAppA.findItem(note.uuid).errorDecrypting).to.equal(true);
     expect(recreatedAppA.findItem(note.uuid).waitingForKey).to.equal(true);
-    recreatedawait Factory.safeDeinit(appA);
+    await Factory.safeDeinit(recreatedAppA);
   });
 
   it('when client key params differ from server, and no matching items key exists, should perform sign in flow', async function () {

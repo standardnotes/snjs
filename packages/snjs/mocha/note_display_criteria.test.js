@@ -10,7 +10,7 @@ describe('note display criteria', function () {
     Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
   });
 
-  beforeEach(function () {
+  beforeEach(async function () {
     this.payloadManager = new PayloadManager();
     this.itemManager = new ItemManager(this.payloadManager);
 

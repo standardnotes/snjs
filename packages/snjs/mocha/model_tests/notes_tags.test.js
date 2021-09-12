@@ -18,7 +18,7 @@ describe('notes and tags', () => {
   });
 
   afterEach(async function () {
-    await await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(this.application);
   });
 
   it('uses proper class for note', async function () {
