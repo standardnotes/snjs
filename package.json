@@ -16,7 +16,8 @@
     "test:e2e:dev": "lerna run test:e2e --parallel",
     "build": "lerna run build",
     "lint": "lerna run lint",
-    "publish-packages": "lerna publish from-package --yes"
+    "publish-packages": "lerna publish from-package --yes",
+    "test:mocha": "node e2e-server.js"
   },
   "devDependencies": {
     "@types/node": "^14.14.22",

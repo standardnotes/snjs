@@ -203,3 +203,8 @@ export { SNLog } from './log';
 
 export type { ItemMessagePayload } from './services/component_manager';
 export type { MessageData } from './services/component_manager';
+
+/** Used by e2e tests */
+export { Features, FeatureIdentifier } from '@standardnotes/features'
+export { RoleName } from '@standardnotes/auth';
+export { SettingName } from '@standardnotes/settings'
