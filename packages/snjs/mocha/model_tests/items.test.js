@@ -18,7 +18,7 @@ describe('items', () => {
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
   });
 
   it('setting an item as dirty should update its client updated at', async function () {

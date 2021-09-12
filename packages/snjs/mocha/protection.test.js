@@ -12,7 +12,7 @@ describe('protections', function () {
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 

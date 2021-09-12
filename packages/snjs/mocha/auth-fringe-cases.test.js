@@ -20,7 +20,7 @@ describe('auth fringe cases', () => {
       email: Uuid.GenerateUuidSynchronously(),
       password: Uuid.GenerateUuidSynchronously(),
       deinit: () => {
-        application.deinit();
+        await Factory.safeDeinit(application);
       },
     };
   };
@@ -60,7 +60,7 @@ describe('auth fringe cases', () => {
         note.uuid
       );
       expect(refreshedNote.errorDecrypting).to.equal(true);
-      restartedApplication.deinit();
+      restartedawait Factory.safeDeinit(application);
     });
 
     it('signing in again should decrypt item', async function () {
@@ -88,7 +88,7 @@ describe('auth fringe cases', () => {
       );
       expect(refreshedNote.errorDecrypting).to.equal(false);
       expect(restartedApplication.itemManager.notes.length).to.equal(1);
-      restartedApplication.deinit();
+      restartedawait Factory.safeDeinit(application);
     }).timeout(10000);
   });
 
@@ -140,7 +140,7 @@ describe('auth fringe cases', () => {
       );
       expect(conflictedCopy.text).to.equal(serverText);
       expect(conflictedCopy.duplicate_of).to.equal(firstVersionOfNote.uuid);
-      newApplication.deinit();
+      newawait Factory.safeDeinit(application);
     }).timeout(10000);
   });
 });

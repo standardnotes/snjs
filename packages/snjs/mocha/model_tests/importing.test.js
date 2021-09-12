@@ -18,7 +18,7 @@ describe('importing', function () {
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -409,7 +409,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -437,7 +437,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -470,7 +470,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -555,7 +555,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -589,7 +589,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 
@@ -627,7 +627,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -666,7 +666,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
@@ -701,7 +701,7 @@ describe('importing', function () {
     );
     delete backupData.keyParams;
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
 
     const result = await this.application.importData(backupData);
@@ -732,7 +732,7 @@ describe('importing', function () {
       (payload) => payload.content_type !== ContentType.ItemsKey
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application);
 
@@ -874,7 +874,7 @@ describe('importing', function () {
     };
     const result = await application.importData(backupFile, true);
     expect(result.errorCount).to.equal(0);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('importing another accounts notes/tags should correctly keep relationships', async function () {
@@ -897,7 +897,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     this.application = await Factory.createInitAppWithRandNamespace();
     Factory.handlePasswordChallenges(this.application, this.password);
 

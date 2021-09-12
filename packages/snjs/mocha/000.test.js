@@ -13,7 +13,7 @@ describe('000 protocol operations', () => {
   });
 
   after(() => {
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('can decode 000 item', async function () {

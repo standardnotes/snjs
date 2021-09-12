@@ -40,7 +40,7 @@ describe('upgrading', () => {
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -159,7 +159,7 @@ describe('upgrading', () => {
     });
 
     const identifier = this.application.identifier;
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
 
     /** Recreate the app once */
     const appFirst = Factory.createApplication(identifier);
@@ -172,7 +172,7 @@ describe('upgrading', () => {
     const result = await appFirst.upgradeProtocolVersion();
     expect(result).to.deep.equal({ success: true });
     expect(appFirst.itemManager.invalidItems).to.be.empty;
-    appFirst.deinit();
+    await Factory.safeDeinit(appFirst);
 
     /** Recreate the once more */
     const appSecond = Factory.createApplication(identifier);
@@ -183,7 +183,7 @@ describe('upgrading', () => {
     });
     await appSecond.launch(true);
     expect(appSecond.itemManager.invalidItems).to.be.empty;
-    appSecond.deinit();
+    await Factory.safeDeinit(appSecond);
   }).timeout(15000);
 
   describe('upgrade failure', function () {

@@ -79,7 +79,7 @@ describe('key recovery service', function () {
     );
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
-    context.deinit();
+    await context.deinit();
   });
 
   it('when encountering many undecryptable items key with same key params, should only prompt once', async function () {
@@ -148,11 +148,10 @@ describe('key recovery service', function () {
     expect(totalPromptCount).to.equal(1);
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
-    context.deinit();
+    await context.deinit();
   });
 
-  it(
-    'when changing password on another client, it should prompt us for new account password',
+  it('when changing password on another client, it should prompt us for new account password',
     async function () {
       /**
        * This test takes way too long due to all the key generation occuring
@@ -291,8 +290,8 @@ describe('key recovery service', function () {
     console.warn(
       'Expecting exceptions below as we destroy app during key recovery'
     );
-    appA.deinit();
-    appB.deinit();
+    await Factory.safeDeinit(appA);
+    await Factory.safeDeinit(appB);
 
     const recreatedAppA = await Factory.createApplication(namespace);
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} });
@@ -300,7 +299,7 @@ describe('key recovery service', function () {
 
     expect(recreatedAppA.findItem(note.uuid).errorDecrypting).to.equal(true);
     expect(recreatedAppA.findItem(note.uuid).waitingForKey).to.equal(true);
-    recreatedAppA.deinit();
+    recreatedawait Factory.safeDeinit(appA);
   });
 
   it('when client key params differ from server, and no matching items key exists, should perform sign in flow', async function () {
@@ -374,7 +373,7 @@ describe('key recovery service', function () {
     expect(clientRootKey.compare(correctRootKey)).to.equal(true);
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
-    context.deinit();
+    await context.deinit();
   });
 
   it(`when encountering an items key that cannot be decrypted, for which we already have a decrypted value,
@@ -440,7 +439,7 @@ describe('key recovery service', function () {
     );
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('application should prompt to recover undecryptables on launch', async function () {
@@ -475,7 +474,7 @@ describe('key recovery service', function () {
     );
     await Factory.sleep(0.1);
     expect(application.syncService.isOutOfSync()).to.equal(false);
-    context.deinit();
+    await context.deinit();
 
     /** Recreate application, and expect key recovery wizard to complete */
     const recreatedApp = await Factory.createApplication(namespace);
@@ -502,7 +501,7 @@ describe('key recovery service', function () {
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey);
 
     expect(recreatedApp.syncService.isOutOfSync()).to.equal(false);
-    recreatedApp.deinit();
+    await Factory.safeDeinit(recreatedApp);
   });
 
   it('when encountering an undecryptable 003 items key, should recover through recovery wizard', async function () {
@@ -566,6 +565,6 @@ describe('key recovery service', function () {
     );
 
     expect(application.syncService.isOutOfSync()).to.equal(false);
-    context.deinit();
+    await context.deinit();
   });
 });

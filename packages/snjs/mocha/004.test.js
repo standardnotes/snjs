@@ -24,7 +24,7 @@ describe('004 protocol operations', function () {
   });
 
   after(function () {
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('cost minimum should throw', function () {

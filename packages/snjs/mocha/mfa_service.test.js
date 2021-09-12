@@ -46,7 +46,7 @@ describe('mfa service', () => {
     Factory.safeDeinit(snApp);
   });
 
-  it("doesn't allow mfa for basic user", async () => {
+  it('doesn\'t allow mfa for basic user', async () => {
     const snApp = await createApp().then(registerApp);
     expect(await snApp.isMfaFeatureAvailable()).to.equal(false);
 

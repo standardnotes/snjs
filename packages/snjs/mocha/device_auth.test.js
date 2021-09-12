@@ -25,7 +25,7 @@ describe('device authentication', function () {
     expect(await application.protectionService.createLaunchChallenge()).to.be
       .ok;
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
-    await application.deinit();
+    await await Factory.safeDeinit(application);
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
@@ -62,7 +62,7 @@ describe('device authentication', function () {
     expect(tmpApplication.protocolService.keyMode).to.equal(
       KeyMode.WrapperOnly
     );
-    await tmpApplication.deinit();
+    await tmpawait Factory.safeDeinit(application);
   }).timeout(10000);
 
   it('handles application launch with passcode and biometrics', async function () {
@@ -78,7 +78,7 @@ describe('device authentication', function () {
         .length
     ).to.equal(2);
     expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
-    await application.deinit();
+    await await Factory.safeDeinit(application);
 
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplication(namespace);
@@ -120,7 +120,7 @@ describe('device authentication', function () {
     expect(tmpApplication.protocolService.keyMode).to.equal(
       KeyMode.WrapperOnly
     );
-    tmpApplication.deinit();
+    tmpawait Factory.safeDeinit(application);
   }).timeout(20000);
 
   it('handles application launch with passcode and account', async function () {
@@ -147,7 +147,7 @@ describe('device authentication', function () {
       KeyMode.RootKeyPlusWrapper
     );
     expect(await application.hasPasscode()).to.equal(true);
-    await application.deinit();
+    await await Factory.safeDeinit(application);
 
     const wrongPasscode = 'barfoo';
     let numPasscodeAttempts = 1;
@@ -190,6 +190,6 @@ describe('device authentication', function () {
     expect(tmpApplication.protocolService.keyMode).to.equal(
       KeyMode.RootKeyPlusWrapper
     );
-    tmpApplication.deinit();
+    tmpawait Factory.safeDeinit(application);
   }).timeout(10000);
 });

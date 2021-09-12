@@ -81,7 +81,7 @@ describe('features', () => {
       expect(storedFeatures[2]).to.equal(tagNestingFeature);
     });
 
-    it.skip('should fetch user features and create items for features with content type', async () => {
+    it('should fetch user features and create items for features with content type', async () => {
       expect(application.apiService.getUserFeatures.callCount).to.equal(1);
       expect(application.itemManager.createItem.callCount).to.equal(2);
       const themeItems = application.getItems(ContentType.Theme);
@@ -115,7 +115,7 @@ describe('features', () => {
       );
     });
 
-    it.skip('should update content for existing feature items', async () => {
+    it('should update content for existing feature items', async () => {
       // Wipe items from initial sync
       await application.itemManager.removeAllItemsFromMemory();
       // Wipe roles from initial sync
@@ -151,7 +151,8 @@ describe('features', () => {
       const now = new Date();
       const yesterday = now.setDate(now.getDate() - 1);
 
-      sinon.spy(application.apiService, 'getUserFeatures').mockImplementation(() => {
+      getUserFeatures.restore();
+      sinon.stub(application.apiService, 'getUserFeatures').callsFake(() => {
         return Promise.resolve({
           data: {
             features: [
@@ -206,11 +207,6 @@ describe('features', () => {
       const themeItem = application.getItems(ContentType.Theme)[0];
       expect(themeItem.deleted).to.equal(true);
     });
-  });
-
-  it('should provide feature', async ()=>{
-    const feature = application.getFeature(FeatureIdentifier.BoldEditor);
-    expect(feature).to.equal(boldEditorFeature);
   });
 
   it('should provide feature', async ()=>{

@@ -32,7 +32,7 @@ describe('003 protocol operations', () => {
   });
 
   after(() => {
-    sharedApplication.deinit();
+    sharedawait Factory.safeDeinit(application);
   });
 
   it('generates random key', async () => {

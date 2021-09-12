@@ -75,7 +75,7 @@ describe('mapping performance', () => {
         application.itemManager.itemsReferencingItem(note.uuid).length
       ).to.be.above(0);
     }
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(20000);
 
   it('mapping a tag with thousands of notes should be quick', async () => {
@@ -151,6 +151,6 @@ describe('mapping performance', () => {
         application.itemManager.itemsReferencingItem(note.uuid).length
       ).to.equal(1);
     }
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(20000);
 });

@@ -21,7 +21,7 @@ describe('basic auth', () => {
   });
 
   afterEach(async function () {
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 

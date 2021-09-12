@@ -14,8 +14,8 @@ describe('keys', function () {
     this.password = Uuid.GenerateUuidSynchronously();
   });
 
-  afterEach(function () {
-    this.application?.deinit();
+  afterEach(async function () {
+    await Factory.safeDeinit(this.application);
     this.application = null;
     localStorage.clear();
   });
@@ -552,7 +552,7 @@ describe('keys', function () {
       password: password,
     });
     const itemsKeys = application.itemManager.itemsKeys();
-    expect(itemsKeys.length).toBe(1);
+    expect(itemsKeys.length).to.equal(1);
     const defaultItemsKey = application.protocolService.getDefaultItemsKey();
 
     const newEmail = Uuid.GenerateUuidSynchronously();
@@ -560,18 +560,18 @@ describe('keys', function () {
       newEmail,
       password,
     );
-    expect(result.error).toBeFalsy();
+    expect(result.error).to.not.be.ok;
 
-    expect(application.itemManager.itemsKeys().length).toBe(2);
+    expect(application.itemManager.itemsKeys().length).to.equal(2);
     const newDefaultItemsKey = application.protocolService.getDefaultItemsKey();
-    expect(newDefaultItemsKey.uuid).not.toEqual(defaultItemsKey.uuid);
+    expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid);
 
     const note = await Factory.createSyncedNote(application);
     const payload = await application.protocolService.payloadByEncryptingPayload(
       note.payload,
       EncryptionIntent.Sync
     );
-    expect(payload.items_key_id).toBe(newDefaultItemsKey.uuid);
+    expect(payload.items_key_id).to.equal(newDefaultItemsKey.uuid);
   });
 
   it('compares root keys', async function () {
@@ -727,7 +727,7 @@ describe('keys', function () {
     });
     /** Simulate empty keychain */
     await this.application.deviceInterface.clearRawKeychainValue();
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
 
     const recreatedApp = await Factory.createApplication(id);
     let totalChallenges = 0;
@@ -743,7 +743,7 @@ describe('keys', function () {
 
     expect(recreatedApp.protocolService.rootKey).to.be.ok;
     expect(totalChallenges).to.equal(expectedChallenges);
-    recreatedApp.deinit();
+    await Factory.safeDeinit(recreatedApp);
   });
 
   describe('changing password on 003 client while signed into 004 client should', function () {
@@ -816,8 +816,8 @@ describe('keys', function () {
       /** Expect a new items key to be created based on the new root key */
       expect(newClient.itemManager.itemsKeys().length).to.equal(2);
 
-      newClient.deinit();
-      oldClient.deinit();
+      await Factory.safeDeinit(newClient);
+      await Factory.safeDeinit(oldClient);
     });
 
     it('add new items key from migration if pw change already happened', async function () {
@@ -855,10 +855,10 @@ describe('keys', function () {
         this.password
       );
 
-      await this.application.sessionManager.changeCredentials(
+      await this.application.sessionManager.changeCredentials({
         currentServerPassword: currentRootKey.serverPassword,
         newRootKey
-      );
+      });
       await this.application.protocolService.reencryptItemsKeys();
       await this.application.sync({ awaitAll: true });
 
@@ -869,14 +869,14 @@ describe('keys', function () {
         `${identifier}-snjs_version`,
         '2.0.14'
       );
-      this.application.deinit();
+      await Factory.safeDeinit(this.application);
 
       const refreshedApp = await Factory.createApplication(identifier);
       await Factory.initializeApplication(refreshedApp);
 
       /** Expect a new items key to be created based on the new root key */
       expect(refreshedApp.itemManager.itemsKeys().length).to.equal(2);
-      refreshedApp.deinit();
+      await Factory.safeDeinit(refreshedApp);
     });
   });
 

@@ -214,7 +214,7 @@ describe('actions service', () => {
 
   after(function () {
     this.fakeServer.restore();
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
     this.application = null;
     localStorage.clear();
   });

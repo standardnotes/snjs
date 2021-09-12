@@ -10,6 +10,28 @@ const syncOptions = {
   awaitAll: true,
 };
 
+export async function createAndInitSimpleAppContext({ registerUser, environment } = { registerUser: false, environment: Environment.Web }) {
+  const application = await createInitAppWithRandNamespace(environment);
+  const email = Uuid.GenerateUuidSynchronously();
+  const password = Uuid.GenerateUuidSynchronously();
+  const newPassword = randomString();
+
+  if (registerUser) {
+    await registerUserToApplication({
+      application,
+      email,
+      password
+    });
+  }
+
+  return {
+    application,
+    email,
+    password,
+    newPassword
+  };
+};
+
 export async function createAppContext(identifier) {
   if (!identifier) {
     identifier = `${Math.random()}`;
@@ -64,8 +86,8 @@ export async function createAppContext(identifier) {
       await application.launch(awaitDatabaseLoad);
     },
     handleChallenge,
-    deinit: () => {
-      application.deinit();
+    deinit: async () => {
+      await safeDeinit(application);
     },
   };
 }
@@ -317,7 +339,7 @@ export async function signOutAndBackIn(application, email, password) {
 
 export async function restartApplication(application) {
   const id = application.identifier;
-  await application.deinit();
+  await await Factory.safeDeinit(application);
   const newApplication = await createAndInitializeApplication(id);
   return newApplication;
 }

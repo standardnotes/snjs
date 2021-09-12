@@ -30,8 +30,8 @@ describe('application instances', () => {
     await Factory.createMappedNote(app1);
     expect(app1.itemManager.items.length).length.to.equal(BASE_ITEM_COUNT + 1);
     expect(app2.itemManager.items.length).to.equal(BASE_ITEM_COUNT);
-    await app1.deinit();
-    await app2.deinit();
+    await await Factory.safeDeinit(app1);
+    await await Factory.safeDeinit(app2);
   });
 
   it('two distinct applications should not share storage manager state', async () => {
@@ -57,8 +57,8 @@ describe('application instances', () => {
     expect(
       (await app2.storageService.getAllRawPayloads()).length
     ).length.to.equal(BASE_ITEM_COUNT + 1);
-    await app1.deinit();
-    await app2.deinit();
+    await await Factory.safeDeinit(app1);
+    await await Factory.safeDeinit(app2);
   });
 
   it('deinit application while storage persisting should be handled gracefully', async () => {
@@ -67,7 +67,7 @@ describe('application instances', () => {
     /** Don't await */
     app.storageService.persistValuesToDisk();
     await app.prepareForDeinit();
-    app.deinit();
+    await Factory.safeDeinit(app);
   });
 
   it('signing out application should delete snjs_version', async () => {
@@ -153,7 +153,7 @@ describe('application instances', () => {
       expect(deinit.calledWith(DeinitSource.SignOut)).to.be.ok;
     });
 
-    it.only('cancels sign out if confirmation dialog is rejected', async () => {
+    it('cancels sign out if confirmation dialog is rejected', async () => {
       confirmAlert.restore();
       confirmAlert = sinon
         .stub(testSNApp.alertService, 'confirm')

@@ -30,7 +30,7 @@ describe('history manager', () => {
     });
 
     afterEach(async function () {
-      await this.application.deinit();
+      await await Factory.safeDeinit(this.application);
     });
 
     async function setTextAndSync(application, item, text) {
@@ -100,7 +100,7 @@ describe('history manager', () => {
     it('first change should create revision with previous value', async function () {
       const identifier = this.application.identifier;
       const item = await Factory.createSyncedNote(this.application);
-      this.application.deinit();
+      await Factory.safeDeinit(this.application);
 
       /** Simulate loading new application session */
       const context = await Factory.createAppContext(identifier);
@@ -122,7 +122,7 @@ describe('history manager', () => {
       );
       expect(entries.length).to.equal(1);
       expect(entries[0].payload.content.title).to.equal(item.content.title);
-      context.deinit();
+      await context.deinit();
     });
 
     it('creating new item and making 1 change should create 0 revisions', async function () {
@@ -151,7 +151,7 @@ describe('history manager', () => {
       expect(
         context.application.historyManager.sessionHistoryForItem(item).length
       ).to.equal(0);
-      context.deinit();
+      await context.deinit();
     });
 
     it('should optimize basic entries', async function () {
@@ -372,7 +372,7 @@ describe('history manager', () => {
     });
 
     afterEach(async function () {
-      await this.application.deinit();
+      await await Factory.safeDeinit(this.application);
     });
 
     it('response from server should be empty if not signed in', async function () {

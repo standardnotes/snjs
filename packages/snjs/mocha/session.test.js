@@ -25,7 +25,7 @@ describe('server session', function () {
   });
 
   afterEach(async function () {
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
     this.application = null;
     localStorage.clear();
   });
@@ -207,6 +207,101 @@ describe('server session', function () {
     expect(syncResponse.error.tag).to.equal('invalid-auth');
     expect(syncResponse.error.message).to.equal('Invalid login credentials.');
   });
+
+  it('change email request should be successful with a valid access token', async function () {
+    let { application, password } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const changeEmailResponse = await application.changeEmail(
+      newEmail,
+      password
+    );
+
+    expect(changeEmailResponse.status).toBe(200);
+    expect(changeEmailResponse.data.user).toBeTruthy();
+
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
+    );
+    const loginResponse = await Factory.loginToApplication({
+      application: application,
+      email: newEmail,
+      password: password,
+    });
+
+    expect(loginResponse).toBeTruthy();
+    expect(loginResponse.status).toBe(200);
+    await Factory.safeDeinit(application);
+  }, Factory.LongTestTimeout);
+
+  it('change email request should fail with an invalid access token', async function () {
+    let { application, password } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
+    const fakeSession = application.apiService.getSession();
+    fakeSession.accessToken = 'this-is-a-fake-token-1234';
+    Factory.ignoreChallenges(application);
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const changeEmailResponse = await application.changeEmail(
+      newEmail,
+      password
+    );
+    expect(changeEmailResponse.error.message).toBe('Invalid login credentials.');
+
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
+    );
+    const loginResponse = await Factory.loginToApplication({
+      application: application,
+      email: newEmail,
+      password,
+    });
+
+    expect(loginResponse).toBeTruthy();
+    expect(loginResponse.status).toBe(401);
+    await Factory.safeDeinit(application);
+  });
+
+  it('change email request should fail with an expired refresh token', async function () {
+    let { application, email, password } = await Factory.createAndInitSimpleAppContext({
+      registerUser: true
+    });
+    /** Waiting for the refresh token to expire. */
+    await sleepUntilSessionExpires(application, false);
+
+    Factory.ignoreChallenges(application);
+    const newEmail = Uuid.GenerateUuidSynchronously();
+    const changeEmailResponse = await application.changeEmail(
+      newEmail,
+      password
+    );
+
+    expect(changeEmailResponse).toBeTruthy();
+    expect(changeEmailResponse.error.message).toBe('Invalid login credentials.');
+
+    application = await Factory.signOutApplicationAndReturnNew(
+      application
+    );
+    const loginResponseWithNewEmail = await Factory.loginToApplication({
+      application: application,
+      email: newEmail,
+      password,
+    });
+
+    expect(loginResponseWithNewEmail).toBeTruthy();
+    expect(loginResponseWithNewEmail.status).toBe(401);
+
+    const loginResponseWithOldEmail = await Factory.loginToApplication({
+      application: application,
+      email: email,
+      password: password,
+    });
+
+    expect(loginResponseWithOldEmail).toBeTruthy();
+    expect(loginResponseWithOldEmail.status).toBe(200);
+    await Factory.safeDeinit(application);
+  }, Factory.LongTestTimeout);
 
   it('change password request should be successful with a valid access token', async function () {
     await Factory.registerUserToApplication({
@@ -525,8 +620,8 @@ describe('server session', function () {
     await appA.sync();
     expect(appA.findItem(note.uuid)).to.be.ok;
 
-    appA.deinit();
-    appB.deinit();
+    await Factory.safeDeinit(appA);
+    await Factory.safeDeinit(appB);
   });
 
   it('should prompt user for account password and sign back in on invalid session', async function () {
@@ -576,7 +671,7 @@ describe('server session', function () {
     const newRootKey = await appA.protocolService.getRootKey();
     expect(oldRootKey).to.not.equal(newRootKey);
 
-    appA.deinit();
+    await Factory.safeDeinit(appA);
   });
 
   it('should return current session in list of sessions', async function () {

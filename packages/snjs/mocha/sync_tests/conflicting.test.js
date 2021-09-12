@@ -34,7 +34,7 @@ describe('online conflict handling', function () {
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -885,7 +885,7 @@ describe('online conflict handling', function () {
     await newApp.syncService.markAllItemsAsNeedingSync();
     await newApp.syncService.sync(syncOptions);
     expect(newApp.itemManager.invalidItems.length).to.equal(0);
-    newApp.deinit();
+    await Factory.safeDeinit(newApp);
   }).timeout(60000);
 
   it('importing data belonging to another account should not result in duplication', async function () {
@@ -915,7 +915,7 @@ describe('online conflict handling', function () {
     await newApp.importData(backupFile, true);
     expect(newApp.itemManager.tags.length).to.equal(1);
     expect(newApp.itemManager.notes.length).to.equal(1);
-    newApp.deinit();
+    await Factory.safeDeinit(newApp);
   }).timeout(10000);
 
   it('importing notes + tags belonging to another account should keep correct associations', async function () {
@@ -955,7 +955,7 @@ describe('online conflict handling', function () {
     const newTag = newApp.itemManager.tags[0];
     const notes = newApp.referencesForItem(newTag);
     expect(notes.length).to.equal(2);
-    newApp.deinit();
+    await Factory.safeDeinit(newApp);
   }).timeout(10000);
 
   it('server should prioritize updated_at_timestamp over updated_at for sync, if provided', async function () {

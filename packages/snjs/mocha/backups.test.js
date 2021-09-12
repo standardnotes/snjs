@@ -20,7 +20,7 @@ describe('backups', function () {
   });
 
   afterEach(function () {
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
     this.application = null;
   });
 
@@ -228,7 +228,7 @@ describe('backups', function () {
       EncryptionIntent.FileDecrypted
     );
     expect(backup).to.not.haveOwnProperty('keyParams');
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('encrypted backup file should have keyParams', async function () {

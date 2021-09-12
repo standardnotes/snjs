@@ -17,7 +17,7 @@ describe('migrations', () => {
     const application = await Factory.createInitAppWithRandNamespace();
     const version = await application.migrationService.getStoredSnjsVersion();
     expect(typeof version).to.equal('string');
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   });
 
   it('should return correct required migrations if stored version is 1.0.0', async function () {
@@ -49,7 +49,7 @@ describe('migrations', () => {
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(
       '1.0.0'
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('after running base migration, 2.0.0 structure set version as 2.0.0', async function () {
@@ -63,7 +63,7 @@ describe('migrations', () => {
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(
       '2.0.0'
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('after running base migration with no present storage values, should set version to current', async function () {
@@ -72,7 +72,7 @@ describe('migrations', () => {
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(
       SnjsVersion
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('after running all migrations from a 1.0.0 installation, should set stored version to current', async function () {
@@ -89,7 +89,7 @@ describe('migrations', () => {
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(
       SnjsVersion
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('after running all migrations from a 2.0.0 installation, should set stored version to current', async function () {
@@ -106,7 +106,7 @@ describe('migrations', () => {
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(
       SnjsVersion
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('should be 2 required migration coming from 1.0.0', async function () {
@@ -131,6 +131,6 @@ describe('migrations', () => {
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(
       SnjsVersion
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 });

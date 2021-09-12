@@ -19,7 +19,7 @@ describe('payload encryption', function () {
   });
 
   afterEach(async function () {
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 

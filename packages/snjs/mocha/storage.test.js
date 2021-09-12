@@ -24,7 +24,7 @@ describe('storage manager', function () {
   });
 
   afterEach(function () {
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
     localStorage.clear();
   });
 
@@ -275,7 +275,7 @@ describe('storage manager', function () {
     expect(payload.content.references).to.be.ok;
 
     const identifier = this.application.identifier;
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
 
     const app = await Factory.createAndInitializeApplication(
       identifier,

@@ -210,7 +210,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Full sync completed event will not trigger due to mocked credentials,
      * thus we manually need to mark any sync dependent migrations as complete. */
     await application.migrationService.markMigrationsAsDone();
-    await application.deinit();
+    await await Factory.safeDeinit(application);
 
     /** Recreate application and ensure storage values are consistent */
     application = Factory.createApplication(appId);
@@ -233,7 +233,7 @@ describe('2020-01-15 mobile migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, , Factory.LongTestTimeout);
 
   it('2020-01-15 migration with passcode only', async function () {
@@ -406,7 +406,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.hideTags).to.be.true;
     expect(preferences.lastExportDate).to.equal(undefined);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.true;
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   });
 
   it('2020-01-15 migration with passcode-only missing keychain', async function () {
@@ -509,7 +509,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.errorDecrypting).to.not.be.ok;
 
     /** application should not crash */
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   });
 
   it('2020-01-15 migration with account only', async function () {
@@ -675,7 +675,7 @@ describe('2020-01-15 mobile migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(10000);
 
   it('2020-01-15 launching with account but missing keychain', async function () {
@@ -700,7 +700,7 @@ describe('2020-01-15 mobile migration', () => {
       version: ProtocolVersion.V003,
     });
     const accountKey = tempApp.protocolService.getRootKey();
-    tempApp.deinit();
+    await Factory.safeDeinit(tempApp);
     localStorage.clear();
 
     const application = await Factory.createAppWithRandNamespace(
@@ -801,7 +801,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(await application.getUser().email).to.equal(email);
     expect(await application.apiService.getSession()).to.be.ok;
     expect(totalChallenges).to.equal(expectedChallenges);
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(10000);
 
   it('2020-01-15 migration with 002 account should not create 003 data', async function () {
@@ -890,7 +890,7 @@ describe('2020-01-15 mobile migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(10000);
 
   it('2020-01-15 migration with 001 account detect 001 version even with missing info', async function () {
@@ -981,7 +981,7 @@ describe('2020-01-15 mobile migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(10000);
 
   it('2020-01-15 successfully creates session if jwt is stored in keychain', async function () {
@@ -1019,7 +1019,7 @@ describe('2020-01-15 mobile migration', () => {
 
     expect(application.apiService.getSession()).to.be.ok;
 
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(10000);
 
   it('2020-01-15 successfully creates session if jwt is stored in storage', async function () {
@@ -1056,7 +1056,7 @@ describe('2020-01-15 mobile migration', () => {
 
     expect(application.apiService.getSession()).to.be.ok;
 
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   }).timeout(10000);
 
   it('2020-01-15 migration with no account and no passcode', async function () {
@@ -1185,7 +1185,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(preferences.hideNotePreview).to.be.true;
     expect(preferences.lastExportDate).to.equal(undefined);
     expect(preferences.doNotShowAgainUnsupportedEditors).to.be.true;
-    await application.deinit();
+    await await Factory.safeDeinit(application);
   });
 
   it('2020-01-15 migration from mobile version 3.0.16', async function () {
@@ -1386,7 +1386,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Full sync completed event will not trigger due to mocked credentials,
      * thus we manually need to mark any sync dependent migrations as complete. */
     await application.migrationService.markMigrationsAsDone();
-    await application.deinit();
+    await await Factory.safeDeinit(application);
 
     /** Recreate application and ensure storage values are consistent */
     application = Factory.createApplication(appId);
@@ -1409,6 +1409,6 @@ describe('2020-01-15 mobile migration', () => {
     console.warn(
       'Expecting exception due to deiniting application while trying to renew session'
     );
-    application.deinit();
+    await Factory.safeDeinit(application);
   }, Factory.LongTestTimeout);
 });

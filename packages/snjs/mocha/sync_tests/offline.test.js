@@ -19,7 +19,7 @@ describe('offline syncing', () => {
 
   afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
   });
 
   before(async function () {

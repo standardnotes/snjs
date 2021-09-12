@@ -25,7 +25,7 @@ describe('001 protocol operations', () => {
   });
 
   after(() => {
-    application.deinit();
+    await Factory.safeDeinit(application);
   });
 
   it('generates random key', async () => {

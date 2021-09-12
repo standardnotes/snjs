@@ -16,7 +16,7 @@ describe('app models', () => {
 
   after(async function () {
     localStorage.clear();
-    sharedApplication.deinit();
+    sharedawait Factory.safeDeinit(application);
   });
 
   beforeEach(async function () {
@@ -25,7 +25,7 @@ describe('app models', () => {
   });
 
   afterEach(async function () {
-    await this.application.deinit();
+    await await Factory.safeDeinit(this.application);
   });
 
   it('payloadManager should be defined', () => {

@@ -13,7 +13,7 @@ describe('protocol', function () {
   });
 
   afterEach(function () {
-    this.application.deinit();
+    await Factory.safeDeinit(this.application);
     this.application = null;
     localStorage.clear();
   });
