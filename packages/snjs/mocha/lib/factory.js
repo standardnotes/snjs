@@ -94,7 +94,11 @@ export async function createAppContext(identifier) {
 }
 
 export async function safeDeinit(application) {
-  await application.syncService?.awaitCurrentSyncs();
+  /** Limit waiting to 1s */
+  await Promise.race([
+    sleep(1),
+    application.syncService.awaitCurrentSyncs()
+  ]);
   await application.prepareForDeinit();
   application.deinit(DeinitSource.SignOut);
 }
