@@ -376,7 +376,7 @@ export class SNStorageService extends PureService {
     }
 
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.saveRawDatabasePayloads(
+      return this.deviceInterface?.saveRawDatabasePayloads(
         nondeleted,
         this.identifier
       );

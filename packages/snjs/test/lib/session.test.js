@@ -660,7 +660,7 @@ describe('server session', function () {
     );
     expect(Object.keys(payloads)).toHaveLength(0);
     await Factory.safeDeinit(application);
-    app2.deinit();
+    await Factory.safeDeinit(app2);
   }, Factory.LongTestTimeout);
 
   it('signing out with invalid session token should still delete local data', async function () {
