@@ -97,7 +97,7 @@ export async function safeDeinit(application) {
   /** Limit waiting to 1s */
   await Promise.race([
     sleep(1),
-    application.syncService.awaitCurrentSyncs()
+    application.syncService?.awaitCurrentSyncs()
   ]);
   await application.prepareForDeinit();
   application.deinit(DeinitSource.SignOut);

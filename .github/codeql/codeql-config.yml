@@ -10,3 +10,4 @@ paths:
 paths-ignore:
 - dist
 - node_modules
+- packages/snjs/mocha
