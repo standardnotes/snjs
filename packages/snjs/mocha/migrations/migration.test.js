@@ -23,13 +23,13 @@ describe('migrations', () => {
   it('should return correct required migrations if stored version is 1.0.0', async function () {
     expect(
       (await SNMigrationService.getRequiredMigrations('1.0.0')).length
-    ).to.equal(3);
+    ).to.equal(4);
   });
 
   it('should return correct required migrations if stored version is 2.0.0', async function () {
     expect(
       (await SNMigrationService.getRequiredMigrations('2.0.0')).length
-    ).to.equal(2);
+    ).to.equal(3);
   });
 
   it('should return 0 required migrations if stored version is futuristic', async function () {
