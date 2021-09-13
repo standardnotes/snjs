@@ -1187,7 +1187,7 @@ export class SNApplication {
     return this.syncService.isOutOfSync();
   }
 
-  public async resolveOutOfSync(): Promise<void> {
+  public async resolveOutOfSync(): Promise<unknown> {
     return this.syncService.resolveOutOfSync();
   }
 
