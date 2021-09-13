@@ -247,6 +247,12 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     });
   }
 
+  async authorizeMfaDisable(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.DisableMfa, {
+      requireAccountPassword: true,
+    });
+  }
+
   async authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.validateOrRenewSession(ChallengeReason.ChangeAutolockInterval);
   }
@@ -261,7 +267,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
 
   private async validateOrRenewSession(
     reason: ChallengeReason,
-    { fallBackToAccountPassword = true } = {}
+    { fallBackToAccountPassword = true, requireAccountPassword = false } = {}
   ): Promise<boolean> {
     if (this.getSessionExpiryDate() > new Date()) {
       return true;
@@ -273,6 +279,12 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     }
     if (this.protocolService.hasPasscode()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
+    }
+    if (requireAccountPassword) {
+      if (!this.protocolService.hasAccount()) {
+        throw Error('Requiring account password for challenge with no account');
+      }
+      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
     }
     if (prompts.length === 0) {
       if (fallBackToAccountPassword && this.protocolService.hasAccount()) {

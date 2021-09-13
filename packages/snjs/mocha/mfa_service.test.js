@@ -5,9 +5,11 @@ const expect = chai.expect;
 const createApp = async () =>
   Factory.createInitAppWithRandNamespace(Environment.Web, Platform.MacWeb);
 
+const accountPassword = 'password';
+
 const registerApp = async (snApp) => {
   const email = Uuid.GenerateUuidSynchronously();
-  const password = Uuid.GenerateUuidSynchronously();
+  const password = accountPassword;
   const ephemeral = false;
   const mergeLocal = true;
 
@@ -29,6 +31,7 @@ describe('mfa service', () => {
 
   it('activates mfa, checks if enabled, deactivates mfa', async () => {
     const snApp = await createApp().then(registerApp);
+    Factory.handlePasswordChallenges(snApp, accountPassword);
 
     expect(await snApp.isMfaActivated()).to.equal(false);
 
@@ -44,9 +47,29 @@ describe('mfa service', () => {
     expect(await snApp.isMfaActivated()).to.equal(false);
 
     Factory.safeDeinit(snApp);
-  });
+  }).timeout(Factory.TenSecondTimeout);
 
-  it('doesn\'t allow mfa for basic user', async () => {
+  it('prompts for account password when disabling mfa', async () => {
+    const snApp = await createApp().then(registerApp);
+    Factory.handlePasswordChallenges(snApp, accountPassword);
+    const secret = await snApp.generateMfaSecret();
+    const token = await snApp.getOtpToken(secret);
+
+    sinon.spy(snApp.challengeService, 'sendChallenge');
+    await snApp.enableMfa(secret, token);
+    await snApp.disableMfa();
+
+    const spyCall = snApp.challengeService.sendChallenge.getCall(0);
+    const challenge = spyCall.firstArg;
+    expect(challenge.prompts).to.have.lengthOf(2);
+    expect(challenge.prompts[0].validation).to.equal(
+      ChallengeValidation.AccountPassword
+    );
+
+    Factory.safeDeinit(snApp);
+  }).timeout(Factory.TenSecondTimeout);
+
+  it("doesn't allow mfa for basic user", async () => {
     const snApp = await createApp().then(registerApp);
     expect(await snApp.isMfaFeatureAvailable()).to.equal(false);
 
