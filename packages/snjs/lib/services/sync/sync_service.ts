@@ -1007,7 +1007,7 @@ export class SNSyncService extends PureService<
   /**
    * Downloads all items and maps to lcoal items to attempt resolve out-of-sync state
    */
-  public async resolveOutOfSync() {
+  public async resolveOutOfSync(): Promise<unknown> {
     const downloader = new AccountDownloader(
       this.apiService,
       this.protocolService,

@@ -90,7 +90,7 @@ export { SyncResponseResolver } from '@Services/sync/account/response_resolver';
 export { SyncOpStatus } from './services/sync/sync_op_status';
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
 export { SyncUpDownLimit } from './services/sync/account/operation';
-export { SNSessionManager } from './services/api/session_manager';
+export { SNSessionManager, SessionEvent } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
 export { ButtonType } from './services/alert_service';
 export type {
@@ -203,3 +203,8 @@ export { SNLog } from './log';
 
 export type { ItemMessagePayload } from './services/component_manager';
 export type { MessageData } from './services/component_manager';
+
+/** Used by e2e tests */
+export { Features, FeatureIdentifier } from '@standardnotes/features'
+export { RoleName } from '@standardnotes/auth';
+export { SettingName } from '@standardnotes/settings'
