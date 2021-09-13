@@ -109,7 +109,7 @@ describe('migrations', () => {
     await Factory.safeDeinit(application);
   });
 
-  it('should be 2 required migration coming from 1.0.0', async function () {
+  it('should be 4 required migration coming from 1.0.0', async function () {
     const application = await Factory.createAppWithRandNamespace();
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -122,7 +122,7 @@ describe('migrations', () => {
     const pendingMigrations = await SNMigrationService.getRequiredMigrations(
       await application.migrationService.getStoredSnjsVersion()
     );
-    expect(pendingMigrations.length).to.equal(3);
+    expect(pendingMigrations.length).to.equal(4);
     expect(pendingMigrations[0].version()).to.equal('2.0.0');
     await application.prepareForLaunch({
       receiveChallenge: () => {},
