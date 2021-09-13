@@ -76,7 +76,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@standardnotes/auth": "3.7.1",
+    "@standardnotes/auth": "3.7.2",
     "@standardnotes/common": "1.1.0",
     "@standardnotes/domain-events": "2.1.0",
     "@standardnotes/features": "1.6.2",
