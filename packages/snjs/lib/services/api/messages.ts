@@ -215,6 +215,7 @@ export const ChallengeStrings = {
   SearchProtectedNotesText:
     'Authentication is required to search protected contents',
   SelectProtectedNote: 'Authentication is required to select a protected note',
+  DisableMfa: 'Authentication is required to disable two-factor authentication',
 };
 
 export const PromptTitles = {

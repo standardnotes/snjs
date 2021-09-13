@@ -41,6 +41,7 @@ export enum ChallengeReason {
   UnprotectNote,
   SearchProtectedNotesText,
   SelectProtectedNote,
+  DisableMfa
 }
 
 /** For mobile */
@@ -120,6 +121,8 @@ export class Challenge {
           return ChallengeStrings.SearchProtectedNotesText;
         case ChallengeReason.SelectProtectedNote:
           return ChallengeStrings.SelectProtectedNote;
+          case ChallengeReason.DisableMfa:
+            return ChallengeStrings.DisableMfa
         case ChallengeReason.Custom:
           return '';
         default:
