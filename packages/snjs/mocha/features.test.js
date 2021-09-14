@@ -4,6 +4,8 @@ const expect = chai.expect;
 
 describe('features', () => {
   let application;
+  let email;
+  let password;
   let midnightThemeFeature;
   let boldEditorFeature;
   let tagNestingFeature;
@@ -44,8 +46,8 @@ describe('features', () => {
       });
     });
 
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
+    email = Uuid.GenerateUuidSynchronously();
+    password = Uuid.GenerateUuidSynchronously();
 
     await Factory.registerUserToApplication({
       application: application,
@@ -209,19 +211,37 @@ describe('features', () => {
     });
   });
 
-  it('should provide feature', async ()=>{
+  it('should provide feature', async () => {
     const feature = application.getFeature(FeatureIdentifier.BoldEditor);
     expect(feature).to.equal(boldEditorFeature);
   });
 
   describe('extension repo items observer', () => {
-    it('should update extension key user setting when extension repo is added', async () => {
+    it.only('should update extension key user setting when extension repo is added', async () => {
+      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(false);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.itemManager.createItem(ContentType.ExtensionRepo, FillItemContent({
         package_info: {
           url: `extensions.standardnotes.org/${extensionKey}`,
         },
       }));
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(true);
+    });
+
+    it.only('should update extension key user setting when there was a pre-existing extension repo item', async () => {
+      application = await Factory.signOutApplicationAndReturnNew(application);
+      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      await application.itemManager.createItem(ContentType.ExtensionRepo, FillItemContent({
+        package_info: {
+          url: `extensions.standardnotes.org/${extensionKey}`,
+        },
+      }));
+      await Factory.loginToApplication({
+        application,
+        email,
+        password
+      });
       await new Promise(resolve => setTimeout(resolve, 1000));
       expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(true);
     });

@@ -23,6 +23,7 @@ import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSessionManager } from './api/session_manager';
+import { PayloadSource } from '@Payloads/sources';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -72,8 +73,10 @@ export class SNFeaturesService extends PureService<void> {
     this.removeExtensionRepoItemsObserver = this.itemManager.addObserver(
       ContentType.ExtensionRepo,
       async (changed, inserted) => {
-        const items = [...changed, ...inserted];
-        await this.updateExtensionKeySetting(items);
+        if (this.sessionManager.getUser()) {
+          const items = [...changed, ...inserted].filter(item => !item.deleted);
+          await this.updateExtensionKeySetting(items);
+        }
       }
     );
   }
@@ -87,6 +90,7 @@ export class SNFeaturesService extends PureService<void> {
           const userKey = userKeyMatch[0];
           await this.settingsService
             .updateSetting(SettingName.ExtensionKey, userKey, true);
+          await this.itemManager.setItemToBeDeleted(item.uuid);
         }
       }
     }
