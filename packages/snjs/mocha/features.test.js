@@ -236,16 +236,18 @@ describe('features', () => {
       expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(false);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       application = await Factory.signOutApplicationAndReturnNew(application);
-      sinon.stub(application.itemManager, 'getItems').callsFake(() => {
-        return [
-          {
-            safeContent: {
-              package_info: {
-                url: `extensions.standardnotes.org/${extensionKey}`,
-              },
+      sinon.stub(application.itemManager, 'getItems').callsFake((contentType) => {
+        if (contentType === ContentType.ExtensionRepo) {
+          return [
+            {
+              safeContent: {
+                package_info: {
+                  url: `extensions.standardnotes.org/${extensionKey}`,
+                },
+              }
             }
-          }
-        ];
+          ];
+        }
       });
       await Factory.loginToApplication({
         application,
