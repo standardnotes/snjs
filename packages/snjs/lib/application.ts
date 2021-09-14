@@ -599,6 +599,21 @@ export class SNApplication {
     return undefined;
   }
 
+  public async deleteAccount(): Promise<boolean> {
+    if (!await this.protectionService.authorizeDeleteAccount()) {
+      return false;
+    }
+
+    const uuid = (this.getUser() as User).uuid as UuidString;
+    const response = await this.apiService.deleteAccount(uuid);
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    await this.signOut(true);
+    return true;
+  }
+
   /**
    * @param isUserModified  Whether to change the modified date the user
    * sees of the item.

@@ -1,3 +1,4 @@
+import { ErrorAlertStrings } from './messages';
 import { UuidString } from './../../types';
 import {
   HttpResponse,
@@ -23,6 +24,7 @@ import {
   GetSubscriptionResponse,
   GetAvailableSubscriptionsResponse,
   ChangeCredentialsResponse,
+  DeleteAccountResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -60,6 +62,7 @@ type PathNamesV1 = {
   settings: (userUuid: string) => string;
   setting: (userUuid: string, settingName: string) => string;
   subscription: (userUuid: string) => string;
+  deleteAccount: (userUuid: string) => string;
 };
 
 type PathNamesV2 = {
@@ -88,6 +91,7 @@ const Paths: {
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
+    deleteAccount: (userUuid) => `/v1/reset/${userUuid}`
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -733,6 +737,19 @@ export class SNApiService extends PureService<
       verb: HttpVerb.Get,
       url,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
+    });
+    return response;
+  }
+
+  public async deleteAccount(
+    userUuid: string
+  ): Promise<HttpResponse | DeleteAccountResponse> {
+    const url = joinPaths(this.host, Paths.v1.deleteAccount(userUuid));
+    const response = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: ErrorAlertStrings.DeleteAccountError,
     });
     return response;
   }

@@ -41,7 +41,8 @@ export enum ChallengeReason {
   UnprotectNote,
   SearchProtectedNotesText,
   SelectProtectedNote,
-  DisableMfa
+  DisableMfa,
+  DeleteAccount
 }
 
 /** For mobile */

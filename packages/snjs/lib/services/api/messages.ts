@@ -37,6 +37,7 @@ export const API_MESSAGE_FAILED_UPDATE_SETTINGS = 'Failed to update settings.';
 
 export const API_MESSAGE_FAILED_SUBSCRIPTION_INFO = 'Failed to get subscription\'s information.';
 
+
 export const UNSUPPORTED_PROTOCOL_VERSION =
   'This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.';
 
@@ -227,6 +228,7 @@ export const PromptTitles = {
 };
 
 export const ErrorAlertStrings = {
+  DeleteAccountError: 'Your account was unable to be deleted due to an error. Please try your request again.',
   MissingSessionTitle: 'Missing Session',
   MissingSessionBody:
     'We were unable to load your server session. This represents an inconsistency with your application state. Please take an opportunity to backup your data, then sign out and sign back in to resolve this issue.',

@@ -253,6 +253,12 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     });
   }
 
+  async authorizeDeleteAccount(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.DeleteAccount, {
+      requireAccountPassword: true,
+    });
+  }
+
   async authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.validateOrRenewSession(ChallengeReason.ChangeAutolockInterval);
   }
