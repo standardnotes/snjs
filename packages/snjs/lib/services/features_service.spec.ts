@@ -15,6 +15,7 @@ import { ContentType } from '@standardnotes/common';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
+import { SNSyncService } from './sync/sync_service';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
@@ -24,6 +25,7 @@ describe('featuresService', () => {
   let webSocketsService: SNWebSocketsService;
   let settingsService: SNSettingsService;
   let sessionManager: SNSessionManager;
+  let syncService: SNSyncService;
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
@@ -39,6 +41,7 @@ describe('featuresService', () => {
       webSocketsService,
       settingsService,
       sessionManager,
+      syncService,
       enableV4,
     );
   };

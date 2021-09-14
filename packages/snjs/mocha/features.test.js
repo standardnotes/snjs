@@ -4,6 +4,8 @@ const expect = chai.expect;
 
 describe('features', () => {
   let application;
+  let email;
+  let password;
   let midnightThemeFeature;
   let boldEditorFeature;
   let tagNestingFeature;
@@ -44,8 +46,8 @@ describe('features', () => {
       });
     });
 
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
+    email = Uuid.GenerateUuidSynchronously();
+    password = Uuid.GenerateUuidSynchronously();
 
     await Factory.registerUserToApplication({
       application: application,
@@ -56,6 +58,7 @@ describe('features', () => {
 
   afterEach(async function () {
     Factory.safeDeinit(application);
+    localStorage.clear();
     sinon.restore();
   });
 
@@ -216,6 +219,7 @@ describe('features', () => {
 
   describe('extension repo items observer', () => {
     it('should update extension key user setting when extension repo is added', async () => {
+      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(false);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.itemManager.createItem(ContentType.ExtensionRepo, FillItemContent({
         package_info: {
@@ -226,4 +230,29 @@ describe('features', () => {
       expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(true);
     });
   });
+
+  describe('full sync completed observer', () => {
+    it('should update extension key user setting when local data is loaded and user is signed in', async () => {
+      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(false);
+      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      application = await Factory.signOutApplicationAndReturnNew(application);
+      sinon.stub(application.itemManager, 'getItems').callsFake(() => {
+        return [
+          {
+            safeContent: {
+              package_info: {
+                url: `extensions.standardnotes.org/${extensionKey}`,
+              },
+            }
+          }
+        ];
+      });
+      await Factory.loginToApplication({
+        application,
+        email,
+        password,
+      });
+      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(true);
+    });
+  })
 });

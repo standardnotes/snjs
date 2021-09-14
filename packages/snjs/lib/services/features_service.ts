@@ -23,6 +23,8 @@ import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSessionManager } from './api/session_manager';
+import { SNSyncService } from './sync/sync_service';
+import { SyncEvent } from './sync/events';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -31,6 +33,7 @@ export class SNFeaturesService extends PureService<void> {
   private removeApiServiceObserver?: () => void;
   private removeWebSocketsServiceObserver?: () => void;
   private removeExtensionRepoItemsObserver?: () => void;
+  private removeFullSyncCompletedObserver?: () => void;
   private initialFeaturesUpdateDone = false;
 
   constructor(
@@ -41,6 +44,7 @@ export class SNFeaturesService extends PureService<void> {
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
     private sessionManager: SNSessionManager,
+    private syncService: SNSyncService,
     private enableV4: boolean,
   ) {
     super();
@@ -73,9 +77,20 @@ export class SNFeaturesService extends PureService<void> {
       ContentType.ExtensionRepo,
       async (changed, inserted) => {
         const items = [...changed, ...inserted];
-        await this.updateExtensionKeySetting(items);
+        if (this.sessionManager.getUser()) {
+          await this.updateExtensionKeySetting(items);
+        }
       }
     );
+
+    this.removeFullSyncCompletedObserver = this.syncService.addEventObserver(
+      async (eventName) => {
+        if (eventName === SyncEvent.FullSyncCompleted && this.sessionManager.getUser()) {
+          const extensionRepoItems = this.itemManager.getItems(ContentType.ExtensionRepo);
+          await this.updateExtensionKeySetting(extensionRepoItems);
+        }
+      }
+    )
   }
 
   public async updateExtensionKeySetting(extensionRepoItems: SNItem[]): Promise<void> {
@@ -266,6 +281,8 @@ export class SNFeaturesService extends PureService<void> {
     (this.removeWebSocketsServiceObserver as unknown) = undefined;
     this.removeExtensionRepoItemsObserver?.();
     (this.removeExtensionRepoItemsObserver as unknown) = undefined;
+    this.removeFullSyncCompletedObserver?.();
+    (this.removeFullSyncCompletedObserver as unknown) = undefined;
     (this.roles as unknown) = undefined;
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;
