@@ -72,8 +72,9 @@ export class SNFeaturesService extends PureService<void> {
 
     this.removeExtensionRepoItemsObserver = this.itemManager.addObserver(
       ContentType.ExtensionRepo,
-      async (changed, inserted) => {
-        if (this.sessionManager.getUser()) {
+      async (changed, inserted, _discarded, _ignored, source) => {
+        const sources = [PayloadSource.Constructor, PayloadSource.LocalChanged];
+        if (this.sessionManager.getUser() && source && sources.includes(source)) {
           const items = [...changed, ...inserted].filter(item => !item.deleted);
           await this.updateExtensionKeySetting(items);
         }

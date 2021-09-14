@@ -217,7 +217,7 @@ describe('features', () => {
   });
 
   describe('extension repo items observer', () => {
-    it.only('should update extension key user setting when extension repo is added', async () => {
+    it('should update extension key user setting when extension repo is added', async () => {
       expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(false);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.itemManager.createItem(ContentType.ExtensionRepo, FillItemContent({
@@ -229,7 +229,7 @@ describe('features', () => {
       expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(true);
     });
 
-    it.only('should update extension key user setting when there was a pre-existing extension repo item', async () => {
+    it('should update extension key user setting when there was a pre-existing extension repo item', async () => {
       application = await Factory.signOutApplicationAndReturnNew(application);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.itemManager.createItem(ContentType.ExtensionRepo, FillItemContent({
