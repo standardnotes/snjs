@@ -102,6 +102,9 @@ describe('featuresService', () => {
 
     sessionManager = {} as jest.Mocked<SNSessionManager>;
     sessionManager.getUser = jest.fn();
+
+    syncService = {} as jest.Mocked<SNSyncService>;
+    syncService.addEventObserver = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
