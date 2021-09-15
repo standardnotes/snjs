@@ -95,6 +95,7 @@ import {
   UNSUPPORTED_BACKUP_FILE_VERSION,
   SessionStrings,
   ImportStrings,
+  INVALID_PASSWORD
 } from './services/api/messages';
 import { SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
@@ -599,19 +600,31 @@ export class SNApplication {
     return undefined;
   }
 
-  public async deleteAccount(): Promise<boolean> {
-    if (!await this.protectionService.authorizeDeleteAccount()) {
-      return false;
+  public async deleteAccount(password: string): Promise<{
+    error: boolean;
+    message?: string;
+  }> {
+    if (!await this.protectionService.authorizeDeleteAccount(password)) {
+      return {
+        error: true,
+        message: INVALID_PASSWORD
+      }
     }
 
     const uuid = (this.getUser() as User).uuid as UuidString;
     const response = await this.apiService.deleteAccount(uuid);
     if (response.error) {
-      throw new Error(response.error.message);
+      return {
+        error: true,
+        message: response.error.message
+      }
     }
 
     await this.signOut(true);
-    return true;
+
+    return {
+      error: false
+    }
   }
 
   /**

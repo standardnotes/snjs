@@ -91,7 +91,7 @@ const Paths: {
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
-    deleteAccount: (userUuid) => `/v1/reset/${userUuid}`
+    deleteAccount: (userUuid) => `/v1/users/${userUuid}`
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -746,7 +746,7 @@ export class SNApiService extends PureService<
   ): Promise<HttpResponse | DeleteAccountResponse> {
     const url = joinPaths(this.host, Paths.v1.deleteAccount(userUuid));
     const response = await this.request({
-      verb: HttpVerb.Post,
+      verb: HttpVerb.Delete,
       url,
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: ErrorAlertStrings.DeleteAccountError,

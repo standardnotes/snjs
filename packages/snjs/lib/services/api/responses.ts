@@ -239,11 +239,7 @@ export type GetSubscriptionResponse = MinimalHttpResponse & {
   }
 }
 
-export type DeleteAccountResponse = MinimalHttpResponse & {
-  data?: {
-
-  }
-}
+export type DeleteAccountResponse = MinimalHttpResponse;
 
 export type AvailableSubscriptions = {
   [key in SubscriptionName]: {
