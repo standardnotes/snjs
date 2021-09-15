@@ -78,6 +78,10 @@ export class SNCredentialService extends PureService<AccountEvent> {
     (this.protectionService as unknown) = undefined;
   }
 
+  public isSignedIn(): boolean {
+    return this.sessionManager.getUser() != undefined;
+  }
+
   /**
    *  @param mergeLocal  Whether to merge existing offline data into account. If false,
    *                     any pre-existing data will be fully deleted upon success.

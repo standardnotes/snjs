@@ -6,7 +6,7 @@ import {
   ItemManager,
   SNItem,
   SNComponentManager,
-  SNSessionManager,
+  SNCredentialService,
 } from '@Lib/index';
 import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
@@ -23,7 +23,7 @@ describe('featuresService', () => {
   let componentManager: SNComponentManager;
   let webSocketsService: SNWebSocketsService;
   let settingsService: SNSettingsService;
-  let sessionManager: SNSessionManager;
+  let credentialService: SNCredentialService;
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
@@ -38,7 +38,7 @@ describe('featuresService', () => {
       componentManager,
       webSocketsService,
       settingsService,
-      sessionManager,
+      credentialService,
       enableV4,
     );
   };
@@ -87,6 +87,7 @@ describe('featuresService', () => {
     itemManager.changeComponent = jest.fn();
     itemManager.setItemsToBeDeleted = jest.fn();
     itemManager.addObserver = jest.fn();
+    itemManager.changeItem = jest.fn();
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
     componentManager.setReadonlyStateForComponent = jest.fn();
@@ -97,8 +98,9 @@ describe('featuresService', () => {
     settingsService = {} as jest.Mocked<SNSettingsService>;
     settingsService.updateSetting = jest.fn();
 
-    sessionManager = {} as jest.Mocked<SNSessionManager>;
-    sessionManager.getUser = jest.fn();
+    credentialService = {} as jest.Mocked<SNCredentialService>;
+    credentialService.isSignedIn = jest.fn();
+    credentialService.addEventObserver = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
@@ -351,7 +353,7 @@ describe('featuresService', () => {
     })
   });
 
-  describe('updateExtensionKeySetting', () => {
+  describe('migrateExtRepoToUserSetting', () => {
     it('should extract key from extension repo url and update user setting', async () => {
       const extensionKey = '129b029707e3470c94a8477a437f9394';
       const extensionRepoItem = FillItemContent({
@@ -362,7 +364,7 @@ describe('featuresService', () => {
         }
       }) as jest.Mocked<SNItem>;
       const featuresService = createService();
-      await featuresService.updateExtensionKeySetting([extensionRepoItem]);
+      await featuresService.migrateExtRepoToUserSetting([extensionRepoItem]);
       expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
     });
   })

@@ -1,3 +1,4 @@
+import { AccountEvent, SNCredentialService } from './credential_service';
 import { ComponentPackageInfo } from './../models/app/component';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
@@ -22,7 +23,6 @@ import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
-import { SNSessionManager } from './api/session_manager';
 import { PayloadSource } from '@Payloads/sources';
 
 export class SNFeaturesService extends PureService<void> {
@@ -41,7 +41,7 @@ export class SNFeaturesService extends PureService<void> {
     private componentManager: SNComponentManager,
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
-    private sessionManager: SNSessionManager,
+    private credentialService: SNCredentialService,
     private enableV4: boolean,
   ) {
     super();
@@ -73,17 +73,27 @@ export class SNFeaturesService extends PureService<void> {
     this.removeExtensionRepoItemsObserver = this.itemManager.addObserver(
       ContentType.ExtensionRepo,
       async (changed, inserted, _discarded, _ignored, source) => {
-        const sources = [PayloadSource.Constructor, PayloadSource.LocalChanged];
-        if (this.sessionManager.getUser() && source && sources.includes(source)) {
+        const sources = [PayloadSource.Constructor, PayloadSource.LocalRetrieved, PayloadSource.RemoteRetrieved];
+        if (this.credentialService.isSignedIn() && source && sources.includes(source)) {
           const items = [...changed, ...inserted].filter(item => !item.deleted);
-          await this.updateExtensionKeySetting(items);
+          await this.migrateExtRepoToUserSetting(items);
         }
       }
     );
+
+    this.credentialService.addEventObserver((eventName: AccountEvent) => {
+      if(eventName === AccountEvent.SignedInOrRegistered) {
+        const extRepos = this.itemManager.getItems(ContentType.ExtensionRepo);
+        void this.migrateExtRepoToUserSetting(extRepos);
+      }
+    })
   }
 
-  public async updateExtensionKeySetting(extensionRepoItems: SNItem[]): Promise<void> {
+  public async migrateExtRepoToUserSetting(extensionRepoItems: SNItem[] = []): Promise<void> {
     for (const item of extensionRepoItems) {
+      if (item.safeContent.migratedToUserSetting) {
+        continue;
+      }
       if (item.safeContent.package_info) {
         const repoUrl: string = item.safeContent.package_info.url;
         const userKeyMatch = repoUrl.match(/\w{32,64}/);
@@ -91,7 +101,12 @@ export class SNFeaturesService extends PureService<void> {
           const userKey = userKeyMatch[0];
           await this.settingsService
             .updateSetting(SettingName.ExtensionKey, userKey, true);
-          await this.itemManager.setItemToBeDeleted(item.uuid);
+          await this.itemManager.changeItem(item.uuid, (m) => {
+            m.setContent({
+              ...m.getItem().safeContent,
+              migratedToUserSetting: true
+            })
+          })
         }
       }
     }
@@ -278,7 +293,7 @@ export class SNFeaturesService extends PureService<void> {
     (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
-    (this.sessionManager as unknown) = undefined;
+    (this.credentialService as unknown) = undefined;
     this.deinited = true;
   }
 }
