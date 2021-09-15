@@ -688,7 +688,7 @@ export class SNApiService extends PureService<
   ): Promise<GetSettingResponse> {
     return await this.tokenRefreshableRequest<GetSettingResponse>({
       verb: HttpVerb.Get,
-      url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName)),
+      url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName.toLowerCase())),
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
     });

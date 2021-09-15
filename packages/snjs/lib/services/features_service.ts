@@ -1,3 +1,4 @@
+import { AccountEvent, SNCredentialService } from './credential_service';
 import { ComponentPackageInfo } from './../models/app/component';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
@@ -16,21 +17,25 @@ import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
 import { SNComponent, SNItem } from '@Lib/models';
-import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
+import {
+  SNWebSocketsService,
+  WebSocketsServiceEvent,
+} from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
 import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
-import { SNSessionManager } from './api/session_manager';
+import { PayloadSource } from '@Payloads/sources';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];
-  private removeApiServiceObserver?: () => void;
-  private removeWebSocketsServiceObserver?: () => void;
-  private removeExtensionRepoItemsObserver?: () => void;
+  private removeApiServiceObserver: () => void;
+  private removeWebSocketsServiceObserver: () => void;
+  private removeExtensionRepoItemsObserver: () => void;
+  private removeSignInObserver: () => void;
   private initialFeaturesUpdateDone = false;
 
   constructor(
@@ -40,8 +45,8 @@ export class SNFeaturesService extends PureService<void> {
     private componentManager: SNComponentManager,
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
-    private sessionManager: SNSessionManager,
-    private enableV4: boolean,
+    private credentialService: SNCredentialService,
+    private enableV4: boolean
   ) {
     super();
 
@@ -71,22 +76,58 @@ export class SNFeaturesService extends PureService<void> {
 
     this.removeExtensionRepoItemsObserver = this.itemManager.addObserver(
       ContentType.ExtensionRepo,
-      async (changed, inserted) => {
-        const items = [...changed, ...inserted];
-        await this.updateExtensionKeySetting(items);
+      async (changed, inserted, _discarded, _ignored, source) => {
+        const sources = [
+          PayloadSource.Constructor,
+          PayloadSource.LocalRetrieved,
+          PayloadSource.RemoteRetrieved,
+        ];
+        if (
+          this.credentialService.isSignedIn() &&
+          source &&
+          sources.includes(source)
+        ) {
+          const items = [...changed, ...inserted].filter(
+            (item) => !item.deleted
+          );
+          await this.migrateExtRepoToUserSetting(items);
+        }
+      }
+    );
+
+    this.removeSignInObserver = this.credentialService.addEventObserver(
+      (eventName: AccountEvent) => {
+        if (eventName === AccountEvent.SignedInOrRegistered) {
+          const extRepos = this.itemManager.getItems(ContentType.ExtensionRepo);
+          void this.migrateExtRepoToUserSetting(extRepos);
+        }
       }
     );
   }
 
-  public async updateExtensionKeySetting(extensionRepoItems: SNItem[]): Promise<void> {
+  public async migrateExtRepoToUserSetting(
+    extensionRepoItems: SNItem[] = []
+  ): Promise<void> {
     for (const item of extensionRepoItems) {
+      if (item.safeContent.migratedToUserSetting) {
+        continue;
+      }
       if (item.safeContent.package_info) {
         const repoUrl: string = item.safeContent.package_info.url;
         const userKeyMatch = repoUrl.match(/\w{32,64}/);
         if (userKeyMatch && userKeyMatch.length > 0) {
           const userKey = userKeyMatch[0];
-          await this.settingsService
-            .updateSetting(SettingName.ExtensionKey, userKey, true);
+          await this.settingsService.updateSetting(
+            SettingName.ExtensionKey,
+            userKey,
+            true
+          );
+          await this.itemManager.changeItem(item.uuid, (m) => {
+            m.setContent({
+              ...m.getItem().safeContent,
+              migratedToUserSetting: true,
+            });
+          });
         }
       }
     }
@@ -111,7 +152,8 @@ export class SNFeaturesService extends PureService<void> {
     roles: RoleName[]
   ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
-    const needsInitialFeaturesUpdate = !this.initialFeaturesUpdateDone && this.features.length === 0;
+    const needsInitialFeaturesUpdate =
+      !this.initialFeaturesUpdateDone && this.features.length === 0;
     if (userRolesChanged || needsInitialFeaturesUpdate) {
       await this.setRoles(roles);
       await this.updateFeatures(userUuid);
@@ -145,7 +187,7 @@ export class SNFeaturesService extends PureService<void> {
   private async updateFeatures(userUuid: UuidString): Promise<void> {
     const featuresResponse = await this.apiService.getUserFeatures(userUuid);
     if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
-      const features = (featuresResponse as UserFeaturesResponse).data.features
+      const features = (featuresResponse as UserFeaturesResponse).data.features;
       await this.setFeatures(features);
       if (this.enableV4) {
         await this.mapFeaturesToItems(features);
@@ -156,7 +198,10 @@ export class SNFeaturesService extends PureService<void> {
   private componentContentForFeatureDescription(
     feature: FeatureDescription
   ): PayloadContent {
-    const content: Partial<ComponentContent> & { identifier: string, url: string } = {
+    const content: Partial<ComponentContent> & {
+      identifier: string;
+      url: string;
+    } = {
       identifier: feature.identifier,
       name: feature.name,
       hosted_url: feature.url,
@@ -168,7 +213,9 @@ export class SNFeaturesService extends PureService<void> {
     return FillItemContent(content);
   }
 
-  private async mapFeaturesToItems(features: FeatureDescription[]): Promise<void> {
+  private async mapFeaturesToItems(
+    features: FeatureDescription[]
+  ): Promise<void> {
     const currentItems = this.itemManager.getItems([
       ContentType.Component,
       ContentType.Theme,
@@ -200,7 +247,7 @@ export class SNFeaturesService extends PureService<void> {
               (mutator) => {
                 mutator.setContent({
                   ...existingItem.safeContent,
-                  ...itemContent
+                  ...itemContent,
                 });
               }
             );
@@ -211,7 +258,10 @@ export class SNFeaturesService extends PureService<void> {
               );
             }
           } else {
-            const newItem = await this.itemManager.createItem(feature.content_type, itemContent);
+            const newItem = await this.itemManager.createItem(
+              feature.content_type,
+              itemContent
+            );
             if (expired) {
               this.componentManager.setReadonlyStateForComponent(
                 newItem as SNComponent,
@@ -227,7 +277,7 @@ export class SNFeaturesService extends PureService<void> {
               (mutator) => {
                 mutator.setContent({
                   ...existingItem.safeContent,
-                  ...itemContent
+                  ...itemContent,
                 });
               }
             );
@@ -235,7 +285,10 @@ export class SNFeaturesService extends PureService<void> {
               itemsToDeleteUuids.push(existingItem.uuid);
             }
           } else if (!expired) {
-            await this.itemManager.createItem(feature.content_type, itemContent);
+            await this.itemManager.createItem(
+              feature.content_type,
+              itemContent
+            );
           }
           break;
       }
@@ -244,7 +297,9 @@ export class SNFeaturesService extends PureService<void> {
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
   }
 
-  public async downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+  public async downloadExternalFeature(
+    url: string
+  ): Promise<SNComponent | undefined> {
     const response = await this.apiService.downloadFeatureUrl(url);
     if (response.error) {
       return undefined;
@@ -254,17 +309,22 @@ export class SNFeaturesService extends PureService<void> {
       return;
     }
     const content = this.componentContentForFeatureDescription(rawFeature);
-    const component = await this.itemManager.createTemplateItem(rawFeature.content_type, content) as SNComponent;
+    const component = (await this.itemManager.createTemplateItem(
+      rawFeature.content_type,
+      content
+    )) as SNComponent;
     return component;
   }
 
   deinit(): void {
     super.deinit();
-    this.removeApiServiceObserver?.();
+    this.removeSignInObserver();
+    (this.removeSignInObserver as unknown) = undefined;
+    this.removeApiServiceObserver();
     (this.removeApiServiceObserver as unknown) = undefined;
-    this.removeWebSocketsServiceObserver?.();
+    this.removeWebSocketsServiceObserver();
     (this.removeWebSocketsServiceObserver as unknown) = undefined;
-    this.removeExtensionRepoItemsObserver?.();
+    this.removeExtensionRepoItemsObserver();
     (this.removeExtensionRepoItemsObserver as unknown) = undefined;
     (this.roles as unknown) = undefined;
     (this.storageService as unknown) = undefined;
@@ -273,7 +333,7 @@ export class SNFeaturesService extends PureService<void> {
     (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
-    (this.sessionManager as unknown) = undefined;
+    (this.credentialService as unknown) = undefined;
     this.deinited = true;
   }
 }

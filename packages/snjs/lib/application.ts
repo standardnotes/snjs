@@ -1665,7 +1665,7 @@ export class SNApplication {
       this.componentManager,
       this.webSocketsService,
       this.settingsService,
-      this.sessionManager,
+      this.credentialService,
       this.enableV4
     );
     this.services.push(this.featuresService);
