@@ -600,11 +600,11 @@ export class SNApplication {
     return undefined;
   }
 
-  public async deleteAccount(password: string): Promise<{
+  public async deleteAccount(): Promise<{
     error: boolean;
     message?: string;
   }> {
-    if (!await this.protectionService.authorizeDeleteAccount(password)) {
+    if (!await this.protectionService.authorizeDeleteAccount()) {
       return {
         error: true,
         message: INVALID_PASSWORD

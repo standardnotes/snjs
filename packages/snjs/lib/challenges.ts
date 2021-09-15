@@ -41,7 +41,8 @@ export enum ChallengeReason {
   UnprotectNote,
   SearchProtectedNotesText,
   SelectProtectedNote,
-  DisableMfa
+  DisableMfa,
+  DeleteAccount
 }
 
 /** For mobile */
@@ -124,6 +125,8 @@ export class Challenge {
           case ChallengeReason.DisableMfa:
             return ChallengeStrings.DisableMfa
         case ChallengeReason.Custom:
+          return '';
+        case ChallengeReason.DeleteAccount:
           return '';
         default:
           return assertUnreachable(this.reason);
