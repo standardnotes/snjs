@@ -1100,8 +1100,9 @@ export class SNApplication {
         ChallengeReason.DecryptEncryptedFile,
         true
       );
-      const passwordResponse =
-        await this.challengeService.promptForChallengeResponse(challenge);
+      const passwordResponse = await this.challengeService.promptForChallengeResponse(
+        challenge
+      );
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1113,8 +1114,10 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-    const decryptedPayloads =
-      await this.protocolService.payloadsByDecryptingBackupFile(data, password);
+    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
+      data,
+      password
+    );
     const validPayloads = decryptedPayloads
       .filter((payload) => {
         return (
@@ -1409,7 +1412,7 @@ export class SNApplication {
      * Because multiple API requests can come back at the same time
      * indicating revoked session we only want to do this once.
      */
-    if(this.revokingSession) {
+    if (this.revokingSession) {
       return;
     }
     this.revokingSession = true;
@@ -1578,7 +1581,9 @@ export class SNApplication {
   }
 
   public async disableMfa(): Promise<void> {
-    return this.mfaService.disableMfa();
+    if (await this.protectionService.authorizeMfaDisable()) {
+      return this.mfaService.disableMfa();
+    }
   }
 
   public downloadExternalFeature(
@@ -1599,14 +1604,12 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload:
-        this.protocolService.payloadByEncryptingPayload.bind(
-          this.protocolService
-        ),
-      payloadByDecryptingPayload:
-        this.protocolService.payloadByDecryptingPayload.bind(
-          this.protocolService
-        ),
+      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
+        this.protocolService
+      ),
+      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
+        this.protocolService
+      ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
@@ -1724,8 +1727,9 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager =
-      this.getClass<typeof SNComponentManager>(SNComponentManager);
+    const MaybeSwappedComponentManager = this.getClass<
+      typeof SNComponentManager
+    >(SNComponentManager);
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
