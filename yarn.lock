@@ -2523,6 +2523,13 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
+"@standardnotes/auth@3.7.1":
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/@standardnotes/auth/-/auth-3.7.1.tgz#d0b1eb63f605e04ecb077fdb5ef83e3fe6db33f9"
+  integrity sha512-xtjAvtikLW3Xv75X/kYA1KTm8FJVPPlXvl+ofnrf/ijkIaRkbUW/3TUhMES+G5CMiG2TZv6uVn32GqJipqgQQQ==
+  dependencies:
+    "@standardnotes/common" "^1.1.0"
+
 "@standardnotes/config@^1.2.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/config/-/config-1.3.0.tgz#2c4bed8d266ca8e8ea2d8fb2e2d5d000d50289e8"
