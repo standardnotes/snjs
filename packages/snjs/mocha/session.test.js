@@ -757,6 +757,52 @@ describe('server session', function () {
     expect(payloads).to.be.empty;
   });
 
+  it('revoking other sessions should destroy their local data', async function () {
+    this.timeout(Factory.TwentySecondTimeout);
+
+    const app2identifier = 'app2';
+
+    const app2 = await Factory.createAndInitializeApplication(app2identifier);
+    app2.prepareForLaunch({
+      receiveChallenge() {},
+    });
+    this.application.setLaunchCallback({
+      receiveChallenge: (challenge) => {
+        const values = challenge.prompts.map(
+          (prompt) =>
+            new ChallengeValue(
+              prompt,
+              prompt.validation === ChallengeValidation.AccountPassword
+                ? this.password
+                : 0
+            )
+        );
+        this.application.submitValuesForChallenge(challenge, values);
+      },
+    });
+
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    }),
+      await app2.signIn(this.email, this.password);
+
+    const { data: sessions } = await this.application.getSessions();
+    const app2session = sessions.find((session) => !session.current);
+    await this.application.revokeOtherSessions();
+    void app2.sync();
+    /** Wait for app2 to deinit */
+    await Factory.sleep(3);
+    expect(app2.dealloced).to.be.true;
+
+    const deviceInterface = new WebDeviceInterface();
+    const payloads = await deviceInterface.getAllRawDatabasePayloads(
+      app2identifier
+    );
+    expect(payloads).to.be.empty;
+  });
+
   it('signing out with invalid session token should still delete local data', async function () {
     await Factory.registerUserToApplication({
       application: this.application,

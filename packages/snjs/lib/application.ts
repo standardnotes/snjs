@@ -567,6 +567,10 @@ export class SNApplication {
     }
   }
 
+  public async revokeOtherSessions(): Promise<void> {
+    return this.sessionManager.revokeOtherSessions();
+  }
+
   public async userCanManageSessions(): Promise<boolean> {
     const userVersion = await this.getUserVersion();
     if (isNullOrUndefined(userVersion)) {

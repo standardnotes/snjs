@@ -21,9 +21,7 @@ import {
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
-import {
-  SNStorageService,
-} from './../storage_service';
+import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import {
   AnyKeyParamsContent,
@@ -80,7 +78,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     private alertService: SNAlertService,
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
-    private webSocketsService: SNWebSocketsService,
+    private webSocketsService: SNWebSocketsService
   ) {
     super();
     apiService.setInvalidSessionObserver((revoked) => {
@@ -117,7 +115,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
     if (rawSession) {
       const session = Session.FromRawStorageValue(rawSession);
       await this.setSession(session, false);
-      this.webSocketsService.startWebSocketConnection(session.authorizationValue);
+      this.webSocketsService.startWebSocketConnection(
+        session.authorizationValue
+      );
     }
   }
 
@@ -216,7 +216,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public getSubscription(): Promise<HttpResponse | GetSubscriptionResponse> {
-    return this.apiService.getSubscription(this.user!.uuid)
+    return this.apiService.getSubscription(this.user!.uuid);
   }
 
   private async promptForMfaValue() {
@@ -552,10 +552,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public async changeCredentials(parameters: {
-    currentServerPassword: string,
-    newRootKey: SNRootKey,
-    wrappingKey?: SNRootKey,
-    newEmail?: string
+    currentServerPassword: string;
+    newRootKey: SNRootKey;
+    wrappingKey?: SNRootKey;
+    newEmail?: string;
   }): Promise<SessionManagerResponse> {
     const userUuid = this.user!.uuid;
     const response = await this.apiService.changeCredentials({
@@ -563,14 +563,14 @@ export class SNSessionManager extends PureService<SessionEvent> {
       currentServerPassword: parameters.currentServerPassword,
       newServerPassword: parameters.newRootKey.serverPassword!,
       newKeyParams: parameters.newRootKey.keyParams,
-      newEmail: parameters.newEmail
+      newEmail: parameters.newEmail,
     });
 
     return this.processChangeCredentialsResponse(
       response as ChangeCredentialsResponse,
       parameters.newRootKey,
       parameters.wrappingKey
-    )
+    );
   }
 
   public async getSessionsList(): Promise<
@@ -596,6 +596,22 @@ export class SNSessionManager extends PureService<SessionEvent> {
   public async revokeSession(sessionId: UuidString): Promise<HttpResponse> {
     const response = await this.apiService.deleteSession(sessionId);
     return response;
+  }
+
+  public async revokeOtherSessions(): Promise<void> {
+    const response = await this.apiService.getSessionsList();
+    if (response.error != undefined || response.data == undefined) {
+      throw new Error(
+        response.error?.message ?? messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    }
+    const sessions = response.data as RemoteSession[];
+    const otherSessions = sessions.filter((session) => !session.current);
+    await Promise.all(
+      otherSessions.map((session) =>
+        this.apiService.deleteSession(session.uuid)
+      )
+    );
   }
 
   private async processChangeCredentialsResponse(
@@ -630,13 +646,17 @@ export class SNSessionManager extends PureService<SessionEvent> {
       /** Legacy JWT response */
       const session = new JwtSession(data.token);
       await this.setSession(session);
-      this.webSocketsService.startWebSocketConnection(session.authorizationValue);
+      this.webSocketsService.startWebSocketConnection(
+        session.authorizationValue
+      );
     } else if (data.session) {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
-      this.webSocketsService.startWebSocketConnection(session.authorizationValue);
+      this.webSocketsService.startWebSocketConnection(
+        session.authorizationValue
+      );
     }
   }
 }
