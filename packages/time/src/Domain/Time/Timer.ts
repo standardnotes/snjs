@@ -21,6 +21,10 @@ export class Timer implements TimerInterface {
     return dayjs.utc().toDate()
   }
 
+  getUTCDateNDaysAgo(n: number): Date {
+    return dayjs.utc().subtract(n, 'days').toDate()
+  }
+
   convertStringDateToDate(date: string): Date {
     return dayjs.utc(date).toDate()
   }
