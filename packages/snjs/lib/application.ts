@@ -567,8 +567,11 @@ export class SNApplication {
     }
   }
 
-  public async revokeOtherSessions(): Promise<void> {
-    return this.sessionManager.revokeOtherSessions();
+  /**
+   * Revokes all sessions except the current one.
+   */
+  public async revokeAllOtherSessions(): Promise<void> {
+    return this.sessionManager.revokeAllOtherSessions();
   }
 
   public async userCanManageSessions(): Promise<boolean> {

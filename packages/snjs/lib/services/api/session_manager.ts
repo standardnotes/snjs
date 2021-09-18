@@ -102,16 +102,16 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public async initializeFromDisk() {
-    this.user = await this.storageService!.getValue(StorageKey.User);
+    this.user = await this.storageService.getValue(StorageKey.User);
     if (!this.user) {
       /** @legacy Check for uuid. */
-      const uuid = await this.storageService!.getValue(StorageKey.LegacyUuid);
+      const uuid = await this.storageService.getValue(StorageKey.LegacyUuid);
       if (uuid) {
         this.user = { uuid: uuid, email: uuid };
       }
     }
 
-    const rawSession = await this.storageService!.getValue(StorageKey.Session);
+    const rawSession = await this.storageService.getValue(StorageKey.Session);
     if (rawSession) {
       const session = Session.FromRawStorageValue(rawSession);
       await this.setSession(session, false);
@@ -598,8 +598,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
     return response;
   }
 
-  public async revokeOtherSessions(): Promise<void> {
-    const response = await this.apiService.getSessionsList();
+  public async revokeAllOtherSessions(): Promise<void> {
+    const response = await this.getSessionsList();
     if (response.error != undefined || response.data == undefined) {
       throw new Error(
         response.error?.message ?? messages.API_MESSAGE_GENERIC_SYNC_FAIL
@@ -608,9 +608,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const sessions = response.data as RemoteSession[];
     const otherSessions = sessions.filter((session) => !session.current);
     await Promise.all(
-      otherSessions.map((session) =>
-        this.apiService.deleteSession(session.uuid)
-      )
+      otherSessions.map((session) => this.revokeSession(session.uuid))
     );
   }
 
