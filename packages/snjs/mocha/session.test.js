@@ -714,41 +714,57 @@ describe('server session', function () {
   it('revoking a session should destroy local data', async function () {
     this.timeout(Factory.TwentySecondTimeout);
 
-    const app2identifier = 'app2';
-
-    const app2 = await Factory.createAndInitializeApplication(app2identifier);
-    app2.prepareForLaunch({
-      receiveChallenge() {},
-    });
-    this.application.setLaunchCallback({
-      receiveChallenge: (challenge) => {
-        const values = challenge.prompts.map(
-          (prompt) =>
-            new ChallengeValue(
-              prompt,
-              prompt.validation === ChallengeValidation.AccountPassword
-                ? this.password
-                : 0
-            )
-        );
-        this.application.submitValuesForChallenge(challenge, values);
-      },
-    });
-
+    Factory.handlePasswordChallenges(this.application, this.password);
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
-    }),
-      await app2.signIn(this.email, this.password);
+    });
+
+    const app2identifier = 'app2';
+    const app2 = await Factory.createAndInitializeApplication(app2identifier);
+    await app2.signIn(this.email, this.password);
+    const app2Deinit = new Promise((resolve) => {
+      app2.setOnDeinit(() => {
+        resolve();
+      });
+    })
 
     const { data: sessions } = await this.application.getSessions();
     const app2session = sessions.find((session) => !session.current);
     await this.application.revokeSession(app2session.uuid);
     void app2.sync();
-    /** Wait for app2 to deinit */
-    await Factory.sleep(3);
-    expect(app2.dealloced).to.be.true;
+    await app2Deinit;
+
+    const deviceInterface = new WebDeviceInterface();
+    const payloads = await deviceInterface.getAllRawDatabasePayloads(
+      app2identifier
+    );
+    expect(payloads).to.be.empty;
+  });
+
+  it('revoking other sessions should destroy their local data', async function () {
+    this.timeout(Factory.TwentySecondTimeout);
+
+    Factory.handlePasswordChallenges(this.application, this.password);
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+
+    const app2identifier = 'app2';
+    const app2 = await Factory.createAndInitializeApplication(app2identifier);
+    await app2.signIn(this.email, this.password);
+    const app2Deinit = new Promise((resolve) => {
+      app2.setOnDeinit(() => {
+        resolve();
+      });
+    })
+
+    await this.application.revokeAllOtherSessions();
+    void app2.sync();
+    await app2Deinit;
 
     const deviceInterface = new WebDeviceInterface();
     const payloads = await deviceInterface.getAllRawDatabasePayloads(
