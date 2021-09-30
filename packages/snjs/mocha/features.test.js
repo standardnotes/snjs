@@ -255,9 +255,7 @@ describe('features', () => {
       await application.itemManager.createItem(
         ContentType.ExtensionRepo,
         FillItemContent({
-          package_info: {
-            url: `extensions.standardnotes.org/${extensionKey}`,
-          },
+          url: `https://extensions.standardnotes.org/${extensionKey}`,
         })
       );
       await promise;
@@ -274,9 +272,7 @@ describe('features', () => {
       await application.createManagedItem(
         ContentType.ExtensionRepo,
         FillItemContent({
-          package_info: {
-            url: `extensions.standardnotes.org/${extensionKey}`,
-          },
+          url: `https://extensions.standardnotes.org/${extensionKey}`,
         }),
         true
       );
@@ -303,9 +299,7 @@ describe('features', () => {
       await application.createManagedItem(
         ContentType.ExtensionRepo,
         FillItemContent({
-          package_info: {
-            url: `extensions.standardnotes.org/${extensionKey}`,
-          },
+          url: `https://extensions.standardnotes.org/${extensionKey}`,
         }),
         true
       );
@@ -341,9 +335,7 @@ describe('features', () => {
       await application.itemManager.createItem(
         ContentType.ExtensionRepo,
         FillItemContent({
-          package_info: {
-            url: `extensions.standardnotes.org/${extensionKey}`,
-          },
+          url: `https://extensions.standardnotes.org/${extensionKey}`,
         })
       );
       await promise;
