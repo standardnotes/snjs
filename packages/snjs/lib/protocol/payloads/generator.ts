@@ -370,7 +370,8 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
   if (
     source === PayloadSource.RemoteRetrieved ||
     source === PayloadSource.ConflictData ||
-    source === PayloadSource.ConflictUuid
+    source === PayloadSource.ConflictUuid ||
+    source === PayloadSource.RemoteRejected
   ) {
     return ServerPayloadFields.slice();
   }
