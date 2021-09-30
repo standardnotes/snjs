@@ -1060,7 +1060,7 @@ describe('online syncing', function () {
   it('syncing an item with non-supported content type should not result in infinite loop', async function () {
     /**
      * When a client tries to sync an item with a server-unrecognized content type, it will
-     * be returned by the server as a conflict. The client will then duplicate it and keep trying to sync.
+     * be returned by the server as an error conflict.
      */
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: Factory.generateUuid(),
