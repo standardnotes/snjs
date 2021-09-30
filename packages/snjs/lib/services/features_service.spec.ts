@@ -358,9 +358,7 @@ describe('featuresService', () => {
       const extensionKey = '129b029707e3470c94a8477a437f9394';
       const extensionRepoItem = FillItemContent({
         safeContent: {
-          package_info: {
-            url: `extensions.standardnotes.org/${extensionKey}`,
-          },
+          url: `https://extensions.standardnotes.org/${extensionKey}`,
         }
       }) as jest.Mocked<SNItem>;
       const featuresService = createService();

@@ -60,6 +60,7 @@ type PathNamesV1 = {
   settings: (userUuid: string) => string;
   setting: (userUuid: string, settingName: string) => string;
   subscription: (userUuid: string) => string;
+  purchase: string;
 };
 
 type PathNamesV2 = {
@@ -88,6 +89,7 @@ const Paths: {
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
+    purchase: '/v1/purchase'
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -124,7 +126,7 @@ export class SNApiService extends PureService<
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private host: string
+    private host: string,
   ) {
     super();
   }
@@ -735,6 +737,10 @@ export class SNApiService extends PureService<
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_SUBSCRIPTION_INFO,
     });
     return response;
+  }
+
+  public getPurchaseIframeUrl(): string {
+    return `${joinPaths(this.host, Paths.v1.purchase)}?sn_api_authorization=${this.session!.authorizationValue}`;
   }
 
   private preprocessingError() {

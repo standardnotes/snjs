@@ -112,8 +112,8 @@ export class SNFeaturesService extends PureService<void> {
       if (item.safeContent.migratedToUserSetting) {
         continue;
       }
-      if (item.safeContent.package_info) {
-        const repoUrl: string = item.safeContent.package_info.url;
+      if (item.safeContent.url) {
+        const repoUrl: string = item.safeContent.url;
         const userKeyMatch = repoUrl.match(/\w{32,64}/);
         if (userKeyMatch && userKeyMatch.length > 0) {
           const userKey = userKeyMatch[0];

@@ -216,7 +216,7 @@ export class SNApplication {
     private defaultHost: string,
     private appVersion: string,
     private enableV4 = false,
-    private webSocketUrl?: string
+    private webSocketUrl?: string,
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -1603,6 +1603,10 @@ export class SNApplication {
     featureId: FeatureIdentifier
   ): FeatureDescription | undefined {
     return this.featuresService.getFeature(featureId);
+  }
+
+  public getPurchaseIframeUrl(): string {
+    return this.apiService.getPurchaseIframeUrl();
   }
 
   private constructServices() {
