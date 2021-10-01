@@ -22,6 +22,13 @@ describe('Timer', () => {
     expect(+date - +dateNDaysAgo >= 4 * 24 * 3600).toBeTruthy()
   })
 
+  it('should return a utc date n days ahead', () => {
+    const date = createTimer().getUTCDate()
+    const dateNDaysAhead = createTimer().getUTCDateNDaysAhead(4)
+
+    expect(+dateNDaysAhead - +date >= 4 * 24 * 3600).toBeTruthy()
+  })
+
   it('should convert a string date to microseconds', () => {
     const timestamp = createTimer().convertStringDateToMicroseconds('2021-03-29 08:00:05.233Z')
     expect(timestamp).toEqual(1617004805233000)
