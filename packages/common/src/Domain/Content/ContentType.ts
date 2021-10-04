@@ -4,6 +4,7 @@ export enum ContentType {
   RootKey = 'SN|RootKey|NoSync',
   ItemsKey = 'SN|ItemsKey',
   EncryptedStorage = 'SN|EncryptedStorage',
+  Privileges = 'SN|Privileges',
   Note = 'Note',
   Tag = 'Tag',
   SmartTag = 'SN|SmartTag',
