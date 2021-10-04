@@ -77,6 +77,16 @@ export class SyncResponseResolver {
       }
     }
 
+    if (this.response.rejectedPayloads.length > 0) {
+      const collectionRejected = await this.collectionByProcessingPayloads(
+        this.response.rejectedPayloads,
+        PayloadSource.RemoteRejected
+      );
+      if (collectionRejected.all().length > 0) {
+        collections.push(collectionRejected);
+      }
+    }
+
     return collections;
   }
 

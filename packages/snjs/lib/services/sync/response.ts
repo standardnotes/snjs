@@ -15,18 +15,16 @@ export class SyncResponse {
   public readonly retrievedPayloads: PurePayload[];
   public readonly uuidConflictPayloads: PurePayload[];
   public readonly dataConflictPayloads: PurePayload[];
+  public readonly rejectedPayloads: PurePayload[];
   public readonly deletedPayloads: PurePayload[];
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse;
-    this.savedPayloads = this.filterRawItemArray(rawResponse.data?.saved_items).map(
-      (rawItem) => {
-        return CreateSourcedPayloadFromObject(
-          rawItem,
-          PayloadSource.RemoteSaved
-        );
-      }
-    );
+    this.savedPayloads = this.filterRawItemArray(
+      rawResponse.data?.saved_items
+    ).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteSaved);
+    });
     this.retrievedPayloads = this.filterRawItemArray(
       rawResponse.data?.retrieved_items
     ).map((rawItem) => {
@@ -49,6 +47,14 @@ export class SyncResponse {
       return CreateSourcedPayloadFromObject(
         rawItem,
         PayloadSource.ConflictUuid
+      );
+    });
+    this.rejectedPayloads = this.filterRawItemArray(
+      this.rawRejectedPayloads
+    ).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(
+        rawItem,
+        PayloadSource.RemoteRejected
       );
     });
     /**
@@ -109,7 +115,8 @@ export class SyncResponse {
     const allPayloads = this.savedPayloads
       .concat(this.retrievedPayloads)
       .concat(this.dataConflictPayloads)
-      .concat(this.uuidConflictPayloads);
+      .concat(this.uuidConflictPayloads)
+      .concat(this.rejectedPayloads);
     return allPayloads;
   }
 
@@ -130,6 +137,19 @@ export class SyncResponse {
       })
       .map((conflict) => {
         return conflict.server_item! || conflict.item!;
+      });
+  }
+
+  private get rawRejectedPayloads() {
+    return this.rawConflictObjects
+      .filter((conflict) => {
+        return (
+          conflict.type === ConflictType.ContentTypeError ||
+          conflict.type === ConflictType.ContentError
+        );
+      })
+      .map((conflict) => {
+        return conflict.unsaved_item!;
       });
   }
 

@@ -1056,4 +1056,24 @@ describe('online syncing', function () {
     expect(note.payload.updated_at_timestamp).to.be.ok;
     expect(note.payload.updated_at).to.be.ok;
   });
+
+  it('syncing an item with non-supported content type should not result in infinite loop', async function () {
+    /**
+     * When a client tries to sync an item with a server-unrecognized content type, it will
+     * be returned by the server as an error conflict.
+     */
+    const payload = CreateMaxPayloadFromAnyObject({
+      uuid: Factory.generateUuid(),
+      content_type: 'Foo',
+      dirty: true,
+      content: {},
+    });
+    this.expectedItemCount++;
+    await this.application.itemManager.emitItemsFromPayloads([payload]);
+    await this.application.sync(syncOptions);
+
+    /** Item should no longer be dirty, otherwise it would keep syncing */
+    const item = this.application.findItem(payload.uuid);
+    expect(item.dirty).to.equal(false);
+  });
 });
