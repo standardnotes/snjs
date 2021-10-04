@@ -23,6 +23,7 @@ import {
   GetSubscriptionResponse,
   GetAvailableSubscriptionsResponse,
   ChangeCredentialsResponse,
+  PostPurchaseTokensResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -61,6 +62,7 @@ type PathNamesV1 = {
   setting: (userUuid: string, settingName: string) => string;
   subscription: (userUuid: string) => string;
   purchase: string;
+  purchaseTokens: string;
 };
 
 type PathNamesV2 = {
@@ -89,7 +91,8 @@ const Paths: {
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
-    purchase: '/v1/purchase'
+    purchase: '/v1/purchase',
+    purchaseTokens: '/v1/purchase-tokens'
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -247,7 +250,7 @@ export class SNApiService extends PureService<
       return response;
     } catch (errorResponse) {
       return this.errorResponseWithFallbackMessage(
-        errorResponse,
+        errorResponse as HttpResponse,
         params.fallbackErrorMessage
       );
     }
@@ -739,8 +742,19 @@ export class SNApiService extends PureService<
     return response;
   }
 
-  public getPurchaseIframeUrl(): string {
-    return `${joinPaths(this.host, Paths.v1.purchase)}?sn_api_authorization=${this.session!.authorizationValue}`;
+  public async getPurchaseFlowUrl(): Promise<string | undefined> {
+    const url = joinPaths(this.host, Paths.v1.purchaseTokens);
+    const response: HttpResponse | PostPurchaseTokensResponse = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_ACCESS_PURCHASE,
+    });
+    if (response.data) {
+      const purchaseToken = (response as PostPurchaseTokensResponse).data!.token;
+      return `${joinPaths(this.host, Paths.v1.purchase)}?purchase_token=${purchaseToken}`;
+    }
+    return undefined;
   }
 
   private preprocessingError() {

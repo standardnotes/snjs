@@ -1605,8 +1605,8 @@ export class SNApplication {
     return this.featuresService.getFeature(featureId);
   }
 
-  public getPurchaseIframeUrl(): string {
-    return this.apiService.getPurchaseIframeUrl();
+  public getPurchaseFlowUrl(): Promise<string | undefined> {
+    return this.apiService.getPurchaseFlowUrl();
   }
 
   private constructServices() {

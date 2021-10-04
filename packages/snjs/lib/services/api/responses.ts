@@ -255,3 +255,9 @@ export type AvailableSubscriptions = {
 export type GetAvailableSubscriptionsResponse = MinimalHttpResponse & {
   data?: AvailableSubscriptions;
 }
+
+export type PostPurchaseTokensResponse = MinimalHttpResponse & {
+  data?: {
+    token: string;
+  }
+}
