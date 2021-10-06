@@ -411,7 +411,6 @@ export class SNComponentManager extends PureService {
   isNativeExtension(component: SNComponent): boolean {
     const nativeUrls = [
       (window as any)._extensions_manager_location,
-      (window as any)._batch_manager_location,
     ];
     const hostedUrl = component.hosted_url;
     const localUrl =
@@ -846,7 +845,7 @@ export class SNComponentManager extends PureService {
   responseItemsByRemovingPrivateProperties<T extends RawPayload>(
     responseItems: T[],
     component: SNComponent,
-    includeUrls = false
+    removeUrls = false
   ): T[] {
     if (component && this.isNativeExtension(component)) {
       /* System extensions can bypass this step */
@@ -858,7 +857,7 @@ export class SNComponentManager extends PureService {
       'permissions',
       'active',
     ];
-    if (includeUrls) {
+    if (removeUrls) {
       privateContentProperties = privateContentProperties.concat([
         'hosted_url',
         'local_url',
@@ -868,7 +867,7 @@ export class SNComponentManager extends PureService {
       const privateProperties = privateContentProperties.slice();
       /** Server extensions are allowed to modify url property */
       if (
-        includeUrls &&
+        removeUrls &&
         responseItem.content_type !== ContentType.ServerExtension
       ) {
         privateProperties.push('url');

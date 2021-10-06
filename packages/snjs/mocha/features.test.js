@@ -107,10 +107,8 @@ describe('features', () => {
       expect(themeItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
-            identifier: midnightThemeFeature.identifier,
             name: midnightThemeFeature.name,
             hosted_url: midnightThemeFeature.url,
-            url: midnightThemeFeature.url,
             package_info: midnightThemeFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
           })
@@ -119,10 +117,8 @@ describe('features', () => {
       expect(editorItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
-            identifier: boldEditorFeature.identifier,
             name: boldEditorFeature.name,
             hosted_url: boldEditorFeature.url,
-            url: boldEditorFeature.url,
             area: boldEditorFeature.area,
             package_info: boldEditorFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
@@ -155,10 +151,7 @@ describe('features', () => {
       expect(themeItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
-            identifier: midnightThemeFeature.identifier,
-            name: midnightThemeFeature.name,
             hosted_url: midnightThemeFeature.url,
-            url: midnightThemeFeature.url,
             package_info: midnightThemeFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
           })

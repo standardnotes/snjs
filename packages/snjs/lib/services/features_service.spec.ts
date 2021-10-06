@@ -1,3 +1,4 @@
+import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
 import {
   StorageKey,
@@ -24,6 +25,7 @@ describe('featuresService', () => {
   let webSocketsService: SNWebSocketsService;
   let settingsService: SNSettingsService;
   let credentialService: SNCredentialService;
+  let syncService: SNSyncService;
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
@@ -39,6 +41,7 @@ describe('featuresService', () => {
       webSocketsService,
       settingsService,
       credentialService,
+      syncService,
       enableV4,
     );
   };
@@ -84,7 +87,9 @@ describe('featuresService', () => {
       items
     );
     itemManager.createItem = jest.fn();
-    itemManager.changeComponent = jest.fn();
+    itemManager.changeComponent = jest.fn().mockReturnValue(
+      {} as jest.Mocked<SNItem>
+    )
     itemManager.setItemsToBeDeleted = jest.fn();
     itemManager.addObserver = jest.fn();
     itemManager.changeItem = jest.fn();
@@ -101,6 +106,8 @@ describe('featuresService', () => {
     credentialService = {} as jest.Mocked<SNCredentialService>;
     credentialService.isSignedIn = jest.fn();
     credentialService.addEventObserver = jest.fn();
+
+    syncService = {} as jest.Mocked<SNSyncService>;
   });
 
   describe('loadUserRoles()', () => {
@@ -167,13 +174,21 @@ describe('featuresService', () => {
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Theme,
         expect.objectContaining({
-          identifier: FeatureIdentifier.MidnightTheme,
+          package_info: {
+            content_type: ContentType.Theme,
+            expires_at: tomorrow,
+            identifier: FeatureIdentifier.MidnightTheme,
+          }
         })
       );
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
         expect.objectContaining({
-          identifier: FeatureIdentifier.BoldEditor,
+          package_info: {
+            content_type: ContentType.Component,
+            expires_at: tomorrow,
+            identifier: FeatureIdentifier.BoldEditor,
+          }
         })
       );
     });
@@ -219,7 +234,7 @@ describe('featuresService', () => {
         data: {
           features: [{
             ...features[1],
-            expiresAt: yesterday,
+            expires_at: yesterday,
           }]
         }
       });
@@ -230,7 +245,11 @@ describe('featuresService', () => {
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
         expect.objectContaining({
-          identifier: FeatureIdentifier.BoldEditor,
+          package_info: {
+            content_type: ContentType.Component,
+            expires_at: yesterday,
+            identifier: FeatureIdentifier.BoldEditor,
+          }
         }),
       );
     });
@@ -253,6 +272,9 @@ describe('featuresService', () => {
       const now = new Date();
       const yesterday = now.setDate(now.getDate() - 1);
 
+      itemManager.changeComponent = jest.fn().mockReturnValue(
+        existingItem
+      )
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
       apiService.getUserFeatures = jest.fn().mockReturnValue({
@@ -288,6 +310,9 @@ describe('featuresService', () => {
       const now = new Date();
       const yesterday = now.setDate(now.getDate() - 1);
 
+      itemManager.changeComponent = jest.fn().mockReturnValue(
+        existingItem
+      )
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
       apiService.getUserFeatures = jest.fn().mockReturnValue({

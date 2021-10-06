@@ -253,6 +253,10 @@ export class ComponentMutator extends ItemMutator {
     this.typedContent.hosted_url = hosted_url;
   }
 
+  set valid_until(valid_until: Date) {
+    this.typedContent.valid_until = valid_until;
+  }
+
   set permissions(permissions: ComponentPermission[]) {
     this.typedContent!.permissions = permissions;
   }

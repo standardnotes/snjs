@@ -418,18 +418,19 @@ export class ItemManager extends PureService {
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ) {
+  ): Promise<SNComponent> {
     const component = this.findItem(uuid);
     if (!component) {
       throw Error('Attempting to change non-existant component');
     }
     const mutator = new ComponentMutator(component, mutationType);
-    return this.applyTransform(
+    await this.applyTransform(
       mutator,
       mutate,
       payloadSource,
       payloadSourceKey
     );
+    return this.findItem(uuid) as SNComponent;
   }
 
   async changeActionsExtension(
@@ -558,7 +559,7 @@ export class ItemManager extends PureService {
     content?: PayloadContent,
     needsSync = false,
     override?: PayloadOverride
-  ) {
+  ): Promise<SNItem> {
     if (!contentType) {
       throw 'Attempting to create item with no contentType';
     }
