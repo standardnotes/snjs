@@ -476,7 +476,7 @@ export class ItemMutator {
   }
 
   /** Not recommended to use as this might break item schema if used incorrectly */
-  public unsafe_setCustomContent(content: PayloadContent) {
+  public unsafe_setCustomContent(content: PayloadContent): void {
     this.content = Copy(content);
   }
 
