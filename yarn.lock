@@ -2538,6 +2538,13 @@
   dependencies:
     "@standardnotes/auth" "^3.7.0"
 
+"@standardnotes/features@1.6.2":
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/@standardnotes/features/-/features-1.6.2.tgz#98c5998426d9f93e06c2846c5bc7b6aef8d31063"
+  integrity sha512-s/rqRyG7mrrgxJOzckPSYlB68wsRpM9jlFwDE+7zQO5/xKh+37ueWfy3RoqOgkKLey6lMpnTurofIJCvqLM3dQ==
+  dependencies:
+    "@standardnotes/common" "^1.1.0"
+
 "@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"

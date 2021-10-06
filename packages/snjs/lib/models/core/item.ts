@@ -475,7 +475,8 @@ export class ItemMutator {
     }
   }
 
-  public setContent(content: PayloadContent) {
+  /** Not recommended to use as this might break item schema if used incorrectly */
+  public unsafe_setCustomContent(content: PayloadContent) {
     this.content = Copy(content);
   }
 
@@ -512,7 +513,6 @@ export class ItemMutator {
       updated_at_timestamp,
     });
   }
-
 
   public set userModifiedDate(date: Date) {
     this.setAppDataItem(AppDataField.UserModifiedDate, date);
