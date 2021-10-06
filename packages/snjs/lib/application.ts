@@ -1680,6 +1680,7 @@ export class SNApplication {
       this.webSocketsService,
       this.settingsService,
       this.credentialService,
+      this.syncService,
       this.enableV4
     );
     this.services.push(this.featuresService);

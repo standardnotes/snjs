@@ -1,3 +1,4 @@
+import { SNSyncService } from './sync/sync_service';
 import { AccountEvent, SNCredentialService } from './credential_service';
 import { ComponentPackageInfo } from './../models/app/component';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
@@ -46,6 +47,7 @@ export class SNFeaturesService extends PureService<void> {
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
     private credentialService: SNCredentialService,
+    private syncService: SNSyncService,
     private enableV4: boolean
   ) {
     super();
@@ -53,6 +55,14 @@ export class SNFeaturesService extends PureService<void> {
     this.removeApiServiceObserver = apiService.addEventObserver(
       async (eventName, data) => {
         if (eventName === ApiServiceEvent.MetaReceived) {
+          /**
+           * All user data must be downloaded before we map features. Otherwise, feature mapping
+           * may think a component doesn't exist and create a new one, when in reality the component
+           * already exists but hasn't been downloaded yet.
+           */
+          if (!this.syncService.completedOnlineDownloadFirstSync) {
+            return;
+          }
           const { userUuid, userRoles } = data as MetaReceivedData;
           await this.updateRoles(
             userUuid,
@@ -123,7 +133,7 @@ export class SNFeaturesService extends PureService<void> {
             true
           );
           await this.itemManager.changeItem(item.uuid, (m) => {
-            m.setContent({
+            m.unsafe_setCustomContent({
               ...m.getItem().safeContent,
               migratedToUserSetting: true,
             });
@@ -198,19 +208,14 @@ export class SNFeaturesService extends PureService<void> {
   private componentContentForFeatureDescription(
     feature: FeatureDescription
   ): PayloadContent {
-    const content: Partial<ComponentContent> & {
-      identifier: string;
-      url: string;
-    } = {
-      identifier: feature.identifier,
-      name: feature.name,
-      hosted_url: feature.url,
-      url: feature.url,
+    const componentContent: Partial<ComponentContent> = {
       area: feature.area,
+      hosted_url: feature.url,
+      name: feature.name,
       package_info: feature as ComponentPackageInfo,
       valid_until: new Date(feature.expires_at || 0),
     };
-    return FillItemContent(content);
+    return FillItemContent(componentContent);
   }
 
   private async mapFeaturesToItems(
@@ -229,8 +234,7 @@ export class SNFeaturesService extends PureService<void> {
         continue;
       }
 
-      const expired = feature.expires_at! < now.getTime();
-      const itemContent = this.componentContentForFeatureDescription(feature);
+      const expired = (feature.expires_at || 0) < now.getTime();
       const existingItem = currentItems.find((item) => {
         if (item.safeContent.package_info) {
           const itemIdentifier = item.safeContent.package_info.identifier;
@@ -239,58 +243,33 @@ export class SNFeaturesService extends PureService<void> {
         return false;
       });
 
-      switch (feature.content_type) {
-        case ContentType.Component:
-          if (existingItem) {
-            await this.itemManager.changeComponent(
-              existingItem.uuid,
-              (mutator) => {
-                mutator.setContent({
-                  ...existingItem.safeContent,
-                  ...itemContent,
-                });
-              }
-            );
-            if (expired) {
-              this.componentManager.setReadonlyStateForComponent(
-                existingItem as SNComponent,
-                expired
-              );
-            }
-          } else {
-            const newItem = await this.itemManager.createItem(
-              feature.content_type,
-              itemContent
-            );
-            if (expired) {
-              this.componentManager.setReadonlyStateForComponent(
-                newItem as SNComponent,
-                expired
-              );
-            }
+      let resultingItem: SNComponent | undefined = existingItem as SNComponent;
+
+      if (existingItem) {
+        resultingItem = await this.itemManager.changeComponent(
+          existingItem.uuid,
+          (mutator) => {
+            mutator.hosted_url = feature.url;
+            mutator.package_info = feature as ComponentPackageInfo;
+            mutator.valid_until = new Date(feature.expires_at || 0);
           }
-          break;
-        default:
-          if (existingItem) {
-            await this.itemManager.changeComponent(
-              existingItem.uuid,
-              (mutator) => {
-                mutator.setContent({
-                  ...existingItem.safeContent,
-                  ...itemContent,
-                });
-              }
-            );
-            if (expired) {
-              itemsToDeleteUuids.push(existingItem.uuid);
-            }
-          } else if (!expired) {
-            await this.itemManager.createItem(
-              feature.content_type,
-              itemContent
-            );
-          }
-          break;
+        );
+      } else if (!expired || feature.content_type === ContentType.Component) {
+        resultingItem = (await this.itemManager.createItem(
+          feature.content_type,
+          this.componentContentForFeatureDescription(feature)
+        )) as SNComponent;
+      }
+
+      if (expired && resultingItem) {
+        if (feature.content_type === ContentType.Component) {
+          this.componentManager.setReadonlyStateForComponent(
+            resultingItem,
+            expired
+          );
+        } else {
+          itemsToDeleteUuids.push(resultingItem.uuid);
+        }
       }
     }
 
@@ -334,6 +313,7 @@ export class SNFeaturesService extends PureService<void> {
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
+    (this.syncService as unknown) = undefined;
     this.deinited = true;
   }
 }
