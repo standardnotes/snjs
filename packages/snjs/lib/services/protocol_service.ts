@@ -1406,9 +1406,23 @@ export class SNProtocolService
     if (itemsKeys.length === 1) {
       return itemsKeys[0];
     }
-    return itemsKeys.find((key) => {
+    const defaultKeys = itemsKeys.filter((key) => {
       return key.isDefault;
     });
+    if (defaultKeys.length > 1) {
+      /**
+       * Prioritize one that is synced, as neverSynced keys will likely be deleted after
+       * DownloadFirst sync.
+       */
+      const syncedKeys = defaultKeys.filter((key) => !key.neverSynced);
+      if (syncedKeys.length > 1) {
+        console.warn('Multiple synced default keys');
+      }
+      if (syncedKeys.length > 0) {
+        return syncedKeys[0];
+      }
+    }
+    return defaultKeys[0];
   }
 
   /** Returns the key params attached to this key's encrypted payload */

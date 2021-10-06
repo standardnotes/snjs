@@ -119,7 +119,7 @@ export class SNSyncService extends PureService<
   private spawnQueue: SyncPromise[] = [];
 
   /* A DownloadFirst sync must always be the first sync completed */
-  private completedOnlineDownloadFirstSync = false;
+  public completedOnlineDownloadFirstSync = false;
 
   private majorChangeThreshold = DEFAULT_MAJOR_CHANGE_THRESHOLD;
   private maxDiscordance = DEFAULT_MAX_DISCORDANCE;
