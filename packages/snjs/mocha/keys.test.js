@@ -545,7 +545,11 @@ describe('keys', function () {
   });
 
   it('changing account email should create new items key and encrypt items with that key', async function () {
-    const { application, email, password } = await Factory.createAndInitSimpleAppContext();
+    const {
+      application,
+      email,
+      password,
+    } = await Factory.createAndInitSimpleAppContext();
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -556,10 +560,7 @@ describe('keys', function () {
     const defaultItemsKey = application.protocolService.getDefaultItemsKey();
 
     const newEmail = Uuid.GenerateUuidSynchronously();
-    const result = await application.changeEmail(
-      newEmail,
-      password,
-    );
+    const result = await application.changeEmail(newEmail, password);
     expect(result.error).to.not.be.ok;
 
     expect(application.itemManager.itemsKeys().length).to.equal(2);
@@ -806,7 +807,7 @@ describe('keys', function () {
 
       await oldClient.sessionManager.changeCredentials({
         currentServerPassword: currentRootKey.serverPassword,
-        newRootKey
+        newRootKey,
       });
 
       /** Re-authenticate on other app; allow challenge to complete */
@@ -857,7 +858,7 @@ describe('keys', function () {
 
       await this.application.sessionManager.changeCredentials({
         currentServerPassword: currentRootKey.serverPassword,
-        newRootKey
+        newRootKey,
       });
       await this.application.protocolService.reencryptItemsKeys();
       await this.application.sync({ awaitAll: true });
@@ -924,7 +925,7 @@ describe('keys', function () {
       CopyPayload(itemsKey.payload, {
         dirty: false,
         updated_at: new Date(0),
-        deleted: false
+        deleted: false,
       })
     );
     await this.application.syncService.sync({
@@ -932,5 +933,43 @@ describe('keys', function () {
     });
     const updatedKey = this.application.findItem(itemsKey.uuid);
     expect(updatedKey.neverSynced).to.equal(false);
+  });
+
+  it('having key while offline then signing into account with key should only have 1 default items key', async function () {
+    const otherClient = await Factory.createInitAppWithRandNamespace();
+    /** Invert order of keys */
+    otherClient.itemManager.collection.setDisplayOptions(
+      ContentType.ItemsKey,
+      CollectionSort.CreatedAt,
+      'dsc'
+    );
+    /** On client A, create account and note */
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+    });
+    await Factory.createSyncedNote(this.application);
+    const itemsKey = this.application.getItems(ContentType.ItemsKey)[0];
+
+    /** Create another client and sign into account */
+    await Factory.loginToApplication({
+      application: otherClient,
+      email: this.email,
+      password: this.password,
+    });
+    const defaultKeys = otherClient.protocolService
+      .latestItemsKeys()
+      .filter((key) => {
+        return key.isDefault;
+      });
+    expect(defaultKeys.length).to.equal(1);
+
+    const rawPayloads = await otherClient.storageService.getAllRawPayloads();
+    const notePayload = rawPayloads.find(
+      (p) => p.content_type === ContentType.Note
+    );
+
+    expect(notePayload.items_key_id).to.equal(itemsKey.uuid);
   });
 });
