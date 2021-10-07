@@ -122,7 +122,7 @@ export function isNullOrUndefined(value: unknown): value is null | undefined {
 /**
  * @returns True if the string is empty or undefined
  */
- export function isEmpty(string: string): boolean {
+export function isEmpty(string: string): boolean {
   return !string || string.length === 0;
 }
 
@@ -546,13 +546,13 @@ export function isSameDay(dateA: Date, dateB: Date) {
   );
 }
 
- /**
-   * Sorts an array of objects in natural order
-   * @param items - The array of objects to sort
-   * @param property - The objects' property to sort by
-   * @param direction - The sorting direction, either ascending (default) or descending
-   * @returns Array of objects sorted in natural order
-   */
+/**
+ * Sorts an array of objects in natural order
+ * @param items - The array of objects to sort
+ * @param property - The objects' property to sort by
+ * @param direction - The sorting direction, either ascending (default) or descending
+ * @returns Array of objects sorted in natural order
+ */
 export function naturalSort<T extends AnyRecord>(
   items: T[],
   property: keyof T,
@@ -574,4 +574,11 @@ export function naturalSort<T extends AnyRecord>(
               b[property].localeCompare(a[property], 'en', { numeric: true })
       );
   }
+}
+
+const MicrosecondsInAMillisecond = 1_000;
+export function convertMicrosecondsToMilliseconds(
+  microseconds: number
+): number {
+  return Math.floor(microseconds / MicrosecondsInAMillisecond);
 }

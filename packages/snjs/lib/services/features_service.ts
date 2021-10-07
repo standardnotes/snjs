@@ -28,6 +28,7 @@ import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
+import { convertMicrosecondsToMilliseconds } from '@Lib/utils';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -162,12 +163,11 @@ export class SNFeaturesService extends PureService<void> {
     roles: RoleName[]
   ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
-    const needsInitialFeaturesUpdate =
-      !this.initialFeaturesUpdateDone && this.features.length === 0;
+    const needsInitialFeaturesUpdate = !this.initialFeaturesUpdateDone;
     if (userRolesChanged || needsInitialFeaturesUpdate) {
+      this.initialFeaturesUpdateDone = true;
       await this.setRoles(roles);
       await this.updateFeatures(userUuid);
-      this.initialFeaturesUpdateDone = true;
     }
   }
 
@@ -198,6 +198,13 @@ export class SNFeaturesService extends PureService<void> {
     const featuresResponse = await this.apiService.getUserFeatures(userUuid);
     if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
       const features = (featuresResponse as UserFeaturesResponse).data.features;
+      features.forEach((feature) => {
+        if (feature.expires_at) {
+          feature.expires_at = convertMicrosecondsToMilliseconds(
+            feature.expires_at
+          );
+        }
+      });
       await this.setFeatures(features);
       if (this.enableV4) {
         await this.mapFeaturesToItems(features);
@@ -234,7 +241,8 @@ export class SNFeaturesService extends PureService<void> {
         continue;
       }
 
-      const expired = (feature.expires_at || 0) < now.getTime();
+      const expired =
+        new Date(feature.expires_at || 0).getTime() < now.getTime();
       const existingItem = currentItems.find((item) => {
         if (item.safeContent.package_info) {
           const itemIdentifier = item.safeContent.package_info.identifier;
@@ -274,6 +282,7 @@ export class SNFeaturesService extends PureService<void> {
     }
 
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
+    this.syncService.sync();
   }
 
   public async downloadExternalFeature(
