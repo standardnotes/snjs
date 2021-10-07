@@ -577,8 +577,25 @@ export function naturalSort<T extends AnyRecord>(
 }
 
 const MicrosecondsInAMillisecond = 1_000;
-export function convertMicrosecondsToMilliseconds(
-  microseconds: number
-): number {
-  return Math.floor(microseconds / MicrosecondsInAMillisecond);
+const MillisecondsInASecond = 1_000;
+
+enum TimestampDigits {
+  Seconds = 10,
+  Milliseconds = 13,
+  Microseconds = 16,
+}
+
+export function convertTimestampToMilliseconds(timestamp: number): number {
+  const digits = String(timestamp).length;
+  switch (digits) {
+    case TimestampDigits.Seconds:
+      return timestamp * MillisecondsInASecond;
+    case TimestampDigits.Milliseconds:
+      return timestamp;
+    case TimestampDigits.Microseconds:
+      return Math.floor(timestamp / MicrosecondsInAMillisecond);
+
+    default:
+      throw 'Unhandle timestamp precision: ${timestamp}';
+  }
 }

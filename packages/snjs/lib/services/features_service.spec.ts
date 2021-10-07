@@ -30,7 +30,8 @@ describe('featuresService', () => {
   let features: FeatureDescription[];
   let items: SNItem[];
   let now: Date;
-  let tomorrow: number;
+  let tomorrow_server: number;
+  let tomorrow_client: number;
 
   const createService = (enableV4 = true) => {
     return new SNFeaturesService(
@@ -53,18 +54,19 @@ describe('featuresService', () => {
     ];
 
     now = new Date();
-    tomorrow = now.setDate(now.getDate() + 1);
+    tomorrow_client = now.setDate(now.getDate() + 1);
+    tomorrow_server = tomorrow_client * 1_000;
 
     features = [
       {
         identifier: FeatureIdentifier.MidnightTheme,
         content_type: ContentType.Theme,
-        expires_at: tomorrow,
+        expires_at: tomorrow_server,
       },
       {
         identifier: FeatureIdentifier.BoldEditor,
         content_type: ContentType.Component,
-        expires_at: tomorrow,
+        expires_at: tomorrow_server,
       },
     ] as jest.Mocked<FeatureDescription[]>;
 
@@ -108,6 +110,7 @@ describe('featuresService', () => {
     credentialService.addEventObserver = jest.fn();
 
     syncService = {} as jest.Mocked<SNSyncService>;
+    syncService.sync = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
@@ -176,7 +179,7 @@ describe('featuresService', () => {
         expect.objectContaining({
           package_info: {
             content_type: ContentType.Theme,
-            expires_at: tomorrow,
+            expires_at: tomorrow_client,
             identifier: FeatureIdentifier.MidnightTheme,
           }
         })
@@ -186,7 +189,7 @@ describe('featuresService', () => {
         expect.objectContaining({
           package_info: {
             content_type: ContentType.Component,
-            expires_at: tomorrow,
+            expires_at: tomorrow_client,
             identifier: FeatureIdentifier.BoldEditor,
           }
         })
@@ -227,14 +230,15 @@ describe('featuresService', () => {
       ];
 
       const now = new Date();
-      const yesterday = now.setDate(now.getDate() - 1);
+      const yesterday_client = now.setDate(now.getDate() - 1);
+      const yesterday_server = yesterday_client * 1_000;
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
           features: [{
             ...features[1],
-            expires_at: yesterday,
+            expires_at: yesterday_server,
           }]
         }
       });
@@ -247,7 +251,7 @@ describe('featuresService', () => {
         expect.objectContaining({
           package_info: {
             content_type: ContentType.Component,
-            expires_at: yesterday,
+            expires_at: yesterday_client,
             identifier: FeatureIdentifier.BoldEditor,
           }
         }),
@@ -270,7 +274,8 @@ describe('featuresService', () => {
       ];
 
       const now = new Date();
-      const yesterday = now.setDate(now.getDate() - 1);
+      const yesterday_client = now.setDate(now.getDate() - 1);
+      const yesterday_server = yesterday_client * 1_000;
 
       itemManager.changeComponent = jest.fn().mockReturnValue(
         existingItem
@@ -281,7 +286,7 @@ describe('featuresService', () => {
         data: {
           features: [{
             ...features[1],
-            expires_at: yesterday,
+            expires_at: yesterday_server,
           }]
         }
       });
@@ -334,7 +339,7 @@ describe('featuresService', () => {
       const features = [
         {
           identifier: FeatureIdentifier.TagNesting,
-          expires_at: tomorrow,
+          expires_at: tomorrow_server,
         }
       ];
 
@@ -356,12 +361,15 @@ describe('featuresService', () => {
       expect(itemManager.createItem).not.toHaveBeenCalled();
     });
 
-    it('does nothing if roles have not changed', async () => {
+    it('does nothing after initial update if roles have not changed', async () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
       await featuresService.updateRoles('123', roles);
-      expect(storageService.setValue).not.toHaveBeenCalled();
+      await featuresService.updateRoles('123', roles);
+      await featuresService.updateRoles('123', roles);
+      await featuresService.updateRoles('123', roles);
+      expect(storageService.setValue).toHaveBeenCalledTimes(2);
     });
 
     it('does not map features to items if V4 is not enabled', async () => {

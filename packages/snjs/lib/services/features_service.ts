@@ -28,7 +28,7 @@ import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
-import { convertMicrosecondsToMilliseconds } from '@Lib/utils';
+import { convertTimestampToMilliseconds } from '@Lib/utils';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -200,7 +200,7 @@ export class SNFeaturesService extends PureService<void> {
       const features = (featuresResponse as UserFeaturesResponse).data.features;
       features.forEach((feature) => {
         if (feature.expires_at) {
-          feature.expires_at = convertMicrosecondsToMilliseconds(
+          feature.expires_at = convertTimestampToMilliseconds(
             feature.expires_at
           );
         }
