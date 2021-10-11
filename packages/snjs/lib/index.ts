@@ -131,6 +131,7 @@ export {
   truncateHexString,
   uniqueArrayByKey,
   uniqCombineObjArrays,
+  convertTimestampToMilliseconds,
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

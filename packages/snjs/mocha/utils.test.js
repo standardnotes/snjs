@@ -172,6 +172,13 @@ describe('utils', () => {
     expect(result.length).to.equal(expectedLength);
   });
 
+  it('convertTimestampToMilliseconds', () => {
+    expect(convertTimestampToMilliseconds(1633636950)).to.equal(1633636950000);
+    expect(convertTimestampToMilliseconds(1633636950123)).to.equal(1633636950123);
+    expect(convertTimestampToMilliseconds(1633636950123456)).to.equal(1633636950123);
+  });
+
+
   describe('isSameDay', () => {
     it('returns true if two dates are on the same day', () => {
       const dateA = new Date(2021, 1, 16, 16, 30, 0);
@@ -211,6 +218,7 @@ describe('utils', () => {
         }
       ]
     });
+
     it('sorts elements in natural order in ascending direction by default', () => {
       const result = naturalSort(items, 'someProperty');
       expect(result).lengthOf(items.length);
@@ -220,6 +228,7 @@ describe('utils', () => {
       expect(result[3]).to.equal(items[3]);
       expect(result[4]).to.equal(items[1]);
     });
+
     it('sorts elements in natural order in descending direction', () => {
       const result = naturalSort(items, 'someProperty', 'desc');
       expect(result).lengthOf(items.length);

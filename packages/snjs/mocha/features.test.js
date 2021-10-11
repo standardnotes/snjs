@@ -15,7 +15,7 @@ describe('features', () => {
     application = await Factory.createInitAppWithRandNamespace();
 
     const now = new Date();
-    const tomorrow = now.setDate(now.getDate() + 1);
+    const tomorrow = now.setDate(now.getDate() + 1) * 1_000;
 
     midnightThemeFeature = {
       ...Features.find(
@@ -225,7 +225,7 @@ describe('features', () => {
       ).to.be.ok;
 
       const themeItem = application.getItems(ContentType.Theme)[0];
-      expect(themeItem.deleted).to.equal(true);
+      expect(themeItem).to.not.be.ok;
     });
   });
 
