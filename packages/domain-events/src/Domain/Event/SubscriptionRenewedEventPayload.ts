@@ -5,4 +5,5 @@ export interface SubscriptionRenewedEventPayload {
   subscriptionName: SubscriptionName
   subscriptionExpiresAt: number
   timestamp: number
+  offline: boolean
 }
