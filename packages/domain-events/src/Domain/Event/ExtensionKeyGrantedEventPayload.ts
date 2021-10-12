@@ -7,4 +7,5 @@ export interface ExtensionKeyGrantedEventPayload {
   offline: boolean
   origin: 'create-user' | 'update-subscription'
   subscriptionName: SubscriptionName | null
+  offlineFeaturesToken: string
 }
