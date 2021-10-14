@@ -23,7 +23,7 @@ import {
   GetSubscriptionResponse,
   GetAvailableSubscriptionsResponse,
   ChangeCredentialsResponse,
-  PostPurchaseTokensResponse,
+  PostSubscriptionTokensResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -62,7 +62,7 @@ type PathNamesV1 = {
   setting: (userUuid: string, settingName: string) => string;
   subscription: (userUuid: string) => string;
   purchase: string;
-  purchaseTokens: string;
+  subscriptionTokens: string;
 };
 
 type PathNamesV2 = {
@@ -92,7 +92,7 @@ const Paths: {
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
     purchase: '/v1/purchase',
-    purchaseTokens: '/v1/purchase-tokens'
+    subscriptionTokens: '/v1/subscription-tokens'
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -743,16 +743,16 @@ export class SNApiService extends PureService<
   }
 
   public async getPurchaseFlowUrl(): Promise<string | undefined> {
-    const url = joinPaths(this.host, Paths.v1.purchaseTokens);
-    const response: HttpResponse | PostPurchaseTokensResponse = await this.request({
+    const url = joinPaths(this.host, Paths.v1.subscriptionTokens);
+    const response: HttpResponse | PostSubscriptionTokensResponse = await this.request({
       verb: HttpVerb.Post,
       url,
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_ACCESS_PURCHASE,
     });
     if (response.data) {
-      const purchaseToken = (response as PostPurchaseTokensResponse).data!.token;
-      return `${joinPaths(this.host, Paths.v1.purchase)}?purchase_token=${purchaseToken}`;
+      const subscriptionToken = (response as PostSubscriptionTokensResponse).data!.token;
+      return `${joinPaths(this.host, Paths.v1.purchase)}?subscription_token=${subscriptionToken}`;
     }
     return undefined;
   }
