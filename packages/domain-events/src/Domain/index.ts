@@ -1,5 +1,7 @@
 export * from './Event/AccountDeletionRequestedEvent'
 export * from './Event/AccountDeletionRequestedEventPayload'
+export * from './Event/DashboardTokenCreatedEvent'
+export * from './Event/DashboardTokenCreatedEventPayload'
 export * from './Event/DomainEventInterface'
 export * from './Event/DropboxBackupFailedEvent'
 export * from './Event/DropboxBackupFailedEventPayload'
