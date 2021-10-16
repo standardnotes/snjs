@@ -1,0 +1,7 @@
+{
+  "extends": "../../node_modules/@standardnotes/config/src/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  }
+}

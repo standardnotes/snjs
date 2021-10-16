@@ -1,3 +1,4 @@
+import { DeltaRemoteRejected } from './remote_rejected';
 import { DeltaRemoteConflicts } from './remote_conflicts';
 import { DeltaRemoteSaved } from './remote_saved';
 import { DeltaRemoteRetrieved } from './remote_retrieved';
@@ -13,5 +14,9 @@ export function DeltaClassForSource(source: PayloadSource) {
     source === PayloadSource.ConflictUuid
   ) {
     return DeltaRemoteConflicts;
+  } else if (source === PayloadSource.RemoteRejected) {
+    return DeltaRemoteRejected;
+  } else {
+    throw `No delta class found for source ${PayloadSource[source]}`;
   }
 }

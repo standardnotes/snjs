@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/auth",
-  "version": "2.3.0",
+  "version": "3.8.0",
   "engines": {
     "node": ">=14.0.0 <16.0.0"
   },
@@ -22,9 +22,11 @@
     "prebuild": "yarn clean",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
-    "test": "yarn lint"
+    "test:unit": "yarn lint"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@standardnotes/common": "^1.1.0"
+  },
   "devDependencies": {
     "@standardnotes/config": "^2.0.0",
     "typescript": "^4.0.5"

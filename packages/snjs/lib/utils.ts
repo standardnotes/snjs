@@ -6,6 +6,11 @@ import uniqWith from 'lodash/uniqWith';
 import uniq from 'lodash/uniq';
 import { AnyRecord } from './types';
 
+const collator =
+  typeof Intl !== 'undefined'
+    ? new Intl.Collator('en', { numeric: true })
+    : undefined;
+
 export function getGlobalScope(): Window | unknown | null {
   return typeof window !== 'undefined'
     ? window
@@ -117,7 +122,7 @@ export function isNullOrUndefined(value: unknown): value is null | undefined {
 /**
  * @returns True if the string is empty or undefined
  */
- export function isEmpty(string: string): boolean {
+export function isEmpty(string: string): boolean {
   return !string || string.length === 0;
 }
 
@@ -237,8 +242,8 @@ export function addIfUnique<T>(array: T[], value: T): boolean {
  */
 export function filterFromArray<T>(
   array: T[],
-  predicate: Partial<Record<keyof T, any>>
-) {
+  predicate: Partial<Record<keyof T, any>> | ((object: T) => boolean)
+): void {
   remove(array, predicate);
 }
 
@@ -539,4 +544,58 @@ export function isSameDay(dateA: Date, dateB: Date) {
     dateA.getMonth() === dateB.getMonth() &&
     dateA.getDate() === dateB.getDate()
   );
+}
+
+/**
+ * Sorts an array of objects in natural order
+ * @param items - The array of objects to sort
+ * @param property - The objects' property to sort by
+ * @param direction - The sorting direction, either ascending (default) or descending
+ * @returns Array of objects sorted in natural order
+ */
+export function naturalSort<T extends AnyRecord>(
+  items: T[],
+  property: keyof T,
+  direction: 'asc' | 'desc' = 'asc'
+): T[] {
+  switch (direction) {
+    case 'asc':
+      return [...items].sort(
+        collator
+          ? (a, b) => collator.compare(a[property], b[property])
+          : (a, b) =>
+              a[property].localeCompare(b[property], 'en', { numeric: true })
+      );
+    case 'desc':
+      return [...items].sort(
+        collator
+          ? (a, b) => collator.compare(b[property], a[property])
+          : (a, b) =>
+              b[property].localeCompare(a[property], 'en', { numeric: true })
+      );
+  }
+}
+
+const MicrosecondsInAMillisecond = 1_000;
+const MillisecondsInASecond = 1_000;
+
+enum TimestampDigits {
+  Seconds = 10,
+  Milliseconds = 13,
+  Microseconds = 16,
+}
+
+export function convertTimestampToMilliseconds(timestamp: number): number {
+  const digits = String(timestamp).length;
+  switch (digits) {
+    case TimestampDigits.Seconds:
+      return timestamp * MillisecondsInASecond;
+    case TimestampDigits.Milliseconds:
+      return timestamp;
+    case TimestampDigits.Microseconds:
+      return Math.floor(timestamp / MicrosecondsInAMillisecond);
+
+    default:
+      throw 'Unhandle timestamp precision: ${timestamp}';
+  }
 }

@@ -48,10 +48,7 @@ export class SNMigrationService extends PureService {
     if (this.activeMigrations.length > 0) {
       const lastMigration = lastElement(this.activeMigrations) as Migration;
       lastMigration.onDone(async () => {
-        await this.services.deviceInterface.setRawStorageValue(
-          namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
-          SnjsVersion
-        );
+        await this.markMigrationsAsDone();
       });
     } else {
       await this.services.deviceInterface.setRawStorageValue(
@@ -59,6 +56,13 @@ export class SNMigrationService extends PureService {
         SnjsVersion
       );
     }
+  }
+
+  private async markMigrationsAsDone() {
+    await this.services.deviceInterface.setRawStorageValue(
+      namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
+      SnjsVersion
+    );
   }
 
   private async runBaseMigrationPreRun() {

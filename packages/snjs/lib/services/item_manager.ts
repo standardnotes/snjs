@@ -3,12 +3,10 @@ import {
   ItemCollection,
   SortDirection,
 } from '@Protocol/collection/item_collection';
-import { UserPrefsMutator } from './../models/app/userPrefs';
 import { SNItemsKey } from '@Models/app/items_key';
-import { TagMutator } from './../models/app/tag';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
-import { NoteMutator } from './../models/app/note';
+import { NoteMutator, SNNote } from './../models/app/note';
 import { ActionsExtensionMutator } from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
@@ -20,7 +18,7 @@ import { FillItemContent, Uuids } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import { isString, removeFromArray, searchArray } from '@Lib/utils';
+import { isString, naturalSort, removeFromArray, searchArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   PayloadContent,
@@ -420,18 +418,19 @@ export class ItemManager extends PureService {
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ) {
+  ): Promise<SNComponent> {
     const component = this.findItem(uuid);
     if (!component) {
       throw Error('Attempting to change non-existant component');
     }
     const mutator = new ComponentMutator(component, mutationType);
-    return this.applyTransform(
+    await this.applyTransform(
       mutator,
       mutate,
       payloadSource,
       payloadSourceKey
     );
+    return this.findItem(uuid) as SNComponent;
   }
 
   async changeActionsExtension(
@@ -560,7 +559,7 @@ export class ItemManager extends PureService {
     content?: PayloadContent,
     needsSync = false,
     override?: PayloadOverride
-  ) {
+  ): Promise<SNItem> {
     if (!contentType) {
       throw 'Attempting to create item with no contentType';
     }
@@ -716,8 +715,91 @@ export class ItemManager extends PureService {
   /**
    * Finds the first tag matching a given title
    */
-  public findTagByTitle(title: string) {
-    return searchArray(this.tags, { title: title });
+  public findTagByTitle(title: string): SNTag | undefined {
+    const lowerCaseTitle = title.toLowerCase();
+    return this.tags.find((tag) => tag.title.toLowerCase() === lowerCaseTitle);
+  }
+
+  /**
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
+   */
+  public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
+    const delimiter = '.';
+    return naturalSort(
+      this.tags.filter((tag) => {
+        const regex = new RegExp(
+          `^${searchQuery}|${delimiter}${searchQuery}`,
+          'i'
+        );
+        const matchesQuery = regex.test(tag.title);
+        const tagInNote = note
+          ? this.itemsReferencingItem(note.uuid).some(
+              (item) => item?.uuid === tag.uuid
+            )
+          : false;
+        return matchesQuery && !tagInNote;
+      }),
+      'title'
+    );
+  }
+
+  /**
+   * Returns all parents for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns Array containing all parent tags
+   */
+   public getTagParentChain(tag: SNTag): SNTag[] {
+    const delimiter = '.';
+    const tagComponents = tag.title.split(delimiter);
+    const parentTagsTitles: string[] = [];
+
+    const getImmediateParent = () => {
+      if (tagComponents.length > 1) {
+        tagComponents.splice(-1, 1);
+        const immediateParentTitle = tagComponents.join(delimiter);
+        parentTagsTitles.push(immediateParentTitle);
+        getImmediateParent();
+      }
+    };
+
+    getImmediateParent();
+    const parentTags = this.tags.filter((tag) =>
+      parentTagsTitles.some((title) => title === tag.title)
+    );
+    return parentTags;
+  }
+
+  /**
+   * Returns all descendants for a tag
+   * @param tag - The tag for which descendants need to be found
+   * @returns Array containing all descendant tags
+   */
+   public getTagDescendants(tag: SNTag): SNTag[] {
+    const delimiter = '.';
+    return this.tags.filter((t) => {
+      const regex = new RegExp(
+        `^${tag.title}${delimiter}|${delimiter}${tag.title}${delimiter}`,
+        'i'
+      );
+      return regex.test(t.title);
+    });
+  }
+
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  public getSortedTagsForNote(note: SNNote): SNTag[] {
+    return naturalSort(
+      this.itemsReferencingItem(note.uuid).filter((ref) => {
+        return ref?.content_type === ContentType.Tag;
+      }) as SNTag[],
+      'title'
+    );
   }
 
   /**

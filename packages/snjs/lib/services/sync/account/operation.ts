@@ -1,5 +1,4 @@
 import { EncryptionIntent } from './../../../protocol/intents';
-import { NonEncryptedTypes } from './response_resolver';
 import { SNProtocolService } from './../../protocol_service';
 import { PayloadManager } from './../../payload_manager';
 import { UuidString } from './../../../types';
@@ -8,6 +7,8 @@ import { arrayByDifference, subtractFromArray } from '@Lib/utils';
 import { SyncResponse } from '@Services/sync/response';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';
+import { RawSyncResponse } from '@Lib/services/api/responses';
+import { NonEncryptedTypes } from '../filter';
 
 export async function payloadsByPreparingForServer(
   protocolService: SNProtocolService,
@@ -80,8 +81,8 @@ export class AccountSyncOperation {
       this.downLimit,
       this.checkIntegrity,
       undefined,
-      undefined
-    );
+      undefined,
+    ) as RawSyncResponse;
     const response = new SyncResponse(rawResponse);
 
     this.responses.push(response);

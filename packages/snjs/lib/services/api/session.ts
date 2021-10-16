@@ -66,10 +66,10 @@ export class TokenSession extends Session {
   public refreshExpiration: number;
 
   static FromApiResponse(response: SessionRenewalResponse) {
-    const accessToken: string = response.session!.access_token;
-    const refreshToken: string = response.session!.refresh_token;
-    const accessExpiration: number = response.session!.access_expiration;
-    const refreshExpiration: number = response.session!.refresh_expiration;
+    const accessToken: string = response.data.session!.access_token;
+    const refreshToken: string = response.data.session!.refresh_token;
+    const accessExpiration: number = response.data.session!.access_expiration;
+    const refreshExpiration: number = response.data.session!.refresh_expiration;
     return new TokenSession(
       accessToken,
       accessExpiration,

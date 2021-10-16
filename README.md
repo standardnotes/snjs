@@ -2,7 +2,7 @@
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
-SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.org) that contains shared logic for all Standard Notes clients.
+SNJS is a client-side JavaScript library for [Standard Notes](https://standardnotes.com) that contains shared logic for all Standard Notes clients.
 
 ## Introduction
 
@@ -36,6 +36,11 @@ Object.assign(window, SNLibrary);
 ```
 
 ## Usage
+
+---
+
+### **Note:** the below usage examples have not kept up to date with library API changes. It is recommended to examine the source code for these functions for exact usage.
+---
 
 1. Initialize an application:
 
@@ -126,30 +131,38 @@ app.streamItems(
 
 ## Tests
 
-Please make sure you have [Docker](https://www.docker.com) installed before running tests:
-```
-yarn test
-```
+### E2E Tests
+Please make sure you have [Docker](https://www.docker.com) and [Docker Compose](https://docs.docker.com/compose/install/) installed before running tests.
 
-Running packages/snjs tests:
+From the root of the repository, run:
 
 ```
+# Starts browser-navigable web page
 yarn run start:test-server:dev
 
-# Spins up server
+# Starts backend servers
 yarn run test:e2e:dev-setup
 ```
 
-Then either run
+Then choose between the following run options:
+
+- Run tests in the command line:
+  ```
+  yarn run test:e2e:dev
+  ```
+
+- Run tests in the browser: Open `http://localhost:9002/packages/snjs/mocha/test.html`.
+
+### Unit Tests
+
+From the root of the repository, run:
 
 ```
-yarn run test:e2e:dev
+yarn run test:unit
 ```
-
-Or open browser to `localhost:9002/test/test.html`.
 
 ## Notes
 - Almost all functions are asynchronous and return promises. [You can read about promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
 ## Help
-Join the #dev channel in [our Slack group](https://standardnotes.org/slack) for help and discussion.
+Join the #dev channel in [our Slack group](https://standardnotes.com/slack) for help and discussion.

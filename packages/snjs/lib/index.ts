@@ -85,12 +85,13 @@ export {
   SyncModes,
   SyncQueueStrategy,
 } from './services/sync/sync_service';
+export { SNCredentialService } from './services/credential_service';
 export { SyncResponse } from './services/sync/response';
 export { payloadsByPreparingForServer } from './services/sync/account/operation';
 export { SyncResponseResolver } from '@Services/sync/account/response_resolver';
 export { SyncOpStatus } from './services/sync/sync_op_status';
 export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils';
-export { SNSessionManager } from './services/api/session_manager';
+export { SNSessionManager, SessionEvent } from './services/api/session_manager';
 export { SNMigrationService } from './services/migration_service';
 export { ButtonType } from './services/alert_service';
 export type {
@@ -113,12 +114,14 @@ export {
   deepMerge,
   dictToArray,
   extendArray,
+  filterFromArray,
   findInArray,
   getGlobalScope,
   greaterOfTwoDates,
   isNullOrUndefined,
   isSameDay,
   jsonParseEmbeddedKeys,
+  naturalSort,
   omitInPlace,
   omitUndefinedCopy,
   removeFromArray,
@@ -128,6 +131,7 @@ export {
   truncateHexString,
   uniqueArrayByKey,
   uniqCombineObjArrays,
+  convertTimestampToMilliseconds,
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {
@@ -138,7 +142,10 @@ export {
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
-export { ContentType } from '@Models/content_types';
+export {
+  ContentType,
+  displayStringForContentType,
+} from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
 
@@ -173,6 +180,7 @@ export {
   isPayloadSourceRetrieved,
   isPayloadSourceInternalChange,
 } from '@Lib/protocol/payloads/sources';
+export { DeltaOutOfSync } from '@Payloads/deltas';
 export { ProtocolVersion } from '@Lib/protocol/versions';
 export { PayloadFormat } from '@Payloads/formats';
 export { PurePayload } from '@Payloads/pure_payload';
@@ -198,4 +206,10 @@ export { ProtectionSessionDurations } from '@Lib/services/protection_service';
 
 export { SNLog } from './log';
 
-export { Permission } from '@standardnotes/auth';
+export type { ItemMessagePayload } from './services/component_manager';
+export type { MessageData } from './services/component_manager';
+
+/** Used by e2e tests */
+export { Features, FeatureIdentifier } from '@standardnotes/features';
+export { RoleName } from '@standardnotes/auth';
+export { SettingName } from '@standardnotes/settings';

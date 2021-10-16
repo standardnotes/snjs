@@ -15,6 +15,7 @@ import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { ItemManager } from './item_manager';
 import { MutationType } from '@Lib/models/core/item';
+import { Uuids } from '@Lib/models/functions';
 
 export enum ProtectionEvent {
   SessionExpiryDateChanged = 'SessionExpiryDateChanged',
@@ -170,6 +171,46 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     }
   }
 
+  async authorizeProtectedActionForNotes(
+    notes: SNNote[],
+    challengeReason: ChallengeReason
+  ): Promise<SNNote[]> {
+    let sessionValidation: Promise<boolean> | undefined;
+    const authorizedNotes = [];
+    for (const note of notes) {
+      const isProtected = note.protected && this.areProtectionsEnabled();
+      if (isProtected && !sessionValidation) {
+        sessionValidation = this.validateOrRenewSession(challengeReason);
+      }
+      if (!isProtected || (await sessionValidation)) {
+        authorizedNotes.push(note);
+      }
+    }
+    return authorizedNotes;
+  }
+
+  protectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    return this.itemManager.changeItems<NoteMutator>(
+      Uuids(notes),
+      (mutator) => {
+        mutator.protected = true;
+      }
+    ) as Promise<SNNote[]>;
+  }
+
+  async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const authorizedNotes = await this.authorizeProtectedActionForNotes(
+      notes,
+      ChallengeReason.UnprotectNote
+    );
+    return this.itemManager.changeItems<NoteMutator>(
+      Uuids(authorizedNotes),
+      (mutator) => {
+        mutator.protected = false;
+      }
+    ) as Promise<SNNote[]>;
+  }
+
   async authorizeNoteAccess(note: SNNote): Promise<boolean> {
     if (!note.protected) {
       return true;
@@ -206,6 +247,12 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     });
   }
 
+  async authorizeMfaDisable(): Promise<boolean> {
+    return this.validateOrRenewSession(ChallengeReason.DisableMfa, {
+      requireAccountPassword: true,
+    });
+  }
+
   async authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.validateOrRenewSession(ChallengeReason.ChangeAutolockInterval);
   }
@@ -214,17 +261,13 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return this.validateOrRenewSession(ChallengeReason.RevokeSession);
   }
 
-  async authorizeBatchManagerAccess(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.AccessBatchManager);
-  }
-
   authorizeCloudLinkAccess(): Promise<boolean> {
     return this.validateOrRenewSession(ChallengeReason.AccessCloudLink);
   }
 
   private async validateOrRenewSession(
     reason: ChallengeReason,
-    { fallBackToAccountPassword = true } = {}
+    { fallBackToAccountPassword = true, requireAccountPassword = false } = {}
   ): Promise<boolean> {
     if (this.getSessionExpiryDate() > new Date()) {
       return true;
@@ -236,6 +279,12 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     }
     if (this.protocolService.hasPasscode()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode));
+    }
+    if (requireAccountPassword) {
+      if (!this.protocolService.hasAccount()) {
+        throw Error('Requiring account password for challenge with no account');
+      }
+      prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword));
     }
     if (prompts.length === 0) {
       if (fallBackToAccountPassword && this.protocolService.hasAccount()) {

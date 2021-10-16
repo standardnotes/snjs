@@ -39,6 +39,8 @@ export enum PayloadSource {
    * have been saved to disk, and are about to be synced */
   PreSyncSave = 19,
   RemoteHistory = 20,
+  /** Payloads which have been rejected and unwilling to be saved by the server */
+  RemoteRejected = 21,
 }
 
 /**

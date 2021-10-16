@@ -1,6 +1,5 @@
 import { SNProtectionService } from './protection_service';
 import { Uuid } from '@Lib/uuid';
-import { isNullOrUndefined } from '@Lib/utils';
 import {
   Challenge,
   ChallengeReason,
@@ -14,7 +13,7 @@ import {
   SNRootKeyParams,
 } from './../protocol/key_params';
 import {
-  PasswordChangeStrings,
+  CredentialsChangeStrings,
   INVALID_PASSWORD,
   InsufficientPasswordMessage,
   ChallengeStrings,
@@ -41,8 +40,10 @@ import { PureService } from '@Services/pure_service';
 import { ChallengeService } from './challenge/challenge_service';
 import { SNItemsKey } from '@Lib/models';
 
-export type PasswordChangeFunctionResponse = { error?: { message: string } };
-export type AccountServiceResponse = HttpResponse<unknown>;
+const MINIMUM_PASSCODE_LENGTH = 1;
+
+export type CredentialsChangeFunctionResponse = { error?: { message: string } };
+export type AccountServiceResponse = HttpResponse;
 
 export const enum AccountEvent {
   SignedInOrRegistered = 'SignedInOrRegistered',
@@ -75,6 +76,10 @@ export class SNCredentialService extends PureService<AccountEvent> {
     (this.alertService as unknown) = undefined;
     (this.challengeService as unknown) = undefined;
     (this.protectionService as unknown) = undefined;
+  }
+
+  public isSignedIn(): boolean {
+    return this.sessionManager.getUser() != undefined;
   }
 
   /**
@@ -198,7 +203,7 @@ export class SNCredentialService extends PureService<AccountEvent> {
    * for missing keys or storage values. Unlike regular sign in, this doesn't worry about
    * performing one of marking all items as needing sync or deleting all local data.
    */
-  public async correctiveSignIn(rootKey: SNRootKey): Promise<SignInResponse> {
+  public async correctiveSignIn(rootKey: SNRootKey): Promise<HttpResponse | SignInResponse> {
     this.lockSyncing();
     const response = await this.sessionManager.bypassChecksAndSignInWithRootKey(
       rootKey.keyParams.identifier,
@@ -217,100 +222,27 @@ export class SNCredentialService extends PureService<AccountEvent> {
   }
 
   /**
-   * @param passcode - Changing the account password requires the local
+   * @param passcode - Changing the account password or email requires the local
    * passcode if configured (to rewrap the account key with passcode). If the passcode
    * is not passed in, the user will be prompted for the passcode. However if the consumer
    * already has reference to the passcode, they can pass it in here so that the user
    * is not prompted again.
    */
-  public async changePassword(
-    currentPassword: string,
-    newPassword: string,
-    passcode?: string,
-    origination = KeyParamsOrigination.PasswordChange,
-    { validatePasswordStrength = true } = {}
-  ): Promise<PasswordChangeFunctionResponse> {
-    const result = await this.performPasswordChange(
-      currentPassword,
-      newPassword,
-      passcode,
-      origination,
-      { validatePasswordStrength }
-    );
+  public async changeCredentials(
+    parameters: {
+      currentPassword: string,
+      origination: KeyParamsOrigination,
+      validateNewPasswordStrength: boolean
+      newEmail?: string,
+      newPassword?: string,
+      passcode?: string,
+    }
+  ): Promise<CredentialsChangeFunctionResponse> {
+    const result = await this.performCredentialsChange(parameters);
     if (result.error) {
       void this.alertService.alert(result.error.message);
     }
     return result;
-  }
-
-  private async performPasswordChange(
-    currentPassword: string,
-    newPassword: string,
-    passcode?: string,
-    origination = KeyParamsOrigination.PasswordChange,
-    { validatePasswordStrength = true } = {}
-  ): Promise<PasswordChangeFunctionResponse> {
-    const {
-      wrappingKey,
-      canceled,
-    } = await this.challengeService.getWrappingKeyIfApplicable(passcode);
-    if (canceled) {
-      return { error: Error(PasswordChangeStrings.PasscodeRequired) };
-    }
-    if (validatePasswordStrength) {
-      if (newPassword.length < MINIMUM_PASSWORD_LENGTH) {
-        return {
-          error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)),
-        };
-      }
-    }
-    const accountPasswordValidation = await this.protocolService.validateAccountPassword(
-      currentPassword
-    );
-    if (!accountPasswordValidation.valid) {
-      return {
-        error: Error(INVALID_PASSWORD),
-      };
-    }
-    /** Current root key must be recomputed as persisted value does not contain server password */
-    const currentRootKey = await this.protocolService.computeRootKey(
-      currentPassword,
-      (await this.protocolService.getRootKeyParams()) as SNRootKeyParams
-    );
-    const user = this.sessionManager.getUser() as User;
-    const newRootKey = await this.protocolService.createRootKey(
-      user.email,
-      newPassword,
-      origination
-    );
-    this.lockSyncing();
-    /** Now, change the password on the server. Roll back on failure */
-    const result = await this.sessionManager.changePassword(
-      currentRootKey.serverPassword as string,
-      newRootKey,
-      wrappingKey
-    );
-    this.unlockSyncing();
-    if (!result.response.error) {
-      const rollback = await this.protocolService.createNewItemsKeyWithRollback();
-      /** Sync the newly created items key. Roll back on failure */
-      await this.protocolService.reencryptItemsKeys();
-      await this.syncService.sync({ awaitAll: true });
-      const defaultItemsKey = this.protocolService.getDefaultItemsKey() as SNItemsKey;
-      const itemsKeyWasSynced = !defaultItemsKey.neverSynced;
-      if (!itemsKeyWasSynced) {
-        await this.sessionManager.changePassword(
-          newRootKey.serverPassword as string,
-          currentRootKey,
-          wrappingKey
-        );
-        await this.protocolService.reencryptItemsKeys();
-        await rollback();
-        await this.syncService.sync({ awaitAll: true });
-        return { error: Error(PasswordChangeStrings.Failed) };
-      }
-    }
-    return result.response;
   }
 
   public async signOut(): Promise<void> {
@@ -375,13 +307,13 @@ export class SNCredentialService extends PureService<AccountEvent> {
           ChallengeValidation.AccountPassword
         );
         const password = value.value as string;
-        const changeResponse = await this.changePassword(
-          password,
-          password,
+        const changeResponse = await this.changeCredentials({
+          currentPassword: password,
+          newPassword: password,
           passcode,
-          KeyParamsOrigination.ProtocolUpgrade,
-          { validatePasswordStrength: false }
-        );
+          origination: KeyParamsOrigination.ProtocolUpgrade,
+          validateNewPasswordStrength: false
+        });
         if (changeResponse?.error) {
           return { error: changeResponse.error };
         }
@@ -403,6 +335,9 @@ export class SNCredentialService extends PureService<AccountEvent> {
   }
 
   public async addPasscode(passcode: string): Promise<boolean> {
+    if (passcode.length < MINIMUM_PASSCODE_LENGTH) {
+      return false;
+    }
     if (!(await this.protectionService.authorizeAddingPasscode())) {
       return false;
     }
@@ -446,6 +381,9 @@ export class SNCredentialService extends PureService<AccountEvent> {
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
+    if (newPasscode.length < MINIMUM_PASSCODE_LENGTH) {
+      return false;
+    }
     if (!(await this.protectionService.authorizeChangingPasscode())) {
       return false;
     }
@@ -510,5 +448,102 @@ export class SNCredentialService extends PureService<AccountEvent> {
 
   private async clearDatabase(): Promise<void> {
     return this.storageService.clearAllPayloads();
+  }
+
+  private async performCredentialsChange(
+    parameters: {
+      currentPassword: string,
+      origination: KeyParamsOrigination,
+      validateNewPasswordStrength: boolean
+      newEmail?: string,
+      newPassword?: string,
+      passcode?: string,
+    }
+  ): Promise<CredentialsChangeFunctionResponse> {
+    const {
+      wrappingKey,
+      canceled,
+    } = await this.challengeService.getWrappingKeyIfApplicable(parameters.passcode);
+    if (canceled) {
+      return { error: Error(CredentialsChangeStrings.PasscodeRequired) };
+    }
+    if (parameters.newPassword !== undefined && parameters.validateNewPasswordStrength) {
+      if (parameters.newPassword.length < MINIMUM_PASSWORD_LENGTH) {
+        return {
+          error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)),
+        };
+      }
+    }
+    const accountPasswordValidation = await this.protocolService.validateAccountPassword(
+      parameters.currentPassword
+    );
+    if (!accountPasswordValidation.valid) {
+      return {
+        error: Error(INVALID_PASSWORD),
+      };
+    }
+    const user = this.sessionManager.getUser() as User;
+    const currentEmail = user.email;
+    const rootKeys = await this.recomputeRootKeysForCredentialChange({
+      currentPassword: parameters.currentPassword,
+      currentEmail,
+      origination: parameters.origination,
+      newEmail: parameters.newEmail,
+      newPassword: parameters.newPassword,
+    });
+
+    this.lockSyncing();
+    /** Now, change the credentials on the server. Roll back on failure */
+    const result = await this.sessionManager.changeCredentials({
+      currentServerPassword: rootKeys.currentRootKey.serverPassword as string,
+      newRootKey: rootKeys.newRootKey,
+      wrappingKey,
+      newEmail: parameters.newEmail,
+    });
+    this.unlockSyncing();
+    if (!result.response.error) {
+      const rollback = await this.protocolService.createNewItemsKeyWithRollback();
+      await this.protocolService.reencryptItemsKeys();
+      await this.syncService.sync({ awaitAll: true });
+      const defaultItemsKey = this.protocolService.getDefaultItemsKey() as SNItemsKey;
+      const itemsKeyWasSynced = !defaultItemsKey.neverSynced;
+      if (!itemsKeyWasSynced) {
+        await this.sessionManager.changeCredentials({
+          currentServerPassword: rootKeys.newRootKey.serverPassword as string,
+          newRootKey: rootKeys.currentRootKey,
+          wrappingKey,
+        });
+        await this.protocolService.reencryptItemsKeys();
+        await rollback();
+        await this.syncService.sync({ awaitAll: true });
+
+        return { error: Error(CredentialsChangeStrings.Failed) };
+      }
+    }
+
+    return result.response;
+  }
+
+  private async recomputeRootKeysForCredentialChange(parameters: {
+    currentPassword: string,
+    currentEmail: string,
+    origination: KeyParamsOrigination,
+    newEmail?: string,
+    newPassword?: string,
+  }): Promise<{currentRootKey: SNRootKey, newRootKey: SNRootKey}> {
+    const currentRootKey = await this.protocolService.computeRootKey(
+      parameters.currentPassword,
+      (await this.protocolService.getRootKeyParams()) as SNRootKeyParams
+    );
+    const newRootKey = await this.protocolService.createRootKey(
+      parameters.newEmail ?? parameters.currentEmail,
+      parameters.newPassword ?? parameters.currentPassword,
+      parameters.origination
+    );
+
+    return {
+      currentRootKey,
+      newRootKey,
+    };
   }
 }

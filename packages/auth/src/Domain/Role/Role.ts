@@ -1,6 +1,8 @@
-export enum Role {
-  User = 'USER',
-  CoreUser = 'CORE_USER',
-  PlusUser = 'PLUS_USER',
-  ProUser = 'PRO_USER'
+import { Uuid } from '@standardnotes/common'
+
+import { RoleName } from './RoleName'
+
+export type Role = {
+  uuid: Uuid
+  name: RoleName
 }

@@ -9,19 +9,19 @@ import {
 import { ChallengeService } from './../challenge/challenge_service';
 import { JwtSession, RemoteSession, TokenSession } from './session';
 import {
-  ChangePasswordResponse,
+  GetSubscriptionResponse,
+  ChangeCredentialsResponse,
   HttpResponse,
   KeyParamsResponse,
   RegistrationResponse,
+  SessionListResponse,
   SignInResponse,
   StatusCode,
   User,
 } from './responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
-import {
-  SNStorageService,
-} from './../storage_service';
+import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import {
   AnyKeyParamsContent,
@@ -42,6 +42,8 @@ import {
   SignInStrings,
 } from './messages';
 import { UuidString } from '@Lib/types';
+import { SNFeaturesService } from '../features_service';
+import { SNWebSocketsService } from './websockets_service';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MissingAccountParams = 'missing-params';
@@ -75,7 +77,8 @@ export class SNSessionManager extends PureService<SessionEvent> {
     private apiService: SNApiService,
     private alertService: SNAlertService,
     private protocolService: SNProtocolService,
-    private challengeService: ChallengeService
+    private challengeService: ChallengeService,
+    private webSocketsService: SNWebSocketsService
   ) {
     super();
     apiService.setInvalidSessionObserver((revoked) => {
@@ -92,23 +95,29 @@ export class SNSessionManager extends PureService<SessionEvent> {
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
+    (this.challengeService as unknown) = undefined;
+    (this.webSocketsService as unknown) = undefined;
     this.user = undefined;
     super.deinit();
   }
 
   public async initializeFromDisk() {
-    this.user = await this.storageService!.getValue(StorageKey.User);
+    this.user = await this.storageService.getValue(StorageKey.User);
     if (!this.user) {
       /** @legacy Check for uuid. */
-      const uuid = await this.storageService!.getValue(StorageKey.LegacyUuid);
+      const uuid = await this.storageService.getValue(StorageKey.LegacyUuid);
       if (uuid) {
         this.user = { uuid: uuid, email: uuid };
       }
     }
 
-    const rawSession = await this.storageService!.getValue(StorageKey.Session);
+    const rawSession = await this.storageService.getValue(StorageKey.Session);
     if (rawSession) {
-      await this.setSession(Session.FromRawStorageValue(rawSession), false);
+      const session = Session.FromRawStorageValue(rawSession);
+      await this.setSession(session, false);
+      this.webSocketsService.startWebSocketConnection(
+        session.authorizationValue
+      );
     }
   }
 
@@ -137,6 +146,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const session = this.apiService.getSession();
     if (session && session.canExpire()) {
       await this.apiService.signOut();
+      this.webSocketsService.closeWebSocketConnection();
     }
   }
 
@@ -205,6 +215,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
     });
   }
 
+  public getSubscription(): Promise<HttpResponse | GetSubscriptionResponse> {
+    return this.apiService.getSubscription(this.user!.uuid);
+  }
+
   private async promptForMfaValue() {
     const challenge = new Challenge(
       [
@@ -267,9 +281,9 @@ export class SNSessionManager extends PureService<SessionEvent> {
       keyParams,
       ephemeral
     );
-    if (!registerResponse.error) {
+    if (!registerResponse.error && registerResponse.data) {
       await this.handleSuccessAuthResponse(
-        registerResponse,
+        registerResponse as RegistrationResponse,
         rootKey,
         wrappingKey
       );
@@ -286,7 +300,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaCode?: string
   ): Promise<{
     keyParams?: SNRootKeyParams;
-    response: KeyParamsResponse;
+    response: KeyParamsResponse | HttpResponse;
     mfaKeyPath?: string;
     mfaCode?: string;
   }> {
@@ -295,11 +309,11 @@ export class SNSessionManager extends PureService<SessionEvent> {
       mfaKeyPath,
       mfaCode
     );
-    if (response.error) {
+    if (response.error || isNullOrUndefined(response.data)) {
       if (mfaCode) {
         await this.alertService.alert(SignInStrings.IncorrectMfa);
       }
-      if (response.error.payload?.mfa_key) {
+      if (response.error?.payload?.mfa_key) {
         /** Prompt for MFA code and try again */
         const inputtedCode = await this.promptForMfaValue();
         if (!inputtedCode) {
@@ -321,7 +335,10 @@ export class SNSessionManager extends PureService<SessionEvent> {
       }
     }
     /** Make sure to use client value for identifier/email */
-    const keyParams = KeyParamsFromApiResponse(response, email);
+    const keyParams = KeyParamsFromApiResponse(
+      response as KeyParamsResponse,
+      email
+    );
     if (!keyParams || !keyParams.version) {
       return {
         response: this.apiService.createErrorResponse(
@@ -478,7 +495,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     mfaKeyPath?: string,
     mfaCode?: string,
     ephemeral = false
-  ): Promise<SignInResponse> {
+  ): Promise<SignInResponse | HttpResponse> {
     const {
       wrappingKey,
       canceled,
@@ -496,19 +513,19 @@ export class SNSessionManager extends PureService<SessionEvent> {
       mfaCode,
       ephemeral
     );
-    if (!signInResponse.error) {
+    if (!signInResponse.error && signInResponse.data) {
       const expandedRootKey = await SNRootKey.ExpandedCopy(
         rootKey,
-        signInResponse.key_params
+        (signInResponse as SignInResponse).data.key_params
       );
       await this.handleSuccessAuthResponse(
-        signInResponse,
+        signInResponse as SignInResponse,
         expandedRootKey,
         wrappingKey
       );
       return signInResponse;
     } else {
-      if (signInResponse.error.payload?.mfa_key) {
+      if (signInResponse.error?.payload?.mfa_key) {
         if (mfaCode) {
           await this.alertService.alert(SignInStrings.IncorrectMfa);
         }
@@ -534,31 +551,38 @@ export class SNSessionManager extends PureService<SessionEvent> {
     }
   }
 
-  public async changePassword(
-    currentServerPassword: string,
-    newRootKey: SNRootKey,
-    wrappingKey?: SNRootKey
-  ): Promise<SessionManagerResponse> {
-    const response = await this.apiService.changePassword(
-      currentServerPassword,
-      newRootKey.serverPassword!,
-      newRootKey.keyParams
+  public async changeCredentials(parameters: {
+    currentServerPassword: string;
+    newRootKey: SNRootKey;
+    wrappingKey?: SNRootKey;
+    newEmail?: string;
+  }): Promise<SessionManagerResponse> {
+    const userUuid = this.user!.uuid;
+    const response = await this.apiService.changeCredentials({
+      userUuid,
+      currentServerPassword: parameters.currentServerPassword,
+      newServerPassword: parameters.newRootKey.serverPassword!,
+      newKeyParams: parameters.newRootKey.keyParams,
+      newEmail: parameters.newEmail,
+    });
+
+    return this.processChangeCredentialsResponse(
+      response as ChangeCredentialsResponse,
+      parameters.newRootKey,
+      parameters.wrappingKey
     );
-    if (!response.error) {
-      await this.handleSuccessAuthResponse(response, newRootKey, wrappingKey);
-    }
-    return {
-      response: response,
-      keyParams: response.key_params,
-    };
   }
 
-  public async getSessionsList(): Promise<HttpResponse<RemoteSession[]>> {
+  public async getSessionsList(): Promise<
+    (HttpResponse & { data: RemoteSession[] }) | HttpResponse
+  > {
     const response = await this.apiService.getSessionsList();
     if (response.error || isNullOrUndefined(response.data)) {
       return response;
     }
-    response.data = response.data
+    (response as HttpResponse & {
+      data: RemoteSession[];
+    }).data = (response as SessionListResponse).data
       .map<RemoteSession>((session) => ({
         ...session,
         updated_at: new Date(session.updated_at),
@@ -574,24 +598,63 @@ export class SNSessionManager extends PureService<SessionEvent> {
     return response;
   }
 
+  public async revokeAllOtherSessions(): Promise<void> {
+    const response = await this.getSessionsList();
+    if (response.error != undefined || response.data == undefined) {
+      throw new Error(
+        response.error?.message ?? messages.API_MESSAGE_GENERIC_SYNC_FAIL
+      );
+    }
+    const sessions = response.data as RemoteSession[];
+    const otherSessions = sessions.filter((session) => !session.current);
+    await Promise.all(
+      otherSessions.map((session) => this.revokeSession(session.uuid))
+    );
+  }
+
+  private async processChangeCredentialsResponse(
+    response: ChangeCredentialsResponse,
+    newRootKey: SNRootKey,
+    wrappingKey?: SNRootKey
+  ): Promise<SessionManagerResponse> {
+    if (!response.error && response.data) {
+      await this.handleSuccessAuthResponse(
+        response as ChangeCredentialsResponse,
+        newRootKey,
+        wrappingKey
+      );
+    }
+    return {
+      response: response,
+      keyParams: (response as ChangeCredentialsResponse).data?.key_params,
+    };
+  }
+
   private async handleSuccessAuthResponse(
-    response: RegistrationResponse | SignInResponse | ChangePasswordResponse,
+    response: RegistrationResponse | SignInResponse | ChangeCredentialsResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey
   ) {
     await this.protocolService.setRootKey(rootKey, wrappingKey);
-    const user = response.user;
+    const { data } = response;
+    const user = data.user;
     this.user = user;
     await this.storageService.setValue(StorageKey.User, user);
-    if (response.token) {
+    if (data.token) {
       /** Legacy JWT response */
-      const session = new JwtSession(response.token);
+      const session = new JwtSession(data.token);
       await this.setSession(session);
-    } else if (response.session) {
+      this.webSocketsService.startWebSocketConnection(
+        session.authorizationValue
+      );
+    } else if (data.session) {
       /** Note that change password requests do not resend the exiting session object, so we
        * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response);
       await this.setSession(session);
+      this.webSocketsService.startWebSocketConnection(
+        session.authorizationValue
+      );
     }
   }
 }

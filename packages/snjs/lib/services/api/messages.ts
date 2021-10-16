@@ -7,16 +7,16 @@ export const API_MESSAGE_GENERIC_INVALID_LOGIN =
   'A server error occurred while trying to sign in. Please try again.';
 export const API_MESSAGE_GENERIC_REGISTRATION_FAIL =
   'A server error occurred while trying to register. Please try again.';
-export const API_MESSAGE_GENERIC_CHANGE_PW_FAIL =
-  'Something went wrong while changing your password. Your password was not changed. Please try again.';
+export const API_MESSAGE_GENERIC_CHANGE_CREDENTIALS_FAIL =
+  'Something went wrong while changing your credentials. Your credentials were not changed. Please try again.';
 export const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.';
 
 export const API_MESSAGE_REGISTRATION_IN_PROGRESS =
   'An existing registration request is already in progress.';
 export const API_MESSAGE_LOGIN_IN_PROGRESS =
   'An existing sign in request is already in progress.';
-export const API_MESSAGE_CHANGE_PW_IN_PROGRESS =
-  'An existing change password request is already in progress.';
+export const API_MESSAGE_CHANGE_CREDENTIALS_IN_PROGRESS =
+  'An existing change credentials request is already in progress.';
 
 export const API_MESSAGE_FALLBACK_LOGIN_FAIL = 'Invalid email or password.';
 
@@ -32,20 +32,27 @@ export const API_MESSAGE_RATE_LIMITED =
 export const API_MESSAGE_INVALID_SESSION =
   'Please sign in to an account in order to continue with your request.';
 
+export const API_MESSAGE_FAILED_GET_SETTINGS = 'Failed to get settings.';
+export const API_MESSAGE_FAILED_UPDATE_SETTINGS = 'Failed to update settings.';
+
+export const API_MESSAGE_FAILED_SUBSCRIPTION_INFO = 'Failed to get subscription\'s information.';
+
+export const API_MESSAGE_FAILED_ACCESS_PURCHASE = 'Failed to access purchase flow.';
+
 export const UNSUPPORTED_PROTOCOL_VERSION =
   'This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.';
 
 export const EXPIRED_PROTOCOL_VERSION =
-  'The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security for more information.';
+  'The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.com/help/security for more information.';
 
 export const OUTDATED_PROTOCOL_VERSION =
-  'The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.org/help/security for more information.';
+  'The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.com/help/security for more information.';
 
 export const UNSUPPORTED_KEY_DERIVATION =
   'Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.';
 
 export const INVALID_PASSWORD_COST =
-  'Unable to sign in due to insecure password parameters. Please visit standardnotes.org/help/security for more information.';
+  'Unable to sign in due to insecure password parameters. Please visit standardnotes.com/help/security for more information.';
 export const INVALID_PASSWORD = 'Invalid password.';
 
 export const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended';
@@ -82,11 +89,11 @@ export const ImportStrings = {
   FileAccountPassword: 'File account password',
 };
 
-export const PasswordChangeStrings = {
+export const CredentialsChangeStrings = {
   PasscodeRequired:
-    'Your passcode is required to process your password change.',
+    'Your passcode is required to process your credentials change.',
   Failed:
-    'Unable to change your password due to a sync error. Please try again.',
+    'Unable to change your credentials due to a sync error. Please try again.',
 };
 
 export const RegisterStrings = {
@@ -190,7 +197,6 @@ export const ChallengeStrings = {
   ChangeAutolockInterval:
     'Authentication is required to change autolock timer duration',
   RevokeSession: 'Authentication is required to revoke a session',
-  AccessBatchManager: 'Authentication is required to access the batch manager',
   AccessCloudLink: 'Authentication is required to access CloudLink',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
@@ -208,7 +214,10 @@ export const ChallengeStrings = {
   ExportBackup: 'Authentication is required to export a backup',
   DisableBiometrics: 'Authentication is required to disable biometrics',
   UnprotectNote: 'Authentication is required to unprotect a note',
-  SearchProtectedNotesText: 'Authentication is required to search protected contents',
+  SearchProtectedNotesText:
+    'Authentication is required to search protected contents',
+  SelectProtectedNote: 'Authentication is required to select a protected note',
+  DisableMfa: 'Authentication is required to disable two-factor authentication',
 };
 
 export const PromptTitles = {

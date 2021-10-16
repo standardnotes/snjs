@@ -499,6 +499,9 @@ export class SNProtocolService
     if (!payload.uuid) {
       throw Error('Attempting to encrypt payload with no uuid.');
     }
+    if (key?.errorDecrypting || key?.waitingForKey) {
+      throw Error('Attempting to encrypt payload with encrypted key.');
+    }
     const version = key ? key.keyVersion : this.getLatestVersion();
     const format = this.payloadContentFormatForIntent(intent, key);
     const operator = this.operatorForVersion(version);
@@ -790,14 +793,14 @@ export class SNProtocolService
       })
     );
 
-    const keyParams = await this.getRootKeyParams();
-
     const data: BackupFile = {
       version: this.getLatestVersion(),
       items: await ejectedPayloadsPromise,
     };
-    if (keyParams) {
-      data.keyParams = keyParams.getPortableValue();
+
+    if (intent === EncryptionIntent.FileEncrypted) {
+      const keyParams = await this.getRootKeyParams();
+      data.keyParams = keyParams?.getPortableValue();
     }
     return data;
   }
@@ -1331,6 +1334,8 @@ export class SNProtocolService
     if (isNullOrUndefined(accountVersionedKey)) {
       await this.createNewDefaultItemsKey();
     }
+
+    this.syncUnsycnedItemsKeys();
   }
 
   private async handleFullSyncCompletion() {
@@ -1341,6 +1346,25 @@ export class SNProtocolService
       if (this.keyMode === KeyMode.WrapperOnly) {
         return this.repersistAllItems();
       }
+    }
+  }
+
+  /**
+   * There is presently an issue where an items key created while signed out of account (
+   * or possibly signed in but with invalid session), then signing into account, results in that
+   * items key never syncing to the account even though it is being used to encrypt synced items.
+   * Until we can determine its cause, this corrective function will find any such keys and sync them.
+   */
+  private syncUnsycnedItemsKeys(): void {
+    if (!this.hasAccount()) {
+      return;
+    }
+
+    const unsyncedKeys = this.latestItemsKeys().filter(
+      (key) => key.neverSynced && !key.dirty && !key.deleted
+    );
+    if (unsyncedKeys.length > 0) {
+      void this.itemManager.setItemsDirty(Uuids(unsyncedKeys));
     }
   }
 
@@ -1382,9 +1406,23 @@ export class SNProtocolService
     if (itemsKeys.length === 1) {
       return itemsKeys[0];
     }
-    return itemsKeys.find((key) => {
+    const defaultKeys = itemsKeys.filter((key) => {
       return key.isDefault;
     });
+    if (defaultKeys.length > 1) {
+      /**
+       * Prioritize one that is synced, as neverSynced keys will likely be deleted after
+       * DownloadFirst sync.
+       */
+      const syncedKeys = defaultKeys.filter((key) => !key.neverSynced);
+      if (syncedKeys.length > 1) {
+        console.warn('Multiple synced default keys');
+      }
+      if (syncedKeys.length > 0) {
+        return syncedKeys[0];
+      }
+    }
+    return defaultKeys[0];
   }
 
   /** Returns the key params attached to this key's encrypted payload */
@@ -1485,7 +1523,7 @@ export class SNProtocolService
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
   public async createNewDefaultItemsKey(): Promise<SNItemsKey> {
-    const rootKey = this.getRootKey()!;
+    const rootKey = this.getRootKey() as SNRootKey;
     const operatorVersion = rootKey
       ? rootKey.keyVersion
       : this.getLatestVersion();
@@ -1541,5 +1579,10 @@ export class SNProtocolService
       ]);
     };
     return rollback;
+  }
+
+  public getPasswordCreatedDate(): Date | undefined {
+    const rootKey = this.getRootKey();
+    return rootKey ? rootKey.keyParams.createdDate : undefined;
   }
 }

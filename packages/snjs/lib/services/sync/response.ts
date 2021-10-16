@@ -15,20 +15,18 @@ export class SyncResponse {
   public readonly retrievedPayloads: PurePayload[];
   public readonly uuidConflictPayloads: PurePayload[];
   public readonly dataConflictPayloads: PurePayload[];
+  public readonly rejectedPayloads: PurePayload[];
   public readonly deletedPayloads: PurePayload[];
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse;
-    this.savedPayloads = this.filterRawItemArray(rawResponse.saved_items).map(
-      (rawItem) => {
-        return CreateSourcedPayloadFromObject(
-          rawItem,
-          PayloadSource.RemoteSaved
-        );
-      }
-    );
+    this.savedPayloads = this.filterRawItemArray(
+      rawResponse.data?.saved_items
+    ).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteSaved);
+    });
     this.retrievedPayloads = this.filterRawItemArray(
-      rawResponse.retrieved_items
+      rawResponse.data?.retrieved_items
     ).map((rawItem) => {
       return CreateSourcedPayloadFromObject(
         rawItem,
@@ -49,6 +47,14 @@ export class SyncResponse {
       return CreateSourcedPayloadFromObject(
         rawItem,
         PayloadSource.ConflictUuid
+      );
+    });
+    this.rejectedPayloads = this.filterRawItemArray(
+      this.rawRejectedPayloads
+    ).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(
+        rawItem,
+        PayloadSource.RemoteRejected
       );
     });
     /**
@@ -75,7 +81,7 @@ export class SyncResponse {
   }
 
   public get error() {
-    return this.rawResponse.error;
+    return this.rawResponse.error || this.rawResponse.data?.error;
   }
 
   /**
@@ -86,15 +92,15 @@ export class SyncResponse {
   }
 
   public get lastSyncToken() {
-    return this.rawResponse[ApiEndpointParam.LastSyncToken];
+    return this.rawResponse.data?.[ApiEndpointParam.LastSyncToken];
   }
 
   public get paginationToken() {
-    return this.rawResponse[ApiEndpointParam.PaginationToken];
+    return this.rawResponse.data?.[ApiEndpointParam.PaginationToken];
   }
 
   public get integrityHash() {
-    return this.rawResponse[ApiEndpointParam.IntegrityResult];
+    return this.rawResponse.data?.[ApiEndpointParam.IntegrityResult];
   }
 
   get checkIntegrity() {
@@ -109,7 +115,8 @@ export class SyncResponse {
     const allPayloads = this.savedPayloads
       .concat(this.retrievedPayloads)
       .concat(this.dataConflictPayloads)
-      .concat(this.uuidConflictPayloads);
+      .concat(this.uuidConflictPayloads)
+      .concat(this.rejectedPayloads);
     return allPayloads;
   }
 
@@ -133,9 +140,22 @@ export class SyncResponse {
       });
   }
 
+  private get rawRejectedPayloads() {
+    return this.rawConflictObjects
+      .filter((conflict) => {
+        return (
+          conflict.type === ConflictType.ContentTypeError ||
+          conflict.type === ConflictType.ContentError
+        );
+      })
+      .map((conflict) => {
+        return conflict.unsaved_item!;
+      });
+  }
+
   private get rawConflictObjects() {
-    const conflicts = this.rawResponse.conflicts || [];
-    const legacyConflicts = this.rawResponse.unsaved || [];
+    const conflicts = this.rawResponse.data?.conflicts || [];
+    const legacyConflicts = this.rawResponse.data?.unsaved || [];
     return conflicts.concat(legacyConflicts);
   }
 

@@ -22,9 +22,7 @@ import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils';
 import { SyncOpStatus } from '@Services/sync/sync_op_status';
 import { SyncState } from '@Services/sync/sync_state';
 import { AccountDownloader } from '@Services/sync/account/downloader';
-import {
-  SyncResponseResolver,
-} from '@Services/sync/account/response_resolver';
+import { SyncResponseResolver } from '@Services/sync/account/response_resolver';
 import { AccountSyncOperation } from '@Services/sync/account/operation';
 import { OfflineSyncOperation } from '@Services/sync/offline/operation';
 import { DeltaOutOfSync } from '@Payloads/deltas';
@@ -122,7 +120,7 @@ export class SNSyncService extends PureService<
   private spawnQueue: SyncPromise[] = [];
 
   /* A DownloadFirst sync must always be the first sync completed */
-  private completedOnlineDownloadFirstSync = false;
+  public completedOnlineDownloadFirstSync = false;
 
   private majorChangeThreshold = DEFAULT_MAJOR_CHANGE_THRESHOLD;
   private maxDiscordance = DEFAULT_MAX_DISCORDANCE;
@@ -135,6 +133,9 @@ export class SNSyncService extends PureService<
   private syncLock = false;
   private _simulate_latency?: { latency: number; enabled: boolean };
   private dealloced = false;
+
+  public lastSyncInvokationPromise?: Promise<unknown>;
+  public currentSyncRequestPromise?: Promise<void>;
 
   /** Content types appearing first are always mapped first */
   private readonly localLoadPriorty = [
@@ -286,9 +287,10 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
-    const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
-      itemsKeysPayloads
-    );
+    const decryptedItemsKeys =
+      await this.protocolService.payloadsByDecryptingPayloads(
+        itemsKeysPayloads
+      );
     await this.payloadManager.emitPayloads(
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
@@ -413,7 +415,7 @@ export class SNSyncService extends PureService<
     return payloads;
   }
 
-  private queueStrategyResolveOnNext() {
+  private queueStrategyResolveOnNext(): Promise<unknown> {
     return new Promise((resolve, reject) => {
       this.resolveQueue.push({ resolve, reject });
     });
@@ -452,7 +454,7 @@ export class SNSyncService extends PureService<
   public async downloadFirstSync(
     waitTimeOnFailureMs: number,
     otherSyncOptions?: SyncOptions
-  ) {
+  ): Promise<void> {
     const maxTries = 5;
     for (let i = 0; i < maxTries; i++) {
       await this.sync({
@@ -469,7 +471,17 @@ export class SNSyncService extends PureService<
     console.error(`Failed downloadFirstSync after ${maxTries} tries`);
   }
 
-  public async sync(options: SyncOptions = {}): Promise<any> {
+  public async awaitCurrentSyncs(): Promise<void> {
+    await this.lastSyncInvokationPromise;
+    await this.currentSyncRequestPromise;
+  }
+
+  public async sync(options: SyncOptions = {}): Promise<unknown> {
+    this.lastSyncInvokationPromise = this.performSync(options);
+    return this.lastSyncInvokationPromise;
+  }
+
+  private async performSync(options: SyncOptions = {}): Promise<unknown> {
     /** Hard locking, does not apply to locking modes below */
     if (this.locked) {
       this.log('Sync Locked');
@@ -609,7 +621,7 @@ export class SNSyncService extends PureService<
       uploadPayloads = [];
     }
 
-    let operation;
+    let operation: AccountSyncOperation | OfflineSyncOperation;
     if (online) {
       operation = await this.syncOnlineOperation(
         uploadPayloads,
@@ -624,7 +636,12 @@ export class SNSyncService extends PureService<
         useMode
       );
     }
-    await operation.run();
+    this.currentSyncRequestPromise = operation.run();
+    await this.currentSyncRequestPromise;
+
+    if (this.dealloced) {
+      return;
+    }
     this.opStatus!.setDidEnd();
     releaseLock();
 
@@ -736,6 +753,9 @@ export class SNSyncService extends PureService<
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
         switch (type) {
           case SyncSignal.Response:
+            if (this.dealloced) {
+              return;
+            }
             if (response!.hasError) {
               await this.handleErrorServerResponse(response!);
             } else {
@@ -791,6 +811,9 @@ export class SNSyncService extends PureService<
     const operation = new OfflineSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse) => {
+        if (this.dealloced) {
+          return;
+        }
         if (type === SyncSignal.Response) {
           await this.handleOfflineResponse(response!);
         }
@@ -830,7 +853,7 @@ export class SNSyncService extends PureService<
       this.notifyEvent(SyncEvent.InvalidSession);
     }
 
-    this.opStatus!.setError(response.error);
+    this.opStatus?.setError(response.error);
     this.notifyEvent(SyncEvent.SyncError, response.error);
   }
 
@@ -927,7 +950,7 @@ export class SNSyncService extends PureService<
    * @param payloads The decrypted payloads to persist
    */
   public async persistPayloads(payloads: PurePayload[]) {
-    if (payloads.length === 0) {
+    if (payloads.length === 0 || this.dealloced) {
       return;
     }
     return this.storageService.savePayloads(payloads).catch((error) => {
@@ -945,13 +968,24 @@ export class SNSyncService extends PureService<
    * The server will also do the same, to determine whether the client values match server values.
    * @returns A SHA256 digest string (hex).
    */
-  private async computeDataIntegrityHash() {
+  private async computeDataIntegrityHash(): Promise<string | undefined> {
     try {
       const items = this.itemManager.nonDeletedItems.sort((a, b) => {
-        return b.serverUpdatedAt!.getTime() - a.serverUpdatedAt!.getTime();
+        return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
       });
-      const dates = items.map((item) => item.updatedAtTimestamp());
-      const string = dates.join(',');
+      const timestamps: number[] = [];
+      const MicrosecondsInMillisecond = 1_000;
+      for (const item of items) {
+        const updatedAtTimestamp = item.serverUpdatedAtTimestamp;
+        if (!updatedAtTimestamp) {
+          return undefined;
+        }
+        const toMilliseconds = Math.floor(
+          updatedAtTimestamp / MicrosecondsInMillisecond
+        );
+        timestamps.push(toMilliseconds);
+      }
+      const string = timestamps.join(',');
       return this.protocolService.crypto.sha256(string);
     } catch (e) {
       console.error('Error computing data integrity hash', e);
@@ -962,7 +996,7 @@ export class SNSyncService extends PureService<
   /**
    * Downloads all items and maps to lcoal items to attempt resolve out-of-sync state
    */
-  public async resolveOutOfSync() {
+  public async resolveOutOfSync(): Promise<unknown> {
     const downloader = new AccountDownloader(
       this.apiService,
       this.protocolService,

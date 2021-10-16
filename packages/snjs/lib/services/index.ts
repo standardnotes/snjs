@@ -20,6 +20,8 @@ export { SNMigrationService } from '@Lib/services/migration_service';
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';
 export { SNHistoryManager } from '@Services/history/history_manager';
 export { SNProtectionService } from '@Lib/services/protection_service';
+export { SNFeaturesService } from '@Services/features_service';
+export { SNSettingsService } from '@Services/settings_service';
 export { SyncEvent as SyncEvent } from '@Services/sync/events';
 export { SyncOpStatus } from '@Services/sync/sync_op_status';
 export { ItemManager } from '@Services/item_manager';
@@ -34,3 +36,5 @@ export {
   StorageEncryptionPolicies,
   StoragePersistencePolicies,
 } from '@Services/storage_service';
+export type { ItemMessagePayload } from '@Services/component_manager';
+export type { MessageData } from '@Services/component_manager';

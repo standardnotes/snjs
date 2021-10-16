@@ -1,8 +1,9 @@
+import { Settings } from './services/settings_service';
 import { SyncOpStatus } from './services/sync/sync_op_status';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
   SNCredentialService,
-  PasswordChangeFunctionResponse,
+  CredentialsChangeFunctionResponse,
   AccountServiceResponse,
   AccountEvent,
 } from './services/credential_service';
@@ -13,9 +14,14 @@ import {
   SortDirection,
 } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
-import { PayloadOverride } from './protocol/payloads/generator';
+import { PayloadOverride, RawPayload } from './protocol/payloads/generator';
 import { ApplicationStage } from '@Lib/stages';
-import { ApplicationIdentifier, DeinitSource, UuidString } from './types';
+import {
+  ApplicationIdentifier,
+  DeinitSource,
+  UuidString,
+  AnyRecord,
+} from './types';
 import {
   ApplicationEvent,
   SyncEvent,
@@ -78,6 +84,7 @@ import {
   SNSingletonManager,
   SNStorageService,
   SNSyncService,
+  SNFeaturesService,
   SyncModes,
 } from './services';
 import { DeviceInterface } from './device_interface';
@@ -95,12 +102,24 @@ import { ProtocolVersion, compareVersions } from './protocol/versions';
 import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
-import { HttpResponse, User } from './services/api/responses';
-import { RemoteSession } from './services/api/session';
+import {
+  AvailableSubscriptions,
+  GetAvailableSubscriptionsResponse,
+  GetSubscriptionResponse,
+  HttpResponse,
+  SignInResponse,
+  User,
+} from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import { SNPermissionsService } from './services/permissions_service';
 import { ProtectionEvent } from './services/protection_service';
-import { Permission } from '@standardnotes/auth';
+import { RemoteSession } from '.';
+import { SNWebSocketsService } from './services/api/websockets_service';
+import { SettingName } from '@standardnotes/settings';
+import { SNSettingsService } from './services/settings_service';
+import { SNMfaService } from './services/mfa_service';
+import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
+import { Subscription } from '@standardnotes/auth';
+import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -110,7 +129,7 @@ type LaunchCallback = {
 };
 type ApplicationEventCallback = (
   event: ApplicationEvent,
-  data?: any
+  data?: unknown
 ) => Promise<void>;
 type ApplicationObserver = {
   singleEvent?: ApplicationEvent;
@@ -140,10 +159,14 @@ export class SNApplication {
   private itemManager!: ItemManager;
   private keyRecoveryService!: SNKeyRecoveryService;
   private preferencesService!: SNPreferencesService;
-  private permissionsService!: SNPermissionsService;
+  private featuresService!: SNFeaturesService;
   private credentialService!: SNCredentialService;
+  private webSocketsService!: SNWebSocketsService;
+  private settingsService!: SNSettingsService;
+  private mfaService!: SNMfaService;
 
   private eventHandlers: ApplicationObserver[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private services: PureService<any, any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
@@ -158,6 +181,7 @@ export class SNApplication {
   private launched = false;
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false;
+  private revokingSession = false;
 
   /**
    * @param environment The Environment that identifies your application.
@@ -176,6 +200,9 @@ export class SNApplication {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
+   * @param appVersion Version of client application.
+   * @param enableV4 Flag indicating whether V4 features should be enabled.
+   * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
   constructor(
     public environment: Environment,
@@ -184,8 +211,12 @@ export class SNApplication {
     private crypto: SNPureCrypto,
     public alertService: SNAlertService,
     public identifier: ApplicationIdentifier,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private swapClasses: { swap: any; with: any }[],
-    private defaultHost: string
+    private defaultHost: string,
+    private appVersion: string,
+    private enableV4 = false,
+    private webSocketUrl?: string,
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -223,6 +254,10 @@ export class SNApplication {
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
     }
+    if (!appVersion) {
+      throw Error('appVersion must be supplied when creating an application.');
+    }
+
     this.constructServices();
   }
 
@@ -285,8 +320,11 @@ export class SNApplication {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
+    await this.webSocketsService.loadWebSocketUrl();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
+    this.settingsService.initializeFromDisk();
+    await this.featuresService.initializeFromDisk();
 
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
@@ -382,6 +420,7 @@ export class SNApplication {
     event: ApplicationEvent,
     callback: ApplicationEventCallback
   ): () => void {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const filteredCallback = async (firedEvent: ApplicationEvent) => {
       if (firedEvent === event) {
         void callback(event);
@@ -390,7 +429,7 @@ export class SNApplication {
     return this.addEventObserver(filteredCallback, event);
   }
 
-  private async notifyEvent(event: ApplicationEvent, data?: any) {
+  private async notifyEvent(event: ApplicationEvent, data?: AnyRecord) {
     if (event === ApplicationEvent.Started) {
       this.onStart();
     } else if (event === ApplicationEvent.Launched) {
@@ -446,7 +485,7 @@ export class SNApplication {
   /**
    * Finds an item by predicate.
    */
-  public getAll(uuids: UuidString[]): (SNItem | undefined)[] {
+  public getAll(uuids: UuidString[]): (SNItem | PurePayload | undefined)[] {
     return this.itemManager.findItems(uuids);
   }
 
@@ -499,8 +538,8 @@ export class SNApplication {
    * Creates an unmanaged payload from any object, where the raw object
    * represents the same data a payload would.
    */
-  public createPayloadFromObject(object: any): PurePayload {
-    return CreateMaxPayloadFromAnyObject(object);
+  public createPayloadFromObject(object: AnyRecord): PurePayload {
+    return CreateMaxPayloadFromAnyObject(object as RawPayload);
   }
 
   /**
@@ -514,7 +553,9 @@ export class SNApplication {
     return this.syncService.getStatus();
   }
 
-  public getSessions(): Promise<HttpResponse<RemoteSession[]>> {
+  public getSessions(): Promise<
+    (HttpResponse & { data: RemoteSession[] }) | HttpResponse
+  > {
     return this.sessionManager.getSessionsList();
   }
 
@@ -526,12 +567,43 @@ export class SNApplication {
     }
   }
 
+  /**
+   * Revokes all sessions except the current one.
+   */
+  public async revokeAllOtherSessions(): Promise<void> {
+    return this.sessionManager.revokeAllOtherSessions();
+  }
+
   public async userCanManageSessions(): Promise<boolean> {
     const userVersion = await this.getUserVersion();
     if (isNullOrUndefined(userVersion)) {
       return false;
     }
     return compareVersions(userVersion, ProtocolVersion.V004) >= 0;
+  }
+
+  public async getUserSubscription(): Promise<Subscription | undefined> {
+    const response = await this.sessionManager.getSubscription();
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+    if (response.data) {
+      return (response as GetSubscriptionResponse).data!.subscription;
+    }
+    return undefined;
+  }
+
+  public async getAvailableSubscriptions(): Promise<
+    AvailableSubscriptions | undefined
+  > {
+    const response = await this.apiService.getAvailableSubscriptions();
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+    if (response.data) {
+      return (response as GetAvailableSubscriptionsResponse).data!;
+    }
+    return undefined;
   }
 
   /**
@@ -704,6 +776,28 @@ export class SNApplication {
     return unprotectedNote;
   }
 
+  public async authorizeProtectedActionForNotes(
+    notes: SNNote[],
+    challengeReason: ChallengeReason
+  ): Promise<SNNote[]> {
+    return await this.protectionService.authorizeProtectedActionForNotes(
+      notes,
+      challengeReason
+    );
+  }
+
+  public async protectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const protectedNotes = await this.protectionService.protectNotes(notes);
+    void this.syncService.sync();
+    return protectedNotes;
+  }
+
+  public async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
+    const unprotectedNotes = await this.protectionService.unprotectNotes(notes);
+    void this.syncService.sync();
+    return unprotectedNotes;
+  }
+
   public getItems(contentType: ContentType | ContentType[]): SNItem[] {
     return this.itemManager.getItems(contentType);
   }
@@ -749,6 +843,43 @@ export class SNApplication {
 
   public findTagByTitle(title: string): SNTag | undefined {
     return this.itemManager.findTagByTitle(title);
+  }
+
+  /**
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
+   */
+  public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
+    return this.itemManager.searchTags(searchQuery, note);
+  }
+
+  /**
+   * Returns all parents for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns Array containing all parent tags
+   */
+  public getTagParentChain(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagParentChain(tag);
+  }
+
+  /**
+   * Returns all descendants for a tag
+   * @param tag - The tag for which descendants need to be found
+   * @returns Array containing all descendant tags
+   */
+  public getTagDescendants(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagDescendants(tag);
+  }
+
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  public getSortedTagsForNote(note: SNNote): SNTag[] {
+    return this.itemManager.getSortedTagsForNote(note);
   }
 
   public async findOrCreateTag(title: string): Promise<SNTag> {
@@ -811,11 +942,20 @@ export class SNApplication {
     return this.apiService.getHost();
   }
 
+  public async setCustomHost(host: string): Promise<void> {
+    await this.apiService.setHost(host);
+    await this.webSocketsService.setWebSocketUrl(undefined);
+  }
+
   public getUser(): User | undefined {
     if (!this.launched) {
       throw Error('Attempting to access user before application unlocked');
     }
     return this.sessionManager.getUser();
+  }
+
+  public getUserPasswordCreationDate(): Date | undefined {
+    return this.protocolService.getPasswordCreatedDate();
   }
 
   public async getProtocolEncryptionDisplayName(): Promise<string | undefined> {
@@ -903,10 +1043,6 @@ export class SNApplication {
 
   public authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.protectionService.authorizeAutolockIntervalChange();
-  }
-
-  public authorizeBatchManagerAccess(): Promise<boolean> {
-    return this.protectionService.authorizeBatchManagerAccess();
   }
 
   public authorizeCloudLinkAccess(): Promise<boolean> {
@@ -1052,6 +1188,7 @@ export class SNApplication {
     return this.storageService.isEphemeralSession();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public sync(options?: SyncOptions): Promise<any> {
     return this.syncService.sync(options);
   }
@@ -1060,19 +1197,19 @@ export class SNApplication {
     return this.syncService.isOutOfSync();
   }
 
-  public async resolveOutOfSync(): Promise<void> {
+  public async resolveOutOfSync(): Promise<unknown> {
     return this.syncService.resolveOutOfSync();
   }
 
   public async setValue(
     key: string,
-    value: any,
+    value: unknown,
     mode?: StorageValueModes
   ): Promise<void> {
     return this.storageService.setValue(key, value, mode);
   }
 
-  public async getValue(key: string, mode?: StorageValueModes): Promise<any> {
+  public getValue(key: string, mode?: StorageValueModes): Promise<unknown> {
     return this.storageService.getValue(key, mode);
   }
 
@@ -1100,10 +1237,6 @@ export class SNApplication {
     value: PrefValue[K]
   ): Promise<void> {
     return this.preferencesService.setValue(key, value);
-  }
-
-  public hasPermission(permission: Permission): boolean {
-    return this.permissionsService.hasPermission(permission);
   }
 
   /**
@@ -1210,7 +1343,7 @@ export class SNApplication {
     ephemeral = false,
     mergeLocal = true,
     awaitSync = false
-  ): Promise<AccountServiceResponse> {
+  ): Promise<HttpResponse | SignInResponse> {
     return this.credentialService.signIn(
       email,
       password,
@@ -1221,27 +1354,79 @@ export class SNApplication {
     );
   }
 
+  public async changeEmail(
+    newEmail: string,
+    currentPassword: string,
+    passcode?: string,
+    origination = KeyParamsOrigination.EmailChange
+  ): Promise<CredentialsChangeFunctionResponse> {
+    return this.credentialService.changeCredentials({
+      currentPassword,
+      newEmail,
+      passcode,
+      origination,
+      validateNewPasswordStrength: false,
+    });
+  }
+
   public async changePassword(
     currentPassword: string,
     newPassword: string,
     passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
-    { validatePasswordStrength = true } = {}
-  ): Promise<PasswordChangeFunctionResponse> {
-    return this.credentialService.changePassword(
+    validateNewPasswordStrength = true
+  ): Promise<CredentialsChangeFunctionResponse> {
+    return this.credentialService.changeCredentials({
       currentPassword,
       newPassword,
       passcode,
       origination,
-      { validatePasswordStrength }
-    );
+      validateNewPasswordStrength,
+    });
   }
 
-  public async signOut(): Promise<void> {
-    await this.credentialService.signOut();
-    await this.notifyEvent(ApplicationEvent.SignedOut);
-    await this.prepareForDeinit();
-    this.deinit(DeinitSource.SignOut);
+  public async signOut(force = false): Promise<void> {
+    const performSignOut = async () => {
+      await this.credentialService.signOut();
+      await this.notifyEvent(ApplicationEvent.SignedOut);
+      await this.prepareForDeinit();
+      this.deinit(DeinitSource.SignOut);
+    };
+
+    if (force) {
+      await performSignOut();
+      return;
+    }
+
+    const dirtyItems = this.itemManager.getDirtyItems();
+    if (dirtyItems.length > 0) {
+      const singular = dirtyItems.length === 1;
+      const didConfirm = await this.alertService.confirm(
+        `There ${singular ? 'is' : 'are'} ${dirtyItems.length} ${
+          singular ? 'item' : 'items'
+        } with unsynced changes. If you sign out, these changes will be lost forever. Are you sure you want to sign out?`
+      );
+      if (didConfirm) {
+        await performSignOut();
+      }
+    } else {
+      await performSignOut();
+    }
+  }
+
+  private async handleRevokedSession(): Promise<void> {
+    /**
+     * Because multiple API requests can come back at the same time
+     * indicating revoked session we only want to do this once.
+     */
+    if (this.revokingSession) {
+      return;
+    }
+    this.revokingSession = true;
+    /** Keep a reference to the soon-to-be-cleared alertService */
+    const alertService = this.alertService;
+    await this.signOut(true);
+    void alertService.alert(SessionStrings.CurrentSessionRevoked);
   }
 
   public async validateAccountPassword(password: string): Promise<boolean> {
@@ -1356,8 +1541,75 @@ export class SNApplication {
     }
   }
 
+  public async listSettings(): Promise<Partial<Settings>> {
+    return this.settingsService.listSettings();
+  }
+
+  public async getSetting(name: SettingName): Promise<string | null> {
+    return this.settingsService.getSetting(name);
+  }
+
+  public async getSensitiveSetting(
+    name: SensitiveSettingName
+  ): Promise<boolean> {
+    return this.settingsService.getSensitiveSetting(name);
+  }
+
+  public async updateSetting(
+    name: SettingName,
+    payload: string,
+    sensitive = false
+  ): Promise<void> {
+    return this.settingsService.updateSetting(name, payload, sensitive);
+  }
+
+  public async deleteSetting(name: SettingName): Promise<void> {
+    return this.settingsService.deleteSetting(name);
+  }
+
+  public isMfaFeatureAvailable(): boolean {
+    return this.mfaService.isMfaFeatureAvailable();
+  }
+
+  public async isMfaActivated(): Promise<boolean> {
+    return this.mfaService.isMfaActivated();
+  }
+
+  public async generateMfaSecret(): Promise<string> {
+    return this.mfaService.generateMfaSecret();
+  }
+
+  public async getOtpToken(secret: string): Promise<string> {
+    return this.mfaService.getOtpToken(secret);
+  }
+
+  public async enableMfa(secret: string, otpToken: string): Promise<void> {
+    return this.mfaService.enableMfa(secret, otpToken);
+  }
+
+  public async disableMfa(): Promise<void> {
+    if (await this.protectionService.authorizeMfaDisable()) {
+      return this.mfaService.disableMfa();
+    }
+  }
+
+  public downloadExternalFeature(
+    url: string
+  ): Promise<SNComponent | undefined> {
+    return this.featuresService.downloadExternalFeature(url);
+  }
+
+  public getFeature(
+    featureId: FeatureIdentifier
+  ): FeatureDescription | undefined {
+    return this.featuresService.getFeature(featureId);
+  }
+
+  public getPurchaseFlowUrl(): Promise<string | undefined> {
+    return this.apiService.getPurchaseFlowUrl();
+  }
+
   private constructServices() {
-    this.createPermissionsService();
     this.createPayloadManager();
     this.createItemManager();
     this.createStorageManager();
@@ -1374,8 +1626,8 @@ export class SNApplication {
     this.createChallengeService();
     this.createHttpManager();
     this.createApiService();
+    this.createWebSocketsService();
     this.createSessionManager();
-    this.createMigrationService();
     this.createHistoryManager();
     this.createSyncManager();
     this.createProtectionService();
@@ -1385,6 +1637,10 @@ export class SNApplication {
     this.createComponentManager();
     this.createActionsManager();
     this.createPreferencesService();
+    this.createSettingsService();
+    this.createFeaturesService();
+    this.createMigrationService();
+    this.createMfaService();
   }
 
   private clearServices() {
@@ -1406,20 +1662,36 @@ export class SNApplication {
     (this.itemManager as unknown) = undefined;
     (this.keyRecoveryService as unknown) = undefined;
     (this.preferencesService as unknown) = undefined;
-    (this.permissionsService as unknown) = undefined;
+    (this.featuresService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
+    (this.webSocketsService as unknown) = undefined;
+    (this.settingsService as unknown) = undefined;
+    (this.mfaService as unknown) = undefined;
 
     this.services = [];
   }
 
-  private createPermissionsService() {
-    this.permissionsService = new SNPermissionsService();
-    this.serviceObservers.push(
-      this.permissionsService.addEventObserver((_event, permissions) => {
-        void this.notifyEvent(ApplicationEvent.PermissionsChanged, permissions);
-      })
+  private createFeaturesService() {
+    this.featuresService = new SNFeaturesService(
+      this.storageService,
+      this.apiService,
+      this.itemManager,
+      this.componentManager,
+      this.webSocketsService,
+      this.settingsService,
+      this.credentialService,
+      this.syncService,
+      this.enableV4
     );
-    this.services.push(this.permissionsService);
+    this.services.push(this.featuresService);
+  }
+
+  private createWebSocketsService() {
+    this.webSocketsService = new SNWebSocketsService(
+      this.storageService,
+      this.webSocketUrl
+    );
+    this.services.push(this.webSocketsService);
   }
 
   private createMigrationService() {
@@ -1430,6 +1702,8 @@ export class SNApplication {
       sessionManager: this.sessionManager,
       challengeService: this.challengeService,
       itemManager: this.itemManager,
+      singletonManager: this.singletonManager,
+      featuresService: this.featuresService,
       environment: this.environment,
       identifier: this.identifier,
     });
@@ -1454,7 +1728,6 @@ export class SNApplication {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.permissionsService,
       this.defaultHost
     );
     this.services.push(this.apiService);
@@ -1481,7 +1754,7 @@ export class SNApplication {
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService();
+    this.httpService = new SNHttpService(this.environment, this.appVersion);
     this.services.push(this.httpService);
   }
 
@@ -1544,7 +1817,8 @@ export class SNApplication {
       this.apiService,
       this.alertService,
       this.protocolService,
-      this.challengeService
+      this.challengeService,
+      this.webSocketsService
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
@@ -1553,16 +1827,17 @@ export class SNApplication {
             void (async () => {
               await this.sync();
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-                void this.protocolService.createNewDefaultItemsKey();
+                void this.protocolService
+                  .createNewDefaultItemsKey()
+                  .then(() => {
+                    void this.sync();
+                  });
               }
             })();
             break;
           }
           case SessionEvent.Revoked: {
-            /** Keep a reference to the soon-to-be-cleared alertService */
-            const alertService = this.alertService;
-            await this.signOut();
-            void alertService.alert(SessionStrings.CurrentSessionRevoked);
+            await this.handleRevokedSession();
             break;
           }
           default: {
@@ -1673,6 +1948,23 @@ export class SNApplication {
       })
     );
     this.services.push(this.preferencesService);
+  }
+
+  private createSettingsService() {
+    this.settingsService = new SNSettingsService(
+      this.sessionManager,
+      this.apiService
+    );
+    this.services.push(this.settingsService);
+  }
+
+  private createMfaService() {
+    this.mfaService = new SNMfaService(
+      this.settingsService,
+      this.crypto,
+      this.featuresService
+    );
+    this.services.push(this.mfaService);
   }
 
   private getClass<T>(base: T) {

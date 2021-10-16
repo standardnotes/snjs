@@ -25,7 +25,8 @@ jobs:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
-      - run: yarn test
+      - run: yarn build
+      - run: yarn test:unit
   e2e-tests:
     env:
       DOCKER_BUILDKIT: 1

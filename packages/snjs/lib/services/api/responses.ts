@@ -5,7 +5,9 @@ import {
   KeyParamsOrigination,
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-import { Role, Permission } from '@standardnotes/auth';
+import { Role, Subscription, SubscriptionName } from '@standardnotes/auth';
+import { FeatureDescription } from '@standardnotes/features';
+import { UuidString } from '@Lib/types';
 
 export enum StatusCode {
   LocalValidationError = 10,
@@ -21,28 +23,33 @@ export enum StatusCode {
   HttpStatusInvalidSession = 401,
   /** User's IP is rate-limited. */
   HttpStatusForbidden = 403,
+  HttpBadRequest = 400,
 }
 
-export type HttpResponse<T = unknown> = {
-  status: StatusCode,
-  error?: {
-    message: string;
-    status: number;
-    tag?: string;
-    /** In the case of MFA required responses,
-     * the required prompt is returned as part of the error */
-    payload?: {
-      mfa_key?: string
-    }
-  }
-  data?: T,
-  meta?: ResponseMeta
-}
+type Error = {
+  message: string;
+  status: number;
+  tag?: string;
+  /** In the case of MFA required responses,
+   * the required prompt is returned as part of the error */
+  payload?: {
+    mfa_key?: string;
+  };
+};
+
+export type HttpResponse = {
+  status?: StatusCode;
+  error?: Error;
+  data?: {
+    error?: Error;
+  };
+  meta?: ResponseMeta;
+};
 
 export type ResponseMeta = {
   auth: {
-    role: Role;
-    permissions: Permission[];
+    userUuid?: UuidString;
+    roles?: Role[];
   };
 };
 
@@ -57,7 +64,7 @@ type SessionBody = {
   refresh_expiration: number;
 };
 
-export type KeyParamsResponse = HttpResponse & {
+export type KeyParamsData = {
   identifier?: string;
   pw_cost?: number;
   pw_nonce?: string;
@@ -72,37 +79,70 @@ export type KeyParamsResponse = HttpResponse & {
   created?: string;
 };
 
+export type KeyParamsResponse = HttpResponse & {
+  data: KeyParamsData;
+};
+
 export type User = {
   uuid: string;
   email: string;
 };
 
-export type RegistrationResponse = HttpResponse & {
+export type RegistrationData = {
   session?: SessionBody;
   /** Represents legacy JWT token */
   token?: string;
   user?: User;
 };
 
-export type SignInResponse = RegistrationResponse & {
+export type RegistrationResponse = HttpResponse & {
+  data: RegistrationData;
+};
+
+export type SignInData = {
+  session?: SessionBody;
+  /** Represents legacy JWT token */
+  token?: string;
+  user?: User;
   key_params?: AnyKeyParamsContent;
 };
 
-export type ChangePasswordResponse = SignInResponse;
+export type SignInResponse = HttpResponse & {
+  data: SignInData;
+};
+
+export type ChangeCredentialsData = {
+  session?: SessionBody;
+  /** Represents legacy JWT token */
+  token?: string;
+  user?: User;
+  key_params?: AnyKeyParamsContent;
+};
+
+export type ChangeCredentialsResponse = HttpResponse & {
+  data: ChangeCredentialsData;
+};
 
 export type SignOutResponse = HttpResponse & Record<string, unknown>;
 
-export type SessionRenewalResponse = HttpResponse & {
+export type SessionRenewalData = {
   session?: SessionBody;
+};
+
+export type SessionRenewalResponse = HttpResponse & {
+  data: SessionRenewalData;
 };
 
 export type SessionListEntry = {
   uuid: string;
+  current: boolean;
   api_version: string;
   created_at: string;
   updated_at: string;
   device_info: string;
 };
+
+export type SessionListResponse = HttpResponse & { data: SessionListEntry[] };
 
 export type RevisionListEntry = {
   content_type: string;
@@ -112,7 +152,7 @@ export type RevisionListEntry = {
   uuid: string;
 };
 
-export type RevisionListResponse = HttpResponse & RevisionListEntry[];
+export type RevisionListResponse = HttpResponse & { data: RevisionListEntry[] };
 
 export type SingleRevision = {
   auth_hash?: string;
@@ -128,11 +168,15 @@ export type SingleRevision = {
   uuid: string;
 };
 
-export type SingleRevisionResponse = HttpResponse & Partial<SingleRevision>;
+export type SingleRevisionResponse = HttpResponse & {
+  data: Partial<SingleRevision>;
+};
 
 export enum ConflictType {
   ConflictingData = 'sync_conflict',
   UuidConflict = 'uuid_conflict',
+  ContentTypeError = 'content_type_error',
+  ContentError = 'content_error',
 }
 
 export type ConflictParams = {
@@ -143,7 +187,7 @@ export type ConflictParams = {
   item?: RawPayload;
 };
 
-export type RawSyncResponse = {
+export type RawSyncData = {
   error?: any;
   [ApiEndpointParam.LastSyncToken]?: string;
   [ApiEndpointParam.PaginationToken]?: string;
@@ -154,3 +198,66 @@ export type RawSyncResponse = {
   unsaved?: ConflictParams[];
   status?: number;
 };
+
+export type RawSyncResponse = HttpResponse & { data: RawSyncData };
+
+export type UserFeaturesData = {
+  features: FeatureDescription[];
+};
+
+export type UserFeaturesResponse = HttpResponse & {
+  data: UserFeaturesData;
+};
+
+type SettingData = {
+  uuid: string;
+  name: string;
+  value: string;
+  sensitive?: boolean;
+};
+
+export type MinimalHttpResponse = {
+  status?: StatusCode;
+  error?: Error;
+};
+
+export type ListSettingsResponse = MinimalHttpResponse & {
+  data?: {
+    settings?: SettingData[];
+  };
+};
+export type GetSettingResponse = MinimalHttpResponse & {
+  data?: {
+    success?: boolean;
+    setting?: SettingData;
+  };
+};
+export type UpdateSettingResponse = MinimalHttpResponse;
+export type DeleteSettingResponse = MinimalHttpResponse;
+
+export type GetSubscriptionResponse = MinimalHttpResponse & {
+  data?: {
+    subscription?: Subscription
+  }
+}
+
+export type AvailableSubscriptions = {
+  [key in SubscriptionName]: {
+    name: string;
+    pricing: {
+      price: number;
+      period: string;
+    }[];
+    features: FeatureDescription[];
+  }
+};
+
+export type GetAvailableSubscriptionsResponse = MinimalHttpResponse & {
+  data?: AvailableSubscriptions;
+}
+
+export type PostSubscriptionTokensResponse = MinimalHttpResponse & {
+  data?: {
+    token: string;
+  }
+}

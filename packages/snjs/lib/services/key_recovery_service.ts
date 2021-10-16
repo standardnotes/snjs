@@ -30,6 +30,7 @@ import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { PayloadSource } from '@Lib/protocol/payloads';
 import { UuidString } from '@Lib/types';
+import { KeyParamsResponse } from './api/responses';
 
 /**
  * The key recovery service listens to items key changes to detect any that cannot be decrypted.
@@ -351,8 +352,8 @@ export class SNKeyRecoveryService extends PureService {
       const paramsResponse = await this.apiService.getAccountKeyParams(
         clientParams.identifier
       );
-      if (!paramsResponse.error) {
-        this.serverParams = KeyParamsFromApiResponse(paramsResponse);
+      if (!paramsResponse.error && paramsResponse.data) {
+        this.serverParams = KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse);
       }
     }
 

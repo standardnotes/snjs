@@ -34,13 +34,14 @@ export enum ChallengeReason {
   ChangeAutolockInterval,
   CreateDecryptedBackupWithProtectedItems,
   RevokeSession,
-  AccessBatchManager,
   AccessCloudLink,
   DecryptEncryptedFile,
   ExportBackup,
   DisableBiometrics,
   UnprotectNote,
   SearchProtectedNotesText,
+  SelectProtectedNote,
+  DisableMfa
 }
 
 /** For mobile */
@@ -106,8 +107,6 @@ export class Challenge {
           return ChallengeStrings.EnterCredentialsForDecryptedBackupDownload;
         case ChallengeReason.RevokeSession:
           return ChallengeStrings.RevokeSession;
-        case ChallengeReason.AccessBatchManager:
-          return ChallengeStrings.AccessBatchManager;
         case ChallengeReason.AccessCloudLink:
           return ChallengeStrings.AccessCloudLink;
         case ChallengeReason.DecryptEncryptedFile:
@@ -120,6 +119,10 @@ export class Challenge {
           return ChallengeStrings.UnprotectNote;
         case ChallengeReason.SearchProtectedNotesText:
           return ChallengeStrings.SearchProtectedNotesText;
+        case ChallengeReason.SelectProtectedNote:
+          return ChallengeStrings.SelectProtectedNote;
+          case ChallengeReason.DisableMfa:
+            return ChallengeStrings.DisableMfa
         case ChallengeReason.Custom:
           return '';
         default:

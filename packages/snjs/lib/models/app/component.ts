@@ -6,17 +6,9 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
+import { ComponentArea, ThemeDockIcon, ComponentFlag } from '@standardnotes/features';
 
-export enum ComponentArea {
-  Editor = 'editor-editor',
-  Themes = 'themes',
-  TagsList = 'tags-list',
-  EditorStack = 'editor-stack',
-  NoteTags = 'note-tags',
-  Rooms = 'rooms',
-  Modal = 'modal',
-  Any = '*',
-}
+export { ComponentArea };
 
 export enum ComponentAction {
   SetSize = 'set-size',
@@ -41,7 +33,10 @@ export enum ComponentAction {
   Reply = 'reply',
   SaveSuccess = 'save-success',
   SaveError = 'save-error',
-  ThemesActivated = 'themes-activated'
+  ThemesActivated = 'themes-activated',
+  KeyDown = 'key-down',
+  KeyUp = 'key-up',
+  Click = 'click'
 }
 
 export type ComponentPermission = {
@@ -49,24 +44,40 @@ export type ComponentPermission = {
   content_types?: ContentType[];
 };
 
-interface ComponentContent {
+export type ComponentPackageInfo = {
+  description: string,
+  acceptsThemes?: boolean,
+  layerable?: boolean,
+  url: string,
+  download_url: string,
+  identifier: string,
+  flags?: string[],
+  deprecation_message?: string,
+  name: string,
+  version: string,
+  deletion_warning?: string,
+  dock_icon?: ThemeDockIcon
+}
+
+export interface ComponentContent {
   componentData: Record<string, any>;
   /** Items that have requested a component to be disabled in its context */
   disassociatedItemIds: string[];
   /** Items that have requested a component to be enabled in its context */
   associatedItemIds: string[];
-  local_url: string;
+  local_url: string | null;
   hosted_url: string;
   offlineOnly: boolean;
   name: string;
   autoupdateDisabled: boolean;
-  package_info: any;
+  package_info: ComponentPackageInfo;
   area: ComponentArea;
   permissions: ComponentPermission[];
-  valid_until: Date;
+  valid_until: Date | number;
   active: boolean;
   legacy_url: string;
   isMobileDefault: boolean;
+  isDeprecated: boolean;
 }
 
 /**
@@ -85,7 +96,7 @@ export class SNComponent extends SNItem implements ComponentContent {
   public readonly offlineOnly: boolean;
   public readonly name: string;
   public readonly autoupdateDisabled: boolean;
-  public readonly package_info: any;
+  public readonly package_info: ComponentPackageInfo;
   public readonly area: ComponentArea;
   public readonly permissions: ComponentPermission[] = [];
   public readonly valid_until: Date;
@@ -201,6 +212,12 @@ export class SNComponent extends SNItem implements ComponentContent {
   public isExplicitlyDisabledForItem(uuid: UuidString) {
     return this.disassociatedItemIds.indexOf(uuid) !== -1;
   }
+
+  public get isDeprecated() {
+    let flags: string[] = this.package_info.flags ?? [];
+    flags = flags.map((flag: string) => flag.toLowerCase());
+    return flags.includes(ComponentFlag.Deprecated);
+  }
 }
 
 export class ComponentMutator extends ItemMutator {
@@ -234,6 +251,10 @@ export class ComponentMutator extends ItemMutator {
 
   set hosted_url(hosted_url: string) {
     this.typedContent.hosted_url = hosted_url;
+  }
+
+  set valid_until(valid_until: Date) {
+    this.typedContent.valid_until = valid_until;
   }
 
   set permissions(permissions: ComponentPermission[]) {

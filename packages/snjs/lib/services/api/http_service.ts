@@ -2,12 +2,15 @@ import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
 import { HttpResponse, StatusCode } from './responses';
 import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@Lib/utils';
+import { SnjsVersion } from '@Lib/version';
+import { Environment } from '@Lib/platforms';
 
 export enum HttpVerb {
-  Get = 'get',
-  Post = 'post',
-  Patch = 'patch',
-  Delete = 'delete',
+  Get = 'GET',
+  Post = 'POST',
+  Put = 'PUT',
+  Patch = 'PATCH',
+  Delete = 'DELETE',
 }
 
 export enum ErrorTag {
@@ -29,6 +32,12 @@ export type HttpRequest = {
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export class SNHttpService extends PureService {
+  constructor(
+    private readonly environment: Environment,
+    private readonly appVersion: string
+  ) {
+    super();
+  }
   public async getAbsolute(
     url: string,
     params?: HttpParams,
@@ -43,6 +52,14 @@ export class SNHttpService extends PureService {
     authentication?: string
   ): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Post, authentication });
+  }
+
+  public async putAbsolute(
+    url: string,
+    params?: HttpParams,
+    authentication?: string
+  ): Promise<HttpResponse> {
+    return this.runHttp({ url, params, verb: HttpVerb.Put, authentication });
   }
 
   public async patchAbsolute(
@@ -80,6 +97,11 @@ export class SNHttpService extends PureService {
     }
     request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
+    request.setRequestHeader('X-SNJS-Version', SnjsVersion);
+
+    const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
+    request.setRequestHeader('X-Application-Version', appVersionHeaderValue);
+
     if (httpRequest.authentication) {
       request.setRequestHeader(
         'Authorization',
@@ -100,6 +122,7 @@ export class SNHttpService extends PureService {
       };
       if (
         verb === HttpVerb.Post ||
+        verb === HttpVerb.Put ||
         verb === HttpVerb.Patch ||
         verb === HttpVerb.Delete
       ) {
@@ -150,7 +173,11 @@ export class SNHttpService extends PureService {
           status: httpStatus,
         };
       } else if (isNullOrUndefined(response.error)) {
-        response.error = { message: UNKNOWN_ERROR, status: httpStatus };
+        if (isNullOrUndefined(response.data) || isNullOrUndefined(response.data.error)) {
+          response.error = { message: UNKNOWN_ERROR, status: httpStatus };
+        } else {
+          response.error = response.data.error;
+        }
       }
       reject(response);
     }

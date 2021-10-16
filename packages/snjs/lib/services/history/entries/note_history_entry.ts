@@ -3,7 +3,11 @@ import { HistoryEntry } from '@Services/history/entries/history_entry';
 
 export class NoteHistoryEntry extends HistoryEntry {
   previewTitle(): string {
-    return this.payload.updated_at!.toLocaleString();
+    if (this.payload.updated_at.getTime() > 0) {
+      return this.payload.updated_at.toLocaleString();
+    } else {
+      return this.payload.created_at!.toLocaleString();
+    }
   }
 
   previewSubTitle(): string {

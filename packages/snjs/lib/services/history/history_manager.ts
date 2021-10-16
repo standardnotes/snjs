@@ -6,7 +6,7 @@ import { SurePayload } from './../../protocol/payloads/sure_payload';
 import { UuidString } from './../../types';
 import {
   RevisionListEntry,
-  SingleRevision,
+  RevisionListResponse,
   SingleRevisionResponse,
 } from './../api/responses';
 import { SNStorageService } from '@Services/storage_service';
@@ -20,7 +20,7 @@ import { ContentType } from '@Models/content_types';
 import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { removeFromArray } from '@Lib/utils';
+import { isNullOrUndefined, removeFromArray } from '@Lib/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
@@ -305,10 +305,10 @@ export class SNHistoryManager extends PureService {
     item: SNItem
   ): Promise<RevisionListEntry[] | undefined> {
     const response = await this.apiService.getItemRevisions(item.uuid);
-    if (response.error) {
+    if (response.error || isNullOrUndefined(response.data)) {
       return undefined;
     }
-    return response.data as RevisionListEntry[];
+    return (response as RevisionListResponse).data;
   }
 
   /**
@@ -319,13 +319,14 @@ export class SNHistoryManager extends PureService {
     itemUuid: UuidString,
     entry: RevisionListEntry
   ): Promise<HistoryEntry | undefined> {
-    const revision = (await this.apiService.getRevision(
+    const revisionResponse = (await this.apiService.getRevision(
       entry,
       itemUuid
-    )) as SingleRevision;
-    if ((revision as SingleRevisionResponse).error) {
+    ));
+    if (revisionResponse.error || isNullOrUndefined(revisionResponse.data)) {
       return undefined;
     }
+    const revision = (revisionResponse as SingleRevisionResponse).data;
     const payload = CreateMaxPayloadFromAnyObject(
       (revision as unknown) as RawPayload,
       {

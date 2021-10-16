@@ -9,7 +9,7 @@ import {
 import { extendArray } from '@Lib/utils';
 
 export class DeltaOutOfSync extends PayloadsDelta {
-  public async resultingCollection() {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const results = [];
     for (const payload of this.applyCollection.all()) {
       /**

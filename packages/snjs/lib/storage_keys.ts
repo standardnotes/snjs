@@ -35,6 +35,9 @@ export enum StorageKey {
   SessionHistoryOptimize = 'sessionHistory_autoOptimize',
   KeyRecoveryUndecryptableItems = 'key_recovery_undecryptable',
   StorageEncryptionPolicy = 'storage_policy',
+  WebSocketUrl = 'webSocket_url',
+  UserRoles = 'user_roles',
+  UserFeatures = 'user_features',
 }
 
 export enum NonwrappedStorageKey {
