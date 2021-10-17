@@ -1,6 +1,5 @@
 import { SNSyncService } from './sync/sync_service';
 import { AccountEvent, SNCredentialService } from './credential_service';
-import { ComponentPackageInfo } from './../models/app/component';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
@@ -219,7 +218,7 @@ export class SNFeaturesService extends PureService<void> {
       area: feature.area,
       hosted_url: feature.url,
       name: feature.name,
-      package_info: feature as ComponentPackageInfo,
+      package_info: feature,
       valid_until: new Date(feature.expires_at || 0),
     };
     return FillItemContent(componentContent);
@@ -258,7 +257,7 @@ export class SNFeaturesService extends PureService<void> {
           existingItem.uuid,
           (mutator) => {
             mutator.hosted_url = feature.url;
-            mutator.package_info = feature as ComponentPackageInfo;
+            mutator.package_info = feature;
             mutator.valid_until = new Date(feature.expires_at || 0);
           }
         );
