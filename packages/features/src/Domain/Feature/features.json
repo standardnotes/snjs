@@ -1,21 +1,22 @@
-[{
-  "name": "Midnight",
-  "identifier": "org.standardnotes.theme-midnight",
-  "permission_name": "theme:midnight",
-  "content_type": "SN|Theme",
-  "version": "1.2.2",
-  "description": "Elegant utilitarianism.",
-  "url": "#{url_prefix}/themes/midnight",
-  "download_url": "https://github.com/standardnotes/midnight-theme/archive/1.2.2.zip",
-  "marketing_url": "https://standardnotes.org/extensions/midnight",
-  "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/themes/midnight-with-mobile.jpg",
-  "dock_icon": {
-    "type": "circle",
-    "background_color": "#086DD6",
-    "foreground_color": "#ffffff",
-    "border_color": "#086DD6"
-  }
-},
+[
+  {
+    "name": "Midnight",
+    "identifier": "org.standardnotes.theme-midnight",
+    "permission_name": "theme:midnight",
+    "content_type": "SN|Theme",
+    "version": "1.2.2",
+    "description": "Elegant utilitarianism.",
+    "url": "#{url_prefix}/themes/midnight",
+    "download_url": "https://github.com/standardnotes/midnight-theme/archive/1.2.2.zip",
+    "marketing_url": "https://standardnotes.org/extensions/midnight",
+    "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/themes/midnight-with-mobile.jpg",
+    "dock_icon": {
+      "type": "circle",
+      "background_color": "#086DD6",
+      "foreground_color": "#ffffff",
+      "border_color": "#086DD6"
+    }
+  },
   {
     "name": "Futura",
     "identifier": "org.standardnotes.theme-futura",
@@ -109,6 +110,9 @@
   },
   {
     "name": "Bold Editor",
+    "note_type": "rich-text",
+    "file_type": "html",
+    "interchangeable": true,
     "identifier": "org.standardnotes.bold-editor",
     "permission_name": "editor:bold",
     "content_type": "SN|Component",
@@ -118,11 +122,13 @@
     "url": "#{url_prefix}/components/bold-editor",
     "marketing_url": "",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/bold.jpg",
-    "download_url": "https://github.com/standardnotes/bold-editor/archive/1.2.1.zip",
-    "flags": ["New"]
+    "download_url": "https://github.com/standardnotes/bold-editor/archive/1.2.1.zip"
   },
   {
     "name": "Plus Editor",
+    "note_type": "rich-text",
+    "file_type": "html",
+    "interchangeable": true,
     "identifier": "org.standardnotes.plus-editor",
     "permission_name": "editor:plus",
     "content_type": "SN|Component",
@@ -136,6 +142,9 @@
   },
   {
     "name": "Markdown Basic",
+    "note_type": "markdown",
+    "file_type": "md",
+    "interchangeable": true,
     "identifier": "org.standardnotes.simple-markdown-editor",
     "permission_name": "editor:markdown-basic",
     "content_type": "SN|Component",
@@ -149,6 +158,9 @@
   },
   {
     "name": "Markdown Pro",
+    "note_type": "markdown",
+    "file_type": "md",
+    "interchangeable": true,
     "identifier": "org.standardnotes.advanced-markdown-editor",
     "permission_name": "editor:markdown-pro",
     "content_type": "SN|Component",
@@ -162,6 +174,9 @@
   },
   {
     "name": "Markdown Minimist",
+    "note_type": "markdown",
+    "file_type": "md",
+    "interchangeable": true,
     "identifier": "org.standardnotes.minimal-markdown-editor",
     "permission_name": "editor:markdown-minimist",
     "content_type": "SN|Component",
@@ -175,6 +190,9 @@
   },
   {
     "name": "Markdown Math",
+    "note_type": "markdown",
+    "file_type": "md",
+    "interchangeable": true,
     "identifier": "org.standardnotes.fancy-markdown-editor",
     "permission_name": "editor:markdown-math",
     "content_type": "SN|Component",
@@ -188,6 +206,9 @@
   },
   {
     "name": "Task Editor",
+    "note_type": "task",
+    "file_type": "md",
+    "interchangeable": false,
     "identifier": "org.standardnotes.simple-task-editor",
     "permission_name": "editor:task-editor",
     "content_type": "SN|Component",
@@ -201,6 +222,9 @@
   },
   {
     "name": "Code Editor",
+    "note_type": "code",
+    "file_type": "txt",
+    "interchangeable": true,
     "identifier": "org.standardnotes.code-editor",
     "permission_name": "editor:code-editor",
     "content_type": "SN|Component",
@@ -214,6 +238,9 @@
   },
   {
     "name": "TokenVault",
+    "note_type": "authentication",
+    "file_type": "json",
+    "interchangeable": false,
     "identifier": "org.standardnotes.token-vault",
     "permission_name": "editor:token-vault",
     "content_type": "SN|Component",
@@ -228,6 +255,9 @@
   },
   {
     "name": "Secure Spreadsheets",
+    "note_type": "spreadsheet",
+    "file_type": "json",
+    "interchangeable": false,
     "identifier": "org.standardnotes.standard-sheets",
     "permission_name": "editor:sheets",
     "content_type": "SN|Component",
@@ -407,4 +437,5 @@
     "marketing_url": "",
     "download_url": "",
     "area": "modal"
-  }]
+  }
+]
