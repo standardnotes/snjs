@@ -6,7 +6,11 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
-import { ComponentArea, ThemeDockIcon, ComponentFlag } from '@standardnotes/features';
+import {
+  ComponentArea,
+  ComponentFlag,
+  FeatureDescription,
+} from '@standardnotes/features';
 
 export { ComponentArea };
 
@@ -36,28 +40,13 @@ export enum ComponentAction {
   ThemesActivated = 'themes-activated',
   KeyDown = 'key-down',
   KeyUp = 'key-up',
-  Click = 'click'
+  Click = 'click',
 }
 
 export type ComponentPermission = {
   name: ComponentAction;
   content_types?: ContentType[];
 };
-
-export type ComponentPackageInfo = {
-  description: string,
-  acceptsThemes?: boolean,
-  layerable?: boolean,
-  url: string,
-  download_url: string,
-  identifier: string,
-  flags?: string[],
-  deprecation_message?: string,
-  name: string,
-  version: string,
-  deletion_warning?: string,
-  dock_icon?: ThemeDockIcon
-}
 
 export interface ComponentContent {
   componentData: Record<string, any>;
@@ -70,7 +59,7 @@ export interface ComponentContent {
   offlineOnly: boolean;
   name: string;
   autoupdateDisabled: boolean;
-  package_info: ComponentPackageInfo;
+  package_info: FeatureDescription;
   area: ComponentArea;
   permissions: ComponentPermission[];
   valid_until: Date | number;
@@ -96,7 +85,7 @@ export class SNComponent extends SNItem implements ComponentContent {
   public readonly offlineOnly: boolean;
   public readonly name: string;
   public readonly autoupdateDisabled: boolean;
-  public readonly package_info: ComponentPackageInfo;
+  public readonly package_info: FeatureDescription;
   public readonly area: ComponentArea;
   public readonly permissions: ComponentPermission[] = [];
   public readonly valid_until: Date;
