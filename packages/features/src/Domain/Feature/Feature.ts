@@ -1,9 +1,8 @@
-import { ContentType } from '@standardnotes/common';
-
-import { ComponentArea } from '../Component/ComponentArea';
-import { PermissionName } from '../Permission/PermissionName';
-import { FeatureIdentifier } from './FeatureIdentifier';
-import { ComponentFlag } from './Flag';
+import { ContentType } from '@standardnotes/common'
+import { ComponentArea } from '../Component/ComponentArea'
+import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from './FeatureIdentifier'
+import { ComponentFlag } from './Flag'
 
 export type ThemeDockIcon = {
   type: 'svg' | 'circle';
