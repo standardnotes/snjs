@@ -171,6 +171,32 @@ describe('note display criteria', function () {
     ).to.equal(2);
   });
 
+  it('includeProtected off', async function () {
+    await this.createNote();
+    const pendingProtected = await this.createNote();
+    await this.itemManager.changeItem(pendingProtected.uuid, (mutator) => {
+      mutator.protected = true;
+    });
+    const criteria = NotesDisplayCriteria.Create({ includeProtected: false });
+    expect(
+      notesMatchingCriteria(criteria, this.itemManager.collection).length
+    ).to.equal(1);
+  });
+
+  it('includeProtected on', async function () {
+    await this.createNote();
+    const pendingProtected = await this.createNote();
+    await this.itemManager.changeItem(pendingProtected.uuid, (mutator) => {
+      mutator.protected = true;
+    });
+    const criteria = NotesDisplayCriteria.Create({
+      includeProtected: true,
+    });
+    expect(
+      notesMatchingCriteria(criteria, this.itemManager.collection).length
+    ).to.equal(2);
+  });
+
   it('protectedSearchEnabled false', async function () {
     const normal = await this.createNote('hello', 'world');
     await this.itemManager.changeItem(normal.uuid, (mutator) => {

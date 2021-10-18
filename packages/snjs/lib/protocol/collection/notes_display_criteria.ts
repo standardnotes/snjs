@@ -16,6 +16,7 @@ export class NotesDisplayCriteria {
   public searchQuery?: SearchQuery;
   public tags: SNTag[] = [];
   public includePinned = true;
+  public includeProtected = true;
   public includeTrashed = false;
   public includeArchived = false;
   public sortProperty?: CollectionSort;
@@ -93,6 +94,9 @@ export class NotesDisplayCriteria {
     }
     if (!this.includePinned) {
       filters.push((note) => !note.pinned);
+    }
+    if (!this.includeProtected) {
+      filters.push((note) => !note.protected);
     }
     if (!this.includeTrashed && !usesTrashSmartTag) {
       filters.push((note) => !note.trashed);

@@ -14,6 +14,8 @@ export enum PrefKey {
   SortNotesBy = 'sortBy',
   SortNotesReverse = 'sortReverse',
   NotesShowArchived = 'showArchived',
+  NotesShowTrashed = 'showTrashed',
+  NotesHideProtected = 'hideProtected',
   NotesHidePinned = 'hidePinned',
   NotesHideNotePreview = 'hideNotePreview',
   NotesHideDate = 'hideDate',
@@ -31,7 +33,9 @@ export type PrefValue = {
   [PrefKey.SortNotesBy]: CollectionSort;
   [PrefKey.SortNotesReverse]: boolean;
   [PrefKey.NotesShowArchived]: boolean;
+  [PrefKey.NotesShowTrashed]: boolean;
   [PrefKey.NotesHidePinned]: boolean;
+  [PrefKey.NotesHideProtected]: boolean;
   [PrefKey.NotesHideNotePreview]: boolean;
   [PrefKey.NotesHideDate]: boolean;
   [PrefKey.NotesHideTags]: boolean;
