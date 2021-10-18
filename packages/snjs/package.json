@@ -79,7 +79,7 @@
     "@standardnotes/auth": "3.7.2",
     "@standardnotes/common": "1.2.0",
     "@standardnotes/domain-events": "2.1.0",
-    "@standardnotes/features": "1.6.2",
+    "@standardnotes/features": "1.7.1",
     "@standardnotes/settings": "1.2.0",
     "@standardnotes/sncrypto-common": "1.5.2"
   }
