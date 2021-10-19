@@ -25,6 +25,7 @@ export type FeatureDescription = {
   area?: ComponentArea;
   content_type?: ContentType;
   deletion_warning?: string;
+  deprecation_message?: string;
   description: string;
   dock_icon?: ThemeDockIcon;
   download_url: string;
