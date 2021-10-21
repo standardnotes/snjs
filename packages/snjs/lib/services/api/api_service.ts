@@ -742,7 +742,7 @@ export class SNApiService extends PureService<
     return response;
   }
 
-  public async getPurchaseFlowUrl(): Promise<string | undefined> {
+  public async getNewSubscriptionToken(): Promise<string | undefined> {
     const url = joinPaths(this.host, Paths.v1.subscriptionTokens);
     const response: HttpResponse | PostSubscriptionTokensResponse = await this.request({
       verb: HttpVerb.Post,
@@ -750,11 +750,7 @@ export class SNApiService extends PureService<
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_ACCESS_PURCHASE,
     });
-    if (response.data) {
-      const subscriptionToken = (response as PostSubscriptionTokensResponse).data!.token;
-      return `${joinPaths(this.host, Paths.v1.purchase)}?subscription_token=${subscriptionToken}`;
-    }
-    return undefined;
+    return (response as PostSubscriptionTokensResponse).data?.token;
   }
 
   private preprocessingError() {
