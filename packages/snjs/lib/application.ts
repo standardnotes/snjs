@@ -1605,10 +1605,6 @@ export class SNApplication {
     return this.featuresService.getFeature(featureId);
   }
 
-  public getPurchaseFlowUrl(): Promise<string | undefined> {
-    return this.apiService.getPurchaseFlowUrl();
-  }
-
   public getNewSubscriptionToken(): Promise<string | undefined> {
     return this.apiService.getNewSubscriptionToken();
   }

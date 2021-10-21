@@ -753,14 +753,6 @@ export class SNApiService extends PureService<
     return (response as PostSubscriptionTokensResponse).data?.token;
   }
 
-  public async getPurchaseFlowUrl(): Promise<string | undefined> {
-    const subscriptionToken = await this.getNewSubscriptionToken();
-    if (subscriptionToken) {
-      return `${joinPaths(this.host, Paths.v1.purchase)}?subscription_token=${subscriptionToken}`;
-    }
-    return undefined;
-  }
-
   private preprocessingError() {
     if (this.refreshingSession) {
       return this.createErrorResponse(
