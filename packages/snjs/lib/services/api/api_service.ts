@@ -742,7 +742,7 @@ export class SNApiService extends PureService<
     return response;
   }
 
-  public async getPurchaseFlowUrl(): Promise<string | undefined> {
+  public async getNewSubscriptionToken(): Promise<string | undefined> {
     const url = joinPaths(this.host, Paths.v1.subscriptionTokens);
     const response: HttpResponse | PostSubscriptionTokensResponse = await this.request({
       verb: HttpVerb.Post,
@@ -752,6 +752,14 @@ export class SNApiService extends PureService<
     });
     if (response.data) {
       const subscriptionToken = (response as PostSubscriptionTokensResponse).data!.token;
+      return subscriptionToken;
+    }
+    return undefined;
+  }
+
+  public async getPurchaseFlowUrl(): Promise<string | undefined> {
+    const subscriptionToken = await this.getNewSubscriptionToken();
+    if (subscriptionToken) {
       return `${joinPaths(this.host, Paths.v1.purchase)}?subscription_token=${subscriptionToken}`;
     }
     return undefined;

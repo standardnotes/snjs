@@ -1609,6 +1609,10 @@ export class SNApplication {
     return this.apiService.getPurchaseFlowUrl();
   }
 
+  public getNewSubscriptionToken(): Promise<string | undefined> {
+    return this.apiService.getNewSubscriptionToken();
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();
