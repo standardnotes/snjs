@@ -750,11 +750,7 @@ export class SNApiService extends PureService<
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_ACCESS_PURCHASE,
     });
-    if (response.data) {
-      const subscriptionToken = (response as PostSubscriptionTokensResponse).data!.token;
-      return subscriptionToken;
-    }
-    return undefined;
+    return (response as PostSubscriptionTokensResponse).data?.token;
   }
 
   public async getPurchaseFlowUrl(): Promise<string | undefined> {
