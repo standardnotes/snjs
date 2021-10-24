@@ -264,7 +264,8 @@ export class SNFeaturesService extends PureService<void> {
       } else if (!expired || feature.content_type === ContentType.Component) {
         resultingItem = (await this.itemManager.createItem(
           feature.content_type,
-          this.componentContentForFeatureDescription(feature)
+          this.componentContentForFeatureDescription(feature),
+          true
         )) as SNComponent;
       }
 
