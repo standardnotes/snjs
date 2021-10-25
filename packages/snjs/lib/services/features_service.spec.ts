@@ -182,7 +182,8 @@ describe('featuresService', () => {
             expires_at: tomorrow_client,
             identifier: FeatureIdentifier.MidnightTheme,
           }
-        })
+        }),
+        true
       );
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
@@ -192,7 +193,8 @@ describe('featuresService', () => {
             expires_at: tomorrow_client,
             identifier: FeatureIdentifier.BoldEditor,
           }
-        })
+        }),
+        true
       );
     });
 
@@ -255,6 +257,7 @@ describe('featuresService', () => {
             identifier: FeatureIdentifier.BoldEditor,
           }
         }),
+        true
       );
     });
 
