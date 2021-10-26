@@ -18,7 +18,12 @@ import { FillItemContent, Uuids } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import { isString, naturalSort, removeFromArray, searchArray } from '@Lib/utils';
+import {
+  isString,
+  naturalSort,
+  removeFromArray,
+  searchArray,
+} from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   PayloadContent,
@@ -424,12 +429,7 @@ export class ItemManager extends PureService {
       throw Error('Attempting to change non-existant component');
     }
     const mutator = new ComponentMutator(component, mutationType);
-    await this.applyTransform(
-      mutator,
-      mutate,
-      payloadSource,
-      payloadSourceKey
-    );
+    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
     return this.findItem(uuid) as SNComponent;
   }
 
@@ -664,8 +664,18 @@ export class ItemManager extends PureService {
    * @param contentType - A string or array of strings representing
    *    content types.
    */
-  public getItems(contentType: ContentType | ContentType[]): SNItem[] {
-    return this.collection.all(contentType);
+  public getItems(
+    contentType: ContentType | ContentType[],
+    nonerroredOnly = false
+  ): SNItem[] {
+    const items = this.collection.all(contentType);
+    if (nonerroredOnly) {
+      return items.filter(
+        (item) => !item.errorDecrypting && !item.waitingForKey
+      );
+    } else {
+      return items;
+    }
   }
 
   /**
@@ -751,7 +761,7 @@ export class ItemManager extends PureService {
    * @param tag - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
-   public getTagParentChain(tag: SNTag): SNTag[] {
+  public getTagParentChain(tag: SNTag): SNTag[] {
     const delimiter = '.';
     const tagComponents = tag.title.split(delimiter);
     const parentTagsTitles: string[] = [];
@@ -777,7 +787,7 @@ export class ItemManager extends PureService {
    * @param tag - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-   public getTagDescendants(tag: SNTag): SNTag[] {
+  public getTagDescendants(tag: SNTag): SNTag[] {
     const delimiter = '.';
     return this.tags.filter((t) => {
       const regex = new RegExp(
