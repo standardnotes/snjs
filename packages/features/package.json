@@ -1,8 +1,8 @@
 {
   "name": "@standardnotes/features",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "engines": {
-    "node": ">=14.0.0 <16.0.0"
+    "node": ">=14.0.0 <17.0.0"
   },
   "description": "Features SDK for Standard Notes projects",
   "main": "dist/index.js",
@@ -23,10 +23,10 @@
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
-    "@standardnotes/common": "^1.1.0"
+    "@standardnotes/common": "^1.2.1"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.0.0",
+    "@standardnotes/config": "^2.0.1",
     "typescript": "^4.0.5"
   }
 }
