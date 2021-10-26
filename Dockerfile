@@ -4,7 +4,7 @@ ARG UID=1001
 ARG GID=1001
 
 RUN apk --no-cache --virtual build-dependencies add \
-    python \
+    python3 \
     make \
     g++
 
