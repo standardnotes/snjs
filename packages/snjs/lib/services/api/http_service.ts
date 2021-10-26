@@ -26,6 +26,7 @@ export type HttpRequest = {
   params?: HttpParams;
   verb: HttpVerb;
   authentication?: string;
+  offlineToken?: string;
 };
 
 /**
@@ -107,6 +108,10 @@ export class SNHttpService extends PureService {
         'Authorization',
         'Bearer ' + httpRequest.authentication
       );
+    }
+
+    if (httpRequest.offlineToken) {
+      request.setRequestHeader('x-offline-token', httpRequest.offlineToken)
     }
     return request;
   }

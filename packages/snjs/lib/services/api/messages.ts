@@ -39,6 +39,8 @@ export const API_MESSAGE_FAILED_SUBSCRIPTION_INFO = 'Failed to get subscription\
 
 export const API_MESSAGE_FAILED_ACCESS_PURCHASE = 'Failed to access purchase flow.';
 
+export const API_MESSAGE_FAILED_OFFLINE_FEATURES = 'Failed to get offline features.';
+
 export const UNSUPPORTED_PROTOCOL_VERSION =
   'This version of the application does not support your newer account type. Please upgrade to the latest version of Standard Notes to sign in.';
 

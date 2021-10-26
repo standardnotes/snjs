@@ -38,6 +38,7 @@ export enum StorageKey {
   WebSocketUrl = 'webSocket_url',
   UserRoles = 'user_roles',
   UserFeatures = 'user_features',
+  OfflineSubscriptionData = 'offlineSubscriptionData'
 }
 
 export enum NonwrappedStorageKey {

@@ -27,7 +27,7 @@ import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
-import { convertTimestampToMilliseconds } from '@Lib/utils';
+import { convertTimestampToMilliseconds, getOfflineSubscriptionData } from '@Lib/utils';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -175,7 +175,7 @@ export class SNFeaturesService extends PureService<void> {
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  private async setFeatures(features: FeatureDescription[]): Promise<void> {
+  public async setFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
   }
@@ -208,6 +208,20 @@ export class SNFeaturesService extends PureService<void> {
       if (this.enableV4) {
         await this.mapFeaturesToItems(features);
       }
+    }
+  }
+
+  public async loadFeaturesForOfflineUser(): Promise<{
+    featuresUrl: string;
+    extensionKey: string;
+  }> {
+    const offlineSubscriptionDataString = await this.storageService.getValue(StorageKey.OfflineSubscriptionData)
+
+    const { featuresUrl, extensionKey } = getOfflineSubscriptionData(offlineSubscriptionDataString);
+
+    return {
+      featuresUrl,
+      extensionKey
     }
   }
 

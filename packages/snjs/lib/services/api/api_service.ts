@@ -24,6 +24,7 @@ import {
   GetAvailableSubscriptionsResponse,
   ChangeCredentialsResponse,
   PostSubscriptionTokensResponse,
+  GetOfflineFeaturesResponse
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -41,9 +42,10 @@ import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
-import { isNullOrUndefined, joinPaths } from '@Lib/utils';
+import { getUrlParts, isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
+import { FeatureDescription } from '@standardnotes/features';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -63,6 +65,7 @@ type PathNamesV1 = {
   subscription: (userUuid: string) => string;
   purchase: string;
   subscriptionTokens: string;
+  offlineFeatures: string;
 };
 
 type PathNamesV2 = {
@@ -92,7 +95,8 @@ const Paths: {
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
     purchase: '/v1/purchase',
-    subscriptionTokens: '/v1/subscription-tokens'
+    subscriptionTokens: '/v1/subscription-tokens',
+    offlineFeatures: '/v1/offline/features',
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -243,6 +247,7 @@ export class SNApiService extends PureService<
     fallbackErrorMessage: string;
     params?: HttpParams;
     authentication?: string;
+    offlineToken?: string;
   }) {
     try {
       const response = await this.httpService.runHttp(params);
@@ -751,6 +756,34 @@ export class SNApiService extends PureService<
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_ACCESS_PURCHASE,
     });
     return (response as PostSubscriptionTokensResponse).data?.token;
+  }
+
+  // TODO: make sure `FeatureDescription[]` is correct return type
+  public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<FeatureDescription[] | undefined> {
+    const allowedUrlHosts = [
+      'extensions.standardnotes.com',
+      'extensions.standardnotes.org',
+      'features.standardnotes.com',
+      'api-dev.standardnotes.com' // TODO: this is for dev purposes, remove it
+    ]
+
+    const splitUrl = getUrlParts(featuresUrl)
+    if (!splitUrl) {
+      return;
+    }
+
+    if (!allowedUrlHosts.includes(splitUrl.host)) {
+      return;
+    }
+
+    const response: HttpResponse | GetOfflineFeaturesResponse = await this.request({
+      verb: HttpVerb.Get,
+      url: featuresUrl,
+      offlineToken: extensionKey,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
+    });
+
+    return (response as GetOfflineFeaturesResponse).data?.features;
   }
 
   private preprocessingError() {
