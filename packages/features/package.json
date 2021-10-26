@@ -1,8 +1,8 @@
 {
   "name": "@standardnotes/features",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "engines": {
-    "node": ">=14.0.0 <16.0.0"
+    "node": ">=14.0.0 <17.0.0"
   },
   "description": "Features SDK for Standard Notes projects",
   "main": "dist/index.js",

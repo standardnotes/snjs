@@ -1,14 +1,14 @@
 {
   "name": "@standardnotes/config",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "engines": {
-    "node": ">=14.0.0 <16.0.0"
+    "node": ">=14.0.0 <17.0.0"
   },
   "description": "Common configuration files used in SN projects",
   "publishConfig": {
     "access": "public"
   },
-  "author": "Karol Sójko <karol@standardnotes.org>",
+  "author": "Karol Sójko <karol@standardnotes.com>",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "lint": "yarn lint:formatting",

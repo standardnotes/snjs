@@ -1,8 +1,8 @@
 {
   "name": "@standardnotes/domain-events-infra",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "engines": {
-    "node": ">=14.0.0 <16.0.0"
+    "node": ">=14.0.0 <17.0.0"
   },
   "description": "Domain Events Infrastructure SDK used in SN projects",
   "main": "dist/index.js",
@@ -13,7 +13,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Karol Sójko <karol@standardnotes.org>",
+  "author": "Karol Sójko <karol@standardnotes.com>",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "clean": "rm -fr dist",
