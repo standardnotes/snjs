@@ -26,7 +26,7 @@ export type HttpRequest = {
   params?: HttpParams;
   verb: HttpVerb;
   authentication?: string;
-  offlineToken?: string;
+  customHeaders?: Record<string, string>[];
 };
 
 /**
@@ -35,7 +35,7 @@ export type HttpRequest = {
 export class SNHttpService extends PureService {
   constructor(
     private readonly environment: Environment,
-    private readonly appVersion: string
+    private readonly appVersion: string,
   ) {
     super();
   }
@@ -110,8 +110,10 @@ export class SNHttpService extends PureService {
       );
     }
 
-    if (httpRequest.offlineToken) {
-      request.setRequestHeader('x-offline-token', httpRequest.offlineToken)
+    if (httpRequest.customHeaders && httpRequest.customHeaders.length > 0) {
+      httpRequest.customHeaders.forEach(({key, value}) => {
+        request.setRequestHeader(key, value);
+      });
     }
     return request;
   }

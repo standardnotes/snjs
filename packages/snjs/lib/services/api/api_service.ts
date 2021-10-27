@@ -42,7 +42,7 @@ import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
-import { getUrlParts, isNullOrUndefined, joinPaths } from '@Lib/utils';
+import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
@@ -247,7 +247,7 @@ export class SNApiService extends PureService<
     fallbackErrorMessage: string;
     params?: HttpParams;
     authentication?: string;
-    offlineToken?: string;
+    customHeaders?: Record<string, string>[];
   }) {
     try {
       const response = await this.httpService.runHttp(params);
@@ -760,30 +760,31 @@ export class SNApiService extends PureService<
 
   // TODO: make sure `FeatureDescription[]` is correct return type
   public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<FeatureDescription[] | undefined> {
-    const allowedUrlHosts = [
+    const trustedHosts = [
       'extensions.standardnotes.com',
       'extensions.standardnotes.org',
       'features.standardnotes.com',
       'api-dev.standardnotes.com' // TODO: this is for dev purposes, remove it
     ]
 
-    const splitUrl = getUrlParts(featuresUrl)
-    if (!splitUrl) {
+    try {
+      const { host } = new URL(featuresUrl);
+
+      if (!trustedHosts.includes(host)) {
+        return;
+      }
+
+      const response: HttpResponse | GetOfflineFeaturesResponse = await this.request({
+        verb: HttpVerb.Get,
+        url: featuresUrl,
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
+        customHeaders: [{key: 'x-offline-token', value: extensionKey}]
+      });
+
+      return (response as GetOfflineFeaturesResponse).data?.features;
+    } catch {
       return;
     }
-
-    if (!allowedUrlHosts.includes(splitUrl.host)) {
-      return;
-    }
-
-    const response: HttpResponse | GetOfflineFeaturesResponse = await this.request({
-      verb: HttpVerb.Get,
-      url: featuresUrl,
-      offlineToken: extensionKey,
-      fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
-    });
-
-    return (response as GetOfflineFeaturesResponse).data?.features;
   }
 
   private preprocessingError() {

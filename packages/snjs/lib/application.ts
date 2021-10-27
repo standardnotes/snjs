@@ -326,18 +326,6 @@ export class SNApplication {
     this.settingsService.initializeFromDisk();
     await this.featuresService.initializeFromDisk();
 
-    if (!this.hasAccount()) {
-      const { featuresUrl, extensionKey } = await this.featuresService.loadFeaturesForOfflineUser();
-      if (featuresUrl && extensionKey) {
-        const features = await this.getOfflineFeatures(featuresUrl, extensionKey);
-
-        if (features) {
-          // TODO: ensure this works correctly
-          await this.featuresService.setFeatures(features);
-        }
-      }
-    }
-
     this.launched = true;
     await this.notifyEvent(ApplicationEvent.Launched);
     await this.handleStage(ApplicationStage.Launched_10);
@@ -1621,8 +1609,8 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<FeatureDescription[] | undefined> {
-    return this.apiService.getOfflineFeatures(featuresUrl, extensionKey);
+  public async getAndStoreOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<boolean> {
+    return this.featuresService.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
   }
 
   private constructServices() {
@@ -1697,6 +1685,7 @@ export class SNApplication {
       this.settingsService,
       this.credentialService,
       this.syncService,
+      this.sessionManager,
       this.enableV4
     );
     this.services.push(this.featuresService);

@@ -5,11 +5,7 @@ import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 import { RoleName } from '@standardnotes/auth';
-import {
-  ApiServiceEvent,
-  MetaReceivedData,
-  SNApiService,
-} from './api/api_service';
+import { ApiServiceEvent, MetaReceivedData, SNApiService } from './api/api_service';
 import { UuidString } from '@Lib/types';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
@@ -17,17 +13,16 @@ import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
 import { SNComponent, SNItem } from '@Lib/models';
-import {
-  SNWebSocketsService,
-  WebSocketsServiceEvent,
-} from './api/websockets_service';
+import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
 import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
-import { convertTimestampToMilliseconds, getOfflineSubscriptionData } from '@Lib/utils';
+import { convertTimestampToMilliseconds } from '@Lib/utils';
+import { ApplicationStage } from '@Lib/stages';
+import { SNSessionManager } from '@Services/api/session_manager';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -48,6 +43,7 @@ export class SNFeaturesService extends PureService<void> {
     private settingsService: SNSettingsService,
     private credentialService: SNCredentialService,
     private syncService: SNSyncService,
+    private sessionManager: SNSessionManager,
     private enableV4: boolean
   ) {
     super();
@@ -113,6 +109,39 @@ export class SNFeaturesService extends PureService<void> {
         }
       }
     );
+  }
+
+  
+  public async fetchAndStoreOfflineFeatures(featuresUrl?: string, extensionKey?: string): Promise<boolean> {
+    let offlineFeaturesUrl = featuresUrl;
+    let offlineExtensionKey = extensionKey;
+
+    if (!offlineFeaturesUrl || !offlineExtensionKey) {
+      const featuresForOfflineUser = await this.loadFeaturesForOfflineUser();
+      offlineFeaturesUrl = featuresForOfflineUser.featuresUrl
+      offlineExtensionKey = featuresForOfflineUser.extensionKey
+    }
+
+    if (offlineFeaturesUrl && offlineExtensionKey) {
+      const features = await this.apiService.getOfflineFeatures(offlineFeaturesUrl, offlineExtensionKey);
+
+      if (features) {
+        await this.setFeatures(features);
+
+        return true;
+      }
+    }
+    return false;
+  }
+  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+    await super.handleApplicationStage(stage);
+
+    if (stage === ApplicationStage.Launched_10) {
+
+      if (!this.sessionManager.getUser()) {
+        await this.fetchAndStoreOfflineFeatures();
+      }
+    }
   }
 
   public async migrateExtRepoToUserSetting(
@@ -217,11 +246,30 @@ export class SNFeaturesService extends PureService<void> {
   }> {
     const offlineSubscriptionDataString = await this.storageService.getValue(StorageKey.OfflineSubscriptionData)
 
-    const { featuresUrl, extensionKey } = getOfflineSubscriptionData(offlineSubscriptionDataString);
+    const { featuresUrl, extensionKey } = this.getOfflineSubscriptionData(offlineSubscriptionDataString);
 
     return {
       featuresUrl,
       extensionKey
+    }
+  }
+
+  private getOfflineSubscriptionData(decodedOfflineSubscriptionToken: string): {
+    featuresUrl: string;
+    extensionKey: string;
+  } {
+    try {
+      const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
+
+      return {
+        featuresUrl,
+        extensionKey
+      };
+    } catch (error) {
+      return {
+        featuresUrl: '',
+        extensionKey: ''
+      };
     }
   }
 

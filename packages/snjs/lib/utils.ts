@@ -599,36 +599,3 @@ export function convertTimestampToMilliseconds(timestamp: number): number {
       throw 'Unhandle timestamp precision: ${timestamp}';
   }
 }
-
-
-export function getUrlParts(url: string): { protocol: string; host: string; } | null {
-  const regexForUrlHost = /(\w+):\/\/([A-Za-z0-9\-.]+)/
-  const matches = url.match(regexForUrlHost);
-  if (!matches || matches.length === 0) {
-    return null;
-  }
-
-  return {
-    protocol: matches[1],
-    host: matches[2]
-  }
-}
-
-export function getOfflineSubscriptionData(decodedOfflineSubscriptionToken: string): {
-  featuresUrl: string;
-  extensionKey: string;
-} {
-  try {
-    const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
-
-    return {
-      featuresUrl,
-      extensionKey
-    };
-  } catch (error) {
-    return {
-      featuresUrl: '',
-      extensionKey: ''
-    };
-  }
-}
