@@ -8,7 +8,7 @@
     "description": "Elegant utilitarianism.",
     "url": "#{url_prefix}/themes/midnight",
     "download_url": "https://github.com/standardnotes/midnight-theme/archive/1.2.2.zip",
-    "marketing_url": "https://standardnotes.org/extensions/midnight",
+    "marketing_url": "https://standardnotes.com/extensions/midnight",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/themes/midnight-with-mobile.jpg",
     "dock_icon": {
       "type": "circle",
@@ -26,7 +26,7 @@
     "description": "Calm and relaxed. Take some time off.",
     "url": "#{url_prefix}/themes/futura",
     "download_url": "https://github.com/standardnotes/futura-theme/archive/1.2.2.zip",
-    "marketing_url": "https://standardnotes.org/extensions/futura",
+    "marketing_url": "https://standardnotes.com/extensions/futura",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/themes/futura-with-mobile.jpg",
     "dock_icon": {
       "type": "circle",
@@ -44,7 +44,7 @@
     "description": "The perfect theme for any time.",
     "url": "#{url_prefix}/themes/solarized-dark",
     "download_url": "https://github.com/standardnotes/solarized-dark-theme/archive/1.2.1.zip",
-    "marketing_url": "https://standardnotes.org/extensions/solarized-dark",
+    "marketing_url": "https://standardnotes.com/extensions/solarized-dark",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/themes/solarized-dark.jpg",
     "dock_icon": {
       "type": "circle",
@@ -81,7 +81,7 @@
     "description": "For when you need to go in.",
     "url": "#{url_prefix}/themes/focus",
     "download_url": "https://github.com/standardnotes/focus-theme/archive/1.2.3.zip",
-    "marketing_url": "https://standardnotes.org/extensions/focused",
+    "marketing_url": "https://standardnotes.com/extensions/focused",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/themes/focus-with-mobile.jpg",
     "dock_icon": {
       "type": "circle",
@@ -99,13 +99,43 @@
     "description": "Light on the eyes, heavy on the spirit.",
     "url": "#{url_prefix}/themes/titanium",
     "download_url": "https://github.com/standardnotes/titanium-theme/archive/1.2.2.zip",
-    "marketing_url": "https://standardnotes.org/extensions/titanium",
+    "marketing_url": "https://standardnotes.com/extensions/titanium",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/themes/titanium-with-mobile.jpg",
     "dock_icon": {
       "type": "circle",
       "background_color": "#6e2b9e",
       "foreground_color": "#ffffff",
       "border_color": "#6e2b9e"
+    }
+  },
+  {
+    "identifier": "org.standardnotes.theme-dynamic",
+    "name": "Dynamic",
+    "permission_name": "theme:dynamic",
+    "content_type": "SN|Theme",
+    "layerable": true,
+    "no_mobile": true,
+    "version": "1.0.0",
+    "description": "A smart theme that minimizes the tags and notes panels when they are not in use.",
+    "url": "#{url_prefix}/themes/dynamic",
+    "download_url": "https://github.com/standardnotes/dynamic-theme/archive/1.0.0.zip",
+    "marketing_url": "https://standardnotes.com/extensions/dynamic"
+  },
+  {
+    "identifier": "org.standardnotes.theme-no-distraction",
+    "name": "No Distraction",
+    "content_type": "SN|Theme",
+    "permission_name": "theme:no-distraction",
+    "layerable": true,
+    "no_mobile": true,
+    "version": "1.2.2",
+    "description": "A theme for focusing on your writing.",
+    "url": "#{url_prefix}/themes/no-distraction",
+    "download_url": "https://github.com/standardnotes/no-distraction-theme/archive/1.2.2.zip",
+    "marketing_url": "https://standardnotes.com/extensions/no-distraction",
+    "dock_icon": {
+      "type": "svg",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M424 64H88c-26.6 0-48 21.6-48 48v288c0 26.4 21.4 48 48 48h336c26.4 0 48-21.6 48-48V112c0-26.4-21.4-48-48-48zm0 336H88V176h336v224z\"/></svg>"
     }
   },
   {
@@ -137,7 +167,7 @@
     "description": "From highlighting to custom font sizes and colors, to tables and lists, this editor is perfect for crafting any document.",
     "url": "#{url_prefix}/components/plus-editor",
     "download_url": "https://github.com/standardnotes/plus-editor/archive/1.5.0.zip",
-    "marketing_url": "https://standardnotes.org/extensions/plus-editor",
+    "marketing_url": "https://standardnotes.com/extensions/plus-editor",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/plus-editor.jpg"
   },
   {
@@ -153,7 +183,7 @@
     "description": "A Markdown editor with dynamic split-pane preview.",
     "url": "#{url_prefix}/components/simple-markdown-editor",
     "download_url": "https://github.com/standardnotes/markdown-basic/archive/1.4.0.zip",
-    "marketing_url": "https://standardnotes.org/extensions/simple-markdown-editor",
+    "marketing_url": "https://standardnotes.com/extensions/simple-markdown-editor",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg"
   },
   {
@@ -169,7 +199,7 @@
     "description": "A fully featured Markdown editor that supports live preview, a styling toolbar, and split pane support.",
     "url": "#{url_prefix}/components/advanced-markdown-editor",
     "download_url": "https://github.com/standardnotes/advanced-markdown-editor/archive/1.3.14.zip",
-    "marketing_url": "https://standardnotes.org/extensions/advanced-markdown",
+    "marketing_url": "https://standardnotes.com/extensions/advanced-markdown",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg"
   },
   {
@@ -185,7 +215,7 @@
     "description": "A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F",
     "url": "#{url_prefix}/components/minimal-markdown-editor",
     "download_url": "https://github.com/standardnotes/minimal-markdown-editor/archive/1.3.7.zip",
-    "marketing_url": "https://standardnotes.org/extensions/minimal-markdown-editor",
+    "marketing_url": "https://standardnotes.com/extensions/minimal-markdown-editor",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg"
   },
   {
@@ -201,7 +231,7 @@
     "description": "A beautiful split-pane Markdown editor with synced-scroll, LaTeX support, and colorful syntax.",
     "url": "#{url_prefix}/components/fancy-markdown-editor",
     "download_url": "https://github.com/standardnotes/math-editor/archive/1.3.4.zip",
-    "marketing_url": "https://standardnotes.org/extensions/math-editor",
+    "marketing_url": "https://standardnotes.com/extensions/math-editor",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg"
   },
   {
@@ -217,7 +247,7 @@
     "description": "A great way to manage short-term and long-term to-do\"s. You can mark tasks as completed, change their order, and edit the text naturally in place.",
     "url": "#{url_prefix}/components/simple-task-editor",
     "download_url": "https://github.com/standardnotes/simple-task-editor/archive/1.3.7.zip",
-    "marketing_url": "https://standardnotes.org/extensions/simple-task-editor",
+    "marketing_url": "https://standardnotes.com/extensions/simple-task-editor",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/task-editor.jpg"
   },
   {
@@ -233,7 +263,7 @@
     "description": "Syntax highlighting and convenient keyboard shortcuts for over 120 programming languages. Ideal for code snippets and procedures.",
     "url": "#{url_prefix}/components/code-editor",
     "download_url": "https://github.com/standardnotes/code-editor/archive/1.3.8.zip",
-    "marketing_url": "https://standardnotes.org/extensions/code-editor",
+    "marketing_url": "https://standardnotes.com/extensions/code-editor",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/code.jpg"
   },
   {
@@ -270,6 +300,32 @@
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png"
   },
   {
+    "identifier": "org.standardnotes.file-safe",
+    "name": "FileSafe",
+    "permission_name": "component:filesafe",
+    "content_type": "SN|Component",
+    "area": "editor-stack",
+    "version": "2.0.10",
+    "description": "Encrypted attachments for your notes using your Dropbox, Google Drive, or WebDAV server. Limited to 50MB per file.",
+    "url": "#{url_prefix}/components/filesafe",
+    "download_url": "https://github.com/standardnotes/filesafe-client/archive/2.0.10.zip",
+    "marketing_url": "https://standardnotes.com/extensions/filesafe",
+    "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png"
+  },
+  {
+    "identifier": "org.standardnotes.folders",
+    "name": "Folders",
+    "content_type": "SN|Component",
+    "permission_name": "component:folders",
+    "area": "tags-list",
+    "version": "1.3.8",
+    "description": "Create nested folders with easy drag and drop.",
+    "url": "#{url_prefix}/components/folders",
+    "download_url": "https://github.com/standardnotes/folders-component/archive/1.3.8.zip",
+    "marketing_url": "https://standardnotes.com/extensions/folders",
+    "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/components/folders.jpg"
+  },
+  {
     "name": "2FA Manager",
     "identifier": "org.standardnotes.mfa-link",
     "permission_name": "component:2fa-manager",
@@ -281,7 +337,8 @@
     "download_url": "https://github.com/standardnotes/mfa-link/archive/1.2.4.zip",
     "area": "modal",
     "no_expire": true,
-    "deletion_warning": "Deleting 2FA Manager will not disable 2FA from your account. To disable 2FA, first open 2FA Manager, then follow the prompts."
+    "deletion_warning": "Deleting 2FA Manager will not disable 2FA from your account. To disable 2FA, first open 2FA Manager, then follow the prompts.",
+    "deprecated": true
   },
   {
     "name": "",
@@ -291,8 +348,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -302,8 +358,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -313,8 +368,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -324,8 +378,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -335,8 +388,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -346,8 +398,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -357,8 +408,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -368,8 +418,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -379,8 +428,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -401,8 +449,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "",
@@ -412,8 +459,7 @@
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   },
   {
     "name": "CloudLink",
@@ -428,14 +474,13 @@
     "area": "modal"
   },
   {
-    "name": "",
+    "name": "Listed Custom Domain",
     "identifier": "org.standardnotes.listed-custom-domain",
     "permission_name": "listed:custom-domain",
     "description": "",
     "version": "",
     "url": "",
     "marketing_url": "",
-    "download_url": "",
-    "area": "modal"
+    "download_url": ""
   }
 ]

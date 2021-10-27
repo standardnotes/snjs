@@ -216,7 +216,7 @@ export class SNApplication {
     private defaultHost: string,
     private appVersion: string,
     private enableV4 = false,
-    private webSocketUrl?: string,
+    private webSocketUrl?: string
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -798,8 +798,11 @@ export class SNApplication {
     return unprotectedNotes;
   }
 
-  public getItems(contentType: ContentType | ContentType[]): SNItem[] {
-    return this.itemManager.getItems(contentType);
+  public getItems(
+    contentType: ContentType | ContentType[],
+    nonerroredOnly = false
+  ): SNItem[] {
+    return this.itemManager.getItems(contentType, nonerroredOnly);
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[] {
