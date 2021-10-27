@@ -128,6 +128,11 @@ export class SNFeaturesService extends PureService<void> {
       if (features) {
         await this.setFeatures(features);
 
+        if (this.enableV4) {
+          await this.itemManager.removeAllItemsFromMemory();
+          await this.mapFeaturesToItems(features);
+        }
+
         return true;
       }
     }
@@ -136,8 +141,7 @@ export class SNFeaturesService extends PureService<void> {
   public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
 
-    if (stage === ApplicationStage.Launched_10) {
-
+    if (stage === ApplicationStage.LoadedDatabase_12) {
       if (!this.sessionManager.getUser()) {
         await this.fetchAndStoreOfflineFeatures();
       }
