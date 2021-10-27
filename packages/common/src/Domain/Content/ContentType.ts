@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export enum ContentType {
   Any = '*',
   Item = 'SF|Item',
