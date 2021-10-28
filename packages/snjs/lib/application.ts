@@ -1613,7 +1613,7 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public async setOfflineFeaturesCode(code: string): Promise<string> {
+  public async setOfflineFeatures(code: string): Promise<string> {
     try {
       const activationCodeWithoutSpaces = code.replace(/\s/g, '');
       const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
