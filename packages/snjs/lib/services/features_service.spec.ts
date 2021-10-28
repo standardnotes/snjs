@@ -431,14 +431,14 @@ describe('featuresService', () => {
       });
     });
 
-    it('should not call `sessionManager.getUser` method if provided argument is not `LoadedDatabase_12` stage', async () => {
-      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.FullSyncCompleted_13);
+    it('should not call `sessionManager.getUser` method if provided argument is not `FullSyncCompleted_13` stage', async () => {
+      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.StorageDecrypted_09);
 
       expect(sessionManager.getUser).not.toHaveBeenCalled();
     });
 
-    it('should call `sessionManager.getUser` method if provided argument is `LoadedDatabase_12` stage', async () => {
-      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
+    it('should call `sessionManager.getUser` method if provided argument is `FullSyncCompleted_13` stage', async () => {
+      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.FullSyncCompleted_13);
 
       expect(sessionManager.getUser).toHaveBeenCalled();
     });

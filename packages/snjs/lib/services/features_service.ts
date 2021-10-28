@@ -153,6 +153,10 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   private async fetchAndStoreOfflineFeatures(featuresUrl?: string, extensionKey?: string): Promise<string> {
+    if (!this.enableV4) {
+      return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
+    }
+
     let errMessage = '';
     let offlineFeaturesUrl = featuresUrl;
     let offlineExtensionKey = extensionKey;
@@ -168,10 +172,7 @@ export class SNFeaturesService extends PureService<void> {
 
       if (features) {
         await this.setFeatures(features);
-
-        if (this.enableV4) {
-          await this.mapFeaturesToItems(features);
-        }
+        await this.mapFeaturesToItems(features);
       } else {
         errMessage = errorMessage as string;
       }
@@ -184,7 +185,7 @@ export class SNFeaturesService extends PureService<void> {
   public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
 
-    if (stage === ApplicationStage.LoadedDatabase_12) {
+    if (stage === ApplicationStage.FullSyncCompleted_13) {
       if (!this.sessionManager.getUser()) {
         await this.fetchAndStoreOfflineFeatures();
       }
