@@ -418,29 +418,4 @@ describe('featuresService', () => {
       expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
     });
   })
-
-  describe('handleApplicationStage', () => {
-    let featuresService: SNFeaturesService | null = null;
-
-    beforeEach(() => {
-      featuresService = createService() as SNFeaturesService;
-
-      storageService.getValue = jest.fn().mockReturnValue({
-        featuresUrl: '',
-        extensionKey: ''
-      });
-    });
-
-    it('should not call `sessionManager.getUser` method if provided argument is not `FullSyncCompleted_13` stage', async () => {
-      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.StorageDecrypted_09);
-
-      expect(sessionManager.getUser).not.toHaveBeenCalled();
-    });
-
-    it('should call `sessionManager.getUser` method if provided argument is `FullSyncCompleted_13` stage', async () => {
-      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.FullSyncCompleted_13);
-
-      expect(sessionManager.getUser).toHaveBeenCalled();
-    });
-  });
 });

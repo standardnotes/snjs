@@ -1617,26 +1617,6 @@ export class SNApplication {
     return this.featuresService.setOfflineFeatures(code);
   }
 
-  private getOfflineSubscriptionDetails (decodedOfflineSubscriptionToken: string): {
-    featuresUrl: string;
-    extensionKey: string;
-  } {
-    try {
-      const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
-
-      return {
-        featuresUrl,
-        extensionKey
-      };
-    } catch (error) {
-      return {
-        featuresUrl: '',
-        extensionKey: ''
-      };
-    }
-  };
-
-
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();

@@ -182,16 +182,6 @@ export class SNFeaturesService extends PureService<void> {
     return errMessage;
   }
 
-  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
-    await super.handleApplicationStage(stage);
-
-    if (stage === ApplicationStage.FullSyncCompleted_13) {
-      if (!this.sessionManager.getUser()) {
-        await this.fetchAndStoreOfflineFeatures();
-      }
-    }
-  }
-
   public async migrateExtRepoToUserSetting(
     extensionRepoItems: SNItem[] = []
   ): Promise<void> {
