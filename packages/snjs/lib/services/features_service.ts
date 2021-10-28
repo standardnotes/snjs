@@ -112,7 +112,8 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   
-  public async fetchAndStoreOfflineFeatures(featuresUrl?: string, extensionKey?: string): Promise<boolean> {
+  public async fetchAndStoreOfflineFeatures(featuresUrl?: string, extensionKey?: string): Promise<string> {
+    let errMessage = '';
     let offlineFeaturesUrl = featuresUrl;
     let offlineExtensionKey = extensionKey;
 
@@ -123,7 +124,7 @@ export class SNFeaturesService extends PureService<void> {
     }
 
     if (offlineFeaturesUrl && offlineExtensionKey) {
-      const features = await this.apiService.getOfflineFeatures(offlineFeaturesUrl, offlineExtensionKey);
+      const { features, errorMessage } = await this.apiService.getOfflineFeatures(offlineFeaturesUrl, offlineExtensionKey);
 
       if (features) {
         await this.setFeatures(features);
@@ -132,12 +133,13 @@ export class SNFeaturesService extends PureService<void> {
           await this.itemManager.removeAllItemsFromMemory();
           await this.mapFeaturesToItems(features);
         }
-
-        return true;
+      } else {
+        errMessage = errorMessage as string;
       }
     }
-    return false;
+    return errMessage;
   }
+
   public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
 
@@ -208,7 +210,7 @@ export class SNFeaturesService extends PureService<void> {
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  public async setFeatures(features: FeatureDescription[]): Promise<void> {
+  private async setFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
   }
@@ -244,7 +246,7 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  public async loadFeaturesForOfflineUser(): Promise<{
+  private async loadFeaturesForOfflineUser(): Promise<{
     featuresUrl: string;
     extensionKey: string;
   }> {

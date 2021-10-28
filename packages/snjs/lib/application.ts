@@ -95,6 +95,7 @@ import {
   UNSUPPORTED_BACKUP_FILE_VERSION,
   SessionStrings,
   ImportStrings,
+  API_MESSAGE_FAILED_OFFLINE_ACTIVATION
 } from './services/api/messages';
 import { SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
@@ -112,7 +113,7 @@ import {
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
-import { RemoteSession } from '.';
+import { RemoteSession, StorageKey } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
@@ -1612,9 +1613,44 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public async getAndStoreOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<boolean> {
-    return this.featuresService.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
+  public async setOfflineFeaturesCode(activationCode: string): Promise<string> {
+    try {
+      const activationCodeWithoutSpaces = activationCode.replace(/\s/g, '');
+      const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
+      const { featuresUrl, extensionKey } = this.getOfflineSubscriptionDetails(decodedData);
+
+      if (!featuresUrl || !extensionKey) {
+        return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
+      }
+
+      await this.setValue(StorageKey.OfflineSubscriptionData, decodedData);
+
+      return this.featuresService.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
+
+    } catch (err) {
+      return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
+    }
   }
+
+  private getOfflineSubscriptionDetails (decodedOfflineSubscriptionToken: string): {
+    featuresUrl: string;
+    extensionKey: string;
+  } {
+    try {
+      const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
+
+      return {
+        featuresUrl,
+        extensionKey
+      };
+    } catch (error) {
+      return {
+        featuresUrl: '',
+        extensionKey: ''
+      };
+    }
+  };
+
 
   private constructServices() {
     this.createPayloadManager();

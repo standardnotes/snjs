@@ -264,6 +264,6 @@ export type PostSubscriptionTokensResponse = MinimalHttpResponse & {
 
 export type GetOfflineFeaturesResponse = MinimalHttpResponse & {
   data?: {
-    features: FeatureDescription[]; // TODO: ensure this is the correct type
+    features: FeatureDescription[];
   }
 }

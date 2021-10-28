@@ -46,6 +46,8 @@ import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
+import packageJson from '../../../package.json'
+import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -758,20 +760,20 @@ export class SNApiService extends PureService<
     return (response as PostSubscriptionTokensResponse).data?.token;
   }
 
-  // TODO: make sure `FeatureDescription[]` is correct return type
-  public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<FeatureDescription[] | undefined> {
-    const trustedHosts = [
-      'extensions.standardnotes.com',
-      'extensions.standardnotes.org',
-      'features.standardnotes.com',
-      'api-dev.standardnotes.com' // TODO: this is for dev purposes, remove it
-    ]
+  public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<{
+    features?: FeatureDescription[];
+    errorMessage?: string
+  }> {
+
+    const { trustedFeatureHosts } = packageJson.client;
 
     try {
       const { host } = new URL(featuresUrl);
 
-      if (!trustedHosts.includes(host)) {
-        return;
+      if (!trustedFeatureHosts.includes(host)) {
+        return {
+          errorMessage: 'This offline features host is not in the trusted allowlist.'
+        }
       }
 
       const response: HttpResponse | GetOfflineFeaturesResponse = await this.request({
@@ -781,9 +783,13 @@ export class SNApiService extends PureService<
         customHeaders: [{key: 'x-offline-token', value: extensionKey}]
       });
 
-      return (response as GetOfflineFeaturesResponse).data?.features;
+      return {
+        features: (response as GetOfflineFeaturesResponse).data?.features || []
+      };
     } catch {
-      return;
+      return {
+        errorMessage: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+      };
     }
   }
 
