@@ -1614,22 +1614,7 @@ export class SNApplication {
   }
 
   public async setOfflineFeatures(code: string): Promise<string> {
-    try {
-      const activationCodeWithoutSpaces = code.replace(/\s/g, '');
-      const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
-      const { featuresUrl, extensionKey } = this.getOfflineSubscriptionDetails(decodedData);
-
-      if (!featuresUrl || !extensionKey) {
-        return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
-      }
-
-      await this.setValue(StorageKey.OfflineSubscriptionData, { featuresUrl, extensionKey });
-
-      return this.featuresService.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
-
-    } catch (err) {
-      return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
-    }
+    return this.featuresService.setOfflineFeatures(code);
   }
 
   private getOfflineSubscriptionDetails (decodedOfflineSubscriptionToken: string): {
@@ -1725,6 +1710,7 @@ export class SNApplication {
       this.credentialService,
       this.syncService,
       this.sessionManager,
+      this.crypto,
       this.enableV4
     );
     this.services.push(this.featuresService);

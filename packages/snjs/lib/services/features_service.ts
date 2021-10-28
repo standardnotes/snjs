@@ -24,6 +24,7 @@ import { convertTimestampToMilliseconds } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { SNSessionManager } from '@Services/api/session_manager';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -45,6 +46,7 @@ export class SNFeaturesService extends PureService<void> {
     private credentialService: SNCredentialService,
     private syncService: SNSyncService,
     private sessionManager: SNSessionManager,
+    private crypto: SNPureCrypto,
     private enableV4: boolean
   ) {
     super();
@@ -112,8 +114,45 @@ export class SNFeaturesService extends PureService<void> {
     );
   }
 
-  
-  public async fetchAndStoreOfflineFeatures(featuresUrl?: string, extensionKey?: string): Promise<string> {
+  public async setOfflineFeatures(code: string): Promise<string> {
+    try {
+      const activationCodeWithoutSpaces = code.replace(/\s/g, '');
+      const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
+      const { featuresUrl, extensionKey } = this.getOfflineSubscriptionDetails(decodedData);
+
+      if (!featuresUrl || !extensionKey) {
+        return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
+      }
+
+      await this.storageService.setValue(StorageKey.OfflineSubscriptionData, { featuresUrl, extensionKey });
+
+      return this.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
+
+    } catch (err) {
+      return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
+    }
+  }
+
+  private getOfflineSubscriptionDetails(decodedOfflineSubscriptionToken: string): {
+    featuresUrl: string;
+    extensionKey: string;
+  } {
+    try {
+      const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
+
+      return {
+        featuresUrl,
+        extensionKey
+      };
+    } catch (error) {
+      return {
+        featuresUrl: '',
+        extensionKey: ''
+      };
+    }
+  }
+
+  private async fetchAndStoreOfflineFeatures(featuresUrl?: string, extensionKey?: string): Promise<string> {
     let errMessage = '';
     let offlineFeaturesUrl = featuresUrl;
     let offlineExtensionKey = extensionKey;
@@ -379,6 +418,8 @@ export class SNFeaturesService extends PureService<void> {
     (this.settingsService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
     (this.syncService as unknown) = undefined;
+    (this.sessionManager as unknown) = undefined;
+    (this.crypto as unknown) = undefined;
     this.deinited = true;
   }
 }

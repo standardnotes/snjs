@@ -18,6 +18,7 @@ import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
 import { ApplicationStage } from '@Lib/stages';
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
@@ -29,6 +30,7 @@ describe('featuresService', () => {
   let credentialService: SNCredentialService;
   let syncService: SNSyncService;
   let sessionManager: SNSessionManager;
+  let crypto: SNPureCrypto;
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
@@ -47,6 +49,7 @@ describe('featuresService', () => {
       credentialService,
       syncService,
       sessionManager,
+      crypto,
       enableV4,
     );
   };
@@ -121,6 +124,9 @@ describe('featuresService', () => {
 
     sessionManager = {} as jest.Mocked<SNSessionManager>;
     sessionManager.getUser = jest.fn();
+
+    crypto = {} as jest.Mocked<SNPureCrypto>
+    crypto.base64Decode = jest.fn()
   });
 
   describe('loadUserRoles()', () => {
@@ -413,51 +419,16 @@ describe('featuresService', () => {
     });
   })
 
-  describe('fetchAndStoreOfflineFeatures', () => {
-    let featuresService: SNFeaturesService | null = null;
-
-    beforeEach(() => {
-      featuresService = createService() as SNFeaturesService;
-    });
-
-    describe('`featuresUrl` and `extensionKey` arguments are falsy', () => {
-      it ('should not call `loadFeaturesForOfflineUser` method', async () => {
-        await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures();
-
-        expect(apiService.getOfflineFeatures).not.toHaveBeenCalled();
-      })
-
-      it ('should return error message', async () => {
-        const errorMessage = await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures();
-
-        expect(errorMessage).not.toEqual('');
-      });
-    });
-
-    describe('`featuresUrl` and `extensionKey` arguments are provided', () => {
-      const featuresUrl = 'http://features.url';
-      const extensionKey = 'extension-key';
-
-      it('should call `apiService.getOfflineFeatures` with provided arguments', async () => {
-        await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures(featuresUrl, extensionKey);
-
-        expect(apiService.getOfflineFeatures).toHaveBeenCalledWith(featuresUrl, extensionKey)
-      });
-
-      it ('should not return error message', async () => {
-        const errorMessage = await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures(featuresUrl, extensionKey);
-
-        expect(errorMessage).toEqual('');
-      });
-    });
-  });
-
   describe('handleApplicationStage', () => {
     let featuresService: SNFeaturesService | null = null;
 
     beforeEach(() => {
       featuresService = createService() as SNFeaturesService;
-      featuresService.fetchAndStoreOfflineFeatures = jest.fn();
+
+      storageService.getValue = jest.fn().mockReturnValue({
+        featuresUrl: '',
+        extensionKey: ''
+      });
     });
 
     it('should not call `sessionManager.getUser` method if provided argument is not `LoadedDatabase_12` stage', async () => {
@@ -466,29 +437,10 @@ describe('featuresService', () => {
       expect(sessionManager.getUser).not.toHaveBeenCalled();
     });
 
-    describe('provided argument is `LoadedDatabase_12` stage', () => {
-      it('should call `sessionManager.getUser` method ', async () => {
-        await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
+    it('should call `sessionManager.getUser` method if provided argument is `LoadedDatabase_12` stage', async () => {
+      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
 
-        expect(sessionManager.getUser).toHaveBeenCalled();
-      });
-
-      it('should call `fetchAndStoreOfflineFeatures` method if `sessionManager.getUser` doesn\'t return truthy value', async () => {
-        await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
-
-        expect((featuresService as SNFeaturesService)?.fetchAndStoreOfflineFeatures).toHaveBeenCalled();
-      });
-
-      it('should not call `fetchAndStoreOfflineFeatures` method if `sessionManager.getUser` returns some user', async () => {
-        sessionManager.getUser = jest.fn().mockReturnValue({
-          uuid: 'user-1',
-          email: 'user-1@gmail.com',
-        });
-
-        await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
-
-        expect((featuresService as SNFeaturesService)?.fetchAndStoreOfflineFeatures).not.toHaveBeenCalled();
-      })
+      expect(sessionManager.getUser).toHaveBeenCalled();
     });
   });
 });
