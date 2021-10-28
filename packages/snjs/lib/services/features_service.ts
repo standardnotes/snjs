@@ -3,7 +3,7 @@ import { AccountEvent, SNCredentialService } from './credential_service';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
-import { SNStorageService } from './storage_service';
+import { SNStorageService, StorageValueModes } from './storage_service';
 import { RoleName } from '@standardnotes/auth';
 import { ApiServiceEvent, MetaReceivedData, SNApiService } from './api/api_service';
 import { UuidString } from '@Lib/types';
@@ -119,7 +119,7 @@ export class SNFeaturesService extends PureService<void> {
     let offlineExtensionKey = extensionKey;
 
     if (!offlineFeaturesUrl || !offlineExtensionKey) {
-      const featuresForOfflineUser = await this.loadFeaturesForOfflineUser();
+      const featuresForOfflineUser = this.loadFeaturesForOfflineUser();
       offlineFeaturesUrl = featuresForOfflineUser.featuresUrl
       offlineExtensionKey = featuresForOfflineUser.extensionKey
     }
@@ -248,36 +248,22 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private async loadFeaturesForOfflineUser(): Promise<{
+  private loadFeaturesForOfflineUser(): {
     featuresUrl: string;
     extensionKey: string;
-  }> {
-    const offlineSubscriptionDataString = await this.storageService.getValue(StorageKey.OfflineSubscriptionData)
-
-    const { featuresUrl, extensionKey } = this.getOfflineSubscriptionData(offlineSubscriptionDataString);
+  } {
+    const { featuresUrl, extensionKey } = this.storageService.getValue(
+      StorageKey.OfflineSubscriptionData,
+      StorageValueModes.Default,
+      {
+        featuresUrl: '',
+        extensionKey: ''
+      }
+    );
 
     return {
       featuresUrl,
       extensionKey
-    }
-  }
-
-  private getOfflineSubscriptionData(decodedOfflineSubscriptionToken: string): {
-    featuresUrl: string;
-    extensionKey: string;
-  } {
-    try {
-      const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
-
-      return {
-        featuresUrl,
-        extensionKey
-      };
-    } catch (error) {
-      return {
-        featuresUrl: '',
-        extensionKey: ''
-      };
     }
   }
 

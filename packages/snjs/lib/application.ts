@@ -1623,7 +1623,7 @@ export class SNApplication {
         return API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
       }
 
-      await this.setValue(StorageKey.OfflineSubscriptionData, decodedData);
+      await this.setValue(StorageKey.OfflineSubscriptionData, { featuresUrl, extensionKey });
 
       return this.featuresService.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
 
