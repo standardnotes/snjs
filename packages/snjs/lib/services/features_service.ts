@@ -23,6 +23,7 @@ import { PayloadSource } from '@Payloads/sources';
 import { convertTimestampToMilliseconds } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { SNSessionManager } from '@Services/api/session_manager';
+import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -135,6 +136,8 @@ export class SNFeaturesService extends PureService<void> {
       } else {
         errMessage = errorMessage as string;
       }
+    } else {
+      errMessage = API_MESSAGE_FAILED_OFFLINE_ACTIVATION;
     }
     return errMessage;
   }

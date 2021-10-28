@@ -1,13 +1,14 @@
 import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
 import {
-  StorageKey,
-  SNStorageService,
-  SNApiService,
   ItemManager,
-  SNItem,
+  SNApiService,
   SNComponentManager,
   SNCredentialService,
+  SNItem,
+  SNSessionManager,
+  SNStorageService,
+  StorageKey
 } from '@Lib/index';
 import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
@@ -16,6 +17,7 @@ import { ContentType } from '@standardnotes/common';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
+import { ApplicationStage } from '@Lib/stages';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
@@ -26,6 +28,7 @@ describe('featuresService', () => {
   let settingsService: SNSettingsService;
   let credentialService: SNCredentialService;
   let syncService: SNSyncService;
+  let sessionManager: SNSessionManager;
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
@@ -43,6 +46,7 @@ describe('featuresService', () => {
       settingsService,
       credentialService,
       syncService,
+      sessionManager,
       enableV4,
     );
   };
@@ -83,6 +87,9 @@ describe('featuresService', () => {
         features,
       }
     });
+    apiService.getOfflineFeatures = jest.fn().mockReturnValue({
+      features
+    })
 
     itemManager = {} as jest.Mocked<ItemManager>;
     itemManager.getItems = jest.fn().mockReturnValue(
@@ -111,6 +118,9 @@ describe('featuresService', () => {
 
     syncService = {} as jest.Mocked<SNSyncService>;
     syncService.sync = jest.fn();
+
+    sessionManager = {} as jest.Mocked<SNSessionManager>;
+    sessionManager.getUser = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
@@ -402,4 +412,83 @@ describe('featuresService', () => {
       expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
     });
   })
+
+  describe('fetchAndStoreOfflineFeatures', () => {
+    let featuresService: SNFeaturesService | null = null;
+
+    beforeEach(() => {
+      featuresService = createService() as SNFeaturesService;
+    });
+
+    describe('`featuresUrl` and `extensionKey` arguments are falsy', () => {
+      it ('should not call `loadFeaturesForOfflineUser` method', async () => {
+        await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures();
+
+        expect(apiService.getOfflineFeatures).not.toHaveBeenCalled();
+      })
+
+      it ('should return error message', async () => {
+        const errorMessage = await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures();
+
+        expect(errorMessage).not.toEqual('');
+      });
+    });
+
+    describe('`featuresUrl` and `extensionKey` arguments are provided', () => {
+      const featuresUrl = 'http://features.url';
+      const extensionKey = 'extension-key';
+
+      it('should call `apiService.getOfflineFeatures` with provided arguments', async () => {
+        await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures(featuresUrl, extensionKey);
+
+        expect(apiService.getOfflineFeatures).toHaveBeenCalledWith(featuresUrl, extensionKey)
+      });
+
+      it ('should not return error message', async () => {
+        const errorMessage = await (featuresService as SNFeaturesService).fetchAndStoreOfflineFeatures(featuresUrl, extensionKey);
+
+        expect(errorMessage).toEqual('');
+      });
+    });
+  });
+
+  describe('handleApplicationStage', () => {
+    let featuresService: SNFeaturesService | null = null;
+
+    beforeEach(() => {
+      featuresService = createService() as SNFeaturesService;
+      featuresService.fetchAndStoreOfflineFeatures = jest.fn();
+    });
+
+    it('should not call `sessionManager.getUser` method if provided argument is not `LoadedDatabase_12` stage', async () => {
+      await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.FullSyncCompleted_13);
+
+      expect(sessionManager.getUser).not.toHaveBeenCalled();
+    });
+
+    describe('provided argument is `LoadedDatabase_12` stage', () => {
+      it('should call `sessionManager.getUser` method ', async () => {
+        await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
+
+        expect(sessionManager.getUser).toHaveBeenCalled();
+      });
+
+      it('should call `fetchAndStoreOfflineFeatures` method if `sessionManager.getUser` doesn\'t return truthy value', async () => {
+        await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
+
+        expect((featuresService as SNFeaturesService)?.fetchAndStoreOfflineFeatures).toHaveBeenCalled();
+      });
+
+      it('should not call `fetchAndStoreOfflineFeatures` method if `sessionManager.getUser` returns some user', async () => {
+        sessionManager.getUser = jest.fn().mockReturnValue({
+          uuid: 'user-1',
+          email: 'user-1@gmail.com',
+        });
+
+        await (featuresService as SNFeaturesService).handleApplicationStage(ApplicationStage.LoadedDatabase_12);
+
+        expect((featuresService as SNFeaturesService)?.fetchAndStoreOfflineFeatures).not.toHaveBeenCalled();
+      })
+    });
+  });
 });
