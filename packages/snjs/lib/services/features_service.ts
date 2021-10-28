@@ -130,7 +130,6 @@ export class SNFeaturesService extends PureService<void> {
         await this.setFeatures(features);
 
         if (this.enableV4) {
-          await this.itemManager.removeAllItemsFromMemory();
           await this.mapFeaturesToItems(features);
         }
       } else {
