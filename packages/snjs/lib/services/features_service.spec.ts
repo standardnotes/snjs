@@ -17,7 +17,6 @@ import { ContentType } from '@standardnotes/common';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
-import { ApplicationStage } from '@Lib/stages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 
 describe('featuresService', () => {

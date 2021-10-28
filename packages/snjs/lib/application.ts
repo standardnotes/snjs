@@ -95,7 +95,6 @@ import {
   UNSUPPORTED_BACKUP_FILE_VERSION,
   SessionStrings,
   ImportStrings,
-  API_MESSAGE_FAILED_OFFLINE_ACTIVATION
 } from './services/api/messages';
 import { SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
@@ -113,7 +112,7 @@ import {
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
-import { RemoteSession, StorageKey } from '.';
+import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';

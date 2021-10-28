@@ -21,7 +21,6 @@ import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
 import { convertTimestampToMilliseconds } from '@Lib/utils';
-import { ApplicationStage } from '@Lib/stages';
 import { SNSessionManager } from '@Services/api/session_manager';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
