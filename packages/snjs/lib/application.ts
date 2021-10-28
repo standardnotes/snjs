@@ -1613,9 +1613,9 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public async setOfflineFeaturesCode(activationCode: string): Promise<string> {
+  public async setOfflineFeaturesCode(code: string): Promise<string> {
     try {
-      const activationCodeWithoutSpaces = activationCode.replace(/\s/g, '');
+      const activationCodeWithoutSpaces = code.replace(/\s/g, '');
       const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
       const { featuresUrl, extensionKey } = this.getOfflineSubscriptionDetails(decodedData);
 
