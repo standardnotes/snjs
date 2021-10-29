@@ -102,7 +102,7 @@ export class SNHttpService extends PureService {
       httpRequest.params &&
       [HttpVerb.Post, HttpVerb.Delete, HttpVerb.Patch, HttpVerb.Put].includes(httpRequest.verb)
     ) {
-      request.setRequestHeader('Content-Length', `${Buffer.byteLength(JSON.stringify(httpRequest.params))}`);
+      request.setRequestHeader('Content-Length', `${new Blob([JSON.stringify(httpRequest.params)]).size}`);
     }
 
     const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
