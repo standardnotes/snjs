@@ -98,6 +98,12 @@ export class SNHttpService extends PureService {
     request.open(httpRequest.verb, httpRequest.url, true);
     request.setRequestHeader('Content-type', 'application/json');
     request.setRequestHeader('X-SNJS-Version', SnjsVersion);
+    if (
+      httpRequest.params &&
+      [HttpVerb.Post, HttpVerb.Delete, HttpVerb.Patch, HttpVerb.Put].includes(httpRequest.verb)
+    ) {
+      request.setRequestHeader('Content-Length', `${Buffer.byteLength(JSON.stringify(httpRequest.params))}`);
+    }
 
     const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
     request.setRequestHeader('X-Application-Version', appVersionHeaderValue);
