@@ -132,6 +132,12 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
+  public getIsOfflineActivationCodeStoredPreviously(): boolean {
+    const { featuresUrl, extensionKey } = this.getFeaturesForOfflineUserFromStorage();
+
+    return featuresUrl !== '' && extensionKey !== '';
+  }
+
   private getOfflineSubscriptionDetails(decodedOfflineSubscriptionToken: string): {
     featuresUrl: string;
     extensionKey: string;
@@ -161,7 +167,7 @@ export class SNFeaturesService extends PureService<void> {
     let offlineExtensionKey = extensionKey;
 
     if (!offlineFeaturesUrl || !offlineExtensionKey) {
-      const featuresForOfflineUser = this.loadFeaturesForOfflineUser();
+      const featuresForOfflineUser = this.getFeaturesForOfflineUserFromStorage();
       offlineFeaturesUrl = featuresForOfflineUser.featuresUrl
       offlineExtensionKey = featuresForOfflineUser.extensionKey
     }
@@ -277,7 +283,7 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private loadFeaturesForOfflineUser(): {
+  private getFeaturesForOfflineUserFromStorage(): {
     featuresUrl: string;
     extensionKey: string;
   } {

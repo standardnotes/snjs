@@ -1616,6 +1616,10 @@ export class SNApplication {
     return this.featuresService.setOfflineFeatures(code);
   }
 
+  public getIsOfflineActivationCodeStoredPreviously(): boolean {
+    return this.featuresService.getIsOfflineActivationCodeStoredPreviously();
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();
