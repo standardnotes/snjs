@@ -120,6 +120,7 @@ import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
 import { Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
+import { SetOfflineFeaturesFunctionResponse } from '@Services/features_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -1612,7 +1613,7 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public async setOfflineFeatures(code: string): Promise<string> {
+  public async setOfflineFeatures(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
     return this.featuresService.setOfflineFeatures(code);
   }
 

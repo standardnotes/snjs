@@ -1,4 +1,4 @@
-import { UuidString } from './../../types';
+import { ErrorObject, UuidString } from './../../types';
 import {
   HttpResponse,
   RegistrationResponse,
@@ -760,11 +760,7 @@ export class SNApiService extends PureService<
     return (response as PostSubscriptionTokensResponse).data?.token;
   }
 
-  public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<{
-    features?: FeatureDescription[];
-    errorMessage?: string
-  }> {
-
+  public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<{ features: FeatureDescription[]; } | ErrorObject> {
     const { trustedFeatureHosts } = packageJson.client;
 
     try {
@@ -772,7 +768,7 @@ export class SNApiService extends PureService<
 
       if (!trustedFeatureHosts.includes(host)) {
         return {
-          errorMessage: 'This offline features host is not in the trusted allowlist.'
+          error: 'This offline features host is not in the trusted allowlist.'
         }
       }
 
@@ -788,7 +784,7 @@ export class SNApiService extends PureService<
       };
     } catch {
       return {
-        errorMessage: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
       };
     }
   }

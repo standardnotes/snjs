@@ -7,3 +7,7 @@ export enum DeinitSource {
   Lock = 2,
   AppGroupUnload = 3,
 }
+
+export type ErrorObject = {
+  error: string;
+}
