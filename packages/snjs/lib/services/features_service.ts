@@ -3,7 +3,7 @@ import { AccountEvent, SNCredentialService } from './credential_service';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
-import { SNStorageService, StorageValueModes } from './storage_service';
+import { SNStorageService } from './storage_service';
 import { RoleName } from '@standardnotes/auth';
 import { ApiServiceEvent, MetaReceivedData, SNApiService } from './api/api_service';
 import { ErrorObject, UuidString } from '@Lib/types';
@@ -125,14 +125,12 @@ export class SNFeaturesService extends PureService<void> {
       const activationCodeWithoutSpaces = code.replace(/\s/g, '');
       const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
       const result = this.getOfflineSubscriptionDetails(decodedData);
-
       if (isErrorObject(result)) {
         return {
           error: result.error
         }
       }
       const { featuresUrl, extensionKey } = result;
-
       await this.storageService.setValue(StorageKey.OfflineSubscriptionData, { featuresUrl, extensionKey });
 
       return this.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
@@ -144,15 +142,13 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   public getIsOfflineActivationCodeStoredPreviously(): boolean {
-    const { featuresUrl, extensionKey } = this.getFeaturesForOfflineUserFromStorage();
-
-    return featuresUrl !== '' && extensionKey !== '';
+    const featuresForOfflineUser = this.getFeaturesForOfflineUserFromStorage();
+    return typeof featuresForOfflineUser !== 'undefined';
   }
 
   private getOfflineSubscriptionDetails(decodedOfflineSubscriptionToken: string): GetOfflineSubscriptionDetailsResponse {
     try {
       const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
-
       return {
         featuresUrl,
         extensionKey
@@ -175,6 +171,11 @@ export class SNFeaturesService extends PureService<void> {
 
     if (!offlineFeaturesUrl || !offlineExtensionKey) {
       const featuresForOfflineUser = this.getFeaturesForOfflineUserFromStorage();
+      if (!featuresForOfflineUser) {
+        return {
+          error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        }
+      }
       offlineFeaturesUrl = featuresForOfflineUser.featuresUrl
       offlineExtensionKey = featuresForOfflineUser.extensionKey
     }
@@ -291,22 +292,13 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private getFeaturesForOfflineUserFromStorage(): {
-    featuresUrl: string;
-    extensionKey: string;
-  } {
-    const { featuresUrl, extensionKey } = this.storageService.getValue(
-      StorageKey.OfflineSubscriptionData,
-      StorageValueModes.Default,
-      {
-        featuresUrl: '',
-        extensionKey: ''
+  private getFeaturesForOfflineUserFromStorage(): OfflineSubscriptionDetails | undefined {
+    const offlineSubscriptionData = this.storageService.getValue(StorageKey.OfflineSubscriptionData);
+    if (offlineSubscriptionData) {
+      return {
+        featuresUrl: offlineSubscriptionData.featuresUrl,
+        extensionKey: offlineSubscriptionData.extensionKey
       }
-    );
-
-    return {
-      featuresUrl,
-      extensionKey
     }
   }
 
