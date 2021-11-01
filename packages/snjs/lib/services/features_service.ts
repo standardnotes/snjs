@@ -168,7 +168,6 @@ export class SNFeaturesService extends PureService<void> {
     }
     let offlineFeaturesUrl = featuresUrl;
     let offlineExtensionKey = extensionKey;
-
     if (!offlineFeaturesUrl || !offlineExtensionKey) {
       const featuresForOfflineUser = this.getFeaturesForOfflineUserFromStorage();
       if (!featuresForOfflineUser) {

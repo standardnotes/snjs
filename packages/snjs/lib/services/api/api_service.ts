@@ -762,23 +762,19 @@ export class SNApiService extends PureService<
 
   public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<{ features: FeatureDescription[]; } | ErrorObject> {
     const { trustedFeatureHosts } = packageJson.client;
-
     try {
       const { host } = new URL(featuresUrl);
-
       if (!trustedFeatureHosts.includes(host)) {
         return {
           error: 'This offline features host is not in the trusted allowlist.'
         }
       }
-
       const response: HttpResponse | GetOfflineFeaturesResponse = await this.request({
         verb: HttpVerb.Get,
         url: featuresUrl,
         fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
         customHeaders: [{key: 'x-offline-token', value: extensionKey}]
       });
-
       return {
         features: (response as GetOfflineFeaturesResponse).data?.features || []
       };
