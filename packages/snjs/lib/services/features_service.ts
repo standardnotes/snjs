@@ -148,6 +148,7 @@ export class SNFeaturesService extends PureService<void> {
 
   public async removeOfflineActivationCode(): Promise<void> {
     await this.storageService.removeValue(StorageKey.OfflineSubscriptionData);
+    await this.storageService.removeValue(StorageKey.UserFeatures);
   }
 
   private getOfflineSubscriptionDetails(decodedOfflineSubscriptionToken: string): GetOfflineSubscriptionDetailsResponse {
