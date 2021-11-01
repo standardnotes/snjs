@@ -1621,6 +1621,10 @@ export class SNApplication {
     return this.featuresService.getIsOfflineActivationCodeStoredPreviously();
   }
 
+  public async removeOfflineActivationCode(): Promise<void> {
+    return this.featuresService.removeOfflineActivationCode();
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();

@@ -146,6 +146,11 @@ export class SNFeaturesService extends PureService<void> {
     return typeof featuresForOfflineUser !== 'undefined';
   }
 
+  public async removeOfflineActivationCode(): Promise<void> {
+    await this.storageService.removeValue(StorageKey.OfflineSubscriptionData);
+    await this.storageService.removeValue(StorageKey.UserFeatures);
+  }
+
   private getOfflineSubscriptionDetails(decodedOfflineSubscriptionToken: string): GetOfflineSubscriptionDetailsResponse {
     try {
       const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
@@ -166,20 +171,8 @@ export class SNFeaturesService extends PureService<void> {
         error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
       };
     }
-    let offlineFeaturesUrl = featuresUrl;
-    let offlineExtensionKey = extensionKey;
-    if (!offlineFeaturesUrl || !offlineExtensionKey) {
-      const featuresForOfflineUser = this.getFeaturesForOfflineUserFromStorage();
-      if (!featuresForOfflineUser) {
-        return {
-          error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
-        }
-      }
-      offlineFeaturesUrl = featuresForOfflineUser.featuresUrl
-      offlineExtensionKey = featuresForOfflineUser.extensionKey
-    }
-    if (offlineFeaturesUrl && offlineExtensionKey) {
-      const result = await this.apiService.getOfflineFeatures(offlineFeaturesUrl, offlineExtensionKey);
+    if (featuresUrl && extensionKey) {
+      const result = await this.apiService.getOfflineFeatures(featuresUrl, extensionKey);
 
       if (isErrorObject(result)) {
         return {
