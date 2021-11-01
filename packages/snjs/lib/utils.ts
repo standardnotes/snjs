@@ -596,6 +596,6 @@ export function convertTimestampToMilliseconds(timestamp: number): number {
       return Math.floor(timestamp / MicrosecondsInAMillisecond);
 
     default:
-      throw 'Unhandle timestamp precision: ${timestamp}';
+      throw `Unhandle timestamp precision: ${timestamp}`;
   }
 }
