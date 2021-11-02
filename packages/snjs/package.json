@@ -9,14 +9,6 @@
   "files": [
     "dist"
   ],
-  "client": {
-    "trustedFeatureHosts": [
-      "extensions.standardnotes.com",
-      "extensions.standardnotes.org",
-      "features.standardnotes.com",
-      "api-dev.standardnotes.com"
-    ]
-  },
   "license": "AGPL-3.0-or-later",
   "publishConfig": {
     "access": "public"
