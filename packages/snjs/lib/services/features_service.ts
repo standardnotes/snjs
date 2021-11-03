@@ -30,7 +30,7 @@ import {
 } from '@Services/api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { ButtonType, SNAlertService } from '@Services/alert_service';
-import packageJson from '../../package.json';
+import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/constants';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -366,10 +366,9 @@ export class SNFeaturesService extends PureService<void> {
 
   public async validateAndDownloadExternalFeature(url: string): Promise<SNComponent | undefined> {
     try {
-      const { trustedFeatureHosts, trustedCustomExtensionsHosts } = packageJson.client;
       const trustedCustomExtensionsUrls = [
-        ...trustedFeatureHosts,
-        ...trustedCustomExtensionsHosts
+        ...TRUSTED_FEATURE_HOSTS,
+        ...TRUSTED_CUSTOM_EXTENSIONS_HOSTS
       ];
       const { host } = new URL(url);
       if (!trustedCustomExtensionsUrls.includes(host)) {
