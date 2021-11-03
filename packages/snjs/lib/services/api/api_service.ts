@@ -46,9 +46,9 @@ import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
-import packageJson from '../../../package.json'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 import { OfflineSubscriptionEntitlements } from '@Services/features_service';
+import { APPLICATION_DEFAULT_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/constants';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -185,10 +185,9 @@ export class SNApiService extends PureService<
 
   public isCustomServerHostUsed(): boolean {
     try {
-      const { applicationDefaultHosts } = packageJson.client;
       const applicationHost = this.getHost() || '';
       const { host } = new URL(applicationHost);
-      return !applicationDefaultHosts.includes(host);
+      return !APPLICATION_DEFAULT_HOSTS.includes(host);
     } catch (err) {
       return false;
     }
@@ -774,10 +773,9 @@ export class SNApiService extends PureService<
 
   public async getOfflineFeatures(offlineSubscriptionEntitlements: OfflineSubscriptionEntitlements): Promise<{ features: FeatureDescription[]; } | ErrorObject> {
     try {
-      const { trustedFeatureHosts } = packageJson.client;
       const { featuresUrl, extensionKey } = offlineSubscriptionEntitlements;
       const { host } = new URL(featuresUrl);
-      if (!trustedFeatureHosts.includes(host)) {
+      if (!TRUSTED_FEATURE_HOSTS.includes(host)) {
         return {
           error: 'This offline features host is not in the trusted allowlist.'
         }

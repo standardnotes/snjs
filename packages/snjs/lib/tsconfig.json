@@ -13,7 +13,6 @@
     "outDir": "../dist/@types",
     "emitDeclarationOnly": true,
     "baseUrl": ".",
-    "resolveJsonModule": true,
     "paths": {
       "@Lib/*": ["*"],
       "@Services/*": ["./services/*"],
