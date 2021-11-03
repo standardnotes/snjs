@@ -9,6 +9,21 @@
   "files": [
     "dist"
   ],
+  "client": {
+    "applicationDefaultHosts": [
+      "api.standardnotes.com",
+      "sync.standardnotes.org"
+    ],
+    "trustedFeatureHosts": [
+      "extensions.standardnotes.com",
+      "extensions.standardnotes.org",
+      "features.standardnotes.com",
+      "api-dev.standardnotes.com"
+    ],
+    "trustedCustomExtensionsHosts": [
+      "listed.to"
+    ]
+  },
   "license": "AGPL-3.0-or-later",
   "publishConfig": {
     "access": "public"

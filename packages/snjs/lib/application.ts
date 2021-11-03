@@ -1600,7 +1600,7 @@ export class SNApplication {
   public downloadExternalFeature(
     url: string
   ): Promise<SNComponent | undefined> {
-    return this.featuresService.downloadExternalFeature(url);
+    return this.featuresService.validateAndDownloadExternalFeature(url);
   }
 
   public getFeature(
@@ -1623,6 +1623,10 @@ export class SNApplication {
 
   public async removeOfflineActivationCode(): Promise<void> {
     return this.featuresService.removeOfflineActivationCode();
+  }
+
+  public isCustomServerHostUsed(): boolean {
+    return this.apiService.isCustomServerHostUsed();
   }
 
   private constructServices() {
@@ -1697,6 +1701,7 @@ export class SNApplication {
       this.settingsService,
       this.credentialService,
       this.syncService,
+      this.alertService,
       this.sessionManager,
       this.crypto,
       this.enableV4

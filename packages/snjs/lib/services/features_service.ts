@@ -22,8 +22,15 @@ import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
 import { convertTimestampToMilliseconds, isErrorObject } from '@Lib/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
-import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
+import {
+  API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
+  API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
+  API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
+  INVALID_EXTENSION_URL
+} from '@Services/api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
+import { ButtonType, SNAlertService } from '@Services/alert_service';
+import packageJson from '../../package.json';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -51,6 +58,7 @@ export class SNFeaturesService extends PureService<void> {
     private settingsService: SNSettingsService,
     private credentialService: SNCredentialService,
     private syncService: SNSyncService,
+    private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
     private crypto: SNPureCrypto,
     private enableV4: boolean
@@ -128,7 +136,7 @@ export class SNFeaturesService extends PureService<void> {
       if (isErrorObject(result)) {
         return {
           error: result.error
-        }
+        };
       }
       await this.storageService.setValue(StorageKey.OfflineSubscriptionData, result);
       return this.fetchAndStoreOfflineFeatures(result);
@@ -174,7 +182,7 @@ export class SNFeaturesService extends PureService<void> {
     if (isErrorObject(result)) {
       return {
         error: result.error
-      }
+      };
     }
     await this.setFeatures(result.features);
     await this.mapFeaturesToItems(result.features);
@@ -282,7 +290,7 @@ export class SNFeaturesService extends PureService<void> {
       return {
         featuresUrl: offlineSubscriptionData.featuresUrl,
         extensionKey: offlineSubscriptionData.extensionKey
-      }
+      };
     }
   }
 
@@ -360,11 +368,39 @@ export class SNFeaturesService extends PureService<void> {
     this.syncService.sync();
   }
 
-  public async downloadExternalFeature(
+  public async validateAndDownloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+    try {
+      const { trustedFeatureHosts, trustedCustomExtensionsHosts } = packageJson.client;
+      const trustedCustomExtensionsUrls = [
+        ...trustedFeatureHosts,
+        ...trustedCustomExtensionsHosts
+      ];
+      const { host } = new URL(url);
+      if (!trustedCustomExtensionsUrls.includes(host)) {
+        const didConfirm = await this.alertService.confirm(
+          API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
+          'Install extension from an untrusted source?',
+          'Proceed to install',
+          ButtonType.Danger,
+          'Cancel'
+        );
+        if (didConfirm) {
+          return this.downloadExternalFeature(url);
+        }
+      } else {
+        return this.downloadExternalFeature(url);
+      }
+    } catch (err) {
+      this.alertService.alert(INVALID_EXTENSION_URL);
+    }
+  }
+
+  private async downloadExternalFeature(
     url: string
   ): Promise<SNComponent | undefined> {
     const response = await this.apiService.downloadFeatureUrl(url);
     if (response.error) {
+      await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION);
       return undefined;
     }
     const rawFeature = response.data as FeatureDescription;
@@ -398,6 +434,7 @@ export class SNFeaturesService extends PureService<void> {
     (this.settingsService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;
     (this.syncService as unknown) = undefined;
+    (this.alertService as unknown) = undefined;
     (this.sessionManager as unknown) = undefined;
     (this.crypto as unknown) = undefined;
     this.deinited = true;

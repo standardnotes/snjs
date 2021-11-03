@@ -2,6 +2,7 @@ import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
 import {
   ItemManager,
+  SNAlertService,
   SNApiService,
   SNComponentManager,
   SNCredentialService,
@@ -28,6 +29,7 @@ describe('featuresService', () => {
   let settingsService: SNSettingsService;
   let credentialService: SNCredentialService;
   let syncService: SNSyncService;
+  let alertService: SNAlertService;
   let sessionManager: SNSessionManager;
   let crypto: SNPureCrypto;
   let roles: RoleName[];
@@ -47,6 +49,7 @@ describe('featuresService', () => {
       settingsService,
       credentialService,
       syncService,
+      alertService,
       sessionManager,
       crypto,
       enableV4,
@@ -120,6 +123,10 @@ describe('featuresService', () => {
 
     syncService = {} as jest.Mocked<SNSyncService>;
     syncService.sync = jest.fn();
+
+    alertService = {} as jest.Mocked<SNAlertService>;
+    alertService.confirm = jest.fn();
+    alertService.alert = jest.fn();
 
     sessionManager = {} as jest.Mocked<SNSessionManager>;
     sessionManager.getUser = jest.fn();

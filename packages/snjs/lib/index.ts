@@ -199,10 +199,6 @@ export {
   namespacedKey,
 } from '@Lib/storage_keys';
 
-export {
-  TRUSTED_FEATURE_URL_HOSTS
-} from '@Lib/constants';
-
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
 
