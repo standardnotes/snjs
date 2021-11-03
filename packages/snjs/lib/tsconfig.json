@@ -20,5 +20,8 @@
       "@Protocol/*": ["./protocol/*"],
       "@Payloads/*": ["./protocol/payloads/*"]
     }
-  }
+  },
+  "exclude": [
+    "../package.json"
+  ]
 }
