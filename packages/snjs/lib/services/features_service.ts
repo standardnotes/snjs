@@ -132,13 +132,11 @@ export class SNFeaturesService extends PureService<void> {
     try {
       const activationCodeWithoutSpaces = code.replace(/\s/g, '');
       const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
-      const result = this.getOfflineSubscriptionDetails(decodedData);
+      const result = this.parseOfflineEntitlementsCode(decodedData);
       if (isErrorObject(result)) {
-        return {
-          error: result.error
-        };
+        return result;
       }
-      await this.storageService.setValue(StorageKey.OfflineSubscriptionData, result);
+      await this.storageService.setValue(StorageKey.OfflineSubscriptionEntitlements, result);
       return this.fetchAndStoreOfflineFeatures(result);
     } catch (err) {
       return {
@@ -149,17 +147,17 @@ export class SNFeaturesService extends PureService<void> {
 
   public getIsOfflineActivationCodeStoredPreviously(): boolean {
     const featuresForOfflineUser = this.getFeaturesForOfflineUserFromStorage();
-    return typeof featuresForOfflineUser !== 'undefined';
+    return featuresForOfflineUser != undefined;
   }
 
   public async removeOfflineActivationCode(): Promise<void> {
-    await this.storageService.removeValue(StorageKey.OfflineSubscriptionData);
+    await this.storageService.removeValue(StorageKey.OfflineSubscriptionEntitlements);
     await this.storageService.removeValue(StorageKey.UserFeatures);
   }
 
-  private getOfflineSubscriptionDetails(decodedOfflineSubscriptionToken: string): GetOfflineSubscriptionDetailsResponse {
+  private parseOfflineEntitlementsCode(code: string): GetOfflineSubscriptionDetailsResponse {
     try {
-      const { featuresUrl, extensionKey } = JSON.parse(decodedOfflineSubscriptionToken);
+      const { featuresUrl, extensionKey } = JSON.parse(code);
       return {
         featuresUrl,
         extensionKey
@@ -180,9 +178,7 @@ export class SNFeaturesService extends PureService<void> {
     const result = await this.apiService.getOfflineFeatures(offlineEntitlements);
 
     if (isErrorObject(result)) {
-      return {
-        error: result.error
-      };
+      return result;
     }
     await this.setFeatures(result.features);
     await this.mapFeaturesToItems(result.features);
@@ -285,11 +281,11 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   private getFeaturesForOfflineUserFromStorage(): OfflineSubscriptionEntitlements | undefined {
-    const offlineSubscriptionData = this.storageService.getValue(StorageKey.OfflineSubscriptionData);
-    if (offlineSubscriptionData) {
+    const offlineSubscriptionEntitlements = this.storageService.getValue(StorageKey.OfflineSubscriptionEntitlements);
+    if (offlineSubscriptionEntitlements) {
       return {
-        featuresUrl: offlineSubscriptionData.featuresUrl,
-        extensionKey: offlineSubscriptionData.extensionKey
+        featuresUrl: offlineSubscriptionEntitlements.featuresUrl,
+        extensionKey: offlineSubscriptionEntitlements.extensionKey
       };
     }
   }

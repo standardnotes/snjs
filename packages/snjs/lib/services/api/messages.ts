@@ -43,7 +43,7 @@ export const API_MESSAGE_FAILED_OFFLINE_FEATURES = 'Failed to get offline featur
 export const API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING = `The extension you are attempting to install comes from an 
   untrusted source. Untrusted extensions may lower the security of your data. Do you want to continue?`;
 export const API_MESSAGE_FAILED_DOWNLOADING_EXTENSION = `Error downloading package details. Please check the 
-  Extension Link and try again.`;
+  extension link and try again.`;
 export const API_MESSAGE_FAILED_OFFLINE_ACTIVATION = 'An unknown issue occurred during offline activation. Please try again.';
 
 export const INVALID_EXTENSION_URL = 'Invalid extension URL.';
