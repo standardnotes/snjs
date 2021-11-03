@@ -48,6 +48,7 @@ import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 import { TRUSTED_FEATURE_URL_HOSTS } from '@Lib/constants';
+import { OfflineSubscriptionEntitlements } from '@Services/features_service';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -760,8 +761,9 @@ export class SNApiService extends PureService<
     return (response as PostSubscriptionTokensResponse).data?.token;
   }
 
-  public async getOfflineFeatures(featuresUrl: string, extensionKey: string): Promise<{ features: FeatureDescription[]; } | ErrorObject> {
+  public async getOfflineFeatures(offlineSubscriptionEntitlements: OfflineSubscriptionEntitlements): Promise<{ features: FeatureDescription[]; } | ErrorObject> {
     try {
+      const { featuresUrl, extensionKey } = offlineSubscriptionEntitlements;
       const { host } = new URL(featuresUrl);
       if (!TRUSTED_FEATURE_URL_HOSTS.includes(host)) {
         return {

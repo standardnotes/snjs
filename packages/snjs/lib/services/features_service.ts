@@ -26,11 +26,11 @@ import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
-type OfflineSubscriptionDetails = {
+export type OfflineSubscriptionEntitlements = {
   featuresUrl: string;
   extensionKey: string;
 };
-type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionDetails | ErrorObject;
+type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject;
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -130,10 +130,8 @@ export class SNFeaturesService extends PureService<void> {
           error: result.error
         }
       }
-      const { featuresUrl, extensionKey } = result;
-      await this.storageService.setValue(StorageKey.OfflineSubscriptionData, { featuresUrl, extensionKey });
-
-      return this.fetchAndStoreOfflineFeatures(featuresUrl, extensionKey)
+      await this.storageService.setValue(StorageKey.OfflineSubscriptionData, result);
+      return this.fetchAndStoreOfflineFeatures(result);
     } catch (err) {
       return {
         error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
@@ -161,31 +159,25 @@ export class SNFeaturesService extends PureService<void> {
     } catch (error) {
       return {
         error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
-      }
+      };
     }
   }
 
-  private async fetchAndStoreOfflineFeatures(featuresUrl?: string, extensionKey?: string): Promise<SetOfflineFeaturesFunctionResponse> {
+  private async fetchAndStoreOfflineFeatures(offlineEntitlements: OfflineSubscriptionEntitlements): Promise<SetOfflineFeaturesFunctionResponse> {
     if (!this.enableV4) {
       return {
         error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
       };
     }
-    if (featuresUrl && extensionKey) {
-      const result = await this.apiService.getOfflineFeatures(featuresUrl, extensionKey);
+    const result = await this.apiService.getOfflineFeatures(offlineEntitlements);
 
-      if (isErrorObject(result)) {
-        return {
-          error: result.error
-        }
-      }
-      await this.setFeatures(result.features);
-      await this.mapFeaturesToItems(result.features);
-    } else {
+    if (isErrorObject(result)) {
       return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        error: result.error
       }
     }
+    await this.setFeatures(result.features);
+    await this.mapFeaturesToItems(result.features);
   }
 
   public async migrateExtRepoToUserSetting(
@@ -284,7 +276,7 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private getFeaturesForOfflineUserFromStorage(): OfflineSubscriptionDetails | undefined {
+  private getFeaturesForOfflineUserFromStorage(): OfflineSubscriptionEntitlements | undefined {
     const offlineSubscriptionData = this.storageService.getValue(StorageKey.OfflineSubscriptionData);
     if (offlineSubscriptionData) {
       return {
