@@ -4,7 +4,7 @@ import isArray from 'lodash/isArray';
 import mergeWith from 'lodash/mergeWith';
 import uniqWith from 'lodash/uniqWith';
 import uniq from 'lodash/uniq';
-import { AnyRecord } from './types';
+import { AnyRecord, ErrorObject } from './types';
 
 const collator =
   typeof Intl !== 'undefined'
@@ -596,6 +596,10 @@ export function convertTimestampToMilliseconds(timestamp: number): number {
       return Math.floor(timestamp / MicrosecondsInAMillisecond);
 
     default:
-      throw 'Unhandle timestamp precision: ${timestamp}';
+      throw `Unhandled timestamp precision: ${timestamp}`;
   }
+}
+
+export function isErrorObject(object: any): object is ErrorObject {
+  return typeof object.error !== 'undefined';
 }

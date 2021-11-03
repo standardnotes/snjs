@@ -1,4 +1,4 @@
-import { UuidString } from './../../types';
+import { ErrorObject, UuidString } from './../../types';
 import {
   HttpResponse,
   RegistrationResponse,
@@ -24,6 +24,7 @@ import {
   GetAvailableSubscriptionsResponse,
   ChangeCredentialsResponse,
   PostSubscriptionTokensResponse,
+  GetOfflineFeaturesResponse
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -44,6 +45,10 @@ import { PureService } from '@Services/pure_service';
 import { isNullOrUndefined, joinPaths } from '@Lib/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
+import { FeatureDescription } from '@standardnotes/features';
+import packageJson from '../../../package.json'
+import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
+import { OfflineSubscriptionEntitlements } from '@Services/features_service';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -63,6 +68,7 @@ type PathNamesV1 = {
   subscription: (userUuid: string) => string;
   purchase: string;
   subscriptionTokens: string;
+  offlineFeatures: string;
 };
 
 type PathNamesV2 = {
@@ -92,7 +98,8 @@ const Paths: {
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
     purchase: '/v1/purchase',
-    subscriptionTokens: '/v1/subscription-tokens'
+    subscriptionTokens: '/v1/subscription-tokens',
+    offlineFeatures: '/v1/offline/features',
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -176,6 +183,17 @@ export class SNApiService extends PureService<
     return this.host;
   }
 
+  public isCustomServerHostUsed(): boolean {
+    try {
+      const { applicationDefaultHosts } = packageJson.client;
+      const applicationHost = this.getHost() || '';
+      const { host } = new URL(applicationHost);
+      return !applicationDefaultHosts.includes(host);
+    } catch (err) {
+      return false;
+    }
+  }
+
   public async setSession(session: Session, persist = true): Promise<void> {
     this.session = session;
     if (persist) {
@@ -243,6 +261,7 @@ export class SNApiService extends PureService<
     fallbackErrorMessage: string;
     params?: HttpParams;
     authentication?: string;
+    customHeaders?: Record<string, string>[];
   }) {
     try {
       const response = await this.httpService.runHttp(params);
@@ -751,6 +770,32 @@ export class SNApiService extends PureService<
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_ACCESS_PURCHASE,
     });
     return (response as PostSubscriptionTokensResponse).data?.token;
+  }
+
+  public async getOfflineFeatures(offlineSubscriptionEntitlements: OfflineSubscriptionEntitlements): Promise<{ features: FeatureDescription[]; } | ErrorObject> {
+    try {
+      const { trustedFeatureHosts } = packageJson.client;
+      const { featuresUrl, extensionKey } = offlineSubscriptionEntitlements;
+      const { host } = new URL(featuresUrl);
+      if (!trustedFeatureHosts.includes(host)) {
+        return {
+          error: 'This offline features host is not in the trusted allowlist.'
+        }
+      }
+      const response: HttpResponse | GetOfflineFeaturesResponse = await this.request({
+        verb: HttpVerb.Get,
+        url: featuresUrl,
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
+        customHeaders: [{key: 'x-offline-token', value: extensionKey}]
+      });
+      return {
+        features: (response as GetOfflineFeaturesResponse).data?.features || []
+      };
+    } catch {
+      return {
+        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+      };
+    }
   }
 
   private preprocessingError() {

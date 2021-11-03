@@ -120,6 +120,7 @@ import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
 import { Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
+import { SetOfflineFeaturesFunctionResponse } from '@Services/features_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -1599,7 +1600,7 @@ export class SNApplication {
   public downloadExternalFeature(
     url: string
   ): Promise<SNComponent | undefined> {
-    return this.featuresService.downloadExternalFeature(url);
+    return this.featuresService.validateAndDownloadExternalFeature(url);
   }
 
   public getFeature(
@@ -1610,6 +1611,22 @@ export class SNApplication {
 
   public getNewSubscriptionToken(): Promise<string | undefined> {
     return this.apiService.getNewSubscriptionToken();
+  }
+
+  public async setOfflineFeatures(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
+    return this.featuresService.setOfflineFeatures(code);
+  }
+
+  public getIsOfflineActivationCodeStoredPreviously(): boolean {
+    return this.featuresService.getIsOfflineActivationCodeStoredPreviously();
+  }
+
+  public async removeOfflineActivationCode(): Promise<void> {
+    return this.featuresService.removeOfflineActivationCode();
+  }
+
+  public isCustomServerHostUsed(): boolean {
+    return this.apiService.isCustomServerHostUsed();
   }
 
   private constructServices() {
@@ -1684,6 +1701,9 @@ export class SNApplication {
       this.settingsService,
       this.credentialService,
       this.syncService,
+      this.alertService,
+      this.sessionManager,
+      this.crypto,
       this.enableV4
     );
     this.services.push(this.featuresService);

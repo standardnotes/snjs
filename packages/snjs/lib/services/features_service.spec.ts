@@ -1,13 +1,15 @@
 import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
 import {
-  StorageKey,
-  SNStorageService,
-  SNApiService,
   ItemManager,
-  SNItem,
+  SNAlertService,
+  SNApiService,
   SNComponentManager,
   SNCredentialService,
+  SNItem,
+  SNSessionManager,
+  SNStorageService,
+  StorageKey
 } from '@Lib/index';
 import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
@@ -16,6 +18,7 @@ import { ContentType } from '@standardnotes/common';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
@@ -26,6 +29,9 @@ describe('featuresService', () => {
   let settingsService: SNSettingsService;
   let credentialService: SNCredentialService;
   let syncService: SNSyncService;
+  let alertService: SNAlertService;
+  let sessionManager: SNSessionManager;
+  let crypto: SNPureCrypto;
   let roles: RoleName[];
   let features: FeatureDescription[];
   let items: SNItem[];
@@ -43,6 +49,9 @@ describe('featuresService', () => {
       settingsService,
       credentialService,
       syncService,
+      alertService,
+      sessionManager,
+      crypto,
       enableV4,
     );
   };
@@ -83,6 +92,9 @@ describe('featuresService', () => {
         features,
       }
     });
+    apiService.getOfflineFeatures = jest.fn().mockReturnValue({
+      features
+    })
 
     itemManager = {} as jest.Mocked<ItemManager>;
     itemManager.getItems = jest.fn().mockReturnValue(
@@ -111,6 +123,16 @@ describe('featuresService', () => {
 
     syncService = {} as jest.Mocked<SNSyncService>;
     syncService.sync = jest.fn();
+
+    alertService = {} as jest.Mocked<SNAlertService>;
+    alertService.confirm = jest.fn();
+    alertService.alert = jest.fn();
+
+    sessionManager = {} as jest.Mocked<SNSessionManager>;
+    sessionManager.getUser = jest.fn();
+
+    crypto = {} as jest.Mocked<SNPureCrypto>
+    crypto.base64Decode = jest.fn()
   });
 
   describe('loadUserRoles()', () => {
