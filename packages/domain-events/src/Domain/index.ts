@@ -1,3 +1,5 @@
+export * from './Event/AccountClaimRequestedEvent'
+export * from './Event/AccountClaimRequestedEventPayload'
 export * from './Event/AccountDeletionRequestedEvent'
 export * from './Event/AccountDeletionRequestedEventPayload'
 export * from './Event/DomainEventInterface'
