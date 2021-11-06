@@ -90,7 +90,15 @@ export class NotesDisplayCriteria {
       }
     }
     if (this.searchQuery) {
-      filters.push((note) => noteMatchesQuery(note, this.searchQuery!));
+      filters.push((note) => {
+        const noteIsAMatch = noteMatchesQuery(note, this.searchQuery!);
+
+        const noteTags = collection.elementsReferencingElement(note)
+          .filter((item) => item.content_type === SNTag) as SNTag[];
+        const someTagsMatches = noteTags.some((tag) => tagMatchesQuery(tag, this.searchQuery!));
+
+        return noteIsAMatch || someTagsMatches;
+      });
     }
     if (!this.includePinned) {
       filters.push((note) => !note.pinned);
@@ -153,6 +161,16 @@ export function noteMatchesQuery(
   } else {
     return matchTypeForStringQuery(note, searchQuery.query) !== Match.None;
   }
+}
+
+export function tagMatchesQuery(
+  tag: SNTag,
+  searchQuery: SearchQuery
+): boolean {
+  if (!searchQuery.query) {
+    return false;
+  }
+  return tag.title.includes(searchQuery.query);
 }
 
 enum Match {
