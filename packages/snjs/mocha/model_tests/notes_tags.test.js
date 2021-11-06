@@ -909,4 +909,43 @@ describe('notes and tags', () => {
         .to.exist;
     });
   });
+
+  it('include notes that have tag titles that match search query', async function () {
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
+      noteTitle: 'A simple note',
+      noteText: 'This is just a note.',
+      tagTitle: 'Test'
+    });
+    const notePayload2 = Factory.createNotePayload('Foo');
+    const notePayload3 = Factory.createNotePayload('Bar');
+    const notePayload4 = Factory.createNotePayload('Testing');
+
+    await this.application.itemManager.emitItemsFromPayloads(
+      [
+        notePayload1,
+        notePayload2,
+        notePayload3,
+        notePayload4,
+        tagPayload1
+      ],
+      PayloadSource.LocalChanged
+    );
+
+    this.application.setNotesDisplayCriteria(
+      NotesDisplayCriteria.Create({
+        sortProperty: 'title',
+        sortDirection: 'dsc',
+        searchQuery: {
+          query: 'Test',
+        }
+      })
+    );
+
+    const displayedNotes = this.application.getDisplayableItems(
+      ContentType.Note
+    );
+    expect(displayedNotes.length).to.equal(2);
+    expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid);
+    expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid);
+  });
 });
