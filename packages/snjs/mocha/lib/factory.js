@@ -380,22 +380,22 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
   return params;
 }
 
-export function createTagParams({ dirty = true } = {}) {
+export function createTagParams({ title, dirty = true } = {}) {
   const params = {
     uuid: generateUuid(),
     content_type: ContentType.Tag,
     dirty: dirty,
     content: {
-      title: 'thoughts',
+      title: title || 'thoughts',
       references: [],
     },
   };
   return params;
 }
 
-export function createRelatedNoteTagPairPayload({ dirty = true } = {}) {
-  const noteParams = createNoteParams({ dirty });
-  const tagParams = createTagParams({ dirty });
+export function createRelatedNoteTagPairPayload({ noteTitle, noteText, tagTitle, dirty = true } = {}) {
+  const noteParams = createNoteParams({ title: noteTitle, text: noteText, dirty });
+  const tagParams = createTagParams({ title: tagTitle, dirty });
   tagParams.content.references = [
     {
       uuid: noteParams.uuid,
