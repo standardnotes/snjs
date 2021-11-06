@@ -94,7 +94,7 @@ export class NotesDisplayCriteria {
         const noteIsAMatch = noteMatchesQuery(note, this.searchQuery!);
 
         const noteTags = collection.elementsReferencingElement(note)
-          .filter((item) => item.content_type === SNTag) as SNTag[];
+          .filter((item) => item.content_type === ContentType.Tag) as SNTag[];
         const someTagsMatches = noteTags.some((tag) => tagMatchesQuery(tag, this.searchQuery!));
 
         return noteIsAMatch || someTagsMatches;
