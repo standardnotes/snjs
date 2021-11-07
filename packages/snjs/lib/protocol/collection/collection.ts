@@ -181,9 +181,13 @@ export class MutableCollection<T extends PurePayload | SNItem> {
     return this.referenceMap.getInverseRelationships(uuid);
   }
 
-  public elementsReferencingElement(element: T) {
+  public elementsReferencingElement(element: T, contentType?: ContentType) {
     const uuids = this.uuidsThatReferenceUuid(element.uuid);
-    return this.findAll(uuids) as T[];
+    const items = this.findAll(uuids) as T[];
+    if (!contentType) {
+      return items;
+    }
+    return items.filter((item) => item.content_type === contentType);
   }
 
   public uuidReferencesForUuid(uuid: UuidString) {
