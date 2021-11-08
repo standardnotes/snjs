@@ -203,7 +203,7 @@ function matchTypeForNoteAndStringQuery(note: SNNote, searchString: string): Mat
 
 function matchTypeForTagAndStringQuery(tag: SNTag, searchString: string): Match {
   if (searchString.length === 0) {
-    return Match.Title;
+    return Match.None;
   }
   const title = tag.title.toLowerCase();
   const lowercaseText = searchString.toLowerCase();
