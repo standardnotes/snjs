@@ -103,9 +103,7 @@ describe('payload encryption', function () {
   });
 
   it('copying payload with override should copy empty arrays', async function () {
-    const pair = await Factory.createRelatedNoteTagPairPayload(
-      this.application.payloadManager
-    );
+    const pair = Factory.createRelatedNoteTagPairPayload();
     const tagPayload = pair[1];
     expect(tagPayload.content.references.length).to.equal(1);
 

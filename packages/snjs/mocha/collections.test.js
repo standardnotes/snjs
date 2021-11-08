@@ -38,6 +38,20 @@ describe('payload collections', () => {
     expect(referencing.length).to.equal(1);
   });
 
+  it('references by content type', async () => {
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload();
+    const collection = ImmutablePayloadCollection.WithPayloads([
+      notePayload1,
+      tagPayload1,
+    ]);
+    const referencingTags = collection.elementsReferencingElement(notePayload1, ContentType.Tag);
+    expect(referencingTags.length).to.equal(1);
+    expect(referencingTags[0].uuid).to.equal(tagPayload1.uuid);
+
+    const referencingNotes = collection.elementsReferencingElement(notePayload1, ContentType.Note);
+    expect(referencingNotes.length).to.equal(0);
+  });
+
   it('conflict map', async () => {
     const payload = Factory.createNotePayload();
     const collection = new ItemCollection();

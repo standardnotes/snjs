@@ -77,7 +77,7 @@ export class NotesDisplayCriteria {
           const noteWithTags = {
             ...note,
             ...note.payload,
-            tags: collection.elementsReferencingElement(note),
+            tags: collection.elementsReferencingElement(note, ContentType.Tag),
           };
           return SNPredicate.ObjectSatisfiesPredicate(noteWithTags, predicate);
         } else {
@@ -90,7 +90,7 @@ export class NotesDisplayCriteria {
       }
     }
     if (this.searchQuery) {
-      filters.push((note) => noteMatchesQuery(note, this.searchQuery!));
+      filters.push((note) => noteMatchesQuery(note, this.searchQuery!, collection));
     }
     if (!this.includePinned) {
       filters.push((note) => !note.pinned);
@@ -143,16 +143,27 @@ function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
 }
 
 export function noteMatchesQuery(
-  note: SNNote,
-  searchQuery: SearchQuery
+  noteToMatch: SNNote,
+  searchQuery: SearchQuery,
+  noteCollection: ItemCollection
 ): boolean {
-  if (note.protected && !searchQuery.includeProtectedNoteText) {
-    const match = matchTypeForStringQuery(note, searchQuery.query);
-    /** Only true if there is a match in the titles */
-    return match === Match.Title || match === Match.TitleAndText;
-  } else {
-    return matchTypeForStringQuery(note, searchQuery.query) !== Match.None;
+  const noteTags = noteCollection.elementsReferencingElement(noteToMatch, ContentType.Tag) as SNTag[];
+  const someTagsMatches = noteTags
+    .some((tag) => matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None);
+
+  if (noteToMatch.protected && !searchQuery.includeProtectedNoteText) {
+    const match = matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query);
+    /** Only true if there is a match in the titles (note and/or tags) */
+    return (
+      match === Match.Title ||
+      match === Match.TitleAndText ||
+      someTagsMatches
+    );
   }
+  return (
+    matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query) !== Match.None ||
+    someTagsMatches
+  );
 }
 
 enum Match {
@@ -163,7 +174,7 @@ enum Match {
   Uuid = 5,
 }
 
-function matchTypeForStringQuery(note: SNNote, searchString: string): Match {
+function matchTypeForNoteAndStringQuery(note: SNNote, searchString: string): Match {
   if (searchString.length === 0) {
     return Match.TitleAndText;
   }
@@ -188,6 +199,23 @@ function matchTypeForStringQuery(note: SNNote, searchString: string): Match {
     return text.indexOf(word) >= 0;
   });
   return (matchesTitle ? Match.Title : 0) + (matchesBody ? Match.Text : 0);
+}
+
+function matchTypeForTagAndStringQuery(tag: SNTag, searchString: string): Match {
+  if (searchString.length === 0) {
+    return Match.None;
+  }
+  const title = tag.title.toLowerCase();
+  const lowercaseText = searchString.toLowerCase();
+  const words = lowercaseText.split(' ');
+  const quotedText = stringBetweenQuotes(lowercaseText);
+  if (quotedText) {
+    return (title.includes(quotedText) ? Match.Title : Match.None);
+  }
+  const matchesTitle = words.every((word) => {
+    return title.indexOf(word) >= 0;
+  });
+  return matchesTitle ? Match.Title : Match.None;
 }
 
 function stringBetweenQuotes(text: string) {

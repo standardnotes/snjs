@@ -909,4 +909,83 @@ describe('notes and tags', () => {
         .to.exist;
     });
   });
+
+  it('include notes that have tag titles that match search query', async function () {
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
+      noteTitle: 'A simple note',
+      noteText: 'This is just a note.',
+      tagTitle: 'Test'
+    });
+    const notePayload2 = Factory.createNotePayload('Foo');
+    const notePayload3 = Factory.createNotePayload('Bar');
+    const notePayload4 = Factory.createNotePayload('Testing');
+
+    await this.application.itemManager.emitItemsFromPayloads(
+      [
+        notePayload1,
+        notePayload2,
+        notePayload3,
+        notePayload4,
+        tagPayload1
+      ],
+      PayloadSource.LocalChanged
+    );
+
+    this.application.setNotesDisplayCriteria(
+      NotesDisplayCriteria.Create({
+        sortProperty: 'title',
+        sortDirection: 'dsc',
+        searchQuery: {
+          query: 'Test',
+        }
+      })
+    );
+
+    const displayedNotes = this.application.getDisplayableItems(
+      ContentType.Note
+    );
+    expect(displayedNotes.length).to.equal(2);
+    expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid);
+    expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid);
+  });
+
+  it('search query should be case insensitive and match notes and tags title', async function () {
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
+      noteTitle: 'A simple note',
+      noteText: 'Just a note. Nothing to see.',
+      tagTitle: 'Foo'
+    });
+    const notePayload2 = Factory.createNotePayload('Another bar (foo)');
+    const notePayload3 = Factory.createNotePayload('Testing FOO (Bar)');
+    const notePayload4 = Factory.createNotePayload('This should not match');
+
+    await this.application.itemManager.emitItemsFromPayloads(
+      [
+        notePayload1,
+        notePayload2,
+        notePayload3,
+        notePayload4,
+        tagPayload1
+      ],
+      PayloadSource.LocalChanged
+    );
+
+    this.application.setNotesDisplayCriteria(
+      NotesDisplayCriteria.Create({
+        sortProperty: 'title',
+        sortDirection: 'dsc',
+        searchQuery: {
+          query: 'foo',
+        }
+      })
+    );
+
+    const displayedNotes = this.application.getDisplayableItems(
+      ContentType.Note
+    );
+    expect(displayedNotes.length).to.equal(3);
+    expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid);
+    expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid);
+    expect(displayedNotes[2].uuid).to.equal(notePayload3.uuid);
+  });
 });
