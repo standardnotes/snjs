@@ -1,3 +1,4 @@
+import { SNComponent } from '@Models/app/component';
 import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
 import {
@@ -220,14 +221,16 @@ describe('featuresService', () => {
     });
 
     it('if item for a feature exists updates its content', async () => {
-      const existingItem = {
+      const existingItem = new SNComponent({
         uuid: '789',
+        content_type: ContentType.Component,
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
+            valid_until: new Date()
           }
-        }
-      };
+        },
+      } as never);
 
       const newRoles = [
         ...roles,
@@ -283,14 +286,16 @@ describe('featuresService', () => {
     });
 
     it('marks expired components as read-only', async () => {
-      const existingItem = {
+      const existingItem = new SNComponent({
         uuid: '789',
+        content_type: ContentType.Component,
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
+            valid_until: new Date()
           }
-        }
-      };
+        },
+      } as never);
 
       const newRoles = [
         ...roles,
@@ -322,14 +327,16 @@ describe('featuresService', () => {
     });
 
     it('deletes items for expired themes', async () => {
-      const existingItem = {
+      const existingItem = new SNComponent({
         uuid: '456',
+        content_type: ContentType.Theme,
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.MidnightTheme,
+            valid_until: new Date()
           }
-        }
-      };
+        },
+      } as never);
 
       const newRoles = [
         ...roles,
