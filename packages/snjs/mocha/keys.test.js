@@ -861,6 +861,7 @@ describe('keys', function () {
         newRootKey,
       });
       await this.application.protocolService.reencryptItemsKeys();
+      /** Note: this may result in a deadlock if features_service syncs and results in an error */
       await this.application.sync({ awaitAll: true });
 
       /** Relaunch application and expect new items key to be created */

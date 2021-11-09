@@ -334,14 +334,12 @@ export class SNFeaturesService extends PureService<void> {
       ContentType.Theme,
     ]);
     const itemsToDeleteUuids = [];
-
     const now = new Date();
-
+    let hasChanges = false;
     for (const feature of features) {
       if (!feature.content_type) {
         continue;
       }
-
       const expired =
         new Date(feature.expires_at || 0).getTime() < now.getTime();
       const existingItem = currentItems.find((item) => {
@@ -350,25 +348,36 @@ export class SNFeaturesService extends PureService<void> {
           return itemIdentifier === feature.identifier && !item.deleted;
         }
         return false;
-      });
+      }) as SNComponent;
 
       let resultingItem: SNComponent | undefined = existingItem as SNComponent;
 
       if (existingItem) {
-        resultingItem = await this.itemManager.changeComponent(
-          existingItem.uuid,
-          (mutator) => {
-            mutator.hosted_url = feature.url;
-            mutator.package_info = feature;
-            mutator.valid_until = new Date(feature.expires_at || 0);
-          }
-        );
+        const expiresAt = new Date(feature.expires_at || 0);
+        const hasChange =
+          feature.url !== existingItem.hosted_url ||
+          feature.version !== existingItem.package_info.version ||
+          expiresAt.getTime() !== existingItem.valid_until.getTime();
+        if (hasChange) {
+          resultingItem = await this.itemManager.changeComponent(
+            existingItem.uuid,
+            (mutator) => {
+              mutator.hosted_url = feature.url;
+              mutator.package_info = feature;
+              mutator.valid_until = expiresAt;
+            }
+          );
+          hasChanges = true;
+        } else {
+          resultingItem = existingItem;
+        }
       } else if (!expired || feature.content_type === ContentType.Component) {
         resultingItem = (await this.itemManager.createItem(
           feature.content_type,
           this.componentContentForFeatureDescription(feature),
           true
         )) as SNComponent;
+        hasChanges = true;
       }
 
       if (expired && resultingItem) {
@@ -379,12 +388,15 @@ export class SNFeaturesService extends PureService<void> {
           );
         } else {
           itemsToDeleteUuids.push(resultingItem.uuid);
+          hasChanges = true;
         }
       }
     }
 
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
-    this.syncService.sync();
+    if (hasChanges) {
+      this.syncService.sync();
+    }
   }
 
   public async validateAndDownloadExternalFeature(
