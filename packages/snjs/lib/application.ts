@@ -1703,8 +1703,7 @@ export class SNApplication {
       this.syncService,
       this.alertService,
       this.sessionManager,
-      this.crypto,
-      this.enableV4
+      this.crypto
     );
     this.services.push(this.featuresService);
   }

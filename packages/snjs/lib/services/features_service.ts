@@ -60,8 +60,7 @@ export class SNFeaturesService extends PureService<void> {
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
-    private crypto: SNPureCrypto,
-    private enableV4: boolean
+    private crypto: SNPureCrypto
   ) {
     super();
 
@@ -170,11 +169,6 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   private async fetchAndStoreOfflineFeatures(offlineEntitlements: OfflineSubscriptionEntitlements): Promise<SetOfflineFeaturesFunctionResponse> {
-    if (!this.enableV4) {
-      return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
-      };
-    }
     const result = await this.apiService.getOfflineFeatures(offlineEntitlements);
 
     if (isErrorObject(result)) {
@@ -274,9 +268,7 @@ export class SNFeaturesService extends PureService<void> {
         }
       });
       await this.setFeatures(features);
-      if (this.enableV4) {
-        await this.mapFeaturesToItems(features);
-      }
+      await this.mapFeaturesToItems(features);
     }
   }
 

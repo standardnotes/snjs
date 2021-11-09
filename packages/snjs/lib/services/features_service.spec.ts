@@ -39,7 +39,7 @@ describe('featuresService', () => {
   let tomorrow_server: number;
   let tomorrow_client: number;
 
-  const createService = (enableV4 = true) => {
+  const createService = () => {
     return new SNFeaturesService(
       storageService,
       apiService,
@@ -51,8 +51,7 @@ describe('featuresService', () => {
       syncService,
       alertService,
       sessionManager,
-      crypto,
-      enableV4,
+      crypto
     );
   };
 
