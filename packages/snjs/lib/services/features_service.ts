@@ -5,7 +5,11 @@ import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 import { RoleName } from '@standardnotes/auth';
-import { ApiServiceEvent, MetaReceivedData, SNApiService } from './api/api_service';
+import {
+  ApiServiceEvent,
+  MetaReceivedData,
+  SNApiService,
+} from './api/api_service';
 import { ErrorObject, UuidString } from '@Lib/types';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
@@ -13,7 +17,10 @@ import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
 import { SNComponent, SNItem } from '@Lib/models';
-import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
+import {
+  SNWebSocketsService,
+  WebSocketsServiceEvent,
+} from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
 import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
@@ -26,18 +33,23 @@ import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
   API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
   API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
-  INVALID_EXTENSION_URL
+  INVALID_EXTENSION_URL,
 } from '@Services/api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { ButtonType, SNAlertService } from '@Services/alert_service';
-import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/constants';
+import {
+  TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
+  TRUSTED_FEATURE_HOSTS,
+} from '@Lib/constants';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
   featuresUrl: string;
   extensionKey: string;
 };
-type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject;
+type GetOfflineSubscriptionDetailsResponse =
+  | OfflineSubscriptionEntitlements
+  | ErrorObject;
 
 export class SNFeaturesService extends PureService<void> {
   private deinited = false;
@@ -127,19 +139,26 @@ export class SNFeaturesService extends PureService<void> {
     );
   }
 
-  public async setOfflineFeatures(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
+  public async setOfflineFeatures(
+    code: string
+  ): Promise<SetOfflineFeaturesFunctionResponse> {
     try {
       const activationCodeWithoutSpaces = code.replace(/\s/g, '');
-      const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
+      const decodedData = await this.crypto.base64Decode(
+        activationCodeWithoutSpaces
+      );
       const result = this.parseOfflineEntitlementsCode(decodedData);
       if (isErrorObject(result)) {
         return result;
       }
-      await this.storageService.setValue(StorageKey.OfflineSubscriptionEntitlements, result);
+      await this.storageService.setValue(
+        StorageKey.OfflineSubscriptionEntitlements,
+        result
+      );
       return this.fetchAndStoreOfflineFeatures(result);
     } catch (err) {
       return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
       };
     }
   }
@@ -150,26 +169,34 @@ export class SNFeaturesService extends PureService<void> {
   }
 
   public async removeOfflineActivationCode(): Promise<void> {
-    await this.storageService.removeValue(StorageKey.OfflineSubscriptionEntitlements);
+    await this.storageService.removeValue(
+      StorageKey.OfflineSubscriptionEntitlements
+    );
     await this.storageService.removeValue(StorageKey.UserFeatures);
   }
 
-  private parseOfflineEntitlementsCode(code: string): GetOfflineSubscriptionDetailsResponse {
+  private parseOfflineEntitlementsCode(
+    code: string
+  ): GetOfflineSubscriptionDetailsResponse {
     try {
       const { featuresUrl, extensionKey } = JSON.parse(code);
       return {
         featuresUrl,
-        extensionKey
+        extensionKey,
       };
     } catch (error) {
       return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
       };
     }
   }
 
-  private async fetchAndStoreOfflineFeatures(offlineEntitlements: OfflineSubscriptionEntitlements): Promise<SetOfflineFeaturesFunctionResponse> {
-    const result = await this.apiService.getOfflineFeatures(offlineEntitlements);
+  private async fetchAndStoreOfflineFeatures(
+    offlineEntitlements: OfflineSubscriptionEntitlements
+  ): Promise<SetOfflineFeaturesFunctionResponse> {
+    const result = await this.apiService.getOfflineFeatures(
+      offlineEntitlements
+    );
 
     if (isErrorObject(result)) {
       return result;
@@ -272,12 +299,16 @@ export class SNFeaturesService extends PureService<void> {
     }
   }
 
-  private getFeaturesForOfflineUserFromStorage(): OfflineSubscriptionEntitlements | undefined {
-    const offlineSubscriptionEntitlements = this.storageService.getValue(StorageKey.OfflineSubscriptionEntitlements);
+  private getFeaturesForOfflineUserFromStorage():
+    | OfflineSubscriptionEntitlements
+    | undefined {
+    const offlineSubscriptionEntitlements = this.storageService.getValue(
+      StorageKey.OfflineSubscriptionEntitlements
+    );
     if (offlineSubscriptionEntitlements) {
       return {
         featuresUrl: offlineSubscriptionEntitlements.featuresUrl,
-        extensionKey: offlineSubscriptionEntitlements.extensionKey
+        extensionKey: offlineSubscriptionEntitlements.extensionKey,
       };
     }
   }
@@ -356,11 +387,13 @@ export class SNFeaturesService extends PureService<void> {
     this.syncService.sync();
   }
 
-  public async validateAndDownloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+  public async validateAndDownloadExternalFeature(
+    url: string
+  ): Promise<SNComponent | undefined> {
     try {
       const trustedCustomExtensionsUrls = [
         ...TRUSTED_FEATURE_HOSTS,
-        ...TRUSTED_CUSTOM_EXTENSIONS_HOSTS
+        ...TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
       ];
       const { host } = new URL(url);
       if (!trustedCustomExtensionsUrls.includes(host)) {

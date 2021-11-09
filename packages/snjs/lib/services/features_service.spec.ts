@@ -395,19 +395,6 @@ describe('featuresService', () => {
       await featuresService.updateRoles('123', roles);
       expect(storageService.setValue).toHaveBeenCalledTimes(2);
     });
-
-    it('does not map features to items if V4 is not enabled', async () => {
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
-
-      storageService.getValue = jest.fn().mockReturnValue(roles);
-      const featuresService = createService(false);
-      await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
-      expect(itemManager.createItem).not.toHaveBeenCalled();
-    })
   });
 
   describe('migrateExtRepoToUserSetting', () => {
