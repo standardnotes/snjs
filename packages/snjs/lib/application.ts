@@ -120,7 +120,10 @@ import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
 import { Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
-import { SetOfflineFeaturesFunctionResponse } from '@Services/features_service';
+import {
+  FeaturesEvent,
+  SetOfflineFeaturesFunctionResponse,
+} from '@Services/features_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -1613,7 +1616,9 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public async setOfflineFeatures(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
+  public async setOfflineFeatures(
+    code: string
+  ): Promise<SetOfflineFeaturesFunctionResponse> {
     return this.featuresService.setOfflineFeatures(code);
   }
 
@@ -1705,6 +1710,19 @@ export class SNApplication {
       this.sessionManager,
       this.crypto
     );
+    this.serviceObservers.push(
+      this.featuresService.addEventObserver((event) => {
+        switch (event) {
+          case FeaturesEvent.UserRolesChanged: {
+            void this.notifyEvent(ApplicationEvent.UserRolesChanged);
+            break;
+          }
+          default: {
+            assertUnreachable(event);
+          }
+        }
+      })
+    );
     this.services.push(this.featuresService);
   }
 
@@ -1742,6 +1760,19 @@ export class SNApplication {
       this.alertService,
       this.challengeService,
       this.protectionService
+    );
+    this.serviceObservers.push(
+      this.credentialService.addEventObserver((event) => {
+        switch (event) {
+          case AccountEvent.SignedInOrRegistered: {
+            void this.notifyEvent(ApplicationEvent.SignedIn);
+            break;
+          }
+          default: {
+            assertUnreachable(event);
+          }
+        }
+      })
     );
     this.services.push(this.credentialService);
   }
@@ -1941,19 +1972,6 @@ export class SNApplication {
       this.payloadManager,
       this.protocolService,
       this.syncService
-    );
-    this.serviceObservers.push(
-      this.credentialService.addEventObserver((event) => {
-        switch (event) {
-          case AccountEvent.SignedInOrRegistered: {
-            void this.notifyEvent(ApplicationEvent.SignedIn);
-            break;
-          }
-          default: {
-            assertUnreachable(event);
-          }
-        }
-      })
     );
     this.services.push(this.actionsManager);
   }

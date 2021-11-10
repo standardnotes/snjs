@@ -28,6 +28,14 @@ describe('utils', () => {
     expect(array).to.eql(original.concat(extended));
   });
 
+  it('arraysEqual', () => {
+    expect(arraysEqual([1, 2, 3], [3, 2, 1])).to.equal(true);
+    expect(arraysEqual([2, 3], [3, 2, 1])).to.equal(false);
+    expect(arraysEqual([1, 2], [1, 2, 2])).to.equal(false);
+    expect(arraysEqual([1, 2, 3], [2, 3, 1])).to.equal(true);
+    expect(arraysEqual([1], [3])).to.equal(false);
+  });
+
   it('top level compare', () => {
     const left = { a: 1, b: 2 };
     const right = { a: 1, b: 2 };

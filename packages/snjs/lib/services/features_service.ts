@@ -27,7 +27,11 @@ import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
-import { convertTimestampToMilliseconds, isErrorObject } from '@Lib/utils';
+import {
+  arraysEqual,
+  convertTimestampToMilliseconds,
+  isErrorObject,
+} from '@Lib/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
@@ -51,7 +55,11 @@ type GetOfflineSubscriptionDetailsResponse =
   | OfflineSubscriptionEntitlements
   | ErrorObject;
 
-export class SNFeaturesService extends PureService<void> {
+export const enum FeaturesEvent {
+  UserRolesChanged = 'UserRolesChanged',
+}
+
+export class SNFeaturesService extends PureService<FeaturesEvent> {
   private deinited = false;
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];
@@ -262,6 +270,9 @@ export class SNFeaturesService extends PureService<void> {
 
   private async setRoles(roles: RoleName[]): Promise<void> {
     this.roles = roles;
+    if (!arraysEqual(this.roles, roles)) {
+      this.notifyEvent(FeaturesEvent.UserRolesChanged);
+    }
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 

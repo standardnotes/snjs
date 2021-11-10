@@ -576,6 +576,16 @@ export function naturalSort<T extends AnyRecord>(
   }
 }
 
+export function arraysEqual<T>(left: T[], right: T[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+  return (
+    left.every((item) => right.includes(item)) &&
+    right.every((item) => left.includes(item))
+  );
+}
+
 const MicrosecondsInAMillisecond = 1_000;
 const MillisecondsInASecond = 1_000;
 

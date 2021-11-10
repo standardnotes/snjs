@@ -132,6 +132,7 @@ export {
   uniqueArrayByKey,
   uniqCombineObjArrays,
   convertTimestampToMilliseconds,
+  arraysEqual
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {
