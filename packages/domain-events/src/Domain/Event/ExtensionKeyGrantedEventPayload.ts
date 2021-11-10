@@ -8,4 +8,7 @@ export interface ExtensionKeyGrantedEventPayload {
   origin: 'create-user' | 'update-subscription'
   subscriptionName: SubscriptionName | null
   offlineFeaturesToken: string
+  payAmount: number | null
+  billingEveryNMonths: number | null
+  activeUntil: string | null
 }
