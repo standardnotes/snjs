@@ -640,6 +640,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     const user = data.user;
     this.user = user;
     await this.storageService.setValue(StorageKey.User, user);
+    this.apiService.setHost(this.apiService.getHost());
     if (data.token) {
       /** Legacy JWT response */
       const session = new JwtSession(data.token);
