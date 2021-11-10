@@ -648,9 +648,9 @@ export class SNComponentManager extends PureService {
     const component = this.findComponent(componentUuid);
     this.log(
       'Component manager send context item in reply',
-      component,
-      item,
-      originalMessage
+      'component:', component,
+      'item: ', item,
+      'originalMessage: ', originalMessage
     );
     const response: MessageReplyData = {
       item: this.jsonForItem(item, component, source),
@@ -698,7 +698,7 @@ export class SNComponentManager extends PureService {
       );
       return;
     }
-    this.log('Component manager send message to component', component, message);
+    this.log('Component manager send message to component', component, 'message: ', message);
     let origin = this.urlForComponent(component);
     if (!origin || !componentState.window) {
       void this.alertService.alert(
@@ -1531,15 +1531,14 @@ export class SNComponentManager extends PureService {
     component: SNComponent,
     componentWindow: Window
   ): Promise<void> {
-    this.log('Register component window', component);
     const data = this.findOrCreateDataForComponent(component.uuid);
     if (data.window === componentWindow) {
       this.log(
-        'Web|componentManager',
+        'Web > componentManager',
         'attempting to re-register same component window.'
       );
     }
-    this.log('Web|componentManager|registerComponentWindow', component);
+    this.log('Web > componentManager > registerComponentWindow', 'component: ', component, 'window: ', componentWindow);
     data.window = componentWindow;
     data.sessionKey = await Uuid.GenerateUuid();
     this.sendMessageToComponent(component, {
