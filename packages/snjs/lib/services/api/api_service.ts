@@ -179,7 +179,7 @@ export class SNApiService extends PureService<
     await this.storageService.setValue(StorageKey.ServerHost, host);
   }
 
-  public getHost(): string | undefined {
+  public getHost(): string {
     return this.host;
   }
 
