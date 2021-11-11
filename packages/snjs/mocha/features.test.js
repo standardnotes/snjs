@@ -236,13 +236,18 @@ describe('features', () => {
 
   describe('extension repo items observer', () => {
     it('should migrate to user setting when extension repo is added', async () => {
+      sinon
+        .stub(application.apiService, 'isCustomServerHostUsed')
+        .callsFake(() => {
+          return false;
+        });
       expect(
         await application.getSensitiveSetting(SettingName.ExtensionKey)
       ).to.equal(false);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       const promise = new Promise((resolve) => {
         sinon
-          .stub(application.featuresService, 'migrateExtRepoToUserSetting')
+          .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
           .callsFake(resolve);
       });
       await application.itemManager.createItem(
@@ -255,11 +260,16 @@ describe('features', () => {
     });
 
     it('signing into account with ext repo should migrate it', async () => {
+      sinon
+        .stub(application.apiService, 'isCustomServerHostUsed')
+        .callsFake(() => {
+          return false;
+        });
       /** Attach an ExtensionRepo object to an account, but prevent it from being migrated.
        * Then sign out, sign back in, and ensure the item is migrated. */
       /** Prevent migration from running */
       sinon
-        .stub(application.featuresService, 'migrateExtRepoToUserSetting')
+        .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
         .callsFake(() => {});
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.createManagedItem(
@@ -273,9 +283,14 @@ describe('features', () => {
       application = await Factory.signOutApplicationAndReturnNew(application);
 
       sinon.restore();
+      sinon
+        .stub(application.apiService, 'isCustomServerHostUsed')
+        .callsFake(() => {
+          return false;
+        });
       const promise = new Promise((resolve) => {
         sinon
-          .stub(application.featuresService, 'migrateExtRepoToUserSetting')
+          .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
           .callsFake(resolve);
       });
       await Factory.loginToApplication({
@@ -288,6 +303,11 @@ describe('features', () => {
 
     it('having an ext repo with no account, then signing into account, should migrate it', async () => {
       application = await Factory.signOutApplicationAndReturnNew(application);
+      sinon
+        .stub(application.apiService, 'isCustomServerHostUsed')
+        .callsFake(() => {
+          return false;
+        });
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.createManagedItem(
         ContentType.ExtensionRepo,
@@ -300,7 +320,7 @@ describe('features', () => {
 
       const promise = new Promise((resolve) => {
         sinon
-          .stub(application.featuresService, 'migrateExtRepoToUserSetting')
+          .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
           .callsFake(resolve);
       });
       await Factory.loginToApplication({
@@ -312,6 +332,11 @@ describe('features', () => {
     });
 
     it('migrated ext repo should have property indicating it was migrated', async () => {
+      sinon
+        .stub(application.apiService, 'isCustomServerHostUsed')
+        .callsFake(() => {
+          return false;
+        });
       expect(
         await application.getSensitiveSetting(SettingName.ExtensionKey)
       ).to.equal(false);
@@ -332,6 +357,27 @@ describe('features', () => {
         })
       );
       await promise;
+    });
+  });
+
+  describe('offline features migration', () => {
+    it('previous extension repo should be migrated to offline feature repo', async () => {
+      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      await application.createManagedItem(
+        ContentType.ExtensionRepo,
+        FillItemContent({
+          url: `https://extensions.standardnotes.org/${extensionKey}`,
+        }),
+        true
+      );
+      await application.sync();
+
+      const repo = application.featuresService.getOfflineRepo();
+      expect(repo.migratedToOfflineEntitlements).to.equal(true);
+      expect(repo.offlineFeaturesUrl).to.equal(
+        'https://api.standardnotes.com/v1/offline/features'
+      );
+      expect(repo.offlineKey).to.equal(extensionKey);
     });
   });
 });

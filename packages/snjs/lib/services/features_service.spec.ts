@@ -1,3 +1,4 @@
+import { SNFeatureRepo, FeatureRepoContent } from './../models/app/feature_repo';
 import { SNComponent } from '@Models/app/component';
 import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
@@ -92,9 +93,10 @@ describe('featuresService', () => {
         features,
       }
     });
-    apiService.getOfflineFeatures = jest.fn().mockReturnValue({
+    apiService.downloadOfflineFeaturesFromRepo = jest.fn().mockReturnValue({
       features
     })
+    apiService.isCustomServerHostUsed = jest.fn().mockReturnValue(false)
 
     itemManager = {} as jest.Mocked<ItemManager>;
     itemManager.getItems = jest.fn().mockReturnValue(
@@ -107,6 +109,7 @@ describe('featuresService', () => {
     itemManager.setItemsToBeDeleted = jest.fn();
     itemManager.addObserver = jest.fn();
     itemManager.changeItem = jest.fn();
+    itemManager.changeFeatureRepo = jest.fn();
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
     componentManager.setReadonlyStateForComponent = jest.fn();
@@ -404,16 +407,19 @@ describe('featuresService', () => {
     });
   });
 
-  describe('migrateExtRepoToUserSetting', () => {
+  describe('migrateFeatureRepoToUserSetting', () => {
     it('should extract key from extension repo url and update user setting', async () => {
       const extensionKey = '129b029707e3470c94a8477a437f9394';
-      const extensionRepoItem = FillItemContent({
+      const extensionRepoItem = new SNFeatureRepo({
+        uuid: '456',
+        content_type: ContentType.ExtensionRepo,
         safeContent: {
           url: `https://extensions.standardnotes.org/${extensionKey}`,
-        }
-      }) as jest.Mocked<SNItem>;
+        },
+      } as never)
+
       const featuresService = createService();
-      await featuresService.migrateExtRepoToUserSetting([extensionRepoItem]);
+      await featuresService.migrateFeatureRepoToUserSetting([extensionRepoItem]);
       expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
     });
   })

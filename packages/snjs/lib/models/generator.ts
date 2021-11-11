@@ -1,3 +1,4 @@
+import { SNFeatureRepo } from './app/feature_repo';
 import { ContentType } from '@Models/content_types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNActionsExtension } from './app/extension';
@@ -23,6 +24,7 @@ const ContentTypeClassMapping: Partial<
   [ContentType.Theme]: SNTheme,
   [ContentType.Component]: SNComponent,
   [ContentType.UserPrefs]: SNUserPrefs,
+  [ContentType.ExtensionRepo]: SNFeatureRepo,
 };
 
 export function CreateItemFromPayload(payload: PurePayload): SNItem {
