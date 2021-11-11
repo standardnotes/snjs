@@ -302,12 +302,12 @@ describe('features', () => {
     });
 
     it('having an ext repo with no account, then signing into account, should migrate it', async () => {
+      application = await Factory.signOutApplicationAndReturnNew(application);
       sinon
         .stub(application.apiService, 'isCustomServerHostUsed')
         .callsFake(() => {
           return false;
         });
-      application = await Factory.signOutApplicationAndReturnNew(application);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.createManagedItem(
         ContentType.ExtensionRepo,
