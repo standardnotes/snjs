@@ -74,7 +74,6 @@ describe('storage manager', function () {
     const key = 'foo';
     const value = 'bar';
     await this.application.storageService.setValue(key, value);
-    console.log('localStorage keys', Object.keys(localStorage));
     /** Items are stored in local storage */
     expect(Object.keys(localStorage).length).to.equal(
       this.expectedKeyCount + BASE_ITEM_COUNT

@@ -186,6 +186,7 @@ export class SNApplication {
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false;
   private revokingSession = false;
+  private handledFullSyncStage = false;
 
   /**
    * @param environment The Environment that identifies your application.
@@ -1616,18 +1617,18 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public async setOfflineFeatures(
+  public setOfflineFeaturesCode(
     code: string
   ): Promise<SetOfflineFeaturesFunctionResponse> {
-    return this.featuresService.setOfflineFeatures(code);
+    return this.featuresService.setOfflineFeaturesCode(code);
   }
 
-  public getIsOfflineActivationCodeStoredPreviously(): boolean {
-    return this.featuresService.getIsOfflineActivationCodeStoredPreviously();
+  public hasOfflineRepo(): boolean {
+    return this.featuresService.hasOfflineRepo();
   }
 
-  public async removeOfflineActivationCode(): Promise<void> {
-    return this.featuresService.removeOfflineActivationCode();
+  public async deleteOfflineFeatureRepo(): Promise<void> {
+    return this.featuresService.deleteOfflineFeatureRepo();
   }
 
   public isCustomServerHostUsed(): boolean {
@@ -1917,6 +1918,12 @@ export class SNApplication {
       const appEvent = applicationEventForSyncEvent(eventName);
       if (appEvent) {
         await this.notifyEvent(appEvent);
+        if (appEvent === ApplicationEvent.CompletedFullSync) {
+          if (!this.handledFullSyncStage) {
+            this.handledFullSyncStage = true;
+            await this.handleStage(ApplicationStage.FullSyncCompleted_13);
+          }
+        }
       }
       await this.protocolService.onSyncEvent(eventName);
     };
