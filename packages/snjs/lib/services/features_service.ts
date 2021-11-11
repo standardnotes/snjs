@@ -191,6 +191,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
         FillItemContent({
           offlineFeaturesUrl: result.featuresUrl,
           offlineKey: result.extensionKey,
+          migratedToOfflineEntitlements: true,
         } as FeatureRepoContent),
         true
       )) as SNFeatureRepo;

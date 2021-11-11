@@ -283,6 +283,11 @@ describe('features', () => {
       application = await Factory.signOutApplicationAndReturnNew(application);
 
       sinon.restore();
+      sinon
+        .stub(application.apiService, 'isCustomServerHostUsed')
+        .callsFake(() => {
+          return false;
+        });
       const promise = new Promise((resolve) => {
         sinon
           .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
