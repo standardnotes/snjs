@@ -461,8 +461,13 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   }
 
   public async validateAndDownloadExternalFeature(
-    url: string
+    urlOrCode: string
   ): Promise<SNComponent | undefined> {
+    let url = urlOrCode;
+    try {
+      url = await this.crypto.base64Decode(urlOrCode);
+      // eslint-disable-next-line no-empty
+    } catch (err) {}
     try {
       const trustedCustomExtensionsUrls = [
         ...TRUSTED_FEATURE_HOSTS,
