@@ -1602,9 +1602,9 @@ export class SNApplication {
   }
 
   public downloadExternalFeature(
-    url: string
+    urlOrCode: string
   ): Promise<SNComponent | undefined> {
-    return this.featuresService.validateAndDownloadExternalFeature(url);
+    return this.featuresService.validateAndDownloadExternalFeature(urlOrCode);
   }
 
   public getFeature(

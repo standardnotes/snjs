@@ -18,7 +18,7 @@ export class SNActionsExtension extends SNComponent {
   constructor(payload: PurePayload) {
     super(payload);
     this.description = payload.safeContent.description;
-    this.url = payload.safeContent.url;
+    this.url = payload.safeContent.hosted_url || payload.safeContent.url;
     this.supported_types = payload.safeContent.supported_types;
     this.deprecation = payload.safeContent.deprecation;
     if (payload.safeContent.actions) {
