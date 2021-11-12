@@ -136,26 +136,26 @@ export class SNComponent extends SNItem implements ComponentContent {
     return ConflictStrategy.KeepLeft;
   }
 
-  public isEditor() {
+  public isEditor(): boolean {
     return this.area === ComponentArea.Editor;
   }
 
-  public isTheme() {
+  public isTheme(): boolean {
     return (
       this.content_type === ContentType.Theme ||
       this.area === ComponentArea.Themes
     );
   }
 
-  public isDefaultEditor() {
+  public isDefaultEditor(): boolean {
     return this.getAppDomainValue(AppDataField.DefaultEditor) === true;
   }
 
-  public getLastSize() {
+  public getLastSize(): any {
     return this.getAppDomainValue(AppDataField.LastSize);
   }
 
-  public acceptsThemes() {
+  public acceptsThemes(): boolean {
     return this.payload.safeContent.package_info?.acceptsThemes;
   }
 
@@ -163,7 +163,7 @@ export class SNComponent extends SNItem implements ComponentContent {
    * The key used to look up data that this component may have saved to an item.
    * This data will be stored on the item using this key.
    */
-  public getClientDataKey() {
+  public getClientDataKey(): string {
     if (this.legacy_url) {
       return this.legacy_url;
     } else {
@@ -171,11 +171,11 @@ export class SNComponent extends SNItem implements ComponentContent {
     }
   }
 
-  public hasValidHostedUrl() {
-    return this.hosted_url || this.legacy_url;
+  public hasValidHostedUrl(): boolean {
+    return (this.hosted_url || this.legacy_url) != undefined;
   }
 
-  public contentKeysToIgnoreWhenCheckingEquality() {
+  public contentKeysToIgnoreWhenCheckingEquality(): string[] {
     return ['active', 'disassociatedItemIds', 'associatedItemIds'].concat(
       super.contentKeysToIgnoreWhenCheckingEquality()
     );
@@ -186,23 +186,27 @@ export class SNComponent extends SNItem implements ComponentContent {
    * given item, compared to a dissaciative component, which is enabled by
    * default in areas unrelated to a certain item.
    */
-  public static associativeAreas() {
+  public static associativeAreas(): ComponentArea[] {
     return [ComponentArea.Editor];
   }
 
-  public isAssociative() {
+  public isAssociative(): boolean {
     return SNComponent.associativeAreas().includes(this.area);
   }
 
-  public isExplicitlyEnabledForItem(uuid: UuidString) {
+  public isExplicitlyEnabledForItem(uuid: UuidString): boolean {
     return this.associatedItemIds.indexOf(uuid) !== -1;
   }
 
-  public isExplicitlyDisabledForItem(uuid: UuidString) {
+  public isExplicitlyDisabledForItem(uuid: UuidString): boolean {
     return this.disassociatedItemIds.indexOf(uuid) !== -1;
   }
 
-  public get isDeprecated() {
+  public get isExpired(): boolean {
+    return this.valid_until.getTime() > 0 && this.valid_until <= new Date();
+  }
+
+  public get isDeprecated(): boolean {
     let flags: string[] = this.package_info.flags ?? [];
     flags = flags.map((flag: string) => flag.toLowerCase());
     return flags.includes(ComponentFlag.Deprecated);
@@ -210,8 +214,8 @@ export class SNComponent extends SNItem implements ComponentContent {
 }
 
 export class ComponentMutator extends ItemMutator {
-  get typedContent() {
-    return this.content! as Partial<ComponentContent>;
+  get typedContent(): Partial<ComponentContent> {
+    return this.content as Partial<ComponentContent>;
   }
 
   set active(active: boolean) {
@@ -247,30 +251,30 @@ export class ComponentMutator extends ItemMutator {
   }
 
   set permissions(permissions: ComponentPermission[]) {
-    this.typedContent!.permissions = permissions;
+    this.typedContent.permissions = permissions;
   }
 
-  public associateWithItem(uuid: UuidString) {
+  public associateWithItem(uuid: UuidString): void {
     const associated = this.typedContent.associatedItemIds || [];
     addIfUnique(associated, uuid);
     this.typedContent.associatedItemIds = associated;
   }
 
-  public disassociateWithItem(uuid: UuidString) {
+  public disassociateWithItem(uuid: UuidString): void {
     const disassociated = this.typedContent.disassociatedItemIds || [];
     addIfUnique(disassociated, uuid);
     this.typedContent.disassociatedItemIds = disassociated;
   }
 
-  public removeAssociatedItemId(uuid: UuidString) {
+  public removeAssociatedItemId(uuid: UuidString): void {
     removeFromArray(this.typedContent.associatedItemIds || [], uuid);
   }
 
-  public removeDisassociatedItemId(uuid: UuidString) {
+  public removeDisassociatedItemId(uuid: UuidString): void {
     removeFromArray(this.typedContent.disassociatedItemIds || [], uuid);
   }
 
-  public setLastSize(size: string) {
+  public setLastSize(size: string): void {
     this.setAppDataItem(AppDataField.LastSize, size);
   }
 }
