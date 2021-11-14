@@ -1,7 +1,8 @@
 import { FillItemContent } from '@Models/functions';
-import { ContentType } from './../../../../common/src/Domain/Content/ContentType';
+import { ContentType } from '@standardnotes/common';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNComponent } from '@Models/app/component';
+
 describe('component model', () => {
   beforeEach(() => {
     const dateToLocalizedString = jest.spyOn(

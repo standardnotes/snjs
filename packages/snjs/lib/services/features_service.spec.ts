@@ -1,4 +1,4 @@
-import { SNFeatureRepo, FeatureRepoContent } from './../models/app/feature_repo';
+import { SNFeatureRepo } from './../models/app/feature_repo';
 import { SNComponent } from '@Models/app/component';
 import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
@@ -13,7 +13,6 @@ import {
   SNStorageService,
   StorageKey
 } from '@Lib/index';
-import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType } from '@standardnotes/common';
