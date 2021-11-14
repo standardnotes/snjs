@@ -865,12 +865,22 @@ export class SNApplication {
   }
 
   /**
+   * Establishes a hierarchical relationship between two tags.
+   */
+  public async establishTagRelationship(
+    parentTag: SNTag,
+    childTag: SNTag
+  ): Promise<void> {
+    await this.itemManager.establishTagRelationship(parentTag, childTag);
+  }
+
+  /**
    * Returns all parents for a tag
    * @param tag - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
   public getTagParentChain(tag: SNTag): SNTag[] {
-    return this.itemManager.getTagParentChain(tag);
+    return this.itemManager.getTagParentChain(tag.uuid);
   }
 
   /**
@@ -878,8 +888,8 @@ export class SNApplication {
    * @param tag - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-  public getTagDescendants(tag: SNTag): SNTag[] {
-    return this.itemManager.getTagDescendants(tag);
+  public getTagChildren(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagChildren(tag.uuid);
   }
 
   /**

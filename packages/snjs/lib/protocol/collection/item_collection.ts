@@ -67,7 +67,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
    */
   public setDisplayOptions(
     contentType: ContentType,
-    sortBy?: CollectionSort,
+    sortBy = CollectionSort.CreatedAt,
     direction: SortDirection = 'asc',
     filter?: (element: SNItem) => boolean
   ): void {
