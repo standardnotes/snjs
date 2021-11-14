@@ -40,6 +40,7 @@ import {
   arraysEqual,
   convertTimestampToMilliseconds,
   isErrorObject,
+  isValidUrl,
 } from '@Lib/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
@@ -399,6 +400,10 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     let hasChanges = false;
     for (const feature of features) {
       if (!feature.content_type) {
+        continue;
+      }
+      const isValid = feature.url ? isValidUrl(feature.url) : true;
+      if (!isValid) {
         continue;
       }
       const expired =

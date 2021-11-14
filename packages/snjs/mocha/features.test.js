@@ -22,18 +22,21 @@ describe('features', () => {
         (feature) => feature.identifier === FeatureIdentifier.MidnightTheme
       ),
       expires_at: tomorrow,
+      url: 'https://standardnotes.com'
     };
     boldEditorFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.BoldEditor
       ),
       expires_at: tomorrow,
+      url: 'https://standardnotes.com'
     };
     tagNestingFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.TagNesting
       ),
       expires_at: tomorrow,
+      url: 'https://standardnotes.com'
     };
 
     sinon.spy(application.itemManager, 'createItem');

@@ -20,6 +20,18 @@ describe('utils', () => {
     expect(isNullOrUndefined([null])).to.equal(false);
   });
 
+  it('isValidUrl', () => {
+    expect(isValidUrl('http://foo.com')).to.equal(true);
+    expect(isValidUrl('https://foo.com')).to.equal(true);
+    expect(isValidUrl('http://localhost:3000')).to.equal(true);
+    expect(isValidUrl('http://localhost:3000/foo/bar')).to.equal(true);
+    expect(isValidUrl('http://192.168.1:3000/foo/bar')).to.equal(true);
+    expect(isValidUrl('://foo.com')).to.equal(false);
+    expect(isValidUrl('{foo}/foo/com')).to.equal(false);
+    expect(isValidUrl('foo.com')).to.equal(false);
+    expect(isValidUrl('www.foo.com')).to.equal(false);
+  });
+
   it('extendArray', () => {
     const array = [1, 2, 3];
     const original = array.slice();

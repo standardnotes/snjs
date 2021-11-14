@@ -1,5 +1,5 @@
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { addIfUnique, removeFromArray } from '@Lib/utils';
+import { addIfUnique, isValidUrl, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
 import { AppDataField } from './../core/item';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -55,7 +55,7 @@ export interface ComponentContent {
   /** Items that have requested a component to be enabled in its context */
   associatedItemIds: string[];
   local_url: string | null;
-  hosted_url: string;
+  hosted_url?: string;
   offlineOnly: boolean;
   name: string;
   autoupdateDisabled: boolean;
@@ -64,7 +64,7 @@ export interface ComponentContent {
   permissions: ComponentPermission[];
   valid_until: Date | number;
   active: boolean;
-  legacy_url: string;
+  legacy_url?: string;
   isMobileDefault: boolean;
   isDeprecated: boolean;
 }
@@ -81,7 +81,7 @@ export class SNComponent extends SNItem implements ComponentContent {
   /** Items that have requested a component to be enabled in its context */
   public readonly associatedItemIds: string[];
   public readonly local_url: string;
-  public readonly hosted_url: string;
+  public readonly hosted_url?: string;
   public readonly offlineOnly: boolean;
   public readonly name: string;
   public readonly autoupdateDisabled: boolean;
@@ -90,17 +90,23 @@ export class SNComponent extends SNItem implements ComponentContent {
   public readonly permissions: ComponentPermission[] = [];
   public readonly valid_until: Date;
   public readonly active: boolean;
-  public readonly legacy_url: string;
+  public readonly legacy_url?: string;
   public readonly isMobileDefault: boolean;
 
   constructor(payload: PurePayload) {
     super(payload);
     /** Custom data that a component can store in itself */
     this.componentData = this.payload.safeContent.componentData || {};
-    this.legacy_url = this.payload.safeContent.legacy_url;
-    this.hosted_url =
-      this.payload.safeContent.hosted_url || this.payload.safeContent.url;
+
+    if (isValidUrl(this.payload.safeContent.hosted_url)) {
+      this.hosted_url = this.payload.safeContent.hosted_url;
+    } else if (isValidUrl(this.payload.safeContent.url)) {
+      this.hosted_url = this.payload.safeContent.url;
+    } else if (isValidUrl(this.payload.safeContent.legacy_url)) {
+      this.hosted_url = this.payload.safeContent.legacy_url;
+    }
     this.local_url = this.payload.safeContent.local_url;
+
     this.valid_until = new Date(this.payload.safeContent.valid_until);
     this.offlineOnly = this.payload.safeContent.offlineOnly;
     this.name = this.payload.safeContent.name;
@@ -115,7 +121,7 @@ export class SNComponent extends SNItem implements ComponentContent {
     this.isMobileDefault = this.payload.safeContent.isMobileDefault;
     /**
      * @legacy
-     * We don't want to set the url directly, as we'd like to phase it out.
+     * We don't want to set this.url directly, as we'd like to phase it out.
      * If the content.url exists, we'll transfer it to legacy_url. We'll only
      * need to set this if content.hosted_url is blank, otherwise,
      * hosted_url is the url replacement.

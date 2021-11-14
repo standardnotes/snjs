@@ -497,6 +497,15 @@ export function deepFreeze(object: any) {
   return Object.freeze(object);
 }
 
+export function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 /**
  * Determines if an object has a getter defined for a given property
  */
