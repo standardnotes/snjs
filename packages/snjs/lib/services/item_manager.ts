@@ -1,4 +1,8 @@
-import { FeatureRepoMutator, SNFeatureRepo } from './../models/app/feature_repo';
+import { TagMutator } from './../models/app/tag';
+import {
+  FeatureRepoMutator,
+  SNFeatureRepo,
+} from './../models/app/feature_repo';
 import {
   CollectionSort,
   ItemCollection,
@@ -8,7 +12,10 @@ import { SNItemsKey } from '@Models/app/items_key';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { SNTag } from '@Models/app/tag';
 import { NoteMutator, SNNote } from './../models/app/note';
-import { ActionsExtensionMutator } from './../models/app/extension';
+import {
+  ActionsExtensionMutator,
+  SNActionsExtension,
+} from './../models/app/extension';
 import { SNSmartTag } from './../models/app/smartTag';
 import { SNPredicate } from './../models/core/predicate';
 import { Uuid } from './../uuid';
@@ -19,11 +26,7 @@ import { FillItemContent, Uuids } from '@Models/functions';
 import { PureService } from '@Lib/services/pure_service';
 import { ComponentMutator } from './../models/app/component';
 import { SNComponent } from '@Models/app/component';
-import {
-  isString,
-  naturalSort,
-  removeFromArray
-} from '@Lib/utils';
+import { isString, naturalSort, removeFromArray } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   PayloadContent,
@@ -67,7 +70,7 @@ type Observer = {
  * and then  we'll propagate them to our listeners.
  */
 export class ItemManager extends PureService {
-  private unsubChangeObserver: any;
+  private unsubChangeObserver: () => void;
   private observers: Observer[] = [];
   private collection!: ItemCollection;
   private notesView!: ItemCollectionNotesView;
@@ -123,12 +126,12 @@ export class ItemManager extends PureService {
     contentType: ContentType,
     sortBy?: CollectionSort,
     direction?: SortDirection,
-    filter?: (element: any) => boolean
+    filter?: (element: SNItem) => boolean
   ): void {
     if (contentType === ContentType.Note) {
       console.warn(
-        `Called setDisplayOptions with ContentType.Note. ` +
-          `setNotesDisplayCriteria should be used instead.`
+        'Called setDisplayOptions with ContentType.Note. ' +
+          'setNotesDisplayCriteria should be used instead.'
       );
     }
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
@@ -138,7 +141,7 @@ export class ItemManager extends PureService {
     this.notesView.setCriteria(criteria);
   }
 
-  public getDisplayableItems(contentType: ContentType) {
+  public getDisplayableItems(contentType: ContentType): SNItem[] {
     if (contentType === ContentType.Note) {
       return this.notesView.displayElements();
     }
@@ -147,7 +150,7 @@ export class ItemManager extends PureService {
 
   public deinit(): void {
     this.unsubChangeObserver();
-    this.unsubChangeObserver = undefined;
+    (this.unsubChangeObserver as unknown) = undefined;
     (this.payloadManager as unknown) = undefined;
     (this.collection as unknown) = undefined;
     (this.notesView as unknown) = undefined;
@@ -403,7 +406,7 @@ export class ItemManager extends PureService {
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ) {
+  ): Promise<PurePayload[]> {
     const note = this.findItem(uuid);
     if (!note) {
       throw Error('Attempting to change non-existant note');
@@ -415,6 +418,22 @@ export class ItemManager extends PureService {
       payloadSource,
       payloadSourceKey
     );
+  }
+
+  async changeTag(
+    uuid: UuidString,
+    mutate: (mutator: TagMutator) => void,
+    mutationType: MutationType = MutationType.UserInteraction,
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<SNTag> {
+    const tag = this.findItem(uuid);
+    if (!tag) {
+      throw Error('Attempting to change non-existant tag');
+    }
+    const mutator = new TagMutator(tag, mutationType);
+    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
+    return this.findItem(uuid) as SNTag;
   }
 
   async changeComponent(
@@ -455,18 +474,14 @@ export class ItemManager extends PureService {
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ) {
+  ): Promise<SNActionsExtension> {
     const extension = this.findItem(uuid);
     if (!extension) {
       throw Error('Attempting to change non-existant extension');
     }
     const mutator = new ActionsExtensionMutator(extension, mutationType);
-    return this.applyTransform(
-      mutator,
-      mutate,
-      payloadSource,
-      payloadSourceKey
-    );
+    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
+    return this.findItem(uuid) as SNActionsExtension;
   }
 
   async changeItemsKey(
@@ -475,18 +490,14 @@ export class ItemManager extends PureService {
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ) {
+  ): Promise<SNItemsKey> {
     const itemsKey = this.findItem(uuid);
     if (!itemsKey) {
       throw Error('Attempting to change non-existant itemsKey');
     }
     const mutator = new ItemsKeyMutator(itemsKey, mutationType);
-    return this.applyTransform(
-      mutator,
-      mutate,
-      payloadSource,
-      payloadSourceKey
-    );
+    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
+    return this.findItem(uuid) as SNItemsKey;
   }
 
   private async applyTransform<T extends ItemMutator>(
@@ -497,7 +508,7 @@ export class ItemManager extends PureService {
   ) {
     mutate(mutator);
     const payload = mutator.getResult();
-    return this.payloadManager!.emitPayload(
+    return this.payloadManager.emitPayload(
       payload,
       payloadSource,
       payloadSourceKey
@@ -613,9 +624,11 @@ export class ItemManager extends PureService {
    * to pass in a dirtied item if that is their intention.
    */
   public async insertItem(item: SNItem): Promise<SNItem> {
-    const payload = item.payload;
-    const insertedItem = await this.emitItemFromPayload(payload);
-    return insertedItem;
+    return this.emitItemFromPayload(item.payload);
+  }
+
+  public async insertItems(items: SNItem[]): Promise<SNItem[]> {
+    return this.emitItemsFromPayloads(items.map((item) => item.payload));
   }
 
   public async emitItemFromPayload(
@@ -772,46 +785,92 @@ export class ItemManager extends PureService {
     );
   }
 
-  /**
-   * Returns all parents for a tag
-   * @param tag - The tag for which parents need to be found
-   * @returns Array containing all parent tags
-   */
-  public getTagParentChain(tag: SNTag): SNTag[] {
-    const delimiter = '.';
-    const tagComponents = tag.title.split(delimiter);
-    const parentTagsTitles: string[] = [];
+  // /**
+  //  * Returns all parents for a tag
+  //  * @param tag - The tag for which parents need to be found
+  //  * @returns Array containing all parent tags
+  //  */
+  // public getTagParentChain(tag: SNTag): SNTag[] {
+  //   const delimiter = '.';
+  //   const tagComponents = tag.title.split(delimiter);
+  //   const parentTagsTitles: string[] = [];
 
-    const getImmediateParent = () => {
-      if (tagComponents.length > 1) {
-        tagComponents.splice(-1, 1);
-        const immediateParentTitle = tagComponents.join(delimiter);
-        parentTagsTitles.push(immediateParentTitle);
-        getImmediateParent();
-      }
-    };
+  //   const getImmediateParent = () => {
+  //     if (tagComponents.length > 1) {
+  //       tagComponents.splice(-1, 1);
+  //       const immediateParentTitle = tagComponents.join(delimiter);
+  //       parentTagsTitles.push(immediateParentTitle);
+  //       getImmediateParent();
+  //     }
+  //   };
 
-    getImmediateParent();
-    const parentTags = this.tags.filter((tag) =>
-      parentTagsTitles.some((title) => title === tag.title)
-    );
-    return parentTags;
+  //   getImmediateParent();
+  //   const parentTags = this.tags.filter((tag) =>
+  //     parentTagsTitles.some((title) => title === tag.title)
+  //   );
+  //   return parentTags;
+  // }
+
+  // /**
+  //  * Returns all descendants for a tag
+  //  * @param tag - The tag for which descendants need to be found
+  //  * @returns Array containing all descendant tags
+  //  */
+  // public getTagDescendants(tag: SNTag): SNTag[] {
+  //   const delimiter = '.';
+  //   return this.tags.filter((t) => {
+  //     const regex = new RegExp(
+  //       `^${tag.title}${delimiter}|${delimiter}${tag.title}${delimiter}`,
+  //       'i'
+  //     );
+  //     return regex.test(t.title);
+  //   });
+  // }
+
+  getTagParent(tagUuid: UuidString): SNTag | undefined {
+    const tag = this.findItem(tagUuid) as SNTag;
+    const parentId = tag.parentId;
+    if (parentId) {
+      return this.findItem(tag.parentId) as SNTag;
+    }
   }
 
   /**
-   * Returns all descendants for a tag
-   * @param tag - The tag for which descendants need to be found
-   * @returns Array containing all descendant tags
+   * @returns Array of tags where the front of the array represents the top of the tree.
    */
-  public getTagDescendants(tag: SNTag): SNTag[] {
-    const delimiter = '.';
-    return this.tags.filter((t) => {
-      const regex = new RegExp(
-        `^${tag.title}${delimiter}|${delimiter}${tag.title}${delimiter}`,
-        'i'
-      );
-      return regex.test(t.title);
+  getTagParentChain(tagUuid: UuidString): SNTag[] {
+    const tag = this.findItem(tagUuid) as SNTag;
+    let parentId = tag.parentId;
+    const chain: SNTag[] = [];
+    while (parentId) {
+      const parent = this.findItem(parentId) as SNTag;
+      chain.unshift(parent);
+      parentId = parent.parentId;
+    }
+    return chain;
+  }
+
+  getTagChildren(tagUuid: UuidString): SNTag[] {
+    const tag = this.findItem(tagUuid) as SNTag;
+    return this.collection.elementsReferencingElement(tag) as SNTag[];
+  }
+
+  /**
+   * @returns The changed child tag
+   */
+  public establishTagRelationship(
+    parentTag: SNTag,
+    childTag: SNTag
+  ): Promise<SNTag> {
+    return this.changeTag(childTag.uuid, (m) => {
+      m.makeChildOf(parentTag);
     });
+  }
+
+  public async addTagToNote(note: SNNote, tag: SNTag): Promise<SNTag> {
+    return this.changeItem(tag.uuid, (mutator) => {
+      mutator.addItemAsRelationship(note);
+    }) as Promise<SNTag>;
   }
 
   /**

@@ -4,7 +4,7 @@ import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
-import { PayloadContent } from './../../protocol/payloads/generator';
+import { PayloadContent, ContentReference } from './../../protocol/payloads/generator';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import {
@@ -19,6 +19,10 @@ import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { PrefKey } from '../app/userPrefs';
+
+export interface ItemContent {
+  references: ContentReference[];
+}
 
 export enum MutationType {
   /**

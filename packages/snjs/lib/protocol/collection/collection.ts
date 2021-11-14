@@ -99,7 +99,7 @@ export class MutableCollection<T extends PurePayload | SNItem> {
    * @param includeBlanks If true and an item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  public findAll(uuids: UuidString[], includeBlanks = false) {
+  public findAll(uuids: UuidString[], includeBlanks = false): T[] {
     const results = [];
     for (const id of uuids) {
       const element = this.map[id];
@@ -107,7 +107,7 @@ export class MutableCollection<T extends PurePayload | SNItem> {
         results.push(element);
       }
     }
-    return results;
+    return results as T[];
   }
 
   public set(elements: T | T[]): void {

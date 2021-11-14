@@ -267,7 +267,7 @@ export function createMappedNote(application, title, text, dirty) {
   );
 }
 
-export function createMappedTag(application) {
+export async function createMappedTag(application) {
   const payload = createStorageItemTagPayload();
   return application.itemManager.emitItemFromPayload(
     payload,
