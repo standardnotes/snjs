@@ -5,8 +5,8 @@ import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNActionsExtension } from './../models/app/extension';
-import { SNItem } from '@Models/core/item';
+import { ActionsExtensionMutator, SNActionsExtension } from './../models/app/extension';
+import { MutationType, SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
 import { PayloadManager } from './payload_manager';
@@ -133,13 +133,18 @@ export class SNActionsService extends PureService {
           return new Action(action);
         })
       : [];
-    await this.itemManager.changeActionsExtension(extension.uuid, (mutator) => {
-      mutator.deprecation = response.deprecation!;
-      mutator.description = description;
-      mutator.supported_types = supported_types;
-      mutator.actions = actions;
-    });
-    return this.itemManager.findItem(extension.uuid) as SNActionsExtension;
+    const mutator = new ActionsExtensionMutator(
+      extension,
+      MutationType.UserInteraction
+    );
+
+    mutator.deprecation = response.deprecation!;
+    mutator.description = description;
+    mutator.supported_types = supported_types;
+    mutator.actions = actions;
+
+    const payloadResult = mutator.getResult();
+    return CreateItemFromPayload(payloadResult) as SNActionsExtension;
   }
 
   public async runAction(

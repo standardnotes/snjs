@@ -268,20 +268,31 @@ describe('actions service', () => {
     const extensionItem = await this.itemManager.findItem(
       this.extensionItemUuid
     );
+    expect(extensionItem.actions.length).to.be.eq(5);
 
     const extensionWithItem = await this.actionsManager.loadExtensionInContextOfItem(
       extensionItem,
       noteItem
     );
+    expect(extensionWithItem.actions.length).to.be.eq(7);
+    expect(extensionWithItem.actions.map((action) => action.label)).to.include.members([
+      /**
+       * These actions were returned from the server
+       * and are relevant for the current item only.
+       */
+      'Action #4',
+      'Action #6'
+    ]);
+
+    // Actions that are relevant for an item should not be stored.
     const updatedExtensionItem = await this.itemManager.findItem(
       this.extensionItemUuid
     );
-
-    expect(extensionWithItem).to.eq(updatedExtensionItem);
-    const extensions = this.actionsManager.getExtensions();
-    expect(extensions[0].actions.map((action) => action.label)).to.include(
-      'Action #4'
-    );
+    const expectedActions = extensionItem.actions.map((action) => {
+      const { id, ...rest } = action;
+      return rest;
+    });
+    expect(updatedExtensionItem.actions).to.containSubset(expectedActions);
   });
 
   describe('get action', async function () {
