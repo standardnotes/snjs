@@ -147,12 +147,12 @@
     "permission_name": "editor:bold",
     "content_type": "SN|Component",
     "area": "editor-editor",
-    "version": "1.2.1",
+    "version": "1.2.9",
     "description": "A simple and peaceful rich editor that helps you write and think clearly. Features FileSafe integration, so you can embed your encrypted images, videos, and audio recordings directly inline.",
     "url": "#{url_prefix}/components/bold-editor",
     "marketing_url": "",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/bold.jpg",
-    "download_url": "https://github.com/standardnotes/bold-editor/archive/1.2.1.zip"
+    "download_url": "https://github.com/standardnotes/bold-editor/archive/1.2.9.zip"
   },
   {
     "name": "Plus Editor",
