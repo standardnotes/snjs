@@ -69,6 +69,34 @@ describe('application instances', () => {
     await Factory.safeDeinit(app);
   });
 
+  it('changing default host should not affect already signed in accounts', async () => {
+    /** This test will always succeed but should be observed for console exceptions */
+    const app = await Factory.createAndInitializeApplication(
+      'app',
+      Environment.Web,
+      Platform.MacWeb,
+      Factory.getDefaultHost()
+    );
+    await Factory.registerUserToApplication({
+      application: app,
+      email: Uuid.GenerateUuidSynchronously(),
+      password: 'password',
+    });
+    await app.prepareForDeinit();
+    await Factory.safeDeinit(app);
+
+    /** Recreate app with different host */
+    const recreatedApp = await Factory.createAndInitializeApplication(
+      'app',
+      Environment.Web,
+      Platform.MacWeb,
+      'http://nonsense.host'
+    );
+
+    expect(recreatedApp.getHost()).to.not.equal('http://nonsense.host');
+    expect(recreatedApp.getHost()).to.equal(Factory.getDefaultHost());
+  });
+
   it('signing out application should delete snjs_version', async () => {
     const identifier = 'app';
     const app = await Factory.createAndInitializeApplication(identifier);

@@ -48,10 +48,10 @@ type PasswordRequestHandler = () => Promise<string>;
  *       to allow publishing a note to a user's blog.
  */
 export class SNActionsService extends PureService {
-  private httpService?: SNHttpService;
-  private payloadManager?: PayloadManager;
-  private protocolService?: SNProtocolService;
-  private syncService?: SNSyncService;
+  private httpService: SNHttpService;
+  private payloadManager: PayloadManager;
+  private protocolService: SNProtocolService;
+  private syncService: SNSyncService;
   private previousPasswords: string[] = [];
 
   constructor(
@@ -79,16 +79,16 @@ export class SNActionsService extends PureService {
     (this.itemManager as unknown) = undefined;
     (this.alertService as unknown) = undefined;
     this.deviceInterface = undefined;
-    this.httpService = undefined;
-    this.payloadManager = undefined;
-    this.protocolService = undefined;
-    this.syncService = undefined;
+    (this.httpService as unknown) = undefined;
+    (this.payloadManager as unknown) = undefined;
+    (this.protocolService as unknown) = undefined;
+    (this.syncService as unknown) = undefined;
     this.previousPasswords.length = 0;
     super.deinit();
   }
 
   public getExtensions(): SNActionsExtension[] {
-    return this.itemManager!.nonErroredItemsForContentType(
+    return this.itemManager.nonErroredItemsForContentType(
       ContentType.ActionsExtension
     ) as SNActionsExtension[];
   }
@@ -111,18 +111,17 @@ export class SNActionsService extends PureService {
   public async loadExtensionInContextOfItem(
     extension: SNActionsExtension,
     item: SNItem
-  ) {
+  ): Promise<SNActionsExtension | undefined> {
     const params = {
       content_type: item.content_type,
       item_uuid: item.uuid,
     };
-    const response = (await this.httpService!.getAbsolute(
-      extension.url,
-      params
-    ).catch((response) => {
-      console.error('Error loading extension', response);
-      return null;
-    })) as ActionResponse;
+    const response = (await this.httpService
+      .getAbsolute(extension.url, params)
+      .catch((response) => {
+        console.error('Error loading extension', response);
+        return null;
+      })) as ActionResponse;
     if (!response) {
       return;
     }
@@ -134,7 +133,6 @@ export class SNActionsService extends PureService {
           return new Action(action);
         })
       : [];
-
     const mutator = new ActionsExtensionMutator(
       extension,
       MutationType.UserInteraction

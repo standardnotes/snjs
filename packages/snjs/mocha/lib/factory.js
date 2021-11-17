@@ -115,7 +115,7 @@ function getAppVersion() {
   return '1.2.3';
 }
 
-export function createApplication(identifier, environment, platform) {
+export function createApplication(identifier, environment, platform, host) {
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
@@ -132,7 +132,7 @@ export function createApplication(identifier, environment, platform) {
     },
     identifier || `${Math.random()}`,
     [],
-    getDefaultHost(),
+    host || getDefaultHost(),
     getAppVersion(),
     true,
     getDefaultWebSocketUrl(),
@@ -152,9 +152,10 @@ export async function createInitAppWithRandNamespace(environment, platform) {
 export async function createAndInitializeApplication(
   namespace,
   environment,
-  platform
+  platform,
+  host
 ) {
-  const application = createApplication(namespace, environment, platform);
+  const application = createApplication(namespace, environment, platform, host);
   await initializeApplication(application);
   return application;
 }

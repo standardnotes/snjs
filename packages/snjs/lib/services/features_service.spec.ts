@@ -1,3 +1,5 @@
+import { SNFeatureRepo } from './../models/app/feature_repo';
+import { SNComponent } from '@Models/app/component';
 import { SNSyncService } from './sync/sync_service';
 import { SettingName } from '@standardnotes/settings';
 import {
@@ -11,7 +13,6 @@ import {
   SNStorageService,
   StorageKey
 } from '@Lib/index';
-import { FillItemContent } from '@Lib/models/functions';
 import { SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType } from '@standardnotes/common';
@@ -39,7 +40,7 @@ describe('featuresService', () => {
   let tomorrow_server: number;
   let tomorrow_client: number;
 
-  const createService = (enableV4 = true) => {
+  const createService = () => {
     return new SNFeaturesService(
       storageService,
       apiService,
@@ -51,8 +52,7 @@ describe('featuresService', () => {
       syncService,
       alertService,
       sessionManager,
-      crypto,
-      enableV4,
+      crypto
     );
   };
 
@@ -92,9 +92,10 @@ describe('featuresService', () => {
         features,
       }
     });
-    apiService.getOfflineFeatures = jest.fn().mockReturnValue({
+    apiService.downloadOfflineFeaturesFromRepo = jest.fn().mockReturnValue({
       features
     })
+    apiService.isCustomServerHostUsed = jest.fn().mockReturnValue(false)
 
     itemManager = {} as jest.Mocked<ItemManager>;
     itemManager.getItems = jest.fn().mockReturnValue(
@@ -107,6 +108,7 @@ describe('featuresService', () => {
     itemManager.setItemsToBeDeleted = jest.fn();
     itemManager.addObserver = jest.fn();
     itemManager.changeItem = jest.fn();
+    itemManager.changeFeatureRepo = jest.fn();
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
     componentManager.setReadonlyStateForComponent = jest.fn();
@@ -221,14 +223,16 @@ describe('featuresService', () => {
     });
 
     it('if item for a feature exists updates its content', async () => {
-      const existingItem = {
+      const existingItem = new SNComponent({
         uuid: '789',
+        content_type: ContentType.Component,
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
+            valid_until: new Date()
           }
-        }
-      };
+        },
+      } as never);
 
       const newRoles = [
         ...roles,
@@ -284,14 +288,16 @@ describe('featuresService', () => {
     });
 
     it('marks expired components as read-only', async () => {
-      const existingItem = {
+      const existingItem = new SNComponent({
         uuid: '789',
+        content_type: ContentType.Component,
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
+            valid_until: new Date()
           }
-        }
-      };
+        },
+      } as never);
 
       const newRoles = [
         ...roles,
@@ -323,14 +329,16 @@ describe('featuresService', () => {
     });
 
     it('deletes items for expired themes', async () => {
-      const existingItem = {
+      const existingItem = new SNComponent({
         uuid: '456',
+        content_type: ContentType.Theme,
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.MidnightTheme,
+            valid_until: new Date()
           }
-        }
-      };
+        },
+      } as never);
 
       const newRoles = [
         ...roles,
@@ -396,31 +404,21 @@ describe('featuresService', () => {
       await featuresService.updateRoles('123', roles);
       expect(storageService.setValue).toHaveBeenCalledTimes(2);
     });
-
-    it('does not map features to items if V4 is not enabled', async () => {
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
-
-      storageService.getValue = jest.fn().mockReturnValue(roles);
-      const featuresService = createService(false);
-      await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
-      expect(itemManager.createItem).not.toHaveBeenCalled();
-    })
   });
 
-  describe('migrateExtRepoToUserSetting', () => {
+  describe('migrateFeatureRepoToUserSetting', () => {
     it('should extract key from extension repo url and update user setting', async () => {
       const extensionKey = '129b029707e3470c94a8477a437f9394';
-      const extensionRepoItem = FillItemContent({
+      const extensionRepoItem = new SNFeatureRepo({
+        uuid: '456',
+        content_type: ContentType.ExtensionRepo,
         safeContent: {
           url: `https://extensions.standardnotes.org/${extensionKey}`,
-        }
-      }) as jest.Mocked<SNItem>;
+        },
+      } as never)
+
       const featuresService = createService();
-      await featuresService.migrateExtRepoToUserSetting([extensionRepoItem]);
+      await featuresService.migrateFeatureRepoToUserSetting([extensionRepoItem]);
       expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
     });
   })

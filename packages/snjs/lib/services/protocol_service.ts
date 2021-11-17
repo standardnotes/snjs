@@ -1416,7 +1416,10 @@ export class SNProtocolService
        */
       const syncedKeys = defaultKeys.filter((key) => !key.neverSynced);
       if (syncedKeys.length > 1) {
-        console.warn('Multiple synced default keys');
+        /**
+         * @todo enable dev-only logging
+         * console.warn('Multiple synced default keys');
+         */
       }
       if (syncedKeys.length > 0) {
         return syncedKeys[0];

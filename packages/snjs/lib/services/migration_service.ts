@@ -21,7 +21,6 @@ import { lastElement } from '@Lib/utils';
  */
 export class SNMigrationService extends PureService {
   private activeMigrations?: Migration[];
-  private handledFullSyncStage = false;
   private baseMigration!: BaseMigration;
 
   constructor(private services: MigrationServices) {
@@ -85,11 +84,6 @@ export class SNMigrationService extends PureService {
   public async handleApplicationEvent(event: ApplicationEvent) {
     if (event === ApplicationEvent.SignedIn) {
       await this.handleStage(ApplicationStage.SignedIn_30);
-    } else if (event === ApplicationEvent.CompletedFullSync) {
-      if (!this.handledFullSyncStage) {
-        this.handledFullSyncStage = true;
-        await this.handleStage(ApplicationStage.FullSyncCompleted_13);
-      }
     }
   }
 

@@ -497,6 +497,15 @@ export function deepFreeze(object: any) {
   return Object.freeze(object);
 }
 
+export function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 /**
  * Determines if an object has a getter defined for a given property
  */
@@ -574,6 +583,16 @@ export function naturalSort<T extends AnyRecord>(
               b[property].localeCompare(a[property], 'en', { numeric: true })
       );
   }
+}
+
+export function arraysEqual<T>(left: T[], right: T[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+  return (
+    left.every((item) => right.includes(item)) &&
+    right.every((item) => left.includes(item))
+  );
 }
 
 const MicrosecondsInAMillisecond = 1_000;

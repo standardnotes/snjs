@@ -120,7 +120,10 @@ import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
 import { Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
-import { SetOfflineFeaturesFunctionResponse } from '@Services/features_service';
+import {
+  FeaturesEvent,
+  SetOfflineFeaturesFunctionResponse,
+} from '@Services/features_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -183,6 +186,7 @@ export class SNApplication {
   /** Whether the application has been destroyed via .deinit() */
   private dealloced = false;
   private revokingSession = false;
+  private handledFullSyncStage = false;
 
   /**
    * @param environment The Environment that identifies your application.
@@ -1598,9 +1602,9 @@ export class SNApplication {
   }
 
   public downloadExternalFeature(
-    url: string
+    urlOrCode: string
   ): Promise<SNComponent | undefined> {
-    return this.featuresService.validateAndDownloadExternalFeature(url);
+    return this.featuresService.validateAndDownloadExternalFeature(urlOrCode);
   }
 
   public getFeature(
@@ -1613,16 +1617,18 @@ export class SNApplication {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public async setOfflineFeatures(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
-    return this.featuresService.setOfflineFeatures(code);
+  public setOfflineFeaturesCode(
+    code: string
+  ): Promise<SetOfflineFeaturesFunctionResponse> {
+    return this.featuresService.setOfflineFeaturesCode(code);
   }
 
-  public getIsOfflineActivationCodeStoredPreviously(): boolean {
-    return this.featuresService.getIsOfflineActivationCodeStoredPreviously();
+  public hasOfflineRepo(): boolean {
+    return this.featuresService.hasOfflineRepo();
   }
 
-  public async removeOfflineActivationCode(): Promise<void> {
-    return this.featuresService.removeOfflineActivationCode();
+  public async deleteOfflineFeatureRepo(): Promise<void> {
+    return this.featuresService.deleteOfflineFeatureRepo();
   }
 
   public isCustomServerHostUsed(): boolean {
@@ -1703,8 +1709,20 @@ export class SNApplication {
       this.syncService,
       this.alertService,
       this.sessionManager,
-      this.crypto,
-      this.enableV4
+      this.crypto
+    );
+    this.serviceObservers.push(
+      this.featuresService.addEventObserver((event) => {
+        switch (event) {
+          case FeaturesEvent.UserRolesChanged: {
+            void this.notifyEvent(ApplicationEvent.UserRolesChanged);
+            break;
+          }
+          default: {
+            assertUnreachable(event);
+          }
+        }
+      })
     );
     this.services.push(this.featuresService);
   }
@@ -1743,6 +1761,19 @@ export class SNApplication {
       this.alertService,
       this.challengeService,
       this.protectionService
+    );
+    this.serviceObservers.push(
+      this.credentialService.addEventObserver((event) => {
+        switch (event) {
+          case AccountEvent.SignedInOrRegistered: {
+            void this.notifyEvent(ApplicationEvent.SignedIn);
+            break;
+          }
+          default: {
+            assertUnreachable(event);
+          }
+        }
+      })
     );
     this.services.push(this.credentialService);
   }
@@ -1887,6 +1918,12 @@ export class SNApplication {
       const appEvent = applicationEventForSyncEvent(eventName);
       if (appEvent) {
         await this.notifyEvent(appEvent);
+        if (appEvent === ApplicationEvent.CompletedFullSync) {
+          if (!this.handledFullSyncStage) {
+            this.handledFullSyncStage = true;
+            await this.handleStage(ApplicationStage.FullSyncCompleted_13);
+          }
+        }
       }
       await this.protocolService.onSyncEvent(eventName);
     };
@@ -1942,19 +1979,6 @@ export class SNApplication {
       this.payloadManager,
       this.protocolService,
       this.syncService
-    );
-    this.serviceObservers.push(
-      this.credentialService.addEventObserver((event) => {
-        switch (event) {
-          case AccountEvent.SignedInOrRegistered: {
-            void this.notifyEvent(ApplicationEvent.SignedIn);
-            break;
-          }
-          default: {
-            assertUnreachable(event);
-          }
-        }
-      })
     );
     this.services.push(this.actionsManager);
   }

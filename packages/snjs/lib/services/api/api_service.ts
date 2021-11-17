@@ -1,3 +1,4 @@
+import { SNFeatureRepo } from './../../models/app/feature_repo';
 import { ErrorObject, UuidString } from './../../types';
 import {
   HttpResponse,
@@ -24,7 +25,7 @@ import {
   GetAvailableSubscriptionsResponse,
   ChangeCredentialsResponse,
   PostSubscriptionTokensResponse,
-  GetOfflineFeaturesResponse
+  GetOfflineFeaturesResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@Models/content_types';
@@ -48,7 +49,10 @@ import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 import { OfflineSubscriptionEntitlements } from '@Services/features_service';
-import { APPLICATION_DEFAULT_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/constants';
+import {
+  APPLICATION_DEFAULT_HOSTS,
+  TRUSTED_FEATURE_HOSTS,
+} from '@Lib/constants';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -73,7 +77,7 @@ type PathNamesV1 = {
 
 type PathNamesV2 = {
   subscriptions: string;
-}
+};
 
 const Paths: {
   v1: PathNamesV1;
@@ -83,7 +87,8 @@ const Paths: {
     keyParams: '/v1/login-params',
     register: '/v1/users',
     signIn: '/v1/login',
-    changeCredentials: (userUuid: string) => `/v1/users/${userUuid}/attributes/credentials`,
+    changeCredentials: (userUuid: string) =>
+      `/v1/users/${userUuid}/attributes/credentials`,
     sync: '/v1/items',
     signOut: '/v1/logout',
     refreshSession: '/v1/sessions/refresh',
@@ -136,7 +141,7 @@ export class SNApiService extends PureService<
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private host: string,
+    private host: string
   ) {
     super();
   }
@@ -179,7 +184,7 @@ export class SNApiService extends PureService<
     await this.storageService.setValue(StorageKey.ServerHost, host);
   }
 
-  public getHost(): string | undefined {
+  public getHost(): string {
     return this.host;
   }
 
@@ -373,11 +378,11 @@ export class SNApiService extends PureService<
   }
 
   async changeCredentials(parameters: {
-    userUuid: UuidString,
-    currentServerPassword: string,
-    newServerPassword: string,
-    newKeyParams: SNRootKeyParams,
-    newEmail?: string
+    userUuid: UuidString;
+    currentServerPassword: string;
+    newServerPassword: string;
+    newKeyParams: SNRootKeyParams;
+    newEmail?: string;
   }): Promise<ChangeCredentialsResponse | HttpResponse> {
     if (this.changing) {
       return this.createErrorResponse(
@@ -389,7 +394,10 @@ export class SNApiService extends PureService<
       return preprocessingError;
     }
     this.changing = true;
-    const url = joinPaths(this.host, Paths.v1.changeCredentials(parameters.userUuid) as string);
+    const url = joinPaths(
+      this.host,
+      Paths.v1.changeCredentials(parameters.userUuid) as string
+    );
     const params = this.params({
       current_password: parameters.currentServerPassword,
       new_password: parameters.newServerPassword,
@@ -711,7 +719,10 @@ export class SNApiService extends PureService<
   ): Promise<GetSettingResponse> {
     return await this.tokenRefreshableRequest<GetSettingResponse>({
       verb: HttpVerb.Get,
-      url: joinPaths(this.host, Paths.v1.setting(userUuid, settingName.toLowerCase())),
+      url: joinPaths(
+        this.host,
+        Paths.v1.setting(userUuid, settingName.toLowerCase())
+      ),
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
     });
@@ -750,7 +761,9 @@ export class SNApiService extends PureService<
     return response;
   }
 
-  public async getAvailableSubscriptions(): Promise<HttpResponse | GetAvailableSubscriptionsResponse> {
+  public async getAvailableSubscriptions(): Promise<
+    HttpResponse | GetAvailableSubscriptionsResponse
+  > {
     const url = joinPaths(this.host, Paths.v2.subscriptions);
     const response = await this.request({
       verb: HttpVerb.Get,
@@ -762,7 +775,9 @@ export class SNApiService extends PureService<
 
   public async getNewSubscriptionToken(): Promise<string | undefined> {
     const url = joinPaths(this.host, Paths.v1.subscriptionTokens);
-    const response: HttpResponse | PostSubscriptionTokensResponse = await this.request({
+    const response:
+      | HttpResponse
+      | PostSubscriptionTokensResponse = await this.request({
       verb: HttpVerb.Post,
       url,
       authentication: this.session?.authorizationValue,
@@ -771,27 +786,32 @@ export class SNApiService extends PureService<
     return (response as PostSubscriptionTokensResponse).data?.token;
   }
 
-  public async getOfflineFeatures(offlineSubscriptionEntitlements: OfflineSubscriptionEntitlements): Promise<{ features: FeatureDescription[]; } | ErrorObject> {
+  public async downloadOfflineFeaturesFromRepo(
+    repo: SNFeatureRepo
+  ): Promise<{ features: FeatureDescription[] } | ErrorObject> {
     try {
-      const { featuresUrl, extensionKey } = offlineSubscriptionEntitlements;
+      const featuresUrl = repo.offlineFeaturesUrl;
+      const extensionKey = repo.offlineKey;
       const { host } = new URL(featuresUrl);
       if (!TRUSTED_FEATURE_HOSTS.includes(host)) {
         return {
-          error: 'This offline features host is not in the trusted allowlist.'
-        }
+          error: 'This offline features host is not in the trusted allowlist.',
+        };
       }
-      const response: HttpResponse | GetOfflineFeaturesResponse = await this.request({
+      const response:
+        | HttpResponse
+        | GetOfflineFeaturesResponse = await this.request({
         verb: HttpVerb.Get,
         url: featuresUrl,
         fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
-        customHeaders: [{key: 'x-offline-token', value: extensionKey}]
+        customHeaders: [{ key: 'x-offline-token', value: extensionKey }],
       });
       return {
-        features: (response as GetOfflineFeaturesResponse).data?.features || []
+        features: (response as GetOfflineFeaturesResponse).data?.features || [],
       };
     } catch {
       return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
       };
     }
   }

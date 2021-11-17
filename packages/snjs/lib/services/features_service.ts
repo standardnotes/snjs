@@ -1,3 +1,12 @@
+import { ApplicationStage } from '@Lib/stages';
+import {
+  LEGACY_PROD_EXT_ORIGIN,
+  PROD_OFFLINE_FEATURES_URL,
+} from './../constants';
+import {
+  SNFeatureRepo,
+  FeatureRepoContent,
+} from './../models/app/feature_repo';
 import { SNSyncService } from './sync/sync_service';
 import { AccountEvent, SNCredentialService } from './credential_service';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
@@ -5,47 +14,68 @@ import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 import { RoleName } from '@standardnotes/auth';
-import { ApiServiceEvent, MetaReceivedData, SNApiService } from './api/api_service';
+import {
+  ApiServiceEvent,
+  MetaReceivedData,
+  SNApiService,
+} from './api/api_service';
 import { ErrorObject, UuidString } from '@Lib/types';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponentManager } from './component_manager';
-import { SNComponent, SNItem } from '@Lib/models';
-import { SNWebSocketsService, WebSocketsServiceEvent } from './api/websockets_service';
+import { SNComponent } from '@Lib/models';
+import {
+  SNWebSocketsService,
+  WebSocketsServiceEvent,
+} from './api/websockets_service';
 import { FillItemContent } from '@Lib/models/functions';
 import { PayloadContent } from '@Lib/protocol';
 import { ComponentContent } from '@Lib/models/app/component';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
 import { PayloadSource } from '@Payloads/sources';
-import { convertTimestampToMilliseconds, isErrorObject } from '@Lib/utils';
+import {
+  arraysEqual,
+  convertTimestampToMilliseconds,
+  isErrorObject,
+  isValidUrl,
+} from '@Lib/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
   API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
   API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
-  INVALID_EXTENSION_URL
+  INVALID_EXTENSION_URL,
 } from '@Services/api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { ButtonType, SNAlertService } from '@Services/alert_service';
-import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/constants';
+import {
+  TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
+  TRUSTED_FEATURE_HOSTS,
+} from '@Lib/constants';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
   featuresUrl: string;
   extensionKey: string;
 };
-type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject;
+type GetOfflineSubscriptionDetailsResponse =
+  | OfflineSubscriptionEntitlements
+  | ErrorObject;
 
-export class SNFeaturesService extends PureService<void> {
+export const enum FeaturesEvent {
+  UserRolesChanged = 'UserRolesChanged',
+}
+
+export class SNFeaturesService extends PureService<FeaturesEvent> {
   private deinited = false;
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];
   private removeApiServiceObserver: () => void;
   private removeWebSocketsServiceObserver: () => void;
-  private removeExtensionRepoItemsObserver: () => void;
+  private removefeatureReposObserver: () => void;
   private removeSignInObserver: () => void;
   private initialFeaturesUpdateDone = false;
 
@@ -60,8 +90,7 @@ export class SNFeaturesService extends PureService<void> {
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
-    private crypto: SNPureCrypto,
-    private enableV4: boolean
+    private crypto: SNPureCrypto
   ) {
     super();
 
@@ -97,23 +126,27 @@ export class SNFeaturesService extends PureService<void> {
       }
     );
 
-    this.removeExtensionRepoItemsObserver = this.itemManager.addObserver(
+    this.removefeatureReposObserver = this.itemManager.addObserver(
       ContentType.ExtensionRepo,
       async (changed, inserted, _discarded, _ignored, source) => {
         const sources = [
           PayloadSource.Constructor,
           PayloadSource.LocalRetrieved,
           PayloadSource.RemoteRetrieved,
+          PayloadSource.FileImport,
         ];
-        if (
-          this.credentialService.isSignedIn() &&
-          source &&
-          sources.includes(source)
-        ) {
+        if (source && sources.includes(source)) {
           const items = [...changed, ...inserted].filter(
             (item) => !item.deleted
-          );
-          await this.migrateExtRepoToUserSetting(items);
+          ) as SNFeatureRepo[];
+          if (
+            this.credentialService.isSignedIn() &&
+            !this.apiService.isCustomServerHostUsed()
+          ) {
+            await this.migrateFeatureRepoToUserSetting(items);
+          } else {
+            await this.migrateFeatureRepoToOfflineEntitlements(items);
+          }
         }
       }
     );
@@ -121,62 +154,96 @@ export class SNFeaturesService extends PureService<void> {
     this.removeSignInObserver = this.credentialService.addEventObserver(
       (eventName: AccountEvent) => {
         if (eventName === AccountEvent.SignedInOrRegistered) {
-          const extRepos = this.itemManager.getItems(ContentType.ExtensionRepo);
-          void this.migrateExtRepoToUserSetting(extRepos);
+          const featureRepos = this.itemManager.getItems(
+            ContentType.ExtensionRepo
+          ) as SNFeatureRepo[];
+          if (!this.apiService.isCustomServerHostUsed()) {
+            void this.migrateFeatureRepoToUserSetting(featureRepos);
+          }
         }
       }
     );
   }
 
-  public async setOfflineFeatures(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
+  async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+    await super.handleApplicationStage(stage);
+    if (stage === ApplicationStage.FullSyncCompleted_13) {
+      const offlineRepo = this.getOfflineRepo();
+      if (offlineRepo) {
+        this.downloadOfflineFeatures(offlineRepo);
+      }
+    }
+  }
+
+  public async setOfflineFeaturesCode(
+    code: string
+  ): Promise<SetOfflineFeaturesFunctionResponse> {
     try {
       const activationCodeWithoutSpaces = code.replace(/\s/g, '');
-      const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces);
+      const decodedData = await this.crypto.base64Decode(
+        activationCodeWithoutSpaces
+      );
       const result = this.parseOfflineEntitlementsCode(decodedData);
       if (isErrorObject(result)) {
         return result;
       }
-      await this.storageService.setValue(StorageKey.OfflineSubscriptionEntitlements, result);
-      return this.fetchAndStoreOfflineFeatures(result);
+      const offlineRepo = (await this.itemManager.createItem(
+        ContentType.ExtensionRepo,
+        FillItemContent({
+          offlineFeaturesUrl: result.featuresUrl,
+          offlineKey: result.extensionKey,
+          migratedToOfflineEntitlements: true,
+        } as FeatureRepoContent),
+        true
+      )) as SNFeatureRepo;
+      this.syncService.sync();
+      return this.downloadOfflineFeatures(offlineRepo);
     } catch (err) {
       return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
       };
     }
   }
 
-  public getIsOfflineActivationCodeStoredPreviously(): boolean {
-    const featuresForOfflineUser = this.getFeaturesForOfflineUserFromStorage();
-    return featuresForOfflineUser != undefined;
+  private getOfflineRepo(): SNFeatureRepo | undefined {
+    const repos = this.itemManager.getItems(
+      ContentType.ExtensionRepo
+    ) as SNFeatureRepo[];
+    return repos.filter((repo) => repo.migratedToOfflineEntitlements)[0];
   }
 
-  public async removeOfflineActivationCode(): Promise<void> {
-    await this.storageService.removeValue(StorageKey.OfflineSubscriptionEntitlements);
+  public hasOfflineRepo(): boolean {
+    return this.getOfflineRepo() != undefined;
+  }
+
+  public async deleteOfflineFeatureRepo(): Promise<void> {
+    const repo = this.getOfflineRepo();
+    if (repo) {
+      await this.itemManager.setItemToBeDeleted(repo.uuid);
+    }
     await this.storageService.removeValue(StorageKey.UserFeatures);
   }
 
-  private parseOfflineEntitlementsCode(code: string): GetOfflineSubscriptionDetailsResponse {
+  private parseOfflineEntitlementsCode(
+    code: string
+  ): GetOfflineSubscriptionDetailsResponse {
     try {
       const { featuresUrl, extensionKey } = JSON.parse(code);
       return {
         featuresUrl,
-        extensionKey
+        extensionKey,
       };
     } catch (error) {
       return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
+        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
       };
     }
   }
 
-  private async fetchAndStoreOfflineFeatures(offlineEntitlements: OfflineSubscriptionEntitlements): Promise<SetOfflineFeaturesFunctionResponse> {
-    if (!this.enableV4) {
-      return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION
-      };
-    }
-    const result = await this.apiService.getOfflineFeatures(offlineEntitlements);
-
+  private async downloadOfflineFeatures(
+    repo: SNFeatureRepo
+  ): Promise<SetOfflineFeaturesFunctionResponse> {
+    const result = await this.apiService.downloadOfflineFeaturesFromRepo(repo);
     if (isErrorObject(result)) {
       return result;
     }
@@ -184,15 +251,15 @@ export class SNFeaturesService extends PureService<void> {
     await this.mapFeaturesToItems(result.features);
   }
 
-  public async migrateExtRepoToUserSetting(
-    extensionRepoItems: SNItem[] = []
+  public async migrateFeatureRepoToUserSetting(
+    featureRepos: SNFeatureRepo[] = []
   ): Promise<void> {
-    for (const item of extensionRepoItems) {
-      if (item.safeContent.migratedToUserSetting) {
+    for (const item of featureRepos) {
+      if (item.migratedToUserSetting) {
         continue;
       }
-      if (item.safeContent.url) {
-        const repoUrl: string = item.safeContent.url;
+      if (item.onlineUrl) {
+        const repoUrl: string = item.onlineUrl;
         const userKeyMatch = repoUrl.match(/\w{32,64}/);
         if (userKeyMatch && userKeyMatch.length > 0) {
           const userKey = userKeyMatch[0];
@@ -201,12 +268,39 @@ export class SNFeaturesService extends PureService<void> {
             userKey,
             true
           );
-          await this.itemManager.changeItem(item.uuid, (m) => {
-            m.unsafe_setCustomContent({
-              ...m.getItem().safeContent,
-              migratedToUserSetting: true,
-            });
+          await this.itemManager.changeFeatureRepo(item.uuid, (m) => {
+            m.migratedToUserSetting = true;
           });
+        }
+      }
+    }
+  }
+
+  public async migrateFeatureRepoToOfflineEntitlements(
+    featureRepos: SNFeatureRepo[] = []
+  ): Promise<void> {
+    for (const item of featureRepos) {
+      if (item.migratedToOfflineEntitlements) {
+        continue;
+      }
+      if (item.onlineUrl) {
+        const repoUrl = item.onlineUrl;
+        const { origin } = new URL(repoUrl);
+        if (!origin.includes(LEGACY_PROD_EXT_ORIGIN)) {
+          continue;
+        }
+        const userKeyMatch = repoUrl.match(/\w{32,64}/);
+        if (userKeyMatch && userKeyMatch.length > 0) {
+          const userKey = userKeyMatch[0];
+          const updatedRepo = await this.itemManager.changeFeatureRepo(
+            item.uuid,
+            (m) => {
+              m.offlineFeaturesUrl = PROD_OFFLINE_FEATURES_URL;
+              m.offlineKey = userKey;
+              m.migratedToOfflineEntitlements = true;
+            }
+          );
+          await this.downloadOfflineFeatures(updatedRepo);
         }
       }
     }
@@ -241,6 +335,9 @@ export class SNFeaturesService extends PureService<void> {
 
   private async setRoles(roles: RoleName[]): Promise<void> {
     this.roles = roles;
+    if (!arraysEqual(this.roles, roles)) {
+      this.notifyEvent(FeaturesEvent.UserRolesChanged);
+    }
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
@@ -274,19 +371,7 @@ export class SNFeaturesService extends PureService<void> {
         }
       });
       await this.setFeatures(features);
-      if (this.enableV4) {
-        await this.mapFeaturesToItems(features);
-      }
-    }
-  }
-
-  private getFeaturesForOfflineUserFromStorage(): OfflineSubscriptionEntitlements | undefined {
-    const offlineSubscriptionEntitlements = this.storageService.getValue(StorageKey.OfflineSubscriptionEntitlements);
-    if (offlineSubscriptionEntitlements) {
-      return {
-        featuresUrl: offlineSubscriptionEntitlements.featuresUrl,
-        extensionKey: offlineSubscriptionEntitlements.extensionKey
-      };
+      await this.mapFeaturesToItems(features);
     }
   }
 
@@ -311,14 +396,16 @@ export class SNFeaturesService extends PureService<void> {
       ContentType.Theme,
     ]);
     const itemsToDeleteUuids = [];
-
     const now = new Date();
-
+    let hasChanges = false;
     for (const feature of features) {
       if (!feature.content_type) {
         continue;
       }
-
+      const isValid = feature.url ? isValidUrl(feature.url) : true;
+      if (!isValid) {
+        continue;
+      }
       const expired =
         new Date(feature.expires_at || 0).getTime() < now.getTime();
       const existingItem = currentItems.find((item) => {
@@ -327,25 +414,36 @@ export class SNFeaturesService extends PureService<void> {
           return itemIdentifier === feature.identifier && !item.deleted;
         }
         return false;
-      });
+      }) as SNComponent;
 
       let resultingItem: SNComponent | undefined = existingItem as SNComponent;
 
       if (existingItem) {
-        resultingItem = await this.itemManager.changeComponent(
-          existingItem.uuid,
-          (mutator) => {
-            mutator.hosted_url = feature.url;
-            mutator.package_info = feature;
-            mutator.valid_until = new Date(feature.expires_at || 0);
-          }
-        );
+        const expiresAt = new Date(feature.expires_at || 0);
+        const hasChange =
+          feature.url !== existingItem.hosted_url ||
+          feature.version !== existingItem.package_info.version ||
+          expiresAt.getTime() !== existingItem.valid_until.getTime();
+        if (hasChange) {
+          resultingItem = await this.itemManager.changeComponent(
+            existingItem.uuid,
+            (mutator) => {
+              mutator.hosted_url = feature.url;
+              mutator.package_info = feature;
+              mutator.valid_until = expiresAt;
+            }
+          );
+          hasChanges = true;
+        } else {
+          resultingItem = existingItem;
+        }
       } else if (!expired || feature.content_type === ContentType.Component) {
         resultingItem = (await this.itemManager.createItem(
           feature.content_type,
           this.componentContentForFeatureDescription(feature),
           true
         )) as SNComponent;
+        hasChanges = true;
       }
 
       if (expired && resultingItem) {
@@ -356,19 +454,29 @@ export class SNFeaturesService extends PureService<void> {
           );
         } else {
           itemsToDeleteUuids.push(resultingItem.uuid);
+          hasChanges = true;
         }
       }
     }
 
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids);
-    this.syncService.sync();
+    if (hasChanges) {
+      this.syncService.sync();
+    }
   }
 
-  public async validateAndDownloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+  public async validateAndDownloadExternalFeature(
+    urlOrCode: string
+  ): Promise<SNComponent | undefined> {
+    let url = urlOrCode;
+    try {
+      url = await this.crypto.base64Decode(urlOrCode);
+      // eslint-disable-next-line no-empty
+    } catch (err) {}
     try {
       const trustedCustomExtensionsUrls = [
         ...TRUSTED_FEATURE_HOSTS,
-        ...TRUSTED_CUSTOM_EXTENSIONS_HOSTS
+        ...TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
       ];
       const { host } = new URL(url);
       if (!trustedCustomExtensionsUrls.includes(host)) {
@@ -418,8 +526,8 @@ export class SNFeaturesService extends PureService<void> {
     (this.removeApiServiceObserver as unknown) = undefined;
     this.removeWebSocketsServiceObserver();
     (this.removeWebSocketsServiceObserver as unknown) = undefined;
-    this.removeExtensionRepoItemsObserver();
-    (this.removeExtensionRepoItemsObserver as unknown) = undefined;
+    this.removefeatureReposObserver();
+    (this.removefeatureReposObserver as unknown) = undefined;
     (this.roles as unknown) = undefined;
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;

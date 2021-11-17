@@ -1,3 +1,4 @@
+import { FeatureRepoMutator, SNFeatureRepo } from './../models/app/feature_repo';
 import {
   CollectionSort,
   ItemCollection,
@@ -21,8 +22,7 @@ import { SNComponent } from '@Models/app/component';
 import {
   isString,
   naturalSort,
-  removeFromArray,
-  searchArray,
+  removeFromArray
 } from '@Lib/utils';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
@@ -431,6 +431,22 @@ export class ItemManager extends PureService {
     const mutator = new ComponentMutator(component, mutationType);
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
     return this.findItem(uuid) as SNComponent;
+  }
+
+  async changeFeatureRepo(
+    uuid: UuidString,
+    mutate: (mutator: FeatureRepoMutator) => void,
+    mutationType: MutationType = MutationType.UserInteraction,
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<SNFeatureRepo> {
+    const repo = this.findItem(uuid);
+    if (!repo) {
+      throw Error('Attempting to change non-existant repo');
+    }
+    const mutator = new FeatureRepoMutator(repo, mutationType);
+    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
+    return this.findItem(uuid) as SNFeatureRepo;
   }
 
   async changeActionsExtension(
