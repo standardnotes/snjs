@@ -1,8 +1,8 @@
 import { ContentType } from '@standardnotes/common'
 
-import { FeatureDescription } from './Feature'
+import { FeatureDescription } from './FeatureDescription'
 import { ComponentArea } from '../Component/ComponentArea'
-import { ComponentFlag } from './Flag'
+import { ComponentFlag } from '../Component/ComponentFlag'
 import { PermissionName } from '../Permission/PermissionName'
 import { FeatureIdentifier } from './FeatureIdentifier'
 import featuresFromJson from './features.json'
