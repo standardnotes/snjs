@@ -13,7 +13,7 @@ import {
   SNStorageService,
   StorageKey
 } from '@Lib/index';
-import { SNFeaturesService } from '@Lib/services/features_service';
+import { FeatureStatus, SNFeaturesService } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType } from '@standardnotes/common';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
@@ -39,6 +39,7 @@ describe('featuresService', () => {
   let now: Date;
   let tomorrow_server: number;
   let tomorrow_client: number;
+  const expiredDate = new Date(new Date().getTime() - 1000).getTime();
 
   const createService = () => {
     return new SNFeaturesService(
@@ -403,6 +404,94 @@ describe('featuresService', () => {
       await featuresService.updateRoles('123', roles);
       await featuresService.updateRoles('123', roles);
       expect(storageService.setValue).toHaveBeenCalledTimes(2);
+    });
+
+    it('feature status', async () => {
+      const featuresService = createService();
+
+      features = [
+        {
+          identifier: FeatureIdentifier.MidnightTheme,
+          content_type: ContentType.Theme,
+          expires_at: tomorrow_server,
+          role_name: RoleName.CoreUser
+        },
+        {
+          identifier: FeatureIdentifier.BoldEditor,
+          content_type: ContentType.Component,
+          expires_at: expiredDate,
+          role_name: RoleName.PlusUser
+        },
+      ] as jest.Mocked<FeatureDescription[]>
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      });
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+        RoleName.CoreUser,
+      ]);
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+
+      await featuresService.updateRoles('123', [RoleName.BasicUser]);
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.NoUserSubscription);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NoUserSubscription);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NoUserSubscription);
+
+      features = [
+        {
+          identifier: FeatureIdentifier.MidnightTheme,
+          content_type: ContentType.Theme,
+          expires_at: expiredDate,
+          role_name: RoleName.CoreUser
+        },
+        {
+          identifier: FeatureIdentifier.BoldEditor,
+          content_type: ContentType.Component,
+          expires_at: expiredDate,
+          role_name: RoleName.PlusUser
+        },
+      ] as jest.Mocked<FeatureDescription[]>;
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      });
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+        RoleName.CoreUser,
+      ]);
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.InCurrentPlanButExpired);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+    })
+
+
+    it('has paid subscription', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+      ]);
+
+      expect(featuresService.hasPaidSubscription()).toBeFalsy;
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      expect(featuresService.hasPaidSubscription()).toBeTruthy;
     });
   });
 

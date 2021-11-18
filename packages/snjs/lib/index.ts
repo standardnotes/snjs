@@ -53,6 +53,7 @@ export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from './models/app/component';
 export { LiveItem } from './models/live_item';
+export { FeatureStatus } from '@Lib/services/features_service';
 
 export type { PermissionDialog } from './services/component_manager';
 export { SNComponentManager } from './services/component_manager';
@@ -134,6 +135,7 @@ export {
   convertTimestampToMilliseconds,
   arraysEqual,
   isValidUrl,
+  dateToLocalizedString,
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

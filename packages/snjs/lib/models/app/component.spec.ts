@@ -4,16 +4,6 @@ import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNComponent } from '@Models/app/component';
 
 describe('component model', () => {
-  beforeEach(() => {
-    const dateToLocalizedString = jest.spyOn(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      SNComponent.prototype as any,
-      'dateToLocalizedString'
-    );
-    dateToLocalizedString.mockImplementation(() => {
-      return undefined;
-    });
-  });
 
   it('valid hosted url should ignore url', () => {
     const component = new SNComponent(

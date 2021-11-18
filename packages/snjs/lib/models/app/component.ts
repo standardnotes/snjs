@@ -1,3 +1,4 @@
+import { FeatureIdentifier } from '@standardnotes/features';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
@@ -111,7 +112,7 @@ export class SNComponent extends SNItem implements ComponentContent {
     this.offlineOnly = this.payload.safeContent.offlineOnly;
     this.name = this.payload.safeContent.name;
     this.area = this.payload.safeContent.area;
-    this.package_info = this.payload.safeContent.package_info;
+    this.package_info = this.payload.safeContent.package_info || {};
     this.permissions = this.payload.safeContent.permissions || [];
     this.active = this.payload.safeContent.active;
     this.autoupdateDisabled = this.payload.safeContent.autoupdateDisabled;
@@ -210,6 +211,10 @@ export class SNComponent extends SNItem implements ComponentContent {
 
   public get isExpired(): boolean {
     return this.valid_until.getTime() > 0 && this.valid_until <= new Date();
+  }
+
+  public get identifier(): FeatureIdentifier {
+    return this.package_info.identifier;
   }
 
   public get isDeprecated(): boolean {

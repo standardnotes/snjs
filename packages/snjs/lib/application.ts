@@ -1,3 +1,4 @@
+import { FeatureStatus } from '@Lib/services/features_service';
 import { Settings } from './services/settings_service';
 import { SyncOpStatus } from './services/sync/sync_op_status';
 import { createMutatorForItem } from '@Lib/models/mutator';
@@ -1611,6 +1612,12 @@ export class SNApplication {
     featureId: FeatureIdentifier
   ): FeatureDescription | undefined {
     return this.featuresService.getFeature(featureId);
+  }
+
+  public getFeatureStatus(
+    featureId: FeatureIdentifier
+  ): FeatureStatus {
+    return this.featuresService.getFeatureStatus(featureId);
   }
 
   public getNewSubscriptionToken(): Promise<string | undefined> {

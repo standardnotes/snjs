@@ -7,7 +7,13 @@ import { UuidString } from './../../types';
 import { PayloadContent } from './../../protocol/payloads/generator';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
-import { Copy, deepFreeze, omitInPlace, sortedCopy } from '@Lib/utils';
+import {
+  Copy,
+  dateToLocalizedString,
+  deepFreeze,
+  omitInPlace,
+  sortedCopy,
+} from '@Lib/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
@@ -86,13 +92,13 @@ export class SNItem {
     this.conflictOf = payload.safeContent.conflict_of;
     this.duplicateOf = payload.duplicate_of;
     this.createdAtString =
-      this.created_at && this.dateToLocalizedString(this.created_at);
+      this.created_at && dateToLocalizedString(this.created_at);
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.userModifiedDate = new Date(
         this.getAppDomainValue(AppDataField.UserModifiedDate) ||
           this.serverUpdatedAt
       );
-      this.updatedAtString = this.dateToLocalizedString(this.userModifiedDate);
+      this.updatedAtString = dateToLocalizedString(this.userModifiedDate);
       this.protected = this.payload.safeContent.protected;
       this.trashed = this.payload.safeContent.trashed;
       this.pinned = this.getAppDomainValue(AppDataField.Pinned);
@@ -383,31 +389,6 @@ export class SNItem {
 
   public satisfiesPredicate(predicate: SNPredicate) {
     return SNPredicate.ItemSatisfiesPredicate(this, predicate);
-  }
-
-  private dateToLocalizedString(date: Date) {
-    if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
-      if (!SNItem.sharedDateFormatter) {
-        const locale =
-          navigator.languages && navigator.languages.length
-            ? navigator.languages[0]
-            : navigator.language;
-        SNItem.sharedDateFormatter = new Intl.DateTimeFormat(locale, {
-          year: 'numeric',
-          month: 'short',
-          day: '2-digit',
-          weekday: 'long',
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-      }
-      return SNItem.sharedDateFormatter.format(date);
-    } else {
-      // IE < 11, Safari <= 9.0.
-      // In English, this generates the string most similar to
-      // the toLocaleDateString() result above.
-      return date.toDateString() + ' ' + date.toLocaleTimeString();
-    }
   }
 }
 

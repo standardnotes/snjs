@@ -69,6 +69,13 @@ export const enum FeaturesEvent {
   UserRolesChanged = 'UserRolesChanged',
 }
 
+export const enum FeatureStatus {
+  NoUserSubscription = 'NoUserSubscription',
+  NotInCurrentPlan = 'NotInCurrentPlan',
+  InCurrentPlanButExpired = 'InCurrentPlanButExpired',
+  Entitled = 'Entitled',
+}
+
 export class SNFeaturesService extends PureService<FeaturesEvent> {
   private deinited = false;
   private roles: RoleName[] = [];
@@ -350,6 +357,38 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     featureId: FeatureIdentifier
   ): FeatureDescription | undefined {
     return this.features.find((feature) => feature.identifier === featureId);
+  }
+
+  public hasPaidSubscription(): boolean {
+    const roles = this.roles;
+    const unpaidRoles = [RoleName.BasicUser];
+    return roles.some((role) => !unpaidRoles.includes(role));
+  }
+
+  public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
+    if (!this.hasPaidSubscription()) {
+      return FeatureStatus.NoUserSubscription;
+    }
+
+    const feature = this.features.find(
+      (feature) => feature.identifier === featureId
+    );
+    if (!feature) {
+      return FeatureStatus.NotInCurrentPlan;
+    }
+
+    const expired =
+      feature.expires_at &&
+      new Date(feature.expires_at).getTime() < new Date().getTime();
+    if (expired) {
+      if (!this.roles.includes(feature.role_name as RoleName)) {
+        return FeatureStatus.NotInCurrentPlan;
+      } else {
+        return FeatureStatus.InCurrentPlanButExpired;
+      }
+    }
+
+    return FeatureStatus.Entitled;
   }
 
   private haveRolesChanged(roles: RoleName[]): boolean {
