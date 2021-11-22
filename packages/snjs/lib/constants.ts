@@ -17,3 +17,5 @@ export const PROD_OFFLINE_FEATURES_URL =
 export const LEGACY_PROD_EXT_ORIGIN = 'https://extensions.standardnotes.org';
 
 export const TRUSTED_CUSTOM_EXTENSIONS_HOSTS = ['listed.to'];
+
+export const DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING = 30; // seconds

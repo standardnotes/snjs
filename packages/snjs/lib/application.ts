@@ -1642,6 +1642,10 @@ export class SNApplication {
     return this.apiService.isCustomServerHostUsed();
   }
 
+  public updateProtectionExpiryDateIfRequired(selectedProtectedNotes: SNNote[]): void {
+    return this.protectionService.updateProtectionExpiryDateIfRequired(selectedProtectedNotes);
+  }
+
   private constructServices() {
     this.createPayloadManager();
     this.createItemManager();

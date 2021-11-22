@@ -14,8 +14,8 @@ import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { ItemManager } from './item_manager';
-import { MutationType } from '@Lib/models/core/item';
 import { Uuids } from '@Lib/models/functions';
+import { DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING } from '@Lib/constants';
 
 export enum ProtectionEvent {
   SessionExpiryDateChanged = 'SessionExpiryDateChanged',
@@ -319,7 +319,11 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
           Error('No valid protection session length found. Got ' + length)
         );
       } else {
-        await this.setSessionLength(length as ProtectionSessionLengthSeconds);
+        // If the user sets protection session duration to "0" ("Don't remember" option in the authentication popup),
+        // then give them some time to edit the note (defined in DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING)
+        // and enable autolock after that time has passed.
+        const sessionLength = length === ProtectionSessionLengthSeconds.None ? DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING : length;
+        await this.setSessionLength(sessionLength as ProtectionSessionLengthSeconds);
       }
       return true;
     } else {
@@ -340,6 +344,17 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
 
   public clearSession(): Promise<void> {
     return this.setSessionExpiryDate(new Date());
+  }
+
+  public updateProtectionExpiryDateIfRequired(selectedProtectedNotes: SNNote[]): void {
+    const sessionExpiryDate = this.getSessionExpiryDate();
+    selectedProtectedNotes.forEach(note => {
+      const secondsBetweenLastEditAndProtectionExpirationInSeconds = (sessionExpiryDate.getTime() - note.userModifiedDate.getTime()) / 1000;
+
+      if (secondsBetweenLastEditAndProtectionExpirationInSeconds < DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING) {
+        this.setSessionLength(DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING);
+      }
+    })
   }
 
   private async setSessionExpiryDate(date: Date) {
