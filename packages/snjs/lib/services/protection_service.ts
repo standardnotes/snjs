@@ -346,15 +346,14 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return this.setSessionExpiryDate(new Date());
   }
 
-  public updateProtectionExpiryDateIfRequired(selectedProtectedNotes: SNNote[]): void {
+  public async updateProtectionExpiryDateIfRequired(selectedProtectedNotes: SNNote[]): Promise<void> {
     const sessionExpiryDate = this.getSessionExpiryDate();
-    selectedProtectedNotes.forEach(note => {
+    for await (const note of selectedProtectedNotes) {
       const secondsBetweenLastEditAndProtectionExpirationInSeconds = (sessionExpiryDate.getTime() - note.userModifiedDate.getTime()) / 1000;
-
       if (secondsBetweenLastEditAndProtectionExpirationInSeconds < DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING) {
-        this.setSessionLength(DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING);
+        await this.setSessionLength(DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING);
       }
-    })
+    }
   }
 
   private async setSessionExpiryDate(date: Date) {

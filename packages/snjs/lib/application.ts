@@ -1642,7 +1642,7 @@ export class SNApplication {
     return this.apiService.isCustomServerHostUsed();
   }
 
-  public updateProtectionExpiryDateIfRequired(selectedProtectedNotes: SNNote[]): void {
+  public async updateProtectionExpiryDateIfRequired(selectedProtectedNotes: SNNote[]): Promise<void> {
     return this.protectionService.updateProtectionExpiryDateIfRequired(selectedProtectedNotes);
   }
 
@@ -1813,7 +1813,8 @@ export class SNApplication {
       this.alertService,
       this.environment,
       this.platform,
-      this.deviceInterface.timeout
+      this.deviceInterface.timeout,
+      this.protectionService
     );
     this.services.push(this.componentManager);
   }
