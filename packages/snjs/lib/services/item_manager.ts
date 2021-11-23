@@ -386,10 +386,6 @@ export class ItemManager extends PureService {
       }
       const mutator = createMutatorForItem(item, mutationType);
       if (mutate) {
-        // DISCUSS: There is an implicit relationship between the createMutatorForItem code and the calling code. 
-        // The client codes will type "TagMutator", because implicitly this code /should/ return TagMutator,
-        // but there is no way to enforce this. This is implicit. We should fix / reverse this relationship.
-        // Maybe there is a way to use union type and type guards to fix this.
         mutate(mutator as M); 
       }
       const payload = mutator.getResult();

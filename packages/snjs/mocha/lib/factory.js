@@ -397,7 +397,6 @@ export function createTagParams({ title, dirty = true } = {}) {
 export function createRelatedNoteTagPairPayload({ noteTitle, noteText, tagTitle, dirty = true } = {}) {
   const noteParams = createNoteParams({ title: noteTitle, text: noteText, dirty });
   const tagParams = createTagParams({ title: tagTitle, dirty });
-  // DISCUSS: case2: we insert the relationship using hardcode
   tagParams.content.references = [
     {
       uuid: noteParams.uuid,
