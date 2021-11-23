@@ -89,7 +89,7 @@ describe('itemManager', () => {
       const parent = createTag('parent');
       const child = createTag('child');
       await itemManager.insertItems([parent, child]);
-      await itemManager.establishTagRelationship(parent, child);
+      await itemManager.setTagRelationship(parent, child);
 
       const changedChild = itemManager.findItem(child.uuid) as SNTag;
       expect(changedChild.parentId).toBe(parent.uuid);
@@ -100,9 +100,25 @@ describe('itemManager', () => {
       const parent = createTag('parent');
       const child = createTag('child');
       await itemManager.insertItems([parent, child]);
-      await itemManager.establishTagRelationship(parent, child);
+      await itemManager.setTagRelationship(parent, child);
 
       expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid);
+    });
+
+    it('unsetTagRelationship', async () => {
+      // arrange
+      itemManager = createService();
+      const parent = createTag('parent');
+      const child = createTag('child');
+      await itemManager.insertItems([parent, child]);
+      await itemManager.setTagRelationship(parent, child);
+      expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid);
+
+      // act
+      await itemManager.unsetTagRelationship(parent, child);
+
+      // assert
+      expect(itemManager.getTagParent(child.uuid)).toBeUndefined();
     });
 
     it('getTagParentChain', async () => {
@@ -117,9 +133,9 @@ describe('itemManager', () => {
         parent,
         child,
       ]);
-      await itemManager.establishTagRelationship(parent, child);
-      await itemManager.establishTagRelationship(grandParent, parent);
-      await itemManager.establishTagRelationship(greatGrandParent, grandParent);
+      await itemManager.setTagRelationship(parent, child);
+      await itemManager.setTagRelationship(grandParent, parent);
+      await itemManager.setTagRelationship(greatGrandParent, grandParent);
 
       const uuidChain = itemManager
         .getTagParentChain(child.uuid)
@@ -138,7 +154,7 @@ describe('itemManager', () => {
       const parentTag = createTag('parent');
       const childTag = createTag('child');
       await itemManager.insertItems([parentTag, childTag]);
-      await itemManager.establishTagRelationship(parentTag, childTag);
+      await itemManager.setTagRelationship(parentTag, childTag);
 
       const parentNote = createNote('parentNote');
       const childNote = createNote('childNote');
