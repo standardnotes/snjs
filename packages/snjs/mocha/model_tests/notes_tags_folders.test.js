@@ -4,16 +4,12 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
+function asUuids(xs) {
+    return (xs || []).map(x=> x.uuid)
+}
+
 describe('tags as folders', () => {
-    const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
-
-    const syncOptions = {
-        checkIntegrity: true,
-        awaitAll: true,
-    };
-
     beforeEach(async function () {
-        this.expectedItemCount = BASE_ITEM_COUNT;
         this.application = await Factory.createInitAppWithRandNamespace();
     });
 
@@ -23,70 +19,34 @@ describe('tags as folders', () => {
 
     it('lets me create a tag, add relationships, move a note to a children, and query data all along', async function () {
         // ## The user creates four tags
+        let tagChildren = await Factory.createMappedTag(this.application, { title: 'children' });
         let tagParent = await Factory.createMappedTag(this.application, { title: 'parent' });
         let tagGrandParent = await Factory.createMappedTag(this.application, { title: 'grandparent' });
         let tagGrandParent2 = await Factory.createMappedTag(this.application, { title: 'grandparent2' });
-        let tagChildren = await Factory.createMappedTag(this.application, { title: 'children' });
-
-        expect(tagParent.content.title).to.equal('parent')
-        expect(tagParent.content.references.length).to.equal(0)
-
-        expect(tagGrandParent.content.title).to.equal('grandparent')
-        expect(tagGrandParent.content.references.length).to.equal(0)
-
-        expect(tagGrandParent.content.title).to.equal('grandparent2')
-        expect(tagGrandParent.content.references.length).to.equal(0)
-
-        expect(tagChildren.content.title).to.equal('children')
-        expect(tagChildren.content.references.length).to.equal(0)
 
         // ## Now the users moves the tag children into the parent
-        tagChildren = await this.application.changeAndSaveItem/*<TagMutator>*/(
-            tagChildren.uuid,
-            (mutator) => {
-              // DISCUSS: case1: we insert the relationship using a mutator (separation of concerns)
-              // DISCUSS: I am stuck here because I can't access the tag mutator, or I don't know how to access it yet.
-              // I want to use a TagMutator but I don't know how to make sure the correct mutator is used.
-              TagMutator.makeChildOf(tagParent);
-            },
-            undefined, // DIG: what is this? (isUserModified)
-            undefined, // DIG: what is this? (PayloadSource)
-            syncOptions // DIG: what is this? (SyncOptions)
-          );
+        await this.application.setTagRelationship(tagParent, tagChildren)
 
-          expect(tagChildren.content.references.length).to.equal(1)
+        expect(this.application.getTagParent(tagChildren)).to.equal(tagParent)
+        expect(asUuids(this.application.getTagChildren(tagParent))).deep.to.equal(asUuids([tagChildren]))
 
-          // ## Now the user moves the tag parent into the grand parent
-          tagParent = await this.application.changeAndSaveItem/*<TagMutator>*/(
-            tagParent.uuid,
-            (mutator) => {
-              // DISCUSS: case1: we insert the relationship using a mutator (separation of concerns)
-              // DISCUSS: I am stuck here because I can't access the tag mutator, or I don't know how to access it yet.
-              // I want to use a TagMutator but I don't know how to make sure the correct mutator is used.
-              TagMutator.makeChildOf(tagGrandParent);
-            },
-            undefined,
-            undefined,
-            syncOptions
-          );
+        // ## Now the user moves the tag parent into the grand parent
+        await this.application.setTagRelationship(tagGrandParent, tagParent)
 
-          expect(tagParent.content.references.length).to.equal(1)
-      
-          // ## Now the user moves the tag parent into another grand parent
-          tagParent = await this.application.changeAndSaveItem/*<TagMutator>*/(
-            tagParent.uuid,
-            (mutator) => {
-              // DISCUSS: case1: we insert the relationship using a mutator (separation of concerns)
-              // DISCUSS: I am stuck here because I can't access the tag mutator, or I don't know how to access it yet.
-              // I want to use a TagMutator but I don't know how to make sure the correct mutator is used.
-              TagMutator.makeChildOf(tagGrandParent2);
-            },
-            undefined,
-            undefined,
-            syncOptions
-          );
+        expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent)
+        expect(asUuids(this.application.getTagChildren(tagGrandParent))).deep.to.equal(asUuids([tagParent]))
 
-          expect(tagParent.content.references.length).to.equal(1)
+        // ## Now the user moves the tag parent into another grand parent
+        await this.application.setTagRelationship(tagGrandParent2, tagParent)
 
+        expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2)
+        expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([])
+        expect(asUuids(this.application.getTagChildren(tagGrandParent2))).deep.to.equal(asUuids([tagParent]))
+
+        // ## Now the user move the tag outside any hierarchy
+        await this.application.unsetTagRelationship(tagGrandParent2, tagParent)
+
+        expect(this.application.getTagParent(tagParent)).to.equal(undefined)
+        expect(this.application.getTagChildren(tagGrandParent2)).deep.to.equals([])
     })
 })

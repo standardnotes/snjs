@@ -862,12 +862,24 @@ export class ItemManager extends PureService {
   /**
    * @returns The changed child tag
    */
-  public establishTagRelationship(
+  public setTagRelationship(
     parentTag: SNTag,
     childTag: SNTag
   ): Promise<SNTag> {
     return this.changeTag(childTag.uuid, (m) => {
       m.makeChildOf(parentTag);
+    });
+  }
+
+  /**
+   * @returns The changed child tag
+   */
+  public unsetTagRelationship(
+    parentTag: SNTag,
+    childTag: SNTag
+  ): Promise<SNTag> {
+    return this.changeTag(childTag.uuid, (m) => {
+      m.removeItemAsRelationship(parentTag)
     });
   }
 
