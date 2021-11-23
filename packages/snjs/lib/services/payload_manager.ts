@@ -33,11 +33,11 @@ type QueueElement = {
 };
 
 /**
- * The model manager is responsible for keeping state regarding what items exist in the
+ * The payload manager is responsible for keeping state regarding what items exist in the
  * global application state. It does so by exposing functions that allow consumers to 'map'
  * a detached payload into global application state. Whenever a change is made or retrieved
  * from any source, it must be mapped in order to be properly reflected in global application state.
- * The model manager deals only with in-memory state, and does not deal directly with storage.
+ * The payload manager deals only with in-memory state, and does not deal directly with storage.
  * It also serves as a query store, and can be queried for current notes, tags, etc.
  * It exposes methods that allow consumers to listen to mapping events. This is how
  * applications 'stream' items to display in the interface.
