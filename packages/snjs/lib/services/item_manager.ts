@@ -386,10 +386,6 @@ export class ItemManager extends PureService {
       }
       const mutator = createMutatorForItem(item, mutationType);
       if (mutate) {
-        // DISCUSS: There is an implicit relationship between the createMutatorForItem code and the calling code. 
-        // The client codes will type "TagMutator", because implicitly this code /should/ return TagMutator,
-        // but there is no way to enforce this. This is implicit. We should fix / reverse this relationship.
-        // Maybe there is a way to use union type and type guards to fix this.
         mutate(mutator as M); 
       }
       const payload = mutator.getResult();
@@ -788,48 +784,6 @@ export class ItemManager extends PureService {
       'title'
     );
   }
-
-  // /**
-  //  * Returns all parents for a tag
-  //  * @param tag - The tag for which parents need to be found
-  //  * @returns Array containing all parent tags
-  //  */
-  // public getTagParentChain(tag: SNTag): SNTag[] {
-  //   const delimiter = '.';
-  //   const tagComponents = tag.title.split(delimiter);
-  //   const parentTagsTitles: string[] = [];
-
-  //   const getImmediateParent = () => {
-  //     if (tagComponents.length > 1) {
-  //       tagComponents.splice(-1, 1);
-  //       const immediateParentTitle = tagComponents.join(delimiter);
-  //       parentTagsTitles.push(immediateParentTitle);
-  //       getImmediateParent();
-  //     }
-  //   };
-
-  //   getImmediateParent();
-  //   const parentTags = this.tags.filter((tag) =>
-  //     parentTagsTitles.some((title) => title === tag.title)
-  //   );
-  //   return parentTags;
-  // }
-
-  // /**
-  //  * Returns all descendants for a tag
-  //  * @param tag - The tag for which descendants need to be found
-  //  * @returns Array containing all descendant tags
-  //  */
-  // public getTagDescendants(tag: SNTag): SNTag[] {
-  //   const delimiter = '.';
-  //   return this.tags.filter((t) => {
-  //     const regex = new RegExp(
-  //       `^${tag.title}${delimiter}|${delimiter}${tag.title}${delimiter}`,
-  //       'i'
-  //     );
-  //     return regex.test(t.title);
-  //   });
-  // }
 
   getTagParent(tagUuid: UuidString): SNTag | undefined {
     const tag = this.findItem(tagUuid) as SNTag;
