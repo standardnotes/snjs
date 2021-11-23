@@ -785,48 +785,6 @@ export class ItemManager extends PureService {
     );
   }
 
-  // /**
-  //  * Returns all parents for a tag
-  //  * @param tag - The tag for which parents need to be found
-  //  * @returns Array containing all parent tags
-  //  */
-  // public getTagParentChain(tag: SNTag): SNTag[] {
-  //   const delimiter = '.';
-  //   const tagComponents = tag.title.split(delimiter);
-  //   const parentTagsTitles: string[] = [];
-
-  //   const getImmediateParent = () => {
-  //     if (tagComponents.length > 1) {
-  //       tagComponents.splice(-1, 1);
-  //       const immediateParentTitle = tagComponents.join(delimiter);
-  //       parentTagsTitles.push(immediateParentTitle);
-  //       getImmediateParent();
-  //     }
-  //   };
-
-  //   getImmediateParent();
-  //   const parentTags = this.tags.filter((tag) =>
-  //     parentTagsTitles.some((title) => title === tag.title)
-  //   );
-  //   return parentTags;
-  // }
-
-  // /**
-  //  * Returns all descendants for a tag
-  //  * @param tag - The tag for which descendants need to be found
-  //  * @returns Array containing all descendant tags
-  //  */
-  // public getTagDescendants(tag: SNTag): SNTag[] {
-  //   const delimiter = '.';
-  //   return this.tags.filter((t) => {
-  //     const regex = new RegExp(
-  //       `^${tag.title}${delimiter}|${delimiter}${tag.title}${delimiter}`,
-  //       'i'
-  //     );
-  //     return regex.test(t.title);
-  //   });
-  // }
-
   getTagParent(tagUuid: UuidString): SNTag | undefined {
     const tag = this.findItem(tagUuid) as SNTag;
     const parentId = tag.parentId;
