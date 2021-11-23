@@ -386,7 +386,11 @@ export class ItemManager extends PureService {
       }
       const mutator = createMutatorForItem(item, mutationType);
       if (mutate) {
-        mutate(mutator as M);
+        // DISCUSS: There is an implicit relationship between the createMutatorForItem code and the calling code. 
+        // The client codes will type "TagMutator", because implicitly this code /should/ return TagMutator,
+        // but there is no way to enforce this. This is implicit. We should fix / reverse this relationship.
+        // Maybe there is a way to use union type and type guards to fix this.
+        mutate(mutator as M); 
       }
       const payload = mutator.getResult();
       payloads.push(payload);
@@ -634,8 +638,8 @@ export class ItemManager extends PureService {
   public async emitItemFromPayload(
     payload: PurePayload,
     source = PayloadSource.Constructor
-  ) {
-    await this.payloadManager!.emitPayload(payload, source);
+  ): Promise<SNItem> {
+    await this.payloadManager.emitPayload(payload, source);
     return this.findItem(payload.uuid!)!;
   }
 

@@ -251,8 +251,8 @@ export function createNotePayload(title, text = undefined, dirty = true) {
   return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text, dirty }));
 }
 
-export function createStorageItemTagPayload() {
-  return CreateMaxPayloadFromAnyObject(createTagParams());
+export function createStorageItemTagPayload(tagParams = {}) {
+  return CreateMaxPayloadFromAnyObject(createTagParams(tagParams));
 }
 
 export function itemToStoragePayload(item) {
@@ -267,8 +267,8 @@ export function createMappedNote(application, title, text, dirty) {
   );
 }
 
-export async function createMappedTag(application) {
-  const payload = createStorageItemTagPayload();
+export async function createMappedTag(application, tagParams = {}) {
+  const payload = createStorageItemTagPayload(tagParams);
   return application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
@@ -397,6 +397,7 @@ export function createTagParams({ title, dirty = true } = {}) {
 export function createRelatedNoteTagPairPayload({ noteTitle, noteText, tagTitle, dirty = true } = {}) {
   const noteParams = createNoteParams({ title: noteTitle, text: noteText, dirty });
   const tagParams = createTagParams({ title: tagTitle, dirty });
+  // DISCUSS: case2: we insert the relationship using hardcode
   tagParams.content.references = [
     {
       uuid: noteParams.uuid,

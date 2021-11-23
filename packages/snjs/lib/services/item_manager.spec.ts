@@ -133,7 +133,7 @@ describe('itemManager', () => {
       ]);
     });
 
-    it.only('viewing notes for parent tag should not display notes of children', async () => {
+    it('viewing notes for parent tag should not display notes of children', async () => {
       itemManager = createService();
       const parentTag = createTag('parent');
       const childTag = createTag('child');

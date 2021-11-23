@@ -205,6 +205,7 @@ describe('notes and tags', () => {
     tag = await this.application.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
+        // DISCUSS: case1: we insert the relationship using a mutator (separation of concerns)
         mutator.removeItemAsRelationship(note);
       },
       undefined,
