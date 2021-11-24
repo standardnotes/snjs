@@ -108,7 +108,7 @@ export class SNComponent extends SNItem implements ComponentContent {
     }
     this.local_url = this.payload.safeContent.local_url;
 
-    this.valid_until = new Date(this.payload.safeContent.valid_until);
+    this.valid_until = new Date(this.payload.safeContent.valid_until || 0);
     this.offlineOnly = this.payload.safeContent.offlineOnly;
     this.name = this.payload.safeContent.name;
     this.area = this.payload.safeContent.area;
