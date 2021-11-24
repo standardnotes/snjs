@@ -20,7 +20,11 @@ import {
   SNApiService,
 } from './api/api_service';
 import { ErrorObject, UuidString } from '@Lib/types';
-import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
+import {
+  FeatureDescription,
+  FeatureIdentifier,
+  Features,
+} from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
@@ -366,6 +370,18 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   }
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
+    const isThirdParty =
+      Features.find((feature) => feature.identifier === featureId) == undefined;
+    if (isThirdParty) {
+      const component = this.itemManager.components.find(
+        (candidate) => candidate.identifier === featureId
+      );
+      if (component?.isExpired) {
+        return FeatureStatus.InCurrentPlanButExpired;
+      }
+      return FeatureStatus.Entitled;
+    }
+
     if (!this.hasPaidSubscription()) {
       return FeatureStatus.NoUserSubscription;
     }
