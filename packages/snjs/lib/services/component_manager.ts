@@ -206,7 +206,6 @@ export class SNComponentManager extends PureService {
   private environment: Environment;
   private platform: Platform;
   private timeout: any;
-  private protectionService: SNProtectionService;
   private desktopManager: any;
   private componentState: Partial<Record<UuidString, ComponentState>> = {};
 
@@ -224,8 +223,7 @@ export class SNComponentManager extends PureService {
     alertService: SNAlertService,
     environment: Environment,
     platform: Platform,
-    timeout: any,
-    protectionService: SNProtectionService,
+    timeout: any
   ) {
     super();
     this.timeout = timeout || setTimeout.bind(window);
@@ -234,7 +232,6 @@ export class SNComponentManager extends PureService {
     this.alertService = alertService;
     this.environment = environment;
     this.platform = platform;
-    this.protectionService = protectionService;
     this.configureForGeneralUsage();
     if (environment !== Environment.Mobile) {
       this.configureForNonMobileUsage();
@@ -1041,7 +1038,6 @@ export class SNComponentManager extends PureService {
         component,
         true
       );
-      const protectedNotes: SNNote[] = [];
       /* Filter locked items */
       const uuids = Uuids(responsePayloads);
       const items = this.itemManager.findItems(uuids, true);
@@ -1057,10 +1053,6 @@ export class SNComponentManager extends PureService {
           if (item.content_type === ContentType.Note) {
             lockedNoteCount++;
           }
-        }
-        // Push only the items whose type is `SNNote`
-        if (item.protected && Object.getPrototypeOf(item) === SNNote.prototype) {
-          protectedNotes.push(item as SNNote);
         }
       }
       if (lockedNoteCount === 1) {
@@ -1082,9 +1074,6 @@ export class SNComponentManager extends PureService {
           'Items have Editing Disabled'
         );
         return;
-      }
-      if (protectedNotes.length > 0) {
-        await this.updateProtectionExpiryDateIfRequired(protectedNotes);
       }
       const payloads = responsePayloads.map((responseItem: any) => {
         return CreateSourcedPayloadFromObject(
@@ -1142,10 +1131,6 @@ export class SNComponentManager extends PureService {
           this.handleMessage(component, saveMessage);
         })
     });
-  }
-
-  async updateProtectionExpiryDateIfRequired(selectedProtectedItems: SNNote[]): Promise<void> {
-    return this.protectionService.updateProtectionExpiryDateIfRequired(selectedProtectedItems);
   }
 
   handleDuplicateItemMessage(
