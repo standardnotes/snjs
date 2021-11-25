@@ -353,7 +353,9 @@ export class SNKeyRecoveryService extends PureService {
         clientParams.identifier
       );
       if (!paramsResponse.error && paramsResponse.data) {
-        this.serverParams = KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse);
+        this.serverParams = KeyParamsFromApiResponse(
+          paramsResponse as KeyParamsResponse
+        );
       }
     }
 
