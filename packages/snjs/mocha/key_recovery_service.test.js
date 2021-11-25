@@ -567,105 +567,102 @@ describe('key recovery service', function () {
     await context.deinit();
   });
 
-  it(
-    'when replacing root key, new root key should be set before items key are re-saved to disk',
-    async function () {
-      const namespace = Factory.randomString();
-      const newPassword = `new-password`;
-      const contextA = await Factory.createAppContext(namespace);
-      const appA = contextA.application;
-      const receiveChallenge = async (challenge) => {
-        const responses = [];
-        for (const prompt of challenge.prompts) {
-          if (prompt.validation === ChallengeValidation.AccountPassword) {
-            responses.push(new ChallengeValue(prompt, contextA.password));
-          } else if (
-            prompt.validation === ChallengeValidation.ProtectionSessionDuration
-          ) {
-            responses.push(new ChallengeValue(prompt, 0));
-          } else if (prompt.placeholder === 'Email') {
-            responses.push(new ChallengeValue(prompt, contextA.email));
-          } else if (
-            prompt.placeholder === 'Password' ||
-            challenge.heading.includes('password')
-          ) {
-            /** Give newPassword when prompted to revalidate session */
-            responses.push(new ChallengeValue(prompt, newPassword));
-          } else {
-            console.error(
-              `Unhandled custom challenge in Factory.createAppContext`,
-              challenge,
-              prompt
-            );
-          }
+  it('when replacing root key, new root key should be set before items key are re-saved to disk', async function () {
+    const namespace = Factory.randomString();
+    const newPassword = `new-password`;
+    const contextA = await Factory.createAppContext(namespace);
+    const appA = contextA.application;
+    const receiveChallenge = async (challenge) => {
+      const responses = [];
+      for (const prompt of challenge.prompts) {
+        if (prompt.validation === ChallengeValidation.AccountPassword) {
+          responses.push(new ChallengeValue(prompt, contextA.password));
+        } else if (
+          prompt.validation === ChallengeValidation.ProtectionSessionDuration
+        ) {
+          responses.push(new ChallengeValue(prompt, 0));
+        } else if (prompt.placeholder === 'Email') {
+          responses.push(new ChallengeValue(prompt, contextA.email));
+        } else if (
+          prompt.placeholder === 'Password' ||
+          challenge.heading.includes('password')
+        ) {
+          /** Give newPassword when prompted to revalidate session */
+          responses.push(new ChallengeValue(prompt, newPassword));
+        } else {
+          console.error(
+            `Unhandled custom challenge in Factory.createAppContext`,
+            challenge,
+            prompt
+          );
         }
-        appA.submitValuesForChallenge(challenge, responses);
-      };
-      await appA.prepareForLaunch({ receiveChallenge });
-      await appA.launch(true);
+      }
+      appA.submitValuesForChallenge(challenge, responses);
+    };
+    await appA.prepareForLaunch({ receiveChallenge });
+    await appA.launch(true);
 
-      await Factory.registerUserToApplication({
-        application: appA,
-        email: contextA.email,
-        password: contextA.password,
-      });
+    await Factory.registerUserToApplication({
+      application: appA,
+      email: contextA.email,
+      password: contextA.password,
+    });
 
-      /** Create simultaneous appB signed into same account */
-      const contextB = await Factory.createAppContext('another-namespace');
-      const appB = contextB.application;
-      await appB.prepareForLaunch({});
-      await appB.launch(true);
-      await Factory.loginToApplication({
-        application: appB,
-        email: contextA.email,
-        password: contextA.password,
-      });
+    /** Create simultaneous appB signed into same account */
+    const contextB = await Factory.createAppContext('another-namespace');
+    const appB = contextB.application;
+    await appB.prepareForLaunch({});
+    await appB.launch(true);
+    await Factory.loginToApplication({
+      application: appB,
+      email: contextA.email,
+      password: contextA.password,
+    });
 
-      /** Change password on appB */
-      const result = await appB.changePassword(contextA.password, newPassword);
-      expect(result.error).to.not.be.ok;
-      await appB.sync();
+    /** Change password on appB */
+    const result = await appB.changePassword(contextA.password, newPassword);
+    expect(result.error).to.not.be.ok;
+    await appB.sync();
 
-      const newDefaultKey = appB.protocolService.getDefaultItemsKey();
+    const newDefaultKey = appB.protocolService.getDefaultItemsKey();
 
-      const encrypted = await appB.protocolService.payloadByEncryptingPayload(
-        newDefaultKey.payload,
-        EncryptionIntent.Sync,
-        appB.protocolService.getRootKey()
-      );
+    const encrypted = await appB.protocolService.payloadByEncryptingPayload(
+      newDefaultKey.payload,
+      EncryptionIntent.Sync,
+      appB.protocolService.getRootKey()
+    );
 
-      /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
-      await appA.payloadManager.emitPayload(
-        CopyPayload(encrypted, {
-          errorDecrypting: true,
-        }),
-        PayloadSource.Constructor
-      );
+    /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
+    await appA.payloadManager.emitPayload(
+      CopyPayload(encrypted, {
+        errorDecrypting: true,
+      }),
+      PayloadSource.Constructor
+    );
 
-      await Factory.awaitFunctionInvokation(
-        appA.keyRecoveryService,
-        'handleDecryptionOfAllKeysMatchingCorrectRootKey'
-      );
+    await Factory.awaitFunctionInvokation(
+      appA.keyRecoveryService,
+      'handleDecryptionOfAllKeysMatchingCorrectRootKey'
+    );
 
-      /** Stored version of items key should use new root key */
-      const stored = (
-        await appA.deviceInterface.getAllRawDatabasePayloads(appA.identifier)
-      ).find((payload) => payload.uuid === newDefaultKey.uuid);
-      const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(
-        new SNItemsKey(CreateMaxPayloadFromAnyObject(stored))
-      );
+    /** Stored version of items key should use new root key */
+    const stored = (
+      await appA.deviceInterface.getAllRawDatabasePayloads(appA.identifier)
+    ).find((payload) => payload.uuid === newDefaultKey.uuid);
+    const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(
+      new SNItemsKey(CreateMaxPayloadFromAnyObject(stored))
+    );
 
-      const correctStored = (
-        await appB.deviceInterface.getAllRawDatabasePayloads(appB.identifier)
-      ).find((payload) => payload.uuid === newDefaultKey.uuid);
-      const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(
-        new SNItemsKey(CreateMaxPayloadFromAnyObject(correctStored))
-      );
+    const correctStored = (
+      await appB.deviceInterface.getAllRawDatabasePayloads(appB.identifier)
+    ).find((payload) => payload.uuid === newDefaultKey.uuid);
+    const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(
+      new SNItemsKey(CreateMaxPayloadFromAnyObject(correctStored))
+    );
 
-      expect(storedParams).to.eql(correctParams);
+    expect(storedParams).to.eql(correctParams);
 
-      contextA.deinit();
-      contextB.deinit();
-    }
-  ).timeout(80000);
+    contextA.deinit();
+    contextB.deinit();
+  }).timeout(80000);
 });
