@@ -323,6 +323,15 @@ export async function loginToApplication({
   );
 }
 
+export async function awaitFunctionInvokation(object, functionName) {
+  return new Promise((resolve) => {
+    const original = object[functionName];
+    object[functionName] = function() {
+      resolve(original.apply(this, arguments));
+    }
+  })
+}
+
 /**
  * Signing out of an application deinits it.
  * A new one must be created.

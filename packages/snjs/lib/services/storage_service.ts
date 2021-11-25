@@ -1,3 +1,4 @@
+import { RawPayload } from './../protocol/payloads/generator';
 import { SNAlertService } from './alert_service';
 import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
@@ -61,7 +62,7 @@ export type StorageValuesObject = {
  * key can decrypt wrapped storage.
  */
 export class SNStorageService extends PureService {
-  public encryptionDelegate?: EncryptionDelegate;
+  public encryptionDelegate!: EncryptionDelegate;
   /** Wait until application has been unlocked before trying to persist */
   private storagePersistable = false;
   private persistencePolicy!: StoragePersistencePolicies;
@@ -84,7 +85,7 @@ export class SNStorageService extends PureService {
 
   public deinit() {
     this.deviceInterface = undefined;
-    this.encryptionDelegate = undefined;
+    (this.encryptionDelegate as unknown) = undefined;
     this.storagePersistable = false;
     super.deinit();
   }
@@ -356,7 +357,7 @@ export class SNStorageService extends PureService {
       return;
     }
 
-    const nondeleted: any[] = [];
+    const nondeleted: RawPayload[] = [];
     for (const payload of decryptedPayloads) {
       if (payload.discardable) {
         /** If the payload is deleted and not dirty, remove it from db. */
@@ -365,7 +366,7 @@ export class SNStorageService extends PureService {
         if (!payload.uuid) {
           throw Error('Attempting to persist payload with no uuid');
         }
-        const encrypted = await this.encryptionDelegate!.payloadByEncryptingPayload(
+        const encrypted = await this.encryptionDelegate.payloadByEncryptingPayload(
           payload,
           this.encryptionPolicy === StorageEncryptionPolicies.Default
             ? EncryptionIntent.LocalStoragePreferEncrypted
