@@ -386,7 +386,7 @@ export class ItemManager extends PureService {
       }
       const mutator = createMutatorForItem(item, mutationType);
       if (mutate) {
-        mutate(mutator as M); 
+        mutate(mutator as M);
       }
       const payload = mutator.getResult();
       payloads.push(payload);
@@ -789,7 +789,7 @@ export class ItemManager extends PureService {
     const tag = this.findItem(tagUuid) as SNTag;
     const parentId = tag.parentId;
     if (parentId) {
-      return this.findItem(tag.parentId) as SNTag;
+      return this.findItem(parentId) as SNTag;
     }
   }
 
@@ -813,13 +813,50 @@ export class ItemManager extends PureService {
     return this.collection.elementsReferencingElement(tag) as SNTag[];
   }
 
+  public isTagAncestor(tagUuid: UuidString, childUuid: UuidString): boolean {
+    const tag = this.findItem(childUuid) as SNTag;
+    let parentId = tag.parentId;
+
+    while (parentId) {
+      if (parentId === tagUuid) {
+        return true;
+      }
+
+      const parent = this.findItem(parentId) as SNTag;
+      parentId = parent.parentId;
+    }
+
+    return false;
+  }
+
+  public isValidTagParent(
+    parentTagUuid: UuidString,
+    childTagUuid: UuidString
+  ): boolean {
+    if (parentTagUuid === childTagUuid) {
+      return false;
+    }
+
+    if (this.isTagAncestor(childTagUuid, parentTagUuid)) {
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * @returns The changed child tag
    */
-  public setTagRelationship(
-    parentTag: SNTag,
-    childTag: SNTag
-  ): Promise<SNTag> {
+  public setTagParent(parentTag: SNTag, childTag: SNTag): Promise<SNTag> {
+    if (parentTag.uuid === childTag.uuid) {
+      // TODO: throw or return no change
+      throw new Error('can not set a tag parent of itself');
+    }
+
+    if (this.isTagAncestor(childTag.uuid, parentTag.uuid)) {
+      throw new Error('can not set a tag ancestor of itself');
+    }
+
     return this.changeTag(childTag.uuid, (m) => {
       m.makeChildOf(parentTag);
     });
@@ -828,12 +865,15 @@ export class ItemManager extends PureService {
   /**
    * @returns The changed child tag
    */
-  public unsetTagRelationship(
-    parentTag: SNTag,
-    childTag: SNTag
-  ): Promise<SNTag> {
+  public unsetTagParent(childTag: SNTag): Promise<SNTag> {
+    const parentTag = this.getTagParent(childTag.uuid);
+
+    if (!parentTag) {
+      return Promise.resolve(childTag);
+    }
+
     return this.changeTag(childTag.uuid, (m) => {
-      m.removeItemAsRelationship(parentTag)
+      m.removeItemAsRelationship(parentTag);
     });
   }
 

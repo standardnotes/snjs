@@ -647,12 +647,17 @@ export class SNApplication {
     return this.itemManager.trashedItems;
   }
 
-  public setDisplayOptions<T extends SNItem>(
+  // TODO: remove the templating if possible, see comment below.
+  public setDisplayOptions(
     contentType: ContentType,
     sortBy?: CollectionSort,
     direction?: SortDirection,
-    filter?: (element: T) => boolean
+    filter?: (element: SNItem) => boolean
   ): void {
+    // TODO: why is it breaking on me? The typing is invalid here (covariance / contravariance related)
+    // the function below needs a filter: (element: vehicule) => boolean,
+    // but the type above allows to pass a function filter: (element: boat) => boolean
+    // that means your function (element: boat) => boolean could be called with a spaceship.
     this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
@@ -864,24 +869,25 @@ export class SNApplication {
     return this.itemManager.searchTags(searchQuery, note);
   }
 
+  public isValidTagParent(
+    parentTagUuid: UuidString,
+    childTagUuid: UuidString
+  ): boolean {
+    return this.itemManager.isValidTagParent(parentTagUuid, childTagUuid);
+  }
+
   /**
    * Establishes a hierarchical relationship between two tags.
    */
-   public async setTagRelationship(
-    parentTag: SNTag,
-    childTag: SNTag
-  ): Promise<void> {
-    await this.itemManager.setTagRelationship(parentTag, childTag);
+  public async setTagParent(parentTag: SNTag, childTag: SNTag): Promise<void> {
+    await this.itemManager.setTagParent(parentTag, childTag);
   }
 
   /**
    * Remove the tag parent.
    */
-  public async unsetTagRelationship(
-    parentTag: SNTag,
-    childTag: SNTag
-  ): Promise<void> {
-    await this.itemManager.unsetTagRelationship(parentTag, childTag);
+  public async unsetTagParent(childTag: SNTag): Promise<void> {
+    await this.itemManager.unsetTagParent(childTag);
   }
 
   /**
@@ -889,7 +895,7 @@ export class SNApplication {
    * @param tag - The tag for which parents need to be found
    * @returns The current parent or undefined
    */
-   public getTagParent(tag: SNTag): SNTag | undefined {
+  public getTagParent(tag: SNTag): SNTag | undefined {
     return this.itemManager.getTagParent(tag.uuid);
   }
 
@@ -1145,9 +1151,8 @@ export class SNApplication {
         ChallengeReason.DecryptEncryptedFile,
         true
       );
-      const passwordResponse = await this.challengeService.promptForChallengeResponse(
-        challenge
-      );
+      const passwordResponse =
+        await this.challengeService.promptForChallengeResponse(challenge);
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1159,10 +1164,8 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
-      data,
-      password
-    );
+    const decryptedPayloads =
+      await this.protocolService.payloadsByDecryptingBackupFile(data, password);
     const validPayloads = decryptedPayloads
       .filter((payload) => {
         return (
@@ -1643,9 +1646,7 @@ export class SNApplication {
     return this.featuresService.getFeature(featureId);
   }
 
-  public getFeatureStatus(
-    featureId: FeatureIdentifier
-  ): FeatureStatus {
+  public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
     return this.featuresService.getFeatureStatus(featureId);
   }
 
@@ -1677,12 +1678,14 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
-        this.protocolService
-      ),
-      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
-        this.protocolService
-      ),
+      payloadByEncryptingPayload:
+        this.protocolService.payloadByEncryptingPayload.bind(
+          this.protocolService
+        ),
+      payloadByDecryptingPayload:
+        this.protocolService.payloadByDecryptingPayload.bind(
+          this.protocolService
+        ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
@@ -1829,9 +1832,8 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager = this.getClass<
-      typeof SNComponentManager
-    >(SNComponentManager);
+    const MaybeSwappedComponentManager =
+      this.getClass<typeof SNComponentManager>(SNComponentManager);
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,

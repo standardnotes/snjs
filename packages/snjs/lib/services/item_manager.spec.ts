@@ -31,14 +31,33 @@ describe('itemManager', () => {
     itemManager.changeItem = jest.fn();
     itemManager.changeFeatureRepo = jest.fn();
 
-    const dateToLocalizedString = jest.spyOn(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      SNItem.prototype as any,
-      'dateToLocalizedString'
-    );
-    dateToLocalizedString.mockImplementation(() => {
-      return undefined;
-    });
+    /**
+     * TODO(laurent): what is this for?
+     * 
+     * I get the following error:
+     
+    Cannot spy the dateToLocalizedString property because it is not a function; undefined given instead
+
+      32 |     itemManager.changeFeatureRepo = jest.fn();
+      33 |
+    > 34 |     const dateToLocalizedString = jest.spyOn(
+         |                                        ^
+      35 |       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      36 |       SNItem.prototype as any,
+      37 |       'dateToLocalizedString'
+
+      at ModuleMocker.spyOn (../../node_modules/jest-environment-node/node_modules/jest-mock/build/index.js:795:15)
+      at Object.<anonymous> (lib/services/item_manager.spec.ts:34:40)
+
+     */
+    // const dateToLocalizedString = jest.spyOn(
+    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   SNItem.prototype as any,
+    //   'dateToLocalizedString'
+    // );
+    // dateToLocalizedString.mockImplementation(() => {
+    //   return undefined;
+    // });
   });
 
   const createTag = (title: string) => {
@@ -89,10 +108,33 @@ describe('itemManager', () => {
       const parent = createTag('parent');
       const child = createTag('child');
       await itemManager.insertItems([parent, child]);
-      await itemManager.setTagRelationship(parent, child);
+      await itemManager.setTagParent(parent, child);
 
       const changedChild = itemManager.findItem(child.uuid) as SNTag;
       expect(changedChild.parentId).toBe(parent.uuid);
+    });
+
+    it('forbids a tag to be its own parent', async () => {
+      itemManager = createService();
+      const tag = createTag('tag');
+      await itemManager.insertItems([tag]);
+
+      expect(() => itemManager.setTagParent(tag, tag)).toThrow()
+      expect(itemManager.getTagParent(tag.uuid)).toBeUndefined()
+    });
+
+    it('forbids a tag to be its own ancestor', async () => {
+      itemManager = createService();
+      const grandParent = createTag('grandParent');
+      const parent = createTag('parent');
+      const child = createTag('child');
+
+      await itemManager.insertItems([child, parent, grandParent]);
+      await itemManager.setTagParent(parent, child);
+      await itemManager.setTagParent(grandParent, parent);
+
+      expect(() => itemManager.setTagParent(child, grandParent)).toThrow()
+      expect(itemManager.getTagParent(grandParent.uuid)).toBeUndefined()
     });
 
     it('getTagParent', async () => {
@@ -100,9 +142,33 @@ describe('itemManager', () => {
       const parent = createTag('parent');
       const child = createTag('child');
       await itemManager.insertItems([parent, child]);
-      await itemManager.setTagRelationship(parent, child);
+      await itemManager.setTagParent(parent, child);
 
       expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid);
+    });
+
+    it('isAncestor', async () => {
+      itemManager = createService();
+      const grandParent = createTag('grandParent');
+      const parent = createTag('parent');
+      const child = createTag('child');
+      const another = createTag('another');
+      
+      await itemManager.insertItems([child, parent, grandParent, another]);
+      await itemManager.setTagParent(parent, child);
+      await itemManager.setTagParent(grandParent, parent);
+
+      expect(itemManager.isTagAncestor(grandParent.uuid, parent.uuid)).toBeTruthy()
+      expect(itemManager.isTagAncestor(grandParent.uuid, child.uuid)).toBeTruthy()
+      expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toBeTruthy()
+
+      expect(itemManager.isTagAncestor(parent.uuid, grandParent.uuid)).toBeFalsy()
+      expect(itemManager.isTagAncestor(child.uuid, grandParent.uuid)).toBeFalsy()
+      expect(itemManager.isTagAncestor(grandParent.uuid, grandParent.uuid)).toBeFalsy()
+
+      expect(itemManager.isTagAncestor(another.uuid, grandParent.uuid)).toBeFalsy()
+      expect(itemManager.isTagAncestor(child.uuid, another.uuid)).toBeFalsy()
+      expect(itemManager.isTagAncestor(grandParent.uuid, another.uuid)).toBeFalsy()
     });
 
     it('unsetTagRelationship', async () => {
@@ -111,11 +177,11 @@ describe('itemManager', () => {
       const parent = createTag('parent');
       const child = createTag('child');
       await itemManager.insertItems([parent, child]);
-      await itemManager.setTagRelationship(parent, child);
+      await itemManager.setTagParent(parent, child);
       expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid);
 
       // act
-      await itemManager.unsetTagRelationship(parent, child);
+      await itemManager.unsetTagParent(child);
 
       // assert
       expect(itemManager.getTagParent(child.uuid)).toBeUndefined();
@@ -133,9 +199,9 @@ describe('itemManager', () => {
         parent,
         child,
       ]);
-      await itemManager.setTagRelationship(parent, child);
-      await itemManager.setTagRelationship(grandParent, parent);
-      await itemManager.setTagRelationship(greatGrandParent, grandParent);
+      await itemManager.setTagParent(parent, child);
+      await itemManager.setTagParent(grandParent, parent);
+      await itemManager.setTagParent(greatGrandParent, grandParent);
 
       const uuidChain = itemManager
         .getTagParentChain(child.uuid)
@@ -154,7 +220,7 @@ describe('itemManager', () => {
       const parentTag = createTag('parent');
       const childTag = createTag('child');
       await itemManager.insertItems([parentTag, childTag]);
-      await itemManager.setTagRelationship(parentTag, childTag);
+      await itemManager.setTagParent(parentTag, childTag);
 
       const parentNote = createNote('parentNote');
       const childNote = createNote('childNote');
@@ -163,6 +229,7 @@ describe('itemManager', () => {
       await itemManager.addTagToNote(parentNote, parentTag);
       await itemManager.addTagToNote(childNote, childTag);
 
+      // TODO(laurent): dig into notes display criteria
       const criteria = NotesDisplayCriteria.Create({
         tags: [parentTag],
       });
