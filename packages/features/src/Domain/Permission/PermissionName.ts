@@ -34,4 +34,5 @@ export enum PermissionName {
   TokenVaultEditor = 'editor:token-vault',
   TwoFactorAuth = 'server:two-factor-auth',
   TwoFactorAuthManager = 'component:2fa-manager',
+  FocusMode = 'app:focus-mode',
 }
