@@ -34,4 +34,5 @@ export enum FeatureIdentifier {
   TokenVaultEditor = 'org.standardnotes.token-vault',
   TwoFactorAuth = 'org.standardnotes.two-factor-auth',
   TwoFactorAuthManager = 'org.standardnotes.mfa-link',
+  FocusMode = 'org.standardnotes.focus-mode',
 }
