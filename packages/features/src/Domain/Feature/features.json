@@ -487,10 +487,5 @@
     "name": "Focus Mode",
     "identifier": "org.standardnotes.focus-mode",
     "permission_name": "app:focus-mode",
-    "description": "",
-    "version": "",
-    "url": "",
-    "marketing_url": "",
-    "download_url": ""
   }
 ]
