@@ -1,8 +1,9 @@
+import { ContentReference } from '@Lib/protocol/payloads/generator';
+import { ContentType } from '@Models/content_types';
+import { ItemMutator, SNItem } from '@Models/core/item';
+import { PurePayload } from '@Protocol/payloads/pure_payload';
 import { UuidString } from './../../types';
 import { ItemContent } from './../core/item';
-import { ItemMutator, SNItem } from '@Models/core/item';
-import { ContentType } from '@Models/content_types';
-import { PurePayload } from '@Protocol/payloads/pure_payload';
 
 export interface TagContent extends ItemContent {
   title: string;
@@ -20,8 +21,13 @@ export class SNTag extends SNItem implements TagContent {
     this.title = this.payload.safeContent.title;
   }
 
+  get noteReferences(): ContentReference[] {
+    const references = this.payload.safeReferences;
+    return references.filter(ref => ref.content_type === ContentType.Note)
+  }
+
   get noteCount(): number {
-    return this.payload.safeReferences.length;
+    return this.noteReferences.length;
   }
 
   public get isSmartTag(): boolean {

@@ -4,7 +4,7 @@ import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@Models/content_types';
 import { ProtocolVersion } from '@Protocol/versions';
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@Lib/utils';
-import { PayloadContent, RawPayload } from '@Payloads/generator';
+import { ContentReference, PayloadContent, RawPayload } from '@Payloads/generator';
 import { PayloadFormat } from '@Payloads/formats';
 
 /**
@@ -182,11 +182,11 @@ export class PurePayload {
   }
 
   /** Defined to allow singular API with Payloadable type (PurePayload | SNItem) */
-  get references() {
+  get references(): ContentReference[]  {
     return this.safeReferences;
   }
 
-  get safeReferences() {
+  get safeReferences(): ContentReference[] {
     return this.safeContent.references || [];
   }
 
