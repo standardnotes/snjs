@@ -484,7 +484,7 @@
     "download_url": ""
   },
   {
-    "name": "Focus mode",
+    "name": "Focus Mode",
     "identifier": "org.standardnotes.focus-mode",
     "permission_name": "app:focus-mode",
     "description": "",
