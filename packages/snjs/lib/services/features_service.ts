@@ -88,7 +88,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   private removeWebSocketsServiceObserver: () => void;
   private removefeatureReposObserver: () => void;
   private removeSignInObserver: () => void;
-  private initialFeaturesUpdateDone = false;
+  private needsInitialFeaturesUpdate = true;
+  private completedSuccessfulFeaturesRetrieval = false;
 
   constructor(
     private storageService: SNStorageService,
@@ -336,9 +337,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     roles: RoleName[]
   ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
-    const needsInitialFeaturesUpdate = !this.initialFeaturesUpdateDone;
-    if (userRolesChanged || needsInitialFeaturesUpdate) {
-      this.initialFeaturesUpdateDone = true;
+    if (userRolesChanged || this.needsInitialFeaturesUpdate) {
+      this.needsInitialFeaturesUpdate = false;
       await this.setRoles(roles);
       await this.updateFeatures(userUuid);
     }
@@ -379,6 +379,10 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       if (component?.isExpired) {
         return FeatureStatus.InCurrentPlanButExpired;
       }
+      return FeatureStatus.Entitled;
+    }
+
+    if (!this.completedSuccessfulFeaturesRetrieval) {
       return FeatureStatus.Entitled;
     }
 
@@ -427,6 +431,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       });
       await this.setFeatures(features);
       await this.mapFeaturesToItems(features);
+      this.completedSuccessfulFeaturesRetrieval = true;
     }
   }
 

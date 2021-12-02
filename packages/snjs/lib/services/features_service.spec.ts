@@ -538,6 +538,24 @@ describe('featuresService', () => {
       expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(FeatureStatus.InCurrentPlanButExpired);
     })
 
+    it('feature status should be entitled until first successful features request made', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      featuresService['completedSuccessfulFeaturesRetrieval'] = false;
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.Entitled);
+
+      featuresService['completedSuccessfulFeaturesRetrieval'] = true;
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+    });
 
     it('has paid subscription', async () => {
       const featuresService = createService();
