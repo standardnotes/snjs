@@ -30,34 +30,6 @@ describe('itemManager', () => {
     itemManager.addObserver = jest.fn();
     itemManager.changeItem = jest.fn();
     itemManager.changeFeatureRepo = jest.fn();
-
-    /**
-     * TODO(laurent): what is this for?
-     * 
-     * I get the following error:
-     
-    Cannot spy the dateToLocalizedString property because it is not a function; undefined given instead
-
-      32 |     itemManager.changeFeatureRepo = jest.fn();
-      33 |
-    > 34 |     const dateToLocalizedString = jest.spyOn(
-         |                                        ^
-      35 |       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      36 |       SNItem.prototype as any,
-      37 |       'dateToLocalizedString'
-
-      at ModuleMocker.spyOn (../../node_modules/jest-environment-node/node_modules/jest-mock/build/index.js:795:15)
-      at Object.<anonymous> (lib/services/item_manager.spec.ts:34:40)
-
-     */
-    // const dateToLocalizedString = jest.spyOn(
-    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //   SNItem.prototype as any,
-    //   'dateToLocalizedString'
-    // );
-    // dateToLocalizedString.mockImplementation(() => {
-    //   return undefined;
-    // });
   });
 
   const createTag = (title: string) => {
