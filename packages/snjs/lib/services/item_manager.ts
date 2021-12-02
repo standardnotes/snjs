@@ -849,7 +849,6 @@ export class ItemManager extends PureService {
    */
   public setTagParent(parentTag: SNTag, childTag: SNTag): Promise<SNTag> {
     if (parentTag.uuid === childTag.uuid) {
-      // TODO: throw or return no change
       throw new Error('can not set a tag parent of itself');
     }
 

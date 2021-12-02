@@ -119,8 +119,8 @@ describe('itemManager', () => {
       const tag = createTag('tag');
       await itemManager.insertItems([tag]);
 
-      expect(() => itemManager.setTagParent(tag, tag)).toThrow()
-      expect(itemManager.getTagParent(tag.uuid)).toBeUndefined()
+      expect(() => itemManager.setTagParent(tag, tag)).toThrow();
+      expect(itemManager.getTagParent(tag.uuid)).toBeUndefined();
     });
 
     it('forbids a tag to be its own ancestor', async () => {
@@ -133,8 +133,8 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child);
       await itemManager.setTagParent(grandParent, parent);
 
-      expect(() => itemManager.setTagParent(child, grandParent)).toThrow()
-      expect(itemManager.getTagParent(grandParent.uuid)).toBeUndefined()
+      expect(() => itemManager.setTagParent(child, grandParent)).toThrow();
+      expect(itemManager.getTagParent(grandParent.uuid)).toBeUndefined();
     });
 
     it('getTagParent', async () => {
@@ -153,26 +153,39 @@ describe('itemManager', () => {
       const parent = createTag('parent');
       const child = createTag('child');
       const another = createTag('another');
-      
+
       await itemManager.insertItems([child, parent, grandParent, another]);
       await itemManager.setTagParent(parent, child);
       await itemManager.setTagParent(grandParent, parent);
 
-      expect(itemManager.isTagAncestor(grandParent.uuid, parent.uuid)).toBeTruthy()
-      expect(itemManager.isTagAncestor(grandParent.uuid, child.uuid)).toBeTruthy()
-      expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toBeTruthy()
+      expect(
+        itemManager.isTagAncestor(grandParent.uuid, parent.uuid)
+      ).toBeTruthy();
+      expect(
+        itemManager.isTagAncestor(grandParent.uuid, child.uuid)
+      ).toBeTruthy();
+      expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toBeTruthy();
 
-      expect(itemManager.isTagAncestor(parent.uuid, grandParent.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(child.uuid, grandParent.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(grandParent.uuid, grandParent.uuid)).toBeFalsy()
+      expect(
+        itemManager.isTagAncestor(parent.uuid, grandParent.uuid)
+      ).toBeFalsy();
+      expect(
+        itemManager.isTagAncestor(child.uuid, grandParent.uuid)
+      ).toBeFalsy();
+      expect(
+        itemManager.isTagAncestor(grandParent.uuid, grandParent.uuid)
+      ).toBeFalsy();
 
-      expect(itemManager.isTagAncestor(another.uuid, grandParent.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(child.uuid, another.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(grandParent.uuid, another.uuid)).toBeFalsy()
+      expect(
+        itemManager.isTagAncestor(another.uuid, grandParent.uuid)
+      ).toBeFalsy();
+      expect(itemManager.isTagAncestor(child.uuid, another.uuid)).toBeFalsy();
+      expect(
+        itemManager.isTagAncestor(grandParent.uuid, another.uuid)
+      ).toBeFalsy();
     });
 
     it('unsetTagRelationship', async () => {
-      // arrange
       itemManager = createService();
       const parent = createTag('parent');
       const child = createTag('child');
@@ -180,10 +193,8 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child);
       expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid);
 
-      // act
       await itemManager.unsetTagParent(child);
 
-      // assert
       expect(itemManager.getTagParent(child.uuid)).toBeUndefined();
     });
 
@@ -229,7 +240,6 @@ describe('itemManager', () => {
       await itemManager.addTagToNote(parentNote, parentTag);
       await itemManager.addTagToNote(childNote, childTag);
 
-      // TODO(laurent): dig into notes display criteria
       const criteria = NotesDisplayCriteria.Create({
         tags: [parentTag],
       });
