@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.18.4",
+  "version": "2.19.4",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -38,6 +38,7 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
     "circular-dependency-plugin": "^5.2.0",
     "connect": "^3.7.0",

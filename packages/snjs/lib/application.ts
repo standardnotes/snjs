@@ -864,13 +864,43 @@ export class SNApplication {
     return this.itemManager.searchTags(searchQuery, note);
   }
 
+  public isValidTagParent(
+    parentTagUuid: UuidString,
+    childTagUuid: UuidString
+  ): boolean {
+    return this.itemManager.isValidTagParent(parentTagUuid, childTagUuid);
+  }
+
   /**
-   * Returns all parents for a tag
+   * Establishes a hierarchical relationship between two tags.
+   */
+  public async setTagParent(parentTag: SNTag, childTag: SNTag): Promise<void> {
+    await this.itemManager.setTagParent(parentTag, childTag);
+  }
+
+  /**
+   * Remove the tag parent.
+   */
+  public async unsetTagParent(childTag: SNTag): Promise<void> {
+    await this.itemManager.unsetTagParent(childTag);
+  }
+
+  /**
+   * Returns the parent for a tag
+   * @param tag - The tag for which parents need to be found
+   * @returns The current parent or undefined
+   */
+  public getTagParent(tag: SNTag): SNTag | undefined {
+    return this.itemManager.getTagParent(tag.uuid);
+  }
+
+  /**
+   * Returns the hierarchy of parents for a tag
    * @param tag - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
   public getTagParentChain(tag: SNTag): SNTag[] {
-    return this.itemManager.getTagParentChain(tag);
+    return this.itemManager.getTagParentChain(tag.uuid);
   }
 
   /**
@@ -878,8 +908,8 @@ export class SNApplication {
    * @param tag - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-  public getTagDescendants(tag: SNTag): SNTag[] {
-    return this.itemManager.getTagDescendants(tag);
+  public getTagChildren(tag: SNTag): SNTag[] {
+    return this.itemManager.getTagChildren(tag.uuid);
   }
 
   /**
@@ -1116,9 +1146,8 @@ export class SNApplication {
         ChallengeReason.DecryptEncryptedFile,
         true
       );
-      const passwordResponse = await this.challengeService.promptForChallengeResponse(
-        challenge
-      );
+      const passwordResponse =
+        await this.challengeService.promptForChallengeResponse(challenge);
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1130,10 +1159,8 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
-      data,
-      password
-    );
+    const decryptedPayloads =
+      await this.protocolService.payloadsByDecryptingBackupFile(data, password);
     const validPayloads = decryptedPayloads
       .filter((payload) => {
         return (
@@ -1614,9 +1641,7 @@ export class SNApplication {
     return this.featuresService.getFeature(featureId);
   }
 
-  public getFeatureStatus(
-    featureId: FeatureIdentifier
-  ): FeatureStatus {
+  public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
     return this.featuresService.getFeatureStatus(featureId);
   }
 
@@ -1648,12 +1673,14 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
-        this.protocolService
-      ),
-      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
-        this.protocolService
-      ),
+      payloadByEncryptingPayload:
+        this.protocolService.payloadByEncryptingPayload.bind(
+          this.protocolService
+        ),
+      payloadByDecryptingPayload:
+        this.protocolService.payloadByDecryptingPayload.bind(
+          this.protocolService
+        ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
@@ -1800,9 +1827,8 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager = this.getClass<
-      typeof SNComponentManager
-    >(SNComponentManager);
+    const MaybeSwappedComponentManager =
+      this.getClass<typeof SNComponentManager>(SNComponentManager);
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
