@@ -647,17 +647,12 @@ export class SNApplication {
     return this.itemManager.trashedItems;
   }
 
-  // TODO: remove the templating if possible, see comment below.
-  public setDisplayOptions(
+  public setDisplayOptions<T extends SNItem>(
     contentType: ContentType,
     sortBy?: CollectionSort,
     direction?: SortDirection,
-    filter?: (element: SNItem) => boolean
+    filter?: (element: T) => boolean
   ): void {
-    // TODO: why is it breaking on me? The typing is invalid here (covariance / contravariance related)
-    // the function below needs a filter: (element: vehicule) => boolean,
-    // but the type above allows to pass a function filter: (element: boat) => boolean
-    // that means your function (element: boat) => boolean could be called with a spaceship.
     this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 

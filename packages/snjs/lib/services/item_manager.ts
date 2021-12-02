@@ -126,7 +126,7 @@ export class ItemManager extends PureService {
     contentType: ContentType,
     sortBy?: CollectionSort,
     direction?: SortDirection,
-    filter?: (element: SNItem) => boolean
+    filter?: (element: any) => boolean
   ): void {
     if (contentType === ContentType.Note) {
       console.warn(
