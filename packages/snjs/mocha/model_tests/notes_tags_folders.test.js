@@ -58,9 +58,8 @@ describe('tags as folders', () => {
     ).deep.to.equal(asUuids([tagParent]));
 
     // ## Now the user tries to move the tag into one of its children
-    expect(
-      this.application.setTagParent(tagParent, tagChildren)
-    ).to.eventually.be.rejected();
+    await expect(this.application.setTagParent(tagChildren, tagParent)).to
+      .eventually.be.rejected;
 
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2);
     expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([]);
