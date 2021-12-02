@@ -354,6 +354,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
 
   private async setFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
+    this.completedSuccessfulFeaturesRetrieval = true;
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
   }
 
@@ -431,7 +432,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       });
       await this.setFeatures(features);
       await this.mapFeaturesToItems(features);
-      this.completedSuccessfulFeaturesRetrieval = true;
     }
   }
 
