@@ -5,7 +5,10 @@ import { ContentType } from './../models/content_types';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKey } from '@Protocol/root_key';
-import { ActionsExtensionMutator, SNActionsExtension } from './../models/app/extension';
+import {
+  ActionsExtensionMutator,
+  SNActionsExtension,
+} from './../models/app/extension';
 import { MutationType, SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
 import { SNProtocolService } from './protocol_service';
@@ -263,10 +266,8 @@ export class SNActionsService extends PureService {
     triedPasswords: string[] = []
   ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item);
-    const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(
-      payload,
-      key
-    );
+    const decryptedPayload =
+      await this.protocolService!.payloadByDecryptingPayload(payload, key);
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload;
     }
