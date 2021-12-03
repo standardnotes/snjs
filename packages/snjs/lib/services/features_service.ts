@@ -259,7 +259,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     if (isErrorObject(result)) {
       return result;
     }
-    await this.setFeatures(result.features);
+    await this.didDownloadFeatures(result.features);
     await this.mapFeaturesToItems(result.features);
   }
 
@@ -352,7 +352,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  private async setFeatures(features: FeatureDescription[]): Promise<void> {
+  private async didDownloadFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
     this.completedSuccessfulFeaturesRetrieval = true;
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
@@ -364,10 +364,14 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.features.find((feature) => feature.identifier === featureId);
   }
 
-  public hasPaidSubscription(): boolean {
-    const roles = this.roles;
-    const unpaidRoles = [RoleName.BasicUser];
-    return roles.some((role) => !unpaidRoles.includes(role));
+  public hasPaidOnlineOrOfflineSubscription(): boolean {
+    if (this.credentialService.isSignedIn()) {
+      const roles = this.roles;
+      const unpaidRoles = [RoleName.BasicUser];
+      return roles.some((role) => !unpaidRoles.includes(role));
+    } else {
+      return this.hasOfflineRepo();
+    }
   }
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
@@ -387,7 +391,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       return FeatureStatus.Entitled;
     }
 
-    if (!this.hasPaidSubscription()) {
+    if (!this.hasPaidOnlineOrOfflineSubscription()) {
       return FeatureStatus.NoUserSubscription;
     }
 
@@ -430,7 +434,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           );
         }
       });
-      await this.setFeatures(features);
+      await this.didDownloadFeatures(features);
       await this.mapFeaturesToItems(features);
     }
   }
