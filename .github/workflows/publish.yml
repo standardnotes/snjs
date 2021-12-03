@@ -55,3 +55,15 @@ jobs:
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  notify_discord:
+    needs: publish
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Run Discord Webhook
+      uses: johnnyhuy/actions-discord-git-webhook@main
+      with:
+        webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        censor_username: false
