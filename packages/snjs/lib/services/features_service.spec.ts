@@ -430,6 +430,8 @@ describe('featuresService', () => {
         },
       });
 
+      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+
       await featuresService.updateRoles('123', [
         RoleName.BasicUser,
         RoleName.CoreUser,
@@ -546,12 +548,34 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
+      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
       expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.Entitled);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = true;
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+    });
+
+    it('feature status for offline subscription', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      credentialService.isSignedIn = jest.fn().mockReturnValue(false);
+      featuresService['completedSuccessfulFeaturesRetrieval'] = true;
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.NoUserSubscription);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NoUserSubscription);
+
+      featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true);
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
       expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NotInCurrentPlan);
@@ -564,14 +588,14 @@ describe('featuresService', () => {
         RoleName.BasicUser,
       ]);
 
-      expect(featuresService.hasPaidSubscription()).toBeFalsy;
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy;
 
       await featuresService.updateRoles('123', [
         RoleName.BasicUser,
         RoleName.PlusUser,
       ]);
 
-      expect(featuresService.hasPaidSubscription()).toBeTruthy;
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeTruthy;
     });
   });
 
