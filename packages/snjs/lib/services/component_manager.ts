@@ -246,10 +246,11 @@ export class SNComponentManager extends PureService {
   }
 
   get components(): SNComponent[] {
-    return this.itemManager.getItems([
-      ContentType.Component,
-      ContentType.Theme,
-    ]) as SNComponent[];
+    const components = this.itemManager.getDisplayableItems(
+      ContentType.Component
+    );
+    const themes = this.itemManager.getDisplayableItems(ContentType.Theme);
+    return components.concat(themes) as SNComponent[];
   }
 
   componentsForArea(area: ComponentArea): SNComponent[] {
@@ -266,9 +267,9 @@ export class SNComponentManager extends PureService {
     this.permissionDialogs.length = 0;
     this.templateComponents.length = 0;
     this.handlers.length = 0;
-    (this.itemManager as any) = undefined;
-    (this.syncService as any) = undefined;
-    (this.alertService as any) = undefined;
+    (this.itemManager as unknown) = undefined;
+    (this.syncService as unknown) = undefined;
+    (this.alertService as unknown) = undefined;
     this.removeItemObserver();
     this.removeItemObserver = null;
     if (window && !this.isMobile) {
