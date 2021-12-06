@@ -1752,6 +1752,10 @@ export class SNApplication {
             void this.notifyEvent(ApplicationEvent.UserRolesChanged);
             break;
           }
+          case FeaturesEvent.FeaturesUpdated: {
+            void this.notifyEvent(ApplicationEvent.FeaturesUpdated);
+            break;
+          }
           default: {
             assertUnreachable(event);
           }
