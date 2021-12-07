@@ -275,11 +275,11 @@
     "permission_name": "editor:token-vault",
     "content_type": "SN|Component",
     "area": "editor-editor",
-    "version": "2.0.4",
+    "version": "2.0.6",
     "description": "Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.",
     "url": "#{url_prefix}/components/token-vault",
     "marketing_url": "",
-    "download_url": "https://github.com/standardnotes/token-vault/archive/2.0.4.zip",
+    "download_url": "https://github.com/standardnotes/token-vault/archive/2.0.6.zip",
     "thumbnail_url": "https://standard-notes.s3.amazonaws.com/screenshots/models/editors/token-vault.png",
     "flags": ["New"]
   },
@@ -486,6 +486,6 @@
   {
     "name": "Focus Mode",
     "identifier": "org.standardnotes.focus-mode",
-    "permission_name": "app:focus-mode",
+    "permission_name": "app:focus-mode"
   }
 ]
