@@ -66,7 +66,6 @@ const AllowedBatchPermissions = Object.freeze([
   ContentType.FilesafeCredentials,
   ContentType.FilesafeFileMetadata,
   ContentType.FilesafeIntegration,
-  ContentType.Mfa,
   ContentType.ServerExtension,
   ContentType.SmartTag,
   ContentType.Tag,
