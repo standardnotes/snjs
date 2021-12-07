@@ -112,7 +112,7 @@ describe('protocol', function () {
   it('decrypting 000 payload should succeed', async function () {
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: await Uuid.GenerateUuid(),
-      content_type: ContentType.Mfa,
+      content_type: ContentType.ServerExtension,
       content: {
         secret: '123',
       },
