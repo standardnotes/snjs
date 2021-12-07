@@ -356,8 +356,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   private async didDownloadFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
     this.completedSuccessfulFeaturesRetrieval = true;
-    await this.storageService.setValue(StorageKey.UserFeatures, this.features);
     this.notifyEvent(FeaturesEvent.FeaturesUpdated);
+    await this.storageService.setValue(StorageKey.UserFeatures, this.features);
   }
 
   public getFeature(
