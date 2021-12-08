@@ -565,11 +565,11 @@ export class ItemManager extends PureService {
     const payload = CreateMaxPayloadFromAnyObject(item);
     const resultingPayloads = await PayloadsByDuplicating(
       payload,
-      this.payloadManager!.getMasterCollection(),
+      this.payloadManager.getMasterCollection(),
       isConflict,
       additionalContent
     );
-    await this.payloadManager!.emitPayloads(
+    await this.payloadManager.emitPayloads(
       resultingPayloads,
       PayloadSource.LocalChanged
     );
@@ -599,7 +599,7 @@ export class ItemManager extends PureService {
       },
       override
     );
-    await this.payloadManager!.emitPayload(payload, PayloadSource.Constructor);
+    await this.payloadManager.emitPayload(payload, PayloadSource.Constructor);
     return this.findItem(payload.uuid!)!;
   }
 
@@ -643,7 +643,7 @@ export class ItemManager extends PureService {
     payloads: PurePayload[],
     source = PayloadSource.Constructor
   ) {
-    await this.payloadManager!.emitPayloads(payloads, source);
+    await this.payloadManager.emitPayloads(payloads, source);
     const uuids = Uuids(payloads);
     return this.findItems(uuids);
   }
@@ -973,12 +973,12 @@ export class ItemManager extends PureService {
       MutationType.NonDirtying
     );
     this.resetState();
-    this.payloadManager!.resetState();
+    this.payloadManager.resetState();
   }
 
-  public removeItemLocally(item: SNItem) {
+  public removeItemLocally(item: SNItem): void {
     this.collection.discard(item);
-    this.payloadManager!.removePayloadLocally(item.payload);
+    this.payloadManager.removePayloadLocally(item.payload);
   }
 }
 

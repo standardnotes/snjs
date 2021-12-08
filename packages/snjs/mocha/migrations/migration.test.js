@@ -1,10 +1,10 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('migrations', () => {
+  const allMigrations = ['2.0.0', '2.0.15', '2.7.0', '2.20.0'];
+
   beforeEach(async () => {
     localStorage.clear();
   });
@@ -23,13 +23,13 @@ describe('migrations', () => {
   it('should return correct required migrations if stored version is 1.0.0', async function () {
     expect(
       (await SNMigrationService.getRequiredMigrations('1.0.0')).length
-    ).to.equal(3);
+    ).to.equal(allMigrations.length);
   });
 
   it('should return correct required migrations if stored version is 2.0.0', async function () {
     expect(
       (await SNMigrationService.getRequiredMigrations('2.0.0')).length
-    ).to.equal(2);
+    ).to.equal(allMigrations.length - 1);
   });
 
   it('should return 0 required migrations if stored version is futuristic', async function () {
@@ -109,7 +109,7 @@ describe('migrations', () => {
     await Factory.safeDeinit(application);
   });
 
-  it('should be 2 required migration coming from 1.0.0', async function () {
+  it('should be correct migration count coming from 1.0.0', async function () {
     const application = await Factory.createAppWithRandNamespace();
     await application.deviceInterface.setRawStorageValue(
       'migrations',
@@ -122,7 +122,7 @@ describe('migrations', () => {
     const pendingMigrations = await SNMigrationService.getRequiredMigrations(
       await application.migrationService.getStoredSnjsVersion()
     );
-    expect(pendingMigrations.length).to.equal(3);
+    expect(pendingMigrations.length).to.equal(allMigrations.length);
     expect(pendingMigrations[0].version()).to.equal('2.0.0');
     await application.prepareForLaunch({
       receiveChallenge: () => {},
@@ -131,6 +131,49 @@ describe('migrations', () => {
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(
       SnjsVersion
     );
+    await Factory.safeDeinit(application);
+  });
+
+  it('2.20.0 remove mfa migration', async function () {
+    const application = await Factory.createAppWithRandNamespace();
+
+    await application.prepareForLaunch({
+      receiveChallenge: () => {},
+    });
+    await application.launch(true);
+
+    const mfaItem = CreateItemFromPayload(
+      CreateMaxPayloadFromAnyObject({
+        uuid: '123',
+        content_type: 'SF|MFA',
+        content: FillItemContent({
+          key: '123',
+        }),
+      })
+    );
+    await application.insertItem(mfaItem);
+    await application.sync();
+
+    expect(application.getItems('SF|MFA').length).to.equal(1);
+    expect(
+      (await application.storageService.getAllRawPayloads()).filter(
+        (p) => p.content_type === 'SF|MFA'
+      ).length
+    ).to.equal(1);
+
+    /** Run migration */
+    const migration = new Migration2_20_0(
+      application.migrationService.services
+    );
+    await migration.handleStage(ApplicationStage.LoadedDatabase_12);
+
+    expect(application.getItems('SF|MFA').length).to.equal(0);
+    expect(
+      (await application.storageService.getAllRawPayloads()).filter(
+        (p) => p.content_type === 'SF|MFA'
+      ).length
+    ).to.equal(0);
+
     await Factory.safeDeinit(application);
   });
 });
