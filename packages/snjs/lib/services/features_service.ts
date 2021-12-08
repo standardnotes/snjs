@@ -20,7 +20,11 @@ import {
   SNApiService,
 } from './api/api_service';
 import { ErrorObject, UuidString } from '@Lib/types';
-import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
+import {
+  FeatureDescription,
+  FeatureIdentifier,
+  Features,
+} from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
@@ -67,6 +71,7 @@ type GetOfflineSubscriptionDetailsResponse =
 
 export const enum FeaturesEvent {
   UserRolesChanged = 'UserRolesChanged',
+  FeaturesUpdated = 'FeaturesUpdated',
 }
 
 export const enum FeatureStatus {
@@ -84,7 +89,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   private removeWebSocketsServiceObserver: () => void;
   private removefeatureReposObserver: () => void;
   private removeSignInObserver: () => void;
-  private initialFeaturesUpdateDone = false;
+  private needsInitialFeaturesUpdate = true;
+  private completedSuccessfulFeaturesRetrieval = false;
 
   constructor(
     private storageService: SNStorageService,
@@ -254,7 +260,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     if (isErrorObject(result)) {
       return result;
     }
-    await this.setFeatures(result.features);
+    await this.didDownloadFeatures(result.features);
     await this.mapFeaturesToItems(result.features);
   }
 
@@ -332,9 +338,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     roles: RoleName[]
   ): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles);
-    const needsInitialFeaturesUpdate = !this.initialFeaturesUpdateDone;
-    if (userRolesChanged || needsInitialFeaturesUpdate) {
-      this.initialFeaturesUpdateDone = true;
+    if (userRolesChanged || this.needsInitialFeaturesUpdate) {
+      this.needsInitialFeaturesUpdate = false;
       await this.setRoles(roles);
       await this.updateFeatures(userUuid);
     }
@@ -348,8 +353,10 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  private async setFeatures(features: FeatureDescription[]): Promise<void> {
+  private async didDownloadFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
+    this.completedSuccessfulFeaturesRetrieval = true;
+    this.notifyEvent(FeaturesEvent.FeaturesUpdated);
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
   }
 
@@ -359,14 +366,34 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.features.find((feature) => feature.identifier === featureId);
   }
 
-  public hasPaidSubscription(): boolean {
-    const roles = this.roles;
-    const unpaidRoles = [RoleName.BasicUser];
-    return roles.some((role) => !unpaidRoles.includes(role));
+  public hasPaidOnlineOrOfflineSubscription(): boolean {
+    if (this.credentialService.isSignedIn()) {
+      const roles = this.roles;
+      const unpaidRoles = [RoleName.BasicUser];
+      return roles.some((role) => !unpaidRoles.includes(role));
+    } else {
+      return this.hasOfflineRepo();
+    }
   }
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
-    if (!this.hasPaidSubscription()) {
+    const isThirdParty =
+      Features.find((feature) => feature.identifier === featureId) == undefined;
+    if (isThirdParty) {
+      const component = this.itemManager.components.find(
+        (candidate) => candidate.identifier === featureId
+      );
+      if (component?.isExpired) {
+        return FeatureStatus.InCurrentPlanButExpired;
+      }
+      return FeatureStatus.Entitled;
+    }
+
+    if (!this.completedSuccessfulFeaturesRetrieval) {
+      return FeatureStatus.Entitled;
+    }
+
+    if (!this.hasPaidOnlineOrOfflineSubscription()) {
       return FeatureStatus.NoUserSubscription;
     }
 
@@ -409,7 +436,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           );
         }
       });
-      await this.setFeatures(features);
+      await this.didDownloadFeatures(features);
       await this.mapFeaturesToItems(features);
     }
   }

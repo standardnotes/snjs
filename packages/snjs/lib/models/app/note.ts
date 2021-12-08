@@ -52,8 +52,8 @@ export class SNNote extends SNItem implements NoteContent {
 }
 
 export class NoteMutator extends ItemMutator {
-  get typedContent() {
-    return this.content! as Partial<NoteContent>;
+  get typedContent(): Partial<NoteContent> {
+    return this.content as Partial<NoteContent>;
   }
 
   set title(title: string) {

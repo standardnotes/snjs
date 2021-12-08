@@ -1,7 +1,7 @@
 import { DomainEventInterface } from './DomainEventInterface'
 import { ActivationCodeRequestedEventPayload } from './ActivationCodeRequestedEventPayload'
 
-export interface ActivationCodeRequested extends DomainEventInterface {
+export interface ActivationCodeRequestedEvent extends DomainEventInterface {
   type: 'ACTIVATION_CODE_REQUESTED'
   payload: ActivationCodeRequestedEventPayload
 }

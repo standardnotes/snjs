@@ -61,6 +61,7 @@ export enum ApplicationEvent {
   PreferencesChanged = 25,
   ProtectionSessionExpiryDateChanged = 26,
   UserRolesChanged = 27,
+  FeaturesUpdated = 28,
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {

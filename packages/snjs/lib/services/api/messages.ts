@@ -35,16 +35,20 @@ export const API_MESSAGE_INVALID_SESSION =
 export const API_MESSAGE_FAILED_GET_SETTINGS = 'Failed to get settings.';
 export const API_MESSAGE_FAILED_UPDATE_SETTINGS = 'Failed to update settings.';
 
-export const API_MESSAGE_FAILED_SUBSCRIPTION_INFO = 'Failed to get subscription\'s information.';
+export const API_MESSAGE_FAILED_SUBSCRIPTION_INFO =
+  "Failed to get subscription's information.";
 
-export const API_MESSAGE_FAILED_ACCESS_PURCHASE = 'Failed to access purchase flow.';
+export const API_MESSAGE_FAILED_ACCESS_PURCHASE =
+  'Failed to access purchase flow.';
 
-export const API_MESSAGE_FAILED_OFFLINE_FEATURES = 'Failed to get offline features.';
+export const API_MESSAGE_FAILED_OFFLINE_FEATURES =
+  'Failed to get offline features.';
 export const API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING = `The extension you are attempting to install comes from an 
   untrusted source. Untrusted extensions may lower the security of your data. Do you want to continue?`;
 export const API_MESSAGE_FAILED_DOWNLOADING_EXTENSION = `Error downloading package details. Please check the 
   extension link and try again.`;
-export const API_MESSAGE_FAILED_OFFLINE_ACTIVATION = 'An unknown issue occurred during offline activation. Please try again.';
+export const API_MESSAGE_FAILED_OFFLINE_ACTIVATION =
+  'An unknown issue occurred during offline activation. Please try again.';
 
 export const INVALID_EXTENSION_URL = 'Invalid extension URL.';
 
@@ -249,6 +253,5 @@ export const ErrorAlertStrings = {
 
 export const KeychainRecoveryStrings = {
   Title: 'Restore Keychain',
-  Text:
-    "We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.",
+  Text: "We've detected that your keychain has been wiped. This can happen when restoring your device from a backup. Please enter your account password to restore your account keys.",
 };

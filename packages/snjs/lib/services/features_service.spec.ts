@@ -430,6 +430,8 @@ describe('featuresService', () => {
         },
       });
 
+      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+
       await featuresService.updateRoles('123', [
         RoleName.BasicUser,
         RoleName.CoreUser,
@@ -476,6 +478,108 @@ describe('featuresService', () => {
       expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan);
     })
 
+    it('third party feature status', async () => {
+      const featuresService = createService();
+
+      const themeFeature = {
+        identifier: 'third-party-theme' as FeatureIdentifier,
+        content_type: ContentType.Theme,
+        expires_at: tomorrow_server,
+        role_name: RoleName.CoreUser
+      };
+
+      const editorFeature = {
+        identifier: 'third-party-editor' as FeatureIdentifier,
+        content_type: ContentType.Component,
+        expires_at: expiredDate,
+        role_name: RoleName.PlusUser
+      };
+
+      features = [
+        themeFeature,
+        editorFeature
+      ] as jest.Mocked<FeatureDescription[]>
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      });
+
+      Object.defineProperty(itemManager, 'components', {
+        get: jest.fn(() => [
+          new SNComponent({
+            uuid: '123',
+            content_type: ContentType.Theme,
+            safeContent: {
+              valid_until: themeFeature.expires_at,
+              package_info: {
+                ...themeFeature,
+              }
+            },
+          } as never),
+          new SNComponent({
+            uuid: '456',
+            content_type: ContentType.Component,
+            safeContent: {
+              valid_until: new Date(editorFeature.expires_at),
+              package_info: {
+                ...editorFeature,
+              }
+            },
+          } as never)
+        ]),
+        set: jest.fn()
+      });
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+      ]);
+
+      expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(FeatureStatus.InCurrentPlanButExpired);
+    })
+
+    it('feature status should be entitled until first successful features request made', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+
+      featuresService['completedSuccessfulFeaturesRetrieval'] = false;
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.Entitled);
+
+      featuresService['completedSuccessfulFeaturesRetrieval'] = true;
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+    });
+
+    it('feature status for offline subscription', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRoles('123', [
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      credentialService.isSignedIn = jest.fn().mockReturnValue(false);
+      featuresService['completedSuccessfulFeaturesRetrieval'] = true;
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.NoUserSubscription);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NoUserSubscription);
+
+      featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true);
+
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+    });
 
     it('has paid subscription', async () => {
       const featuresService = createService();
@@ -484,14 +588,14 @@ describe('featuresService', () => {
         RoleName.BasicUser,
       ]);
 
-      expect(featuresService.hasPaidSubscription()).toBeFalsy;
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy;
 
       await featuresService.updateRoles('123', [
         RoleName.BasicUser,
         RoleName.PlusUser,
       ]);
 
-      expect(featuresService.hasPaidSubscription()).toBeTruthy;
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeTruthy;
     });
   });
 

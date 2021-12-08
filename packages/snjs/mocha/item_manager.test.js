@@ -582,6 +582,7 @@ describe('item manager', function () {
       });
 
       const results = this.itemManager.getSortedTagsForNote(note);
+      
       expect(results).lengthOf(tags.length);
       expect(results[0].title).to.equal(tags[1].title);
       expect(results[1].title).to.equal(tags[0].title);
@@ -592,49 +593,21 @@ describe('item manager', function () {
 
   describe('getTagParentChain', async function () {
     it('should return parent tags for a tag', async function () {
-      const parentTags = [
-        await this.itemManager.findOrCreateTagByTitle('parent'),
-        await this.itemManager.findOrCreateTagByTitle('parent.child'),
-      ];
-      const grandchildTag = await this.itemManager.findOrCreateTagByTitle('parent.child.grandchild');
-      await this.itemManager.findOrCreateTagByTitle('some other tag');
+      const [parent, child, grandchild, _other] = await Promise.all([
+         this.itemManager.findOrCreateTagByTitle('parent'),
+         this.itemManager.findOrCreateTagByTitle('parent.child'),
+         this.itemManager.findOrCreateTagByTitle('parent.child.grandchild'),
+          this.itemManager.findOrCreateTagByTitle('some other tag')
+      ]);
 
-      const results = this.itemManager.getTagParentChain(grandchildTag);
-      expect(results).lengthOf(parentTags.length);
-      expect(results).to.contain(parentTags[0]);
-      expect(results).to.contain(parentTags[1]);
+      await this.itemManager.setTagParent(parent, child)
+      await this.itemManager.setTagParent(child, grandchild)
+      
+      const results = this.itemManager.getTagParentChain(grandchild.uuid);
+
+      expect(results).lengthOf(2);
+      expect(results[0].uuid).to.equal(parent.uuid);
+      expect(results[1].uuid).to.equal(child.uuid);
     })
   });
-
-  describe('getTagDescendants', async function () {
-    it('should return descendant tags for a parent tag', async function () {
-      const parentTag = await this.itemManager.findOrCreateTagByTitle('parent');
-      const descendantTags = [
-        await this.itemManager.findOrCreateTagByTitle('parent.firstChild'),
-        await this.itemManager.findOrCreateTagByTitle('parent.firstChild.grandchild'),
-        await this.itemManager.findOrCreateTagByTitle('parent.secondChild'),
-      ];
-      await this.itemManager.findOrCreateTagByTitle('some other tag');
-
-      const results = this.itemManager.getTagDescendants(parentTag);
-      expect(results).lengthOf(descendantTags.length);
-      expect(results).to.contain(descendantTags[0]);
-      expect(results).to.contain(descendantTags[1]);
-      expect(results).to.contain(descendantTags[2]);
-    })
-
-    it('should return descendant tags for a child tag', async function () {
-      const childTag = await this.itemManager.findOrCreateTagByTitle('parent.child');
-      const descendantTags = [
-        await this.itemManager.findOrCreateTagByTitle('parent.child.firstGrandchild'),
-        await this.itemManager.findOrCreateTagByTitle('parent.child.secondGrandchild'),
-      ];
-      await this.itemManager.findOrCreateTagByTitle('some other tag');
-
-      const results = this.itemManager.getTagDescendants(childTag);
-      expect(results).lengthOf(descendantTags.length);
-      expect(results).to.contain(descendantTags[0]);
-      expect(results).to.contain(descendantTags[1]);
-    })
-  })
 });

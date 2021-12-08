@@ -353,7 +353,9 @@ export class SNKeyRecoveryService extends PureService {
         clientParams.identifier
       );
       if (!paramsResponse.error && paramsResponse.data) {
-        this.serverParams = KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse);
+        this.serverParams = KeyParamsFromApiResponse(
+          paramsResponse as KeyParamsResponse
+        );
       }
     }
 
@@ -504,6 +506,11 @@ export class SNKeyRecoveryService extends PureService {
     replacesRootKey: boolean,
     additionalKeys: PurePayload[] = []
   ) {
+    if (replacesRootKey) {
+      /** Replace our root key with the generated root key */
+      const wrappingKey = await this.getWrappingKeyIfApplicable();
+      await this.protocolService.setRootKey(rootKey, wrappingKey);
+    }
     const matching = this.popQueueForKeyParams(rootKey.keyParams);
     const decryptedMatching = await this.protocolService.payloadsByDecryptingPayloads(
       matching.map((m) => m.key.payload),
@@ -516,9 +523,6 @@ export class SNKeyRecoveryService extends PureService {
     );
     await this.storageService.savePayloads(allRelevantKeyPayloads);
     if (replacesRootKey) {
-      /** Replace our root key with the generated root key */
-      const wrappingKey = await this.getWrappingKeyIfApplicable();
-      await this.protocolService.setRootKey(rootKey, wrappingKey);
       this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
     } else {
       this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);

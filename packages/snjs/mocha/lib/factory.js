@@ -251,8 +251,8 @@ export function createNotePayload(title, text = undefined, dirty = true) {
   return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text, dirty }));
 }
 
-export function createStorageItemTagPayload() {
-  return CreateMaxPayloadFromAnyObject(createTagParams());
+export function createStorageItemTagPayload(tagParams = {}) {
+  return CreateMaxPayloadFromAnyObject(createTagParams(tagParams));
 }
 
 export function itemToStoragePayload(item) {
@@ -267,8 +267,8 @@ export function createMappedNote(application, title, text, dirty) {
   );
 }
 
-export function createMappedTag(application) {
-  const payload = createStorageItemTagPayload();
+export async function createMappedTag(application, tagParams = {}) {
+  const payload = createStorageItemTagPayload(tagParams);
   return application.itemManager.emitItemFromPayload(
     payload,
     PayloadSource.LocalChanged
@@ -321,6 +321,15 @@ export async function loginToApplication({
     mergeLocal,
     true
   );
+}
+
+export async function awaitFunctionInvokation(object, functionName) {
+  return new Promise((resolve) => {
+    const original = object[functionName];
+    object[functionName] = function() {
+      resolve(original.apply(this, arguments));
+    }
+  })
 }
 
 /**
