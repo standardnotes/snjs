@@ -71,6 +71,7 @@ type GetOfflineSubscriptionDetailsResponse =
 
 export const enum FeaturesEvent {
   UserRolesChanged = 'UserRolesChanged',
+  FeaturesUpdated = 'FeaturesUpdated',
 }
 
 export const enum FeatureStatus {
@@ -355,6 +356,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   private async didDownloadFeatures(features: FeatureDescription[]): Promise<void> {
     this.features = features;
     this.completedSuccessfulFeaturesRetrieval = true;
+    this.notifyEvent(FeaturesEvent.FeaturesUpdated);
     await this.storageService.setValue(StorageKey.UserFeatures, this.features);
   }
 
