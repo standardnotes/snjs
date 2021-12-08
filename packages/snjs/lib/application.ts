@@ -113,7 +113,7 @@ import {
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
-import { RemoteSession } from '.';
+import { RemoteSession, StorageKey } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
@@ -1988,7 +1988,10 @@ export class SNApplication {
       this.protectionService.addEventObserver((event) => {
         if (event === ProtectionEvent.SessionExpiryDateChanged) {
           void this.notifyEvent(
-            ApplicationEvent.ProtectionSessionExpiryDateChanged
+            ApplicationEvent.ProtectionSessionExpiryDateChanged,
+            {
+              protectionDuration: this.storageService.getValue(StorageKey.ProtectionSessionLength)
+            }
           );
         }
       })
