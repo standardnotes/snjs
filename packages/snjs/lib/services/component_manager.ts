@@ -45,7 +45,6 @@ import {
   platformToString,
 } from '@Lib/platforms';
 import { UuidString } from '../types';
-import { SNProtectionService } from '@Services/protection_service';
 
 const DESKTOP_URL_PREFIX = 'sn://';
 const LOCAL_HOST = 'localhost';
@@ -1130,7 +1129,7 @@ export class SNComponentManager extends PureService {
             error: ComponentAction.SaveError,
           });
           this.handleMessage(component, saveMessage);
-        })
+        });
     });
   }
 
