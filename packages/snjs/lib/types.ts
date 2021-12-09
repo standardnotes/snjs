@@ -13,5 +13,5 @@ export type ErrorObject = {
 }
 
 export type ApplicationEventPayload = Partial<{
-  protectionDuration: number;
+
 }>
