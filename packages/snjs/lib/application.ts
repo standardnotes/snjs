@@ -22,6 +22,7 @@ import {
   DeinitSource,
   UuidString,
   AnyRecord,
+  ApplicationEventPayload
 } from './types';
 import {
   ApplicationEvent,
@@ -435,7 +436,7 @@ export class SNApplication {
     return this.addEventObserver(filteredCallback, event);
   }
 
-  private async notifyEvent(event: ApplicationEvent, data?: AnyRecord) {
+  private async notifyEvent(event: ApplicationEvent, data?: ApplicationEventPayload) {
     if (event === ApplicationEvent.Started) {
       this.onStart();
     } else if (event === ApplicationEvent.Launched) {

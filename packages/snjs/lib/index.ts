@@ -7,7 +7,7 @@ export {
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';
 export type { BackupFile } from '@Services/protocol_service';
-export type { UuidString, ApplicationIdentifier } from './types';
+export type { UuidString, ApplicationIdentifier, ApplicationEventPayload } from './types';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
