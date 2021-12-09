@@ -7,7 +7,11 @@ export {
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';
 export type { BackupFile } from '@Services/protocol_service';
-export type { UuidString, ApplicationIdentifier, ApplicationEventPayload } from './types';
+export type {
+  UuidString,
+  ApplicationIdentifier,
+  ApplicationEventPayload,
+} from './types';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
@@ -100,7 +104,10 @@ export type {
   SNAlertService,
 } from './services/alert_service';
 export { SNHistoryManager } from './services/history/history_manager';
-export { SNProtectionService } from './services/protection_service';
+export {
+  SNProtectionService,
+  SecondsToDeferUILevelSessionExpirationDuringActiveInteraction,
+} from './services/protection_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
 export type {
@@ -219,5 +226,3 @@ export { RoleName } from '@standardnotes/auth';
 export { SettingName } from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { ApplicationStage } from '@Lib/stages';
-
-export { DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING } from './constants'

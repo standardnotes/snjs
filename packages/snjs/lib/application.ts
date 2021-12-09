@@ -22,7 +22,7 @@ import {
   DeinitSource,
   UuidString,
   AnyRecord,
-  ApplicationEventPayload
+  ApplicationEventPayload,
 } from './types';
 import {
   ApplicationEvent,
@@ -113,7 +113,10 @@ import {
   User,
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import { ProtectionEvent } from './services/protection_service';
+import {
+  ProtectionEvent,
+  ProtectionSessionLengthSeconds,
+} from './services/protection_service';
 import { RemoteSession, StorageKey } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { SettingName } from '@standardnotes/settings';
@@ -436,7 +439,10 @@ export class SNApplication {
     return this.addEventObserver(filteredCallback, event);
   }
 
-  private async notifyEvent(event: ApplicationEvent, data?: ApplicationEventPayload) {
+  private async notifyEvent(
+    event: ApplicationEvent,
+    data?: ApplicationEventPayload
+  ) {
     if (event === ApplicationEvent.Started) {
       this.onStart();
     } else if (event === ApplicationEvent.Launched) {
@@ -1070,10 +1076,6 @@ export class SNApplication {
     return this.protectionService.clearSession();
   }
 
-  public isProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
-    return this.protectionService.isProtectionRemembranceSelectionDontRemember(protectionSessionDuration);
-  }
-
   /**
    * @returns whether note access has been granted or not
    */
@@ -1147,8 +1149,9 @@ export class SNApplication {
         ChallengeReason.DecryptEncryptedFile,
         true
       );
-      const passwordResponse =
-        await this.challengeService.promptForChallengeResponse(challenge);
+      const passwordResponse = await this.challengeService.promptForChallengeResponse(
+        challenge
+      );
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1160,8 +1163,10 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-    const decryptedPayloads =
-      await this.protocolService.payloadsByDecryptingBackupFile(data, password);
+    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
+      data,
+      password
+    );
     const validPayloads = decryptedPayloads
       .filter((payload) => {
         return (
@@ -1674,14 +1679,12 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload:
-        this.protocolService.payloadByEncryptingPayload.bind(
-          this.protocolService
-        ),
-      payloadByDecryptingPayload:
-        this.protocolService.payloadByDecryptingPayload.bind(
-          this.protocolService
-        ),
+      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
+        this.protocolService
+      ),
+      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
+        this.protocolService
+      ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
@@ -1832,15 +1835,16 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager =
-      this.getClass<typeof SNComponentManager>(SNComponentManager);
+    const MaybeSwappedComponentManager = this.getClass<
+      typeof SNComponentManager
+    >(SNComponentManager);
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
       this.alertService,
       this.environment,
       this.platform,
-      this.deviceInterface.timeout,
+      this.deviceInterface.timeout
     );
     this.services.push(this.componentManager);
   }
@@ -1987,13 +1991,10 @@ export class SNApplication {
     );
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
-        if (event === ProtectionEvent.SessionExpiryDateChanged) {
-          void this.notifyEvent(
-            ApplicationEvent.ProtectionSessionExpiryDateChanged,
-            {
-              protectionDuration: this.storageService.getValue(StorageKey.ProtectionSessionLength)
-            }
-          );
+        if (event === ProtectionEvent.SessionBegan) {
+          void this.notifyEvent(ApplicationEvent.ProtectionSessionBegan);
+        } else if (event === ProtectionEvent.SessionExpired) {
+          void this.notifyEvent(ApplicationEvent.ProtectionSessionExpired);
         }
       })
     );

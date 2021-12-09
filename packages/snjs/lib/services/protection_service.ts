@@ -17,10 +17,14 @@ import { ItemManager } from './item_manager';
 import { Uuids } from '@Lib/models/functions';
 
 export enum ProtectionEvent {
-  SessionExpiryDateChanged = 'SessionExpiryDateChanged',
+  SessionBegan = 'SessionBegan',
+  SessionExpired = 'SessionExpired',
 }
 
-enum ProtectionSessionLengthSeconds {
+export const SecondsToDeferUILevelSessionExpirationDuringActiveInteraction = 30;
+export const EphemeralSessionSecondsDuration = 30;
+
+export enum ProtectionSessionLengthSeconds {
   None = 0,
   FiveMinutes = 300,
   OneHour = 3600,
@@ -37,7 +41,7 @@ export function isValidProtectionSessionLength(number: unknown): boolean {
 export const ProtectionSessionDurations = [
   {
     valueInSeconds: ProtectionSessionLengthSeconds.None,
-    label: "Don't Remember",
+    label: 'Don\'t Remember',
   },
   {
     valueInSeconds: ProtectionSessionLengthSeconds.FiveMinutes,
@@ -58,7 +62,7 @@ export const ProtectionSessionDurations = [
  * like viewing a protected note, as well as managing how long that
  * authentication should be valid for.
  */
-export class SNProtectionService extends PureService<ProtectionEvent.SessionExpiryDateChanged> {
+export class SNProtectionService extends PureService<ProtectionEvent> {
   private sessionExpiryTimeout = -1;
 
   constructor(
@@ -338,20 +342,22 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
   }
 
   public clearSession(): Promise<void> {
-    return this.setSessionExpiryDate(new Date());
+    void this.setSessionExpiryDate(new Date());
+    return this.notifyEvent(ProtectionEvent.SessionExpired);
   }
 
-  public isProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
+  public isProtectionRemembranceSelectionDontRemember(
+    protectionSessionDuration: number
+  ): boolean {
     return protectionSessionDuration === ProtectionSessionLengthSeconds.None;
   }
 
   private async setSessionExpiryDate(date: Date) {
     await this.storageService.setValue(StorageKey.ProtectionExpirey, date);
-    void this.notifyEvent(ProtectionEvent.SessionExpiryDateChanged);
   }
 
-  private async getSessionLength(): Promise<number> {
-    const length = await this.storageService.getValue(
+  private getSessionLength(): ProtectionSessionLengthSeconds {
+    const length = this.storageService.getValue(
       StorageKey.ProtectionSessionLength
     );
     if (length) {
@@ -369,19 +375,23 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
       length
     );
     const expiresAt = new Date();
+    if (length === ProtectionSessionLengthSeconds.None) {
+      length = EphemeralSessionSecondsDuration;
+    }
     expiresAt.setSeconds(expiresAt.getSeconds() + length);
     await this.setSessionExpiryDate(expiresAt);
     this.updateSessionExpiryTimer(expiresAt);
+    void this.notifyEvent(ProtectionEvent.SessionBegan);
   }
 
   private updateSessionExpiryTimer(expiryDate: Date) {
-    const expiryTime = expiryDate.getTime();
-    if (expiryTime > Date.now()) {
-      const timer: TimerHandler = () => {
-        void this.setSessionExpiryDate(new Date());
-      };
-      clearTimeout(this.sessionExpiryTimeout);
-      this.sessionExpiryTimeout = setTimeout(timer, expiryTime - Date.now());
-    }
+    clearTimeout(this.sessionExpiryTimeout);
+    const timer: TimerHandler = () => {
+      this.clearSession();
+    };
+    this.sessionExpiryTimeout = setTimeout(
+      timer,
+      expiryDate.getTime() - Date.now()
+    );
   }
 }
