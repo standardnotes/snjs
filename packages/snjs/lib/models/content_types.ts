@@ -16,7 +16,6 @@ export function displayStringForContentType(
     [ContentType.Editor]: 'editor',
     [ContentType.Theme]: 'theme',
     [ContentType.ServerExtension]: 'server extension',
-    [ContentType.Mfa]: 'two-factor authentication setting',
     [ContentType.FilesafeCredentials]: 'FileSafe credential',
     [ContentType.FilesafeFileMetadata]: 'FileSafe file',
     [ContentType.FilesafeIntegration]: 'FileSafe integration',

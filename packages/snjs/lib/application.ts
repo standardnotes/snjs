@@ -634,10 +634,6 @@ export class SNApplication {
     await this.sync();
   }
 
-  public deleteItemLocally(item: SNItem): void {
-    this.itemManager.removeItemLocally(item);
-  }
-
   public async emptyTrash(): Promise<void> {
     await this.itemManager.emptyTrash();
     await this.sync();

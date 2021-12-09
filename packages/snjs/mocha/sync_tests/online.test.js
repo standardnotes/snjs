@@ -150,7 +150,7 @@ describe('online syncing', function () {
   it('server extensions should not be encrypted for sync', async function () {
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: await Uuid.GenerateUuid(),
-      content_type: ContentType.Mfa,
+      content_type: ContentType.ServerExtension,
       content: {
         secret: '123',
       },
