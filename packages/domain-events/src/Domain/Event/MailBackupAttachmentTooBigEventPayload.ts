@@ -1,6 +1,6 @@
 export interface MailBackupAttachmentTooBigEventPayload {
   allowedSize: string
   attachmentSize: string
-  extensionSettingUuid: string
+  extensionSettingUuid?: string
   email: string
 }
