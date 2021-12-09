@@ -1070,8 +1070,8 @@ export class SNApplication {
     return this.protectionService.clearSession();
   }
 
-  public getIsProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
-    return this.protectionService.getIsProtectionRemembranceSelectionDontRemember(protectionSessionDuration);
+  public isProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
+    return this.protectionService.isProtectionRemembranceSelectionDontRemember(protectionSessionDuration);
   }
 
   /**

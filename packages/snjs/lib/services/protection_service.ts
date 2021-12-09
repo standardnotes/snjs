@@ -341,7 +341,7 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return this.setSessionExpiryDate(new Date());
   }
 
-  public getIsProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
+  public isProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
     return protectionSessionDuration === ProtectionSessionLengthSeconds.None;
   }
 
