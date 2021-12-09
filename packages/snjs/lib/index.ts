@@ -217,3 +217,5 @@ export type { MessageData } from './services/component_manager';
 export { Features, FeatureIdentifier } from '@standardnotes/features';
 export { RoleName } from '@standardnotes/auth';
 export { SettingName } from '@standardnotes/settings';
+
+export { DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING } from './constants'

@@ -1073,6 +1073,10 @@ export class SNApplication {
     return this.protectionService.clearSession();
   }
 
+  public getIsProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
+    return this.protectionService.getIsProtectionRemembranceSelectionDontRemember(protectionSessionDuration);
+  }
+
   /**
    * @returns whether note access has been granted or not
    */

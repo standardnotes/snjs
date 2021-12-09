@@ -341,6 +341,10 @@ export class SNProtectionService extends PureService<ProtectionEvent.SessionExpi
     return this.setSessionExpiryDate(new Date());
   }
 
+  public getIsProtectionRemembranceSelectionDontRemember(protectionSessionDuration: number): boolean {
+    return protectionSessionDuration === ProtectionSessionLengthSeconds.None;
+  }
+
   private async setSessionExpiryDate(date: Date) {
     await this.storageService.setValue(StorageKey.ProtectionExpirey, date);
     void this.notifyEvent(ProtectionEvent.SessionExpiryDateChanged);
