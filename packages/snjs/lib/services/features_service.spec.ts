@@ -11,9 +11,12 @@ import {
   SNItem,
   SNSessionManager,
   SNStorageService,
-  StorageKey
+  StorageKey,
 } from '@Lib/index';
-import { FeatureStatus, SNFeaturesService } from '@Lib/services/features_service';
+import {
+  FeatureStatus,
+  SNFeaturesService,
+} from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType } from '@standardnotes/common';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
@@ -58,10 +61,7 @@ describe('featuresService', () => {
   };
 
   beforeEach(() => {
-    roles = [
-      RoleName.BasicUser,
-      RoleName.CoreUser,
-    ];
+    roles = [RoleName.BasicUser, RoleName.CoreUser];
 
     now = new Date();
     tomorrow_client = now.setDate(now.getDate() + 1);
@@ -91,21 +91,19 @@ describe('featuresService', () => {
     apiService.getUserFeatures = jest.fn().mockReturnValue({
       data: {
         features,
-      }
+      },
     });
     apiService.downloadOfflineFeaturesFromRepo = jest.fn().mockReturnValue({
-      features
-    })
-    apiService.isCustomServerHostUsed = jest.fn().mockReturnValue(false)
+      features,
+    });
+    apiService.isCustomServerHostUsed = jest.fn().mockReturnValue(false);
 
     itemManager = {} as jest.Mocked<ItemManager>;
-    itemManager.getItems = jest.fn().mockReturnValue(
-      items
-    );
+    itemManager.getItems = jest.fn().mockReturnValue(items);
     itemManager.createItem = jest.fn();
-    itemManager.changeComponent = jest.fn().mockReturnValue(
-      {} as jest.Mocked<SNItem>
-    )
+    itemManager.changeComponent = jest
+      .fn()
+      .mockReturnValue({} as jest.Mocked<SNItem>);
     itemManager.setItemsToBeDeleted = jest.fn();
     itemManager.addObserver = jest.fn();
     itemManager.changeItem = jest.fn();
@@ -134,65 +132,70 @@ describe('featuresService', () => {
     sessionManager = {} as jest.Mocked<SNSessionManager>;
     sessionManager.getUser = jest.fn();
 
-    crypto = {} as jest.Mocked<SNPureCrypto>
-    crypto.base64Decode = jest.fn()
+    crypto = {} as jest.Mocked<SNPureCrypto>;
+    crypto.base64Decode = jest.fn();
   });
 
   describe('loadUserRoles()', () => {
     it('retrieves user roles and features from storage', async () => {
       await createService().initializeFromDisk();
-      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserRoles, undefined, []);
-      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserFeatures, undefined, []);
-    })
-  })
+      expect(storageService.getValue).toHaveBeenCalledWith(
+        StorageKey.UserRoles,
+        undefined,
+        []
+      );
+      expect(storageService.getValue).toHaveBeenCalledWith(
+        StorageKey.UserFeatures,
+        undefined,
+        []
+      );
+    });
+  });
 
   describe('updateRoles()', () => {
     it('saves new roles to storage and fetches features if a role has been added', async () => {
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
       await featuresService.updateRoles('123', newRoles);
-      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles);
+      expect(storageService.setValue).toHaveBeenCalledWith(
+        StorageKey.UserRoles,
+        newRoles
+      );
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123');
     });
 
     it('saves new roles to storage and fetches features if a role has been removed', async () => {
-      const newRoles = [
-        RoleName.BasicUser,
-      ];
+      const newRoles = [RoleName.BasicUser];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
       await featuresService.updateRoles('123', newRoles);
-      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles);
+      expect(storageService.setValue).toHaveBeenCalledWith(
+        StorageKey.UserRoles,
+        newRoles
+      );
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123');
     });
 
-
     it('saves features to storage when roles change', async () => {
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
       await featuresService.updateRoles('123', newRoles);
-      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserFeatures, features);
-    })
+      expect(storageService.setValue).toHaveBeenCalledWith(
+        StorageKey.UserFeatures,
+        features
+      );
+    });
 
     it('creates items for non-expired features with content type if they do not exist', async () => {
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
@@ -206,7 +209,7 @@ describe('featuresService', () => {
             content_type: ContentType.Theme,
             expires_at: tomorrow_client,
             identifier: FeatureIdentifier.MidnightTheme,
-          }
+          },
         }),
         true
       );
@@ -217,7 +220,7 @@ describe('featuresService', () => {
             content_type: ContentType.Component,
             expires_at: tomorrow_client,
             identifier: FeatureIdentifier.BoldEditor,
-          }
+          },
         }),
         true
       );
@@ -230,15 +233,12 @@ describe('featuresService', () => {
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
-            valid_until: new Date()
-          }
+            valid_until: new Date(),
+          },
         },
       } as never);
 
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
@@ -248,15 +248,12 @@ describe('featuresService', () => {
 
       expect(itemManager.changeComponent).toHaveBeenCalledWith(
         '789',
-        expect.any(Function),
+        expect.any(Function)
       );
-    })
+    });
 
     it('creates items for expired components if they do not exist', async () => {
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       const now = new Date();
       const yesterday_client = now.setDate(now.getDate() - 1);
@@ -265,11 +262,13 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
-          features: [{
-            ...features[1],
-            expires_at: yesterday_server,
-          }]
-        }
+          features: [
+            {
+              ...features[1],
+              expires_at: yesterday_server,
+            },
+          ],
+        },
       });
 
       const featuresService = createService();
@@ -282,7 +281,7 @@ describe('featuresService', () => {
             content_type: ContentType.Component,
             expires_at: yesterday_client,
             identifier: FeatureIdentifier.BoldEditor,
-          }
+          },
         }),
         true
       );
@@ -295,38 +294,37 @@ describe('featuresService', () => {
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
-            valid_until: new Date()
-          }
+            valid_until: new Date(),
+          },
         },
       } as never);
 
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       const now = new Date();
       const yesterday_client = now.setDate(now.getDate() - 1);
       const yesterday_server = yesterday_client * 1_000;
 
-      itemManager.changeComponent = jest.fn().mockReturnValue(
-        existingItem
-      )
+      itemManager.changeComponent = jest.fn().mockReturnValue(existingItem);
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
-          features: [{
-            ...features[1],
-            expires_at: yesterday_server,
-          }]
-        }
+          features: [
+            {
+              ...features[1],
+              expires_at: yesterday_server,
+            },
+          ],
+        },
       });
 
       const featuresService = createService();
       await featuresService.initializeFromDisk();
       await featuresService.updateRoles('123', newRoles);
-      expect(componentManager.setReadonlyStateForComponent).toHaveBeenCalledWith(existingItem, true);
+      expect(
+        componentManager.setReadonlyStateForComponent
+      ).toHaveBeenCalledWith(existingItem, true);
     });
 
     it('deletes items for expired themes', async () => {
@@ -336,31 +334,28 @@ describe('featuresService', () => {
         safeContent: {
           package_info: {
             identifier: FeatureIdentifier.MidnightTheme,
-            valid_until: new Date()
-          }
+            valid_until: new Date(),
+          },
         },
       } as never);
 
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       const now = new Date();
       const yesterday = now.setDate(now.getDate() - 1);
 
-      itemManager.changeComponent = jest.fn().mockReturnValue(
-        existingItem
-      )
+      itemManager.changeComponent = jest.fn().mockReturnValue(existingItem);
       storageService.getValue = jest.fn().mockReturnValue(roles);
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
-          features: [{
-            ...features[0],
-            expires_at: yesterday,
-          }]
-        }
+          features: [
+            {
+              ...features[0],
+              expires_at: yesterday,
+            },
+          ],
+        },
       });
 
       const featuresService = createService();
@@ -374,7 +369,7 @@ describe('featuresService', () => {
         {
           identifier: FeatureIdentifier.TagNesting,
           expires_at: tomorrow_server,
-        }
+        },
       ];
 
       apiService.getUserFeatures = jest.fn().mockReturnValue({
@@ -383,10 +378,7 @@ describe('featuresService', () => {
         },
       });
 
-      const newRoles = [
-        ...roles,
-        RoleName.PlusUser,
-      ];
+      const newRoles = [...roles, RoleName.PlusUser];
 
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
@@ -414,15 +406,15 @@ describe('featuresService', () => {
           identifier: FeatureIdentifier.MidnightTheme,
           content_type: ContentType.Theme,
           expires_at: tomorrow_server,
-          role_name: RoleName.CoreUser
+          role_name: RoleName.CoreUser,
         },
         {
           identifier: FeatureIdentifier.BoldEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
-          role_name: RoleName.PlusUser
+          role_name: RoleName.PlusUser,
         },
-      ] as jest.Mocked<FeatureDescription[]>
+      ] as jest.Mocked<FeatureDescription[]>;
 
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
@@ -437,28 +429,40 @@ describe('featuresService', () => {
         RoleName.CoreUser,
       ]);
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NotInCurrentPlan);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.Entitled);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
 
       await featuresService.updateRoles('123', [RoleName.BasicUser]);
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.NoUserSubscription);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NoUserSubscription);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NoUserSubscription);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.NoUserSubscription);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)
+      ).toBe(FeatureStatus.NoUserSubscription);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
+      ).toBe(FeatureStatus.NoUserSubscription);
 
       features = [
         {
           identifier: FeatureIdentifier.MidnightTheme,
           content_type: ContentType.Theme,
           expires_at: expiredDate,
-          role_name: RoleName.CoreUser
+          role_name: RoleName.CoreUser,
         },
         {
           identifier: FeatureIdentifier.BoldEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
-          role_name: RoleName.PlusUser
+          role_name: RoleName.PlusUser,
         },
       ] as jest.Mocked<FeatureDescription[]>;
 
@@ -473,10 +477,16 @@ describe('featuresService', () => {
         RoleName.CoreUser,
       ]);
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.InCurrentPlanButExpired);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NotInCurrentPlan);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan);
-    })
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.InCurrentPlanButExpired);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
+    });
 
     it('third party feature status', async () => {
       const featuresService = createService();
@@ -485,20 +495,19 @@ describe('featuresService', () => {
         identifier: 'third-party-theme' as FeatureIdentifier,
         content_type: ContentType.Theme,
         expires_at: tomorrow_server,
-        role_name: RoleName.CoreUser
+        role_name: RoleName.CoreUser,
       };
 
       const editorFeature = {
         identifier: 'third-party-editor' as FeatureIdentifier,
         content_type: ContentType.Component,
         expires_at: expiredDate,
-        role_name: RoleName.PlusUser
+        role_name: RoleName.PlusUser,
       };
 
-      features = [
-        themeFeature,
-        editorFeature
-      ] as jest.Mocked<FeatureDescription[]>
+      features = [themeFeature, editorFeature] as jest.Mocked<
+        FeatureDescription[]
+      >;
 
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
@@ -515,7 +524,7 @@ describe('featuresService', () => {
               valid_until: themeFeature.expires_at,
               package_info: {
                 ...themeFeature,
-              }
+              },
             },
           } as never),
           new SNComponent({
@@ -525,20 +534,39 @@ describe('featuresService', () => {
               valid_until: new Date(editorFeature.expires_at),
               package_info: {
                 ...editorFeature,
-              }
+              },
             },
-          } as never)
+          } as never),
         ]),
-        set: jest.fn()
+        set: jest.fn(),
       });
 
-      await featuresService.updateRoles('123', [
-        RoleName.BasicUser,
-      ]);
+      await featuresService.updateRoles('123', [RoleName.BasicUser]);
 
-      expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(FeatureStatus.Entitled);
-      expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(FeatureStatus.InCurrentPlanButExpired);
-    })
+      expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(
+        FeatureStatus.Entitled
+      );
+      expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(
+        FeatureStatus.InCurrentPlanButExpired
+      );
+    });
+
+    it('feature status should be not entitled if no account or offline repo', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRoles('123', [RoleName.BasicUser]);
+
+      credentialService.isSignedIn = jest.fn().mockReturnValue(false);
+
+      featuresService['completedSuccessfulFeaturesRetrieval'] = false;
+
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.NoUserSubscription);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
+      ).toBe(FeatureStatus.NoUserSubscription);
+    });
 
     it('feature status should be entitled until first successful features request made', async () => {
       const featuresService = createService();
@@ -552,13 +580,21 @@ describe('featuresService', () => {
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.Entitled);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.Entitled);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
+      ).toBe(FeatureStatus.Entitled);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = true;
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.Entitled);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
     });
 
     it('feature status for offline subscription', async () => {
@@ -572,21 +608,27 @@ describe('featuresService', () => {
       credentialService.isSignedIn = jest.fn().mockReturnValue(false);
       featuresService['completedSuccessfulFeaturesRetrieval'] = true;
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.NoUserSubscription);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NoUserSubscription);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.NoUserSubscription);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
+      ).toBe(FeatureStatus.NoUserSubscription);
 
       featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true);
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled);
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(FeatureStatus.NotInCurrentPlan);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.Entitled);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
     });
 
     it('has paid subscription', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRoles('123', [
-        RoleName.BasicUser,
-      ]);
+      await featuresService.updateRoles('123', [RoleName.BasicUser]);
 
       expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy;
 
@@ -608,11 +650,17 @@ describe('featuresService', () => {
         safeContent: {
           url: `https://extensions.standardnotes.org/${extensionKey}`,
         },
-      } as never)
+      } as never);
 
       const featuresService = createService();
-      await featuresService.migrateFeatureRepoToUserSetting([extensionRepoItem]);
-      expect(settingsService.updateSetting).toHaveBeenCalledWith(SettingName.ExtensionKey, extensionKey, true);
+      await featuresService.migrateFeatureRepoToUserSetting([
+        extensionRepoItem,
+      ]);
+      expect(settingsService.updateSetting).toHaveBeenCalledWith(
+        SettingName.ExtensionKey,
+        extensionKey,
+        true
+      );
     });
-  })
+  });
 });
