@@ -15,7 +15,6 @@ export enum ContentType {
   UserPrefs = 'SN|UserPreferences',
   HistorySession = 'SN|HistorySession',
   Theme = 'SN|Theme',
-  Mfa = 'SF|MFA',
   ServerExtension = 'SF|Extension',
   FilesafeCredentials = 'SN|FileSafe|Credentials',
   FilesafeFileMetadata = 'SN|FileSafe|FileMetadata',

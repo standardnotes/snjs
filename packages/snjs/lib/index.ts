@@ -217,5 +217,7 @@ export type { MessageData } from './services/component_manager';
 export { Features, FeatureIdentifier } from '@standardnotes/features';
 export { RoleName } from '@standardnotes/auth';
 export { SettingName } from '@standardnotes/settings';
+export { Migration2_20_0 } from './migrations/2_20_0';
+export { ApplicationStage } from '@Lib/stages';
 
 export { DURATION_TO_POSTPONE_PROTECTED_NOTE_LOCK_WHILE_EDITING } from './constants'

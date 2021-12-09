@@ -5,7 +5,6 @@ import { PayloadFormat, PurePayload } from '@Lib/protocol/payloads';
  * Non-encrypted types are items whose values a server must be able to read.
  */
 export const NonEncryptedTypes = Object.freeze([
-  ContentType.Mfa,
   ContentType.ServerExtension,
 ]);
 
