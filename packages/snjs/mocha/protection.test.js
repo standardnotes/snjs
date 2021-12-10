@@ -314,7 +314,7 @@ describe('protections', function () {
   it('handles session length', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     await this.application.protectionService.setSessionLength(300);
-    const length = await this.application.protectionService.getSessionLength();
+    const length = await this.application.protectionService.getLastSessionLength();
     expect(length).to.equal(300);
     const expirey = await this.application.getProtectionSessionExpiryDate();
     expect(expirey).to.be.ok;
@@ -323,7 +323,7 @@ describe('protections', function () {
   it('handles session length', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     await this.application.protectionService.setSessionLength(300);
-    const length = await this.application.protectionService.getSessionLength();
+    const length = await this.application.protectionService.getLastSessionLength();
     expect(length).to.equal(300);
     const expirey = await this.application.getProtectionSessionExpiryDate();
     expect(expirey).to.be.ok;
@@ -403,23 +403,23 @@ describe('protections', function () {
     });
   });
 
-  describe('areProtectionsEnabled', async function () {
+  describe('hasUnprotectedAccessSession', async function () {
     it('should return true when session length has not been set', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
       await this.application.addPasscode('passcode');
-      expect(this.application.areProtectionsEnabled()).to.be.true;
+      expect(this.application.hasUnprotectedAccessSession()).to.be.true;
     });
 
     it('should return false when session length has been set', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
       await this.application.addPasscode('passcode');
       await this.application.protectionService.setSessionLength(300);
-      expect(this.application.areProtectionsEnabled()).to.be.false;
+      expect(this.application.hasUnprotectedAccessSession()).to.be.false;
     });
 
     it('should return false when there are no protection sources', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
-      expect(this.application.areProtectionsEnabled()).to.be.false;
+      expect(this.application.hasUnprotectedAccessSession()).to.be.false;
     });
   });
 

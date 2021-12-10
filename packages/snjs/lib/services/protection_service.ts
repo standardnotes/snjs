@@ -17,15 +17,14 @@ import { ItemManager } from './item_manager';
 import { Uuids } from '@Lib/models/functions';
 
 export enum ProtectionEvent {
-  SessionBegan = 'SessionBegan',
-  SessionExpired = 'SessionExpired',
+  UnprotectedSessionBegan = 'UnprotectedSessionBegan',
+  UnprotectedSessionExpired = 'UnprotectedSessionExpired',
 }
 
-export const SecondsToDeferUILevelSessionExpirationDuringActiveInteraction = 30;
-export const EphemeralSessionSecondsDuration = 30;
+export const ProposedSecondsToDeferUILevelSessionExpirationDuringActiveInteraction = 30;
 
-export enum ProtectionSessionLengthSeconds {
-  None = 0,
+export enum UnprotectedAccessSecondsDuration {
+  OneMinute = 60,
   FiveMinutes = 300,
   OneHour = 3600,
   OneWeek = 604800,
@@ -34,25 +33,25 @@ export enum ProtectionSessionLengthSeconds {
 export function isValidProtectionSessionLength(number: unknown): boolean {
   return (
     typeof number === 'number' &&
-    Object.values(ProtectionSessionLengthSeconds).includes(number)
+    Object.values(UnprotectedAccessSecondsDuration).includes(number)
   );
 }
 
 export const ProtectionSessionDurations = [
   {
-    valueInSeconds: ProtectionSessionLengthSeconds.None,
-    label: 'Don\'t Remember',
+    valueInSeconds: UnprotectedAccessSecondsDuration.OneMinute,
+    label: '1 Minute',
   },
   {
-    valueInSeconds: ProtectionSessionLengthSeconds.FiveMinutes,
+    valueInSeconds: UnprotectedAccessSecondsDuration.FiveMinutes,
     label: '5 Minutes',
   },
   {
-    valueInSeconds: ProtectionSessionLengthSeconds.OneHour,
+    valueInSeconds: UnprotectedAccessSecondsDuration.OneHour,
     label: '1 Hour',
   },
   {
-    valueInSeconds: ProtectionSessionLengthSeconds.OneWeek,
+    valueInSeconds: UnprotectedAccessSecondsDuration.OneWeek,
     label: '1 Week',
   },
 ];
@@ -97,9 +96,9 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
     );
   }
 
-  public areProtectionsEnabled(): boolean {
+  public hasUnprotectedAccessSession(): boolean {
     return (
-      this.hasProtectionSources() && this.getSessionExpiryDate() <= new Date()
+      this.hasProtectionSources() && this.getSessionExpiryDate() > new Date()
     );
   }
 
@@ -181,7 +180,7 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
     let sessionValidation: Promise<boolean> | undefined;
     const authorizedNotes = [];
     for (const note of notes) {
-      const isProtected = note.protected && this.areProtectionsEnabled();
+      const isProtected = note.protected && this.hasUnprotectedAccessSession();
       if (isProtected && !sessionValidation) {
         sessionValidation = this.validateOrRenewSession(challengeReason);
       }
@@ -304,7 +303,7 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
         undefined,
         undefined,
         undefined,
-        await this.getSessionLength()
+        this.getLastSessionLength() || UnprotectedAccessSecondsDuration.OneMinute
       )
     );
 
@@ -322,7 +321,7 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
           Error('No valid protection session length found. Got ' + length)
         );
       } else {
-        await this.setSessionLength(length as ProtectionSessionLengthSeconds);
+        await this.setSessionLength(length as UnprotectedAccessSecondsDuration);
       }
       return true;
     } else {
@@ -343,45 +342,31 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
 
   public clearSession(): Promise<void> {
     void this.setSessionExpiryDate(new Date());
-    return this.notifyEvent(ProtectionEvent.SessionExpired);
-  }
-
-  public isProtectionRemembranceSelectionDontRemember(
-    protectionSessionDuration: number
-  ): boolean {
-    return protectionSessionDuration === ProtectionSessionLengthSeconds.None;
+    return this.notifyEvent(ProtectionEvent.UnprotectedSessionExpired);
   }
 
   private async setSessionExpiryDate(date: Date) {
     await this.storageService.setValue(StorageKey.ProtectionExpirey, date);
   }
 
-  private getSessionLength(): ProtectionSessionLengthSeconds {
-    const length = this.storageService.getValue(
+  private getLastSessionLength(): UnprotectedAccessSecondsDuration | undefined {
+    return this.storageService.getValue(
       StorageKey.ProtectionSessionLength
     );
-    if (length) {
-      return length;
-    } else {
-      return ProtectionSessionLengthSeconds.None;
-    }
   }
 
   private async setSessionLength(
-    length: ProtectionSessionLengthSeconds
+    length: UnprotectedAccessSecondsDuration
   ): Promise<void> {
     await this.storageService.setValue(
       StorageKey.ProtectionSessionLength,
       length
     );
     const expiresAt = new Date();
-    if (length === ProtectionSessionLengthSeconds.None) {
-      length = EphemeralSessionSecondsDuration;
-    }
     expiresAt.setSeconds(expiresAt.getSeconds() + length);
     await this.setSessionExpiryDate(expiresAt);
     this.updateSessionExpiryTimer(expiresAt);
-    void this.notifyEvent(ProtectionEvent.SessionBegan);
+    void this.notifyEvent(ProtectionEvent.UnprotectedSessionBegan);
   }
 
   private updateSessionExpiryTimer(expiryDate: Date) {

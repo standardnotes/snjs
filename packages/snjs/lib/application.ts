@@ -115,7 +115,7 @@ import {
 import { PayloadFormat } from './protocol/payloads';
 import {
   ProtectionEvent,
-  ProtectionSessionLengthSeconds,
+  UnprotectedAccessSecondsDuration,
 } from './services/protection_service';
 import { RemoteSession, StorageKey } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
@@ -1060,8 +1060,8 @@ export class SNApplication {
     return this.protectionService.hasProtectionSources();
   }
 
-  public areProtectionsEnabled(): boolean {
-    return this.protectionService.areProtectionsEnabled();
+  public hasUnprotectedAccessSession(): boolean {
+    return this.protectionService.hasUnprotectedAccessSession();
   }
 
   /**
@@ -1991,10 +1991,10 @@ export class SNApplication {
     );
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
-        if (event === ProtectionEvent.SessionBegan) {
-          void this.notifyEvent(ApplicationEvent.ProtectionSessionBegan);
-        } else if (event === ProtectionEvent.SessionExpired) {
-          void this.notifyEvent(ApplicationEvent.ProtectionSessionExpired);
+        if (event === ProtectionEvent.UnprotectedSessionBegan) {
+          void this.notifyEvent(ApplicationEvent.UnprotectedSessionBegan);
+        } else if (event === ProtectionEvent.UnprotectedSessionExpired) {
+          void this.notifyEvent(ApplicationEvent.UnprotectedSessionExpired);
         }
       })
     );
