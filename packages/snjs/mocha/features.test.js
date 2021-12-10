@@ -365,6 +365,7 @@ describe('features', () => {
 
   describe('offline features migration', () => {
     it('previous extension repo should be migrated to offline feature repo', async () => {
+      application = await Factory.signOutApplicationAndReturnNew(application);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.createManagedItem(
         ContentType.ExtensionRepo,
