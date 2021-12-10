@@ -42,7 +42,6 @@ import {
   SignInStrings,
 } from './messages';
 import { UuidString } from '@Lib/types';
-import { SNFeaturesService } from '../features_service';
 import { SNWebSocketsService } from './websockets_service';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
@@ -148,6 +147,14 @@ export class SNSessionManager extends PureService<SessionEvent> {
       await this.apiService.signOut();
       this.webSocketsService.closeWebSocketConnection();
     }
+  }
+
+  public isSignedIn(): boolean {
+    return this.getUser() != undefined;
+  }
+
+  public isSignedIntoFirstPartyServer(): boolean {
+    return this.isSignedIn() && !this.apiService.isThirdPartyHostUsed();
   }
 
   public async reauthenticateInvalidSession(

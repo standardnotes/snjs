@@ -96,7 +96,7 @@ describe('featuresService', () => {
     apiService.downloadOfflineFeaturesFromRepo = jest.fn().mockReturnValue({
       features,
     });
-    apiService.isCustomServerHostUsed = jest.fn().mockReturnValue(false);
+    apiService.isThirdPartyHostUsed = jest.fn().mockReturnValue(false);
 
     itemManager = {} as jest.Mocked<ItemManager>;
     itemManager.getItems = jest.fn().mockReturnValue(items);
@@ -119,7 +119,6 @@ describe('featuresService', () => {
     settingsService.updateSetting = jest.fn();
 
     credentialService = {} as jest.Mocked<SNCredentialService>;
-    credentialService.isSignedIn = jest.fn();
     credentialService.addEventObserver = jest.fn();
 
     syncService = {} as jest.Mocked<SNSyncService>;
@@ -130,6 +129,7 @@ describe('featuresService', () => {
     alertService.alert = jest.fn();
 
     sessionManager = {} as jest.Mocked<SNSessionManager>;
+    sessionManager.isSignedIntoFirstPartyServer = jest.fn();
     sessionManager.getUser = jest.fn();
 
     crypto = {} as jest.Mocked<SNPureCrypto>;
@@ -422,7 +422,7 @@ describe('featuresService', () => {
         },
       });
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
 
       await featuresService.updateRoles('123', [
         RoleName.BasicUser,
@@ -556,7 +556,7 @@ describe('featuresService', () => {
 
       await featuresService.updateRoles('123', [RoleName.BasicUser]);
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(false);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
@@ -576,7 +576,7 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
@@ -605,7 +605,7 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(false);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
       featuresService['completedSuccessfulFeaturesRetrieval'] = true;
 
       expect(
@@ -629,6 +629,7 @@ describe('featuresService', () => {
       const featuresService = createService();
 
       await featuresService.updateRoles('123', [RoleName.BasicUser]);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
 
       expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy;
 
@@ -637,7 +638,18 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
-      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeTruthy;
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true);
+    });
+
+    it('has paid subscription should be true if offline repo and signed into third party server', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRoles('123', [RoleName.BasicUser]);
+
+      featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
+
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true);
     });
   });
 

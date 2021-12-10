@@ -188,7 +188,7 @@ export class SNApiService extends PureService<
     return this.host;
   }
 
-  public isCustomServerHostUsed(): boolean {
+  public isThirdPartyHostUsed(): boolean {
     try {
       const applicationHost = this.getHost() || '';
       const { host } = new URL(applicationHost);

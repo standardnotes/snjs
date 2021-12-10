@@ -153,8 +153,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
             (item) => !item.deleted
           ) as SNFeatureRepo[];
           if (
-            this.credentialService.isSignedIn() &&
-            !this.apiService.isCustomServerHostUsed()
+            this.sessionManager.isSignedIntoFirstPartyServer()
           ) {
             await this.migrateFeatureRepoToUserSetting(items);
           } else {
@@ -170,7 +169,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           const featureRepos = this.itemManager.getItems(
             ContentType.ExtensionRepo
           ) as SNFeatureRepo[];
-          if (!this.apiService.isCustomServerHostUsed()) {
+          if (!this.apiService.isThirdPartyHostUsed()) {
             void this.migrateFeatureRepoToUserSetting(featureRepos);
           }
         }
@@ -369,7 +368,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   }
 
   public hasPaidOnlineOrOfflineSubscription(): boolean {
-    if (this.credentialService.isSignedIn()) {
+    if (this.sessionManager.isSignedIntoFirstPartyServer()) {
       const roles = this.roles;
       const unpaidRoles = [RoleName.BasicUser];
       return roles.some((role) => !unpaidRoles.includes(role));
