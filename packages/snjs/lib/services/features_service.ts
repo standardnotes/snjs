@@ -2,7 +2,7 @@ import { ApplicationStage } from '@Lib/stages';
 import {
   LEGACY_PROD_EXT_ORIGIN,
   PROD_OFFLINE_FEATURES_URL,
-} from './../constants';
+} from './../hosts';
 import {
   SNFeatureRepo,
   FeatureRepoContent,
@@ -58,7 +58,7 @@ import { ButtonType, SNAlertService } from '@Services/alert_service';
 import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
-} from '@Lib/constants';
+} from '@Lib/hosts';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
