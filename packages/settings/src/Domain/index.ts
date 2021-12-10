@@ -1,3 +1,4 @@
 export * from './EmailBackup/EmailBackupFrequency'
-export * from './MuteEmails/MuteEmailsOption'
+export * from './MuteFailedBackupsEmails/MuteFailedBackupsEmailsOption'
+export * from './MuteFailedCloudBackupsEmails/MuteFailedCloudBackupsEmailsOption'
 export * from './Setting/SettingName'
