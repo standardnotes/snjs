@@ -295,7 +295,12 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
         return true;
       }
     }
-
+    const lastSessionLength = this.getLastSessionLength();
+    const chosenSessionLength = isValidProtectionSessionLength(
+      lastSessionLength
+    )
+      ? lastSessionLength
+      : UnprotectedAccessSecondsDuration.OneMinute;
     prompts.push(
       new ChallengePrompt(
         ChallengeValidation.ProtectionSessionDuration,
@@ -303,7 +308,7 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
         undefined,
         undefined,
         undefined,
-        this.getLastSessionLength() || UnprotectedAccessSecondsDuration.OneMinute
+        chosenSessionLength
       )
     );
 
@@ -350,9 +355,7 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
   }
 
   private getLastSessionLength(): UnprotectedAccessSecondsDuration | undefined {
-    return this.storageService.getValue(
-      StorageKey.ProtectionSessionLength
-    );
+    return this.storageService.getValue(StorageKey.ProtectionSessionLength);
   }
 
   private async setSessionLength(
