@@ -119,7 +119,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
             return;
           }
           const { userUuid, userRoles } = data as MetaReceivedData;
-          await this.updateRoles(
+          await this.updateRolesAndFetchFeatures(
             userUuid,
             userRoles.map((role) => role.name)
           );
@@ -133,8 +133,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           const {
             payload: { userUuid, currentRoles },
           } = data as UserRolesChangedEvent;
-          await this.setRoles(currentRoles);
-          await this.updateFeatures(userUuid);
+          await this.updateRolesAndFetchFeatures(userUuid, currentRoles);
         }
       }
     );
@@ -332,7 +331,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     );
   }
 
-  public async updateRoles(
+  public async updateRolesAndFetchFeatures(
     userUuid: UuidString,
     roles: RoleName[]
   ): Promise<void> {
@@ -340,7 +339,19 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     if (userRolesChanged || this.needsInitialFeaturesUpdate) {
       this.needsInitialFeaturesUpdate = false;
       await this.setRoles(roles);
-      await this.updateFeatures(userUuid);
+      const featuresResponse = await this.apiService.getUserFeatures(userUuid);
+      if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
+        const features = (featuresResponse as UserFeaturesResponse).data.features;
+        features.forEach((feature) => {
+          if (feature.expires_at) {
+            feature.expires_at = convertTimestampToMilliseconds(
+              feature.expires_at
+            );
+          }
+        });
+        await this.didDownloadFeatures(features);
+        await this.mapFeaturesToItems(features);
+      }
     }
   }
 
@@ -427,22 +438,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       roles.some((role) => !this.roles.includes(role)) ||
       this.roles.some((role) => !roles.includes(role))
     );
-  }
-
-  private async updateFeatures(userUuid: UuidString): Promise<void> {
-    const featuresResponse = await this.apiService.getUserFeatures(userUuid);
-    if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
-      const features = (featuresResponse as UserFeaturesResponse).data.features;
-      features.forEach((feature) => {
-        if (feature.expires_at) {
-          feature.expires_at = convertTimestampToMilliseconds(
-            feature.expires_at
-          );
-        }
-      });
-      await this.didDownloadFeatures(features);
-      await this.mapFeaturesToItems(features);
-    }
   }
 
   private componentContentForFeatureDescription(
