@@ -619,6 +619,14 @@ export class ItemManager extends PureService {
   }
 
   /**
+   * @param item item to be checked
+   * @returns Whether the item is a template (unmanaged)
+   */
+  public isTemplateItem(item: SNItem): boolean {
+    return !this.collection.find(item.uuid);
+  }
+
+  /**
    * Inserts the item as-is by reading its payload value. This function will not
    * modify item in any way (such as marking it as dirty). It is up to the caller
    * to pass in a dirtied item if that is their intention.

@@ -6,6 +6,14 @@ import { SNTag } from '@Models/app/tag';
 import { PayloadManager } from './payload_manager';
 import { ItemManager, SNItem } from '@Lib/index';
 import { ContentType } from '@standardnotes/common';
+import { Uuid } from '@Lib/uuid';
+
+const setupRandomUuid = () => {
+  Uuid.SetGenerators(
+    () => Promise.resolve(String(Math.random())),
+    () => String(Math.random())
+  );
+};
 
 describe('itemManager', () => {
   let payloadManager: PayloadManager;
@@ -237,6 +245,39 @@ describe('itemManager', () => {
       expect(tags).toHaveLength(2);
       expect(tags[0].uuid).toEqual(childTag.uuid);
       expect(tags[1].uuid).toEqual(parentTag.uuid);
+    });
+  });
+
+  describe('template items', () => {
+    it('create template item', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const item = await itemManager.createTemplateItem(ContentType.Note, {
+        title: 'hello',
+        references: [],
+      });
+
+      expect(item).toBeTruthy();
+      /* Template items should never be added to the record */
+      expect(itemManager.items).toHaveLength(0);
+      expect(itemManager.notes).toHaveLength(0);
+    });
+
+    it('isTemplateItem return the correct value', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const item = await itemManager.createTemplateItem(ContentType.Note, {
+        title: 'hello',
+        references: [],
+      });
+
+      expect(itemManager.isTemplateItem(item)).toBeTruthy();
+
+      await itemManager.insertItem(item);
+
+      expect(itemManager.isTemplateItem(item)).toBeFalsy();
     });
   });
 });

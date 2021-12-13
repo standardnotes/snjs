@@ -534,6 +534,14 @@ export class SNApplication {
   }
 
   /**
+   * @param item item to be checked
+   * @returns Whether the item is a template (unmanaged)
+   */
+  public isTemplateItem(item: SNItem): boolean {
+    return this.itemManager.isTemplateItem(item);
+  }
+
+  /**
    * Creates an unmanaged item from a payload.
    */
   public createItemFromPayload(payload: PurePayload): SNItem {
