@@ -172,7 +172,7 @@ export class ItemManager extends PureService {
    * @param includeBlanks If true and an item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  findItems(uuids: UuidString[], includeBlanks = false) {
+  findItems(uuids: UuidString[], includeBlanks = false): SNItem[] {
     return this.collection.findAll(uuids, includeBlanks);
   }
 
@@ -880,6 +880,17 @@ export class ItemManager extends PureService {
     return this.changeItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note);
     }) as Promise<SNTag>;
+  }
+
+  public async addTagHierarchyToNote(
+    note: SNNote,
+    tag: SNTag
+  ): Promise<SNTag[]> {
+    const parentChainTags = this.getTagParentChain(tag.uuid);
+    const tagsToAdd = [...parentChainTags, tag];
+    return Promise.all(
+      tagsToAdd.map((tagToAdd) => this.addTagToNote(note, tagToAdd))
+    );
   }
 
   /**

@@ -917,6 +917,16 @@ export class SNApplication {
     return this.itemManager.getSortedTagsForNote(note);
   }
 
+  /**
+   * Add a tag and all its parent to a note.
+   *
+   * @param note The note assigned to a tag
+   * @param tagUuid The tag we'll assign to the note
+   */
+  public addTagHierarchyToNote(note: SNNote, tag: SNTag): Promise<SNTag[]> {
+    return this.itemManager.addTagHierarchyToNote(note, tag);
+  }
+
   public async findOrCreateTag(title: string): Promise<SNTag> {
     return this.itemManager.findOrCreateTagByTitle(title);
   }

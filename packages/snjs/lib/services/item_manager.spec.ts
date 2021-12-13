@@ -130,12 +130,12 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child);
       await itemManager.setTagParent(grandParent, parent);
 
-      expect(
-        itemManager.isTagAncestor(grandParent.uuid, parent.uuid)
-      ).toEqual(true);
-      expect(
-        itemManager.isTagAncestor(grandParent.uuid, child.uuid)
-      ).toEqual(true);
+      expect(itemManager.isTagAncestor(grandParent.uuid, parent.uuid)).toEqual(
+        true
+      );
+      expect(itemManager.isTagAncestor(grandParent.uuid, child.uuid)).toEqual(
+        true
+      );
       expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toEqual(true);
 
       expect(
@@ -219,6 +219,24 @@ describe('itemManager', () => {
 
       const notes = itemManager.getDisplayableItems(ContentType.Note);
       expect(notes).toHaveLength(1);
+    });
+
+    it('adding a note to a tag hierarchy should add the note to its parent too', async () => {
+      itemManager = createService();
+      const parentTag = createTag('parent');
+      const childTag = createTag('child');
+      const note = createNote('note');
+
+      await itemManager.insertItems([parentTag, childTag, note]);
+      await itemManager.setTagParent(parentTag, childTag);
+
+      await itemManager.addTagHierarchyToNote(note, childTag);
+
+      const tags = itemManager.getSortedTagsForNote(note);
+
+      expect(tags).toHaveLength(2);
+      expect(tags[0].uuid).toEqual(childTag.uuid);
+      expect(tags[1].uuid).toEqual(parentTag.uuid);
     });
   });
 });
