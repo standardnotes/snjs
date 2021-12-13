@@ -9,6 +9,8 @@ export const TRUSTED_FEATURE_HOSTS = [
   'api.standardnotes.com',
   'extensions.standardnotes.com',
   'extensions.standardnotes.org',
+  'extensions-server-dev.standardnotes.org',
+  'extensions-server-dev.standardnotes.com',
   'features.standardnotes.com',
 ];
 
