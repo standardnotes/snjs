@@ -48,11 +48,11 @@ import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
-import { OfflineSubscriptionEntitlements } from '@Services/features_service';
 import {
   APPLICATION_DEFAULT_HOSTS,
+  isUrlFirstParty,
   TRUSTED_FEATURE_HOSTS,
-} from '@Lib/constants';
+} from '@Lib/hosts';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -188,14 +188,9 @@ export class SNApiService extends PureService<
     return this.host;
   }
 
-  public isCustomServerHostUsed(): boolean {
-    try {
-      const applicationHost = this.getHost() || '';
-      const { host } = new URL(applicationHost);
-      return !APPLICATION_DEFAULT_HOSTS.includes(host);
-    } catch (err) {
-      return false;
-    }
+  public isThirdPartyHostUsed(): boolean {
+    const applicationHost = this.getHost() || '';
+    return !isUrlFirstParty(applicationHost);
   }
 
   public async setSession(session: Session, persist = true): Promise<void> {

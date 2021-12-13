@@ -132,11 +132,11 @@ describe('itemManager', () => {
 
       expect(
         itemManager.isTagAncestor(grandParent.uuid, parent.uuid)
-      ).toBeTruthy();
+      ).toEqual(true);
       expect(
         itemManager.isTagAncestor(grandParent.uuid, child.uuid)
-      ).toBeTruthy();
-      expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toBeTruthy();
+      ).toEqual(true);
+      expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toEqual(true);
 
       expect(
         itemManager.isTagAncestor(parent.uuid, grandParent.uuid)

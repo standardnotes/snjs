@@ -2,7 +2,7 @@ import { ApplicationStage } from '@Lib/stages';
 import {
   LEGACY_PROD_EXT_ORIGIN,
   PROD_OFFLINE_FEATURES_URL,
-} from './../constants';
+} from './../hosts';
 import {
   SNFeatureRepo,
   FeatureRepoContent,
@@ -58,7 +58,7 @@ import { ButtonType, SNAlertService } from '@Services/alert_service';
 import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
-} from '@Lib/constants';
+} from '@Lib/hosts';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -119,7 +119,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
             return;
           }
           const { userUuid, userRoles } = data as MetaReceivedData;
-          await this.updateRoles(
+          await this.updateRolesAndFetchFeatures(
             userUuid,
             userRoles.map((role) => role.name)
           );
@@ -133,8 +133,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           const {
             payload: { userUuid, currentRoles },
           } = data as UserRolesChangedEvent;
-          await this.setRoles(currentRoles);
-          await this.updateFeatures(userUuid);
+          await this.updateRolesAndFetchFeatures(userUuid, currentRoles);
         }
       }
     );
@@ -153,8 +152,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
             (item) => !item.deleted
           ) as SNFeatureRepo[];
           if (
-            this.credentialService.isSignedIn() &&
-            !this.apiService.isCustomServerHostUsed()
+            this.sessionManager.isSignedIntoFirstPartyServer()
           ) {
             await this.migrateFeatureRepoToUserSetting(items);
           } else {
@@ -170,7 +168,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           const featureRepos = this.itemManager.getItems(
             ContentType.ExtensionRepo
           ) as SNFeatureRepo[];
-          if (!this.apiService.isCustomServerHostUsed()) {
+          if (!this.apiService.isThirdPartyHostUsed()) {
             void this.migrateFeatureRepoToUserSetting(featureRepos);
           }
         }
@@ -333,7 +331,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     );
   }
 
-  public async updateRoles(
+  public async updateRolesAndFetchFeatures(
     userUuid: UuidString,
     roles: RoleName[]
   ): Promise<void> {
@@ -341,7 +339,19 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     if (userRolesChanged || this.needsInitialFeaturesUpdate) {
       this.needsInitialFeaturesUpdate = false;
       await this.setRoles(roles);
-      await this.updateFeatures(userUuid);
+      const featuresResponse = await this.apiService.getUserFeatures(userUuid);
+      if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
+        const features = (featuresResponse as UserFeaturesResponse).data.features;
+        features.forEach((feature) => {
+          if (feature.expires_at) {
+            feature.expires_at = convertTimestampToMilliseconds(
+              feature.expires_at
+            );
+          }
+        });
+        await this.didDownloadFeatures(features);
+        await this.mapFeaturesToItems(features);
+      }
     }
   }
 
@@ -369,7 +379,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   }
 
   public hasPaidOnlineOrOfflineSubscription(): boolean {
-    if (this.credentialService.isSignedIn()) {
+    if (this.sessionManager.isSignedIntoFirstPartyServer()) {
       const roles = this.roles;
       const unpaidRoles = [RoleName.BasicUser];
       return roles.some((role) => !unpaidRoles.includes(role));
@@ -428,22 +438,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       roles.some((role) => !this.roles.includes(role)) ||
       this.roles.some((role) => !roles.includes(role))
     );
-  }
-
-  private async updateFeatures(userUuid: UuidString): Promise<void> {
-    const featuresResponse = await this.apiService.getUserFeatures(userUuid);
-    if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
-      const features = (featuresResponse as UserFeaturesResponse).data.features;
-      features.forEach((feature) => {
-        if (feature.expires_at) {
-          feature.expires_at = convertTimestampToMilliseconds(
-            feature.expires_at
-          );
-        }
-      });
-      await this.didDownloadFeatures(features);
-      await this.mapFeaturesToItems(features);
-    }
   }
 
   private componentContentForFeatureDescription(

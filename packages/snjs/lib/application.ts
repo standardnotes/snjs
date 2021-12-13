@@ -1669,8 +1669,8 @@ export class SNApplication {
     return this.featuresService.deleteOfflineFeatureRepo();
   }
 
-  public isCustomServerHostUsed(): boolean {
-    return this.apiService.isCustomServerHostUsed();
+  public isThirdPartyHostUsed(): boolean {
+    return this.apiService.isThirdPartyHostUsed();
   }
 
   private constructServices() {

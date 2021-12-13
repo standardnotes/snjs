@@ -1,5 +1,6 @@
 export const APPLICATION_DEFAULT_HOSTS = [
   'api.standardnotes.com',
+  'api-dev.standardnotes.com',
   'sync.standardnotes.org',
 ];
 
@@ -10,6 +11,17 @@ export const TRUSTED_FEATURE_HOSTS = [
   'extensions.standardnotes.org',
   'features.standardnotes.com',
 ];
+
+const LocalHost = 'localhost';
+
+export function isUrlFirstParty(url: string): boolean {
+  try {
+    const { host } = new URL(url);
+    return host.startsWith(LocalHost) || APPLICATION_DEFAULT_HOSTS.includes(host);
+  } catch (_err) {
+    return false;
+  }
+}
 
 export const PROD_OFFLINE_FEATURES_URL =
   'https://api.standardnotes.com/v1/offline/features';

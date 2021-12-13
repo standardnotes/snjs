@@ -96,7 +96,7 @@ describe('featuresService', () => {
     apiService.downloadOfflineFeaturesFromRepo = jest.fn().mockReturnValue({
       features,
     });
-    apiService.isCustomServerHostUsed = jest.fn().mockReturnValue(false);
+    apiService.isThirdPartyHostUsed = jest.fn().mockReturnValue(false);
 
     itemManager = {} as jest.Mocked<ItemManager>;
     itemManager.getItems = jest.fn().mockReturnValue(items);
@@ -119,7 +119,6 @@ describe('featuresService', () => {
     settingsService.updateSetting = jest.fn();
 
     credentialService = {} as jest.Mocked<SNCredentialService>;
-    credentialService.isSignedIn = jest.fn();
     credentialService.addEventObserver = jest.fn();
 
     syncService = {} as jest.Mocked<SNSyncService>;
@@ -130,6 +129,7 @@ describe('featuresService', () => {
     alertService.alert = jest.fn();
 
     sessionManager = {} as jest.Mocked<SNSessionManager>;
+    sessionManager.isSignedIntoFirstPartyServer = jest.fn();
     sessionManager.getUser = jest.fn();
 
     crypto = {} as jest.Mocked<SNPureCrypto>;
@@ -159,7 +159,7 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(storageService.setValue).toHaveBeenCalledWith(
         StorageKey.UserRoles,
         newRoles
@@ -173,7 +173,7 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(storageService.setValue).toHaveBeenCalledWith(
         StorageKey.UserRoles,
         newRoles
@@ -187,7 +187,7 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(storageService.setValue).toHaveBeenCalledWith(
         StorageKey.UserFeatures,
         features
@@ -200,7 +200,7 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(itemManager.createItem).toHaveBeenCalledTimes(2);
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Theme,
@@ -244,7 +244,7 @@ describe('featuresService', () => {
       itemManager.getItems = jest.fn().mockReturnValue([existingItem]);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
 
       expect(itemManager.changeComponent).toHaveBeenCalledWith(
         '789',
@@ -273,7 +273,7 @@ describe('featuresService', () => {
 
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
         expect.objectContaining({
@@ -321,7 +321,7 @@ describe('featuresService', () => {
 
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(
         componentManager.setReadonlyStateForComponent
       ).toHaveBeenCalledWith(existingItem, true);
@@ -360,7 +360,7 @@ describe('featuresService', () => {
 
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith(['456']);
     });
 
@@ -383,7 +383,7 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', newRoles);
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
       expect(itemManager.createItem).not.toHaveBeenCalled();
     });
 
@@ -391,10 +391,10 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles);
       const featuresService = createService();
       await featuresService.initializeFromDisk();
-      await featuresService.updateRoles('123', roles);
-      await featuresService.updateRoles('123', roles);
-      await featuresService.updateRoles('123', roles);
-      await featuresService.updateRoles('123', roles);
+      await featuresService.updateRolesAndFetchFeatures('123', roles);
+      await featuresService.updateRolesAndFetchFeatures('123', roles);
+      await featuresService.updateRolesAndFetchFeatures('123', roles);
+      await featuresService.updateRolesAndFetchFeatures('123', roles);
       expect(storageService.setValue).toHaveBeenCalledTimes(2);
     });
 
@@ -422,9 +422,9 @@ describe('featuresService', () => {
         },
       });
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
 
-      await featuresService.updateRoles('123', [
+      await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
         RoleName.CoreUser,
       ]);
@@ -439,7 +439,7 @@ describe('featuresService', () => {
         featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
       ).toBe(FeatureStatus.NotInCurrentPlan);
 
-      await featuresService.updateRoles('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
 
       expect(
         featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
@@ -472,7 +472,7 @@ describe('featuresService', () => {
         },
       });
 
-      await featuresService.updateRoles('123', [
+      await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
         RoleName.CoreUser,
       ]);
@@ -541,7 +541,7 @@ describe('featuresService', () => {
         set: jest.fn(),
       });
 
-      await featuresService.updateRoles('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
 
       expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(
         FeatureStatus.Entitled
@@ -554,9 +554,9 @@ describe('featuresService', () => {
     it('feature status should be not entitled if no account or offline repo', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRoles('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(false);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
@@ -571,12 +571,12 @@ describe('featuresService', () => {
     it('feature status should be entitled until first successful features request made', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRoles('123', [
+      await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
         RoleName.PlusUser,
       ]);
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
@@ -600,12 +600,12 @@ describe('featuresService', () => {
     it('feature status for offline subscription', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRoles('123', [
+      await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
         RoleName.PlusUser,
       ]);
 
-      credentialService.isSignedIn = jest.fn().mockReturnValue(false);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
       featuresService['completedSuccessfulFeaturesRetrieval'] = true;
 
       expect(
@@ -628,16 +628,28 @@ describe('featuresService', () => {
     it('has paid subscription', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRoles('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
 
       expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy;
 
-      await featuresService.updateRoles('123', [
+      await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
         RoleName.PlusUser,
       ]);
 
-      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeTruthy;
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true);
+    });
+
+    it('has paid subscription should be true if offline repo and signed into third party server', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
+
+      featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
+
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true);
     });
   });
 

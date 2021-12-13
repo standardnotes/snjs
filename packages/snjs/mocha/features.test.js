@@ -240,7 +240,7 @@ describe('features', () => {
   describe('extension repo items observer', () => {
     it('should migrate to user setting when extension repo is added', async () => {
       sinon
-        .stub(application.apiService, 'isCustomServerHostUsed')
+        .stub(application.apiService, 'isThirdPartyHostUsed')
         .callsFake(() => {
           return false;
         });
@@ -264,7 +264,7 @@ describe('features', () => {
 
     it('signing into account with ext repo should migrate it', async () => {
       sinon
-        .stub(application.apiService, 'isCustomServerHostUsed')
+        .stub(application.apiService, 'isThirdPartyHostUsed')
         .callsFake(() => {
           return false;
         });
@@ -287,7 +287,7 @@ describe('features', () => {
 
       sinon.restore();
       sinon
-        .stub(application.apiService, 'isCustomServerHostUsed')
+        .stub(application.apiService, 'isThirdPartyHostUsed')
         .callsFake(() => {
           return false;
         });
@@ -307,7 +307,7 @@ describe('features', () => {
     it('having an ext repo with no account, then signing into account, should migrate it', async () => {
       application = await Factory.signOutApplicationAndReturnNew(application);
       sinon
-        .stub(application.apiService, 'isCustomServerHostUsed')
+        .stub(application.apiService, 'isThirdPartyHostUsed')
         .callsFake(() => {
           return false;
         });
@@ -336,7 +336,7 @@ describe('features', () => {
 
     it('migrated ext repo should have property indicating it was migrated', async () => {
       sinon
-        .stub(application.apiService, 'isCustomServerHostUsed')
+        .stub(application.apiService, 'isThirdPartyHostUsed')
         .callsFake(() => {
           return false;
         });
@@ -365,6 +365,7 @@ describe('features', () => {
 
   describe('offline features migration', () => {
     it('previous extension repo should be migrated to offline feature repo', async () => {
+      application = await Factory.signOutApplicationAndReturnNew(application);
       const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
       await application.createManagedItem(
         ContentType.ExtensionRepo,
