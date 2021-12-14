@@ -106,6 +106,7 @@ export type {
 export { SNHistoryManager } from './services/history/history_manager';
 export {
   SNProtectionService,
+  UnprotectedAccessSecondsDuration,
   ProposedSecondsToDeferUILevelSessionExpirationDuringActiveInteraction,
 } from './services/protection_service';
 export { SNSingletonManager } from './services/singleton_manager';

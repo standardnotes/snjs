@@ -97,9 +97,10 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
   }
 
   public hasUnprotectedAccessSession(): boolean {
-    return (
-      this.hasProtectionSources() && this.getSessionExpiryDate() > new Date()
-    );
+    if (!this.hasProtectionSources()) {
+      return true;
+    }
+    return this.getSessionExpiryDate() > new Date();
   }
 
   public hasBiometricsEnabled(): boolean {
@@ -180,11 +181,12 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
     let sessionValidation: Promise<boolean> | undefined;
     const authorizedNotes = [];
     for (const note of notes) {
-      const isProtected = note.protected && this.hasUnprotectedAccessSession();
-      if (isProtected && !sessionValidation) {
+      const needsAuthorization =
+        note.protected && !this.hasUnprotectedAccessSession();
+      if (needsAuthorization && !sessionValidation) {
         sessionValidation = this.validateOrRenewSession(challengeReason);
       }
-      if (!isProtected || (await sessionValidation)) {
+      if (!needsAuthorization || (await sessionValidation)) {
         authorizedNotes.push(note);
       }
     }
@@ -311,7 +313,6 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
         chosenSessionLength
       )
     );
-
     const response = await this.challengeService.promptForChallengeResponse(
       new Challenge(prompts, reason, true)
     );
