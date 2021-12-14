@@ -2,6 +2,7 @@ export const APPLICATION_DEFAULT_HOSTS = [
   'api.standardnotes.com',
   'api-dev.standardnotes.com',
   'sync.standardnotes.org',
+  'syncing-server-demo.standardnotes.com'
 ];
 
 export const TRUSTED_FEATURE_HOSTS = [
