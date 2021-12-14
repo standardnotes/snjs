@@ -523,7 +523,7 @@ export function handlePasswordChallenges(application, password) {
           new ChallengeValue(
             prompt,
             prompt.validation === ChallengeValidation.ProtectionSessionDuration
-              ? 0
+              ? UnprotectedAccessSecondsDuration.OneMinute
               : password
           )
       );
