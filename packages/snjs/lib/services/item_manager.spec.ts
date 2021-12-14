@@ -258,7 +258,7 @@ describe('itemManager', () => {
         references: [],
       });
 
-      expect(item).toBeTruthy();
+      expect(!!item).toEqual(true);
       /* Template items should never be added to the record */
       expect(itemManager.items).toHaveLength(0);
       expect(itemManager.notes).toHaveLength(0);
@@ -273,11 +273,11 @@ describe('itemManager', () => {
         references: [],
       });
 
-      expect(itemManager.isTemplateItem(item)).toBeTruthy();
+      expect(itemManager.isTemplateItem(item)).toEqual(true);
 
       await itemManager.insertItem(item);
 
-      expect(itemManager.isTemplateItem(item)).toBeFalsy();
+      expect(itemManager.isTemplateItem(item)).toEqual(false);
     });
   });
 });
