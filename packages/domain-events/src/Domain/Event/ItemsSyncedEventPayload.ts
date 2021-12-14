@@ -5,4 +5,5 @@ export interface ItemsSyncedEventPayload {
   itemUuids: Array<string>
   forceMute: boolean
   skipFileBackup: boolean
+  source: 'backup' | 'account-deletion' | 'realtime-extensions-sync' | 'daily-extensions-sync'
 }
