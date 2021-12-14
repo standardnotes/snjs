@@ -11,7 +11,3 @@ export enum DeinitSource {
 export type ErrorObject = {
   error: string;
 }
-
-export type ApplicationEventPayload = Partial<{
-
-}>

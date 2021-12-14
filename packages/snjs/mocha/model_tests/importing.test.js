@@ -835,7 +835,7 @@ describe('importing', function () {
                   prompt,
                   prompt.validation === ChallengeValidation.AccountPassword
                     ? password
-                    : UnprotectedAccessSecondsDuration.OneMinute
+                    : 0
                 )
             )
           );
