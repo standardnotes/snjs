@@ -540,14 +540,14 @@ export async function createTags(
   application,
   hierarchy,
   parent = undefined,
-  result = undefined
+  resultAccumulator = undefined
 ) {
-  const r = result || {};
+  const result = resultAccumulator || {};
 
   const promises = Object.entries(hierarchy).map(async ([key, value]) => {
     let tag = await application.findOrCreateTag(key);
 
-    r[key] = tag;
+    result[key] = tag;
 
     if (parent) {
       await application.setTagParent(parent, tag);
@@ -557,12 +557,12 @@ export async function createTags(
       return;
     }
 
-    await createTags(application, value, tag, r);
+    await createTags(application, value, tag, result);
   });
 
   await Promise.all(promises);
 
-  return r;
+  return result;
 }
 
 export async function createNote(application, title, text = '', dirty = false) {
