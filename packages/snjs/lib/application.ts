@@ -22,7 +22,6 @@ import {
   DeinitSource,
   UuidString,
   AnyRecord,
-  ApplicationEventPayload,
 } from './types';
 import {
   ApplicationEvent,
@@ -113,11 +112,8 @@ import {
   User,
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import {
-  ProtectionEvent,
-  UnprotectedAccessSecondsDuration,
-} from './services/protection_service';
-import { RemoteSession, StorageKey } from '.';
+import { ProtectionEvent } from './services/protection_service';
+import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
@@ -439,10 +435,7 @@ export class SNApplication {
     return this.addEventObserver(filteredCallback, event);
   }
 
-  private async notifyEvent(
-    event: ApplicationEvent,
-    data?: ApplicationEventPayload
-  ) {
+  private async notifyEvent(event: ApplicationEvent, data?: AnyRecord) {
     if (event === ApplicationEvent.Started) {
       this.onStart();
     } else if (event === ApplicationEvent.Launched) {
@@ -1060,8 +1053,8 @@ export class SNApplication {
     return this.protectionService.hasProtectionSources();
   }
 
-  public hasUnprotectedAccessSession(): boolean {
-    return this.protectionService.hasUnprotectedAccessSession();
+  public areProtectionsEnabled(): boolean {
+    return this.protectionService.areProtectionsEnabled();
   }
 
   /**
@@ -1149,9 +1142,8 @@ export class SNApplication {
         ChallengeReason.DecryptEncryptedFile,
         true
       );
-      const passwordResponse = await this.challengeService.promptForChallengeResponse(
-        challenge
-      );
+      const passwordResponse =
+        await this.challengeService.promptForChallengeResponse(challenge);
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1163,10 +1155,8 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
-      data,
-      password
-    );
+    const decryptedPayloads =
+      await this.protocolService.payloadsByDecryptingBackupFile(data, password);
     const validPayloads = decryptedPayloads
       .filter((payload) => {
         return (
@@ -1679,12 +1669,14 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
-        this.protocolService
-      ),
-      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
-        this.protocolService
-      ),
+      payloadByEncryptingPayload:
+        this.protocolService.payloadByEncryptingPayload.bind(
+          this.protocolService
+        ),
+      payloadByDecryptingPayload:
+        this.protocolService.payloadByDecryptingPayload.bind(
+          this.protocolService
+        ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
@@ -1835,9 +1827,8 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager = this.getClass<
-      typeof SNComponentManager
-    >(SNComponentManager);
+    const MaybeSwappedComponentManager =
+      this.getClass<typeof SNComponentManager>(SNComponentManager);
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
@@ -1991,10 +1982,10 @@ export class SNApplication {
     );
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
-        if (event === ProtectionEvent.UnprotectedSessionBegan) {
-          void this.notifyEvent(ApplicationEvent.UnprotectedSessionBegan);
-        } else if (event === ProtectionEvent.UnprotectedSessionExpired) {
-          void this.notifyEvent(ApplicationEvent.UnprotectedSessionExpired);
+        if (event === ProtectionEvent.SessionExpiryDateChanged) {
+          void this.notifyEvent(
+            ApplicationEvent.ProtectionSessionExpiryDateChanged
+          );
         }
       })
     );
