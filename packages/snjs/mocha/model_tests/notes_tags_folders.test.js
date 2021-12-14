@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js';
-import { asUuids } from '../lib/factory.js';
+import { Uuids } from '@Lib/utils';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -34,8 +34,8 @@ describe('tags as folders', () => {
     await this.application.setTagParent(tagParent, tagChildren);
 
     expect(this.application.getTagParent(tagChildren)).to.equal(tagParent);
-    expect(asUuids(this.application.getTagChildren(tagParent))).deep.to.equal(
-      asUuids([tagChildren])
+    expect(Uuids(this.application.getTagChildren(tagParent))).deep.to.equal(
+      Uuids([tagChildren])
     );
 
     // ## Now the user moves the tag parent into the grand parent
@@ -43,8 +43,8 @@ describe('tags as folders', () => {
 
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent);
     expect(
-      asUuids(this.application.getTagChildren(tagGrandParent))
-    ).deep.to.equal(asUuids([tagParent]));
+      Uuids(this.application.getTagChildren(tagGrandParent))
+    ).deep.to.equal(Uuids([tagParent]));
 
     // ## Now the user moves the tag parent into another grand parent
     await this.application.setTagParent(tagGrandParent2, tagParent);
@@ -52,8 +52,8 @@ describe('tags as folders', () => {
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2);
     expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([]);
     expect(
-      asUuids(this.application.getTagChildren(tagGrandParent2))
-    ).deep.to.equal(asUuids([tagParent]));
+      Uuids(this.application.getTagChildren(tagGrandParent2))
+    ).deep.to.equal(Uuids([tagParent]));
 
     // ## Now the user tries to move the tag into one of its children
     await expect(this.application.setTagParent(tagChildren, tagParent)).to
@@ -62,8 +62,8 @@ describe('tags as folders', () => {
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2);
     expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([]);
     expect(
-      asUuids(this.application.getTagChildren(tagGrandParent2))
-    ).deep.to.equal(asUuids([tagParent]));
+      Uuids(this.application.getTagChildren(tagGrandParent2))
+    ).deep.to.equal(Uuids([tagParent]));
 
     // ## Now the user move the tag outside any hierarchy
     await this.application.unsetTagParent(tagParent);

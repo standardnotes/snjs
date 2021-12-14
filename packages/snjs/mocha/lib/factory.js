@@ -532,10 +532,6 @@ export function handlePasswordChallenges(application, password) {
   });
 }
 
-export function asUuids(xs) {
-  return (xs || []).map((x) => x.uuid);
-}
-
 export async function createTags(
   application,
   hierarchy,
