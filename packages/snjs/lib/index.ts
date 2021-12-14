@@ -7,11 +7,7 @@ export {
 export type { ApplicationDescriptor } from './application_group';
 export type { ActionResponse } from './services/actions_service';
 export type { BackupFile } from '@Services/protocol_service';
-export type {
-  UuidString,
-  ApplicationIdentifier,
-  ApplicationEventPayload,
-} from './types';
+export type { UuidString, ApplicationIdentifier } from './types';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
@@ -104,11 +100,7 @@ export type {
   SNAlertService,
 } from './services/alert_service';
 export { SNHistoryManager } from './services/history/history_manager';
-export {
-  SNProtectionService,
-  UnprotectedAccessSecondsDuration,
-  ProposedSecondsToDeferUILevelSessionExpirationDuringActiveInteraction,
-} from './services/protection_service';
+export { SNProtectionService } from './services/protection_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
 export type {

@@ -169,7 +169,7 @@ describe('key recovery service', function () {
         } else if (
           prompt.validation === ChallengeValidation.ProtectionSessionDuration
         ) {
-          responses.push(new ChallengeValue(prompt, UnprotectedAccessSecondsDuration.OneMinute));
+          responses.push(new ChallengeValue(prompt, 0));
         } else if (prompt.placeholder === 'Email') {
           responses.push(new ChallengeValue(prompt, contextA.email));
         } else if (
@@ -580,7 +580,7 @@ describe('key recovery service', function () {
         } else if (
           prompt.validation === ChallengeValidation.ProtectionSessionDuration
         ) {
-          responses.push(new ChallengeValue(prompt, UnprotectedAccessSecondsDuration.OneMinute));
+          responses.push(new ChallengeValue(prompt, 0));
         } else if (prompt.placeholder === 'Email') {
           responses.push(new ChallengeValue(prompt, contextA.email));
         } else if (
