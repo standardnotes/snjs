@@ -172,7 +172,7 @@ export class ItemManager extends PureService {
    * @param includeBlanks If true and an item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  findItems(uuids: UuidString[], includeBlanks = false): SNItem[] {
+  findItems(uuids: UuidString[], includeBlanks = false) {
     return this.collection.findAll(uuids, includeBlanks);
   }
 
@@ -619,14 +619,6 @@ export class ItemManager extends PureService {
   }
 
   /**
-   * @param item item to be checked
-   * @returns Whether the item is a template (unmanaged)
-   */
-  public isTemplateItem(item: SNItem): boolean {
-    return !this.collection.find(item.uuid);
-  }
-
-  /**
    * Inserts the item as-is by reading its payload value. This function will not
    * modify item in any way (such as marking it as dirty). It is up to the caller
    * to pass in a dirtied item if that is their intention.
@@ -888,17 +880,6 @@ export class ItemManager extends PureService {
     return this.changeItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note);
     }) as Promise<SNTag>;
-  }
-
-  public async addTagHierarchyToNote(
-    note: SNNote,
-    tag: SNTag
-  ): Promise<SNTag[]> {
-    const parentChainTags = this.getTagParentChain(tag.uuid);
-    const tagsToAdd = [...parentChainTags, tag];
-    return Promise.all(
-      tagsToAdd.map((tagToAdd) => this.addTagToNote(note, tagToAdd))
-    );
   }
 
   /**
