@@ -55,7 +55,7 @@ jobs:
         run: echo ::set-output name=feature_name::${GITHUB_REF/refs\/heads\/feature\//}
       - run: yarn install --pure-lockfile
       - run: yarn build
-      - run: yarn lerna publish --canary --preid beta-${{ steps.get_feature_name.outputs.feature_name }}
+      - run: yarn lerna publish --yes --canary --preid beta-${{ steps.get_feature_name.outputs.feature_name }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
