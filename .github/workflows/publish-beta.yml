@@ -2,7 +2,7 @@ name: Beta
 
 on:
   push:
-    branches: [ feature/* ]
+    branches: [ beta/* ]
 
 jobs:
   lint:
@@ -50,12 +50,12 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Get feature branch name
-        id: get_feature_name
-        run: echo ::set-output name=feature_name::${GITHUB_REF/refs\/heads\/feature\//}
+      - name: Get beta branch name
+        id: get_beta_name
+        run: echo ::set-output name=beta_name::${GITHUB_REF/refs\/heads\/beta\//}
       - run: yarn install --pure-lockfile
       - run: yarn build
-      - run: yarn lerna publish --yes --canary --preid beta-${{ steps.get_feature_name.outputs.feature_name }}
+      - run: yarn lerna publish --yes --canary --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
