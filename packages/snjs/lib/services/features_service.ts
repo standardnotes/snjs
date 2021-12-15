@@ -329,6 +329,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       undefined,
       []
     );
+
+    this.notifyEvent(FeaturesEvent.FeaturesUpdated);
   }
 
   public async updateRolesAndFetchFeatures(
