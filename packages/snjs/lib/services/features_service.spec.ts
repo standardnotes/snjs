@@ -568,8 +568,14 @@ describe('featuresService', () => {
       ).toBe(FeatureStatus.NoUserSubscription);
     });
 
-    it('feature status should be entitled until first successful features request made', async () => {
+    it('feature status should be entitled for subscriber until first successful features request made if no cached features', async () => {
       const featuresService = createService();
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features: []
+        },
+      });
 
       await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
@@ -587,7 +593,8 @@ describe('featuresService', () => {
         featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
       ).toBe(FeatureStatus.Entitled);
 
-      featuresService['completedSuccessfulFeaturesRetrieval'] = true;
+
+      await featuresService.didDownloadFeatures(features);
 
       expect(
         featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
@@ -596,6 +603,37 @@ describe('featuresService', () => {
         featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
       ).toBe(FeatureStatus.NotInCurrentPlan);
     });
+
+    it('feature status should be dynamic for subscriber if cached features and no successful features request made yet', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      featuresService['completedSuccessfulFeaturesRetrieval'] = false;
+
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
+
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.Entitled);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
+
+
+      featuresService['completedSuccessfulFeaturesRetrieval'] = false;
+
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
+      ).toBe(FeatureStatus.Entitled);
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
+      ).toBe(FeatureStatus.NotInCurrentPlan);
+    });
+
 
     it('feature status for offline subscription', async () => {
       const featuresService = createService();
