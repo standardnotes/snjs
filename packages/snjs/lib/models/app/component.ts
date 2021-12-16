@@ -28,7 +28,6 @@ export enum ComponentAction {
   CreateItems = 'create-items',
   DeleteItems = 'delete-items',
   SetComponentData = 'set-component-data',
-  InstallLocalComponent = 'install-local-component',
   ToggleActivateComponent = 'toggle-activate-component',
   RequestPermissions = 'request-permissions',
   PresentConflictResolution = 'present-conflict-resolution',
