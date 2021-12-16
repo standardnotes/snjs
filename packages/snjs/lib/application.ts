@@ -973,6 +973,14 @@ export class SNApplication {
     return this.itemManager.findOrCreateTagByTitle(title);
   }
 
+  public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
+    return this.itemManager.createTagOrSmartTag(title);
+  }
+
+  public isSmartTagTitle(title: string): boolean {
+    return this.itemManager.isSmartTagTitle(title);
+  }
+
   public getSmartTags(): SNSmartTag[] {
     return this.itemManager.getSmartTags();
   }

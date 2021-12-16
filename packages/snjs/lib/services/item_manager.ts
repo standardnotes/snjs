@@ -1,45 +1,49 @@
-import { TagMutator } from './../models/app/tag';
-import {
-  FeatureRepoMutator,
-  SNFeatureRepo,
-} from './../models/app/feature_repo';
+import { createMutatorForItem } from '@Lib/models/mutator';
+import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
+import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
+import { PureService } from '@Lib/services/pure_service';
+import { isString, naturalSort, removeFromArray } from '@Lib/utils';
+import { SNComponent } from '@Models/app/component';
+import { SNItemsKey } from '@Models/app/items_key';
+import { SNTag } from '@Models/app/tag';
+import { FillItemContent, Uuids } from '@Models/functions';
+import { CreateItemFromPayload } from '@Models/generator';
+import { PayloadsByDuplicating } from '@Payloads/functions';
+import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   CollectionSort,
   ItemCollection,
   SortDirection,
 } from '@Protocol/collection/item_collection';
-import { SNItemsKey } from '@Models/app/items_key';
-import { ItemsKeyMutator } from './../models/app/items_key';
-import { SNTag } from '@Models/app/tag';
-import { NoteMutator, SNNote } from './../models/app/note';
+import { ContentType } from '../models/content_types';
+import { ComponentMutator } from './../models/app/component';
 import {
   ActionsExtensionMutator,
   SNActionsExtension,
 } from './../models/app/extension';
-import { SNSmartTag } from './../models/app/smartTag';
+import {
+  FeatureRepoMutator,
+  SNFeatureRepo,
+} from './../models/app/feature_repo';
+import { ItemsKeyMutator } from './../models/app/items_key';
+import { NoteMutator, SNNote } from './../models/app/note';
+import {
+  SmartTagPredicateContent,
+  SMART_TAG_DSL_PREFIX,
+  SNSmartTag,
+} from './../models/app/smartTag';
+import { TagMutator } from './../models/app/tag';
+import { ItemMutator, MutationType, SNItem } from './../models/core/item';
 import { SNPredicate } from './../models/core/predicate';
-import { Uuid } from './../uuid';
-import { PayloadsByDuplicating } from '@Payloads/functions';
-import { UuidString } from './../types';
-import { CreateItemFromPayload } from '@Models/generator';
-import { FillItemContent, Uuids } from '@Models/functions';
-import { PureService } from '@Lib/services/pure_service';
-import { ComponentMutator } from './../models/app/component';
-import { SNComponent } from '@Models/app/component';
-import { isString, naturalSort, removeFromArray } from '@Lib/utils';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   PayloadContent,
   PayloadOverride,
 } from './../protocol/payloads/generator';
-import { ItemMutator, MutationType, SNItem } from './../models/core/item';
-import { PayloadSource } from './../protocol/payloads/sources';
 import { PurePayload } from './../protocol/payloads/pure_payload';
+import { PayloadSource } from './../protocol/payloads/sources';
+import { UuidString } from './../types';
+import { Uuid } from './../uuid';
 import { PayloadManager } from './payload_manager';
-import { ContentType } from '../models/content_types';
-import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
-import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
-import { createMutatorForItem } from '@Lib/models/mutator';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -977,19 +981,57 @@ export class ItemManager extends PureService {
     );
   }
 
+  public async createTag(title: string): Promise<SNTag> {
+    return this.createItem(
+      ContentType.Tag,
+      FillItemContent({ title }),
+      true
+    ) as Promise<SNTag>;
+  }
+
+  public async createSmartTag(
+    title: string,
+    predicate: SmartTagPredicateContent
+  ): Promise<SNSmartTag> {
+    return this.createItem(
+      ContentType.SmartTag,
+      FillItemContent({ title, predicate }),
+      true
+    ) as Promise<SNSmartTag>;
+  }
+
+  public async createSmartTagFromDSL(dsl: string): Promise<SNSmartTag> {
+    let components = null;
+
+    try {
+      components = JSON.parse(dsl.substring(1, dsl.length));
+    } catch (e) {
+      throw Error('invalid syntax');
+    }
+
+    const [title, keypath, operator, value] = components;
+
+    return this.createSmartTag(title, { keypath, operator, value });
+  }
+
+  public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
+    if (this.isSmartTagTitle(title)) {
+      return this.createSmartTagFromDSL(title);
+    } else {
+      return this.createTag(title);
+    }
+  }
+
+  public isSmartTagTitle(title: string): boolean {
+    return title.startsWith(SMART_TAG_DSL_PREFIX);
+  }
+
   /**
    * Finds or creates a tag with a given title
    */
-  public async findOrCreateTagByTitle(title: string) {
+  public async findOrCreateTagByTitle(title: string): Promise<SNTag> {
     const tag = this.findTagByTitle(title);
-    return (
-      tag ||
-      ((await this.createItem(
-        ContentType.Tag,
-        FillItemContent({ title }),
-        true
-      )) as SNTag)
-    );
+    return tag || this.createTag(title);
   }
 
   /**
