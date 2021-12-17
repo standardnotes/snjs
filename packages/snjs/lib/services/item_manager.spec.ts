@@ -4,9 +4,8 @@ import { FillItemContent } from '@Models/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNTag } from '@Models/app/tag';
 import { PayloadManager } from './payload_manager';
-import { ItemManager, SNItem } from '@Lib/index';
+import { ItemManager, SNItem, Uuid } from '@Lib/index';
 import { ContentType } from '@standardnotes/common';
-import { Uuid } from '@Lib/uuid';
 
 const setupRandomUuid = () => {
   Uuid.SetGenerators(

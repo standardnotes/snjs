@@ -560,13 +560,3 @@ export async function createTags(
 
   return result;
 }
-
-export async function createNote(application, title, text = '', dirty = false) {
-  const params = createNoteParams({ title, text, dirty });
-  const payload = CreateMaxPayloadFromAnyObject(params);
-  const note = await application.itemManager.emitItemFromPayload(
-    payload,
-    PayloadSource.LocalChanged
-  );
-  return note;
-}
