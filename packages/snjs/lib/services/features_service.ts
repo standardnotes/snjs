@@ -1,8 +1,5 @@
 import { ApplicationStage } from '@Lib/stages';
-import {
-  LEGACY_PROD_EXT_ORIGIN,
-  PROD_OFFLINE_FEATURES_URL,
-} from './../hosts';
+import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from './../hosts';
 import {
   SNFeatureRepo,
   FeatureRepoContent,
@@ -151,9 +148,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           const items = [...changed, ...inserted].filter(
             (item) => !item.deleted
           ) as SNFeatureRepo[];
-          if (
-            this.sessionManager.isSignedIntoFirstPartyServer()
-          ) {
+          if (this.sessionManager.isSignedIntoFirstPartyServer()) {
             await this.migrateFeatureRepoToUserSetting(items);
           } else {
             await this.migrateFeatureRepoToOfflineEntitlements(items);
@@ -341,7 +336,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       await this.setRoles(roles);
       const featuresResponse = await this.apiService.getUserFeatures(userUuid);
       if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
-        const features = (featuresResponse as UserFeaturesResponse).data.features;
+        const features = (featuresResponse as UserFeaturesResponse).data
+          .features;
         features.forEach((feature) => {
           if (feature.expires_at) {
             feature.expires_at = convertTimestampToMilliseconds(
@@ -363,7 +359,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  private async didDownloadFeatures(
+  public async didDownloadFeatures(
     features: FeatureDescription[]
   ): Promise<void> {
     this.features = features;
@@ -401,14 +397,15 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       return FeatureStatus.Entitled;
     }
 
-    if (
-      this.hasPaidOnlineOrOfflineSubscription() &&
-      !this.completedSuccessfulFeaturesRetrieval
-    ) {
-      return FeatureStatus.Entitled;
-    }
-
-    if (!this.hasPaidOnlineOrOfflineSubscription()) {
+    if (this.hasPaidOnlineOrOfflineSubscription()) {
+      if (!this.completedSuccessfulFeaturesRetrieval) {
+        const hasCachedFeatures = this.features.length > 0;
+        const temporarilyAllowUntilServerUpdates = !hasCachedFeatures;
+        if (temporarilyAllowUntilServerUpdates) {
+          return FeatureStatus.Entitled;
+        }
+      }
+    } else {
       return FeatureStatus.NoUserSubscription;
     }
 
