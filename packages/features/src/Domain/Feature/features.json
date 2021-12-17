@@ -147,12 +147,12 @@
     "permission_name": "editor:bold",
     "content_type": "SN|Component",
     "area": "editor-editor",
-    "version": "1.2.9",
+    "version": "1.2.10",
     "description": "A simple and peaceful rich editor that helps you write and think clearly. Features FileSafe integration, so you can embed your encrypted images, videos, and audio recordings directly inline.",
     "url": "#{url_prefix}/components/bold-editor",
     "marketing_url": "",
     "thumbnail_url": "https://s3.amazonaws.com/standard-notes/screenshots/models/editors/bold.jpg",
-    "download_url": "https://github.com/standardnotes/bold-editor/archive/1.2.9.zip"
+    "download_url": "https://github.com/standardnotes/bold-editor/archive/1.2.10.zip"
   },
   {
     "name": "Plus Editor",
@@ -275,11 +275,11 @@
     "permission_name": "editor:token-vault",
     "content_type": "SN|Component",
     "area": "editor-editor",
-    "version": "2.0.6",
+    "version": "2.0.7",
     "description": "Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.",
     "url": "#{url_prefix}/components/token-vault",
     "marketing_url": "",
-    "download_url": "https://github.com/standardnotes/token-vault/archive/2.0.6.zip",
+    "download_url": "https://github.com/standardnotes/token-vault/archive/2.0.7.zip",
     "thumbnail_url": "https://standard-notes.s3.amazonaws.com/screenshots/models/editors/token-vault.png",
     "flags": ["New"]
   },

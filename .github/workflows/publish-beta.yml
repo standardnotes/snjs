@@ -1,0 +1,72 @@
+name: Beta
+
+on:
+  push:
+    branches: [ beta/* ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install --pure-lockfile
+      - run: yarn build
+      - run: yarn lint
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install --pure-lockfile
+      - run: yarn build
+      - run: yarn test:unit
+  e2e-tests:
+    env:
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn test:e2e
+
+  publish:
+    needs: [lint, unit-tests, e2e-tests]
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Get beta branch name
+        id: get_beta_name
+        run: echo ::set-output name=beta_name::${GITHUB_REF/refs\/heads\/beta\//}
+      - run: yarn install --pure-lockfile
+      - run: yarn build
+      - run: yarn lerna publish --yes --canary --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  notify_discord:
+    needs: publish
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Run Discord Webhook
+      uses: johnnyhuy/actions-discord-git-webhook@main
+      with:
+        webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        censor_username: false

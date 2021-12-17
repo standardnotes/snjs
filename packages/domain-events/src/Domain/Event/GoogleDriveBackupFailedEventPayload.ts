@@ -1,4 +1,4 @@
 export interface GoogleDriveBackupFailedEventPayload {
-  extensionSettingUuid: string
+  muteCloudEmailsSettingUuid: string
   email: string
 }

@@ -1,4 +1,4 @@
 export interface OneDriveBackupFailedEventPayload {
-  extensionSettingUuid: string
+  muteCloudEmailsSettingUuid: string
   email: string
 }
