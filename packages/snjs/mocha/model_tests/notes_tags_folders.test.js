@@ -82,7 +82,6 @@ describe('tags as folders', () => {
     const note2 = await Factory.createNote(this.application, 'my second note');
 
     // ## The user add a note to the child tag
-    console.log('note1:', note1, 'tags:', tags);
     await this.application.addTagHierarchyToNote(note1, tags.child);
     await this.application.addTagHierarchyToNote(note2, tags.another);
 
