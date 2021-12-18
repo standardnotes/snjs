@@ -8,10 +8,14 @@ export type {
   RevisionListEntry,
   SingleRevision,
 } from '@Services/api/responses';
-export type { PermissionDialog } from '@Services/component_manager';
 export { SNSessionManager } from '@Services/api/session_manager';
 export { SNApiService } from '@Services/api/api_service';
-export { SNComponentManager } from '@Services/component_manager';
+export { SNComponentManager } from '@Services/component_manager/component_manager';
+export type {
+  ItemMessagePayload,
+  MessageData,
+  PermissionDialog,
+} from '@Services/component_manager/types';
 export { SNHttpService } from '@Services/api/http_service';
 export { PayloadManager } from '@Services/payload_manager';
 export { SNSingletonManager } from '@Services/singleton_manager';
@@ -36,5 +40,3 @@ export {
   StorageEncryptionPolicies,
   StoragePersistencePolicies,
 } from '@Services/storage_service';
-export type { ItemMessagePayload } from '@Services/component_manager';
-export type { MessageData } from '@Services/component_manager';

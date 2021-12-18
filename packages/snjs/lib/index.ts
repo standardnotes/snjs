@@ -54,12 +54,19 @@ export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from './models/app/component';
 export { LiveItem } from './models/live_item';
 export { FeatureStatus } from '@Lib/services/features_service';
-
-export type { PermissionDialog } from './services/component_manager';
-export { SNComponentManager } from './services/component_manager';
+export type {
+  ItemMessagePayload,
+  MessageData,
+  PermissionDialog,
+} from './services/component_manager/types';
+export { SNComponentManager, ComponentManagerEvent } from './services/component_manager/component_manager';
+export { ComponentViewer } from './services/component_manager/component_viewer';
 export { HistoryEntry } from '@Services/history/entries/history_entry';
 export { PayloadManager } from './services/payload_manager';
+
+export type { TransactionalMutation } from './services/item_manager';
 export { ItemManager } from './services/item_manager';
+
 export { SNHttpService } from './services/api/http_service';
 export { ChallengeService } from './services/challenge/challenge_service';
 export { PureService } from '@Services/pure_service';
@@ -209,9 +216,6 @@ export { BaseMigration } from '@Lib/migrations/base';
 export { ProtectionSessionDurations } from '@Lib/services/protection_service';
 
 export { SNLog } from './log';
-
-export type { ItemMessagePayload } from './services/component_manager';
-export type { MessageData } from './services/component_manager';
 
 /** Used by e2e tests */
 export { Features, FeatureIdentifier } from '@standardnotes/features';

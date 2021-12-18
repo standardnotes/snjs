@@ -28,7 +28,7 @@ import {
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
-import { SNComponentManager } from './component_manager';
+import { SNComponentManager } from './component_manager/component_manager';
 import { SNComponent } from '@Lib/models';
 import {
   SNWebSocketsService,
@@ -513,10 +513,10 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
 
       if (expired && resultingItem) {
         if (feature.content_type === ContentType.Component) {
-          this.componentManager.setReadonlyStateForComponent(
-            resultingItem,
-            expired
-          );
+          // this.componentManager.setReadonlyStateForComponent(
+          //   resultingItem,
+          //   expired
+          // );
         } else {
           itemsToDeleteUuids.push(resultingItem.uuid);
           hasChanges = true;

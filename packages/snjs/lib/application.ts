@@ -1,3 +1,4 @@
+import { TransactionalMutation } from './services/item_manager';
 import { FeatureStatus } from '@Lib/services/features_service';
 import { Settings } from './services/settings_service';
 import { SyncOpStatus } from './services/sync/sync_op_status';
@@ -140,7 +141,7 @@ type ApplicationObserver = {
   singleEvent?: ApplicationEvent;
   callback: ApplicationEventCallback;
 };
-type ItemStream = (items: SNItem[], source?: PayloadSource) => void;
+type ItemStream = (items: SNItem[], source: PayloadSource) => void;
 type ObserverRemover = () => void;
 
 /** The main entrypoint of an application. */
@@ -764,6 +765,35 @@ export class SNApplication {
     );
   }
 
+  /**
+   * Run unique mutations per each item in the array, then only propagate all changes
+   * once all mutations have been run. This differs from `changeItems` in that changeItems
+   * runs the same mutation on all items.
+   */
+  public async runTransactionalMutations(
+    transactions: TransactionalMutation[],
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<(SNItem | undefined)[]> {
+    return this.itemManager.runTransactionalMutations(
+      transactions,
+      payloadSource,
+      payloadSourceKey
+    );
+  }
+
+  public async runTransactionalMutation(
+    transaction: TransactionalMutation,
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<SNItem | undefined> {
+    return this.itemManager.runTransactionalMutation(
+      transaction,
+      payloadSource,
+      payloadSourceKey
+    );
+  }
+
   public async protectNote(note: SNNote): Promise<SNNote> {
     const protectedNote = await this.protectionService.protectNote(note);
     void this.syncService.sync();
@@ -948,7 +978,7 @@ export class SNApplication {
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType);
     if (matches.length > 0) {
-      stream(matches);
+      stream(matches, PayloadSource.InitialObserverRegistrationPush);
     }
     this.streamRemovers.push(observer);
     return () => {
@@ -961,8 +991,18 @@ export class SNApplication {
    * Activates or deactivates a component, depending on its
    * current state, and syncs.
    */
+  // public async toggleComponent(component: SNComponent): Promise<void> {
+  //   await this.componentManager.toggleComponent(component);
+  //   await this.syncService.sync();
+  // }
+
   public async toggleComponent(component: SNComponent): Promise<void> {
-    await this.componentManager.toggleComponent(component);
+    await this.componentManager.toggleComponent(component.uuid);
+    await this.syncService.sync();
+  }
+
+  public async toggleTheme(theme: SNComponent): Promise<void> {
+    await this.componentManager.toggleTheme(theme.uuid);
     await this.syncService.sync();
   }
 
@@ -1142,8 +1182,9 @@ export class SNApplication {
         ChallengeReason.DecryptEncryptedFile,
         true
       );
-      const passwordResponse =
-        await this.challengeService.promptForChallengeResponse(challenge);
+      const passwordResponse = await this.challengeService.promptForChallengeResponse(
+        challenge
+      );
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1155,8 +1196,10 @@ export class SNApplication {
     if (!(await this.protectionService.authorizeFileImport())) {
       return;
     }
-    const decryptedPayloads =
-      await this.protocolService.payloadsByDecryptingBackupFile(data, password);
+    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
+      data,
+      password
+    );
     const validPayloads = decryptedPayloads
       .filter((payload) => {
         return (
@@ -1669,14 +1712,12 @@ export class SNApplication {
     this.createStorageManager();
     this.createProtocolService();
     const encryptionDelegate = {
-      payloadByEncryptingPayload:
-        this.protocolService.payloadByEncryptingPayload.bind(
-          this.protocolService
-        ),
-      payloadByDecryptingPayload:
-        this.protocolService.payloadByDecryptingPayload.bind(
-          this.protocolService
-        ),
+      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
+        this.protocolService
+      ),
+      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
+        this.protocolService
+      ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
     this.createChallengeService();
@@ -1827,8 +1868,9 @@ export class SNApplication {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager =
-      this.getClass<typeof SNComponentManager>(SNComponentManager);
+    const MaybeSwappedComponentManager = this.getClass<
+      typeof SNComponentManager
+    >(SNComponentManager);
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,

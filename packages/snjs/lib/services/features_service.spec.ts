@@ -110,7 +110,7 @@ describe('featuresService', () => {
     itemManager.changeFeatureRepo = jest.fn();
 
     componentManager = {} as jest.Mocked<SNComponentManager>;
-    componentManager.setReadonlyStateForComponent = jest.fn();
+    // componentManager.setReadonlyStateForComponent = jest.fn();
 
     webSocketsService = {} as jest.Mocked<SNWebSocketsService>;
     webSocketsService.addEventObserver = jest.fn();
@@ -322,9 +322,9 @@ describe('featuresService', () => {
       const featuresService = createService();
       await featuresService.initializeFromDisk();
       await featuresService.updateRolesAndFetchFeatures('123', newRoles);
-      expect(
-        componentManager.setReadonlyStateForComponent
-      ).toHaveBeenCalledWith(existingItem, true);
+      // expect(
+      //   componentManager.setReadonlyStateForComponent
+      // ).toHaveBeenCalledWith(existingItem, true);
     });
 
     it('deletes items for expired themes', async () => {
