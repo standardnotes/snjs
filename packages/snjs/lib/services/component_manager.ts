@@ -1,4 +1,4 @@
-import { SNFeaturesService } from './../features_service';
+import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import {
   ContentType,
@@ -33,8 +33,11 @@ import {
   PermissionDialog,
   DesktopManagerInterface,
   AllowedBatchPermissions,
-} from './types';
-import { ActionObserver, ComponentViewer } from './component_viewer';
+} from '@Services/component_manager/types';
+import {
+  ActionObserver,
+  ComponentViewer,
+} from '@Services/component_manager/component_viewer';
 
 const DESKTOP_URL_PREFIX = 'sn://';
 const LOCAL_HOST = 'localhost';

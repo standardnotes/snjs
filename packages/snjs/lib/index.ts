@@ -64,7 +64,7 @@ export type {
 export {
   SNComponentManager,
   ComponentManagerEvent,
-} from './services/component_manager/component_manager';
+} from './services/component_manager';
 export {
   ComponentViewer,
   ComponentViewerEvent,

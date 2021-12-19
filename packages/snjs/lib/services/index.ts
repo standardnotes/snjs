@@ -10,7 +10,7 @@ export type {
 } from '@Services/api/responses';
 export { SNSessionManager } from '@Services/api/session_manager';
 export { SNApiService } from '@Services/api/api_service';
-export { SNComponentManager } from '@Services/component_manager/component_manager';
+export { SNComponentManager } from '@Services/component_manager';
 export type {
   ItemMessagePayload,
   MessageData,
