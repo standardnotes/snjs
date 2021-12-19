@@ -991,11 +991,6 @@ export class SNApplication {
    * Activates or deactivates a component, depending on its
    * current state, and syncs.
    */
-  // public async toggleComponent(component: SNComponent): Promise<void> {
-  //   await this.componentManager.toggleComponent(component);
-  //   await this.syncService.sync();
-  // }
-
   public async toggleComponent(component: SNComponent): Promise<void> {
     await this.componentManager.toggleComponent(component.uuid);
     await this.syncService.sync();
