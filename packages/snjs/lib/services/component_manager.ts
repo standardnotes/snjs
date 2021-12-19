@@ -377,7 +377,7 @@ export class SNComponentManager extends PureService<
       }
     }
     if (requiredPermissions.length > 0) {
-      this.promptForPermissionsWithTimeout(
+      this.promptForPermissionsWithAngularAsyncRendering(
         component,
         requiredPermissions,
         // eslint-disable-next-line @typescript-eslint/require-await
@@ -392,7 +392,7 @@ export class SNComponentManager extends PureService<
     }
   }
 
-  promptForPermissionsWithTimeout(
+  promptForPermissionsWithAngularAsyncRendering(
     component: SNComponent,
     permissions: ComponentPermission[],
     callback: (approved: boolean) => Promise<void>
