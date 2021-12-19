@@ -1,10 +1,15 @@
-import { SNItem } from '@Models/core/item';
 import { ComponentAction, ComponentPermission } from '@Models/app/component';
 import { SNComponent } from '@Lib/models';
 import { ComponentArea } from '@Models/app/component';
 import { UuidString } from '@Lib/types';
 import { ContentType } from '@Models/content_types';
 import { RawPayload } from '@Payloads/generator';
+
+export interface DesktopManagerInterface {
+  syncComponentsInstallation(components: SNComponent[]): void;
+  registerUpdateObserver(callback: (component: SNComponent) => void): void;
+  getExtServerHost(): string;
+}
 
 export type ComponentRawPayload = RawPayload & {
   clientData: any;
@@ -14,17 +19,12 @@ export type ComponentRawPayload = RawPayload & {
  * Content types which are allowed to be managed/streamed in bulk by a component.
  */
  export const AllowedBatchPermissions = Object.freeze([
-  ContentType.ActionsExtension,
-  ContentType.Component,
-  ContentType.Editor,
-  ContentType.ExtensionRepo,
   ContentType.FilesafeCredentials,
   ContentType.FilesafeFileMetadata,
   ContentType.FilesafeIntegration,
   ContentType.ServerExtension,
   ContentType.SmartTag,
   ContentType.Tag,
-  ContentType.Theme,
 ]);
 
 /* This domain will be used to save context item client data */
@@ -37,21 +37,6 @@ export type StreamObserver = {
   originalMessage: any;
   /** contentTypes is optional in the case of a context stream observer */
   contentTypes?: ContentType[];
-};
-
-export type ComponentHandler = {
-  identifier: string;
-  areas: ComponentArea[];
-  actionHandler?: (
-    component: SNComponent,
-    action: ComponentAction,
-    data: MessageData
-  ) => void;
-  contextRequestHandler?: (componentUuid: UuidString) => SNItem | undefined;
-  componentForSessionKeyHandler?: (
-    sessionKey: string
-  ) => SNComponent | undefined;
-  focusHandler?: (component: SNComponent, focused: boolean) => void;
 };
 
 export type PermissionDialog = {
@@ -137,12 +122,4 @@ export type ItemMessagePayload = {
    * extension currently has. Changes are always metadata updates if the mapping source
    * is PayloadSource.RemoteSaved || PayloadSource.LocalSaved || PayloadSource.PreSyncSave */
   isMetadataUpdate: any;
-};
-
-export type ComponentState = {
-  window?: Window;
-  hidden: boolean;
-  readonly: boolean;
-  lockReadonly: boolean;
-  sessionKey?: string;
 };

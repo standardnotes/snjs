@@ -1,8 +1,5 @@
 import { ApplicationStage } from '@Lib/stages';
-import {
-  LEGACY_PROD_EXT_ORIGIN,
-  PROD_OFFLINE_FEATURES_URL,
-} from './../hosts';
+import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from './../hosts';
 import {
   SNFeatureRepo,
   FeatureRepoContent,
@@ -28,7 +25,6 @@ import {
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
-import { SNComponentManager } from './component_manager/component_manager';
 import { SNComponent } from '@Lib/models';
 import {
   SNWebSocketsService,
@@ -96,7 +92,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     private storageService: SNStorageService,
     private apiService: SNApiService,
     private itemManager: ItemManager,
-    private componentManager: SNComponentManager,
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
     private credentialService: SNCredentialService,
@@ -151,9 +146,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           const items = [...changed, ...inserted].filter(
             (item) => !item.deleted
           ) as SNFeatureRepo[];
-          if (
-            this.sessionManager.isSignedIntoFirstPartyServer()
-          ) {
+          if (this.sessionManager.isSignedIntoFirstPartyServer()) {
             await this.migrateFeatureRepoToUserSetting(items);
           } else {
             await this.migrateFeatureRepoToOfflineEntitlements(items);
@@ -341,7 +334,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       await this.setRoles(roles);
       const featuresResponse = await this.apiService.getUserFeatures(userUuid);
       if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
-        const features = (featuresResponse as UserFeaturesResponse).data.features;
+        const features = (featuresResponse as UserFeaturesResponse).data
+          .features;
         features.forEach((feature) => {
           if (feature.expires_at) {
             feature.expires_at = convertTimestampToMilliseconds(
@@ -512,12 +506,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       }
 
       if (expired && resultingItem) {
-        if (feature.content_type === ContentType.Component) {
-          // this.componentManager.setReadonlyStateForComponent(
-          //   resultingItem,
-          //   expired
-          // );
-        } else {
+        if (feature.content_type !== ContentType.Component) {
           itemsToDeleteUuids.push(resultingItem.uuid);
           hasChanges = true;
         }
@@ -597,7 +586,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
-    (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;

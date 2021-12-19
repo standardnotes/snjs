@@ -1,3 +1,4 @@
+import { SNFeaturesService } from './../features_service';
 import { ComponentMutator } from '@Models/app/component';
 import {
   ContentType,
@@ -24,12 +25,14 @@ import {
   concatArrays,
   filterFromArray,
   removeFromArray,
+  sleep,
 } from '@Lib/utils';
 import { Environment, Platform } from '@Lib/platforms';
 import { UuidString } from '@Lib/types';
 import {
-  ComponentHandler,
   PermissionDialog,
+  DesktopManagerInterface,
+  AllowedBatchPermissions,
 } from './types';
 import { ActionObserver, ComponentViewer } from './component_viewer';
 
@@ -55,36 +58,23 @@ export class SNComponentManager extends PureService<
   ComponentManagerEvent,
   EventData
 > {
-  private itemManager!: ItemManager;
-  private syncService!: SNSyncService;
-  protected alertService!: SNAlertService;
-  private environment: Environment;
-  private platform: Platform;
   private timeout: any;
-  private desktopManager: any;
-
+  private desktopManager?: DesktopManagerInterface;
   private viewers: ComponentViewer[] = [];
-  private removeItemObserver?: any;
+  private removeItemObserver!: () => void;
   private permissionDialogs: PermissionDialog[] = [];
-  private handlers: ComponentHandler[] = [];
-
-  private templateComponents: SNComponent[] = [];
 
   constructor(
-    itemManager: ItemManager,
-    syncService: SNSyncService,
-    alertService: SNAlertService,
-    environment: Environment,
-    platform: Platform,
+    private itemManager: ItemManager,
+    private syncService: SNSyncService,
+    private featuresService: SNFeaturesService,
+    private alertService: SNAlertService,
+    private environment: Environment,
+    private platform: Platform,
     timeout: any
   ) {
     super();
     this.timeout = timeout || setTimeout.bind(window);
-    this.itemManager = itemManager;
-    this.syncService = syncService;
-    this.alertService = alertService;
-    this.environment = environment;
-    this.platform = platform;
     this.loggingEnabled = false;
     this.addItemObserver();
     if (environment !== Environment.Mobile) {
@@ -117,14 +107,17 @@ export class SNComponentManager extends PureService<
   /** @override */
   deinit(): void {
     super.deinit();
+    for (const viewer of this.viewers) {
+      viewer.destroy();
+    }
+    this.viewers.length = 0;
     this.permissionDialogs.length = 0;
-    this.templateComponents.length = 0;
-    this.handlers.length = 0;
+    this.desktopManager = undefined;
     (this.itemManager as unknown) = undefined;
     (this.syncService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
     this.removeItemObserver();
-    this.removeItemObserver = null;
+    (this.removeItemObserver as unknown) = undefined;
     if (window && !this.isMobile) {
       window.removeEventListener('focus', this.detectFocusChange, true);
       window.removeEventListener('blur', this.detectFocusChange, true);
@@ -142,6 +135,7 @@ export class SNComponentManager extends PureService<
       this.itemManager,
       this.syncService,
       this.alertService,
+      this.featuresService,
       this.environment,
       this.platform,
       {
@@ -161,7 +155,7 @@ export class SNComponentManager extends PureService<
     removeFromArray(this.viewers, viewer);
   }
 
-  setDesktopManager(desktopManager: any): void {
+  setDesktopManager(desktopManager: DesktopManagerInterface): void {
     this.desktopManager = desktopManager;
     this.configureForDesktop();
   }
@@ -177,13 +171,13 @@ export class SNComponentManager extends PureService<
     if (components.length > 0 && source !== PayloadSource.RemoteSaved) {
       /* Ensure any component in our data is installed by the system */
       if (this.isDesktop) {
-        this.desktopManager.syncComponentsInstallation(components);
+        this.desktopManager?.syncComponentsInstallation(components);
       }
     }
 
     const themes = components.filter((c) => c.isTheme());
     if (themes.length > 0) {
-      this.postActiveThemesToAllComponents();
+      this.postActiveThemesToAllViewers();
     }
   }
 
@@ -245,15 +239,15 @@ export class SNComponentManager extends PureService<
   }
 
   configureForDesktop(): void {
-    this.desktopManager.registerUpdateObserver((component: SNComponent) => {
+    this.desktopManager?.registerUpdateObserver((component: SNComponent) => {
       /* Reload theme if active */
       if (component.active && component.isTheme()) {
-        this.postActiveThemesToAllComponents();
+        this.postActiveThemesToAllViewers();
       }
     });
   }
 
-  postActiveThemesToAllComponents(): void {
+  postActiveThemesToAllViewers(): void {
     for (const viewer of this.viewers) {
       viewer.postActiveThemes();
     }
@@ -278,7 +272,7 @@ export class SNComponentManager extends PureService<
         component.local_url &&
         component.local_url.replace(
           DESKTOP_URL_PREFIX,
-          this.desktopManager.getExtServerHost()
+          this.desktopManager!.getExtServerHost()
         )
       );
     } else {
@@ -310,20 +304,7 @@ export class SNComponentManager extends PureService<
   }
 
   private findComponent(uuid: UuidString) {
-    return (
-      this.templateComponents.find((c) => c.uuid === uuid) ||
-      (this.itemManager.findItem(uuid) as SNComponent)
-    );
-  }
-
-  public addTemporaryTemplateComponent(component: SNComponent): void {
-    this.templateComponents.push(component);
-  }
-
-  public removeTemporaryTemplateComponent(component: SNComponent): void {
-    this.templateComponents = this.templateComponents.filter(
-      (c) => c.uuid !== component.uuid
-    );
+    return this.itemManager.findItem(uuid) as SNComponent;
   }
 
   findComponentViewer(identifier: string): ComponentViewer | undefined {
@@ -334,11 +315,36 @@ export class SNComponentManager extends PureService<
     return this.viewers.find((viewer) => viewer.sessionKey === key);
   }
 
+  private areRequestedPermissionsValid(
+    permissions: ComponentPermission[]
+  ): boolean {
+    for (const permission of permissions) {
+      if (permission.name === ComponentAction.StreamItems) {
+        const hasNonAllowedBatchPermission = permission.content_types?.some(
+          (type) => !AllowedBatchPermissions.includes(type)
+        );
+        if (hasNonAllowedBatchPermission) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
   runWithPermissions(
     componentUuid: UuidString,
     requiredPermissions: ComponentPermission[],
     runFunction: () => void
   ): void {
+    if (!this.areRequestedPermissionsValid(requiredPermissions)) {
+      console.error(
+        'Component is requesting invalid permissions',
+        componentUuid,
+        requiredPermissions
+      );
+      return;
+    }
     const component = this.findComponent(componentUuid);
     /* Make copy as not to mutate input values */
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[];
@@ -495,50 +501,43 @@ export class SNComponentManager extends PureService<
     throw 'Must override SNComponentManager.presentPermissionsDialog';
   }
 
-  // public registerHandler(handler: ComponentHandler): () => void {
-  //   this.handlers.push(handler);
-  //   return () => {
-  //     const matching = find(this.handlers, { identifier: handler.identifier });
-  //     if (!matching) {
-  //       this.log('Attempting to deregister non-existing handler');
-  //       return;
-  //     }
-  //     removeFromArray(this.handlers, matching);
-  //   };
-  // }
-
-  // async activateTheme(uuid: UuidString): Promise<void> {
-  //   this.log('Activating theme', uuid);
-  //   const component = this.findComponent(uuid);
-  //   if (!component.active) {
-  //     await this.itemManager.changeComponent(component.uuid, (mutator) => {
-  //       mutator.active = true;
-  //     });
-  //   }
-  // }
-
-  // async deactivateTheme(uuid: UuidString): Promise<void> {
-  //   this.log('Deactivating theme', uuid);
-  //   const component = this.findComponent(uuid);
-  //   if (component?.active) {
-  //     await this.itemManager.changeComponent(component.uuid, (mutator) => {
-  //       mutator.active = false;
-  //     });
-  //   }
-  // }
-
   async toggleTheme(uuid: UuidString): Promise<void> {
     this.log('Toggling theme', uuid);
-    const theme = this.findComponent(uuid);
-    await this.itemManager.changeComponent(theme.uuid, (mutator) => {
-      mutator.active = !(mutator.getItem() as SNComponent).active;
-    });
+
+    const theme = this.findComponent(uuid) as SNTheme;
+    if (theme.active) {
+      await this.itemManager.changeComponent(theme.uuid, (mutator) => {
+        mutator.active = false;
+      });
+    } else {
+      const activeThemes = this.getActiveThemes();
+
+      /* Activate current before deactivating others, so as not to flicker */
+      await this.itemManager.changeComponent(theme.uuid, (mutator) => {
+        mutator.active = true;
+      });
+
+      /* Deactive currently active theme(s) if new theme is not layerable */
+      if (!theme.isLayerable()) {
+        await sleep(10);
+        for (const candidate of activeThemes) {
+          if (candidate && !candidate.isLayerable()) {
+            await this.itemManager.changeComponent(
+              candidate.uuid,
+              (mutator) => {
+                mutator.active = false;
+              }
+            );
+          }
+        }
+      }
+    }
   }
 
   async toggleComponent(uuid: UuidString): Promise<void> {
     this.log('Toggling component', uuid);
-    const theme = this.findComponent(uuid);
-    await this.itemManager.changeComponent(theme.uuid, (mutator) => {
+    const component = this.findComponent(uuid);
+    await this.itemManager.changeComponent(component.uuid, (mutator) => {
       mutator.active = !(mutator.getItem() as SNComponent).active;
     });
   }
@@ -568,31 +567,6 @@ export class SNComponentManager extends PureService<
   ): HTMLIFrameElement | undefined {
     return viewer.getIframe();
   }
-
-  // async toggleComponent(_component: SNComponent): Promise<void> {
-
-  //     if (component.active) {
-  //       await this.deactivateComponent(component.uuid);
-  //     } else {
-  //       if (component.content_type === ContentType.Theme) {
-  //         const theme = component as SNTheme;
-  //         /* Deactive currently active theme if new theme is not layerable */
-  //         const activeThemes = this.getActiveThemes();
-  //         /* Activate current before deactivating others, so as not to flicker */
-  //         await this.activateComponent(component.uuid);
-  //         if (!theme.isLayerable()) {
-  //           await sleep(10);
-  //           for (const candidate of activeThemes) {
-  //             if (candidate && !candidate.isLayerable()) {
-  //               await this.deactivateComponent(candidate.uuid);
-  //             }
-  //           }
-  //         }
-  //       } else {
-  //         await this.activateComponent(component.uuid);
-  //       }
-  //     }
-  // }
 
   editorForNote(note: SNNote): SNComponent | undefined {
     const editors = this.componentsForArea(ComponentArea.Editor);

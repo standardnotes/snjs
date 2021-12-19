@@ -54,13 +54,23 @@ export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from './models/app/component';
 export { LiveItem } from './models/live_item';
 export { FeatureStatus } from '@Lib/services/features_service';
+
 export type {
   ItemMessagePayload,
   MessageData,
   PermissionDialog,
+  DesktopManagerInterface,
 } from './services/component_manager/types';
-export { SNComponentManager, ComponentManagerEvent } from './services/component_manager/component_manager';
-export { ComponentViewer } from './services/component_manager/component_viewer';
+export {
+  SNComponentManager,
+  ComponentManagerEvent,
+} from './services/component_manager/component_manager';
+export {
+  ComponentViewer,
+  ComponentViewerEvent,
+  ComponentViewerError,
+} from './services/component_manager/component_viewer';
+
 export { HistoryEntry } from '@Services/history/entries/history_entry';
 export { PayloadManager } from './services/payload_manager';
 
@@ -143,6 +153,7 @@ export {
   arraysEqual,
   isValidUrl,
   dateToLocalizedString,
+  nonSecureRandomIdentifier,
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

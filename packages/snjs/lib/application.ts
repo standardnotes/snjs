@@ -1731,11 +1731,11 @@ export class SNApplication {
     this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
-    this.createComponentManager();
     this.createActionsManager();
     this.createPreferencesService();
     this.createSettingsService();
     this.createFeaturesService();
+    this.createComponentManager();
     this.createMigrationService();
     this.createMfaService();
   }
@@ -1773,7 +1773,6 @@ export class SNApplication {
       this.storageService,
       this.apiService,
       this.itemManager,
-      this.componentManager,
       this.webSocketsService,
       this.settingsService,
       this.credentialService,
@@ -1874,6 +1873,7 @@ export class SNApplication {
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
+      this.featuresService,
       this.alertService,
       this.environment,
       this.platform,

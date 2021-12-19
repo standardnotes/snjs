@@ -1,3 +1,5 @@
+import { FeatureStatus, FeaturesEvent } from '@Lib/services/features_service';
+import { SNFeaturesService } from '@Lib/services';
 import { ComponentArea } from '@standardnotes/features';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
@@ -74,6 +76,16 @@ export type ActionObserver = (
   messageData: MessageData
 ) => void;
 
+export const enum ComponentViewerEvent {
+  FeatureStatusUpdated = 'FeatureStatusUpdated',
+}
+type EventObserver = (event: ComponentViewerEvent) => void;
+
+export const enum ComponentViewerError {
+  OfflineRestricted = 'OfflineRestricted',
+  MissingUrl = 'MissingUrl',
+}
+
 export class ComponentViewer {
   private streamItems?: ContentType[];
   private streamContextItemOriginalMessage?: ComponentMessage;
@@ -83,18 +95,22 @@ export class ComponentViewer {
   public identifier = nonSecureRandomIdentifier();
   private actionObservers: ActionObserver[] = [];
   public overrideContextItem?: SNItem;
+  private featureStatus: FeatureStatus;
+  private removeFeaturesObserver: () => void;
+  private eventObservers: EventObserver[] = [];
 
-  window?: Window;
-  hidden = false;
-  readonly = false;
-  lockReadonly = false;
-  sessionKey?: string;
+  private window?: Window;
+  private hidden = false;
+  private readonly = false;
+  public lockReadonly = false;
+  public sessionKey?: string;
 
   constructor(
     public component: SNComponent,
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private alertService: SNAlertService,
+    featuresService: SNFeaturesService,
     private environment: Environment,
     private platform: Platform,
     private componentManagerFunctions: ComponentManagerFunctions,
@@ -112,6 +128,18 @@ export class ComponentViewer {
     if (actionObserver) {
       this.actionObservers.push(actionObserver);
     }
+    this.featureStatus = featuresService.getFeatureStatus(component.identifier);
+    this.removeFeaturesObserver = featuresService.addEventObserver((event) => {
+      if (event === FeaturesEvent.FeaturesUpdated) {
+        const featureStatus = featuresService.getFeatureStatus(
+          component.identifier
+        );
+        if (featureStatus !== this.featureStatus) {
+          this.featureStatus = featureStatus;
+          this.notifyEventObservers(ComponentViewerEvent.FeatureStatusUpdated);
+        }
+      }
+    });
     this.log('Constructor', this);
   }
 
@@ -129,17 +157,81 @@ export class ComponentViewer {
   }
 
   private deinit(): void {
+    this.eventObservers.length = 0;
+    this.removeFeaturesObserver();
+    (this.removeFeaturesObserver as unknown) = undefined;
     this.removeItemObserver();
     (this.removeItemObserver as unknown) = undefined;
     this.actionObservers.length = 0;
   }
 
-  public addActionObserver(observer: ActionObserver): void {
+  public addEventObserver(observer: EventObserver): () => void {
+    this.eventObservers.push(observer);
+    return () => {
+      removeFromArray(this.eventObservers, observer);
+    };
+  }
+
+  private notifyEventObservers(event: ComponentViewerEvent): void {
+    for (const observer of this.eventObservers) {
+      observer(event);
+    }
+  }
+
+  public addActionObserver(observer: ActionObserver): () => void {
     this.actionObservers.push(observer);
+    return () => {
+      removeFromArray(this.actionObservers, observer);
+    };
+  }
+
+  public setReadonly(readonly: boolean): void {
+    if (this.lockReadonly) {
+      throw Error(
+        'Attempting to set readonly on lockedReadonly component viewer'
+      );
+    }
+    this.readonly = readonly;
   }
 
   get componentUuid(): string {
     return this.component.uuid;
+  }
+
+  public getFeatureStatus(): FeatureStatus {
+    return this.featureStatus;
+  }
+
+  private isOfflineRestricted(): boolean {
+    return this.component.offlineOnly && !this.isDesktop;
+  }
+
+  private hasUrlError(): boolean {
+    return this.isDesktop
+      ? !this.component.local_url && !this.component.hasValidHostedUrl()
+      : !this.component.hasValidHostedUrl();
+  }
+
+  public shouldRender(): boolean {
+    return this.getError() == undefined;
+  }
+
+  public getError(): ComponentViewerError | undefined {
+    if (this.isOfflineRestricted()) {
+      return ComponentViewerError.OfflineRestricted;
+    }
+    if (this.hasUrlError()) {
+      return ComponentViewerError.MissingUrl;
+    }
+  }
+
+  private updateOurComponentRefFromChangedItems(items: SNItem[]): void {
+    const updatedComponent = items.find(
+      (item) => item.uuid === this.component.uuid
+    );
+    if (updatedComponent) {
+      this.component = updatedComponent as SNComponent;
+    }
   }
 
   handleChangesInItems(
@@ -147,6 +239,8 @@ export class ComponentViewer {
     source?: PayloadSource,
     sourceKey?: string
   ): void {
+    this.updateOurComponentRefFromChangedItems(items);
+
     const areWeOriginator = sourceKey && sourceKey === this.component.uuid;
     if (areWeOriginator) {
       return;
@@ -269,7 +363,15 @@ export class ComponentViewer {
     this.sendMessage(reply);
   }
 
-  sendMessage(message: ComponentMessage | MessageReply): void {
+  /**
+   * @param essential If the message is non-essential, no alert will be shown
+   *  if we can no longer find the window.
+   * @returns
+   */
+  sendMessage(
+    message: ComponentMessage | MessageReply,
+    essential = true
+  ): void {
     const permissibleActionsWhileHidden = [
       ComponentAction.ComponentRegistered,
       ComponentAction.ActivateThemes,
@@ -295,10 +397,12 @@ export class ComponentViewer {
     this.log('Send message to component', this.component, 'message: ', message);
     let origin = this.url;
     if (!origin || !this.window) {
-      void this.alertService.alert(
-        `Standard Notes is trying to communicate with ${this.component.name}, ` +
-          'but an error is occurring. Please restart this extension and try again.'
-      );
+      if (essential) {
+        void this.alertService.alert(
+          `Standard Notes is trying to communicate with ${this.component.name}, ` +
+            'but an error is occurring. Please restart this extension and try again.'
+        );
+      }
       return;
     }
     if (!origin!.startsWith('http') && !origin!.startsWith('file')) {
@@ -306,7 +410,7 @@ export class ComponentViewer {
       origin = window.location.href + origin;
     }
     /* Mobile messaging requires json */
-    this.window?.postMessage(
+    this.window!.postMessage(
       this.isMobile ? JSON.stringify(message) : message,
       origin!
     );
@@ -354,10 +458,16 @@ export class ComponentViewer {
     });
   }
 
-  /** Called by other views when the iframe is ready */
+  public getWindow(): Window | undefined {
+    return this.window;
+  }
+
+  /** Called by client when the iframe is ready */
   public async setWindow(window: Window): Promise<void> {
-    if (this.window === window) {
-      this.log('Attempting to re-register same component window.');
+    if (this.window) {
+      throw Error(
+        'Attempting to override component viewer window. Create a new component viewer instead.'
+      );
     }
     this.log('setWindow', 'component: ', this.component, 'window: ', window);
     this.window = window;
@@ -386,7 +496,7 @@ export class ComponentViewer {
       action: ComponentAction.ActivateThemes,
       data: data,
     };
-    this.sendMessage(message);
+    this.sendMessage(message, false);
   }
 
   /* A hidden component will not receive messages. However, when a component is unhidden,
@@ -414,14 +524,14 @@ export class ComponentViewer {
     if (!this.component) {
       this.log('Component not defined for message, returning', message);
       this.alertService.alert(
-        'An extension is trying to communicate with Standard Notes, ' +
+        'A component is trying to communicate with Standard Notes, ' +
           'but there is an error establishing a bridge. Please restart the app and try again.'
       );
       return;
     }
     if (this.readonly && ReadwriteActions.includes(message.action)) {
       this.alertService.alert(
-        `The extension ${this.component.name} is trying to save, but it is in a locked state and cannot accept changes.`
+        `${this.component.name} is trying to save, but it is in a locked state and cannot accept changes.`
       );
       return;
     }
@@ -639,28 +749,6 @@ export class ComponentViewer {
             });
             this.handleMessage(saveMessage);
           });
-      }
-    );
-  }
-
-  handleDuplicateItemMessage(message: ComponentMessage): void {
-    const itemParams = message.data.item!;
-    const item = this.itemManager.findItem(itemParams.uuid)!;
-    const requiredPermissions = [
-      {
-        name: ComponentAction.StreamItems,
-        content_types: [item.content_type!],
-      },
-    ];
-    this.componentManagerFunctions.runWithPermissions(
-      this.component.uuid,
-      requiredPermissions,
-      async () => {
-        const duplicate = await this.itemManager.duplicateItem(item.uuid);
-        this.syncService.sync();
-        this.replyToMessage(message, {
-          item: this.jsonForItem(duplicate),
-        });
       }
     );
   }
