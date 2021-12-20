@@ -194,9 +194,6 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
   }
 
   protectNotes(notes: SNNote[]): Promise<SNNote[]> {
-    void this.notifyEvent(ProtectionEvent.UnprotectedSessionBegan, {
-      isNoteMarkedAsProtected: true
-    });
     return this.itemManager.changeItems<NoteMutator>(
       Uuids(notes),
       (mutator) => {

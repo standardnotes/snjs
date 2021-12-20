@@ -13,5 +13,4 @@ export type ErrorObject = {
 }
 
 export type ApplicationEventPayload = Partial<{
-  isNoteMarkedAsProtected: boolean
 }>
