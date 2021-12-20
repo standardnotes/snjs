@@ -1,5 +1,6 @@
 import { ItemManager, SNItem } from '@Lib/index';
 import { SNNote } from '@Lib/models';
+import { SmartTagPredicateContent } from '@Lib/models/app/smartTag';
 import { Uuid } from '@Lib/uuid';
 import { SNTag } from '@Models/app/tag';
 import { FillItemContent } from '@Models/functions';
@@ -297,19 +298,19 @@ describe('itemManager', () => {
   const TAG_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]';
   const TAG_LONG = '!["Long", "text.length", ">", 500]';
 
-  const TAG_NOT_PINNED_JSON = {
+  const TAG_NOT_PINNED_JSON: SmartTagPredicateContent = {
     keypath: 'pinned',
     operator: '=',
     value: false,
   };
 
-  const TAG_LAST_DAY_JSON = {
+  const TAG_LAST_DAY_JSON: SmartTagPredicateContent = {
     keypath: 'updated_at',
     operator: '>',
     value: '1.days.ago',
   };
 
-  const TAG_LONG_JSON = {
+  const TAG_LONG_JSON: SmartTagPredicateContent = {
     keypath: 'text.length',
     operator: '>',
     value: 500,
