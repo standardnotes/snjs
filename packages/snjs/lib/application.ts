@@ -1990,11 +1990,11 @@ export class SNApplication {
       this.itemManager
     );
     this.serviceObservers.push(
-      this.protectionService.addEventObserver((event) => {
+      this.protectionService.addEventObserver((event, data) => {
         if (event === ProtectionEvent.UnprotectedSessionBegan) {
-          void this.notifyEvent(ApplicationEvent.UnprotectedSessionBegan);
+          void this.notifyEvent(ApplicationEvent.UnprotectedSessionBegan, data);
         } else if (event === ProtectionEvent.UnprotectedSessionExpired) {
-          void this.notifyEvent(ApplicationEvent.UnprotectedSessionExpired);
+          void this.notifyEvent(ApplicationEvent.UnprotectedSessionExpired, data);
         }
       })
     );

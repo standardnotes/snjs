@@ -1,10 +1,11 @@
 import { removeFromArray } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
+import { ApplicationEventPayload } from '@Lib/types';
 
 type EventObserver<E, D> = (eventName: E, data?: D) => Promise<void> | void;
 
-export abstract class PureService<EventName = string, EventData = undefined> {
+export abstract class PureService<EventName = string, EventData = ApplicationEventPayload> {
   private eventObservers: EventObserver<EventName, EventData>[] = [];
   public loggingEnabled = false;
   public deviceInterface?: DeviceInterface;
