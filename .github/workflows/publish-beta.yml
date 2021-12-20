@@ -55,7 +55,7 @@ jobs:
         run: echo ::set-output name=beta_name::${GITHUB_REF/refs\/heads\/beta\//}
       - run: yarn install --pure-lockfile
       - run: yarn build
-      - run: yarn lerna publish --yes --canary --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
+      - run: yarn lerna publish --yes --canary --preid beta-${{ steps.get_beta_name.outputs.beta_name }} --pre-dist-tag ${{ steps.get_beta_name.outputs.beta_name }}-${{ github.sha }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
