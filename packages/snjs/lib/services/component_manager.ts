@@ -408,15 +408,6 @@ export class SNComponentManager extends PureService {
     }
   }
 
-  isNativeExtension(component: SNComponent): boolean {
-    const nativeUrls = [(window as any)._extensions_manager_location];
-    const hostedUrl = component.hosted_url;
-    const localUrl =
-      component.local_url &&
-      component.local_url.replace(DESKTOP_URL_PREFIX, '');
-    return nativeUrls.includes(hostedUrl) || nativeUrls.includes(localUrl);
-  }
-
   detectFocusChange = (): void => {
     const activeIframes = this.allComponentIframes();
     for (const iframe of activeIframes) {
@@ -611,8 +602,7 @@ export class SNComponentManager extends PureService {
       clientData: clientData,
     };
     return this.responseItemsByRemovingPrivateProperties(
-      [params],
-      component
+      [params]
     )[0];
   }
 
@@ -833,8 +823,6 @@ export class SNComponentManager extends PureService {
       this.handleToggleComponentMessage(componentToToggle);
     } else if (message.action === ComponentAction.RequestPermissions) {
       this.handleRequestPermissionsMessage(component, message);
-    } else if (message.action === ComponentAction.InstallLocalComponent) {
-      this.handleInstallLocalComponentMessage(component, message);
     } else if (message.action === ComponentAction.DuplicateItem) {
       this.handleDuplicateItemMessage(component, message);
     }
@@ -853,13 +841,8 @@ export class SNComponentManager extends PureService {
 
   responseItemsByRemovingPrivateProperties<T extends RawPayload>(
     responseItems: T[],
-    component: SNComponent,
     removeUrls = false
   ): T[] {
-    if (component && this.isNativeExtension(component)) {
-      /* System extensions can bypass this step */
-      return responseItems;
-    }
     /* Don't allow component to overwrite these properties. */
     let privateContentProperties = [
       'autoupdateDisabled',
@@ -1034,7 +1017,6 @@ export class SNComponentManager extends PureService {
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       responsePayloads = this.responseItemsByRemovingPrivateProperties(
         responsePayloads,
-        component,
         true
       );
       /* Filter locked items */
@@ -1173,8 +1155,7 @@ export class SNComponentManager extends PureService {
     ];
     this.runWithPermissions(component.uuid, requiredPermissions, async () => {
       responseItems = this.responseItemsByRemovingPrivateProperties(
-        responseItems,
-        component
+        responseItems
       );
       const processedItems = [];
       for (const responseItem of responseItems) {
@@ -1329,18 +1310,6 @@ export class SNComponentManager extends PureService {
         }
       }
     }
-  }
-
-  handleInstallLocalComponentMessage(
-    sourceComponent: SNComponent,
-    message: ComponentMessage
-  ): void {
-    /* Only native extensions have this permission */
-    if (!this.isNativeExtension(sourceComponent)) {
-      return;
-    }
-    const targetComponent = this.itemManager.findItem(message.data.uuid!);
-    this.desktopManager.installComponent(targetComponent);
   }
 
   runWithPermissions(
