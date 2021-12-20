@@ -36,7 +36,7 @@ describe('protections', function () {
               prompt,
               prompt.validation === ChallengeValidation.AccountPassword
                 ? password
-                : 0
+                : UnprotectedAccessSecondsDuration.OneMinute
             )
         );
 
@@ -83,7 +83,7 @@ describe('protections', function () {
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
-                : 0
+                : UnprotectedAccessSecondsDuration.OneMinute
             )
         );
 
@@ -119,7 +119,7 @@ describe('protections', function () {
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
-                : 0
+                : UnprotectedAccessSecondsDuration.OneMinute
             )
         );
 
@@ -178,7 +178,7 @@ describe('protections', function () {
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
-                : 3600
+                : UnprotectedAccessSecondsDuration.OneHour
             )
         );
 
@@ -217,7 +217,7 @@ describe('protections', function () {
                 prompt,
                 prompt.validation === ChallengeValidation.AccountPassword
                   ? password
-                  : 3600
+                  : UnprotectedAccessSecondsDuration.OneHour
               )
           );
         } else {
@@ -266,7 +266,7 @@ describe('protections', function () {
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
-                : 0
+                : UnprotectedAccessSecondsDuration.OneMinute
             )
         );
 
@@ -297,7 +297,7 @@ describe('protections', function () {
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
-                : 0
+                : UnprotectedAccessSecondsDuration.OneMinute
             )
         );
 
@@ -314,7 +314,7 @@ describe('protections', function () {
   it('handles session length', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     await this.application.protectionService.setSessionLength(300);
-    const length = await this.application.protectionService.getSessionLength();
+    const length = await this.application.protectionService.getLastSessionLength();
     expect(length).to.equal(300);
     const expirey = await this.application.getProtectionSessionExpiryDate();
     expect(expirey).to.be.ok;
@@ -322,9 +322,9 @@ describe('protections', function () {
 
   it('handles session length', async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
-    await this.application.protectionService.setSessionLength(300);
-    const length = await this.application.protectionService.getSessionLength();
-    expect(length).to.equal(300);
+    await this.application.protectionService.setSessionLength(UnprotectedAccessSecondsDuration.OneMinute);
+    const length = await this.application.protectionService.getLastSessionLength();
+    expect(length).to.equal(UnprotectedAccessSecondsDuration.OneMinute);
     const expirey = await this.application.getProtectionSessionExpiryDate();
     expect(expirey).to.be.ok;
   });
@@ -403,23 +403,24 @@ describe('protections', function () {
     });
   });
 
-  describe('areProtectionsEnabled', async function () {
-    it('should return true when session length has not been set', async function () {
+  describe('hasUnprotectedAccessSession', async function () {
+    it('should return false when session length has not been set', async function () {
+      this.foo = 'tar';
       this.application = await Factory.createInitAppWithRandNamespace();
       await this.application.addPasscode('passcode');
-      expect(this.application.areProtectionsEnabled()).to.be.true;
+      expect(this.application.hasUnprotectedAccessSession()).to.be.false;
     });
 
-    it('should return false when session length has been set', async function () {
+    it('should return true when session length has been set', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
       await this.application.addPasscode('passcode');
-      await this.application.protectionService.setSessionLength(300);
-      expect(this.application.areProtectionsEnabled()).to.be.false;
+      await this.application.protectionService.setSessionLength(UnprotectedAccessSecondsDuration.OneMinute);
+      expect(this.application.hasUnprotectedAccessSession()).to.be.true;
     });
 
-    it('should return false when there are no protection sources', async function () {
+    it('should return true when there are no protection sources', async function () {
       this.application = await Factory.createInitAppWithRandNamespace();
-      expect(this.application.areProtectionsEnabled()).to.be.false;
+      expect(this.application.hasUnprotectedAccessSession()).to.be.true;
     });
   });
 
@@ -445,7 +446,7 @@ describe('protections', function () {
                 prompt,
                 prompt.validation === ChallengeValidation.AccountPassword
                   ? password
-                  : 0
+                  : UnprotectedAccessSecondsDuration.OneMinute
               )
           );
           this.application.submitValuesForChallenge(challenge, values);
@@ -491,7 +492,7 @@ describe('protections', function () {
                 prompt,
                 prompt.validation === ChallengeValidation.LocalPasscode
                   ? passcode
-                  : 0
+                  : UnprotectedAccessSecondsDuration.OneMinute
               )
           );
 
@@ -543,6 +544,12 @@ describe('protections', function () {
   describe('protectNotes', async function () {
     it('protects all notes', async function () {
       this.application = await Factory.createApplication(Factory.randomString());
+      await this.application.prepareForLaunch({
+        receiveChallenge: (challenge) => {
+          this.application.cancelChallenge(challenge);
+        },
+      });
+      await this.application.launch(true);
 
       const NOTE_COUNT = 3;
       let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT);
@@ -575,7 +582,7 @@ describe('protections', function () {
                 prompt,
                 prompt.validation === ChallengeValidation.LocalPasscode
                   ? passcode
-                  : 0
+                  : UnprotectedAccessSecondsDuration.OneMinute
               )
           );
 
@@ -616,7 +623,7 @@ describe('protections', function () {
                 prompt,
                 prompt.validation === ChallengeValidation.LocalPasscode
                   ? passcode
-                  : 0
+                  : UnprotectedAccessSecondsDuration.OneMinute
               )
           );
 
