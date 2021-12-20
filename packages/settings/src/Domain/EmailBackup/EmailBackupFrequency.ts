@@ -1,5 +1,5 @@
 export enum EmailBackupFrequency {
+  Disabled = 'disabled',
   Daily = 'daily',
   Weekly = 'weekly',
-  Disabled = 'no email backups'
 }
