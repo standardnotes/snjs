@@ -541,6 +541,14 @@ export class SNApplication {
   }
 
   /**
+   * @param item item to be checked
+   * @returns Whether the item is a template (unmanaged)
+   */
+  public isTemplateItem(item: SNItem): boolean {
+    return this.itemManager.isTemplateItem(item);
+  }
+
+  /**
    * Creates an unmanaged item from a payload.
    */
   public createItemFromPayload(payload: PurePayload): SNItem {
@@ -922,6 +930,16 @@ export class SNApplication {
    */
   public getSortedTagsForNote(note: SNNote): SNTag[] {
     return this.itemManager.getSortedTagsForNote(note);
+  }
+
+  /**
+   * Add a tag and all its parent to a note.
+   *
+   * @param note The note assigned to a tag
+   * @param tagUuid The tag we'll assign to the note
+   */
+  public addTagHierarchyToNote(note: SNNote, tag: SNTag): Promise<SNTag[]> {
+    return this.itemManager.addTagHierarchyToNote(note, tag);
   }
 
   public async findOrCreateTag(title: string): Promise<SNTag> {

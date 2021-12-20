@@ -422,7 +422,9 @@ describe('featuresService', () => {
         },
       });
 
-      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(true);
 
       await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
@@ -439,7 +441,9 @@ describe('featuresService', () => {
         featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
       ).toBe(FeatureStatus.NotInCurrentPlan);
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+      ]);
 
       expect(
         featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
@@ -541,7 +545,9 @@ describe('featuresService', () => {
         set: jest.fn(),
       });
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+      ]);
 
       expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(
         FeatureStatus.Entitled
@@ -554,9 +560,13 @@ describe('featuresService', () => {
     it('feature status should be not entitled if no account or offline repo', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+      ]);
 
-      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(false);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
@@ -573,7 +583,7 @@ describe('featuresService', () => {
 
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
-          features: []
+          features: [],
         },
       });
 
@@ -582,7 +592,9 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
-      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(true);
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
@@ -592,7 +604,6 @@ describe('featuresService', () => {
       expect(
         featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
       ).toBe(FeatureStatus.Entitled);
-
 
       await featuresService.didDownloadFeatures(features);
 
@@ -614,7 +625,9 @@ describe('featuresService', () => {
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
-      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(true);
 
       expect(
         featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
@@ -622,7 +635,6 @@ describe('featuresService', () => {
       expect(
         featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
       ).toBe(FeatureStatus.NotInCurrentPlan);
-
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false;
 
@@ -634,7 +646,6 @@ describe('featuresService', () => {
       ).toBe(FeatureStatus.NotInCurrentPlan);
     });
 
-
     it('feature status for offline subscription', async () => {
       const featuresService = createService();
 
@@ -643,7 +654,9 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
-      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(false);
       featuresService['completedSuccessfulFeaturesRetrieval'] = true;
 
       expect(
@@ -666,8 +679,12 @@ describe('featuresService', () => {
     it('has paid subscription', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
-      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true);
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+      ]);
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(true);
 
       expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy;
 
@@ -676,18 +693,26 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
-      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true);
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(
+        true
+      );
     });
 
     it('has paid subscription should be true if offline repo and signed into third party server', async () => {
       const featuresService = createService();
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser]);
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+      ]);
 
       featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true);
-      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false);
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(false);
 
-      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true);
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(
+        true
+      );
     });
   });
 

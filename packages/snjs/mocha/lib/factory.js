@@ -11,7 +11,12 @@ const syncOptions = {
   awaitAll: true,
 };
 
-export async function createAndInitSimpleAppContext({ registerUser, environment } = { registerUser: false, environment: Environment.Web }) {
+export async function createAndInitSimpleAppContext(
+  { registerUser, environment } = {
+    registerUser: false,
+    environment: Environment.Web,
+  }
+) {
   const application = await createInitAppWithRandNamespace(environment);
   const email = Uuid.GenerateUuidSynchronously();
   const password = Uuid.GenerateUuidSynchronously();
@@ -21,7 +26,7 @@ export async function createAndInitSimpleAppContext({ registerUser, environment 
     await registerUserToApplication({
       application,
       email,
-      password
+      password,
     });
   }
 
@@ -29,9 +34,9 @@ export async function createAndInitSimpleAppContext({ registerUser, environment 
     application,
     email,
     password,
-    newPassword
+    newPassword,
   };
-};
+}
 
 export async function createAppContext(identifier) {
   if (!identifier) {
@@ -95,10 +100,7 @@ export async function createAppContext(identifier) {
 
 export async function safeDeinit(application) {
   /** Limit waiting to 1s */
-  await Promise.race([
-    sleep(1),
-    application.syncService?.awaitCurrentSyncs()
-  ]);
+  await Promise.race([sleep(1), application.syncService?.awaitCurrentSyncs()]);
   await application.prepareForDeinit();
   application.deinit(DeinitSource.SignOut);
 }
@@ -135,7 +137,7 @@ export function createApplication(identifier, environment, platform, host) {
     host || getDefaultHost(),
     getAppVersion(),
     true,
-    getDefaultWebSocketUrl(),
+    getDefaultWebSocketUrl()
   );
 }
 
@@ -248,7 +250,9 @@ export function createStorageItemPayload(contentType) {
 }
 
 export function createNotePayload(title, text = undefined, dirty = true) {
-  return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text, dirty }));
+  return CreateMaxPayloadFromAnyObject(
+    createNoteParams({ title, text, dirty })
+  );
 }
 
 export function createStorageItemTagPayload(tagParams = {}) {
@@ -326,10 +330,10 @@ export async function loginToApplication({
 export async function awaitFunctionInvokation(object, functionName) {
   return new Promise((resolve) => {
     const original = object[functionName];
-    object[functionName] = function() {
+    object[functionName] = function () {
       resolve(original.apply(this, arguments));
-    }
-  })
+    };
+  });
 }
 
 /**
@@ -403,8 +407,17 @@ export function createTagParams({ title, dirty = true } = {}) {
   return params;
 }
 
-export function createRelatedNoteTagPairPayload({ noteTitle, noteText, tagTitle, dirty = true } = {}) {
-  const noteParams = createNoteParams({ title: noteTitle, text: noteText, dirty });
+export function createRelatedNoteTagPairPayload({
+  noteTitle,
+  noteText,
+  tagTitle,
+  dirty = true,
+} = {}) {
+  const noteParams = createNoteParams({
+    title: noteTitle,
+    text: noteText,
+    dirty,
+  });
   const tagParams = createTagParams({ title: tagTitle, dirty });
   tagParams.content.references = [
     {
@@ -517,4 +530,33 @@ export function handlePasswordChallenges(application, password) {
       application.submitValuesForChallenge(challenge, values);
     },
   });
+}
+
+export async function createTags(
+  application,
+  hierarchy,
+  parent = undefined,
+  resultAccumulator = undefined
+) {
+  const result = resultAccumulator || {};
+
+  const promises = Object.entries(hierarchy).map(async ([key, value]) => {
+    let tag = await application.findOrCreateTag(key);
+
+    result[key] = tag;
+
+    if (parent) {
+      await application.setTagParent(parent, tag);
+    }
+
+    if (value === true) {
+      return;
+    }
+
+    await createTags(application, value, tag, result);
+  });
+
+  await Promise.all(promises);
+
+  return result;
 }
