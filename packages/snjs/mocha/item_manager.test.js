@@ -95,9 +95,9 @@ describe('item manager', function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    expect(
-      this.itemManager.collection.referenceMap.directMap[tag.uuid]
-    ).to.eql([note.uuid]);
+    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql(
+      [note.uuid]
+    );
   });
 
   it('inverse reference map', async function () {
@@ -236,7 +236,9 @@ describe('item manager', function () {
 
   it('dirty items should not include errored items', async function () {
     const note = await this.itemManager.setItemDirty(
-      (await this.createNote()).uuid
+      (
+        await this.createNote()
+      ).uuid
     );
     const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
       errorDecrypting: true,
@@ -251,11 +253,13 @@ describe('item manager', function () {
 
   it('dirty items should include errored items if they are being deleted', async function () {
     const note = await this.itemManager.setItemDirty(
-      (await this.createNote()).uuid
+      (
+        await this.createNote()
+      ).uuid
     );
     const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
       errorDecrypting: true,
-      deleted: true
+      deleted: true,
     });
     await this.itemManager.emitItemsFromPayloads(
       [errorred],
@@ -355,17 +359,6 @@ describe('item manager', function () {
     });
   });
 
-  it('create template item', async function () {
-    const item = await this.itemManager.createTemplateItem(ContentType.Note, {
-      title: 'hello',
-    });
-
-    expect(item).to.be.ok;
-    /* Template items should never be added to the record */
-    expect(this.itemManager.items.length).to.equal(0);
-    expect(this.itemManager.notes.length).to.equal(0);
-  });
-
   it('set item deleted', async function () {
     const note = await this.createNote();
     await this.itemManager.setItemToBeDeleted(note.uuid);
@@ -397,7 +390,7 @@ describe('item manager', function () {
     const tag = await this.createTag();
 
     expect(this.itemManager.findTagByTitle(tag.title.toUpperCase())).to.be.ok;
-  })
+  });
 
   it('find or create tag by title', async function () {
     const title = 'foo';
@@ -498,45 +491,47 @@ describe('item manager', function () {
     expect(latestVersion.title).to.equal(changedTitle);
   });
 
-  describe('searchTags', async function() {
-    it('should return tag with query matching title', async function() {
+  describe('searchTags', async function () {
+    it('should return tag with query matching title', async function () {
       const tag = await this.itemManager.findOrCreateTagByTitle('tag');
 
       const results = this.itemManager.searchTags('tag');
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(tag.title);
     });
-    it('should return all tags with query partially matching title', async function() {
+    it('should return all tags with query partially matching title', async function () {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag one');
-      const secondTag = await this.itemManager.findOrCreateTagByTitle('tag two');
+      const secondTag = await this.itemManager.findOrCreateTagByTitle(
+        'tag two'
+      );
 
       const results = this.itemManager.searchTags('tag');
       expect(results).lengthOf(2);
       expect(results[0].title).to.equal(firstTag.title);
       expect(results[1].title).to.equal(secondTag.title);
     });
-    it('should be case insensitive', async function() {
+    it('should be case insensitive', async function () {
       const tag = await this.itemManager.findOrCreateTagByTitle('Tag');
 
       const results = this.itemManager.searchTags('tag');
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(tag.title);
     });
-    it('should return tag with query matching delimiter separated component', async function() {
+    it('should return tag with query matching delimiter separated component', async function () {
       const tag = await this.itemManager.findOrCreateTagByTitle('parent.child');
 
       const results = this.itemManager.searchTags('child');
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(tag.title);
     });
-    it('should return tags with matching query including delimiter', async function() {
+    it('should return tags with matching query including delimiter', async function () {
       const tag = await this.itemManager.findOrCreateTagByTitle('parent.child');
 
       const results = this.itemManager.searchTags('parent.chi');
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(tag.title);
     });
-    it('should return tags in natural order', async function() {
+    it('should return tags in natural order', async function () {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag 100');
       const secondTag = await this.itemManager.findOrCreateTagByTitle('tag 2');
       const thirdTag = await this.itemManager.findOrCreateTagByTitle('tag b');
@@ -551,7 +546,9 @@ describe('item manager', function () {
     });
     it('should not return tags associated with note', async function () {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag one');
-      const secondTag = await this.itemManager.findOrCreateTagByTitle('tag two');
+      const secondTag = await this.itemManager.findOrCreateTagByTitle(
+        'tag two'
+      );
 
       const note = await this.createNote();
       await this.itemManager.changeItem(firstTag.uuid, (mutator) => {
@@ -561,7 +558,7 @@ describe('item manager', function () {
       const results = this.itemManager.searchTags('tag', note);
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(secondTag.title);
-    })
+    });
   });
 
   describe('getSortedTagsForNote', async function () {
@@ -575,39 +572,39 @@ describe('item manager', function () {
 
       const note = await this.createNote();
 
-      tags.map(async tag => {
+      tags.map(async (tag) => {
         await this.itemManager.changeItem(tag.uuid, (mutator) => {
           mutator.addItemAsRelationship(note);
         });
       });
 
       const results = this.itemManager.getSortedTagsForNote(note);
-      
+
       expect(results).lengthOf(tags.length);
       expect(results[0].title).to.equal(tags[1].title);
       expect(results[1].title).to.equal(tags[0].title);
       expect(results[2].title).to.equal(tags[3].title);
       expect(results[3].title).to.equal(tags[2].title);
-    })
+    });
   });
 
   describe('getTagParentChain', async function () {
     it('should return parent tags for a tag', async function () {
       const [parent, child, grandchild, _other] = await Promise.all([
-         this.itemManager.findOrCreateTagByTitle('parent'),
-         this.itemManager.findOrCreateTagByTitle('parent.child'),
-         this.itemManager.findOrCreateTagByTitle('parent.child.grandchild'),
-          this.itemManager.findOrCreateTagByTitle('some other tag')
+        this.itemManager.findOrCreateTagByTitle('parent'),
+        this.itemManager.findOrCreateTagByTitle('parent.child'),
+        this.itemManager.findOrCreateTagByTitle('parent.child.grandchild'),
+        this.itemManager.findOrCreateTagByTitle('some other tag'),
       ]);
 
-      await this.itemManager.setTagParent(parent, child)
-      await this.itemManager.setTagParent(child, grandchild)
-      
+      await this.itemManager.setTagParent(parent, child);
+      await this.itemManager.setTagParent(child, grandchild);
+
       const results = this.itemManager.getTagParentChain(grandchild.uuid);
 
       expect(results).lengthOf(2);
       expect(results[0].uuid).to.equal(parent.uuid);
       expect(results[1].uuid).to.equal(child.uuid);
-    })
+    });
   });
 });
