@@ -1,12 +1,9 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js';
+
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-
-function asUuids(xs) {
-  return (xs || []).map((x) => x.uuid);
-}
 
 describe('tags as folders', () => {
   beforeEach(async function () {
@@ -36,8 +33,8 @@ describe('tags as folders', () => {
     await this.application.setTagParent(tagParent, tagChildren);
 
     expect(this.application.getTagParent(tagChildren)).to.equal(tagParent);
-    expect(asUuids(this.application.getTagChildren(tagParent))).deep.to.equal(
-      asUuids([tagChildren])
+    expect(Uuids(this.application.getTagChildren(tagParent))).deep.to.equal(
+      Uuids([tagChildren])
     );
 
     // ## Now the user moves the tag parent into the grand parent
@@ -45,8 +42,8 @@ describe('tags as folders', () => {
 
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent);
     expect(
-      asUuids(this.application.getTagChildren(tagGrandParent))
-    ).deep.to.equal(asUuids([tagParent]));
+      Uuids(this.application.getTagChildren(tagGrandParent))
+    ).deep.to.equal(Uuids([tagParent]));
 
     // ## Now the user moves the tag parent into another grand parent
     await this.application.setTagParent(tagGrandParent2, tagParent);
@@ -54,8 +51,8 @@ describe('tags as folders', () => {
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2);
     expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([]);
     expect(
-      asUuids(this.application.getTagChildren(tagGrandParent2))
-    ).deep.to.equal(asUuids([tagParent]));
+      Uuids(this.application.getTagChildren(tagGrandParent2))
+    ).deep.to.equal(Uuids([tagParent]));
 
     // ## Now the user tries to move the tag into one of its children
     await expect(this.application.setTagParent(tagChildren, tagParent)).to
@@ -64,13 +61,35 @@ describe('tags as folders', () => {
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2);
     expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([]);
     expect(
-      asUuids(this.application.getTagChildren(tagGrandParent2))
-    ).deep.to.equal(asUuids([tagParent]));
+      Uuids(this.application.getTagChildren(tagGrandParent2))
+    ).deep.to.equal(Uuids([tagParent]));
 
     // ## Now the user move the tag outside any hierarchy
     await this.application.unsetTagParent(tagParent);
 
     expect(this.application.getTagParent(tagParent)).to.equal(undefined);
     expect(this.application.getTagChildren(tagGrandParent2)).deep.to.equals([]);
+  });
+
+  it('lets me add a note to a tag hierarchy', async function () {
+    // ## The user creates four tags hierarchy
+    const tags = await Factory.createTags(this.application, {
+      grandparent: { parent: { child: true } },
+      another: true,
+    });
+
+    const note1 = await Factory.createMappedNote(this.application, 'my first note');
+    const note2 = await Factory.createMappedNote(this.application, 'my second note');
+
+    // ## The user add a note to the child tag
+    await this.application.addTagHierarchyToNote(note1, tags.child);
+    await this.application.addTagHierarchyToNote(note2, tags.another);
+
+    // ## The note has been added to other tags
+    const note1Tags = await this.application.getSortedTagsForNote(note1);
+    const note2Tags = await this.application.getSortedTagsForNote(note2);
+
+    expect(note1Tags.length).to.equal(3);
+    expect(note2Tags.length).to.equal(1);
   });
 });

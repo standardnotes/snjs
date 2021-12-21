@@ -59,9 +59,10 @@ export enum ApplicationEvent {
   StorageReady = 24,
 
   PreferencesChanged = 25,
-  ProtectionSessionExpiryDateChanged = 26,
+  UnprotectedSessionBegan = 26,
   UserRolesChanged = 27,
   FeaturesUpdated = 28,
+  UnprotectedSessionExpired = 29,
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {

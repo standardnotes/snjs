@@ -357,7 +357,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     await this.storageService.setValue(StorageKey.UserRoles, this.roles);
   }
 
-  private async didDownloadFeatures(
+  public async didDownloadFeatures(
     features: FeatureDescription[]
   ): Promise<void> {
     this.features = features;
@@ -395,14 +395,15 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       return FeatureStatus.Entitled;
     }
 
-    if (
-      this.hasPaidOnlineOrOfflineSubscription() &&
-      !this.completedSuccessfulFeaturesRetrieval
-    ) {
-      return FeatureStatus.Entitled;
-    }
-
-    if (!this.hasPaidOnlineOrOfflineSubscription()) {
+    if (this.hasPaidOnlineOrOfflineSubscription()) {
+      if (!this.completedSuccessfulFeaturesRetrieval) {
+        const hasCachedFeatures = this.features.length > 0;
+        const temporarilyAllowUntilServerUpdates = !hasCachedFeatures;
+        if (temporarilyAllowUntilServerUpdates) {
+          return FeatureStatus.Entitled;
+        }
+      }
+    } else {
       return FeatureStatus.NoUserSubscription;
     }
 
