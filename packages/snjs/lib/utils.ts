@@ -5,7 +5,7 @@ import mergeWith from 'lodash/mergeWith';
 import uniqWith from 'lodash/uniqWith';
 import uniq from 'lodash/uniq';
 import { AnyRecord, ErrorObject } from './types';
-import DOMPurify  from 'dompurify';
+import DOMPurify from 'dompurify';
 
 const collator =
   typeof Intl !== 'undefined'
