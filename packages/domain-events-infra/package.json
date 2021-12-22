@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/domain-events-infra",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -23,7 +23,7 @@
     "test:unit": "jest spec --coverage"
   },
   "dependencies": {
-    "@standardnotes/domain-events": "^2.8.0",
+    "@standardnotes/domain-events": "2.8.0",
     "aws-sdk": "^2.824.0",
     "ioredis": "^4.19.4",
     "newrelic": "^7.4.0",
@@ -32,7 +32,7 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.0.1",
+    "@standardnotes/config": "2.0.1",
     "@types/ioredis": "^4.17.10",
     "@types/jest": "^26.0.15",
     "@types/newrelic": "^7.0.1",
