@@ -44,7 +44,7 @@ export class SNSettingsService extends PureService {
   async deleteSetting(name: SettingName) {
     return this._provider.deleteSetting(name);
   }
-  getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency) {
+  getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
     return this._frequencyOptionsLabels[frequency];
   }
 

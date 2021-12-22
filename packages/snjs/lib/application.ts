@@ -1624,7 +1624,7 @@ export class SNApplication {
     return this.settingsService.deleteSetting(name);
   }
 
-  public getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency) {
+  public getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
     return this.settingsService.getEmailBackupFrequencyOptionLabel(frequency);
   }
 
