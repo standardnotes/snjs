@@ -206,7 +206,7 @@ describe('migrations', () => {
     ).to.equal(1);
 
     /** Run migration */
-    const migration = new Migration2_20_0(
+    const migration = new Migration2_25_4(
       application.migrationService.services
     );
     await migration.handleStage(ApplicationStage.LoadedDatabase_12);
