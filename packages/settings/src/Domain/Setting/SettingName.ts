@@ -4,4 +4,5 @@ export enum SettingName {
   EmailBackup = 'EMAIL_BACKUP',
   MuteFailedBackupsEmails = 'MUTE_FAILED_BACKUPS_EMAILS',
   MuteFailedCloudBackupsEmails = 'MUTE_FAILED_CLOUD_BACKUPS_EMAILS',
+  DropboxBackupFrequency = 'DROPBOX_BACKUP_FREQUENCY',
 }
