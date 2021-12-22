@@ -1,3 +1,4 @@
+export * from './DropboxBackupFrequency/DropboxBackupFrequency'
 export * from './EmailBackup/EmailBackupFrequency'
 export * from './MuteFailedBackupsEmails/MuteFailedBackupsEmailsOption'
 export * from './MuteFailedCloudBackupsEmails/MuteFailedCloudBackupsEmailsOption'
