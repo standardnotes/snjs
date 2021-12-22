@@ -23,7 +23,7 @@
     "test:unit": "jest spec --coverage"
   },
   "dependencies": {
-    "@standardnotes/domain-events": "2.8.0",
+    "@standardnotes/domain-events": "2.11.0",
     "aws-sdk": "^2.824.0",
     "ioredis": "^4.19.4",
     "newrelic": "^7.4.0",
