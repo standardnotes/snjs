@@ -209,7 +209,7 @@ describe('migrations', () => {
     const migration = new Migration2_25_4(
       application.migrationService.services
     );
-    await migration.handleStage(ApplicationStage.LoadedDatabase_12);
+    await migration.handleStage(ApplicationStage.FullSyncCompleted_13);
 
     expect(application.getItems('SN|Theme').length).to.equal(0);
     expect(
