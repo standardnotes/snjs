@@ -52,6 +52,11 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
       - run: yarn build
+      - name: setup git config
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor}}@users.noreply.github.com"
+      - run: yarn version-bump
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

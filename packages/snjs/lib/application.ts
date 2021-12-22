@@ -113,13 +113,10 @@ import {
   User,
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import {
-  ProtectionEvent,
-  UnprotectedAccessSecondsDuration,
-} from './services/protection_service';
-import { RemoteSession, StorageKey } from '.';
+import { ProtectionEvent } from './services/protection_service';
+import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
-import { SettingName } from '@standardnotes/settings';
+import { EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
@@ -1625,6 +1622,10 @@ export class SNApplication {
 
   public async deleteSetting(name: SettingName): Promise<void> {
     return this.settingsService.deleteSetting(name);
+  }
+
+  public getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
+    return this.settingsService.getEmailBackupFrequencyOptionLabel(frequency);
   }
 
   public isMfaFeatureAvailable(): boolean {
