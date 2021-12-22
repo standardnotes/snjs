@@ -2564,11 +2564,6 @@
     "@standardnotes/auth" "3.8.3"
     "@standardnotes/common" "^1.2.1"
 
-"@standardnotes/settings@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/settings/-/settings-1.2.1.tgz#4c7656ea86d784a2f77c70acc89face5d28da024"
-  integrity sha512-EhCDtQKcVzY6cJ6qXCkAiA3sJ3Wj/q0L0ZVYq+tCXd0jaxmZ8fSk5YNqdwJfjmNXsqtuh7xq6eA2dcXd1fD9VQ==
-
 "@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
