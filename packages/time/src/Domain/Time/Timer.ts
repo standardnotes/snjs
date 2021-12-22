@@ -13,6 +13,10 @@ export class Timer implements TimerInterface {
     return this.convertStringDateToMilliseconds(date.toString())
   }
 
+  convertDateToMicroseconds(date: Date): number {
+    return this.convertStringDateToMicroseconds(date.toString())
+  }
+
   convertMicrosecondsToSeconds(microseconds: number): number {
     return Math.floor(microseconds / Time.MicrosecondsInASecond)
   }
