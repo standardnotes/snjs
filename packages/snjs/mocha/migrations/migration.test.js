@@ -176,4 +176,49 @@ describe('migrations', () => {
 
     await Factory.safeDeinit(application);
   });
+
+  it('2.25.4 remove no distraction theme', async function () {
+    const application = await Factory.createAppWithRandNamespace();
+
+    await application.prepareForLaunch({
+      receiveChallenge: () => {},
+    });
+    await application.launch(true);
+
+    const noDistractionItem = CreateItemFromPayload(
+      CreateMaxPayloadFromAnyObject({
+        uuid: '123',
+        content_type: 'SN|Theme',
+        package_info: {
+          identifier: 'org.standardnotes.theme-no-distraction',
+        },
+      })
+    );
+    await application.insertItem(noDistractionItem);
+    await application.sync();
+
+    expect(application.getItems('SN|Theme').length).to.equal(1);
+    expect(
+      (await application.storageService.getAllRawPayloads()).filter(
+        (p) =>
+          p.package_info.identifier === 'org.standardnotes.theme-no-distraction'
+      ).length
+    ).to.equal(1);
+
+    /** Run migration */
+    const migration = new Migration2_20_0(
+      application.migrationService.services
+    );
+    await migration.handleStage(ApplicationStage.LoadedDatabase_12);
+
+    expect(application.getItems('SN|Theme').length).to.equal(0);
+    expect(
+      (await application.storageService.getAllRawPayloads()).filter(
+        (p) =>
+          p.package_info.identifier === 'org.standardnotes.theme-no-distraction'
+      ).length
+    ).to.equal(0);
+
+    await Factory.safeDeinit(application);
+  });
 });
