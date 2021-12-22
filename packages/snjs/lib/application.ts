@@ -113,11 +113,8 @@ import {
   User,
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
-import {
-  ProtectionEvent,
-  UnprotectedAccessSecondsDuration,
-} from './services/protection_service';
-import { RemoteSession, StorageKey } from '.';
+import { ProtectionEvent } from './services/protection_service';
+import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
