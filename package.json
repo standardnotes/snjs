@@ -20,6 +20,7 @@
     "build": "lerna run build",
     "lint": "lerna run lint",
     "version-bump": "lerna version --conventional-commits --conventional-graduate --yes",
+    "version-bump-beta": "lerna version --conventional-commits --conventional-prerelease --preid beta --yes",
     "publish-packages": "lerna publish from-git --yes"
   },
   "devDependencies": {
