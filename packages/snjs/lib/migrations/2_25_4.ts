@@ -14,7 +14,6 @@ export class Migration2_25_4 extends Migration {
       this.markDone();
     };
 
-    this.registerStageHandler(ApplicationStage.LoadedDatabase_12, handler);
     this.registerStageHandler(ApplicationStage.FullSyncCompleted_13, handler);
   }
 
