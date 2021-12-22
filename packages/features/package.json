@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/features",
-  "version": "1.12.0",
+  "version": "1.12.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -26,7 +26,7 @@
     "@standardnotes/common": "1.2.1"
   },
   "devDependencies": {
-    "@standardnotes/config": "2.0.1",
+    "@standardnotes/config": "^2.0.2",
     "typescript": "^4.0.5"
   }
 }
