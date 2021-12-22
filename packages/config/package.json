@@ -12,7 +12,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "lint": "yarn lint:formatting",
-    "lint:formatting": "prettier --check .",
+    "lint:formatting": "prettier --ignore-path src/.prettierignore --check .",
     "format": "prettier --write ."
   },
   "dependencies": {
