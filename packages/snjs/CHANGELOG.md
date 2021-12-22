@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.26.2 (2021-12-22)
+
+
+### Bug Fixes
+
+* path to prettier ignore definitions ([cb9649d](https://github.com/standardnotes/snjs/commit/cb9649d0cbab36d17cbc610ae0518b1785662901))
+
+
+
+
+
 ## 2.26.1 (2021-12-22)
 
 
