@@ -9,10 +9,13 @@ export class Migration2_25_4 extends Migration {
   }
 
   protected registerStageHandlers(): void {
-    this.registerStageHandler(ApplicationStage.LoadedDatabase_12, async () => {
+    const handler = async () => {
       await this.deleteNoDistraction();
       this.markDone();
-    });
+    };
+
+    this.registerStageHandler(ApplicationStage.LoadedDatabase_12, handler);
+    this.registerStageHandler(ApplicationStage.FullSyncCompleted_13, handler);
   }
 
   private async deleteNoDistraction(): Promise<void> {
