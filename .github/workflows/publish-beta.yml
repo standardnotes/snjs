@@ -59,7 +59,7 @@ jobs:
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor}}@users.noreply.github.com"
-      - run: yarn version-bump-beta
+      - run: yarn version-bump-beta --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -13,6 +13,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
       - run: yarn build
+      - run: yarn version-bump
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
