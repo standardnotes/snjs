@@ -13,6 +13,18 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
       - run: yarn build
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - name: setup git config
+        run: |
+          git config user.name "StandardNotes CI"
+          git config user.email "ci@standardnotes.com"
+      - run: yarn version-bump
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
