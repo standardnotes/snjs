@@ -15,7 +15,6 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    types: [ opened, synchronize ]
     branches: [ master ]
   schedule:
     - cron: '44 21 * * 1'
