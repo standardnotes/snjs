@@ -31,9 +31,6 @@ export class Migration2_25_4 extends Migration {
       await this.services.itemManager.setItemToBeDeleted(
         noDistractionTheme.uuid
       );
-      await this.services.storageService.deletePayloadWithId(
-        noDistractionTheme.uuid
-      );
     }
   }
 }
