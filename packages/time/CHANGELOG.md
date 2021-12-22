@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.2.1 (2021-12-22)
+
+
+### Bug Fixes
+
+* gpg signing with CI StandardNotes user ([d72f61c](https://github.com/standardnotes/snjs/commit/d72f61c23cd15b31d37340cc756d16526634b9ee))
+
+
+
+
+
+# [1.2.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.1.0...@standardnotes/time@1.2.0) (2021-12-22)
+
+
+### Features
+
+* add converting date to microseconds ([#516](https://github.com/standardnotes/snjs/issues/516)) ([a3dfd9e](https://github.com/standardnotes/snjs/commit/a3dfd9eccb275734ecd381cfb9fbb3fa132aa0ac))
+
+
+
+
+
 # 1.1.0 (2021-12-22)
 
 
