@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 1.7.0 (2021-12-23)
+
+
+### Features
+
+* rename email backup setting to email backup frequency ([25e7b46](https://github.com/standardnotes/snjs/commit/25e7b4620834711ac7f513ae893898c5eab1af53))
+
+
+
+
+
 ## 1.6.3 (2021-12-23)
 
 
