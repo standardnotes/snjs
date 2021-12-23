@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.6.3 (2021-12-23)
+
+
+### Bug Fixes
+
+* lock package versions ([8aa2ce6](https://github.com/standardnotes/snjs/commit/8aa2ce676b57598ab72840adf851869d8e769022))
+
+
+
+
+
 ## 1.6.2 (2021-12-23)
 
 
