@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.7.0...@standardnotes/settings@1.8.0) (2021-12-23)
+
+
+### Features
+
+* add cloud backup settings names ([#524](https://github.com/standardnotes/snjs/issues/524)) ([942352b](https://github.com/standardnotes/snjs/commit/942352bb68623c6b718d854b26d645bac97be6ee))
+
+
+
+
+
 # 1.7.0 (2021-12-23)
 
 
