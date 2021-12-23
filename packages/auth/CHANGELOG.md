@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.11.0...@standardnotes/auth@3.12.0) (2021-12-23)
+
+
+### Features
+
+* remove not used AuthMethods type ([98cb8e2](https://github.com/standardnotes/snjs/commit/98cb8e2bdf152c2b9e4f349fb77b537f8ac416e3))
+
+
+
+
+
 # 3.11.0 (2021-12-23)
 
 
