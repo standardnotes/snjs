@@ -1,7 +1,7 @@
 export enum SettingName {
   MfaSecret = 'MFA_SECRET',
   ExtensionKey = 'EXTENSION_KEY',
-  EmailBackup = 'EMAIL_BACKUP',
+  EmailBackupFrequency = 'EMAIL_BACKUP_FREQUENCY',
   DropboxBackupFrequency = 'DROPBOX_BACKUP_FREQUENCY',
   OneDriveBackupFrequency = 'ONE_DRIVE_BACKUP_FREQUENCY',
   GoogleDriveBackupFrequency = 'GOOGLE_DRIVE_BACKUP_FREQUENCY',
