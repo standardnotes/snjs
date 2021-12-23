@@ -1,8 +1,8 @@
 import { ItemManager, SNItem } from '@Lib/index';
 import { SNNote } from '@Lib/models';
-import { SmartTagPredicateContent } from '@Lib/models/app/smartTag';
+import { SmartTagPredicateContent, SNSmartTag } from '@Lib/models/app/smartTag';
 import { Uuid } from '@Lib/uuid';
-import { SNTag } from '@Models/app/tag';
+import { SNTag, TagMutator } from '@Models/app/tag';
 import { FillItemContent } from '@Models/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ContentType } from '@standardnotes/common';
@@ -14,6 +14,28 @@ const setupRandomUuid = () => {
     () => Promise.resolve(String(Math.random())),
     () => String(Math.random())
   );
+};
+
+const TAG_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';
+const TAG_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]';
+const TAG_LONG = '!["Long", "text.length", ">", 500]';
+
+const TAG_NOT_PINNED_JSON: SmartTagPredicateContent = {
+  keypath: 'pinned',
+  operator: '=',
+  value: false,
+};
+
+const TAG_LAST_DAY_JSON: SmartTagPredicateContent = {
+  keypath: 'updated_at',
+  operator: '>',
+  value: '1.days.ago',
+};
+
+const TAG_LONG_JSON: SmartTagPredicateContent = {
+  keypath: 'text.length',
+  operator: '>',
+  value: 500,
 };
 
 describe('itemManager', () => {
@@ -294,28 +316,6 @@ describe('itemManager', () => {
     });
   });
 
-  const TAG_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';
-  const TAG_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]';
-  const TAG_LONG = '!["Long", "text.length", ">", 500]';
-
-  const TAG_NOT_PINNED_JSON: SmartTagPredicateContent = {
-    keypath: 'pinned',
-    operator: '=',
-    value: false,
-  };
-
-  const TAG_LAST_DAY_JSON: SmartTagPredicateContent = {
-    keypath: 'updated_at',
-    operator: '>',
-    value: '1.days.ago',
-  };
-
-  const TAG_LONG_JSON: SmartTagPredicateContent = {
-    keypath: 'text.length',
-    operator: '>',
-    value: 500,
-  };
-
   describe('tags and smart tags', () => {
     it('lets me create a smart tag', async () => {
       itemManager = createService();
@@ -391,5 +391,41 @@ describe('itemManager', () => {
       expect(someTag.content_type).toEqual(ContentType.Tag);
       expect(someSmartTag.content_type).toEqual(ContentType.SmartTag);
     });
+  });
+
+  it('lets me rename a smart tag', async () => {
+    itemManager = createService();
+    setupRandomUuid();
+
+    const tag = await itemManager.createSmartTag(
+      'Not Pinned',
+      TAG_NOT_PINNED_JSON
+    );
+
+    await itemManager.changeItem<TagMutator>(tag.uuid, (m) => {
+      m.title = 'New Title';
+    });
+
+    const smartTag = itemManager.findItem(tag.uuid) as SNSmartTag;
+    const smartTags = itemManager.getSmartTags();
+
+    expect(smartTag.title).toEqual('New Title');
+    expect(
+      smartTags.some((tag: SNSmartTag) => tag.title === 'New Title')
+    ).toEqual(true);
+  });
+
+  it('lets me find a smart tag', async () => {
+    itemManager = createService();
+    setupRandomUuid();
+
+    const tag = await itemManager.createSmartTag(
+      'Not Pinned',
+      TAG_NOT_PINNED_JSON
+    );
+
+    const smartTag = itemManager.findItem(tag.uuid) as SNSmartTag;
+
+    expect(smartTag).toBeDefined();
   });
 });
