@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.10.1 (2021-12-23)
+
+
+### Bug Fixes
+
+* remove the ammend commit from lerna versioning ([f0400d9](https://github.com/standardnotes/snjs/commit/f0400d9a2f5a04eaece2e4c16da71166a2ddb251))
+
+
+
+
+
 # 3.10.0 (2021-12-23)
 
 
