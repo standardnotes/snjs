@@ -1,4 +1,4 @@
-Name: Git Sync
+name: Git Sync
 
 on: push
 jobs:
