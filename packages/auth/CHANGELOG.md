@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.9.3 (2021-12-23)
+
+
+### Bug Fixes
+
+* pr template ([#518](https://github.com/standardnotes/snjs/issues/518)) ([b445bb6](https://github.com/standardnotes/snjs/commit/b445bb64841217ae27c2514887629235be95d2a3))
+
+
+
+
+
 ## 3.9.2 (2021-12-23)
 
 
