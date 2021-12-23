@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 2.1.0 (2021-12-23)
+
+
+### Features
+
+* add one drive backup frequency setting ([#522](https://github.com/standardnotes/snjs/issues/522)) ([c27827f](https://github.com/standardnotes/snjs/commit/c27827f8c7969dd32511c9c75122ece372132c83))
+
+
+
+
+
 ## 2.0.5 (2021-12-23)
 
 
