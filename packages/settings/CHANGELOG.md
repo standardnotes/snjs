@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.7.1-beta-testing.0 (2021-12-23)
+
+
+### Bug Fixes
+
+* testing beta deployment ([94fbdb3](https://github.com/standardnotes/snjs/commit/94fbdb3c3e58a06e6ecee336fbd0a09b7112a715))
+
+
+
+
+
 # 1.7.0 (2021-12-23)
 
 
