@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.5.4 (2021-12-23)
+
+
+### Bug Fixes
+
+* remove running tests upon deployment - ensured on PR status checks ([#523](https://github.com/standardnotes/snjs/issues/523)) ([5c795d1](https://github.com/standardnotes/snjs/commit/5c795d17b583d02955773576384e622c3ef7f418))
+
+
+
+
+
 ## 1.5.3 (2021-12-23)
 
 
