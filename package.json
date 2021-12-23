@@ -19,8 +19,8 @@
     "test:e2e:dev": "mocha-headless-chrome --timeout 1200000 -f http://localhost:9002/packages/snjs/mocha/test.html?sync_server_host_name=localhost",
     "build": "lerna run build",
     "lint": "lerna run lint",
-    "version-bump": "lerna version --conventional-commits --yes -m \"chore(release): publish\"",
-    "version-bump-beta": "lerna version --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
+    "version-bump": "lerna version --sign-git-commit --sign-git-tag --conventional-commits --yes -m \"chore(release): publish\"",
+    "version-bump-beta": "lerna version --sign-git-commit --sign-git-tag --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
     "publish-packages": "lerna publish from-git --yes"
   },
   "devDependencies": {
