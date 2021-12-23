@@ -1,3 +1,5 @@
+Name: Git Sync
+
 on: push
 jobs:
   git-sync:
