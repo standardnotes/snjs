@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.1.2 (2021-12-23)
+
+
+### Bug Fixes
+
+* add publishing from package version by lerna ([80433d0](https://github.com/standardnotes/snjs/commit/80433d044f258095753482b8322d73aba3d9a9e4))
+
+
+
+
+
 ## 2.1.1 (2021-12-23)
 
 
