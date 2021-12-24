@@ -112,9 +112,9 @@ export class SNItem {
       this.userModifiedDate = this.serverUpdatedAt || new Date();
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
-    setImmediate(() => {
+    setTimeout(() => {
       deepFreeze(this);
-    });
+    }, 0);
   }
 
   public static DefaultAppDomain() {

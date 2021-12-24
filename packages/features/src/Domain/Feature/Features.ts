@@ -216,7 +216,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'html',
     interchangeable: true,
     identifier: FeatureIdentifier.BoldEditor,
-    index_path: 'index.html',
+    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -251,7 +251,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'html',
     interchangeable: true,
     identifier: FeatureIdentifier.PlusEditor,
-    index_path: 'index.html',
+    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -278,7 +278,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'md',
     interchangeable: true,
     identifier: FeatureIdentifier.MarkdownBasicEditor,
-    index_path: 'index.html',
+    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -305,7 +305,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'md',
     interchangeable: true,
     identifier: FeatureIdentifier.MarkdownProEditor,
-    index_path: 'index.html',
+    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -387,7 +387,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'md',
     interchangeable: false,
     identifier: FeatureIdentifier.TaskEditor,
-    index_path: 'index.html',
+    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -414,7 +414,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'json',
     interchangeable: false,
     identifier: FeatureIdentifier.TokenVaultEditor,
-    index_path: 'index.html',
+    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -441,7 +441,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'json',
     interchangeable: false,
     identifier: FeatureIdentifier.SheetsEditor,
-    index_path: 'index.html',
+    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -515,7 +515,7 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
     component_permissions: [
       {
         name: ComponentAction.StreamItems,
-        content_types: [ContentType.Tag],
+        content_types: [ContentType.Tag, ContentType.SmartTag],
       },
     ],
     name: 'Folders',

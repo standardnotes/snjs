@@ -171,7 +171,11 @@ export class SNComponentManager extends PureService<
     if (components.length > 0 && source !== PayloadSource.RemoteSaved) {
       /* Ensure any component in our data is installed by the system */
       if (this.isDesktop) {
-        this.desktopManager?.syncComponentsInstallation(components);
+        const thirdPartyComponents = components.filter((component) => {
+          const nativeFeature = this.nativeFeatureForComponent(component);
+          return nativeFeature ? false : true;
+        });
+        this.desktopManager?.syncComponentsInstallation(thirdPartyComponents);
       }
     }
 
@@ -280,14 +284,16 @@ export class SNComponentManager extends PureService<
 
     if (this.isDesktop) {
       if (nativeFeature) {
-        return `${this.desktopManager!.getExtServerHost()}components/${
+        return `${this.desktopManager!.getExtServerHost()}/components/${
           component.identifier
         }/${nativeFeature.index_path}`;
       } else if (component.local_url) {
         return component.local_url.replace(
           DESKTOP_URL_PREFIX,
-          this.desktopManager!.getExtServerHost()
+          this.desktopManager!.getExtServerHost() + '/'
         );
+      } else {
+        return component.hosted_url || component.legacy_url;
       }
     }
 
@@ -365,7 +371,8 @@ export class SNComponentManager extends PureService<
     }
     const component = this.findComponent(componentUuid);
     const nativeFeature = this.nativeFeatureForComponent(component);
-    const acquiredPermissions = nativeFeature?.component_permissions || component.permissions;
+    const acquiredPermissions =
+      nativeFeature?.component_permissions || component.permissions;
 
     /* Make copy as not to mutate input values */
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[];

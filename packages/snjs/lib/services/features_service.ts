@@ -528,6 +528,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       url = await this.crypto.base64Decode(urlOrCode);
       // eslint-disable-next-line no-empty
     } catch (err) {}
+
     try {
       const trustedCustomExtensionsUrls = [
         ...TRUSTED_FEATURE_HOSTS,
@@ -565,6 +566,26 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     if (!rawFeature.content_type) {
       return;
     }
+
+    const nativeFeature = Features.find(
+      (f) => f.identifier === rawFeature.identifier
+    );
+    if (nativeFeature) {
+      await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION);
+      return;
+    }
+
+    if (rawFeature.url) {
+      for (const nativeFeature of Features) {
+        if (rawFeature.url.includes(nativeFeature.identifier)) {
+          await this.alertService.alert(
+            API_MESSAGE_FAILED_DOWNLOADING_EXTENSION
+          );
+          return;
+        }
+      }
+    }
+
     const content = this.componentContentForFeatureDescription(rawFeature);
     const component = (await this.itemManager.createTemplateItem(
       rawFeature.content_type,
