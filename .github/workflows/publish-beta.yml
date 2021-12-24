@@ -6,6 +6,7 @@ on:
 
 jobs:
   lint:
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,6 +18,7 @@ jobs:
       - run: yarn build
       - run: yarn lint
   unit-tests:
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,6 +30,7 @@ jobs:
       - run: yarn build
       - run: yarn test:unit
   e2e-tests:
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
     env:
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
@@ -42,10 +45,14 @@ jobs:
 
   publish:
     needs: [lint, unit-tests, e2e-tests]
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: '16.x'
@@ -55,12 +62,25 @@ jobs:
         run: echo ::set-output name=beta_name::${GITHUB_REF/refs\/heads\/beta\//}
       - run: yarn install --pure-lockfile
       - run: yarn build
-      - run: yarn lerna publish --yes --canary --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
+      - name: setup git config
+        run: |
+          git config --global user.name "standardci"
+          git config --global user.email "ci@standardnotes.com"
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - run: yarn version-bump-beta --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
+      - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   notify_discord:
     needs: publish
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
 
     runs-on: ubuntu-latest
 

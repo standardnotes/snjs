@@ -162,6 +162,7 @@ export {
   isValidUrl,
   dateToLocalizedString,
   nonSecureRandomIdentifier,
+  sanitizeHtmlString,
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

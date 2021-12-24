@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/common",
-  "version": "1.4.1",
+  "version": "1.7.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -23,9 +23,8 @@
     "lint": "eslint . --ext .ts",
     "test:unit": "jest spec --coverage"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@standardnotes/config": "2.0.1",
+    "@standardnotes/config": "^2.2.0",
     "@types/jest": "^26.0.15",
     "jest": "^26.6.3",
     "ts-jest": "^26.4.4",

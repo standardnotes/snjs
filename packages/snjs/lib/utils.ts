@@ -5,6 +5,7 @@ import mergeWith from 'lodash/mergeWith';
 import uniqWith from 'lodash/uniqWith';
 import uniq from 'lodash/uniq';
 import { AnyRecord, ErrorObject } from './types';
+import DOMPurify from 'dompurify';
 
 const collator =
   typeof Intl !== 'undefined'
@@ -621,6 +622,10 @@ export function convertTimestampToMilliseconds(timestamp: number): number {
 
 export function isErrorObject(object: any): object is ErrorObject {
   return typeof object.error !== 'undefined';
+}
+
+export function sanitizeHtmlString(html: string): string {
+  return DOMPurify.sanitize(html);
 }
 
 let sharedDateFormatter: unknown;
