@@ -144,6 +144,7 @@ export {
   arraysEqual,
   isValidUrl,
   dateToLocalizedString,
+  sanitizeHtmlString,
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {
