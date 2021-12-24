@@ -3,9 +3,9 @@ import { Migration } from '@Lib/migrations/migration';
 import { ContentType, SNItem, SNTheme } from '@Lib/models';
 import { FeatureIdentifier } from '..';
 
-export class Migration2_25_4 extends Migration {
+export class Migration2_29_0 extends Migration {
   static version(): string {
-    return '2.25.4';
+    return '2.29.0';
   }
 
   protected registerStageHandlers(): void {
@@ -21,8 +21,7 @@ export class Migration2_25_4 extends Migration {
     const themes = this.services.itemManager.getItems(
       ContentType.Theme
     ) as SNTheme[];
-    const noDistractionIdentifier =
-      'org.standardnotes.theme-no-distraction' as FeatureIdentifier;
+    const noDistractionIdentifier = 'org.standardnotes.theme-no-distraction' as FeatureIdentifier;
     const noDistractionTheme = themes.find(
       (theme) => theme.package_info.identifier === noDistractionIdentifier
     ) as SNItem;

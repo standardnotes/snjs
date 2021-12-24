@@ -177,7 +177,7 @@ describe('migrations', () => {
     await Factory.safeDeinit(application);
   });
 
-  it('2.25.4 remove no distraction theme', async function () {
+  it('2.29.0 remove no distraction theme', async function () {
     const application = await Factory.createAppWithRandNamespace();
 
     await application.prepareForLaunch({
@@ -206,7 +206,7 @@ describe('migrations', () => {
     ).to.equal(1);
 
     /** Run migration */
-    const migration = new Migration2_25_4(
+    const migration = new Migration2_29_0(
       application.migrationService.services
     );
     await migration.handleStage(ApplicationStage.FullSyncCompleted_13);
