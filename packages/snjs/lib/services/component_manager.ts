@@ -1,4 +1,4 @@
-import { Features } from '@standardnotes/features';
+import { Features, FeatureDescription } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import {
@@ -15,14 +15,8 @@ import { SNSyncService } from '@Services/sync/sync_service';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import { PureService } from '@Lib/services/pure_service';
-import {
-  ComponentArea,
-  SNComponent,
-} from '@Models/app/component';
-import {
-  ComponentAction,
-  ComponentPermission,
-} from '@standardnotes/features'
+import { ComponentArea, SNComponent } from '@Models/app/component';
+import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import {
   Copy,
   concatArrays,
@@ -268,15 +262,21 @@ export class SNComponentManager extends PureService<
     }) as SNTheme[];
   }
 
+  nativeFeatureForComponent(
+    component: SNComponent
+  ): FeatureDescription | undefined {
+    return Features.find(
+      (feature) => feature.identifier === component.identifier
+    );
+  }
+
   urlForComponent(component: SNComponent): string | undefined {
     /* offlineOnly is available only on desktop, and not on web or mobile. */
     if (component.offlineOnly && !this.isDesktop) {
       return undefined;
     }
 
-    const nativeFeature = Features.find(
-      (feature) => feature.identifier === component.identifier
-    );
+    const nativeFeature = this.nativeFeatureForComponent(component);
 
     if (this.isDesktop) {
       if (nativeFeature) {
@@ -364,9 +364,11 @@ export class SNComponentManager extends PureService<
       return;
     }
     const component = this.findComponent(componentUuid);
+    const nativeFeature = this.nativeFeatureForComponent(component);
+    const acquiredPermissions = nativeFeature?.component_permissions || component.permissions;
+
     /* Make copy as not to mutate input values */
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[];
-    const acquiredPermissions = component.permissions;
     for (const required of requiredPermissions.slice()) {
       /* Remove anything we already have */
       const respectiveAcquired = acquiredPermissions.find(
