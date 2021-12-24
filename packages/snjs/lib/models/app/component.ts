@@ -221,6 +221,10 @@ export class SNComponent extends SNItem implements ComponentContent {
     flags = flags.map((flag: string) => flag.toLowerCase());
     return flags.includes(ComponentFlag.Deprecated);
   }
+
+  public get deprecationMessage(): string | undefined {
+    return this.package_info.deprecation_message;
+  }
 }
 
 export class ComponentMutator extends ItemMutator {

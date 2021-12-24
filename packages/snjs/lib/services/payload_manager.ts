@@ -15,7 +15,7 @@ type ChangeCallback = (
   inserted: PurePayload[],
   discarded: PurePayload[],
   ignored: PurePayload[],
-  source?: PayloadSource,
+  source: PayloadSource,
   sourceKey?: string
 ) => void;
 

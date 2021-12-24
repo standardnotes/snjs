@@ -657,3 +657,29 @@ export function dateToLocalizedString(date: Date): string {
     return date.toDateString() + ' ' + date.toLocaleTimeString();
   }
 }
+
+export function nonSecureRandomIdentifier(): string {
+  return `${Math.random() * 100}`.replace('.', '');
+}
+
+export function log(instance: any, message: string, ...args: unknown[]): void {
+  const service = instance.constructor.name;
+  const date = new Date();
+  const timeString = date
+    .toLocaleTimeString()
+    .replace(' PM', '')
+    .replace(' AM', '');
+  const string = `${service}:${timeString}.${date.getMilliseconds()}`;
+  if (args) {
+    args = args.map((arg) => {
+      if (Array.isArray(arg)) {
+        return arg.slice();
+      } else {
+        return arg;
+      }
+    });
+    console.log(string, message, ...args);
+  } else {
+    console.log(string, message);
+  }
+}
