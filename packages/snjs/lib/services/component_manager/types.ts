@@ -1,8 +1,4 @@
-import {
-  FeatureIdentifier,
-  ComponentAction,
-  ComponentPermission,
-} from '@standardnotes/features';
+import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import { SNComponent } from '@Lib/models';
 import { ComponentArea } from '@Models/app/component';
 import { UuidString } from '@Lib/types';
