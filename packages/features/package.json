@@ -18,7 +18,7 @@
     "clean": "rm -fr dist",
     "prestart": "yarn clean",
     "start": "tsc -p tsconfig.json --watch",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && cp -r ./src/Static/ ./dist/static",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {

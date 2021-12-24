@@ -239,6 +239,7 @@
     "file_type": "txt",
     "interchangeable": true,
     "identifier": "org.standardnotes.code-editor",
+    "index_path": "index.html",
     "permission_name": "editor:code-editor",
     "content_type": "SN|Component",
     "area": "editor-editor",

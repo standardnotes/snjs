@@ -1,3 +1,4 @@
+import { Features } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import {
@@ -270,28 +271,42 @@ export class SNComponentManager extends PureService<
     if (component.offlineOnly && !this.isDesktop) {
       return undefined;
     }
-    if (component.offlineOnly || (this.isDesktop && component.local_url)) {
-      return (
-        component.local_url &&
-        component.local_url.replace(
+
+    const feature = Features.find(
+      (feature) => feature.identifier === component.identifier
+    );
+    console.log("SN ~ file: component_manager.ts ~ line 278 ~ urlForComponent ~ feature", feature);
+    const isNativeComponent = !!feature;
+
+    if (this.isDesktop) {
+      if (isNativeComponent) {
+        return `${this.desktopManager!.getExtServerHost()}components/${
+          component.identifier
+        }/${feature.index_path}`;
+      } else if (component.local_url) {
+        return component.local_url.replace(
           DESKTOP_URL_PREFIX,
           this.desktopManager!.getExtServerHost()
-        )
-      );
-    } else {
-      let url = component.hosted_url || component.legacy_url;
-      if (!url) {
-        return undefined;
+        );
       }
-      if (this.isMobile) {
-        const localReplacement =
-          this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
-        url = url
-          .replace(LOCAL_HOST, localReplacement)
-          .replace(CUSTOM_LOCAL_HOST, localReplacement);
-      }
-      return url;
     }
+
+    if (isNativeComponent) {
+      return `/components/${component.identifier}/${feature.index_path}`;
+    }
+
+    let url = component.hosted_url || component.legacy_url;
+    if (!url) {
+      return undefined;
+    }
+    if (this.isMobile) {
+      const localReplacement =
+        this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
+      url = url
+        .replace(LOCAL_HOST, localReplacement)
+        .replace(CUSTOM_LOCAL_HOST, localReplacement);
+    }
+    return url;
   }
 
   urlsForActiveThemes(): string[] {

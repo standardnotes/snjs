@@ -1,0 +1,6 @@
+[submodule "packages/features/org.standardnotes.code-editor"]
+	path = packages/features/org.standardnotes.code-editor
+	url = git@github.com:standardnotes/code-editor.git
+[submodule "packages/features/src/Domain/Assets/org.standardnotes.code-editor"]
+	path = packages/features/src/Domain/Assets/org.standardnotes.code-editor
+	url = git@github.com:standardnotes/code-editor.git

@@ -1,3 +1,4 @@
+import { FeatureIdentifier } from '@standardnotes/features';
 import { ComponentAction, ComponentPermission } from '@Models/app/component';
 import { SNComponent } from '@Lib/models';
 import { ComponentArea } from '@Models/app/component';
@@ -9,6 +10,7 @@ export interface DesktopManagerInterface {
   syncComponentsInstallation(components: SNComponent[]): void;
   registerUpdateObserver(callback: (component: SNComponent) => void): void;
   getExtServerHost(): string;
+  getNativeFeatureUrl(featureId: FeatureIdentifier): Promise<string | undefined>;
 }
 
 export type ComponentRawPayload = RawPayload & {

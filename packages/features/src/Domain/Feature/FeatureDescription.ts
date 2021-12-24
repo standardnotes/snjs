@@ -1,11 +1,11 @@
-import { ContentType } from '@standardnotes/common'
-import { RoleName } from '@standardnotes/auth'
-import { ComponentArea } from '../Component/ComponentArea'
-import { PermissionName } from '../Permission/PermissionName'
-import { FeatureIdentifier } from './FeatureIdentifier'
-import { ComponentFlag } from '../Component/ComponentFlag'
-import { NoteType } from '../Component/NoteType'
-import { ThemeDockIcon } from '../Component/ThemeDockIcon'
+import { ContentType } from '@standardnotes/common';
+import { RoleName } from '@standardnotes/auth';
+import { ComponentArea } from '../Component/ComponentArea';
+import { PermissionName } from '../Permission/PermissionName';
+import { FeatureIdentifier } from './FeatureIdentifier';
+import { ComponentFlag } from '../Component/ComponentFlag';
+import { NoteType } from '../Component/NoteType';
+import { ThemeDockIcon } from '../Component/ThemeDockIcon';
 
 export type FeatureDescription = {
   area?: ComponentArea;
@@ -21,6 +21,8 @@ export type FeatureDescription = {
   file_type: 'txt' | 'html' | 'md' | 'json';
   flags?: ComponentFlag[];
   identifier: FeatureIdentifier;
+  /** The relative path of the index.html file or the main css file if theme, within the component folder itself */
+  index_path?: string;
   /** Whether an editor is interchangable with another editor that has the same file_type */
   interchangeable: boolean;
   /** Some themes can be layered on top of other themes */
