@@ -3,11 +3,16 @@ import { PureService } from '../pure_service';
 import { SNApiService } from '../api/api_service';
 import { SettingsGateway } from './SettingsGateway';
 import { SNSessionManager } from '../api/session_manager';
-import { SettingName } from '@standardnotes/settings';
+import { EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SensitiveSettingName } from './SensitiveSettingName';
 
 export class SNSettingsService extends PureService {
   private _provider!: SettingsGateway;
+  private _frequencyOptionsLabels = {
+    [EmailBackupFrequency.Disabled]: 'No email backups',
+    [EmailBackupFrequency.Daily]: 'Daily',
+    [EmailBackupFrequency.Weekly]: 'Weekly',
+  };
 
   constructor(
     private readonly sessionManager: SNSessionManager,
@@ -38,6 +43,9 @@ export class SNSettingsService extends PureService {
 
   async deleteSetting(name: SettingName) {
     return this._provider.deleteSetting(name);
+  }
+  getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
+    return this._frequencyOptionsLabels[frequency];
   }
 
   deinit(): void {

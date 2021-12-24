@@ -16,11 +16,13 @@ import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import { PureService } from '@Lib/services/pure_service';
 import {
-  ComponentAction,
   ComponentArea,
-  ComponentPermission,
   SNComponent,
 } from '@Models/app/component';
+import {
+  ComponentAction,
+  ComponentPermission,
+} from '@standardnotes/features'
 import {
   Copy,
   concatArrays,
@@ -272,17 +274,15 @@ export class SNComponentManager extends PureService<
       return undefined;
     }
 
-    const feature = Features.find(
+    const nativeFeature = Features.find(
       (feature) => feature.identifier === component.identifier
     );
-    console.log("SN ~ file: component_manager.ts ~ line 278 ~ urlForComponent ~ feature", feature);
-    const isNativeComponent = !!feature;
 
     if (this.isDesktop) {
-      if (isNativeComponent) {
+      if (nativeFeature) {
         return `${this.desktopManager!.getExtServerHost()}components/${
           component.identifier
-        }/${feature.index_path}`;
+        }/${nativeFeature.index_path}`;
       } else if (component.local_url) {
         return component.local_url.replace(
           DESKTOP_URL_PREFIX,
@@ -291,8 +291,8 @@ export class SNComponentManager extends PureService<
       }
     }
 
-    if (isNativeComponent) {
-      return `/components/${component.identifier}/${feature.index_path}`;
+    if (nativeFeature) {
+      return `/components/${component.identifier}/${nativeFeature.index_path}`;
     }
 
     let url = component.hosted_url || component.legacy_url;

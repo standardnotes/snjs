@@ -6,11 +6,7 @@ export {
 } from '@Models/core/item';
 export { SNItemsKey } from '@Models/app/items_key';
 export { SNPredicate } from '@Models/core/predicate';
-export {
-  SNComponent,
-  ComponentMutator,
-  ComponentAction,
-} from './app/component';
+export { SNComponent, ComponentMutator } from './app/component';
 export { SNEditor } from '@Models/app/editor';
 export {
   ActionsExtensionMutator,
@@ -29,5 +25,3 @@ export {
   displayStringForContentType,
 } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';
-
-export type { ComponentPermission } from './app/component';

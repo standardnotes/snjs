@@ -31,7 +31,7 @@ import {
   ComponentRawPayload,
   DeleteItemsMessageData,
 } from './types';
-import { ComponentAction, ComponentPermission } from '@Models/app/component';
+import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import { PayloadSource } from '@Lib/protocol/payloads';
 import { ItemManager } from '@Services/item_manager';
 import { UuidString } from '@Lib/types';

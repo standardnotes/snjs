@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/features",
-  "version": "1.11.1",
+  "version": "1.14.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -18,7 +18,7 @@
     "clean": "rm -fr dist",
     "prestart": "yarn clean",
     "start": "tsc -p tsconfig.json --watch",
-    "build": "tsc -p tsconfig.json && cp -r ./src/Static/ ./dist/static",
+    "build": "tsc -p tsconfig.json && node features-to-json.mjs && cp -r ./src/Static/ ./dist/static",
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
@@ -26,7 +26,7 @@
     "@standardnotes/common": "1.2.1"
   },
   "devDependencies": {
-    "@standardnotes/config": "2.0.1",
+    "@standardnotes/config": "^2.2.0",
     "typescript": "^4.0.5"
   }
 }

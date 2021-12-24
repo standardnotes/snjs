@@ -488,7 +488,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
           resultingItem = await this.itemManager.changeComponent(
             existingItem.uuid,
             (mutator) => {
-              mutator.hosted_url = feature.url;
+              mutator.hosted_url = feature.url!;
               mutator.package_info = feature;
               mutator.valid_until = expiresAt;
             }

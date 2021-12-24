@@ -1,5 +1,8 @@
-import { FeatureIdentifier } from '@standardnotes/features';
-import { ComponentAction, ComponentPermission } from '@Models/app/component';
+import {
+  FeatureIdentifier,
+  ComponentAction,
+  ComponentPermission,
+} from '@standardnotes/features';
 import { SNComponent } from '@Lib/models';
 import { ComponentArea } from '@Models/app/component';
 import { UuidString } from '@Lib/types';
@@ -10,7 +13,9 @@ export interface DesktopManagerInterface {
   syncComponentsInstallation(components: SNComponent[]): void;
   registerUpdateObserver(callback: (component: SNComponent) => void): void;
   getExtServerHost(): string;
-  getNativeFeatureUrl(featureId: FeatureIdentifier): Promise<string | undefined>;
+  getNativeFeatureUrl(
+    featureId: FeatureIdentifier
+  ): Promise<string | undefined>;
 }
 
 export type ComponentRawPayload = RawPayload & {
@@ -20,7 +25,7 @@ export type ComponentRawPayload = RawPayload & {
 /**
  * Content types which are allowed to be managed/streamed in bulk by a component.
  */
- export const AllowedBatchPermissions = Object.freeze([
+export const AllowedBatchPermissions = Object.freeze([
   ContentType.FilesafeCredentials,
   ContentType.FilesafeFileMetadata,
   ContentType.FilesafeIntegration,
