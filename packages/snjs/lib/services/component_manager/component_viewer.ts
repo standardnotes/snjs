@@ -114,7 +114,7 @@ export class ComponentViewer {
     private environment: Environment,
     private platform: Platform,
     private componentManagerFunctions: ComponentManagerFunctions,
-    private url?: string,
+    public readonly url?: string,
     private contextItemUuid?: UuidString,
     actionObserver?: ActionObserver
   ) {

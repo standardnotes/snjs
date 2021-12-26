@@ -19,6 +19,7 @@ import {
 import { ErrorObject, UuidString } from '@Lib/types';
 import {
   FeatureDescription,
+  ThirdPartyFeatureDescription,
   FeatureIdentifier,
   Features,
 } from '@standardnotes/features';
@@ -40,7 +41,6 @@ import {
   arraysEqual,
   convertTimestampToMilliseconds,
   isErrorObject,
-  isValidUrl,
 } from '@Lib/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
@@ -435,12 +435,11 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     );
   }
 
-  private componentContentForFeatureDescription(
+  private componentContentForNativeFeatureDescription(
     feature: FeatureDescription
   ): PayloadContent {
     const componentContent: Partial<ComponentContent> = {
       area: feature.area,
-      hosted_url: feature.url,
       name: feature.name,
       package_info: feature,
       valid_until: new Date(feature.expires_at || 0),
@@ -462,10 +461,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       if (!feature.content_type) {
         continue;
       }
-      const isValid = feature.url ? isValidUrl(feature.url) : true;
-      if (!isValid) {
-        continue;
-      }
       const expired =
         new Date(feature.expires_at || 0).getTime() < now.getTime();
       const existingItem = currentItems.find((item) => {
@@ -481,14 +476,12 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       if (existingItem) {
         const expiresAt = new Date(feature.expires_at || 0);
         const hasChange =
-          feature.url !== existingItem.hosted_url ||
           feature.version !== existingItem.package_info.version ||
           expiresAt.getTime() !== existingItem.valid_until.getTime();
         if (hasChange) {
           resultingItem = await this.itemManager.changeComponent(
             existingItem.uuid,
             (mutator) => {
-              mutator.hosted_url = feature.url!;
               mutator.package_info = feature;
               mutator.valid_until = expiresAt;
             }
@@ -500,7 +493,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       } else if (!expired || feature.content_type === ContentType.Component) {
         resultingItem = (await this.itemManager.createItem(
           feature.content_type,
-          this.componentContentForFeatureDescription(feature),
+          this.componentContentForNativeFeatureDescription(feature),
           true
         )) as SNComponent;
         hasChanges = true;
@@ -562,7 +555,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION);
       return undefined;
     }
-    const rawFeature = response.data as FeatureDescription;
+    const rawFeature = response.data as ThirdPartyFeatureDescription;
     if (!rawFeature.content_type) {
       return;
     }
@@ -586,7 +579,13 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       }
     }
 
-    const content = this.componentContentForFeatureDescription(rawFeature);
+    const content = FillItemContent({
+      area: rawFeature.area,
+      name: rawFeature.name,
+      package_info: rawFeature,
+      valid_until: new Date(rawFeature.expires_at || 0),
+      hosted_url: rawFeature.url,
+    } as Partial<ComponentContent>);
     const component = (await this.itemManager.createTemplateItem(
       rawFeature.content_type,
       content

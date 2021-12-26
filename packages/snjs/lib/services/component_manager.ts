@@ -68,7 +68,7 @@ export class SNComponentManager extends PureService<
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private featuresService: SNFeaturesService,
-    private alertService: SNAlertService,
+    protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
     timeout: any

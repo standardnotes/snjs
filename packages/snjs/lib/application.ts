@@ -1301,7 +1301,7 @@ export class SNApplication {
     return this.storageService.setValue(key, value, mode);
   }
 
-  public getValue(key: string, mode?: StorageValueModes): Promise<unknown> {
+  public getValue(key: string, mode?: StorageValueModes): unknown {
     return this.storageService.getValue(key, mode);
   }
 
