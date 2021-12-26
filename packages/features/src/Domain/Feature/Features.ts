@@ -21,18 +21,48 @@ export const Features: FeatureDescription[] = [
   ...clientFeatures(),
 ];
 
+function githubDownloadUrl(
+  repoUrl: string,
+  version: string,
+  identifier: FeatureIdentifier
+) {
+  return `${repoUrl}/releases/download/${version}/${identifier}.zip`;
+}
+
+function FillThemeComponentDefaults(
+  theme: Partial<ThemeFeatureDescription>
+): ThemeFeatureDescription {
+  if (!theme.static_files) {
+    theme.static_files = ['dist/**/*', 'package.json'];
+  }
+
+  if (theme.git_repo_url && !theme.download_url) {
+    theme.download_url = githubDownloadUrl(
+      theme.git_repo_url,
+      theme.version!,
+      theme.identifier!
+    );
+  }
+
+  if (!theme.index_path) {
+    theme.index_path = 'dist/dist.css';
+  }
+
+  theme.content_type = ContentType.Theme;
+  if (!theme.area) {
+    theme.area = ComponentArea.Editor;
+  }
+  return theme as ThemeFeatureDescription;
+}
+
 function themes(): ThemeFeatureDescription[] {
-  const midnight: ThemeFeatureDescription = {
+  const midnight: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Midnight',
     identifier: FeatureIdentifier.MidnightTheme,
     permission_name: PermissionName.MidnightTheme,
-    content_type: ContentType.Theme,
     version: '1.2.4',
-    index_path: 'dist/dist.css',
     description: 'Elegant utilitarianism.',
-    url: '#{url_prefix}/themes/midnight',
-    download_url:
-      'https://github.com/standardnotes/midnight-theme/archive/1.2.4.zip',
+    git_repo_url: 'https://github.com/standardnotes/midnight-theme',
     marketing_url: 'https://standardnotes.com/extensions/midnight',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/midnight-with-mobile.jpg',
@@ -42,19 +72,15 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#086DD6',
     },
-  };
+  });
 
-  const futura: ThemeFeatureDescription = {
+  const futura: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Futura',
     identifier: FeatureIdentifier.FuturaTheme,
     permission_name: PermissionName.FuturaTheme,
-    index_path: 'dist/dist.css',
-    content_type: ContentType.Theme,
     version: '1.2.4',
     description: 'Calm and relaxed. Take some time off.',
-    url: '#{url_prefix}/themes/futura',
-    download_url:
-      'https://github.com/standardnotes/futura-theme/archive/1.2.4.zip',
+    git_repo_url: 'https://github.com/standardnotes/futura-theme',
     marketing_url: 'https://standardnotes.com/extensions/futura',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/futura-with-mobile.jpg',
@@ -64,19 +90,15 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#fca429',
     },
-  };
+  });
 
-  const solarizedDark: ThemeFeatureDescription = {
+  const solarizedDark: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Solarized Dark',
     identifier: FeatureIdentifier.SolarizedDarkTheme,
     permission_name: PermissionName.SolarizedDarkTheme,
-    index_path: 'dist/dist.css',
-    content_type: ContentType.Theme,
     version: '1.2.3',
     description: 'The perfect theme for any time.',
-    url: '#{url_prefix}/themes/solarized-dark',
-    download_url:
-      'https://github.com/standardnotes/solarized-dark-theme/archive/1.2.3.zip',
+    git_repo_url: 'https://github.com/standardnotes/solarized-dark-theme',
     marketing_url: 'https://standardnotes.com/extensions/solarized-dark',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/solarized-dark.jpg',
@@ -86,19 +108,15 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#2AA198',
     },
-  };
+  });
 
-  const autobiography: ThemeFeatureDescription = {
+  const autobiography: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Autobiography',
     identifier: FeatureIdentifier.AutobiographyTheme,
     permission_name: PermissionName.AutobiographyTheme,
-    index_path: 'dist/dist.css',
-    content_type: ContentType.Theme,
     version: '1.0.1',
     description: 'A theme for writers and readers.',
-    url: '#{url_prefix}/themes/autobiography',
-    download_url:
-      'https://github.com/standardnotes/autobiography-theme/archive/1.0.1.zip',
+    git_repo_url: 'https://github.com/standardnotes/autobiography-theme',
     marketing_url: '',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
@@ -108,19 +126,15 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ECE4DB',
       border_color: '#9D7441',
     },
-  };
+  });
 
-  const focus: ThemeFeatureDescription = {
+  const focus: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Focus',
     identifier: FeatureIdentifier.FocusedTheme,
     permission_name: PermissionName.FocusedTheme,
-    index_path: 'dist/dist.css',
-    content_type: ContentType.Theme,
     version: '1.2.5',
     description: 'For when you need to go in.',
-    url: '#{url_prefix}/themes/focus',
-    download_url:
-      'https://github.com/standardnotes/focus-theme/archive/1.2.5.zip',
+    git_repo_url: 'https://github.com/standardnotes/focus-theme',
     marketing_url: 'https://standardnotes.com/extensions/focused',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/focus-with-mobile.jpg',
@@ -130,19 +144,15 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#a464c2',
     },
-  };
+  });
 
-  const titanium: ThemeFeatureDescription = {
+  const titanium: ThemeFeatureDescription = FillThemeComponentDefaults({
+    name: 'Titanium',
+    version: '1.2.4',
     identifier: FeatureIdentifier.TitaniumTheme,
     permission_name: PermissionName.TitaniumTheme,
-    index_path: 'dist/dist.css',
-    name: 'Titanium',
-    content_type: ContentType.Theme,
-    version: '1.2.4',
     description: 'Light on the eyes, heavy on the spirit.',
-    url: '#{url_prefix}/themes/titanium',
-    download_url:
-      'https://github.com/standardnotes/titanium-theme/archive/1.2.4.zip',
+    git_repo_url: 'https://github.com/standardnotes/titanium-theme',
     marketing_url: 'https://standardnotes.com/extensions/titanium',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/titanium-with-mobile.jpg',
@@ -152,24 +162,20 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#6e2b9e',
     },
-  };
+  });
 
-  const dynamic: ThemeFeatureDescription = {
-    identifier: FeatureIdentifier.DynamicTheme,
+  const dynamic: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Dynamic',
+    identifier: FeatureIdentifier.DynamicTheme,
     permission_name: PermissionName.ThemeDynamic,
-    index_path: 'dist/dist.css',
-    content_type: ContentType.Theme,
     layerable: true,
     no_mobile: true,
     version: '1.0.0',
     description:
       'A smart theme that minimizes the tags and notes panels when they are not in use.',
-    url: '#{url_prefix}/themes/dynamic',
-    download_url:
-      'https://github.com/standardnotes/dynamic-theme/archive/1.0.0.zip',
+    git_repo_url: 'https://github.com/standardnotes/dynamic-theme',
     marketing_url: 'https://standardnotes.com/extensions/dynamic',
-  };
+  });
 
   return [
     midnight,
@@ -182,41 +188,71 @@ function themes(): ThemeFeatureDescription[] {
   ];
 }
 
-function editors(): EditorFeatureDescription[] {
-  const code: EditorFeatureDescription = {
-    name: 'Code Editor',
-    note_type: NoteType.Code,
-    file_type: 'txt',
-    interchangeable: true,
-    identifier: FeatureIdentifier.CodeEditor,
-    index_path: 'index.html',
-    component_permissions: [
+function FillEditorComponentDefaults(
+  component: Partial<EditorFeatureDescription>
+): EditorFeatureDescription {
+  if (!component.static_files) {
+    component.static_files = ['index.html', 'dist', 'package.json'];
+  }
+
+  if (component.git_repo_url && !component.download_url) {
+    component.download_url = githubDownloadUrl(
+      component.git_repo_url,
+      component.version!,
+      component.identifier!
+    );
+  }
+
+  if (!component.index_path) {
+    component.index_path = 'dist/index.html';
+  }
+
+  if (!component.component_permissions) {
+    component.component_permissions = [
       {
         name: ComponentAction.StreamContextItem,
         content_types: [ContentType.Note],
       },
-    ],
+    ];
+  }
+
+  component.content_type = ContentType.Component;
+  if (!component.area) {
+    component.area = ComponentArea.Editor;
+  }
+
+  if (component.interchangeable == undefined) {
+    component.interchangeable = true;
+  }
+
+  return component as EditorFeatureDescription;
+}
+
+function editors(): EditorFeatureDescription[] {
+  const code: EditorFeatureDescription = FillEditorComponentDefaults({
+    name: 'Code Editor',
+    version: '1.3.9',
+    identifier: FeatureIdentifier.CodeEditor,
     permission_name: PermissionName.CodeEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
-    version: '1.3.8',
+    note_type: NoteType.Code,
+    file_type: 'txt',
+    interchangeable: true,
+    index_path: 'index.html',
     description:
-      'Syntax highlighting and convenient keyboard shortcuts for over 120 programming languages. Ideal for code snippets and procedures.',
-    url: '#{url_prefix}/components/code-editor',
-    download_url:
-      'https://github.com/standardnotes/code-editor/archive/1.3.8.zip',
+      'Syntax highlighting and convenient keyboard shortcuts for over 120 programming' +
+      'languages. Ideal for code snippets and procedures.',
+    git_repo_url: 'https://github.com/standardnotes/code-editor',
     marketing_url: 'https://standardnotes.com/extensions/code-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/code.jpg',
-  };
+  });
 
-  const bold: EditorFeatureDescription = {
+  const bold: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Bold Editor',
+    identifier: FeatureIdentifier.BoldEditor,
+    version: '1.2.10',
     note_type: NoteType.RichText,
     file_type: 'html',
-    interchangeable: true,
-    identifier: FeatureIdentifier.BoldEditor,
-    index_path: 'dist/index.html',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -232,235 +268,141 @@ function editors(): EditorFeatureDescription[] {
       },
     ],
     permission_name: PermissionName.BoldEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
-    version: '1.2.10',
     description:
       'A simple and peaceful rich editor that helps you write and think clearly. Features FileSafe integration, so you can embed your encrypted images, videos, and audio recordings directly inline.',
-    url: '#{url_prefix}/components/bold-editor',
     marketing_url: '',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/bold.jpg',
-    download_url:
-      'https://github.com/standardnotes/bold-editor/archive/1.2.10.zip',
-  };
+    git_repo_url: 'https://github.com/standardnotes/bold-editor',
+  });
 
-  const plus: EditorFeatureDescription = {
+  const plus: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Plus Editor',
     note_type: NoteType.RichText,
     file_type: 'html',
-    interchangeable: true,
     identifier: FeatureIdentifier.PlusEditor,
-    index_path: 'dist/index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
     permission_name: PermissionName.PlusEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
     version: '1.5.0',
     description:
       'From highlighting to custom font sizes and colors, to tables and lists, this editor is perfect for crafting any document.',
-    url: '#{url_prefix}/components/plus-editor',
-    download_url:
-      'https://github.com/standardnotes/plus-editor/archive/1.5.0.zip',
+    git_repo_url: 'https://github.com/standardnotes/plus-editor',
     marketing_url: 'https://standardnotes.com/extensions/plus-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/plus-editor.jpg',
-  };
+  });
 
-  const markdownBasic: EditorFeatureDescription = {
+  const markdownBasic: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Basic',
-    note_type: NoteType.Markdown,
-    file_type: 'md',
-    interchangeable: true,
     identifier: FeatureIdentifier.MarkdownBasicEditor,
-    index_path: 'dist/index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
-    permission_name: PermissionName.MarkdownBasicEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
+    note_type: NoteType.Markdown,
     version: '1.4.0',
+    file_type: 'md',
+    permission_name: PermissionName.MarkdownBasicEditor,
     description: 'A Markdown editor with dynamic split-pane preview.',
-    url: '#{url_prefix}/components/simple-markdown-editor',
-    download_url:
-      'https://github.com/standardnotes/markdown-basic/archive/1.4.0.zip',
+    git_repo_url: 'https://github.com/standardnotes/markdown-basic',
     marketing_url:
       'https://standardnotes.com/extensions/simple-markdown-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg',
-  };
+  });
 
-  const markdownPro: EditorFeatureDescription = {
+  const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Pro',
+    identifier: FeatureIdentifier.MarkdownProEditor,
+    version: '1.3.14',
     note_type: NoteType.Markdown,
     file_type: 'md',
-    interchangeable: true,
-    identifier: FeatureIdentifier.MarkdownProEditor,
-    index_path: 'dist/index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
     permission_name: PermissionName.MarkdownProEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
-    version: '1.3.14',
     description:
       'A fully featured Markdown editor that supports live preview, a styling toolbar, and split pane support.',
-    url: '#{url_prefix}/components/advanced-markdown-editor',
-    download_url:
-      'https://github.com/standardnotes/advanced-markdown-editor/archive/1.3.14.zip',
+    git_repo_url: 'https://github.com/standardnotes/advanced-markdown-editor',
     marketing_url: 'https://standardnotes.com/extensions/advanced-markdown',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
-  };
+  });
 
-  const markdownMinimist: EditorFeatureDescription = {
-    name: 'Markdown Minimist',
-    note_type: NoteType.Markdown,
-    file_type: 'md',
-    interchangeable: true,
-    identifier: FeatureIdentifier.MarkdownMinimistEditor,
-    index_path: 'index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
-    permission_name: PermissionName.MarkdownMinimistEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
-    version: '1.3.7',
-    description:
-      'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
-    url: '#{url_prefix}/components/minimal-markdown-editor',
-    download_url:
-      'https://github.com/standardnotes/minimal-markdown-editor/archive/1.3.7.zip',
-    marketing_url:
-      'https://standardnotes.com/extensions/minimal-markdown-editor',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
-  };
+  const markdownMinimist: EditorFeatureDescription = FillEditorComponentDefaults(
+    {
+      name: 'Markdown Minimist',
+      identifier: FeatureIdentifier.MarkdownMinimistEditor,
+      note_type: NoteType.Markdown,
+      file_type: 'md',
+      index_path: 'index.html',
+      permission_name: PermissionName.MarkdownMinimistEditor,
+      version: '1.3.7',
+      description:
+        'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
+      git_repo_url: 'https://github.com/standardnotes/minimal-markdown-editor',
+      marketing_url:
+        'https://standardnotes.com/extensions/minimal-markdown-editor',
+      thumbnail_url:
+        'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
+    } as EditorFeatureDescription
+  );
 
-  const markdownMath: EditorFeatureDescription = {
+  const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Math',
+    identifier: FeatureIdentifier.MarkdownMathEditor,
+    version: '1.3.4',
+    permission_name: PermissionName.MarkdownMathEditor,
     note_type: NoteType.Markdown,
     file_type: 'md',
-    interchangeable: true,
-    identifier: FeatureIdentifier.MarkdownMathEditor,
     index_path: 'index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
-    permission_name: PermissionName.MarkdownMathEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
-    version: '1.3.4',
     description:
       'A beautiful split-pane Markdown editor with synced-scroll, LaTeX support, and colorful syntax.',
-    url: '#{url_prefix}/components/fancy-markdown-editor',
-    download_url:
-      'https://github.com/standardnotes/math-editor/archive/1.3.4.zip',
+    git_repo_url: 'https://github.com/standardnotes/math-editor',
     marketing_url: 'https://standardnotes.com/extensions/math-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg',
-  };
+  });
 
-  const task: EditorFeatureDescription = {
+  const task: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Task Editor',
+    identifier: FeatureIdentifier.TaskEditor,
     note_type: NoteType.Task,
+    version: '1.3.7',
     file_type: 'md',
     interchangeable: false,
-    identifier: FeatureIdentifier.TaskEditor,
-    index_path: 'dist/index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
     permission_name: PermissionName.TaskEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
-    version: '1.3.7',
     description:
       'A great way to manage short-term and long-term to-do"s. You can mark tasks as completed, change their order, and edit the text naturally in place.',
-    url: '#{url_prefix}/components/simple-task-editor',
-    download_url:
-      'https://github.com/standardnotes/simple-task-editor/archive/1.3.7.zip',
+    git_repo_url: 'https://github.com/standardnotes/simple-task-editor',
     marketing_url: 'https://standardnotes.com/extensions/simple-task-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/task-editor.jpg',
-  };
+  });
 
-  const tokenvault: EditorFeatureDescription = {
+  const tokenvault: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'TokenVault',
     note_type: NoteType.Authentication,
     file_type: 'json',
     interchangeable: false,
     identifier: FeatureIdentifier.TokenVaultEditor,
-    index_path: 'dist/index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
     permission_name: PermissionName.TokenVaultEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
     version: '2.0.7',
     description:
       'Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.',
-    url: '#{url_prefix}/components/token-vault',
     marketing_url: '',
-    download_url:
-      'https://github.com/standardnotes/token-vault/archive/2.0.7.zip',
+    git_repo_url: 'https://github.com/standardnotes/token-vault',
     thumbnail_url:
       'https://standard-notes.s3.amazonaws.com/screenshots/models/editors/token-vault.png',
-  };
+  });
 
-  const spreadsheets: EditorFeatureDescription = {
+  const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Secure Spreadsheets',
+    identifier: FeatureIdentifier.SheetsEditor,
+    version: '1.4.0',
     note_type: NoteType.Spreadsheet,
     file_type: 'json',
     interchangeable: false,
-    identifier: FeatureIdentifier.SheetsEditor,
-    index_path: 'dist/index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-    ],
     permission_name: PermissionName.SheetsEditor,
-    content_type: ContentType.Component,
-    area: ComponentArea.Editor,
-    version: '1.4.0',
     description:
       'A powerful spreadsheet editor with formatting and formula support. Not recommended for large data sets, as encryption of such data may decrease editor performance.',
-    url: '#{url_prefix}/components/standard-sheets',
     marketing_url: '',
-    download_url:
-      'https://github.com/standardnotes/secure-spreadsheets/archive/1.4.0.zip',
+    git_repo_url: 'https://github.com/standardnotes/secure-spreadsheets',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png',
-  };
+  });
 
   return [
     code,
@@ -477,81 +419,78 @@ function editors(): EditorFeatureDescription[] {
 }
 
 function nonEditorComponents(): IframeComponentFeatureDescription[] {
-  const filesafe: IframeComponentFeatureDescription = {
-    identifier: FeatureIdentifier.FileSafe,
-    index_path: 'index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamContextItem,
-        content_types: [ContentType.Note],
-      },
-      {
-        name: ComponentAction.StreamItems,
-        content_types: [
-          ContentType.FilesafeCredentials,
-          ContentType.FilesafeFileMetadata,
-          ContentType.FilesafeIntegration,
-        ],
-      },
-    ],
-    name: 'FileSafe',
-    permission_name: PermissionName.ComponentFilesafe,
-    content_type: ContentType.Component,
-    area: ComponentArea.EditorStack,
-    version: '2.0.10',
-    description:
-      'Encrypted attachments for your notes using your Dropbox, Google Drive, or WebDAV server. Limited to 50MB per file.',
-    url: '#{url_prefix}/components/filesafe',
-    download_url:
-      'https://github.com/standardnotes/filesafe-client/archive/2.0.10.zip',
-    marketing_url: 'https://standardnotes.com/extensions/filesafe',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
-  };
+  const filesafe: IframeComponentFeatureDescription = FillEditorComponentDefaults(
+    {
+      name: 'FileSafe',
+      identifier: FeatureIdentifier.FileSafe,
+      version: '2.0.10',
+      index_path: 'index.html',
+      component_permissions: [
+        {
+          name: ComponentAction.StreamContextItem,
+          content_types: [ContentType.Note],
+        },
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [
+            ContentType.FilesafeCredentials,
+            ContentType.FilesafeFileMetadata,
+            ContentType.FilesafeIntegration,
+          ],
+        },
+      ],
+      permission_name: PermissionName.ComponentFilesafe,
+      area: ComponentArea.EditorStack,
+      description:
+        'Encrypted attachments for your notes using your Dropbox, Google Drive, or WebDAV server. Limited to 50MB per file.',
+      git_repo_url: 'https://github.com/standardnotes/filesafe-client',
+      marketing_url: 'https://standardnotes.com/extensions/filesafe',
+      thumbnail_url:
+        'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
+    }
+  );
 
-  const folders: IframeComponentFeatureDescription = {
-    identifier: FeatureIdentifier.FoldersComponent,
-    index_path: 'index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamItems,
-        content_types: [ContentType.Tag, ContentType.SmartTag],
-      },
-    ],
-    name: 'Folders',
-    content_type: ContentType.Component,
-    permission_name: PermissionName.ComponentFolders,
-    area: ComponentArea.TagsList,
-    version: '1.3.8',
-    description: 'Create nested folders with easy drag and drop.',
-    url: '#{url_prefix}/components/folders',
-    download_url:
-      'https://github.com/standardnotes/folders-component/archive/1.3.8.zip',
-    marketing_url: 'https://standardnotes.com/extensions/folders',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/components/folders.jpg',
-  };
+  const folders: IframeComponentFeatureDescription = FillEditorComponentDefaults(
+    {
+      name: 'Folders',
+      identifier: FeatureIdentifier.FoldersComponent,
+      version: '1.3.8',
+      index_path: 'index.html',
+      component_permissions: [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [ContentType.Tag, ContentType.SmartTag],
+        },
+      ],
+      permission_name: PermissionName.ComponentFolders,
+      area: ComponentArea.TagsList,
+      description: 'Create nested folders with easy drag and drop.',
+      git_repo_url: 'https://github.com/standardnotes/folders-component',
+      marketing_url: 'https://standardnotes.com/extensions/folders',
+      thumbnail_url:
+        'https://s3.amazonaws.com/standard-notes/screenshots/models/components/folders.jpg',
+    }
+  );
 
-  const cloudlink: IframeComponentFeatureDescription = {
-    name: 'CloudLink',
-    identifier: FeatureIdentifier.CloudLink,
-    index_path: 'index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamItems,
-        content_types: [ContentType.ServerExtension],
-      },
-    ],
-    permission_name: PermissionName.CloudLink,
-    content_type: ContentType.Component,
-    description:
-      'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
-    version: '1.2.3',
-    url: '#{url_prefix}/components/cloudlink',
-    marketing_url: '',
-    download_url: '',
-    area: ComponentArea.Modal,
-  };
+  const cloudlink: IframeComponentFeatureDescription = FillEditorComponentDefaults(
+    {
+      name: 'CloudLink',
+      identifier: FeatureIdentifier.CloudLink,
+      version: '1.2.3',
+      index_path: 'index.html',
+      component_permissions: [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [ContentType.ServerExtension],
+        },
+      ],
+      permission_name: PermissionName.CloudLink,
+      description:
+        'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
+      git_repo_url: '',
+      area: ComponentArea.Modal,
+    }
+  );
 
   return [filesafe, folders, cloudlink];
 }

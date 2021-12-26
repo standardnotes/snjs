@@ -23,7 +23,6 @@ export type BaseFeatureDescription = {
   no_mobile?: boolean;
   thumbnail_url?: string;
   permission_name: PermissionName;
-  version?: string;
 };
 
 export type ServerFeatureDescription = {
@@ -43,11 +42,13 @@ export type ComponentFeatureDescription = BaseFeatureDescription & {
   index_path: string;
   download_url: string;
   content_type: ContentType;
-  url: string;
+  git_repo_url: string;
+  static_files?: string[];
+  version: string;
+  area: ComponentArea;
 };
 
 export type IframeComponentFeatureDescription = ComponentFeatureDescription & {
-  area: ComponentArea;
   component_permissions: ComponentPermission[];
 };
 
