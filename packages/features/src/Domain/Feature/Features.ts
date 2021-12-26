@@ -231,7 +231,7 @@ function FillEditorComponentDefaults(
 function editors(): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
-    version: '1.3.9',
+    version: '1.3.8',
     identifier: FeatureIdentifier.CodeEditor,
     permission_name: PermissionName.CodeEditor,
     note_type: NoteType.Code,

@@ -48,6 +48,10 @@ export type ComponentFeatureDescription = BaseFeatureDescription & {
   area: ComponentArea;
 };
 
+export type ThirdPartyFeatureDescription = ComponentFeatureDescription & {
+  url: string;
+}
+
 export type IframeComponentFeatureDescription = ComponentFeatureDescription & {
   component_permissions: ComponentPermission[];
 };

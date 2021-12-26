@@ -4,6 +4,7 @@ import archiver from 'archiver';
 import crypto from 'crypto';
 import { spawnSync as spawn } from 'child_process';
 import { Features } from './dist/Domain/Feature/Features.js';
+import { FeatureIdentifier } from './dist/Domain/Feature/FeatureIdentifier.js';
 
 function zipDirectory(sourceDir, outPath) {
   const archive = archiver('zip', { zlib: { level: 9 } });
@@ -96,13 +97,14 @@ const createRelease = async (feature, zipPath) => {
   return uploadError;
 };
 
-const computeChecksum = async (zipPath) => {
+const computeChecksum = async (zipPath, version) => {
   const zipData = fs.readFileSync(zipPath, 'base64');
   const base64 = crypto.createHash('sha256').update(zipData).digest('hex');
   const checksumProcess = spawn('sha256sum', [zipPath]);
   const checksumString = checksumProcess.stdout.toString();
   const binary = checksumString.split('  ')[0];
   return {
+    version,
     base64,
     binary,
   };
@@ -114,40 +116,45 @@ const Checksums = JSON.parse(fs.readFileSync(ChecksumsSrcPath).toString());
 console.log('Loaded existing checksums', Checksums);
 
 const processFeature = async (feature) => {
-  if (await hasExistingRelease(feature.git_repo, feature.version)) {
-    console.log(
-      `Feature ${feature.identifier} already has release ${feature.version}` +
-        `skipping zip + publish and reusing existing checksum ${
-          Checksums[feature.identifier]
-        }`
-    );
-    continue;
-  }
+  // if (await hasExistingRelease(feature.git_repo, feature.version)) {
+  //   console.log(
+  //     `Feature ${feature.identifier} already has release ${feature.version}` +
+  //       `skipping zip + publish and reusing existing checksum ${
+  //         Checksums[feature.identifier]
+  //       }`
+  //   );
+  //   continue;
+  // }
   const directory = `src/Static/${feature.identifier}`;
   const outZip = `tmp/${feature.identifier}.zip`;
   await zipDirectory(directory, outZip);
   console.log(`Zipped to ${outZip}`);
 
-  const uploadError = await createRelease(feature, outZip);
-  if (uploadError.length > 0) {
-    throw Error(
-      `Error creating release ${feature.identifier}@${feature.version}, aborting process`
-    );
-  }
+  // const uploadError = await createRelease(feature, outZip);
+  // if (uploadError.length > 0) {
+  //   throw Error(
+  //     `Error creating release ${feature.identifier}@${feature.version}, aborting process`
+  //   );
+  // }
 
-  const checksum = await computeChecksum(outZip);
+  const checksum = await computeChecksum(outZip, feature.version);
   Checksums[feature.identifier] = checksum;
   console.log(`Computed checksums for ${feature.identifier}:`, checksum);
 
   copyToDist(feature);
 };
 
+// const TmpWhiteListedEditors = [
+//   FeatureIdentifier.CodeEditor,
+//   FeatureIdentifier.BoldEditor,
+// ];
+
 await (async () => {
   for (const feature of Features) {
     if (feature.download_url) {
-      if (feature.identifier !== 'org.standardnotes.code-editor') {
-        continue;
-      }
+      // if (!TmpWhiteListedEditors.includes(feature.identifier)) {
+      //   continue;
+      // }
       await processFeature(feature);
       console.log('\n\n');
     }

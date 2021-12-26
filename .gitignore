@@ -17,3 +17,5 @@ api-gateway.env
 syncing-server-js.env
 syncing-server.env
 codeqldb
+
+packages/features/tmp
