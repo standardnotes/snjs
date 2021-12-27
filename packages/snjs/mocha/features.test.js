@@ -42,7 +42,6 @@ describe('features', () => {
     sinon.spy(application.itemManager, 'createItem');
     sinon.spy(application.itemManager, 'changeComponent');
     sinon.spy(application.itemManager, 'setItemsToBeDeleted');
-    sinon.spy(application.componentManager, 'setReadonlyStateForComponent');
     getUserFeatures = sinon
       .stub(application.apiService, 'getUserFeatures')
       .callsFake(() => {
@@ -160,41 +159,6 @@ describe('features', () => {
           })
         )
       );
-    });
-
-    it('should set component to read only if feature has expired', async () => {
-      const now = new Date();
-      const yesterday = now.setDate(now.getDate() - 1);
-
-      getUserFeatures.restore();
-      sinon.stub(application.apiService, 'getUserFeatures').callsFake(() => {
-        return Promise.resolve({
-          data: {
-            features: [
-              {
-                ...boldEditorFeature,
-                expires_at: yesterday,
-              },
-            ],
-          },
-        });
-      });
-
-      // Wipe roles from initial sync
-      await application.featuresService.setRoles([]);
-      // Call sync intentionally to get roles again in meta
-      await application.sync();
-      // Timeout since we don't await for features update
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      expect(
-        application.componentManager.setReadonlyStateForComponent.callCount
-      ).to.equal(1);
-      const editorItems = application.getItems(ContentType.Component);
-      expect(
-        application.componentManager.getReadonlyStateForComponent(
-          editorItems[0]
-        ).readonly
-      ).to.equal(true);
     });
 
     it('should delete theme item if feature has expired', async () => {

@@ -1,3 +1,4 @@
+import { TransactionalMutation } from './services/item_manager';
 import { FeatureStatus } from '@Lib/services/features_service';
 import { Settings } from './services/settings_service';
 import { SyncOpStatus } from './services/sync/sync_op_status';
@@ -141,7 +142,7 @@ type ApplicationObserver = {
   singleEvent?: ApplicationEvent;
   callback: ApplicationEventCallback;
 };
-type ItemStream = (items: SNItem[], source?: PayloadSource) => void;
+type ItemStream = (items: SNItem[], source: PayloadSource) => void;
 type ObserverRemover = () => void;
 
 /** The main entrypoint of an application. */
@@ -776,6 +777,35 @@ export class SNApplication {
     );
   }
 
+  /**
+   * Run unique mutations per each item in the array, then only propagate all changes
+   * once all mutations have been run. This differs from `changeItems` in that changeItems
+   * runs the same mutation on all items.
+   */
+  public async runTransactionalMutations(
+    transactions: TransactionalMutation[],
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<(SNItem | undefined)[]> {
+    return this.itemManager.runTransactionalMutations(
+      transactions,
+      payloadSource,
+      payloadSourceKey
+    );
+  }
+
+  public async runTransactionalMutation(
+    transaction: TransactionalMutation,
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<SNItem | undefined> {
+    return this.itemManager.runTransactionalMutation(
+      transaction,
+      payloadSource,
+      payloadSourceKey
+    );
+  }
+
   public async protectNote(note: SNNote): Promise<SNNote> {
     const protectedNote = await this.protectionService.protectNote(note);
     void this.syncService.sync();
@@ -970,7 +1000,7 @@ export class SNApplication {
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType);
     if (matches.length > 0) {
-      stream(matches);
+      stream(matches, PayloadSource.InitialObserverRegistrationPush);
     }
     this.streamRemovers.push(observer);
     return () => {
@@ -984,7 +1014,12 @@ export class SNApplication {
    * current state, and syncs.
    */
   public async toggleComponent(component: SNComponent): Promise<void> {
-    await this.componentManager.toggleComponent(component);
+    await this.componentManager.toggleComponent(component.uuid);
+    await this.syncService.sync();
+  }
+
+  public async toggleTheme(theme: SNComponent): Promise<void> {
+    await this.componentManager.toggleTheme(theme.uuid);
     await this.syncService.sync();
   }
 
@@ -1717,11 +1752,11 @@ export class SNApplication {
     this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
-    this.createComponentManager();
     this.createActionsManager();
     this.createPreferencesService();
     this.createSettingsService();
     this.createFeaturesService();
+    this.createComponentManager();
     this.createMigrationService();
     this.createMfaService();
   }
@@ -1759,7 +1794,6 @@ export class SNApplication {
       this.storageService,
       this.apiService,
       this.itemManager,
-      this.componentManager,
       this.webSocketsService,
       this.settingsService,
       this.credentialService,
@@ -1860,6 +1894,7 @@ export class SNApplication {
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
+      this.featuresService,
       this.alertService,
       this.environment,
       this.platform,

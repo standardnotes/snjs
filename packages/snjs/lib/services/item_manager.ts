@@ -50,13 +50,19 @@ type ObserverCallback = (
   discarded: SNItem[],
   /** Items for which encrypted overwrite protection is enabled and enacted */
   ignored: SNItem[],
-  source?: PayloadSource,
+  source: PayloadSource,
   sourceKey?: string
 ) => void;
 
 type Observer = {
   contentType: ContentType[];
   callback: ObserverCallback;
+};
+
+export type TransactionalMutation = {
+  itemUuid: UuidString;
+  mutate: (mutator: ItemMutator) => void;
+  mutationType?: MutationType;
 };
 
 /**
@@ -232,7 +238,7 @@ export class ItemManager extends PureService {
   public addObserver(
     contentType: ContentType | ContentType[],
     callback: ObserverCallback
-  ) {
+  ): () => void {
     if (!Array.isArray(contentType)) {
       contentType = [contentType];
     }
@@ -274,7 +280,7 @@ export class ItemManager extends PureService {
     inserted: PurePayload[],
     discarded: PurePayload[],
     ignored: PurePayload[],
-    source?: PayloadSource,
+    source: PayloadSource,
     sourceKey?: string
   ) {
     const changedItems = changed.map((p) => CreateItemFromPayload(p));
@@ -304,7 +310,7 @@ export class ItemManager extends PureService {
     inserted: SNItem[],
     discarded: SNItem[],
     ignored: SNItem[],
-    source?: PayloadSource,
+    source: PayloadSource,
     sourceKey?: string
   ) {
     const filter = (items: SNItem[], types: ContentType[]) => {
@@ -398,6 +404,62 @@ export class ItemManager extends PureService {
     );
     const results = this.findItems(payloads.map((p) => p.uuid!));
     return results;
+  }
+
+  /**
+   * Run unique mutations per each item in the array, then only propagate all changes
+   * once all mutations have been run. This differs from `changeItems` in that changeItems
+   * runs the same mutation on all items.
+   */
+  public async runTransactionalMutations(
+    transactions: TransactionalMutation[],
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<(SNItem | undefined)[]> {
+    const payloads: PurePayload[] = [];
+    for (const transaction of transactions) {
+      const item = this.findItem(transaction.itemUuid);
+      if (!item) {
+        continue;
+      }
+      const mutator = createMutatorForItem(
+        item,
+        transaction.mutationType || MutationType.UserInteraction
+      );
+      transaction.mutate(mutator);
+      const payload = mutator.getResult();
+      payloads.push(payload);
+    }
+
+    await this.payloadManager.emitPayloads(
+      payloads,
+      payloadSource,
+      payloadSourceKey
+    );
+    const results = this.findItems(payloads.map((p) => p.uuid!));
+    return results;
+  }
+
+  public async runTransactionalMutation(
+    transaction: TransactionalMutation,
+    payloadSource = PayloadSource.LocalChanged,
+    payloadSourceKey?: string
+  ): Promise<(SNItem | undefined)> {
+    const item = this.findItem(transaction.itemUuid);
+    const mutator = createMutatorForItem(
+      item!,
+      transaction.mutationType || MutationType.UserInteraction
+    );
+    transaction.mutate(mutator);
+    const payload = mutator.getResult();
+
+    await this.payloadManager.emitPayloads(
+      [payload],
+      payloadSource,
+      payloadSourceKey
+    );
+    const result = this.findItem(payload.uuid);
+    return result;
   }
 
   async changeNote(
