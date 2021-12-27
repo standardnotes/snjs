@@ -4,7 +4,21 @@ import archiver from 'archiver';
 import crypto from 'crypto';
 import { spawnSync as spawn } from 'child_process';
 import { Features } from './dist/Domain/Feature/Features.js';
-import { FeatureIdentifier } from './dist/Domain/Feature/FeatureIdentifier.js';
+
+const SOURCE_FILES_PATH = 'src/Static';
+const DIST_FILES_PATH = 'dist/static';
+
+console.log('Beginning packaging procedure...');
+
+const specificFeatureIdentifier = process.argv[2];
+if (specificFeatureIdentifier) {
+  console.log('Processing only', specificFeatureIdentifier);
+}
+
+const ChecksumsSrcPath = path.join(SOURCE_FILES_PATH, 'checksums.json');
+const ChecksumsDistPath = path.join(DIST_FILES_PATH, 'checksums.json');
+const Checksums = JSON.parse(fs.readFileSync(ChecksumsSrcPath).toString());
+console.log('Loaded existing checksums from', ChecksumsSrcPath);
 
 function zipDirectory(sourceDir, outPath) {
   const archive = archiver('zip', { zlib: { level: 9 } });
@@ -20,9 +34,6 @@ function zipDirectory(sourceDir, outPath) {
     archive.finalize();
   });
 }
-
-const SOURCE_FILES_PATH = 'src/Static';
-const DIST_FILES_PATH = 'dist/static';
 
 const copyFileOrDir = (src, dest) => {
   const isDir = fs.lstatSync(src).isDirectory();
@@ -86,7 +97,7 @@ const createRelease = async (feature, zipPath) => {
     `${feature.version}`,
     zipPath,
     `--repo`,
-    feature.git_repo,
+    feature.git_repo_url,
     '--target',
     'main',
     '--title',
@@ -110,32 +121,28 @@ const computeChecksum = async (zipPath, version) => {
   };
 };
 
-const ChecksumsSrcPath = path.join(SOURCE_FILES_PATH, 'checksums.json');
-const ChecksumsDistPath = path.join(DIST_FILES_PATH, 'checksums.json');
-const Checksums = JSON.parse(fs.readFileSync(ChecksumsSrcPath).toString());
-console.log('Loaded existing checksums', Checksums);
-
 const processFeature = async (feature) => {
-  // if (await hasExistingRelease(feature.git_repo, feature.version)) {
-  //   console.log(
-  //     `Feature ${feature.identifier} already has release ${feature.version}` +
-  //       `skipping zip + publish and reusing existing checksum ${
-  //         Checksums[feature.identifier]
-  //       }`
-  //   );
-  //   continue;
-  // }
+  console.log('Processing feature', feature.identifier, '...');
+  if (await hasExistingRelease(feature.git_repo_url, feature.version)) {
+    console.log(
+      `Feature ${feature.identifier} already has release ${feature.version} ` +
+        `skipping zip + publish and reusing existing checksum ${JSON.stringify(
+          Checksums[feature.identifier]
+        )}`
+    );
+    return;
+  }
   const directory = `src/Static/${feature.identifier}`;
   const outZip = `tmp/${feature.identifier}.zip`;
   await zipDirectory(directory, outZip);
   console.log(`Zipped to ${outZip}`);
 
-  // const uploadError = await createRelease(feature, outZip);
-  // if (uploadError.length > 0) {
-  //   throw Error(
-  //     `Error creating release ${feature.identifier}@${feature.version}, aborting process`
-  //   );
-  // }
+  const uploadError = await createRelease(feature, outZip);
+  if (uploadError.length > 0) {
+    throw Error(
+      `Error creating release ${feature.identifier}@${feature.version}, aborting process. ${uploadError}`
+    );
+  }
 
   const checksum = await computeChecksum(outZip, feature.version);
   Checksums[feature.identifier] = checksum;
@@ -144,23 +151,37 @@ const processFeature = async (feature) => {
   copyToDist(feature);
 };
 
-// const TmpWhiteListedEditors = [
-//   FeatureIdentifier.CodeEditor,
-//   FeatureIdentifier.BoldEditor,
-// ];
-
 await (async () => {
-  for (const feature of Features) {
-    if (feature.download_url) {
-      // if (!TmpWhiteListedEditors.includes(feature.identifier)) {
-      //   continue;
-      // }
-      await processFeature(feature);
-      console.log('\n\n');
+  const featuresToProcess = specificFeatureIdentifier
+    ? [
+        Features.find(
+          (feature) => feature.identifier === specificFeatureIdentifier
+        ),
+      ]
+    : Features;
+
+  let index = 0;
+  for (const feature of featuresToProcess) {
+    if (index === 0) {
+      console.log('\n---\n');
     }
+    if (feature.download_url) {
+      await processFeature(feature);
+    } else {
+      console.log(
+        'Feature does not have download_url, not packaging',
+        feature.identifier
+      );
+    }
+    if (index !== featuresToProcess.length - 1) {
+      console.log('\n---\n');
+    }
+    index++;
   }
 
+  for (const feature of featuresToProcess) {
+  }
   fs.writeFileSync(ChecksumsSrcPath, JSON.stringify(Checksums, undefined, 2));
-  console.log('Succesfully wrote checksums', Checksums);
+  console.log('Succesfully wrote checksums to', ChecksumsSrcPath);
   copyFileOrDir(ChecksumsSrcPath, ChecksumsDistPath);
 })();
