@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.29.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.29.0...@standardnotes/snjs@2.29.1) (2021-12-27)
+
+
+### Bug Fixes
+
+* safe access to potentially undefined references array ([#529](https://github.com/standardnotes/snjs/issues/529)) ([63f5cdd](https://github.com/standardnotes/snjs/commit/63f5cdd74780b33e32b97b6a1c1aae81ede76275))
+
+
+
+
+
 # [2.29.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.28.1...@standardnotes/snjs@2.29.0) (2021-12-24)
 
 
