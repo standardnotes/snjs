@@ -21,7 +21,7 @@ import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { PrefKey } from '../app/userPrefs';
 
 export interface ItemContent {
-  references: ContentReference[];
+  references?: ContentReference[];
 }
 
 export enum MutationType {
@@ -144,7 +144,7 @@ export class SNItem {
     return this.payload.safeContent;
   }
 
-  get references() {
+  get references(): ContentReference[] {
     return this.payload.safeContent.references || [];
   }
 
@@ -223,8 +223,8 @@ export class SNItem {
     return CopyPayload(this.payload, override);
   }
 
-  public hasRelationshipWithItem(item: SNItem) {
-    const target = this.payload.safeContent.references?.find((r) => {
+  public hasRelationshipWithItem(item: SNItem): boolean {
+    const target = this.references?.find((r) => {
       return r.uuid === item.uuid;
     });
     return !!target;
