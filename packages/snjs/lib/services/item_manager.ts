@@ -174,7 +174,21 @@ export class ItemManager extends PureService {
    * Returns an item for a given id
    */
   findItem<T extends SNItem = SNItem>(uuid: UuidString): T | undefined {
-    return this.collection.find(uuid) as T | undefined;
+    const itemFromCollection = this.collection.find(uuid);
+
+    if (itemFromCollection) {
+      return itemFromCollection as T;
+    }
+
+    const itemFromSmartTags = this.systemSmartTags.find(
+      (tag) => tag.uuid === uuid
+    );
+
+    if (itemFromSmartTags) {
+      return (itemFromSmartTags as unknown) as T;
+    }
+
+    return undefined;
   }
 
   /**
@@ -448,7 +462,7 @@ export class ItemManager extends PureService {
     transaction: TransactionalMutation,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string
-  ): Promise<(SNItem | undefined)> {
+  ): Promise<SNItem | undefined> {
     const item = this.findItem(transaction.itemUuid);
     const mutator = createMutatorForItem(
       item!,
@@ -689,7 +703,7 @@ export class ItemManager extends PureService {
    * @returns Whether the item is a template (unmanaged)
    */
   public isTemplateItem(item: SNItem): boolean {
-    return !this.collection.find(item.uuid);
+    return !this.findItem(item.uuid);
   }
 
   /**

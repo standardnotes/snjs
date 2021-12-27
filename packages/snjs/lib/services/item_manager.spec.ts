@@ -302,6 +302,24 @@ describe('itemManager', () => {
 
       expect(itemManager.isTemplateItem(item)).toEqual(false);
     });
+
+    it('isTemplateItem return the correct value for system smart tags', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const [
+        systemTag1,
+        ...restOfSystemTags
+      ] = itemManager.getSmartTags().filter((tag) => tag.isSystemSmartTag);
+
+      const isSystemTemplate = itemManager.isTemplateItem(systemTag1);
+      expect(isSystemTemplate).toEqual(false);
+
+      const areTemplates = restOfSystemTags
+        .map((tag) => itemManager.isTemplateItem(tag))
+        .every((value) => !!value);
+      expect(areTemplates).toEqual(false);
+    });
   });
 
   describe('tags', () => {
