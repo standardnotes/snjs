@@ -435,6 +435,16 @@
     "download_url": ""
   },
   {
+    "name": "Smart Tags",
+    "identifier": "org.standardnotes.smart-tags",
+    "permission_name": "app:smart-tags",
+    "description": "Create Smart Tags.",
+    "version": "0.1.0",
+    "url": "",
+    "marketing_url": "",
+    "download_url": ""
+  },
+  {
     "name": "",
     "identifier": "org.standardnotes.files",
     "permission_name": "app:files",

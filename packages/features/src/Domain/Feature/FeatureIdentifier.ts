@@ -28,6 +28,7 @@ export enum FeatureIdentifier {
   SheetsEditor = 'org.standardnotes.standard-sheets',
   SolarizedDarkTheme = 'org.standardnotes.theme-solarized-dark',
   TagNesting = 'org.standardnotes.tag-nesting',
+  SmartTags = 'org.standardnotes.smart-tags',
   TaskEditor = 'org.standardnotes.simple-task-editor',
   TitaniumTheme = 'org.standardnotes.theme-titanium',
   TokenVaultEditor = 'org.standardnotes.token-vault',
