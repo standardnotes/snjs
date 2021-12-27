@@ -1,4 +1,6 @@
 export enum PayloadSource {
+  /** When an observer registers to stream items, the items are pushed immediately to the observer */
+  InitialObserverRegistrationPush = 0,
   RemoteRetrieved = 1,
   RemoteSaved = 2,
   /* The payload returned by offline sync operation */
