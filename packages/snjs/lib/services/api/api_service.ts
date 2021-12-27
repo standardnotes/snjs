@@ -801,6 +801,9 @@ export class SNApiService extends PureService<
         fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
         customHeaders: [{ key: 'x-offline-token', value: extensionKey }],
       });
+      if (response.error) {
+        return { error: response.error.message };
+      }
       return {
         features: (response as GetOfflineFeaturesResponse).data?.features || [],
       };
