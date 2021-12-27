@@ -51,7 +51,7 @@ export class SNTag extends SNItem implements TagContent {
   }
 
   public get parentId(): UuidString | undefined {
-    const reference = this.payload.safeContent.references.find(
+    const reference = this.references.find(
       (ref) => ref.content_type === ContentType.Tag
     );
     return reference?.uuid;
@@ -79,7 +79,7 @@ export class TagMutator extends ItemMutator {
   }
 
   public makeChildOf(tag: SNTag): void {
-    const references = this.typedContent.references.filter(
+    const references = this.item.references.filter(
       (ref) => ref.content_type !== ContentType.Tag
     );
     references.push({
