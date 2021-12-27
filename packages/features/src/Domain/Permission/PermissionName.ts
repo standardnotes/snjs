@@ -29,7 +29,6 @@ export enum PermissionName {
   TagNesting = 'app:tag-nesting',
   TaskEditor = 'editor:task-editor',
   ThemeDynamic = 'theme:dynamic',
-  ThemeNoDistraction = 'theme:no-distraction',
   TitaniumTheme = 'theme:titanium',
   TokenVaultEditor = 'editor:token-vault',
   TwoFactorAuth = 'server:two-factor-auth',
