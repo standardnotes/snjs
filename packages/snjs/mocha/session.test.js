@@ -310,6 +310,8 @@ describe('server session', function () {
   });
 
   it('change password request should be successful with a valid access token', async function () {
+    this.timeout(Factory.TwentySecondTimeout);
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -667,7 +669,7 @@ describe('server session', function () {
     await appA.sync();
 
     /** Allow session recovery to do its thing */
-    await Factory.sleep(2.0);
+    await Factory.sleep(5.0);
 
     expect(didPromptForSignIn).to.equal(true);
     expect(appA.apiService.session.accessToken).to.not.equal('foo');

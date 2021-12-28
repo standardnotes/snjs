@@ -263,7 +263,7 @@ export function itemToStoragePayload(item) {
   return CreateMaxPayloadFromAnyObject(item);
 }
 
-export function createMappedNote(application, title, text, dirty) {
+export function createMappedNote(application, title, text, dirty = true) {
   const payload = createNotePayload(title, text, dirty);
   return application.itemManager.emitItemFromPayload(
     payload,
@@ -559,4 +559,10 @@ export async function createTags(
   await Promise.all(promises);
 
   return result;
+}
+
+export async function pinNote(application, note) {
+  return application.changeItem(note.uuid, (mutator) => {
+    mutator.pinned = true;
+  });
 }
