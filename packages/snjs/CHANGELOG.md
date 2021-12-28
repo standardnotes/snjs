@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.30.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.29.1...@standardnotes/snjs@2.30.0) (2021-12-28)
+
+
+### Features
+
+* smart tags native support ([#504](https://github.com/standardnotes/snjs/issues/504)) ([4b5349c](https://github.com/standardnotes/snjs/commit/4b5349c8a3f2d9837ec6cd4c8fe009b7eccb5264))
+
+
+
+
+
 ## [2.29.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.29.0...@standardnotes/snjs@2.29.1) (2021-12-27)
 
 
