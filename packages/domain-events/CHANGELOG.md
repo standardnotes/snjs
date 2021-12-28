@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.13.1...@standardnotes/domain-events@2.14.0) (2021-12-28)
+
+
+### Features
+
+* add subscription sync requested event ([#530](https://github.com/standardnotes/snjs/issues/530)) ([7c590e1](https://github.com/standardnotes/snjs/commit/7c590e19a20c7e5bcb6425643a579a66d8f1dd79))
+
+
+
+
+
 ## [2.13.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.13.0...@standardnotes/domain-events@2.13.1) (2021-12-23)
 
 **Note:** Version bump only for package @standardnotes/domain-events
