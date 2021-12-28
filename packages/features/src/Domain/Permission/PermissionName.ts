@@ -27,7 +27,7 @@ export enum PermissionName {
   SheetsEditor = 'editor:sheets',
   SolarizedDarkTheme = 'theme:solarized-dark',
   TagNesting = 'app:tag-nesting',
-  SmartTags = 'app:smart-tags',
+  SmartFilters = 'app:smart-filters',
   TaskEditor = 'editor:task-editor',
   ThemeDynamic = 'theme:dynamic',
   TitaniumTheme = 'theme:titanium',
