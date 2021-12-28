@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.0...@standardnotes/domain-events@2.14.1) (2021-12-28)
+
+
+### Bug Fixes
+
+* add missing canceled property from subscription sync requested event ([#531](https://github.com/standardnotes/snjs/issues/531)) ([0184933](https://github.com/standardnotes/snjs/commit/01849333eab182127e926b0008b7c437210cd33d))
+
+
+
+
+
 # [2.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.13.1...@standardnotes/domain-events@2.14.0) (2021-12-28)
 
 
