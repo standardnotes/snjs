@@ -10,7 +10,4 @@ export interface SubscriptionSyncRequestedEventPayload {
   canceled: boolean
   extensionKey: string
   offlineFeaturesToken: string
-  payAmount: number | null
-  billingEveryNMonths: number | null
-  activeUntil: string | null
 }
