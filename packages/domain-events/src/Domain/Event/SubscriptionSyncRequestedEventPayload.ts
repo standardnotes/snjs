@@ -7,6 +7,7 @@ export interface SubscriptionSyncRequestedEventPayload {
   subscriptionExpiresAt: number
   timestamp: number
   offline: boolean
+  canceled: boolean
   extensionKey: string
   offlineFeaturesToken: string
   payAmount: number | null
