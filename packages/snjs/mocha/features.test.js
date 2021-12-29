@@ -120,7 +120,6 @@ describe('features', () => {
         JSON.parse(
           JSON.stringify({
             name: boldEditorFeature.name,
-            hosted_url: boldEditorFeature.url,
             area: boldEditorFeature.area,
             package_info: boldEditorFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
