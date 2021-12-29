@@ -428,7 +428,17 @@
     "name": "Tag Nesting",
     "identifier": "org.standardnotes.tag-nesting",
     "permission_name": "app:tag-nesting",
-    "description": "Create nested tags with easy drag and drop.",
+    "description": "Organize your tags into folders.",
+    "version": "0.1.0",
+    "url": "",
+    "marketing_url": "",
+    "download_url": ""
+  },
+  {
+    "name": "Smart Filters",
+    "identifier": "org.standardnotes.smart-filters",
+    "permission_name": "app:smart-filters",
+    "description": "Create smart filters for viewing notes matching specific criteria.",
     "version": "0.1.0",
     "url": "",
     "marketing_url": "",
