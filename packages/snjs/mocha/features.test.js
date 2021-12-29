@@ -110,7 +110,6 @@ describe('features', () => {
         JSON.parse(
           JSON.stringify({
             name: midnightThemeFeature.name,
-            hosted_url: midnightThemeFeature.url,
             package_info: midnightThemeFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
           })
@@ -152,7 +151,6 @@ describe('features', () => {
       expect(themeItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
-            hosted_url: midnightThemeFeature.url,
             package_info: midnightThemeFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
           })
