@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.3...@standardnotes/time@1.4.4) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/time
+
+
+
+
+
+## [1.4.3](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.2...@standardnotes/time@1.4.3) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/time
+
+
+
+
+
 ## [1.4.2](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.1...@standardnotes/time@1.4.2) (2021-12-29)
 
 

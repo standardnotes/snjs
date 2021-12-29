@@ -2549,6 +2549,10 @@
   dependencies:
     "@standardnotes/auth" "^3.8.1"
 
+"@standardnotes/filesafe-bar@standardnotes/filesafe-client":
+  version "2.0.15"
+  resolved "https://codeload.github.com/standardnotes/filesafe-client/tar.gz/fc111cc0a81de01d63ba27dea2998100c6f0011f"
+
 "@standardnotes/sncrypto-common@1.5.2", "@standardnotes/sncrypto-common@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/sncrypto-common/-/sncrypto-common-1.5.2.tgz#be9404689d94f953c68302609a4f76751eaa82cd"
@@ -10993,6 +10997,106 @@ smart-buffer@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.1.0.tgz#91605c25d91652f4661ea69ccf45f1b331ca21ba"
   integrity sha512-iVICrxOzCynf/SNaBQCw34eM9jROU/s5rzIhpOvzhzuYHfJR/DhZfDkXiZSgKXfgv26HT3Yni3AV/DGw0cGnnw==
+
+sn-advanced-markdown-editor@1.3.14:
+  version "1.3.14"
+  resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.3.14.tgz#2d31890c1be383d38498185c55a38e00e6245d7f"
+  integrity sha512-cz5muTgdST3VXpDmqyP36R6dbMtEgLGX/NMP6V3RPbWYtYjiCNKVOKSHTDT9MiMgnNdNMkpFtlj2yYhDdOeiKA==
+
+sn-bold-editor@1.2.7:
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.2.7.tgz#df652d2859b0da735cbf14b48624a7d36ee520b4"
+  integrity sha512-/95A7lLt7xAd6keK234szqQt1P7gh31rffMDWBE3sBV0NdUeR3mou5kGKGFlJSmMKn3iVgqw+iqUwYMcyvh/1Q==
+
+sn-cloudlink@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/sn-cloudlink/-/sn-cloudlink-1.3.0.tgz#d5dacb98eafa3dbc8a08b9784638ddb712cfb084"
+  integrity sha512-QxkE56hHfEY+z+aB95N4NjccYc9I0Fnx4XNns6LoIDimfi+pOrpe7cf50dyCn1h2aResmbci42WLtuzKvISuNA==
+
+sn-code-editor@^1.3.8:
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/sn-code-editor/-/sn-code-editor-1.3.8.tgz#9ee581ae376a7bc344ab1c166393efcc7c233f6d"
+  integrity sha512-ztN265IEkXMKx4YyvY12FD0DNLqH/PU14SiqOOuQQNW2M3pMYuiqqmr8L0/8deUGzCBDhJaP587hQujk1YCrhg==
+
+sn-codemirror-search@1.0.0, sn-codemirror-search@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/sn-codemirror-search/-/sn-codemirror-search-1.0.0.tgz#13c06b2cead6a3670eabdbffadd69d839ea53c3f"
+  integrity sha512-T8WAFgdhChF91ZHX2ELGy48kzulMgzwTWA5p1QqMHOZDbgi23i3XWflNzcwPdKw8Px0DIRwpJ6ffQfcft0LMbQ==
+
+sn-fancy-markdown-editor@1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/sn-fancy-markdown-editor/-/sn-fancy-markdown-editor-1.3.4.tgz#0fdaee39b6ac1efbe9bdf8d5f09c8c4c695046fe"
+  integrity sha512-dW/j/NOQmJL3pLxEXexJjbXl0qk/LTLRwLXXVvoymhrXqE5xF/ok7/y2deDuMNIPi6O+8R5fMTDo8felPArp/Q==
+
+sn-folders@1.3.8:
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/sn-folders/-/sn-folders-1.3.8.tgz#ae3caec472ce8d201495f1aa501e01ed198a45bc"
+  integrity sha512-OE190Jny3SkbdPjD6wqkrv0R3Ze5j9OFNIg6qGLdortXs9POg8eOzYPRls5DL7imJZtptHYn5ku0EfqXVfxxiw==
+
+sn-minimal-markdown-editor@1.3.7:
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/sn-minimal-markdown-editor/-/sn-minimal-markdown-editor-1.3.7.tgz#c7ed981a59ffe0793e7974cc2f1eab07436ba153"
+  integrity sha512-qy6lOMPlBVwb2merUy8RkoMdzdHKBZtqDlLDGkOboCFizUXQJr74ZklLYZ4EEdjJefuSg+86l48glo4YilDQ9g==
+  dependencies:
+    sn-codemirror-search "1.0.0"
+
+sn-plus-editor@1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/sn-plus-editor/-/sn-plus-editor-1.5.0.tgz#679d293bbfa81e156c2e03e69947730ce9f659e6"
+  integrity sha512-4ZsiFQsXFDYrQ7CkjSKy7VazIBRShLC9kjTjk4mUIxVgNIhDieQ0nxlpXp4sFUVptgdmkRoaJJtXirq5afO/8g==
+
+sn-simple-markdown-editor@1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/sn-simple-markdown-editor/-/sn-simple-markdown-editor-1.4.0.tgz#fb00d67ba4fc2117a07df5b0a5771e62bf9f7c36"
+  integrity sha512-6MlVZo/hFj0rmpCo8wXzJnrcTHiu/TLf1Y2O9l/c7+seOW2JFHYNr+RcKZQPEhZ/sFXOPWfBBAXFs5C4SGuiaA==
+
+sn-simple-task-editor@1.3.7:
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/sn-simple-task-editor/-/sn-simple-task-editor-1.3.7.tgz#028113067a26f18459ff065cdf8f2c328e77b748"
+  integrity sha512-vdUwGdIC/s/Ql02bkO4LE6mlCoUTAJnV874agIwVNBsItRuPBZK65M1KcwIghqle/mKKATS2YTHGTr35Qaodwg==
+
+sn-spreadsheets@1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.2.tgz#95532fbadffaa250397ec22519fd6c903d4cbf25"
+  integrity sha512-Qy5ycFOhVZYepAvSfiHc34FNk/2yZ5E/mCIsMLmbj9EWf/ocsPGk4MmnPLg2195nXttcVzZxQDB+mRuDFsEvCw==
+
+sn-theme-autobiography@standardnotes/autobiography-theme:
+  version "1.0.2"
+  resolved "https://codeload.github.com/standardnotes/autobiography-theme/tar.gz/8679a48243b1155d6b0eb65a4bd1f76559c1af67"
+
+sn-theme-dynamic@standardnotes/dynamic-theme:
+  version "1.0.0"
+  resolved "https://codeload.github.com/standardnotes/dynamic-theme/tar.gz/0e77c9da042c8aface6fd3466695ad8184dc6a50"
+
+sn-theme-focus@standardnotes/focus-theme:
+  version "1.2.6"
+  resolved "https://codeload.github.com/standardnotes/focus-theme/tar.gz/e7c0511591062e89d319b2a2ab5b879694edd8a5"
+
+sn-theme-futura@standardnotes/futura-theme:
+  version "1.2.5"
+  resolved "https://codeload.github.com/standardnotes/futura-theme/tar.gz/d12567fbcc9b33c9c6cdfbbff22b78596b538649"
+
+sn-theme-midnight@standardnotes/midnight-theme:
+  version "1.2.5"
+  resolved "https://codeload.github.com/standardnotes/midnight-theme/tar.gz/937ebfe31b34bd68095fec39801b8102540d8a0e"
+
+sn-theme-solarized-dark@standardnotes/solarized-dark-theme:
+  version "1.2.4"
+  resolved "https://codeload.github.com/standardnotes/solarized-dark-theme/tar.gz/03e05fb4327e6625c065d4417d19db782d8fc242"
+
+sn-theme-titanium@standardnotes/titanium-theme:
+  version "1.2.5"
+  resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/61be5a3361f263e3d51bce562e4f8f7cdd6bcece"
+
+sn-token-vault@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.3.tgz#3564f04dfe4b8c9b13f747274f325f096817f129"
+  integrity sha512-qj1s3qJw4XutXCC64v/xc+CP4MuCoJvkW0CmbFYTq6ecDv0UAEPl/VB7fGu2zx1AawenXmHgFPovtHPHOWRC8Q==
+
+sn-vim-editor@1.3.7:
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/sn-vim-editor/-/sn-vim-editor-1.3.7.tgz#410666efb5715e3f265647d523b1e87f75de2caa"
+  integrity sha512-9z7OnDGatT4lsLkgEpJUHmfnTi5kx5BcJO5PsiczG7GeSS+brlt1DFohAp0i3OGlUDaNtogkUSVuaovnu5NFKg==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

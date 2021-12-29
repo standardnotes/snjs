@@ -25,6 +25,7 @@ COPY --chown=$UID:$GID packages/snjs/package.json /var/www/packages/snjs/package
 COPY --chown=$UID:$GID packages/auth/package.json /var/www/packages/auth/package.json
 COPY --chown=$UID:$GID packages/time/package.json /var/www/packages/time/package.json
 COPY --chown=$UID:$GID packages/features/package.json /var/www/packages/features/package.json
+COPY --chown=$UID:$GID packages/components/package.json /var/www/packages/components/package.json
 COPY --chown=$UID:$GID packages/settings/package.json /var/www/packages/settings/package.json
 COPY --chown=$UID:$GID packages/common/package.json /var/www/packages/common/package.json
 
