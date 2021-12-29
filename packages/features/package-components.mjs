@@ -83,6 +83,8 @@ const copyToDist = async (feature) => {
     const targetFilePath = path.join(targetComponentPath, file);
     copyFileOrDir(srcFilePath, targetFilePath);
   }
+
+  return targetComponentPath;
 };
 
 const hasExistingRelease = async (repo, version) => {
@@ -133,7 +135,10 @@ const processFeature = async (feature) => {
     );
     return;
   }
-  const directory = `src/Static/${feature.identifier}`;
+
+  const distPath = await copyToDist(feature);
+
+  const directory = distPath;
   const outZip = `${TmpDir}/${feature.identifier}.zip`;
   await zipDirectory(directory, outZip);
   console.log(`Zipped to ${outZip}`);
@@ -153,7 +158,7 @@ const processFeature = async (feature) => {
 };
 
 await (async () => {
-   ensureDirExists(TmpDir);
+  ensureDirExists(TmpDir);
 
   const featuresToProcess = specificFeatureIdentifier
     ? [

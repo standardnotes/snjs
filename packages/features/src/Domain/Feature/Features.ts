@@ -33,7 +33,7 @@ function FillThemeComponentDefaults(
   theme: Partial<ThemeFeatureDescription>
 ): ThemeFeatureDescription {
   if (!theme.static_files) {
-    theme.static_files = ['dist/**/*', 'package.json'];
+    theme.static_files = ['dist', 'package.json'];
   }
 
   if (theme.git_repo_url && !theme.download_url) {
