@@ -6,6 +6,7 @@ export enum SettingName {
   DropboxBackupUrl = 'DROPBOX_BACKUP_URL',
   OneDriveBackupFrequency = 'ONE_DRIVE_BACKUP_FREQUENCY',
   OneDriveBackupUrl = 'ONE_DRIVE_BACKUP_URL',
+  OneDriveBackupToken = 'ONE_DRIVE_BACKUP_TOKEN',
   GoogleDriveBackupFrequency = 'GOOGLE_DRIVE_BACKUP_FREQUENCY',
   GoogleDriveBackupUrl = 'GOOGLE_DRIVE_BACKUP_URL',
   MuteFailedBackupsEmails = 'MUTE_FAILED_BACKUPS_EMAILS',
