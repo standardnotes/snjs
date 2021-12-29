@@ -1,10 +1,14 @@
+import { ContentType } from '@standardnotes/common';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { SNLog } from './../../log';
 import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
-import { PayloadContent, ContentReference } from './../../protocol/payloads/generator';
+import {
+  PayloadContent,
+  ContentReference,
+} from './../../protocol/payloads/generator';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import {
@@ -152,7 +156,7 @@ export class SNItem {
     return this.payload.deleted;
   }
 
-  get content_type() {
+  get content_type(): ContentType {
     return this.payload.content_type!;
   }
 
