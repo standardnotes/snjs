@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1-beta-fix-deploy-tags.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.8.0...@standardnotes/settings@1.8.1-beta-fix-deploy-tags.0) (2021-12-29)
+
+
+### Bug Fixes
+
+* add one drive backup token setting name ([357315f](https://github.com/standardnotes/snjs/commit/357315f8d46cfd05b730f8be6b25a5dd6afcb344))
+
+
+
+
+
 # [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.7.0...@standardnotes/settings@1.8.0) (2021-12-23)
 
 
