@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.6](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.5...@standardnotes/domain-events-infra@1.4.6) (2021-12-29)
+
+
+### Bug Fixes
+
+* remove code coverage reports from repository ([61f5dfd](https://github.com/standardnotes/snjs/commit/61f5dfd8e9698e36142df131ad210749865f70f4))
+
+
+
+
+
 ## [1.4.5](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.4...@standardnotes/domain-events-infra@1.4.5) (2021-12-29)
 
 

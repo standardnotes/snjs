@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.2...@standardnotes/snjs@2.31.3) (2021-12-29)
+
+
+### Bug Fixes
+
+* remove code coverage reports from repository ([61f5dfd](https://github.com/standardnotes/snjs/commit/61f5dfd8e9698e36142df131ad210749865f70f4))
+
+
+
+
+
 ## [2.31.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.1...@standardnotes/snjs@2.31.2) (2021-12-29)
 
 
