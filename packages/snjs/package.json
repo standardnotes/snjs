@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.30.1-beta-fix-deploys.0",
+  "version": "2.30.1-beta-fix-deploys.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -83,7 +83,7 @@
     "@standardnotes/common": "1.2.1",
     "@standardnotes/domain-events": "2.5.1",
     "@standardnotes/features": "1.11.0",
-    "@standardnotes/settings": "^1.8.1-beta-fix-deploys.0",
+    "@standardnotes/settings": "^1.8.1-beta-fix-deploys.1",
     "@standardnotes/sncrypto-common": "1.5.2"
   }
 }
