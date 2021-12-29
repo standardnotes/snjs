@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.18.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.0...@standardnotes/features@1.18.1) (2021-12-29)
+
+
+### Bug Fixes
+
+* include components cp in build script ([4733ec9](https://github.com/standardnotes/snjs/commit/4733ec9ece77d867280fabe20c63ba827d4834b7))
+
+
+
+
+
 # [1.18.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.16.0...@standardnotes/features@1.18.0) (2021-12-29)
 
 
