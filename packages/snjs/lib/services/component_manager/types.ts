@@ -1,4 +1,4 @@
-import { ComponentAction, ComponentPermission } from '@Models/app/component';
+import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import { SNComponent } from '@Lib/models';
 import { ComponentArea } from '@Models/app/component';
 import { UuidString } from '@Lib/types';
@@ -18,7 +18,7 @@ export type ComponentRawPayload = RawPayload & {
 /**
  * Content types which are allowed to be managed/streamed in bulk by a component.
  */
- export const AllowedBatchPermissions = Object.freeze([
+export const AllowedBatchPermissions = Object.freeze([
   ContentType.FilesafeCredentials,
   ContentType.FilesafeFileMetadata,
   ContentType.FilesafeIntegration,

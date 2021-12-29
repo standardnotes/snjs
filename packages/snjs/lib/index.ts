@@ -45,17 +45,18 @@ export {
   SNTheme,
   ThemeMutator,
   SNComponent,
-  ComponentAction,
   ComponentMutator,
   SNEditor,
   SNUserPrefs,
   UserPrefsMutator,
   PrefKey,
 } from './models';
+
 export type { PrefValue } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
-export type { ComponentPermission } from './models/app/component';
+export type { ComponentPermission } from '@standardnotes/features';
+export { ComponentAction } from '@standardnotes/features';
 export { LiveItem } from './models/live_item';
 export { FeatureStatus } from '@Lib/services/features_service';
 
