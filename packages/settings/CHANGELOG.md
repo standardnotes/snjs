@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1-beta-fix-deploys.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.8.0...@standardnotes/settings@1.8.1-beta-fix-deploys.0) (2021-12-29)
+
+
+### Bug Fixes
+
+* add dropbox backup token setting name ([ef7c676](https://github.com/standardnotes/snjs/commit/ef7c6763d8e08c93b1159e12a3746b4166619e52))
+
+
+
+
+
 # [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.7.0...@standardnotes/settings@1.8.0) (2021-12-23)
 
 
