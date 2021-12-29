@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/settings",
-  "version": "1.8.1-beta-fix-deploy-tags.0",
+  "version": "1.8.1-beta-fix-deploy-tags.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },

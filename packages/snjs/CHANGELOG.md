@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.30.1-beta-fix-deploy-tags.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.30.1-beta-fix-deploy-tags.0...@standardnotes/snjs@2.30.1-beta-fix-deploy-tags.1) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.30.1-beta-fix-deploy-tags.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.30.0...@standardnotes/snjs@2.30.1-beta-fix-deploy-tags.0) (2021-12-29)
 
 **Note:** Version bump only for package @standardnotes/snjs
