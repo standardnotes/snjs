@@ -1,9 +1,10 @@
 name: Git Sync
 
-on: push
-  branches-ignore:
-    - beta/*
-    - master
+on:
+  push:
+    branches-ignore:
+      - beta/*
+      - master
 
 jobs:
   git-sync:
