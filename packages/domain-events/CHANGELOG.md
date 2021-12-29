@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.4](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.3...@standardnotes/domain-events@2.14.4) (2021-12-29)
+
+
+### Bug Fixes
+
+* remove code coverage reports from repository ([61f5dfd](https://github.com/standardnotes/snjs/commit/61f5dfd8e9698e36142df131ad210749865f70f4))
+
+
+
+
+
+## [2.14.3](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.2...@standardnotes/domain-events@2.14.3) (2021-12-29)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
 ## [2.14.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.1...@standardnotes/domain-events@2.14.2) (2021-12-28)
 
 

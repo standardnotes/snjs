@@ -3,7 +3,9 @@ node_modules
 .vscode
 .idea
 
-# List individually so that components/all/org./dist is included
+coverage
+
+# List individually so that packages/components/all/org./dist is included
 packages/auth/dist
 packages/common/dist
 packages/components/dist

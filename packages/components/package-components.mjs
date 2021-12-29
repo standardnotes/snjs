@@ -123,15 +123,15 @@ const computeChecksum = async (zipPath, version) => {
 
 const processFeature = async (feature) => {
   console.log('Processing feature', feature.identifier, '...');
-  // if (await hasExistingRelease(feature.git_repo_url, feature.version)) {
-  //   console.log(
-  //     `Feature ${feature.identifier} already has release ${feature.version} ` +
-  //       `skipping zip + publish and reusing existing checksum ${JSON.stringify(
-  //         Checksums[feature.identifier]
-  //       )}`
-  //   );
-  //   return;
-  // }
+  if (await hasExistingRelease(feature.git_repo_url, feature.version)) {
+    console.log(
+      `Feature ${feature.identifier} already has release ${feature.version} ` +
+        `skipping zip + publish and reusing existing checksum ${JSON.stringify(
+          Checksums[feature.identifier]
+        )}`
+    );
+    return;
+  }
 
   const distPath = await copyToTmp(feature);
 
@@ -140,12 +140,12 @@ const processFeature = async (feature) => {
   await zipDirectory(directory, outZip);
   console.log(`Zipped to ${outZip}`);
 
-  // const uploadError = await createRelease(feature, outZip);
-  // if (uploadError.length > 0) {
-  //   throw Error(
-  //     `Error creating release ${feature.identifier}@${feature.version}, aborting process. ${uploadError}`
-  //   );
-  // }
+  const uploadError = await createRelease(feature, outZip);
+  if (uploadError.length > 0) {
+    throw Error(
+      `Error creating release ${feature.identifier}@${feature.version}, aborting process. ${uploadError}`
+    );
+  }
 
   const checksum = await computeChecksum(outZip, feature.version);
   Checksums[feature.identifier] = checksum;
