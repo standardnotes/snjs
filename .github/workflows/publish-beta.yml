@@ -74,9 +74,24 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
       - run: yarn version-bump-beta --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
-      - run: yarn publish-packages
+      - run: yarn publish-packages-beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  git-sync:
+    needs: publish
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: git-sync
+        uses: wei/git-sync@v3
+        with:
+          source_repo: "standardnotes/snjs"
+          source_branch: "refs/remotes/source/*"
+          destination_repo: "standardnotes/private-snjs"
+          destination_branch: "refs/heads/*"
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
   notify_discord:
     needs: publish

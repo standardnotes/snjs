@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.16.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.15.1...@standardnotes/features@1.16.0) (2021-12-29)
+
+
+### Features
+
+* add smart tags as a feature / premium option ([#526](https://github.com/standardnotes/snjs/issues/526)) ([02cd04c](https://github.com/standardnotes/snjs/commit/02cd04c8b144c3c6a5aa51ff24d746c39afb1b57))
+
+
+
+
+
+## [1.15.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.15.0...@standardnotes/features@1.15.1) (2021-12-27)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+# [1.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.14.0...@standardnotes/features@1.15.0) (2021-12-27)
+
+
+### Features
+
+* Remove theme:no-distraction permission ([#515](https://github.com/standardnotes/snjs/issues/515)) ([e8031fe](https://github.com/standardnotes/snjs/commit/e8031fe5a8f68add24de922b4f171ec69affa286))
+
+
+
+
+
 # 1.14.0 (2021-12-23)
 
 

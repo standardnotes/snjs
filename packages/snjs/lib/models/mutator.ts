@@ -16,6 +16,7 @@ export function createMutatorForItem(
     case ContentType.Note:
       return new NoteMutator(item, type);
     case ContentType.Tag:
+    case ContentType.SmartTag:
       return new TagMutator(item, type);
     case ContentType.Component:
       return new ComponentMutator(item, type);
