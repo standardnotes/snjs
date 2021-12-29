@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/features",
-  "version": "1.17.1",
+  "version": "1.17.2",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -19,7 +19,7 @@
     "prestart": "yarn clean",
     "start": "tsc -p tsconfig.json --watch",
     "build": "tsc -p tsconfig.json && node features-to-json.mjs",
-    "package-components": "node package-components.mjs",
+    "package-components": "node features-to-json.mjs && node package-components.mjs",
     "lint": "eslint . --ext .ts",
     "submodules": "git submodule update --force --remote"
   },
