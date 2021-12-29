@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.31.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.30.0...@standardnotes/snjs@2.31.0) (2021-12-29)
+
+
+### Features
+
+* native components ([#525](https://github.com/standardnotes/snjs/issues/525)) ([ca7f8e8](https://github.com/standardnotes/snjs/commit/ca7f8e876bccdaff60daf2cdee3d3b2020954e53))
+
+
+
+
+
 # [2.30.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.29.1...@standardnotes/snjs@2.30.0) (2021-12-28)
 
 
