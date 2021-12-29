@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.2](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.1...@standardnotes/time@1.4.2) (2021-12-29)
+
+
+### Bug Fixes
+
+* remove code coverage reports from repository ([61f5dfd](https://github.com/standardnotes/snjs/commit/61f5dfd8e9698e36142df131ad210749865f70f4))
+
+
+
+
+
 ## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.0...@standardnotes/time@1.4.1) (2021-12-29)
 
 
