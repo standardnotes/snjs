@@ -1,6 +1,10 @@
 name: Git Sync
 
 on: push
+  branches-ignore:
+    - beta/*
+    - master
+
 jobs:
   git-sync:
     runs-on: ubuntu-latest

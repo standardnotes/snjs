@@ -78,6 +78,22 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  git-sync:
+    needs: publish
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: git-sync
+        uses: wei/git-sync@v3
+        with:
+          source_repo: "standardnotes/snjs"
+          source_branch: "refs/remotes/source/*"
+          destination_repo: "standardnotes/private-snjs"
+          destination_branch: "refs/heads/*"
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
   notify_discord:
     needs: publish
     if: contains(github.event.head_commit.message, 'chore(release)') == false
