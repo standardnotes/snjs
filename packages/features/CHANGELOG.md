@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.18.2](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.1...@standardnotes/features@1.18.2) (2021-12-29)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
 ## [1.18.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.0...@standardnotes/features@1.18.1) (2021-12-29)
 
 

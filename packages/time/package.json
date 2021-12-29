@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/time",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },

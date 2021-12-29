@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.5](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.4...@standardnotes/domain-events-infra@1.4.5) (2021-12-29)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
 ## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.3...@standardnotes/domain-events-infra@1.4.4) (2021-12-28)
 
 **Note:** Version bump only for package @standardnotes/domain-events-infra
