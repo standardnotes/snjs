@@ -1,5 +1,5 @@
-import { ComponentAction } from '../Component/ComponentAction';
-import { ContentType } from '@standardnotes/common';
+import { ComponentAction } from '../Component/ComponentAction'
+import { ContentType } from '@standardnotes/common'
 import {
   FeatureDescription,
   ThemeFeatureDescription,
@@ -7,11 +7,11 @@ import {
   ClientFeatureDescription,
   IframeComponentFeatureDescription,
   ServerFeatureDescription,
-} from './FeatureDescription';
-import { ComponentArea } from '../Component/ComponentArea';
-import { PermissionName } from '../Permission/PermissionName';
-import { FeatureIdentifier } from './FeatureIdentifier';
-import { NoteType } from '../Component/NoteType';
+} from './FeatureDescription'
+import { ComponentArea } from '../Component/ComponentArea'
+import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from './FeatureIdentifier'
+import { NoteType } from '../Component/NoteType'
 
 export const Features: FeatureDescription[] = [
   ...themes(),
@@ -19,40 +19,40 @@ export const Features: FeatureDescription[] = [
   ...nonEditorComponents(),
   ...serverFeatures(),
   ...clientFeatures(),
-];
+]
 
 function githubDownloadUrl(
   repoUrl: string,
   version: string,
   identifier: FeatureIdentifier
 ) {
-  return `${repoUrl}/releases/download/${version}/${identifier}.zip`;
+  return `${repoUrl}/releases/download/${version}/${identifier}.zip`
 }
 
 function FillThemeComponentDefaults(
   theme: Partial<ThemeFeatureDescription>
 ): ThemeFeatureDescription {
   if (!theme.static_files) {
-    theme.static_files = ['dist', 'package.json'];
+    theme.static_files = ['dist', 'package.json']
   }
 
   if (theme.git_repo_url && !theme.download_url) {
     theme.download_url = githubDownloadUrl(
       theme.git_repo_url,
-      theme.version!,
-      theme.identifier!
-    );
+      theme.version as string,
+      theme.identifier as FeatureIdentifier
+    )
   }
 
   if (!theme.index_path) {
-    theme.index_path = 'dist/dist.css';
+    theme.index_path = 'dist/dist.css'
   }
 
-  theme.content_type = ContentType.Theme;
+  theme.content_type = ContentType.Theme
   if (!theme.area) {
-    theme.area = ComponentArea.Editor;
+    theme.area = ComponentArea.Editor
   }
-  return theme as ThemeFeatureDescription;
+  return theme as ThemeFeatureDescription
 }
 
 function themes(): ThemeFeatureDescription[] {
@@ -72,7 +72,7 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#086DD6',
     },
-  });
+  })
 
   const futura: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Futura',
@@ -90,7 +90,7 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#fca429',
     },
-  });
+  })
 
   const solarizedDark: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Solarized Dark',
@@ -108,7 +108,7 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#2AA198',
     },
-  });
+  })
 
   const autobiography: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Autobiography',
@@ -126,7 +126,7 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ECE4DB',
       border_color: '#9D7441',
     },
-  });
+  })
 
   const focus: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Focus',
@@ -144,7 +144,7 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#a464c2',
     },
-  });
+  })
 
   const titanium: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Titanium',
@@ -162,7 +162,7 @@ function themes(): ThemeFeatureDescription[] {
       foreground_color: '#ffffff',
       border_color: '#6e2b9e',
     },
-  });
+  })
 
   const dynamic: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Dynamic',
@@ -175,7 +175,7 @@ function themes(): ThemeFeatureDescription[] {
       'A smart theme that minimizes the tags and notes panels when they are not in use.',
     git_repo_url: 'https://github.com/standardnotes/dynamic-theme',
     marketing_url: 'https://standardnotes.com/extensions/dynamic',
-  });
+  })
 
   return [
     midnight,
@@ -185,26 +185,26 @@ function themes(): ThemeFeatureDescription[] {
     focus,
     titanium,
     dynamic,
-  ];
+  ]
 }
 
 function FillEditorComponentDefaults(
   component: Partial<EditorFeatureDescription>
 ): EditorFeatureDescription {
   if (!component.static_files) {
-    component.static_files = ['index.html', 'dist', 'package.json'];
+    component.static_files = ['index.html', 'dist', 'package.json']
   }
 
   if (component.git_repo_url && !component.download_url) {
     component.download_url = githubDownloadUrl(
       component.git_repo_url,
-      component.version!,
-      component.identifier!
-    );
+      component.version as string,
+      component.identifier as FeatureIdentifier
+    )
   }
 
   if (!component.index_path) {
-    component.index_path = 'dist/index.html';
+    component.index_path = 'dist/index.html'
   }
 
   if (!component.component_permissions) {
@@ -213,19 +213,19 @@ function FillEditorComponentDefaults(
         name: ComponentAction.StreamContextItem,
         content_types: [ContentType.Note],
       },
-    ];
+    ]
   }
 
-  component.content_type = ContentType.Component;
+  component.content_type = ContentType.Component
   if (!component.area) {
-    component.area = ComponentArea.Editor;
+    component.area = ComponentArea.Editor
   }
 
   if (component.interchangeable == undefined) {
-    component.interchangeable = true;
+    component.interchangeable = true
   }
 
-  return component as EditorFeatureDescription;
+  return component as EditorFeatureDescription
 }
 
 function editors(): EditorFeatureDescription[] {
@@ -245,7 +245,7 @@ function editors(): EditorFeatureDescription[] {
     marketing_url: 'https://standardnotes.com/extensions/code-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/code.jpg',
-  });
+  })
 
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Bold Editor',
@@ -274,7 +274,7 @@ function editors(): EditorFeatureDescription[] {
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/bold.jpg',
     git_repo_url: 'https://github.com/standardnotes/bold-editor',
-  });
+  })
 
   const plus: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Plus Editor',
@@ -289,7 +289,7 @@ function editors(): EditorFeatureDescription[] {
     marketing_url: 'https://standardnotes.com/extensions/plus-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/plus-editor.jpg',
-  });
+  })
 
   const markdownBasic: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Basic',
@@ -304,7 +304,7 @@ function editors(): EditorFeatureDescription[] {
       'https://standardnotes.com/extensions/simple-markdown-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg',
-  });
+  })
 
   const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Pro',
@@ -319,7 +319,7 @@ function editors(): EditorFeatureDescription[] {
     marketing_url: 'https://standardnotes.com/extensions/advanced-markdown',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
-  });
+  })
 
   const markdownMinimist: EditorFeatureDescription = FillEditorComponentDefaults(
     {
@@ -338,7 +338,7 @@ function editors(): EditorFeatureDescription[] {
       thumbnail_url:
         'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
     } as EditorFeatureDescription
-  );
+  )
 
   const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Math',
@@ -354,7 +354,7 @@ function editors(): EditorFeatureDescription[] {
     marketing_url: 'https://standardnotes.com/extensions/math-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg',
-  });
+  })
 
   const task: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Task Editor',
@@ -370,7 +370,7 @@ function editors(): EditorFeatureDescription[] {
     marketing_url: 'https://standardnotes.com/extensions/simple-task-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/task-editor.jpg',
-  });
+  })
 
   const tokenvault: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'TokenVault',
@@ -386,7 +386,7 @@ function editors(): EditorFeatureDescription[] {
     git_repo_url: 'https://github.com/standardnotes/token-vault',
     thumbnail_url:
       'https://standard-notes.s3.amazonaws.com/screenshots/models/editors/token-vault.png',
-  });
+  })
 
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Secure Spreadsheets',
@@ -402,7 +402,7 @@ function editors(): EditorFeatureDescription[] {
     git_repo_url: 'https://github.com/standardnotes/secure-spreadsheets',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png',
-  });
+  })
 
   return [
     code,
@@ -415,7 +415,7 @@ function editors(): EditorFeatureDescription[] {
     task,
     tokenvault,
     spreadsheets,
-  ];
+  ]
 }
 
 function nonEditorComponents(): IframeComponentFeatureDescription[] {
@@ -448,7 +448,7 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
       thumbnail_url:
         'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
     }
-  );
+  )
 
   const folders: IframeComponentFeatureDescription = FillEditorComponentDefaults(
     {
@@ -470,7 +470,7 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
       thumbnail_url:
         'https://s3.amazonaws.com/standard-notes/screenshots/models/components/folders.jpg',
     }
-  );
+  )
 
   const cloudlink: IframeComponentFeatureDescription = FillEditorComponentDefaults(
     {
@@ -490,9 +490,9 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
       git_repo_url: '',
       area: ComponentArea.Modal,
     }
-  );
+  )
 
-  return [filesafe, folders, cloudlink];
+  return [filesafe, folders, cloudlink]
 }
 
 function serverFeatures(): ServerFeatureDescription[] {
@@ -537,7 +537,7 @@ function serverFeatures(): ServerFeatureDescription[] {
       identifier: FeatureIdentifier.Files5GB,
       permission_name: PermissionName.Files5GB,
     },
-  ];
+  ]
 }
 
 function clientFeatures(): ClientFeatureDescription[] {
@@ -548,7 +548,7 @@ function clientFeatures(): ClientFeatureDescription[] {
       permission_name: PermissionName.TagNesting,
       description: 'Organize your tags into folders.',
     },
-        {
+    {
       name: 'Smart Filters',
       identifier: FeatureIdentifier.SmartFilters,
       permission_name: PermissionName.SmartFilters,
@@ -572,5 +572,5 @@ function clientFeatures(): ClientFeatureDescription[] {
       permission_name: PermissionName.ListedCustomDomain,
       description: '',
     },
-  ];
+  ]
 }
