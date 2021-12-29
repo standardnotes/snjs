@@ -3,9 +3,8 @@ import path from 'path';
 import archiver from 'archiver';
 import crypto from 'crypto';
 import { spawnSync as spawn } from 'child_process';
-import { Features } from './dist/Domain/Feature/Features.js';
-
-const SOURCE_FILES_PATH = 'src/Static';
+import { Features } from '../features/dist/Domain/Feature/Features.js';
+const SOURCE_FILES_PATH = '../../node_modules';
 
 console.log('Beginning packaging procedure...');
 
@@ -16,13 +15,15 @@ if (specificFeatureIdentifier) {
 
 const TmpDir = 'tmp';
 const TmpZipDir = path.join(TmpDir);
-const ComponentsDir = path.join('components');
-const OutStaticDir = path.join(ComponentsDir);
+const ComponentsDir = path.join('all');
 
 const ChecksumsSrcPath = path.join(ComponentsDir, 'checksums.json');
 const ChecksumsDistPath = path.join(ComponentsDir, 'checksums.json');
 const Checksums = JSON.parse(fs.readFileSync(ChecksumsSrcPath).toString());
 console.log('Loaded existing checksums from', ChecksumsSrcPath);
+
+const LocationMapping = JSON.parse(fs.readFileSync('identifier-to-package.json'));
+console.log("SN ~ file: package-components.mjs ~ line 26 ~ LocationMapping", LocationMapping);
 
 function zipDirectory(sourceDir, outPath) {
   const archive = archiver('zip', { zlib: { level: 9 } });
@@ -65,14 +66,9 @@ const ensureDirExists = (dir) => {
 };
 
 const copyToTmp = async (feature) => {
-  const srcComponentPath = `${path.join(
-    SOURCE_FILES_PATH,
-    feature.identifier
-  )}`;
-  const targetComponentPath = `${path.join(
-    OutStaticDir,
-    feature.identifier
-  )}`;
+  const location = LocationMapping[feature.identifier];
+  const srcComponentPath = path.join(SOURCE_FILES_PATH, location);
+  const targetComponentPath = `${path.join(ComponentsDir, feature.identifier)}`;
 
   ensureDirExists(targetComponentPath);
 
@@ -127,15 +123,15 @@ const computeChecksum = async (zipPath, version) => {
 
 const processFeature = async (feature) => {
   console.log('Processing feature', feature.identifier, '...');
-  if (await hasExistingRelease(feature.git_repo_url, feature.version)) {
-    console.log(
-      `Feature ${feature.identifier} already has release ${feature.version} ` +
-        `skipping zip + publish and reusing existing checksum ${JSON.stringify(
-          Checksums[feature.identifier]
-        )}`
-    );
-    return;
-  }
+  // if (await hasExistingRelease(feature.git_repo_url, feature.version)) {
+  //   console.log(
+  //     `Feature ${feature.identifier} already has release ${feature.version} ` +
+  //       `skipping zip + publish and reusing existing checksum ${JSON.stringify(
+  //         Checksums[feature.identifier]
+  //       )}`
+  //   );
+  //   return;
+  // }
 
   const distPath = await copyToTmp(feature);
 
@@ -144,12 +140,12 @@ const processFeature = async (feature) => {
   await zipDirectory(directory, outZip);
   console.log(`Zipped to ${outZip}`);
 
-  const uploadError = await createRelease(feature, outZip);
-  if (uploadError.length > 0) {
-    throw Error(
-      `Error creating release ${feature.identifier}@${feature.version}, aborting process. ${uploadError}`
-    );
-  }
+  // const uploadError = await createRelease(feature, outZip);
+  // if (uploadError.length > 0) {
+  //   throw Error(
+  //     `Error creating release ${feature.identifier}@${feature.version}, aborting process. ${uploadError}`
+  //   );
+  // }
 
   const checksum = await computeChecksum(outZip, feature.version);
   Checksums[feature.identifier] = checksum;
@@ -159,7 +155,6 @@ const processFeature = async (feature) => {
 await (async () => {
   ensureDirExists(TmpDir);
   ensureDirExists(TmpZipDir);
-  ensureDirExists(OutStaticDir);
 
   const featuresToProcess = specificFeatureIdentifier
     ? [
