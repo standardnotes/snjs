@@ -2,8 +2,17 @@ node_modules
 .DS_Store
 .vscode
 .idea
-dist
-coverage
+
+# List individually so that features/components/org./dist is included
+auth/dist
+common/dist
+config/dist
+domain-events/dist
+domain-events-infra/dist
+features/dist
+settings/dist
+snjs/dist
+time/dist
 
 yarn-error.log
 package-lock.json
