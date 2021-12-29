@@ -1,97 +1,97 @@
 {
   "org.standardnotes.code-editor": {
     "version": "1.3.8",
-    "base64": "727875983324da3287f445fdc92cb7c219dcb08402063f8ddb53648bd7a7563b",
-    "binary": "a5881b360f78524c8a13accc9fd446b17fe92b74a8d1963033c74217ba5d383f"
+    "base64": "3bbe569c7b35bb2ce73e5500ff161fa88f8cc07a33a227aafe69d69a3eaed8c4",
+    "binary": "683b51ba444eedc2af01933df4b5a5565e2f819f12582a8f8426b3ead9348398"
   },
   "org.standardnotes.theme-midnight": {
-    "version": "1.2.4",
-    "base64": "9e7f4c95556e3394278b4dad6c59fe1f60b258c8b3a5b5195d6d47a5719e2919",
-    "binary": "ff90864446003f575aa8db2194924f78d094aae79e1f7bdd42b9348b989622ad"
+    "version": "1.2.5",
+    "base64": "4f199b5b883184bd0c4483bfb88b6f9d56ec2b2ccdee019abc21025e2fd80de3",
+    "binary": "71c12992feeeccd6eebc53fccf92db0849d545ff0cc7870bd6fff8ae8572df06"
   },
   "org.standardnotes.theme-futura": {
-    "version": "1.2.4",
-    "base64": "00a7be5bfbd7545cc29349b76398e97f033c39533751b59da61b6ba4e00fe566",
-    "binary": "d82595859c8c5a2369bd97c4f93a127c7bc3e3925d2f4a7b5f3baf78efb33476"
+    "version": "1.2.5",
+    "base64": "1b1374960e00cb003408efc72f4b58a459c5b94e0c6d616709d8f46f99c5b9bd",
+    "binary": "c5117e6797c1d5a2d0e12871a281169f67b0b0a3bed04cd4d97ec7ca909f03fa"
   },
   "org.standardnotes.theme-solarized-dark": {
-    "version": "1.2.3",
-    "base64": "63566769164f1d6ad1766a1c586be8d15d21d54df67bd484321c7efa13759910",
-    "binary": "a432dcaaf60e42b26f3bf4a14fb1bad6e1b365830b39f0986bf676616b350a27"
+    "version": "1.2.4",
+    "base64": "c48cbe1074a40a1dd5fcecb9d6a8454381cfb8e1b3774f9efb0cb33766a8b5cf",
+    "binary": "a580f26088d1344c3734e341625e964e2422a850a874b97ed007405c030f3aaf"
   },
   "org.standardnotes.theme-autobiography": {
-    "version": "1.0.1",
-    "base64": "677cc4b79862877183e24bc0bb3099657c18078ed99b32fb1ee32029b5f9585e",
-    "binary": "bc2f02016d343c0d17da48c34a1f98c61b364a351ce9372b1eccd376a056f8c4"
+    "version": "1.0.2",
+    "base64": "3e80ddbbe15772f540bb23203acc0340de573bfb33b04b618facd41fd0ad044d",
+    "binary": "319157969e906b4724131351aa6c31461ad7de0237ab4e46d58537b7ce1ed361"
   },
   "org.standardnotes.theme-focus": {
-    "version": "1.2.5",
-    "base64": "413cdb2143ab3cb97e9e1b5bd5f43078417255737287f5202aeacf7bad6e0467",
-    "binary": "05c85fd7e4078402fb9dd1094cab849e47241c8ee928b1899c589c7e2a677198"
+    "version": "1.2.6",
+    "base64": "cad38151e92bb53237418b4810ccb8668d881a7fe29faa0296e2ef4824490cd6",
+    "binary": "e51bcaab0d4723375d07cd0f6bd275a738c8dc8ac6bdccb67364b769d9e5fb4f"
   },
   "org.standardnotes.theme-titanium": {
-    "version": "1.2.4",
-    "base64": "cf0a11da9d2dc011286a58ea5eae9a0373b5c4dcc57f2d3a1558a30d8c043cd6",
-    "binary": "9f01f3511f0f26b88339f1887577c85fbaf566d29d662b56f41177e681273fbc"
+    "version": "1.2.5",
+    "base64": "f2b16c7f9e6c6ebfb2f5d7b6db38af8f07e174d2fb550c1f8935860f6db07883",
+    "binary": "fc3858d4a370c7e9edf95bce71f0ae6572650a94790127c83c15fa8d76261775"
   },
   "org.standardnotes.theme-dynamic": {
     "version": "1.0.0",
-    "base64": "270c845385b7e03363b7af5e24dccd8466c1716103d549be0f5ce855435c8e0c",
-    "binary": "ee7f5ade2297e7702c9007b8de2c35d30ea2bb58590cce7fead95ac39731457d"
+    "base64": "b9c4a4863e2d35d632106c052808e520a047404ef47caeb6ce79cae3a2291167",
+    "binary": "8c7b78abe2ee426e74efb84fd08fe06372c40d8694edabdd77b42939c517659d"
   },
   "org.standardnotes.bold-editor": {
     "version": "1.2.10",
-    "base64": "e3eb035e2728af1bd677458bc22303a50cd2dbb61e1d80c53fa897b7b066998f",
-    "binary": "bbe26fcc19a89a207650c511f099aec1fe74c83e8d65d1d4ee6e8e7d6cb2241d"
+    "base64": "5da977a16e7fcf1e5066f6062e7ba2434e273cf6a205116eec6c3f5930de428a",
+    "binary": "6124df1dcb6e78af91de1cd19db432ee8b09b670f2d53280e49e4b4317349941"
   },
   "org.standardnotes.plus-editor": {
     "version": "1.5.0",
-    "base64": "d8af0a8851a1379883ac1c86bbedbf01877f80776b9179a06f58a4461875176c",
-    "binary": "2d6052acc7affec94f61df2f0e53a49c6b663500166a64eb6cacc915bffe075c"
+    "base64": "5e308043a23be595dc61ee26fc6dbaa65c818bd18e0778913caa0f0e960a1710",
+    "binary": "f2d07c58e9616468d9b1eb35559981506fcb91a1535ade293912894fa83d91b1"
   },
   "org.standardnotes.simple-markdown-editor": {
     "version": "1.4.0",
-    "base64": "06d8f19cd6e74d76011f804fccfef67354cf7e177288df167e7dd25ae292fafa",
-    "binary": "d639a7bc77e960225ceda2504991f6c319461fccb2055b1f1f5d19190fd211dc"
+    "base64": "c4e38456d09382b1b43218a29aa7cb414273e5f8ba693568e92adb132658983a",
+    "binary": "0f5095e96477cdd9ca68671544f9cf5fb5874bdae679041c1f76b3cc6b5a8faf"
   },
   "org.standardnotes.advanced-markdown-editor": {
     "version": "1.3.14",
-    "base64": "3a6bd2dff38c6a4297659d0b826efc5af9b376287b42361cac9be7886f555480",
-    "binary": "df1330880b8ae93af1980971316742aef0962dfb3677bfc277404622eef20b1f"
+    "base64": "c6865a34eaa1e5ac7699beda8390f78241b41563c0679c6edeb2feb3488008dc",
+    "binary": "41fe3b2b022b043ec42c5ee1a5709fa5588f1e0379c4effb9c7dd2254a6d1c3c"
   },
   "org.standardnotes.minimal-markdown-editor": {
     "version": "1.3.7",
-    "base64": "d5a9aa9ab60dd0598b7764b9832c6e1115e3eb45f3b29c9b3f7dd0f18229c140",
-    "binary": "b97ac1c957216cc01fe5d11517a0e4837268b2e6a8fe12264e248c59d77052e4"
+    "base64": "b6bd5eec482ed08cabfff36a2b74874fa97bb15f3e71c6c01341c0005459c8bc",
+    "binary": "6de72533467def1bcaebba78851a035cf8e236b55fb995a40df2b9e1154b1466"
   },
   "org.standardnotes.fancy-markdown-editor": {
     "version": "1.3.4",
-    "base64": "e7f21b302451708f1df05359f549abb81fa6dca048542ab3589d1d29c5b016b2",
-    "binary": "9f6913c1c3f59e0666736aa1dfb52639e395dce2a82f35fbde3317f263f8c89a"
+    "base64": "19f5998ec17309757413a695215572834dadfbef4a86d33562cbeabb9a020440",
+    "binary": "980082d36eb36c4c72eaa3ad395d73d91bc1a540e49da65df93dad5bd096252c"
   },
   "org.standardnotes.simple-task-editor": {
     "version": "1.3.7",
-    "base64": "f0c3c4e535fbc5f27f13bc1595ab39ac36e1c1197c98aa8383bf6751d1782aa8",
-    "binary": "4db28d8c0a6c54aa599ca3204678f0362bf1cea14d2ca5a745a0b12a9ab7dc84"
+    "base64": "68ca6d9429826465d76bd47ae4fc16a09b1033f20d5a11fd718aa45de5e998dd",
+    "binary": "524808ae156002af4c841cd845953f2d299c9c04a63a15ac20d2f7793f7b448b"
   },
   "org.standardnotes.token-vault": {
     "version": "2.0.7",
-    "base64": "ec431de9d743a3d9527aa2d1b4a8e087b18636338c17c28f08a429ceae6a7e6f",
-    "binary": "33f98bfe5b78c6035be4704b6d0692be21e4689fb280699f339a195f202ea0ce"
+    "base64": "a347e633b25c1c7922b8e3dbefae7f7c39232fc530ac211d2d12f962277aecc1",
+    "binary": "b8929170416fbe1344123a0b6c945a0023792040ff22b5ad22754c457da97c61"
   },
   "org.standardnotes.standard-sheets": {
     "version": "1.4.0",
-    "base64": "fdb79edb5325b9ff23ac7bb909b4bef4223a84da3a63d03c1b4b30a193b9937a",
-    "binary": "b47ba78e55a892bb0c8b14f5ff1bf08a7a77ea4ba1c8de6bc95979b0b20d25f5"
+    "base64": "a6fa2ce1a6d4f8ba947fb93566862763616e1f14a2d83a965be641feb9ef0410",
+    "binary": "f1c3b04ddb54d757b51e2abbe58014c20dadf27044297032183623272ce14f13"
   },
   "org.standardnotes.file-safe": {
     "version": "2.0.10",
-    "base64": "ae2f640f98be362aa275fb152020a95dbf301171d321e7b4943f4346bcf0e31c",
-    "binary": "ea6283fb41aac7decc0e10d5115f6bcf140c32b0a0ab37c2bde6b6131ba5c6fd"
+    "base64": "c23fed0fc1fada0373a039870357cd3e3f8ada75f0d66fca8280de4366145feb",
+    "binary": "a727b39e32015fadbeb0d47034d0920c002d82b1f2808edd5baf1838d05f8247"
   },
   "org.standardnotes.folders": {
     "version": "1.3.8",
-    "base64": "ebe075ce3e9817473f5e6e982f7b9512efda8dcf6b49868892fcf83196dc6f0d",
-    "binary": "0a94dc9bf882b24a613ab14034e7bbea1564bc28e2da0cd03d73394c68e48fbf"
+    "base64": "fac36cfb1d5ee7cf6f98fe6484aee0da822e0b2550311fa4827a34293a52091d",
+    "binary": "c3e4a40baa581a2b93a75da83c0a67420d1fcb2bca6b687deaa2137ab50f5cb4"
   }
 }

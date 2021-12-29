@@ -15,6 +15,7 @@ if (specificFeatureIdentifier) {
   console.log('Processing only', specificFeatureIdentifier);
 }
 
+const TmpDir = 'tmp';
 const ChecksumsSrcPath = path.join(SOURCE_FILES_PATH, 'checksums.json');
 const ChecksumsDistPath = path.join(DIST_FILES_PATH, 'checksums.json');
 const Checksums = JSON.parse(fs.readFileSync(ChecksumsSrcPath).toString());
@@ -133,7 +134,7 @@ const processFeature = async (feature) => {
     return;
   }
   const directory = `src/Static/${feature.identifier}`;
-  const outZip = `tmp/${feature.identifier}.zip`;
+  const outZip = `${TmpDir}/${feature.identifier}.zip`;
   await zipDirectory(directory, outZip);
   console.log(`Zipped to ${outZip}`);
 
@@ -152,6 +153,8 @@ const processFeature = async (feature) => {
 };
 
 await (async () => {
+   ensureDirExists(TmpDir);
+
   const featuresToProcess = specificFeatureIdentifier
     ? [
         Features.find(
@@ -179,8 +182,6 @@ await (async () => {
     index++;
   }
 
-  for (const feature of featuresToProcess) {
-  }
   fs.writeFileSync(ChecksumsSrcPath, JSON.stringify(Checksums, undefined, 2));
   console.log('Succesfully wrote checksums to', ChecksumsSrcPath);
   copyFileOrDir(ChecksumsSrcPath, ChecksumsDistPath);
