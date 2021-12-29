@@ -74,7 +74,7 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
       - run: yarn version-bump-beta --preid beta-${{ steps.get_beta_name.outputs.beta_name }}
-      - run: yarn publish-packages
+      - run: yarn publish-packages-beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
