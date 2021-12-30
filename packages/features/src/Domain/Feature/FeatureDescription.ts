@@ -1,12 +1,12 @@
-import { ComponentPermission } from '../Component/ComponentPermission';
-import { ContentType } from '@standardnotes/common';
-import { RoleName } from '@standardnotes/auth';
-import { ComponentArea } from '../Component/ComponentArea';
-import { PermissionName } from '../Permission/PermissionName';
-import { FeatureIdentifier } from './FeatureIdentifier';
-import { ComponentFlag } from '../Component/ComponentFlag';
-import { NoteType } from '../Component/NoteType';
-import { ThemeDockIcon } from '../Component/ThemeDockIcon';
+import { ComponentPermission } from '../Component/ComponentPermission'
+import { ContentType } from '@standardnotes/common'
+import { RoleName } from '@standardnotes/auth'
+import { ComponentArea } from '../Component/ComponentArea'
+import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from './FeatureIdentifier'
+import { ComponentFlag } from '../Component/ComponentFlag'
+import { NoteType } from '../Component/NoteType'
+import { ThemeDockIcon } from '../Component/ThemeDockIcon'
 
 export type BaseFeatureDescription = {
   deletion_warning?: string;
