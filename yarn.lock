@@ -10933,15 +10933,15 @@ sn-advanced-markdown-editor@1.3.14:
   resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.3.14.tgz#2d31890c1be383d38498185c55a38e00e6245d7f"
   integrity sha512-cz5muTgdST3VXpDmqyP36R6dbMtEgLGX/NMP6V3RPbWYtYjiCNKVOKSHTDT9MiMgnNdNMkpFtlj2yYhDdOeiKA==
 
-sn-bold-editor@1.2.7:
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.2.7.tgz#df652d2859b0da735cbf14b48624a7d36ee520b4"
-  integrity sha512-/95A7lLt7xAd6keK234szqQt1P7gh31rffMDWBE3sBV0NdUeR3mou5kGKGFlJSmMKn3iVgqw+iqUwYMcyvh/1Q==
+sn-bold-editor@1.2.10:
+  version "1.2.10"
+  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.2.10.tgz#8c1aefe99204ea6c5f9a45ba86078fe87f36b4e8"
+  integrity sha512-1nXvnodDXxp19i4W2mgmgfq9YrOZrLoe2OCtFmaiXDDLCbq45Ds2JB9SJW8/i8xoAePJh8B6hmen2jm0oCLQ6g==
 
-sn-cloudlink@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/sn-cloudlink/-/sn-cloudlink-1.3.0.tgz#d5dacb98eafa3dbc8a08b9784638ddb712cfb084"
-  integrity sha512-QxkE56hHfEY+z+aB95N4NjccYc9I0Fnx4XNns6LoIDimfi+pOrpe7cf50dyCn1h2aResmbci42WLtuzKvISuNA==
+sn-cloudlink@1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/sn-cloudlink/-/sn-cloudlink-1.3.1.tgz#477cadc912cf83b594d6c268ef77581bcb34ea38"
+  integrity sha512-8BtQN3dPHEyiyl31ATkiIhyIK/gb4kGy/redDjLbegL2ZnGacTuXYBVF1kQmqy/81knVKQ1PzJyEukZdB0YNrA==
 
 sn-code-editor@^1.3.8:
   version "1.3.8"
@@ -11018,10 +11018,10 @@ sn-theme-titanium@standardnotes/titanium-theme:
   version "1.2.5"
   resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/61be5a3361f263e3d51bce562e4f8f7cdd6bcece"
 
-sn-token-vault@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.3.tgz#3564f04dfe4b8c9b13f747274f325f096817f129"
-  integrity sha512-qj1s3qJw4XutXCC64v/xc+CP4MuCoJvkW0CmbFYTq6ecDv0UAEPl/VB7fGu2zx1AawenXmHgFPovtHPHOWRC8Q==
+sn-token-vault@2.0.7:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.7.tgz#c5c1164142d9e26fa80b6c735d8d6493489bcf9f"
+  integrity sha512-IBr16Gk9v+BZkGwSfuJifAJF/0ZNWGmjkno6cZQDcYbwPdnMY7+R0Oz//0xeKvlH1hbT/zJueyrSodvvlvGkeg==
 
 sn-vim-editor@1.3.7:
   version "1.3.7"

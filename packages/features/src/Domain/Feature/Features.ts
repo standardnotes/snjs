@@ -392,7 +392,7 @@ function editors(): EditorFeatureDescription[] {
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Secure Spreadsheets',
     identifier: FeatureIdentifier.SheetsEditor,
-    version: '1.4.0',
+    version: '1.4.2',
     note_type: NoteType.Spreadsheet,
     file_type: 'json',
     interchangeable: false,
@@ -477,7 +477,7 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
     {
       name: 'CloudLink',
       identifier: FeatureIdentifier.CloudLink,
-      version: '1.2.3',
+      version: '1.3.1',
       index_path: 'index.html',
       component_permissions: [
         {

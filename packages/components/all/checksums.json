@@ -41,8 +41,8 @@
   },
   "org.standardnotes.bold-editor": {
     "version": "1.2.10",
-    "base64": "69ad75de783a3968d5b5279a7aa71b6bfdbcce24925d9f491afd0ba01bf3f121",
-    "binary": "6f99b7dae973bbd2ef270d1b4a0310709c1f03e727c9367e7082d8c616a6bbf5"
+    "base64": "0de1df66cc3ae7774a3c0cedb2454e3465cadabf41ba5060ab9e543a2bea5dea",
+    "binary": "bac85952fbe8af1eac49701da69b811de531fd15b1cfd6bbc90d61d9c785f5d1"
   },
   "org.standardnotes.plus-editor": {
     "version": "1.5.0",
@@ -76,11 +76,11 @@
   },
   "org.standardnotes.token-vault": {
     "version": "2.0.7",
-    "base64": "e8f3a22818c887be8739ae6c1a08c7995887c26aebebe72d30ec2c14a4b30d70",
-    "binary": "0ceb3234d13ea25f55fe828dc41f7df11882d414f75bdc1a56d1f8206c34e906"
+    "base64": "56f8ac6a46a60c9e949e5409696f1afe93296563c6940b7df1770a1dec41d7ab",
+    "binary": "525da86875fb7238ae92eb4bd60a829add4a79623a15ca3182aa221cd44b32f4"
   },
   "org.standardnotes.standard-sheets": {
-    "version": "1.4.0",
+    "version": "1.4.2",
     "base64": "d32d7f8cc8141d9c8983849d8bcb25bfb1000710b6380ee7287a8c22c6366a90",
     "binary": "1cf178db81042c7afe779cd53114a4d0d5004259d6fbba315eb0a78e7caabece"
   },
