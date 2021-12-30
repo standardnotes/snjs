@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.11](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.10...@standardnotes/snjs@2.31.11) (2021-12-30)
+
+
+### Bug Fixes
+
+* **snjs:** component viewer correct var check ([f66c45a](https://github.com/standardnotes/snjs/commit/f66c45aff1f741502e215cb7bcdb51c8e800fa93))
+
+
+
+
+
 ## [2.31.10](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.9...@standardnotes/snjs@2.31.10) (2021-12-30)
 
 **Note:** Version bump only for package @standardnotes/snjs
