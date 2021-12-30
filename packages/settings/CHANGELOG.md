@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.8.0...@standardnotes/settings@1.8.1) (2021-12-30)
+
+
+### Bug Fixes
+
+* cloud backups token setting name ([#533](https://github.com/standardnotes/snjs/issues/533)) ([59545f0](https://github.com/standardnotes/snjs/commit/59545f05cfb90f39f072d48bf6b4bf62ac81b877))
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
 # [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.7.0...@standardnotes/settings@1.8.0) (2021-12-23)
 
 
