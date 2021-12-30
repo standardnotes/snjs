@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.15](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.14...@standardnotes/snjs@2.31.15) (2021-12-30)
+
+
+### Bug Fixes
+
+* map remote features to static features ([1e81dcc](https://github.com/standardnotes/snjs/commit/1e81dcc9ea2f86b4853ec543a7efbca5ed50228e))
+
+
+
+
+
 ## [2.31.14](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.13...@standardnotes/snjs@2.31.14) (2021-12-30)
 
 
