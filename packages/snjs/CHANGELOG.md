@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.14](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.13...@standardnotes/snjs@2.31.14) (2021-12-30)
+
+
+### Bug Fixes
+
+* exclude server items from integrity hash ([67dfad4](https://github.com/standardnotes/snjs/commit/67dfad40394a338283a1d622c42633012bc7b9c6))
+
+
+
+
+
 ## [2.31.13](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.12...@standardnotes/snjs@2.31.13) (2021-12-30)
 
 
