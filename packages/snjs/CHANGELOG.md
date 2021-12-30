@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.7](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.6...@standardnotes/snjs@2.31.7) (2021-12-30)
+
+
+### Bug Fixes
+
+* linter errors in features package ([#534](https://github.com/standardnotes/snjs/issues/534)) ([640012e](https://github.com/standardnotes/snjs/commit/640012e2aa0d956b9a7ffd92a1435e9bd072229f))
+
+
+
+
+
 ## [2.31.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.5...@standardnotes/snjs@2.31.6) (2021-12-29)
 
 **Note:** Version bump only for package @standardnotes/snjs
