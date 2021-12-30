@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@standardnotes/filesafe-bar": "standardnotes/filesafe-client",
-    "deterministic-zip": "^1.1.0",
+    "@standardnotes/deterministic-zip": "^1.2.0",
     "sn-advanced-markdown-editor": "1.3.14",
     "sn-bold-editor": "1.2.7",
     "sn-cloudlink": "1.3.0",
