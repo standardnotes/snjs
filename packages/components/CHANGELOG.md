@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.0...@standardnotes/components@1.2.1) (2021-12-30)
+
+
+### Bug Fixes
+
+* deterministic-zip package ([b5814b9](https://github.com/standardnotes/snjs/commit/b5814b9040bc2d40969e102e86b82e4184cc624f))
+
+
+
+
+
 # [1.2.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.1.1...@standardnotes/components@1.2.0) (2021-12-29)
 
 
