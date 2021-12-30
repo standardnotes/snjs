@@ -1,6 +1,6 @@
 import { FeatureStatus, FeaturesEvent } from '@Lib/services/features_service';
 import { SNFeaturesService } from '@Lib/services';
-import { ComponentArea } from '@standardnotes/features';
+import { ComponentArea, Features } from '@standardnotes/features';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
 import { Uuid } from '@Lib/uuid';
@@ -206,7 +206,16 @@ export class ComponentViewer {
     return this.component.offlineOnly && !this.isDesktop;
   }
 
+  private isNativeFeature(): boolean {
+    return !!Features.find(
+      (feature) => feature.identifier === this.component.identifier
+    );
+  }
+
   private hasUrlError(): boolean {
+    if (this.isNativeFeature()) {
+      return false;
+    }
     return this.isDesktop
       ? !this.component.local_url && !this.component.hasValidHostedUrl()
       : !this.component.hasValidHostedUrl();
