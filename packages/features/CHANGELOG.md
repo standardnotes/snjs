@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.20.2](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.1...@standardnotes/features@1.20.2) (2021-12-30)
+
+
+### Bug Fixes
+
+* missing code editor vendor dir ([1b9cedd](https://github.com/standardnotes/snjs/commit/1b9cedde303d4334d0d816c2e650513bb17b8b49))
+
+
+
+
+
 ## [1.20.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.0...@standardnotes/features@1.20.1) (2021-12-30)
 
 
