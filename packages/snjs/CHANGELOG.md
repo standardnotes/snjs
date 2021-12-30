@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.13](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.12...@standardnotes/snjs@2.31.13) (2021-12-30)
+
+
+### Bug Fixes
+
+* no url error for native component ([7ae4409](https://github.com/standardnotes/snjs/commit/7ae4409bc7cf5fffe94d8a5ddb9eb51eb93ed2e5))
+
+
+
+
+
 ## [2.31.12](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.11...@standardnotes/snjs@2.31.12) (2021-12-30)
 
 
