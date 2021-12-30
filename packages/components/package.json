@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/components",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "main": "index.js",
   "files": [
     "dist"
@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@standardnotes/filesafe-bar": "standardnotes/filesafe-client",
+    "deterministic-zip": "^1.1.0",
     "sn-advanced-markdown-editor": "1.3.14",
     "sn-bold-editor": "1.2.7",
     "sn-cloudlink": "1.3.0",
