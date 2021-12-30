@@ -255,7 +255,7 @@ export class ComponentViewer {
       }
     }
 
-    if (this.streamItemsOriginalMessage) {
+    if (this.streamContextItemOriginalMessage) {
       const matchingItem = find(items, { uuid: this.contextItemUuid });
       if (matchingItem && !matchingItem.deleted) {
         this.sendContextItemThroughBridge(matchingItem, source);
