@@ -298,7 +298,7 @@ export class SNComponentManager extends PureService<
     }
 
     if (nativeFeature) {
-      return `/components/${component.identifier}/${nativeFeature.index_path}`;
+      return `public/components/${component.identifier}/${nativeFeature.index_path}`;
     }
 
     let url = component.hosted_url || component.legacy_url;
