@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.31.15",
+  "version": "2.31.16",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
