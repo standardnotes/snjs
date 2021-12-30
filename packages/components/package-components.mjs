@@ -1,11 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import archiver from 'archiver';
 import crypto from 'crypto';
 import { spawnSync as spawn } from 'child_process';
-import { Features } from './dist/Domain/Feature/Features.js';
-
-const SOURCE_FILES_PATH = 'src/Static';
+import { Features } from '../features/dist/Domain/Feature/Features.js';
+const SOURCE_FILES_PATH = '../../node_modules';
+import zip from 'deterministic-zip';
 
 console.log('Beginning packaging procedure...');
 
@@ -16,26 +15,23 @@ if (specificFeatureIdentifier) {
 
 const TmpDir = 'tmp';
 const TmpZipDir = path.join(TmpDir);
-const ComponentsDir = path.join('components');
-const OutStaticDir = path.join(ComponentsDir);
+const ComponentsDir = path.join('all');
 
 const ChecksumsSrcPath = path.join(ComponentsDir, 'checksums.json');
 const ChecksumsDistPath = path.join(ComponentsDir, 'checksums.json');
 const Checksums = JSON.parse(fs.readFileSync(ChecksumsSrcPath).toString());
 console.log('Loaded existing checksums from', ChecksumsSrcPath);
 
-function zipDirectory(sourceDir, outPath) {
-  const archive = archiver('zip', { zlib: { level: 9 } });
-  const stream = fs.createWriteStream(outPath);
+const LocationMapping = JSON.parse(
+  fs.readFileSync('identifier-to-package.json')
+);
 
-  return new Promise((resolve, reject) => {
-    archive
-      .directory(sourceDir, false)
-      .on('error', (err) => reject(err))
-      .pipe(stream);
-
-    stream.on('close', () => resolve());
-    archive.finalize();
+async function zipDirectory(sourceDir, outPath) {
+  return new Promise((resolve) => {
+    zip(sourceDir, outPath, { cwd: sourceDir }, (err) => {
+      console.log(`Zipped to ${outPath}`);
+      resolve();
+    });
   });
 }
 
@@ -65,14 +61,9 @@ const ensureDirExists = (dir) => {
 };
 
 const copyToTmp = async (feature) => {
-  const srcComponentPath = `${path.join(
-    SOURCE_FILES_PATH,
-    feature.identifier
-  )}`;
-  const targetComponentPath = `${path.join(
-    OutStaticDir,
-    feature.identifier
-  )}`;
+  const location = LocationMapping[feature.identifier];
+  const srcComponentPath = path.join(SOURCE_FILES_PATH, location);
+  const targetComponentPath = `${path.join(ComponentsDir, feature.identifier)}`;
 
   ensureDirExists(targetComponentPath);
 
@@ -142,7 +133,6 @@ const processFeature = async (feature) => {
   const directory = distPath;
   const outZip = `${TmpZipDir}/${feature.identifier}.zip`;
   await zipDirectory(directory, outZip);
-  console.log(`Zipped to ${outZip}`);
 
   const uploadError = await createRelease(feature, outZip);
   if (uploadError.length > 0) {
@@ -159,7 +149,6 @@ const processFeature = async (feature) => {
 await (async () => {
   ensureDirExists(TmpDir);
   ensureDirExists(TmpZipDir);
-  ensureDirExists(OutStaticDir);
 
   const featuresToProcess = specificFeatureIdentifier
     ? [

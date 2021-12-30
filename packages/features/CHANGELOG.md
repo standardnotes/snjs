@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.20.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.0...@standardnotes/features@1.20.1) (2021-12-30)
+
+
+### Bug Fixes
+
+* linter errors in features package ([#534](https://github.com/standardnotes/snjs/issues/534)) ([640012e](https://github.com/standardnotes/snjs/commit/640012e2aa0d956b9a7ffd92a1435e9bd072229f))
+
+
+
+
+
+# [1.20.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.19.1...@standardnotes/features@1.20.0) (2021-12-29)
+
+
+### Features
+
+* **components:** add deterministic zipping ([66d0c61](https://github.com/standardnotes/snjs/commit/66d0c61c966d5c8a8bfa33a6069acf3c24407842))
+
+
+
+
+
+## [1.19.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.19.0...@standardnotes/features@1.19.1) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+# [1.19.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.2...@standardnotes/features@1.19.0) (2021-12-29)
+
+
+### Features
+
+* new components package ([95dd5aa](https://github.com/standardnotes/snjs/commit/95dd5aab0c2124192554be3f20f14ace62d9c46b))
+
+
+
+
+
 ## [1.18.2](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.1...@standardnotes/features@1.18.2) (2021-12-29)
 
 
