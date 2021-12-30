@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.3](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.2...@standardnotes/components@1.2.3) (2021-12-30)
+
+
+### Bug Fixes
+
+* component versions ([cb7407a](https://github.com/standardnotes/snjs/commit/cb7407a7002516f17974c6fcd693738c53c6293c))
+
+
+
+
+
 ## [1.2.2](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.1...@standardnotes/components@1.2.2) (2021-12-30)
 
 
