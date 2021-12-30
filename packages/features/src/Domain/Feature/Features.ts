@@ -191,9 +191,9 @@ function themes(): ThemeFeatureDescription[] {
 function FillEditorComponentDefaults(
   component: Partial<EditorFeatureDescription>
 ): EditorFeatureDescription {
-  if (!component.static_files) {
-    component.static_files = ['index.html', 'dist', 'package.json']
-  }
+  component.static_files = ['index.html', 'dist', 'package.json'].concat(
+    component.static_files || []
+  )
 
   if (component.git_repo_url && !component.download_url) {
     component.download_url = githubDownloadUrl(
@@ -238,6 +238,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'txt',
     interchangeable: true,
     index_path: 'index.html',
+    static_files: ['vendor'],
     description:
       'Syntax highlighting and convenient keyboard shortcuts for over 120 programming' +
       'languages. Ideal for code snippets and procedures.',
@@ -552,7 +553,8 @@ function clientFeatures(): ClientFeatureDescription[] {
       name: 'Smart Filters',
       identifier: FeatureIdentifier.SmartFilters,
       permission_name: PermissionName.SmartFilters,
-      description: 'Create smart filters for viewing notes matching specific criteria.',
+      description:
+        'Create smart filters for viewing notes matching specific criteria.',
     },
     {
       name: '',
