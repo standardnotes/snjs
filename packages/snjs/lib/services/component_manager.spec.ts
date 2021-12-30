@@ -149,7 +149,7 @@ describe('featuresService', () => {
           component
         ) as FeatureDescription;
         expect(url).toEqual(
-          `public/components/${component.identifier}/${feature.index_path}`
+          `/public/components/${component.identifier}/${feature.index_path}`
         );
       });
 
