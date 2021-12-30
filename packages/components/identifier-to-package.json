@@ -1,0 +1,21 @@
+{
+  "org.standardnotes.theme-midnight": "sn-theme-midnight",
+  "org.standardnotes.theme-futura": "sn-theme-futura",
+  "org.standardnotes.theme-solarized-dark": "sn-theme-solarized-dark",
+  "org.standardnotes.theme-autobiography": "sn-theme-autobiography",
+  "org.standardnotes.theme-focus": "sn-theme-focus",
+  "org.standardnotes.theme-titanium": "sn-theme-titanium",
+  "org.standardnotes.theme-dynamic": "sn-theme-dynamic",
+  "org.standardnotes.code-editor": "sn-code-editor",
+  "org.standardnotes.bold-editor": "sn-bold-editor",
+  "org.standardnotes.plus-editor": "sn-plus-editor",
+  "org.standardnotes.simple-markdown-editor": "sn-simple-markdown-editor",
+  "org.standardnotes.advanced-markdown-editor": "sn-advanced-markdown-editor",
+  "org.standardnotes.minimal-markdown-editor": "sn-minimal-markdown-editor",
+  "org.standardnotes.fancy-markdown-editor": "sn-fancy-markdown-editor",
+  "org.standardnotes.simple-task-editor": "sn-simple-task-editor",
+  "org.standardnotes.token-vault": "sn-token-vault",
+  "org.standardnotes.standard-sheets": "sn-spreadsheets",
+  "org.standardnotes.file-safe": "@standardnotes/filesafe-bar",
+  "org.standardnotes.folders": "sn-folders"
+}

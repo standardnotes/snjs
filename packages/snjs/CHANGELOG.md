@@ -3,6 +3,113 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.8](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.7...@standardnotes/snjs@2.31.8) (2021-12-30)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.7](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.6...@standardnotes/snjs@2.31.7) (2021-12-30)
+
+
+### Bug Fixes
+
+* linter errors in features package ([#534](https://github.com/standardnotes/snjs/issues/534)) ([640012e](https://github.com/standardnotes/snjs/commit/640012e2aa0d956b9a7ffd92a1435e9bd072229f))
+
+
+
+
+
+## [2.31.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.5...@standardnotes/snjs@2.31.6) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.4...@standardnotes/snjs@2.31.5) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.3...@standardnotes/snjs@2.31.4) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.2...@standardnotes/snjs@2.31.3) (2021-12-29)
+
+
+### Bug Fixes
+
+* remove code coverage reports from repository ([61f5dfd](https://github.com/standardnotes/snjs/commit/61f5dfd8e9698e36142df131ad210749865f70f4))
+
+
+
+
+
+## [2.31.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.1...@standardnotes/snjs@2.31.2) (2021-12-29)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
+## [2.31.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.0...@standardnotes/snjs@2.31.1) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.31.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.30.0...@standardnotes/snjs@2.31.0) (2021-12-29)
+
+
+### Features
+
+* native components ([#525](https://github.com/standardnotes/snjs/issues/525)) ([ca7f8e8](https://github.com/standardnotes/snjs/commit/ca7f8e876bccdaff60daf2cdee3d3b2020954e53))
+
+
+
+
+
+# [2.30.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.29.1...@standardnotes/snjs@2.30.0) (2021-12-28)
+
+
+### Features
+
+* smart tags native support ([#504](https://github.com/standardnotes/snjs/issues/504)) ([4b5349c](https://github.com/standardnotes/snjs/commit/4b5349c8a3f2d9837ec6cd4c8fe009b7eccb5264))
+
+
+
+
+
+## [2.29.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.29.0...@standardnotes/snjs@2.29.1) (2021-12-27)
+
+
+### Bug Fixes
+
+* safe access to potentially undefined references array ([#529](https://github.com/standardnotes/snjs/issues/529)) ([63f5cdd](https://github.com/standardnotes/snjs/commit/63f5cdd74780b33e32b97b6a1c1aae81ede76275))
+
+
+
+
+
 # [2.29.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.28.1...@standardnotes/snjs@2.29.0) (2021-12-24)
 
 

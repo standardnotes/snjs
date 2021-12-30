@@ -1,5 +1,6 @@
 import { SNItem } from '@Models/core/item';
 import { isString } from '@Lib/utils';
+
 type PredicateType = string[] | SNPredicate;
 type PredicateArray = Array<string[]> | SNPredicate[];
 type PredicateValue = string | Date | boolean | PredicateType | PredicateArray;
@@ -13,6 +14,7 @@ function toPredicate(object: unknown): SNPredicate {
   }
   return SNPredicate.FromJson(object);
 }
+
 /**
  * A local-only construct that defines a built query that can be used to
  * dynamically search items.
@@ -28,7 +30,7 @@ export class SNPredicate {
     this.value = value;
 
     if (this.isRecursive()) {
-      const array = this.value as Array<any>;
+      const array = this.value as unknown[];
       this.value = array.map((element) => toPredicate(element));
     } else if (this.value === 'true' || this.value === 'false') {
       /* If value is boolean string, convert to boolean */

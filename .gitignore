@@ -2,8 +2,20 @@ node_modules
 .DS_Store
 .vscode
 .idea
-dist
+
 coverage
+
+# List individually so that packages/components/all/org./dist is included
+packages/auth/dist
+packages/common/dist
+packages/components/dist
+packages/config/dist
+packages/domain-events-infra/dist
+packages/domain-events/dist
+packages/features/dist
+packages/settings/dist
+packages/snjs/dist
+packages/time/dist
 
 yarn-error.log
 package-lock.json
@@ -17,3 +29,5 @@ api-gateway.env
 syncing-server-js.env
 syncing-server.env
 codeqldb
+
+packages/components/tmp

@@ -1,3 +1,4 @@
+import { Features, FeatureDescription } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import {
@@ -14,12 +15,8 @@ import { SNSyncService } from '@Services/sync/sync_service';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import { PureService } from '@Lib/services/pure_service';
-import {
-  ComponentAction,
-  ComponentArea,
-  ComponentPermission,
-  SNComponent,
-} from '@Models/app/component';
+import { ComponentArea, SNComponent } from '@Models/app/component';
+import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import {
   Copy,
   concatArrays,
@@ -71,7 +68,7 @@ export class SNComponentManager extends PureService<
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private featuresService: SNFeaturesService,
-    private alertService: SNAlertService,
+    protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
     timeout: any
@@ -174,7 +171,11 @@ export class SNComponentManager extends PureService<
     if (components.length > 0 && source !== PayloadSource.RemoteSaved) {
       /* Ensure any component in our data is installed by the system */
       if (this.isDesktop) {
-        this.desktopManager?.syncComponentsInstallation(components);
+        const thirdPartyComponents = components.filter((component) => {
+          const nativeFeature = this.nativeFeatureForComponent(component);
+          return nativeFeature ? false : true;
+        });
+        this.desktopManager?.syncComponentsInstallation(thirdPartyComponents);
       }
     }
 
@@ -265,33 +266,53 @@ export class SNComponentManager extends PureService<
     }) as SNTheme[];
   }
 
+  nativeFeatureForComponent(
+    component: SNComponent
+  ): FeatureDescription | undefined {
+    return Features.find(
+      (feature) => feature.identifier === component.identifier
+    );
+  }
+
   urlForComponent(component: SNComponent): string | undefined {
     /* offlineOnly is available only on desktop, and not on web or mobile. */
     if (component.offlineOnly && !this.isDesktop) {
       return undefined;
     }
-    if (component.offlineOnly || (this.isDesktop && component.local_url)) {
-      return (
-        component.local_url &&
-        component.local_url.replace(
+
+    const nativeFeature = this.nativeFeatureForComponent(component);
+
+    if (this.isDesktop) {
+      if (nativeFeature) {
+        return `${this.desktopManager!.getExtServerHost()}/components/${
+          component.identifier
+        }/${nativeFeature.index_path}`;
+      } else if (component.local_url) {
+        return component.local_url.replace(
           DESKTOP_URL_PREFIX,
-          this.desktopManager!.getExtServerHost()
-        )
-      );
-    } else {
-      let url = component.hosted_url || component.legacy_url;
-      if (!url) {
-        return undefined;
+          this.desktopManager!.getExtServerHost() + '/'
+        );
+      } else {
+        return component.hosted_url || component.legacy_url;
       }
-      if (this.isMobile) {
-        const localReplacement =
-          this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
-        url = url
-          .replace(LOCAL_HOST, localReplacement)
-          .replace(CUSTOM_LOCAL_HOST, localReplacement);
-      }
-      return url;
     }
+
+    if (nativeFeature) {
+      return `/components/${component.identifier}/${nativeFeature.index_path}`;
+    }
+
+    let url = component.hosted_url || component.legacy_url;
+    if (!url) {
+      return undefined;
+    }
+    if (this.isMobile) {
+      const localReplacement =
+        this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST;
+      url = url
+        .replace(LOCAL_HOST, localReplacement)
+        .replace(CUSTOM_LOCAL_HOST, localReplacement);
+    }
+    return url;
   }
 
   urlsForActiveThemes(): string[] {
@@ -349,9 +370,12 @@ export class SNComponentManager extends PureService<
       return;
     }
     const component = this.findComponent(componentUuid);
+    const nativeFeature = this.nativeFeatureForComponent(component);
+    const acquiredPermissions =
+      nativeFeature?.component_permissions || component.permissions;
+
     /* Make copy as not to mutate input values */
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[];
-    const acquiredPermissions = component.permissions;
     for (const required of requiredPermissions.slice()) {
       /* Remove anything we already have */
       const respectiveAcquired = acquiredPermissions.find(

@@ -3,6 +3,111 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.20.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.0...@standardnotes/features@1.20.1) (2021-12-30)
+
+
+### Bug Fixes
+
+* linter errors in features package ([#534](https://github.com/standardnotes/snjs/issues/534)) ([640012e](https://github.com/standardnotes/snjs/commit/640012e2aa0d956b9a7ffd92a1435e9bd072229f))
+
+
+
+
+
+# [1.20.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.19.1...@standardnotes/features@1.20.0) (2021-12-29)
+
+
+### Features
+
+* **components:** add deterministic zipping ([66d0c61](https://github.com/standardnotes/snjs/commit/66d0c61c966d5c8a8bfa33a6069acf3c24407842))
+
+
+
+
+
+## [1.19.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.19.0...@standardnotes/features@1.19.1) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+# [1.19.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.2...@standardnotes/features@1.19.0) (2021-12-29)
+
+
+### Features
+
+* new components package ([95dd5aa](https://github.com/standardnotes/snjs/commit/95dd5aab0c2124192554be3f20f14ace62d9c46b))
+
+
+
+
+
+## [1.18.2](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.1...@standardnotes/features@1.18.2) (2021-12-29)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
+## [1.18.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.18.0...@standardnotes/features@1.18.1) (2021-12-29)
+
+
+### Bug Fixes
+
+* include components cp in build script ([4733ec9](https://github.com/standardnotes/snjs/commit/4733ec9ece77d867280fabe20c63ba827d4834b7))
+
+
+
+
+
+# [1.18.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.16.0...@standardnotes/features@1.18.0) (2021-12-29)
+
+
+### Features
+
+* native components ([#525](https://github.com/standardnotes/snjs/issues/525)) ([ca7f8e8](https://github.com/standardnotes/snjs/commit/ca7f8e876bccdaff60daf2cdee3d3b2020954e53))
+
+
+
+
+
+# [1.16.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.15.1...@standardnotes/features@1.16.0) (2021-12-29)
+
+
+### Features
+
+* add smart tags as a feature / premium option ([#526](https://github.com/standardnotes/snjs/issues/526)) ([02cd04c](https://github.com/standardnotes/snjs/commit/02cd04c8b144c3c6a5aa51ff24d746c39afb1b57))
+
+
+
+
+
+## [1.15.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.15.0...@standardnotes/features@1.15.1) (2021-12-27)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+# [1.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.14.0...@standardnotes/features@1.15.0) (2021-12-27)
+
+
+### Features
+
+* Remove theme:no-distraction permission ([#515](https://github.com/standardnotes/snjs/issues/515)) ([e8031fe](https://github.com/standardnotes/snjs/commit/e8031fe5a8f68add24de922b4f171ec69affa286))
+
+
+
+
+
 # 1.14.0 (2021-12-23)
 
 

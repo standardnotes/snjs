@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.5](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.4...@standardnotes/time@1.4.5) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/time
+
+
+
+
+
+## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.3...@standardnotes/time@1.4.4) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/time
+
+
+
+
+
+## [1.4.3](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.2...@standardnotes/time@1.4.3) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/time
+
+
+
+
+
+## [1.4.2](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.1...@standardnotes/time@1.4.2) (2021-12-29)
+
+
+### Bug Fixes
+
+* remove code coverage reports from repository ([61f5dfd](https://github.com/standardnotes/snjs/commit/61f5dfd8e9698e36142df131ad210749865f70f4))
+
+
+
+
+
+## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.0...@standardnotes/time@1.4.1) (2021-12-29)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
 # 1.4.0 (2021-12-23)
 
 

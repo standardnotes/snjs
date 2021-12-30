@@ -1,0 +1,40 @@
+{
+  "name": "@standardnotes/components",
+  "version": "1.2.0",
+  "main": "index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "cp -r all dist",
+    "package-components": "node package-components.mjs"
+  },
+  "devDependencies": {
+    "@standardnotes/filesafe-bar": "standardnotes/filesafe-client",
+    "deterministic-zip": "^1.1.0",
+    "sn-advanced-markdown-editor": "1.3.14",
+    "sn-bold-editor": "1.2.7",
+    "sn-cloudlink": "1.3.0",
+    "sn-code-editor": "^1.3.8",
+    "sn-codemirror-search": "^1.0.0",
+    "sn-fancy-markdown-editor": "1.3.4",
+    "sn-folders": "1.3.8",
+    "sn-minimal-markdown-editor": "1.3.7",
+    "sn-plus-editor": "1.5.0",
+    "sn-simple-markdown-editor": "1.4.0",
+    "sn-simple-task-editor": "1.3.7",
+    "sn-spreadsheets": "1.4.2",
+    "sn-theme-autobiography": "standardnotes/autobiography-theme",
+    "sn-theme-dynamic": "standardnotes/dynamic-theme",
+    "sn-theme-focus": "standardnotes/focus-theme",
+    "sn-theme-futura": "standardnotes/futura-theme",
+    "sn-theme-midnight": "standardnotes/midnight-theme",
+    "sn-theme-solarized-dark": "standardnotes/solarized-dark-theme",
+    "sn-theme-titanium": "standardnotes/titanium-theme",
+    "sn-token-vault": "2.0.3",
+    "sn-vim-editor": "1.3.7"
+  }
+}

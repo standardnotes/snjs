@@ -1,10 +1,14 @@
+import { ContentType } from '@standardnotes/common';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { SNLog } from './../../log';
 import { ProtocolVersion } from '@Protocol/versions';
 import { PayloadFormat } from './../../protocol/payloads/formats';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { UuidString } from './../../types';
-import { PayloadContent, ContentReference } from './../../protocol/payloads/generator';
+import {
+  PayloadContent,
+  ContentReference,
+} from './../../protocol/payloads/generator';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import {
@@ -21,7 +25,7 @@ import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { PrefKey } from '../app/userPrefs';
 
 export interface ItemContent {
-  references: ContentReference[];
+  references?: ContentReference[];
 }
 
 export enum MutationType {
@@ -112,9 +116,9 @@ export class SNItem {
       this.userModifiedDate = this.serverUpdatedAt || new Date();
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
-    setImmediate(() => {
+    setTimeout(() => {
       deepFreeze(this);
-    });
+    }, 0);
   }
 
   public static DefaultAppDomain() {
@@ -144,7 +148,7 @@ export class SNItem {
     return this.payload.safeContent;
   }
 
-  get references() {
+  get references(): ContentReference[] {
     return this.payload.safeContent.references || [];
   }
 
@@ -152,7 +156,7 @@ export class SNItem {
     return this.payload.deleted;
   }
 
-  get content_type() {
+  get content_type(): ContentType {
     return this.payload.content_type!;
   }
 
@@ -223,8 +227,8 @@ export class SNItem {
     return CopyPayload(this.payload, override);
   }
 
-  public hasRelationshipWithItem(item: SNItem) {
-    const target = this.payload.safeContent.references?.find((r) => {
+  public hasRelationshipWithItem(item: SNItem): boolean {
+    const target = this.references?.find((r) => {
       return r.uuid === item.uuid;
     });
     return !!target;
