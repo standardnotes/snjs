@@ -844,7 +844,7 @@ export class ItemManager extends PureService {
    */
   public findTagByTitle(title: string): SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase();
-    return this.tags.find((tag) => tag.title.toLowerCase() === lowerCaseTitle);
+    return this.tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle);
   }
 
   /**

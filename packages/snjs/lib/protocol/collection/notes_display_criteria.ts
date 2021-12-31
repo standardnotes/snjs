@@ -216,7 +216,7 @@ function matchTypeForTagAndStringQuery(
   tag: SNTag,
   searchString: string
 ): Match {
-  if (searchString.length === 0) {
+  if (!tag.title || searchString.length === 0) {
     return Match.None;
   }
   const title = tag.title.toLowerCase();
