@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.18](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.17...@standardnotes/snjs@2.31.18) (2021-12-31)
+
+
+### Bug Fixes
+
+* handle null tag title ([c5f0c40](https://github.com/standardnotes/snjs/commit/c5f0c401bc1739f1ac27b9dfe44ee60fe0f8e948))
+
+
+
+
+
 ## [2.31.17](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.16...@standardnotes/snjs@2.31.17) (2021-12-30)
 
 
