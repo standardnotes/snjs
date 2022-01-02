@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.19](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.18...@standardnotes/snjs@2.31.19) (2022-01-02)
+
+
+### Bug Fixes
+
+* check source before syncing components ([1fd1e8b](https://github.com/standardnotes/snjs/commit/1fd1e8b5f9b25ea13a0f75cc433c7b137ff4ea63))
+
+
+
+
+
 ## [2.31.18](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.17...@standardnotes/snjs@2.31.18) (2021-12-31)
 
 
