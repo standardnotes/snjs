@@ -162,19 +162,23 @@ export class SNComponentManager extends PureService<
 
   handleChangedComponents(
     components: SNComponent[],
-    source?: PayloadSource
+    source: PayloadSource
   ): void {
-    /**
-     * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid
-     * recursion caused by the component being modified and saved after it is updated.
-     */
-    if (components.length > 0 && source !== PayloadSource.RemoteSaved) {
+    const acceptableSources = [
+      PayloadSource.LocalChanged,
+      PayloadSource.RemoteRetrieved,
+    ];
+    if (components.length === 0 || !acceptableSources.includes(source)) {
+      return;
+    }
+
+    if (this.isDesktop) {
       /* Ensure any component in our data is installed by the system */
-      if (this.isDesktop) {
-        const thirdPartyComponents = components.filter((component) => {
-          const nativeFeature = this.nativeFeatureForComponent(component);
-          return nativeFeature ? false : true;
-        });
+      const thirdPartyComponents = components.filter((component) => {
+        const nativeFeature = this.nativeFeatureForComponent(component);
+        return nativeFeature ? false : true;
+      });
+      if (thirdPartyComponents.length > 0) {
         this.desktopManager?.syncComponentsInstallation(thirdPartyComponents);
       }
     }
