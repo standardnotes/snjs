@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { spawnSync as spawn } from 'child_process';
 import { Features } from '../features/dist/Domain/Feature/Features.js';
 const SOURCE_FILES_PATH = '../../node_modules';
-import zip from 'deterministic-zip';
+import zip from '@standardnotes/deterministic-zip';
 
 console.log('Beginning packaging procedure...');
 

@@ -18,10 +18,15 @@ import {
 } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
 import { ContentType } from '@standardnotes/common';
-import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
+import {
+  FeatureDescription,
+  FeatureIdentifier,
+  Features,
+} from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
+import { convertTimestampToMilliseconds } from '@Lib/utils';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
@@ -62,17 +67,17 @@ describe('featuresService', () => {
 
     now = new Date();
     tomorrow_client = now.setDate(now.getDate() + 1);
-    tomorrow_server = tomorrow_client * 1_000;
+    tomorrow_server = convertTimestampToMilliseconds(tomorrow_client * 1_000);
 
     features = [
       {
-        identifier: FeatureIdentifier.MidnightTheme,
-        content_type: ContentType.Theme,
+        ...Features.find(
+          (f) => f.identifier === FeatureIdentifier.MidnightTheme
+        ),
         expires_at: tomorrow_server,
       },
       {
-        identifier: FeatureIdentifier.BoldEditor,
-        content_type: ContentType.Component,
+        ...Features.find((f) => f.identifier === FeatureIdentifier.BoldEditor),
         expires_at: tomorrow_server,
       },
     ] as jest.Mocked<FeatureDescription[]>;
@@ -200,22 +205,22 @@ describe('featuresService', () => {
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Theme,
         expect.objectContaining({
-          package_info: {
+          package_info: expect.objectContaining({
             content_type: ContentType.Theme,
             expires_at: tomorrow_client,
             identifier: FeatureIdentifier.MidnightTheme,
-          },
+          }),
         }),
         true
       );
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
         expect.objectContaining({
-          package_info: {
+          package_info: expect.objectContaining({
             content_type: ContentType.Component,
             expires_at: tomorrow_client,
             identifier: FeatureIdentifier.BoldEditor,
-          },
+          }),
         }),
         true
       );
@@ -272,11 +277,11 @@ describe('featuresService', () => {
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
         expect.objectContaining({
-          package_info: {
+          package_info: expect.objectContaining({
             content_type: ContentType.Component,
             expires_at: yesterday_client,
             identifier: FeatureIdentifier.BoldEditor,
-          },
+          }),
         }),
         true
       );
@@ -351,6 +356,37 @@ describe('featuresService', () => {
       await featuresService.updateRolesAndFetchFeatures('123', roles);
       await featuresService.updateRolesAndFetchFeatures('123', roles);
       expect(storageService.setValue).toHaveBeenCalledTimes(2);
+    });
+
+    it('remote native features should be swapped with compiled version', async () => {
+      const remoteFeature = {
+        identifier: FeatureIdentifier.BoldEditor,
+        content_type: ContentType.Component,
+        expires_at: tomorrow_server,
+        version: '1.0.0',
+      } as FeatureDescription;
+
+      const newRoles = [...roles, RoleName.PlusUser];
+
+      storageService.getValue = jest.fn().mockReturnValue(roles);
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features: [remoteFeature],
+        },
+      });
+
+      const featuresService = createService();
+      const nativeFeature = featuresService[
+        'mapRemoteNativeFeatureToStaticFeature'
+      ](remoteFeature);
+      featuresService['mapNativeFeatureToItem'] = jest.fn();
+      await featuresService.initializeFromDisk();
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles);
+      expect(featuresService['mapNativeFeatureToItem']).toHaveBeenCalledWith(
+        nativeFeature,
+        expect.anything(),
+        expect.anything()
+      );
     });
 
     it('feature status', async () => {
@@ -468,11 +504,7 @@ describe('featuresService', () => {
         FeatureDescription[]
       >;
 
-      apiService.getUserFeatures = jest.fn().mockReturnValue({
-        data: {
-          features,
-        },
-      });
+      featuresService['features'] = features;
 
       Object.defineProperty(itemManager, 'components', {
         get: jest.fn(() => [

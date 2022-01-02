@@ -3,6 +3,110 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.18](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.17...@standardnotes/snjs@2.31.18) (2021-12-31)
+
+
+### Bug Fixes
+
+* handle null tag title ([c5f0c40](https://github.com/standardnotes/snjs/commit/c5f0c401bc1739f1ac27b9dfe44ee60fe0f8e948))
+
+
+
+
+
+## [2.31.17](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.16...@standardnotes/snjs@2.31.17) (2021-12-30)
+
+
+### Bug Fixes
+
+* web component path ([64fc4c6](https://github.com/standardnotes/snjs/commit/64fc4c6efebd8119ada88b71919ea4fd0c4f777a))
+
+
+
+
+
+## [2.31.16](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.15...@standardnotes/snjs@2.31.16) (2021-12-30)
+
+
+### Bug Fixes
+
+* component path ([8e544cb](https://github.com/standardnotes/snjs/commit/8e544cbe72aa1cc4395b56f2106f80c0941b7c33))
+
+
+
+
+
+## [2.31.15](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.14...@standardnotes/snjs@2.31.15) (2021-12-30)
+
+
+### Bug Fixes
+
+* map remote features to static features ([1e81dcc](https://github.com/standardnotes/snjs/commit/1e81dcc9ea2f86b4853ec543a7efbca5ed50228e))
+
+
+
+
+
+## [2.31.14](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.13...@standardnotes/snjs@2.31.14) (2021-12-30)
+
+
+### Bug Fixes
+
+* exclude server items from integrity hash ([67dfad4](https://github.com/standardnotes/snjs/commit/67dfad40394a338283a1d622c42633012bc7b9c6))
+
+
+
+
+
+## [2.31.13](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.12...@standardnotes/snjs@2.31.13) (2021-12-30)
+
+
+### Bug Fixes
+
+* no url error for native component ([7ae4409](https://github.com/standardnotes/snjs/commit/7ae4409bc7cf5fffe94d8a5ddb9eb51eb93ed2e5))
+
+
+
+
+
+## [2.31.12](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.11...@standardnotes/snjs@2.31.12) (2021-12-30)
+
+
+### Bug Fixes
+
+* web components path ([26d24d7](https://github.com/standardnotes/snjs/commit/26d24d7e3ed0e77a9b15106fa15e1b6ed6c008ce))
+
+
+
+
+
+## [2.31.11](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.10...@standardnotes/snjs@2.31.11) (2021-12-30)
+
+
+### Bug Fixes
+
+* **snjs:** component viewer correct var check ([f66c45a](https://github.com/standardnotes/snjs/commit/f66c45aff1f741502e215cb7bcdb51c8e800fa93))
+
+
+
+
+
+## [2.31.10](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.9...@standardnotes/snjs@2.31.10) (2021-12-30)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.9](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.8...@standardnotes/snjs@2.31.9) (2021-12-30)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.31.8](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.7...@standardnotes/snjs@2.31.8) (2021-12-30)
 
 **Note:** Version bump only for package @standardnotes/snjs

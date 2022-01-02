@@ -1,4 +1,4 @@
-import { FeatureIdentifier } from '@standardnotes/features';
+import { FeatureIdentifier, ThirdPartyFeatureDescription } from '@standardnotes/features';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
@@ -182,6 +182,10 @@ export class SNComponent extends SNItem implements ComponentContent {
 
   public get identifier(): FeatureIdentifier {
     return this.package_info.identifier;
+  }
+
+  public get thirdPartyPackageInfo(): ThirdPartyFeatureDescription {
+    return this.package_info as ThirdPartyFeatureDescription;
   }
 
   public get isDeprecated(): boolean {

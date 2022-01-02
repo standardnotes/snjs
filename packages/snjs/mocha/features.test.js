@@ -15,28 +15,25 @@ describe('features', () => {
     application = await Factory.createInitAppWithRandNamespace();
 
     const now = new Date();
-    const tomorrow = now.setDate(now.getDate() + 1) * 1_000;
+    const tomorrow = now.setDate(now.getDate() + 1);
 
     midnightThemeFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.MidnightTheme
       ),
       expires_at: tomorrow,
-      url: 'https://standardnotes.com'
     };
     boldEditorFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.BoldEditor
       ),
       expires_at: tomorrow,
-      url: 'https://standardnotes.com'
     };
     tagNestingFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.TagNesting
       ),
       expires_at: tomorrow,
-      url: 'https://standardnotes.com'
     };
 
     sinon.spy(application.itemManager, 'createItem');
@@ -77,10 +74,10 @@ describe('features', () => {
       expect(application.featuresService.roles[0]).to.equal(RoleName.BasicUser);
 
       expect(application.featuresService.features).to.have.lengthOf(3);
-      expect(application.featuresService.features[0]).to.equal(
+      expect(application.featuresService.features[0]).to.containSubset(
         midnightThemeFeature
       );
-      expect(application.featuresService.features[1]).to.equal(
+      expect(application.featuresService.features[1]).to.containSubset(
         boldEditorFeature
       );
 
@@ -94,9 +91,9 @@ describe('features', () => {
       );
 
       expect(storedFeatures).to.have.lengthOf(3);
-      expect(storedFeatures[0]).to.equal(midnightThemeFeature);
-      expect(storedFeatures[1]).to.equal(boldEditorFeature);
-      expect(storedFeatures[2]).to.equal(tagNestingFeature);
+      expect(storedFeatures[0]).to.containSubset(midnightThemeFeature);
+      expect(storedFeatures[1]).to.containSubset(boldEditorFeature);
+      expect(storedFeatures[2]).to.containSubset(tagNestingFeature);
     });
 
     it('should fetch user features and create items for features with content type', async () => {
@@ -195,7 +192,7 @@ describe('features', () => {
 
   it('should provide feature', async () => {
     const feature = application.getFeature(FeatureIdentifier.BoldEditor);
-    expect(feature).to.equal(boldEditorFeature);
+    expect(feature).to.containSubset(boldEditorFeature);
   });
 
   describe('extension repo items observer', () => {
