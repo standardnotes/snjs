@@ -286,10 +286,9 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
-    const decryptedItemsKeys =
-      await this.protocolService.payloadsByDecryptingPayloads(
-        itemsKeysPayloads
-      );
+    const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
+      itemsKeysPayloads
+    );
     await this.payloadManager.emitPayloads(
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
@@ -980,10 +979,13 @@ export class SNSyncService extends PureService<
    * @returns A SHA256 digest string (hex).
    */
   private async computeDataIntegrityHash(): Promise<string | undefined> {
+    const ExcludedTypes = [ContentType.ServerExtension];
     try {
-      const items = this.itemManager.nonDeletedItems.sort((a, b) => {
-        return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
-      });
+      const items = this.itemManager.nonDeletedItems
+        .filter((item) => !ExcludedTypes.includes(item.content_type))
+        .sort((a, b) => {
+          return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
+        });
       const timestamps: number[] = [];
       const MicrosecondsInMillisecond = 1_000;
       for (const item of items) {

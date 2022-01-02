@@ -3,6 +3,86 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.14.7](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.6...@standardnotes/domain-events@2.14.7) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.14.6](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.5...@standardnotes/domain-events@2.14.6) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.14.5](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.4...@standardnotes/domain-events@2.14.5) (2021-12-29)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.14.4](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.3...@standardnotes/domain-events@2.14.4) (2021-12-29)
+
+
+### Bug Fixes
+
+* remove code coverage reports from repository ([61f5dfd](https://github.com/standardnotes/snjs/commit/61f5dfd8e9698e36142df131ad210749865f70f4))
+
+
+
+
+
+## [2.14.3](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.2...@standardnotes/domain-events@2.14.3) (2021-12-29)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+
+
+
+## [2.14.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.1...@standardnotes/domain-events@2.14.2) (2021-12-28)
+
+
+### Bug Fixes
+
+* remove not needed properties from subscription sync requested event ([29ede5e](https://github.com/standardnotes/snjs/commit/29ede5ee353735325d79bbd0346b8ce8b5d39cdf))
+
+
+
+
+
+## [2.14.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.0...@standardnotes/domain-events@2.14.1) (2021-12-28)
+
+
+### Bug Fixes
+
+* add missing canceled property from subscription sync requested event ([#531](https://github.com/standardnotes/snjs/issues/531)) ([0184933](https://github.com/standardnotes/snjs/commit/01849333eab182127e926b0008b7c437210cd33d))
+
+
+
+
+
+# [2.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.13.1...@standardnotes/domain-events@2.14.0) (2021-12-28)
+
+
+### Features
+
+* add subscription sync requested event ([#530](https://github.com/standardnotes/snjs/issues/530)) ([7c590e1](https://github.com/standardnotes/snjs/commit/7c590e19a20c7e5bcb6425643a579a66d8f1dd79))
+
+
+
+
+
 ## [2.13.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.13.0...@standardnotes/domain-events@2.13.1) (2021-12-23)
 
 **Note:** Version bump only for package @standardnotes/domain-events

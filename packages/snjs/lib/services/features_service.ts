@@ -1,3 +1,4 @@
+import { SNItem } from '@Models/core/item';
 import { ApplicationStage } from '@Lib/stages';
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from './../hosts';
 import {
@@ -19,13 +20,13 @@ import {
 import { ErrorObject, UuidString } from '@Lib/types';
 import {
   FeatureDescription,
+  ThirdPartyFeatureDescription,
   FeatureIdentifier,
   Features,
 } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
-import { SNComponentManager } from './component_manager';
 import { SNComponent } from '@Lib/models';
 import {
   SNWebSocketsService,
@@ -41,7 +42,6 @@ import {
   arraysEqual,
   convertTimestampToMilliseconds,
   isErrorObject,
-  isValidUrl,
 } from '@Lib/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
@@ -56,6 +56,7 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
+import { Copy } from '..';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -93,7 +94,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     private storageService: SNStorageService,
     private apiService: SNApiService,
     private itemManager: ItemManager,
-    private componentManager: SNComponentManager,
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
     private credentialService: SNCredentialService,
@@ -254,7 +254,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       return result;
     }
     await this.didDownloadFeatures(result.features);
-    await this.mapFeaturesToItems(result.features);
   }
 
   public async migrateFeatureRepoToUserSetting(
@@ -338,15 +337,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
         const features = (featuresResponse as UserFeaturesResponse).data
           .features;
-        features.forEach((feature) => {
-          if (feature.expires_at) {
-            feature.expires_at = convertTimestampToMilliseconds(
-              feature.expires_at
-            );
-          }
-        });
         await this.didDownloadFeatures(features);
-        await this.mapFeaturesToItems(features);
       }
     }
   }
@@ -362,10 +353,59 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   public async didDownloadFeatures(
     features: FeatureDescription[]
   ): Promise<void> {
+    features = features
+      .filter((feature) => !!this.findStaticNativeFeature(feature.identifier))
+      .map((feature) => this.mapRemoteNativeFeatureToStaticFeature(feature));
+
     this.features = features;
     this.completedSuccessfulFeaturesRetrieval = true;
     this.notifyEvent(FeaturesEvent.FeaturesUpdated);
-    await this.storageService.setValue(StorageKey.UserFeatures, this.features);
+    this.storageService.setValue(StorageKey.UserFeatures, this.features);
+
+    await this.mapRemoteNativeFeaturesToItems(features);
+  }
+
+  /**
+   * Returns the native feature as compiled into @standardnotes/features
+   */
+  private findStaticNativeFeature(
+    identifier: FeatureIdentifier
+  ): FeatureDescription | undefined {
+    return Features.find((f) => f.identifier === identifier);
+  }
+
+  private mapRemoteNativeFeatureToStaticFeature(
+    remoteFeature: FeatureDescription
+  ): FeatureDescription {
+    const remoteFields: (keyof FeatureDescription)[] = [
+      'expires_at',
+      'role_name',
+      'no_expire',
+      'permission_name',
+    ];
+
+    const nativeFeature = this.findStaticNativeFeature(
+      remoteFeature.identifier
+    );
+
+    if (!nativeFeature) {
+      throw Error(
+        `Attempting to map remote native to unfound static feature ${remoteFeature.identifier}`
+      );
+    }
+
+    const nativeFeatureCopy = Copy(nativeFeature) as FeatureDescription;
+
+    for (const field of remoteFields) {
+      nativeFeatureCopy[field] = remoteFeature[field] as never;
+    }
+
+    if (nativeFeatureCopy.expires_at) {
+      nativeFeatureCopy.expires_at = convertTimestampToMilliseconds(
+        nativeFeatureCopy.expires_at
+      );
+    }
+    return nativeFeatureCopy;
   }
 
   public getFeature(
@@ -385,8 +425,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   }
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
-    const isThirdParty =
-      Features.find((feature) => feature.identifier === featureId) == undefined;
+    const isThirdParty = this.findStaticNativeFeature(featureId) == undefined;
     if (isThirdParty) {
       const component = this.itemManager.components.find(
         (candidate) => candidate.identifier === featureId
@@ -437,12 +476,11 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     );
   }
 
-  private componentContentForFeatureDescription(
+  private componentContentForNativeFeatureDescription(
     feature: FeatureDescription
   ): PayloadContent {
     const componentContent: Partial<ComponentContent> = {
       area: feature.area,
-      hosted_url: feature.url,
       name: feature.name,
       package_info: feature,
       valid_until: new Date(feature.expires_at || 0),
@@ -450,74 +488,23 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return FillItemContent(componentContent);
   }
 
-  private async mapFeaturesToItems(
+  private async mapRemoteNativeFeaturesToItems(
     features: FeatureDescription[]
   ): Promise<void> {
     const currentItems = this.itemManager.getItems([
       ContentType.Component,
       ContentType.Theme,
     ]);
-    const itemsToDeleteUuids = [];
-    const now = new Date();
+    const itemsToDeleteUuids: UuidString[] = [];
     let hasChanges = false;
     for (const feature of features) {
-      if (!feature.content_type) {
-        continue;
-      }
-      const isValid = feature.url ? isValidUrl(feature.url) : true;
-      if (!isValid) {
-        continue;
-      }
-      const expired =
-        new Date(feature.expires_at || 0).getTime() < now.getTime();
-      const existingItem = currentItems.find((item) => {
-        if (item.safeContent.package_info) {
-          const itemIdentifier = item.safeContent.package_info.identifier;
-          return itemIdentifier === feature.identifier && !item.deleted;
-        }
-        return false;
-      }) as SNComponent;
-
-      let resultingItem: SNComponent | undefined = existingItem as SNComponent;
-
-      if (existingItem) {
-        const expiresAt = new Date(feature.expires_at || 0);
-        const hasChange =
-          feature.url !== existingItem.hosted_url ||
-          feature.version !== existingItem.package_info.version ||
-          expiresAt.getTime() !== existingItem.valid_until.getTime();
-        if (hasChange) {
-          resultingItem = await this.itemManager.changeComponent(
-            existingItem.uuid,
-            (mutator) => {
-              mutator.hosted_url = feature.url;
-              mutator.package_info = feature;
-              mutator.valid_until = expiresAt;
-            }
-          );
-          hasChanges = true;
-        } else {
-          resultingItem = existingItem;
-        }
-      } else if (!expired || feature.content_type === ContentType.Component) {
-        resultingItem = (await this.itemManager.createItem(
-          feature.content_type,
-          this.componentContentForFeatureDescription(feature),
-          true
-        )) as SNComponent;
+      const didChange = await this.mapNativeFeatureToItem(
+        feature,
+        currentItems,
+        itemsToDeleteUuids
+      );
+      if (didChange) {
         hasChanges = true;
-      }
-
-      if (expired && resultingItem) {
-        if (feature.content_type === ContentType.Component) {
-          this.componentManager.setReadonlyStateForComponent(
-            resultingItem,
-            expired
-          );
-        } else {
-          itemsToDeleteUuids.push(resultingItem.uuid);
-          hasChanges = true;
-        }
       }
     }
 
@@ -525,6 +512,65 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     if (hasChanges) {
       this.syncService.sync();
     }
+  }
+
+  private async mapNativeFeatureToItem(
+    feature: FeatureDescription,
+    currentItems: SNItem[],
+    itemsToDeleteUuids: UuidString[]
+  ): Promise<boolean> {
+    if (!feature.content_type) {
+      return false;
+    }
+
+    let hasChanges = false;
+    const now = new Date();
+    const expired = new Date(feature.expires_at || 0).getTime() < now.getTime();
+
+    const existingItem = currentItems.find((item) => {
+      if (item.safeContent.package_info) {
+        const itemIdentifier = item.safeContent.package_info.identifier;
+        return itemIdentifier === feature.identifier && !item.deleted;
+      }
+      return false;
+    }) as SNComponent;
+
+    let resultingItem: SNComponent | undefined = existingItem as SNComponent;
+
+    if (existingItem) {
+      const expiresAt = new Date(feature.expires_at || 0);
+      const hasChange =
+        feature.version !== existingItem.package_info.version ||
+        expiresAt.getTime() !== existingItem.valid_until.getTime();
+      if (hasChange) {
+        resultingItem = await this.itemManager.changeComponent(
+          existingItem.uuid,
+          (mutator) => {
+            mutator.package_info = feature;
+            mutator.valid_until = expiresAt;
+          }
+        );
+        hasChanges = true;
+      } else {
+        resultingItem = existingItem;
+      }
+    } else if (!expired || feature.content_type === ContentType.Component) {
+      resultingItem = (await this.itemManager.createItem(
+        feature.content_type,
+        this.componentContentForNativeFeatureDescription(feature),
+        true
+      )) as SNComponent;
+      hasChanges = true;
+    }
+
+    if (expired && resultingItem) {
+      if (feature.content_type !== ContentType.Component) {
+        itemsToDeleteUuids.push(resultingItem.uuid);
+        hasChanges = true;
+      }
+    }
+
+    return hasChanges;
   }
 
   public async validateAndDownloadExternalFeature(
@@ -535,6 +581,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       url = await this.crypto.base64Decode(urlOrCode);
       // eslint-disable-next-line no-empty
     } catch (err) {}
+
     try {
       const trustedCustomExtensionsUrls = [
         ...TRUSTED_FEATURE_HOSTS,
@@ -568,11 +615,35 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION);
       return undefined;
     }
-    const rawFeature = response.data as FeatureDescription;
+    const rawFeature = response.data as ThirdPartyFeatureDescription;
     if (!rawFeature.content_type) {
       return;
     }
-    const content = this.componentContentForFeatureDescription(rawFeature);
+
+    const nativeFeature = this.findStaticNativeFeature(rawFeature.identifier);
+    if (nativeFeature) {
+      await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION);
+      return;
+    }
+
+    if (rawFeature.url) {
+      for (const nativeFeature of Features) {
+        if (rawFeature.url.includes(nativeFeature.identifier)) {
+          await this.alertService.alert(
+            API_MESSAGE_FAILED_DOWNLOADING_EXTENSION
+          );
+          return;
+        }
+      }
+    }
+
+    const content = FillItemContent({
+      area: rawFeature.area,
+      name: rawFeature.name,
+      package_info: rawFeature,
+      valid_until: new Date(rawFeature.expires_at || 0),
+      hosted_url: rawFeature.url,
+    } as Partial<ComponentContent>);
     const component = (await this.itemManager.createTemplateItem(
       rawFeature.content_type,
       content
@@ -594,7 +665,6 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
-    (this.componentManager as unknown) = undefined;
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
     (this.credentialService as unknown) = undefined;

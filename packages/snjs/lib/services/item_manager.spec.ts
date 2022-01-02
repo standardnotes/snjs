@@ -1,17 +1,41 @@
-import { NotesDisplayCriteria } from './../protocol/collection/notes_display_criteria';
+import { ItemManager, SNItem } from '@Lib/index';
 import { SNNote } from '@Lib/models';
+import { SmartTagPredicateContent, SNSmartTag } from '@Lib/models/app/smartTag';
+import { Uuid } from '@Lib/uuid';
+import { SNTag, TagMutator } from '@Models/app/tag';
 import { FillItemContent } from '@Models/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { SNTag } from '@Models/app/tag';
-import { PayloadManager } from './payload_manager';
-import { ItemManager, SNItem, Uuid } from '@Lib/index';
 import { ContentType } from '@standardnotes/common';
+import { NotesDisplayCriteria } from './../protocol/collection/notes_display_criteria';
+import { PayloadManager } from './payload_manager';
 
 const setupRandomUuid = () => {
   Uuid.SetGenerators(
     () => Promise.resolve(String(Math.random())),
     () => String(Math.random())
   );
+};
+
+const TAG_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';
+const TAG_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]';
+const TAG_LONG = '!["Long", "text.length", ">", 500]';
+
+const TAG_NOT_PINNED_JSON: SmartTagPredicateContent = {
+  keypath: 'pinned',
+  operator: '=',
+  value: false,
+};
+
+const TAG_LAST_DAY_JSON: SmartTagPredicateContent = {
+  keypath: 'updated_at',
+  operator: '>',
+  value: '1.days.ago',
+};
+
+const TAG_LONG_JSON: SmartTagPredicateContent = {
+  keypath: 'text.length',
+  operator: '>',
+  value: 500,
 };
 
 describe('itemManager', () => {
@@ -278,5 +302,148 @@ describe('itemManager', () => {
 
       expect(itemManager.isTemplateItem(item)).toEqual(false);
     });
+
+    it('isTemplateItem return the correct value for system smart tags', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const [
+        systemTag1,
+        ...restOfSystemTags
+      ] = itemManager.getSmartTags().filter((tag) => tag.isSystemSmartTag);
+
+      const isSystemTemplate = itemManager.isTemplateItem(systemTag1);
+      expect(isSystemTemplate).toEqual(false);
+
+      const areTemplates = restOfSystemTags
+        .map((tag) => itemManager.isTemplateItem(tag))
+        .every((value) => !!value);
+      expect(areTemplates).toEqual(false);
+    });
+  });
+
+  describe('tags', () => {
+    it('lets me create a regular tag with a clear API', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const tag = await itemManager.createTag('this is my new tag');
+
+      expect(tag).toBeTruthy();
+      expect(itemManager.isTemplateItem(tag)).toEqual(false);
+    });
+  });
+
+  describe('tags and smart tags', () => {
+    it('lets me create a smart tag', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const [tag1, tag2, tag3] = await Promise.all([
+        itemManager.createSmartTag('Not Pinned', TAG_NOT_PINNED_JSON),
+        itemManager.createSmartTag('Last Day', TAG_LAST_DAY_JSON),
+        itemManager.createSmartTag('Long', TAG_LONG_JSON),
+      ]);
+
+      expect(tag1).toBeTruthy();
+      expect(tag2).toBeTruthy();
+      expect(tag3).toBeTruthy();
+
+      expect(tag1.content_type).toEqual(ContentType.SmartTag);
+      expect(tag2.content_type).toEqual(ContentType.SmartTag);
+      expect(tag3.content_type).toEqual(ContentType.SmartTag);
+    });
+
+    it('lets me use a smart tag', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const tag = await itemManager.createSmartTag(
+        'Not Pinned',
+        TAG_NOT_PINNED_JSON
+      );
+
+      const notes = itemManager.notesMatchingSmartTag(tag);
+
+      expect(notes).toEqual([]);
+    });
+
+    it('lets me test if a title is a smart tag', () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      expect(itemManager.isSmartTagTitle(TAG_NOT_PINNED)).toEqual(true);
+      expect(itemManager.isSmartTagTitle(TAG_LAST_DAY)).toEqual(true);
+      expect(itemManager.isSmartTagTitle(TAG_LONG)).toEqual(true);
+
+      expect(itemManager.isSmartTagTitle('Helloworld')).toEqual(false);
+      expect(itemManager.isSmartTagTitle('@^![ some title')).toEqual(false);
+    });
+
+    it('lets me create a smart tag from the DSL', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const [tag1, tag2, tag3] = await Promise.all([
+        itemManager.createSmartTagFromDSL(TAG_NOT_PINNED),
+        itemManager.createSmartTagFromDSL(TAG_LAST_DAY),
+        itemManager.createSmartTagFromDSL(TAG_LONG),
+      ]);
+
+      expect(tag1).toBeTruthy();
+      expect(tag2).toBeTruthy();
+      expect(tag3).toBeTruthy();
+
+      expect(tag1.content_type).toEqual(ContentType.SmartTag);
+      expect(tag2.content_type).toEqual(ContentType.SmartTag);
+      expect(tag3.content_type).toEqual(ContentType.SmartTag);
+    });
+
+    it('will create smart tag or tags from the generic method', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const someTag = await itemManager.createTagOrSmartTag('some-tag');
+      const someSmartTag = await itemManager.createTagOrSmartTag(TAG_LONG);
+
+      expect(someTag.content_type).toEqual(ContentType.Tag);
+      expect(someSmartTag.content_type).toEqual(ContentType.SmartTag);
+    });
+  });
+
+  it('lets me rename a smart tag', async () => {
+    itemManager = createService();
+    setupRandomUuid();
+
+    const tag = await itemManager.createSmartTag(
+      'Not Pinned',
+      TAG_NOT_PINNED_JSON
+    );
+
+    await itemManager.changeItem<TagMutator>(tag.uuid, (m) => {
+      m.title = 'New Title';
+    });
+
+    const smartTag = itemManager.findItem(tag.uuid) as SNSmartTag;
+    const smartTags = itemManager.getSmartTags();
+
+    expect(smartTag.title).toEqual('New Title');
+    expect(
+      smartTags.some((tag: SNSmartTag) => tag.title === 'New Title')
+    ).toEqual(true);
+  });
+
+  it('lets me find a smart tag', async () => {
+    itemManager = createService();
+    setupRandomUuid();
+
+    const tag = await itemManager.createSmartTag(
+      'Not Pinned',
+      TAG_NOT_PINNED_JSON
+    );
+
+    const smartTag = itemManager.findItem(tag.uuid) as SNSmartTag;
+
+    expect(smartTag).toBeDefined();
   });
 });

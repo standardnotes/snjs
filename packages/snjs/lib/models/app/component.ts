@@ -1,4 +1,4 @@
-import { FeatureIdentifier } from '@standardnotes/features';
+import { FeatureIdentifier, ThirdPartyFeatureDescription } from '@standardnotes/features';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
@@ -11,42 +11,10 @@ import {
   ComponentArea,
   ComponentFlag,
   FeatureDescription,
+  ComponentPermission,
 } from '@standardnotes/features';
 
 export { ComponentArea };
-
-export enum ComponentAction {
-  SetSize = 'set-size',
-  StreamItems = 'stream-items',
-  StreamContextItem = 'stream-context-item',
-  SaveItems = 'save-items',
-  SelectItem = 'select-item',
-  AssociateItem = 'associate-item',
-  DeassociateItem = 'deassociate-item',
-  ClearSelection = 'clear-selection',
-  CreateItem = 'create-item',
-  CreateItems = 'create-items',
-  DeleteItems = 'delete-items',
-  SetComponentData = 'set-component-data',
-  ToggleActivateComponent = 'toggle-activate-component',
-  RequestPermissions = 'request-permissions',
-  PresentConflictResolution = 'present-conflict-resolution',
-  DuplicateItem = 'duplicate-item',
-  ComponentRegistered = 'component-registered',
-  ActivateThemes = 'themes',
-  Reply = 'reply',
-  SaveSuccess = 'save-success',
-  SaveError = 'save-error',
-  ThemesActivated = 'themes-activated',
-  KeyDown = 'key-down',
-  KeyUp = 'key-up',
-  Click = 'click',
-}
-
-export type ComponentPermission = {
-  name: ComponentAction;
-  content_types?: ContentType[];
-};
 
 export interface ComponentContent {
   componentData: Record<string, any>;
@@ -216,10 +184,18 @@ export class SNComponent extends SNItem implements ComponentContent {
     return this.package_info.identifier;
   }
 
+  public get thirdPartyPackageInfo(): ThirdPartyFeatureDescription {
+    return this.package_info as ThirdPartyFeatureDescription;
+  }
+
   public get isDeprecated(): boolean {
     let flags: string[] = this.package_info.flags ?? [];
     flags = flags.map((flag: string) => flag.toLowerCase());
     return flags.includes(ComponentFlag.Deprecated);
+  }
+
+  public get deprecationMessage(): string | undefined {
+    return this.package_info.deprecation_message;
   }
 }
 

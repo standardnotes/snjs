@@ -1,4 +1,4 @@
-import { removeFromArray } from '@Lib/utils';
+import { log, removeFromArray } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
 import { ApplicationEventPayload } from '@Lib/types';
@@ -72,24 +72,7 @@ export abstract class PureService<EventName = string, EventData = undefined> {
 
   log(message: string, ...args: unknown[]): void {
     if (this.loggingEnabled) {
-      const date = new Date();
-      const timeString = date
-        .toLocaleTimeString()
-        .replace(' PM', '')
-        .replace(' AM', '');
-      const string = `${timeString}.${date.getMilliseconds()}`;
-      if (args) {
-        args = args.map((arg) => {
-          if (Array.isArray(arg)) {
-            return arg.slice();
-          } else {
-            return arg;
-          }
-        });
-        console.log(string, message, ...args);
-      } else {
-        console.log(string, message);
-      }
+      log(this, message, args);
     }
   }
 }

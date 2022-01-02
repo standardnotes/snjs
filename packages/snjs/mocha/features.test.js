@@ -15,34 +15,30 @@ describe('features', () => {
     application = await Factory.createInitAppWithRandNamespace();
 
     const now = new Date();
-    const tomorrow = now.setDate(now.getDate() + 1) * 1_000;
+    const tomorrow = now.setDate(now.getDate() + 1);
 
     midnightThemeFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.MidnightTheme
       ),
       expires_at: tomorrow,
-      url: 'https://standardnotes.com'
     };
     boldEditorFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.BoldEditor
       ),
       expires_at: tomorrow,
-      url: 'https://standardnotes.com'
     };
     tagNestingFeature = {
       ...Features.find(
         (feature) => feature.identifier === FeatureIdentifier.TagNesting
       ),
       expires_at: tomorrow,
-      url: 'https://standardnotes.com'
     };
 
     sinon.spy(application.itemManager, 'createItem');
     sinon.spy(application.itemManager, 'changeComponent');
     sinon.spy(application.itemManager, 'setItemsToBeDeleted');
-    sinon.spy(application.componentManager, 'setReadonlyStateForComponent');
     getUserFeatures = sinon
       .stub(application.apiService, 'getUserFeatures')
       .callsFake(() => {
@@ -78,10 +74,10 @@ describe('features', () => {
       expect(application.featuresService.roles[0]).to.equal(RoleName.BasicUser);
 
       expect(application.featuresService.features).to.have.lengthOf(3);
-      expect(application.featuresService.features[0]).to.equal(
+      expect(application.featuresService.features[0]).to.containSubset(
         midnightThemeFeature
       );
-      expect(application.featuresService.features[1]).to.equal(
+      expect(application.featuresService.features[1]).to.containSubset(
         boldEditorFeature
       );
 
@@ -95,9 +91,9 @@ describe('features', () => {
       );
 
       expect(storedFeatures).to.have.lengthOf(3);
-      expect(storedFeatures[0]).to.equal(midnightThemeFeature);
-      expect(storedFeatures[1]).to.equal(boldEditorFeature);
-      expect(storedFeatures[2]).to.equal(tagNestingFeature);
+      expect(storedFeatures[0]).to.containSubset(midnightThemeFeature);
+      expect(storedFeatures[1]).to.containSubset(boldEditorFeature);
+      expect(storedFeatures[2]).to.containSubset(tagNestingFeature);
     });
 
     it('should fetch user features and create items for features with content type', async () => {
@@ -111,7 +107,6 @@ describe('features', () => {
         JSON.parse(
           JSON.stringify({
             name: midnightThemeFeature.name,
-            hosted_url: midnightThemeFeature.url,
             package_info: midnightThemeFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
           })
@@ -121,7 +116,6 @@ describe('features', () => {
         JSON.parse(
           JSON.stringify({
             name: boldEditorFeature.name,
-            hosted_url: boldEditorFeature.url,
             area: boldEditorFeature.area,
             package_info: boldEditorFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
@@ -154,47 +148,11 @@ describe('features', () => {
       expect(themeItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
-            hosted_url: midnightThemeFeature.url,
             package_info: midnightThemeFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
           })
         )
       );
-    });
-
-    it('should set component to read only if feature has expired', async () => {
-      const now = new Date();
-      const yesterday = now.setDate(now.getDate() - 1);
-
-      getUserFeatures.restore();
-      sinon.stub(application.apiService, 'getUserFeatures').callsFake(() => {
-        return Promise.resolve({
-          data: {
-            features: [
-              {
-                ...boldEditorFeature,
-                expires_at: yesterday,
-              },
-            ],
-          },
-        });
-      });
-
-      // Wipe roles from initial sync
-      await application.featuresService.setRoles([]);
-      // Call sync intentionally to get roles again in meta
-      await application.sync();
-      // Timeout since we don't await for features update
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      expect(
-        application.componentManager.setReadonlyStateForComponent.callCount
-      ).to.equal(1);
-      const editorItems = application.getItems(ContentType.Component);
-      expect(
-        application.componentManager.getReadonlyStateForComponent(
-          editorItems[0]
-        ).readonly
-      ).to.equal(true);
     });
 
     it('should delete theme item if feature has expired', async () => {
@@ -234,7 +192,7 @@ describe('features', () => {
 
   it('should provide feature', async () => {
     const feature = application.getFeature(FeatureIdentifier.BoldEditor);
-    expect(feature).to.equal(boldEditorFeature);
+    expect(feature).to.containSubset(boldEditorFeature);
   });
 
   describe('extension repo items observer', () => {
