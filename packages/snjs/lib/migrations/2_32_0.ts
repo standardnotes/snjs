@@ -3,9 +3,9 @@ import { Migration } from '@Lib/migrations/migration';
 import { ContentType, SNItem, SNTheme } from '@Lib/models';
 import { FeatureIdentifier } from '..';
 
-export class Migration2_29_0 extends Migration {
+export class Migration2_32_0 extends Migration {
   static version(): string {
-    return '2.29.0';
+    return '2.32.0';
   }
 
   protected registerStageHandlers(): void {
