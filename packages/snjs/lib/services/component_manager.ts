@@ -301,8 +301,14 @@ export class SNComponentManager extends PureService<
       }
     }
 
+    const isWeb = this.environment === Environment.Web;
     if (nativeFeature) {
-      return `/components/${component.identifier}/${nativeFeature.index_path}`;
+      if (!isWeb) {
+        throw Error(
+          'Mobile must override urlForComponent to handle native paths'
+        );
+      }
+      return `${window.location.origin}/components/${component.identifier}/${nativeFeature.index_path}`;
     }
 
     let url = component.hosted_url || component.legacy_url;
