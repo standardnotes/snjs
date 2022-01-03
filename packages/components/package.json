@@ -28,7 +28,7 @@
     "sn-simple-task-editor": "1.3.7",
     "sn-spreadsheets": "1.4.2",
     "sn-theme-autobiography": "standardnotes/autobiography-theme",
-    "sn-theme-dynamic": "standardnotes/dynamic-theme",
+    "sn-theme-dynamic": "standardnotes/dynamic-theme#1.0.1",
     "sn-theme-focus": "standardnotes/focus-theme",
     "sn-theme-futura": "standardnotes/futura-theme",
     "sn-theme-midnight": "standardnotes/midnight-theme",
