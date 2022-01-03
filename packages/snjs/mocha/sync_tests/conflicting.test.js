@@ -607,7 +607,7 @@ describe('online conflict handling', function () {
 
   it('duplicating an item should maintian its relationships', async function () {
     const payload1 = Factory.createStorageItemPayload(
-      ContentType.ServerExtension
+      ContentType.Tag
     );
     const payload2 = Factory.createStorageItemPayload(ContentType.UserPrefs);
     this.expectedItemCount -= 1; /** auto-created user preferences  */
@@ -616,17 +616,17 @@ describe('online conflict handling', function () {
       PayloadSource.LocalChanged
     );
     this.expectedItemCount += 2;
-    let serverExt = this.application.itemManager.getItems(
-      ContentType.ServerExtension
+    let tag = this.application.itemManager.getItems(
+      ContentType.Tag
     )[0];
     let userPrefs = this.application.itemManager.getItems(
       ContentType.UserPrefs
     )[0];
-    expect(serverExt).to.be.ok;
+    expect(tag).to.be.ok;
     expect(userPrefs).to.be.ok;
 
-    serverExt = await this.application.itemManager.changeItem(
-      serverExt.uuid,
+    tag = await this.application.itemManager.changeItem(
+      tag.uuid,
       (mutator) => {
         mutator.addItemAsRelationship(userPrefs);
       }
@@ -640,15 +640,15 @@ describe('online conflict handling', function () {
     ).to.equal(1);
     expect(
       this.application.itemManager.itemsReferencingItem(userPrefs.uuid)
-    ).to.include(serverExt);
+    ).to.include(tag);
 
     await this.application.syncService.sync(syncOptions);
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
 
-    serverExt = await this.application.itemManager.changeItem(
-      serverExt.uuid,
+    tag = await this.application.itemManager.changeItem(
+      tag.uuid,
       (mutator) => {
         mutator.content.title = `${Math.random()}`;
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(
@@ -667,11 +667,11 @@ describe('online conflict handling', function () {
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
     const fooItems = this.application.itemManager.getItems(
-      ContentType.ServerExtension
+      ContentType.Tag
     );
     const fooItem2 = fooItems[1];
 
-    expect(fooItem2.content.conflict_of).to.equal(serverExt.uuid);
+    expect(fooItem2.content.conflict_of).to.equal(tag.uuid);
     // Two items now link to this original object
     const referencingItems = this.application.itemManager.itemsReferencingItem(
       userPrefs.uuid
@@ -680,13 +680,13 @@ describe('online conflict handling', function () {
     expect(referencingItems[0]).to.not.equal(referencingItems[1]);
 
     expect(
-      this.application.itemManager.itemsReferencingItem(serverExt.uuid).length
+      this.application.itemManager.itemsReferencingItem(tag.uuid).length
     ).to.equal(0);
     expect(
       this.application.itemManager.itemsReferencingItem(fooItem2.uuid).length
     ).to.equal(0);
 
-    expect(serverExt.content.references.length).to.equal(1);
+    expect(tag.content.references.length).to.equal(1);
     expect(fooItem2.content.references.length).to.equal(1);
     expect(userPrefs.content.references.length).to.equal(0);
 
