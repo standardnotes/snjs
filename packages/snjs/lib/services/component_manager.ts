@@ -128,7 +128,8 @@ export class SNComponentManager extends PureService<
   public createComponentViewer(
     component: SNComponent,
     contextItem?: UuidString,
-    actionObserver?: ActionObserver
+    actionObserver?: ActionObserver,
+    urlOverride?: string,
   ): ComponentViewer {
     const viewer = new ComponentViewer(
       component,
@@ -142,7 +143,7 @@ export class SNComponentManager extends PureService<
         runWithPermissions: this.runWithPermissions.bind(this),
         urlsForActiveThemes: this.urlsForActiveThemes.bind(this),
       },
-      this.urlForComponent(component),
+      urlOverride || this.urlForComponent(component),
       contextItem,
       actionObserver
     );
