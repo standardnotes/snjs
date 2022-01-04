@@ -36,9 +36,7 @@ export class ItemCollection extends MutableCollection<SNItem> {
   > = {};
   /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
    * an array of sorted elements, based on the current displaySortBy */
-  private sortedMap: Partial<
-    Record<ContentType, SNItem[]>
-  > = {};
+  private sortedMap: Partial<Record<ContentType, SNItem[]>> = {};
 
   public set(elements: SNItem | SNItem[]): void {
     elements = uniqueArrayByKey(
@@ -224,7 +222,16 @@ export class ItemCollection extends MutableCollection<SNItem> {
       if (sortBy.dir === 'asc') {
         vector *= -1;
       }
-      if (sortBy.key === CollectionSort.Title) {
+      /**
+       * Check for string length due to issue on React Native 0.65.1
+       * where empty strings causes crash:
+       * https://github.com/facebook/react-native/issues/32174
+       * */
+      if (
+        sortBy.key === CollectionSort.Title &&
+        aValue.length > 0 &&
+        bValue.length > 0
+      ) {
         return vector * aValue.localeCompare(bValue, 'en', { numeric: true });
       } else if (aValue > bValue) {
         return -1 * vector;

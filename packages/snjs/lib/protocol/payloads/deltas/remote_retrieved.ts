@@ -25,7 +25,8 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       if (!decrypted) {
         /** Decrypted should only be missing in case of deleted retrieved item */
         if (!received.deleted) {
-          throw 'Cannot find decrypted for non-deleted payload.';
+          console.error('Cannot find decrypted for non-deleted payload.');
+          continue;
         }
         filtered.push(received);
         continue;
