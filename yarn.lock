@@ -10994,9 +10994,9 @@ sn-theme-autobiography@standardnotes/autobiography-theme:
   version "1.0.2"
   resolved "https://codeload.github.com/standardnotes/autobiography-theme/tar.gz/8679a48243b1155d6b0eb65a4bd1f76559c1af67"
 
-sn-theme-dynamic@standardnotes/dynamic-theme:
-  version "1.0.0"
-  resolved "https://codeload.github.com/standardnotes/dynamic-theme/tar.gz/0e77c9da042c8aface6fd3466695ad8184dc6a50"
+sn-theme-dynamic@standardnotes/dynamic-theme#1.0.1:
+  version "1.0.1"
+  resolved "https://codeload.github.com/standardnotes/dynamic-theme/tar.gz/2f458515f73a46e44f90e286ceb4eb67ed1f96fa"
 
 sn-theme-focus@standardnotes/focus-theme:
   version "1.2.6"

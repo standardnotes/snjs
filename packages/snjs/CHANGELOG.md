@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.23](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.22...@standardnotes/snjs@2.31.23) (2022-01-03)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.22](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.21...@standardnotes/snjs@2.31.22) (2022-01-03)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.21](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.20...@standardnotes/snjs@2.31.21) (2022-01-03)
+
+
+### Bug Fixes
+
+* allow url override for component viewer factory function ([014067e](https://github.com/standardnotes/snjs/commit/014067e9050927de104b5e7e35f8e3f7596fa84b))
+
+
+
+
+
 ## [2.31.20](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.19...@standardnotes/snjs@2.31.20) (2022-01-02)
 
 

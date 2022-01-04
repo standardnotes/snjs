@@ -170,7 +170,7 @@ function themes(): ThemeFeatureDescription[] {
     permission_name: PermissionName.ThemeDynamic,
     layerable: true,
     no_mobile: true,
-    version: '1.0.0',
+    version: '1.0.1',
     description:
       'A smart theme that minimizes the tags and notes panels when they are not in use.',
     git_repo_url: 'https://github.com/standardnotes/dynamic-theme',
