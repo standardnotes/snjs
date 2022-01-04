@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.7...@standardnotes/domain-events@2.15.0) (2022-01-04)
+
+
+### Features
+
+* add cloud backup requested event ([#536](https://github.com/standardnotes/snjs/issues/536)) ([05db6b6](https://github.com/standardnotes/snjs/commit/05db6b6d820b6fb68b5c45a7109c6fdb408526be))
+
+
+
+
+
 ## [2.14.7](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.6...@standardnotes/domain-events@2.14.7) (2021-12-29)
 
 **Note:** Version bump only for package @standardnotes/domain-events
