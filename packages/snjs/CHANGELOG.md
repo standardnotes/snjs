@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.24](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.23...@standardnotes/snjs@2.31.24) (2022-01-04)
+
+
+### Bug Fixes
+
+* workaround for RN localeCompare crash ([d19fee5](https://github.com/standardnotes/snjs/commit/d19fee5133596bde8966315511b0cedb3d52ffdd))
+
+
+
+
+
 ## [2.31.23](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.22...@standardnotes/snjs@2.31.23) (2022-01-03)
 
 **Note:** Version bump only for package @standardnotes/snjs
