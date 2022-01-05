@@ -22,11 +22,13 @@
     "version-bump": "lerna version --sign-git-commit --sign-git-tag --conventional-commits --yes -m \"chore(release): publish\"",
     "version-bump-beta": "lerna version --sign-git-commit --sign-git-tag --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
     "publish-packages": "lerna publish from-git --yes",
-    "publish-packages-beta": "lerna publish from-git --yes --dist-tag beta"
+    "publish-packages-beta": "lerna publish from-git --yes --dist-tag beta",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "^14.14.22",
     "eslint": "^7.13.0",
+    "husky": "^7.0.4",
     "lerna": "^3.22.1"
   },
   "dependencies": {}
