@@ -54,7 +54,7 @@ export class SNSettingsService extends PureService {
   }
 
   getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider): string {
-    return this._cloudProviderIntegrationUrls[cloudProviderName];
+    return `${this._cloudProviderIntegrationUrls[cloudProviderName]}?redirect_url=https%3A%2F%2Fextensions.standardnotes.org%2F%2Fcomponents%2Fcloudlink%3F`;
   }
 
   deinit(): void {
