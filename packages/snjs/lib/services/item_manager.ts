@@ -873,6 +873,23 @@ export class ItemManager extends PureService {
     );
   }
 
+  public countDisplayableNotesInTag(tagUuid: UuidString): number {
+    const tag = this.findItem(tagUuid) as SNTag | undefined;
+
+    if (!tag) {
+      throw new Error('missing tag');
+    }
+
+    const references = tag.noteReferences;
+
+    const displayed = this.getDisplayableItems(ContentType.Note) as SNNote[];
+    const displayedSet = new Set(Uuids(displayed));
+    const displayedReferences = references.filter((ref) =>
+      displayedSet.has(ref.uuid)
+    );
+    return displayedReferences.length;
+  }
+
   getTagParent(tagUuid: UuidString): SNTag | undefined {
     const tag = this.findItem(tagUuid) as SNTag;
     const parentId = tag.parentId;

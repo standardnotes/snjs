@@ -906,6 +906,10 @@ export class SNApplication {
     return this.itemManager.searchTags(searchQuery, note);
   }
 
+  public countDisplayableNotesInTag(tagUuid: UuidString): number {
+    return this.itemManager.countDisplayableNotesInTag(tagUuid);
+  }
+
   public isValidTagParent(
     parentTagUuid: UuidString,
     childTagUuid: UuidString

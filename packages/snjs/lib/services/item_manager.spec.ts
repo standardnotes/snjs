@@ -271,6 +271,50 @@ describe('itemManager', () => {
     });
   });
 
+  describe('tags and notes countings', () => {
+    it('count 0 for empty tags', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+
+      const tag = createTag('my new tag');
+      await itemManager.insertItem(tag);
+
+      const count = await itemManager.countDisplayableNotesInTag(tag.uuid);
+      expect(count).toEqual(0);
+    });
+
+    it('counts regular notes', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+      const tag = createTag('my new tag');
+      const note = createNote('one note');
+      await itemManager.insertItems([tag, note]);
+      await itemManager.addTagHierarchyToNote(note, tag);
+
+      const count = await itemManager.countDisplayableNotesInTag(tag.uuid);
+      expect(count).toEqual(1);
+    });
+
+    it('does not count archived notes when not set', async () => {
+      itemManager = createService();
+      setupRandomUuid();
+      const tag = createTag('my new tag');
+      const note = createNote('one note');
+      await itemManager.insertItems([tag, note]);
+      await itemManager.addTagHierarchyToNote(note, tag);
+      await itemManager.changeItem(note.uuid, (mutator) => {
+        mutator.archived = true;
+      });
+
+      const criteria = NotesDisplayCriteria.Create({
+        includeArchived: false,
+      });
+      itemManager.setNotesDisplayCriteria(criteria);
+      const count = await itemManager.countDisplayableNotesInTag(tag.uuid);
+      expect(count).toEqual(0);
+    });
+  });
+
   describe('template items', () => {
     it('create template item', async () => {
       itemManager = createService();

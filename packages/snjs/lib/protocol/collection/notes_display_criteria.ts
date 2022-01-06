@@ -40,6 +40,10 @@ export class NotesDisplayCriteria {
     return Object.freeze(copy);
   }
 
+  public copy(override: Partial<NotesDisplayCriteria>): NotesDisplayCriteria {
+    return NotesDisplayCriteria.Copy(this, override);
+  }
+
   computeFilters(collection: ItemCollection): NoteFilter[] {
     const nonSmartTags = this.tags.filter((tag) => !tag.isSmartTag);
     const allSmartTags = this.tags.filter((tag) => tag.isSmartTag) as [

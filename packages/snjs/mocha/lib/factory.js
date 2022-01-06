@@ -561,8 +561,20 @@ export async function createTags(
   return result;
 }
 
-export async function pinNote(application, note) {
+export async function pinNote(application, note, newValue = true) {
   return application.changeItem(note.uuid, (mutator) => {
-    mutator.pinned = true;
+    mutator.pinned = newValue;
+  });
+}
+
+export async function archiveNote(application, note, newValue = true) {
+  return application.changeItem(note.uuid, (mutator) => {
+    mutator.archived = newValue;
+  });
+}
+
+export async function trashNote(application, note, newValue = true) {
+  return application.changeItem(note.uuid, (mutator) => {
+    mutator.trashed = newValue;
   });
 }
