@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.34.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.0...@standardnotes/snjs@2.34.1) (2022-01-06)
+
+
+### Bug Fixes
+
+* sync after deleting offline repo ([29df45a](https://github.com/standardnotes/snjs/commit/29df45a8b018d216b3b2ed6671b494966e97fc17))
+
+
+
+
+
 # [2.34.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.33.0...@standardnotes/snjs@2.34.0) (2022-01-06)
 
 
