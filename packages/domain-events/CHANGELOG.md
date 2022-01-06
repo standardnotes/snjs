@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.16.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.15.0...@standardnotes/domain-events@2.16.0) (2022-01-06)
+
+
+### Features
+
+* add daily version adoption report generated event ([#540](https://github.com/standardnotes/snjs/issues/540)) ([3b0f986](https://github.com/standardnotes/snjs/commit/3b0f986f34bf295a32022bb7b345fd230229ba5a))
+
+
+
+
+
 # [2.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.14.7...@standardnotes/domain-events@2.15.0) (2022-01-04)
 
 
