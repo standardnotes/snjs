@@ -231,6 +231,9 @@ export {
   namespacedKey,
 } from '@Lib/storage_keys';
 
+export { NoteViewController } from './ui/note_view_controller';
+export { NoteGroupController } from './ui/note_group_controller';
+
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
 
