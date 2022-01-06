@@ -425,7 +425,6 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
       name: 'FileSafe',
       identifier: FeatureIdentifier.FileSafe,
       version: '2.0.10',
-      index_path: 'index.html',
       component_permissions: [
         {
           name: ComponentAction.StreamContextItem,
