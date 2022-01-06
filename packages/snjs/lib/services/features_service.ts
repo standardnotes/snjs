@@ -226,6 +226,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     const repo = this.getOfflineRepo();
     if (repo) {
       await this.itemManager.setItemToBeDeleted(repo.uuid);
+      this.syncService.sync();
     }
     await this.storageService.removeValue(StorageKey.UserFeatures);
   }
