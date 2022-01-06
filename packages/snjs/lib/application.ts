@@ -117,7 +117,7 @@ import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
-import { EmailBackupFrequency, SettingName } from '@standardnotes/settings';
+import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
@@ -1733,6 +1733,10 @@ export class SNApplication {
 
   public isThirdPartyHostUsed(): boolean {
     return this.apiService.isThirdPartyHostUsed();
+  }
+
+  public getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider): string {
+    return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName);
   }
 
   private constructServices() {

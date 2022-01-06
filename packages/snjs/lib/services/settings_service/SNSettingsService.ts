@@ -3,7 +3,7 @@ import { PureService } from '../pure_service';
 import { SNApiService } from '../api/api_service';
 import { SettingsGateway } from './SettingsGateway';
 import { SNSessionManager } from '../api/session_manager';
-import { EmailBackupFrequency, SettingName } from '@standardnotes/settings';
+import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SensitiveSettingName } from './SensitiveSettingName';
 
 export class SNSettingsService extends PureService {
@@ -13,6 +13,11 @@ export class SNSettingsService extends PureService {
     [EmailBackupFrequency.Daily]: 'Daily',
     [EmailBackupFrequency.Weekly]: 'Weekly',
   };
+  private _cloudProviderIntegrationUrls = {
+    [CloudProvider.Dropbox]: 'https://extensions.standardnotes.org/dropbox',
+    [CloudProvider.Google]: 'https://extensions.standardnotes.org/gdrive',
+    [CloudProvider.OneDrive]: 'https://extensions.standardnotes.org/onedrive',
+  }
 
   constructor(
     private readonly sessionManager: SNSessionManager,
@@ -46,6 +51,10 @@ export class SNSettingsService extends PureService {
   }
   getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
     return this._frequencyOptionsLabels[frequency];
+  }
+
+  getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider): string {
+    return `${this._cloudProviderIntegrationUrls[cloudProviderName]}?redirect_url=https%3A%2F%2Fextensions.standardnotes.org%2F%2Fcomponents%2Fcloudlink%3F`;
   }
 
   deinit(): void {
