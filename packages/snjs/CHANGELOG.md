@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.34.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.33.0...@standardnotes/snjs@2.34.0) (2022-01-06)
+
+
+### Features
+
+* extracted note controllers from web app ([0d2c615](https://github.com/standardnotes/snjs/commit/0d2c615a16ec632e2abe4b3762605b7f5d30cf34))
+
+
+
+
+
 # [2.33.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.32.0...@standardnotes/snjs@2.33.0) (2022-01-06)
 
 
