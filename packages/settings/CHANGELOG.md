@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.8.1...@standardnotes/settings@1.9.0) (2022-01-06)
+
+
+### Features
+
+* expose urls needed for cloud backup integration ([#537](https://github.com/standardnotes/snjs/issues/537)) ([efa492f](https://github.com/standardnotes/snjs/commit/efa492f6ddd26e23b590150c00263ac14267f572))
+
+
+
+
+
 ## [1.8.1](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.8.0...@standardnotes/settings@1.8.1) (2021-12-30)
 
 
