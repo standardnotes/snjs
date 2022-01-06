@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.33.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.32.0...@standardnotes/snjs@2.33.0) (2022-01-06)
+
+
+### Features
+
+* Add NotesHideEditorIcon pref key ([#539](https://github.com/standardnotes/snjs/issues/539)) ([636cc2a](https://github.com/standardnotes/snjs/commit/636cc2ab75ddf900edcc04a4124da5bcac7cdb22))
+
+
+
+
+
 # [2.32.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.25...@standardnotes/snjs@2.32.0) (2022-01-06)
 
 
