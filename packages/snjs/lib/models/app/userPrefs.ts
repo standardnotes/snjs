@@ -20,6 +20,7 @@ export enum PrefKey {
   NotesHideNotePreview = 'hideNotePreview',
   NotesHideDate = 'hideDate',
   NotesHideTags = 'hideTags',
+  NotesHideEditorIcon = 'hideEditorIcon',
 }
 
 export type PrefValue = {
@@ -39,6 +40,7 @@ export type PrefValue = {
   [PrefKey.NotesHideNotePreview]: boolean;
   [PrefKey.NotesHideDate]: boolean;
   [PrefKey.NotesHideTags]: boolean;
+  [PrefKey.NotesHideEditorIcon]: boolean;
 };
 
 export class SNUserPrefs extends SNItem {
