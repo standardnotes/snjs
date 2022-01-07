@@ -117,7 +117,11 @@ import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
-import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';
+import {
+  CloudProvider,
+  EmailBackupFrequency,
+  SettingName,
+} from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
@@ -1667,7 +1671,9 @@ export class SNApplication {
     return this.settingsService.deleteSetting(name);
   }
 
-  public getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
+  public getEmailBackupFrequencyOptionLabel(
+    frequency: EmailBackupFrequency
+  ): string {
     return this.settingsService.getEmailBackupFrequencyOptionLabel(frequency);
   }
 
@@ -1731,12 +1737,20 @@ export class SNApplication {
     return this.featuresService.deleteOfflineFeatureRepo();
   }
 
+  public isThirdPartyFeature(identifier: string): boolean {
+    return this.featuresService.isThirdPartyFeature(identifier);
+  }
+
   public isThirdPartyHostUsed(): boolean {
     return this.apiService.isThirdPartyHostUsed();
   }
 
-  public getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider): string {
-    return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName);
+  public getCloudProviderIntegrationUrl(
+    cloudProviderName: CloudProvider
+  ): string {
+    return this.settingsService.getCloudProviderIntegrationUrl(
+      cloudProviderName
+    );
   }
 
   private constructServices() {

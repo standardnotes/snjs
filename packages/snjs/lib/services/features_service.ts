@@ -375,6 +375,13 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return Features.find((f) => f.identifier === identifier);
   }
 
+  public isThirdPartyFeature(identifier: string): boolean {
+    const isNativeFeature = !!this.findStaticNativeFeature(
+      identifier as FeatureIdentifier
+    );
+    return !isNativeFeature;
+  }
+
   private mapRemoteNativeFeatureToStaticFeature(
     remoteFeature: FeatureDescription
   ): FeatureDescription {
