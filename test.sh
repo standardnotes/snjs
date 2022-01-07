@@ -45,7 +45,7 @@ function startContainers {
   docker compose -f $COMPOSE_FILE build
 
   echo "# Starting all containers for Test Suite"
-  docker compose up -f $COMPOSE_FILE -d
+  docker compose -f $COMPOSE_FILE up -d
 }
 
 function waitForServices {
