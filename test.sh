@@ -8,9 +8,9 @@ then
   exit 1
 fi
 
-COMPOSE_FILE = "docker-compose.yml"
+COMPOSE_FILE="docker-compose.yml"
 if [ "$SUITE" -eq "canary" ]; then
-  $COMPOSE_FILE = "docker-compose.canary.yml"
+  $COMPOSE_FILE="docker-compose.canary.yml"
 fi
 
 function setup {
