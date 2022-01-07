@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.16.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.0...@standardnotes/domain-events@2.16.1) (2022-01-07)
+
+
+### Bug Fixes
+
+* add extensionSettingUuid to backup events for a gradual release ([14dc8e9](https://github.com/standardnotes/snjs/commit/14dc8e9e319c1402b50f96080dad614912bbda59))
+
+
+
+
+
 # [2.16.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.15.0...@standardnotes/domain-events@2.16.0) (2022-01-06)
 
 
