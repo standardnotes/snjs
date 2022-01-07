@@ -880,14 +880,8 @@ export class ItemManager extends PureService {
       throw new Error('missing tag');
     }
 
-    const references = tag.noteReferences;
-
-    const displayed = this.getDisplayableItems(ContentType.Note) as SNNote[];
-    const displayedSet = new Set(Uuids(displayed));
-    const displayedReferences = references.filter((ref) =>
-      displayedSet.has(ref.uuid)
-    );
-    return displayedReferences.length;
+    const displayed = this.notesView.forTag(tag).displayElements();
+    return displayed.length;
   }
 
   getTagParent(tagUuid: UuidString): SNTag | undefined {

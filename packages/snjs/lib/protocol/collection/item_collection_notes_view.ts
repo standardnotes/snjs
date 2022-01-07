@@ -29,6 +29,11 @@ export class ItemCollectionNotesView {
     this.needsRebuilding = true;
   }
 
+  public forTag(tag: SNTag): ItemCollectionNotesView {
+    const criteria = this.criteria.copy({tags: [tag]});
+    return new ItemCollectionNotesView(this.collection, criteria);
+  }
+
   public notesMatchingSmartTag(smartTag: SNSmartTag) {
     const criteria = criteriaForSmartTag(smartTag);
     return notesMatchingCriteria(criteria, this.collection);
