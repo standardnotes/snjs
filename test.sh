@@ -1,5 +1,18 @@
 # !/bin/bash
 
+[ -n "${SUITE}" ] || SUITE=$1 && shift 1
+if [ -z "$SUITE" ];
+then
+  echo "Test suite argument is missing. Please choose canary or stable"
+  usage
+  exit 1
+fi
+
+COMPOSE_FILE="docker-compose.yml"
+if [ "$SUITE" -eq "canary" ]; then
+  $COMPOSE_FILE="docker-compose.canary.yml"
+fi
+
 function setup {
   echo "# Copying the sample configuration files"
   cp docker/api-gateway.env.sample docker/api-gateway.env
@@ -16,23 +29,23 @@ function cleanup {
   if [ $output_logs == 1 ]
   then
     echo "Outputing last 100 lines of logs"
-    docker-compose logs --tail=100
+    docker compose -f $COMPOSE_FILE logs --tail=100
   fi
   echo "# Killing all containers"
-  docker-compose kill
+  docker compose -f $COMPOSE_FILE kill
   echo "# Removing all containers"
-  docker-compose rm -vf
+  docker compose -f $COMPOSE_FILE rm -vf
 }
 
 function startContainers {
   echo "# Pulling latest versions"
-  docker-compose pull
+  docker compose -f $COMPOSE_FILE pull
 
   echo "# Building Docker images"
-  docker-compose build
+  docker compose -f $COMPOSE_FILE build
 
   echo "# Starting all containers for Test Suite"
-  docker-compose up -d
+  docker compose -f $COMPOSE_FILE up -d
 }
 
 function waitForServices {
@@ -40,7 +53,7 @@ function waitForServices {
   while [ $attempt -le 60 ]; do
       attempt=$(( $attempt + 1 ))
       echo "# Waiting for all services to be up (attempt: $attempt) ..."
-      result=$(docker-compose logs api-gateway)
+      result=$(docker compose -f $COMPOSE_FILE logs api-gateway)
       if grep -q 'Server started on port' <<< $result ; then
           sleep 2 # for warmup
           echo "# All services are up!"
