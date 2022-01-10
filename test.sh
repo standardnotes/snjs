@@ -9,7 +9,7 @@ then
 fi
 
 COMPOSE_FILE="docker-compose.yml"
-if [ "$SUITE" -eq "canary" ]; then
+if [ "$SUITE" == "canary" ]; then
   $COMPOSE_FILE="docker-compose.canary.yml"
 fi
 
@@ -38,6 +38,7 @@ function cleanup {
 }
 
 function startContainers {
+  echo "# Running Test Suite in $SUITE mode. Using $COMPOSE_FILE compose file."
   echo "# Pulling latest versions"
   docker compose -f $COMPOSE_FILE pull
 
