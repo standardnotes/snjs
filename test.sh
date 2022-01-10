@@ -10,7 +10,7 @@ fi
 
 COMPOSE_FILE="docker-compose.yml"
 if [ "$SUITE" == "canary" ]; then
-  $COMPOSE_FILE="docker-compose.canary.yml"
+  COMPOSE_FILE="docker-compose.canary.yml"
 fi
 
 function setup {
