@@ -6,7 +6,7 @@ import { isNote } from '@Lib/models/app/note';
 import { isTag } from '@Lib/models/app/tag';
 
 export class TagNotesIndex {
-  private tagToNotesMap: Record<UuidString, Set<UuidString>> = {};
+  private tagToNotesMap: Partial<Record<UuidString, Set<UuidString>>> = {};
   private allCountableNotes = new Set<UuidString>();
 
   constructor(private collection: ItemCollection) {}
@@ -20,7 +20,7 @@ export class TagNotesIndex {
   }
 
   public countableNotesForTag(tag: SNTag): number {
-    return this.tagToNotesMap[tag.uuid]?.size;
+    return this.tagToNotesMap[tag.uuid]?.size || 0;
   }
 
   public receiveTagAndNoteChanges(items: (SNTag | SNNote)[]): void {
@@ -54,7 +54,7 @@ export class TagNotesIndex {
         note.uuid
       );
       for (const tagUuid of associatedTagUuids) {
-        const set = this.tagToNotesMap[tagUuid];
+        const set = this.setForTag(tagUuid);
         if (isCountable) {
           set.add(note.uuid);
         } else {
@@ -62,5 +62,14 @@ export class TagNotesIndex {
         }
       }
     }
+  }
+
+  private setForTag(uuid: UuidString): Set<UuidString> {
+    let set = this.tagToNotesMap[uuid];
+    if (!set) {
+      set = new Set();
+      this.tagToNotesMap[uuid] = set;
+    }
+    return set;
   }
 }
