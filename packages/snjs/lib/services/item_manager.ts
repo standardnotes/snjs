@@ -897,8 +897,7 @@ export class ItemManager extends PureService {
   }
 
   getTagChildren(tagUuid: UuidString): SNTag[] {
-    const tag = this.findItem(tagUuid) as SNTag;
-    return this.collection.elementsReferencingElement(tag) as SNTag[];
+    return this.tags.filter((tag) => tag.parentId === tagUuid);
   }
 
   public isTagAncestor(tagUuid: UuidString, childUuid: UuidString): boolean {
