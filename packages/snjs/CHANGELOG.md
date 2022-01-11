@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.35.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.0...@standardnotes/snjs@2.35.1) (2022-01-11)
+
+
+### Bug Fixes
+
+* default tag to empty string if title undefined ([908fbaf](https://github.com/standardnotes/snjs/commit/908fbafd39600165b8d516826cc1dd5488075be6))
+
+
+
+
+
 # [2.35.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.3...@standardnotes/snjs@2.35.0) (2022-01-11)
 
 
