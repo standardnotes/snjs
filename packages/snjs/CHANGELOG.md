@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.35.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.3...@standardnotes/snjs@2.35.0) (2022-01-11)
+
+
+### Features
+
+* extract save method from clients into note_view_controller ([1692935](https://github.com/standardnotes/snjs/commit/169293517488f210e544640aac1702209a01d760))
+
+
+
+
+
 ## [2.34.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.2...@standardnotes/snjs@2.34.3) (2022-01-10)
 
 **Note:** Version bump only for package @standardnotes/snjs
