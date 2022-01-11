@@ -1,4 +1,7 @@
-import { TagNotesIndex } from './../protocol/collection/tag_notes_index';
+import {
+  TagNotesIndex,
+  TagNoteCountChangeObserver,
+} from './../protocol/collection/tag_notes_index';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
@@ -259,11 +262,22 @@ export class ItemManager extends PureService {
     ) as SNComponent[];
   }
 
+  public addNoteCountChangeObserver(
+    observer: TagNoteCountChangeObserver
+  ): () => void {
+    return this.tagNotesIndex.addCountChangeObserver(observer);
+  }
+
   public allCountableNotesCount(): number {
     return this.tagNotesIndex.allCountableNotesCount();
   }
 
   public countableNotesForTag(tag: SNTag): number {
+    if (tag.isSmartTag) {
+      throw Error(
+        'countableNotesForTag is not meant to be used for smart tags.'
+      );
+    }
     return this.tagNotesIndex.countableNotesForTag(tag);
   }
 
