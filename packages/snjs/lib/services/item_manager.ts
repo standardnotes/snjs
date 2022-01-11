@@ -1,3 +1,4 @@
+import { TagNotesIndex } from './../protocol/collection/tag_notes_index';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
@@ -85,6 +86,7 @@ export class ItemManager extends PureService {
   private collection!: ItemCollection;
   private notesView!: ItemCollectionNotesView;
   private systemSmartTags: SNSmartTag[];
+  private tagNotesIndex!: TagNotesIndex;
 
   constructor(private payloadManager: PayloadManager) {
     super();
@@ -130,6 +132,7 @@ export class ItemManager extends PureService {
       'asc'
     );
     this.notesView = new ItemCollectionNotesView(this.collection);
+    this.tagNotesIndex = new TagNotesIndex(this.collection);
   }
 
   public setDisplayOptions(
@@ -253,6 +256,14 @@ export class ItemManager extends PureService {
     ) as SNComponent[];
   }
 
+  public allCountableNotesCount(): number {
+    return this.tagNotesIndex.allCountableNotesCount();
+  }
+
+  public countableNotesForTag(tag: SNTag): number {
+    return this.tagNotesIndex.countableNotesForTag(tag);
+  }
+
   public addObserver(
     contentType: ContentType | ContentType[],
     callback: ObserverCallback
@@ -313,6 +324,13 @@ export class ItemManager extends PureService {
       this.collection.discard(item);
     }
     this.notesView.setNeedsRebuilding();
+    this.tagNotesIndex.receiveTagAndNoteChanges(
+      changedOrInserted.filter(
+        (item) =>
+          item.content_type === ContentType.Tag ||
+          item.content_type === ContentType.Note
+      ) as SNTag[]
+    );
     this.notifyObservers(
       changedItems,
       insertedItems,

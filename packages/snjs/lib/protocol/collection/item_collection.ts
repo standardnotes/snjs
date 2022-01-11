@@ -134,9 +134,12 @@ export class ItemCollection extends MutableCollection<SNItem> {
       const previousElement = !isNullOrUndefined(previousIndex)
         ? sortedElements[previousIndex]
         : undefined;
-      /** If the element is deleted, or if it no longer exists in the primary map (because
+
+      /**
+       *  If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
-       * the filter. If no filter the element passes by default. */
+       * the filter. If no filter the element passes by default.
+       */
       const passes =
         element.deleted || !this.map[element.uuid]
           ? false
