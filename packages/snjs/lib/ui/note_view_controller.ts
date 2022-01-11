@@ -3,9 +3,27 @@ import { SNItem } from '@Models/core/item';
 import { ContentType } from '@Models/content_types';
 import { SNTag } from '@Lib/index';
 import { PayloadSource } from '@Lib/protocol/payloads';
-import { SNNote } from '@Lib/models';
+import { NoteMutator, SNNote } from '@Lib/models';
 import { UuidString } from '@Lib/types';
 import { SNApplication } from './../application';
+
+export const STRING_SAVING_WHILE_DOCUMENT_HIDDEN =
+  'Attempting to save an item while the application is hidden. To protect data integrity, please refresh the application window and try again.';
+export const STRING_DELETED_NOTE =
+  'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.';
+export const STRING_INVALID_NOTE =
+  "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note.";
+
+export const STRING_ELLIPSES = '...';
+
+const NOTE_PREVIEW_CHAR_LIMIT = 80;
+const SAVE_TIMEOUT_DEBOUNCE = 350;
+const SAVE_TIMEOUT_NO_DEBOUNCE = 100;
+
+export type EditorValues = {
+  title: string;
+  text: string;
+};
 
 export class NoteViewController {
   public note!: SNNote;
@@ -16,6 +34,7 @@ export class NoteViewController {
   ) => void)[] = [];
   private removeStreamObserver?: () => void;
   public isTemplateNote = false;
+  private saveTimeout?: Promise<void>;
 
   constructor(
     application: SNApplication,
@@ -70,6 +89,7 @@ export class NoteViewController {
     (this.removeStreamObserver as unknown) = undefined;
     (this.application as unknown) = undefined;
     this.innerValueChangeObservers.length = 0;
+    this.saveTimeout = undefined;
   }
 
   private handleNoteStream(notes: SNNote[], source: PayloadSource) {
@@ -104,5 +124,81 @@ export class NoteViewController {
     return () => {
       removeFromArray(this.innerValueChangeObservers, callback);
     };
+  }
+
+  /**
+   * @param bypassDebouncer Calling save will debounce by default. You can pass true to save
+   * immediately.
+   * @param isUserModified This field determines if the item will be saved as a user
+   * modification, thus updating the user modified date displayed in the UI
+   * @param dontUpdatePreviews Whether this change should update the note's plain and HTML
+   * preview.
+   * @param customMutate A custom mutator function.
+   */
+  public async save(dto: {
+    editorValues: EditorValues;
+    bypassDebouncer?: boolean;
+    isUserModified?: boolean;
+    dontUpdatePreviews?: boolean;
+    customMutate?: (mutator: NoteMutator) => void;
+  }): Promise<void> {
+    const title = dto.editorValues.title;
+    const text = dto.editorValues.text;
+    const isTemplate = this.isTemplateNote;
+
+    if (typeof document !== 'undefined' && document.hidden) {
+      this.application.alertService.alert(STRING_SAVING_WHILE_DOCUMENT_HIDDEN);
+      return;
+    }
+
+    if (this.note.deleted) {
+      this.application.alertService.alert(STRING_DELETED_NOTE);
+      return;
+    }
+
+    if (isTemplate) {
+      await this.insertTemplatedNote();
+    }
+
+    if (!this.application.findItem(this.note.uuid)) {
+      this.application.alertService.alert(STRING_INVALID_NOTE);
+      return;
+    }
+
+    await this.application.changeItem(
+      this.note.uuid,
+      (mutator) => {
+        const noteMutator = mutator as NoteMutator;
+        if (dto.customMutate) {
+          dto.customMutate(noteMutator);
+        }
+        noteMutator.title = title;
+        noteMutator.text = text;
+
+        if (!dto.dontUpdatePreviews) {
+          const noteText = text || '';
+          const truncate = noteText.length > NOTE_PREVIEW_CHAR_LIMIT;
+          const substring = noteText.substring(0, NOTE_PREVIEW_CHAR_LIMIT);
+          const previewPlain = substring + (truncate ? STRING_ELLIPSES : '');
+          // eslint-disable-next-line camelcase
+          noteMutator.preview_plain = previewPlain;
+          // eslint-disable-next-line camelcase
+          noteMutator.preview_html = undefined;
+        }
+      },
+      dto.isUserModified
+    );
+
+    if (this.saveTimeout) {
+      this.application.deviceInterface.timeout.cancel(this.saveTimeout);
+    }
+
+    const noDebounce = dto.bypassDebouncer || this.application.noAccount();
+    const syncDebouceMs = noDebounce
+      ? SAVE_TIMEOUT_NO_DEBOUNCE
+      : SAVE_TIMEOUT_DEBOUNCE;
+    this.saveTimeout = this.application.deviceInterface.timeout(() => {
+      this.application.sync();
+    }, syncDebouceMs);
   }
 }
