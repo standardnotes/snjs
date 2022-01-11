@@ -47,7 +47,6 @@ export class TagNotesIndex {
   private recieveNoteChanges(notes: SNNote[]): void {
     for (const note of notes) {
       const isCountable = this.isNoteCountable(note);
-
       if (isCountable) {
         this.allCountableNotes.add(note.uuid);
       } else {
@@ -57,12 +56,8 @@ export class TagNotesIndex {
       const associatedTagUuids = this.collection.uuidsThatReferenceUuid(
         note.uuid
       );
-      const associatedTags = this.collection.findAll(
-        associatedTagUuids
-      ) as SNTag[];
-
-      for (const tag of associatedTags) {
-        const set = this.tagToNotesMap[tag.uuid];
+      for (const tagUuid of associatedTagUuids) {
+        const set = this.tagToNotesMap[tagUuid];
         if (isCountable) {
           set.add(note.uuid);
         } else {
