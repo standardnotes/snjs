@@ -7,6 +7,7 @@ import { ItemContent } from './../core/item';
 
 export interface TagContent extends ItemContent {
   title: string;
+  parentId?: UuidString;
 }
 
 /**
@@ -15,15 +16,17 @@ export interface TagContent extends ItemContent {
  */
 export class SNTag extends SNItem implements TagContent {
   public readonly title: string;
+  public readonly parentId?: UuidString;
 
   constructor(payload: PurePayload) {
     super(payload);
     this.title = this.payload.safeContent.title;
+    this.parentId = this.payload.safeContent.parentId;
   }
 
   get noteReferences(): ContentReference[] {
     const references = this.payload.safeReferences;
-    return references.filter(ref => ref.content_type === ContentType.Note)
+    return references.filter((ref) => ref.content_type === ContentType.Note);
   }
 
   get noteCount(): number {
@@ -50,13 +53,6 @@ export class SNTag extends SNItem implements TagContent {
     return this.payload.safeContent.isArchiveTag;
   }
 
-  public get parentId(): UuidString | undefined {
-    const reference = this.references.find(
-      (ref) => ref.content_type === ContentType.Tag
-    );
-    return reference?.uuid;
-  }
-
   public static arrayToDisplayString(tags: SNTag[]): string {
     return tags
       .sort((a, b) => {
@@ -79,13 +75,10 @@ export class TagMutator extends ItemMutator {
   }
 
   public makeChildOf(tag: SNTag): void {
-    const references = this.item.references.filter(
-      (ref) => ref.content_type !== ContentType.Tag
-    );
-    references.push({
-      content_type: ContentType.Tag,
-      uuid: tag.uuid,
-    });
-    this.typedContent.references = references;
+    this.typedContent.parentId = tag.uuid;
+  }
+
+  public removeParent(): void {
+    this.typedContent.parentId = undefined;
   }
 }

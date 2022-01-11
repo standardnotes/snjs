@@ -960,7 +960,7 @@ export class ItemManager extends PureService {
     }
 
     return this.changeTag(childTag.uuid, (m) => {
-      m.removeItemAsRelationship(parentTag);
+      m.removeParent();
     });
   }
 
