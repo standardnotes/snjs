@@ -1,8 +1,9 @@
-import { ContentType } from '@Models/content_types';
 import { ItemCollection } from './item_collection';
 import { SNNote } from '@Lib/models';
 import { SNTag } from '@Lib/index';
 import { UuidString } from '@Lib/types';
+import { isNote } from '@Lib/models/app/note';
+import { isTag } from '@Lib/models/app/tag';
 
 export class TagNotesIndex {
   private tagToNotesMap: Record<UuidString, Set<UuidString>> = {};
@@ -23,18 +24,14 @@ export class TagNotesIndex {
   }
 
   public receiveTagAndNoteChanges(items: (SNTag | SNNote)[]): void {
-    const notes = items.filter(
-      (item) => item.content_type === ContentType.Note
-    ) as SNNote[];
-    this.recieveNoteChanges(notes);
+    const notes = items.filter(isNote);
+    this.receiveNoteChanges(notes);
 
-    const tags = items.filter(
-      (item) => item.content_type === ContentType.Tag
-    ) as SNTag[];
-    this.recieveTagChanges(tags);
+    const tags = items.filter(isTag);
+    this.receiveTagChanges(tags);
   }
 
-  private recieveTagChanges(tags: SNTag[]): void {
+  private receiveTagChanges(tags: SNTag[]): void {
     for (const tag of tags) {
       const uuids = tag.noteReferences.map((ref) => ref.uuid);
       const countableUuids = uuids.filter((uuid) =>
@@ -44,7 +41,7 @@ export class TagNotesIndex {
     }
   }
 
-  private recieveNoteChanges(notes: SNNote[]): void {
+  private receiveNoteChanges(notes: SNNote[]): void {
     for (const note of notes) {
       const isCountable = this.isNoteCountable(note);
       if (isCountable) {

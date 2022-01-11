@@ -70,6 +70,9 @@ export type TransactionalMutation = {
   mutationType?: MutationType;
 };
 
+export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
+  x.content_type === ContentType.Note || x.content_type === ContentType.Tag;
+
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
  * more user-friendly or item-specific interface to creating and updating data.
@@ -325,11 +328,7 @@ export class ItemManager extends PureService {
     }
     this.notesView.setNeedsRebuilding();
     this.tagNotesIndex.receiveTagAndNoteChanges(
-      changedOrInserted.filter(
-        (item) =>
-          item.content_type === ContentType.Tag ||
-          item.content_type === ContentType.Note
-      ) as SNTag[]
+      changedOrInserted.filter(isTagOrNote)
     );
     this.notifyObservers(
       changedItems,
