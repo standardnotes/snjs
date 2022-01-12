@@ -1,5 +1,5 @@
 import * as Factory from './lib/factory.js';
-import { SettingName } from '@standardnotes/settings';
+import { MuteFailedBackupsEmailsOption, SettingName } from '@standardnotes/settings';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -86,8 +86,8 @@ describe('settings service', function () {
 
   it('creates and lists a sensitive setting', async () => {
     await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true);
-    await snApp.updateSetting('UNSENSITIVE', 'so_unsensitive');
+    await snApp.updateSetting(SettingName.MuteFailedBackupsEmails, MuteFailedBackupsEmailsOption.Muted);
     const settings = await snApp.listSettings();
-    expect(settings).to.eql({ UNSENSITIVE: 'so_unsensitive' });
+    expect(settings).to.eql({ 'MUTE_FAILED_BACKUPS_EMAILS': 'muted' });
   });
 });
