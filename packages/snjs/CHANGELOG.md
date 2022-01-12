@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.35.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.2...@standardnotes/snjs@2.35.3) (2022-01-12)
+
+
+### Bug Fixes
+
+* make extension-server url dynamic, depending on whether the env is dev or prod ([#550](https://github.com/standardnotes/snjs/issues/550)) ([f28b564](https://github.com/standardnotes/snjs/commit/f28b56400564cd8cb03777489b8ddacbefe9bb9d))
+
+
+
+
+
 ## [2.35.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.1...@standardnotes/snjs@2.35.2) (2022-01-12)
 
 
