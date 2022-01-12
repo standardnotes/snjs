@@ -13,14 +13,14 @@ export type SearchQuery = {
 };
 
 export class NotesDisplayCriteria {
-  public readonly searchQuery?: SearchQuery;
-  public readonly tags: SNTag[] = [];
-  public readonly includePinned = true;
-  public readonly includeProtected = true;
-  public readonly includeTrashed = false;
-  public readonly includeArchived = false;
-  public readonly sortProperty?: CollectionSort;
-  public readonly sortDirection?: SortDirection;
+  public searchQuery?: SearchQuery;
+  public tags: SNTag[] = [];
+  public includePinned = true;
+  public includeProtected = true;
+  public includeTrashed = false;
+  public includeArchived = false;
+  public sortProperty?: CollectionSort;
+  public sortDirection?: SortDirection;
 
   static Create(
     properties: Partial<NotesDisplayCriteria>
