@@ -8,7 +8,7 @@ To further your protections against general disruptions in your network or ours,
 
 ### Decrypting a Backup Offline
 
-[Download the offline decrypt script](https://raw.githubusercontent.com/standardfile/decrypt/master/dist/decrypt.html) and open it with any browser.
+[Download the offline decrypt script](https://raw.githubusercontent.com/standardnotes/snjs/master/packages/decrypt-script/dist/decrypt.html) and open it with any browser.
 
 You can right click the link above and choose "Save link as", or open the page directly and save the page with Cmd/Ctrl + S.
 
@@ -20,11 +20,11 @@ There are two ways to create backups of your note data:
 
 1. Manual: In the "Account" menu of the Standard Notes app, in the lower left corner, you will see options for downloading encrypted or decrypted archives of your data.
 
-2. Automatic: [Our Extended subscription](https://standardnotes.org/extensions) creates automatic and real-time backups of all your data to your Dropbox, OneDrive, and Google Drive, with other cloud providers being added soon.
+2. Automatic: [Our Extended subscription](https://standardnotes.com/extensions) creates automatic and real-time backups of all your data to your Dropbox, OneDrive, and Google Drive, with other cloud providers being added soon.
 
 #### Need help? We're here for you.
 
-Find some frequently asked questions as well as ways to get in touch on the [Help](https://standardnotes.org/help) page.
+Find some frequently asked questions as well as ways to get in touch on the [Help](https://standardnotes.com/help) page.
 
 ## Building the script yourself
 
