@@ -15,8 +15,10 @@ export const TRUSTED_FEATURE_HOSTS = [
   'features.standardnotes.com',
 ];
 
-export const EXTENSIONS_SERVER_HOST_DEV = 'https://extensions-server-dev.standardnotes.org';
-export const EXTENSIONS_SERVER_HOST_PROD = 'https://extensions.standardnotes.org';
+export enum ExtensionsServerURL {
+  Prod = 'https://extensions.standardnotes.org',
+  Dev = 'https://extensions-server-dev.standardnotes.org'
+}
 
 const LocalHost = 'localhost';
 

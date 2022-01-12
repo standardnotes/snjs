@@ -5,7 +5,7 @@ import { SettingsGateway } from './SettingsGateway';
 import { SNSessionManager } from '../api/session_manager';
 import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SensitiveSettingName } from './SensitiveSettingName';
-import { EXTENSIONS_SERVER_HOST_DEV, EXTENSIONS_SERVER_HOST_PROD } from '@Lib/hosts';
+import { ExtensionsServerURL } from '@Lib/hosts';
 
 export class SNSettingsService extends PureService {
   private _provider!: SettingsGateway;
@@ -57,7 +57,8 @@ export class SNSettingsService extends PureService {
   }
 
   getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider, isDevEnvironment: boolean): string {
-    const extensionsServerHost = isDevEnvironment ? EXTENSIONS_SERVER_HOST_DEV : EXTENSIONS_SERVER_HOST_PROD;
+    const { Dev, Prod } = ExtensionsServerURL;
+    const extensionsServerHost = isDevEnvironment ? Dev : Prod;
     return `${extensionsServerHost}/${this._cloudProviderIntegrationUrlEndpoints[cloudProviderName]}?redirect_url=${extensionsServerHost}/components/cloudlink?`;
   }
 

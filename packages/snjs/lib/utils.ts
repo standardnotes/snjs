@@ -683,9 +683,3 @@ export function log(instance: any, message: string, ...args: unknown[]): void {
     console.log(string, message);
   }
 }
-
-export function getExtensionsServerHost(isDevEnvironment: boolean): string {
-  return isDevEnvironment ?
-    'https://extensions-server-dev.standardnotes.org' :
-    'https://extensions.standardnotes.org';
-}
