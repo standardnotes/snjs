@@ -9,7 +9,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "cp -r all dist",
+    "build": "cp -r all/ dist",
     "package-components": "node package-components.mjs"
   },
   "devDependencies": {
