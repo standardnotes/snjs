@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.35.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.1...@standardnotes/snjs@2.35.2) (2022-01-12)
+
+
+### Bug Fixes
+
+* updating fake settings tests ([#549](https://github.com/standardnotes/snjs/issues/549)) ([e5f7742](https://github.com/standardnotes/snjs/commit/e5f7742cc7146c8d63b10ebfd0a4479b98924b90))
+
+
+
+
+
 ## [2.35.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.0...@standardnotes/snjs@2.35.1) (2022-01-11)
 
 
