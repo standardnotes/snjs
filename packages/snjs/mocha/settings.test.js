@@ -1,9 +1,10 @@
 import * as Factory from './lib/factory.js';
+import { SettingName } from '@standardnotes/settings';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('settings service', function () {
-  const fakeSetting = 'FAKE_SETTING';
+  const fakeSetting = SettingName.ExtensionKey;
   const fakePayload = 'Im so meta even this acronym';
   const updatedFakePayload = 'is meta';
 
@@ -30,6 +31,18 @@ describe('settings service', function () {
     await snApp.updateSetting(fakeSetting, fakePayload);
     const responseCreate = await snApp.getSetting(fakeSetting);
     expect(responseCreate).to.equal(fakePayload);
+  });
+
+  it('throws error on an invalid setting update', async function () {
+    fakeSetting = 'FAKE_SETTING';
+    let caughtError = null;
+    try {
+      await snApp.updateSetting(fakeSetting, fakePayload);
+    } catch (error) {
+      caughtError = error
+    }
+
+    expect(caughtError).not.to.equal(null)
   });
 
   it('creates and lists settings', async function () {
