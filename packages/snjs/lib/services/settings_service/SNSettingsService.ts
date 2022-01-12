@@ -5,6 +5,7 @@ import { SettingsGateway } from './SettingsGateway';
 import { SNSessionManager } from '../api/session_manager';
 import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SensitiveSettingName } from './SensitiveSettingName';
+import { EXTENSIONS_SERVER_HOST_DEV, EXTENSIONS_SERVER_HOST_PROD } from '@Lib/hosts';
 
 export class SNSettingsService extends PureService {
   private _provider!: SettingsGateway;
@@ -13,10 +14,12 @@ export class SNSettingsService extends PureService {
     [EmailBackupFrequency.Daily]: 'Daily',
     [EmailBackupFrequency.Weekly]: 'Weekly',
   };
-  private _cloudProviderIntegrationUrls = {
-    [CloudProvider.Dropbox]: 'https://extensions.standardnotes.org/dropbox',
-    [CloudProvider.Google]: 'https://extensions.standardnotes.org/gdrive',
-    [CloudProvider.OneDrive]: 'https://extensions.standardnotes.org/onedrive',
+
+  private _cloudProviderIntegrationUrlEndpoints = {
+    [CloudProvider.Dropbox]: 'dropbox',
+    [CloudProvider.Google]: 'gdrive',
+    [CloudProvider.OneDrive]: 'onedrive',
+
   }
 
   constructor(
@@ -53,8 +56,9 @@ export class SNSettingsService extends PureService {
     return this._frequencyOptionsLabels[frequency];
   }
 
-  getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider): string {
-    return `${this._cloudProviderIntegrationUrls[cloudProviderName]}?redirect_url=https%3A%2F%2Fextensions.standardnotes.org%2F%2Fcomponents%2Fcloudlink%3F`;
+  getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider, isDevEnvironment: boolean): string {
+    const extensionsServerHost = isDevEnvironment ? EXTENSIONS_SERVER_HOST_DEV : EXTENSIONS_SERVER_HOST_PROD;
+    return `${extensionsServerHost}/${this._cloudProviderIntegrationUrlEndpoints[cloudProviderName]}?redirect_url=${extensionsServerHost}/components/cloudlink?`;
   }
 
   deinit(): void {
