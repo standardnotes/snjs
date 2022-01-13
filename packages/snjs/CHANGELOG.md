@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.35.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.3...@standardnotes/snjs@2.35.4) (2022-01-12)
+
+
+### Bug Fixes
+
+* remove readonly qualifier ([a4a06eb](https://github.com/standardnotes/snjs/commit/a4a06eb738f013c4bd76b9dc8a1e8466d492ccea))
+* **snjs:** handle case where tag is no longer available ([87b43c8](https://github.com/standardnotes/snjs/commit/87b43c865f4f3a734db35c2ce9e58a07a03d125e))
+
+
+
+
+
+## [2.35.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.2...@standardnotes/snjs@2.35.3) (2022-01-12)
+
+
+### Bug Fixes
+
+* make extension-server url dynamic, depending on whether the env is dev or prod ([#550](https://github.com/standardnotes/snjs/issues/550)) ([f28b564](https://github.com/standardnotes/snjs/commit/f28b56400564cd8cb03777489b8ddacbefe9bb9d))
+
+
+
+
+
+## [2.35.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.1...@standardnotes/snjs@2.35.2) (2022-01-12)
+
+
+### Bug Fixes
+
+* updating fake settings tests ([#549](https://github.com/standardnotes/snjs/issues/549)) ([e5f7742](https://github.com/standardnotes/snjs/commit/e5f7742cc7146c8d63b10ebfd0a4479b98924b90))
+
+
+
+
+
+## [2.35.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.0...@standardnotes/snjs@2.35.1) (2022-01-11)
+
+
+### Bug Fixes
+
+* default tag to empty string if title undefined ([908fbaf](https://github.com/standardnotes/snjs/commit/908fbafd39600165b8d516826cc1dd5488075be6))
+
+
+
+
+
 # [2.35.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.3...@standardnotes/snjs@2.35.0) (2022-01-11)
 
 

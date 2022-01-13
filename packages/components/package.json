@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/components",
-  "version": "1.2.5",
+  "version": "1.2.7",
   "main": "index.js",
   "files": [
     "dist"
@@ -9,7 +9,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "cp -r all dist",
+    "build": "cp -r all/ dist",
     "package-components": "node package-components.mjs"
   },
   "devDependencies": {
@@ -28,7 +28,7 @@
     "sn-simple-task-editor": "1.3.7",
     "sn-spreadsheets": "1.4.2",
     "sn-theme-autobiography": "standardnotes/autobiography-theme",
-    "sn-theme-dynamic": "standardnotes/dynamic-theme#1.0.2",
+    "sn-theme-dynamic": "standardnotes/dynamic-theme#1.0.3",
     "sn-theme-focus": "standardnotes/focus-theme",
     "sn-theme-futura": "standardnotes/futura-theme",
     "sn-theme-midnight": "standardnotes/midnight-theme",

@@ -29,21 +29,23 @@ export class ItemCollectionNotesView {
     this.needsRebuilding = true;
   }
 
-  public notesMatchingSmartTag(smartTag: SNSmartTag) {
+  public notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[] {
     const criteria = criteriaForSmartTag(smartTag);
     return notesMatchingCriteria(criteria, this.collection);
   }
 
   private rebuildList(): void {
-    const criteria = NotesDisplayCriteria.Copy(this.criteria, {
-      /** Get the most recent version of the tags */
-      tags: this.criteria.tags.map((tag) => {
+    const mostRecentVersionOfTags = this.criteria.tags
+      .map((tag) => {
         if (tag.isSystemSmartTag) {
           return tag;
         } else {
           return this.collection.find(tag.uuid) as SNTag;
         }
-      }),
+      })
+      .filter((tag) => tag != undefined);
+    const criteria = NotesDisplayCriteria.Copy(this.criteria, {
+      tags: mostRecentVersionOfTags,
     });
     this.displayedNotes = notesMatchingCriteria(criteria, this.collection);
   }

@@ -18,7 +18,7 @@ export class SNTag extends SNItem implements TagContent {
 
   constructor(payload: PurePayload) {
     super(payload);
-    this.title = this.payload.safeContent.title;
+    this.title = this.payload.safeContent.title || '';
   }
 
   get noteReferences(): ContentReference[] {

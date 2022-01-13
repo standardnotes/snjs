@@ -1746,11 +1746,10 @@ export class SNApplication {
   }
 
   public getCloudProviderIntegrationUrl(
-    cloudProviderName: CloudProvider
+    cloudProviderName: CloudProvider,
+    isDevEnvironment: boolean,
   ): string {
-    return this.settingsService.getCloudProviderIntegrationUrl(
-      cloudProviderName
-    );
+    return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName, isDevEnvironment);
   }
 
   private constructServices() {
