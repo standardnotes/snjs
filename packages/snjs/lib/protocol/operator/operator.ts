@@ -131,13 +131,6 @@ export abstract class SNProtocolOperator {
       return CreateEncryptionParameters({
         content: payload.content,
       });
-    } else if (format === PayloadFormat.DecryptedBase64String) {
-      const jsonString = JSON.stringify(payload.content);
-      const base64String = await this.crypto.base64Encode(jsonString);
-      const content = ProtocolVersion.V000Base64Decrypted + base64String;
-      return CreateEncryptionParameters({
-        content: content,
-      });
     } else {
       throw `Must override generateEncryptedParameters to handle format ${format}.`;
     }
@@ -158,21 +151,6 @@ export abstract class SNProtocolOperator {
     if (format === PayloadFormat.DecryptedBareObject) {
       /** No decryption required */
       return encryptedParameters;
-    } else if (format === PayloadFormat.DecryptedBase64String) {
-      const contentString = encryptedParameters.contentString.substring(
-        ProtocolVersion.VersionLength,
-        encryptedParameters.contentString.length
-      );
-      let decodedContent;
-      try {
-        const jsonString = await this.crypto.base64Decode(contentString);
-        decodedContent = JSON.parse(jsonString);
-      } catch (e) {
-        decodedContent = encryptedParameters.content;
-      }
-      return CopyEncryptionParameters(encryptedParameters, {
-        content: decodedContent,
-      });
     } else {
       throw Error(
         `Must override generateDecryptedParameters to handle format ${format}.`

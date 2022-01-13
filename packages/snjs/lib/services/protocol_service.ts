@@ -357,10 +357,6 @@ export class SNProtocolService
     }
   }
 
-  private createOperatorForLatestVersion() {
-    return this.createOperatorForVersion(this.getLatestVersion());
-  }
-
   private createOperatorForVersion(
     version: ProtocolVersion
   ): SNProtocolOperator {
@@ -372,8 +368,6 @@ export class SNProtocolService
       return new SNProtocolOperator003(this.crypto);
     } else if (version === ProtocolVersion.V004) {
       return new SNProtocolOperator004(this.crypto);
-    } else if (version === ProtocolVersion.V000Base64Decrypted) {
-      return this.createOperatorForLatestVersion();
     } else {
       throw Error(`Unable to find operator for version ${version}`);
     }

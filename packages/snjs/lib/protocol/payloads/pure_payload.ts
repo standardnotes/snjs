@@ -2,9 +2,16 @@ import { FillItemContent } from '@Models/functions';
 import { PayloadField } from './fields';
 import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@Models/content_types';
-import { ProtocolVersion } from '@Protocol/versions';
+import {
+  ProtocolVersion,
+  protocolVersionFromEncryptedString,
+} from '@Protocol/versions';
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@Lib/utils';
-import { ContentReference, PayloadContent, RawPayload } from '@Payloads/generator';
+import {
+  ContentReference,
+  PayloadContent,
+  RawPayload,
+} from '@Payloads/generator';
 import { PayloadFormat } from '@Payloads/formats';
 
 /**
@@ -21,7 +28,7 @@ import { PayloadFormat } from '@Payloads/formats';
  * in generator.js.
  *
  * Payloads also have a content format. Formats can either be
- * DecryptedBase64String, EncryptedString, or DecryptedBareObject.
+ * EncryptedString or DecryptedBareObject.
  */
 export class PurePayload {
   /** When constructed, the payload takes in an array of fields that the input raw payload
@@ -115,26 +122,19 @@ export class PurePayload {
     this.duplicate_of = rawPayload.duplicate_of;
 
     if (isString(this.content)) {
-      if (
-        (this.content as string).startsWith(ProtocolVersion.V000Base64Decrypted)
-      ) {
-        this.format = PayloadFormat.DecryptedBase64String;
-      } else {
-        this.format = PayloadFormat.EncryptedString;
-      }
-    } else if (isObject(this.content)) {
-      this.format = PayloadFormat.DecryptedBareObject;
-    } else {
-      this.format = PayloadFormat.Deleted;
-    }
-
-    if (isString(this.content)) {
-      this.version = (this.content as string).substring(
-        0,
-        ProtocolVersion.VersionLength
-      ) as ProtocolVersion;
+      this.version = protocolVersionFromEncryptedString(this.content as string);
     } else if (this.content) {
       this.version = (this.content as PayloadContent).version;
+    }
+
+    if (isString(this.content) && this.version) {
+      this.format = PayloadFormat.EncryptedString;
+    } else if (isObject(this.content)) {
+      this.format = PayloadFormat.DecryptedBareObject;
+    } else if (this.deleted) {
+      this.format = PayloadFormat.Deleted;
+    } else {
+      throw Error('Corrupt payload');
     }
 
     deepFreeze(this);
@@ -182,7 +182,7 @@ export class PurePayload {
   }
 
   /** Defined to allow singular API with Payloadable type (PurePayload | SNItem) */
-  get references(): ContentReference[]  {
+  get references(): ContentReference[] {
     return this.safeReferences;
   }
 
