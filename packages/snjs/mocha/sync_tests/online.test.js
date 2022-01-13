@@ -16,19 +16,26 @@ describe('online syncing', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+
+    this.context = await Factory.createAppContext();
+    await this.context.launch();
+
+    this.application = this.context.application;
+    this.email = this.context.email;
+    this.password = this.context.password;
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
     });
+
     this.signOut = async () => {
       this.application = await Factory.signOutApplicationAndReturnNew(
         this.application
       );
     };
+
     this.signIn = async () => {
       await this.application.signIn(
         this.email,
@@ -551,7 +558,8 @@ describe('online syncing', function () {
     expect(this.application.itemManager.items.length).to.equal(0);
 
     /** Download all data */
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
