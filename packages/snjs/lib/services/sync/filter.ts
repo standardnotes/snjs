@@ -1,12 +1,4 @@
-import { ContentType } from '@Lib/models';
 import { PayloadFormat, PurePayload } from '@Lib/protocol/payloads';
-
-/**
- * Non-encrypted types are items whose values a server must be able to read.
- */
-export const NonEncryptedTypes = Object.freeze([
-  ContentType.ServerExtension,
-]);
 
 export function filterDisallowedRemotePayloads(
   payloads: PurePayload[]
@@ -16,11 +8,11 @@ export function filterDisallowedRemotePayloads(
       PayloadFormat.DecryptedBareObject,
       PayloadFormat.DecryptedBase64String,
     ].includes(payload.format);
-    const isAllowedDecrypted = NonEncryptedTypes.includes(payload.content_type);
-    const allowed = isEncrypted || isAllowedDecrypted;
-    if (!allowed) {
+
+    if (!isEncrypted) {
       console.error('Filtering disallowed payload', payload);
     }
-    return allowed;
+
+    return isEncrypted;
   });
 }

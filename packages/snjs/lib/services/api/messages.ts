@@ -43,9 +43,9 @@ export const API_MESSAGE_FAILED_ACCESS_PURCHASE =
 
 export const API_MESSAGE_FAILED_OFFLINE_FEATURES =
   'Failed to get offline features.';
-export const API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING = `The extension you are attempting to install comes from an 
+export const API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING = `The extension you are attempting to install comes from an
   untrusted source. Untrusted extensions may lower the security of your data. Do you want to continue?`;
-export const API_MESSAGE_FAILED_DOWNLOADING_EXTENSION = `Error downloading package details. Please check the 
+export const API_MESSAGE_FAILED_DOWNLOADING_EXTENSION = `Error downloading package details. Please check the
   extension link and try again.`;
 export const API_MESSAGE_FAILED_OFFLINE_ACTIVATION =
   'An unknown issue occurred during offline activation. Please try again.';
@@ -210,7 +210,6 @@ export const ChallengeStrings = {
   ChangeAutolockInterval:
     'Authentication is required to change autolock timer duration',
   RevokeSession: 'Authentication is required to revoke a session',
-  AccessCloudLink: 'Authentication is required to access CloudLink',
   EnterAccountPassword: 'Enter your account password',
   EnterLocalPasscode: 'Enter your application passcode',
   EnterPasscodeForMigration:

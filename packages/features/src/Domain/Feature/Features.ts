@@ -472,27 +472,7 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
     }
   )
 
-  const cloudlink: IframeComponentFeatureDescription = FillEditorComponentDefaults(
-    {
-      name: 'CloudLink',
-      identifier: FeatureIdentifier.CloudLink,
-      version: '1.3.1',
-      index_path: 'index.html',
-      component_permissions: [
-        {
-          name: ComponentAction.StreamItems,
-          content_types: [ContentType.ServerExtension],
-        },
-      ],
-      permission_name: PermissionName.CloudLink,
-      description:
-        'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
-      git_repo_url: '',
-      area: ComponentArea.Modal,
-    }
-  )
-
-  return [filesafe, folders, cloudlink]
+  return [filesafe, folders]
 }
 
 function serverFeatures(): ServerFeatureDescription[] {

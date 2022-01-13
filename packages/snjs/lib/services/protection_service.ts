@@ -265,10 +265,6 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
     return this.validateOrRenewSession(ChallengeReason.RevokeSession);
   }
 
-  authorizeCloudLinkAccess(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.AccessCloudLink);
-  }
-
   private async validateOrRenewSession(
     reason: ChallengeReason,
     { fallBackToAccountPassword = true, requireAccountPassword = false } = {}

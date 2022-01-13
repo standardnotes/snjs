@@ -147,21 +147,6 @@ describe('online syncing', function () {
     expect(notes[0].uuid).to.equal(note.uuid);
   });
 
-  it('server extensions should not be encrypted for sync', async function () {
-    const payload = CreateMaxPayloadFromAnyObject({
-      uuid: await Uuid.GenerateUuid(),
-      content_type: ContentType.ServerExtension,
-      content: {
-        secret: '123',
-      },
-    });
-    const results = await this.application.syncService.payloadsByPreparingForServer(
-      [payload]
-    );
-    const processed = results[0];
-    expect(processed.format).to.equal(PayloadFormat.DecryptedBase64String);
-  });
-
   it('resolve on next timing strategy', async function () {
     const syncCount = 7;
     let successes = 0;

@@ -38,7 +38,6 @@ import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 import { SNLog } from '@Lib/log';
-import { NonEncryptedTypes } from './filter';
 
 const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
@@ -453,11 +452,7 @@ export class SNSyncService extends PureService<
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
     return this.protocolService.payloadsByEncryptingPayloads(
       payloads,
-      (payload) => {
-        return NonEncryptedTypes.includes(payload.content_type!)
-          ? EncryptionIntent.SyncDecrypted
-          : EncryptionIntent.Sync;
-      }
+      EncryptionIntent.Sync
     );
   }
 
@@ -979,13 +974,10 @@ export class SNSyncService extends PureService<
    * @returns A SHA256 digest string (hex).
    */
   private async computeDataIntegrityHash(): Promise<string | undefined> {
-    const ExcludedTypes = [ContentType.ServerExtension];
     try {
-      const items = this.itemManager.nonDeletedItems
-        .filter((item) => !ExcludedTypes.includes(item.content_type))
-        .sort((a, b) => {
-          return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
-        });
+      const items = this.itemManager.nonDeletedItems.sort((a, b) => {
+        return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
+      });
       const timestamps: number[] = [];
       const MicrosecondsInMillisecond = 1_000;
       for (const item of items) {

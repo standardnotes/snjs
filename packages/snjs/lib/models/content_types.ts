@@ -15,7 +15,6 @@ export function displayStringForContentType(
     [ContentType.Component]: 'component',
     [ContentType.Editor]: 'editor',
     [ContentType.Theme]: 'theme',
-    [ContentType.ServerExtension]: 'server extension',
     [ContentType.FilesafeCredentials]: 'FileSafe credential',
     [ContentType.FilesafeFileMetadata]: 'FileSafe file',
     [ContentType.FilesafeIntegration]: 'FileSafe integration',
