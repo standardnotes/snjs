@@ -541,13 +541,14 @@ describe('online syncing', function () {
   }).timeout(15000);
 
   it('should handle downloading with sync pagination', async function () {
-    const largeItemCount = 160;
+    const largeItemCount = SyncUpDownLimit + 10;
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(this.application);
       await this.application.itemManager.setItemDirty(note.uuid);
     }
     /** Upload */
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
     this.expectedItemCount += largeItemCount;
 
     /** Clear local data */

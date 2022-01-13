@@ -756,6 +756,8 @@ export class SNSyncService extends PureService<
     source: SyncSources,
     mode: SyncModes
   ) {
+    const syncToken = await this.getLastSyncToken();
+    const paginationToken = await this.getPaginationToken();
     const operation = new AccountSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
@@ -778,21 +780,19 @@ export class SNSyncService extends PureService<
             break;
         }
       },
-      await this.getLastSyncToken(),
-      await this.getPaginationToken(),
+      syncToken,
+      paginationToken,
       checkIntegrity,
       this.apiService
     );
     this.log(
       'Syncing online user',
-      'source:',
-      source,
-      'operation id',
-      operation.id,
-      'integrity check',
-      checkIntegrity,
-      'mode:',
-      mode,
+      `source: ${SyncSources[source]}`,
+      `operation id: ${operation.id}`,
+      `integrity check: ${checkIntegrity}`,
+      `mode: ${mode}`,
+      `syncToken: ${syncToken}`,
+      `cursorToken: ${paginationToken}`,
       'payloads:',
       payloads
     );
