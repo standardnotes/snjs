@@ -438,8 +438,6 @@ export class SNProtocolService
         intent === EncryptionIntent.FilePreferEncrypted
       ) {
         return PayloadFormat.DecryptedBareObject;
-      } else if (intent === EncryptionIntent.SyncDecrypted) {
-        return PayloadFormat.DecryptedBase64String;
       } else {
         throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.';
       }
