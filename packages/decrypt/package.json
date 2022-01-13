@@ -13,7 +13,6 @@
   "devDependencies": {
     "copy-webpack-plugin": "^10.2.0",
     "css-loader": "^6.5.1",
-    "del-cli": "^4.0.1",
     "html-webpack-plugin": "^5.5.0",
     "inline-assets": "^1.4.7",
     "jszip": "^3.7.1",

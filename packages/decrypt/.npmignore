@@ -1,0 +1,5 @@
+dist/*
+!dist/decrypt.html
+src
+tsconfig.json
+webpack.config.js
