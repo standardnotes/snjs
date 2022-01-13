@@ -11,5 +11,10 @@ export function isRemotePayloadAllowed(payload: PurePayload): boolean {
     return payload.content == undefined;
   }
 
-  return payload.format === PayloadFormat.EncryptedString;
+  const acceptableFormats = [
+    PayloadFormat.EncryptedString,
+    PayloadFormat.MetadataOnly,
+  ];
+
+  return acceptableFormats.includes(payload.format);
 }

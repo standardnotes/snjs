@@ -133,6 +133,8 @@ export class PurePayload {
       this.format = PayloadFormat.DecryptedBareObject;
     } else if (this.deleted) {
       this.format = PayloadFormat.Deleted;
+    } else if (!this.content) {
+      this.format = PayloadFormat.MetadataOnly;
     } else {
       throw Error('Corrupt payload');
     }

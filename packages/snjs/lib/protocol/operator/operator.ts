@@ -12,7 +12,6 @@ import { PurePayload } from './../payloads/pure_payload';
 import { SNItemsKey } from '@Models/app/items_key';
 import { PayloadFormat } from '@Payloads/formats';
 import {
-  CopyEncryptionParameters,
   CreateEncryptionParameters,
   CreateMaxPayloadFromAnyObject,
 } from '@Payloads/generator';
