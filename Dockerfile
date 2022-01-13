@@ -28,11 +28,13 @@ COPY --chown=$UID:$GID packages/features/package.json /var/www/packages/features
 COPY --chown=$UID:$GID packages/components/package.json /var/www/packages/components/package.json
 COPY --chown=$UID:$GID packages/settings/package.json /var/www/packages/settings/package.json
 COPY --chown=$UID:$GID packages/common/package.json /var/www/packages/common/package.json
-COPY --chown=$UID:$GID packages/decrypt/package.json /var/www/packages/decrypt/package.json
 
 RUN yarn install --pure-lockfile
 
 COPY --chown=$UID:$GID . /var/www
+
+# Remove packages/decrypt, as we don't need it for e2e tests
+RUN rm -rf /var/www/packages/decrypt/*
 
 RUN yarn build
 
