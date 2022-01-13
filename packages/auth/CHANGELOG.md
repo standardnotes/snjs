@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.12.0...@standardnotes/auth@3.13.0) (2022-01-13)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+### Features
+
+* add token decoder ([#551](https://github.com/standardnotes/snjs/issues/551)) ([7240588](https://github.com/standardnotes/snjs/commit/724058864be08d0d78d4d8c232864aed125ea6e0))
+
+
+
+
+
 # [3.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.11.0...@standardnotes/auth@3.12.0) (2021-12-23)
 
 
