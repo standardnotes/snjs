@@ -33,9 +33,6 @@ RUN yarn install --pure-lockfile
 
 COPY --chown=$UID:$GID . /var/www
 
-# Remove packages/decrypt, as we don't need it for e2e tests
-RUN rm -rf /var/www/packages/decrypt/*
-
 RUN yarn build
 
 EXPOSE 9001
