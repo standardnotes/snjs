@@ -1,4 +1,5 @@
-import { Features, FeatureDescription } from '@standardnotes/features';
+import { SNPreferencesService } from './preferences_service';
+import { Features, FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import { displayStringForContentType } from '@Models/content_types';
@@ -66,6 +67,7 @@ export class SNComponentManager extends PureService<
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private featuresService: SNFeaturesService,
+    private preferencesSerivce: SNPreferencesService,
     protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
@@ -114,6 +116,7 @@ export class SNComponentManager extends PureService<
     (this.itemManager as unknown) = undefined;
     (this.syncService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
+    (this.preferencesSerivce as unknown) = undefined;
     this.removeItemObserver();
     (this.removeItemObserver as unknown) = undefined;
     if (window && !this.isMobile) {
@@ -134,6 +137,7 @@ export class SNComponentManager extends PureService<
       this.itemManager,
       this.syncService,
       this.alertService,
+      this.preferencesSerivce,
       this.featuresService,
       this.environment,
       this.platform,

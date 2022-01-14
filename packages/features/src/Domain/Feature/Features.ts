@@ -284,6 +284,7 @@ function editors(): EditorFeatureDescription[] {
     identifier: FeatureIdentifier.PlusEditor,
     permission_name: PermissionName.PlusEditor,
     version: '1.5.0',
+    spellcheckControl: true,
     description:
       'From highlighting to custom font sizes and colors, to tables and lists, this editor is perfect for crafting any document.',
     git_repo_url: 'https://github.com/standardnotes/plus-editor',

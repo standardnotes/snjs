@@ -1,3 +1,6 @@
+import { PrefKey } from '@Models/app/userPrefs';
+import { NoteContent } from '@Models/app/note';
+import { SNPreferencesService } from './../preferences_service';
 import { FeatureStatus, FeaturesEvent } from '@Lib/services/features_service';
 import { SNFeaturesService } from '@Lib/services';
 import { ComponentArea, Features } from '@standardnotes/features';
@@ -32,12 +35,12 @@ import {
   DeleteItemsMessageData,
 } from './types';
 import { ComponentAction, ComponentPermission } from '@standardnotes/features';
-import { PayloadSource } from '@Lib/protocol/payloads';
+import { PayloadSource, PayloadFormat } from '@Lib/protocol/payloads';
 import { ItemManager } from '@Services/item_manager';
 import { UuidString } from '@Lib/types';
 import { SNItem, MutationType } from '@Models/core/item';
 import { ContentType } from '@standardnotes/common';
-import { SNComponent } from '@Lib/models';
+import { SNComponent, SNNote } from '@Lib/models';
 import {
   concatArrays,
   isString,
@@ -110,6 +113,7 @@ export class ComponentViewer {
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private alertService: SNAlertService,
+    private preferencesSerivce: SNPreferencesService,
     featuresService: SNFeaturesService,
     private environment: Environment,
     private platform: Platform,
@@ -354,10 +358,30 @@ export class ComponentViewer {
       updated_at: item.serverUpdatedAt!,
       deleted: item.deleted!,
       isMetadataUpdate: isMetadatUpdate,
-      content: item.content,
+      content: this.contentForItem(item),
       clientData: clientData,
     };
     return this.responseItemsByRemovingPrivateProperties([params])[0];
+  }
+
+  contentForItem(item: SNItem): PayloadContent | string | undefined {
+    if (
+      item.content_type === ContentType.Note &&
+      item.payload.format === PayloadFormat.DecryptedBareObject
+    ) {
+      const note = item as SNNote;
+      const content = note.safeContent as NoteContent;
+      const spellcheck =
+        note.spellcheck != undefined
+          ? note.spellcheck
+          : this.preferencesSerivce.getValue(PrefKey.EditorSpellcheck, true);
+      return {
+        ...content,
+        spellcheck,
+      } as NoteContent;
+    }
+
+    return item.content;
   }
 
   private replyToMessage(
