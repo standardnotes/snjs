@@ -1,7 +1,7 @@
 import { FillItemContent } from '@Models/functions';
 import { PayloadField } from './fields';
 import { PayloadSource } from '@Payloads/sources';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ProtocolVersion } from '@Protocol/versions';
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@Lib/utils';
 import { ContentReference, PayloadContent, RawPayload } from '@Payloads/generator';

@@ -16,7 +16,7 @@ import {
   CreateSourcedPayloadFromObject,
 } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';

@@ -1,6 +1,7 @@
 import { SNSmartTag } from './../../models/app/smartTag';
 import { ItemCollection } from './item_collection';
-import { ContentType, SNNote, SNTag } from '../../models';
+import { SNNote, SNTag } from '../../models';
+import { ContentType } from '@standardnotes/common';
 import {
   criteriaForSmartTag,
   NotesDisplayCriteria,

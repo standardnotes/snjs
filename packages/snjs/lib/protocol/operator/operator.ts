@@ -18,7 +18,7 @@ import {
 } from '@Payloads/generator';
 import { ProtocolVersion } from '@Protocol/versions';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { ContentType } from '@Lib/models';
+import { ContentType } from '@standardnotes/common';
 
 export type ItemsKeyContent = {
   itemsKey: string;

@@ -2,7 +2,7 @@ import { removeFromArray } from '@Lib/utils';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { DeltaFileImport } from './../protocol/payloads/deltas/file_import';
 import { PayloadSource } from './../protocol/payloads/sources';
-import { ContentType } from './../models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { Uuids } from '@Models/functions';
 import { UuidString } from './../types';
 import { PurePayload } from '@Payloads/pure_payload';
