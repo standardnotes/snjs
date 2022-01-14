@@ -1,5 +1,5 @@
 import { PayloadSource } from '@Payloads/sources';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { UuidString } from './../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { MutableCollection } from './collection';

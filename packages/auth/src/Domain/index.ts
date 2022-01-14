@@ -1,3 +1,5 @@
+export * from './Decoder/TokenDecoder'
+export * from './Decoder/TokenDecoderInterface'
 export * from './Role/Role'
 export * from './Role/RoleName'
 export * from './Subscription/Subscription'

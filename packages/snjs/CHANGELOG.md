@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.35.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.5...@standardnotes/snjs@2.35.6) (2022-01-14)
+
+
+### Bug Fixes
+
+* cross-package dependencies and content type imports ([#556](https://github.com/standardnotes/snjs/issues/556)) ([26ba1e0](https://github.com/standardnotes/snjs/commit/26ba1e0c38e7e0ae572996125150a4c3d27f1c0a))
+
+
+
+
+
+## [2.35.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.3...@standardnotes/snjs@2.35.5) (2022-01-13)
+
+
+### Bug Fixes
+
+* remove readonly qualifier ([a4a06eb](https://github.com/standardnotes/snjs/commit/a4a06eb738f013c4bd76b9dc8a1e8466d492ccea))
+* **snjs:** handle case where tag is no longer available ([87b43c8](https://github.com/standardnotes/snjs/commit/87b43c865f4f3a734db35c2ce9e58a07a03d125e))
+
+
+
+
+
 ## [2.35.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.3...@standardnotes/snjs@2.35.4) (2022-01-12)
 
 

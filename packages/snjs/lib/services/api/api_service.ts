@@ -28,7 +28,7 @@ import {
   GetOfflineFeaturesResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';

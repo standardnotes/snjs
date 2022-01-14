@@ -21,7 +21,6 @@ export { SNSmartTag } from '@Models/app/smartTag';
 export { SNTheme, ThemeMutator } from '@Models/app/theme';
 
 export {
-  ContentType,
   displayStringForContentType,
 } from '@Models/content_types';
 export { CreateItemFromPayload } from '@Models/generator';

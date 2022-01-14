@@ -58,7 +58,7 @@ import {
   removeFromArray,
   sleep,
 } from '@Lib/utils';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import {
   CopyPayload,
   CreateMaxPayloadFromAnyObject,

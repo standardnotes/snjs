@@ -1,5 +1,5 @@
 import { PayloadField } from '@Protocol/payloads/fields';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { SurePayload } from '@Lib/protocol/payloads/sure_payload';
 import { HistoryEntry } from './history_entry';
 import { NoteHistoryEntry } from './note_history_entry';

@@ -1,7 +1,7 @@
 import { CreateItemFromPayload } from '@Models/generator';
 import { HttpResponse } from './api/responses';
 import { Action, ActionAccessType } from './../models/app/action';
-import { ContentType } from './../models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKey } from '@Protocol/root_key';

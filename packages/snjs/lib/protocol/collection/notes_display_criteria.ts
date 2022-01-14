@@ -2,7 +2,7 @@ import { SortDirection } from './item_collection';
 import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 import { SNTag } from './../../models/app/tag';
 import { SNPredicate } from './../../models/core/predicate';
-import { ContentType } from './../../models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ItemCollection } from './item_collection';
 import { SNNote } from './../../models/app/note';
 import { SNSmartTag } from './../../models/app/smartTag';
