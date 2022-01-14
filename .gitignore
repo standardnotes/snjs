@@ -16,6 +16,9 @@ packages/features/dist
 packages/settings/dist
 packages/snjs/dist
 packages/time/dist
+packages/sncrypto-common/dist
+packages/sncrypto-node/dist
+packages/sncrypto-web/dist
 
 yarn-error.log
 package-lock.json
