@@ -1,0 +1,36 @@
+name: Push to packages/decrypt
+
+on:
+  push:
+    paths:
+    - 'packages/decrypt/**'
+    branches:
+      - master
+
+jobs:
+  commit-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Setup GIT config
+        run: |
+          git config --global user.name "standardci"
+          git config --global user.email "ci@standardnotes.com"
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - run: yarn install --pure-lockfile
+      - run: cd packages/decrypt
+      - run: yarn build
+      - name: Commit built changes
+        run: |
+          git add dist/
+          git commit -m "chore: build decrypt script"
