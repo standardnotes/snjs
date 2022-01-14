@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@standardnotes/sncrypto-web": "^1.2.9",
-    "@standardnotes/snjs": "^2.3.0"
+    "@standardnotes/snjs": "^2.35.6"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^10.2.0",
