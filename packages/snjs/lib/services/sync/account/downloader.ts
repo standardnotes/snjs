@@ -1,6 +1,6 @@
 import { filterDisallowedRemotePayloads } from '@Lib/services/sync/filter';
 import { PurePayload } from '@Payloads/pure_payload';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import {
   RawPayload,
   CreateSourcedPayloadFromObject,

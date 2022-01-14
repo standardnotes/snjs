@@ -55,7 +55,7 @@ import {
   removeFromArray,
 } from '@Lib/utils';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';

@@ -1,4 +1,5 @@
-import { ContentType, SNUserPrefs } from '@Lib/models';
+import { SNUserPrefs } from '@Lib/models';
+import { ContentType } from '@standardnotes/common';
 import {
   PrefKey,
   PrefValue,

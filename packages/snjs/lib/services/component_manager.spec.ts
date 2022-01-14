@@ -5,7 +5,7 @@
 import { FeatureDescription } from '@standardnotes/features';
 import { DesktopManagerInterface } from '@Services/component_manager/types';
 import { FeatureIdentifier } from '@standardnotes/features';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { SNComponent } from '@Lib/models';
 import { Environment, Platform } from '@Lib/platforms';
 import { SNAlertService } from '@Services/alert_service';

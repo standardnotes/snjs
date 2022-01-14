@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/components",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "main": "index.js",
   "files": [
     "dist"
@@ -9,6 +9,8 @@
     "access": "public"
   },
   "scripts": {
+    "clean": "rm -fr dist",
+    "prebuild": "yarn clean",
     "build": "cp -r all/ dist",
     "package-components": "node package-components.mjs"
   },

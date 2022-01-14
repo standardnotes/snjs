@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.8](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.7...@standardnotes/components@1.2.8) (2022-01-14)
+
+
+### Bug Fixes
+
+* add prebuild cleanup for components package ([ee9b29d](https://github.com/standardnotes/snjs/commit/ee9b29d72914ee499ffd18605ab07dc6d46c0213))
+
+
+
+
+
 ## [1.2.7](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.6...@standardnotes/components@1.2.7) (2022-01-12)
 
 
