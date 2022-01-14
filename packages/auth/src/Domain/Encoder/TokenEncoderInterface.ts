@@ -1,3 +1,3 @@
-export interface TokenEncoderInterface {
-  encodeToken<T>(data: T): string
+export interface TokenEncoderInterface<T> {
+  encodeToken(data: T): string
 }

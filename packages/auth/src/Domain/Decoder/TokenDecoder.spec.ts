@@ -5,7 +5,7 @@ import { TokenDecoder } from './TokenDecoder'
 describe('TokenDecoder', () => {
   const jwtSecret = 'secret'
 
-  const createDecoder = () => new TokenDecoder(jwtSecret)
+  const createDecoder = () => new TokenDecoder<{ iat: number, pw_hash: string, sub: string, user_uuid: string }>(jwtSecret)
 
   it('should decode a token', () => {
     expect(createDecoder().decodeToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcl91dWlkIjoiMTIzIiwicHdfaGFzaCI6IjlmODZkMDgxODg0YzdkNjU5YTJmZWFhMGM1NWFkMDE1YTNiZjRmMWIyYjBiODIyY2QxNWQ2YzE1YjBmMDBhMDgiLCJpYXQiOjE1MTYyMzkwMjJ9.TXDPCbCAITDjcUUorHsF4S5Nxkz4eFE4F3TPCsKI89A'))

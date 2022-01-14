@@ -1,3 +1,3 @@
-export interface TokenDecoderInterface {
-  decodeToken<T>(token: string): T | undefined
+export interface TokenDecoderInterface<T> {
+  decodeToken(token: string): T | undefined
 }

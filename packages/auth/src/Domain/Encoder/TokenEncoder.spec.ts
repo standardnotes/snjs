@@ -5,7 +5,7 @@ import { TokenEncoder } from './TokenEncoder'
 describe('TokenEncoder', () => {
   const jwtSecret = 'secret'
 
-  const createEncoder = () => new TokenEncoder(jwtSecret)
+  const createEncoder = () => new TokenEncoder<{ user_uuid: string }>(jwtSecret)
 
   it('should encode a token', () => {
     expect(createEncoder().encodeToken({
