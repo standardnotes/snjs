@@ -1,7 +1,7 @@
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 import { SNPredicate } from '@Models/core/predicate';
-import { ContentType } from '../content_types';
+import { ContentType } from '@standardnotes/common';
 
 export enum PrefKey {
   TagsPanelWidth = 'tagsPanelWidth',

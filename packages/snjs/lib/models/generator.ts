@@ -1,5 +1,5 @@
 import { SNFeatureRepo } from './app/feature_repo';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNActionsExtension } from './app/extension';
 import { SNComponent } from '@Models/app/component';

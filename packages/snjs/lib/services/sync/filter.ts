@@ -1,4 +1,4 @@
-import { ContentType } from '@Lib/models';
+import { ContentType } from '@standardnotes/common';
 import { PayloadFormat, PurePayload } from '@Lib/protocol/payloads';
 
 /**

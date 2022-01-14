@@ -12,7 +12,7 @@ import { CopyPayload, PayloadOverride } from '@Payloads/generator';
 import { extendArray } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { PurePayload } from '@Payloads/pure_payload';
-import { ContentType } from '@Lib/models';
+import { ContentType } from '@standardnotes/common';
 
 type AffectorFunction = (
   basePayload: PurePayload,

@@ -175,9 +175,9 @@ export {
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
 export {
-  ContentType,
   displayStringForContentType,
 } from '@Models/content_types';
+export { ContentType } from '@standardnotes/common';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
 

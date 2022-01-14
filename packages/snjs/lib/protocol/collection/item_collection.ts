@@ -1,7 +1,7 @@
 import { MutableCollection } from './collection';
 import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { UuidString } from './../../types';
 
 export enum CollectionSort {

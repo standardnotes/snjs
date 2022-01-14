@@ -3,7 +3,7 @@ import { MigrationServices } from './types';
 import { PreviousSnjsVersion2_0_0 } from './../version';
 import { LegacyKeys1_0_0, NonwrappedStorageKey } from './../storage_keys';
 import { JwtSession } from './../services/api/session';
-import { ContentType } from './../models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { SNItemsKey } from './../models/app/items_key';
 import { RootKeyContent, SNRootKey } from './../protocol/root_key';
 import { EncryptionIntent } from './../protocol/intents';

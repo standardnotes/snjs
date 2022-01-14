@@ -1,6 +1,6 @@
 import { removeFromArray } from '@Lib/utils';
 import { SNItem } from '@Models/core/item';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { SNTag } from '@Lib/index';
 import { PayloadSource } from '@Lib/protocol/payloads';
 import { NoteMutator, SNNote } from '@Lib/models';

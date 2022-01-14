@@ -3,7 +3,7 @@ import { AnyKeyParamsContent, SNRootKeyParams } from './key_params';
 import { FillItemContent } from '@Models/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ProtocolVersion } from '@Protocol/versions';
 import { Uuid } from '@Lib/uuid';
 import { timingSafeEqual } from '@standardnotes/sncrypto-common';

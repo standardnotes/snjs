@@ -1,10 +1,8 @@
 import { Features, FeatureDescription } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
-import {
-  ContentType,
-  displayStringForContentType,
-} from '@Models/content_types';
+import { displayStringForContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { PayloadSource } from '@Protocol/payloads/sources';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from '@Models/app/note';

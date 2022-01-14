@@ -36,7 +36,7 @@ import { PayloadSource } from '@Lib/protocol/payloads';
 import { ItemManager } from '@Services/item_manager';
 import { UuidString } from '@Lib/types';
 import { SNItem, MutationType } from '@Models/core/item';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { SNComponent } from '@Lib/models';
 import {
   concatArrays,
