@@ -6,6 +6,9 @@
     "postbuild": "inline-assets dist/index.html dist/decrypt.html",
     "start": "webpack-dev-server --mode='development'"
   },
+  "engines": {
+    "node": ">=14.0.0 <17.0.0"
+  },
   "dependencies": {
     "@standardnotes/sncrypto-web": "^1.2.9",
     "@standardnotes/snjs": "^2.3.0"
