@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/sncrypto-node",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "SNCrypto for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
     "test:unit": "jest spec"
   },
   "dependencies": {
-    "@standardnotes/sncrypto-common": "^1.5.2"
+    "@standardnotes/sncrypto-common": "^1.6.0"
   },
   "jest": {
     "preset": "./jest.json",
@@ -29,9 +29,9 @@
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@standardnotes/config": "^2.2.0",
     "babel-loader": "^8.2.3",
+    "regenerator-runtime": "^0.13.9",
     "ts-loader": "^9.2.6",
     "webpack": "^5.59.1",
-    "webpack-cli": "^4.9.1",
-    "regenerator-runtime": "^0.13.9"
+    "webpack-cli": "^4.9.1"
   }
 }
