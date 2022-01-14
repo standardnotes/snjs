@@ -1,0 +1,37 @@
+{
+  "name": "@standardnotes/sncrypto-node",
+  "version": "1.5.2",
+  "description": "SNCrypto for Node.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "webpack --mode production && tsc",
+    "lint": "eslint . --ext .ts",
+    "test:unit": "jest spec"
+  },
+  "dependencies": {
+    "@standardnotes/sncrypto-common": "^1.5.2"
+  },
+  "jest": {
+    "preset": "./jest.json",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@standardnotes/config": "^2.2.0",
+    "babel-loader": "^8.2.3",
+    "ts-loader": "^9.2.6",
+    "webpack": "^5.59.1",
+    "webpack-cli": "^4.9.1",
+    "regenerator-runtime": "^0.13.9"
+  }
+}

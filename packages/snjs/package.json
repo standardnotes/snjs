@@ -27,7 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
-    "@standardnotes/sncrypto-web": "1.5.2",
+    "@standardnotes/sncrypto-web": "^1.5.3",
     "@types/crypto-js": "^4.0.1",
     "@types/dompurify": "^2.3.2",
     "@types/jest": "^26.0.23",
@@ -84,6 +84,6 @@
     "@standardnotes/domain-events": "2.5.1",
     "@standardnotes/features": "^1.20.7",
     "@standardnotes/settings": "^1.9.0",
-    "@standardnotes/sncrypto-common": "1.5.2"
+    "@standardnotes/sncrypto-common": "^1.5.2"
   }
 }
