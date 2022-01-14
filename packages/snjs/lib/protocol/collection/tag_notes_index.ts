@@ -5,13 +5,14 @@ import { SNTag } from '@Lib/index';
 import { UuidString } from '@Lib/types';
 import { isNote } from '@Lib/models/app/note';
 import { isTag } from '@Lib/models/app/tag';
+import { ItemDelta, SNIndex } from './indexes';
 
 /** tagUuid undefined signifies all notes count change */
 export type TagNoteCountChangeObserver = (
   tagUuid: UuidString | undefined
 ) => void;
 
-export class TagNotesIndex {
+export class TagNotesIndex implements SNIndex {
   private tagToNotesMap: Partial<Record<UuidString, Set<UuidString>>> = {};
   private allCountableNotes = new Set<UuidString>();
   private observers: TagNoteCountChangeObserver[] = [];
@@ -46,11 +47,12 @@ export class TagNotesIndex {
     return this.tagToNotesMap[tag.uuid]?.size || 0;
   }
 
-  public receiveTagAndNoteChanges(items: (SNTag | SNNote)[]): void {
-    const notes = items.filter(isNote);
-    this.receiveNoteChanges(notes);
+  public onChange(delta: ItemDelta): void {
+    const changedOrInserted = delta.changed.concat(delta.inserted);
+    const notes = changedOrInserted.filter(isNote);
+    const tags = changedOrInserted.filter(isTag);
 
-    const tags = items.filter(isTag);
+    this.receiveNoteChanges(notes);
     this.receiveTagChanges(tags);
   }
 

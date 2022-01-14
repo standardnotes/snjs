@@ -1,8 +1,5 @@
-import {
-  TagNotesIndex,
-  TagNoteCountChangeObserver,
-} from './../protocol/collection/tag_notes_index';
 import { createMutatorForItem } from '@Lib/models/mutator';
+import { ItemDelta } from '@Lib/protocol/collection/indexes';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
 import { PureService } from '@Lib/services/pure_service';
@@ -17,31 +14,34 @@ import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   CollectionSort,
   ItemCollection,
-  SortDirection,
+  SortDirection
 } from '@Protocol/collection/item_collection';
 import { ContentType } from '@standardnotes/common'
 import { ComponentMutator } from './../models/app/component';
 import {
   ActionsExtensionMutator,
-  SNActionsExtension,
+  SNActionsExtension
 } from './../models/app/extension';
 import {
   FeatureRepoMutator,
-  SNFeatureRepo,
+  SNFeatureRepo
 } from './../models/app/feature_repo';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { NoteMutator, SNNote } from './../models/app/note';
 import {
   SmartTagPredicateContent,
   SMART_TAG_DSL_PREFIX,
-  SNSmartTag,
+  SNSmartTag
 } from './../models/app/smartTag';
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
 import { SNPredicate } from './../models/core/predicate';
 import {
+  TagNoteCountChangeObserver, TagNotesIndex
+} from './../protocol/collection/tag_notes_index';
+import {
   PayloadContent,
-  PayloadOverride,
+  PayloadOverride
 } from './../protocol/payloads/generator';
 import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadSource } from './../protocol/payloads/sources';
@@ -329,26 +329,25 @@ export class ItemManager extends PureService {
     source: PayloadSource,
     sourceKey?: string
   ) {
-    const changedItems = changed.map((p) => CreateItemFromPayload(p));
-    const insertedItems = inserted.map((p) => CreateItemFromPayload(p));
-    const ignoredItems = ignored.map((p) => CreateItemFromPayload(p));
-    const changedOrInserted = changedItems.concat(insertedItems);
-    if (changedOrInserted.length > 0) {
-      this.collection.set(changedOrInserted);
-    }
-    const discardedItems = discarded.map((p) => CreateItemFromPayload(p));
-    for (const item of discardedItems) {
-      this.collection.discard(item);
-    }
-    this.notesView.setNeedsRebuilding();
-    this.tagNotesIndex.receiveTagAndNoteChanges(
-      changedOrInserted.filter(isTagOrNote)
-    );
+    const createItems = (items: PurePayload[]) =>
+      items.map((item) => CreateItemFromPayload(item));
+
+    const delta: ItemDelta = {
+      changed: createItems(changed),
+      inserted: createItems(inserted),
+      discarded: createItems(discarded),
+      ignored: createItems(ignored),
+    };
+
+    this.collection.onChange(delta);
+    this.notesView.onChange(delta);
+    this.tagNotesIndex.onChange(delta);
+
     this.notifyObservers(
-      changedItems,
-      insertedItems,
-      discardedItems,
-      ignoredItems,
+      delta.changed,
+      delta.inserted,
+      delta.discarded,
+      delta.ignored,
       source,
       sourceKey
     );
