@@ -1,8 +1,8 @@
-import { SNPreferencesService } from './preferences_service';
 /**
  * @jest-environment jsdom
  */
 
+import { SNPreferencesService } from './preferences_service';
 import { FeatureDescription } from '@standardnotes/features';
 import { DesktopManagerInterface } from '@Services/component_manager/types';
 import { FeatureIdentifier } from '@standardnotes/features';

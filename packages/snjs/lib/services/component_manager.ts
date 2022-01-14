@@ -1,5 +1,5 @@
 import { SNPreferencesService } from './preferences_service';
-import { Features, FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
+import { Features, FeatureDescription } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import { displayStringForContentType } from '@Models/content_types';
