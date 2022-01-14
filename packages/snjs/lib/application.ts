@@ -1920,6 +1920,7 @@ export class SNApplication {
       this.itemManager,
       this.syncService,
       this.featuresService,
+      this.preferencesService,
       this.alertService,
       this.environment,
       this.platform,
