@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@standardnotes/common": "1.2.1",
-    "@standardnotes/sncrypto-node": "^1.5.2",
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {

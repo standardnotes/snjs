@@ -1,5 +1,3 @@
-export * from './Crypter/CrypterInterface'
-export * from './Crypter/Crypter'
 export * from './Decoder/TokenDecoder'
 export * from './Decoder/TokenDecoderInterface'
 export * from './Encoder/TokenEncoder'
