@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
       - uses: actions/setup-node@v1
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Setup GIT config
-        run: |
-          git config --global user.name "standardci"
-          git config --global user.email "ci@standardnotes.com"
+
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -27,10 +27,17 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+
       - run: yarn install --pure-lockfile
       - run: cd packages/decrypt
       - run: yarn build
-      - name: Commit built changes
-        run: |
-          git add dist/
-          git commit -m "chore: build decrypt script"
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        with:
+          file_pattern: dist/decrypt.html
+          commit_message: "chore: build decrypt script"
+          commit_user_name: "standardci"
+          commit_user_email: "ci@standardnotes.com"
+          commit_author: "standardci <ci@standardnotes.com>"
