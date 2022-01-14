@@ -22,7 +22,7 @@ import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNItemsKey } from './../models/app/items_key';
-import { ContentType } from './../models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { PureService } from '@Services/pure_service';
 import { dateSorted, isNullOrUndefined, removeFromArray } from '@Lib/utils';

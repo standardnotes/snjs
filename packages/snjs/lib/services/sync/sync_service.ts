@@ -31,7 +31,7 @@ import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collect
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { EncryptionIntent } from '@Protocol/intents';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
 import { SyncSignal, SyncStats } from '@Services/sync/signals';

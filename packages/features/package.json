@@ -22,8 +22,8 @@
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
-    "@standardnotes/auth": "3.8.3",
-    "@standardnotes/common": "1.2.1"
+    "@standardnotes/auth": "^3.13.0",
+    "@standardnotes/common": "^1.7.0"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.2.0",

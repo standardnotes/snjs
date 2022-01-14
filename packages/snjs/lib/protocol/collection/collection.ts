@@ -2,7 +2,7 @@ import { UuidMap } from './uuid_map';
 import { extendArray, isString } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import remove from 'lodash/remove';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { UuidString } from './../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 

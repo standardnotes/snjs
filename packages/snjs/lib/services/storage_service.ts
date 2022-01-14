@@ -13,7 +13,7 @@ import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { Copy, isNullOrUndefined } from '@Lib/utils';
 import { Uuid } from '@Lib/uuid';
 import { DeviceInterface } from '../device_interface';

@@ -2,7 +2,7 @@ import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import { SNComponent } from '@Lib/models';
 import { ComponentArea } from '@Models/app/component';
 import { UuidString } from '@Lib/types';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { RawPayload } from '@Payloads/generator';
 
 export interface DesktopManagerInterface {
