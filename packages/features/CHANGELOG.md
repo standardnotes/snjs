@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.23.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.22.0...@standardnotes/features@1.23.0) (2022-01-14)
+
+
+### Features
+
+* markdown pro, bold editor ([0bc5add](https://github.com/standardnotes/snjs/commit/0bc5addabc7033149d207d1140f9c5e1b7dc7fb6))
+
+
+
+
+
 # [1.22.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.21.0...@standardnotes/features@1.22.0) (2022-01-14)
 
 
