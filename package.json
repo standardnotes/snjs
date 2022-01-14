@@ -11,6 +11,8 @@
     "bootstrap": "lerna bootstrap",
     "start": "lerna run start --parallel",
     "test:unit": "lerna run test:unit --parallel",
+    "start:e2e:mocha": "yarn run start:test-server:dev",
+    "start:e2e:docker": "yarn run test:e2e:dev-setup",
     "start:test-server": "node e2e-server.js",
     "start:test-server:dev": "node e2e-server.js --dev",
     "test:e2e": "bash test.sh stable",
