@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.38.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.3...@standardnotes/snjs@2.38.0) (2022-01-15)
+
+
+### Features
+
+* remove server extension type ([#552](https://github.com/standardnotes/snjs/issues/552)) ([aa542f3](https://github.com/standardnotes/snjs/commit/aa542f3124c60fa81a0b271030b3c35415c54a62))
+
+
+
+
+
 ## [2.37.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.2...@standardnotes/snjs@2.37.3) (2022-01-15)
 
 **Note:** Version bump only for package @standardnotes/snjs
