@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.15](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.14...@standardnotes/domain-events-infra@1.4.15) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/domain-events-infra
+
+
+
+
+
 ## [1.4.14](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.13...@standardnotes/domain-events-infra@1.4.14) (2022-01-14)
 
 **Note:** Version bump only for package @standardnotes/domain-events-infra
