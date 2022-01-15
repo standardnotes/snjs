@@ -3,7 +3,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('migrations', () => {
-  const allMigrations = ['2.0.0', '2.0.15', '2.7.0', '2.20.0'];
+  const allMigrations = ['2.0.0', '2.0.15', '2.7.0', '2.20.0', '2.36.0'];
 
   beforeEach(async () => {
     localStorage.clear();

@@ -170,10 +170,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     format: PayloadFormat,
     key?: SNItemsKey | SNRootKey
   ) {
-    if (
-      format === PayloadFormat.DecryptedBareObject ||
-      format === PayloadFormat.DecryptedBase64String
-    ) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return super.generateEncryptedParameters(payload, format, key);
     }
     if (format !== PayloadFormat.EncryptedString) {
@@ -221,10 +218,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     key?: SNItemsKey | SNRootKey
   ) {
     const format = encryptedParameters.format;
-    if (
-      format === PayloadFormat.DecryptedBareObject ||
-      format === PayloadFormat.DecryptedBase64String
-    ) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return super.generateDecryptedParameters(encryptedParameters, key);
     }
     if (!encryptedParameters.enc_item_key) {

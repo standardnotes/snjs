@@ -1149,10 +1149,6 @@ export class SNApplication {
     return this.protectionService.authorizeAutolockIntervalChange();
   }
 
-  public authorizeCloudLinkAccess(): Promise<boolean> {
-    return this.protectionService.authorizeCloudLinkAccess();
-  }
-
   public authorizeSearchingProtectedNotesText(): Promise<boolean> {
     return this.protectionService.authorizeSearchingProtectedNotesText();
   }

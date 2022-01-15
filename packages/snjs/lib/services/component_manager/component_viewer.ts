@@ -468,10 +468,7 @@ export class ComponentViewer {
     return responseItems.map((responseItem) => {
       const privateProperties = privateContentProperties.slice();
       /** Server extensions are allowed to modify url property */
-      if (
-        removeUrls &&
-        responseItem.content_type !== ContentType.ServerExtension
-      ) {
+      if (removeUrls) {
         privateProperties.push('url');
       }
       if (!responseItem.content || isString(responseItem.content)) {

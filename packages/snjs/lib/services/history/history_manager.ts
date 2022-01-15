@@ -25,6 +25,7 @@ import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
 import { HistoryMap, historyMapFunctions } from './history_map';
+import { isRemotePayloadAllowed } from '../sync/filter';
 
 const PersistTimeout = 2000;
 
@@ -319,10 +320,7 @@ export class SNHistoryManager extends PureService {
     itemUuid: UuidString,
     entry: RevisionListEntry
   ): Promise<HistoryEntry | undefined> {
-    const revisionResponse = (await this.apiService.getRevision(
-      entry,
-      itemUuid
-    ));
+    const revisionResponse = await this.apiService.getRevision(entry, itemUuid);
     if (revisionResponse.error || isNullOrUndefined(revisionResponse.data)) {
       return undefined;
     }
@@ -333,6 +331,10 @@ export class SNHistoryManager extends PureService {
         uuid: revision.item_uuid,
       }
     );
+    if (!isRemotePayloadAllowed(payload)) {
+      console.error('Remote payload is disallowed', payload);
+      return undefined;
+    }
     const encryptedPayload = CreateSourcedPayloadFromObject(
       payload,
       PayloadSource.RemoteHistory

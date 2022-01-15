@@ -165,6 +165,10 @@ export async function createAndInitializeApplication(
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
     receiveChallenge: (challenge) => {
+      console.log(
+        'Factory received potentially unhandled challenge',
+        challenge
+      );
       if (challenge.reason !== ChallengeReason.Custom) {
         throw Error("Factory application shouldn't have challenges");
       }
