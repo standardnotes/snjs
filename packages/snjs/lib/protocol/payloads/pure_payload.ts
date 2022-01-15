@@ -1,11 +1,11 @@
 import { FillItemContent } from '@Models/functions';
 import { PayloadField } from './fields';
 import { PayloadSource } from '@Payloads/sources';
-import { ContentType } from '@Models/content_types';
 import {
   ProtocolVersion,
   protocolVersionFromEncryptedString,
 } from '@Protocol/versions';
+import { ContentType } from '@standardnotes/common';
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@Lib/utils';
 import {
   ContentReference,

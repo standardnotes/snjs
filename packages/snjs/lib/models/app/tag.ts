@@ -1,5 +1,5 @@
 import { ContentReference } from '@Lib/protocol/payloads/generator';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { PurePayload } from '@Protocol/payloads/pure_payload';
 import { UuidString } from './../../types';

@@ -15,7 +15,7 @@ import {
   ItemCollection,
   SortDirection,
 } from '@Protocol/collection/item_collection';
-import { ContentType } from '../models/content_types';
+import { ContentType } from '@standardnotes/common'
 import { ComponentMutator } from './../models/app/component';
 import {
   ActionsExtensionMutator,

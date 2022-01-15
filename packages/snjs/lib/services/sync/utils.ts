@@ -1,4 +1,4 @@
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { PurePayload } from '@Payloads/pure_payload';
 /**
  * Sorts payloads according by most recently modified first, according to the priority,

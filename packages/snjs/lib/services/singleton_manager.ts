@@ -1,4 +1,4 @@
-import { ContentType } from './../models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
 import { SNPredicate } from '@Models/core/predicate';
 import { SNItem, SingletonStrategy } from '@Models/core/item';

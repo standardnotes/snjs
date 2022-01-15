@@ -1,4 +1,4 @@
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { SNApplication } from './../application';
 import { SNItem } from '@Models/core/item';
 

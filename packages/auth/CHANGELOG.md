@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.13.1...@standardnotes/auth@3.14.0) (2022-01-15)
+
+
+### Features
+
+* add crypter, decoder and encoder to auth package ([#553](https://github.com/standardnotes/snjs/issues/553)) ([940e0a5](https://github.com/standardnotes/snjs/commit/940e0a56a84e5f057a94a526289ae79e1ea46f70))
+
+
+
+
+
+## [3.13.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.13.0...@standardnotes/auth@3.13.1) (2022-01-14)
+
+
+### Bug Fixes
+
+* cross-package dependencies and content type imports ([#556](https://github.com/standardnotes/snjs/issues/556)) ([26ba1e0](https://github.com/standardnotes/snjs/commit/26ba1e0c38e7e0ae572996125150a4c3d27f1c0a))
+
+
+
+
+
 # [3.13.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.12.0...@standardnotes/auth@3.13.0) (2022-01-13)
 
 

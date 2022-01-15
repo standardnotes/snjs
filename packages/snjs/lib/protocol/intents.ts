@@ -1,4 +1,4 @@
-import { ContentType } from './../models/content_types';
+import { ContentType } from '@standardnotes/common';
 /**
  * Only three types of items should be encrypted with a root key:
  * - A root key is encrypted with another root key in the case of root key wrapping

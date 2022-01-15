@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.23.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.23.0...@standardnotes/features@1.23.1) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+# [1.23.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.22.0...@standardnotes/features@1.23.0) (2022-01-14)
+
+
+### Features
+
+* markdown pro, bold editor ([0bc5add](https://github.com/standardnotes/snjs/commit/0bc5addabc7033149d207d1140f9c5e1b7dc7fb6))
+
+
+
+
+
+# [1.22.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.21.0...@standardnotes/features@1.22.0) (2022-01-14)
+
+
+### Features
+
+* plus editor 1.6.0 ([6bdf5a7](https://github.com/standardnotes/snjs/commit/6bdf5a7519559f75d72016a1f4e6f715e55d437a))
+
+
+
+
+
+# [1.21.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.8...@standardnotes/features@1.21.0) (2022-01-14)
+
+
+### Features
+
+* spellcheck control per note ([#557](https://github.com/standardnotes/snjs/issues/557)) ([76cc637](https://github.com/standardnotes/snjs/commit/76cc63781e3568bbb48b44001ab51644af0985b3))
+
+
+
+
+
+## [1.20.8](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.7...@standardnotes/features@1.20.8) (2022-01-14)
+
+
+### Bug Fixes
+
+* cross-package dependencies and content type imports ([#556](https://github.com/standardnotes/snjs/issues/556)) ([26ba1e0](https://github.com/standardnotes/snjs/commit/26ba1e0c38e7e0ae572996125150a4c3d27f1c0a))
+
+
+
+
+
 ## [1.20.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.6...@standardnotes/features@1.20.7) (2022-01-12)
 
 **Note:** Version bump only for package @standardnotes/features
