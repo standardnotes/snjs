@@ -251,7 +251,7 @@ function editors(): EditorFeatureDescription[] {
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Bold Editor',
     identifier: FeatureIdentifier.BoldEditor,
-    version: '1.2.10',
+    version: '1.3.0',
     note_type: NoteType.RichText,
     file_type: 'html',
     component_permissions: [
@@ -268,6 +268,7 @@ function editors(): EditorFeatureDescription[] {
         ],
       },
     ],
+    spellcheckControl: true,
     permission_name: PermissionName.BoldEditor,
     description:
       'A simple and peaceful rich editor that helps you write and think clearly. Features FileSafe integration, so you can embed your encrypted images, videos, and audio recordings directly inline.',
@@ -283,7 +284,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'html',
     identifier: FeatureIdentifier.PlusEditor,
     permission_name: PermissionName.PlusEditor,
-    version: '1.5.0',
+    version: '1.6.0',
     spellcheckControl: true,
     description:
       'From highlighting to custom font sizes and colors, to tables and lists, this editor is perfect for crafting any document.',
@@ -311,10 +312,11 @@ function editors(): EditorFeatureDescription[] {
   const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Pro',
     identifier: FeatureIdentifier.MarkdownProEditor,
-    version: '1.3.14',
+    version: '1.4.0',
     note_type: NoteType.Markdown,
     file_type: 'md',
     permission_name: PermissionName.MarkdownProEditor,
+    spellcheckControl: true,
     description:
       'A fully featured Markdown editor that supports live preview, a styling toolbar, and split pane support.',
     git_repo_url: 'https://github.com/standardnotes/advanced-markdown-editor',

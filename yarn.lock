@@ -11455,15 +11455,15 @@ smart-buffer@^4.1.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.1.0.tgz#91605c25d91652f4661ea69ccf45f1b331ca21ba"
   integrity sha512-iVICrxOzCynf/SNaBQCw34eM9jROU/s5rzIhpOvzhzuYHfJR/DhZfDkXiZSgKXfgv26HT3Yni3AV/DGw0cGnnw==
 
-sn-advanced-markdown-editor@1.3.14:
-  version "1.3.14"
-  resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.3.14.tgz#2d31890c1be383d38498185c55a38e00e6245d7f"
-  integrity sha512-cz5muTgdST3VXpDmqyP36R6dbMtEgLGX/NMP6V3RPbWYtYjiCNKVOKSHTDT9MiMgnNdNMkpFtlj2yYhDdOeiKA==
+sn-advanced-markdown-editor@1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.4.0.tgz#5dc0e393dc62a5efa3e54dc8b7352ab11dace6df"
+  integrity sha512-yvjJgPb+Eg3nTKTWbtv2ohB/Nl843Ezvqzo/YuWcbrmiMvFuM+uT4w9wdhfwurn06tg9u5l1dnejBoUrrtYLYA==
 
-sn-bold-editor@1.2.10:
-  version "1.2.10"
-  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.2.10.tgz#8c1aefe99204ea6c5f9a45ba86078fe87f36b4e8"
-  integrity sha512-1nXvnodDXxp19i4W2mgmgfq9YrOZrLoe2OCtFmaiXDDLCbq45Ds2JB9SJW8/i8xoAePJh8B6hmen2jm0oCLQ6g==
+sn-bold-editor@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.3.0.tgz#da40b764af5d4f0ec1d9fbce3afe189cd21fe04f"
+  integrity sha512-73RUmawRMfl522erhxYi0Q8/VMO4mgtktP5og+7AWupYxffekLk/MEFFnteKgVABdEG2ShxVKeMIgiMEFlipXA==
 
 sn-cloudlink@1.3.1:
   version "1.3.1"
@@ -11497,10 +11497,10 @@ sn-minimal-markdown-editor@1.3.7:
   dependencies:
     sn-codemirror-search "1.0.0"
 
-sn-plus-editor@1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/sn-plus-editor/-/sn-plus-editor-1.5.0.tgz#679d293bbfa81e156c2e03e69947730ce9f659e6"
-  integrity sha512-4ZsiFQsXFDYrQ7CkjSKy7VazIBRShLC9kjTjk4mUIxVgNIhDieQ0nxlpXp4sFUVptgdmkRoaJJtXirq5afO/8g==
+sn-plus-editor@1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/sn-plus-editor/-/sn-plus-editor-1.6.0.tgz#1ed963552c742b92c04b456c6325a33d65f9d429"
+  integrity sha512-pp/CQNTmLwDCJRhfkEZO7nchKU36k0/zYKnbWRheAknjcZIW5R57ax/pRMjas3Hhh5o62/agItIu7BPF89l9jA==
 
 sn-simple-markdown-editor@1.4.0:
   version "1.4.0"
