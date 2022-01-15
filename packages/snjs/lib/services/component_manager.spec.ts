@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 
+import { SNPreferencesService } from './preferences_service';
 import { FeatureDescription } from '@standardnotes/features';
 import { DesktopManagerInterface } from '@Services/component_manager/types';
 import { FeatureIdentifier } from '@standardnotes/features';
@@ -20,6 +21,7 @@ describe('featuresService', () => {
   let featureService: SNFeaturesService;
   let alertService: SNAlertService;
   let syncService: SNSyncService;
+  let prefsService: SNPreferencesService;
 
   const desktopExtHost = 'http://localhost:123';
 
@@ -38,6 +40,7 @@ describe('featuresService', () => {
       itemManager,
       syncService,
       featureService,
+      prefsService,
       alertService,
       environment,
       platform,
@@ -66,6 +69,8 @@ describe('featuresService', () => {
     itemManager.changeFeatureRepo = jest.fn();
 
     featureService = {} as jest.Mocked<SNFeaturesService>;
+
+    prefsService = {} as jest.Mocked<SNPreferencesService>;
 
     alertService = {} as jest.Mocked<SNAlertService>;
     alertService.confirm = jest.fn();

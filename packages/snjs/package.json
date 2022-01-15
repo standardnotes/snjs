@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.35.6",
+  "version": "2.37.2",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
-    "@standardnotes/sncrypto-web": "1.5.2",
+    "@standardnotes/sncrypto-web": "^1.6.0",
     "@types/crypto-js": "^4.0.1",
     "@types/dompurify": "^2.3.2",
     "@types/jest": "^26.0.23",
@@ -82,8 +82,8 @@
     "@standardnotes/auth": "^3.13.1",
     "@standardnotes/common": "^1.7.0",
     "@standardnotes/domain-events": "^2.16.3",
-    "@standardnotes/features": "^1.20.8",
+    "@standardnotes/features": "^1.23.0",
     "@standardnotes/settings": "^1.9.0",
-    "@standardnotes/sncrypto-common": "1.5.2"
+    "@standardnotes/sncrypto-common": "^1.6.0"
   }
 }

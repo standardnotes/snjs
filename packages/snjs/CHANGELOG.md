@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.37.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.1...@standardnotes/snjs@2.37.2) (2022-01-14)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.37.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.0...@standardnotes/snjs@2.37.1) (2022-01-14)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.37.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.36.0...@standardnotes/snjs@2.37.0) (2022-01-14)
+
+
+### Features
+
+* spellcheck control per note ([#557](https://github.com/standardnotes/snjs/issues/557)) ([76cc637](https://github.com/standardnotes/snjs/commit/76cc63781e3568bbb48b44001ab51644af0985b3))
+
+
+
+
+
+# [2.36.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.6...@standardnotes/snjs@2.36.0) (2022-01-14)
+
+
+### Features
+
+* move sncrypto packages to snjs monorepo ([#554](https://github.com/standardnotes/snjs/issues/554)) ([db83991](https://github.com/standardnotes/snjs/commit/db8399190d9d10fdc31060568b836c62933fd525))
+
+
+
+
+
 ## [2.35.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.5...@standardnotes/snjs@2.35.6) (2022-01-14)
 
 

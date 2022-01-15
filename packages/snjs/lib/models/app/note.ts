@@ -1,15 +1,17 @@
+import { PayloadContent } from '@Payloads/generator';
 import { PayloadFormat } from './../../protocol/payloads/formats';
 import { isNullOrUndefined } from '@Lib/utils';
 import { AppDataField, ItemMutator, SNItem } from '@Models/core/item';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 
-export interface NoteContent {
+export interface NoteContent extends PayloadContent {
   title: string;
   text: string;
   mobilePrefersPlainEditor?: boolean;
   hidePreview: boolean;
   preview_plain?: string;
   preview_html?: string;
+  spellcheck?: boolean;
 }
 
 /** A note item */
@@ -24,6 +26,7 @@ export class SNNote extends SNItem implements NoteContent {
   public readonly preview_plain!: string;
   public readonly preview_html!: string;
   public readonly prefersPlainEditor!: boolean;
+  public readonly spellcheck?: boolean | undefined;
 
   constructor(payload: PurePayload) {
     super(payload);
@@ -32,6 +35,8 @@ export class SNNote extends SNItem implements NoteContent {
     this.preview_plain = this.payload.safeContent.preview_plain;
     this.preview_html = this.payload.safeContent.preview_html;
     this.hidePreview = this.payload.safeContent.hidePreview;
+    this.spellcheck = this.payload.safeContent.spellcheck;
+
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.prefersPlainEditor = this.getAppDomainValue(
         AppDataField.PrefersPlainEditor
@@ -42,11 +47,11 @@ export class SNNote extends SNItem implements NoteContent {
     }
   }
 
-  safeText() {
+  safeText(): string {
     return this.text || '';
   }
 
-  safeTitle() {
+  safeTitle(): string {
     return this.title || '';
   }
 }
@@ -78,5 +83,13 @@ export class NoteMutator extends ItemMutator {
 
   set prefersPlainEditor(prefersPlainEditor: boolean) {
     this.setAppDataItem(AppDataField.PrefersPlainEditor, prefersPlainEditor);
+  }
+
+  set spellcheck(spellcheck: boolean) {
+    this.typedContent.spellcheck = spellcheck;
+  }
+
+  toggleSpellcheck(): void {
+    this.typedContent.spellcheck = !this.typedContent.spellcheck;
   }
 }
