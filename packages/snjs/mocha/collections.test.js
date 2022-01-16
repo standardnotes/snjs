@@ -262,7 +262,7 @@ describe('payload collections', () => {
       CopyPayload(regularPayload1.payload, {
         ...regularPayload1.payload,
         errorDecrypting: true,
-        content: 'ssss',
+        content: '004:123',
         uuid: Factory.generateUuidish(),
       })
     );

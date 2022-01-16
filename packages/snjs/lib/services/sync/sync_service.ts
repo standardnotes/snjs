@@ -38,7 +38,6 @@ import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 import { SNLog } from '@Lib/log';
-import { NonEncryptedTypes } from './filter';
 
 const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
@@ -453,11 +452,7 @@ export class SNSyncService extends PureService<
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
     return this.protocolService.payloadsByEncryptingPayloads(
       payloads,
-      (payload) => {
-        return NonEncryptedTypes.includes(payload.content_type!)
-          ? EncryptionIntent.SyncDecrypted
-          : EncryptionIntent.Sync;
-      }
+      EncryptionIntent.Sync
     );
   }
 
@@ -761,6 +756,8 @@ export class SNSyncService extends PureService<
     source: SyncSources,
     mode: SyncModes
   ) {
+    const syncToken = await this.getLastSyncToken();
+    const paginationToken = await this.getPaginationToken();
     const operation = new AccountSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
@@ -783,21 +780,19 @@ export class SNSyncService extends PureService<
             break;
         }
       },
-      await this.getLastSyncToken(),
-      await this.getPaginationToken(),
+      syncToken,
+      paginationToken,
       checkIntegrity,
       this.apiService
     );
     this.log(
       'Syncing online user',
-      'source:',
-      source,
-      'operation id',
-      operation.id,
-      'integrity check',
-      checkIntegrity,
-      'mode:',
-      mode,
+      `source: ${SyncSources[source]}`,
+      `operation id: ${operation.id}`,
+      `integrity check: ${checkIntegrity}`,
+      `mode: ${mode}`,
+      `syncToken: ${syncToken}`,
+      `cursorToken: ${paginationToken}`,
       'payloads:',
       payloads
     );
@@ -979,13 +974,10 @@ export class SNSyncService extends PureService<
    * @returns A SHA256 digest string (hex).
    */
   private async computeDataIntegrityHash(): Promise<string | undefined> {
-    const ExcludedTypes = [ContentType.ServerExtension];
     try {
-      const items = this.itemManager.nonDeletedItems
-        .filter((item) => !ExcludedTypes.includes(item.content_type))
-        .sort((a, b) => {
-          return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
-        });
+      const items = this.itemManager.nonDeletedItems.sort((a, b) => {
+        return b.serverUpdatedAtTimestamp! - a.serverUpdatedAtTimestamp!;
+      });
       const timestamps: number[] = [];
       const MicrosecondsInMillisecond = 1_000;
       for (const item of items) {
