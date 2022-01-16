@@ -22,8 +22,8 @@ export enum PrefKey {
   NotesHideTags = 'hideTags',
   NotesHideEditorIcon = 'hideEditorIcon',
   UseDeviceThemeSettings = 'useDeviceThemeSettings',
-  AutomaticLightTheme = 'autoLightTheme',
-  AutomaticDarkTheme = 'autoDarkTheme',
+  AutoLightThemeIdentifier = 'autoLightThemeIdentifier',
+  AutoDarkThemeIdentifier = 'autoDarkThemeIdentifier',
 }
 
 export type PrefValue = {
@@ -45,8 +45,8 @@ export type PrefValue = {
   [PrefKey.NotesHideTags]: boolean;
   [PrefKey.NotesHideEditorIcon]: boolean;
   [PrefKey.UseDeviceThemeSettings]: boolean;
-  [PrefKey.AutomaticLightTheme]: string;
-  [PrefKey.AutomaticDarkTheme]: string;
+  [PrefKey.AutoLightThemeIdentifier]: string;
+  [PrefKey.AutoDarkThemeIdentifier]: string;
 };
 
 export class SNUserPrefs extends SNItem {
