@@ -8,7 +8,11 @@ export class TokenEncoder<T> implements TokenEncoderInterface<T> {
   ) {
   }
 
+  encodeExpirableToken(data: T, expiresIn: string | number | undefined): string {
+    return sign(data as Record<string, unknown>, this.jwtSecret, { algorithm: 'HS256', expiresIn })
+  }
+
   encodeToken(data: T): string {
-    return sign(JSON.stringify(data), this.jwtSecret, { algorithm: 'HS256' })
+    return sign(data as Record<string, unknown>, this.jwtSecret, { algorithm: 'HS256' })
   }
 }
