@@ -196,7 +196,7 @@ export function lastElement(array: any[]) {
  * Adds all items from otherArray into inArray, in-place.
  * Does not return a value.
  */
-export function extendArray<T>(inArray: T[], otherArray: T[]) {
+export function extendArray<T>(inArray: T[], otherArray: T[]): void {
   for (const value of otherArray) {
     inArray.push(value);
   }
