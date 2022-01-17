@@ -88,7 +88,7 @@ export class TagMutator extends ItemMutator {
     const references = this.item.references.filter(isTagToParentTagReference);
 
     const reference: TagToParentTagReference = {
-      reference_type: ContenteReferenceType.tagToParentTag,
+      reference_type: ContenteReferenceType.TagToParentTag,
       content_type: ContentType.Tag,
       uuid: tag.uuid,
     };

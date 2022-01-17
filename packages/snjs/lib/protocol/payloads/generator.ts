@@ -14,11 +14,11 @@ export interface LegacyTagToNoteReference {
 }
 
 export enum ContenteReferenceType {
-  tagToParentTag = 'TagToParentTag',
+  TagToParentTag = 'TagToParentTag',
 }
 
 export interface TagToParentTagReference {
-  reference_type: ContenteReferenceType.tagToParentTag;
+  reference_type: ContenteReferenceType.TagToParentTag;
   uuid: string;
   content_type: string;
 }
@@ -30,7 +30,7 @@ export type ContentReference =
 export const isTagToParentTagReference = (
   x: ContentReference
 ): x is TagToParentTagReference => {
-  return (x as any).reference_type === ContenteReferenceType.tagToParentTag;
+  return (x as any).reference_type === ContenteReferenceType.TagToParentTag;
 };
 
 export type PayloadContent = {
