@@ -14,7 +14,7 @@ export interface LegacyTagToNoteReference {
 }
 
 export enum ContenteReferenceType {
-  tagToParentTag = 'tagToParentTag',
+  tagToParentTag = 'TagToParentTag',
 }
 
 export interface TagToParentTagReference {
