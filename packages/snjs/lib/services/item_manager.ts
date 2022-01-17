@@ -14,34 +14,35 @@ import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import {
   CollectionSort,
   ItemCollection,
-  SortDirection
+  SortDirection,
 } from '@Protocol/collection/item_collection';
-import { ContentType } from '@standardnotes/common'
+import { ContentType } from '@standardnotes/common';
 import { ComponentMutator } from './../models/app/component';
 import {
   ActionsExtensionMutator,
-  SNActionsExtension
+  SNActionsExtension,
 } from './../models/app/extension';
 import {
   FeatureRepoMutator,
-  SNFeatureRepo
+  SNFeatureRepo,
 } from './../models/app/feature_repo';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { NoteMutator, SNNote } from './../models/app/note';
 import {
   SmartTagPredicateContent,
   SMART_TAG_DSL_PREFIX,
-  SNSmartTag
+  SNSmartTag,
 } from './../models/app/smartTag';
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
 import { SNPredicate } from './../models/core/predicate';
 import {
-  TagNoteCountChangeObserver, TagNotesIndex
+  TagNoteCountChangeObserver,
+  TagNotesIndex,
 } from './../protocol/collection/tag_notes_index';
 import {
   PayloadContent,
-  PayloadOverride
+  PayloadOverride,
 } from './../protocol/payloads/generator';
 import { PurePayload } from './../protocol/payloads/pure_payload';
 import { PayloadSource } from './../protocol/payloads/sources';
@@ -272,8 +273,12 @@ export class ItemManager extends PureService {
     return this.tagNotesIndex.allCountableNotesCount();
   }
 
-  public countableNotesForTag(tag: SNTag): number {
+  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
     if (tag.isSmartTag) {
+      if (tag.isAllTag) {
+        return this.tagNotesIndex.allCountableNotesCount();
+      }
+
       throw Error(
         'countableNotesForTag is not meant to be used for smart tags.'
       );

@@ -868,7 +868,7 @@ export class SNApplication {
     return this.itemManager.allCountableNotesCount();
   }
 
-  public countableNotesForTag(tag: SNTag): number {
+  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
     return this.itemManager.countableNotesForTag(tag);
   }
 
