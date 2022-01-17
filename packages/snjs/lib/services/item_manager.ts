@@ -1090,7 +1090,12 @@ export class ItemManager extends PureService {
   /**
    * Finds or creates a tag with a given title
    */
-  public async findOrCreateTagByTitle(title: string): Promise<SNTag> {
+  public async findOrCreateTagByTitle(
+    title: string,
+    parentUuid?: UuidString
+  ): Promise<SNTag> {
+    // TODO: test with new syntax
+    console.log('this is what it takes to commit', parentUuid);
     const tag = this.findTagByTitle(title);
     return tag || this.createTag(title);
   }
