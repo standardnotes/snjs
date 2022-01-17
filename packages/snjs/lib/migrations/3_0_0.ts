@@ -5,6 +5,7 @@ import { SNTag, TagMutator } from '@Lib/models';
 import sortBy from 'lodash/sortBy';
 import initial from 'lodash/initial';
 import last from 'lodash/last';
+import { ComponentArea } from '@Lib/models/app/component';
 
 export class Migration3_0_0 extends Migration {
   static version(): string {
@@ -38,8 +39,23 @@ export class Migration3_0_0 extends Migration {
     return current;
   }
 
+  private shouldMigrateTags(): boolean {
+    const itemManager = this.services.itemManager;
+    const hasActiveFoldersComponent = itemManager.components.some(
+      (component) => {
+        component.active && component.area === ComponentArea.TagsList;
+      }
+    );
+
+    return hasActiveFoldersComponent;
+  }
+
   private async upgradeTagFoldersToHierarchy(): Promise<void> {
-    // TODO: skip if the user has no folders enabled.
+    const showMigrateTags = this.shouldMigrateTags();
+
+    if (!showMigrateTags) {
+      return;
+    }
 
     const itemManager = this.services.itemManager;
     const tags = itemManager.getItems(ContentType.Tag) as SNTag[];
