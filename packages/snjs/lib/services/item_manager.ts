@@ -940,7 +940,11 @@ export class ItemManager extends PureService {
 
   getTagChildren(tagUuid: UuidString): SNTag[] {
     const tag = this.findItem(tagUuid) as SNTag;
-    const tags = this.collection.elementsReferencingElement(tag) as SNTag[];
+    const tags = this.collection.elementsReferencingElement(
+      tag,
+      ContentType.Tag
+    ) as SNTag[];
+
     return tags.filter((tag) => tag.parentId === tag.uuid);
   }
 
