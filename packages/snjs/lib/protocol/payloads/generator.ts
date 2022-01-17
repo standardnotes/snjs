@@ -8,7 +8,7 @@ import { EncryptionIntent } from '@Protocol/intents';
 import { Copy, pickByCopy, uniqueArray } from '@Lib/utils';
 import { PayloadField } from '@Payloads/fields';
 
-export interface LegacyTagToNoteRefernce {
+export interface LegacyTagToNoteReference {
   uuid: string;
   content_type: string;
 }
@@ -24,7 +24,7 @@ export interface TagToParentTagReference {
 }
 
 export type ContentReference =
-  | LegacyTagToNoteRefernce
+  | LegacyTagToNoteReference
   | TagToParentTagReference;
 
 export const isTagToParentTagReference = (
