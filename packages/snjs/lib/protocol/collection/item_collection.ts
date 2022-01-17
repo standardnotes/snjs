@@ -3,6 +3,7 @@ import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@Lib/utils';
 import { SNItem } from './../../models/core/item';
 import { ContentType } from '@standardnotes/common';
 import { UuidString } from './../../types';
+import { ItemDelta, SNIndex } from './indexes';
 
 export enum CollectionSort {
   CreatedAt = 'created_at',
@@ -13,7 +14,9 @@ export type SortDirection = 'asc' | 'dsc';
 
 /** The item collection class builds on mutable collection by providing an option to keep
  * items sorted and filtered. */
-export class ItemCollection extends MutableCollection<SNItem> {
+export class ItemCollection
+  extends MutableCollection<SNItem>
+  implements SNIndex {
   private displaySortBy: Partial<
     Record<
       ContentType,
@@ -134,9 +137,12 @@ export class ItemCollection extends MutableCollection<SNItem> {
       const previousElement = !isNullOrUndefined(previousIndex)
         ? sortedElements[previousIndex]
         : undefined;
-      /** If the element is deleted, or if it no longer exists in the primary map (because
+
+      /**
+       *  If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
-       * the filter. If no filter the element passes by default. */
+       * the filter. If no filter the element passes by default.
+       */
       const passes =
         element.deleted || !this.map[element.uuid]
           ? false
@@ -259,5 +265,15 @@ export class ItemCollection extends MutableCollection<SNItem> {
       currentIndex++;
     }
     this.sortedMap[contentType] = cleaned;
+  }
+
+  public onChange(delta: ItemDelta): void {
+    const changedOrInserted = delta.changed.concat(delta.inserted);
+
+    if (changedOrInserted.length > 0) {
+      this.set(changedOrInserted);
+    }
+
+    this.discard(delta.discarded);
   }
 }

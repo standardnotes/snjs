@@ -9,6 +9,9 @@ export interface TagContent extends ItemContent {
   title: string;
 }
 
+export const isTag = (x: SNItem): x is SNTag =>
+  x.content_type === ContentType.Tag;
+
 /**
  * Allows organization of notes into groups.
  * A tag can have many notes, and a note can have many tags.
@@ -23,7 +26,7 @@ export class SNTag extends SNItem implements TagContent {
 
   get noteReferences(): ContentReference[] {
     const references = this.payload.safeReferences;
-    return references.filter(ref => ref.content_type === ContentType.Note)
+    return references.filter((ref) => ref.content_type === ContentType.Note);
   }
 
   get noteCount(): number {

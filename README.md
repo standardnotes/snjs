@@ -138,10 +138,10 @@ From the root of the repository, run:
 
 ```
 # Starts browser-navigable web page
-yarn run start:test-server:dev
+yarn run start:e2e:mocha
 
 # Starts backend servers
-yarn run test:e2e:dev-setup
+yarn run start:e2e:docker
 ```
 
 Then choose between the following run options:
