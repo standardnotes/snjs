@@ -1,5 +1,5 @@
+import { ContentType } from '@Lib/index';
 import { isNullOrUndefined } from '@Lib/utils';
-import { ContentType } from '@Models/content_types';
 import { AppDataField, ItemMutator, SNItem } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
 import { PayloadFormat } from './../../protocol/payloads/formats';
