@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.39.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.4...@standardnotes/snjs@2.39.0) (2022-01-17)
+
+
+### Features
+
+* Add preferences for automatic themes ([#558](https://github.com/standardnotes/snjs/issues/558)) ([ab4936e](https://github.com/standardnotes/snjs/commit/ab4936ea2520dc2bb0e71086a6581078507581f8))
+
+
+
+
+
 ## [2.38.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.3...@standardnotes/snjs@2.38.4) (2022-01-17)
 
 **Note:** Version bump only for package @standardnotes/snjs
