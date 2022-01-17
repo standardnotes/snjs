@@ -22,7 +22,7 @@ export enum PrefKey {
   NotesHideDate = 'hideDate',
   NotesHideTags = 'hideTags',
   NotesHideEditorIcon = 'hideEditorIcon',
-  UseDeviceThemeSettings = 'useDeviceThemeSettings',
+  UseSystemColorScheme = 'useSystemColorScheme',
   AutoLightThemeIdentifier = 'autoLightThemeIdentifier',
   AutoDarkThemeIdentifier = 'autoDarkThemeIdentifier',
 }
@@ -45,7 +45,7 @@ export type PrefValue = {
   [PrefKey.NotesHideDate]: boolean;
   [PrefKey.NotesHideTags]: boolean;
   [PrefKey.NotesHideEditorIcon]: boolean;
-  [PrefKey.UseDeviceThemeSettings]: boolean;
+  [PrefKey.UseSystemColorScheme]: boolean;
   [PrefKey.AutoLightThemeIdentifier]: FeatureIdentifier | 'None';
   [PrefKey.AutoDarkThemeIdentifier]: FeatureIdentifier | 'None';
 };
