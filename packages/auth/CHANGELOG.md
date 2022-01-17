@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.0...@standardnotes/auth@3.15.1) (2022-01-17)
+
+
+### Bug Fixes
+
+* token encoders ([e0be0f4](https://github.com/standardnotes/snjs/commit/e0be0f4f0677615c3e347843eea33f08e9920eae))
+
+
+
+
+
 # [3.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.14.1...@standardnotes/auth@3.15.0) (2022-01-17)
 
 
