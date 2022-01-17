@@ -4,5 +4,4 @@ export type ValetTokenData = {
   userUuid: Uuid,
   permittedOperation: 'read' | 'write',
   permittedResources: Array<string>,
-  validUntil: number,
 }
