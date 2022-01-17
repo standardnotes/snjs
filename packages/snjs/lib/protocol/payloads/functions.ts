@@ -87,13 +87,14 @@ export async function PayloadsByDuplicating(
    * Get the payloads that make reference to payload and add the copy.
    */
   const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = PayloadsByUpdatingReferences(referencing, [
-    {
-      uuid: copy.uuid!,
-      content_type: copy.content_type!,
-    },
-  ]);
-  extendArray(results, updatedReferencing);
+  // TODO: fixme
+  // const updatedReferencing = PayloadsByUpdatingReferences(referencing, [
+  //   {
+  //     uuid: copy.uuid!,
+  //     content_type: copy.content_type!,
+  //   },
+  // ]);
+  // extendArray(results, updatedReferencing);
 
   const affector = AffectorMapping[payload.content_type];
   if (affector) {
@@ -136,17 +137,18 @@ export async function PayloadsByAlternatingUuid(
    * payload as a relationship, instead adding the new copy.
    */
   const referencing = baseCollection.elementsReferencingElement(payload);
-  const updatedReferencing = PayloadsByUpdatingReferences(
-    referencing,
-    [
-      {
-        uuid: copy.uuid!,
-        content_type: copy.content_type!,
-      },
-    ],
-    [payload.uuid!]
-  );
-  extendArray(results, updatedReferencing);
+  // TODO: fixme
+  // const updatedReferencing = PayloadsByUpdatingReferences(
+  //   referencing,
+  //   [
+  //     {
+  //       uuid: copy.uuid!,
+  //       content_type: copy.content_type!,
+  //     },
+  //   ],
+  //   [payload.uuid!]
+  // // );
+  // extendArray(results, updatedReferencing);
 
   if (payload.content_type === ContentType.ItemsKey) {
     /**

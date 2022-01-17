@@ -8,9 +8,29 @@ import { EncryptionIntent } from '@Protocol/intents';
 import { Copy, pickByCopy, uniqueArray } from '@Lib/utils';
 import { PayloadField } from '@Payloads/fields';
 
-export type ContentReference = {
+export interface LegacyTagToNoteRefernce {
   uuid: string;
   content_type: string;
+}
+
+export enum ContenteReferenceType {
+  tagToParentTag = 'tagToParentTag',
+}
+
+export interface TagToParentTagReference {
+  reference_type: ContenteReferenceType.tagToParentTag;
+  uuid: string;
+  content_type: string;
+}
+
+export type ContentReference =
+  | LegacyTagToNoteRefernce
+  | TagToParentTagReference;
+
+export const isTagToParentTagReference = (
+  x: ContentReference
+): x is TagToParentTagReference => {
+  return (x as any).reference_type === ContenteReferenceType.tagToParentTag;
 };
 
 export type PayloadContent = {
