@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.38.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.3...@standardnotes/snjs@2.38.4) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.2...@standardnotes/snjs@2.38.3) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.1...@standardnotes/snjs@2.38.2) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.0...@standardnotes/snjs@2.38.1) (2022-01-16)
+
+
+### Bug Fixes
+
+* add payload source constructor to sync components on launch ([ddb79cc](https://github.com/standardnotes/snjs/commit/ddb79ccee8512523e8d0241310039be84f08cfc0))
+
+
+
+
+
 # [2.38.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.3...@standardnotes/snjs@2.38.0) (2022-01-15)
 
 

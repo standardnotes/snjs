@@ -1,5 +1,7 @@
 import 'reflect-metadata'
 
+import { verify } from 'jsonwebtoken'
+
 import { TokenEncoder } from './TokenEncoder'
 
 describe('TokenEncoder', () => {
@@ -8,9 +10,16 @@ describe('TokenEncoder', () => {
   const createEncoder = () => new TokenEncoder<{ user_uuid: string }>(jwtSecret)
 
   it('should encode a token', () => {
-    expect(createEncoder().encodeToken({
-      user_uuid: '123',
-    }))
-      .toEqual('eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX3V1aWQiOiIxMjMifQ.dC6O32I6QskBy3-sskjYY8as_KFo8wFrbwph2l9n6y0')
+    const encodedToken = createEncoder().encodeToken({ user_uuid: '123' })
+
+    expect((verify(encodedToken, jwtSecret)).user_uuid).toEqual('123')
+    expect((verify(encodedToken, jwtSecret)).exp).toBeUndefined()
+  })
+
+  it('should encode an expirable token', () => {
+    const encodedToken = createEncoder().encodeExpirableToken({ user_uuid: '123' }, 123)
+
+    expect((verify(encodedToken, jwtSecret)).user_uuid).toEqual('123')
+    expect((verify(encodedToken, jwtSecret)).exp).toBeGreaterThan(0)
   })
 })

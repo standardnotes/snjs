@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.2](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.1...@standardnotes/auth@3.15.2) (2022-01-17)
+
+
+### Bug Fixes
+
+* remove valet token valid until date in favor of jwt expiration ([7973fb1](https://github.com/standardnotes/snjs/commit/7973fb1695f3b02fa9b8888c6c5d0ff10b1979ee))
+
+
+
+
+
+## [3.15.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.0...@standardnotes/auth@3.15.1) (2022-01-17)
+
+
+### Bug Fixes
+
+* token encoders ([e0be0f4](https://github.com/standardnotes/snjs/commit/e0be0f4f0677615c3e347843eea33f08e9920eae))
+
+
+
+
+
+# [3.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.14.1...@standardnotes/auth@3.15.0) (2022-01-17)
+
+
+### Features
+
+* refactor token data names ([#559](https://github.com/standardnotes/snjs/issues/559)) ([2c615c9](https://github.com/standardnotes/snjs/commit/2c615c9b6f733195684163a58df606f5a8ffde59))
+
+
+
+
+
 ## [3.14.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.14.0...@standardnotes/auth@3.14.1) (2022-01-15)
 
 **Note:** Version bump only for package @standardnotes/auth
