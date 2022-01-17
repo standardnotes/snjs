@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.14.1...@standardnotes/auth@3.15.0) (2022-01-17)
+
+
+### Features
+
+* refactor token data names ([#559](https://github.com/standardnotes/snjs/issues/559)) ([2c615c9](https://github.com/standardnotes/snjs/commit/2c615c9b6f733195684163a58df606f5a8ffde59))
+
+
+
+
+
 ## [3.14.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.14.0...@standardnotes/auth@3.14.1) (2022-01-15)
 
 **Note:** Version bump only for package @standardnotes/auth
