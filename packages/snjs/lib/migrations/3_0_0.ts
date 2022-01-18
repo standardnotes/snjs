@@ -6,6 +6,7 @@ import sortBy from 'lodash/sortBy';
 import initial from 'lodash/initial';
 import last from 'lodash/last';
 import { ComponentArea } from '@Lib/models/app/component';
+import { ItemManager } from '@Lib/services';
 
 export class Migration3_0_0 extends Migration {
   static version(): string {
@@ -16,7 +17,7 @@ export class Migration3_0_0 extends Migration {
     this.registerStageHandler(
       ApplicationStage.FullSyncCompleted_13,
       async () => {
-        await this.upgradeTagFoldersToHierarchy();
+        await this.migrate();
         this.markDone();
       }
     );
@@ -33,14 +34,19 @@ export class Migration3_0_0 extends Migration {
     return hasActiveFoldersComponent;
   }
 
-  private async upgradeTagFoldersToHierarchy(): Promise<void> {
+  private async migrate(): Promise<void> {
     const showMigrateTags = this.shouldMigrateTags();
 
     if (!showMigrateTags) {
       return;
     }
 
-    const itemManager = this.services.itemManager;
+    return Migration3_0_0.upgradeTagFoldersToHierarchy(this.services.itemManager);
+  }
+
+  public static async upgradeTagFoldersToHierarchy(
+    itemManager: ItemManager
+  ): Promise<void> {
     const tags = itemManager.getItems(ContentType.Tag) as SNTag[];
 
     // Ensure we process path1 before path1.children
@@ -57,7 +63,7 @@ export class Migration3_0_0 extends Migration {
       const hasDotPrefix = hierarchy[0] === '';
 
       if (hasSimpleTitle || hasDotPrefix) {
-        return;
+        continue;
       }
 
       const parents = initial(hierarchy);
