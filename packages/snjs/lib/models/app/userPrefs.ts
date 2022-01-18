@@ -46,8 +46,8 @@ export type PrefValue = {
   [PrefKey.NotesHideTags]: boolean;
   [PrefKey.NotesHideEditorIcon]: boolean;
   [PrefKey.UseSystemColorScheme]: boolean;
-  [PrefKey.AutoLightThemeIdentifier]: FeatureIdentifier | 'None';
-  [PrefKey.AutoDarkThemeIdentifier]: FeatureIdentifier | 'None';
+  [PrefKey.AutoLightThemeIdentifier]: FeatureIdentifier | 'Default';
+  [PrefKey.AutoDarkThemeIdentifier]: FeatureIdentifier | 'Default';
 };
 
 export class SNUserPrefs extends SNItem {
