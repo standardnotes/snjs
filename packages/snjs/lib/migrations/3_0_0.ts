@@ -41,7 +41,9 @@ export class Migration3_0_0 extends Migration {
       return;
     }
 
-    return Migration3_0_0.upgradeTagFoldersToHierarchy(this.services.itemManager);
+    return Migration3_0_0.upgradeTagFoldersToHierarchy(
+      this.services.itemManager
+    );
   }
 
   public static async upgradeTagFoldersToHierarchy(
