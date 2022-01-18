@@ -11460,10 +11460,10 @@ sn-advanced-markdown-editor@1.4.0:
   resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.4.0.tgz#5dc0e393dc62a5efa3e54dc8b7352ab11dace6df"
   integrity sha512-yvjJgPb+Eg3nTKTWbtv2ohB/Nl843Ezvqzo/YuWcbrmiMvFuM+uT4w9wdhfwurn06tg9u5l1dnejBoUrrtYLYA==
 
-sn-bold-editor@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.3.0.tgz#da40b764af5d4f0ec1d9fbce3afe189cd21fe04f"
-  integrity sha512-73RUmawRMfl522erhxYi0Q8/VMO4mgtktP5og+7AWupYxffekLk/MEFFnteKgVABdEG2ShxVKeMIgiMEFlipXA==
+sn-bold-editor@1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.3.1.tgz#e8b3ed53b662d8f11a601070959f75215658555a"
+  integrity sha512-+l7FwtbAHsQO2iP7Iod0dh2R8HY8jd5zWQJ3lfYerkrsQxXxCgiQNpeav/zR1LfrDie0KVgIuYeLthhmnHkUMQ==
 
 sn-cloudlink@1.3.1:
   version "1.3.1"
@@ -11512,10 +11512,10 @@ sn-simple-task-editor@1.3.7:
   resolved "https://registry.yarnpkg.com/sn-simple-task-editor/-/sn-simple-task-editor-1.3.7.tgz#028113067a26f18459ff065cdf8f2c328e77b748"
   integrity sha512-vdUwGdIC/s/Ql02bkO4LE6mlCoUTAJnV874agIwVNBsItRuPBZK65M1KcwIghqle/mKKATS2YTHGTr35Qaodwg==
 
-sn-spreadsheets@1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.2.tgz#95532fbadffaa250397ec22519fd6c903d4cbf25"
-  integrity sha512-Qy5ycFOhVZYepAvSfiHc34FNk/2yZ5E/mCIsMLmbj9EWf/ocsPGk4MmnPLg2195nXttcVzZxQDB+mRuDFsEvCw==
+sn-spreadsheets@1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.3.tgz#441bfded79352e95b024f2424e8030c575c939a1"
+  integrity sha512-dwWQACmbLB3P5d8xVb2LsVzJYCM1LUij8A23JD1zrr3zb7wOVrec+qEgSpF9nKjiaI9a3AU9V2TECv1OA3iNiA==
 
 sn-theme-autobiography@standardnotes/autobiography-theme:
   version "1.0.2"
