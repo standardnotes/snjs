@@ -22,23 +22,6 @@ export class Migration3_0_0 extends Migration {
     );
   }
 
-  // TODO: move to core features
-  private async getOrCreateParents(
-    parents: string[]
-  ): Promise<SNTag | undefined> {
-    const itemManager = this.services.itemManager;
-    let current: SNTag | undefined = undefined;
-
-    for (const parent of parents) {
-      const currentUuid: string | undefined = current
-        ? current.uuid
-        : undefined;
-      current = await itemManager.findOrCreateTagByTitle(parent, currentUuid);
-    }
-
-    return current;
-  }
-
   private shouldMigrateTags(): boolean {
     const itemManager = this.services.itemManager;
     const hasActiveFoldersComponent = itemManager.components.some(
@@ -87,7 +70,7 @@ export class Migration3_0_0 extends Migration {
         throw new Error('invalid data state');
       }
 
-      const parent = await this.getOrCreateParents(parents);
+      const parent = await itemManager.findOrCreateTagParentChain(parents);
 
       await itemManager.changeItem(tag.uuid, (mutator: TagMutator) => {
         mutator.title = newTitle;
