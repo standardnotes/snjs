@@ -251,7 +251,7 @@ function editors(): EditorFeatureDescription[] {
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Bold Editor',
     identifier: FeatureIdentifier.BoldEditor,
-    version: '1.3.0',
+    version: '1.3.1',
     note_type: NoteType.RichText,
     file_type: 'html',
     component_permissions: [
@@ -395,7 +395,7 @@ function editors(): EditorFeatureDescription[] {
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Secure Spreadsheets',
     identifier: FeatureIdentifier.SheetsEditor,
-    version: '1.4.2',
+    version: '1.4.3',
     note_type: NoteType.Spreadsheet,
     file_type: 'json',
     interchangeable: false,
