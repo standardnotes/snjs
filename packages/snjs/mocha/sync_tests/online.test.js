@@ -1070,4 +1070,22 @@ describe('online syncing', function () {
     const item = this.application.findItem(payload.uuid);
     expect(item.dirty).to.equal(false);
   });
+
+  it('should call onPresyncSave before sync begins', async function() {
+    const events = [];
+    this.application.syncService.addEventObserver((event) => {
+      if (event === SyncEvent.SyncWillBegin) {
+        events.push('sync-will-begin');
+      }
+    });
+
+    await this.application.syncService.sync({
+      onPresyncSave: () => {
+        events.push('on-presync-save');
+      },
+    });
+
+    expect(events[0]).to.equal('on-presync-save');
+    expect(events[1]).to.equal('sync-will-begin');
+  });
 });

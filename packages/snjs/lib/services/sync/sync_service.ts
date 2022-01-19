@@ -89,6 +89,11 @@ export type SyncOptions = {
   source?: SyncSources;
   /** Whether to await any sync requests that may be queued from this call. */
   awaitAll?: boolean;
+  /**
+   * A callback that is triggered after pre-sync save completes,
+   * and before the sync request is network dispatched
+   */
+  onPresyncSave?: () => void;
 };
 
 type SyncPromise = {
@@ -542,6 +547,10 @@ export class SNSyncService extends PureService<
     );
     await this.persistPayloads(payloadsNeedingSave);
 
+    if (options.onPresyncSave) {
+      options.onPresyncSave();
+    }
+
     /** The in time resolve queue refers to any sync requests that were made while we still
      * have not sent out the current request. So, anything in the in time resolve queue
      * will have made it in time to piggyback on the current request. Anything that comes
@@ -644,7 +653,9 @@ export class SNSyncService extends PureService<
         useMode
       );
     }
+
     this.currentSyncRequestPromise = operation.run();
+
     await this.currentSyncRequestPromise;
 
     if (this.dealloced) {

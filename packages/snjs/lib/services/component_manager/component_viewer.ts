@@ -763,21 +763,15 @@ export class ComponentViewer {
           this.component.uuid
         );
         this.syncService
-          .sync()
-          .then(() => {
-            /* Allow handlers to be notified when a save begins and ends, to update the UI */
-            const saveMessage = Object.assign({}, message);
-            saveMessage.action = ComponentAction.SaveSuccess;
-            this.replyToMessage(message, {});
-            this.handleMessage(saveMessage);
+          .sync({
+            onPresyncSave: () => {
+              this.replyToMessage(message, {});
+            },
           })
           .catch(() => {
-            const saveMessage = Object.assign({}, message);
-            saveMessage.action = ComponentAction.SaveError;
             this.replyToMessage(message, {
-              error: ComponentAction.SaveError,
+              error: 'save-error',
             });
-            this.handleMessage(saveMessage);
           });
       }
     );
