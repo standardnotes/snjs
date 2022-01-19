@@ -231,7 +231,7 @@ function FillEditorComponentDefaults(
 function editors(): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
-    version: '1.3.8',
+    version: '1.3.9',
     identifier: FeatureIdentifier.CodeEditor,
     permission_name: PermissionName.CodeEditor,
     note_type: NoteType.Code,
@@ -284,7 +284,7 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'html',
     identifier: FeatureIdentifier.PlusEditor,
     permission_name: PermissionName.PlusEditor,
-    version: '1.6.0',
+    version: '1.6.1',
     spellcheckControl: true,
     description:
       'From highlighting to custom font sizes and colors, to tables and lists, this editor is perfect for crafting any document.',
@@ -298,7 +298,7 @@ function editors(): EditorFeatureDescription[] {
     name: 'Markdown Basic',
     identifier: FeatureIdentifier.MarkdownBasicEditor,
     note_type: NoteType.Markdown,
-    version: '1.4.0',
+    version: '1.4.1',
     file_type: 'md',
     permission_name: PermissionName.MarkdownBasicEditor,
     description: 'A Markdown editor with dynamic split-pane preview.',
@@ -312,7 +312,7 @@ function editors(): EditorFeatureDescription[] {
   const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Pro',
     identifier: FeatureIdentifier.MarkdownProEditor,
-    version: '1.4.0',
+    version: '1.4.1',
     note_type: NoteType.Markdown,
     file_type: 'md',
     permission_name: PermissionName.MarkdownProEditor,
@@ -333,7 +333,7 @@ function editors(): EditorFeatureDescription[] {
       file_type: 'md',
       index_path: 'index.html',
       permission_name: PermissionName.MarkdownMinimistEditor,
-      version: '1.3.7',
+      version: '1.3.8',
       description:
         'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
       git_repo_url: 'https://github.com/standardnotes/minimal-markdown-editor',
@@ -347,7 +347,7 @@ function editors(): EditorFeatureDescription[] {
   const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Math',
     identifier: FeatureIdentifier.MarkdownMathEditor,
-    version: '1.3.4',
+    version: '1.3.5',
     permission_name: PermissionName.MarkdownMathEditor,
     note_type: NoteType.Markdown,
     file_type: 'md',
@@ -364,7 +364,7 @@ function editors(): EditorFeatureDescription[] {
     name: 'Task Editor',
     identifier: FeatureIdentifier.TaskEditor,
     note_type: NoteType.Task,
-    version: '1.3.7',
+    version: '1.3.8',
     file_type: 'md',
     interchangeable: false,
     permission_name: PermissionName.TaskEditor,
@@ -383,7 +383,7 @@ function editors(): EditorFeatureDescription[] {
     interchangeable: false,
     identifier: FeatureIdentifier.TokenVaultEditor,
     permission_name: PermissionName.TokenVaultEditor,
-    version: '2.0.7',
+    version: '2.0.8',
     description:
       'Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.',
     marketing_url: '',
