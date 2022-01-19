@@ -63,8 +63,9 @@ export class Migration3_0_0 extends Migration {
       const hierarchy = tag.title.split('.');
       const hasSimpleTitle = hierarchy.length === 1;
       const hasDotPrefix = hierarchy[0] === '';
+      const hasParent = !!tag.parentId;
 
-      if (hasSimpleTitle || hasDotPrefix) {
+      if (hasParent || hasSimpleTitle || hasDotPrefix) {
         continue;
       }
 
