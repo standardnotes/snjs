@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.3](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.2...@standardnotes/components@1.4.3) (2022-01-19)
+
+
+### Bug Fixes
+
+* bump editors ([9e109b1](https://github.com/standardnotes/snjs/commit/9e109b1a29a3767f8fd3126bab0ccfcf4a2487a4))
+
+
+
+
+
 ## [1.4.2](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.1...@standardnotes/components@1.4.2) (2022-01-19)
 
 **Note:** Version bump only for package @standardnotes/components
