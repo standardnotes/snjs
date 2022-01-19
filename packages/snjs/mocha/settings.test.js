@@ -1,6 +1,7 @@
 import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
+import { MuteFailedBackupsEmailsOption, SettingName } from '@standardnotes/settings';
 
 describe('settings service', function () {
   const validSetting = SettingName.GoogleDriveBackupFrequency;
@@ -27,13 +28,20 @@ describe('settings service', function () {
   });
 
   it('creates and reads a setting', async function () {
+    expect(false).to.equal(true);
+    console.log(MuteFailedBackupsEmailsOption);
     await snApp.updateSetting(validSetting, fakePayload);
     const responseCreate = await snApp.getSetting(validSetting);
+    await snApp.updateSetting(fakeSetting, fakePayload);
+    const responseCreate = await snApp.getSetting(fakeSetting);
     expect(responseCreate).to.equal(fakePayload);
   });
 
   it('throws error on an invalid setting update', async function () {
+    expect(false).to.equal(true);
+    console.log(SettingName);
     const invalidSetting = 'FAKE_SETTING';
+    fakeSetting = 'FAKE_SETTING';
     let caughtError = null;
     try {
       await snApp.updateSetting(invalidSetting, fakePayload);
