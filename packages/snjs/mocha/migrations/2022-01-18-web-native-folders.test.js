@@ -4,56 +4,155 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
+const setupRandomUuid = () => {
+  let currentId = 0;
+
+  Uuid.SetGenerators(
+    () => Promise.resolve(String(currentId++)),
+    () => String(currentId++)
+  );
+};
+
 describe('migration 3.0.0 web native folders migration', () => {
-  beforeEach(() => {
-    localStorage.clear();
+  beforeEach(async function () {
+    this.application = await Factory.createInitAppWithRandNamespace();
+    setupRandomUuid();
   });
 
-  afterEach(() => {
-    localStorage.clear();
+  afterEach(async function () {
+    await Factory.safeDeinit(this.application);
+    // TODO: cleanup uuid behind us or we'll mess other tests.
   });
 
   it('migration with flat tag folders', async function () {
-    const application = await prepareApp();
-
-    // Save a few tags
     const titles = ['a', 'b', 'c'];
-
-    const createTag = (title) => {
-      return Factory.createMappedTag(application, title);
-    };
-
-    const tags = await Promise.all(titles.map(createTag));
+    await makeTags(this.application, titles);
 
     // Run the migration
-    await runMigrationAndWaitForLaunch(application);
-    expect(application.sessionManager.online()).to.equal(true);
+    await this.application.migrateTagDotsToHierarchy();
 
     // Check new tags
-    expect(application.itemManager.tags.length).lessThanOrEqual(3);
+    const result = extractTagHierarchy(this.application);
 
-    await Factory.safeDeinit(application);
-  }).timeout(15000);
-});
-
-const prepareApp = async () => {
-  const application = await Factory.createAppWithRandNamespace();
-  /** Create legacy migrations value so that base migration detects old app */
-  await application.deviceInterface.setRawStorageValue(
-    'migrations',
-    JSON.stringify(['anything'])
-  );
-  return application;
-};
-
-const runMigrationAndWaitForLaunch = async (application) => {
-  await application.prepareForLaunch({
-    receiveChallenge: async (challenge) => {
-      application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], passcode),
-      ]);
-    },
+    expect(result).to.deep.equal({
+      a: { _uuid: 'a' },
+      b: { _uuid: 'b' },
+      c: { _uuid: 'c' },
+    });
   });
 
-  await application.launch(true);
+  it('migration with simple tag folders', async function () {
+    const titles = ['a.b.c', 'b', 'a.b'];
+    await makeTags(this.application, titles);
+
+    // Run the migration
+    await this.application.migrateTagDotsToHierarchy();
+
+    // Check new tags
+    const result = extractTagHierarchy(this.application);
+
+    expect(result).to.deep.equal({
+      a: {
+        _uuid: '0',
+        b: {
+          _uuid: 'a.b',
+          c: { _uuid: 'a.b.c' },
+        },
+      },
+      b: { _uuid: 'b' },
+    });
+  });
+
+  it('migration with more complex cases', async function () {
+    const titles = ['a.b.c', 'b', 'a.b'];
+    await makeTags(this.application, titles);
+
+    // Run the migration
+    await this.application.migrateTagDotsToHierarchy();
+
+    // Check new tags
+    const result = extractTagHierarchy(this.application);
+
+    expect(result).to.deep.equal({
+      a: {
+        _uuid: '0',
+        b: {
+          _uuid: 'a.b',
+          c: { _uuid: 'a.b.c' },
+        },
+      },
+      b: { _uuid: 'b' },
+    });
+  });
+
+  it('should produce a valid hierarchy cases with  missing intermediate tags or unordered', async function () {
+    const titles = ['y.2', 'w.3', 'y'];
+    await makeTags(this.application, titles);
+
+    // Run the migration
+    await this.application.migrateTagDotsToHierarchy();
+
+    // Check new tags
+    const result = extractTagHierarchy(this.application);
+
+    expect(result).to.deep.equal({
+      w: {
+        _uuid: '0',
+        3: {
+          _uuid: 'w.3',
+        },
+      },
+      y: { _uuid: 'y', 2: { _uuid: 'y.2' } },
+    });
+  });
+
+  it('skip prefixed names', async function () {
+    const titles = ['.something', '.something...something', 'something.a.b.c'];
+    await makeTags(this.application, titles);
+
+    // Run the migration
+    await this.application.migrateTagDotsToHierarchy();
+
+    // Check new tags
+    const result = extractTagHierarchy(this.application);
+
+    expect(result).to.deep.equal({
+      '.something': { _uuid: '.something' },
+      '.something...something': { _uuid: '.something...something' },
+      something: {
+        _uuid: '0',
+        a: { _uuid: '1', b: { _uuid: '2', c: { _uuid: 'something.a.b.c' } } },
+      },
+    });
+  });
+});
+
+const makeTags = async (application, titles) => {
+  const createTag = (title) => {
+    return Factory.createMappedTag(application, { title, uuid: title });
+  };
+
+  const tags = await Promise.all(titles.map(createTag));
+  return tags;
+};
+
+const extractTagHierarchy = (application) => {
+  const result = {};
+  const roots = application.itemManager.getRootTags();
+
+  const constructHierarchy = (currentTag, result) => {
+    result[currentTag.title] = { _uuid: currentTag.uuid };
+
+    const children = application.getTagChildren(currentTag);
+
+    children.forEach((child) => {
+      constructHierarchy(child, result[currentTag.title]);
+    });
+  };
+
+  roots.forEach((tag) => {
+    constructHierarchy(tag, result);
+  });
+
+  return result;
 };
