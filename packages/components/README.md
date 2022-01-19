@@ -6,6 +6,8 @@ Note that checksums are based on the resulting zip archive, and that re-zipping 
 
 If a release already exists on GitHub, packaging will be skipped.
 
+**Important:** Be sure to have `GH_TOKEN` exported in your env in order for the GitHub CLI tool to function properly.
+
 ### Package all components:
 
 ```
@@ -17,3 +19,10 @@ yarn run package-components
 ```
 yarn run package-components org.standardnotes.code-editor
 ```
+
+### Releasing an update to a component:
+
+1. Bump the version of the feature in `snjs/packages/features/src/Domain/Feature/Features.ts`
+2. Run `yarn build` inside `snjs/packages/features`
+3. Bump the version of the component in `snjs/packages/components/package.json`
+4. Run `yarn run package-components org.standardnotes.feature-identifier`

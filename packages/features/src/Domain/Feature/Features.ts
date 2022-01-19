@@ -251,7 +251,7 @@ function editors(): EditorFeatureDescription[] {
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Bold Editor',
     identifier: FeatureIdentifier.BoldEditor,
-    version: '1.3.1',
+    version: '1.3.2',
     note_type: NoteType.RichText,
     file_type: 'html',
     component_permissions: [
@@ -383,7 +383,7 @@ function editors(): EditorFeatureDescription[] {
     interchangeable: false,
     identifier: FeatureIdentifier.TokenVaultEditor,
     permission_name: PermissionName.TokenVaultEditor,
-    version: '2.0.8',
+    version: '2.0.9',
     description:
       'Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.',
     marketing_url: '',
