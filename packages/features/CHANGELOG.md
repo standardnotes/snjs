@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.25.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.7...@standardnotes/features@1.25.0) (2022-01-19)
+
+
+### Features
+
+* onPresyncSave ([0e5f451](https://github.com/standardnotes/snjs/commit/0e5f451e85cfd7cb58ff1f0a87425e4dd43f6030))
+
+
+
+
+
 ## [1.24.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.6...@standardnotes/features@1.24.7) (2022-01-19)
 
 
