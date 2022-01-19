@@ -17,17 +17,17 @@
   "devDependencies": {
     "@standardnotes/deterministic-zip": "^1.2.0",
     "@standardnotes/filesafe-bar": "standardnotes/filesafe-client",
-    "sn-advanced-markdown-editor": "1.4.0",
+    "sn-advanced-markdown-editor": "1.4.1",
     "sn-bold-editor": "1.3.1",
     "sn-cloudlink": "1.3.1",
-    "sn-code-editor": "^1.3.8",
+    "sn-code-editor": "1.3.9",
     "sn-codemirror-search": "^1.0.0",
-    "sn-fancy-markdown-editor": "1.3.4",
+    "sn-fancy-markdown-editor": "1.3.5",
     "sn-folders": "1.3.8",
-    "sn-minimal-markdown-editor": "1.3.7",
-    "sn-plus-editor": "1.6.0",
-    "sn-simple-markdown-editor": "1.4.0",
-    "sn-simple-task-editor": "1.3.7",
+    "sn-minimal-markdown-editor": "1.3.8",
+    "sn-plus-editor": "1.6.1",
+    "sn-simple-markdown-editor": "1.4.1",
+    "sn-simple-task-editor": "1.3.8",
     "sn-spreadsheets": "1.4.3",
     "sn-theme-autobiography": "standardnotes/autobiography-theme",
     "sn-theme-dynamic": "standardnotes/dynamic-theme#1.0.3",
@@ -36,7 +36,6 @@
     "sn-theme-midnight": "standardnotes/midnight-theme",
     "sn-theme-solarized-dark": "standardnotes/solarized-dark-theme",
     "sn-theme-titanium": "standardnotes/titanium-theme",
-    "sn-token-vault": "2.0.7",
-    "sn-vim-editor": "1.3.7"
+    "sn-token-vault": "2.0.8"
   }
 }
