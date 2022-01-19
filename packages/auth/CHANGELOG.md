@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.3](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.2...@standardnotes/auth@3.15.3) (2022-01-19)
+
+
+### Bug Fixes
+
+* add upload bytes information to valet token ([6d35f2b](https://github.com/standardnotes/snjs/commit/6d35f2b3774b1d0dad60c3ad00d2a958b81a52cb))
+
+
+
+
+
 ## [3.15.2](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.1...@standardnotes/auth@3.15.2) (2022-01-17)
 
 
