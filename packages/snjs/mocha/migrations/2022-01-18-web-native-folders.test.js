@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('2022-01-18 web native folders migration', () => {
+describe('migration 3.0.0 web native folders migration', () => {
   beforeEach(() => {
     localStorage.clear();
   });
