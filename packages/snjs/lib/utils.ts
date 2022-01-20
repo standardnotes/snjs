@@ -20,14 +20,14 @@ export function getGlobalScope(): Window | unknown | null {
     : null;
 }
 
-export function dictToArray<T>(dict: Record<any, T>) {
-  return Object.keys(dict).map((key) => dict[key]!);
+export function dictToArray<T>(dict: Record<any, T>): T[] {
+  return Object.values(dict);
 }
 
 /**
  * Whether we are in a web browser
  */
-export function isWebEnvironment() {
+export function isWebEnvironment(): boolean {
   return getGlobalScope() !== null;
 }
 
@@ -62,12 +62,12 @@ export function isReactNativeEnvironment(): boolean {
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export function findInArray<T>(
+export function findInArray<T, K extends keyof T>(
   array: T[],
-  key: keyof T,
-  value: any
+  key: K,
+  value: T[K]
 ): T | undefined {
-  return array.find((item: any) => item[key] === value) as T;
+  return array.find((item: T) => item[key] === value);
 }
 
 /**
@@ -96,7 +96,7 @@ export function concatArrays(...args: any[]) {
 /**
  * @returns Whether the value is a function or object
  */
-export function isObject(value: any) {
+export function isObject(value: unknown): boolean {
   if (value === null) {
     return false;
   }
@@ -106,7 +106,7 @@ export function isObject(value: any) {
 /**
  * @returns Whether the value is a function
  */
-export function isFunction(value: any) {
+export function isFunction(value: unknown): boolean {
   if (value === null) {
     return false;
   }
@@ -130,14 +130,14 @@ export function isEmpty(string: string): boolean {
 /**
  * @returns Whether the value is a string
  */
-export function isString(value: any) {
+export function isString(value: unknown): value is string {
   return typeof value === 'string' || value instanceof String;
 }
 
 /**
  * @returns The greater of the two dates
  */
-export function greaterOfTwoDates(dateA: Date, dateB: Date) {
+export function greaterOfTwoDates(dateA: Date, dateB: Date): Date {
   if (dateA > dateB) {
     return dateA;
   } else {
@@ -188,7 +188,7 @@ export function uniqueArrayByKey<T>(array: T[], key: keyof T): T[] {
  * Returns the last element in the array.
  * @returns The last element in the array
  */
-export function lastElement(array: any[]) {
+export function lastElement<T>(array: T[]): T | undefined {
   return array[array.length - 1];
 }
 
@@ -206,7 +206,7 @@ export function extendArray<T>(inArray: T[], otherArray: T[]): void {
  * Removes all items appearing in toSubtract from inArray, in-place
  * @param toSubtract - The list of items to remove from inArray
  */
-export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
+export function subtractFromArray<T>(inArray: T[], toSubtract: T[]): void {
   for (const value of toSubtract) {
     removeFromArray(inArray, value);
   }
@@ -216,7 +216,7 @@ export function subtractFromArray<T>(inArray: T[], toSubtract: T[]) {
  * Removes the first matching element of an array by strict equality.
  * If no matchin element is found, the array is left unchanged.
  */
-export function removeFromArray<T>(array: T[], value: T) {
+export function removeFromArray<T>(array: T[], value: T): void {
   const valueIndex = array.indexOf(value);
   if (valueIndex === -1) {
     return;
@@ -251,7 +251,7 @@ export function filterFromArray<T>(
 /**
  * Returns a new array by removing all elements in subtract from array
  */
-export function arrayByDifference<T>(array: T[], subtract: T[]) {
+export function arrayByDifference<T>(array: T[], subtract: T[]): T[] {
   return array
     .filter((x) => !subtract.includes(x))
     .concat(subtract.filter((x) => !array.includes(x)));
