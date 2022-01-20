@@ -242,10 +242,7 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     format: PayloadFormat,
     key?: SNItemsKey | SNRootKey
   ) {
-    if (
-      format === PayloadFormat.DecryptedBareObject ||
-      format === PayloadFormat.DecryptedBase64String
-    ) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return super.generateEncryptedParameters(payload, format, key);
     }
     if (format !== PayloadFormat.EncryptedString) {
@@ -290,17 +287,16 @@ export class SNProtocolOperator004 extends SNProtocolOperator003 {
     key?: SNItemsKey | SNRootKey
   ) {
     const format = payload.format;
-    if (
-      format === PayloadFormat.DecryptedBareObject ||
-      format === PayloadFormat.DecryptedBase64String
-    ) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return super.generateDecryptedParameters(payload, key);
     }
     if (!payload.uuid) {
-      throw 'encryptedParameters.uuid cannot be null';
+      throw Error('encryptedParameters.uuid cannot be null');
     }
     if (!key || !key.itemsKey) {
-      throw 'Attempting to generateDecryptedParameters with no itemsKey.';
+      throw Error(
+        'Attempting to generateDecryptedParameters with no itemsKey.'
+      );
     }
     /** Decrypt item_key payload. */
     const itemKeyComponents = this.deconstructEncryptedPayloadString(

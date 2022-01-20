@@ -16,19 +16,26 @@ describe('online syncing', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+
+    this.context = await Factory.createAppContext();
+    await this.context.launch();
+
+    this.application = this.context.application;
+    this.email = this.context.email;
+    this.password = this.context.password;
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
     });
+
     this.signOut = async () => {
       this.application = await Factory.signOutApplicationAndReturnNew(
         this.application
       );
     };
+
     this.signIn = async () => {
       await this.application.signIn(
         this.email,
@@ -145,21 +152,6 @@ describe('online syncing', function () {
     expect(notes.length).to.equal(1);
     /** uuid should have been alternated */
     expect(notes[0].uuid).to.equal(note.uuid);
-  });
-
-  it('server extensions should not be encrypted for sync', async function () {
-    const payload = CreateMaxPayloadFromAnyObject({
-      uuid: await Uuid.GenerateUuid(),
-      content_type: ContentType.ServerExtension,
-      content: {
-        secret: '123',
-      },
-    });
-    const results = await this.application.syncService.payloadsByPreparingForServer(
-      [payload]
-    );
-    const processed = results[0];
-    expect(processed.format).to.equal(PayloadFormat.DecryptedBase64String);
   });
 
   it('resolve on next timing strategy', async function () {
@@ -549,13 +541,14 @@ describe('online syncing', function () {
   }).timeout(15000);
 
   it('should handle downloading with sync pagination', async function () {
-    const largeItemCount = 160;
+    const largeItemCount = SyncUpDownLimit + 10;
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(this.application);
       await this.application.itemManager.setItemDirty(note.uuid);
     }
     /** Upload */
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
     this.expectedItemCount += largeItemCount;
 
     /** Clear local data */
@@ -566,7 +559,8 @@ describe('online syncing', function () {
     expect(this.application.itemManager.items.length).to.equal(0);
 
     /** Download all data */
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
@@ -1075,5 +1069,23 @@ describe('online syncing', function () {
     /** Item should no longer be dirty, otherwise it would keep syncing */
     const item = this.application.findItem(payload.uuid);
     expect(item.dirty).to.equal(false);
+  });
+
+  it('should call onPresyncSave before sync begins', async function() {
+    const events = [];
+    this.application.syncService.addEventObserver((event) => {
+      if (event === SyncEvent.SyncWillBegin) {
+        events.push('sync-will-begin');
+      }
+    });
+
+    await this.application.syncService.sync({
+      onPresyncSave: () => {
+        events.push('on-presync-save');
+      },
+    });
+
+    expect(events[0]).to.equal('on-presync-save');
+    expect(events[1]).to.equal('sync-will-begin');
   });
 });

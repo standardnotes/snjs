@@ -17,7 +17,7 @@ import {
   CopyEncryptionParameters,
   CreateEncryptionParameters,
 } from '@Payloads/generator';
-import { ProtocolVersion } from '@Protocol/versions';
+import { ProtocolVersion, ProtocolVersionLength } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
 import { V001Algorithm } from '@Protocol/operator/algorithms';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -97,10 +97,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     format: PayloadFormat,
     key?: SNItemsKey | SNRootKey
   ) {
-    if (
-      format === PayloadFormat.DecryptedBareObject ||
-      format === PayloadFormat.DecryptedBase64String
-    ) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return super.generateEncryptedParameters(payload, format, key);
     }
     if (format !== PayloadFormat.EncryptedString) {
@@ -140,10 +137,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     key?: SNItemsKey | SNRootKey
   ) {
     const format = encryptedParameters.format;
-    if (
-      format === PayloadFormat.DecryptedBareObject ||
-      format === PayloadFormat.DecryptedBase64String
-    ) {
+    if (format === PayloadFormat.DecryptedBareObject) {
       return super.generateDecryptedParameters(encryptedParameters, key);
     }
     if (!encryptedParameters.enc_item_key) {
@@ -205,11 +199,11 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
   ) {
     const encryptionVersion = string.substring(
       0,
-      ProtocolVersion.VersionLength
+      ProtocolVersionLength
     );
     return {
       ciphertext: string.substring(
-        ProtocolVersion.VersionLength,
+        ProtocolVersionLength,
         string.length
       ),
       version: encryptionVersion,

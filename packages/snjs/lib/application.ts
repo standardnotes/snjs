@@ -1,3 +1,4 @@
+import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index';
 import { TransactionalMutation } from './services/item_manager';
 import { FeatureStatus } from '@Lib/services/features_service';
 import { Settings } from './services/settings_service';
@@ -857,6 +858,20 @@ export class SNApplication {
     return this.itemManager.notesMatchingSmartTag(smartTag);
   }
 
+  public addNoteCountChangeObserver(
+    observer: TagNoteCountChangeObserver
+  ): () => void {
+    return this.itemManager.addNoteCountChangeObserver(observer);
+  }
+
+  public allCountableNotesCount(): number {
+    return this.itemManager.allCountableNotesCount();
+  }
+
+  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
+    return this.itemManager.countableNotesForTag(tag);
+  }
+
   /** Returns an item's direct references */
   public referencesForItem(item: SNItem, contentType?: ContentType): SNItem[] {
     let references = this.itemManager.referencesForItem(item.uuid);
@@ -1147,10 +1162,6 @@ export class SNApplication {
 
   public authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.protectionService.authorizeAutolockIntervalChange();
-  }
-
-  public authorizeCloudLinkAccess(): Promise<boolean> {
-    return this.protectionService.authorizeCloudLinkAccess();
   }
 
   public authorizeSearchingProtectedNotesText(): Promise<boolean> {

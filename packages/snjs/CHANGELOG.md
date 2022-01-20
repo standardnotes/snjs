@@ -3,6 +3,149 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.41.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.7...@standardnotes/snjs@2.41.0) (2022-01-19)
+
+
+### Features
+
+* onPresyncSave ([0e5f451](https://github.com/standardnotes/snjs/commit/0e5f451e85cfd7cb58ff1f0a87425e4dd43f6030))
+
+
+
+
+
+## [2.40.7](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.6...@standardnotes/snjs@2.40.7) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.5...@standardnotes/snjs@2.40.6) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.4...@standardnotes/snjs@2.40.5) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.3...@standardnotes/snjs@2.40.4) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.2...@standardnotes/snjs@2.40.3) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.1...@standardnotes/snjs@2.40.2) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.0...@standardnotes/snjs@2.40.1) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.40.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.39.0...@standardnotes/snjs@2.40.0) (2022-01-17)
+
+
+### Features
+
+* tag notes index ([#546](https://github.com/standardnotes/snjs/issues/546)) ([ab12281](https://github.com/standardnotes/snjs/commit/ab122817648f3ac3a7c51ef66a0609f5521300ec))
+
+
+
+
+
+# [2.39.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.4...@standardnotes/snjs@2.39.0) (2022-01-17)
+
+
+### Features
+
+* Add preferences for automatic themes ([#558](https://github.com/standardnotes/snjs/issues/558)) ([ab4936e](https://github.com/standardnotes/snjs/commit/ab4936ea2520dc2bb0e71086a6581078507581f8))
+
+
+
+
+
+## [2.38.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.3...@standardnotes/snjs@2.38.4) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.2...@standardnotes/snjs@2.38.3) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.1...@standardnotes/snjs@2.38.2) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.0...@standardnotes/snjs@2.38.1) (2022-01-16)
+
+
+### Bug Fixes
+
+* add payload source constructor to sync components on launch ([ddb79cc](https://github.com/standardnotes/snjs/commit/ddb79ccee8512523e8d0241310039be84f08cfc0))
+
+
+
+
+
+# [2.38.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.3...@standardnotes/snjs@2.38.0) (2022-01-15)
+
+
+### Features
+
+* remove server extension type ([#552](https://github.com/standardnotes/snjs/issues/552)) ([aa542f3](https://github.com/standardnotes/snjs/commit/aa542f3124c60fa81a0b271030b3c35415c54a62))
+
+
+
+
+
+## [2.37.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.2...@standardnotes/snjs@2.37.3) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.37.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.1...@standardnotes/snjs@2.37.2) (2022-01-14)
 
 **Note:** Version bump only for package @standardnotes/snjs

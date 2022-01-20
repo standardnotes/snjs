@@ -1,7 +1,6 @@
 import { log, removeFromArray } from '@Lib/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
-import { ApplicationEventPayload } from '@Lib/types';
 
 type EventObserver<E, D> = (eventName: E, data?: D) => Promise<void> | void;
 

@@ -1,10 +1,18 @@
 export enum ProtocolVersion {
-  V000Base64Decrypted = '000',
   V001 = '001',
   V002 = '002',
   V003 = '003',
   V004 = '004',
-  VersionLength = 3,
+}
+export const ProtocolVersionLength = 3;
+
+export function protocolVersionFromEncryptedString(
+  string: string
+): ProtocolVersion | undefined {
+  const version = string.substring(0, ProtocolVersionLength) as ProtocolVersion;
+  if (Object.values(ProtocolVersion).includes(version)) {
+    return version;
+  }
 }
 
 /**

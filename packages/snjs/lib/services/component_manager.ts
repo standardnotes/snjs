@@ -130,7 +130,7 @@ export class SNComponentManager extends PureService<
     component: SNComponent,
     contextItem?: UuidString,
     actionObserver?: ActionObserver,
-    urlOverride?: string,
+    urlOverride?: string
   ): ComponentViewer {
     const viewer = new ComponentViewer(
       component,
@@ -170,13 +170,14 @@ export class SNComponentManager extends PureService<
     const acceptableSources = [
       PayloadSource.LocalChanged,
       PayloadSource.RemoteRetrieved,
+      PayloadSource.LocalRetrieved,
+      PayloadSource.Constructor,
     ];
     if (components.length === 0 || !acceptableSources.includes(source)) {
       return;
     }
 
     if (this.isDesktop) {
-      /* Ensure any component in our data is installed by the system */
       const thirdPartyComponents = components.filter((component) => {
         const nativeFeature = this.nativeFeatureForComponent(component);
         return nativeFeature ? false : true;

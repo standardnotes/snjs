@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.9.0...@standardnotes/settings@1.10.0) (2022-01-18)
+
+
+### Features
+
+* add file upload settings ([e2b8575](https://github.com/standardnotes/snjs/commit/e2b85752ada2d32d0c3deaedf7014d5293de4315))
+
+
+
+
+
 # [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.8.1...@standardnotes/settings@1.9.0) (2022-01-06)
 
 

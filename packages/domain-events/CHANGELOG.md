@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.17.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.17.0...@standardnotes/domain-events@2.17.1) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+# [2.17.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.8...@standardnotes/domain-events@2.17.0) (2022-01-18)
+
+
+### Features
+
+* add file uploaded event ([53d3153](https://github.com/standardnotes/snjs/commit/53d3153887aef8d3a61f2864f43d5228f15ecb3a))
+
+
+
+
+
+## [2.16.8](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.7...@standardnotes/domain-events@2.16.8) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.16.7](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.6...@standardnotes/domain-events@2.16.7) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.16.6](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.5...@standardnotes/domain-events@2.16.6) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.16.5](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.4...@standardnotes/domain-events@2.16.5) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.16.4](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.3...@standardnotes/domain-events@2.16.4) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
 ## [2.16.3](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.16.2...@standardnotes/domain-events@2.16.3) (2022-01-14)
 
 **Note:** Version bump only for package @standardnotes/domain-events

@@ -1,4 +1,5 @@
 import { createMutatorForItem } from '@Lib/models/mutator';
+import { ItemDelta } from '@Lib/protocol/collection/indexes';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
 import { PureService } from '@Lib/services/pure_service';
@@ -15,7 +16,7 @@ import {
   ItemCollection,
   SortDirection,
 } from '@Protocol/collection/item_collection';
-import { ContentType } from '@standardnotes/common'
+import { ContentType } from '@standardnotes/common';
 import { ComponentMutator } from './../models/app/component';
 import {
   ActionsExtensionMutator,
@@ -35,6 +36,10 @@ import {
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
 import { SNPredicate } from './../models/core/predicate';
+import {
+  TagNoteCountChangeObserver,
+  TagNotesIndex,
+} from './../protocol/collection/tag_notes_index';
 import {
   PayloadContent,
   PayloadOverride,
@@ -69,6 +74,9 @@ export type TransactionalMutation = {
   mutationType?: MutationType;
 };
 
+export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
+  x.content_type === ContentType.Note || x.content_type === ContentType.Tag;
+
 /**
  * The item manager is backed by the Payload Manager. Think of the item manager as a
  * more user-friendly or item-specific interface to creating and updating data.
@@ -85,6 +93,7 @@ export class ItemManager extends PureService {
   private collection!: ItemCollection;
   private notesView!: ItemCollectionNotesView;
   private systemSmartTags: SNSmartTag[];
+  private tagNotesIndex!: TagNotesIndex;
 
   constructor(private payloadManager: PayloadManager) {
     super();
@@ -130,6 +139,7 @@ export class ItemManager extends PureService {
       'asc'
     );
     this.notesView = new ItemCollectionNotesView(this.collection);
+    this.tagNotesIndex = new TagNotesIndex(this.collection);
   }
 
   public setDisplayOptions(
@@ -253,6 +263,29 @@ export class ItemManager extends PureService {
     ) as SNComponent[];
   }
 
+  public addNoteCountChangeObserver(
+    observer: TagNoteCountChangeObserver
+  ): () => void {
+    return this.tagNotesIndex.addCountChangeObserver(observer);
+  }
+
+  public allCountableNotesCount(): number {
+    return this.tagNotesIndex.allCountableNotesCount();
+  }
+
+  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
+    if (tag.isSmartTag) {
+      if (tag.isAllTag) {
+        return this.tagNotesIndex.allCountableNotesCount();
+      }
+
+      throw Error(
+        'countableNotesForTag is not meant to be used for smart tags.'
+      );
+    }
+    return this.tagNotesIndex.countableNotesForTag(tag);
+  }
+
   public addObserver(
     contentType: ContentType | ContentType[],
     callback: ObserverCallback
@@ -301,23 +334,25 @@ export class ItemManager extends PureService {
     source: PayloadSource,
     sourceKey?: string
   ) {
-    const changedItems = changed.map((p) => CreateItemFromPayload(p));
-    const insertedItems = inserted.map((p) => CreateItemFromPayload(p));
-    const ignoredItems = ignored.map((p) => CreateItemFromPayload(p));
-    const changedOrInserted = changedItems.concat(insertedItems);
-    if (changedOrInserted.length > 0) {
-      this.collection.set(changedOrInserted);
-    }
-    const discardedItems = discarded.map((p) => CreateItemFromPayload(p));
-    for (const item of discardedItems) {
-      this.collection.discard(item);
-    }
-    this.notesView.setNeedsRebuilding();
+    const createItems = (items: PurePayload[]) =>
+      items.map((item) => CreateItemFromPayload(item));
+
+    const delta: ItemDelta = {
+      changed: createItems(changed),
+      inserted: createItems(inserted),
+      discarded: createItems(discarded),
+      ignored: createItems(ignored),
+    };
+
+    this.collection.onChange(delta);
+    this.notesView.onChange(delta);
+    this.tagNotesIndex.onChange(delta);
+
     this.notifyObservers(
-      changedItems,
-      insertedItems,
-      discardedItems,
-      ignoredItems,
+      delta.changed,
+      delta.inserted,
+      delta.discarded,
+      delta.ignored,
       source,
       sourceKey
     );

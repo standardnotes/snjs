@@ -109,26 +109,6 @@ describe('protocol', function () {
     expect(ejected.dirtiedDate).to.not.be.ok;
   });
 
-  it('decrypting 000 payload should succeed', async function () {
-    const payload = CreateMaxPayloadFromAnyObject({
-      uuid: await Uuid.GenerateUuid(),
-      content_type: ContentType.ServerExtension,
-      content: {
-        secret: '123',
-      },
-    });
-    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.SyncDecrypted
-    );
-    expect(encrypted.content.startsWith('000')).to.equal(true);
-    const decrypted = await this.application.protocolService.payloadByDecryptingPayload(
-      encrypted
-    );
-    expect(decrypted.errorDecrypting).to.not.be.ok;
-    expect(decrypted.content.secret).to.equal(payload.content.secret);
-  });
-
   it('encrypted payload for server should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test');
     const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(

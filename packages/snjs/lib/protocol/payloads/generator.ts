@@ -329,10 +329,7 @@ function payloadFieldsForIntent(intent: EncryptionIntent) {
     return StoragePayloadFields.slice();
   }
 
-  if (
-    intent === EncryptionIntent.Sync ||
-    intent === EncryptionIntent.SyncDecrypted
-  ) {
+  if (intent === EncryptionIntent.Sync) {
     return ServerPayloadFields.slice();
   } else {
     throw `No payload fields found for intent ${intent}`;

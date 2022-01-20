@@ -1,5 +1,5 @@
 import { ItemManager, SNItem } from '@Lib/index';
-import { SNNote } from '@Lib/models';
+import { SNNote, NoteMutator } from '@Lib/models';
 import { SmartTagPredicateContent, SNSmartTag } from '@Lib/models/app/smartTag';
 import { Uuid } from '@Lib/uuid';
 import { SNTag, TagMutator } from '@Models/app/tag';
@@ -331,6 +331,59 @@ describe('itemManager', () => {
 
       expect(tag).toBeTruthy();
       expect(itemManager.isTemplateItem(tag)).toEqual(false);
+    });
+  });
+
+  describe('tags notes index', () => {
+    it('counts countable notes', async () => {
+      itemManager = createService();
+
+      const parentTag = createTag('parent');
+      const childTag = createTag('child');
+      await itemManager.insertItems([parentTag, childTag]);
+      await itemManager.setTagParent(parentTag, childTag);
+
+      const parentNote = createNote('parentNote');
+      const childNote = createNote('childNote');
+      await itemManager.insertItems([parentNote, childNote]);
+
+      await itemManager.addTagToNote(parentNote, parentTag);
+      await itemManager.addTagToNote(childNote, childTag);
+
+      expect(itemManager.countableNotesForTag(parentTag)).toBe(1);
+      expect(itemManager.countableNotesForTag(childTag)).toBe(1);
+      expect(itemManager.allCountableNotesCount()).toBe(2);
+    });
+
+    it('archiving a note should update count index', async () => {
+      itemManager = createService();
+
+      const tag1 = createTag('tag 1');
+      await itemManager.insertItems([tag1]);
+
+      const note1 = createNote('note 1');
+      const note2 = createNote('note 2');
+      await itemManager.insertItems([note1, note2]);
+
+      await itemManager.addTagToNote(note1, tag1);
+      await itemManager.addTagToNote(note2, tag1);
+
+      expect(itemManager.countableNotesForTag(tag1)).toBe(2);
+      expect(itemManager.allCountableNotesCount()).toBe(2);
+
+      await itemManager.changeItem<NoteMutator>(note1.uuid, (m) => {
+        m.archived = true;
+      });
+
+      expect(itemManager.allCountableNotesCount()).toBe(1);
+      expect(itemManager.countableNotesForTag(tag1)).toBe(1);
+
+      await itemManager.changeItem<NoteMutator>(note1.uuid, (m) => {
+        m.archived = false;
+      });
+
+      expect(itemManager.allCountableNotesCount()).toBe(2);
+      expect(itemManager.countableNotesForTag(tag1)).toBe(2);
     });
   });
 
