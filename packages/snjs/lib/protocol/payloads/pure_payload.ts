@@ -13,6 +13,7 @@ import {
   RawPayload,
 } from '@Payloads/generator';
 import { PayloadFormat } from '@Payloads/formats';
+import { UuidString } from './../../types';
 
 /**
  * A payload is a vehicle in which item data is transported or persisted.
@@ -190,6 +191,16 @@ export class PurePayload {
 
   get safeReferences(): ContentReference[] {
     return this.safeContent.references || [];
+  }
+
+  public getReference(uuid: UuidString): ContentReference {
+    const result = this.safeReferences.find((ref) => ref.uuid === uuid);
+
+    if (!result) {
+      throw new Error('reference not found');
+    }
+
+    return result;
   }
 
   get contentObject() {

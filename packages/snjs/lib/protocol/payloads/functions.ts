@@ -1,19 +1,19 @@
-import { UuidString } from './../../types';
-import { MutationType } from './../../models/core/item';
+import { extendArray } from '@Lib/utils';
+import { Uuid } from '@Lib/uuid';
+import { CreateItemFromPayload } from '@Models/generator';
+import { CopyPayload, PayloadOverride } from '@Payloads/generator';
+import { PurePayload } from '@Payloads/pure_payload';
+import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
+import { ContentType } from '@standardnotes/common';
+import remove from 'lodash/remove';
 import {
   ComponentArea,
   ComponentMutator,
-  SNComponent,
+  SNComponent
 } from './../../models/app/component';
+import { MutationType } from './../../models/core/item';
+import { UuidString } from './../../types';
 import { ContentReference, PayloadContent } from './generator';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
-import { CreateItemFromPayload } from '@Models/generator';
-import remove from 'lodash/remove';
-import { CopyPayload, PayloadOverride } from '@Payloads/generator';
-import { extendArray } from '@Lib/utils';
-import { Uuid } from '@Lib/uuid';
-import { PurePayload } from '@Payloads/pure_payload';
-import { ContentType } from '@standardnotes/common';
 
 type AffectorFunction = (
   basePayload: PurePayload,
@@ -138,7 +138,7 @@ export async function PayloadsByAlternatingUuid(
     payload,
     baseCollection,
     [copy],
-    [payload.uuid!]
+    [payload.uuid]
   );
   extendArray(results, updatedReferencing);
 
@@ -181,15 +181,15 @@ function PayloadsByUpdatingReferencingPayloadReferences(
   const results = [];
   for (const referencingPayload of referencingPayloads) {
     const references = referencingPayload.contentObject.references.slice();
-    const referenceType = referencingPayload.getReference(payload.uuid)
-      .reference_type;
+    const reference = referencingPayload.getReference(payload.uuid);
+
     for (const addPayload of add) {
-      const reference: ContentReference = {
+      const newReference: ContentReference = {
+        ...reference,
         uuid: addPayload.uuid,
-        content_type: addPayload.content_type,
-        reference_type: referenceType,
+        content_type: addPayload.content_type, // Note that this is not typesafe, we might have an invalid content type here.
       };
-      references.push(reference);
+      references.push(newReference);
     }
     for (const id of removeIds) {
       remove(references, { uuid: id });
@@ -199,7 +199,7 @@ function PayloadsByUpdatingReferencingPayloadReferences(
       dirtiedDate: new Date(),
       content: {
         ...referencingPayload.safeContent,
-        references: references,
+        references,
       },
     });
     results.push(result);
@@ -214,7 +214,7 @@ function PayloadsByUpdatingReferencingPayloadReferences(
 export function PayloadContentsEqual(
   payloadA: PurePayload,
   payloadB: PurePayload
-) {
+): boolean {
   const itemA = CreateItemFromPayload(payloadA);
   const itemB = CreateItemFromPayload(payloadB);
   return itemA.isItemContentEqualWith(itemB);
