@@ -1,12 +1,10 @@
-import { ApplicationStage } from '../stages';
 import { Migration } from '@Lib/migrations/migration';
-import { ContentType } from '@standardnotes/common';
 import { SNTag, TagMutator } from '@Lib/models';
-import sortBy from 'lodash/sortBy';
-import initial from 'lodash/initial';
-import last from 'lodash/last';
 import { ComponentArea } from '@Lib/models/app/component';
 import { ItemManager } from '@Lib/services';
+import { lastElement, sortByKey, withoutLastElement } from '@Lib/utils';
+import { ContentType } from '@standardnotes/common';
+import { ApplicationStage } from '../stages';
 
 export class Migration3_0_0 extends Migration {
   static version(): string {
@@ -52,7 +50,7 @@ export class Migration3_0_0 extends Migration {
     const tags = itemManager.getItems(ContentType.Tag) as SNTag[];
 
     // Ensure we process path1 before path1.children
-    const sortedTags = sortBy(tags, 'title');
+    const sortedTags = sortByKey(tags, 'title');
 
     for (const tag of sortedTags) {
       // Note that we use a bunch of awaits in for-loops here.
@@ -69,8 +67,8 @@ export class Migration3_0_0 extends Migration {
         continue;
       }
 
-      const parents = initial(hierarchy);
-      const newTitle = last(hierarchy);
+      const parents = withoutLastElement(hierarchy);
+      const newTitle = lastElement(hierarchy);
 
       if (!newTitle) {
         // NOTE: this is impossible, because we already know that

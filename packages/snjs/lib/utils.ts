@@ -1,11 +1,11 @@
-import remove from 'lodash/remove';
+import DOMPurify from 'dompurify';
 import find from 'lodash/find';
 import isArray from 'lodash/isArray';
 import mergeWith from 'lodash/mergeWith';
-import uniqWith from 'lodash/uniqWith';
+import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
+import uniqWith from 'lodash/uniqWith';
 import { AnyRecord, ErrorObject } from './types';
-import DOMPurify from 'dompurify';
 
 const collator =
   typeof Intl !== 'undefined'
@@ -319,6 +319,26 @@ export function sortedCopy(object: any) {
   return Copy(result);
 }
 
+export const sortByKey = <T>(input: T[], key: keyof T): T[] => {
+  const compare = (a: T, b: T): number => {
+    const valueA = a[key];
+    const valueB = b[key];
+
+    if (valueA < valueB) {
+      return -1;
+    }
+    if (valueA > valueB) {
+      return 1;
+    }
+    return 0;
+  };
+
+  const newArray = [...input];
+  newArray.sort(compare);
+
+  return newArray;
+};
+
 /** Returns a new object by omitting any keys which have an undefined or null value  */
 export function omitUndefinedCopy(object: any) {
   const result: any = {};
@@ -386,6 +406,10 @@ export function jsonParseEmbeddedKeys(object: AnyRecord) {
   }
   return result;
 }
+
+export const withoutLastElement = <T>(array: T[]): T[] => {
+  return array.slice(0, -1);
+};
 
 /**
  * Deletes keys of the input object.
