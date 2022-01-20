@@ -25,17 +25,14 @@ import { Uuids } from '@Models/functions';
  *    it otherwise. While this method may serve most cases, it does not allow the consumer
  *    to subscribe to changes, such as if after this method is called, a UserPreferences object
  *    is downloaded from a remote source.
- * 2. Consumers may use `registerPredicate` in order to constantly monitor a particular
- *    predicate and ensure that only 1 value exists for that predicate. This may be used in
- *    tandem with `findOrCreateSingleton`, for example to monitor a predicate after we
- *    intitially create the item.
+ * 2. Items can override isSingleton, singletonPredicate, and strategyWhenConflictingWithItem (optional)
+ *    to automatically gain singleton resolution.
  */
 export class SNSingletonManager extends PureService {
   private resolveQueue: SNItem[] = [];
-  private registeredPredicates: SNPredicate[] = [];
 
-  private removeItemObserver: any;
-  private removeSyncObserver: any;
+  private removeItemObserver!: () => void;
+  private removeSyncObserver!: () => void;
 
   constructor(
     private itemManager: ItemManager,
@@ -51,11 +48,10 @@ export class SNSingletonManager extends PureService {
     (this.syncService as unknown) = undefined;
     (this.itemManager as unknown) = undefined;
     this.resolveQueue.length = 0;
-    this.registeredPredicates.length = 0;
     this.removeItemObserver();
-    this.removeItemObserver = undefined;
+    (this.removeItemObserver as unknown) = undefined;
     this.removeSyncObserver();
-    this.removeSyncObserver = undefined;
+    (this.removeSyncObserver as unknown) = undefined;
     super.deinit();
   }
 
@@ -115,51 +111,30 @@ export class SNSingletonManager extends PureService {
     );
   }
 
-  /**
-   * Predicates registered are automatically observed. If global item state changes
-   * such that the item(s) match the predicate, procedures will be followed such that
-   * the end result is that only 1 item remains, and the others are deleted.
-   */
-  public registerPredicate(predicate: SNPredicate): void {
-    this.registeredPredicates.push(predicate);
-  }
-
-  private validItemsMatchingPredicate(predicate: SNPredicate) {
-    return this.itemManager.itemsMatchingPredicate(predicate).filter((item) => {
-      return !item.errorDecrypting;
-    });
+  private validItemsMatchingPredicate(
+    contentType: ContentType,
+    predicate: SNPredicate
+  ) {
+    return this.itemManager
+      .itemsMatchingPredicate(contentType, predicate)
+      .filter((item) => {
+        return !item.errorDecrypting;
+      });
   }
 
   private async resolveSingletonsForItems(
     items: SNItem[],
     eventSource: SyncEvent
   ) {
-    const matchesForRegisteredPredicate = (item: SNItem) => {
-      for (const predicate of this.registeredPredicates) {
-        if (item.satisfiesPredicate(predicate)) {
-          return this.validItemsMatchingPredicate(predicate);
-        }
-      }
-    };
-    const matchesForSelfPredicate = (item: SNItem) => {
-      if (!item.isSingleton) {
-        return null;
-      }
-      return this.validItemsMatchingPredicate(item.singletonPredicate);
-    };
-    const matches = (item: SNItem) => {
-      const selfMatches = matchesForSelfPredicate(item);
-      if (selfMatches && selfMatches.length > 0) {
-        return selfMatches;
-      }
-      return matchesForRegisteredPredicate(item);
-    };
     const handled: SNItem[] = [];
     for (const item of items) {
-      if (handled.includes(item)) {
+      if (handled.includes(item) || !item.isSingleton) {
         continue;
       }
-      const matchingItems = matches(item);
+      const matchingItems = this.validItemsMatchingPredicate(
+        item.content_type,
+        item.singletonPredicate
+      );
       extendArray(handled, matchingItems || []);
       if (!matchingItems || matchingItems.length <= 1) {
         continue;
@@ -196,9 +171,13 @@ export class SNSingletonManager extends PureService {
   }
 
   public findSingleton<T extends SNItem>(
+    contentType: ContentType,
     predicate: SNPredicate
   ): T | undefined {
-    const matchingItems = this.validItemsMatchingPredicate(predicate);
+    const matchingItems = this.validItemsMatchingPredicate(
+      contentType,
+      predicate
+    );
     if (matchingItems.length > 0) {
       return matchingItems[0] as T;
     }
@@ -210,7 +189,10 @@ export class SNSingletonManager extends PureService {
     createContentType: ContentType,
     createContent: PayloadContent
   ): Promise<T> {
-    const existingSingleton = this.findSingleton<T>(predicate);
+    const existingSingleton = this.findSingleton<T>(
+      createContentType,
+      predicate
+    );
     if (!isNullOrUndefined(existingSingleton)) {
       return existingSingleton;
     }
@@ -239,14 +221,17 @@ export class SNSingletonManager extends PureService {
         return matchingItem as T;
       }
       /** Check again */
-      const refreshedItems = this.validItemsMatchingPredicate(predicate);
+      const refreshedItems = this.validItemsMatchingPredicate(
+        createContentType,
+        predicate
+      );
       if (refreshedItems.length > 0) {
         return refreshedItems[0] as T;
       }
     }
     /** Delete any items that are errored */
     const errorDecrypting = this.itemManager
-      .itemsMatchingPredicate(predicate)
+      .itemsMatchingPredicate(createContentType, predicate)
       .filter((item) => {
         return item.errorDecrypting;
       });

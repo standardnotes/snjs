@@ -4,10 +4,12 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
+const FooContentType = 'Foo';
+
 const createItemParams = function () {
   const params = {
     uuid: Factory.generateUuidish(),
-    content_type: 'Item',
+    content_type: FooContentType,
     content: {
       title: 'Hello',
       desc: 'World',
@@ -41,6 +43,7 @@ describe('predicates', async function () {
     localStorage.clear();
     this.itemManager = new PayloadManager();
     this.itemManager = new ItemManager(this.itemManager);
+
     this.createItem = async () => {
       const payload = CreateMaxPayloadFromAnyObject(createItemParams());
       const template = CreateItemFromPayload(payload);
@@ -78,7 +81,7 @@ describe('predicates', async function () {
       item.satisfiesPredicate(
         new SNPredicate('this_field_ignored', 'and', [
           ['content.title', '=', 'Hello'],
-          ['content_type', '=', 'Item'],
+          ['content_type', '=', FooContentType],
         ])
       )
     ).to.equal(true);
@@ -86,7 +89,7 @@ describe('predicates', async function () {
       item.satisfiesPredicate(
         new SNPredicate('', 'and', [
           ['content.title', '=', 'Wrong'],
-          ['content_type', '=', 'Item'],
+          ['content_type', '=', FooContentType],
         ])
       )
     ).to.equal(false);
@@ -106,7 +109,7 @@ describe('predicates', async function () {
       item.satisfiesPredicate(
         new SNPredicate('this_field_ignored', 'or', [
           ['content.title', '=', 'Hello'],
-          ['content_type', '=', 'Item'],
+          ['content_type', '=', FooContentType],
         ])
       )
     ).to.equal(true);
@@ -114,7 +117,7 @@ describe('predicates', async function () {
       item.satisfiesPredicate(
         new SNPredicate('', 'or', [
           ['content.title', '=', 'Wrong'],
-          ['content_type', '=', 'Item'],
+          ['content_type', '=', FooContentType],
         ])
       )
     ).to.equal(true);
@@ -300,14 +303,16 @@ describe('predicates', async function () {
     const item = await this.createItem();
 
     expect(
-      item.satisfiesPredicate(new SNPredicate('content_type', '=', 'Foo'))
+      item.satisfiesPredicate(new SNPredicate('content_type', '=', 'NotFoo'))
     ).to.equal(false);
     expect(
-      item.satisfiesPredicate(new SNPredicate('content_type', '=', 'Item'))
+      item.satisfiesPredicate(
+        new SNPredicate('content_type', '=', FooContentType)
+      )
     ).to.equal(true);
 
     expect(
-      item.satisfiesPredicate(new SNPredicate('content.title', '=', 'Foo'))
+      item.satisfiesPredicate(new SNPredicate('content.title', '=', 'NotFoo'))
     ).to.equal(false);
     expect(
       item.satisfiesPredicate(new SNPredicate('content.title', '=', 'Hello'))
@@ -327,14 +332,16 @@ describe('predicates', async function () {
     const item = await this.createItem();
 
     expect(
-      item.satisfiesPredicate(new SNPredicate('content_type', '!=', 'Foo'))
+      item.satisfiesPredicate(new SNPredicate('content_type', '!=', 'NotFoo'))
     ).to.equal(true);
     expect(
-      item.satisfiesPredicate(new SNPredicate('content_type', '!=', 'Item'))
+      item.satisfiesPredicate(
+        new SNPredicate('content_type', '!=', FooContentType)
+      )
     ).to.equal(false);
 
     expect(
-      item.satisfiesPredicate(new SNPredicate('content.title', '!=', 'Foo'))
+      item.satisfiesPredicate(new SNPredicate('content.title', '!=', 'NotFoo'))
     ).to.equal(true);
     expect(
       item.satisfiesPredicate(new SNPredicate('content.title', '!=', 'Hello'))
@@ -353,10 +360,10 @@ describe('predicates', async function () {
   it('test nonexistent property', async function () {
     const item = await this.createItem();
     expect(
-      item.satisfiesPredicate(new SNPredicate('foobar', '!=', 'Foo'))
+      item.satisfiesPredicate(new SNPredicate('foobar', '!=', 'NotFoo'))
     ).to.equal(true);
     expect(
-      item.satisfiesPredicate(new SNPredicate('foobar', '=', 'Foo'))
+      item.satisfiesPredicate(new SNPredicate('foobar', '=', 'NotFoo'))
     ).to.equal(false);
 
     expect(item.satisfiesPredicate(new SNPredicate('foobar', '<', 3))).to.equal(
@@ -441,70 +448,95 @@ describe('predicates', async function () {
     await itemManager.emitItemFromPayload(payload1, PayloadSource.LocalSaved);
 
     const predicate = new SNPredicate('content.title', '=', 'ello');
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
 
     predicate.keypath = 'content.desc';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
 
     predicate.keypath = 'content.title';
     predicate.value = 'Hello';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(1);
 
     predicate.keypath = 'content.numbers.length';
     predicate.value = 2;
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
 
     predicate.value = 3;
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(1);
 
     predicate.operator = '<';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
 
     predicate.operator = '<=';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(1);
 
     predicate.operator = '>';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
 
     predicate.keypath = 'updated_at';
     predicate.operator = '>';
     const date = new Date();
     date.setSeconds(date.getSeconds() + 1);
     predicate.value = date;
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
 
     predicate.operator = '<';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(
-      itemManager.items.length
-    );
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(itemManager.items.length);
 
     predicate.keypath = 'updated_at';
     predicate.operator = '<';
     predicate.value = '30.days.ago';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
     predicate.operator = '>';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(1);
 
     predicate.value = '1.hours.ago';
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(1);
 
     // multi matching
     expect(
-      itemManager.itemsMatchingPredicates([
-        new SNPredicate('content_type', '=', 'Item'),
+      itemManager.itemsMatchingPredicates(FooContentType, [
+        new SNPredicate('content_type', '=', FooContentType),
         new SNPredicate('content.title', '=', 'SHello'),
       ]).length
     ).to.equal(0);
 
     expect(
-      itemManager.itemsMatchingPredicates([
-        new SNPredicate('content_type', '=', 'Item'),
+      itemManager.itemsMatchingPredicates(FooContentType, [
+        new SNPredicate('content_type', '=', FooContentType),
         new SNPredicate('content.title', '=', 'Hello'),
       ]).length
     ).to.equal(1);
 
     expect(
       itemManager.itemsMatchingPredicate(
+        FooContentType,
         new SNPredicate('content.title', 'startsWith', 'H')
       ).length
     ).to.equal(1);
@@ -514,7 +546,7 @@ describe('predicates', async function () {
     const itemManager = this.itemManager;
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: Factory.generateUuidish(),
-      content_type: 'Item',
+      content_type: FooContentType,
       content: {
         tags: [
           {
@@ -536,6 +568,7 @@ describe('predicates', async function () {
 
     expect(
       itemManager.itemsMatchingPredicate(
+        FooContentType,
         new SNPredicate('content.tags', 'includes', [
           'title',
           'includes',
@@ -545,11 +578,13 @@ describe('predicates', async function () {
     ).to.equal(1);
     expect(
       itemManager.itemsMatchingPredicate(
+        FooContentType,
         new SNPredicate('content.tags', 'includes', ['title', 'in', ['sobar']])
       ).length
     ).to.equal(1);
     expect(
       itemManager.itemsMatchingPredicate(
+        FooContentType,
         new SNPredicate('content.tags', 'includes', [
           'title',
           'in',
@@ -559,6 +594,7 @@ describe('predicates', async function () {
     ).to.equal(1);
     expect(
       itemManager.itemsMatchingPredicate(
+        FooContentType,
         new SNPredicate(
           'content.tags',
           'includes',
@@ -567,17 +603,19 @@ describe('predicates', async function () {
       ).length
     ).to.equal(1);
     expect(
-      itemManager.itemsMatchingPredicate(new SNPredicate('archived', '=', true))
-        .length
+      itemManager.itemsMatchingPredicate(
+        FooContentType,
+        new SNPredicate('archived', '=', true)
+      ).length
     ).to.equal(0);
-    const contentPred = new SNPredicate('content_type', '=', 'Item');
+    const contentPred = new SNPredicate('content_type', '=', FooContentType);
 
     await this.itemManager.changeItem(item2.uuid, (mutator) => {
       mutator.archived = true;
     });
 
     expect(
-      itemManager.itemsMatchingPredicates([
+      itemManager.itemsMatchingPredicates(FooContentType, [
         contentPred,
         new SNPredicate('archived', '=', true),
       ]).length
@@ -599,9 +637,9 @@ describe('predicates', async function () {
       PayloadSource.LocalSaved
     );
     const predicate = new SNPredicate('pinned', '=', false);
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(
-      itemManager.items.length
-    );
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(itemManager.items.length);
   });
 
   it('regex', async function () {
@@ -620,11 +658,15 @@ describe('predicates', async function () {
       'matches',
       '^[a-zA-Z]+$'
     );
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(0);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(0);
 
     await this.itemManager.changeItem(changedItem.uuid, (mutator) => {
       mutator.content.title = 'abc';
     });
-    expect(itemManager.itemsMatchingPredicate(predicate).length).to.equal(1);
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(1);
   });
 });

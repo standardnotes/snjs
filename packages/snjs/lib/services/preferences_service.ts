@@ -57,6 +57,7 @@ export class SNPreferencesService extends PureService<PreferencesChangedEvent> {
     if (stage === ApplicationStage.LoadedDatabase_12) {
       /** Try to read preferences singleton from storage */
       this.preferences = this.singletonManager.findSingleton(
+        ContentType.UserPrefs,
         SNUserPrefs.singletonPredicate
       );
       if (this.preferences) {

@@ -16,14 +16,20 @@ describe('online conflict handling', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+
+    this.context = await Factory.createAppContext();
+    await this.context.launch();
+
+    this.application = this.context.application;
+    this.email = this.context.email;
+    this.password = this.context.password;
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
     });
+
     this.sharedFinalAssertions = async function () {
       expect(this.application.syncService.isOutOfSync()).to.equal(false);
       const items = this.application.itemManager.items;
@@ -573,8 +579,11 @@ describe('online conflict handling', function () {
      * be something like 160. */
     const largeItemCount = SyncUpDownLimit + 10;
     await Factory.createManyMappedNotes(this.application, largeItemCount);
+
     /** Upload */
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
+
     this.expectedItemCount += largeItemCount;
     const items = this.application.itemManager.items;
     expect(items.length).to.equal(this.expectedItemCount);
@@ -597,8 +606,11 @@ describe('online conflict handling', function () {
       // We expect all the notes to be duplicated.
       this.expectedItemCount++;
     }
+
     await this.application.syncService.clearSyncPositionTokens();
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
+
     expect(this.application.itemManager.notes.length).to.equal(
       largeItemCount * 2
     );
