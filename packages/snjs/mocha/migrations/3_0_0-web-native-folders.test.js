@@ -125,6 +125,42 @@ describe('migration 3.0.0 web native folders migration', () => {
       },
     });
   });
+
+  it('skip not-supported names', async function () {
+    const titles = [
+      'something.',
+      'something..',
+      'something..another.thing',
+      'a.b.c',
+      'a',
+      'something..another.thing..anyway',
+    ];
+    await makeTags(this.application, titles);
+
+    // Run the migration
+    await this.application.migrateTagDotsToHierarchy();
+
+    // Check new tags
+    const result = extractTagHierarchy(this.application);
+
+    expect(result).to.deep.equal({
+      'something.': { _uuid: 'something.' },
+      'something..': { _uuid: 'something..' },
+      'something..another.thing': { _uuid: 'something..another.thing' },
+      'something..another.thing..anyway': {
+        _uuid: 'something..another.thing..anyway',
+      },
+      a: {
+        _uuid: 'a',
+        b: {
+          _uuid: '0',
+          c: {
+            _uuid: 'a.b.c',
+          },
+        },
+      },
+    });
+  });
 });
 
 const makeTags = async (application, titles) => {

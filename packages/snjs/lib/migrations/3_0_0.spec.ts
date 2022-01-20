@@ -18,10 +18,9 @@ const itemManagerMock = (tagTitles: string[]) => {
 };
 
 describe('migration 3.0.0: folders component to hierarchy', () => {
-
   // TODO: what about testing cases where the user trigger a migration AFTER we already migrated the data.
   // For example they have a tag with parents, but the tag is name 'a.b.c'
-  
+
   it('should produce a valid hierarchy in the simple case', async () => {
     const titles = ['a', 'a.b', 'a.b.c'];
 
@@ -116,5 +115,31 @@ describe('migration 3.0.0: folders component to hierarchy', () => {
 
     expect(findOrCreateTagParentChainCalls.length).toEqual(0);
     expect(changeItemCalls.length).toEqual(0);
+  });
+
+  it.only('skip not-supported names', async () => {
+    const titles = [
+      'something.',
+      'something..',
+      'something..another.thing',
+      'a.b.c',
+      'a',
+      'something..another.thing..anyway',
+    ];
+
+    const itemManager = itemManagerMock(titles);
+    await Migration3_0_0.upgradeTagFoldersToHierarchy(
+      (itemManager as unknown) as ItemManager
+    );
+
+    const findOrCreateTagParentChainCalls =
+      itemManager.findOrCreateTagParentChain.mock.calls;
+    const changeItemCalls = itemManager.changeItem.mock.calls;
+
+    expect(findOrCreateTagParentChainCalls.length).toEqual(1);
+    expect(findOrCreateTagParentChainCalls[0][0]).toEqual(['a', 'b']);
+
+    expect(changeItemCalls.length).toEqual(1);
+    expect(changeItemCalls[0][0]).toEqual('a.b.c');
   });
 });
