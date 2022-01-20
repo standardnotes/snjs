@@ -11,4 +11,5 @@ paths-ignore:
 - dist
 - node_modules
 - packages/snjs/mocha
+- packages/sncrypto-node/src/crypto.spec.ts
 - packages/components/all
