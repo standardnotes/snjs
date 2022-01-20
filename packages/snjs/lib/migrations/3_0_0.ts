@@ -71,10 +71,7 @@ export class Migration3_0_0 extends Migration {
       const newTitle = lastElement(hierarchy);
 
       if (!newTitle) {
-        // NOTE: this is impossible, because we already know that
-        // hierarchy.length > 0. This makes the compiler happy
-        // (non-null assertion + no undefined)
-        throw new Error('invalid data state');
+        return;
       }
 
       const parent = await itemManager.findOrCreateTagParentChain(parents);
