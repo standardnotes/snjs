@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export enum RoleName {
   BasicUser = 'BASIC_USER',
   CoreUser = 'CORE_USER',

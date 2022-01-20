@@ -3,7 +3,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('settings service', function () {
-  const fakeSetting = 'FAKE_SETTING';
+  const validSetting = SettingName.GoogleDriveBackupFrequency;
   const fakePayload = 'Im so meta even this acronym';
   const updatedFakePayload = 'is meta';
 
@@ -27,36 +27,48 @@ describe('settings service', function () {
   });
 
   it('creates and reads a setting', async function () {
-    await snApp.updateSetting(fakeSetting, fakePayload);
-    const responseCreate = await snApp.getSetting(fakeSetting);
+    await snApp.updateSetting(validSetting, fakePayload);
+    const responseCreate = await snApp.getSetting(validSetting);
     expect(responseCreate).to.equal(fakePayload);
   });
 
+  it('throws error on an invalid setting update', async function () {
+    const invalidSetting = 'FAKE_SETTING';
+    let caughtError = null;
+    try {
+      await snApp.updateSetting(invalidSetting, fakePayload);
+    } catch (error) {
+      caughtError = error
+    }
+
+    expect(caughtError).not.to.equal(null)
+  });
+
   it('creates and lists settings', async function () {
-    await snApp.updateSetting(fakeSetting, fakePayload);
+    await snApp.updateSetting(validSetting, fakePayload);
     const responseList = await snApp.listSettings();
-    expect(responseList).to.eql({ [fakeSetting]: fakePayload });
+    expect(responseList).to.eql({ [validSetting]: fakePayload });
   });
 
   it('creates and deletes a setting', async function () {
-    await snApp.updateSetting(fakeSetting, fakePayload);
-    const responseCreate = await snApp.getSetting(fakeSetting);
+    await snApp.updateSetting(validSetting, fakePayload);
+    const responseCreate = await snApp.getSetting(validSetting);
     expect(responseCreate).to.eql(fakePayload);
 
-    await snApp.deleteSetting(fakeSetting);
+    await snApp.deleteSetting(validSetting);
     const responseDeleted = await snApp.listSettings();
     expect(responseDeleted).to.eql({});
   });
 
   it('creates and updates a setting', async function () {
-    await snApp.updateSetting(fakeSetting, fakePayload);
-    await snApp.updateSetting(fakeSetting, updatedFakePayload);
-    const responseUpdated = await snApp.getSetting(fakeSetting);
+    await snApp.updateSetting(validSetting, fakePayload);
+    await snApp.updateSetting(validSetting, updatedFakePayload);
+    const responseUpdated = await snApp.getSetting(validSetting);
     expect(responseUpdated).to.eql(updatedFakePayload);
   });
 
   it('reads a nonexistent setting', async () => {
-    const setting = await snApp.getSetting(fakeSetting);
+    const setting = await snApp.getSetting(validSetting);
     expect(setting).to.equal(null);
   });
 
@@ -73,8 +85,8 @@ describe('settings service', function () {
 
   it('creates and lists a sensitive setting', async () => {
     await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true);
-    await snApp.updateSetting('UNSENSITIVE', 'so_unsensitive');
+    await snApp.updateSetting(SettingName.MuteFailedBackupsEmails, MuteFailedBackupsEmailsOption.Muted);
     const settings = await snApp.listSettings();
-    expect(settings).to.eql({ UNSENSITIVE: 'so_unsensitive' });
+    expect(settings).to.eql({ 'MUTE_FAILED_BACKUPS_EMAILS': 'muted' });
   });
 });

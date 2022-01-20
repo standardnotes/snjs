@@ -3,6 +3,174 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.25.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.7...@standardnotes/features@1.25.0) (2022-01-19)
+
+
+### Features
+
+* onPresyncSave ([0e5f451](https://github.com/standardnotes/snjs/commit/0e5f451e85cfd7cb58ff1f0a87425e4dd43f6030))
+
+
+
+
+
+## [1.24.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.6...@standardnotes/features@1.24.7) (2022-01-19)
+
+
+### Bug Fixes
+
+* bump editors ([9e109b1](https://github.com/standardnotes/snjs/commit/9e109b1a29a3767f8fd3126bab0ccfcf4a2487a4))
+
+
+
+
+
+## [1.24.6](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.5...@standardnotes/features@1.24.6) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.24.5](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.4...@standardnotes/features@1.24.5) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.24.4](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.3...@standardnotes/features@1.24.4) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.24.3](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.2...@standardnotes/features@1.24.3) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.24.2](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.1...@standardnotes/features@1.24.2) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.24.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.24.0...@standardnotes/features@1.24.1) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+# [1.24.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.23.1...@standardnotes/features@1.24.0) (2022-01-15)
+
+
+### Features
+
+* remove server extension type ([#552](https://github.com/standardnotes/snjs/issues/552)) ([aa542f3](https://github.com/standardnotes/snjs/commit/aa542f3124c60fa81a0b271030b3c35415c54a62))
+
+
+
+
+
+## [1.23.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.23.0...@standardnotes/features@1.23.1) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+# [1.23.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.22.0...@standardnotes/features@1.23.0) (2022-01-14)
+
+
+### Features
+
+* markdown pro, bold editor ([0bc5add](https://github.com/standardnotes/snjs/commit/0bc5addabc7033149d207d1140f9c5e1b7dc7fb6))
+
+
+
+
+
+# [1.22.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.21.0...@standardnotes/features@1.22.0) (2022-01-14)
+
+
+### Features
+
+* plus editor 1.6.0 ([6bdf5a7](https://github.com/standardnotes/snjs/commit/6bdf5a7519559f75d72016a1f4e6f715e55d437a))
+
+
+
+
+
+# [1.21.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.8...@standardnotes/features@1.21.0) (2022-01-14)
+
+
+### Features
+
+* spellcheck control per note ([#557](https://github.com/standardnotes/snjs/issues/557)) ([76cc637](https://github.com/standardnotes/snjs/commit/76cc63781e3568bbb48b44001ab51644af0985b3))
+
+
+
+
+
+## [1.20.8](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.7...@standardnotes/features@1.20.8) (2022-01-14)
+
+
+### Bug Fixes
+
+* cross-package dependencies and content type imports ([#556](https://github.com/standardnotes/snjs/issues/556)) ([26ba1e0](https://github.com/standardnotes/snjs/commit/26ba1e0c38e7e0ae572996125150a4c3d27f1c0a))
+
+
+
+
+
+## [1.20.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.6...@standardnotes/features@1.20.7) (2022-01-12)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.20.6](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.5...@standardnotes/features@1.20.6) (2022-01-10)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.20.5](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.4...@standardnotes/features@1.20.5) (2022-01-05)
+
+
+### Bug Fixes
+
+* filesafe index path ([7cdfe46](https://github.com/standardnotes/snjs/commit/7cdfe46bc74b6671b1e26972363d6f3d0048d29a))
+
+
+
+
+
+## [1.20.4](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.3...@standardnotes/features@1.20.4) (2022-01-03)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
 ## [1.20.3](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.20.2...@standardnotes/features@1.20.3) (2021-12-30)
 
 

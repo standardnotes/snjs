@@ -1,3 +1,4 @@
+import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index';
 import { TransactionalMutation } from './services/item_manager';
 import { FeatureStatus } from '@Lib/services/features_service';
 import { Settings } from './services/settings_service';
@@ -58,7 +59,7 @@ import {
   removeFromArray,
   sleep,
 } from '@Lib/utils';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import {
   CopyPayload,
   CreateMaxPayloadFromAnyObject,
@@ -117,7 +118,11 @@ import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
-import { EmailBackupFrequency, SettingName } from '@standardnotes/settings';
+import {
+  CloudProvider,
+  EmailBackupFrequency,
+  SettingName,
+} from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
@@ -853,6 +858,20 @@ export class SNApplication {
     return this.itemManager.notesMatchingSmartTag(smartTag);
   }
 
+  public addNoteCountChangeObserver(
+    observer: TagNoteCountChangeObserver
+  ): () => void {
+    return this.itemManager.addNoteCountChangeObserver(observer);
+  }
+
+  public allCountableNotesCount(): number {
+    return this.itemManager.allCountableNotesCount();
+  }
+
+  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
+    return this.itemManager.countableNotesForTag(tag);
+  }
+
   /** Returns an item's direct references */
   public referencesForItem(item: SNItem, contentType?: ContentType): SNItem[] {
     let references = this.itemManager.referencesForItem(item.uuid);
@@ -1143,10 +1162,6 @@ export class SNApplication {
 
   public authorizeAutolockIntervalChange(): Promise<boolean> {
     return this.protectionService.authorizeAutolockIntervalChange();
-  }
-
-  public authorizeCloudLinkAccess(): Promise<boolean> {
-    return this.protectionService.authorizeCloudLinkAccess();
   }
 
   public authorizeSearchingProtectedNotesText(): Promise<boolean> {
@@ -1667,7 +1682,9 @@ export class SNApplication {
     return this.settingsService.deleteSetting(name);
   }
 
-  public getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
+  public getEmailBackupFrequencyOptionLabel(
+    frequency: EmailBackupFrequency
+  ): string {
     return this.settingsService.getEmailBackupFrequencyOptionLabel(frequency);
   }
 
@@ -1731,8 +1748,19 @@ export class SNApplication {
     return this.featuresService.deleteOfflineFeatureRepo();
   }
 
+  public isThirdPartyFeature(identifier: string): boolean {
+    return this.featuresService.isThirdPartyFeature(identifier);
+  }
+
   public isThirdPartyHostUsed(): boolean {
     return this.apiService.isThirdPartyHostUsed();
+  }
+
+  public getCloudProviderIntegrationUrl(
+    cloudProviderName: CloudProvider,
+    isDevEnvironment: boolean,
+  ): string {
+    return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName, isDevEnvironment);
   }
 
   private constructServices() {
@@ -1903,6 +1931,7 @@ export class SNApplication {
       this.itemManager,
       this.syncService,
       this.featuresService,
+      this.preferencesService,
       this.alertService,
       this.environment,
       this.platform,

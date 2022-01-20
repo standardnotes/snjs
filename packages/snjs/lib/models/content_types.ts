@@ -2,8 +2,6 @@ import { ContentType } from '@standardnotes/common';
 
 export const DefaultAppDomain = 'org.standardnotes.sn';
 
-export { ContentType };
-
 export function displayStringForContentType(
   contentType: ContentType
 ): string | undefined {
@@ -15,7 +13,6 @@ export function displayStringForContentType(
     [ContentType.Component]: 'component',
     [ContentType.Editor]: 'editor',
     [ContentType.Theme]: 'theme',
-    [ContentType.ServerExtension]: 'server extension',
     [ContentType.FilesafeCredentials]: 'FileSafe credential',
     [ContentType.FilesafeFileMetadata]: 'FileSafe file',
     [ContentType.FilesafeIntegration]: 'FileSafe integration',

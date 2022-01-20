@@ -175,9 +175,9 @@ export {
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
 export {
-  ContentType,
   displayStringForContentType,
 } from '@Models/content_types';
+export { ContentType } from '@standardnotes/common';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
 
@@ -231,6 +231,9 @@ export {
   namespacedKey,
 } from '@Lib/storage_keys';
 
+export { NoteViewController } from './ui/note_view_controller';
+export { NoteGroupController } from './ui/note_group_controller';
+
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
 
@@ -241,6 +244,6 @@ export { SNLog } from './log';
 /** Used by e2e tests */
 export { Features, FeatureIdentifier } from '@standardnotes/features';
 export { RoleName } from '@standardnotes/auth';
-export { SettingName } from '@standardnotes/settings';
+export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { ApplicationStage } from '@Lib/stages';

@@ -3,6 +3,101 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.3](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.2...@standardnotes/components@1.4.3) (2022-01-19)
+
+
+### Bug Fixes
+
+* bump editors ([9e109b1](https://github.com/standardnotes/snjs/commit/9e109b1a29a3767f8fd3126bab0ccfcf4a2487a4))
+
+
+
+
+
+## [1.4.2](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.1...@standardnotes/components@1.4.2) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.0...@standardnotes/components@1.4.1) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+# [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.3.0...@standardnotes/components@1.4.0) (2022-01-14)
+
+
+### Features
+
+* markdown pro, bold editor ([0bc5add](https://github.com/standardnotes/snjs/commit/0bc5addabc7033149d207d1140f9c5e1b7dc7fb6))
+
+
+
+
+
+# [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.8...@standardnotes/components@1.3.0) (2022-01-14)
+
+
+### Features
+
+* plus editor 1.6.0 ([6bdf5a7](https://github.com/standardnotes/snjs/commit/6bdf5a7519559f75d72016a1f4e6f715e55d437a))
+
+
+
+
+
+## [1.2.8](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.7...@standardnotes/components@1.2.8) (2022-01-14)
+
+
+### Bug Fixes
+
+* add prebuild cleanup for components package ([ee9b29d](https://github.com/standardnotes/snjs/commit/ee9b29d72914ee499ffd18605ab07dc6d46c0213))
+
+
+
+
+
+## [1.2.7](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.6...@standardnotes/components@1.2.7) (2022-01-12)
+
+
+### Bug Fixes
+
+* components cp script ([eebd54b](https://github.com/standardnotes/snjs/commit/eebd54b36cb875136d76c5fc6194804c0cd2ae4f))
+
+
+
+
+
+## [1.2.6](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.5...@standardnotes/components@1.2.6) (2022-01-12)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+## [1.2.5](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.4...@standardnotes/components@1.2.5) (2022-01-10)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+## [1.2.4](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.3...@standardnotes/components@1.2.4) (2022-01-03)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
 ## [1.2.3](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.2.2...@standardnotes/components@1.2.3) (2021-12-30)
 
 

@@ -6,7 +6,7 @@ import { ActionsExtensionMutator } from './app/extension';
 import { ComponentMutator } from './app/component';
 import { TagMutator } from './app/tag';
 import { NoteMutator } from './app/note';
-import { ContentType } from './content_types';
+import { ContentType } from '@standardnotes/common';
 
 export function createMutatorForItem(
   item: SNItem,

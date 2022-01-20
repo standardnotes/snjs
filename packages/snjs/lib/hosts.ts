@@ -15,6 +15,11 @@ export const TRUSTED_FEATURE_HOSTS = [
   'features.standardnotes.com',
 ];
 
+export enum ExtensionsServerURL {
+  Prod = 'https://extensions.standardnotes.org',
+  Dev = 'https://extensions-server-dev.standardnotes.org'
+}
+
 const LocalHost = 'localhost';
 
 export function isUrlFirstParty(url: string): boolean {

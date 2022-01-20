@@ -226,6 +226,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     const repo = this.getOfflineRepo();
     if (repo) {
       await this.itemManager.setItemToBeDeleted(repo.uuid);
+      this.syncService.sync();
     }
     await this.storageService.removeValue(StorageKey.UserFeatures);
   }
@@ -372,6 +373,13 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     identifier: FeatureIdentifier
   ): FeatureDescription | undefined {
     return Features.find((f) => f.identifier === identifier);
+  }
+
+  public isThirdPartyFeature(identifier: string): boolean {
+    const isNativeFeature = !!this.findStaticNativeFeature(
+      identifier as FeatureIdentifier
+    );
+    return !isNativeFeature;
   }
 
   private mapRemoteNativeFeatureToStaticFeature(

@@ -1,5 +1,5 @@
 import { ContentReference } from '@Lib/protocol/payloads/generator';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { PurePayload } from '@Protocol/payloads/pure_payload';
 import { UuidString } from './../../types';
@@ -8,6 +8,9 @@ import { ItemContent } from './../core/item';
 export interface TagContent extends ItemContent {
   title: string;
 }
+
+export const isTag = (x: SNItem): x is SNTag =>
+  x.content_type === ContentType.Tag;
 
 /**
  * Allows organization of notes into groups.
@@ -18,12 +21,12 @@ export class SNTag extends SNItem implements TagContent {
 
   constructor(payload: PurePayload) {
     super(payload);
-    this.title = this.payload.safeContent.title;
+    this.title = this.payload.safeContent.title || '';
   }
 
   get noteReferences(): ContentReference[] {
     const references = this.payload.safeReferences;
-    return references.filter(ref => ref.content_type === ContentType.Note)
+    return references.filter((ref) => ref.content_type === ContentType.Note);
   }
 
   get noteCount(): number {

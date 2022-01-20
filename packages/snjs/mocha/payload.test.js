@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 chai.use(chaiAsPromised);
 const expect = chai.expect;
+import * as Factory from './lib/factory.js';
 
 describe('payload', () => {
   beforeEach(async function () {
@@ -86,14 +87,16 @@ describe('payload', () => {
     expect(payload.format).to.equal(PayloadFormat.EncryptedString);
   });
 
-  it('payload format base64 string', function () {
-    const payload = new PurePayload({
-      uuid: '123',
-      content_type: ContentType.Note,
-      content: '000:somebase64string',
-    });
-
-    expect(payload.format).to.equal(PayloadFormat.DecryptedBase64String);
+  it('payload with unrecognized prefix should be corrupt', async function () {
+    await Factory.expectThrowsAsync(
+      () =>
+        new PurePayload({
+          uuid: '123',
+          content_type: ContentType.Note,
+          content: '000:somebase64string',
+        }),
+      'Corrupt payload'
+    );
   });
 
   it('payload format deleted', function () {

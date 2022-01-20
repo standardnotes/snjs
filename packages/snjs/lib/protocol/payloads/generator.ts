@@ -3,7 +3,7 @@ import { ProtocolVersion } from './../versions';
 import { UuidString } from './../../types';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PayloadSource } from '@Payloads/sources';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { EncryptionIntent } from '@Protocol/intents';
 import { Copy, pickByCopy, uniqueArray } from '@Lib/utils';
 import { PayloadField } from '@Payloads/fields';
@@ -329,10 +329,7 @@ function payloadFieldsForIntent(intent: EncryptionIntent) {
     return StoragePayloadFields.slice();
   }
 
-  if (
-    intent === EncryptionIntent.Sync ||
-    intent === EncryptionIntent.SyncDecrypted
-  ) {
+  if (intent === EncryptionIntent.Sync) {
     return ServerPayloadFields.slice();
   } else {
     throw `No payload fields found for intent ${intent}`;

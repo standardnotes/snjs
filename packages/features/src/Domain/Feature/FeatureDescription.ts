@@ -61,6 +61,7 @@ export type EditorFeatureDescription = IframeComponentFeatureDescription & {
   /** Whether an editor is interchangable with another editor that has the same file_type */
   interchangeable: boolean;
   note_type: NoteType;
+  spellcheckControl?: boolean;
 };
 
 export type ThemeFeatureDescription = ComponentFeatureDescription & {

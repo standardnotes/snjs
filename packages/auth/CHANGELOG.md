@@ -3,6 +3,97 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.3](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.2...@standardnotes/auth@3.15.3) (2022-01-19)
+
+
+### Bug Fixes
+
+* add upload bytes information to valet token ([6d35f2b](https://github.com/standardnotes/snjs/commit/6d35f2b3774b1d0dad60c3ad00d2a958b81a52cb))
+
+
+
+
+
+## [3.15.2](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.1...@standardnotes/auth@3.15.2) (2022-01-17)
+
+
+### Bug Fixes
+
+* remove valet token valid until date in favor of jwt expiration ([7973fb1](https://github.com/standardnotes/snjs/commit/7973fb1695f3b02fa9b8888c6c5d0ff10b1979ee))
+
+
+
+
+
+## [3.15.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.0...@standardnotes/auth@3.15.1) (2022-01-17)
+
+
+### Bug Fixes
+
+* token encoders ([e0be0f4](https://github.com/standardnotes/snjs/commit/e0be0f4f0677615c3e347843eea33f08e9920eae))
+
+
+
+
+
+# [3.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.14.1...@standardnotes/auth@3.15.0) (2022-01-17)
+
+
+### Features
+
+* refactor token data names ([#559](https://github.com/standardnotes/snjs/issues/559)) ([2c615c9](https://github.com/standardnotes/snjs/commit/2c615c9b6f733195684163a58df606f5a8ffde59))
+
+
+
+
+
+## [3.14.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.14.0...@standardnotes/auth@3.14.1) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/auth
+
+
+
+
+
+# [3.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.13.1...@standardnotes/auth@3.14.0) (2022-01-15)
+
+
+### Features
+
+* add crypter, decoder and encoder to auth package ([#553](https://github.com/standardnotes/snjs/issues/553)) ([940e0a5](https://github.com/standardnotes/snjs/commit/940e0a56a84e5f057a94a526289ae79e1ea46f70))
+
+
+
+
+
+## [3.13.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.13.0...@standardnotes/auth@3.13.1) (2022-01-14)
+
+
+### Bug Fixes
+
+* cross-package dependencies and content type imports ([#556](https://github.com/standardnotes/snjs/issues/556)) ([26ba1e0](https://github.com/standardnotes/snjs/commit/26ba1e0c38e7e0ae572996125150a4c3d27f1c0a))
+
+
+
+
+
+# [3.13.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.12.0...@standardnotes/auth@3.13.0) (2022-01-13)
+
+
+### Bug Fixes
+
+* correct gitignore paths ([cefc0cf](https://github.com/standardnotes/snjs/commit/cefc0cfcf98e3e5378e055b8c46931b53b23195e))
+* include dist in static components ([d17ce0f](https://github.com/standardnotes/snjs/commit/d17ce0f67045c6e4c97bf4577709aa58794e72e6))
+
+
+### Features
+
+* add token decoder ([#551](https://github.com/standardnotes/snjs/issues/551)) ([7240588](https://github.com/standardnotes/snjs/commit/724058864be08d0d78d4d8c232864aed125ea6e0))
+
+
+
+
+
 # [3.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.11.0...@standardnotes/auth@3.12.0) (2021-12-23)
 
 

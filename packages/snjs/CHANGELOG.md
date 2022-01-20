@@ -3,6 +3,397 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.41.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.7...@standardnotes/snjs@2.41.0) (2022-01-19)
+
+
+### Features
+
+* onPresyncSave ([0e5f451](https://github.com/standardnotes/snjs/commit/0e5f451e85cfd7cb58ff1f0a87425e4dd43f6030))
+
+
+
+
+
+## [2.40.7](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.6...@standardnotes/snjs@2.40.7) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.5...@standardnotes/snjs@2.40.6) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.4...@standardnotes/snjs@2.40.5) (2022-01-19)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.3...@standardnotes/snjs@2.40.4) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.2...@standardnotes/snjs@2.40.3) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.1...@standardnotes/snjs@2.40.2) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.40.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.40.0...@standardnotes/snjs@2.40.1) (2022-01-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.40.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.39.0...@standardnotes/snjs@2.40.0) (2022-01-17)
+
+
+### Features
+
+* tag notes index ([#546](https://github.com/standardnotes/snjs/issues/546)) ([ab12281](https://github.com/standardnotes/snjs/commit/ab122817648f3ac3a7c51ef66a0609f5521300ec))
+
+
+
+
+
+# [2.39.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.4...@standardnotes/snjs@2.39.0) (2022-01-17)
+
+
+### Features
+
+* Add preferences for automatic themes ([#558](https://github.com/standardnotes/snjs/issues/558)) ([ab4936e](https://github.com/standardnotes/snjs/commit/ab4936ea2520dc2bb0e71086a6581078507581f8))
+
+
+
+
+
+## [2.38.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.3...@standardnotes/snjs@2.38.4) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.2...@standardnotes/snjs@2.38.3) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.1...@standardnotes/snjs@2.38.2) (2022-01-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.38.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.38.0...@standardnotes/snjs@2.38.1) (2022-01-16)
+
+
+### Bug Fixes
+
+* add payload source constructor to sync components on launch ([ddb79cc](https://github.com/standardnotes/snjs/commit/ddb79ccee8512523e8d0241310039be84f08cfc0))
+
+
+
+
+
+# [2.38.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.3...@standardnotes/snjs@2.38.0) (2022-01-15)
+
+
+### Features
+
+* remove server extension type ([#552](https://github.com/standardnotes/snjs/issues/552)) ([aa542f3](https://github.com/standardnotes/snjs/commit/aa542f3124c60fa81a0b271030b3c35415c54a62))
+
+
+
+
+
+## [2.37.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.2...@standardnotes/snjs@2.37.3) (2022-01-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.37.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.1...@standardnotes/snjs@2.37.2) (2022-01-14)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.37.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.37.0...@standardnotes/snjs@2.37.1) (2022-01-14)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.37.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.36.0...@standardnotes/snjs@2.37.0) (2022-01-14)
+
+
+### Features
+
+* spellcheck control per note ([#557](https://github.com/standardnotes/snjs/issues/557)) ([76cc637](https://github.com/standardnotes/snjs/commit/76cc63781e3568bbb48b44001ab51644af0985b3))
+
+
+
+
+
+# [2.36.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.6...@standardnotes/snjs@2.36.0) (2022-01-14)
+
+
+### Features
+
+* move sncrypto packages to snjs monorepo ([#554](https://github.com/standardnotes/snjs/issues/554)) ([db83991](https://github.com/standardnotes/snjs/commit/db8399190d9d10fdc31060568b836c62933fd525))
+
+
+
+
+
+## [2.35.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.5...@standardnotes/snjs@2.35.6) (2022-01-14)
+
+
+### Bug Fixes
+
+* cross-package dependencies and content type imports ([#556](https://github.com/standardnotes/snjs/issues/556)) ([26ba1e0](https://github.com/standardnotes/snjs/commit/26ba1e0c38e7e0ae572996125150a4c3d27f1c0a))
+
+
+
+
+
+## [2.35.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.3...@standardnotes/snjs@2.35.5) (2022-01-13)
+
+
+### Bug Fixes
+
+* remove readonly qualifier ([a4a06eb](https://github.com/standardnotes/snjs/commit/a4a06eb738f013c4bd76b9dc8a1e8466d492ccea))
+* **snjs:** handle case where tag is no longer available ([87b43c8](https://github.com/standardnotes/snjs/commit/87b43c865f4f3a734db35c2ce9e58a07a03d125e))
+
+
+
+
+
+## [2.35.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.3...@standardnotes/snjs@2.35.4) (2022-01-12)
+
+
+### Bug Fixes
+
+* remove readonly qualifier ([a4a06eb](https://github.com/standardnotes/snjs/commit/a4a06eb738f013c4bd76b9dc8a1e8466d492ccea))
+* **snjs:** handle case where tag is no longer available ([87b43c8](https://github.com/standardnotes/snjs/commit/87b43c865f4f3a734db35c2ce9e58a07a03d125e))
+
+
+
+
+
+## [2.35.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.2...@standardnotes/snjs@2.35.3) (2022-01-12)
+
+
+### Bug Fixes
+
+* make extension-server url dynamic, depending on whether the env is dev or prod ([#550](https://github.com/standardnotes/snjs/issues/550)) ([f28b564](https://github.com/standardnotes/snjs/commit/f28b56400564cd8cb03777489b8ddacbefe9bb9d))
+
+
+
+
+
+## [2.35.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.1...@standardnotes/snjs@2.35.2) (2022-01-12)
+
+
+### Bug Fixes
+
+* updating fake settings tests ([#549](https://github.com/standardnotes/snjs/issues/549)) ([e5f7742](https://github.com/standardnotes/snjs/commit/e5f7742cc7146c8d63b10ebfd0a4479b98924b90))
+
+
+
+
+
+## [2.35.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.35.0...@standardnotes/snjs@2.35.1) (2022-01-11)
+
+
+### Bug Fixes
+
+* default tag to empty string if title undefined ([908fbaf](https://github.com/standardnotes/snjs/commit/908fbafd39600165b8d516826cc1dd5488075be6))
+
+
+
+
+
+# [2.35.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.3...@standardnotes/snjs@2.35.0) (2022-01-11)
+
+
+### Features
+
+* extract save method from clients into note_view_controller ([1692935](https://github.com/standardnotes/snjs/commit/169293517488f210e544640aac1702209a01d760))
+
+
+
+
+
+## [2.34.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.2...@standardnotes/snjs@2.34.3) (2022-01-10)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.34.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.1...@standardnotes/snjs@2.34.2) (2022-01-07)
+
+
+### Bug Fixes
+
+* add isNativeFeature application function ([1350866](https://github.com/standardnotes/snjs/commit/1350866a021201795c2aef10c2276ca7be42267f))
+
+
+
+
+
+## [2.34.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.34.0...@standardnotes/snjs@2.34.1) (2022-01-06)
+
+
+### Bug Fixes
+
+* sync after deleting offline repo ([29df45a](https://github.com/standardnotes/snjs/commit/29df45a8b018d216b3b2ed6671b494966e97fc17))
+
+
+
+
+
+# [2.34.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.33.0...@standardnotes/snjs@2.34.0) (2022-01-06)
+
+
+### Features
+
+* extracted note controllers from web app ([0d2c615](https://github.com/standardnotes/snjs/commit/0d2c615a16ec632e2abe4b3762605b7f5d30cf34))
+
+
+
+
+
+# [2.33.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.32.0...@standardnotes/snjs@2.33.0) (2022-01-06)
+
+
+### Features
+
+* Add NotesHideEditorIcon pref key ([#539](https://github.com/standardnotes/snjs/issues/539)) ([636cc2a](https://github.com/standardnotes/snjs/commit/636cc2ab75ddf900edcc04a4124da5bcac7cdb22))
+
+
+
+
+
+# [2.32.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.25...@standardnotes/snjs@2.32.0) (2022-01-06)
+
+
+### Features
+
+* expose urls needed for cloud backup integration ([#537](https://github.com/standardnotes/snjs/issues/537)) ([efa492f](https://github.com/standardnotes/snjs/commit/efa492f6ddd26e23b590150c00263ac14267f572))
+
+
+
+
+
+## [2.31.25](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.24...@standardnotes/snjs@2.31.25) (2022-01-05)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.24](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.23...@standardnotes/snjs@2.31.24) (2022-01-04)
+
+
+### Bug Fixes
+
+* workaround for RN localeCompare crash ([d19fee5](https://github.com/standardnotes/snjs/commit/d19fee5133596bde8966315511b0cedb3d52ffdd))
+
+
+
+
+
+## [2.31.23](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.22...@standardnotes/snjs@2.31.23) (2022-01-03)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.22](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.21...@standardnotes/snjs@2.31.22) (2022-01-03)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.31.21](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.20...@standardnotes/snjs@2.31.21) (2022-01-03)
+
+
+### Bug Fixes
+
+* allow url override for component viewer factory function ([014067e](https://github.com/standardnotes/snjs/commit/014067e9050927de104b5e7e35f8e3f7596fa84b))
+
+
+
+
+
+## [2.31.20](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.19...@standardnotes/snjs@2.31.20) (2022-01-02)
+
+
+### Bug Fixes
+
+* use absolute path for native web components ([1b4e1dc](https://github.com/standardnotes/snjs/commit/1b4e1dcac144c0d68cf7c25b9b6f6694305d030a))
+
+
+
+
+
+## [2.31.19](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.18...@standardnotes/snjs@2.31.19) (2022-01-02)
+
+
+### Bug Fixes
+
+* check source before syncing components ([1fd1e8b](https://github.com/standardnotes/snjs/commit/1fd1e8b5f9b25ea13a0f75cc433c7b137ff4ea63))
+
+
+
+
+
 ## [2.31.18](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.31.17...@standardnotes/snjs@2.31.18) (2021-12-31)
 
 

@@ -18,8 +18,6 @@ export enum ComponentAction {
   ComponentRegistered = 'component-registered',
   ActivateThemes = 'themes',
   Reply = 'reply',
-  SaveSuccess = 'save-success',
-  SaveError = 'save-error',
   ThemesActivated = 'themes-activated',
   KeyDown = 'key-down',
   KeyUp = 'key-up',

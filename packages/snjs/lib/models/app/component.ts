@@ -5,7 +5,7 @@ import { UuidString } from './../../types';
 import { AppDataField } from './../core/item';
 import { PurePayload } from '@Payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
 import {
   ComponentArea,

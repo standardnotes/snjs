@@ -55,7 +55,7 @@ import {
   removeFromArray,
 } from '@Lib/utils';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
-import { ContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { DeviceInterface } from '../device_interface';
@@ -357,10 +357,6 @@ export class SNProtocolService
     }
   }
 
-  private createOperatorForLatestVersion() {
-    return this.createOperatorForVersion(this.getLatestVersion());
-  }
-
   private createOperatorForVersion(
     version: ProtocolVersion
   ): SNProtocolOperator {
@@ -372,8 +368,6 @@ export class SNProtocolService
       return new SNProtocolOperator003(this.crypto);
     } else if (version === ProtocolVersion.V004) {
       return new SNProtocolOperator004(this.crypto);
-    } else if (version === ProtocolVersion.V000Base64Decrypted) {
-      return this.createOperatorForLatestVersion();
     } else {
       throw Error(`Unable to find operator for version ${version}`);
     }
@@ -438,8 +432,6 @@ export class SNProtocolService
         intent === EncryptionIntent.FilePreferEncrypted
       ) {
         return PayloadFormat.DecryptedBareObject;
-      } else if (intent === EncryptionIntent.SyncDecrypted) {
-        return PayloadFormat.DecryptedBase64String;
       } else {
         throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.';
       }

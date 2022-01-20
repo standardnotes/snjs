@@ -2,7 +2,7 @@ import { Uuid } from '@standardnotes/common'
 
 import { Role } from '../Role/Role'
 
-export type Token = {
+export type CrossServiceTokenData = {
   user: {
     uuid: Uuid,
     email: string

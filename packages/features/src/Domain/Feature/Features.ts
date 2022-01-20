@@ -170,7 +170,7 @@ function themes(): ThemeFeatureDescription[] {
     permission_name: PermissionName.ThemeDynamic,
     layerable: true,
     no_mobile: true,
-    version: '1.0.0',
+    version: '1.0.3',
     description:
       'A smart theme that minimizes the tags and notes panels when they are not in use.',
     git_repo_url: 'https://github.com/standardnotes/dynamic-theme',
@@ -231,7 +231,7 @@ function FillEditorComponentDefaults(
 function editors(): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
-    version: '1.3.8',
+    version: '1.3.9',
     identifier: FeatureIdentifier.CodeEditor,
     permission_name: PermissionName.CodeEditor,
     note_type: NoteType.Code,
@@ -251,7 +251,7 @@ function editors(): EditorFeatureDescription[] {
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Bold Editor',
     identifier: FeatureIdentifier.BoldEditor,
-    version: '1.2.10',
+    version: '1.3.2',
     note_type: NoteType.RichText,
     file_type: 'html',
     component_permissions: [
@@ -268,6 +268,7 @@ function editors(): EditorFeatureDescription[] {
         ],
       },
     ],
+    spellcheckControl: true,
     permission_name: PermissionName.BoldEditor,
     description:
       'A simple and peaceful rich editor that helps you write and think clearly. Features FileSafe integration, so you can embed your encrypted images, videos, and audio recordings directly inline.',
@@ -283,7 +284,8 @@ function editors(): EditorFeatureDescription[] {
     file_type: 'html',
     identifier: FeatureIdentifier.PlusEditor,
     permission_name: PermissionName.PlusEditor,
-    version: '1.5.0',
+    version: '1.6.1',
+    spellcheckControl: true,
     description:
       'From highlighting to custom font sizes and colors, to tables and lists, this editor is perfect for crafting any document.',
     git_repo_url: 'https://github.com/standardnotes/plus-editor',
@@ -296,7 +298,7 @@ function editors(): EditorFeatureDescription[] {
     name: 'Markdown Basic',
     identifier: FeatureIdentifier.MarkdownBasicEditor,
     note_type: NoteType.Markdown,
-    version: '1.4.0',
+    version: '1.4.1',
     file_type: 'md',
     permission_name: PermissionName.MarkdownBasicEditor,
     description: 'A Markdown editor with dynamic split-pane preview.',
@@ -310,10 +312,11 @@ function editors(): EditorFeatureDescription[] {
   const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Pro',
     identifier: FeatureIdentifier.MarkdownProEditor,
-    version: '1.3.14',
+    version: '1.4.1',
     note_type: NoteType.Markdown,
     file_type: 'md',
     permission_name: PermissionName.MarkdownProEditor,
+    spellcheckControl: true,
     description:
       'A fully featured Markdown editor that supports live preview, a styling toolbar, and split pane support.',
     git_repo_url: 'https://github.com/standardnotes/advanced-markdown-editor',
@@ -330,7 +333,7 @@ function editors(): EditorFeatureDescription[] {
       file_type: 'md',
       index_path: 'index.html',
       permission_name: PermissionName.MarkdownMinimistEditor,
-      version: '1.3.7',
+      version: '1.3.8',
       description:
         'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
       git_repo_url: 'https://github.com/standardnotes/minimal-markdown-editor',
@@ -344,7 +347,7 @@ function editors(): EditorFeatureDescription[] {
   const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Math',
     identifier: FeatureIdentifier.MarkdownMathEditor,
-    version: '1.3.4',
+    version: '1.3.5',
     permission_name: PermissionName.MarkdownMathEditor,
     note_type: NoteType.Markdown,
     file_type: 'md',
@@ -361,7 +364,7 @@ function editors(): EditorFeatureDescription[] {
     name: 'Task Editor',
     identifier: FeatureIdentifier.TaskEditor,
     note_type: NoteType.Task,
-    version: '1.3.7',
+    version: '1.3.8',
     file_type: 'md',
     interchangeable: false,
     permission_name: PermissionName.TaskEditor,
@@ -380,7 +383,7 @@ function editors(): EditorFeatureDescription[] {
     interchangeable: false,
     identifier: FeatureIdentifier.TokenVaultEditor,
     permission_name: PermissionName.TokenVaultEditor,
-    version: '2.0.7',
+    version: '2.0.9',
     description:
       'Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.',
     marketing_url: '',
@@ -392,7 +395,7 @@ function editors(): EditorFeatureDescription[] {
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Secure Spreadsheets',
     identifier: FeatureIdentifier.SheetsEditor,
-    version: '1.4.2',
+    version: '1.4.3',
     note_type: NoteType.Spreadsheet,
     file_type: 'json',
     interchangeable: false,
@@ -425,7 +428,6 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
       name: 'FileSafe',
       identifier: FeatureIdentifier.FileSafe,
       version: '2.0.10',
-      index_path: 'index.html',
       component_permissions: [
         {
           name: ComponentAction.StreamContextItem,
@@ -473,27 +475,7 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
     }
   )
 
-  const cloudlink: IframeComponentFeatureDescription = FillEditorComponentDefaults(
-    {
-      name: 'CloudLink',
-      identifier: FeatureIdentifier.CloudLink,
-      version: '1.3.1',
-      index_path: 'index.html',
-      component_permissions: [
-        {
-          name: ComponentAction.StreamItems,
-          content_types: [ContentType.ServerExtension],
-        },
-      ],
-      permission_name: PermissionName.CloudLink,
-      description:
-        'Manage and install cloud backups, including Note History, Dropbox, Google Drive, OneDrive, and Daily Email Backups.',
-      git_repo_url: '',
-      area: ComponentArea.Modal,
-    }
-  )
-
-  return [filesafe, folders, cloudlink]
+  return [filesafe, folders]
 }
 
 function serverFeatures(): ServerFeatureDescription[] {

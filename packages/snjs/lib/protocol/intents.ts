@@ -1,4 +1,4 @@
-import { ContentType } from './../models/content_types';
+import { ContentType } from '@standardnotes/common';
 /**
  * Only three types of items should be encrypted with a root key:
  * - A root key is encrypted with another root key in the case of root key wrapping
@@ -15,8 +15,6 @@ export function ContentTypeUsesRootKeyEncryption(contentType: ContentType) {
 
 export enum EncryptionIntent {
   Sync = 0,
-  /** Permissible only for server extensions */
-  SyncDecrypted = 1,
   LocalStorageEncrypted = 2,
   LocalStorageDecrypted = 3,
   /** Store encrypted if possible, but decrypted if not */
@@ -44,7 +42,6 @@ export function isFileIntent(intent: EncryptionIntent) {
 
 export function isDecryptedIntent(intent: EncryptionIntent) {
   return (
-    intent === EncryptionIntent.SyncDecrypted ||
     intent === EncryptionIntent.LocalStorageDecrypted ||
     intent === EncryptionIntent.FileDecrypted
   );

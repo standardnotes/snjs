@@ -1,10 +1,9 @@
+import { SNPreferencesService } from './preferences_service';
 import { Features, FeatureDescription } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
-import {
-  ContentType,
-  displayStringForContentType,
-} from '@Models/content_types';
+import { displayStringForContentType } from '@Models/content_types';
+import { ContentType } from '@standardnotes/common';
 import { PayloadSource } from '@Protocol/payloads/sources';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from '@Models/app/note';
@@ -68,6 +67,7 @@ export class SNComponentManager extends PureService<
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private featuresService: SNFeaturesService,
+    private preferencesSerivce: SNPreferencesService,
     protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
@@ -116,6 +116,7 @@ export class SNComponentManager extends PureService<
     (this.itemManager as unknown) = undefined;
     (this.syncService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
+    (this.preferencesSerivce as unknown) = undefined;
     this.removeItemObserver();
     (this.removeItemObserver as unknown) = undefined;
     if (window && !this.isMobile) {
@@ -128,13 +129,15 @@ export class SNComponentManager extends PureService<
   public createComponentViewer(
     component: SNComponent,
     contextItem?: UuidString,
-    actionObserver?: ActionObserver
+    actionObserver?: ActionObserver,
+    urlOverride?: string
   ): ComponentViewer {
     const viewer = new ComponentViewer(
       component,
       this.itemManager,
       this.syncService,
       this.alertService,
+      this.preferencesSerivce,
       this.featuresService,
       this.environment,
       this.platform,
@@ -142,7 +145,7 @@ export class SNComponentManager extends PureService<
         runWithPermissions: this.runWithPermissions.bind(this),
         urlsForActiveThemes: this.urlsForActiveThemes.bind(this),
       },
-      this.urlForComponent(component),
+      urlOverride || this.urlForComponent(component),
       contextItem,
       actionObserver
     );
@@ -162,19 +165,24 @@ export class SNComponentManager extends PureService<
 
   handleChangedComponents(
     components: SNComponent[],
-    source?: PayloadSource
+    source: PayloadSource
   ): void {
-    /**
-     * We only want to sync if the item source is Retrieved, not RemoteSaved to avoid
-     * recursion caused by the component being modified and saved after it is updated.
-     */
-    if (components.length > 0 && source !== PayloadSource.RemoteSaved) {
-      /* Ensure any component in our data is installed by the system */
-      if (this.isDesktop) {
-        const thirdPartyComponents = components.filter((component) => {
-          const nativeFeature = this.nativeFeatureForComponent(component);
-          return nativeFeature ? false : true;
-        });
+    const acceptableSources = [
+      PayloadSource.LocalChanged,
+      PayloadSource.RemoteRetrieved,
+      PayloadSource.LocalRetrieved,
+      PayloadSource.Constructor,
+    ];
+    if (components.length === 0 || !acceptableSources.includes(source)) {
+      return;
+    }
+
+    if (this.isDesktop) {
+      const thirdPartyComponents = components.filter((component) => {
+        const nativeFeature = this.nativeFeatureForComponent(component);
+        return nativeFeature ? false : true;
+      });
+      if (thirdPartyComponents.length > 0) {
         this.desktopManager?.syncComponentsInstallation(thirdPartyComponents);
       }
     }
@@ -297,8 +305,14 @@ export class SNComponentManager extends PureService<
       }
     }
 
+    const isWeb = this.environment === Environment.Web;
     if (nativeFeature) {
-      return `/components/${component.identifier}/${nativeFeature.index_path}`;
+      if (!isWeb) {
+        throw Error(
+          'Mobile must override urlForComponent to handle native paths'
+        );
+      }
+      return `${window.location.origin}/components/${component.identifier}/${nativeFeature.index_path}`;
     }
 
     let url = component.hosted_url || component.legacy_url;

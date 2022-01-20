@@ -1,7 +1,8 @@
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 import { SNPredicate } from '@Models/core/predicate';
-import { ContentType } from '../content_types';
+import { ContentType } from '@standardnotes/common';
+import { FeatureIdentifier } from '@standardnotes/features';
 
 export enum PrefKey {
   TagsPanelWidth = 'tagsPanelWidth',
@@ -20,6 +21,10 @@ export enum PrefKey {
   NotesHideNotePreview = 'hideNotePreview',
   NotesHideDate = 'hideDate',
   NotesHideTags = 'hideTags',
+  NotesHideEditorIcon = 'hideEditorIcon',
+  UseSystemColorScheme = 'useSystemColorScheme',
+  AutoLightThemeIdentifier = 'autoLightThemeIdentifier',
+  AutoDarkThemeIdentifier = 'autoDarkThemeIdentifier',
 }
 
 export type PrefValue = {
@@ -39,6 +44,10 @@ export type PrefValue = {
   [PrefKey.NotesHideNotePreview]: boolean;
   [PrefKey.NotesHideDate]: boolean;
   [PrefKey.NotesHideTags]: boolean;
+  [PrefKey.NotesHideEditorIcon]: boolean;
+  [PrefKey.UseSystemColorScheme]: boolean;
+  [PrefKey.AutoLightThemeIdentifier]: FeatureIdentifier | 'Default';
+  [PrefKey.AutoDarkThemeIdentifier]: FeatureIdentifier | 'Default';
 };
 
 export class SNUserPrefs extends SNItem {

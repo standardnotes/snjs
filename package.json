@@ -11,9 +11,12 @@
     "bootstrap": "lerna bootstrap",
     "start": "lerna run start --parallel",
     "test:unit": "lerna run test:unit --parallel",
+    "start:e2e:mocha": "yarn run start:test-server:dev",
+    "start:e2e:docker": "yarn run test:e2e:dev-setup",
     "start:test-server": "node e2e-server.js",
     "start:test-server:dev": "node e2e-server.js --dev",
-    "test:e2e": "bash test.sh",
+    "test:e2e": "bash test.sh stable",
+    "test:e2e:canary": "bash test.sh canary",
     "test:e2e:dev-server": "docker-compose up -d",
     "test:e2e:dev-setup": "docker-compose up",
     "test:e2e:dev": "mocha-headless-chrome --timeout 1200000 -f http://localhost:9002/packages/snjs/mocha/test.html?sync_server_host_name=localhost",
@@ -22,11 +25,13 @@
     "version-bump": "lerna version --sign-git-commit --sign-git-tag --conventional-commits --yes -m \"chore(release): publish\"",
     "version-bump-beta": "lerna version --sign-git-commit --sign-git-tag --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
     "publish-packages": "lerna publish from-git --yes",
-    "publish-packages-beta": "lerna publish from-git --yes --dist-tag beta"
+    "publish-packages-beta": "lerna publish from-git --yes --dist-tag beta",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "^14.14.22",
     "eslint": "^7.13.0",
+    "husky": "^7.0.4",
     "lerna": "^3.22.1"
   },
   "dependencies": {}
