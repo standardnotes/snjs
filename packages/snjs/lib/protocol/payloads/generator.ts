@@ -7,30 +7,62 @@ import { ContentType } from '@standardnotes/common';
 import { EncryptionIntent } from '@Protocol/intents';
 import { Copy, pickByCopy, uniqueArray } from '@Lib/utils';
 import { PayloadField } from '@Payloads/fields';
+import { SNItem } from '@Lib/models';
 
-export interface LegacyTagToNoteReference {
+export interface LegacyAnonymousReference {
   uuid: string;
   content_type: string;
+}
+
+export interface LegacyTagToNoteReference extends LegacyAnonymousReference {
+  content_type: ContentType.Note;
 }
 
 export enum ContenteReferenceType {
   TagToParentTag = 'TagToParentTag',
 }
 
-export interface TagToParentTagReference {
-  reference_type: ContenteReferenceType.TagToParentTag;
+export interface AnonymousReference {
   uuid: string;
-  content_type: string;
+  content_type: ContentType;
+  reference_type: ContenteReferenceType;
 }
 
-export type ContentReference =
-  | LegacyTagToNoteReference
-  | TagToParentTagReference;
+export interface TagToParentTagReference extends AnonymousReference {
+  content_type: ContentType.Tag;
+  reference_type: ContenteReferenceType.TagToParentTag;
+}
+
+export type NewReference = TagToParentTagReference;
+
+export type ContentReference = LegacyAnonymousReference | NewReference;
+
+export const isLegacyAnonymousReference = (
+  x: ContentReference
+): x is LegacyAnonymousReference => {
+  return (x as any).reference_type === undefined;
+};
+
+export const isNewReference = (x: ContentReference): x is NewReference => {
+  return (x as any).reference_type !== undefined;
+};
+
+export const isLegacyTagToNoteReference = (
+  x: LegacyAnonymousReference,
+  currentItem: SNItem
+): x is LegacyTagToNoteReference => {
+  const isReferenceToANote = x.content_type === ContentType.Note;
+  const isReferenceFromATag = currentItem.content_type === ContentType.Tag;
+  return isReferenceToANote && isReferenceFromATag;
+};
 
 export const isTagToParentTagReference = (
   x: ContentReference
 ): x is TagToParentTagReference => {
-  return (x as any).reference_type === ContenteReferenceType.TagToParentTag;
+  return (
+    isNewReference(x) &&
+    x.reference_type === ContenteReferenceType.TagToParentTag
+  );
 };
 
 export type PayloadContent = {
