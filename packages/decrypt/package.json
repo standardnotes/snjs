@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "webpack --mode='production'",
-    "postbuild": "inline-assets dist/index.html dist/decrypt.html && git add dist/decrypt.html",
+    "postbuild": "inline-assets dist/index.html dist/decrypt.html",
     "start": "webpack-dev-server --mode='development'"
   },
   "engines": {
