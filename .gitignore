@@ -34,3 +34,6 @@ syncing-server.env
 codeqldb
 
 packages/components/tmp
+
+packages/decrypt/dist/*
+!packages/decrypt/dist/decrypt.html

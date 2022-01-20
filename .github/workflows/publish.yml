@@ -31,6 +31,8 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+      - name: Add changes from decrypt.html
+        run: git add packages/decrypt/dist/decrypt.html
       - run: yarn version-bump
       - run: yarn publish-packages
         env:
