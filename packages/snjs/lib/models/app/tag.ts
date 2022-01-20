@@ -85,7 +85,9 @@ export class TagMutator extends ItemMutator {
   }
 
   public makeChildOf(tag: SNTag): void {
-    const references = this.item.references.filter(isTagToParentTagReference);
+    const references = this.item.references.filter(
+      (ref) => !isTagToParentTagReference(ref)
+    );
 
     const reference: TagToParentTagReference = {
       reference_type: ContenteReferenceType.TagToParentTag,
@@ -99,7 +101,9 @@ export class TagMutator extends ItemMutator {
   }
 
   public unsetParent(): void {
-    const references = this.item.references.filter(ref => !isTagToParentTagReference(ref));
+    const references = this.item.references.filter(
+      (ref) => !isTagToParentTagReference(ref)
+    );
     this.typedContent.references = references;
   }
 }
