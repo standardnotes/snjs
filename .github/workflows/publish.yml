@@ -24,7 +24,6 @@ jobs:
         run: |
           git config --global user.name "standardci"
           git config --global user.email "ci@standardnotes.com"
-      - run: ls -l ./packages/decrypt/dist/
       - name: check if decrypt package changed
         id: decrypt_check
         run: echo ::set-output name=decrypt_changed::$(npx lerna changed | grep "@standardnotes/decrypt")
@@ -32,7 +31,9 @@ jobs:
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: ls -l ./packages/decrypt/dist/
+      - run: echo ${{ steps.decrypt_check.outputs.decrypt_changed }}
+      - run: echo ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
+      - run: echo ${{ steps.decrypt_check.outputs.decrypt_changed == '0' }}
       - name: Publish to S3
         if: ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
         uses: jakejarvis/s3-sync-action@master
@@ -42,7 +43,7 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.AWS_DOWNLOADS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: ./packages/decrypt/dist/decrypt.html
+          SOURCE_DIR: ./packages/decrypt/dist
       - name: Invalidate CloudFront Cache
         if: ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
         uses: chetan/invalidate-cloudfront-action@master
