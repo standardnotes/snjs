@@ -19,18 +19,13 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
+      - run: ls -l ./packages/decrypt/dist/
       - run: yarn build
       - name: setup git config
         run: |
           git config --global user.name "standardci"
           git config --global user.email "ci@standardnotes.com"
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
+      - run: ls -l ./packages/decrypt/dist/
       - name: check if decrypt package changed
         id: decrypt_check
         run: echo ::set-output name=decrypt_changed::$(npx lerna changed | grep "@standardnotes/decrypt")
@@ -38,8 +33,10 @@ jobs:
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - uses: jakejarvis/s3-sync-action@master
+      - run: ls -l ./packages/decrypt/dist/
+      - name: Publish to S3
         if: ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
+        uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
         env:
