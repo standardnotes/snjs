@@ -26,7 +26,10 @@ jobs:
           git config --global user.email "ci@standardnotes.com"
       - name: check if decrypt package changed
         id: decrypt_check
-        run: echo ::set-output name=decrypt_changed::$(npx lerna changed | grep "@standardnotes/decrypt")
+        run: |
+          npx lerna changed | grep "@standardnotes/decrypt"
+          status=$?
+          echo ::set-output name=decrypt_changed::$status
       - run: yarn version-bump
       - run: yarn publish-packages
         env:
