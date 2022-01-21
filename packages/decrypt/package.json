@@ -1,17 +1,25 @@
 {
   "name": "@standardnotes/decrypt",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "scripts": {
     "build": "webpack --mode='production'",
     "postbuild": "inline-assets dist/index.html dist/decrypt.html",
     "start": "webpack-dev-server --mode='development'"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
   "dependencies": {
-    "@standardnotes/sncrypto-web": "^1.2.9",
-    "@standardnotes/snjs": "^2.35.6"
+    "@standardnotes/sncrypto-web": "^1.6.1",
+    "@standardnotes/snjs": "^2.41.1"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^10.2.0",

@@ -40,7 +40,10 @@ export function getGlobalScope(): Window & typeof globalThis {
  * @access public
  */
 export function ieOrEdge(): boolean {
-  return (typeof document !== 'undefined' && !!document.documentMode) || /Edge/.test(navigator.userAgent)
+  return (
+    (typeof document !== 'undefined' && !!document.documentMode) ||
+    /Edge/.test(navigator.userAgent)
+  )
 }
 
 /**
@@ -48,7 +51,9 @@ export function ieOrEdge(): boolean {
  * @access public
  */
 export function isWebCryptoAvailable(): boolean {
-  return !ieOrEdge() && getGlobalScope().crypto && !!getGlobalScope().crypto.subtle
+  return (
+    !ieOrEdge() && getGlobalScope().crypto && !!getGlobalScope().crypto.subtle
+  )
 }
 
 /**
@@ -84,7 +89,9 @@ export async function stringToArrayBuffer(string: string): Promise<Uint8Array> {
  * Converts an ArrayBuffer into a plain string
  * @param {ArrayBuffer} arrayBuffer
  */
-export async function arrayBufferToString(arrayBuffer: ArrayBuffer): Promise<string> {
+export async function arrayBufferToString(
+  arrayBuffer: ArrayBuffer,
+): Promise<string> {
   await ready
   return to_string(arrayBuffer as Uint8Array)
 }
@@ -93,7 +100,9 @@ export async function arrayBufferToString(arrayBuffer: ArrayBuffer): Promise<str
  * Converts an ArrayBuffer into a hex string
  * @param arrayBuffer
  */
-export async function arrayBufferToHexString(arrayBuffer: ArrayBuffer): Promise<string> {
+export async function arrayBufferToHexString(
+  arrayBuffer: ArrayBuffer,
+): Promise<string> {
   await ready
   return to_hex(Buffer.from(arrayBuffer))
 }
@@ -121,7 +130,9 @@ export async function base64ToArrayBuffer(base64: string): Promise<Uint8Array> {
  * Converts an ArrayBuffer into a base64 string
  * @param buffer
  */
-export async function arrayBufferToBase64(arrayBuffer: ArrayBuffer): Promise<string> {
+export async function arrayBufferToBase64(
+  arrayBuffer: ArrayBuffer,
+): Promise<string> {
   await ready
   return to_base64(Buffer.from(arrayBuffer), SN_BASE64_VARIANT)
 }
@@ -199,8 +210,9 @@ export function base32Decode(b32Input: string): ArrayBuffer {
   const input = b32Input.toUpperCase().replace(/=+$/, '')
 
   for (let i = 0; i < input.length; i++) {
-    if (!RFC4648.includes(input[i]))
-    {throw new Error(`Invalid RFC4648 char ${input[i]} at index ${i}`)}
+    if (!RFC4648.includes(input[i])) {
+      throw new Error(`Invalid RFC4648 char ${input[i]} at index ${i}`)
+    }
   }
 
   const output = new Uint8Array(((input.length * 5) / 8) | 0)
@@ -225,7 +237,7 @@ export function base32Decode(b32Input: string): ArrayBuffer {
 /**
  * Truncate HMAC-SHA1 calculated value for HOTP code generation
  */
-export function truncateOTP(hsBuffer: ArrayBuffer):number {
+export function truncateOTP(hsBuffer: ArrayBuffer): number {
   const hs = new Uint8Array(hsBuffer)
   // First we take the last byte of our generated HS and extract last 4 bits out of it.
   // This will be our _offset_, a number between 0 and 15.
@@ -249,7 +261,7 @@ export function truncateOTP(hsBuffer: ArrayBuffer):number {
 /**
  * Pad HOTP counter with leading zeros producing an 8 byte array
  */
-export function padStart(counter: number):ArrayBuffer {
+export function padStart(counter: number): ArrayBuffer {
   const buffer = new ArrayBuffer(8)
   const bView = new DataView(buffer)
 

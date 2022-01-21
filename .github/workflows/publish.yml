@@ -24,21 +24,11 @@ jobs:
         run: |
           git config --global user.name "standardci"
           git config --global user.email "ci@standardnotes.com"
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-      - name: Commit @standardnotes/decrypt built files
-        run: |
-          git diff --quiet packages/decrypt/dist/ || 
-          git commit packages/decrypt/dist/ -m 'chore: build @standardnotes/decrypt' --no-verify
       - run: yarn version-bump
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 
   git-sync:
     needs: publish
