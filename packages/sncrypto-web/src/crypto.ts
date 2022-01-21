@@ -1,5 +1,6 @@
 import * as Utils from './utils'
 import * as sodium from './libsodium'
+import { SodiumConstants } from './constants'
 
 import {
   Base64String,
@@ -30,6 +31,15 @@ enum WebCryptoActions {
 type WebCryptoParams = {
   name: string
   hash?: string
+}
+
+type StreamEncryptor = {
+  state: sodium.StateAddress
+  header: Uint8Array
+}
+
+type StreamDecryptor = {
+  state: sodium.StateAddress
 }
 
 /**
@@ -322,6 +332,74 @@ export class SNWebCrypto implements SNPureCrypto {
     } catch {
       return null
     }
+  }
+
+  async xchacha20StreamEncryptInitEncryptor(
+    key: HexString,
+  ): Promise<StreamEncryptor> {
+    await this.ready
+    const res = sodium.crypto_secretstream_xchacha20poly1305_init_push(
+      await Utils.hexStringToArrayBuffer(key),
+    )
+    return {
+      state: res.state,
+      header: res.header,
+    }
+  }
+
+  async xchacha20StreamEncryptorPush(
+    encryptor: StreamEncryptor,
+    plainBuffer: Uint8Array,
+    aad = '',
+    tag = 0,
+  ): Promise<Uint8Array> {
+    await this.ready
+    const encryptedBuffer = sodium.crypto_secretstream_xchacha20poly1305_push(
+      encryptor.state,
+      plainBuffer,
+      aad.length > 0 ? await Utils.stringToArrayBuffer(aad) : null,
+      tag,
+    )
+    return encryptedBuffer
+  }
+
+  async xchacha20StreamEncryptInitDecryptor(
+    header: Uint8Array,
+    key: HexString,
+  ): Promise<StreamDecryptor> {
+    await this.ready
+    if (
+      header.length !==
+      SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES
+    ) {
+      throw new Error(
+        `Header must be ${SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES} bytes long`,
+      )
+    }
+    const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(
+      header,
+      await Utils.hexStringToArrayBuffer(key),
+    )
+    return { state }
+  }
+
+  async xchacha20StreamDecryptorPush(
+    decryptor: StreamDecryptor,
+    encryptedBuffer: Uint8Array,
+    aad = '',
+  ): Promise<Uint8Array> {
+    if (
+      encryptedBuffer.length <
+      SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
+    ) {
+      throw new Error('Invalid ciphertext size')
+    }
+    const out = sodium.crypto_secretstream_xchacha20poly1305_pull(
+      decryptor.state,
+      encryptedBuffer,
+      aad.length > 0 ? await Utils.stringToArrayBuffer(aad) : null,
+    )
+    return out.message
   }
 
   /**

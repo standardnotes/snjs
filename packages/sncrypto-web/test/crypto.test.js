@@ -198,6 +198,60 @@ describe('crypto operations', async function () {
     expect(decrypted).to.equal(plaintext)
   })
 
+  it.only('xchacha20 streaming encrypt/decrypt', async function () {
+    const key = await webCrypto.generateRandomKey(256)
+    const bigFile = await fetch(
+      'http://localhost:9003/test/resources/big_file.md',
+    )
+    const bigText = await bigFile.text()
+    const plaintext = bigText
+    const plainBuffer = await stringToArrayBuffer(plaintext)
+    const encryptor = await webCrypto.xchacha20StreamEncryptInitEncryptor(key)
+
+    let encryptedBuffer = Buffer.concat([encryptor.header])
+    const pushChunkSize = plainBuffer.length / 200
+    const pullChunkSize =
+      pushChunkSize +
+      SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
+
+    for (let i = 0; i < plainBuffer.length; i += pushChunkSize) {
+      const readUntil =
+        i + pushChunkSize > plainBuffer.length
+          ? plainBuffer.length
+          : i + pushChunkSize
+      const chunk = await webCrypto.xchacha20StreamEncryptorPush(
+        encryptor,
+        plainBuffer.slice(i, readUntil),
+      )
+      encryptedBuffer = Buffer.concat([encryptedBuffer, chunk])
+    }
+
+    const decryptor = await webCrypto.xchacha20StreamEncryptInitDecryptor(
+      encryptor.header,
+      key,
+    )
+
+    let decryptedBuffer = Buffer.alloc(0)
+    for (
+      let i = encryptor.header.length;
+      i < encryptedBuffer.length;
+      i += pullChunkSize
+    ) {
+      const readUntil =
+        i + pullChunkSize > encryptedBuffer.length
+          ? encryptedBuffer.length
+          : i + pullChunkSize
+      const chunk = await webCrypto.xchacha20StreamDecryptorPush(
+        decryptor,
+        encryptedBuffer.slice(i, readUntil),
+      )
+      decryptedBuffer = Buffer.concat([decryptedBuffer, chunk])
+    }
+
+    const decryptedPlain = await arrayBufferToString(decryptedBuffer)
+    expect(decryptedPlain).to.equal(plaintext)
+  })
+
   it('xchacha20 should fail with nonmatching aad', async function () {
     const key = await webCrypto.generateRandomKey(256)
     const nonce = await webCrypto.generateRandomKey(192)
