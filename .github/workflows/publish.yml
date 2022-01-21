@@ -19,7 +19,6 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --pure-lockfile
-      - run: ls -l ./packages/decrypt/dist/
       - run: yarn build
       - name: setup git config
         run: |
