@@ -246,4 +246,5 @@ export { Features, FeatureIdentifier } from '@standardnotes/features';
 export { RoleName } from '@standardnotes/auth';
 export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
+export { Migration2_42_0 } from './migrations/2_42_0';
 export { ApplicationStage } from '@Lib/stages';
