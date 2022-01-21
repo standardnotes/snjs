@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.4](https://github.com/standardnotes/snjs/compare/@standardnotes/decrypt@1.1.3...@standardnotes/decrypt@1.1.4) (2022-01-21)
+
+
+### Bug Fixes
+
+* publish config to public for @standardnotes/decrypt ([8514769](https://github.com/standardnotes/snjs/commit/8514769672bf66dcf71b7e63061ca4ce6bcfff90))
+
+
+
+
+
 ## [1.1.3](https://github.com/standardnotes/snjs/compare/@standardnotes/decrypt@1.1.2...@standardnotes/decrypt@1.1.3) (2022-01-21)
 
 
