@@ -10,20 +10,9 @@
     "declaration": true,
     "outDir": "dist",
     "inlineSourceMap": true,
-    "types": [
-      "node"
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "typings"
-    ]
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types", "typings"]
   },
-  "include": [
-    "src/**/*",
-    "typings/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "test/**/*"
-  ]
+  "include": ["src/**/*", "typings/**/*"],
+  "exclude": ["node_modules", "test/**/*"]
 }

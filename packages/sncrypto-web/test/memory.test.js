@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import './vendor/chai-as-promised-built.js';
+import './vendor/chai-as-promised-built.js'
 
-chai.use(chaiAsPromised);
+chai.use(chaiAsPromised)
 
 /**
  * Simple empty test page to create and deinit empty page
@@ -10,8 +10,8 @@ chai.use(chaiAsPromised);
  */
 describe('memory', async function () {
   it('cleanup', function () {
-    this.webCrypto = new SNWebCrypto();
-    this.webCrypto.deinit();
-    this.webCrypto = null;
-  });
-});
+    this.webCrypto = new SNWebCrypto()
+    this.webCrypto.deinit()
+    this.webCrypto = null
+  })
+})

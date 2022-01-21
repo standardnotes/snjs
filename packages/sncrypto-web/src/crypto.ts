@@ -17,14 +17,14 @@ enum WebCryptoAlgs {
   Sha256 = 'SHA-256',
   Pbkdf2 = 'PBKDF2',
   Sha1 = 'SHA-1',
-  Hmac = 'HMAC'
+  Hmac = 'HMAC',
 }
 
 enum WebCryptoActions {
   DeriveBits = 'deriveBits',
   Encrypt = 'encrypt',
   Decrypt = 'decrypt',
-  Sign = 'sign'
+  Sign = 'sign',
 }
 
 type WebCryptoParams = {
@@ -75,14 +75,12 @@ export class SNWebCrypto implements SNPureCrypto {
     password: Utf8String,
     salt: Utf8String,
     iterations: number,
-    length: number
+    length: number,
   ): Promise<HexString | null> {
     const keyData = await Utils.stringToArrayBuffer(password)
-    const key = await this.webCryptoImportKey(
-      keyData,
-      WebCryptoAlgs.Pbkdf2,
-      [WebCryptoActions.DeriveBits]
-    )
+    const key = await this.webCryptoImportKey(keyData, WebCryptoAlgs.Pbkdf2, [
+      WebCryptoActions.DeriveBits,
+    ])
     if (!key) {
       console.error('Key is null, unable to continue')
       return null
@@ -92,53 +90,43 @@ export class SNWebCrypto implements SNPureCrypto {
 
   public async generateRandomKey(bits: number): Promise<string> {
     const bytes = bits / 8
-    const arrayBuffer = Utils.getGlobalScope().crypto.getRandomValues(new Uint8Array(bytes))
+    const arrayBuffer = Utils.getGlobalScope().crypto.getRandomValues(
+      new Uint8Array(bytes),
+    )
     return Utils.arrayBufferToHexString(arrayBuffer)
   }
 
   public async aes256CbcEncrypt(
     plaintext: Utf8String,
     iv: HexString,
-    key: HexString
+    key: HexString,
   ): Promise<Base64String> {
     const keyData = await Utils.hexStringToArrayBuffer(key)
     const ivData = await Utils.hexStringToArrayBuffer(iv)
     const alg = { name: WebCryptoAlgs.AesCbc, iv: ivData }
-    const importedKeyData = await this.webCryptoImportKey(
-      keyData,
-      alg.name,
-      [WebCryptoActions.Encrypt]
-    )
+    const importedKeyData = await this.webCryptoImportKey(keyData, alg.name, [
+      WebCryptoActions.Encrypt,
+    ])
     const textData = await Utils.stringToArrayBuffer(plaintext)
-    const result = await crypto.subtle.encrypt(
-      alg,
-      importedKeyData,
-      textData
-    )
+    const result = await crypto.subtle.encrypt(alg, importedKeyData, textData)
     return Utils.arrayBufferToBase64(result)
   }
 
   public async aes256CbcDecrypt(
     ciphertext: Base64String,
     iv: HexString,
-    key: HexString
+    key: HexString,
   ): Promise<Utf8String | null> {
     const keyData = await Utils.hexStringToArrayBuffer(key)
     const ivData = await Utils.hexStringToArrayBuffer(iv)
     const alg = { name: WebCryptoAlgs.AesCbc, iv: ivData }
-    const importedKeyData = await this.webCryptoImportKey(
-      keyData,
-      alg.name,
-      [WebCryptoActions.Decrypt]
-    )
+    const importedKeyData = await this.webCryptoImportKey(keyData, alg.name, [
+      WebCryptoActions.Decrypt,
+    ])
     const textData = await Utils.base64ToArrayBuffer(ciphertext)
 
     try {
-      const result = await crypto.subtle.decrypt(
-        alg,
-        importedKeyData,
-        textData
-      )
+      const result = await crypto.subtle.decrypt(alg, importedKeyData, textData)
 
       return Utils.arrayBufferToString(result)
     } catch {
@@ -148,14 +136,14 @@ export class SNWebCrypto implements SNPureCrypto {
 
   public async hmac256(
     message: Utf8String,
-    key: HexString
+    key: HexString,
   ): Promise<HexString | null> {
     const keyHexData = await Utils.hexStringToArrayBuffer(key)
     const keyData = await this.webCryptoImportKey(
       keyHexData,
       WebCryptoAlgs.Hmac,
       [WebCryptoActions.Sign],
-      { name: WebCryptoAlgs.Sha256 }
+      { name: WebCryptoAlgs.Sha256 },
     )
     const messageData = await Utils.stringToArrayBuffer(message)
     const funcParams = { name: WebCryptoAlgs.Hmac }
@@ -164,7 +152,7 @@ export class SNWebCrypto implements SNPureCrypto {
       const signature = await crypto.subtle.sign(
         funcParams,
         keyData,
-        messageData
+        messageData,
       )
 
       return Utils.arrayBufferToHexString(signature)
@@ -183,14 +171,14 @@ export class SNWebCrypto implements SNPureCrypto {
 
   public async hmac1(
     message: Utf8String,
-    key: HexString
+    key: HexString,
   ): Promise<HexString | null> {
     const keyHexData = await Utils.hexStringToArrayBuffer(key)
     const keyData = await this.webCryptoImportKey(
       keyHexData,
       WebCryptoAlgs.Hmac,
       [WebCryptoActions.Sign],
-      { name: WebCryptoAlgs.Sha1 }
+      { name: WebCryptoAlgs.Sha1 },
     )
     const messageData = await Utils.stringToArrayBuffer(message)
     const funcParams = { name: WebCryptoAlgs.Hmac }
@@ -199,7 +187,7 @@ export class SNWebCrypto implements SNPureCrypto {
       const signature = await crypto.subtle.sign(
         funcParams,
         keyData,
-        messageData
+        messageData,
       )
 
       return Utils.arrayBufferToHexString(signature)
@@ -235,7 +223,7 @@ export class SNWebCrypto implements SNPureCrypto {
     keyData: Uint8Array,
     alg: WebCryptoAlgs,
     actions: Array<WebCryptoActions>,
-    hash?: WebCryptoParams
+    hash?: WebCryptoParams,
   ): Promise<CryptoKey> {
     return subtleCrypto.importKey(
       'raw',
@@ -245,7 +233,7 @@ export class SNWebCrypto implements SNPureCrypto {
         hash: hash,
       },
       false,
-      actions
+      actions,
     )
   }
 
@@ -258,7 +246,7 @@ export class SNWebCrypto implements SNPureCrypto {
     key: CryptoKey,
     salt: Utf8String,
     iterations: number,
-    length: number
+    length: number,
   ): Promise<HexString> {
     const params = {
       name: WebCryptoAlgs.Pbkdf2,
@@ -277,7 +265,7 @@ export class SNWebCrypto implements SNPureCrypto {
     salt: HexString,
     iterations: number,
     bytes: number,
-    length: number
+    length: number,
   ): Promise<HexString> {
     await this.ready
     const result = sodium.crypto_pwhash(
@@ -287,7 +275,7 @@ export class SNWebCrypto implements SNPureCrypto {
       iterations,
       bytes,
       sodium.crypto_pwhash_ALG_DEFAULT,
-      'hex'
+      'hex',
     )
     return result
   }
@@ -296,7 +284,7 @@ export class SNWebCrypto implements SNPureCrypto {
     plaintext: Utf8String,
     nonce: HexString,
     key: HexString,
-    assocData: Utf8String
+    assocData: Utf8String,
   ): Promise<Base64String> {
     await this.ready
     if (nonce.length !== 48) {
@@ -307,7 +295,7 @@ export class SNWebCrypto implements SNPureCrypto {
       assocData,
       null,
       await Utils.hexStringToArrayBuffer(nonce),
-      await Utils.hexStringToArrayBuffer(key)
+      await Utils.hexStringToArrayBuffer(key),
     )
     return Utils.arrayBufferToBase64(arrayBuffer)
   }
@@ -316,7 +304,7 @@ export class SNWebCrypto implements SNPureCrypto {
     ciphertext: Base64String,
     nonce: HexString,
     key: HexString,
-    assocData: Utf8String | Uint8Array
+    assocData: Utf8String | Uint8Array,
   ): Promise<Utf8String | null> {
     await this.ready
     if (nonce.length !== 48) {
@@ -329,7 +317,7 @@ export class SNWebCrypto implements SNPureCrypto {
         assocData,
         await Utils.hexStringToArrayBuffer(nonce),
         await Utils.hexStringToArrayBuffer(key),
-        'text'
+        'text',
       )
     } catch {
       return null
@@ -346,7 +334,7 @@ export class SNWebCrypto implements SNPureCrypto {
     const bits = 160
     const bytes = bits / 8
     const secretBytes = Utils.getGlobalScope().crypto.getRandomValues(
-      new Uint8Array(bytes)
+      new Uint8Array(bytes),
     )
     const secret = Utils.base32Encode(secretBytes)
     return secret
@@ -364,18 +352,22 @@ export class SNWebCrypto implements SNPureCrypto {
   public async hotpToken(
     secret: string,
     counter: number,
-    tokenLength = 6
+    tokenLength = 6,
   ): Promise<string> {
     const bytes = new Uint8Array(Utils.base32Decode(secret))
 
-    const key = await this.webCryptoImportKey(bytes, WebCryptoAlgs.Hmac,
-      [WebCryptoActions.Sign], { name:WebCryptoAlgs.Sha1 })
+    const key = await this.webCryptoImportKey(
+      bytes,
+      WebCryptoAlgs.Hmac,
+      [WebCryptoActions.Sign],
+      { name: WebCryptoAlgs.Sha1 },
+    )
 
     const counterArray = Utils.padStart(counter)
     const hs = await Utils.getSubtleCrypto().sign('HMAC', key, counterArray)
     const sNum = Utils.truncateOTP(hs)
     const padded = ('0'.repeat(tokenLength) + (sNum % 10 ** tokenLength)).slice(
-      -tokenLength
+      -tokenLength,
     )
 
     return padded
@@ -395,7 +387,7 @@ export class SNWebCrypto implements SNPureCrypto {
     secret: string,
     timestamp: number,
     tokenLength = 6,
-    step = 30
+    step = 30,
   ): Promise<string> {
     const time = Math.floor(timestamp / step / 1000.0)
     const token = await this.hotpToken(secret, time, tokenLength)
