@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/standardnotes/snjs/compare/@standardnotes/decrypt@1.1.2...@standardnotes/decrypt@1.1.3) (2022-01-21)
+
+
+### Bug Fixes
+
+* remove publishing dist folder for @standardnotes/decrypt package ([22e72d8](https://github.com/standardnotes/snjs/commit/22e72d821429107289ebf1200dbe85144e0a1fbd))
+* what files are published in @standardnotes/decrypt package ([7a20d32](https://github.com/standardnotes/snjs/commit/7a20d32ff54c98defb832b100dfb1625f9e5713d))
+
+
+
+
+
 ## [1.1.2](https://github.com/standardnotes/snjs/compare/@standardnotes/decrypt@1.1.1...@standardnotes/decrypt@1.1.2) (2022-01-21)
 
 **Note:** Version bump only for package @standardnotes/decrypt
