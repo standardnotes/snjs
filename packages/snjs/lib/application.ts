@@ -494,8 +494,8 @@ export class SNApplication {
   /**
    * Finds an item by predicate.
    */
-  public findItems(predicate: SNPredicate): SNItem[] {
-    return this.itemManager.itemsMatchingPredicate(predicate);
+  public findItems(contentType: ContentType, predicate: SNPredicate): SNItem[] {
+    return this.itemManager.itemsMatchingPredicate(contentType, predicate);
   }
 
   /**
@@ -1758,9 +1758,12 @@ export class SNApplication {
 
   public getCloudProviderIntegrationUrl(
     cloudProviderName: CloudProvider,
-    isDevEnvironment: boolean,
+    isDevEnvironment: boolean
   ): string {
-    return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName, isDevEnvironment);
+    return this.settingsService.getCloudProviderIntegrationUrl(
+      cloudProviderName,
+      isDevEnvironment
+    );
   }
 
   private constructServices() {

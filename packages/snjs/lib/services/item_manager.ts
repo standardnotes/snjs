@@ -833,7 +833,7 @@ export class ItemManager extends PureService {
   /**
    * Returns all items which are properly decrypted
    */
-  nonErroredItemsForContentType(contentType: ContentType) {
+  nonErroredItemsForContentType(contentType: ContentType): SNItem[] {
     const items = this.collection.all(contentType);
     return items.filter((item) => !item.errorDecrypting && !item.waitingForKey);
   }
@@ -841,15 +841,22 @@ export class ItemManager extends PureService {
   /**
    * Returns all items matching a given predicate
    */
-  public itemsMatchingPredicate(predicate: SNPredicate) {
-    return this.itemsMatchingPredicates([predicate]);
+  public itemsMatchingPredicate(
+    contentType: ContentType,
+    predicate: SNPredicate
+  ): SNItem[] {
+    return this.itemsMatchingPredicates(contentType, [predicate]);
   }
 
   /**
    * Returns all items matching an array of predicates
    */
-  public itemsMatchingPredicates(predicates: SNPredicate[]) {
-    return this.subItemsMatchingPredicates(this.items, predicates);
+  public itemsMatchingPredicates(
+    contentType: ContentType,
+    predicates: SNPredicate[]
+  ): SNItem[] {
+    const subItems = this.getItems(contentType);
+    return this.subItemsMatchingPredicates(subItems, predicates);
   }
 
   /**
@@ -859,7 +866,7 @@ export class ItemManager extends PureService {
   public subItemsMatchingPredicates(
     items: SNItem[],
     predicates: SNPredicate[]
-  ) {
+  ): SNItem[] {
     const results = items.filter((item) => {
       if (item.deleted) {
         return false;

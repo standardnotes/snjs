@@ -9,21 +9,29 @@ export class Migration2_7_0 extends Migration {
   }
 
   protected registerStageHandlers(): void {
-    this.registerStageHandler(ApplicationStage.FullSyncCompleted_13, async () => {
-      await this.deleteBatchManagerSingleton();
-      this.markDone();
-    });
+    this.registerStageHandler(
+      ApplicationStage.FullSyncCompleted_13,
+      async () => {
+        await this.deleteBatchManagerSingleton();
+        this.markDone();
+      }
+    );
   }
 
   private async deleteBatchManagerSingleton() {
     const batchMgrId = 'org.standardnotes.batch-manager';
     const batchMgrPred = SNPredicate.CompoundPredicate([
       new SNPredicate('content_type', '=', ContentType.Component),
-      new SNPredicate('package_info.identifier', '=', batchMgrId)
+      new SNPredicate('package_info.identifier', '=', batchMgrId),
     ]);
-    const batchMgrSingleton = this.services.singletonManager.findSingleton(batchMgrPred);
+    const batchMgrSingleton = this.services.singletonManager.findSingleton(
+      ContentType.Component,
+      batchMgrPred
+    );
     if (batchMgrSingleton) {
-      await this.services.itemManager.setItemToBeDeleted(batchMgrSingleton.uuid);
+      await this.services.itemManager.setItemToBeDeleted(
+        batchMgrSingleton.uuid
+      );
     }
   }
 }
