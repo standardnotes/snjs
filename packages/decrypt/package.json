@@ -11,6 +11,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
