@@ -27,7 +27,7 @@ jobs:
       - name: check if decrypt package changed
         id: decrypt_check
         run: |
-          npx lerna changed | grep "@standardnotes/decrypt"
+          changes=$(npx lerna changed | grep "@standardnotes/decrypt")
           status=$?
           echo ::set-output name=decrypt_changed::$status
       - run: yarn version-bump
