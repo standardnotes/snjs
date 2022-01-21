@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/decrypt",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "scripts": {
     "build": "webpack --mode='production'",
     "postbuild": "inline-assets dist/index.html dist/decrypt.html",
@@ -18,8 +18,8 @@
     "node": ">=14.0.0 <17.0.0"
   },
   "dependencies": {
-    "@standardnotes/sncrypto-web": "^1.6.1",
-    "@standardnotes/snjs": "^2.41.1"
+    "@standardnotes/sncrypto-web": "^1.6.2",
+    "@standardnotes/snjs": "^2.42.0"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^10.2.0",

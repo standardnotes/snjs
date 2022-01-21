@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.42.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.41.1...@standardnotes/snjs@2.42.0) (2022-01-21)
+
+
+### Bug Fixes
+
+* automatically delete component duplicates based on identifier ([#566](https://github.com/standardnotes/snjs/issues/566)) ([eb161cd](https://github.com/standardnotes/snjs/commit/eb161cd07b9586cc4f2bbc59709ce590f16f75df))
+
+
+### Features
+
+* add migration to remove NoDistraction theme ([#511](https://github.com/standardnotes/snjs/issues/511)) ([7a0a870](https://github.com/standardnotes/snjs/commit/7a0a870c4742fad5440f1f7d68e84d3d519f1b6e))
+
+
+
+
+
 ## [2.41.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.41.0...@standardnotes/snjs@2.41.1) (2022-01-21)
 
 **Note:** Version bump only for package @standardnotes/snjs
