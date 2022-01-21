@@ -31,10 +31,32 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+      - name: check if decrypt package changed
+        id: decrypt_check
+        run: echo ::set-output name=decrypt_changed::$(npx lerna changed | grep "@standardnotes/decrypt")
       - run: yarn version-bump
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: jakejarvis/s3-sync-action@master
+        if: ${{ steps.decrypt_check.outputs.decrypt_changed }} == 0
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_DOWNLOADS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'packages/decrypt/dist/decrypt.html'
+      - name: Invalidate CloudFront Cache
+        if: ${{ steps.decrypt_check.outputs.decrypt_changed }} == 0
+        uses: chetan/invalidate-cloudfront-action@master
+        env:
+          DISTRIBUTION: ${{ secrets.DOWNLOADS_DISTRIBUTION }}
+          PATHS: '/*'
+          AWS_REGION: 'us-east-1'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
 
   git-sync:
     needs: publish
