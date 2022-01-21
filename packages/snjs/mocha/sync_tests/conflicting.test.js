@@ -16,14 +16,19 @@ describe('online conflict handling', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+
+    this.context = await Factory.createAppContext();
+    await this.context.launch();
+    this.application = this.context.application;
+    this.email = this.context.email;
+    this.password = this.context.password;
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
     });
+
     this.sharedFinalAssertions = async function () {
       expect(this.application.syncService.isOutOfSync()).to.equal(false);
       const items = this.application.itemManager.items;
@@ -573,8 +578,11 @@ describe('online conflict handling', function () {
      * be something like 160. */
     const largeItemCount = SyncUpDownLimit + 10;
     await Factory.createManyMappedNotes(this.application, largeItemCount);
+
     /** Upload */
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
+
     this.expectedItemCount += largeItemCount;
     const items = this.application.itemManager.items;
     expect(items.length).to.equal(this.expectedItemCount);
@@ -583,6 +591,7 @@ describe('online conflict handling', function () {
      * the server as dirty, with no sync token, so that the server also
      * gives us everything it has.
      */
+    this.application.syncService.lockSyncing();
     const yesterday = Factory.yesterday();
     for (const note of this.application.itemManager.notes) {
       /** First modify the item without saving so that
@@ -597,8 +606,12 @@ describe('online conflict handling', function () {
       // We expect all the notes to be duplicated.
       this.expectedItemCount++;
     }
+    this.application.syncService.unlockSyncing();
+
     await this.application.syncService.clearSyncPositionTokens();
-    await this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync(syncOptions);
+    await this.context.awaitNextSucessfulSync();
+
     expect(this.application.itemManager.notes.length).to.equal(
       largeItemCount * 2
     );
@@ -606,9 +619,7 @@ describe('online conflict handling', function () {
   }).timeout(60000);
 
   it('duplicating an item should maintian its relationships', async function () {
-    const payload1 = Factory.createStorageItemPayload(
-      ContentType.Tag
-    );
+    const payload1 = Factory.createStorageItemPayload(ContentType.Tag);
     const payload2 = Factory.createStorageItemPayload(ContentType.UserPrefs);
     this.expectedItemCount -= 1; /** auto-created user preferences  */
     await this.application.itemManager.emitItemsFromPayloads(
@@ -616,21 +627,16 @@ describe('online conflict handling', function () {
       PayloadSource.LocalChanged
     );
     this.expectedItemCount += 2;
-    let tag = this.application.itemManager.getItems(
-      ContentType.Tag
-    )[0];
+    let tag = this.application.itemManager.getItems(ContentType.Tag)[0];
     let userPrefs = this.application.itemManager.getItems(
       ContentType.UserPrefs
     )[0];
     expect(tag).to.be.ok;
     expect(userPrefs).to.be.ok;
 
-    tag = await this.application.itemManager.changeItem(
-      tag.uuid,
-      (mutator) => {
-        mutator.addItemAsRelationship(userPrefs);
-      }
-    );
+    tag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
+      mutator.addItemAsRelationship(userPrefs);
+    });
 
     await this.application.itemManager.setItemDirty(userPrefs.uuid);
     userPrefs = this.application.findItem(userPrefs.uuid);
@@ -647,15 +653,12 @@ describe('online conflict handling', function () {
       this.expectedItemCount
     );
 
-    tag = await this.application.itemManager.changeItem(
-      tag.uuid,
-      (mutator) => {
-        mutator.content.title = `${Math.random()}`;
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
-      }
-    );
+    tag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
+      mutator.content.title = `${Math.random()}`;
+      mutator.updated_at_timestamp = Factory.dateToMicroseconds(
+        Factory.yesterday()
+      );
+    });
     await this.application.syncService.sync({ ...syncOptions, awaitAll: true });
 
     // fooItem should now be conflicted and a copy created
@@ -666,9 +669,7 @@ describe('online conflict handling', function () {
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
 
-    const fooItems = this.application.itemManager.getItems(
-      ContentType.Tag
-    );
+    const fooItems = this.application.itemManager.getItems(ContentType.Tag);
     const fooItem2 = fooItems[1];
 
     expect(fooItem2.content.conflict_of).to.equal(tag.uuid);

@@ -107,8 +107,7 @@ describe('singletons', function () {
     );
   });
 
-  it('resolves registered predicate', async function () {
-    this.application.singletonManager.registerPredicate(this.extPred);
+  it('duplicate components should auto-resolve to 1', async function () {
     const extManager = await this.createExtMgr();
     this.expectedItemCount += 1;
 
@@ -122,7 +121,10 @@ describe('singletons', function () {
     expect(refreshedExtMgr).to.be.ok;
     await this.application.sync(syncOptions);
     expect(
-      this.application.itemManager.itemsMatchingPredicate(this.extPred).length
+      this.application.itemManager.itemsMatchingPredicate(
+        ContentType.Component,
+        this.extPred
+      ).length
     ).to.equal(1);
   });
 
@@ -151,7 +153,10 @@ describe('singletons', function () {
     expect(refreshedUserPrefs).to.be.ok;
     await this.application.sync(syncOptions);
     expect(
-      this.application.itemManager.itemsMatchingPredicate(predicate).length
+      this.application.itemManager.itemsMatchingPredicate(
+        contentType,
+        predicate
+      ).length
     ).to.equal(1);
   });
 
@@ -160,7 +165,6 @@ describe('singletons', function () {
     await this.signOut();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
-    this.application.singletonManager.registerPredicate(this.extPred);
     await this.createExtMgr();
     this.expectedItemCount += 1;
     await Factory.registerUserToApplication({
@@ -169,7 +173,6 @@ describe('singletons', function () {
       password: this.password,
     });
     await this.signOut();
-    this.application.singletonManager.registerPredicate(this.extPred);
     await this.createExtMgr();
     await this.application.sync(syncOptions);
     const extraSync = this.application.sync(syncOptions);
@@ -179,7 +182,6 @@ describe('singletons', function () {
 
   it('singletons that are deleted after download first sync should not sync to server', async function () {
     await this.registerUser();
-    this.application.singletonManager.registerPredicate(this.extPred);
     await this.createExtMgr();
     await this.createExtMgr();
     await this.createExtMgr();
@@ -290,8 +292,6 @@ describe('singletons', function () {
      * is then subsequently decrypted, singleton logic runs again for the item.
      */
 
-    this.application.singletonManager.registerPredicate(this.extPred);
-
     await this.application.createManagedItem(
       ContentType.Component,
       {
@@ -333,7 +333,10 @@ describe('singletons', function () {
     await this.application.syncService.sync(syncOptions);
 
     expect(
-      this.application.itemManager.itemsMatchingPredicate(this.extPred).length
+      this.application.itemManager.itemsMatchingPredicate(
+        ContentType.Component,
+        this.extPred
+      ).length
     ).to.equal(1);
   });
 

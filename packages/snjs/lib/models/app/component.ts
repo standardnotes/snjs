@@ -1,4 +1,8 @@
-import { FeatureIdentifier, ThirdPartyFeatureDescription } from '@standardnotes/features';
+import {
+  FeatureIdentifier,
+  ThirdPartyFeatureDescription,
+} from '@standardnotes/features';
+import { SNPredicate } from '@Lib/models/core/predicate';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
@@ -108,6 +112,19 @@ export class SNComponent extends SNItem implements ComponentContent {
       return super.strategyWhenConflictingWithItem(item, previousRevision);
     }
     return ConflictStrategy.KeepLeft;
+  }
+
+  get isSingleton(): boolean {
+    return true;
+  }
+
+  get singletonPredicate(): SNPredicate {
+    const uniqueIdentifierPredicate = new SNPredicate(
+      'identifier',
+      '=',
+      this.identifier
+    );
+    return uniqueIdentifierPredicate;
   }
 
   public isEditor(): boolean {
