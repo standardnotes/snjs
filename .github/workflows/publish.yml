@@ -39,16 +39,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: jakejarvis/s3-sync-action@master
-        if: ${{ steps.decrypt_check.outputs.decrypt_changed }} == 0
+        if: ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
         with:
           args: --acl public-read --follow-symlinks --delete
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_DOWNLOADS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: 'packages/decrypt/dist/decrypt.html'
+          SOURCE_DIR: ./packages/decrypt/dist/decrypt.html
       - name: Invalidate CloudFront Cache
-        if: ${{ steps.decrypt_check.outputs.decrypt_changed }} == 0
+        if: ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
         uses: chetan/invalidate-cloudfront-action@master
         env:
           DISTRIBUTION: ${{ secrets.DOWNLOADS_DISTRIBUTION }}
