@@ -6,6 +6,11 @@
     "postbuild": "inline-assets dist/index.html dist/decrypt.html",
     "start": "webpack-dev-server --mode='development'"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
