@@ -3,7 +3,14 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('migrations', () => {
-  const allMigrations = ['2.0.0', '2.0.15', '2.7.0', '2.20.0', '2.36.0'];
+  const allMigrations = [
+    '2.0.0',
+    '2.0.15',
+    '2.7.0',
+    '2.20.0',
+    '2.36.0',
+    '2.42.0',
+  ];
 
   beforeEach(async () => {
     localStorage.clear();
@@ -173,6 +180,42 @@ describe('migrations', () => {
         (p) => p.content_type === 'SF|MFA'
       ).length
     ).to.equal(0);
+
+    await Factory.safeDeinit(application);
+  });
+
+  it('2.42.0 remove no distraction theme', async function () {
+    const application = await Factory.createAppWithRandNamespace();
+
+    await application.prepareForLaunch({
+      receiveChallenge: () => {},
+    });
+    await application.launch(true);
+
+    const noDistractionItem = CreateItemFromPayload(
+      CreateMaxPayloadFromAnyObject({
+        uuid: '123',
+        content_type: ContentType.Theme,
+        content: FillItemContent({
+          package_info: {
+            identifier: 'org.standardnotes.theme-no-distraction',
+          },
+        }),
+      })
+    );
+    await application.insertItem(noDistractionItem);
+    await application.sync();
+
+    expect(application.getItems(ContentType.Theme).length).to.equal(1);
+
+    /** Run migration */
+    const migration = new Migration2_42_0(
+      application.migrationService.services
+    );
+    await migration.handleStage(ApplicationStage.FullSyncCompleted_13);
+    await application.sync();
+
+    expect(application.getItems(ContentType.Theme).length).to.equal(0);
 
     await Factory.safeDeinit(application);
   });

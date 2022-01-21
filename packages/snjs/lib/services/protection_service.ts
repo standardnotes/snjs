@@ -74,6 +74,7 @@ export class SNProtectionService extends PureService<ProtectionEvent> {
   }
 
   public deinit(): void {
+    clearTimeout(this.sessionExpiryTimeout);
     (this.protocolService as unknown) = undefined;
     (this.challengeService as unknown) = undefined;
     (this.storageService as unknown) = undefined;
