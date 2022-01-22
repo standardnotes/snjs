@@ -1,3 +1,7 @@
+import {
+  StreamEncryptor,
+  StreamDecryptor,
+} from '@standardnotes/sncrypto-common'
 import * as Utils from './utils'
 import * as sodium from './libsodium'
 import { SodiumConstants } from './constants'
@@ -9,8 +13,6 @@ import {
   Utf8String,
   timingSafeEqual,
 } from '@standardnotes/sncrypto-common'
-
-const subtleCrypto = Utils.getSubtleCrypto()
 
 enum WebCryptoAlgs {
   AesCbc = 'AES-CBC',
@@ -31,15 +33,6 @@ enum WebCryptoActions {
 type WebCryptoParams = {
   name: string
   hash?: string
-}
-
-type StreamEncryptor = {
-  state: sodium.StateAddress
-  header: Uint8Array
-}
-
-type StreamDecryptor = {
-  state: sodium.StateAddress
 }
 
 /**
@@ -235,7 +228,7 @@ export class SNWebCrypto implements SNPureCrypto {
     actions: Array<WebCryptoActions>,
     hash?: WebCryptoParams,
   ): Promise<CryptoKey> {
-    return subtleCrypto.importKey(
+    return Utils.getSubtleCrypto().importKey(
       'raw',
       keyData,
       {
@@ -265,9 +258,11 @@ export class SNWebCrypto implements SNPureCrypto {
       hash: { name: WebCryptoAlgs.Sha512 },
     }
 
-    return subtleCrypto.deriveBits(params, key, length).then((bits) => {
-      return Utils.arrayBufferToHexString(new Uint8Array(bits))
-    })
+    return Utils.getSubtleCrypto()
+      .deriveBits(params, key, length)
+      .then((bits) => {
+        return Utils.arrayBufferToHexString(new Uint8Array(bits))
+      })
   }
 
   public async argon2(
@@ -334,7 +329,7 @@ export class SNWebCrypto implements SNPureCrypto {
     }
   }
 
-  async xchacha20StreamEncryptInitEncryptor(
+  public async xchacha20StreamInitEncryptor(
     key: HexString,
   ): Promise<StreamEncryptor> {
     await this.ready
@@ -343,11 +338,11 @@ export class SNWebCrypto implements SNPureCrypto {
     )
     return {
       state: res.state,
-      header: res.header,
+      header: await Utils.arrayBufferToBase64(res.header),
     }
   }
 
-  async xchacha20StreamEncryptorPush(
+  public async xchacha20StreamEncryptorPush(
     encryptor: StreamEncryptor,
     plainBuffer: Uint8Array,
     aad = '',
@@ -355,7 +350,7 @@ export class SNWebCrypto implements SNPureCrypto {
   ): Promise<Uint8Array> {
     await this.ready
     const encryptedBuffer = sodium.crypto_secretstream_xchacha20poly1305_push(
-      encryptor.state,
+      encryptor.state as sodium.StateAddress,
       plainBuffer,
       aad.length > 0 ? await Utils.stringToArrayBuffer(aad) : null,
       tag,
@@ -363,11 +358,12 @@ export class SNWebCrypto implements SNPureCrypto {
     return encryptedBuffer
   }
 
-  async xchacha20StreamEncryptInitDecryptor(
-    header: Uint8Array,
+  public async xchacha20StreamInitDecryptor(
+    header: Base64String,
     key: HexString,
   ): Promise<StreamDecryptor> {
     await this.ready
+
     if (
       header.length !==
       SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES
@@ -376,30 +372,34 @@ export class SNWebCrypto implements SNPureCrypto {
         `Header must be ${SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES} bytes long`,
       )
     }
+
     const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(
-      header,
+      await Utils.base64ToArrayBuffer(header),
       await Utils.hexStringToArrayBuffer(key),
     )
+
     return { state }
   }
 
-  async xchacha20StreamDecryptorPush(
+  public async xchacha20StreamDecryptorPush(
     decryptor: StreamDecryptor,
     encryptedBuffer: Uint8Array,
     aad = '',
-  ): Promise<Uint8Array> {
+  ): Promise<{ message: Uint8Array; tag: number }> {
     if (
       encryptedBuffer.length <
       SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
     ) {
       throw new Error('Invalid ciphertext size')
     }
-    const out = sodium.crypto_secretstream_xchacha20poly1305_pull(
-      decryptor.state,
+
+    const result = sodium.crypto_secretstream_xchacha20poly1305_pull(
+      decryptor.state as sodium.StateAddress,
       encryptedBuffer,
       aad.length > 0 ? await Utils.stringToArrayBuffer(aad) : null,
     )
-    return out.message
+
+    return result
   }
 
   /**
