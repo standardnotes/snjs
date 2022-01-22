@@ -1,4 +1,3 @@
-export { SodiumConstants } from './constants'
 export { SNWebCrypto } from './crypto'
 export {
   arrayBufferToBase64,

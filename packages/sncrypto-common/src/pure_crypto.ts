@@ -13,6 +13,18 @@ export type StreamDecryptor = {
   state: SodiumStateAddress;
 };
 
+export enum SodiumConstant {
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_STATEBYTES = 52,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES = 17,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES = 24,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES = 32,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH = 0,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PULL = 1,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_REKEY = 2,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL = 3,
+  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_MESSAGEBYTES_MAX = 0x3fffffff80,
+}
+
 /**
  * Interface that clients have to implement to use snjs
  */
@@ -142,15 +154,15 @@ export interface SNPureCrypto {
     nonce: HexString,
     key: HexString,
     assocData: Utf8String | Uint8Array
-  ): Promise<string | null>;
+  ): Promise<Utf8String | null>;
 
   xchacha20StreamInitEncryptor(key: HexString): Promise<StreamEncryptor>;
 
   xchacha20StreamEncryptorPush(
     encryptor: StreamEncryptor,
     plainBuffer: Uint8Array,
-    aad?: string,
-    tag?: number
+    assocData: Utf8String,
+    tag?: SodiumConstant
   ): Promise<Uint8Array>;
 
   xchacha20StreamInitDecryptor(
@@ -161,22 +173,22 @@ export interface SNPureCrypto {
   xchacha20StreamDecryptorPush(
     decryptor: StreamDecryptor,
     encryptedBuffer: Uint8Array,
-    aad?: string
-  ): Promise<{ message: Uint8Array; tag: number }>;
+    assocData: Utf8String
+  ): Promise<{ message: Uint8Array; tag: SodiumConstant }>;
 
   /**
    * Converts a plain string into base64
    * @param text - A plain string
    * @returns  A base64 encoded string
    */
-  base64Encode(text: Utf8String): Promise<string>;
+  base64Encode(text: Utf8String): Promise<Base64String>;
 
   /**
    * Converts a base64 string into a plain string
    * @param base64String - A base64 encoded string
    * @returns A plain string
    */
-  base64Decode(base64String: Base64String): Promise<string>;
+  base64Decode(base64String: Base64String): Promise<Utf8String>;
 
   deinit(): void;
 

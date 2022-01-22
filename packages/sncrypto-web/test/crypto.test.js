@@ -213,7 +213,7 @@ describe('crypto operations', async function () {
     const pushChunkSize = plainBuffer.length / 200
     const pullChunkSize =
       pushChunkSize +
-      SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
 
     for (let i = 0; i < plainBuffer.length; i += pushChunkSize) {
       const readUntil =

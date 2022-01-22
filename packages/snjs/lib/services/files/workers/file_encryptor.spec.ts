@@ -1,5 +1,8 @@
-import { SodiumConstants } from '@standardnotes/sncrypto-web';
-import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common';
+import {
+  SNPureCrypto,
+  StreamEncryptor,
+  SodiumConstant,
+} from '@standardnotes/sncrypto-common';
 import { DecryptedFileInterface } from './../types';
 import { FileEncryptor } from './../workers/file_encryptor';
 
@@ -49,7 +52,7 @@ describe('file encryptor', () => {
       expect.any(Object),
       decryptedBytes,
       file.remoteIdentifier,
-      SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
     );
   });
 

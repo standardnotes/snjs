@@ -31,7 +31,10 @@ export class SNFileService extends PureService {
 
   async createUploadOperation(
     file: SNFile
-  ): Promise<EncryptAndUploadFileOperation> {
+  ): Promise<{
+    operation: EncryptAndUploadFileOperation;
+    updatedFile: SNFile;
+  }> {
     const operation = new EncryptAndUploadFileOperation(
       file,
       this.crypto,
@@ -40,11 +43,14 @@ export class SNFileService extends PureService {
 
     const header = await operation.initializeHeader();
 
-    this.itemManager.changeItem<FileMutator>(file.uuid, (mutator) => {
-      mutator.encryptionHeader = header;
-    });
+    const updatedFile = (await this.itemManager.changeItem<FileMutator>(
+      file.uuid,
+      (mutator) => {
+        mutator.encryptionHeader = header;
+      }
+    )) as SNFile;
 
-    return operation;
+    return { operation, updatedFile };
   }
 
   public createDownloadOperation(

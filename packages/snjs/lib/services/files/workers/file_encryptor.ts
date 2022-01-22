@@ -1,6 +1,5 @@
 import { DecryptedFileInterface } from './../types';
-import { SodiumConstants } from '@standardnotes/sncrypto-web';
-import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common';
+import { SNPureCrypto, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common';
 
 export class FileEncryptor {
   private stream!: StreamEncryptor;
@@ -27,7 +26,7 @@ export class FileEncryptor {
     }
 
     const tag = isFinalChunk
-      ? SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
+      ? SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
       : undefined;
 
     const encryptedBytes = await this.crypto.xchacha20StreamEncryptorPush(

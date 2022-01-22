@@ -21,15 +21,15 @@ export class EncryptAndUploadFileOperation {
     return header;
   }
 
-  public async addBytes(
+  public async pushBytes(
     decryptedBytes: Uint8Array,
     isFinalChunk: boolean
-  ): Promise<void> {
+  ): Promise<boolean> {
     const encryptedBytes = await this.encryptor.pushBytes(
       decryptedBytes,
       isFinalChunk
     );
 
-    await this.uploader.uploadBytes(encryptedBytes);
+    return this.uploader.uploadBytes(encryptedBytes);
   }
 }

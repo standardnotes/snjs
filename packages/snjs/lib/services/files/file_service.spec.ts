@@ -1,7 +1,8 @@
+import { SNFile } from './../../models/app/file';
 import { SNFileService } from './file_service';
 import { SNSyncService } from '../sync/sync_service';
 import { ItemManager, SNAlertService, SNApiService } from '@Lib/index';
-import { SNPureCrypto } from '@standardnotes/sncrypto-common';
+import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common';
 
 describe('fileService', () => {
   let apiService: SNApiService;
@@ -9,6 +10,7 @@ describe('fileService', () => {
   let syncService: SNSyncService;
   let alertService: SNAlertService;
   let crypto: SNPureCrypto;
+  let fileService: SNFileService;
 
   const createService = () => {
     return new SNFileService(
@@ -40,5 +42,31 @@ describe('fileService', () => {
 
     crypto = {} as jest.Mocked<SNPureCrypto>;
     crypto.base64Decode = jest.fn();
+
+    crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
+      state: {},
+    } as StreamEncryptor);
+
+    crypto.xchacha20StreamDecryptorPush = jest
+      .fn()
+      .mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 });
+
+    crypto.xchacha20StreamInitEncryptor = jest.fn().mockReturnValue({
+      header: 'some-header',
+      state: {},
+    } as StreamEncryptor);
+
+    crypto.xchacha20StreamEncryptorPush = jest
+      .fn()
+      .mockReturnValue(new Uint8Array());
+
+    fileService = createService();
+  });
+
+  it('createUploadOperation should change file with encryptionHeader', async () => {
+    const file = {} as jest.Mocked<SNFile>;
+    await fileService.createUploadOperation(file);
+
+    expect(itemManager.changeItem).toHaveBeenCalled();
   });
 });

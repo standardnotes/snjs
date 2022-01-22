@@ -1,10 +1,10 @@
 import {
   StreamEncryptor,
   StreamDecryptor,
+  SodiumConstant,
 } from '@standardnotes/sncrypto-common'
 import * as Utils from './utils'
 import * as sodium from './libsodium'
-import { SodiumConstants } from './constants'
 
 import {
   Base64String,
@@ -345,14 +345,14 @@ export class SNWebCrypto implements SNPureCrypto {
   public async xchacha20StreamEncryptorPush(
     encryptor: StreamEncryptor,
     plainBuffer: Uint8Array,
-    aad = '',
-    tag = 0,
+    assocData: Utf8String,
+    tag: SodiumConstant = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH,
   ): Promise<Uint8Array> {
     await this.ready
     const encryptedBuffer = sodium.crypto_secretstream_xchacha20poly1305_push(
       encryptor.state as sodium.StateAddress,
       plainBuffer,
-      aad.length > 0 ? await Utils.stringToArrayBuffer(aad) : null,
+      assocData.length > 0 ? await Utils.stringToArrayBuffer(assocData) : null,
       tag,
     )
     return encryptedBuffer
@@ -366,10 +366,10 @@ export class SNWebCrypto implements SNPureCrypto {
 
     if (
       header.length !==
-      SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES
     ) {
       throw new Error(
-        `Header must be ${SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES} bytes long`,
+        `Header must be ${SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES} bytes long`,
       )
     }
 
@@ -384,11 +384,11 @@ export class SNWebCrypto implements SNPureCrypto {
   public async xchacha20StreamDecryptorPush(
     decryptor: StreamDecryptor,
     encryptedBuffer: Uint8Array,
-    aad = '',
-  ): Promise<{ message: Uint8Array; tag: number }> {
+    assocData: Utf8String,
+  ): Promise<{ message: Uint8Array; tag: SodiumConstant }> {
     if (
       encryptedBuffer.length <
-      SodiumConstants.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
     ) {
       throw new Error('Invalid ciphertext size')
     }
@@ -396,7 +396,7 @@ export class SNWebCrypto implements SNPureCrypto {
     const result = sodium.crypto_secretstream_xchacha20poly1305_pull(
       decryptor.state as sodium.StateAddress,
       encryptedBuffer,
-      aad.length > 0 ? await Utils.stringToArrayBuffer(aad) : null,
+      assocData.length > 0 ? await Utils.stringToArrayBuffer(assocData) : null,
     )
 
     return result
