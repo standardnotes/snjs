@@ -243,6 +243,12 @@ export type GetSubscriptionResponse = MinimalHttpResponse & {
   };
 };
 
+export type CreateValetTokenResponse = MinimalHttpResponse & {
+  data?: {
+    token: string
+  }
+}
+
 export type AvailableSubscriptions = {
   [key in SubscriptionName]: {
     name: string;

@@ -1,8 +1,8 @@
-import * as Factory from '../lib/factory.js';
+import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('files', function () {
+describe.only('files', function () {
   this.timeout(Factory.TenSecondTimeout);
 
   beforeEach(async function () {
@@ -11,6 +11,7 @@ describe('files', function () {
     this.context = await Factory.createAppContext();
     await this.context.launch();
 
+    this.application = this.context.application;
     this.fileService = this.context.application.fileService;
 
     await Factory.registerUserToApplication({
@@ -57,6 +58,11 @@ describe('files', function () {
 
     return receivedBytes;
   };
+
+  it.only('should create valet token from server', async function () {
+    const token = await this.application.apiService.createFileUploadToken();
+    expect(token.length).to.be.above(0);
+  });
 
   it('should encrypt and upload file', async function () {
     const response = await fetch('http://localhost:9003/assets/two_mb_file.md');

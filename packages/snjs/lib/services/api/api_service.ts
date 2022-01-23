@@ -29,6 +29,7 @@ import {
   GetOfflineFeaturesResponse,
   ListedRegistrationResponse,
   User,
+  CreateValetTokenResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@standardnotes/common';
@@ -77,6 +78,7 @@ type PathNamesV1 = {
   purchase: string;
   subscriptionTokens: string;
   offlineFeatures: string;
+  createFileValetToken: string;
 };
 
 type PathNamesV2 = {
@@ -111,6 +113,7 @@ const Paths: {
     purchase: '/v1/purchase',
     subscriptionTokens: '/v1/subscription-tokens',
     offlineFeatures: '/v1/offline/features',
+    createFileValetToken: '/v1/files/valet-tokens',
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -850,6 +853,24 @@ export class SNApiService
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_LISTED_REGISTRATION,
       authentication: this.session?.authorizationValue,
     });
+  }
+
+  public async createFileUploadToken(): Promise<string | undefined> {
+    const url = joinPaths(this.host, Paths.v1.createFileValetToken);
+    const params = {
+      operation: 'write',
+    };
+    const response = await this.tokenRefreshableRequest<CreateValetTokenResponse>(
+      {
+        verb: HttpVerb.Post,
+        url: url,
+        authentication: this.session?.authorizationValue,
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_CREATE_FILE_TOKEN,
+        params,
+      }
+    );
+
+    return response.data?.token;
   }
 
   public async uploadFileBytes(
