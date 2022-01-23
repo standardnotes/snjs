@@ -1,4 +1,4 @@
-import { ApiServiceInterface, RemoteFileInterface } from './../types';
+import { FilesApi, RemoteFileInterface } from './../types';
 import { FileUploader } from './../workers/file_uploader';
 
 describe('file uploader', () => {
@@ -7,7 +7,7 @@ describe('file uploader', () => {
   let file: RemoteFileInterface;
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<ApiServiceInterface>;
+    apiService = {} as jest.Mocked<FilesApi>;
     apiService.uploadFileBytes = jest.fn().mockReturnValue({ success: true });
 
     file = {

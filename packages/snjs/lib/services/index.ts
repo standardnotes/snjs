@@ -40,3 +40,4 @@ export {
   StorageEncryptionPolicies,
   StoragePersistencePolicies,
 } from '@Services/storage_service';
+export { SNFileService } from './files/file_service';

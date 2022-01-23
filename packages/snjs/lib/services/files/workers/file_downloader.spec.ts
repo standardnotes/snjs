@@ -1,14 +1,14 @@
-import { RemoteFileInterface, ApiServiceInterface } from './../types';
+import { RemoteFileInterface, FilesApi } from './../types';
 import { FileDownloader } from './../workers/file_downloader';
 
 describe('file downloader', () => {
-  let apiService: ApiServiceInterface;
+  let apiService: FilesApi;
   let downloader: FileDownloader;
   let file: RemoteFileInterface;
   const numChunks = 5;
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<ApiServiceInterface>;
+    apiService = {} as jest.Mocked<FilesApi>;
     apiService.downloadFile = jest
       .fn()
       .mockImplementation(

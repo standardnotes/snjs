@@ -1,13 +1,17 @@
-export interface ApiServiceInterface {
+export interface FilesApi {
   uploadFileBytes(
+    remoteIdentifier: string,
     encryptedBytes: Uint8Array,
-    remoteIdentifier: string
   ): Promise<{ success: boolean }>;
 
   downloadFile(
-    remoteId: string,
-    onBytesReceived: (bytes: Uint8Array) => void,
+    remoteIdentifier: string,
+    onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void>;
+}
+
+export interface FilesDevice {
+  showFilePicker(): void;
 }
 
 export interface DecryptedFileInterface {

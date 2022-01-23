@@ -92,6 +92,7 @@ import {
   SNStorageService,
   SNSyncService,
   SNFeaturesService,
+  SNFileService,
   SyncModes,
 } from './services';
 import { DeviceInterface } from './device_interface';
@@ -191,6 +192,7 @@ export class SNApplication implements ListedInterface {
   private settingsService!: SNSettingsService;
   private mfaService!: SNMfaService;
   private listedService!: ListedService;
+  private fileService!: SNFileService;
 
   private eventHandlers: ApplicationObserver[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1863,6 +1865,7 @@ export class SNApplication implements ListedInterface {
     this.createMfaService();
     this.createListedService();
     this.createActionsManager();
+    this.createFileService();
   }
 
   private clearServices() {
@@ -1890,6 +1893,7 @@ export class SNApplication implements ListedInterface {
     (this.settingsService as unknown) = undefined;
     (this.mfaService as unknown) = undefined;
     (this.listedService as unknown) = undefined;
+    (this.fileService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1902,6 +1906,18 @@ export class SNApplication implements ListedInterface {
       this.httpService
     );
     this.services.push(this.listedService);
+  }
+
+  private createFileService() {
+    this.fileService = new SNFileService(
+      this.apiService,
+      this.itemManager,
+      this.syncService,
+      this.alertService,
+      this.crypto
+    );
+
+    this.services.push(this.fileService);
   }
 
   private createFeaturesService() {

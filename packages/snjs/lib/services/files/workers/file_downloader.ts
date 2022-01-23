@@ -1,9 +1,9 @@
-import { ApiServiceInterface, RemoteFileInterface } from '../types';
+import { FilesApi, RemoteFileInterface } from '../types';
 
 export class FileDownloader {
   constructor(
     private readonly file: RemoteFileInterface,
-    private apiService: ApiServiceInterface,
+    private apiService: FilesApi,
     private onEncryptedBytes: (encryptedBytes: Uint8Array) => void
   ) {}
 

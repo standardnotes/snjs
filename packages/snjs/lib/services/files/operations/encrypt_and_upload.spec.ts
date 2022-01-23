@@ -1,15 +1,15 @@
 import { EncryptAndUploadFileOperation } from './encrypt_and_upload';
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common';
-import { ApiServiceInterface, DecryptedFileInterface } from './../types';
+import { FilesApi, DecryptedFileInterface } from './../types';
 
 describe('encrypt and upload', () => {
-  let apiService: ApiServiceInterface;
+  let apiService: FilesApi;
   let operation: EncryptAndUploadFileOperation;
   let file: DecryptedFileInterface;
   let crypto: SNPureCrypto;
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<ApiServiceInterface>;
+    apiService = {} as jest.Mocked<FilesApi>;
     apiService.uploadFileBytes = jest.fn().mockReturnValue({ success: true });
 
     crypto = {} as jest.Mocked<SNPureCrypto>;

@@ -1,7 +1,7 @@
 import { FileDownloader } from './../workers/file_downloader';
 import { FileDecryptor } from './../workers/file_decryptor';
 import {
-  ApiServiceInterface,
+  FilesApi,
   RemoteFileInterface,
   EncryptedFileInterface,
 } from './../types';
@@ -15,7 +15,7 @@ export class DownloadAndDecryptFileOperation {
   constructor(
     file: RemoteFileInterface & EncryptedFileInterface,
     crypto: SNPureCrypto,
-    api: ApiServiceInterface,
+    api: FilesApi,
     private onDecryptedBytes: (decryptedBytes: Uint8Array) => void
   ) {
     this.decryptor = new FileDecryptor(file, crypto);

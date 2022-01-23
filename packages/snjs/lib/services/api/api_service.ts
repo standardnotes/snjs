@@ -1,3 +1,4 @@
+import { FilesApi } from './../files/types';
 import { SNFeatureRepo } from './../../models/app/feature_repo';
 import { ErrorObject, UuidString } from './../../types';
 import {
@@ -130,10 +131,9 @@ export type MetaReceivedData = {
   userRoles: Role[];
 };
 
-export class SNApiService extends PureService<
-  ApiServiceEvent.MetaReceived,
-  MetaReceivedData
-> {
+export class SNApiService
+  extends PureService<ApiServiceEvent.MetaReceived, MetaReceivedData>
+  implements FilesApi {
   private session?: Session;
   public user?: User;
   private registering = false;
@@ -850,6 +850,21 @@ export class SNApiService extends PureService<
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_LISTED_REGISTRATION,
       authentication: this.session?.authorizationValue,
     });
+  }
+
+  public async uploadFileBytes(
+    remoteIdentifier: string,
+    encryptedBytes: Uint8Array
+  ): Promise<{ success: boolean }> {
+    console.log('Upload file bytes', remoteIdentifier, encryptedBytes);
+    return { success: true };
+  }
+
+  public async downloadFile(
+    remoteIdentifier: string,
+    onBytesReceived: (bytes: Uint8Array) => void
+  ): Promise<void> {
+    console.log('Download file', remoteIdentifier, onBytesReceived);
   }
 
   private preprocessingError() {

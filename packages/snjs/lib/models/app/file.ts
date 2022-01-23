@@ -2,7 +2,12 @@ import { ItemMutator, SNItem } from '@Models/core/item';
 import { PayloadContent } from '@Payloads/generator';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 
-export interface FileContent extends PayloadContent {
+export enum FileProtocolV1 {
+  ChunkSize = 100_000,
+  KeySize = 256,
+}
+
+export interface FileContent {
   remoteIdentifier: string;
   name: string;
   key: string;
@@ -12,7 +17,9 @@ export interface FileContent extends PayloadContent {
   chunkSize: number;
 }
 
-export class SNFile extends SNItem implements FileContent {
+type ExtendedFileContent = FileContent & PayloadContent;
+
+export class SNFile extends SNItem implements ExtendedFileContent {
   public readonly remoteIdentifier: string;
   public readonly name: string;
   public readonly key: string;
@@ -32,8 +39,8 @@ export class SNFile extends SNItem implements FileContent {
     this.chunkSize = this.typedContent.chunkSize;
   }
 
-  private get typedContent(): FileContent {
-    return this.safeContent as FileContent;
+  private get typedContent(): ExtendedFileContent {
+    return this.safeContent as ExtendedFileContent;
   }
 }
 

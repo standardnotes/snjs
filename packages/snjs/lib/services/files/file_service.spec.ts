@@ -63,10 +63,5 @@ describe('fileService', () => {
     fileService = createService();
   });
 
-  it('createUploadOperation should change file with encryptionHeader', async () => {
-    const file = {} as jest.Mocked<SNFile>;
-    await fileService.createUploadOperation(file);
-
-    expect(itemManager.changeItem).toHaveBeenCalled();
-  });
+  it('placeholder', async () => {});
 });

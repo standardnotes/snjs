@@ -2,13 +2,13 @@ import { sleep } from '@Lib/utils';
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common';
 import {
   RemoteFileInterface,
-  ApiServiceInterface,
+  FilesApi,
   EncryptedFileInterface,
 } from './../types';
 import { DownloadAndDecryptFileOperation } from './download_and_decrypt';
 
 describe('download and decrypt', () => {
-  let apiService: ApiServiceInterface;
+  let apiService: FilesApi;
   let operation: DownloadAndDecryptFileOperation;
   let file: RemoteFileInterface & EncryptedFileInterface;
   let crypto: SNPureCrypto;
@@ -16,7 +16,7 @@ describe('download and decrypt', () => {
   const NumChunks = 5;
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<ApiServiceInterface>;
+    apiService = {} as jest.Mocked<FilesApi>;
     apiService.downloadFile = jest
       .fn()
       .mockImplementation(

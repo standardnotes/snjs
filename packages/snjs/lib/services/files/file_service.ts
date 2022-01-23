@@ -1,13 +1,16 @@
+import { FillItemContent } from '@Models/functions';
+import { ContentType } from '@standardnotes/common';
 import { DownloadAndDecryptFileOperation } from './operations/download_and_decrypt';
-import { ApiServiceInterface } from './types';
+import { DecryptedFileInterface } from './types';
 import { EncryptAndUploadFileOperation } from './operations/encrypt_and_upload';
-import { SNFile, FileMutator } from './../../models/app/file';
+import { SNFile, FileProtocolV1, FileContent } from './../../models/app/file';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { PureService } from '@Services/pure_service';
 import { SNAlertService } from '../alert_service';
 import { SNSyncService } from '../sync/sync_service';
 import { ItemManager } from '@Services/item_manager';
 import { SNApiService } from '../api/api_service';
+import { Uuid } from '@Lib/uuid';
 
 export class SNFileService extends PureService {
   constructor(
@@ -29,41 +32,70 @@ export class SNFileService extends PureService {
     (this.crypto as unknown) = undefined;
   }
 
-  async createUploadOperation(
-    file: SNFile
-  ): Promise<{
-    operation: EncryptAndUploadFileOperation;
-    updatedFile: SNFile;
-  }> {
-    const operation = new EncryptAndUploadFileOperation(
-      file,
+  public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
+    const key = await this.crypto.generateRandomKey(FileProtocolV1.KeySize);
+    const remoteIdentifier = await Uuid.GenerateUuid();
+    const fileParams: DecryptedFileInterface = {
+      key,
+      remoteIdentifier,
+    };
+
+    const uploadOperation = new EncryptAndUploadFileOperation(
+      fileParams,
       this.crypto,
-      (this.apiService as unknown) as ApiServiceInterface
+      this.apiService
     );
 
-    const header = await operation.initializeHeader();
+    await uploadOperation.initializeHeader();
 
-    const updatedFile = (await this.itemManager.changeItem<FileMutator>(
-      file.uuid,
-      (mutator) => {
-        mutator.encryptionHeader = header;
-      }
-    )) as SNFile;
-
-    return { operation, updatedFile };
+    return uploadOperation;
   }
 
-  public createDownloadOperation(
+  public pushBytesForUpload(
+    operation: EncryptAndUploadFileOperation,
+    bytes: Uint8Array,
+    isFinalChunk: boolean
+  ): Promise<boolean> {
+    return operation.pushBytes(bytes, isFinalChunk);
+  }
+
+  public async finishUpload(
+    operation: EncryptAndUploadFileOperation,
+    fileName: string,
+    fileExt: string
+  ): Promise<SNFile> {
+    const fileContent: FileContent = {
+      chunkSize: FileProtocolV1.ChunkSize,
+      encryptionHeader: operation.getEncryptionHeader(),
+      ext: fileExt,
+      key: operation.getEncryptionHeader(),
+      name: fileName,
+      remoteIdentifier: operation.getRemoteIdentifier(),
+      size: operation.getRawSize(),
+    };
+
+    const file = await this.itemManager.createItem<SNFile>(
+      ContentType.File,
+      FillItemContent(fileContent),
+      true
+    );
+
+    this.syncService.sync();
+
+    return file;
+  }
+
+  public async downloadFile(
     file: SNFile,
-    onDecryptedBytes: (decryptedBytes: Uint8Array) => void
-  ): DownloadAndDecryptFileOperation {
+    onDecryptedBytes: (bytes: Uint8Array) => void
+  ): Promise<void> {
     const operation = new DownloadAndDecryptFileOperation(
       file,
       this.crypto,
-      (this.apiService as unknown) as ApiServiceInterface,
+      this.apiService,
       onDecryptedBytes
     );
 
-    return operation;
+    return operation.run();
   }
 }
