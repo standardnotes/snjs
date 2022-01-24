@@ -33,9 +33,9 @@ export interface TagToParentTagReference extends AnonymousReference {
   reference_type: ContenteReferenceType.TagToParentTag;
 }
 
-export type NewReference = TagToParentTagReference;
+export type Reference = TagToParentTagReference;
 
-export type ContentReference = LegacyAnonymousReference | NewReference;
+export type ContentReference = LegacyAnonymousReference | Reference;
 
 export const isLegacyAnonymousReference = (
   x: ContentReference
@@ -43,7 +43,7 @@ export const isLegacyAnonymousReference = (
   return (x as any).reference_type === undefined;
 };
 
-export const isNewReference = (x: ContentReference): x is NewReference => {
+export const isReference = (x: ContentReference): x is Reference => {
   return (x as any).reference_type !== undefined;
 };
 
@@ -60,7 +60,7 @@ export const isTagToParentTagReference = (
   x: ContentReference
 ): x is TagToParentTagReference => {
   return (
-    isNewReference(x) &&
+    isReference(x) &&
     x.reference_type === ContenteReferenceType.TagToParentTag
   );
 };
