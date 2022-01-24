@@ -19,7 +19,6 @@ packages/time/dist
 packages/sncrypto-common/dist
 packages/sncrypto-node/dist
 packages/sncrypto-web/dist
-wip/decrypt/dist
 
 yarn-error.log
 package-lock.json

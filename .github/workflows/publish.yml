@@ -31,40 +31,10 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-      - name: Check if decrypt package changed
-        continue-on-error: true
-        id: decrypt_check
-        run: |
-          changes=$(npx lerna changed | grep "@standardnotes/decrypt")
-          status=$?
-          echo ::set-output name=decrypt_changed::$status
       - run: yarn version-bump
       - run: yarn publish-packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: echo ${{ steps.decrypt_check.outputs.decrypt_changed }}
-      - run: echo ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
-      - run: echo ${{ steps.decrypt_check.outputs.decrypt_changed == '0' }}
-      - name: Publish to S3
-        if: ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read --follow-symlinks --delete
-        env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_DOWNLOADS_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: ./packages/decrypt/dist
-      - name: Invalidate CloudFront Cache
-        if: ${{ steps.decrypt_check.outputs.decrypt_changed == 0 }}
-        uses: chetan/invalidate-cloudfront-action@master
-        env:
-          DISTRIBUTION: ${{ secrets.DOWNLOADS_DISTRIBUTION }}
-          PATHS: '/*'
-          AWS_REGION: 'us-east-1'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
 
   git-sync:
     needs: publish
