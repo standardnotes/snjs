@@ -197,7 +197,7 @@ export class PurePayload {
     const result = this.safeReferences.find((ref) => ref.uuid === uuid);
 
     if (!result) {
-      throw new Error('reference not found');
+      throw new Error('Reference not found');
     }
 
     return result;

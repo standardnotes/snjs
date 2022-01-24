@@ -187,7 +187,7 @@ function PayloadsByUpdatingReferencingPayloadReferences(
       const newReference: ContentReference = {
         ...reference,
         uuid: addPayload.uuid,
-        content_type: addPayload.content_type, // Note that this is not typesafe, we might have an invalid content type here.
+        content_type: addPayload.content_type,
       };
       references.push(newReference);
     }
