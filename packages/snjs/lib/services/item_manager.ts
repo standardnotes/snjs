@@ -945,7 +945,7 @@ export class ItemManager extends PureService {
       ContentType.Tag
     ) as SNTag[];
 
-    return tags.filter((tag) => tag.parentId === tag.uuid);
+    return tags.filter((tag) => tag.parentId === tagUuid);
   }
 
   public isTagAncestor(tagUuid: UuidString, childUuid: UuidString): boolean {
