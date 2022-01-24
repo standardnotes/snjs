@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.6](https://github.com/standardnotes/snjs/compare/@standardnotes/decrypt@1.1.4...@standardnotes/decrypt@1.1.6) (2022-01-24)
+
+
+### Bug Fixes
+
+* bump decrypt version ([e77b300](https://github.com/standardnotes/snjs/commit/e77b3003ee2053890f33236a2fbeefd612f2c74f))
+* CodeQL analysis and SNCrypto-* packages ([#568](https://github.com/standardnotes/snjs/issues/568)) ([137ed46](https://github.com/standardnotes/snjs/commit/137ed46d8f16509211cda265f653c016fe111974))
+* move decrypt package ([#569](https://github.com/standardnotes/snjs/issues/569)) ([a1c950d](https://github.com/standardnotes/snjs/commit/a1c950dab72bdffd21618ed55490a2b4843531ee))
+* restore decrypt package ([1304e2d](https://github.com/standardnotes/snjs/commit/1304e2dd7482d2337ef908b39cd47f6958699de1))
+
+
+
+
+
 ## [1.1.4](https://github.com/standardnotes/snjs/compare/@standardnotes/decrypt@1.1.3...@standardnotes/decrypt@1.1.4) (2022-01-21)
 
 
