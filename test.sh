@@ -19,9 +19,9 @@ function setup {
   cp docker/auth.env.sample docker/auth.env
   cp docker/syncing-server-js.env.sample docker/syncing-server-js.env
 
-  # echo "# Installing project dependecies (Host Machine)"
-  # yarn install --pure-lockfile
-  # yarn build
+  echo "# Installing project dependecies (Host Machine)"
+  yarn install --pure-lockfile
+  yarn build
 }
 
 function cleanup {
