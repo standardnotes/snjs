@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.42.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.0...@standardnotes/snjs@2.42.1) (2022-01-25)
+
+
+### Bug Fixes
+
+* refactor tag parent reference ([#560](https://github.com/standardnotes/snjs/issues/560)) ([c1a5ba7](https://github.com/standardnotes/snjs/commit/c1a5ba73b03263c914c042fdbee7efd367a3cd09))
+
+
+
+
+
 # [2.42.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.41.1...@standardnotes/snjs@2.42.0) (2022-01-22)
 
 
