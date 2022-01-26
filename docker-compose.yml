@@ -59,7 +59,7 @@ services:
       LOG_LEVEL: debug
       VERSION: test
       SNS_TOPIC_ARN: arn:aws:sns:us-east-1:1-2-3:snjs
-      SNS_ENDPOINT: sns:9911
+      SNS_ENDPOINT: "http://sns:9911"
       NEW_RELIC_ENABLED: 'false'
     networks:
       - snjs
@@ -113,7 +113,7 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.35.2
+    image: standardnotes/auth:1.35.3
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -125,7 +125,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.35.2
+    image: standardnotes/auth:1.35.3
     depends_on:
       - auth
     entrypoint: [
