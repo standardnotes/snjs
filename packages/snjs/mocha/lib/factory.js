@@ -109,12 +109,27 @@ export function getDefaultHost() {
   return 'http://localhost:3123';
 }
 
+export function getDefaultMockedEventServiceUrl() {
+  return 'http://localhost:3124';
+}
+
 export function getDefaultWebSocketUrl() {
   return 'ws://localhost';
 }
 
 function getAppVersion() {
   return '1.2.3';
+}
+
+export async function publishMockedEvent(eventType, eventPayload) {
+  await fetch({
+    url: `${getDefaultMockedEventServiceUrl()}/events`,
+    method: 'post',
+    body: JSON.stringify({
+      eventType,
+      eventPayload
+    })
+  })
 }
 
 export function createApplication(identifier, environment, platform, host) {
