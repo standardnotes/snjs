@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.43.0-beta-tag-folders-release.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.2...@standardnotes/snjs@2.43.0-beta-tag-folders-release.0) (2022-01-26)
+
+
+### Bug Fixes
+
+* check component active before migrating ([015d99a](https://github.com/standardnotes/snjs/commit/015d99a80a469abaaa0262c6a2321c9d10343960))
+* import migration 3.0.0 ([392e464](https://github.com/standardnotes/snjs/commit/392e46465d90acad87605ebe23a322c3ff0b723c))
+* migrate tags without parents only ([dfd7c44](https://github.com/standardnotes/snjs/commit/dfd7c4431aea5ef7225de81d408286f0aa586a03))
+* migration test code ([0235377](https://github.com/standardnotes/snjs/commit/0235377bbac442b03bab2ff069d5ec4d8c613469))
+* protect from every unsupported cases ([1af7ad9](https://github.com/standardnotes/snjs/commit/1af7ad9d591b6a3fb214f0614d93d5b49f8444ec))
+* remove a few warnings while going through code ([3afe4ae](https://github.com/standardnotes/snjs/commit/3afe4ae286db0e66c56c56181b89e666dfbe5806))
+
+
+### Features
+
+* add findOrCreateTagParentChain and findOrCreateTagByTitle ([7329762](https://github.com/standardnotes/snjs/commit/73297623e6ed9ac78ab3d1d6ae26cbc485df860c))
+* add migrateTagDotsToHierarchy ([8332742](https://github.com/standardnotes/snjs/commit/8332742b568f5c61e9c531466f1ae24fc4041750))
+* migration for tag folder tests ([c2f3d7e](https://github.com/standardnotes/snjs/commit/c2f3d7e3ac2c079b71912534f19f7e6f350b868c))
+* move from lodash to utils ([7948ca4](https://github.com/standardnotes/snjs/commit/7948ca42542648560860bdc7208799562847d403))
+* return from the migration on invalid cases (review) ([90dc5e2](https://github.com/standardnotes/snjs/commit/90dc5e2ae16b66e284edf19fcaa7fdd9ce682eec))
+* wip implement migration for tag folders ([c48fa86](https://github.com/standardnotes/snjs/commit/c48fa8676874f1214fda817bfd4843e78ba5083c))
+* WIP migration e2e for folders ([75e4640](https://github.com/standardnotes/snjs/commit/75e4640ac4f6cc8fee42036fb9b043ae36796e72))
+
+
+
+
+
 ## [2.42.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.1...@standardnotes/snjs@2.42.2) (2022-01-25)
 
 **Note:** Version bump only for package @standardnotes/snjs
