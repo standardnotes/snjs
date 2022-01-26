@@ -25,8 +25,8 @@ services:
 
   sns:
     image: s12v/sns
-    ports:
-      - 9911:9911
+    expose:
+      - 9911
     volumes:
       - ./docker/sns.json:/etc/sns/db.json
       - ./wait-for.sh:/etc/scripts/wait-for.sh
@@ -36,12 +36,14 @@ services:
       "java", "-jar", "/sns.jar"
     ]
     networks:
-      - snjs
+      snjs:
+        aliases:
+          - sns
 
   sqs:
     image: s12v/elasticmq
-    ports:
-      - 9324:9324
+    expose:
+      - 9324
     volumes:
       - ./docker/sqs.conf:/etc/elasticmq/elasticmq.conf
     restart: unless-stopped
@@ -49,18 +51,14 @@ services:
       - snjs
 
   mock-event-publisher:
-    image: standardnotes/mock-event-publisher:1.0.1
+    image: standardnotes/mock-event-publisher:1.0.4
     entrypoint: [
       "./wait-for.sh", "sns", "9911",
       "./docker/entrypoint.sh", "start-web"
     ]
-    environment:
-      PORT: 3000
-      LOG_LEVEL: debug
-      VERSION: test
-      SNS_TOPIC_ARN: arn:aws:sns:us-east-1:1-2-3:snjs
-      SNS_ENDPOINT: "http://sns:9911"
-      NEW_RELIC_ENABLED: 'false'
+    ports:
+      - 3124:3000
+    env_file: docker/mock-event-publisher.env
     networks:
       - snjs
 
@@ -134,11 +132,6 @@ services:
       "./docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/auth.env
-    environment:
-      SQS_QUEUE_URL: "http://sqs:9324/queue/auth"
-      SQS_AWS_REGION: us-east-1
-      SQS_ACCESS_KEY_ID: "x"
-      SQS_SECRET_ACCESS_KEY: "x"
     networks:
       - snjs
 

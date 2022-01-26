@@ -18,6 +18,7 @@ function setup {
   cp docker/api-gateway.env.sample docker/api-gateway.env
   cp docker/auth.env.sample docker/auth.env
   cp docker/syncing-server-js.env.sample docker/syncing-server-js.env
+  cp docker/mock-event-publisher.env.sample docker/mock-event-publisher.env
 
   echo "# Installing project dependecies (Host Machine)"
   yarn install --pure-lockfile
@@ -51,7 +52,7 @@ function startContainers {
 
 function waitForServices {
   attempt=0
-  while [ $attempt -le 60 ]; do
+  while [ $attempt -le 90 ]; do
       attempt=$(( $attempt + 1 ))
       echo "# Waiting for all services to be up (attempt: $attempt) ..."
       result=$(docker compose -f $COMPOSE_FILE logs api-gateway)

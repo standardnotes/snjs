@@ -109,8 +109,8 @@ export function getDefaultHost() {
   return 'http://localhost:3123';
 }
 
-export function getDefaultMockedEventService() {
-  return 'http://mock-event-publisher:3000';
+export function getDefaultMockedEventServiceUrl() {
+  return 'http://localhost:3124';
 }
 
 export function getDefaultWebSocketUrl() {
@@ -123,12 +123,12 @@ function getAppVersion() {
 
 export async function publishMockedEvent(eventType, eventPayload) {
   await fetch({
-    method: 'POST',
-    url: `${getDefaultMockedEventService()}/events`,
-    body: {
+    url: `${getDefaultMockedEventServiceUrl()}/events`,
+    method: 'post',
+    body: JSON.stringify({
       eventType,
       eventPayload
-    }
+    })
   })
 }
 
@@ -201,9 +201,6 @@ export async function registerUserToApplication({
 }) {
   if (!email) email = generateUuid();
   if (!password) password = generateUuid();
-  await publishMockedEvent('SUBSCRIPTION_PURCHASED', {
-    email
-  })
   return application.register(email, password, ephemeral, mergeLocal);
 }
 
