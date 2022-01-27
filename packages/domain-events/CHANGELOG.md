@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.18.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.17.1...@standardnotes/domain-events@2.18.0) (2022-01-27)
+
+
+### Features
+
+* add features list to extension key granted event ([#574](https://github.com/standardnotes/snjs/issues/574)) ([946319a](https://github.com/standardnotes/snjs/commit/946319a7eb694ee54b3a6377dad116580911f8ca))
+
+
+
+
+
 ## [2.17.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.17.0...@standardnotes/domain-events@2.17.1) (2022-01-19)
 
 **Note:** Version bump only for package @standardnotes/domain-events
