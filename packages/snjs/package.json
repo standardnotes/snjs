@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.43.0-beta-tag-folders-release.0",
+  "version": "2.43.0-beta-tag-folders-release.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },

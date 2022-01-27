@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.43.0-beta-tag-folders-release.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.0-beta-tag-folders-release.0...@standardnotes/snjs@2.43.0-beta-tag-folders-release.1) (2022-01-27)
+
+
+### Bug Fixes
+
+* sort smarttags alphabetically ([4daf834](https://github.com/standardnotes/snjs/commit/4daf83428219f0e26729d18c310694adc4de0093))
+
+
+
+
+
 # [2.43.0-beta-tag-folders-release.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.2...@standardnotes/snjs@2.43.0-beta-tag-folders-release.0) (2022-01-26)
 
 
