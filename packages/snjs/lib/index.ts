@@ -234,6 +234,7 @@ export {
 
 export { NoteViewController } from './ui/note_view_controller';
 export { NoteGroupController } from './ui/note_group_controller';
+export { IconsController } from './ui/icons_controller';
 
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
