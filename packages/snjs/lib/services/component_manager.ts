@@ -1,5 +1,5 @@
 import { SNPreferencesService } from './preferences_service';
-import { Features, FeatureDescription } from '@standardnotes/features';
+import { Features, FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import { displayStringForContentType } from '@Models/content_types';
@@ -24,7 +24,7 @@ import {
   sleep,
 } from '@Lib/utils';
 import { Environment, Platform } from '@Lib/platforms';
-import { UuidString } from '@Lib/types';
+import { IconType, UuidString } from '@Lib/types';
 import {
   PermissionDialog,
   DesktopManagerInterface,
@@ -696,5 +696,30 @@ export class SNComponentManager extends PureService<
       return '.';
     }
     return contentTypeStrings.concat(contextAreaStrings).join(', ') + '.';
+  }
+
+  getIconAndTintForEditor(
+    identifier: FeatureIdentifier | undefined
+  ): [IconType, number] {
+    switch (identifier) {
+      case FeatureIdentifier.BoldEditor:
+      case FeatureIdentifier.PlusEditor:
+        return ['rich-text', 1];
+      case FeatureIdentifier.MarkdownBasicEditor:
+      case FeatureIdentifier.MarkdownMathEditor:
+      case FeatureIdentifier.MarkdownMinimistEditor:
+      case FeatureIdentifier.MarkdownProEditor:
+        return ['markdown', 2];
+      case FeatureIdentifier.TokenVaultEditor:
+        return ['authenticator', 6];
+      case FeatureIdentifier.SheetsEditor:
+        return ['spreadsheets', 5];
+      case FeatureIdentifier.TaskEditor:
+        return ['tasks', 3];
+      case FeatureIdentifier.CodeEditor:
+        return ['code', 4];
+      default:
+        return ['plain-text', 1];
+    }
   }
 }

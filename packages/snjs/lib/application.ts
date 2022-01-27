@@ -25,6 +25,7 @@ import {
   UuidString,
   AnyRecord,
   ApplicationEventPayload,
+  IconType
 } from './types';
 import {
   ApplicationEvent,
@@ -1764,6 +1765,10 @@ export class SNApplication {
       cloudProviderName,
       isDevEnvironment
     );
+  }
+
+  public getIconAndTintForEditor(identifier: FeatureIdentifier | undefined): [IconType, number] {
+    return this.componentManager.getIconAndTintForEditor(identifier);
   }
 
   private constructServices() {

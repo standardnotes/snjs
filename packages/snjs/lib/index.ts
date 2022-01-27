@@ -11,6 +11,7 @@ export type {
   UuidString,
   ApplicationIdentifier,
   ApplicationEventPayload,
+  IconType,
 } from './types';
 
 export { SNApplicationGroup } from './application_group';
