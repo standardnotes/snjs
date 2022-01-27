@@ -41,7 +41,7 @@ services:
       - snjs
 
   mock-event-publisher:
-    image: standardnotes/mock-event-publisher:1.0.4
+    image: standardnotes/mock-event-publisher:1.0.5
     entrypoint: [
       "./wait-for.sh", "localstack", "4566",
       "./docker/entrypoint.sh", "start-web"
@@ -83,7 +83,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.31.0
+    image: standardnotes/api-gateway:1.32.0
     depends_on:
       - syncing-server-js
       - auth

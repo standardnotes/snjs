@@ -19,6 +19,17 @@ describe.only('files', function () {
       email: this.context.email,
       password: this.context.password,
     });
+
+    await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
+      userEmail: this.context.email,
+      subscriptionId: 1,
+      subscriptionName: 'PLUS_PLAN',
+      subscriptionExpiresAt: ((new Date()).getTime() + 3_600_000) * 1_000,
+      timestamp: Date.now(),
+      offline: false
+    })
+    /** Wait and allow server to apply subscription to user */
+    await Factory.sleep(0.5);
   });
 
   afterEach(async function () {
@@ -60,8 +71,61 @@ describe.only('files', function () {
   };
 
   it.only('should create valet token from server', async function () {
-    const token = await this.application.apiService.createFileUploadToken();
+    const remoteIdentifier = Factory.generateUuid()
+    const token = await this.application.apiService.createFileUploadToken(remoteIdentifier);
+
     expect(token.length).to.be.above(0);
+  });
+
+  it.only('should not create valet token from server when user has no subscription', async function () {
+    localStorage.clear();
+
+    this.context = await Factory.createAppContext();
+    await this.context.launch();
+
+    this.application = this.context.application;
+
+    await Factory.registerUserToApplication({
+      application: this.context.application,
+      email: this.context.email,
+      password: this.context.password,
+    });
+
+    const remoteIdentifier = Factory.generateUuid()
+    const token = await this.application.apiService.createFileUploadToken(remoteIdentifier);
+
+    expect(token.error).to.equal('no-subscription');
+  });
+
+  it.only('should not create valet token from server when user has an expired subscription', async function () {
+    localStorage.clear();
+
+    this.context = await Factory.createAppContext();
+    await this.context.launch();
+
+    this.application = this.context.application;
+
+    await Factory.registerUserToApplication({
+      application: this.context.application,
+      email: this.context.email,
+      password: this.context.password,
+    });
+
+    await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
+      userEmail: this.context.email,
+      subscriptionId: 1,
+      subscriptionName: 'PLUS_PLAN',
+      subscriptionExpiresAt: ((new Date()).getTime() - 3_600_000) * 1_000,
+      timestamp: Date.now(),
+      offline: false
+    })
+    /** Wait and allow server to apply subscription to user */
+    await Factory.sleep(0.5);
+
+    const remoteIdentifier = Factory.generateUuid()
+    const token = await this.application.apiService.createFileUploadToken(remoteIdentifier);
+
+    expect(token.error).to.equal('expired-subscription');
   });
 
   it('should encrypt and upload file', async function () {

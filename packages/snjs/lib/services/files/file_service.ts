@@ -33,9 +33,9 @@ export class SNFileService extends PureService {
   }
 
   public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
-    const apiToken = await this.apiService.createFileUploadToken();
-    const key = await this.crypto.generateRandomKey(FileProtocolV1.KeySize);
     const remoteIdentifier = await Uuid.GenerateUuid();
+    const apiToken = await this.apiService.createFileUploadToken(remoteIdentifier);
+    const key = await this.crypto.generateRandomKey(FileProtocolV1.KeySize);
     const fileParams: DecryptedFileInterface = {
       key,
       remoteIdentifier,

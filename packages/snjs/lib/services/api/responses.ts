@@ -245,7 +245,11 @@ export type GetSubscriptionResponse = MinimalHttpResponse & {
 
 export type CreateValetTokenResponse = MinimalHttpResponse & {
   data?: {
-    token: string
+    success: true
+    valetToken: string
+  } | {
+    success: false
+    reason: 'no-subscription' | 'expired-subscription'
   }
 }
 

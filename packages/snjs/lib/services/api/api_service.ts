@@ -855,10 +855,13 @@ export class SNApiService
     });
   }
 
-  public async createFileUploadToken(): Promise<string | undefined> {
+  public async createFileUploadToken(remoteIdentifier: string): Promise<string | ErrorObject> {
     const url = joinPaths(this.host, Paths.v1.createFileValetToken);
     const params = {
       operation: 'write',
+      resources: [
+        remoteIdentifier,
+      ],
     };
     const response = await this.tokenRefreshableRequest<CreateValetTokenResponse>(
       {
@@ -870,7 +873,13 @@ export class SNApiService
       }
     );
 
-    return response.data?.token;
+    if (!response.data?.success) {
+      return {
+        error: response.data?.reason as string
+      }
+    }
+
+    return response.data?.valetToken;
   }
 
   public async uploadFileBytes(
