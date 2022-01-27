@@ -2,7 +2,7 @@ import {
   FeatureIdentifier,
   ThirdPartyFeatureDescription,
 } from '@standardnotes/features';
-import { SNPredicate } from '@Lib/models/core/predicate';
+import { PredicateOperator, SNPredicate } from '@Lib/models/core/predicate';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@Lib/utils';
 import { UuidString } from './../../types';
@@ -121,7 +121,7 @@ export class SNComponent extends SNItem implements ComponentContent {
   get singletonPredicate(): SNPredicate {
     const uniqueIdentifierPredicate = new SNPredicate(
       'identifier',
-      '=',
+      PredicateOperator.Equals,
       this.identifier
     );
     return uniqueIdentifierPredicate;

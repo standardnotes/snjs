@@ -2,6 +2,7 @@ import { ApplicationStage } from '../stages';
 import { Migration } from '@Lib/migrations/migration';
 import { SNPredicate } from '@Lib/models';
 import { ContentType } from '@standardnotes/common';
+import { PredicateOperator } from '@Lib/models/core/predicate';
 
 export class Migration2_7_0 extends Migration {
   static version(): string {
@@ -21,8 +22,16 @@ export class Migration2_7_0 extends Migration {
   private async deleteBatchManagerSingleton() {
     const batchMgrId = 'org.standardnotes.batch-manager';
     const batchMgrPred = SNPredicate.CompoundPredicate([
-      new SNPredicate('content_type', '=', ContentType.Component),
-      new SNPredicate('package_info.identifier', '=', batchMgrId),
+      new SNPredicate(
+        'content_type',
+        PredicateOperator.Equals,
+        ContentType.Component
+      ),
+      new SNPredicate(
+        'package_info.identifier',
+        PredicateOperator.Equals,
+        batchMgrId
+      ),
     ]);
     const batchMgrSingleton = this.services.singletonManager.findSingleton(
       ContentType.Component,

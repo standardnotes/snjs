@@ -6,13 +6,13 @@ const expect = chai.expect;
 
 const FooContentType = 'Foo';
 
-const createItemParams = function () {
+const createItemParams = function (title = 'Hello', desc = 'World') {
   const params = {
     uuid: Factory.generateUuidish(),
     content_type: FooContentType,
     content: {
-      title: 'Hello',
-      desc: 'World',
+      title: title,
+      desc: desc,
       numbers: ['1', '2', '3'],
       tags: [
         {
@@ -437,6 +437,20 @@ describe('predicates', async function () {
     expect(
       changedItem.satisfiesPredicate(JSON.parse('["archived", "=", false]'))
     ).to.equal(false);
+  });
+
+  it('"contains" operator', async function () {
+    const itemManager = this.itemManager;
+    const payload1 = CreateMaxPayloadFromAnyObject({
+      ...createItemParams('hello', 'world'),
+      updated_at: new Date(),
+    });
+    await itemManager.emitItemFromPayload(payload1, PayloadSource.LocalSaved);
+
+    const predicate = new SNPredicate('content.title', 'includes', 'ello');
+    expect(
+      itemManager.itemsMatchingPredicate(FooContentType, predicate).length
+    ).to.equal(1);
   });
 
   it('item manager predicate matching', async function () {

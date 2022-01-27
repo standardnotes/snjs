@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.43.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.2...@standardnotes/snjs@2.43.0) (2022-01-26)
+
+
+### Features
+
+* add SNS & SQS setup for subscription events ([#572](https://github.com/standardnotes/snjs/issues/572)) ([e706ec3](https://github.com/standardnotes/snjs/commit/e706ec36673eb94204b9d88938a69248906e8586))
+
+
+
+
+
+## [2.42.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.1...@standardnotes/snjs@2.42.2) (2022-01-25)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.42.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.0...@standardnotes/snjs@2.42.1) (2022-01-25)
 
 

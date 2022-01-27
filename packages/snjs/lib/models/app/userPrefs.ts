@@ -1,3 +1,4 @@
+import { PredicateOperator } from './../core/predicate';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 import { SNPredicate } from '@Models/core/predicate';
@@ -53,7 +54,7 @@ export type PrefValue = {
 export class SNUserPrefs extends SNItem {
   static singletonPredicate = new SNPredicate(
     'content_type',
-    '=',
+    PredicateOperator.Equals,
     ContentType.UserPrefs
   );
 
