@@ -136,7 +136,7 @@ export class ItemManager extends PureService {
     this.collection.setDisplayOptions(
       ContentType.SmartTag,
       CollectionSort.Title,
-      'asc'
+      'dsc'
     );
     this.notesView = new ItemCollectionNotesView(this.collection);
     this.tagNotesIndex = new TagNotesIndex(this.collection);
