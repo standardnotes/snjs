@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.19.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.18.1...@standardnotes/domain-events@2.19.0) (2022-01-28)
+
+
+### Features
+
+* add listed account created event ([beddc4b](https://github.com/standardnotes/snjs/commit/beddc4b8c3ca5beb297d8d17d0d84252bf6b4b6b))
+
+
+
+
+
 ## [2.18.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.18.0...@standardnotes/domain-events@2.18.1) (2022-01-28)
 
 **Note:** Version bump only for package @standardnotes/domain-events
