@@ -395,7 +395,7 @@ function editors(): EditorFeatureDescription[] {
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Secure Spreadsheets',
     identifier: FeatureIdentifier.SheetsEditor,
-    version: '1.4.3',
+    version: '1.4.4',
     note_type: NoteType.Spreadsheet,
     file_type: 'json',
     interchangeable: false,
