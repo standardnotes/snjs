@@ -24,9 +24,7 @@ export class Migration3_0_0 extends Migration {
   private shouldMigrateTags(): boolean {
     const itemManager = this.services.itemManager;
     const hasActiveFoldersComponent = itemManager.components.some(
-      (component) => {
-        component.active && component.area === ComponentArea.TagsList;
-      }
+      (component) => component.active && component.area === ComponentArea.TagsList
     );
 
     return hasActiveFoldersComponent;
