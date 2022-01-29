@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.43.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.5...@standardnotes/snjs@2.43.6) (2022-01-29)
+
+
+### Bug Fixes
+
+* remove sncomponent as actions extension subclass due to fact singleton strategies differ ([#577](https://github.com/standardnotes/snjs/issues/577)) ([2b54377](https://github.com/standardnotes/snjs/commit/2b54377e2f9d0d95e40a4f5c3d6976b592e8a212))
+
+
+
+
+
 ## [2.43.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.4...@standardnotes/snjs@2.43.5) (2022-01-28)
 
 **Note:** Version bump only for package @standardnotes/snjs
