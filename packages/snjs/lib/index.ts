@@ -77,6 +77,7 @@ export {
 } from './services/component_manager/component_viewer';
 
 export { HistoryEntry } from '@Services/history/entries/history_entry';
+export { NoteHistoryEntry } from './services/history/entries/note_history_entry';
 export { PayloadManager } from './services/payload_manager';
 
 export type { TransactionalMutation } from './services/item_manager';
