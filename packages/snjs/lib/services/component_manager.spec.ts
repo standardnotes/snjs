@@ -211,6 +211,16 @@ describe('featuresService', () => {
       expect(requiresAlert).toBe(false);
     });
 
+    it('should not require alert switching from & to a html editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const htmlEditor = nativeComponent();
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        htmlEditor,
+        htmlEditor
+      );
+      expect(requiresAlert).toBe(false);
+    });
+
     it('should require alert switching from a html editor to custom editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb);
       const htmlEditor = nativeComponent();

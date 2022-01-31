@@ -707,6 +707,13 @@ export class SNComponentManager extends PureService<
         from.package_info.file_type !== 'md' &&
         to.package_info.file_type !== 'md'
       ) {
+        if (
+          from.package_info.file_type === 'html' &&
+          to.package_info.file_type === 'html'
+        ) {
+          return false;
+        }
+
         return true;
       }
     }
