@@ -702,23 +702,19 @@ export class SNComponentManager extends PureService<
     from: SNComponent | undefined,
     to: SNComponent | undefined
   ): boolean {
-    if (from && to) {
-      if (
-        from.package_info.file_type !== 'md' &&
-        to.package_info.file_type !== 'md'
-      ) {
-        if (
-          from.package_info.file_type === 'html' &&
-          to.package_info.file_type === 'html'
-        ) {
-          return false;
-        }
+    const isEitherPlainEditor = !from || !to;
+    const isEitherMarkdown =
+      from?.package_info.file_type === 'md' ||
+      to?.package_info.file_type === 'md';
+    const areBothHtml =
+      from?.package_info.file_type === 'html' &&
+      to?.package_info.file_type === 'html';
 
-        return true;
-      }
+    if (isEitherPlainEditor || isEitherMarkdown || areBothHtml) {
+      return false;
+    } else {
+      return true;
     }
-
-    return false;
   }
 
   async showEditorChangeAlert(): Promise<boolean> {
