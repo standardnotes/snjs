@@ -395,7 +395,7 @@ function editors(): EditorFeatureDescription[] {
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Secure Spreadsheets',
     identifier: FeatureIdentifier.SheetsEditor,
-    version: '1.4.3',
+    version: '1.4.4',
     note_type: NoteType.Spreadsheet,
     file_type: 'json',
     interchangeable: false,
@@ -481,22 +481,27 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
 function serverFeatures(): ServerFeatureDescription[] {
   return [
     {
+      name: 'Two factor authentication',
       identifier: FeatureIdentifier.TwoFactorAuth,
       permission_name: PermissionName.TwoFactorAuth,
     },
     {
+      name: 'Unlimited note history',
       identifier: FeatureIdentifier.NoteHistoryUnlimited,
       permission_name: PermissionName.NoteHistoryUnlimited,
     },
     {
+      name: '365 days note history',
       identifier: FeatureIdentifier.NoteHistory365Days,
       permission_name: PermissionName.NoteHistory365Days,
     },
     {
+      name: '30 days note history',
       identifier: FeatureIdentifier.NoteHistory30Days,
       permission_name: PermissionName.NoteHistory30Days,
     },
     {
+      name: 'Email backups',
       identifier: FeatureIdentifier.DailyEmailBackup,
       permission_name: PermissionName.DailyEmailBackup,
     },
@@ -539,7 +544,7 @@ function clientFeatures(): ClientFeatureDescription[] {
         'Create smart filters for viewing notes matching specific criteria.',
     },
     {
-      name: '',
+      name: 'Encrypted files',
       identifier: FeatureIdentifier.Files,
       permission_name: PermissionName.Files,
       description: '',

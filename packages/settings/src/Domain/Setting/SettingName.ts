@@ -12,4 +12,5 @@ export enum SettingName {
   MuteFailedCloudBackupsEmails = 'MUTE_FAILED_CLOUD_BACKUPS_EMAILS',
   FileUploadBytesLimit = 'FILE_UPLOAD_BYTES_LIMIT',
   FileUploadBytesUsed = 'FILE_UPLOAD_BYTES_USED',
+  ListedAuthorSecrets = 'LISTED_AUTHOR_SECRETS',
 }
