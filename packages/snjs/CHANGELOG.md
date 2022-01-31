@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.45.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.3...@standardnotes/snjs@2.45.0) (2022-01-31)
+
+
+### Features
+
+* add new icon types ([#579](https://github.com/standardnotes/snjs/issues/579)) ([9f7c466](https://github.com/standardnotes/snjs/commit/9f7c466734849fe0066314b369603dc0faa10123))
+
+
+
+
+
 ## [2.44.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.2...@standardnotes/snjs@2.44.3) (2022-01-31)
 
 **Note:** Version bump only for package @standardnotes/snjs
