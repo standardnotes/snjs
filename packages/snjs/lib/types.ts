@@ -77,4 +77,7 @@ export type IconType = 'menu-arrow-down-alt'
   | 'menu-arrow-down'
   | 'menu-close'
   | 'window'
-  | 'premium-feature';
+  | 'premium-feature'
+  | 'spellcheck'
+  | 'editor'
+  | 'user-switch';
