@@ -30,6 +30,10 @@ export abstract class DeviceInterface {
     this.interval = undefined;
   }
 
+  public cancelTimeout(timeout: unknown): void {
+    clearTimeout(timeout as any);
+  }
+
   abstract getRawStorageValue(key: string): Promise<string | undefined>;
 
   /**
