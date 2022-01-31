@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "timestamp": 1465414804110,
+  "subscriptions": [
+    {
+      "arn": "e9126059-9eab-4b37-8194-e0d64dfb2045",
+      "topicArn": "arn:aws:sns:us-east-1:1-2-3:snjs",
+      "endpoint": "aws-sqs://auth?amazonSQSEndpoint=http://sqs:9324&accessKey=&secretKey=",
+      "owner": "",
+      "protocol": "sqs"
+    }
+  ],
+  "topics": [
+    {
+      "arn": "arn:aws:sns:us-east-1:1-2-3:snjs",
+      "name": "snjs"
+    }
+  ]
+}

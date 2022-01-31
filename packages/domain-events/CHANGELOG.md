@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.20.0...@standardnotes/domain-events@2.20.1) (2022-01-31)
+
+
+### Bug Fixes
+
+* user uuid type on listed account requested event ([2ccfe50](https://github.com/standardnotes/snjs/commit/2ccfe50f0d997245df90981ac5f87d560879e1ff))
+
+
+
+
+
+# [2.20.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.19.0...@standardnotes/domain-events@2.20.0) (2022-01-31)
+
+
+### Features
+
+* add listed account requested event ([b3c59ef](https://github.com/standardnotes/snjs/commit/b3c59efec325d175b625520de1841f670516a419))
+
+
+
+
+
+# [2.19.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.18.1...@standardnotes/domain-events@2.19.0) (2022-01-28)
+
+
+### Features
+
+* add listed account created event ([beddc4b](https://github.com/standardnotes/snjs/commit/beddc4b8c3ca5beb297d8d17d0d84252bf6b4b6b))
+
+
+
+
+
+## [2.18.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.18.0...@standardnotes/domain-events@2.18.1) (2022-01-28)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+# [2.18.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.17.1...@standardnotes/domain-events@2.18.0) (2022-01-27)
+
+
+### Features
+
+* add features list to extension key granted event ([#574](https://github.com/standardnotes/snjs/issues/574)) ([946319a](https://github.com/standardnotes/snjs/commit/946319a7eb694ee54b3a6377dad116580911f8ca))
+
+
+
+
+
 ## [2.17.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.17.0...@standardnotes/domain-events@2.17.1) (2022-01-19)
 
 **Note:** Version bump only for package @standardnotes/domain-events

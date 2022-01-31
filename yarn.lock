@@ -11512,10 +11512,10 @@ sn-simple-task-editor@1.3.8:
   resolved "https://registry.yarnpkg.com/sn-simple-task-editor/-/sn-simple-task-editor-1.3.8.tgz#c787a4c84ca297db336e55de5cb07ca4dfce01e3"
   integrity sha512-OOFbSiGoZo2T0vZdXEpalbxzW1WGi9O82GIAdVFRKcr3aMNERN9EeO+4mVe3uP22DngITi4pj4KRX9ZYdKvumg==
 
-sn-spreadsheets@1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.3.tgz#441bfded79352e95b024f2424e8030c575c939a1"
-  integrity sha512-dwWQACmbLB3P5d8xVb2LsVzJYCM1LUij8A23JD1zrr3zb7wOVrec+qEgSpF9nKjiaI9a3AU9V2TECv1OA3iNiA==
+sn-spreadsheets@1.4.4:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.4.tgz#95e2947bb227f5cbb8ba8b88270eaf51ff300d79"
+  integrity sha512-nYHT6NjspBZmYrG70ESY6KoGA5UPTvp/Y9OaOIB5PhH/X6K5posiDIfPo5IBqNT4oOZ03QHPkNAW1Q6X4KgdUA==
 
 sn-theme-autobiography@standardnotes/autobiography-theme:
   version "1.0.2"

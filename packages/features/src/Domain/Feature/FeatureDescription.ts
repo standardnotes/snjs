@@ -26,6 +26,7 @@ export type BaseFeatureDescription = {
 };
 
 export type ServerFeatureDescription = {
+  name?: string;
   identifier: FeatureIdentifier;
   permission_name: PermissionName;
 };

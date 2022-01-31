@@ -3,6 +3,114 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.45.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.3...@standardnotes/snjs@2.45.0) (2022-01-31)
+
+
+### Features
+
+* add new icon types ([#579](https://github.com/standardnotes/snjs/issues/579)) ([9f7c466](https://github.com/standardnotes/snjs/commit/9f7c466734849fe0066314b369603dc0faa10123))
+
+
+
+
+
+## [2.44.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.2...@standardnotes/snjs@2.44.3) (2022-01-31)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.44.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.1...@standardnotes/snjs@2.44.2) (2022-01-31)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.44.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.0...@standardnotes/snjs@2.44.1) (2022-01-31)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.44.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.6...@standardnotes/snjs@2.44.0) (2022-01-31)
+
+
+### Features
+
+* store editor icons and their colors in snjs ([#573](https://github.com/standardnotes/snjs/issues/573)) ([1932d8d](https://github.com/standardnotes/snjs/commit/1932d8deb9309f22744d2ec53fd46b805874e738))
+
+
+
+
+
+## [2.43.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.5...@standardnotes/snjs@2.43.6) (2022-01-29)
+
+
+### Bug Fixes
+
+* remove sncomponent as actions extension subclass due to fact singleton strategies differ ([#577](https://github.com/standardnotes/snjs/issues/577)) ([2b54377](https://github.com/standardnotes/snjs/commit/2b54377e2f9d0d95e40a4f5c3d6976b592e8a212))
+
+
+
+
+
+## [2.43.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.4...@standardnotes/snjs@2.43.5) (2022-01-28)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.43.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.3...@standardnotes/snjs@2.43.4) (2022-01-28)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.43.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.2...@standardnotes/snjs@2.43.3) (2022-01-28)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.43.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.1...@standardnotes/snjs@2.43.2) (2022-01-27)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.43.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.0...@standardnotes/snjs@2.43.1) (2022-01-27)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.43.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.2...@standardnotes/snjs@2.43.0) (2022-01-26)
+
+
+### Features
+
+* add SNS & SQS setup for subscription events ([#572](https://github.com/standardnotes/snjs/issues/572)) ([e706ec3](https://github.com/standardnotes/snjs/commit/e706ec36673eb94204b9d88938a69248906e8586))
+
+
+
+
+
 ## [2.42.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.42.1...@standardnotes/snjs@2.42.2) (2022-01-25)
 
 **Note:** Version bump only for package @standardnotes/snjs
