@@ -697,4 +697,30 @@ export class SNComponentManager extends PureService<
     }
     return contentTypeStrings.concat(contextAreaStrings).join(', ') + '.';
   }
+
+  doesEditorChangeRequireAlert(
+    from: SNComponent | undefined,
+    to: SNComponent | undefined
+  ): boolean {
+    if (from && to) {
+      if (
+        from.package_info.file_type !== 'md' &&
+        to.package_info.file_type !== 'md'
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async showEditorChangeAlert(): Promise<boolean> {
+    const shouldChangeEditor = await this.alertService.confirm(
+      'Doing so might result in minor formatting changes.',
+      'Are you sure you want to change the editor?',
+      'Yes, change it'
+    );
+
+    return shouldChangeEditor;
+  }
 }
