@@ -190,7 +190,7 @@ export class NoteViewController {
     );
 
     if (this.saveTimeout) {
-      this.application.deviceInterface.timeout.cancel(this.saveTimeout);
+      this.application.deviceInterface.cancelTimeout(this.saveTimeout);
     }
 
     const noDebounce = dto.bypassDebouncer || this.application.noAccount();
