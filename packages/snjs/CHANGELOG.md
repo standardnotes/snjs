@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.44.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.6...@standardnotes/snjs@2.44.0) (2022-01-31)
+
+
+### Features
+
+* store editor icons and their colors in snjs ([#573](https://github.com/standardnotes/snjs/issues/573)) ([1932d8d](https://github.com/standardnotes/snjs/commit/1932d8deb9309f22744d2ec53fd46b805874e738))
+
+
+
+
+
 ## [2.43.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.5...@standardnotes/snjs@2.43.6) (2022-01-29)
 
 
