@@ -3,7 +3,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const createApp = async () =>
-  Factory.createInitAppWithRandNamespace(Environment.Web, Platform.MacWeb);
+  Factory.createInitAppWithRealCrypto(Environment.Web, Platform.MacWeb);
 
 const accountPassword = 'password';
 

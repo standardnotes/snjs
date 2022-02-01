@@ -16,7 +16,7 @@ describe('storage manager', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedKeyCount = BASE_KEY_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace(
+    this.application = await Factory.createInitAppWithFakeCrypto(
       Environment.Mobile
     );
     this.email = Uuid.GenerateUuidSynchronously();

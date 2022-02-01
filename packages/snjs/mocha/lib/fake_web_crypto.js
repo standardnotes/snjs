@@ -1,4 +1,4 @@
-export class FakeWebCrypto {
+export default class FakeWebCrypto {
   constructor() {}
 
   deinit() {}
@@ -14,13 +14,36 @@ export class FakeWebCrypto {
     return randomString;
   }
 
-  generateUUIDSync() {
-    return this.randomString(16);
-  }
+  generateUUIDSync = () => {
+    const globalScope = getGlobalScope()
+    const crypto = globalScope.crypto || globalScope.msCrypto
+    if (crypto) {
+      const buf = new Uint32Array(4)
+      crypto.getRandomValues(buf)
+      let idx = -1
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        idx++
+        const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15
+        const v = c === 'x' ? r : (r & 0x3 | 0x8)
+        return v.toString(16)
+      })
+    } else {
+      let d = new Date().getTime()
+      if (globalScope.performance && typeof globalScope.performance.now === 'function') {
+        d += performance.now() // use high-precision timer if available
+      }
+      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (d + Math.random() * 16) % 16 | 0
+        d = Math.floor(d / 16)
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+      })
+      return uuid
+    }
+  };
 
-  async generateUUID() {
-    return this.randomString(16);
-  }
+  generateUUID = async () => {
+    return this.generateUUIDSync();
+  };
 
   timingSafeEqual(a, b) {
     return a === b;
@@ -56,7 +79,7 @@ export class FakeWebCrypto {
   }
 
   async sha256(text) {
-    return btoa(text);
+    return new SNWebCrypto().sha256(text);
   }
 
   async hmac1(message, key) {

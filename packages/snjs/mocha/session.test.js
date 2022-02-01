@@ -5,7 +5,7 @@ import WebDeviceInterface from './lib/web_device_interface.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('server session', function () {
+describe.skip('server session', function () {
   this.timeout(Factory.TenSecondTimeout);
 
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
@@ -18,7 +18,7 @@ describe('server session', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
     this.newPassword = Factory.randomString();
@@ -594,7 +594,7 @@ describe('server session', function () {
       password: this.password,
     });
 
-    const appA = await Factory.createApplication(Factory.randomString());
+    const appA = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await appA.prepareForLaunch({});
     await appA.launch(true);
 
@@ -608,7 +608,7 @@ describe('server session', function () {
     });
 
     /** Create simultaneous appB signed into same account */
-    const appB = await Factory.createApplication('another-namespace');
+    const appB = await Factory.createApplicationWithRealCrypto('another-namespace');
     await appB.prepareForLaunch({});
     await appB.launch(true);
     await Factory.loginToApplication({
@@ -649,7 +649,7 @@ describe('server session', function () {
         new ChallengeValue(challenge.prompts[1], password),
       ]);
     };
-    const appA = await Factory.createApplication(Factory.randomString());
+    const appA = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await appA.prepareForLaunch({ receiveChallenge });
     await appA.launch(true);
 

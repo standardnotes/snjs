@@ -19,7 +19,7 @@ describe('protections', function () {
   it('prompts for password when accessing protected note', async function () {
     let challengePrompts = 0;
 
-    this.application = await Factory.createApplication(Factory.randomString());
+    this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     const password = Uuid.GenerateUuidSynchronously();
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
@@ -58,7 +58,7 @@ describe('protections', function () {
   });
 
   it('sets `note.protected` to true', async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     let note = await Factory.createMappedNote(this.application);
     note = await this.application.protectNote(note);
     expect(note.protected).to.be.true;
@@ -68,7 +68,7 @@ describe('protections', function () {
     const passcode = 'passcode🌂';
     let challengePrompts = 0;
 
-    this.application = await Factory.createApplication(Factory.randomString());
+    this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1;
@@ -104,7 +104,7 @@ describe('protections', function () {
     const passcode = 'passcode🌂';
     let challengePrompts = 0;
 
-    this.application = await Factory.createApplication(Factory.randomString());
+    this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1;
@@ -142,7 +142,7 @@ describe('protections', function () {
     const passcode = 'passcode🌂';
     let challengePrompts = 0;
 
-    this.application = await Factory.createApplication(Factory.randomString());
+    this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts++;
@@ -163,7 +163,7 @@ describe('protections', function () {
     const passcode = 'passcode🌂';
 
     let challengePrompts = 0;
-    this.application = await Factory.createApplication(Factory.randomString());
+    this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1;
@@ -197,7 +197,7 @@ describe('protections', function () {
   });
 
   it('prompts for password when adding a passcode', async function () {
-    const application = Factory.createApplication(Factory.randomString());
+    const application = Factory.createApplicationWithRealCrypto(Factory.randomString());
     const password = Uuid.GenerateUuidSynchronously();
     const passcode = 'passcode';
     let didPromptForPassword = false;
@@ -241,7 +241,7 @@ describe('protections', function () {
 
 
   it('authorizes note access when no password or passcode are set', async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
 
     let note = await Factory.createMappedNote(this.application);
     note = await this.application.protectNote(note);
@@ -252,7 +252,7 @@ describe('protections', function () {
   it('authorizes autolock interval change', async function () {
     const passcode = 'passcode🌂';
 
-    this.application = await Factory.createApplication(Factory.randomString());
+    this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         expect(
@@ -283,7 +283,7 @@ describe('protections', function () {
   it('authorizes batch manager access', async function () {
     const passcode = 'passcode🌂';
 
-    this.application = await Factory.createApplication(Factory.randomString());
+    this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         expect(
@@ -312,7 +312,7 @@ describe('protections', function () {
   });
 
   it('handles session length', async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     await this.application.protectionService.setSessionLength(300);
     const length = await this.application.protectionService.getLastSessionLength();
     expect(length).to.equal(300);
@@ -321,7 +321,7 @@ describe('protections', function () {
   });
 
   it('handles session length', async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     await this.application.protectionService.setSessionLength(UnprotectedAccessSecondsDuration.OneMinute);
     const length = await this.application.protectionService.getLastSessionLength();
     expect(length).to.equal(UnprotectedAccessSecondsDuration.OneMinute);
@@ -331,31 +331,31 @@ describe('protections', function () {
 
   describe('hasProtectionSources', async function () {
     it('no account, no passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       expect(this.application.hasProtectionSources()).to.be.false;
     });
 
     it('no account, no passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       await this.application.enableBiometrics();
       expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('no account, passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       await this.application.addPasscode('passcode');
       expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('no account, passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       await this.application.addPasscode('passcode');
       await this.application.enableBiometrics();
       expect(this.application.hasProtectionSources()).to.be.true;
     });
 
     it('account, no passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       await Factory.registerUserToApplication({
         application: this.application,
         email: Uuid.GenerateUuidSynchronously(),
@@ -365,7 +365,7 @@ describe('protections', function () {
     });
 
     it('account, no passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       await Factory.registerUserToApplication({
         application: this.application,
         email: Uuid.GenerateUuidSynchronously(),
@@ -376,7 +376,7 @@ describe('protections', function () {
     });
 
     it('account, passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       const password = Uuid.GenerateUuidSynchronously();
       await Factory.registerUserToApplication({
         application: this.application,
@@ -389,7 +389,7 @@ describe('protections', function () {
     });
 
     it('account, passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       const password = Uuid.GenerateUuidSynchronously();
       await Factory.registerUserToApplication({
         application: this.application,
@@ -406,20 +406,20 @@ describe('protections', function () {
   describe('hasUnprotectedAccessSession', async function () {
     it('should return false when session length has not been set', async function () {
       this.foo = 'tar';
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       await this.application.addPasscode('passcode');
       expect(this.application.hasUnprotectedAccessSession()).to.be.false;
     });
 
     it('should return true when session length has been set', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       await this.application.addPasscode('passcode');
       await this.application.protectionService.setSessionLength(UnprotectedAccessSecondsDuration.OneMinute);
       expect(this.application.hasUnprotectedAccessSession()).to.be.true;
     });
 
     it('should return true when there are no protection sources', async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       expect(this.application.hasUnprotectedAccessSession()).to.be.true;
     });
   });
@@ -427,7 +427,7 @@ describe('protections', function () {
   describe('authorizeProtectedActionForNotes', async function () {
     it('prompts for password once with the right challenge reason when one or more notes are protected', async function () {
       let challengePrompts = 0;
-      this.application = await Factory.createApplication(Factory.randomString());
+      this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
       const password = Uuid.GenerateUuidSynchronously();
 
       await this.application.prepareForLaunch({
@@ -474,7 +474,7 @@ describe('protections', function () {
 
     it('prompts for passcode once with the right challenge reason when one or more notes are protected', async function () {
       let challengePrompts = 0;
-      this.application = await Factory.createApplication(Factory.randomString());
+      this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
       const passcode = 'passcode🌂';
 
       await this.application.prepareForLaunch({
@@ -518,7 +518,7 @@ describe('protections', function () {
       const passcode = 'passcode🌂';
       let challengePrompts = 0;
 
-      this.application = await Factory.createApplication(Factory.randomString());
+      this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
       await this.application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts++;
@@ -543,7 +543,7 @@ describe('protections', function () {
 
   describe('protectNotes', async function () {
     it('protects all notes', async function () {
-      this.application = await Factory.createApplication(Factory.randomString());
+      this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
       await this.application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           this.application.cancelChallenge(challenge);
@@ -564,7 +564,7 @@ describe('protections', function () {
   describe('unprotect notes', async function () {
     it('prompts for password and unprotects all notes if challenge is succesful', async function () {
       let challengePrompts = 0;
-      this.application = await Factory.createApplication(Factory.randomString());
+      this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
       const passcode = 'passcode🌂';
 
       await this.application.prepareForLaunch({
@@ -605,7 +605,7 @@ describe('protections', function () {
 
     it('prompts for passcode and unprotects all notes if challenge is succesful', async function () {
       let challengePrompts = 0;
-      this.application = await Factory.createApplication(Factory.randomString());
+      this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
       const passcode = 'passcode🌂';
 
       await this.application.prepareForLaunch({
@@ -648,7 +648,7 @@ describe('protections', function () {
       const passcode = 'passcode🌂';
       let challengePrompts = 0;
 
-      this.application = await Factory.createApplication(Factory.randomString());
+      this.application = await Factory.createApplicationWithRealCrypto(Factory.randomString());
       await this.application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts++;

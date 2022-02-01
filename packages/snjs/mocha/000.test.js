@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('000 legacy protocol operations', () => {
-  const application = Factory.createApplication();
+  const application = Factory.createApplicationWithRealCrypto();
   const protocol000 = new SNProtocolOperator004(new SNWebCrypto());
 
   before(async () => {

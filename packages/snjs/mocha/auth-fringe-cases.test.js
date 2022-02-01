@@ -8,7 +8,7 @@ describe('auth fringe cases', () => {
   const BASE_ITEM_COUNT = ['default items key', 'user prefs'].length;
 
   const createContext = async () => {
-    const application = await Factory.createInitAppWithRandNamespace();
+    const application = await Factory.createInitAppWithFakeCrypto();
     return {
       expectedItemCount: BASE_ITEM_COUNT,
       application: application,

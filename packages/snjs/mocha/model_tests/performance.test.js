@@ -10,7 +10,7 @@ describe('mapping performance', () => {
     There was an issue with mapping where we were using arrays for everything instead of hashes (like items, missedReferences),
     which caused searching to be really expensive and caused a huge slowdown.
     */
-    const application = await Factory.createInitAppWithRandNamespace();
+    const application = await Factory.createInitAppWithFakeCrypto();
 
     // create a bunch of notes and tags, and make sure mapping doesn't take a long time
     const noteCount = 1500;
@@ -84,7 +84,7 @@ describe('mapping performance', () => {
       Fixed now. The issue was that we were looping around too much. I've consolidated some of the loops
       so that things require less loops in payloadManager, regarding missedReferences.
     */
-    const application = await Factory.createInitAppWithRandNamespace();
+    const application = await Factory.createInitAppWithFakeCrypto();
 
     const noteCount = 10000;
     const notes = [];

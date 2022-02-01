@@ -21,7 +21,7 @@ describe('migrations', () => {
   });
 
   it('version number is stored as string', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+    const application = await Factory.createInitAppWithFakeCrypto();
     const version = await application.migrationService.getStoredSnjsVersion();
     expect(typeof version).to.equal('string');
     await Factory.safeDeinit(application);

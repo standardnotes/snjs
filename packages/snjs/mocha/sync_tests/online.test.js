@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('online syncing', function () {
+describe('online syncing', function () {
   this.timeout(Factory.TenSecondTimeout);
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
 

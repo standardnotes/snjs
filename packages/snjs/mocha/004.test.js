@@ -10,7 +10,7 @@ describe('004 protocol operations', function () {
   let _keyParams;
   let _key;
 
-  const application = Factory.createApplication();
+  const application = Factory.createApplicationWithRealCrypto();
   const protocol004 = new SNProtocolOperator004(new SNWebCrypto());
 
   before(async function () {

@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('001 protocol operations', () => {
-  const application = Factory.createApplication();
+  const application = Factory.createApplicationWithRealCrypto();
   const protocol001 = new SNProtocolOperator001(new SNWebCrypto());
 
   const _identifier = 'hello@test.com';

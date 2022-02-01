@@ -7,7 +7,7 @@ const expect = chai.expect;
 describe('protocol', function () {
   beforeEach(async function () {
     localStorage.clear();
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
   });

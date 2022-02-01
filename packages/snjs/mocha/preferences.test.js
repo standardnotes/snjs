@@ -7,7 +7,7 @@ const expect = chai.expect;
 describe('preferences', function () {
   beforeEach(async function () {
     localStorage.clear();
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
   });
@@ -97,7 +97,7 @@ describe('preferences', function () {
 
     await Factory.safeDeinit(this.application);
 
-    this.application = Factory.createApplication(identifier);
+    this.application = Factory.createApplicationWithRealCrypto(identifier);
     const willSyncPromise = new Promise((resolve) => {
       this.application.addEventObserver(resolve, ApplicationEvent.WillSync);
     });

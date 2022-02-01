@@ -14,7 +14,7 @@ describe('backups', function () {
   });
 
   beforeEach(async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
   });
@@ -218,7 +218,7 @@ describe('backups', function () {
   });
 
   it('decrypted backup file with account should not have keyParams', async function () {
-    const application = await Factory.createInitAppWithRandNamespace();
+    const application = await Factory.createInitAppWithFakeCrypto();
     await Factory.registerUserToApplication({
       application: application,
       email: Uuid.GenerateUuidSynchronously(),

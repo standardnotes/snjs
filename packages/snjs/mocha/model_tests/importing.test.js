@@ -10,7 +10,7 @@ describe('importing', function () {
 
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     this.email = Uuid.GenerateUuidSynchronously();
     this.password = Uuid.GenerateUuidSynchronously();
     Factory.handlePasswordChallenges(this.application, this.password);
@@ -410,7 +410,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application, this.password);
 
     await this.application.importData(backupData, true);
@@ -438,7 +438,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application, this.password);
 
     await this.application.importData(backupData, true);
@@ -471,7 +471,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application, this.password);
 
     const result = await this.application.importData(backupData, true);
@@ -527,7 +527,7 @@ describe('importing', function () {
 
     const password = 'password';
 
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application, password);
 
     const result = await this.application.importData(backupData, true);
@@ -556,7 +556,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application, this.password);
 
     const result = await this.application.importData(backupData, true);
@@ -590,7 +590,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application, this.password);
 
     const madeUpPayload = JSON.parse(JSON.stringify(noteItem));
@@ -628,7 +628,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
         const values = challenge.prompts.map(
@@ -667,7 +667,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     this.application.setLaunchCallback({
       receiveChallenge: (challenge) => {
         const values = challenge.prompts.map(
@@ -702,7 +702,7 @@ describe('importing', function () {
     delete backupData.keyParams;
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
 
     const result = await this.application.importData(backupData);
 
@@ -733,7 +733,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application);
 
     const result = await this.application.importData(backupData, true);
@@ -754,7 +754,7 @@ describe('importing', function () {
      * This test is only meant to test successful local importing.
      */
     const identifier = 'standardnotes';
-    const application = await Factory.createApplication(identifier);
+    const application = await Factory.createApplicationWithRealCrypto(identifier);
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'keychain',
@@ -898,7 +898,7 @@ describe('importing', function () {
     );
 
     await Factory.safeDeinit(this.application);
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithRealCrypto();
     Factory.handlePasswordChallenges(this.application, this.password);
 
     await Factory.registerUserToApplication({

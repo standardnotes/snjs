@@ -22,7 +22,7 @@ describe('history manager', () => {
 
   describe('session', async function () {
     beforeEach(async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       this.historyManager = this.application.historyManager;
       this.payloadManager = this.application.payloadManager;
       /** Automatically optimize after every revision by setting this to 0 */
@@ -359,7 +359,7 @@ describe('history manager', () => {
 
   describe('remote', async function () {
     beforeEach(async function () {
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       this.historyManager = this.application.historyManager;
       this.payloadManager = this.application.payloadManager;
       this.email = Uuid.GenerateUuidSynchronously();
@@ -377,7 +377,7 @@ describe('history manager', () => {
 
     it('response from server should be empty if not signed in', async function () {
       await this.application.signOut();
-      this.application = await Factory.createInitAppWithRandNamespace();
+      this.application = await Factory.createInitAppWithFakeCrypto();
       this.historyManager = this.application.historyManager;
       this.payloadManager = this.application.payloadManager;
       const item = await Factory.createSyncedNote(this.application);

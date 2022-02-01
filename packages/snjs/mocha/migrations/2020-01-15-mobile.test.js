@@ -213,7 +213,7 @@ describe('2020-01-15 mobile migration', () => {
     await Factory.safeDeinit(application);
 
     /** Recreate application and ensure storage values are consistent */
-    application = Factory.createApplication(appId);
+    application = Factory.createApplicationWithRealCrypto(appId);
     await application.prepareForLaunch({
       receiveChallenge,
     });
@@ -686,7 +686,7 @@ describe('2020-01-15 mobile migration', () => {
      */
 
     /** Register a real user so we can attempt to sign back into this account later */
-    const tempApp = await Factory.createInitAppWithRandNamespace(
+    const tempApp = await Factory.createInitAppWithFakeCrypto(
       Environment.Mobile,
       Platform.Ios
     );
@@ -1389,7 +1389,7 @@ describe('2020-01-15 mobile migration', () => {
     await Factory.safeDeinit(application);
 
     /** Recreate application and ensure storage values are consistent */
-    application = Factory.createApplication(appId);
+    application = Factory.createApplicationWithRealCrypto(appId);
     await application.prepareForLaunch({
       receiveChallenge,
     });
