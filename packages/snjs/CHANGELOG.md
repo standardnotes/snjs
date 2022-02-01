@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.47.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.46.0...@standardnotes/snjs@2.47.0) (2022-02-01)
+
+
+### Features
+
+* add function to check if editor change requires alert ([#581](https://github.com/standardnotes/snjs/issues/581)) ([a9f27b1](https://github.com/standardnotes/snjs/commit/a9f27b18d17cb222425059440ddd84f82d2b4244))
+
+
+
+
+
 # [2.46.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.3...@standardnotes/snjs@2.46.0) (2022-02-01)
 
 
