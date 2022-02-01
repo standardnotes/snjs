@@ -132,7 +132,7 @@ import {
   FeaturesEvent,
   SetOfflineFeaturesFunctionResponse,
 } from '@Services/features_service';
-import { Migration3_0_0 } from './migrations/3_0_0';
+import { TagsToFoldersMigration } from './migrations/drafts/tags_to_folders';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -930,7 +930,7 @@ export class SNApplication {
   }
 
   public async migrateTagDotsToHierarchy(): Promise<void> {
-    return Migration3_0_0.upgradeTagFoldersToHierarchy(this.itemManager);
+    return TagsToFoldersMigration.upgradeTagFoldersToHierarchy(this.itemManager);
   }
 
   /**

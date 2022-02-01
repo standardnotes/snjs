@@ -1,5 +1,5 @@
 import { ItemManager } from '@Lib/services';
-import { Migration3_0_0 } from './3_0_0';
+import { TagsToFoldersMigration } from './tags_to_folders';
 
 const itemManagerMock = (tagTitles: string[]) => {
   const mockTag = (title: string) => ({
@@ -25,7 +25,7 @@ describe('migration 3.0.0: folders component to hierarchy', () => {
     const titles = ['a', 'a.b', 'a.b.c'];
 
     const itemManager = itemManagerMock(titles);
-    await Migration3_0_0.upgradeTagFoldersToHierarchy(
+    await TagsToFoldersMigration.upgradeTagFoldersToHierarchy(
       (itemManager as unknown) as ItemManager
     );
 
@@ -46,7 +46,7 @@ describe('migration 3.0.0: folders component to hierarchy', () => {
     const titles = ['a', 'x', 'y', 'z'];
 
     const itemManager = itemManagerMock(titles);
-    await Migration3_0_0.upgradeTagFoldersToHierarchy(
+    await TagsToFoldersMigration.upgradeTagFoldersToHierarchy(
       (itemManager as unknown) as ItemManager
     );
 
@@ -63,7 +63,7 @@ describe('migration 3.0.0: folders component to hierarchy', () => {
     const titles = ['a.b', 'c', 'a.b'];
 
     const itemManager = itemManagerMock(titles);
-    await Migration3_0_0.upgradeTagFoldersToHierarchy(
+    await TagsToFoldersMigration.upgradeTagFoldersToHierarchy(
       (itemManager as unknown) as ItemManager
     );
 
@@ -84,7 +84,7 @@ describe('migration 3.0.0: folders component to hierarchy', () => {
     const titles = ['y.2', 'w.3', 'y'];
 
     const itemManager = itemManagerMock(titles);
-    await Migration3_0_0.upgradeTagFoldersToHierarchy(
+    await TagsToFoldersMigration.upgradeTagFoldersToHierarchy(
       (itemManager as unknown) as ItemManager
     );
 
@@ -105,7 +105,7 @@ describe('migration 3.0.0: folders component to hierarchy', () => {
     const titles = ['.something', '.something...something'];
 
     const itemManager = itemManagerMock(titles);
-    await Migration3_0_0.upgradeTagFoldersToHierarchy(
+    await TagsToFoldersMigration.upgradeTagFoldersToHierarchy(
       (itemManager as unknown) as ItemManager
     );
 
@@ -128,7 +128,7 @@ describe('migration 3.0.0: folders component to hierarchy', () => {
     ];
 
     const itemManager = itemManagerMock(titles);
-    await Migration3_0_0.upgradeTagFoldersToHierarchy(
+    await TagsToFoldersMigration.upgradeTagFoldersToHierarchy(
       (itemManager as unknown) as ItemManager
     );
 

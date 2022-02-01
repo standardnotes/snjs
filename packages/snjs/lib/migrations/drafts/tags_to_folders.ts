@@ -4,9 +4,9 @@ import { ComponentArea } from '@Lib/models/app/component';
 import { ItemManager } from '@Lib/services';
 import { lastElement, sortByKey, withoutLastElement } from '@Lib/utils';
 import { ContentType } from '@standardnotes/common';
-import { ApplicationStage } from '../stages';
+import { ApplicationStage } from '../../stages';
 
-export class Migration3_0_0 extends Migration {
+export class TagsToFoldersMigration extends Migration {
   static version(): string {
     return '3.0.0';
   }
@@ -37,7 +37,7 @@ export class Migration3_0_0 extends Migration {
       return;
     }
 
-    return Migration3_0_0.upgradeTagFoldersToHierarchy(
+    return TagsToFoldersMigration.upgradeTagFoldersToHierarchy(
       this.services.itemManager
     );
   }
