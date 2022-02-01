@@ -63,6 +63,8 @@ export enum ApplicationEvent {
   UserRolesChanged = 27,
   FeaturesUpdated = 28,
   UnprotectedSessionExpired = 29,
+  /** Called when the app first launches and after first sync request made after sign in */
+  CompletedInitialSync = 30,
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
@@ -82,5 +84,7 @@ export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
     [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
     [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
     [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
+    [SyncEvent.DownloadFirstSyncCompleted]:
+      ApplicationEvent.CompletedInitialSync,
   } as any)[syncEvent];
 }

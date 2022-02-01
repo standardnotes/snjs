@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.2](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.11.1...@standardnotes/settings@1.11.2) (2022-02-01)
+
+
+### Bug Fixes
+
+* listed authors secret data type to include author id ([d9a27da](https://github.com/standardnotes/snjs/commit/d9a27dab48f7b444bd07f27dee9ca7aad77c6bc9))
+
+
+
+
+
+## [1.11.1](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.11.0...@standardnotes/settings@1.11.1) (2022-01-31)
+
+
+### Bug Fixes
+
+* add listed author secrets data type ([a780672](https://github.com/standardnotes/snjs/commit/a78067242b011148aa40b16e1a2536fa88c44f8f))
+
+
+
+
+
 # [1.11.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.10.0...@standardnotes/settings@1.11.0) (2022-01-28)
 
 

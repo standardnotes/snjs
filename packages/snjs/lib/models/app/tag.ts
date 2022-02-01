@@ -10,6 +10,8 @@ import { ContentType } from '@standardnotes/common';
 import { UuidString } from './../../types';
 import { ItemContent } from './../core/item';
 
+export const TagFolderDelimitter = '.';
+
 export interface TagContent extends ItemContent {
   title: string;
 }

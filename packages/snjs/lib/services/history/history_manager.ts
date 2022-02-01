@@ -210,11 +210,7 @@ export class SNHistoryManager extends PureService {
 
   cancelPendingPersist(): void {
     if (this.saveTimeout) {
-      if ('cancel' in this.deviceInterface.timeout) {
-        this.deviceInterface.timeout.cancel(this.saveTimeout);
-      } else {
-        clearTimeout(this.saveTimeout);
-      }
+      this.deviceInterface.cancelTimeout(this.saveTimeout);
     }
   }
 

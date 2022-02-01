@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.21.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.20.1...@standardnotes/domain-events@2.21.0) (2022-02-01)
+
+
+### Features
+
+* add listed account deleted event ([d939e36](https://github.com/standardnotes/snjs/commit/d939e36fd8edc318afb52bf55e597d9e24ae3c92))
+
+
+
+
+
+## [2.20.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.20.0...@standardnotes/domain-events@2.20.1) (2022-01-31)
+
+
+### Bug Fixes
+
+* user uuid type on listed account requested event ([2ccfe50](https://github.com/standardnotes/snjs/commit/2ccfe50f0d997245df90981ac5f87d560879e1ff))
+
+
+
+
+
+# [2.20.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.19.0...@standardnotes/domain-events@2.20.0) (2022-01-31)
+
+
+### Features
+
+* add listed account requested event ([b3c59ef](https://github.com/standardnotes/snjs/commit/b3c59efec325d175b625520de1841f670516a419))
+
+
+
+
+
 # [2.19.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.18.1...@standardnotes/domain-events@2.19.0) (2022-01-28)
 
 

@@ -3,6 +3,105 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.48.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.47.1...@standardnotes/snjs@2.48.0) (2022-02-01)
+
+
+### Features
+
+* tags to folders migration applicator ([c72134d](https://github.com/standardnotes/snjs/commit/c72134d5c520bfff23a2e9f9e7386d828eb7a46d))
+
+
+
+
+
+## [2.47.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.47.0...@standardnotes/snjs@2.47.1) (2022-02-01)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.47.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.46.0...@standardnotes/snjs@2.47.0) (2022-02-01)
+
+
+### Features
+
+* add function to check if editor change requires alert ([#581](https://github.com/standardnotes/snjs/issues/581)) ([a9f27b1](https://github.com/standardnotes/snjs/commit/a9f27b18d17cb222425059440ddd84f82d2b4244))
+
+
+
+
+
+# [2.46.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.3...@standardnotes/snjs@2.46.0) (2022-02-01)
+
+
+### Features
+
+* add new icon types ([#579](https://github.com/standardnotes/snjs/issues/579)) ([9f7c466](https://github.com/standardnotes/snjs/commit/9f7c466734849fe0066314b369603dc0faa10123))
+* implement migration for tag folders ([#561](https://github.com/standardnotes/snjs/issues/561)) ([4ec6d91](https://github.com/standardnotes/snjs/commit/4ec6d9158c850a6ceb887d7c40e58751989bece8))
+
+
+
+
+
+# [2.45.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.3...@standardnotes/snjs@2.45.0) (2022-01-31)
+
+
+### Features
+
+* add new icon types ([#579](https://github.com/standardnotes/snjs/issues/579)) ([9f7c466](https://github.com/standardnotes/snjs/commit/9f7c466734849fe0066314b369603dc0faa10123))
+
+
+
+
+
+## [2.44.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.2...@standardnotes/snjs@2.44.3) (2022-01-31)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.44.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.1...@standardnotes/snjs@2.44.2) (2022-01-31)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.44.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.0...@standardnotes/snjs@2.44.1) (2022-01-31)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.44.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.6...@standardnotes/snjs@2.44.0) (2022-01-31)
+
+
+### Features
+
+* store editor icons and their colors in snjs ([#573](https://github.com/standardnotes/snjs/issues/573)) ([1932d8d](https://github.com/standardnotes/snjs/commit/1932d8deb9309f22744d2ec53fd46b805874e738))
+
+
+
+
+
+## [2.43.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.5...@standardnotes/snjs@2.43.6) (2022-01-29)
+
+
+### Bug Fixes
+
+* remove sncomponent as actions extension subclass due to fact singleton strategies differ ([#577](https://github.com/standardnotes/snjs/issues/577)) ([2b54377](https://github.com/standardnotes/snjs/commit/2b54377e2f9d0d95e40a4f5c3d6976b592e8a212))
+
+
+
+
+
 ## [2.43.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.43.4...@standardnotes/snjs@2.43.5) (2022-01-28)
 
 **Note:** Version bump only for package @standardnotes/snjs

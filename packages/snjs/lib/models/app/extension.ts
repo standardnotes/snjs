@@ -1,4 +1,7 @@
-import { SNComponent } from '@Models/app/component';
+import {
+  FeatureDescription,
+  ThirdPartyFeatureDescription,
+} from '@standardnotes/features';
 import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies';
 import { HistoryEntry } from './../../services/history/entries/history_entry';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
@@ -8,18 +11,22 @@ import { Action } from './action';
 /**
  * Related to the SNActionsService and the local Action model.
  */
-export class SNActionsExtension extends SNComponent {
+export class SNActionsExtension extends SNItem {
   public readonly actions: Action[] = [];
-  public readonly description!: string;
-  public readonly url!: string;
-  public readonly supported_types!: string[];
+  public readonly description: string;
+  public readonly url: string;
+  public readonly supported_types: string[];
   public readonly deprecation?: string;
+  public readonly name: string;
+  public readonly package_info: FeatureDescription;
 
   constructor(payload: PurePayload) {
     super(payload);
-    this.description = payload.safeContent.description;
+    this.name = payload.safeContent.name || '';
+    this.description = payload.safeContent.description || '';
     this.url = payload.safeContent.hosted_url || payload.safeContent.url;
     this.supported_types = payload.safeContent.supported_types;
+    this.package_info = this.payload.safeContent.package_info || {};
     this.deprecation = payload.safeContent.deprecation;
     if (payload.safeContent.actions) {
       this.actions = payload.safeContent.actions.map((action: any) => {
@@ -28,7 +35,11 @@ export class SNActionsExtension extends SNComponent {
     }
   }
 
-  actionsWithContextForItem(item: SNItem) {
+  public get thirdPartyPackageInfo(): ThirdPartyFeatureDescription {
+    return this.package_info as ThirdPartyFeatureDescription;
+  }
+
+  actionsWithContextForItem(item: SNItem): Action[] {
     return this.actions.filter((action) => {
       return action.context === item.content_type || action.context === 'Item';
     });

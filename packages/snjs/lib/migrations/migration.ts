@@ -69,7 +69,7 @@ export abstract class Migration {
     this.onDoneHandler = callback;
   }
 
-  async handleStage(stage: ApplicationStage) {
+  async handleStage(stage: ApplicationStage): Promise<void> {
     const handler = this.stageHandlers[stage];
     if (handler) {
       await handler();
