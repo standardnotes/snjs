@@ -231,7 +231,7 @@ function FillEditorComponentDefaults(
 function editors(): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
-    version: '1.3.9',
+    version: '1.3.10',
     spellcheckControl: true,
     identifier: FeatureIdentifier.CodeEditor,
     permission_name: PermissionName.CodeEditor,
@@ -299,7 +299,7 @@ function editors(): EditorFeatureDescription[] {
     name: 'Markdown Basic',
     identifier: FeatureIdentifier.MarkdownBasicEditor,
     note_type: NoteType.Markdown,
-    version: '1.4.1',
+    version: '1.4.2',
     spellcheckControl: true,
     file_type: 'md',
     permission_name: PermissionName.MarkdownBasicEditor,
@@ -335,7 +335,7 @@ function editors(): EditorFeatureDescription[] {
       file_type: 'md',
       index_path: 'index.html',
       permission_name: PermissionName.MarkdownMinimistEditor,
-      version: '1.3.8',
+      version: '1.3.9',
       spellcheckControl: true,
       description:
         'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
@@ -350,7 +350,7 @@ function editors(): EditorFeatureDescription[] {
   const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Math',
     identifier: FeatureIdentifier.MarkdownMathEditor,
-    version: '1.3.5',
+    version: '1.3.6',
     spellcheckControl: true,
     permission_name: PermissionName.MarkdownMathEditor,
     note_type: NoteType.Markdown,
@@ -368,7 +368,7 @@ function editors(): EditorFeatureDescription[] {
     name: 'Task Editor',
     identifier: FeatureIdentifier.TaskEditor,
     note_type: NoteType.Task,
-    version: '1.3.8',
+    version: '1.3.9',
     spellcheckControl: true,
     file_type: 'md',
     interchangeable: false,
