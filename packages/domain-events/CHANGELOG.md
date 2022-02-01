@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.21.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.20.1...@standardnotes/domain-events@2.21.0) (2022-02-01)
+
+
+### Features
+
+* add listed account deleted event ([d939e36](https://github.com/standardnotes/snjs/commit/d939e36fd8edc318afb52bf55e597d9e24ae3c92))
+
+
+
+
+
 ## [2.20.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.20.0...@standardnotes/domain-events@2.20.1) (2022-01-31)
 
 
