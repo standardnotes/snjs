@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.48.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.47.1...@standardnotes/snjs@2.48.0) (2022-02-01)
+
+
+### Features
+
+* tags to folders migration applicator ([c72134d](https://github.com/standardnotes/snjs/commit/c72134d5c520bfff23a2e9f9e7386d828eb7a46d))
+
+
+
+
+
 ## [2.47.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.47.0...@standardnotes/snjs@2.47.1) (2022-02-01)
 
 **Note:** Version bump only for package @standardnotes/snjs
