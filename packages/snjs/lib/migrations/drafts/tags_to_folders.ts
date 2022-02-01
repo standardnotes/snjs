@@ -51,11 +51,6 @@ export class TagsToFoldersMigration extends Migration {
     const sortedTags = sortByKey(tags, 'title');
 
     for (const tag of sortedTags) {
-      // Note that we use a bunch of awaits in for-loops here.
-      // This is usually a no-no since it makes the code synchronous,
-      // This is a special case here, we have a lot of dependencies
-      // between tags (parentX must exists before we process parentX.ChildZ)
-
       const hierarchy = tag.title.split('.');
       const hasSimpleTitle = hierarchy.length === 1;
       const hasParent = !!tag.parentId;
