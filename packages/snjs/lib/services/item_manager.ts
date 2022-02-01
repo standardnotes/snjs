@@ -969,7 +969,7 @@ export class ItemManager extends PureService {
     }
 
     if (!current) {
-      throw new Error('invalid tag hierarchy');
+      throw new Error('Invalid tag hierarchy');
     }
 
     return current;
@@ -1021,11 +1021,11 @@ export class ItemManager extends PureService {
    */
   public setTagParent(parentTag: SNTag, childTag: SNTag): Promise<SNTag> {
     if (parentTag.uuid === childTag.uuid) {
-      throw new Error('can not set a tag parent of itself');
+      throw new Error('Can not set a tag parent of itself');
     }
 
     if (this.isTagAncestor(childTag.uuid, parentTag.uuid)) {
-      throw new Error('can not set a tag ancestor of itself');
+      throw new Error('Can not set a tag ancestor of itself');
     }
 
     return this.changeTag(childTag.uuid, (m) => {
@@ -1093,7 +1093,7 @@ export class ItemManager extends PureService {
       const parentTag = this.findItem(parentUuid);
 
       if (!parentTag || !isTag(parentTag)) {
-        throw new Error('invalid parent tag');
+        throw new Error('Invalid parent tag');
       }
 
       return this.changeTag(newTag.uuid, (m) => {

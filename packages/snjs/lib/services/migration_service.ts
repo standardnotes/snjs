@@ -140,7 +140,7 @@ export class SNMigrationService extends PureService {
     await this.baseMigration.handleStage(stage);
 
     if (!this.activeMigrations) {
-      throw new Error('invalid active migrations');
+      throw new Error('Invalid active migrations');
     }
 
     for (const migration of this.activeMigrations) {
