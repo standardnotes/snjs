@@ -13,7 +13,7 @@ const setupRandomUuid = () => {
   );
 };
 
-describe('migration 3.0.0 web native folders migration', () => {
+describe('web native folders migration', () => {
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
     setupRandomUuid();
@@ -29,7 +29,7 @@ describe('migration 3.0.0 web native folders migration', () => {
     await makeTags(this.application, titles);
 
     // Run the migration
-    await this.application.migrateTagDotsToHierarchy();
+    await this.application.migrateTagsToFolders();
 
     // Check new tags
     const result = extractTagHierarchy(this.application);
@@ -46,7 +46,7 @@ describe('migration 3.0.0 web native folders migration', () => {
     await makeTags(this.application, titles);
 
     // Run the migration
-    await this.application.migrateTagDotsToHierarchy();
+    await this.application.migrateTagsToFolders();
 
     // Check new tags
     const result = extractTagHierarchy(this.application);
@@ -68,7 +68,7 @@ describe('migration 3.0.0 web native folders migration', () => {
     await makeTags(this.application, titles);
 
     // Run the migration
-    await this.application.migrateTagDotsToHierarchy();
+    await this.application.migrateTagsToFolders();
 
     // Check new tags
     const result = extractTagHierarchy(this.application);
@@ -90,7 +90,7 @@ describe('migration 3.0.0 web native folders migration', () => {
     await makeTags(this.application, titles);
 
     // Run the migration
-    await this.application.migrateTagDotsToHierarchy();
+    await this.application.migrateTagsToFolders();
 
     // Check new tags
     const result = extractTagHierarchy(this.application);
@@ -111,7 +111,7 @@ describe('migration 3.0.0 web native folders migration', () => {
     await makeTags(this.application, titles);
 
     // Run the migration
-    await this.application.migrateTagDotsToHierarchy();
+    await this.application.migrateTagsToFolders();
 
     // Check new tags
     const result = extractTagHierarchy(this.application);
@@ -138,7 +138,7 @@ describe('migration 3.0.0 web native folders migration', () => {
     await makeTags(this.application, titles);
 
     // Run the migration
-    await this.application.migrateTagDotsToHierarchy();
+    await this.application.migrateTagsToFolders();
 
     // Check new tags
     const result = extractTagHierarchy(this.application);

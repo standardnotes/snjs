@@ -6,7 +6,7 @@ import { PureService } from '@Lib/services/pure_service';
 import { isString, naturalSort, removeFromArray } from '@Lib/utils';
 import { SNComponent } from '@Models/app/component';
 import { SNItemsKey } from '@Models/app/items_key';
-import { isTag, SNTag } from '@Models/app/tag';
+import { isTag, SNTag, TagFolderDelimitter } from '@Models/app/tag';
 import { FillItemContent, Uuids } from '@Models/functions';
 import { CreateItemFromPayload } from '@Models/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
@@ -816,17 +816,17 @@ export class ItemManager extends PureService {
    * @param contentType - A string or array of strings representing
    *    content types.
    */
-  public getItems(
+  public getItems<T extends SNItem>(
     contentType: ContentType | ContentType[],
     nonerroredOnly = false
-  ): SNItem[] {
+  ): T[] {
     const items = this.collection.all(contentType);
     if (nonerroredOnly) {
       return items.filter(
         (item) => !item.errorDecrypting && !item.waitingForKey
-      );
+      ) as T[];
     } else {
-      return items;
+      return items as T[];
     }
   }
 
@@ -913,11 +913,10 @@ export class ItemManager extends PureService {
    * @returns Array containing tags matching search query and not associated with note
    */
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
-    const delimiter = '.';
     return naturalSort(
       this.tags.filter((tag) => {
         const regex = new RegExp(
-          `^${searchQuery}|${delimiter}${searchQuery}`,
+          `^${searchQuery}|${TagFolderDelimitter}${searchQuery}`,
           'i'
         );
         const matchesQuery = regex.test(tag.title);
@@ -1091,11 +1090,9 @@ export class ItemManager extends PureService {
 
     if (parentUuid) {
       const parentTag = this.findItem(parentUuid);
-
       if (!parentTag || !isTag(parentTag)) {
         throw new Error('Invalid parent tag');
       }
-
       return this.changeTag(newTag.uuid, (m) => {
         m.makeChildOf(parentTag);
       });
@@ -1117,7 +1114,6 @@ export class ItemManager extends PureService {
 
   public async createSmartTagFromDSL(dsl: string): Promise<SNSmartTag> {
     let components = null;
-
     try {
       components = JSON.parse(dsl.substring(1, dsl.length));
     } catch (e) {
@@ -1125,7 +1121,6 @@ export class ItemManager extends PureService {
     }
 
     const [title, keypath, operator, value] = components;
-
     return this.createSmartTag(title, { keypath, operator, value });
   }
 

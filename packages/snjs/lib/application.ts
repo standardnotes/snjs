@@ -132,7 +132,7 @@ import {
   FeaturesEvent,
   SetOfflineFeaturesFunctionResponse,
 } from '@Services/features_service';
-import { TagsToFoldersMigration } from './migrations/drafts/tags_to_folders';
+import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -929,8 +929,19 @@ export class SNApplication {
     return this.itemManager.isValidTagParent(parentTagUuid, childTagUuid);
   }
 
-  public async migrateTagDotsToHierarchy(): Promise<void> {
-    return TagsToFoldersMigration.upgradeTagFoldersToHierarchy(this.itemManager);
+  public hasTagsNeedingFoldersMigration(): boolean {
+    return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(
+      this.itemManager
+    );
+  }
+
+  /**
+   * Migrates any tags containing a '.' character to sa chema-based heirarchy, removing
+   * the dot from the tag's title.
+   */
+  public async migrateTagsToFolders(): Promise<void> {
+    await TagsToFoldersMigrationApplicator.run(this.itemManager);
+    return this.sync();
   }
 
   /**
@@ -997,6 +1008,7 @@ export class SNApplication {
     return this.itemManager.findOrCreateTagByTitle(title);
   }
 
+  /** Creates and returns the tag but does not run sync. Callers must perform sync. */
   public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
     return this.itemManager.createTagOrSmartTag(title);
   }
