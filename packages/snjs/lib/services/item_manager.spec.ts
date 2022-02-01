@@ -150,6 +150,94 @@ describe('itemManager', () => {
       expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid);
     });
 
+    it('findTagByTitleAndParent', async () => {
+      itemManager = createService();
+      const parent = createTag('name1');
+      const child = createTag('childName');
+      const duplicateNameChild = createTag('name1');
+
+      await itemManager.insertItems([parent, child, duplicateNameChild]);
+      await itemManager.setTagParent(parent, child);
+      await itemManager.setTagParent(parent, duplicateNameChild);
+
+      const a = await itemManager.findTagByTitleAndParent('name1', undefined);
+      const b = await itemManager.findTagByTitleAndParent(
+        'name1',
+        parent?.uuid
+      );
+      const c = await itemManager.findTagByTitleAndParent('name1', child?.uuid);
+
+      expect(a?.uuid).toEqual(parent.uuid);
+      expect(b?.uuid).toEqual(duplicateNameChild.uuid);
+      expect(c?.uuid).toEqual(undefined);
+    });
+
+    it('findOrCreateTagByTitle', async () => {
+      setupRandomUuid();
+      itemManager = createService();
+      const parent = createTag('parent');
+      const child = createTag('child');
+      await itemManager.insertItems([parent, child]);
+      await itemManager.setTagParent(parent, child);
+
+      const childA = await itemManager.findOrCreateTagByTitle('child');
+      const childB = await itemManager.findOrCreateTagByTitle(
+        'child',
+        parent.uuid
+      );
+      const childC = await itemManager.findOrCreateTagByTitle(
+        'child-bis',
+        parent.uuid
+      );
+      const childD = await itemManager.findOrCreateTagByTitle(
+        'child-bis',
+        parent.uuid
+      );
+
+      expect(childA.uuid).not.toEqual(child.uuid);
+      expect(childB.uuid).toEqual(child.uuid);
+      expect(childD.uuid).toEqual(childC.uuid);
+
+      expect(itemManager.getTagParent(childA.uuid)?.uuid).toBe(undefined);
+      expect(itemManager.getTagParent(childB.uuid)?.uuid).toBe(parent.uuid);
+      expect(itemManager.getTagParent(childC.uuid)?.uuid).toBe(parent.uuid);
+      expect(itemManager.getTagParent(childD.uuid)?.uuid).toBe(parent.uuid);
+    });
+
+    it('findOrCreateTagParentChain', async () => {
+      itemManager = createService();
+      const parent = createTag('parent');
+      const child = createTag('child');
+
+      await itemManager.insertItems([parent, child]);
+      await itemManager.setTagParent(parent, child);
+
+      const a = await itemManager.findOrCreateTagParentChain(['parent']);
+      const b = await itemManager.findOrCreateTagParentChain([
+        'parent',
+        'child',
+      ]);
+      const c = await itemManager.findOrCreateTagParentChain([
+        'parent',
+        'child2',
+      ]);
+      const d = await itemManager.findOrCreateTagParentChain([
+        'parent2',
+        'child1',
+      ]);
+
+      expect(a?.uuid).toEqual(parent.uuid);
+      expect(b?.uuid).toEqual(child.uuid);
+
+      expect(c?.uuid).not.toEqual(parent.uuid);
+      expect(c?.uuid).not.toEqual(child.uuid);
+      expect(c?.parentId).toEqual(parent.uuid);
+
+      expect(d?.uuid).not.toEqual(parent.uuid);
+      expect(d?.uuid).not.toEqual(child.uuid);
+      expect(d?.parentId).not.toEqual(parent.uuid);
+    });
+
     it('isAncestor', async () => {
       itemManager = createService();
       const grandParent = createTag('grandParent');

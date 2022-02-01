@@ -413,9 +413,9 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
   return params;
 }
 
-export function createTagParams({ title, dirty = true } = {}) {
+export function createTagParams({ title, dirty = true, uuid = undefined } = {}) {
   const params = {
-    uuid: generateUuid(),
+    uuid: uuid || generateUuid(),
     content_type: ContentType.Tag,
     dirty: dirty,
     content: {

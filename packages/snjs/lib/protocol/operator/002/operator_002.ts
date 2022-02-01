@@ -58,7 +58,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const keyParams = Create002KeyParams({
       email: identifier,
       pw_nonce: pwNonce,
-      pw_cost: pwCost,
+      pw_cost: pwCost!,
       pw_salt: pwSalt,
       version: ProtocolVersion.V002,
       origination,

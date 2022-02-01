@@ -6,7 +6,7 @@ import { PureService } from '@Lib/services/pure_service';
 import { isString, naturalSort, removeFromArray } from '@Lib/utils';
 import { SNComponent } from '@Models/app/component';
 import { SNItemsKey } from '@Models/app/items_key';
-import { SNTag } from '@Models/app/tag';
+import { isTag, SNTag } from '@Models/app/tag';
 import { FillItemContent, Uuids } from '@Models/functions';
 import { CreateItemFromPayload } from '@Models/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
@@ -136,7 +136,7 @@ export class ItemManager extends PureService {
     this.collection.setDisplayOptions(
       ContentType.SmartTag,
       CollectionSort.Title,
-      'asc'
+      'dsc'
     );
     this.notesView = new ItemCollectionNotesView(this.collection);
     this.tagNotesIndex = new TagNotesIndex(this.collection);
@@ -881,12 +881,29 @@ export class ItemManager extends PureService {
     return results;
   }
 
+  public getRootTags(): SNTag[] {
+    return this.tags.filter((tag) => tag.parentId === undefined);
+  }
+
   /**
    * Finds the first tag matching a given title
    */
   public findTagByTitle(title: string): SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase();
     return this.tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle);
+  }
+
+  public findTagByTitleAndParent(
+    title: string,
+    parentUuid: UuidString | undefined
+  ): SNTag | undefined {
+    const lowerCaseTitle = title.toLowerCase();
+
+    const tags = parentUuid
+      ? this.getTagChildren(parentUuid)
+      : this.getRootTags();
+
+    return tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle);
   }
 
   /**
@@ -938,7 +955,27 @@ export class ItemManager extends PureService {
     return chain;
   }
 
-  getTagChildren(tagUuid: UuidString): SNTag[] {
+  public async findOrCreateTagParentChain(
+    titlesHierarchy: string[]
+  ): Promise<SNTag> {
+    let current: SNTag | undefined = undefined;
+
+    for (const title of titlesHierarchy) {
+      const currentUuid: string | undefined = current
+        ? current.uuid
+        : undefined;
+
+      current = await this.findOrCreateTagByTitle(title, currentUuid);
+    }
+
+    if (!current) {
+      throw new Error('Invalid tag hierarchy');
+    }
+
+    return current;
+  }
+
+  public getTagChildren(tagUuid: UuidString): SNTag[] {
     const tag = this.findItem(tagUuid) as SNTag;
     const tags = this.collection.elementsReferencingElement(
       tag,
@@ -984,11 +1021,11 @@ export class ItemManager extends PureService {
    */
   public setTagParent(parentTag: SNTag, childTag: SNTag): Promise<SNTag> {
     if (parentTag.uuid === childTag.uuid) {
-      throw new Error('can not set a tag parent of itself');
+      throw new Error('Can not set a tag parent of itself');
     }
 
     if (this.isTagAncestor(childTag.uuid, parentTag.uuid)) {
-      throw new Error('can not set a tag ancestor of itself');
+      throw new Error('Can not set a tag ancestor of itself');
     }
 
     return this.changeTag(childTag.uuid, (m) => {
@@ -1042,12 +1079,29 @@ export class ItemManager extends PureService {
     );
   }
 
-  public async createTag(title: string): Promise<SNTag> {
-    return this.createItem(
+  public async createTag(
+    title: string,
+    parentUuid?: UuidString
+  ): Promise<SNTag> {
+    const newTag = (await this.createItem(
       ContentType.Tag,
       FillItemContent({ title }),
       true
-    ) as Promise<SNTag>;
+    )) as SNTag;
+
+    if (parentUuid) {
+      const parentTag = this.findItem(parentUuid);
+
+      if (!parentTag || !isTag(parentTag)) {
+        throw new Error('Invalid parent tag');
+      }
+
+      return this.changeTag(newTag.uuid, (m) => {
+        m.makeChildOf(parentTag);
+      });
+    }
+
+    return newTag;
   }
 
   public async createSmartTag(
@@ -1090,9 +1144,12 @@ export class ItemManager extends PureService {
   /**
    * Finds or creates a tag with a given title
    */
-  public async findOrCreateTagByTitle(title: string): Promise<SNTag> {
-    const tag = this.findTagByTitle(title);
-    return tag || this.createTag(title);
+  public async findOrCreateTagByTitle(
+    title: string,
+    parentUuid?: UuidString
+  ): Promise<SNTag> {
+    const tag = this.findTagByTitleAndParent(title, parentUuid);
+    return tag || this.createTag(title, parentUuid);
   }
 
   /**
