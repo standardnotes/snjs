@@ -132,6 +132,7 @@ import {
   FeaturesEvent,
   SetOfflineFeaturesFunctionResponse,
 } from '@Services/features_service';
+import { TagsToFoldersMigration } from './migrations/drafts/tags_to_folders';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -926,6 +927,10 @@ export class SNApplication {
     childTagUuid: UuidString
   ): boolean {
     return this.itemManager.isValidTagParent(parentTagUuid, childTagUuid);
+  }
+
+  public async migrateTagDotsToHierarchy(): Promise<void> {
+    return TagsToFoldersMigration.upgradeTagFoldersToHierarchy(this.itemManager);
   }
 
   /**

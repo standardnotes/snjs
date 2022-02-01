@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.46.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.3...@standardnotes/snjs@2.46.0) (2022-02-01)
+
+
+### Features
+
+* add new icon types ([#579](https://github.com/standardnotes/snjs/issues/579)) ([9f7c466](https://github.com/standardnotes/snjs/commit/9f7c466734849fe0066314b369603dc0faa10123))
+* implement migration for tag folders ([#561](https://github.com/standardnotes/snjs/issues/561)) ([4ec6d91](https://github.com/standardnotes/snjs/commit/4ec6d9158c850a6ceb887d7c40e58751989bece8))
+
+
+
+
+
 # [2.45.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.44.3...@standardnotes/snjs@2.45.0) (2022-01-31)
 
 
