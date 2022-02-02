@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.49.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.3...@standardnotes/snjs@2.49.4) (2022-02-02)
+
+
+### Bug Fixes
+
+* smart tag case insensitivity for strings ([#585](https://github.com/standardnotes/snjs/issues/585)) ([100d705](https://github.com/standardnotes/snjs/commit/100d705bb1cfbb04787aefca7603c78e74818284))
+
+
+
+
+
 ## [2.49.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.2...@standardnotes/snjs@2.49.3) (2022-02-02)
 
 
