@@ -275,7 +275,7 @@ export type ListedRegistrationResponse = MinimalHttpResponse & {
 export type ListedAccount = {
   secret: string;
   authorId: string;
-  hostUrl?: string;
+  hostUrl: string;
 };
 
 export type ListedAccountInfo = ActionResponse & {

@@ -1,7 +1,5 @@
 import { ListedService } from './services/listed_service';
-import {
-  ListedInterface,
-} from './application_interfaces/listed_interface';
+import { ListedInterface } from './application_interfaces/listed_interface';
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index';
 import { TransactionalMutation } from './services/item_manager';
 import { FeatureStatus } from '@Lib/services/features_service';
@@ -2170,6 +2168,7 @@ export class SNApplication implements ListedInterface {
       this.payloadManager,
       this.protocolService,
       this.syncService,
+      this.challengeService,
       this.listedService
     );
     this.services.push(this.actionsManager);

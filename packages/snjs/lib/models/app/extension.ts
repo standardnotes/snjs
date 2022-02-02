@@ -98,7 +98,7 @@ export class ActionsExtensionMutator extends ItemMutator {
     this.content!.actions = actions;
   }
 
-  set deprecation(deprecation: string) {
+  set deprecation(deprecation: string | undefined) {
     this.content!.deprecation = deprecation;
   }
 }

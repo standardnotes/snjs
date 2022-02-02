@@ -20,12 +20,6 @@ export enum ExtensionsServerURL {
   Prod = 'https://extensions.standardnotes.org',
 }
 
-export enum ListedUrl {
-  Local = 'http://localhost:3009',
-  Dev = 'https://dev.listed.to',
-  Prod = 'https://listed.to',
-}
-
 const LocalHost = 'localhost';
 
 export function isUrlFirstParty(url: string): boolean {
