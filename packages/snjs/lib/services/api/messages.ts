@@ -34,6 +34,7 @@ export const API_MESSAGE_INVALID_SESSION =
 
 export const API_MESSAGE_FAILED_GET_SETTINGS = 'Failed to get settings.';
 export const API_MESSAGE_FAILED_UPDATE_SETTINGS = 'Failed to update settings.';
+export const API_MESSAGE_FAILED_LISTED_REGISTRATION = 'Unable to register for Listed. Please try again later.';
 
 export const API_MESSAGE_FAILED_SUBSCRIPTION_INFO =
   "Failed to get subscription's information.";

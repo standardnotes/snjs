@@ -5,7 +5,7 @@ export {
 } from './version';
 
 export type { ApplicationDescriptor } from './application_group';
-export type { ActionResponse } from './services/actions_service';
+export type { ActionResponse } from './services/api/responses';
 export type { BackupFile } from '@Services/protocol_service';
 export type {
   UuidString,
@@ -176,9 +176,7 @@ export {
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
-export {
-  displayStringForContentType,
-} from '@Models/content_types';
+export { displayStringForContentType } from '@Models/content_types';
 export { ContentType } from '@standardnotes/common';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
@@ -237,6 +235,13 @@ export { NoteViewController } from './ui/note_view_controller';
 export { NoteGroupController } from './ui/note_group_controller';
 export { IconsController } from './ui/icons_controller';
 
+export type {
+  ListedAccount,
+  ListedAccountInfo,
+} from './application_interfaces/listed_interface';
+
+export { ListedAccountInfoToActionExtension } from './services/listed_service';
+
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
 
@@ -247,7 +252,10 @@ export { SNLog } from './log';
 /** Used by e2e tests */
 export { Features, FeatureIdentifier } from '@standardnotes/features';
 export { RoleName } from '@standardnotes/auth';
-export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/settings';
+export {
+  SettingName,
+  MuteFailedBackupsEmailsOption,
+} from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
 export { ApplicationStage } from '@Lib/stages';

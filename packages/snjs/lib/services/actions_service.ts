@@ -1,5 +1,6 @@
+import { ListedService } from './listed_service';
 import { CreateItemFromPayload } from '@Models/generator';
-import { HttpResponse } from './api/responses';
+import { ActionResponse, HttpResponse } from './api/responses';
 import { Action, ActionAccessType } from './../models/app/action';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
@@ -24,16 +25,6 @@ import {
 } from '@Payloads/generator';
 import { DeviceInterface } from '../device_interface';
 
-export type ActionResponse = HttpResponse & {
-  description: string;
-  supported_types: string[];
-  deprecation?: string;
-  actions: any[];
-  item?: any;
-  keyParams?: any;
-  auth_params?: any;
-};
-
 type PasswordRequestHandler = () => Promise<string>;
 
 /**
@@ -51,29 +42,19 @@ type PasswordRequestHandler = () => Promise<string>;
  *       to allow publishing a note to a user's blog.
  */
 export class SNActionsService extends PureService {
-  private httpService: SNHttpService;
-  private payloadManager: PayloadManager;
-  private protocolService: SNProtocolService;
-  private syncService: SNSyncService;
   private previousPasswords: string[] = [];
 
   constructor(
     private itemManager: ItemManager,
     private alertService: SNAlertService,
-    deviceInterface: DeviceInterface,
-    httpService: SNHttpService,
-    payloadManager: PayloadManager,
-    protocolService: SNProtocolService,
-    syncService: SNSyncService
+    public deviceInterface: DeviceInterface,
+    private httpService: SNHttpService,
+    private payloadManager: PayloadManager,
+    private protocolService: SNProtocolService,
+    private syncService: SNSyncService,
+    private listedService: ListedService
   ) {
     super();
-    this.itemManager = itemManager;
-    this.alertService = alertService;
-    this.deviceInterface = deviceInterface;
-    this.httpService = httpService;
-    this.payloadManager = payloadManager;
-    this.protocolService = protocolService;
-    this.syncService = syncService;
     this.previousPasswords = [];
   }
 
@@ -81,9 +62,10 @@ export class SNActionsService extends PureService {
   public deinit(): void {
     (this.itemManager as unknown) = undefined;
     (this.alertService as unknown) = undefined;
-    this.deviceInterface = undefined;
+    (this.deviceInterface as unknown) = undefined;
     (this.httpService as unknown) = undefined;
     (this.payloadManager as unknown) = undefined;
+    (this.listedService as unknown) = undefined;
     (this.protocolService as unknown) = undefined;
     (this.syncService as unknown) = undefined;
     this.previousPasswords.length = 0;
@@ -91,9 +73,13 @@ export class SNActionsService extends PureService {
   }
 
   public getExtensions(): SNActionsExtension[] {
-    return this.itemManager.nonErroredItemsForContentType(
+    const extensionItems = this.itemManager.nonErroredItemsForContentType<SNActionsExtension>(
       ContentType.ActionsExtension
-    ) as SNActionsExtension[];
+    );
+    const excludingListed = extensionItems.filter(
+      (extension) => !extension.isListedExtension
+    );
+    return excludingListed;
   }
 
   public extensionsInContextOfItem(item: SNItem) {
@@ -266,8 +252,10 @@ export class SNActionsService extends PureService {
     triedPasswords: string[] = []
   ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item);
-    const decryptedPayload =
-      await this.protocolService!.payloadByDecryptingPayload(payload, key);
+    const decryptedPayload = await this.protocolService!.payloadByDecryptingPayload(
+      payload,
+      key
+    );
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload;
     }

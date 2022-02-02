@@ -833,9 +833,13 @@ export class ItemManager extends PureService {
   /**
    * Returns all items which are properly decrypted
    */
-  nonErroredItemsForContentType(contentType: ContentType): SNItem[] {
+  nonErroredItemsForContentType<T extends SNItem>(
+    contentType: ContentType
+  ): T[] {
     const items = this.collection.all(contentType);
-    return items.filter((item) => !item.errorDecrypting && !item.waitingForKey);
+    return items.filter(
+      (item) => !item.errorDecrypting && !item.waitingForKey
+    ) as T[];
   }
 
   /**

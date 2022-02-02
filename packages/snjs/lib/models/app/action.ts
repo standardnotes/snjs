@@ -13,12 +13,11 @@ export enum ActionVerb {
   Nested = 'nested',
 }
 
-let availableId = Number.MIN_SAFE_INTEGER;
+let availableId = 0;
 function getAvailableId() {
   availableId += 1;
   if (availableId === Number.MAX_SAFE_INTEGER) {
-    /** Wrap around */
-    availableId = Number.MIN_SAFE_INTEGER;
+    availableId = 0;
   }
   return availableId;
 }

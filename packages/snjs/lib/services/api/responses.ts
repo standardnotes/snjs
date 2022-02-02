@@ -1,3 +1,4 @@
+import { ListedAccountInfo } from './../../application_interfaces/listed_interface';
 import { RawPayload } from '@Payloads/generator';
 import { ApiEndpointParam } from './keys';
 import {
@@ -237,9 +238,9 @@ export type DeleteSettingResponse = MinimalHttpResponse;
 
 export type GetSubscriptionResponse = MinimalHttpResponse & {
   data?: {
-    subscription?: Subscription
-  }
-}
+    subscription?: Subscription;
+  };
+};
 
 export type AvailableSubscriptions = {
   [key in SubscriptionName]: {
@@ -249,21 +250,39 @@ export type AvailableSubscriptions = {
       period: string;
     }[];
     features: FeatureDescription[];
-  }
+  };
 };
 
 export type GetAvailableSubscriptionsResponse = MinimalHttpResponse & {
   data?: AvailableSubscriptions;
-}
+};
 
 export type PostSubscriptionTokensResponse = MinimalHttpResponse & {
   data?: {
     token: string;
-  }
-}
+  };
+};
 
 export type GetOfflineFeaturesResponse = MinimalHttpResponse & {
   data?: {
     features: FeatureDescription[];
-  }
-}
+  };
+};
+
+export type ListedRegistrationResponse = MinimalHttpResponse & {
+  data?: unknown;
+};
+
+export type ListedAccountInfoResponse = HttpResponse & {
+  data: ListedAccountInfo;
+};
+
+export type ActionResponse = HttpResponse & {
+  description: string;
+  supported_types: string[];
+  deprecation?: string;
+  actions: any[];
+  item?: any;
+  keyParams?: any;
+  auth_params?: any;
+};
