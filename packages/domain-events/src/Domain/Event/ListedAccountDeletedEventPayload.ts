@@ -3,4 +3,5 @@ export interface ListedAccountDeletedEventPayload {
   userId: number
   userName: string
   secret: string
+  hostUrl: string
 }
