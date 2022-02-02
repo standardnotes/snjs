@@ -542,6 +542,9 @@ describe('featuresService', () => {
       expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(
         FeatureStatus.InCurrentPlanButExpired
       );
+      expect(featuresService.getFeatureStatus('missing-feature-identifier' as FeatureIdentifier)).toBe(
+        FeatureStatus.NoUserSubscription
+      );
     });
 
     it('feature status should be not entitled if no account or offline repo', async () => {
