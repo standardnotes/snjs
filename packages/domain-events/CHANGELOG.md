@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.21.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.21.1...@standardnotes/domain-events@2.21.2) (2022-02-02)
+
+
+### Bug Fixes
+
+* add host url to listed account events ([bd4f4c4](https://github.com/standardnotes/snjs/commit/bd4f4c4d03e7abd95005bafdc7b61b5339902ef8))
+
+
+
+
+
 ## [2.21.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.21.0...@standardnotes/domain-events@2.21.1) (2022-02-01)
 
 **Note:** Version bump only for package @standardnotes/domain-events
