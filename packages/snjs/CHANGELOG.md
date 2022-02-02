@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.49.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.1...@standardnotes/snjs@2.49.2) (2022-02-02)
+
+
+### Bug Fixes
+
+* no migration needed if tag already has parentId ([57a3887](https://github.com/standardnotes/snjs/commit/57a3887ac64a83847de003cbf95324f2c7eb2ac2))
+
+
+
+
+
 ## [2.49.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.0...@standardnotes/snjs@2.49.1) (2022-02-02)
 
 
