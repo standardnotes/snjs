@@ -8,14 +8,12 @@ import { SNActionsExtension } from './../models/app/extension';
 import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './settings_service/SNSettingsService';
 import {
-  ListedAccount,
-  ListedAccountInfo,
   ListedInterface,
 } from './../application_interfaces/listed_interface';
 import { SNApiService } from './api/api_service';
 import { PureService } from '@Services/pure_service';
 import { ListedUrl } from '@Lib/hosts';
-import { ListedAccountInfoResponse } from './api/responses';
+import { ListedAccount, ListedAccountInfo, ListedAccountInfoResponse } from './api/responses';
 
 export function ListedAccountInfoToActionExtension(
   accountInfo: ListedAccountInfo
@@ -61,7 +59,7 @@ export class ListedService extends PureService implements ListedInterface {
     account: ListedAccount,
     inContextOfItem?: UuidString
   ): Promise<ListedAccountInfo | undefined> {
-    const hostUrl = account.hostUrl || ListedUrl.Prod;
+    const hostUrl = account.hostUrl || ListedUrl.Dev;
     let url = `${hostUrl}/authors/${account.authorId}/extension?secret=${account.secret}`;
     if (inContextOfItem) {
       url += `&item_uuid=${inContextOfItem}`;

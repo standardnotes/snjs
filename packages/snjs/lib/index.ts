@@ -5,7 +5,11 @@ export {
 } from './version';
 
 export type { ApplicationDescriptor } from './application_group';
-export type { ActionResponse } from './services/api/responses';
+export type {
+  ActionResponse,
+  ListedAccount,
+  ListedAccountInfo,
+} from './services/api/responses';
 export type { BackupFile } from '@Services/protocol_service';
 export type {
   UuidString,
@@ -42,7 +46,6 @@ export {
   SNSmartTag,
   SNActionsExtension,
   ActionsExtensionMutator,
-  Action,
   SNTheme,
   ThemeMutator,
   SNComponent,
@@ -53,7 +56,7 @@ export {
   PrefKey,
 } from './models';
 
-export type { PrefValue } from './models';
+export type { PrefValue, Action } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from '@standardnotes/features';
@@ -234,11 +237,6 @@ export {
 export { NoteViewController } from './ui/note_view_controller';
 export { NoteGroupController } from './ui/note_group_controller';
 export { IconsController } from './ui/icons_controller';
-
-export type {
-  ListedAccount,
-  ListedAccountInfo,
-} from './application_interfaces/listed_interface';
 
 export { ListedAccountInfoToActionExtension } from './services/listed_service';
 

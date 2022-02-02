@@ -1,4 +1,3 @@
-import { ListedAccountInfo } from './../../application_interfaces/listed_interface';
 import { RawPayload } from '@Payloads/generator';
 import { ApiEndpointParam } from './keys';
 import {
@@ -271,6 +270,18 @@ export type GetOfflineFeaturesResponse = MinimalHttpResponse & {
 
 export type ListedRegistrationResponse = MinimalHttpResponse & {
   data?: unknown;
+};
+
+export type ListedAccount = {
+  secret: string;
+  authorId: string;
+  hostUrl?: string;
+};
+
+export type ListedAccountInfo = ActionResponse & {
+  display_name: string;
+  author_url: string;
+  settings_url: string;
 };
 
 export type ListedAccountInfoResponse = HttpResponse & {

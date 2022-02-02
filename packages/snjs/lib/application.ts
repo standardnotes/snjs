@@ -1,7 +1,5 @@
 import { ListedService } from './services/listed_service';
 import {
-  ListedAccount,
-  ListedAccountInfo,
   ListedInterface,
 } from './application_interfaces/listed_interface';
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index';
@@ -117,6 +115,8 @@ import {
   GetAvailableSubscriptionsResponse,
   GetSubscriptionResponse,
   HttpResponse,
+  ListedAccount,
+  ListedAccountInfo,
   SignInResponse,
   User,
 } from './services/api/responses';

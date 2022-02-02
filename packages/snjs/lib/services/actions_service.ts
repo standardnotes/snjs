@@ -1,7 +1,6 @@
 import { ListedService } from './listed_service';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ActionResponse, HttpResponse } from './api/responses';
-import { Action, ActionAccessType } from './../models/app/action';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -9,6 +8,8 @@ import { SNRootKey } from '@Protocol/root_key';
 import {
   ActionsExtensionMutator,
   SNActionsExtension,
+  Action,
+  ActionAccessType,
 } from './../models/app/extension';
 import { MutationType, SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
@@ -117,11 +118,7 @@ export class SNActionsService extends PureService {
     const description = response.description || extension.description;
     const supported_types =
       response.supported_types || extension.supported_types;
-    const actions = response.actions
-      ? response.actions.map((action: any) => {
-          return new Action(action);
-        })
-      : [];
+    const actions = response.actions || [];
     const mutator = new ActionsExtensionMutator(
       extension,
       MutationType.UserInteraction
