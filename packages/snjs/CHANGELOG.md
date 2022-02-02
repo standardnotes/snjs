@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.49.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.48.2...@standardnotes/snjs@2.49.0) (2022-02-02)
+
+
+### Features
+
+* add remaining icon types from library ([#584](https://github.com/standardnotes/snjs/issues/584)) ([393cb4e](https://github.com/standardnotes/snjs/commit/393cb4e9fa633337d16438eddeda72de4a4edbbc))
+
+
+
+
+
 ## [2.48.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.48.1...@standardnotes/snjs@2.48.2) (2022-02-02)
 
 **Note:** Version bump only for package @standardnotes/snjs
