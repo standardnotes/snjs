@@ -53,7 +53,6 @@ import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 import {
-  APPLICATION_DEFAULT_HOSTS,
   isUrlFirstParty,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
@@ -149,7 +148,8 @@ export class SNApiService
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private host: string
+    private host: string,
+    private filesHost: string
   ) {
     super();
   }
@@ -203,6 +203,32 @@ export class SNApiService
   public isThirdPartyHostUsed(): boolean {
     const applicationHost = this.getHost() || '';
     return !isUrlFirstParty(applicationHost);
+  }
+
+  public async loadFilesHost(): Promise<void> {
+    const storedValue = await this.storageService.getValue(
+      StorageKey.FilesServerHost
+    );
+    this.filesHost =
+      storedValue ||
+      this.filesHost ||
+      (window as {
+        _default_files_server?: string;
+      })._default_files_server;
+  }
+
+  public async setFilesHost(filesHost: string): Promise<void> {
+    this.filesHost = filesHost;
+    await this.storageService.setValue(StorageKey.FilesServerHost, filesHost);
+  }
+
+  public getFilesHost(): string {
+    return this.filesHost;
+  }
+
+  public isThirdPartyFilesHostUsed(): boolean {
+    const filesHost = this.getFilesHost() || '';
+    return !isUrlFirstParty(filesHost);
   }
 
   public async setSession(session: Session, persist = true): Promise<void> {

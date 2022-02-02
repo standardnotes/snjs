@@ -70,14 +70,14 @@ describe.only('files', function () {
     return receivedBytes;
   };
 
-  it.only('should create valet token from server', async function () {
+  it('should create valet token from server', async function () {
     const remoteIdentifier = Factory.generateUuid()
     const token = await this.application.apiService.createFileUploadToken(remoteIdentifier);
 
     expect(token.length).to.be.above(0);
   });
 
-  it.only('should not create valet token from server when user has no subscription', async function () {
+  it('should not create valet token from server when user has no subscription', async function () {
     localStorage.clear();
 
     this.context = await Factory.createAppContext();
@@ -97,7 +97,7 @@ describe.only('files', function () {
     expect(token.error).to.equal('no-subscription');
   });
 
-  it.only('should not create valet token from server when user has an expired subscription', async function () {
+  it('should not create valet token from server when user has an expired subscription', async function () {
     localStorage.clear();
 
     this.context = await Factory.createAppContext();
@@ -128,7 +128,7 @@ describe.only('files', function () {
     expect(token.error).to.equal('expired-subscription');
   });
 
-  it('should encrypt and upload file', async function () {
+  it.only('should encrypt and upload file', async function () {
     const response = await fetch('http://localhost:9003/assets/two_mb_file.md');
     const buffer = response.arrayBuffer;
 
