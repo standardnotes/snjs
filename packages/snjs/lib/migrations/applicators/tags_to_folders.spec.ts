@@ -18,9 +18,6 @@ const itemManagerMock = (tagTitles: string[]) => {
 };
 
 describe('folders component to hierarchy', () => {
-  // TODO: what about testing cases where the user trigger a migration AFTER we already migrated the data.
-  // For example they have a tag with parents, but the tag is name 'a.b.c'
-
   it('should produce a valid hierarchy in the simple case', async () => {
     const titles = ['a', 'a.b', 'a.b.c'];
 
