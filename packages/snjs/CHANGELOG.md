@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.49.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.0...@standardnotes/snjs@2.49.1) (2022-02-02)
+
+
+### Bug Fixes
+
+* return `NoUserSubscription` status when the third-party feature was not found ([#583](https://github.com/standardnotes/snjs/issues/583)) ([782ea88](https://github.com/standardnotes/snjs/commit/782ea8857ea43e1769281bd64f2c84f9dec9c178))
+
+
+
+
+
 # [2.49.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.48.2...@standardnotes/snjs@2.49.0) (2022-02-02)
 
 
