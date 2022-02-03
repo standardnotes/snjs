@@ -3,7 +3,7 @@ import { UuidString } from '@Lib/types';
 
 export interface ListedInterface {
   canRegisterNewListedAccount: () => boolean;
-  registerForNewListedAccount: () => Promise<unknown>;
+  requestNewListedAccount: () => Promise<ListedAccount | undefined>;
   getListedAccounts(): Promise<ListedAccount[]>;
   getListedAccountInfo(
     account: ListedAccount,

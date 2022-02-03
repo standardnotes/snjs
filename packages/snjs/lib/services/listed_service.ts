@@ -1,3 +1,4 @@
+import { lastElement, sleep } from '@Lib/utils';
 import { UuidString } from '@Lib/types';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { FillItemContent } from '@Models/functions';
@@ -44,9 +45,28 @@ export class ListedService extends PureService implements ListedInterface {
     return this.apiService.user != undefined;
   }
 
-  public async registerForNewListedAccount(): Promise<unknown> {
+  /**
+   * Account creation is asyncronous on the backend due to message-based nature of architecture.
+   * In order to get the newly created account, we poll the server once a second for up to 5 seconds
+   * to check for new accounts.
+   */
+  public async requestNewListedAccount(): Promise<ListedAccount | undefined> {
+    const accountsBeforeRequest = await this.getSettingsBasedListedAccounts();
     const response = await this.apiService.registerForListedAccount();
-    return response;
+    if (response.error) {
+      return undefined;
+    }
+    const MaxAttempts = 4;
+    const DelayBetweenRequests = 3000;
+    for (let i = 0; i < MaxAttempts; i++) {
+      const accounts = await this.getSettingsBasedListedAccounts();
+      if (accounts.length > accountsBeforeRequest.length) {
+        return lastElement(accounts);
+      } else {
+        await sleep(DelayBetweenRequests, false);
+      }
+    }
+    return undefined;
   }
 
   public async getListedAccounts(): Promise<ListedAccount[]> {

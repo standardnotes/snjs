@@ -1194,8 +1194,8 @@ export class SNApplication implements ListedInterface {
     return this.listedService.canRegisterNewListedAccount();
   }
 
-  public async registerForNewListedAccount(): Promise<unknown> {
-    return this.listedService.registerForNewListedAccount();
+  public async requestNewListedAccount(): Promise<ListedAccount | undefined> {
+    return this.listedService.requestNewListedAccount();
   }
 
   public async getListedAccounts(): Promise<ListedAccount[]> {
