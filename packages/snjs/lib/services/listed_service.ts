@@ -31,8 +31,7 @@ export class ListedService extends PureService implements ListedInterface {
 
   /**
    * Account creation is asyncronous on the backend due to message-based nature of architecture.
-   * In order to get the newly created account, we poll the server once a second for up to 5 seconds
-   * to check for new accounts.
+   * In order to get the newly created account, we poll the server to check for new accounts.
    */
   public async requestNewListedAccount(): Promise<ListedAccount | undefined> {
     const accountsBeforeRequest = await this.getSettingsBasedListedAccounts();

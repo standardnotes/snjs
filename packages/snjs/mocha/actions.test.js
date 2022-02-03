@@ -321,9 +321,6 @@ describe('actions service', () => {
       this.windowAlert = sandbox
         .stub(window, 'alert')
         .callsFake((message) => message);
-      this.passwordRequestHandler = sandbox
-        .stub()
-        .callsFake(() => this.password);
     });
 
     afterEach(async function () {
@@ -338,7 +335,6 @@ describe('actions service', () => {
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
         this.noteItem,
-        this.passwordRequestHandler
       );
 
       sinon.assert.calledOnceWithExactly(
@@ -356,7 +352,6 @@ describe('actions service', () => {
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
         this.noteItem,
-        this.passwordRequestHandler
       );
 
       expect(actionResponse).to.have.property('item');
@@ -371,53 +366,9 @@ describe('actions service', () => {
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
         this.noteItem,
-        this.passwordRequestHandler
       );
       expect(actionResponse).to.be.undefined;
     });
-
-    it('should return undefined and alert if payload could not be decrypted and auth_params are missing', async function () {
-      const itemPayload = new PurePayload({
-        uuid: Factory.generateUuid(),
-      });
-
-      sandbox
-        .stub(this.actionsManager.httpService, 'getAbsolute')
-        .resolves({ item: itemPayload });
-      sandbox
-        .stub(this.actionsManager.protocolService, 'payloadByDecryptingPayload')
-        .returns({ errorDecrypting: true });
-
-      const actionResponse = await this.actionsManager.runAction(
-        this.renderAction,
-        this.noteItem,
-        this.passwordRequestHandler
-      );
-
-      sinon.assert.calledOnceWithExactly(
-        this.alertServiceAlert,
-        errorDecryptingRevisionMessage
-      );
-      expect(actionResponse).to.be.undefined;
-    });
-
-    it('should try previous passwords and prompt for other passwords', async function () {
-      /** Using a custom action that returns a payload with an invalid items_key_id. */
-      const extensionItem = await this.itemManager.findItem(
-        this.extensionItemUuid
-      );
-      this.renderAction = extensionItem.actions.filter(
-        (action) => action.verb === 'render'
-      )[1];
-
-      await this.actionsManager.runAction(
-        this.renderAction,
-        this.noteItem,
-        this.passwordRequestHandler
-      );
-
-      sinon.assert.called(this.passwordRequestHandler);
-    }).timeout(20000);
 
     it('should return decrypted payload if password is valid', async function () {
       const extensionItem = await this.itemManager.findItem(
@@ -429,7 +380,6 @@ describe('actions service', () => {
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
         this.noteItem,
-        this.passwordRequestHandler
       );
 
       expect(actionResponse.item).to.be.ok;
