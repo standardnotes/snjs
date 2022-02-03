@@ -1,3 +1,1 @@
-export type ListedAuthorSecretsData = {
-  secrets: Array<{ authorId: number, secret: string }>
-}
+export type ListedAuthorSecretsData = Array<{ authorId: number, secret: string, hostUrl: string }>

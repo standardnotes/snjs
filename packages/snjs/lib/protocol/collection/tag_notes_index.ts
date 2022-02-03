@@ -20,7 +20,7 @@ export class TagNotesIndex implements SNIndex {
   constructor(private collection: ItemCollection) {}
 
   private isNoteCountable = (note: SNNote) => {
-    return !note.archived && !note.trashed;
+    return !note.archived && !note.trashed && !note.deleted;
   };
 
   public addCountChangeObserver(

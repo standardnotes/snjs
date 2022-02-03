@@ -1121,7 +1121,7 @@ export class ItemManager extends PureService {
     try {
       components = JSON.parse(dsl.substring(1, dsl.length));
     } catch (e) {
-      throw Error('invalid syntax');
+      throw Error('Invalid smart tag syntax');
     }
 
     const [title, keypath, operator, value] = components;

@@ -8,7 +8,7 @@ export class TagsToFoldersMigrationApplicator {
   public static isApplicableToCurrentData(itemManager: ItemManager): boolean {
     const tags = itemManager.getItems<SNTag>(ContentType.Tag);
     for (const tag of tags) {
-      if (tag.title.includes(TagFolderDelimitter)) {
+      if (tag.title.includes(TagFolderDelimitter) && !tag.parentId) {
         return true;
       }
     }

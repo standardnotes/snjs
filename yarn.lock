@@ -11460,40 +11460,40 @@ smart-buffer@^4.1.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.1.0.tgz#91605c25d91652f4661ea69ccf45f1b331ca21ba"
   integrity sha512-iVICrxOzCynf/SNaBQCw34eM9jROU/s5rzIhpOvzhzuYHfJR/DhZfDkXiZSgKXfgv26HT3Yni3AV/DGw0cGnnw==
 
-sn-advanced-markdown-editor@1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.4.1.tgz#8ee022e48137d48bef95fab884136140f0110d6a"
-  integrity sha512-SofxRrvtKXMTWsk97Q7QMnTvYtXQbi4taVWjaXV1MXaM2NvogbuAjIvReqxk2fwS8QXknHZ2t33xF5mtovMsqQ==
+sn-advanced-markdown-editor@1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.4.2.tgz#5a516bee6c459e47a9710f85524adfe88cbc87c2"
+  integrity sha512-Bx0dhTfoQPgAZyl4QSZ6r/dCpS00TsJxM8vdJXovvVBnS/H06SYftlaciFLWkgfiaXshgQrcappbMO74oOLPtQ==
 
 sn-bold-editor@1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.3.2.tgz#90376d303d2b7d7adfae1fc65a3efb89975f45ec"
   integrity sha512-PjfS1+GLAMtlxTVd9qv81A9+xCaWrL4rnF7Lm9oFKur4ApAWF8Kjn9pD+nbGZ90Qr1F56Uiygy80RobfhZ+PNw==
 
-sn-code-editor@1.3.9:
-  version "1.3.9"
-  resolved "https://registry.yarnpkg.com/sn-code-editor/-/sn-code-editor-1.3.9.tgz#5bf3170cf2808f4a0e900e5b874a11e2178647c5"
-  integrity sha512-ZzpnKlOu5LkQmU5QhfuXvPxBeybnJ53Ezn9PerpMTFNYRgVtRA4th6hWTu4fVoozJuqhR/GnmvaJVqtrJHEY3w==
+sn-code-editor@1.3.10:
+  version "1.3.10"
+  resolved "https://registry.yarnpkg.com/sn-code-editor/-/sn-code-editor-1.3.10.tgz#07caa777a8da82dd0513bfbd9743d480514816d2"
+  integrity sha512-jAhqMLFTm4F0481KM9mSrTBMSMfwMhnyD63hDgeK7ziRLHdC5vFH3om00dHCO9IdGVdtkZL6nHo8l1TJ7mi2xA==
 
 sn-codemirror-search@1.0.0, sn-codemirror-search@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/sn-codemirror-search/-/sn-codemirror-search-1.0.0.tgz#13c06b2cead6a3670eabdbffadd69d839ea53c3f"
   integrity sha512-T8WAFgdhChF91ZHX2ELGy48kzulMgzwTWA5p1QqMHOZDbgi23i3XWflNzcwPdKw8Px0DIRwpJ6ffQfcft0LMbQ==
 
-sn-fancy-markdown-editor@1.3.5:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/sn-fancy-markdown-editor/-/sn-fancy-markdown-editor-1.3.5.tgz#4bc6702fe9e1a900e9f6fdd9d26bc5393681b86d"
-  integrity sha512-VVU7Z51dqkh9Fybmbywa45qpvPlpe6uU3GNuZaY3yErVNxFWvhGeWXVcA4TveTVdJfWnL6EJ3xCxwuejHig2RA==
+sn-fancy-markdown-editor@1.3.6:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/sn-fancy-markdown-editor/-/sn-fancy-markdown-editor-1.3.6.tgz#9e563fb3bf66a1a2e338f38faf392ce34bfab3d8"
+  integrity sha512-ZgwEyCo2njVpSRLGmsrisPF7ZNnzKJMnZCCm59+Z1IdlKRzz2vc79Oe5PsHpDuzE4UqWOgcI3Kxh5pUnWtWzog==
 
 sn-folders@1.3.8:
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/sn-folders/-/sn-folders-1.3.8.tgz#ae3caec472ce8d201495f1aa501e01ed198a45bc"
   integrity sha512-OE190Jny3SkbdPjD6wqkrv0R3Ze5j9OFNIg6qGLdortXs9POg8eOzYPRls5DL7imJZtptHYn5ku0EfqXVfxxiw==
 
-sn-minimal-markdown-editor@1.3.8:
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/sn-minimal-markdown-editor/-/sn-minimal-markdown-editor-1.3.8.tgz#2a7ef512b32d2ea2fc4ce7cc0a785142dfeb1b65"
-  integrity sha512-gWB5TkHblSpEQVAwwk14rUrZ1Ej0mljmKLvfCs2gUbblkvd7fmFPZ6QZ0YobsFimLh7eWBYl7pDi4Kzb0OW7pA==
+sn-minimal-markdown-editor@1.3.9:
+  version "1.3.9"
+  resolved "https://registry.yarnpkg.com/sn-minimal-markdown-editor/-/sn-minimal-markdown-editor-1.3.9.tgz#977012f744f8f7f926926ccc262703dbad5ce176"
+  integrity sha512-lUMpZYcsjK1kGeljR6oAQolDOQkY+W5a3jo2fZZ1ROye/fRfvpfqZf7+tHArBNHxMG5TAnlJpAZsBP4kFUe6gQ==
   dependencies:
     sn-codemirror-search "1.0.0"
 
@@ -11502,15 +11502,15 @@ sn-plus-editor@1.6.1:
   resolved "https://registry.yarnpkg.com/sn-plus-editor/-/sn-plus-editor-1.6.1.tgz#11ad67b0eb5a5f5e3f18a1805c12b29c15bea164"
   integrity sha512-Ys2XTrUnelCFpD/StqwB4Q7rooPeox4xDegbXHV7MnTuYIcU41TkQBHrnsmcf6zL3Mkv5hzYHtrP3JzFfHk5NA==
 
-sn-simple-markdown-editor@1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/sn-simple-markdown-editor/-/sn-simple-markdown-editor-1.4.1.tgz#84ec4c0ed1cdeaae51611c7196f8145df1d8a859"
-  integrity sha512-t4A+ZGLWwnaMg0kQA0aMIBdARyosQM0og9YgBvb/ZhL0H5Q9nUxtrUPmi3Kr09+d1I03pXbAnuDYwzEfPdCiOw==
+sn-simple-markdown-editor@1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/sn-simple-markdown-editor/-/sn-simple-markdown-editor-1.4.2.tgz#32cbb6300a1b251c285c97bf89b9c6442213698a"
+  integrity sha512-HASXYu/zs2PGYtIZm+1zb9IorQvqe8ovDVA0K2nQ2ZzHMgw5/w7SVNVPH0FZeStv9JEqOYCccLUK0UZGdKdMWA==
 
-sn-simple-task-editor@1.3.8:
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/sn-simple-task-editor/-/sn-simple-task-editor-1.3.8.tgz#c787a4c84ca297db336e55de5cb07ca4dfce01e3"
-  integrity sha512-OOFbSiGoZo2T0vZdXEpalbxzW1WGi9O82GIAdVFRKcr3aMNERN9EeO+4mVe3uP22DngITi4pj4KRX9ZYdKvumg==
+sn-simple-task-editor@1.3.9:
+  version "1.3.9"
+  resolved "https://registry.yarnpkg.com/sn-simple-task-editor/-/sn-simple-task-editor-1.3.9.tgz#e3e0a122ae77df564feb55d04e08f5cff4781fb1"
+  integrity sha512-CKF4jn7hqhhLnZhHj1LqsfSGFmdpQpz/puX0U8U0Q9/2W9aap9pnmduOo1OP25dBnGXnrjxsK5LP6W3l83tehg==
 
 sn-spreadsheets@1.4.4:
   version "1.4.4"

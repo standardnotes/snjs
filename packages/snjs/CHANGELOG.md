@@ -3,6 +3,88 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.49.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.3...@standardnotes/snjs@2.49.4) (2022-02-02)
+
+
+### Bug Fixes
+
+* smart tag case insensitivity for strings ([#585](https://github.com/standardnotes/snjs/issues/585)) ([100d705](https://github.com/standardnotes/snjs/commit/100d705bb1cfbb04787aefca7603c78e74818284))
+
+
+
+
+
+## [2.49.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.2...@standardnotes/snjs@2.49.3) (2022-02-02)
+
+
+### Bug Fixes
+
+* delete note should not be countable ([e2ef2fc](https://github.com/standardnotes/snjs/commit/e2ef2fcb21b44911973efa2da68e05f69154d53c))
+
+
+
+
+
+## [2.49.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.1...@standardnotes/snjs@2.49.2) (2022-02-02)
+
+
+### Bug Fixes
+
+* no migration needed if tag already has parentId ([57a3887](https://github.com/standardnotes/snjs/commit/57a3887ac64a83847de003cbf95324f2c7eb2ac2))
+
+
+
+
+
+## [2.49.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.0...@standardnotes/snjs@2.49.1) (2022-02-02)
+
+
+### Bug Fixes
+
+* return `NoUserSubscription` status when the third-party feature was not found ([#583](https://github.com/standardnotes/snjs/issues/583)) ([782ea88](https://github.com/standardnotes/snjs/commit/782ea8857ea43e1769281bd64f2c84f9dec9c178))
+
+
+
+
+
+# [2.49.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.48.2...@standardnotes/snjs@2.49.0) (2022-02-02)
+
+
+### Features
+
+* add remaining icon types from library ([#584](https://github.com/standardnotes/snjs/issues/584)) ([393cb4e](https://github.com/standardnotes/snjs/commit/393cb4e9fa633337d16438eddeda72de4a4edbbc))
+
+
+
+
+
+## [2.48.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.48.1...@standardnotes/snjs@2.48.2) (2022-02-02)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.48.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.48.0...@standardnotes/snjs@2.48.1) (2022-02-01)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.48.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.47.1...@standardnotes/snjs@2.48.0) (2022-02-01)
+
+
+### Features
+
+* tags to folders migration applicator ([c72134d](https://github.com/standardnotes/snjs/commit/c72134d5c520bfff23a2e9f9e7386d828eb7a46d))
+
+
+
+
+
 ## [2.47.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.47.0...@standardnotes/snjs@2.47.1) (2022-02-01)
 
 **Note:** Version bump only for package @standardnotes/snjs

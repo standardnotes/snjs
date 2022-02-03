@@ -438,7 +438,10 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       const component = this.itemManager.components.find(
         (candidate) => candidate.identifier === featureId
       );
-      if (component?.isExpired) {
+      if (!component) {
+        return FeatureStatus.NoUserSubscription;
+      }
+      if (component.isExpired) {
         return FeatureStatus.InCurrentPlanButExpired;
       }
       return FeatureStatus.Entitled;

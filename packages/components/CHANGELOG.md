@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.4...@standardnotes/components@1.5.0) (2022-02-01)
+
+
+### Features
+
+* enable spellcheck control for editors ([#578](https://github.com/standardnotes/snjs/issues/578)) ([24e7add](https://github.com/standardnotes/snjs/commit/24e7add3b6217703d142509b2dfd2ecfcc3ceb74))
+
+
+
+
+
 ## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.3...@standardnotes/components@1.4.4) (2022-01-28)
 
 **Note:** Version bump only for package @standardnotes/components
