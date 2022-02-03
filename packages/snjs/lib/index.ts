@@ -238,8 +238,6 @@ export { NoteViewController } from './ui/note_view_controller';
 export { NoteGroupController } from './ui/note_group_controller';
 export { IconsController } from './ui/icons_controller';
 
-export { ListedAccountInfoToActionExtension } from './services/listed_service';
-
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
 

@@ -1,7 +1,5 @@
 import { lastElement, sleep } from '@Lib/utils';
 import { UuidString } from '@Lib/types';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { FillItemContent } from '@Models/functions';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
 import { SNHttpService } from './api/http_service';
@@ -16,20 +14,6 @@ import {
   ListedAccountInfo,
   ListedAccountInfoResponse,
 } from './api/responses';
-
-export function ListedAccountInfoToActionExtension(
-  accountInfo: ListedAccountInfo
-): SNActionsExtension {
-  const payload = CreateMaxPayloadFromAnyObject({
-    content_type: ContentType.ActionsExtension,
-    uuid: accountInfo.author_url,
-    content: FillItemContent({
-      ...accountInfo,
-      name: accountInfo.display_name,
-    }),
-  });
-  return new SNActionsExtension(payload);
-}
 
 export class ListedService extends PureService implements ListedInterface {
   constructor(
