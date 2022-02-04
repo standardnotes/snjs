@@ -1,4 +1,4 @@
-import { RawPayload } from './../../protocol/payloads/generator';
+import { CopyPayload, RawPayload } from './../../protocol/payloads/generator';
 import { DeviceInterface } from '@Lib/device_interface';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { CreateHistoryEntryForPayload } from '@Services/history/entries/generator';
@@ -321,16 +321,32 @@ export class SNHistoryManager extends PureService {
       return undefined;
     }
     const revision = (revisionResponse as SingleRevisionResponse).data;
-    const payload = CreateMaxPayloadFromAnyObject(
-      (revision as unknown) as RawPayload,
+
+    const serverPayload = CreateMaxPayloadFromAnyObject(
+      (revision as unknown) as RawPayload
+    );
+    /**
+     * When an item is duplicated, its revisions also carry over to the newly created item.
+     * However since the new item has a different UUID than the source item, we must decrypt
+     * these olders revisions (which have not been mutated after copy) with the source item's
+     * uuid.
+     */
+    const embeddedParams = await this.protocolService.getEmbeddedPayloadAuthenticatedData(
+      serverPayload
+    );
+    const sourceItemUuid = embeddedParams?.u;
+    const payload = CopyPayload(
+      CreateMaxPayloadFromAnyObject((revision as unknown) as RawPayload),
       {
-        uuid: revision.item_uuid,
+        uuid: sourceItemUuid || revision.item_uuid,
       }
     );
+
     if (!isRemotePayloadAllowed(payload)) {
       console.error('Remote payload is disallowed', payload);
       return undefined;
     }
+
     const encryptedPayload = CreateSourcedPayloadFromObject(
       payload,
       PayloadSource.RemoteHistory

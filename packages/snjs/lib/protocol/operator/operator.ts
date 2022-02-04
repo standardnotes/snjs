@@ -48,7 +48,7 @@ export abstract class SNProtocolOperator {
    * Computes a root key given a password and previous keyParams
    * @param password - Plain string representing raw user password
    */
-  public abstract async computeRootKey(
+  public abstract computeRootKey(
     password: string,
     keyParams: SNRootKeyParams
   ): Promise<SNRootKey>;
@@ -59,7 +59,7 @@ export abstract class SNProtocolOperator {
    *    for the user
    * @param password - Plain string representing raw user password
    */
-  public abstract async createRootKey(
+  public abstract createRootKey(
     identifier: string,
     password: string,
     origination: KeyParamsOrigination
@@ -69,7 +69,7 @@ export abstract class SNProtocolOperator {
    * Returns the payload's authenticated data. The passed payload must be in a
    * non-decrypted, ciphertext state.
    */
-  public abstract async getPayloadAuthenticatedData(
+  public abstract getPayloadAuthenticatedData(
     payload: PurePayload
   ): Promise<
     | RootKeyEncryptedAuthenticatedData
@@ -78,7 +78,7 @@ export abstract class SNProtocolOperator {
     | undefined
   >;
 
-  protected abstract async generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
+  protected abstract generateNewItemsKeyContent(): Promise<ItemsKeyContent>;
 
   protected async firstHalfOfKey(key: string) {
     return key.substring(0, key.length / 2);

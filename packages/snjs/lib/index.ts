@@ -169,6 +169,7 @@ export {
   dateToLocalizedString,
   nonSecureRandomIdentifier,
   sanitizeHtmlString,
+  lastElement
 } from './utils';
 export { Uuid } from '@Lib/uuid';
 export {

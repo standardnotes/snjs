@@ -1,6 +1,7 @@
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { SNLog } from './../log';
 import {
+  ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
 } from './../protocol/payloads/generator';
@@ -1421,20 +1422,40 @@ export class SNProtocolService
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public async getKeyEmbeddedKeyParams(key: SNItemsKey) {
+  public async getEmbeddedPayloadAuthenticatedData(
+    payload: PurePayload
+  ): Promise<
+    | RootKeyEncryptedAuthenticatedData
+    | ItemAuthenticatedData
+    | LegacyAttachedData
+    | undefined
+  > {
+    const version = payload.version;
+    if (!version) {
+      return undefined;
+    }
+    const operator = this.operatorForVersion(version);
+    const authenticatedData = await operator.getPayloadAuthenticatedData(
+      payload
+    );
+    return authenticatedData;
+  }
+
+  /** Returns the key params attached to this key's encrypted payload */
+  public async getKeyEmbeddedKeyParams(
+    key: SNItemsKey
+  ): Promise<SNRootKeyParams | undefined> {
     /** We can only look up key params for keys that are encrypted (as strings) */
     if (key.payload.format === PayloadFormat.DecryptedBareObject) {
       return undefined;
     }
-    const version = key.version;
-    const operator = this.operatorForVersion(version);
-    const authenticatedData = await operator.getPayloadAuthenticatedData(
+    const authenticatedData = await this.getEmbeddedPayloadAuthenticatedData(
       key.payload
     );
     if (!authenticatedData) {
       return undefined;
     }
-    if (isVersionLessThanOrEqualTo(version, ProtocolVersion.V003)) {
+    if (isVersionLessThanOrEqualTo(key.version, ProtocolVersion.V003)) {
       const rawKeyParams = authenticatedData as LegacyAttachedData;
       return this.createKeyParams(rawKeyParams);
     } else {
