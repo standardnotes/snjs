@@ -127,9 +127,9 @@ export async function publishMockedEvent(eventType, eventPayload) {
     method: 'post',
     body: JSON.stringify({
       eventType,
-      eventPayload
-    })
-  })
+      eventPayload,
+    }),
+  });
 }
 
 export function createApplication(identifier, environment, platform, host) {
@@ -412,7 +412,11 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
   return params;
 }
 
-export function createTagParams({ title, dirty = true, uuid = undefined } = {}) {
+export function createTagParams({
+  title,
+  dirty = true,
+  uuid = undefined,
+} = {}) {
   const params = {
     uuid: uuid || generateUuid(),
     content_type: ContentType.Tag,
@@ -460,6 +464,12 @@ export async function storagePayloadCount(application) {
   const payloads = await application.storageService.getAllRawPayloads();
   return payloads.length;
 }
+
+/**
+ * The number of seconds between changes before a server creates a new revision.
+ * Controlled via docker/syncing-server-js.env
+ */
+export const ServerRevisionFrequency = 1.1;
 
 export function yesterday() {
   return new Date(new Date().setDate(new Date().getDate() - 1));
