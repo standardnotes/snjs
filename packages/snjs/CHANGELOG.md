@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.51.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.51.0...@standardnotes/snjs@2.51.1) (2022-02-04)
+
+
+### Bug Fixes
+
+* handle duplicated item history decryption ([#588](https://github.com/standardnotes/snjs/issues/588)) ([47de366](https://github.com/standardnotes/snjs/commit/47de3666f62af25040500bfe6ac4cb395a30d81f))
+
+
+
+
+
 # [2.51.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.50.0...@standardnotes/snjs@2.51.0) (2022-02-04)
 
 
