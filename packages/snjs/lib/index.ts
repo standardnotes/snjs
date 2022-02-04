@@ -188,6 +188,7 @@ export { ApplicationEvent } from '@Lib/events';
 export {
   Environment,
   Platform,
+  Runtime,
   isEnvironmentWebOrDesktop,
   isEnvironmentMobile,
   platformFromString,
