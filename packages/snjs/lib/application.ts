@@ -53,13 +53,14 @@ import {
 import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { Environment, Platform } from './platforms';
+import { Environment, Platform, Runtime } from './platforms';
 import {
   assertUnreachable,
   isNullOrUndefined,
   isString,
   removeFromArray,
   sleep,
+  nonSecureRandomIdentifier,
 } from '@Lib/utils';
 import { ContentType } from '@standardnotes/common';
 import {
@@ -120,7 +121,6 @@ import {
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
-import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import {
   CloudProvider,
@@ -137,6 +137,7 @@ import {
   SetOfflineFeaturesFunctionResponse,
 } from '@Services/features_service';
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders';
+import { RemoteSession } from './services/api/session';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -158,6 +159,13 @@ type ObserverRemover = () => void;
 /** The main entrypoint of an application. */
 export class SNApplication implements ListedInterface {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void;
+
+  /**
+   * A runtime based identifier for each dynamic instantiation of the application instance.
+   * This differs from the persistent application.identifier which persists in storage
+   * across instantiations.
+   */
+  public readonly ephemeralIdentifier = nonSecureRandomIdentifier();
 
   private migrationService!: SNMigrationService;
   private httpService!: SNHttpService;
@@ -210,9 +218,8 @@ export class SNApplication implements ListedInterface {
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param alertService The platform-dependent implementation of alert service.
-   * @param identifier A unique identifier to namespace storage and other
-   * persistent properties. This parameter is kept for backward compatibility and/or in case
-   * you don't want SNNamespaceService to assign a dynamic namespace for you.
+   * @param identifier A unique persistent identifier to namespace storage and other
+   * persistent properties. For an ephemeral runtime identifier, use ephemeralIdentifier.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array of key/value pairs
    * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
@@ -220,22 +227,21 @@ export class SNApplication implements ListedInterface {
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
    * @param appVersion Version of client application.
-   * @param enableV4 Flag indicating whether V4 features should be enabled.
    * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
   constructor(
-    public environment: Environment,
-    public platform: Platform,
+    public readonly environment: Environment,
+    public readonly platform: Platform,
     public deviceInterface: DeviceInterface,
     private crypto: SNPureCrypto,
     public alertService: SNAlertService,
-    public identifier: ApplicationIdentifier,
+    public readonly identifier: ApplicationIdentifier,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
     private appVersion: string,
-    private enableV4 = false,
-    private webSocketUrl?: string
+    private webSocketUrl?: string,
+    private readonly runtime: Runtime = Runtime.Prod
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');

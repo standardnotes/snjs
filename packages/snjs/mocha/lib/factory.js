@@ -151,7 +151,6 @@ export function createApplication(identifier, environment, platform, host) {
     [],
     host || getDefaultHost(),
     getAppVersion(),
-    true,
     getDefaultWebSocketUrl()
   );
 }
