@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.51.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.50.0...@standardnotes/snjs@2.51.0) (2022-02-04)
+
+
+### Features
+
+* ephemeral application identifier ([#587](https://github.com/standardnotes/snjs/issues/587)) ([502f5fe](https://github.com/standardnotes/snjs/commit/502f5fe99f798e0b486ac8c8ee07e94e5bd0fe53))
+
+
+
+
+
 # [2.50.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.4...@standardnotes/snjs@2.50.0) (2022-02-04)
 
 
