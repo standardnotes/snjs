@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.50.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.4...@standardnotes/snjs@2.50.0) (2022-02-04)
+
+
+### Features
+
+* listed account creation ([#586](https://github.com/standardnotes/snjs/issues/586)) ([488d0d2](https://github.com/standardnotes/snjs/commit/488d0d2642e764ff06a9d5358fe7f49f8863930e))
+
+
+
+
+
 ## [2.49.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.49.3...@standardnotes/snjs@2.49.4) (2022-02-02)
 
 
