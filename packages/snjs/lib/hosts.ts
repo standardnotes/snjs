@@ -2,7 +2,7 @@ export const APPLICATION_DEFAULT_HOSTS = [
   'api.standardnotes.com',
   'api-dev.standardnotes.com',
   'sync.standardnotes.org',
-  'syncing-server-demo.standardnotes.com'
+  'syncing-server-demo.standardnotes.com',
 ];
 
 export const TRUSTED_FEATURE_HOSTS = [
@@ -16,8 +16,8 @@ export const TRUSTED_FEATURE_HOSTS = [
 ];
 
 export enum ExtensionsServerURL {
+  Dev = 'https://extensions-server-dev.standardnotes.org',
   Prod = 'https://extensions.standardnotes.org',
-  Dev = 'https://extensions-server-dev.standardnotes.org'
 }
 
 const LocalHost = 'localhost';
@@ -25,7 +25,9 @@ const LocalHost = 'localhost';
 export function isUrlFirstParty(url: string): boolean {
   try {
     const { host } = new URL(url);
-    return host.startsWith(LocalHost) || APPLICATION_DEFAULT_HOSTS.includes(host);
+    return (
+      host.startsWith(LocalHost) || APPLICATION_DEFAULT_HOSTS.includes(host)
+    );
   } catch (_err) {
     return false;
   }

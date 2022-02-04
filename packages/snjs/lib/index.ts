@@ -5,7 +5,11 @@ export {
 } from './version';
 
 export type { ApplicationDescriptor } from './application_group';
-export type { ActionResponse } from './services/actions_service';
+export type {
+  ActionResponse,
+  ListedAccount,
+  ListedAccountInfo,
+} from './services/api/responses';
 export type { BackupFile } from '@Services/protocol_service';
 export type {
   UuidString,
@@ -42,7 +46,6 @@ export {
   SNSmartTag,
   SNActionsExtension,
   ActionsExtensionMutator,
-  Action,
   SNTheme,
   ThemeMutator,
   SNComponent,
@@ -53,7 +56,7 @@ export {
   PrefKey,
 } from './models';
 
-export type { PrefValue } from './models';
+export type { PrefValue, Action } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from '@standardnotes/features';
@@ -176,9 +179,7 @@ export {
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
-export {
-  displayStringForContentType,
-} from '@Models/content_types';
+export { displayStringForContentType } from '@Models/content_types';
 export { ContentType } from '@standardnotes/common';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
@@ -247,7 +248,10 @@ export { SNLog } from './log';
 /** Used by e2e tests */
 export { Features, FeatureIdentifier } from '@standardnotes/features';
 export { RoleName } from '@standardnotes/auth';
-export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/settings';
+export {
+  SettingName,
+  MuteFailedBackupsEmailsOption,
+} from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
 export { ApplicationStage } from '@Lib/stages';

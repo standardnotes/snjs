@@ -1,6 +1,13 @@
+import { ChallengeService } from './challenge/challenge_service';
+import {
+  Challenge,
+  ChallengePrompt,
+  ChallengeValidation,
+  ChallengeReason,
+} from './../challenges';
+import { ListedService } from './listed_service';
 import { CreateItemFromPayload } from '@Models/generator';
-import { HttpResponse } from './api/responses';
-import { Action, ActionAccessType } from './../models/app/action';
+import { ActionResponse, HttpResponse } from './api/responses';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -8,6 +15,8 @@ import { SNRootKey } from '@Protocol/root_key';
 import {
   ActionsExtensionMutator,
   SNActionsExtension,
+  Action,
+  ActionAccessType,
 } from './../models/app/extension';
 import { MutationType, SNItem } from '@Models/core/item';
 import { SNSyncService } from './sync/sync_service';
@@ -15,26 +24,11 @@ import { SNProtocolService } from './protocol_service';
 import { PayloadManager } from './payload_manager';
 import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
-import { PayloadSource } from '@Payloads/sources';
+
 import { EncryptionIntent } from '@Protocol/intents';
 import { PureService } from '@Lib/services/pure_service';
-import {
-  CopyPayload,
-  CreateMaxPayloadFromAnyObject,
-} from '@Payloads/generator';
+import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { DeviceInterface } from '../device_interface';
-
-export type ActionResponse = HttpResponse & {
-  description: string;
-  supported_types: string[];
-  deprecation?: string;
-  actions: any[];
-  item?: any;
-  keyParams?: any;
-  auth_params?: any;
-};
-
-type PasswordRequestHandler = () => Promise<string>;
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -51,29 +45,20 @@ type PasswordRequestHandler = () => Promise<string>;
  *       to allow publishing a note to a user's blog.
  */
 export class SNActionsService extends PureService {
-  private httpService: SNHttpService;
-  private payloadManager: PayloadManager;
-  private protocolService: SNProtocolService;
-  private syncService: SNSyncService;
   private previousPasswords: string[] = [];
 
   constructor(
     private itemManager: ItemManager,
     private alertService: SNAlertService,
-    deviceInterface: DeviceInterface,
-    httpService: SNHttpService,
-    payloadManager: PayloadManager,
-    protocolService: SNProtocolService,
-    syncService: SNSyncService
+    public deviceInterface: DeviceInterface,
+    private httpService: SNHttpService,
+    private payloadManager: PayloadManager,
+    private protocolService: SNProtocolService,
+    private syncService: SNSyncService,
+    private challengeService: ChallengeService,
+    private listedService: ListedService
   ) {
     super();
-    this.itemManager = itemManager;
-    this.alertService = alertService;
-    this.deviceInterface = deviceInterface;
-    this.httpService = httpService;
-    this.payloadManager = payloadManager;
-    this.protocolService = protocolService;
-    this.syncService = syncService;
     this.previousPasswords = [];
   }
 
@@ -81,9 +66,11 @@ export class SNActionsService extends PureService {
   public deinit(): void {
     (this.itemManager as unknown) = undefined;
     (this.alertService as unknown) = undefined;
-    this.deviceInterface = undefined;
+    (this.deviceInterface as unknown) = undefined;
     (this.httpService as unknown) = undefined;
     (this.payloadManager as unknown) = undefined;
+    (this.listedService as unknown) = undefined;
+    (this.challengeService as unknown) = undefined;
     (this.protocolService as unknown) = undefined;
     (this.syncService as unknown) = undefined;
     this.previousPasswords.length = 0;
@@ -91,9 +78,13 @@ export class SNActionsService extends PureService {
   }
 
   public getExtensions(): SNActionsExtension[] {
-    return this.itemManager.nonErroredItemsForContentType(
+    const extensionItems = this.itemManager.nonErroredItemsForContentType<SNActionsExtension>(
       ContentType.ActionsExtension
-    ) as SNActionsExtension[];
+    );
+    const excludingListed = extensionItems.filter(
+      (extension) => !extension.isListedExtension
+    );
+    return excludingListed;
   }
 
   public extensionsInContextOfItem(item: SNItem) {
@@ -131,17 +122,13 @@ export class SNActionsService extends PureService {
     const description = response.description || extension.description;
     const supported_types =
       response.supported_types || extension.supported_types;
-    const actions = response.actions
-      ? response.actions.map((action: any) => {
-          return new Action(action);
-        })
-      : [];
+    const actions = response.actions || [];
     const mutator = new ActionsExtensionMutator(
       extension,
       MutationType.UserInteraction
     );
 
-    mutator.deprecation = response.deprecation!;
+    mutator.deprecation = response.deprecation;
     mutator.description = description;
     mutator.supported_types = supported_types;
     mutator.actions = actions;
@@ -152,16 +139,12 @@ export class SNActionsService extends PureService {
 
   public async runAction(
     action: Action,
-    item: SNItem,
-    passwordRequestHandler: PasswordRequestHandler
-  ): Promise<ActionResponse> {
+    item: SNItem
+  ): Promise<ActionResponse | undefined> {
     let result;
     switch (action.verb) {
-      case 'get':
-        result = await this.handleGetAction(action, passwordRequestHandler);
-        break;
       case 'render':
-        result = await this.handleRenderAction(action, passwordRequestHandler);
+        result = await this.handleRenderAction(action);
         break;
       case 'show':
         result = await this.handleShowAction(action);
@@ -172,72 +155,15 @@ export class SNActionsService extends PureService {
       default:
         break;
     }
-    return result as ActionResponse;
+    return result;
   }
 
-  private async handleGetAction(
-    action: Action,
-    passwordRequestHandler: PasswordRequestHandler
-  ): Promise<ActionResponse> {
-    const confirmed = await this.alertService!.confirm(
-      "Are you sure you want to replace the current note contents with this action's results?"
-    );
-    if (confirmed) {
-      return this.runConfirmedGetAction(action, passwordRequestHandler);
-    } else {
-      return {
-        error: {
-          status: 1,
-          message: 'Action canceled by user.',
-        },
-      } as ActionResponse;
-    }
-  }
-
-  private async runConfirmedGetAction(
-    action: Action,
-    passwordRequestHandler: PasswordRequestHandler
-  ) {
-    const response = (await this.httpService!.getAbsolute(action.url).catch(
-      (response) => {
-        const error = (response && response.error) || {
-          message:
-            'An issue occurred while processing this action. Please try again.',
-        };
-        this.alertService!.alert(error.message);
-        return { error } as HttpResponse;
-      }
-    )) as ActionResponse;
-    if (response.error) {
-      return response;
-    }
-    const payload = await this.payloadByDecryptingResponse(
-      response,
-      passwordRequestHandler
-    );
-    await this.payloadManager!.emitPayload(
-      CopyPayload(payload!, {
-        dirty: true,
-        dirtiedDate: new Date(),
-      }),
-      PayloadSource.RemoteActionRetrieved
-    );
-    this.syncService!.sync();
-    return {
-      ...response,
-      item: response.item,
-    } as ActionResponse;
-  }
-
-  private async handleRenderAction(
-    action: Action,
-    passwordRequestHandler: PasswordRequestHandler
-  ) {
-    const response = await this.httpService!.getAbsolute(action.url)
+  private async handleRenderAction(action: Action) {
+    const response = await this.httpService
+      .getAbsolute(action.url)
       .then(async (response) => {
         const payload = await this.payloadByDecryptingResponse(
-          response as ActionResponse,
-          passwordRequestHandler
+          response as ActionResponse
         );
         if (payload) {
           const item = CreateItemFromPayload(payload);
@@ -252,7 +178,7 @@ export class SNActionsService extends PureService {
           message:
             'An issue occurred while processing this action. Please try again.',
         };
-        this.alertService!.alert(error.message);
+        this.alertService.alert(error.message);
         return { error } as HttpResponse;
       });
 
@@ -261,38 +187,59 @@ export class SNActionsService extends PureService {
 
   private async payloadByDecryptingResponse(
     response: ActionResponse,
-    passwordRequestHandler: PasswordRequestHandler,
     key?: SNRootKey,
     triedPasswords: string[] = []
   ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item);
-    const decryptedPayload =
-      await this.protocolService!.payloadByDecryptingPayload(payload, key);
+
+    if (!payload.enc_item_key) {
+      this.alertService.alert(
+        'This revision is missing its key and cannot be recovered.'
+      );
+      return;
+    }
+
+    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
+      payload,
+      key
+    );
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload;
     }
+
+    for (const itemsKey of this.itemManager.itemsKeys()) {
+      const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
+        payload,
+        itemsKey
+      );
+      if (!decryptedPayload.errorDecrypting) {
+        return decryptedPayload;
+      }
+    }
+
     const keyParamsData = response.keyParams || response.auth_params;
     if (!keyParamsData) {
       /**
        * In some cases revisions were missing auth params.
        * Instruct the user to email us to get this remedied.
        */
-      this.alertService!.alert(
+      this.alertService.alert(
         'We were unable to decrypt this revision using your current keys, ' +
           'and this revision is missing metadata that would allow us to try different ' +
           'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
-          'Please email hello@standardnotes.org for assistance.'
+          'Please email help@standardnotes.com for assistance.'
       );
       return undefined;
     }
-    const keyParams = this.protocolService!.createKeyParams(keyParamsData);
+    const keyParams = this.protocolService.createKeyParams(keyParamsData);
+
     /* Try previous passwords */
     for (const passwordCandidate of this.previousPasswords) {
       if (triedPasswords.includes(passwordCandidate)) {
         continue;
       }
       triedPasswords.push(passwordCandidate);
-      const key = await this.protocolService!.computeRootKey(
+      const key = await this.protocolService.computeRootKey(
         passwordCandidate,
         keyParams
       );
@@ -301,7 +248,6 @@ export class SNActionsService extends PureService {
       }
       const nestedResponse: any = await this.payloadByDecryptingResponse(
         response,
-        passwordRequestHandler,
         key,
         triedPasswords
       );
@@ -309,17 +255,41 @@ export class SNActionsService extends PureService {
         return nestedResponse;
       }
     }
+
     /** Prompt for other passwords */
-    const password = await passwordRequestHandler();
+    const password = await this.promptForLegacyPassword();
+    if (!password) {
+      return undefined;
+    }
+
     if (this.previousPasswords.includes(password)) {
       return undefined;
     }
+
     this.previousPasswords.push(password);
-    return this.payloadByDecryptingResponse(
-      response,
-      passwordRequestHandler,
-      key
+    return this.payloadByDecryptingResponse(response, key);
+  }
+
+  private async promptForLegacyPassword(): Promise<string | undefined> {
+    const challenge = new Challenge(
+      [
+        new ChallengePrompt(
+          ChallengeValidation.None,
+          'Previous Password',
+          undefined,
+          true
+        ),
+      ],
+      ChallengeReason.Custom,
+      true,
+      'Unable to find key for revision. Please enter the account password you may have used at the time of the revision.'
     );
+
+    const response = await this.challengeService.promptForChallengeResponse(
+      challenge
+    );
+
+    return response?.getDefaultValue().value as string;
   }
 
   private async handlePostAction(action: Action, item: SNItem) {

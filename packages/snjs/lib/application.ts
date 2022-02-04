@@ -1,3 +1,5 @@
+import { ListedService } from './services/listed_service';
+import { ListedInterface } from './application_interfaces/listed_interface';
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index';
 import { TransactionalMutation } from './services/item_manager';
 import { FeatureStatus } from '@Lib/services/features_service';
@@ -111,6 +113,8 @@ import {
   GetAvailableSubscriptionsResponse,
   GetSubscriptionResponse,
   HttpResponse,
+  ListedAccount,
+  ListedAccountInfo,
   SignInResponse,
   User,
 } from './services/api/responses';
@@ -152,7 +156,7 @@ type ItemStream = (items: SNItem[], source: PayloadSource) => void;
 type ObserverRemover = () => void;
 
 /** The main entrypoint of an application. */
-export class SNApplication {
+export class SNApplication implements ListedInterface {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void;
 
   private migrationService!: SNMigrationService;
@@ -177,6 +181,7 @@ export class SNApplication {
   private webSocketsService!: SNWebSocketsService;
   private settingsService!: SNSettingsService;
   private mfaService!: SNMfaService;
+  private listedService!: ListedService;
 
   private eventHandlers: ApplicationObserver[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1185,6 +1190,25 @@ export class SNApplication {
     return this.protectionService.authorizeSearchingProtectedNotesText();
   }
 
+  public canRegisterNewListedAccount(): boolean {
+    return this.listedService.canRegisterNewListedAccount();
+  }
+
+  public async requestNewListedAccount(): Promise<ListedAccount | undefined> {
+    return this.listedService.requestNewListedAccount();
+  }
+
+  public async getListedAccounts(): Promise<ListedAccount[]> {
+    return this.listedService.getListedAccounts();
+  }
+
+  public getListedAccountInfo(
+    account: ListedAccount,
+    inContextOfItem?: UuidString
+  ): Promise<ListedAccountInfo | undefined> {
+    return this.listedService.getListedAccountInfo(account, inContextOfItem);
+  }
+
   /**
    * @returns
    * .affectedItems: Items that were either created or dirtied by this import
@@ -1808,13 +1832,14 @@ export class SNApplication {
     this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
-    this.createActionsManager();
     this.createPreferencesService();
     this.createSettingsService();
     this.createFeaturesService();
     this.createComponentManager();
     this.createMigrationService();
     this.createMfaService();
+    this.createListedService();
+    this.createActionsManager();
   }
 
   private clearServices() {
@@ -1841,8 +1866,19 @@ export class SNApplication {
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
     (this.mfaService as unknown) = undefined;
+    (this.listedService as unknown) = undefined;
 
     this.services = [];
+  }
+
+  private createListedService(): void {
+    this.listedService = new ListedService(
+      this.apiService,
+      this.itemManager,
+      this.settingsService,
+      this.httpService
+    );
+    this.services.push(this.listedService);
   }
 
   private createFeaturesService() {
@@ -2131,7 +2167,9 @@ export class SNApplication {
       this.httpService,
       this.payloadManager,
       this.protocolService,
-      this.syncService
+      this.syncService,
+      this.challengeService,
+      this.listedService
     );
     this.services.push(this.actionsManager);
   }

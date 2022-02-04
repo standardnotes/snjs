@@ -100,13 +100,18 @@ export class SNSessionManager extends PureService<SessionEvent> {
     super.deinit();
   }
 
+  private setUser(user?: User) {
+    this.user = user;
+    this.apiService.setUser(user);
+  }
+
   public async initializeFromDisk() {
-    this.user = await this.storageService.getValue(StorageKey.User);
+    this.setUser(await this.storageService.getValue(StorageKey.User));
     if (!this.user) {
       /** @legacy Check for uuid. */
       const uuid = await this.storageService.getValue(StorageKey.LegacyUuid);
       if (uuid) {
-        this.user = { uuid: uuid, email: uuid };
+        this.setUser({ uuid: uuid, email: uuid });
       }
     }
 
@@ -141,7 +146,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
   }
 
   public async signOut() {
-    this.user = undefined;
+    this.setUser(undefined);
     const session = this.apiService.getSession();
     if (session && session.canExpire()) {
       await this.apiService.signOut();
@@ -645,7 +650,7 @@ export class SNSessionManager extends PureService<SessionEvent> {
     await this.protocolService.setRootKey(rootKey, wrappingKey);
     const { data } = response;
     const user = data.user;
-    this.user = user;
+    this.setUser(user);
     await this.storageService.setValue(StorageKey.User, user);
     this.apiService.setHost(this.apiService.getHost());
     if (data.token) {
