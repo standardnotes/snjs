@@ -174,9 +174,11 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
     if (stage === ApplicationStage.FullSyncCompleted_13) {
-      const offlineRepo = this.getOfflineRepo();
-      if (offlineRepo) {
-        this.downloadOfflineFeatures(offlineRepo);
+      if (!this.hasOnlineSubscription()) {
+        const offlineRepo = this.getOfflineRepo();
+        if (offlineRepo) {
+          this.downloadOfflineFeatures(offlineRepo);
+        }
       }
     }
   }
@@ -422,14 +424,18 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.features.find((feature) => feature.identifier === featureId);
   }
 
-  public hasPaidOnlineOrOfflineSubscription(): boolean {
+  private hasOnlineSubscription(): boolean {
     if (this.sessionManager.isSignedIntoFirstPartyServer()) {
       const roles = this.roles;
       const unpaidRoles = [RoleName.BasicUser];
       return roles.some((role) => !unpaidRoles.includes(role));
     } else {
-      return this.hasOfflineRepo();
+      return false;
     }
+  }
+
+  public hasPaidOnlineOrOfflineSubscription(): boolean {
+    return this.hasOnlineSubscription() || this.hasOfflineRepo();
   }
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
@@ -549,16 +555,16 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     let resultingItem: SNComponent | undefined = existingItem as SNComponent;
 
     if (existingItem) {
-      const expiresAt = new Date(feature.expires_at || 0);
+      const featureExpiresAt = new Date(feature.expires_at || 0);
       const hasChange =
         feature.version !== existingItem.package_info.version ||
-        expiresAt.getTime() !== existingItem.valid_until.getTime();
+        featureExpiresAt.getTime() !== existingItem.valid_until.getTime();
       if (hasChange) {
         resultingItem = await this.itemManager.changeComponent(
           existingItem.uuid,
           (mutator) => {
             mutator.package_info = feature;
-            mutator.valid_until = expiresAt;
+            mutator.valid_until = featureExpiresAt;
           }
         );
         hasChanges = true;
