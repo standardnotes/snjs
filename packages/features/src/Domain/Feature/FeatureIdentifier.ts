@@ -20,6 +20,7 @@ export enum FeatureIdentifier {
   MarkdownMathEditor = 'org.standardnotes.fancy-markdown-editor',
   MarkdownMinimistEditor = 'org.standardnotes.minimal-markdown-editor',
   MarkdownProEditor = 'org.standardnotes.advanced-markdown-editor',
+  MarkdownVisualEditor = 'org.standardnotes.markdown-visual-editor',
   MidnightTheme = 'org.standardnotes.theme-midnight',
   NoteHistory30Days = 'org.standardnotes.note-history-30',
   NoteHistory365Days = 'org.standardnotes.note-history-365',

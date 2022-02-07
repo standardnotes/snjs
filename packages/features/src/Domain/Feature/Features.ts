@@ -364,6 +364,22 @@ function editors(): EditorFeatureDescription[] {
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg',
   })
 
+  const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
+    name: 'Markdown Visual (Beta)',
+    identifier: FeatureIdentifier.MarkdownVisualEditor,
+    version: '1.0.1',
+    note_type: NoteType.Markdown,
+    file_type: 'md',
+    permission_name: PermissionName.MarkdownVisualEditor,
+    spellcheckControl: true,
+    description:
+      'A lightweight WYSIWYG markdown editor, derivated from Milkdown editor.',
+    git_repo_url: 'https://github.com/standardnotes/markdown-visual',
+    marketing_url: 'https://github.com/standardnotes/markdown-visual',
+    static_files: ['build'],
+    index_path: 'build/index.html',
+  })
+
   const task: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Task Editor',
     identifier: FeatureIdentifier.TaskEditor,
@@ -421,6 +437,7 @@ function editors(): EditorFeatureDescription[] {
     markdownPro,
     markdownMinimist,
     markdownMath,
+    markdownVisual,
     task,
     tokenvault,
     spreadsheets,

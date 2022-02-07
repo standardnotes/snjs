@@ -19,6 +19,7 @@ export enum PermissionName {
   MarkdownMathEditor = 'editor:markdown-math',
   MarkdownMinimistEditor = 'editor:markdown-minimist',
   MarkdownProEditor = 'editor:markdown-pro',
+  MarkdownVisualEditor = 'editor:markdown-visual',
   MidnightTheme = 'theme:midnight',
   NoteHistory30Days = 'server:note-history-30-days',
   NoteHistory365Days = 'server:note-history-365-days',
