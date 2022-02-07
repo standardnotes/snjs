@@ -9,6 +9,7 @@ import { FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { SNComponent } from '@Lib/models';
 import { Environment, Platform } from '@Lib/platforms';
+import { Runtime } from '@standardnotes/common';
 import { SNAlertService } from '@Services/alert_service';
 import { SNItem } from '@Models/core/item';
 import { ItemManager } from '@Services/item_manager';
@@ -44,9 +45,7 @@ describe('featuresService', () => {
       alertService,
       environment,
       platform,
-      (func: () => void) => {
-        func();
-      }
+      Runtime.Prod
     );
     manager.setDesktopManager(desktopManager);
     manager.configureForNonMobileUsage = jest.fn().mockReturnValue(0);

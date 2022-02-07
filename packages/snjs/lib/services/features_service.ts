@@ -22,9 +22,9 @@ import {
   FeatureDescription,
   ThirdPartyFeatureDescription,
   FeatureIdentifier,
-  Features,
+  GetFeatures,
 } from '@standardnotes/features';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Runtime } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponent } from '@Lib/models';
@@ -100,7 +100,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
-    private crypto: SNPureCrypto
+    private crypto: SNPureCrypto,
+    private runtime: Runtime
   ) {
     super();
 
@@ -374,7 +375,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   private findStaticNativeFeature(
     identifier: FeatureIdentifier
   ): FeatureDescription | undefined {
-    return Features.find((f) => f.identifier === identifier);
+    return GetFeatures(this.runtime).find((f) => f.identifier === identifier);
   }
 
   public isThirdPartyFeature(identifier: string): boolean {
@@ -644,7 +645,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     }
 
     if (rawFeature.url) {
-      for (const nativeFeature of Features) {
+      for (const nativeFeature of GetFeatures(this.runtime)) {
         if (rawFeature.url.includes(nativeFeature.identifier)) {
           await this.alertService.alert(
             API_MESSAGE_FAILED_DOWNLOADING_EXTENSION
