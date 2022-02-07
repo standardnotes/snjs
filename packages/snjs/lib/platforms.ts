@@ -15,11 +15,6 @@ export enum Platform {
   LinuxDesktop = 8,
 }
 
-export enum Runtime {
-  Dev = 'Dev',
-  Prod = 'Prod'
-}
-
 export function platformFromString(string: string) {
   const map: Record<string, Platform> = {
     'mac-web': Platform.MacWeb,

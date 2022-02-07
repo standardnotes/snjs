@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.52.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.51.3...@standardnotes/snjs@2.52.0) (2022-02-07)
+
+
+### Features
+
+* dynamic features based on runtime env ([#590](https://github.com/standardnotes/snjs/issues/590)) ([060861a](https://github.com/standardnotes/snjs/commit/060861a6c5bc179e3e1987c2b63490888e153bbb))
+
+
+
+
+
+## [2.51.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.51.2...@standardnotes/snjs@2.51.3) (2022-02-07)
+
+
+### Bug Fixes
+
+* do not download offline repo if online subscription, as it may have conflicting info ([9e749c8](https://github.com/standardnotes/snjs/commit/9e749c89f3afb4aa6d3f973bc919fee66fd76790))
+
+
+
+
+
+## [2.51.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.51.1...@standardnotes/snjs@2.51.2) (2022-02-07)
+
+
+### Bug Fixes
+
+* embedded safe text and title for note ([6313e77](https://github.com/standardnotes/snjs/commit/6313e77a5a155000382c37771ac2de981e8f6f64))
+
+
+
+
+
 ## [2.51.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.51.0...@standardnotes/snjs@2.51.1) (2022-02-04)
 
 

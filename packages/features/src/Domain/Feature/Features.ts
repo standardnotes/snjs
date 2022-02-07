@@ -1,5 +1,5 @@
 import { ComponentAction } from '../Component/ComponentAction'
-import { ContentType } from '@standardnotes/common'
+import { ContentType, Runtime } from '@standardnotes/common'
 import {
   FeatureDescription,
   ThemeFeatureDescription,
@@ -13,13 +13,15 @@ import { PermissionName } from '../Permission/PermissionName'
 import { FeatureIdentifier } from './FeatureIdentifier'
 import { NoteType } from '../Component/NoteType'
 
-export const Features: FeatureDescription[] = [
-  ...themes(),
-  ...editors(),
-  ...nonEditorComponents(),
-  ...serverFeatures(),
-  ...clientFeatures(),
-]
+export function GetFeatures(runtime: Runtime = Runtime.Prod): FeatureDescription[] {
+  return [
+    ...themes(runtime),
+    ...editors(runtime),
+    ...nonEditorComponents(runtime),
+    ...serverFeatures(runtime),
+    ...clientFeatures(runtime),
+  ]
+}
 
 function githubDownloadUrl(
   repoUrl: string,
@@ -55,7 +57,7 @@ function FillThemeComponentDefaults(
   return theme as ThemeFeatureDescription
 }
 
-function themes(): ThemeFeatureDescription[] {
+function themes(_: Runtime): ThemeFeatureDescription[] {
   const midnight: ThemeFeatureDescription = FillThemeComponentDefaults({
     name: 'Midnight',
     identifier: FeatureIdentifier.MidnightTheme,
@@ -228,7 +230,7 @@ function FillEditorComponentDefaults(
   return component as EditorFeatureDescription
 }
 
-function editors(): EditorFeatureDescription[] {
+function editors(_: Runtime): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
     version: '1.3.10',
@@ -444,7 +446,7 @@ function editors(): EditorFeatureDescription[] {
   ]
 }
 
-function nonEditorComponents(): IframeComponentFeatureDescription[] {
+function nonEditorComponents(_: Runtime): IframeComponentFeatureDescription[] {
   const filesafe: IframeComponentFeatureDescription = FillEditorComponentDefaults(
     {
       name: 'FileSafe',
@@ -500,7 +502,7 @@ function nonEditorComponents(): IframeComponentFeatureDescription[] {
   return [filesafe, folders]
 }
 
-function serverFeatures(): ServerFeatureDescription[] {
+function serverFeatures(_: Runtime): ServerFeatureDescription[] {
   return [
     {
       name: 'Two factor authentication',
@@ -550,7 +552,7 @@ function serverFeatures(): ServerFeatureDescription[] {
   ]
 }
 
-function clientFeatures(): ClientFeatureDescription[] {
+function clientFeatures(_: Runtime): ClientFeatureDescription[] {
   return [
     {
       name: 'Tag Nesting',

@@ -181,7 +181,7 @@ export {
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
 export { displayStringForContentType } from '@Models/content_types';
-export { ContentType } from '@standardnotes/common';
+export { ContentType, Runtime } from '@standardnotes/common';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
 
@@ -189,7 +189,6 @@ export { ApplicationEvent } from '@Lib/events';
 export {
   Environment,
   Platform,
-  Runtime,
   isEnvironmentWebOrDesktop,
   isEnvironmentMobile,
   platformFromString,
@@ -248,7 +247,7 @@ export { ProtectionSessionDurations } from '@Lib/services/protection_service';
 export { SNLog } from './log';
 
 /** Used by e2e tests */
-export { Features, FeatureIdentifier } from '@standardnotes/features';
+export { GetFeatures, FeatureIdentifier } from '@standardnotes/features';
 export { RoleName } from '@standardnotes/auth';
 export {
   SettingName,

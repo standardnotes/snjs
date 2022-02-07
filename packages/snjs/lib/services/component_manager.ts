@@ -1,9 +1,9 @@
 import { SNPreferencesService } from './preferences_service';
-import { Features, FeatureDescription } from '@standardnotes/features';
+import { GetFeatures, FeatureDescription } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import { displayStringForContentType } from '@Models/content_types';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Runtime } from '@standardnotes/common';
 import { PayloadSource } from '@Protocol/payloads/sources';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from '@Models/app/note';
@@ -57,7 +57,6 @@ export class SNComponentManager extends PureService<
   ComponentManagerEvent,
   EventData
 > {
-  private timeout: any;
   private desktopManager?: DesktopManagerInterface;
   private viewers: ComponentViewer[] = [];
   private removeItemObserver!: () => void;
@@ -71,10 +70,9 @@ export class SNComponentManager extends PureService<
     protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
-    timeout: any
+    private runtime: Runtime
   ) {
     super();
-    this.timeout = timeout || setTimeout.bind(window);
     this.loggingEnabled = false;
     this.addItemObserver();
     if (environment !== Environment.Mobile) {
@@ -141,6 +139,7 @@ export class SNComponentManager extends PureService<
       this.featuresService,
       this.environment,
       this.platform,
+      this.runtime,
       {
         runWithPermissions: this.runWithPermissions.bind(this),
         urlsForActiveThemes: this.urlsForActiveThemes.bind(this),
@@ -213,7 +212,7 @@ export class SNComponentManager extends PureService<
     const activeIframes = this.allComponentIframes();
     for (const iframe of activeIframes) {
       if (document.activeElement === iframe) {
-        this.timeout(() => {
+        setTimeout(() => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const viewer = this.findComponentViewer(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -277,7 +276,7 @@ export class SNComponentManager extends PureService<
   nativeFeatureForComponent(
     component: SNComponent
   ): FeatureDescription | undefined {
-    return Features.find(
+    return GetFeatures(this.runtime).find(
       (feature) => feature.identifier === component.identifier
     );
   }
@@ -435,7 +434,7 @@ export class SNComponentManager extends PureService<
     permissions: ComponentPermission[],
     callback: (approved: boolean) => Promise<void>
   ): void {
-    this.timeout(() => {
+    setTimeout(() => {
       this.promptForPermissions(component, permissions, callback);
     });
   }
