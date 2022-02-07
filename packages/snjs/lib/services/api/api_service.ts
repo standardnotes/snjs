@@ -30,6 +30,9 @@ import {
   ListedRegistrationResponse,
   User,
   CreateValetTokenResponse,
+  StartUploadSessionResponse,
+  CloseUploadSessionResponse,
+  UploadFileChunkResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@standardnotes/common';
@@ -78,6 +81,9 @@ type PathNamesV1 = {
   subscriptionTokens: string;
   offlineFeatures: string;
   createFileValetToken: string;
+  startUploadSession: string;
+  uploadFileChunk: string;
+  closeUploadSession: string;
 };
 
 type PathNamesV2 = {
@@ -113,6 +119,9 @@ const Paths: {
     subscriptionTokens: '/v1/subscription-tokens',
     offlineFeatures: '/v1/offline/features',
     createFileValetToken: '/v1/files/valet-tokens',
+    startUploadSession: '/v1/files/upload/create-session',
+    uploadFileChunk: '/v1/files/upload/chunk',
+    closeUploadSession: '/v1/files/upload/close-session'
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -908,12 +917,54 @@ export class SNApiService
     return response.data?.valetToken;
   }
 
+  public async startUploadSession(apiToken: string): Promise<boolean> {
+    const url = joinPaths(this.filesHost, Paths.v1.startUploadSession);
+
+    const response:
+      | HttpResponse
+      | StartUploadSessionResponse = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_START_UPLOAD_SESSION,
+    });
+
+    return (response as StartUploadSessionResponse).success;
+  }
+
   public async uploadFileBytes(
-    remoteIdentifier: string,
+    apiToken: string,
+    chunkId: number,
     encryptedBytes: Uint8Array
-  ): Promise<{ success: boolean }> {
-    console.log('Upload file bytes', remoteIdentifier, encryptedBytes);
-    return { success: true };
+  ): Promise<boolean> {
+    const url = joinPaths(this.filesHost, Paths.v1.uploadFileChunk);
+
+    const response:
+      | HttpResponse
+      | UploadFileChunkResponse = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      params: this.params({ chunk: encryptedBytes, chunkId }),
+      customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK,
+    });
+
+    return (response as UploadFileChunkResponse).success;
+  }
+
+  public async closeUploadSession(apiToken: string): Promise<boolean> {
+    const url = joinPaths(this.filesHost, Paths.v1.closeUploadSession);
+
+    const response:
+      | HttpResponse
+      | CloseUploadSessionResponse = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_CLOSE_UPLOAD_SESSION,
+    });
+
+    return (response as CloseUploadSessionResponse).success;
   }
 
   public async downloadFile(

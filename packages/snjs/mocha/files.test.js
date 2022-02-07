@@ -38,32 +38,37 @@ describe.only('files', function () {
     localStorage.clear();
   });
 
-  const uploadFile = async (buffer, name, ext) => {
+  const uploadFile = async (fileService, buffer, name, ext) => {
     const chunkSize = FileProtocolV1.ChunkSize;
 
-    const operation = await this.fileService.beginNewFileUpload();
+    const operation = await fileService.beginNewFileUpload();
 
+    let chunkId = 1;
     for (let i = 0; i < buffer.length; i += chunkSize) {
       const readUntil =
         i + chunkSize > buffer.length ? buffer.length : i + chunkSize;
       const chunk = buffer.slice(i, readUntil);
       const isFinalChunk = readUntil === buffer.length;
 
-      await this.fileService.pushBytesForUpload(operation, chunk, isFinalChunk);
+      const bytesUploadedSuccessfully = await fileService.pushBytesForUpload(operation, chunk, chunkId++, isFinalChunk);
+      if (!bytesUploadedSuccessfully) {
+        throw new Error('Could not upload file chunk')
+      }
     }
 
-    await this.fileService.finishUpload(operation, name, ext);
+    await fileService.finishUpload(operation, name, ext);
+
     return operation;
   };
 
-  const downloadFile = async (remoteIdentifier) => {
-    const file = this.context.application.itemManager
+  const downloadFile = async (fileService, itemManager, remoteIdentifier) => {
+    const file = itemManager
       .getItems(ContentType.File)
       .find((file) => file.content.remoteIdentifier === remoteIdentifier);
 
     let receivedBytes = new Uint8Array();
 
-    await this.fileService.downloadFile(file, (decryptedBytes) => {
+    await fileService.downloadFile(file, (decryptedBytes) => {
       receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes]);
     });
 
@@ -129,11 +134,11 @@ describe.only('files', function () {
   });
 
   it.only('should encrypt and upload file', async function () {
-    const response = await fetch('http://localhost:9003/assets/two_mb_file.md');
-    const buffer = response.arrayBuffer;
+    const response = await fetch('http://localhost:9002/packages/snjs/mocha/assets/two_mb_file.md');
+    const buffer = await response.arrayBuffer();
 
-    const operation = await uploadFile(buffer, 'my-file', 'md');
-    const downloadedBytes = await downloadFile(operation.getRemoteIdentifier());
+    const operation = await uploadFile(this.fileService, new Uint8Array(buffer), 'my-file', 'md');
+    const downloadedBytes = await downloadFile(this.fileService, this.context.application.itemManager, operation.getRemoteIdentifier());
 
     expect(downloadedBytes).to.eql(buffer);
   });

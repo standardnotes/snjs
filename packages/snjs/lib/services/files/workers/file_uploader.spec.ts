@@ -19,7 +19,7 @@ describe('file uploader', () => {
 
   it('should return true when a chunk is uploaded', async () => {
     const bytes = new Uint8Array();
-    const success = await uploader.uploadBytes(bytes);
+    const success = await uploader.uploadBytes(bytes, 2, 'api-token');
 
     expect(success).toEqual(true);
   });

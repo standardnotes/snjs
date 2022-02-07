@@ -11,6 +11,7 @@ import { SNSyncService } from '../sync/sync_service';
 import { ItemManager } from '@Services/item_manager';
 import { SNApiService } from '../api/api_service';
 import { Uuid } from '@Lib/uuid';
+import { isErrorObject } from '@Lib/utils';
 
 export class SNFileService extends PureService {
   constructor(
@@ -35,6 +36,10 @@ export class SNFileService extends PureService {
   public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
     const remoteIdentifier = await Uuid.GenerateUuid();
     const apiToken = await this.apiService.createFileUploadToken(remoteIdentifier);
+    if (isErrorObject(apiToken)) {
+      throw new Error('Could not obtain files api valet token')
+    }
+
     const key = await this.crypto.generateRandomKey(FileProtocolV1.KeySize);
     const fileParams: DecryptedFileInterface = {
       key,
@@ -43,11 +48,17 @@ export class SNFileService extends PureService {
 
     const uploadOperation = new EncryptAndUploadFileOperation(
       fileParams,
+      apiToken,
       this.crypto,
       this.apiService
     );
 
     await uploadOperation.initializeHeader();
+
+    const uploadSessionStarted = await this.apiService.startUploadSession(apiToken)
+    if (!uploadSessionStarted) {
+      throw new Error('Could not start upload session')
+    }
 
     return uploadOperation;
   }
@@ -55,9 +66,10 @@ export class SNFileService extends PureService {
   public pushBytesForUpload(
     operation: EncryptAndUploadFileOperation,
     bytes: Uint8Array,
+    chunkId: number,
     isFinalChunk: boolean
   ): Promise<boolean> {
-    return operation.pushBytes(bytes, isFinalChunk);
+    return operation.pushBytes(bytes, chunkId, isFinalChunk);
   }
 
   public async finishUpload(
@@ -65,6 +77,11 @@ export class SNFileService extends PureService {
     fileName: string,
     fileExt: string
   ): Promise<SNFile> {
+    const uploadSessionClosed = await this.apiService.closeUploadSession(operation.getApiToken())
+    if (!uploadSessionClosed) {
+      throw new Error('Could not close upload session')
+    }
+
     const fileContent: FileContent = {
       chunkSize: FileProtocolV1.ChunkSize,
       encryptionHeader: operation.getEncryptionHeader(),

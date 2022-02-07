@@ -6,12 +6,13 @@ export class FileUploader {
     private apiService: FilesApi
   ) {}
 
-  public async uploadBytes(encryptedBytes: Uint8Array): Promise<boolean> {
+  public async uploadBytes(encryptedBytes: Uint8Array, chunkId: number, apiToken: string): Promise<boolean> {
     const result = await this.apiService.uploadFileBytes(
-      this.file.remoteIdentifier,
+      apiToken,
+      chunkId,
       encryptedBytes
     );
 
-    return result.success;
+    return result;
   }
 }

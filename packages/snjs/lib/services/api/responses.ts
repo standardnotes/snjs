@@ -309,3 +309,17 @@ export type ActionResponse = HttpResponse & {
   keyParams?: any;
   auth_params?: any;
 };
+
+export type StartUploadSessionResponse = MinimalHttpResponse & {
+  success: boolean;
+  uploadId: string;
+};
+
+export type UploadFileChunkResponse = MinimalHttpResponse & {
+  success: boolean;
+};
+
+export type CloseUploadSessionResponse = MinimalHttpResponse & {
+  success: boolean;
+  message: string;
+};

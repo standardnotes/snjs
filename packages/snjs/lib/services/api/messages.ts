@@ -46,6 +46,15 @@ export const API_MESSAGE_FAILED_ACCESS_PURCHASE =
 
 export const API_MESSAGE_FAILED_DELETE_REVISION = 'Failed to delete revision.';
 
+export const API_MESSAGE_FAILED_START_UPLOAD_SESSION =
+  'Failed to start an upload session.';
+
+export const API_MESSAGE_FAILED_CLOSE_UPLOAD_SESSION =
+  'Failed to close an upload session.';
+
+export const API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK =
+  'Failed to upload file chunk.';
+
 export const API_MESSAGE_FAILED_OFFLINE_FEATURES =
   'Failed to get offline features.';
 export const API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING = `The extension you are attempting to install comes from an

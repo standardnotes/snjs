@@ -109,6 +109,10 @@ export function getDefaultHost() {
   return 'http://localhost:3123';
 }
 
+export function getDefaultFilesHost() {
+  return 'http://localhost:3125';
+}
+
 export function getDefaultMockedEventServiceUrl() {
   return 'http://localhost:3124';
 }
@@ -135,7 +139,7 @@ export async function publishMockedEvent(eventType, eventPayload) {
   });
 }
 
-export function createApplication(identifier, environment, platform, host) {
+export function createApplication(identifier, environment, platform, host, filesHost) {
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
@@ -153,6 +157,7 @@ export function createApplication(identifier, environment, platform, host) {
     identifier || `${Math.random()}`,
     [],
     host || getDefaultHost(),
+    filesHost || getDefaultFilesHost(),
     getAppVersion(),
     getDefaultWebSocketUrl()
   );

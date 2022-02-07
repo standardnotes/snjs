@@ -12,21 +12,27 @@ export class EncryptAndUploadFileOperation {
 
   constructor(
     private file: DecryptedFileInterface,
-    crypto: SNPureCrypto,
-    api: FilesApi
+    private apiToken: string,
+    private crypto: SNPureCrypto,
+    private api: FilesApi
   ) {
-    this.encryptor = new FileEncryptor(file, crypto);
-    this.uploader = new FileUploader(file, api);
+    this.encryptor = new FileEncryptor(file, this.crypto);
+    this.uploader = new FileUploader(file, this.api);
   }
 
   public async initializeHeader(): Promise<string> {
     const header = await this.encryptor.initializeHeader();
     this.encryptionHeader = header;
+
     return header;
   }
 
   public getEncryptionHeader(): string {
     return this.encryptionHeader;
+  }
+
+  public getApiToken(): string {
+    return this.apiToken;
   }
 
   public getRawSize(): number {
@@ -43,9 +49,10 @@ export class EncryptAndUploadFileOperation {
 
   public async pushBytes(
     decryptedBytes: Uint8Array,
+    chunkId: number,
     isFinalChunk: boolean
   ): Promise<boolean> {
-    this.rawSize += decryptedBytes.length;
+    this.rawSize += decryptedBytes.byteLength;
 
     const encryptedBytes = await this.encryptor.pushBytes(
       decryptedBytes,
@@ -54,6 +61,6 @@ export class EncryptAndUploadFileOperation {
 
     this.encryptedSize += encryptedBytes.length;
 
-    return this.uploader.uploadBytes(encryptedBytes);
+    return this.uploader.uploadBytes(encryptedBytes, chunkId, this.apiToken);
   }
 }

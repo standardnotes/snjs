@@ -1,8 +1,17 @@
 export interface FilesApi {
+  startUploadSession(
+    apiToken: string,
+  ): Promise<boolean>;
+
   uploadFileBytes(
-    remoteIdentifier: string,
+    apiToken: string,
+    chunkId: number,
     encryptedBytes: Uint8Array,
-  ): Promise<{ success: boolean }>;
+    ): Promise<boolean>;
+
+  closeUploadSession(
+    apiToken: string,
+  ): Promise<boolean>;
 
   downloadFile(
     remoteIdentifier: string,
