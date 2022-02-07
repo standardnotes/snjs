@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.28.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.27.0...@standardnotes/features@1.28.0) (2022-02-07)
+
+
+### Features
+
+* dynamic features based on runtime env ([#590](https://github.com/standardnotes/snjs/issues/590)) ([060861a](https://github.com/standardnotes/snjs/commit/060861a6c5bc179e3e1987c2b63490888e153bbb))
+
+
+
+
+
 # [1.27.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.26.1...@standardnotes/features@1.27.0) (2022-02-01)
 
 
