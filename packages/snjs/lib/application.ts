@@ -53,7 +53,7 @@ import {
 import { ChallengeObserver } from './services/challenge/challenge_service';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { Environment, Platform, Runtime } from './platforms';
+import { Environment, Platform } from './platforms';
 import {
   assertUnreachable,
   isNullOrUndefined,
@@ -62,7 +62,7 @@ import {
   sleep,
   nonSecureRandomIdentifier,
 } from '@Lib/utils';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Runtime } from '@standardnotes/common';
 import {
   CopyPayload,
   CreateMaxPayloadFromAnyObject,
@@ -1898,7 +1898,8 @@ export class SNApplication implements ListedInterface {
       this.syncService,
       this.alertService,
       this.sessionManager,
-      this.crypto
+      this.crypto,
+      this.runtime
     );
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
@@ -1997,7 +1998,7 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.environment,
       this.platform,
-      this.deviceInterface.timeout
+      this.runtime
     );
     this.services.push(this.componentManager);
   }

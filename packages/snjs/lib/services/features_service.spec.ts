@@ -17,11 +17,11 @@ import {
   SNFeaturesService,
 } from '@Lib/services/features_service';
 import { RoleName } from '@standardnotes/auth';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Runtime } from '@standardnotes/common';
 import {
   FeatureDescription,
   FeatureIdentifier,
-  Features,
+  GetFeatures,
 } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
@@ -58,7 +58,8 @@ describe('featuresService', () => {
       syncService,
       alertService,
       sessionManager,
-      crypto
+      crypto,
+      Runtime.Prod
     );
   };
 
@@ -71,13 +72,13 @@ describe('featuresService', () => {
 
     features = [
       {
-        ...Features.find(
+        ...GetFeatures().find(
           (f) => f.identifier === FeatureIdentifier.MidnightTheme
         ),
         expires_at: tomorrow_server,
       },
       {
-        ...Features.find((f) => f.identifier === FeatureIdentifier.BoldEditor),
+        ...GetFeatures().find((f) => f.identifier === FeatureIdentifier.BoldEditor),
         expires_at: tomorrow_server,
       },
     ] as jest.Mocked<FeatureDescription[]>;

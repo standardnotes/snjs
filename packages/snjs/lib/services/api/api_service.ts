@@ -1,4 +1,3 @@
-import { API_MESSAGE_FAILED_LISTED_REGISTRATION } from './messages';
 import { SNFeatureRepo } from './../../models/app/feature_repo';
 import { ErrorObject, UuidString } from './../../types';
 import {
