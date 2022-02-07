@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { spawnSync as spawn } from 'child_process';
-import { Features } from '../features/dist/Domain/Feature/Features.js';
+import { GetFeatures } from '../features/dist/Domain/Feature/Features.js';
+import { Runtime } from '../common/dist/Domain/DataType/Runtime.js';
 const SOURCE_FILES_PATH = '../../node_modules';
 import zip from '@standardnotes/deterministic-zip';
 
@@ -152,11 +153,11 @@ await (async () => {
 
   const featuresToProcess = specificFeatureIdentifier
     ? [
-        Features.find(
+        GetFeatures(Runtime.Dev).find(
           (feature) => feature.identifier === specificFeatureIdentifier
         ),
       ]
-    : Features;
+    : GetFeatures(Runtime.Dev);
 
   let index = 0;
   for (const feature of featuresToProcess) {
