@@ -18,19 +18,19 @@ describe('features', () => {
     const tomorrow = now.setDate(now.getDate() + 1);
 
     midnightThemeFeature = {
-      ...Features.find(
+      ...GetFeatures().find(
         (feature) => feature.identifier === FeatureIdentifier.MidnightTheme
       ),
       expires_at: tomorrow,
     };
     boldEditorFeature = {
-      ...Features.find(
+      ...GetFeatures().find(
         (feature) => feature.identifier === FeatureIdentifier.BoldEditor
       ),
       expires_at: tomorrow,
     };
     tagNestingFeature = {
-      ...Features.find(
+      ...GetFeatures().find(
         (feature) => feature.identifier === FeatureIdentifier.TagNesting
       ),
       expires_at: tomorrow,
