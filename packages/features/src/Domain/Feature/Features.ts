@@ -230,7 +230,7 @@ function FillEditorComponentDefaults(
   return component as EditorFeatureDescription
 }
 
-function editors(_: Runtime): EditorFeatureDescription[] {
+function editors(runtime: Runtime): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
     version: '1.3.10',
@@ -439,10 +439,10 @@ function editors(_: Runtime): EditorFeatureDescription[] {
     markdownPro,
     markdownMinimist,
     markdownMath,
-    markdownVisual,
     task,
     tokenvault,
     spreadsheets,
+    ...(runtime === Runtime.Dev ? [markdownVisual] : []),
   ]
 }
 
