@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.51.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.51.1...@standardnotes/snjs@2.51.2) (2022-02-07)
+
+
+### Bug Fixes
+
+* embedded safe text and title for note ([6313e77](https://github.com/standardnotes/snjs/commit/6313e77a5a155000382c37771ac2de981e8f6f64))
+
+
+
+
+
 ## [2.51.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.51.0...@standardnotes/snjs@2.51.1) (2022-02-04)
 
 
