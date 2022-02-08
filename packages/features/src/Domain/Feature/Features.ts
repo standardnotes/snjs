@@ -230,7 +230,7 @@ function FillEditorComponentDefaults(
   return component as EditorFeatureDescription
 }
 
-function editors(_: Runtime): EditorFeatureDescription[] {
+function editors(runtime: Runtime): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
     version: '1.3.10',
@@ -366,6 +366,22 @@ function editors(_: Runtime): EditorFeatureDescription[] {
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg',
   })
 
+  const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
+    name: 'Markdown Visual (Beta)',
+    identifier: FeatureIdentifier.MarkdownVisualEditor,
+    version: '1.0.1',
+    note_type: NoteType.Markdown,
+    file_type: 'md',
+    permission_name: PermissionName.MarkdownVisualEditor,
+    spellcheckControl: true,
+    description:
+      'A lightweight WYSIWYG markdown editor, derivated from Milkdown editor.',
+    git_repo_url: 'https://github.com/standardnotes/markdown-visual',
+    marketing_url: 'https://github.com/standardnotes/markdown-visual',
+    static_files: ['build'],
+    index_path: 'build/index.html',
+  })
+
   const task: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Task Editor',
     identifier: FeatureIdentifier.TaskEditor,
@@ -426,6 +442,7 @@ function editors(_: Runtime): EditorFeatureDescription[] {
     task,
     tokenvault,
     spreadsheets,
+    ...(runtime === Runtime.Dev ? [markdownVisual] : []),
   ]
 }
 
