@@ -12,6 +12,7 @@ import { ItemManager } from '@Services/item_manager';
 import { SNApiService } from '../api/api_service';
 import { Uuid } from '@Lib/uuid';
 import { isErrorObject } from '@Lib/utils';
+import { PayloadContent } from '@Lib/protocol';
 
 export class SNFileService extends PureService {
   constructor(
@@ -35,7 +36,7 @@ export class SNFileService extends PureService {
 
   public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
     const remoteIdentifier = await Uuid.GenerateUuid();
-    const apiToken = await this.apiService.createFileUploadToken(remoteIdentifier);
+    const apiToken = await this.apiService.createFileValetToken(remoteIdentifier, 'write');
     if (isErrorObject(apiToken)) {
       throw new Error('Could not obtain files api valet token')
     }
@@ -98,7 +99,7 @@ export class SNFileService extends PureService {
       true
     );
 
-    this.syncService.sync();
+    await this.syncService.sync();
 
     return file;
   }
@@ -107,10 +108,19 @@ export class SNFileService extends PureService {
     file: SNFile,
     onDecryptedBytes: (bytes: Uint8Array) => void
   ): Promise<void> {
+    const apiToken = await this.apiService.createFileValetToken((file.content as PayloadContent).remoteIdentifier, 'read');
+    if (isErrorObject(apiToken)) {
+      throw new Error('Could not obtain files api valet token')
+    }
+
+    /** REFACTOR TO-DO: pass the file only - as the payload properties where not accessible down the line */
     const operation = new DownloadAndDecryptFileOperation(
-      file,
+      (file.content as PayloadContent).remoteIdentifier,
+      (file.content as PayloadContent).encryptionHeader,
+      (file.content as PayloadContent).key,
       this.crypto,
       this.apiService,
+      apiToken,
       onDecryptedBytes
     );
 

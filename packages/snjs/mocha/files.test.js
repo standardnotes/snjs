@@ -13,6 +13,7 @@ describe.only('files', function () {
 
     this.application = this.context.application;
     this.fileService = this.context.application.fileService;
+    this.itemManager = this.context.application.itemManager;
 
     await Factory.registerUserToApplication({
       application: this.context.application,
@@ -77,7 +78,7 @@ describe.only('files', function () {
 
   it('should create valet token from server', async function () {
     const remoteIdentifier = Factory.generateUuid()
-    const token = await this.application.apiService.createFileUploadToken(remoteIdentifier);
+    const token = await this.application.apiService.createFileValetToken(remoteIdentifier, 'write');
 
     expect(token.length).to.be.above(0);
   });
@@ -97,7 +98,7 @@ describe.only('files', function () {
     });
 
     const remoteIdentifier = Factory.generateUuid()
-    const token = await this.application.apiService.createFileUploadToken(remoteIdentifier);
+    const token = await this.application.apiService.createFileValetToken(remoteIdentifier, 'write');
 
     expect(token.error).to.equal('no-subscription');
   });
@@ -128,7 +129,7 @@ describe.only('files', function () {
     await Factory.sleep(0.5);
 
     const remoteIdentifier = Factory.generateUuid()
-    const token = await this.application.apiService.createFileUploadToken(remoteIdentifier);
+    const token = await this.application.apiService.createFileValetToken(remoteIdentifier, 'write');
 
     expect(token.error).to.equal('expired-subscription');
   });
@@ -138,7 +139,8 @@ describe.only('files', function () {
     const buffer = await response.arrayBuffer();
 
     const operation = await uploadFile(this.fileService, new Uint8Array(buffer), 'my-file', 'md');
-    const downloadedBytes = await downloadFile(this.fileService, this.context.application.itemManager, operation.getRemoteIdentifier());
+
+    const downloadedBytes = await downloadFile(this.fileService, this.itemManager, operation.getRemoteIdentifier());
 
     expect(downloadedBytes).to.eql(buffer);
   });

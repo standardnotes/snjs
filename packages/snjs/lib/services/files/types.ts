@@ -14,7 +14,7 @@ export interface FilesApi {
   ): Promise<boolean>;
 
   downloadFile(
-    remoteIdentifier: string,
+    apiToken: string,
     onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void>;
 }

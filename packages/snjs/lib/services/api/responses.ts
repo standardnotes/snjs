@@ -323,3 +323,6 @@ export type CloseUploadSessionResponse = MinimalHttpResponse & {
   success: boolean;
   message: string;
 };
+
+export type DownloadFileChunkResponse = MinimalHttpResponse & {
+};

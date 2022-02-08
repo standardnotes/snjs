@@ -55,9 +55,12 @@ describe('download and decrypt', () => {
     let receivedBytes = new Uint8Array();
 
     operation = new DownloadAndDecryptFileOperation(
-      file,
+      '123',
+      'some-header',
+      'secret',
       crypto,
       apiService,
+      'api-token',
       (decryptedBytes) => {
         receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes]);
       }

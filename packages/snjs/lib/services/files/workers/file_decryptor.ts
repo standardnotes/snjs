@@ -1,4 +1,3 @@
-import { EncryptedFileInterface } from './../types';
 import {
   SNPureCrypto,
   StreamDecryptor,
@@ -9,14 +8,18 @@ export class FileDecryptor {
   private decryptor!: StreamDecryptor;
 
   constructor(
-    private readonly file: EncryptedFileInterface,
+    private remoteIdentifier: string,
+    private encryptionHeader: string,
+    private encryptionKey: string,
     private crypto: SNPureCrypto
   ) {}
 
   public async initialize(): Promise<void> {
+    console.log('encryption header', this.encryptionHeader)
+    console.log('encryption key', this.encryptionKey)
     this.decryptor = await this.crypto.xchacha20StreamInitDecryptor(
-      this.file.encryptionHeader,
-      this.file.key
+      this.encryptionHeader,
+      this.encryptionKey
     );
   }
 
@@ -26,7 +29,7 @@ export class FileDecryptor {
     const result = await this.crypto.xchacha20StreamDecryptorPush(
       this.decryptor,
       encryptedBytes,
-      this.file.remoteIdentifier
+      this.remoteIdentifier
     );
 
     const isFinal =

@@ -24,7 +24,7 @@ describe('file decryptor', () => {
       key: 'secret',
     };
 
-    decryptor = new FileDecryptor(file, crypto);
+    decryptor = new FileDecryptor('123', 'some-header', 'secret', crypto);
   });
 
   it('initialize', async () => {

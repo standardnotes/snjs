@@ -33,6 +33,7 @@ import {
   StartUploadSessionResponse,
   CloseUploadSessionResponse,
   UploadFileChunkResponse,
+  DownloadFileChunkResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType } from '@standardnotes/common';
@@ -59,6 +60,7 @@ import {
   isUrlFirstParty,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
+import { FileProtocolV1 } from '@Lib/index';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -84,6 +86,7 @@ type PathNamesV1 = {
   startUploadSession: string;
   uploadFileChunk: string;
   closeUploadSession: string;
+  downloadFileChunk: string;
 };
 
 type PathNamesV2 = {
@@ -121,7 +124,8 @@ const Paths: {
     createFileValetToken: '/v1/files/valet-tokens',
     startUploadSession: '/v1/files/upload/create-session',
     uploadFileChunk: '/v1/files/upload/chunk',
-    closeUploadSession: '/v1/files/upload/close-session'
+    closeUploadSession: '/v1/files/upload/close-session',
+    downloadFileChunk: '/v1/files'
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -890,10 +894,10 @@ export class SNApiService
     });
   }
 
-  public async createFileUploadToken(remoteIdentifier: string): Promise<string | ErrorObject> {
+  public async createFileValetToken(remoteIdentifier: string, operation: 'write' | 'read'): Promise<string | ErrorObject> {
     const url = joinPaths(this.host, Paths.v1.createFileValetToken);
     const params = {
-      operation: 'write',
+      operation,
       resources: [
         remoteIdentifier,
       ],
@@ -968,10 +972,25 @@ export class SNApiService
   }
 
   public async downloadFile(
-    remoteIdentifier: string,
-    onBytesReceived: (bytes: Uint8Array) => void
+    apiToken: string,
+    _onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void> {
-    console.log('Download file', remoteIdentifier, onBytesReceived);
+    const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
+    console.log('url', url)
+
+    const response:
+      | HttpResponse
+      | DownloadFileChunkResponse = await this.request({
+      verb: HttpVerb.Get,
+      url,
+      customHeaders: [
+        { key: 'x-valet-token', value: apiToken },
+        { key: 'x-chunk-size', value: FileProtocolV1.ChunkSize.toString() }
+      ],
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK,
+    });
+
+    console.log(response)
   }
 
   private preprocessingError() {

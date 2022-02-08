@@ -31,7 +31,7 @@ describe('file downloader', () => {
   it('should pass back bytes as they are received', async () => {
     let receivedBytes = new Uint8Array();
 
-    downloader = new FileDownloader(file, apiService, (encryptedBytes) => {
+    downloader = new FileDownloader('api-token', apiService, (encryptedBytes) => {
       receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes]);
     });
 

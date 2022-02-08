@@ -55,6 +55,9 @@ export const API_MESSAGE_FAILED_CLOSE_UPLOAD_SESSION =
 export const API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK =
   'Failed to upload file chunk.';
 
+export const API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK =
+  'Failed to download file chunk.';
+
 export const API_MESSAGE_FAILED_OFFLINE_FEATURES =
   'Failed to get offline features.';
 export const API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING = `The extension you are attempting to install comes from an

@@ -13,23 +13,31 @@ export class DownloadAndDecryptFileOperation {
   private completionResolve!: () => void;
 
   constructor(
-    file: RemoteFileInterface & EncryptedFileInterface,
+    remoteIdentifier: string,
+    encryptionHeader: string,
+    encryptionKey: string,
     crypto: SNPureCrypto,
     api: FilesApi,
+    apiToken: string,
     private onDecryptedBytes: (decryptedBytes: Uint8Array) => void
   ) {
-    this.decryptor = new FileDecryptor(file, crypto);
+    this.decryptor = new FileDecryptor(remoteIdentifier, encryptionHeader, encryptionKey, crypto);
     this.downloader = new FileDownloader(
-      file,
+      apiToken,
       api,
       this.onDownloadedBytes.bind(this)
     );
   }
 
   public async run(): Promise<void> {
+    console.log('operation run')
     await this.decryptor.initialize();
 
+    console.log('operation decryptor initialized')
+
     this.downloader.download();
+
+    console.log('operation downloader triggered')
 
     return new Promise((resolve) => {
       this.completionResolve = resolve;
