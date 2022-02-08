@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.6.0...@standardnotes/components@1.7.0) (2022-02-08)
+
+
+### Features
+
+* markdown visual editor ([#589](https://github.com/standardnotes/snjs/issues/589)) ([a6c9e74](https://github.com/standardnotes/snjs/commit/a6c9e742acef2c8d027646bf0f7a963b4de712ce))
+
+
+
+
+
 # [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.5.0...@standardnotes/components@1.6.0) (2022-02-07)
 
 
