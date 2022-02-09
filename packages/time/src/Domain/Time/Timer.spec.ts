@@ -95,4 +95,8 @@ describe('Timer', () => {
   it('should convert microseconds to seconds', () => {
     expect(createTimer().convertMicrosecondsToSeconds(1616164633241312)).toEqual(1616164633)
   })
+
+  it('should format date', () => {
+    expect(createTimer().formatDate(new Date('2021-03-29T08:00:05.233123Z'), 'YYYY-MM-DD')).toEqual('2021-03-29')
+  })
 })

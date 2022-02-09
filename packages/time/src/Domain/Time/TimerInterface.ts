@@ -15,5 +15,6 @@ export interface TimerInterface {
   convertMicrosecondsToSeconds(microseconds: number): number
   convertMicrosecondsToStringDate(microseconds: number): string
   convertMicrosecondsToDate(microseconds: number): Date
+  formatDate(date: Date, format: string): string
   dateWasNDaysAgo(date: Date): number
 }

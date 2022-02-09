@@ -9,6 +9,10 @@ export class Timer implements TimerInterface {
     dayjs.extend(utc)
   }
 
+  formatDate(date: Date, format: string): string {
+    return dayjs.utc(date).format(format)
+  }
+
   convertDateToMilliseconds(date: Date): number {
     return this.convertStringDateToMilliseconds(date.toString())
   }
