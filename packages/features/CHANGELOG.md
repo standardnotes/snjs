@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.30.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.29.0...@standardnotes/features@1.30.0) (2022-02-09)
+
+
+### Features
+
+* remove filesafe ([1cee4dd](https://github.com/standardnotes/snjs/commit/1cee4dd595003600d89adfd71fedf7b5454880b8))
+
+
+
+
+
 # [1.29.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.28.0...@standardnotes/features@1.29.0) (2022-02-08)
 
 
