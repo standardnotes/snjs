@@ -1406,7 +1406,7 @@ export class SNApplication implements ListedInterface {
    * @param maxWait The maximum number of milliseconds to wait for services
    * to finish tasks. 0 means no limit.
    */
-  async prepareForDeinit(maxWait = 0): Promise<void> {
+  private async prepareForDeinit(maxWait = 0): Promise<void> {
     const promise = Promise.all(
       this.services.map((service) => service.blockDeinit())
     );
@@ -1453,7 +1453,10 @@ export class SNApplication implements ListedInterface {
    * Destroys the application instance.
    */
   public deinit(source: DeinitSource): void {
+    this.dealloced = true;
+
     clearInterval(this.autoSyncInterval);
+
     for (const uninstallObserver of this.serviceObservers) {
       uninstallObserver();
     }
@@ -1463,8 +1466,7 @@ export class SNApplication implements ListedInterface {
     for (const service of this.services) {
       service.deinit();
     }
-    this.onDeinit?.(this, source);
-    this.onDeinit = undefined;
+
     (this.crypto as unknown) = undefined;
     this.createdNewDatabase = false;
     this.services.length = 0;
@@ -1472,8 +1474,10 @@ export class SNApplication implements ListedInterface {
     this.managedSubscribers.length = 0;
     this.streamRemovers.length = 0;
     this.clearServices();
-    this.dealloced = true;
     this.started = false;
+
+    this.onDeinit?.(this, source);
+    this.onDeinit = undefined;
   }
 
   /**

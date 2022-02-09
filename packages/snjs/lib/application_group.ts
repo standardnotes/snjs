@@ -106,7 +106,9 @@ export class SNApplicationGroup extends PureService {
     if (this.primaryApplication === application) {
       this.primaryApplication = undefined;
     }
+
     removeFromArray(this.applications, application);
+
     if (source === DeinitSource.SignOut) {
       this.removeDescriptor(this.descriptorForApplication(application));
       if (sideffects) {
