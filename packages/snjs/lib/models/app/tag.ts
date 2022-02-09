@@ -14,6 +14,7 @@ export const TagFolderDelimitter = '.';
 
 export interface TagContent extends ItemContent {
   title: string;
+  expanded: boolean;
 }
 
 export const isTag = (x: SNItem): x is SNTag =>
@@ -25,10 +26,16 @@ export const isTag = (x: SNItem): x is SNTag =>
  */
 export class SNTag extends SNItem implements TagContent {
   public readonly title: string;
+  /** Whether to render child tags in view hierarchy. Opposite of collapsed. */
+  public readonly expanded: boolean;
 
   constructor(payload: PurePayload) {
     super(payload);
     this.title = this.payload.safeContent.title || '';
+    this.expanded =
+      this.payload.safeContent.expanded != undefined
+        ? this.payload.safeContent.expanded
+        : true;
   }
 
   get noteReferences(): ContentReference[] {
@@ -84,6 +91,10 @@ export class TagMutator extends ItemMutator {
 
   set title(title: string) {
     this.typedContent.title = title;
+  }
+
+  set expanded(expanded: boolean) {
+    this.typedContent.expanded = expanded;
   }
 
   public makeChildOf(tag: SNTag): void {
