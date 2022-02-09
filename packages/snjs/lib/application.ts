@@ -130,7 +130,7 @@ import {
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
-import { Subscription } from '@standardnotes/auth';
+import { RoleName, Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import {
   FeaturesEvent,
@@ -1779,6 +1779,10 @@ export class SNApplication implements ListedInterface {
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
     return this.featuresService.getFeatureStatus(featureId);
+  }
+
+  public hasRole(role: RoleName): boolean {
+    return this.featuresService.hasRole(role);
   }
 
   public getNewSubscriptionToken(): Promise<string | undefined> {
