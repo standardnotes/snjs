@@ -447,36 +447,6 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
 }
 
 function nonEditorComponents(_: Runtime): IframeComponentFeatureDescription[] {
-  const filesafe: IframeComponentFeatureDescription = FillEditorComponentDefaults(
-    {
-      name: 'FileSafe',
-      identifier: FeatureIdentifier.FileSafe,
-      version: '2.0.10',
-      component_permissions: [
-        {
-          name: ComponentAction.StreamContextItem,
-          content_types: [ContentType.Note],
-        },
-        {
-          name: ComponentAction.StreamItems,
-          content_types: [
-            ContentType.FilesafeCredentials,
-            ContentType.FilesafeFileMetadata,
-            ContentType.FilesafeIntegration,
-          ],
-        },
-      ],
-      permission_name: PermissionName.ComponentFilesafe,
-      area: ComponentArea.EditorStack,
-      description:
-        'Encrypted attachments for your notes using your Dropbox, Google Drive, or WebDAV server. Limited to 50MB per file.',
-      git_repo_url: 'https://github.com/standardnotes/filesafe-client',
-      marketing_url: 'https://standardnotes.com/extensions/filesafe',
-      thumbnail_url:
-        'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
-    }
-  )
-
   const folders: IframeComponentFeatureDescription = FillEditorComponentDefaults(
     {
       name: 'Folders',
@@ -499,7 +469,7 @@ function nonEditorComponents(_: Runtime): IframeComponentFeatureDescription[] {
     }
   )
 
-  return [filesafe, folders]
+  return [folders]
 }
 
 function serverFeatures(_: Runtime): ServerFeatureDescription[] {
@@ -568,7 +538,7 @@ function clientFeatures(_: Runtime): ClientFeatureDescription[] {
         'Create smart filters for viewing notes matching specific criteria.',
     },
     {
-      name: 'Encrypted files',
+      name: 'Encrypted files (coming soon)',
       identifier: FeatureIdentifier.Files,
       permission_name: PermissionName.Files,
       description: '',
