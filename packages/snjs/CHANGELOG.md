@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.54.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.53.1...@standardnotes/snjs@2.54.0) (2022-02-09)
+
+
+### Features
+
+* use expanded tag title when searching ([cf277f2](https://github.com/standardnotes/snjs/commit/cf277f2ecf4fb1430ad7e822cc98f1f1c7dd0605))
+
+
+
+
+
 ## [2.53.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.53.0...@standardnotes/snjs@2.53.1) (2022-02-09)
 
 **Note:** Version bump only for package @standardnotes/snjs
