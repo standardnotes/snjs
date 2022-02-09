@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.5.0...@standardnotes/time@1.6.0) (2022-02-09)
+
+
+### Features
+
+* add date formatting ([4c65cb8](https://github.com/standardnotes/snjs/commit/4c65cb82b1acd842f7e35fb79389de95bef0ddcf))
+
+
+
+
+
 # [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.5...@standardnotes/time@1.5.0) (2022-02-09)
 
 
