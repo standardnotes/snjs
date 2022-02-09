@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.53.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.52.2...@standardnotes/snjs@2.53.0) (2022-02-09)
+
+
+### Features
+
+* add expanded property to tag ([6a682fe](https://github.com/standardnotes/snjs/commit/6a682feaa7df1c5cae200e197068be233b11930a))
+
+
+
+
+
 ## [2.52.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.52.1...@standardnotes/snjs@2.52.2) (2022-02-09)
 
 
