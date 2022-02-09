@@ -8,9 +8,9 @@ SNJS is a client-side JavaScript library for [Standard Notes](https://standardno
 
 SNJS is a shared library for use in all Standard Notes clients (desktop, web, and mobile). Its role is to extract any business or data logic from client code, so that clients are mostly responsible for UI-level code, and don’t have to think about encryption and key management, or even authentication or storage specifics. Extracting the code into a shared library also prevents us from having to write the same critical code on multiple platforms.
 
-The entry point of SNJS is the [`SNApplication`](packages/snjslib/application.ts) class. The application class is a complete unit of application functionality. Theoretically, many instances of an application can be created, each with its own storage namespace and memory state. This can allow clients to support multiple user accounts.
+The entry point of SNJS is the [`SNApplication`](packages/snjs/lib/application.ts) class. The application class is a complete unit of application functionality. Theoretically, many instances of an application can be created, each with its own storage namespace and memory state. This can allow clients to support multiple user accounts.
 
-An application must be supplied a custom subclass of [DeviceInterface](packages/snjslib/device_interface.ts). This allows the library to generalize all behavior a client will need to perform throughout normal client operation, such as saving data to a local database store, saving key/values, and accessing the keychain.
+An application must be supplied a custom subclass of [DeviceInterface](packages/snjs/lib/device_interface.ts). This allows the library to generalize all behavior a client will need to perform throughout normal client operation, such as saving data to a local database store, saving key/values, and accessing the keychain.
 
 On Web platforms SNJS interacts with [`sncrypto`](https://github.com/standardnotes/snjs/tree/packages/sncrypto-common) to perform operations as mentioned in the [specification](https://github.com/standardnotes/snjs/blob/master/packages/snjs/specification.md) document. This includes operations like key generation and data encryption.
 
