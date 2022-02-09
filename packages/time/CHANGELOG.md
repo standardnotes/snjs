@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.5...@standardnotes/time@1.5.0) (2022-02-09)
+
+
+### Features
+
+* add calculating time difference in days ([1348065](https://github.com/standardnotes/snjs/commit/1348065eb2bd7a559046a0f125751b32ad224d93))
+
+
+
+
+
 ## [1.4.5](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.4...@standardnotes/time@1.4.5) (2021-12-29)
 
 **Note:** Version bump only for package @standardnotes/time
