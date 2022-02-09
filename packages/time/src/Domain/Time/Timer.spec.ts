@@ -29,6 +29,12 @@ describe('Timer', () => {
     expect(+dateNDaysAhead - +date >= 4 * 24 * 3600).toBeTruthy()
   })
 
+  it('should calculate days difference between now and a given date', () => {
+    const dateNDaysAgo = createTimer().getUTCDateNDaysAgo(4)
+
+    expect(createTimer().dateWasNDaysAgo(dateNDaysAgo)).toEqual(4)
+  })
+
   it('should return a utc date n hours ago', () => {
     const date = createTimer().getUTCDate()
     const dateNHoursAgo = createTimer().getUTCDateNHoursAgo(4)
@@ -51,6 +57,11 @@ describe('Timer', () => {
   it('should convert a date to microseconds', () => {
     const timestamp = createTimer().convertDateToMicroseconds(new Date('2021-03-29 08:00:05.233Z'))
     expect(timestamp).toEqual(1617004805000000)
+  })
+
+  it('should convert a date to iso string', () => {
+    const isoString = createTimer().convertDateToISOString(new Date('2021-03-29 08:00:05'))
+    expect(isoString).toEqual('2021-03-29T06:00:05.000Z')
   })
 
   it('should convert a string date to microseconds', () => {
