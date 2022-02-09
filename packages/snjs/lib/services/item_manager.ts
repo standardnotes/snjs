@@ -923,7 +923,8 @@ export class ItemManager extends PureService {
           `^${searchQuery}|${TagFolderDelimitter}${searchQuery}`,
           'i'
         );
-        const matchesQuery = regex.test(tag.title);
+        const expandedTitle = this.getTagLongTitle(tag);
+        const matchesQuery = regex.test(expandedTitle);
         const tagInNote = note
           ? this.itemsReferencingItem(note.uuid).some(
               (item) => item?.uuid === tag.uuid
@@ -941,6 +942,24 @@ export class ItemManager extends PureService {
     if (parentId) {
       return this.findItem(parentId) as SNTag;
     }
+  }
+
+  public getTagPrefixTitle(tag: SNTag): string | undefined {
+    const hierarchy = this.getTagParentChain(tag.uuid);
+
+    if (hierarchy.length === 0) {
+      return undefined;
+    }
+
+    const prefixTitle = hierarchy.map((tag) => tag.title).join('/');
+    return `${prefixTitle}/`;
+  }
+
+  public getTagLongTitle(tag: SNTag): string {
+    const hierarchy = this.getTagParentChain(tag.uuid);
+    const tags = [...hierarchy, tag];
+    const longTitle = tags.map((tag) => tag.title).join('/');
+    return longTitle;
   }
 
   /**
