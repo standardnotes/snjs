@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.6.0...@standardnotes/time@1.6.1) (2022-02-10)
+
+
+### Bug Fixes
+
+* timer tests with utc dates ([c0b15a2](https://github.com/standardnotes/snjs/commit/c0b15a2ae45632615fa5e4064d5210bdd97ff237))
+
+
+
+
+
 # [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.5.0...@standardnotes/time@1.6.0) (2022-02-09)
 
 
