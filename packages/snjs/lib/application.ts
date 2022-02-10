@@ -138,6 +138,7 @@ import {
 } from '@Services/features_service';
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders';
 import { RemoteSession } from './services/api/session';
+import { RoleName } from '.';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -1787,6 +1788,10 @@ export class SNApplication implements ListedInterface {
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
     return this.featuresService.getFeatureStatus(featureId);
+  }
+
+  public hasRole(role: RoleName): boolean {
+    return this.featuresService.hasRole(role);
   }
 
   public getNewSubscriptionToken(): Promise<string | undefined> {

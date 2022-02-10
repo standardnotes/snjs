@@ -438,6 +438,10 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.hasOnlineSubscription() || this.hasOfflineRepo();
   }
 
+  public hasRole(role: RoleName): boolean {
+    return this.roles.includes(role)
+  }
+
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
     const isThirdParty = this.findStaticNativeFeature(featureId) == undefined;
     if (isThirdParty) {

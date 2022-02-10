@@ -6,7 +6,7 @@ import {
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 import { Role, Subscription } from '@standardnotes/auth';
-import { SubscriptionName } from '@standardnotes/common';
+import { RoleName, SubscriptionName } from '@standardnotes/common';
 import { FeatureDescription } from '@standardnotes/features';
 import { UuidString } from '@Lib/types';
 
@@ -151,6 +151,7 @@ export type RevisionListEntry = {
   updated_at: string;
   /** The uuid of the revision */
   uuid: string;
+  required_role: RoleName;
 };
 
 export type RevisionListResponse = HttpResponse & { data: RevisionListEntry[] };
