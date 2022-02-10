@@ -9,6 +9,7 @@ import { Role, Subscription } from '@standardnotes/auth';
 import { SubscriptionName } from '@standardnotes/common';
 import { FeatureDescription } from '@standardnotes/features';
 import { UuidString } from '@Lib/types';
+import { RoleName } from '@Lib/index';
 
 export enum StatusCode {
   LocalValidationError = 10,
@@ -151,6 +152,7 @@ export type RevisionListEntry = {
   updated_at: string;
   /** The uuid of the revision */
   uuid: string;
+  required_role: RoleName;
 };
 
 export type RevisionListResponse = HttpResponse & { data: RevisionListEntry[] };
