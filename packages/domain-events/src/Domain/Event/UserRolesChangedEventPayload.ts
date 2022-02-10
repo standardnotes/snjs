@@ -1,4 +1,4 @@
-import { RoleName } from '@standardnotes/auth'
+import { RoleName } from '@standardnotes/common'
 
 export interface UserRolesChangedEventPayload {
   userUuid: string
