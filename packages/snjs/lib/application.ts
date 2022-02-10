@@ -130,7 +130,7 @@ import {
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
-import { RoleName, Subscription } from '@standardnotes/auth';
+import { Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
 import {
   FeaturesEvent,
@@ -138,6 +138,7 @@ import {
 } from '@Services/features_service';
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders';
 import { RemoteSession } from './services/api/session';
+import { RoleName } from '.';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
