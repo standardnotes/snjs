@@ -6,10 +6,9 @@ import {
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
 import { Role, Subscription } from '@standardnotes/auth';
-import { SubscriptionName } from '@standardnotes/common';
+import { RoleName, SubscriptionName } from '@standardnotes/common';
 import { FeatureDescription } from '@standardnotes/features';
 import { UuidString } from '@Lib/types';
-import { RoleName } from '@Lib/index';
 
 export enum StatusCode {
   LocalValidationError = 10,
