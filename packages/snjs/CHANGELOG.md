@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.56.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.56.0...@standardnotes/snjs@2.56.1) (2022-02-10)
+
+
+### Bug Fixes
+
+* reuse existing tag notes count observers when recreating after resetting collection ([b726f3d](https://github.com/standardnotes/snjs/commit/b726f3d6b8f0b24eb57a72cb9114d4a4d53e6690))
+
+
+
+
+
 # [2.56.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.55.0...@standardnotes/snjs@2.56.0) (2022-02-10)
 
 
