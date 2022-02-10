@@ -27,6 +27,7 @@ export type HttpRequest = {
   verb: HttpVerb;
   authentication?: string;
   customHeaders?: Record<string, string>[];
+  responseType?: XMLHttpRequestResponseType;
 };
 
 /**
@@ -97,6 +98,8 @@ export class SNHttpService extends PureService {
       );
     }
     request.open(httpRequest.verb, httpRequest.url, true);
+    request.responseType = httpRequest.responseType ?? '';
+
     request.setRequestHeader('Content-type', 'application/json');
     request.setRequestHeader('X-SNJS-Version', SnjsVersion);
 
@@ -151,14 +154,25 @@ export class SNHttpService extends PureService {
     const httpStatus = request.status;
     const response: HttpResponse = {
       status: httpStatus,
+      headers: new Map<string, string | null>(),
     };
+
+    const responseHeaderLines = request.getAllResponseHeaders().trim().split(/[\r\n]+/);
+    responseHeaderLines.forEach((responseHeaderLine) => {
+      const parts = responseHeaderLine.split(': ');
+      const name = parts.shift() as string;
+      const value = parts.join(': ');
+
+      (<Map<string, string | null>>response.headers).set(name, value)
+    })
+
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
         let body;
-        if (request.getResponseHeader('content-type')?.includes('application/json')) {
+        if (!request.responseType) {
           body = JSON.parse(request.responseText);
         } else {
-          body = request.responseText;
+          body = request.response;
         }
         /**
          * v0 APIs do not have a `data` top-level object. In such cases, mimic

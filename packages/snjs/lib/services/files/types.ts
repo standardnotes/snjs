@@ -15,6 +15,7 @@ export interface FilesApi {
 
   downloadFile(
     apiToken: string,
+    contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void>;
 }

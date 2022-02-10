@@ -8,8 +8,7 @@ export class FileDownloader {
   ) {}
 
   public download(): Promise<void> {
-    console.log('file downloader download')
-    return this.apiService.downloadFile(this.apiToken, (bytes) => {
+    return this.apiService.downloadFile(this.apiToken, 0, (bytes) => {
       this.onEncryptedBytes(bytes);
     });
   }

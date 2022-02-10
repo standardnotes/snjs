@@ -312,6 +312,7 @@ export class SNApiService
     params?: HttpParams;
     authentication?: string;
     customHeaders?: Record<string, string>[];
+    responseType?: XMLHttpRequestResponseType;
   }) {
     try {
       const response = await this.httpService.runHttp(params);
@@ -973,6 +974,7 @@ export class SNApiService
 
   public async downloadFile(
     apiToken: string,
+    contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void> {
     const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
@@ -985,12 +987,33 @@ export class SNApiService
       customHeaders: [
         { key: 'x-valet-token', value: apiToken },
         { key: 'x-chunk-size', value: FileProtocolV1.ChunkSize.toString() },
-        { key: 'range', value: 'bytes=0-' }
+        { key: 'range', value: `bytes=${contentRangeStart}-` }
       ],
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK,
+      responseType: 'arraybuffer',
     });
 
-    onBytesReceived(response)
+    const contentRangeHeader = (<Map<string, string | null>>response.headers).get('content-range');
+    if (!contentRangeHeader) {
+      throw new Error('Could not obtain content-range header while downloading file chunk');
+    }
+
+    const matches = contentRangeHeader.match(/(^[a-zA-Z][\w]*)\s+(\d+)\s?-\s?(\d+)?\s?\/?\s?(\d+|\*)?/);
+    if (!matches || matches.length !== 5) {
+      throw new Error('Malformed content-range header in response when downloading file chunk');
+    }
+
+    const rangeStart = +matches[2]
+    const rangeEnd = +matches[3]
+    const totalSize = +matches[4]
+
+    const bytesReceived = new Uint8Array(response.data as ArrayBuffer);
+
+    onBytesReceived(bytesReceived);
+
+    if (rangeEnd < totalSize - 1) {
+      this.downloadFile(apiToken, rangeStart + FileProtocolV1.ChunkSize, onBytesReceived)
+    }
   }
 
   private preprocessingError() {

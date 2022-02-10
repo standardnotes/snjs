@@ -45,6 +45,7 @@ export type HttpResponse = {
     error?: Error;
   };
   meta?: ResponseMeta;
+  headers?: Map<string, string | null>;
 };
 
 export type ResponseMeta = {
@@ -325,4 +326,5 @@ export type CloseUploadSessionResponse = MinimalHttpResponse & {
 };
 
 export type DownloadFileChunkResponse = MinimalHttpResponse & {
+  data: ArrayBuffer
 };

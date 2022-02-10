@@ -136,9 +136,9 @@ describe.only('files', function () {
 
   it.only('should encrypt and upload file', async function () {
     const response = await fetch('http://localhost:9002/packages/snjs/mocha/assets/two_mb_file.md');
-    const buffer = await response.arrayBuffer();
+    const buffer = new Uint8Array(await response.arrayBuffer());
 
-    const operation = await uploadFile(this.fileService, new Uint8Array(buffer), 'my-file', 'md');
+    const operation = await uploadFile(this.fileService, buffer, 'my-file', 'md');
 
     const downloadedBytes = await downloadFile(this.fileService, this.itemManager, operation.getRemoteIdentifier());
 

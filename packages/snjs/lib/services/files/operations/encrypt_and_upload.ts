@@ -61,6 +61,6 @@ export class EncryptAndUploadFileOperation {
 
     this.encryptedSize += encryptedBytes.length;
 
-    return this.uploader.uploadBytes(encryptedBytes, chunkId, this.apiToken);
+    return this.uploader.uploadBytes(decryptedBytes, chunkId, this.apiToken);
   }
 }

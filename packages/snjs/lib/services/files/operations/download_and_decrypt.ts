@@ -6,6 +6,7 @@ import {
   EncryptedFileInterface,
 } from './../types';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
+import { FileProtocolV1 } from '@Lib/index';
 
 export class DownloadAndDecryptFileOperation {
   private readonly decryptor: FileDecryptor;
@@ -30,14 +31,12 @@ export class DownloadAndDecryptFileOperation {
   }
 
   public async run(): Promise<void> {
-    console.log('operation run')
+    /**
+     * TMP WORKAROUND TO FINALIZE WITHOUT DECRYPTION
+     */
     // await this.decryptor.initialize();
 
-    console.log('operation decryptor initialized')
-
     this.downloader.download();
-
-    console.log('operation downloader triggered')
 
     return new Promise((resolve) => {
       this.completionResolve = resolve;
@@ -45,12 +44,24 @@ export class DownloadAndDecryptFileOperation {
   }
 
   private async onDownloadedBytes(encryptedBytes: Uint8Array): Promise<void> {
-    const result = await this.decryptor.decryptBytes(encryptedBytes);
-
-    this.onDecryptedBytes(result.decryptedBytes);
-
-    if (result.isFinalChunk) {
+    /**
+     * TMP WORKAROUND TO FINALIZE WITHOUT DECRYPTION
+     */
+    this.onDecryptedBytes(encryptedBytes);
+    if (encryptedBytes.byteLength < FileProtocolV1.ChunkSize) {
       this.completionResolve();
     }
+
+    /**
+     * PROPER DECRYPTION BELOW
+     */
+
+    // const result = await this.decryptor.decryptBytes(encryptedBytes);
+
+    // this.onDecryptedBytes(result.decryptedBytes);
+
+    // if (result.isFinalChunk) {
+    //   this.completionResolve();
+    // }
   }
 }
