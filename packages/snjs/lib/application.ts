@@ -923,6 +923,14 @@ export class SNApplication implements ListedInterface {
     return this.itemManager.findTagByTitle(title);
   }
 
+  public getTagPrefixTitle(tag: SNTag): string | undefined {
+    return this.itemManager.getTagPrefixTitle(tag);
+  }
+
+  public getTagLongTitle(tag: SNTag): string {
+    return this.itemManager.getTagLongTitle(tag);
+  }
+
   /**
    * Finds tags with title or component starting with a search query and (optionally) not associated with a note
    * @param searchQuery - The query string to match

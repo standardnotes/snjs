@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.9.0...@standardnotes/common@1.10.0) (2022-02-10)
+
+
+### Features
+
+* move role names and suscription names from auth to common package ([5358c03](https://github.com/standardnotes/snjs/commit/5358c03ef113597bcdcf7b0f3e730c8014885a0f))
+
+
+
+
+
 # [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.8.0...@standardnotes/common@1.9.0) (2022-02-07)
 
 

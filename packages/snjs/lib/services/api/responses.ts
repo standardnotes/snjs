@@ -5,7 +5,8 @@ import {
   KeyParamsOrigination,
 } from './../../protocol/key_params';
 import { ProtocolVersion } from './../../protocol/versions';
-import { Role, Subscription, SubscriptionName } from '@standardnotes/auth';
+import { Role, Subscription } from '@standardnotes/auth';
+import { SubscriptionName } from '@standardnotes/common';
 import { FeatureDescription } from '@standardnotes/features';
 import { UuidString } from '@Lib/types';
 

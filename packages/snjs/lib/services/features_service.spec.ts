@@ -16,8 +16,7 @@ import {
   FeatureStatus,
   SNFeaturesService,
 } from '@Lib/services/features_service';
-import { RoleName } from '@standardnotes/auth';
-import { ContentType, Runtime } from '@standardnotes/common';
+import { ContentType, Runtime, RoleName } from '@standardnotes/common';
 import {
   FeatureDescription,
   FeatureIdentifier,

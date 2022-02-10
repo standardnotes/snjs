@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.5...@standardnotes/auth@3.16.0) (2022-02-10)
+
+
+### Features
+
+* remove role name and subscription name from auth in favor of common ([14ec74c](https://github.com/standardnotes/snjs/commit/14ec74c3d98febf1117073f32442504cfad428e8))
+
+
+
+
+
+## [3.15.5](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.4...@standardnotes/auth@3.15.5) (2022-02-10)
+
+**Note:** Version bump only for package @standardnotes/auth
+
+
+
+
+
 ## [3.15.4](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.15.3...@standardnotes/auth@3.15.4) (2022-02-07)
 
 **Note:** Version bump only for package @standardnotes/auth

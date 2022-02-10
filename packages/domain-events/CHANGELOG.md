@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.22.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.21.6...@standardnotes/domain-events@2.22.0) (2022-02-10)
+
+
+### Features
+
+* remove role name and subscription name from auth in favor of common ([14ec74c](https://github.com/standardnotes/snjs/commit/14ec74c3d98febf1117073f32442504cfad428e8))
+
+
+
+
+
+## [2.21.6](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.21.5...@standardnotes/domain-events@2.21.6) (2022-02-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
 ## [2.21.5](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.21.4...@standardnotes/domain-events@2.21.5) (2022-02-09)
 
 **Note:** Version bump only for package @standardnotes/domain-events

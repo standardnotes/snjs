@@ -11,7 +11,6 @@ import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
 import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
-import { RoleName } from '@standardnotes/auth';
 import {
   ApiServiceEvent,
   MetaReceivedData,
@@ -24,7 +23,7 @@ import {
   FeatureIdentifier,
   GetFeatures,
 } from '@standardnotes/features';
-import { ContentType, Runtime } from '@standardnotes/common';
+import { ContentType, Runtime, RoleName } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponent } from '@Lib/models';

@@ -1,6 +1,5 @@
 import { ComponentPermission } from '../Component/ComponentPermission'
-import { ContentType } from '@standardnotes/common'
-import { RoleName } from '@standardnotes/auth'
+import { ContentType, RoleName } from '@standardnotes/common'
 import { ComponentArea } from '../Component/ComponentArea'
 import { PermissionName } from '../Permission/PermissionName'
 import { FeatureIdentifier } from './FeatureIdentifier'

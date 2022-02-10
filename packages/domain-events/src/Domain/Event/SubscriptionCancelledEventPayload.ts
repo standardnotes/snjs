@@ -1,4 +1,4 @@
-import { SubscriptionName } from '@standardnotes/auth'
+import { SubscriptionName } from '@standardnotes/common'
 
 export interface SubscriptionCancelledEventPayload {
   userEmail: string

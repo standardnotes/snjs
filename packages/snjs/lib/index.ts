@@ -248,7 +248,7 @@ export { SNLog } from './log';
 
 /** Used by e2e tests */
 export { GetFeatures, FeatureIdentifier } from '@standardnotes/features';
-export { RoleName } from '@standardnotes/auth';
+export { RoleName } from '@standardnotes/common';
 export {
   SettingName,
   MuteFailedBackupsEmailsOption,
