@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.56.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.55.0...@standardnotes/snjs@2.56.0) (2022-02-10)
+
+
+### Features
+
+* add hasRole function ([#591](https://github.com/standardnotes/snjs/issues/591)) ([b6d9e21](https://github.com/standardnotes/snjs/commit/b6d9e21b47d0d13d48f94a75214e4d1075092730))
+
+
+
+
+
 # [2.55.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.54.1...@standardnotes/snjs@2.55.0) (2022-02-10)
 
 
