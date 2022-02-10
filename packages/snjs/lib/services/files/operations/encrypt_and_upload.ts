@@ -61,6 +61,14 @@ export class EncryptAndUploadFileOperation {
 
     this.encryptedSize += encryptedBytes.length;
 
+    /**
+     * TMP WORKAROUND TO SKIP ENCRYPTION FOR UPLOAD/DOWNLOAD TEST PURPOSES
+     */
     return this.uploader.uploadBytes(decryptedBytes, chunkId, this.apiToken);
+
+    /**
+     * TMP WORKAROUND TO SKIP ENCRYPTION FOR UPLOAD/DOWNLOAD TEST PURPOSES
+     */
+    // return this.uploader.uploadBytes(encryptedBytes, chunkId, this.apiToken);
   }
 }
