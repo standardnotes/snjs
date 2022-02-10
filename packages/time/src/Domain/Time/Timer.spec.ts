@@ -50,18 +50,18 @@ describe('Timer', () => {
   })
 
   it('should convert a date to milliseconds', () => {
-    const timestamp = createTimer().convertDateToMilliseconds(new Date('Mon Mar 29 2021 12:13:45 GMT+0200'))
-    expect(timestamp).toEqual(1617012825000)
+    const timestamp = createTimer().convertDateToMilliseconds(new Date(Date.UTC(2021, 2, 29, 12, 13, 45)))
+    expect(timestamp).toEqual(1617020025000)
   })
 
   it('should convert a date to microseconds', () => {
-    const timestamp = createTimer().convertDateToMicroseconds(new Date('2021-03-29 08:00:05.233Z'))
+    const timestamp = createTimer().convertDateToMicroseconds(new Date(Date.UTC(2021, 2, 29, 8, 0, 5, 233)))
     expect(timestamp).toEqual(1617004805000000)
   })
 
   it('should convert a date to iso string', () => {
-    const isoString = createTimer().convertDateToISOString(new Date('2021-03-29 08:00:05'))
-    expect(isoString).toEqual('2021-03-29T06:00:05.000Z')
+    const isoString = createTimer().convertDateToISOString(new Date(Date.UTC(2021, 2, 29, 8, 0, 5)))
+    expect(isoString).toEqual('2021-03-29T08:00:05.000Z')
   })
 
   it('should convert a string date to microseconds', () => {
