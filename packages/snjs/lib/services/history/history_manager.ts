@@ -5,6 +5,7 @@ import { CreateHistoryEntryForPayload } from '@Services/history/entries/generato
 import { SurePayload } from './../../protocol/payloads/sure_payload';
 import { UuidString } from './../../types';
 import {
+  HttpResponse,
   RevisionListEntry,
   RevisionListResponse,
   SingleRevisionResponse,
@@ -358,6 +359,14 @@ export class SNHistoryManager extends PureService {
       return undefined;
     }
     return new HistoryEntry(decryptedPayload as SurePayload);
+  }
+
+  async deleteRemoteRevision(
+    itemUuid: UuidString,
+    entry: RevisionListEntry
+  ): Promise<HttpResponse> {
+    const response = await this.apiService.deleteRevision(itemUuid, entry);
+    return response;
   }
 
   /**

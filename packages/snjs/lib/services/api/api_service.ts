@@ -105,7 +105,8 @@ const Paths: {
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
-    listedRegistration: (userUuid: string) => `/v1/users/${userUuid}/integrations/listed`,
+    listedRegistration: (userUuid: string) =>
+      `/v1/users/${userUuid}/integrations/listed`,
     purchase: '/v1/purchase',
     subscriptionTokens: '/v1/subscription-tokens',
     offlineFeatures: '/v1/offline/features',
@@ -741,6 +742,25 @@ export class SNApiService extends PureService<
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPDATE_SETTINGS,
     });
+  }
+
+  async deleteRevision(
+    itemUuid: UuidString,
+    entry: RevisionListEntry
+  ): Promise<HttpResponse> {
+    const url = joinPaths(
+      this.host,
+      Paths.v1.itemRevision(itemUuid, entry.uuid)
+    );
+    const response = await this.httpService.deleteAbsolute(
+      url,
+      {
+        itemUuid: itemUuid,
+        revisionUuid: entry.uuid,
+      },
+      this.session?.authorizationValue
+    );
+    return response;
   }
 
   public downloadFeatureUrl(url: string): Promise<HttpResponse> {
