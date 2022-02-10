@@ -31,7 +31,7 @@ export class DownloadAndDecryptFileOperation {
 
   public async run(): Promise<void> {
     console.log('operation run')
-    await this.decryptor.initialize();
+    // await this.decryptor.initialize();
 
     console.log('operation decryptor initialized')
 

@@ -973,10 +973,9 @@ export class SNApiService
 
   public async downloadFile(
     apiToken: string,
-    _onBytesReceived: (bytes: Uint8Array) => void
+    onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void> {
     const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
-    console.log('url', url)
 
     const response:
       | HttpResponse
@@ -985,12 +984,13 @@ export class SNApiService
       url,
       customHeaders: [
         { key: 'x-valet-token', value: apiToken },
-        { key: 'x-chunk-size', value: FileProtocolV1.ChunkSize.toString() }
+        { key: 'x-chunk-size', value: FileProtocolV1.ChunkSize.toString() },
+        { key: 'range', value: 'bytes=0-' }
       ],
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK,
     });
 
-    console.log(response)
+    onBytesReceived(response)
   }
 
   private preprocessingError() {

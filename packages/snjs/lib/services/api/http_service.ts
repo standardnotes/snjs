@@ -154,7 +154,12 @@ export class SNHttpService extends PureService {
     };
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
-        const body = JSON.parse(request.responseText);
+        let body;
+        if (request.getResponseHeader('content-type')?.includes('application/json')) {
+          body = JSON.parse(request.responseText);
+        } else {
+          body = request.responseText;
+        }
         /**
          * v0 APIs do not have a `data` top-level object. In such cases, mimic
          * the newer response body style by putting all the top-level
