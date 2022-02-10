@@ -139,7 +139,10 @@ export class ItemManager extends PureService {
       'dsc'
     );
     this.notesView = new ItemCollectionNotesView(this.collection);
-    this.tagNotesIndex = new TagNotesIndex(this.collection);
+    this.tagNotesIndex = new TagNotesIndex(
+      this.collection,
+      this.tagNotesIndex?.observers
+    );
   }
 
   public setDisplayOptions(
