@@ -41,11 +41,11 @@ services:
           - sns
 
   sqs:
-    image: s12v/elasticmq
+    image: softwaremill/elasticmq-native
     expose:
       - 9324
     volumes:
-      - ./docker/sqs.conf:/etc/elasticmq/elasticmq.conf
+      - ./docker/sqs.conf:/opt/elasticmq.conf
     restart: unless-stopped
     networks:
       - snjs
