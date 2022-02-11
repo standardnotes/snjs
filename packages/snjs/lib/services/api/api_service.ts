@@ -747,19 +747,17 @@ export class SNApiService extends PureService<
   async deleteRevision(
     itemUuid: UuidString,
     entry: RevisionListEntry
-  ): Promise<HttpResponse> {
+  ): Promise<MinimalHttpResponse> {
     const url = joinPaths(
       this.host,
       Paths.v1.itemRevision(itemUuid, entry.uuid)
     );
-    const response = await this.httpService.deleteAbsolute(
+    const response = await this.tokenRefreshableRequest({
+      verb: HttpVerb.Delete,
       url,
-      {
-        itemUuid: itemUuid,
-        revisionUuid: entry.uuid,
-      },
-      this.session?.authorizationValue
-    );
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_DELETE_REVISION,
+      authentication: this.session?.authorizationValue,
+    });
     return response;
   }
 
