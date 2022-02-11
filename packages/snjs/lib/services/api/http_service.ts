@@ -169,7 +169,7 @@ export class SNHttpService extends PureService {
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
         let body;
-        if (!request.responseType) {
+        if (response.headers?.get('content-type')?.includes('application/json')) {
           body = JSON.parse(request.responseText);
         } else {
           body = request.response;
