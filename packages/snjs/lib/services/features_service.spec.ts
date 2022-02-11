@@ -21,6 +21,7 @@ import {
   FeatureDescription,
   FeatureIdentifier,
   GetFeatures,
+  DeprecatedFeatureIdentifier,
 } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
@@ -77,7 +78,9 @@ describe('featuresService', () => {
         expires_at: tomorrow_server,
       },
       {
-        ...GetFeatures().find((f) => f.identifier === FeatureIdentifier.BoldEditor),
+        ...GetFeatures().find(
+          (f) => f.identifier === FeatureIdentifier.BoldEditor
+        ),
         expires_at: tomorrow_server,
       },
     ] as jest.Mocked<FeatureDescription[]>;
@@ -542,9 +545,11 @@ describe('featuresService', () => {
       expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(
         FeatureStatus.InCurrentPlanButExpired
       );
-      expect(featuresService.getFeatureStatus('missing-feature-identifier' as FeatureIdentifier)).toBe(
-        FeatureStatus.NoUserSubscription
-      );
+      expect(
+        featuresService.getFeatureStatus(
+          'missing-feature-identifier' as FeatureIdentifier
+        )
+      ).toBe(FeatureStatus.NoUserSubscription);
     });
 
     it('feature status should be not entitled if no account or offline repo', async () => {
@@ -664,6 +669,31 @@ describe('featuresService', () => {
       expect(
         featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
       ).toBe(FeatureStatus.NotInCurrentPlan);
+    });
+
+    it('feature status for deprecated feature', async () => {
+      const featuresService = createService();
+
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(true);
+
+      expect(
+        featuresService.getFeatureStatus(
+          (DeprecatedFeatureIdentifier.FileSafe as unknown) as FeatureIdentifier
+        )
+      ).toBe(FeatureStatus.NoUserSubscription);
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+        RoleName.CoreUser,
+      ]);
+
+      expect(
+        featuresService.getFeatureStatus(
+          (DeprecatedFeatureIdentifier.FileSafe as unknown) as FeatureIdentifier
+        )
+      ).toBe(FeatureStatus.Entitled);
     });
 
     it('has paid subscription', async () => {

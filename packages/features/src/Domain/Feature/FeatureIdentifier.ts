@@ -11,7 +11,6 @@ export enum FeatureIdentifier {
   Files = 'org.standardnotes.files',
   Files25GB = 'org.standardnotes.files-25-gb',
   Files5GB = 'org.standardnotes.files-5-gb',
-  FileSafe = 'org.standardnotes.file-safe',
   FocusedTheme = 'org.standardnotes.theme-focus',
   FoldersComponent = 'org.standardnotes.folders',
   FuturaTheme = 'org.standardnotes.theme-futura',
@@ -36,4 +35,8 @@ export enum FeatureIdentifier {
   TwoFactorAuth = 'org.standardnotes.two-factor-auth',
   TwoFactorAuthManager = 'org.standardnotes.mfa-link',
   FocusMode = 'org.standardnotes.focus-mode',
+}
+
+export enum DeprecatedFeatureIdentifier {
+  FileSafe = 'org.standardnotes.file-safe',
 }
