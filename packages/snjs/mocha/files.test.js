@@ -3,7 +3,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe.only('files', function () {
-  this.timeout(Factory.TenSecondTimeout);
+  this.timeout(Factory.TwentySecondTimeout);
 
   beforeEach(async function () {
     localStorage.clear();
