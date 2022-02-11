@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.58.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.57.0...@standardnotes/snjs@2.58.0) (2022-02-11)
+
+
+### Features
+
+* add deleteRevision function ([#592](https://github.com/standardnotes/snjs/issues/592)) ([d3106ba](https://github.com/standardnotes/snjs/commit/d3106ba155a3b2ee52f20d488dae1630ff00196d))
+
+
+
+
+
 # [2.57.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.56.1...@standardnotes/snjs@2.57.0) (2022-02-11)
 
 
