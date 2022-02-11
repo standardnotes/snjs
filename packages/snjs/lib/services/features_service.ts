@@ -22,6 +22,7 @@ import {
   ThirdPartyFeatureDescription,
   FeatureIdentifier,
   GetFeatures,
+  DeprecatedFeatureIdentifier,
 } from '@standardnotes/features';
 import { ContentType, Runtime, RoleName } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
@@ -439,10 +440,25 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   }
 
   public hasRole(role: RoleName): boolean {
-    return this.roles.includes(role)
+    return this.roles.includes(role);
+  }
+
+  public isFeatureDeprecated(featureId: string): boolean {
+    return Object.values(DeprecatedFeatureIdentifier).includes(
+      featureId as DeprecatedFeatureIdentifier
+    );
   }
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
+    const isDeprecated = this.isFeatureDeprecated(featureId);
+    if (isDeprecated) {
+      if (this.hasPaidOnlineOrOfflineSubscription()) {
+        return FeatureStatus.Entitled;
+      } else {
+        return FeatureStatus.NoUserSubscription;
+      }
+    }
+
     const isThirdParty = this.findStaticNativeFeature(featureId) == undefined;
     if (isThirdParty) {
       const component = this.itemManager.components.find(

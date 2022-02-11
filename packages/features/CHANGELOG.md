@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.32.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.31.0...@standardnotes/features@1.32.0) (2022-02-11)
+
+
+### Features
+
+* deprecated feature identifiers ([8e870f3](https://github.com/standardnotes/snjs/commit/8e870f352b022af768799a13473580d65150ff4b))
+
+
+
+
+
 # [1.31.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.30.1...@standardnotes/features@1.31.0) (2022-02-10)
 
 
