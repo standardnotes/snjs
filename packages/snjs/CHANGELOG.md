@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.58.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.58.0...@standardnotes/snjs@2.58.1) (2022-02-12)
+
+
+### Bug Fixes
+
+* components getter should include themes ([c54ce9d](https://github.com/standardnotes/snjs/commit/c54ce9dbfa3efa30f4f51d0dd5c218337df24f62))
+
+
+
+
+
 # [2.58.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.57.0...@standardnotes/snjs@2.58.0) (2022-02-11)
 
 
