@@ -260,10 +260,14 @@ export class ItemManager extends PureService {
   /**
    * Returns all non-deleted components
    */
-  get components() {
-    return this.collection.displayElements(
+  get components(): SNComponent[] {
+    const components = this.collection.displayElements(
       ContentType.Component
     ) as SNComponent[];
+    const themes = this.collection.displayElements(
+      ContentType.Theme
+    ) as SNComponent[];
+    return components.concat(themes);
   }
 
   public addNoteCountChangeObserver(

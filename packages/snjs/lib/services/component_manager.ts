@@ -89,11 +89,7 @@ export class SNComponentManager extends PureService<
   }
 
   get components(): SNComponent[] {
-    const components = this.itemManager.getDisplayableItems(
-      ContentType.Component
-    );
-    const themes = this.itemManager.getDisplayableItems(ContentType.Theme);
-    return components.concat(themes) as SNComponent[];
+    return this.itemManager.components;
   }
 
   componentsForArea(area: ComponentArea): SNComponent[] {
