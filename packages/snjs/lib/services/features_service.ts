@@ -81,6 +81,12 @@ export const enum FeatureStatus {
 
 export class SNFeaturesService extends PureService<FeaturesEvent> {
   private deinited = false;
+  private roleHierarchy = {
+    [RoleName.BasicUser]: 0,
+    [RoleName.CoreUser]: 1,
+    [RoleName.PlusUser]: 2,
+    [RoleName.ProUser]: 3,
+  };
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];
   private removeApiServiceObserver: () => void;
@@ -439,8 +445,20 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.hasOnlineSubscription() || this.hasOfflineRepo();
   }
 
-  public hasRole(role: RoleName): boolean {
-    return this.roles.includes(role);
+  public hasAtLeastRole(role: RoleName): boolean {
+    const userRolesSortedByHierarchy = this.roles.sort(
+      (prev, next) => this.roleHierarchy[prev] - this.roleHierarchy[next]
+    );
+    const highestUserRoleLevel = this.roleHierarchy[
+      userRolesSortedByHierarchy[userRolesSortedByHierarchy.length - 1]
+    ];
+    const levelOfRoleToCheck = this.roleHierarchy[role];
+
+    if (levelOfRoleToCheck < highestUserRoleLevel) {
+      return true;
+    }
+
+    return false;
   }
 
   public isFeatureDeprecated(featureId: string): boolean {
