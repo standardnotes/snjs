@@ -81,12 +81,6 @@ export const enum FeatureStatus {
 
 export class SNFeaturesService extends PureService<FeaturesEvent> {
   private deinited = false;
-  private roleHierarchy = {
-    [RoleName.BasicUser]: 0,
-    [RoleName.CoreUser]: 1,
-    [RoleName.PlusUser]: 2,
-    [RoleName.ProUser]: 3,
-  };
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];
   private removeApiServiceObserver: () => void;
@@ -445,15 +439,19 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.hasOnlineSubscription() || this.hasOfflineRepo();
   }
 
-  public hasMinimumRole(role: RoleName): boolean {
-    const userRolesSortedByHierarchy = this.roles.sort(
-      (prev, next) => this.roleHierarchy[prev] - this.roleHierarchy[next]
-    );
-    const highestUserRole = lastElement(userRolesSortedByHierarchy) as RoleName;
-    const highestUserRoleLevel = this.roleHierarchy[highestUserRole];
-    const levelOfRoleToCheck = this.roleHierarchy[role];
+  public sortRolesByHierarchy(roles: RoleName[]): RoleName[] {
+    return Object.values(RoleName).filter((role) => roles.indexOf(role) !== -1);
+  }
 
-    if (levelOfRoleToCheck <= highestUserRoleLevel) {
+  public hasMinimumRole(role: RoleName): boolean {
+    const allPossibleRoles = Object.values(RoleName);
+    const userRolesSortedByHierarchy = this.sortRolesByHierarchy(this.roles);
+    const highestUserRoleIndex = allPossibleRoles.indexOf(
+      lastElement(userRolesSortedByHierarchy) as RoleName
+    );
+    const indexOfRoleToCheck = allPossibleRoles.indexOf(role);
+
+    if (indexOfRoleToCheck <= highestUserRoleIndex) {
       return true;
     }
 

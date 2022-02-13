@@ -805,7 +805,27 @@ describe('featuresService', () => {
     });
   });
 
-  describe('hasAtLeastRole', () => {
+  describe('sortRolesByHierarchy', () => {
+    it('should sort given roles according to role hierarchy', () => {
+      const featuresService = createService();
+
+      const sortedRoles = featuresService.sortRolesByHierarchy([
+        RoleName.ProUser,
+        RoleName.CoreUser,
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      expect(sortedRoles).toStrictEqual([
+        RoleName.BasicUser,
+        RoleName.CoreUser,
+        RoleName.PlusUser,
+        RoleName.ProUser,
+      ]);
+    });
+  });
+
+  describe('hasMinimumRole', () => {
     it('should be false if basic user checks for core role', async () => {
       const featuresService = createService();
 
