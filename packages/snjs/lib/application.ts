@@ -1791,7 +1791,7 @@ export class SNApplication implements ListedInterface {
   }
 
   public hasAtLeastRole(role: RoleName): boolean {
-    return this.featuresService.hasAtLeastRole(role);
+    return this.featuresService.hasMinimumRole(role);
   }
 
   public getNewSubscriptionToken(): Promise<string | undefined> {

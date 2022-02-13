@@ -813,7 +813,7 @@ describe('featuresService', () => {
         RoleName.BasicUser,
       ]);
 
-      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.CoreUser);
+      const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser);
 
       expect(hasCoreUserRole).toBe(false);
     });
@@ -826,9 +826,9 @@ describe('featuresService', () => {
         RoleName.BasicUser,
       ]);
 
-      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.PlusUser);
+      const hasPlusUserRole = featuresService.hasMinimumRole(RoleName.PlusUser);
 
-      expect(hasCoreUserRole).toBe(false);
+      expect(hasPlusUserRole).toBe(false);
     });
 
     it('should be false if plus user checks for pro role', async () => {
@@ -839,9 +839,9 @@ describe('featuresService', () => {
         RoleName.BasicUser,
       ]);
 
-      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.ProUser);
+      const hasProUserRole = featuresService.hasMinimumRole(RoleName.ProUser);
 
-      expect(hasCoreUserRole).toBe(false);
+      expect(hasProUserRole).toBe(false);
     });
 
     it('should be true if pro user checks for core user', async () => {
