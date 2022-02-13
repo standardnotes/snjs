@@ -56,7 +56,7 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
-import { Copy } from '..';
+import { Copy, lastElement } from '..';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -445,16 +445,15 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.hasOnlineSubscription() || this.hasOfflineRepo();
   }
 
-  public hasAtLeastRole(role: RoleName): boolean {
+  public hasMinimumRole(role: RoleName): boolean {
     const userRolesSortedByHierarchy = this.roles.sort(
       (prev, next) => this.roleHierarchy[prev] - this.roleHierarchy[next]
     );
-    const highestUserRoleLevel = this.roleHierarchy[
-      userRolesSortedByHierarchy[userRolesSortedByHierarchy.length - 1]
-    ];
+    const highestUserRole = lastElement(userRolesSortedByHierarchy) as RoleName;
+    const highestUserRoleLevel = this.roleHierarchy[highestUserRole];
     const levelOfRoleToCheck = this.roleHierarchy[role];
 
-    if (levelOfRoleToCheck < highestUserRoleLevel) {
+    if (levelOfRoleToCheck <= highestUserRoleLevel) {
       return true;
     }
 

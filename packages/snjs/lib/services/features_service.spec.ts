@@ -853,9 +853,23 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ]);
 
-      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.CoreUser);
+      const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser);
 
       expect(hasCoreUserRole).toBe(true);
+    });
+
+    it('should be true if pro user checks for pro user', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.ProUser,
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      const hasProUserRole = featuresService.hasMinimumRole(RoleName.ProUser);
+
+      expect(hasProUserRole).toBe(true);
     });
   });
 });
