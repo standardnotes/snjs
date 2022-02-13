@@ -56,8 +56,7 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
-import { Copy } from '..';
-import { lastElement } from '../utils';
+import { Copy, lastElement } from '../utils';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -446,13 +445,13 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
 
   public hasMinimumRole(role: RoleName): boolean {
     const sortedAllRoles = Object.values(RoleName);
-    
+
     const sortedUserRoles = this.rolesBySorting(this.roles);
-    
+
     const highestUserRoleIndex = sortedAllRoles.indexOf(
       lastElement(sortedUserRoles) as RoleName
     );
-    
+
     const indexOfRoleToCheck = sortedAllRoles.indexOf(role);
 
     return indexOfRoleToCheck <= highestUserRoleIndex;
