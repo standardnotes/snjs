@@ -804,4 +804,58 @@ describe('featuresService', () => {
       expect(result).toBeUndefined();
     });
   });
+
+  describe('hasAtLeastRole', () => {
+    it('should be false if basic user checks for core role', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+      ]);
+
+      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.CoreUser);
+
+      expect(hasCoreUserRole).toBe(false);
+    });
+
+    it('should be false if core user checks for plus role', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.CoreUser,
+        RoleName.BasicUser,
+      ]);
+
+      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.PlusUser);
+
+      expect(hasCoreUserRole).toBe(false);
+    });
+
+    it('should be false if plus user checks for pro role', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.PlusUser,
+        RoleName.BasicUser,
+      ]);
+
+      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.ProUser);
+
+      expect(hasCoreUserRole).toBe(false);
+    });
+
+    it('should be true if pro user checks for core user', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.ProUser,
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      const hasCoreUserRole = featuresService.hasAtLeastRole(RoleName.CoreUser);
+
+      expect(hasCoreUserRole).toBe(true);
+    });
+  });
 });
