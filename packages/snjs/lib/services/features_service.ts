@@ -56,7 +56,8 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
-import { Copy, lastElement } from '..';
+import { Copy } from '..';
+import { lastElement } from '../utils';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -439,23 +440,22 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.hasOnlineSubscription() || this.hasOfflineRepo();
   }
 
-  public sortRolesByHierarchy(roles: RoleName[]): RoleName[] {
-    return Object.values(RoleName).filter((role) => roles.indexOf(role) !== -1);
+  public rolesBySorting(roles: RoleName[]): RoleName[] {
+    return Object.values(RoleName).filter((role) => roles.includes(role));
   }
 
   public hasMinimumRole(role: RoleName): boolean {
-    const allPossibleRoles = Object.values(RoleName);
-    const userRolesSortedByHierarchy = this.sortRolesByHierarchy(this.roles);
-    const highestUserRoleIndex = allPossibleRoles.indexOf(
-      lastElement(userRolesSortedByHierarchy) as RoleName
+    const sortedAllRoles = Object.values(RoleName);
+    
+    const sortedUserRoles = this.rolesBySorting(this.roles);
+    
+    const highestUserRoleIndex = sortedAllRoles.indexOf(
+      lastElement(sortedUserRoles) as RoleName
     );
-    const indexOfRoleToCheck = allPossibleRoles.indexOf(role);
+    
+    const indexOfRoleToCheck = sortedAllRoles.indexOf(role);
 
-    if (indexOfRoleToCheck <= highestUserRoleIndex) {
-      return true;
-    }
-
-    return false;
+    return indexOfRoleToCheck <= highestUserRoleIndex;
   }
 
   public isFeatureDeprecated(featureId: string): boolean {

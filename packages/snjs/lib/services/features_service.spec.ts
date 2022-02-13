@@ -809,7 +809,7 @@ describe('featuresService', () => {
     it('should sort given roles according to role hierarchy', () => {
       const featuresService = createService();
 
-      const sortedRoles = featuresService.sortRolesByHierarchy([
+      const sortedRoles = featuresService.rolesBySorting([
         RoleName.ProUser,
         RoleName.CoreUser,
         RoleName.BasicUser,
