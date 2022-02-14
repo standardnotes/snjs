@@ -1790,8 +1790,8 @@ export class SNApplication implements ListedInterface {
     return this.featuresService.getFeatureStatus(featureId);
   }
 
-  public hasRole(role: RoleName): boolean {
-    return this.featuresService.hasRole(role);
+  public hasMinimumRole(role: RoleName): boolean {
+    return this.featuresService.hasMinimumRole(role);
   }
 
   public getNewSubscriptionToken(): Promise<string | undefined> {
