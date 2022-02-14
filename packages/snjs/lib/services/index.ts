@@ -40,4 +40,3 @@ export {
   StorageEncryptionPolicies,
   StoragePersistencePolicies,
 } from '@Services/storage_service';
-export { ActionVerb } from '@Lib/models/app/extension';
