@@ -11522,33 +11522,33 @@ sn-spreadsheets@1.4.4:
   resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.4.tgz#95e2947bb227f5cbb8ba8b88270eaf51ff300d79"
   integrity sha512-nYHT6NjspBZmYrG70ESY6KoGA5UPTvp/Y9OaOIB5PhH/X6K5posiDIfPo5IBqNT4oOZ03QHPkNAW1Q6X4KgdUA==
 
-sn-theme-autobiography@standardnotes/autobiography-theme:
-  version "1.0.2"
-  resolved "https://codeload.github.com/standardnotes/autobiography-theme/tar.gz/8679a48243b1155d6b0eb65a4bd1f76559c1af67"
+sn-theme-autobiography@standardnotes/autobiography-theme#1.0.3:
+  version "1.0.3"
+  resolved "https://codeload.github.com/standardnotes/autobiography-theme/tar.gz/d1be2f748f572e33375f5ddfb35b685ff09b4519"
 
 sn-theme-dynamic@standardnotes/dynamic-theme#1.0.3:
   version "1.0.3"
   resolved "https://codeload.github.com/standardnotes/dynamic-theme/tar.gz/82db279c2e1fa1c89c15fe430685fa784c8984d3"
 
-sn-theme-focus@standardnotes/focus-theme:
+sn-theme-focus@standardnotes/focus-theme#1.2.7:
+  version "1.2.7"
+  resolved "https://codeload.github.com/standardnotes/focus-theme/tar.gz/7a2dd0a7360555765483710ce2895b3310d4e626"
+
+sn-theme-futura@standardnotes/futura-theme#1.2.6:
   version "1.2.6"
-  resolved "https://codeload.github.com/standardnotes/focus-theme/tar.gz/e7c0511591062e89d319b2a2ab5b879694edd8a5"
+  resolved "https://codeload.github.com/standardnotes/futura-theme/tar.gz/f52c99603f44beea51aea7e853024101aab93466"
 
-sn-theme-futura@standardnotes/futura-theme:
+sn-theme-midnight@standardnotes/midnight-theme#1.2.6:
+  version "1.2.6"
+  resolved "https://codeload.github.com/standardnotes/midnight-theme/tar.gz/105582d031746fe3f959f7622a2d4f3b02d3f61f"
+
+sn-theme-solarized-dark@standardnotes/solarized-dark-theme#1.2.5:
   version "1.2.5"
-  resolved "https://codeload.github.com/standardnotes/futura-theme/tar.gz/d12567fbcc9b33c9c6cdfbbff22b78596b538649"
+  resolved "https://codeload.github.com/standardnotes/solarized-dark-theme/tar.gz/1be23808c25955329151731e062c0befaac511b2"
 
-sn-theme-midnight@standardnotes/midnight-theme:
-  version "1.2.5"
-  resolved "https://codeload.github.com/standardnotes/midnight-theme/tar.gz/937ebfe31b34bd68095fec39801b8102540d8a0e"
-
-sn-theme-solarized-dark@standardnotes/solarized-dark-theme:
-  version "1.2.4"
-  resolved "https://codeload.github.com/standardnotes/solarized-dark-theme/tar.gz/03e05fb4327e6625c065d4417d19db782d8fc242"
-
-sn-theme-titanium@standardnotes/titanium-theme:
-  version "1.2.5"
-  resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/61be5a3361f263e3d51bce562e4f8f7cdd6bcece"
+sn-theme-titanium@standardnotes/titanium-theme#1.2.6:
+  version "1.2.6"
+  resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/36a609f00ef26d4c9c7df1f9980ed2b6b77e1c6e"
 
 sn-token-vault@2.0.9:
   version "2.0.9"
