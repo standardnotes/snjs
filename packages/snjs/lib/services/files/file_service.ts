@@ -91,7 +91,7 @@ export class SNFileService extends PureService {
     }
 
     const fileContent: FileContent = {
-      chunkSize: FileProtocolV1.ChunkSize,
+      chunkSize: FileProtocolV1.DecryptedChunkSize,
       encryptionHeader: operation.getEncryptionHeader(),
       ext: fileExt,
       key: operation.getKey(),

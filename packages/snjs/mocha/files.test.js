@@ -40,7 +40,7 @@ describe.only('files', function () {
   });
 
   const uploadFile = async (fileService, buffer, name, ext) => {
-    const chunkSize = FileProtocolV1.ChunkSize;
+    const chunkSize = FileProtocolV1.DecryptedChunkSize;
 
     const operation = await fileService.beginNewFileUpload();
 

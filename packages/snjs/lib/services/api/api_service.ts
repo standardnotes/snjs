@@ -56,10 +56,7 @@ import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
-import {
-  isUrlFirstParty,
-  TRUSTED_FEATURE_HOSTS,
-} from '@Lib/hosts';
+import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts';
 import { FileProtocolV1 } from '@Lib/index';
 
 type PathNamesV1 = {
@@ -125,7 +122,7 @@ const Paths: {
     startUploadSession: '/v1/files/upload/create-session',
     uploadFileChunk: '/v1/files/upload/chunk',
     closeUploadSession: '/v1/files/upload/close-session',
-    downloadFileChunk: '/v1/files'
+    downloadFileChunk: '/v1/files',
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -895,13 +892,14 @@ export class SNApiService
     });
   }
 
-  public async createFileValetToken(remoteIdentifier: string, operation: 'write' | 'read'): Promise<string | ErrorObject> {
+  public async createFileValetToken(
+    remoteIdentifier: string,
+    operation: 'write' | 'read'
+  ): Promise<string | ErrorObject> {
     const url = joinPaths(this.host, Paths.v1.createFileValetToken);
     const params = {
       operation,
-      resources: [
-        remoteIdentifier,
-      ],
+      resources: [remoteIdentifier],
     };
     const response = await this.tokenRefreshableRequest<CreateValetTokenResponse>(
       {
@@ -915,8 +913,8 @@ export class SNApiService
 
     if (!response.data?.success) {
       return {
-        error: response.data?.reason as string
-      }
+        error: response.data?.reason as string,
+      };
     }
 
     return response.data?.valetToken;
@@ -944,15 +942,15 @@ export class SNApiService
   ): Promise<boolean> {
     const url = joinPaths(this.filesHost, Paths.v1.uploadFileChunk);
 
-    const response:
-      | HttpResponse
-      | UploadFileChunkResponse = await this.request({
-      verb: HttpVerb.Post,
-      url,
-      params: this.params({ chunk: encryptedBytes, chunkId }),
-      customHeaders: [{ key: 'x-valet-token', value: apiToken }],
-      fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK,
-    });
+    const response: HttpResponse | UploadFileChunkResponse = await this.request(
+      {
+        verb: HttpVerb.Post,
+        url,
+        params: this.params({ chunk: encryptedBytes, chunkId }),
+        customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK,
+      }
+    );
 
     return (response as UploadFileChunkResponse).success;
   }
@@ -986,33 +984,48 @@ export class SNApiService
       url,
       customHeaders: [
         { key: 'x-valet-token', value: apiToken },
-        { key: 'x-chunk-size', value: FileProtocolV1.ChunkSize.toString() },
-        { key: 'range', value: `bytes=${contentRangeStart}-` }
+        {
+          key: 'x-chunk-size',
+          value: FileProtocolV1.EncryptedChunkSize.toString(),
+        },
+        { key: 'range', value: `bytes=${contentRangeStart}-` },
       ],
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK,
       responseType: 'arraybuffer',
     });
 
-    const contentRangeHeader = (<Map<string, string | null>>response.headers).get('content-range');
+    const contentRangeHeader = (<Map<string, string | null>>(
+      response.headers
+    )).get('content-range');
     if (!contentRangeHeader) {
-      throw new Error('Could not obtain content-range header while downloading file chunk');
+      throw new Error(
+        'Could not obtain content-range header while downloading file chunk'
+      );
     }
 
-    const matches = contentRangeHeader.match(/(^[a-zA-Z][\w]*)\s+(\d+)\s?-\s?(\d+)?\s?\/?\s?(\d+|\*)?/);
+    const matches = contentRangeHeader.match(
+      /(^[a-zA-Z][\w]*)\s+(\d+)\s?-\s?(\d+)?\s?\/?\s?(\d+|\*)?/
+    );
     if (!matches || matches.length !== 5) {
-      throw new Error('Malformed content-range header in response when downloading file chunk');
+      throw new Error(
+        'Malformed content-range header in response when downloading file chunk'
+      );
     }
 
-    const rangeStart = +matches[2]
-    const rangeEnd = +matches[3]
-    const totalSize = +matches[4]
+    const rangeStart = +matches[2];
+    const rangeEnd = +matches[3];
+    const totalSize = +matches[4];
 
     const bytesReceived = new Uint8Array(response.data as ArrayBuffer);
 
     onBytesReceived(bytesReceived);
 
     if (rangeEnd < totalSize - 1) {
-      this.downloadFile(apiToken, rangeStart + FileProtocolV1.ChunkSize, onBytesReceived)
+      this.downloadFile(
+        apiToken,
+        rangeStart + FileProtocolV1.EncryptedChunkSize,
+        onBytesReceived
+      );
     }
   }
 
