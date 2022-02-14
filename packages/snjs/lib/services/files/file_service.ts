@@ -36,9 +36,12 @@ export class SNFileService extends PureService {
 
   public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
     const remoteIdentifier = await Uuid.GenerateUuid();
-    const apiToken = await this.apiService.createFileValetToken(remoteIdentifier, 'write');
+    const apiToken = await this.apiService.createFileValetToken(
+      remoteIdentifier,
+      'write'
+    );
     if (isErrorObject(apiToken)) {
-      throw new Error('Could not obtain files api valet token')
+      throw new Error('Could not obtain files api valet token');
     }
 
     const key = await this.crypto.generateRandomKey(FileProtocolV1.KeySize);
@@ -56,9 +59,11 @@ export class SNFileService extends PureService {
 
     await uploadOperation.initializeHeader();
 
-    const uploadSessionStarted = await this.apiService.startUploadSession(apiToken)
+    const uploadSessionStarted = await this.apiService.startUploadSession(
+      apiToken
+    );
     if (!uploadSessionStarted) {
-      throw new Error('Could not start upload session')
+      throw new Error('Could not start upload session');
     }
 
     return uploadOperation;
@@ -78,16 +83,18 @@ export class SNFileService extends PureService {
     fileName: string,
     fileExt: string
   ): Promise<SNFile> {
-    const uploadSessionClosed = await this.apiService.closeUploadSession(operation.getApiToken())
+    const uploadSessionClosed = await this.apiService.closeUploadSession(
+      operation.getApiToken()
+    );
     if (!uploadSessionClosed) {
-      throw new Error('Could not close upload session')
+      throw new Error('Could not close upload session');
     }
 
     const fileContent: FileContent = {
       chunkSize: FileProtocolV1.ChunkSize,
       encryptionHeader: operation.getEncryptionHeader(),
       ext: fileExt,
-      key: operation.getEncryptionHeader(),
+      key: operation.getKey(),
       name: fileName,
       remoteIdentifier: operation.getRemoteIdentifier(),
       size: operation.getRawSize(),
@@ -108,20 +115,23 @@ export class SNFileService extends PureService {
     file: SNFile,
     onDecryptedBytes: (bytes: Uint8Array) => void
   ): Promise<void> {
-    const apiToken = await this.apiService.createFileValetToken((file.content as PayloadContent).remoteIdentifier, 'read');
+    const apiToken = await this.apiService.createFileValetToken(
+      (file.content as PayloadContent).remoteIdentifier,
+      'read'
+    );
     if (isErrorObject(apiToken)) {
-      throw new Error('Could not obtain files api valet token')
+      throw new Error('Could not obtain files api valet token');
     }
 
-    /** REFACTOR TO-DO: pass the file only - as the payload properties where not accessible down the line */
     const operation = new DownloadAndDecryptFileOperation(
-      (file.content as PayloadContent).remoteIdentifier,
-      (file.content as PayloadContent).encryptionHeader,
-      (file.content as PayloadContent).key,
+      file,
       this.crypto,
       this.apiService,
       apiToken,
-      onDecryptedBytes
+      onDecryptedBytes,
+      () => {
+        console.log('Error downloading/decrypting file');
+      }
     );
 
     return operation.run();

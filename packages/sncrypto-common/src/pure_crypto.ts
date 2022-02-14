@@ -174,7 +174,7 @@ export interface SNPureCrypto {
     decryptor: StreamDecryptor,
     encryptedBuffer: Uint8Array,
     assocData: Utf8String
-  ): Promise<{ message: Uint8Array; tag: SodiumConstant }>;
+  ): Promise<{ message: Uint8Array; tag: SodiumConstant } | false>;
 
   /**
    * Converts a plain string into base64

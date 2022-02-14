@@ -25,10 +25,10 @@ describe.only('files', function () {
       userEmail: this.context.email,
       subscriptionId: 1,
       subscriptionName: 'PLUS_PLAN',
-      subscriptionExpiresAt: ((new Date()).getTime() + 3_600_000) * 1_000,
+      subscriptionExpiresAt: (new Date().getTime() + 3_600_000) * 1_000,
       timestamp: Date.now(),
-      offline: false
-    })
+      offline: false,
+    });
     /** Wait and allow server to apply subscription to user */
     await Factory.sleep(0.5);
   });
@@ -51,9 +51,14 @@ describe.only('files', function () {
       const chunk = buffer.slice(i, readUntil);
       const isFinalChunk = readUntil === buffer.length;
 
-      const bytesUploadedSuccessfully = await fileService.pushBytesForUpload(operation, chunk, chunkId++, isFinalChunk);
+      const bytesUploadedSuccessfully = await fileService.pushBytesForUpload(
+        operation,
+        chunk,
+        chunkId++,
+        isFinalChunk
+      );
       if (!bytesUploadedSuccessfully) {
-        throw new Error('Could not upload file chunk')
+        throw new Error('Could not upload file chunk');
       }
     }
 
@@ -77,8 +82,11 @@ describe.only('files', function () {
   };
 
   it('should create valet token from server', async function () {
-    const remoteIdentifier = Factory.generateUuid()
-    const token = await this.application.apiService.createFileValetToken(remoteIdentifier, 'write');
+    const remoteIdentifier = Factory.generateUuid();
+    const token = await this.application.apiService.createFileValetToken(
+      remoteIdentifier,
+      'write'
+    );
 
     expect(token.length).to.be.above(0);
   });
@@ -97,8 +105,11 @@ describe.only('files', function () {
       password: this.context.password,
     });
 
-    const remoteIdentifier = Factory.generateUuid()
-    const token = await this.application.apiService.createFileValetToken(remoteIdentifier, 'write');
+    const remoteIdentifier = Factory.generateUuid();
+    const token = await this.application.apiService.createFileValetToken(
+      remoteIdentifier,
+      'write'
+    );
 
     expect(token.error).to.equal('no-subscription');
   });
@@ -121,26 +132,58 @@ describe.only('files', function () {
       userEmail: this.context.email,
       subscriptionId: 1,
       subscriptionName: 'PLUS_PLAN',
-      subscriptionExpiresAt: ((new Date()).getTime() - 3_600_000) * 1_000,
+      subscriptionExpiresAt: (new Date().getTime() - 3_600_000) * 1_000,
       timestamp: Date.now(),
-      offline: false
-    })
+      offline: false,
+    });
     /** Wait and allow server to apply subscription to user */
     await Factory.sleep(0.5);
 
-    const remoteIdentifier = Factory.generateUuid()
-    const token = await this.application.apiService.createFileValetToken(remoteIdentifier, 'write');
+    const remoteIdentifier = Factory.generateUuid();
+    const token = await this.application.apiService.createFileValetToken(
+      remoteIdentifier,
+      'write'
+    );
 
     expect(token.error).to.equal('expired-subscription');
   });
 
-  it('should encrypt and upload file', async function () {
+  it('should encrypt and upload small file', async function () {
+    const response = await fetch('/packages/snjs/mocha/assets/small_file.md');
+    const buffer = new Uint8Array(await response.arrayBuffer());
+
+    const operation = await uploadFile(
+      this.fileService,
+      buffer,
+      'my-file',
+      'md'
+    );
+
+    const downloadedBytes = await downloadFile(
+      this.fileService,
+      this.itemManager,
+      operation.getRemoteIdentifier()
+    );
+
+    expect(downloadedBytes).to.eql(buffer);
+  });
+
+  it.only('should encrypt and upload big file', async function () {
     const response = await fetch('/packages/snjs/mocha/assets/two_mb_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
 
-    const operation = await uploadFile(this.fileService, buffer, 'my-file', 'md');
+    const operation = await uploadFile(
+      this.fileService,
+      buffer,
+      'my-file',
+      'md'
+    );
 
-    const downloadedBytes = await downloadFile(this.fileService, this.itemManager, operation.getRemoteIdentifier());
+    const downloadedBytes = await downloadFile(
+      this.fileService,
+      this.itemManager,
+      operation.getRemoteIdentifier()
+    );
 
     expect(downloadedBytes).to.eql(buffer);
   });

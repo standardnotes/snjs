@@ -24,7 +24,7 @@ describe('file decryptor', () => {
       key: 'secret',
     };
 
-    decryptor = new FileDecryptor('123', 'some-header', 'secret', crypto);
+    decryptor = new FileDecryptor(file, crypto);
   });
 
   it('initialize', async () => {
@@ -47,6 +47,6 @@ describe('file decryptor', () => {
       file.remoteIdentifier
     );
 
-    expect(result.decryptedBytes.length).toEqual(1);
+    expect(result!.decryptedBytes.length).toEqual(1);
   });
 });

@@ -63,5 +63,6 @@ describe('fileService', () => {
     fileService = createService();
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   it('placeholder', async () => {});
 });

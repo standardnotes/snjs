@@ -3,34 +3,37 @@ import {
   StreamDecryptor,
   SodiumConstant,
 } from '@standardnotes/sncrypto-common';
+import { EncryptedFileInterface } from '../types';
 
 export class FileDecryptor {
   private decryptor!: StreamDecryptor;
 
   constructor(
-    private remoteIdentifier: string,
-    private encryptionHeader: string,
-    private encryptionKey: string,
+    private file: EncryptedFileInterface,
     private crypto: SNPureCrypto
   ) {}
 
   public async initialize(): Promise<void> {
-    console.log('encryption header', this.encryptionHeader)
-    console.log('encryption key', this.encryptionKey)
     this.decryptor = await this.crypto.xchacha20StreamInitDecryptor(
-      this.encryptionHeader,
-      this.encryptionKey
+      this.file.encryptionHeader,
+      this.file.key
     );
   }
 
   public async decryptBytes(
     encryptedBytes: Uint8Array
-  ): Promise<{ decryptedBytes: Uint8Array; isFinalChunk: boolean }> {
+  ): Promise<
+    { decryptedBytes: Uint8Array; isFinalChunk: boolean } | undefined
+  > {
     const result = await this.crypto.xchacha20StreamDecryptorPush(
       this.decryptor,
       encryptedBytes,
-      this.remoteIdentifier
+      this.file.remoteIdentifier
     );
+
+    if (result === false) {
+      return undefined;
+    }
 
     const isFinal =
       result.tag ===

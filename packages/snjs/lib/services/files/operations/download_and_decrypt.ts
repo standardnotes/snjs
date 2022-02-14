@@ -6,7 +6,6 @@ import {
   EncryptedFileInterface,
 } from './../types';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { FileProtocolV1 } from '@Lib/index';
 
 export class DownloadAndDecryptFileOperation {
   private readonly decryptor: FileDecryptor;
@@ -14,15 +13,14 @@ export class DownloadAndDecryptFileOperation {
   private completionResolve!: () => void;
 
   constructor(
-    remoteIdentifier: string,
-    encryptionHeader: string,
-    encryptionKey: string,
+    file: RemoteFileInterface & EncryptedFileInterface,
     crypto: SNPureCrypto,
     api: FilesApi,
     apiToken: string,
-    private onDecryptedBytes: (decryptedBytes: Uint8Array) => void
+    private onDecryptedBytes: (decryptedBytes: Uint8Array) => void,
+    private onError: () => void
   ) {
-    this.decryptor = new FileDecryptor(remoteIdentifier, encryptionHeader, encryptionKey, crypto);
+    this.decryptor = new FileDecryptor(file, crypto);
     this.downloader = new FileDownloader(
       apiToken,
       api,
@@ -31,10 +29,7 @@ export class DownloadAndDecryptFileOperation {
   }
 
   public async run(): Promise<void> {
-    /**
-     * TMP WORKAROUND TO FINALIZE WITHOUT DECRYPTION
-     */
-    // await this.decryptor.initialize();
+    await this.decryptor.initialize();
 
     this.downloader.download();
 
@@ -44,24 +39,19 @@ export class DownloadAndDecryptFileOperation {
   }
 
   private async onDownloadedBytes(encryptedBytes: Uint8Array): Promise<void> {
-    /**
-     * TMP WORKAROUND TO FINALIZE WITHOUT DECRYPTION
-     */
-    this.onDecryptedBytes(encryptedBytes);
-    if (encryptedBytes.byteLength < FileProtocolV1.ChunkSize) {
+    const result = await this.decryptor.decryptBytes(encryptedBytes);
+
+    if (!result) {
+      this.downloader.abort();
+      this.onError();
       this.completionResolve();
+      return;
     }
 
-    /**
-     * PROPER DECRYPTION BELOW
-     */
+    this.onDecryptedBytes(result.decryptedBytes);
 
-    // const result = await this.decryptor.decryptBytes(encryptedBytes);
-
-    // this.onDecryptedBytes(result.decryptedBytes);
-
-    // if (result.isFinalChunk) {
-    //   this.completionResolve();
-    // }
+    if (result.isFinalChunk) {
+      this.completionResolve();
+    }
   }
 }

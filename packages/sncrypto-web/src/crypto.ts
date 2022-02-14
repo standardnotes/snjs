@@ -364,8 +364,10 @@ export class SNWebCrypto implements SNPureCrypto {
   ): Promise<StreamDecryptor> {
     await this.ready
 
+    const rawHeader = await Utils.base64ToArrayBuffer(header)
+
     if (
-      header.length !==
+      rawHeader.length !==
       SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES
     ) {
       throw new Error(
@@ -374,7 +376,7 @@ export class SNWebCrypto implements SNPureCrypto {
     }
 
     const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(
-      await Utils.base64ToArrayBuffer(header),
+      rawHeader,
       await Utils.hexStringToArrayBuffer(key),
     )
 
@@ -385,7 +387,7 @@ export class SNWebCrypto implements SNPureCrypto {
     decryptor: StreamDecryptor,
     encryptedBuffer: Uint8Array,
     assocData: Utf8String,
-  ): Promise<{ message: Uint8Array; tag: SodiumConstant }> {
+  ): Promise<{ message: Uint8Array; tag: SodiumConstant } | false> {
     if (
       encryptedBuffer.length <
       SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
@@ -399,7 +401,11 @@ export class SNWebCrypto implements SNPureCrypto {
       assocData.length > 0 ? await Utils.stringToArrayBuffer(assocData) : null,
     )
 
-    return result
+    if ((result as unknown) === false) {
+      return false
+    }
+
+    return result as { message: Uint8Array; tag: SodiumConstant }
   }
 
   /**

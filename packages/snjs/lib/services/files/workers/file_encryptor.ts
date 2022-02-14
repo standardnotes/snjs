@@ -1,5 +1,9 @@
 import { DecryptedFileInterface } from './../types';
-import { SNPureCrypto, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common';
+import {
+  SNPureCrypto,
+  StreamEncryptor,
+  SodiumConstant,
+} from '@standardnotes/sncrypto-common';
 
 export class FileEncryptor {
   private stream!: StreamEncryptor;
@@ -10,9 +14,7 @@ export class FileEncryptor {
   ) {}
 
   public async initializeHeader(): Promise<string> {
-    this.stream = await this.crypto.xchacha20StreamInitEncryptor(
-      this.file.key
-    );
+    this.stream = await this.crypto.xchacha20StreamInitEncryptor(this.file.key);
 
     return this.stream.header;
   }

@@ -54,16 +54,24 @@ describe('download and decrypt', () => {
   it('run should resolve when operation is complete', async () => {
     let receivedBytes = new Uint8Array();
 
+    file = {
+      remoteIdentifier: '123',
+      key: 'secret',
+      encryptionHeader: 'some-header',
+    };
+
     operation = new DownloadAndDecryptFileOperation(
-      '123',
-      'some-header',
-      'secret',
+      file,
       crypto,
       apiService,
       'api-token',
       (decryptedBytes) => {
-        receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes]);
-      }
+        if (decryptedBytes) {
+          receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes]);
+        }
+      },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      () => {}
     );
 
     operation['decryptor'].decryptBytes = jest.fn().mockImplementation(() => {
