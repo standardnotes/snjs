@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.59.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.0...@standardnotes/snjs@2.59.1) (2022-02-14)
+
+
+### Bug Fixes
+
+* export ActionVerb from lib index instead of services ([#597](https://github.com/standardnotes/snjs/issues/597)) ([8eda762](https://github.com/standardnotes/snjs/commit/8eda762f6065762030c03478d170360ea5d2265b))
+
+
+
+
+
 # [2.59.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.58.1...@standardnotes/snjs@2.59.0) (2022-02-14)
 
 
