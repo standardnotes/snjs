@@ -233,7 +233,7 @@ function FillEditorComponentDefaults(
 function editors(runtime: Runtime): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
-    version: '1.3.10',
+    version: '1.3.11',
     spellcheckControl: true,
     identifier: FeatureIdentifier.CodeEditor,
     permission_name: PermissionName.CodeEditor,
