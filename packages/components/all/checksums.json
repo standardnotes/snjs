@@ -75,9 +75,9 @@
     "binary": "3f553a232f3ec81ae95506d60eda2f30877974af213b144f02d0464517f74a97"
   },
   "org.standardnotes.token-vault": {
-    "version": "2.0.9",
-    "base64": "a40b7df5ac564c763fb1b8f588dcf584576cb4c2ee6d88e456cfa2dc49fec91c",
-    "binary": "04d6c4765de4e2cdd4e28f3f8c30e79a49e980fa1cdd9df812e844f8486795f3"
+    "version": "2.0.10",
+    "base64": "65540f4e291ea5d00ecda1fc6a7c876ec33cdf41fabc4802eb675f92a4fcaea3",
+    "binary": "5db0caea04c8db86c8bdd99d973c7b9021a2cfaa5a9d7728c4a4775e22ae7c30"
   },
   "org.standardnotes.standard-sheets": {
     "version": "1.4.4",
