@@ -11550,10 +11550,10 @@ sn-theme-titanium@standardnotes/titanium-theme#1.2.6:
   version "1.2.6"
   resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/36a609f00ef26d4c9c7df1f9980ed2b6b77e1c6e"
 
-sn-token-vault@2.0.9:
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.9.tgz#f9d5a2fca14ed79b40bc2f69e1ca4cd4457be3c2"
-  integrity sha512-2D0lL7DeaYGV8j6JankEr0gJA2LA+BvassxhGw7bok3RPQvUOBlicVenI9a7enoKb6K4iiSjScrAlub0jLfubA==
+sn-token-vault@2.0.10:
+  version "2.0.10"
+  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.10.tgz#43f7ffd96f62d6014318a98e990eb0d584c486d1"
+  integrity sha512-arj8YvFpPBRsJ20BPtglOMWlvXlafC3M3XZo/eSSx1uJUBfwWwDNFcgdJSkBsuXweVWc1UBqsfGm4JuUtHIaUQ==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

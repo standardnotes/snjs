@@ -406,7 +406,7 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
     interchangeable: false,
     identifier: FeatureIdentifier.TokenVaultEditor,
     permission_name: PermissionName.TokenVaultEditor,
-    version: '2.0.9',
+    version: '2.0.10',
     description:
       'Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.',
     marketing_url: '',
