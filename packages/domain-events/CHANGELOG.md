@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.23.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.1...@standardnotes/domain-events@2.23.2) (2022-02-15)
+
+
+### Bug Fixes
+
+* add user role names to user signed in payload ([9354d9c](https://github.com/standardnotes/snjs/commit/9354d9c36a40d5918902d2253f42330ec7748ac1))
+
+
+
+
+
 ## [2.23.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.0...@standardnotes/domain-events@2.23.1) (2022-02-15)
 
 
