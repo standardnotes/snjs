@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.23.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.1...@standardnotes/domain-events@2.23.2) (2022-02-15)
+
+
+### Bug Fixes
+
+* add user role names to user signed in payload ([9354d9c](https://github.com/standardnotes/snjs/commit/9354d9c36a40d5918902d2253f42330ec7748ac1))
+
+
+
+
+
+## [2.23.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.0...@standardnotes/domain-events@2.23.1) (2022-02-15)
+
+
+### Bug Fixes
+
+* user signed in event payload ([71128b2](https://github.com/standardnotes/snjs/commit/71128b23d7a363f475ce7eae4acf23bfa44e1a88))
+
+
+
+
+
+# [2.23.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.22.2...@standardnotes/domain-events@2.23.0) (2022-02-15)
+
+
+### Features
+
+* add user signed in event ([fcc217e](https://github.com/standardnotes/snjs/commit/fcc217e74b8b584ef2180774037508e449d7e937))
+
+
+
+
+
 ## [2.22.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.22.1...@standardnotes/domain-events@2.22.2) (2022-02-14)
 
 **Note:** Version bump only for package @standardnotes/domain-events
