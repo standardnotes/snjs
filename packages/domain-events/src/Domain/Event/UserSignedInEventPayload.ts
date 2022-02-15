@@ -1,6 +1,6 @@
 export interface UserSignedInEventPayload {
   userUuid: string
-  email: string
+  userEmail: string
   device: string
   browser: string
 }
