@@ -7,6 +7,8 @@ export type Base64String = string
  */
 export interface SNPureCrypto {
 
+  initialize(): Promise<void>;
+
   /**
    * Derives a key from a password and salt using PBKDF2 via WebCrypto.
    * @param password - utf8 string
@@ -27,7 +29,7 @@ export interface SNPureCrypto {
    * @param bits - Length of key in bits
    * @returns A string key in hex format
    */
-  generateRandomKey(bits: number): Promise<string>
+  generateRandomKey(bits: number): string
 
   /**
    * @legacy
@@ -108,7 +110,7 @@ export interface SNPureCrypto {
     iterations: number,
     bytes: number,
     length: number
-  ): Promise<HexString>
+  ): HexString
 
   /**
    * Encrypt a message (and associated data) with XChaCha20-Poly1305.
@@ -123,7 +125,7 @@ export interface SNPureCrypto {
     nonce: HexString,
     key: HexString,
     assocData: Utf8String
-  ): Promise<Base64String>
+  ): Base64String
 
   /**
    * Decrypt a message (and associated data) with XChaCha20-Poly1305
@@ -138,21 +140,21 @@ export interface SNPureCrypto {
     nonce: HexString,
     key: HexString,
     assocData: Utf8String | Uint8Array
-  ): Promise<string | null>
+  ): string | null
 
   /**
    * Converts a plain string into base64
    * @param text - A plain string
    * @returns  A base64 encoded string
    */
-  base64Encode(text: Utf8String): Promise<string>
+  base64Encode(text: Utf8String): string
 
   /**
    * Converts a base64 string into a plain string
    * @param base64String - A base64 encoded string
    * @returns A plain string
    */
-  base64Decode(base64String: Base64String): Promise<string>
+  base64Decode(base64String: Base64String): string
 
   deinit(): void
 
