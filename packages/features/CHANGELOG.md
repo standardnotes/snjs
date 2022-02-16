@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.32.5](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.32.4...@standardnotes/features@1.32.5) (2022-02-16)
+
+
+### Bug Fixes
+
+* add new feature identifiers ([6a2623f](https://github.com/standardnotes/snjs/commit/6a2623f1dadb2d275e0c8b265d39f77c844ba26c))
+
+
+
+
+
 ## [1.32.4](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.32.3...@standardnotes/features@1.32.4) (2022-02-16)
 
 **Note:** Version bump only for package @standardnotes/features
