@@ -300,13 +300,28 @@ export class SNSyncService extends PureService<
       PayloadSource.LocalRetrieved
     );
 
-    const decrypted = await this.protocolService.payloadsByDecryptingPayloads(
-      payloads
-    );
-    await this.payloadManager.emitPayloads(
-      decrypted,
-      PayloadSource.LocalRetrieved
-    );
+    const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 300;
+    /** Map in batches to give interface a chance to update */
+    const payloadCount = payloads.length;
+    const batchSize = DEFAULT_DATABASE_LOAD_BATCH_SIZE;
+    const numBatches = Math.ceil(payloadCount / batchSize);
+    for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
+      const currentPosition = batchIndex * batchSize;
+      const batch = payloads.slice(
+        currentPosition,
+        currentPosition + batchSize
+      );
+      const decrypted = await this.protocolService.payloadsByDecryptingPayloads(
+        batch
+      );
+      await this.payloadManager.emitPayloads(
+        decrypted,
+        PayloadSource.LocalRetrieved
+      );
+      this.notifyEvent(SyncEvent.LocalDataIncrementalLoad);
+      this.opStatus.setDatabaseLoadStatus(currentPosition, payloadCount, false);
+      await sleep(1, false);
+    }
 
     this.databaseLoaded = true;
     this.opStatus.setDatabaseLoadStatus(0, 0, true);
