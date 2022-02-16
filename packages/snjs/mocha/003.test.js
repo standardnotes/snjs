@@ -103,7 +103,7 @@ describe('003 protocol operations', () => {
       content:
         '003:ca505a223d3ef3ad5cd4e6f4e0d06a2bb34b8b032f60180165c37acd5a4718e3:80488ade-933a-4570-8852-5282a094fafc:bad25bb4ba935646148fe7f118c5f60d:g+eHtGG+M4ZdIevpx9xkK9mmFYo8/1JTlaDysM18nGrA3Oe3wvFTfG5PPvH50uY6PgBbWZPS+BNpsH/gVMH8T9LCreRLPVw5yRhunyva0pgsk/k4Dmi4PTsvvNqhA2F8X2LZTwuw7QlLkvOneX9cNmNDzVGmsedSWhEZXbD5jmb1Ev77Gq1kjqh2eFc7lPa/WBb52fs8FHKbO9HUGqXF49/JOunpvp76/bAydavGQ2n/abkGCoYvrtmyM1lqthBb8w60KidkC/Hm4cGAm8wNKyg58YUHCYPAlaUI0DxPGXu24Ur/6M7HdP/9puitJGUSlXA32DXABMd8DbUk6JPvJRKvQ/v4Dd3UR0h7Gdm/YME=:eyJpZGVudGlmaWVyIjoiZGVtb0BzdGFuZGFyZG5vdGVzLm9yZyIsInB3X2Nvc3QiOjExMDAwMCwicHdfbm9uY2UiOiIzMTEwNzgzN2I0NGQ4NjE3OTE0MGI3YzYwMmE1NWQ2OTQyNDNlMmU5Y2VkMGM0YzkxNGFjMjFhZDkwMjE1MDU1IiwidmVyc2lvbiI6IjAwMyJ9',
     });
-    const decrypted = await protocol003.generateDecryptedParameters(
+    const decrypted = await protocol003.generateDecryptedParametersAsync(
       payload,
       key
     );
@@ -128,7 +128,7 @@ describe('003 protocol operations', () => {
   it('generating encryption params includes items_key_id', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol003.createItemsKey();
-    const params = await protocol003.generateEncryptedParameters(
+    const params = await protocol003.generateEncryptedParametersAsync(
       payload,
       PayloadFormat.EncryptedString,
       key
@@ -141,12 +141,12 @@ describe('003 protocol operations', () => {
   it('can decrypt encrypted params', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol003.createItemsKey();
-    const params = await protocol003.generateEncryptedParameters(
+    const params = await protocol003.generateEncryptedParametersAsync(
       payload,
       PayloadFormat.EncryptedString,
       key
     );
-    const decrypted = await protocol003.generateDecryptedParameters(
+    const decrypted = await protocol003.generateDecryptedParametersAsync(
       params,
       key
     );

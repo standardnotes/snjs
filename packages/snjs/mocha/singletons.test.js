@@ -15,7 +15,7 @@ describe('singletons', function () {
 
   function createPrefsPayload() {
     const params = {
-      uuid: Uuid.GenerateUuidSynchronously(),
+      uuid: Uuid.GenerateUuid(),
       content_type: ContentType.UserPrefs,
       content: {
         foo: 'bar',
@@ -36,8 +36,8 @@ describe('singletons', function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
     this.registerUser = async () => {
       await Factory.registerUserToApplication({
         application: this.application,
@@ -163,8 +163,8 @@ describe('singletons', function () {
   it('resolves registered predicate with signing in/out', async function () {
     await this.registerUser();
     await this.signOut();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
     await this.createExtMgr();
     this.expectedItemCount += 1;
     await Factory.registerUserToApplication({

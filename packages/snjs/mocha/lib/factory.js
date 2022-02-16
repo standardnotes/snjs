@@ -18,8 +18,8 @@ export async function createAndInitSimpleAppContext(
   }
 ) {
   const application = await createInitAppWithRandNamespace(environment);
-  const email = Uuid.GenerateUuidSynchronously();
-  const password = Uuid.GenerateUuidSynchronously();
+  const email = Uuid.GenerateUuid();
+  const password = Uuid.GenerateUuid();
   const newPassword = randomString();
 
   if (registerUser) {
@@ -43,8 +43,8 @@ export async function createAppContext(identifier) {
     identifier = `${Math.random()}`;
   }
   const application = await createApplication(identifier);
-  const email = Uuid.GenerateUuidSynchronously();
-  const password = Uuid.GenerateUuidSynchronously();
+  const email = Uuid.GenerateUuid();
+  const password = Uuid.GenerateUuid();
   const passcode = 'mypasscode';
   const handleChallenge = (challenge) => {
     const responses = [];
@@ -395,7 +395,7 @@ export function createItemParams(contentType) {
 
 export function generateUuid() {
   const crypto = new SNWebCrypto();
-  return crypto.generateUUIDSync();
+  return crypto.generateUUID();
 }
 
 export function createNoteParams({ title, text, dirty = true } = {}) {

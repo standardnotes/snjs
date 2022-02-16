@@ -6,7 +6,7 @@ const expect = chai.expect;
 
 describe('000 legacy protocol operations', () => {
   const application = Factory.createApplication();
-  const protocol000 = new SNProtocolOperator004(new SNWebCrypto());
+  const protocol004 = new SNProtocolOperator004(new SNWebCrypto());
 
   before(async () => {
     await Factory.initializeApplication(application);
@@ -22,7 +22,7 @@ describe('000 legacy protocol operations', () => {
 
       await Factory.expectThrowsAsync(
       () =>
-        protocol000.generateDecryptedParameters({
+        protocol004.generateDecryptedParametersSync({
           uuid: 'foo',
           content: string,
           content_type: 'foo',

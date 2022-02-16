@@ -71,7 +71,7 @@ export function getSubtleCrypto(): SubtleCrypto {
  * Generates a UUID syncronously
  * @access public
  */
-export function generateUUIDSync(): string {
+export function generateUUID(): string {
   return uuidv4()
 }
 

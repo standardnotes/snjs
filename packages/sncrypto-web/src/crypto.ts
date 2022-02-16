@@ -56,7 +56,7 @@ export class SNWebCrypto implements SNPureCrypto {
   }
 
   public generateUUID(): string {
-    return Utils.generateUUIDSync()
+    return Utils.generateUUID()
   }
 
   public timingSafeEqual(a: string, b: string): boolean {
