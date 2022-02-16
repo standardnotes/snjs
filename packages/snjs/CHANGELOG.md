@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.60.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.8...@standardnotes/snjs@2.60.0) (2022-02-16)
+
+
+### Features
+
+* syncronous crypto ([#600](https://github.com/standardnotes/snjs/issues/600)) ([66496f6](https://github.com/standardnotes/snjs/commit/66496f6487630689b76eae6cd15bcb0c31e6b9cc))
+
+
+
+
+
 ## [2.59.8](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.7...@standardnotes/snjs@2.59.8) (2022-02-16)
 
 **Note:** Version bump only for package @standardnotes/snjs
