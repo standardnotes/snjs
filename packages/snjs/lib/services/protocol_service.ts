@@ -1,3 +1,7 @@
+import {
+  SynchronousOperator,
+  AsynchronousOperator,
+} from './../protocol/operator/operator';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { SNLog } from './../log';
 import {
@@ -41,7 +45,6 @@ import {
 } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
-import { SNProtocolOperator } from '@Protocol/operator/operator';
 import { PayloadManager } from './payload_manager';
 import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
@@ -85,6 +88,20 @@ export enum KeyMode {
 /** The last protocol version to not use root-key based items keys */
 const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003;
 
+type AnyOperator =
+  | SNProtocolOperator001
+  | SNProtocolOperator002
+  | SNProtocolOperator003
+  | SNProtocolOperator004;
+
+function isAsyncOperator(
+  operator: AsynchronousOperator | SynchronousOperator
+): operator is AsynchronousOperator {
+  return (
+    (operator as AsynchronousOperator).generateDecryptedParametersAsync !==
+    undefined
+  );
+}
 /**
  * The protocol service is responsible for the encryption and decryption of payloads, and
  * handles delegation of a task to the respective protocol operator. Each version of the protocol
@@ -116,7 +133,7 @@ export class SNProtocolService
   extends PureService
   implements EncryptionDelegate {
   public crypto: SNPureCrypto;
-  private operators: Record<string, SNProtocolOperator> = {};
+  private operators: Record<string, AnyOperator> = {};
   private keyMode = KeyMode.RootKeyNone;
   private keyObservers: KeyChangeObserver[] = [];
   private rootKey?: SNRootKey;
@@ -137,17 +154,7 @@ export class SNProtocolService
     this.storageService = storageService;
     this.crypto = crypto;
 
-    if (isReactNativeEnvironment()) {
-      Uuid.SetGenerators(
-        this.crypto.generateUUID,
-        undefined // no sync implementation on React Native
-      );
-    } else {
-      Uuid.SetGenerators(
-        this.crypto.generateUUID,
-        this.crypto.generateUUIDSync
-      );
-    }
+    Uuid.SetGenerators(this.crypto.generateUUID);
 
     /** Hide rootKey enumeration */
     Object.defineProperty(this, 'rootKey', {
@@ -358,9 +365,7 @@ export class SNProtocolService
     }
   }
 
-  private createOperatorForVersion(
-    version: ProtocolVersion
-  ): SNProtocolOperator {
+  private createOperatorForVersion(version: ProtocolVersion): AnyOperator {
     if (version === ProtocolVersion.V001) {
       return new SNProtocolOperator001(this.crypto);
     } else if (version === ProtocolVersion.V002) {
@@ -498,11 +503,20 @@ export class SNProtocolService
     const version = key ? key.keyVersion : this.getLatestVersion();
     const format = this.payloadContentFormatForIntent(intent, key);
     const operator = this.operatorForVersion(version);
-    const encryptionParameters = await operator.generateEncryptedParameters(
-      payload,
-      format,
-      key
-    );
+    let encryptionParameters;
+    if (isAsyncOperator(operator)) {
+      encryptionParameters = await operator.generateEncryptedParametersAsync(
+        payload,
+        format,
+        key
+      );
+    } else {
+      encryptionParameters = operator.generateEncryptedParametersSync(
+        payload,
+        format,
+        key
+      );
+    }
     if (!encryptionParameters) {
       throw 'Unable to generate encryption parameters';
     }
@@ -576,10 +590,18 @@ export class SNProtocolService
     const source = payload.source;
     const operator = this.operatorForVersion(version);
     try {
-      const decryptedParameters = await operator.generateDecryptedParameters(
-        payload,
-        key
-      );
+      let decryptedParameters;
+      if (isAsyncOperator(operator)) {
+        decryptedParameters = await operator.generateDecryptedParametersAsync(
+          payload,
+          key
+        );
+      } else {
+        decryptedParameters = operator.generateDecryptedParametersSync(
+          payload,
+          key
+        ) as PurePayload;
+      }
       return CreateMaxPayloadFromAnyObject(
         payload,
         decryptedParameters,
@@ -600,8 +622,8 @@ export class SNProtocolService
   public async payloadsByDecryptingPayloads(
     payloads: PurePayload[],
     key?: SNRootKey | SNItemsKey
-  ) {
-    const decryptItem = async (encryptedPayload: PurePayload) => {
+  ): Promise<PurePayload[]> {
+    const decryptItem = (encryptedPayload: PurePayload) => {
       if (!encryptedPayload) {
         /** Keep in-counts similar to out-counts */
         return encryptedPayload;
@@ -1422,34 +1444,29 @@ export class SNProtocolService
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public async getEmbeddedPayloadAuthenticatedData(
+  public getEmbeddedPayloadAuthenticatedData(
     payload: PurePayload
-  ): Promise<
+  ):
     | RootKeyEncryptedAuthenticatedData
     | ItemAuthenticatedData
     | LegacyAttachedData
-    | undefined
-  > {
+    | undefined {
     const version = payload.version;
     if (!version) {
       return undefined;
     }
     const operator = this.operatorForVersion(version);
-    const authenticatedData = await operator.getPayloadAuthenticatedData(
-      payload
-    );
+    const authenticatedData = operator.getPayloadAuthenticatedData(payload);
     return authenticatedData;
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public async getKeyEmbeddedKeyParams(
-    key: SNItemsKey
-  ): Promise<SNRootKeyParams | undefined> {
+  public getKeyEmbeddedKeyParams(key: SNItemsKey): SNRootKeyParams | undefined {
     /** We can only look up key params for keys that are encrypted (as strings) */
     if (key.payload.format === PayloadFormat.DecryptedBareObject) {
       return undefined;
     }
-    const authenticatedData = await this.getEmbeddedPayloadAuthenticatedData(
+    const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(
       key.payload
     );
     if (!authenticatedData) {

@@ -55,11 +55,7 @@ export class SNWebCrypto implements SNPureCrypto {
     this.ready = null
   }
 
-  public generateUUIDSync(): string {
-    return Utils.generateUUIDSync()
-  }
-
-  public async generateUUID(): Promise<string> {
+  public generateUUID(): string {
     return Utils.generateUUIDSync()
   }
 

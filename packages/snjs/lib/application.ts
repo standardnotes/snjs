@@ -1696,7 +1696,7 @@ export class SNApplication implements ListedInterface {
     return this.migrationService.hasPendingMigrations();
   }
 
-  public generateUuid(): Promise<string> {
+  public generateUuid(): string {
     return Uuid.GenerateUuid();
   }
 

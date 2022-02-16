@@ -10,10 +10,7 @@ import { NotesDisplayCriteria } from './../protocol/collection/notes_display_cri
 import { PayloadManager } from './payload_manager';
 
 const setupRandomUuid = () => {
-  Uuid.SetGenerators(
-    () => Promise.resolve(String(Math.random())),
-    () => String(Math.random())
-  );
+  Uuid.SetGenerators(() => String(Math.random()));
 };
 
 const TAG_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';

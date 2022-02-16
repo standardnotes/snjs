@@ -688,6 +688,25 @@ export function nonSecureRandomIdentifier(): string {
   return `${Math.random() * 100}`.replace('.', '');
 }
 
+export function splitString(string: string, parts: number): string[] {
+  const outputLength = string.length;
+  const partLength = outputLength / parts;
+  const partitions = [];
+  for (let i = 0; i < parts; i++) {
+    const partition = string.slice(partLength * i, partLength * (i + 1));
+    partitions.push(partition);
+  }
+  return partitions;
+}
+
+export function firstHalfOfString(string: string): string {
+  return string.substring(0, string.length / 2);
+}
+
+export function secondHalfOfString(string: string): string {
+  return string.substring(string.length / 2, string.length);
+}
+
 export function log(instance: any, message: string, ...args: unknown[]): void {
   const service = instance.constructor.name;
   const date = new Date();
