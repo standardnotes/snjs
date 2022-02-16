@@ -21,7 +21,7 @@ describe('crypto operations', async function () {
   })
 
   it('generates valid uuid', async function () {
-    expect(webCrypto.generateUUIDSync().length).to.equal(36)
+    expect(webCrypto.generateUUID().length).to.equal(36)
   })
 
   it('properly encodes base64', async function () {

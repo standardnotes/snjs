@@ -66,7 +66,7 @@ describe('2020-01-15 web migration', () => {
         storage: embeddedStorage,
       },
     });
-    const encryptionParams = await operator003.generateEncryptedParameters(
+    const encryptionParams = await operator003.generateEncryptedParametersAsync(
       storagePayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -82,7 +82,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -203,7 +203,7 @@ describe('2020-01-15 web migration', () => {
       },
       content_type: ContentType.EncryptedStorage,
     });
-    const encryptionParams = await operator003.generateEncryptedParameters(
+    const encryptionParams = await operator003.generateEncryptedParametersAsync(
       storagePayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -219,7 +219,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -318,7 +318,7 @@ describe('2020-01-15 web migration', () => {
     }
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -441,7 +441,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteParams = await operator003.generateEncryptedParameters(
+    const noteParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.DecryptedBareObject
     );
@@ -524,7 +524,7 @@ describe('2020-01-15 web migration', () => {
     }
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator001.generateEncryptedParameters(
+    const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -676,7 +676,7 @@ describe('2020-01-15 web migration', () => {
         storage: embeddedStorage,
       },
     });
-    const encryptionParams = await operator002.generateEncryptedParameters(
+    const encryptionParams = await operator002.generateEncryptedParametersAsync(
       storagePayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -692,7 +692,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator002.generateEncryptedParameters(
+    const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey

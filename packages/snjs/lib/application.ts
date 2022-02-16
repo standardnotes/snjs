@@ -292,6 +292,7 @@ export class SNApplication implements ListedInterface {
    * This function will load all services in their correct order.
    */
   async prepareForLaunch(callback: LaunchCallback): Promise<void> {
+    await this.crypto.initialize();
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface
       .openDatabase(this.identifier)
@@ -1695,7 +1696,7 @@ export class SNApplication implements ListedInterface {
     return this.migrationService.hasPendingMigrations();
   }
 
-  public generateUuid(): Promise<string> {
+  public generateUuid(): string {
     return Uuid.GenerateUuid();
   }
 

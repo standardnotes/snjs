@@ -15,8 +15,8 @@ describe('backups', function () {
 
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
   });
 
   afterEach(async function () {
@@ -221,8 +221,8 @@ describe('backups', function () {
     const application = await Factory.createInitAppWithRandNamespace();
     await Factory.registerUserToApplication({
       application: application,
-      email: Uuid.GenerateUuidSynchronously(),
-      password: Uuid.GenerateUuidSynchronously(),
+      email: Uuid.GenerateUuid(),
+      password: Uuid.GenerateUuid(),
     });
     const backup = await application.createBackupFile(
       EncryptionIntent.FileDecrypted

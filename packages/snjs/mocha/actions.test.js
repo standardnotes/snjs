@@ -22,8 +22,8 @@ describe('actions service', () => {
     this.application = await Factory.createInitAppWithRandNamespace();
     this.itemManager = this.application.itemManager;
     this.actionsManager = this.application.actionsManager;
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
 
     await Factory.registerUserToApplication({
       application: this.application,

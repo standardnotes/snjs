@@ -4,7 +4,6 @@ import {
   from_base64,
   from_hex,
   from_string,
-  ready,
   to_base64,
   to_hex,
   to_string,
@@ -72,7 +71,7 @@ export function getSubtleCrypto(): SubtleCrypto {
  * Generates a UUID syncronously
  * @access public
  */
-export function generateUUIDSync(): string {
+export function generateUUID(): string {
   return uuidv4()
 }
 
@@ -80,8 +79,7 @@ export function generateUUIDSync(): string {
  * Converts a plain string into an ArrayBuffer
  * @param {string} string - A plain string
  */
-export async function stringToArrayBuffer(string: string): Promise<Uint8Array> {
-  await ready
+export function stringToArrayBuffer(string: string): Uint8Array {
   return from_string(string)
 }
 
@@ -89,10 +87,7 @@ export async function stringToArrayBuffer(string: string): Promise<Uint8Array> {
  * Converts an ArrayBuffer into a plain string
  * @param {ArrayBuffer} arrayBuffer
  */
-export async function arrayBufferToString(
-  arrayBuffer: ArrayBuffer,
-): Promise<string> {
-  await ready
+export function arrayBufferToString(arrayBuffer: ArrayBuffer): string {
   return to_string(arrayBuffer as Uint8Array)
 }
 
@@ -100,10 +95,7 @@ export async function arrayBufferToString(
  * Converts an ArrayBuffer into a hex string
  * @param arrayBuffer
  */
-export async function arrayBufferToHexString(
-  arrayBuffer: ArrayBuffer,
-): Promise<string> {
-  await ready
+export function arrayBufferToHexString(arrayBuffer: ArrayBuffer): string {
   return to_hex(Buffer.from(arrayBuffer))
 }
 
@@ -112,8 +104,7 @@ export async function arrayBufferToHexString(
  * @access public
  * @param hex - A hex string
  */
-export async function hexStringToArrayBuffer(hex: string): Promise<Uint8Array> {
-  await ready
+export function hexStringToArrayBuffer(hex: string): Uint8Array {
   return from_hex(hex)
 }
 
@@ -121,8 +112,7 @@ export async function hexStringToArrayBuffer(hex: string): Promise<Uint8Array> {
  * Converts a base64 string into an ArrayBuffer
  * @param base64 - A base64 string
  */
-export async function base64ToArrayBuffer(base64: string): Promise<Uint8Array> {
-  await ready
+export function base64ToArrayBuffer(base64: string): Uint8Array {
   return from_base64(base64, SN_BASE64_VARIANT)
 }
 
@@ -130,10 +120,7 @@ export async function base64ToArrayBuffer(base64: string): Promise<Uint8Array> {
  * Converts an ArrayBuffer into a base64 string
  * @param buffer
  */
-export async function arrayBufferToBase64(
-  arrayBuffer: ArrayBuffer,
-): Promise<string> {
-  await ready
+export function arrayBufferToBase64(arrayBuffer: ArrayBuffer): string {
   return to_base64(Buffer.from(arrayBuffer), SN_BASE64_VARIANT)
 }
 
@@ -141,8 +128,7 @@ export async function arrayBufferToBase64(
  * Converts a hex string into a base64 string
  * @param hex - A hex string
  */
-export async function hexToBase64(hex: string): Promise<string> {
-  await ready
+export function hexToBase64(hex: string): string {
   return to_base64(from_hex(hex), SN_BASE64_VARIANT)
 }
 
@@ -150,8 +136,7 @@ export async function hexToBase64(hex: string): Promise<string> {
  * Converts a base64 string into a hex string
  * @param base64 - A base64 string
  */
-export async function base64ToHex(base64: string): Promise<string> {
-  await ready
+export function base64ToHex(base64: string): string {
   return to_hex(from_base64(base64, SN_BASE64_VARIANT))
 }
 
@@ -160,8 +145,7 @@ export async function base64ToHex(base64: string): Promise<string> {
  * @param text - A plain string
  * @returns  A base64 encoded string
  */
-export async function base64Encode(text: string): Promise<string> {
-  await ready
+export function base64Encode(text: string): string {
   return to_base64(text, SN_BASE64_VARIANT)
 }
 
@@ -170,8 +154,7 @@ export async function base64Encode(text: string): Promise<string> {
  * @param base64String - A base64 encoded string
  * @returns A plain string
  */
-export async function base64Decode(base64String: string): Promise<string> {
-  await ready
+export function base64Decode(base64String: string): string {
   return to_string(from_base64(base64String, SN_BASE64_VARIANT))
 }
 

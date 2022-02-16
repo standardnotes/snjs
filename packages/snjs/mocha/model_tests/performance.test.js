@@ -19,7 +19,7 @@ describe('mapping performance', () => {
     const notes = [];
     for (let i = 0; i < tagCount; i++) {
       var tag = {
-        uuid: Uuid.GenerateUuidSynchronously(),
+        uuid: Uuid.GenerateUuid(),
         content_type: ContentType.Tag,
         content: {
           title: `${Math.random()}`,
@@ -30,7 +30,7 @@ describe('mapping performance', () => {
     }
     for (let i = 0; i < noteCount; i++) {
       const note = {
-        uuid: Uuid.GenerateUuidSynchronously(),
+        uuid: Uuid.GenerateUuid(),
         content_type: ContentType.Note,
         content: {
           title: `${Math.random()}`,
@@ -90,7 +90,7 @@ describe('mapping performance', () => {
     const notes = [];
 
     const tag = {
-      uuid: Uuid.GenerateUuidSynchronously(),
+      uuid: Uuid.GenerateUuid(),
       content_type: ContentType.Tag,
       content: {
         title: `${Math.random()}`,
@@ -100,7 +100,7 @@ describe('mapping performance', () => {
 
     for (let i = 0; i < noteCount; i++) {
       const note = {
-        uuid: Uuid.GenerateUuidSynchronously(),
+        uuid: Uuid.GenerateUuid(),
         content_type: ContentType.Note,
         content: {
           title: `${Math.random()}`,

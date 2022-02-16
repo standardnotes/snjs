@@ -362,8 +362,8 @@ describe('history manager', () => {
       this.application = await Factory.createInitAppWithRandNamespace();
       this.historyManager = this.application.historyManager;
       this.payloadManager = this.application.payloadManager;
-      this.email = Uuid.GenerateUuidSynchronously();
-      this.password = Uuid.GenerateUuidSynchronously();
+      this.email = Uuid.GenerateUuid();
+      this.password = Uuid.GenerateUuid();
       await Factory.registerUserToApplication({
         application: this.application,
         email: this.email,

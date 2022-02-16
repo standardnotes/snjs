@@ -39,7 +39,6 @@ import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 import { SNLog } from '@Lib/log';
 
-const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15;
 const INVALID_SESSION_RESPONSE_STATUS = 401;
@@ -261,15 +260,17 @@ export class SNSyncService extends PureService<
    * They are fed as a parameter so that callers don't have to await the loading, but can
    * await getting the raw payloads from storage
    */
-  public async loadDatabasePayloads(rawPayloads: any[]) {
+  public async loadDatabasePayloads(rawPayloads: any[]): Promise<void> {
     if (this.databaseLoaded) {
       throw 'Attempting to initialize already initialized local database.';
     }
+
     if (rawPayloads.length === 0) {
       this.databaseLoaded = true;
-      this.opStatus!.setDatabaseLoadStatus(0, 0, true);
+      this.opStatus.setDatabaseLoadStatus(0, 0, true);
       return;
     }
+
     const unsortedPayloads = rawPayloads
       .map((rawPayload) => {
         try {
@@ -290,6 +291,7 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
+
     const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
       itemsKeysPayloads
     );
@@ -297,32 +299,17 @@ export class SNSyncService extends PureService<
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
     );
-    /** Map in batches to give interface a chance to update */
-    const payloadCount = payloads.length;
-    const batchSize = DEFAULT_DATABASE_LOAD_BATCH_SIZE;
-    const numBatches = Math.ceil(payloadCount / batchSize);
-    for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
-      const currentPosition = batchIndex * batchSize;
-      const batch = payloads.slice(
-        currentPosition,
-        currentPosition + batchSize
-      );
-      const decrypted = await this.protocolService.payloadsByDecryptingPayloads(
-        batch
-      );
-      await this.payloadManager.emitPayloads(
-        decrypted,
-        PayloadSource.LocalRetrieved
-      );
-      this.notifyEvent(SyncEvent.LocalDataIncrementalLoad);
-      this.opStatus!.setDatabaseLoadStatus(
-        currentPosition,
-        payloadCount,
-        false
-      );
-    }
+
+    const decrypted = await this.protocolService.payloadsByDecryptingPayloads(
+      payloads
+    );
+    await this.payloadManager.emitPayloads(
+      decrypted,
+      PayloadSource.LocalRetrieved
+    );
+
     this.databaseLoaded = true;
-    this.opStatus!.setDatabaseLoadStatus(0, 0, true);
+    this.opStatus.setDatabaseLoadStatus(0, 0, true);
   }
 
   private async setLastSyncToken(token: string) {
@@ -367,18 +354,6 @@ export class SNSyncService extends PureService<
   private async itemsNeedingSync() {
     const items = this.itemManager.getDirtyItems();
     return items;
-  }
-
-  private async alternateUuidForItem(uuid: UuidString) {
-    const item = this.itemManager.findItem(uuid)!;
-    const payload = CreateMaxPayloadFromAnyObject(item);
-    const results = await PayloadsByAlternatingUuid(
-      payload,
-      this.payloadManager.getMasterCollection()
-    );
-    await this.payloadManager.emitPayloads(results, PayloadSource.LocalChanged);
-    await this.persistPayloads(results);
-    return this.itemManager.findItem(results[0].uuid!);
   }
 
   /**
