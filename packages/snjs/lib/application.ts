@@ -28,6 +28,7 @@ import {
   AnyRecord,
   ApplicationEventPayload,
 } from './types';
+import { ApplicationOptionsDefaults, ApplicationOptions } from './options';
 import {
   ApplicationEvent,
   SyncEvent,
@@ -242,7 +243,8 @@ export class SNApplication implements ListedInterface {
     private defaultHost: string,
     private appVersion: string,
     private webSocketUrl?: string,
-    private readonly runtime: Runtime = Runtime.Prod
+    private readonly runtime: Runtime = Runtime.Prod,
+    private readonly options: ApplicationOptions = ApplicationOptionsDefaults
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -2126,7 +2128,7 @@ export class SNApplication implements ListedInterface {
       this.payloadManager,
       this.apiService,
       this.historyManager,
-      this.deviceInterface.interval
+      this.options
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName);
