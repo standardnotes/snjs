@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.60.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.3...@standardnotes/snjs@2.60.4) (2022-02-16)
+
+
+### Bug Fixes
+
+* readd on load decryption batching ([9e89229](https://github.com/standardnotes/snjs/commit/9e89229ca0724fe5fd2cd48ad4d1ffc2688709c0))
+
+
+
+
+
 ## [2.60.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.2...@standardnotes/snjs@2.60.3) (2022-02-16)
 
 
