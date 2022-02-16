@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.60.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.2...@standardnotes/snjs@2.60.3) (2022-02-16)
+
+
+### Bug Fixes
+
+* safer tag handling in hierarchy check ([3a8b376](https://github.com/standardnotes/snjs/commit/3a8b376b5d7f1d44e8a725fe4638dd64e35507ba))
+
+
+
+
+
 ## [2.60.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.1...@standardnotes/snjs@2.60.2) (2022-02-16)
 
 **Note:** Version bump only for package @standardnotes/snjs
