@@ -594,3 +594,18 @@ export async function pinNote(application, note) {
     mutator.pinned = true;
   });
 }
+
+export async function alternateUuidForItem(application, uuid) {
+  const item = application.itemManager.findItem(uuid);
+  const payload = CreateMaxPayloadFromAnyObject(item);
+  const results = await PayloadsByAlternatingUuid(
+    payload,
+    application.payloadManager.getMasterCollection()
+  );
+  await application.payloadManager.emitPayloads(
+    results,
+    PayloadSource.LocalChanged
+  );
+  await application.syncService.persistPayloads(results);
+  return application.itemManager.findItem(results[0].uuid);
+}

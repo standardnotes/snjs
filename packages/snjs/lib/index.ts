@@ -213,6 +213,7 @@ export {
   PayloadByMerging,
   CopyPayload,
 } from '@Payloads/generator';
+export { PayloadsByAlternatingUuid } from './protocol/payloads';
 export {
   PayloadSource,
   isPayloadSourceRetrieved,

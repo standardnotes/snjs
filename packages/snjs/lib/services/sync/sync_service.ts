@@ -356,18 +356,6 @@ export class SNSyncService extends PureService<
     return items;
   }
 
-  private async alternateUuidForItem(uuid: UuidString) {
-    const item = this.itemManager.findItem(uuid)!;
-    const payload = CreateMaxPayloadFromAnyObject(item);
-    const results = await PayloadsByAlternatingUuid(
-      payload,
-      this.payloadManager.getMasterCollection()
-    );
-    await this.payloadManager.emitPayloads(results, PayloadSource.LocalChanged);
-    await this.persistPayloads(results);
-    return this.itemManager.findItem(results[0].uuid!);
-  }
-
   /**
    * Mark all items as dirty and needing sync, then persist to storage.
    */
