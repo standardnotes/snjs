@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.61.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.4...@standardnotes/snjs@2.61.0) (2022-02-16)
+
+
+### Features
+
+* application options in constructor params ([411be7c](https://github.com/standardnotes/snjs/commit/411be7c7f4f25aeae10f67b263296263ba1fda92))
+
+
+
+
+
 ## [2.60.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.3...@standardnotes/snjs@2.60.4) (2022-02-16)
 
 
