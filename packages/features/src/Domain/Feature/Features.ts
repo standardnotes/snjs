@@ -500,6 +500,11 @@ function serverFeatures(_: Runtime): ServerFeatureDescription[] {
       permission_name: PermissionName.DailyEmailBackup,
     },
     {
+      name: 'Sign-in email alerts',
+      identifier: FeatureIdentifier.SignInAlerts,
+      permission_name: PermissionName.SignInAlerts,
+    },
+    {
       identifier: FeatureIdentifier.DailyDropboxBackup,
       permission_name: PermissionName.DailyDropboxBackup,
     },
@@ -553,6 +558,12 @@ function clientFeatures(_: Runtime): ClientFeatureDescription[] {
       name: 'Listed Custom Domain',
       identifier: FeatureIdentifier.ListedCustomDomain,
       permission_name: PermissionName.ListedCustomDomain,
+      description: '',
+    },
+    {
+      name: 'Multiple accounts',
+      identifier: FeatureIdentifier.AccountSwitcher,
+      permission_name: PermissionName.AccountSwitcher,
       description: '',
     },
   ]
