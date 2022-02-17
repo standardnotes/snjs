@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.23.8](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.7...@standardnotes/domain-events@2.23.8) (2022-02-17)
+
+
+### Bug Fixes
+
+* add sign in alert enabled property to user signed in event ([2157a59](https://github.com/standardnotes/snjs/commit/2157a59db6f178689029e65d6dc92c3c39ede33f))
+
+
+
+
+
 ## [2.23.7](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.6...@standardnotes/domain-events@2.23.7) (2022-02-16)
 
 **Note:** Version bump only for package @standardnotes/domain-events
