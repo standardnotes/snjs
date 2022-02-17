@@ -30,23 +30,23 @@ describe('file encryptor', () => {
     encryptor = new FileEncryptor(file, crypto);
   });
 
-  it('should initialize header', async () => {
-    const header = await encryptor.initializeHeader();
+  it('should initialize header', () => {
+    const header = encryptor.initializeHeader();
 
     expect(header.length).toBeGreaterThan(0);
   });
 
-  it('pushBytes should return encrypted bytes', async () => {
-    await encryptor.initializeHeader();
-    const encryptedBytes = await encryptor.pushBytes(new Uint8Array(), false);
+  it('pushBytes should return encrypted bytes', () => {
+    encryptor.initializeHeader();
+    const encryptedBytes = encryptor.pushBytes(new Uint8Array(), false);
 
     expect(encryptedBytes).toBeInstanceOf(Uint8Array);
   });
 
-  it('pushBytes with last chunk should pass final tag', async () => {
-    await encryptor.initializeHeader();
+  it('pushBytes with last chunk should pass final tag', () => {
+    encryptor.initializeHeader();
     const decryptedBytes = new Uint8Array();
-    await encryptor.pushBytes(decryptedBytes, true);
+    encryptor.pushBytes(decryptedBytes, true);
 
     expect(crypto.xchacha20StreamEncryptorPush).toHaveBeenCalledWith(
       expect.any(Object),
@@ -56,10 +56,10 @@ describe('file encryptor', () => {
     );
   });
 
-  it('pushBytes with not last chunk should not pass final tag', async () => {
-    await encryptor.initializeHeader();
+  it('pushBytes with not last chunk should not pass final tag', () => {
+    encryptor.initializeHeader();
     const decryptedBytes = new Uint8Array();
-    await encryptor.pushBytes(decryptedBytes, false);
+    encryptor.pushBytes(decryptedBytes, false);
 
     expect(crypto.xchacha20StreamEncryptorPush).toHaveBeenCalledWith(
       expect.any(Object),

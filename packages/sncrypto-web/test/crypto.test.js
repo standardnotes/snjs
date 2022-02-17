@@ -205,9 +205,9 @@ describe('crypto operations', async function () {
     )
     const bigText = await bigFile.text()
     const plaintext = bigText
-    const plainBuffer = await stringToArrayBuffer(plaintext)
-    const encryptor = await webCrypto.xchacha20StreamEncryptInitEncryptor(key)
-    const header = await base64StringToArrayBuffer(encryptor.header)
+    const plainBuffer = stringToArrayBuffer(plaintext)
+    const encryptor = webCrypto.xchacha20StreamEncryptInitEncryptor(key)
+    const header = base64StringToArrayBuffer(encryptor.header)
 
     let encryptedBuffer = Buffer.concat([header])
     const pushChunkSize = plainBuffer.length / 200
@@ -220,14 +220,14 @@ describe('crypto operations', async function () {
         i + pushChunkSize > plainBuffer.length
           ? plainBuffer.length
           : i + pushChunkSize
-      const chunk = await webCrypto.xchacha20StreamEncryptorPush(
+      const chunk = webCrypto.xchacha20StreamEncryptorPush(
         encryptor,
         plainBuffer.slice(i, readUntil),
       )
       encryptedBuffer = Buffer.concat([encryptedBuffer, chunk])
     }
 
-    const decryptor = await webCrypto.xchacha20StreamEncryptInitDecryptor(
+    const decryptor = webCrypto.xchacha20StreamEncryptInitDecryptor(
       header,
       key,
     )
@@ -242,14 +242,14 @@ describe('crypto operations', async function () {
         i + pullChunkSize > encryptedBuffer.length
           ? encryptedBuffer.length
           : i + pullChunkSize
-      const chunk = await webCrypto.xchacha20StreamDecryptorPush(
+      const chunk = webCrypto.xchacha20StreamDecryptorPush(
         decryptor,
         encryptedBuffer.slice(i, readUntil),
       )
       decryptedBuffer = Buffer.concat([decryptedBuffer, chunk.message])
     }
 
-    const decryptedPlain = await arrayBufferToString(decryptedBuffer)
+    const decryptedPlain = arrayBufferToString(decryptedBuffer)
     expect(decryptedPlain).to.equal(plaintext)
   })
 

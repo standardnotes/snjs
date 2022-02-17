@@ -35,7 +35,7 @@ export class SNFileService extends PureService {
   }
 
   public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
-    const remoteIdentifier = await Uuid.GenerateUuid();
+    const remoteIdentifier = Uuid.GenerateUuid();
     const apiToken = await this.apiService.createFileValetToken(
       remoteIdentifier,
       'write'
@@ -44,7 +44,7 @@ export class SNFileService extends PureService {
       throw new Error('Could not obtain files api valet token');
     }
 
-    const key = await this.crypto.generateRandomKey(FileProtocolV1.KeySize);
+    const key = this.crypto.generateRandomKey(FileProtocolV1.KeySize);
     const fileParams: DecryptedFileInterface = {
       key,
       remoteIdentifier,
@@ -57,7 +57,7 @@ export class SNFileService extends PureService {
       this.apiService
     );
 
-    await uploadOperation.initializeHeader();
+    uploadOperation.initializeHeader();
 
     const uploadSessionStarted = await this.apiService.startUploadSession(
       apiToken

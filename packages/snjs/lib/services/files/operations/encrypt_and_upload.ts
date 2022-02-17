@@ -20,8 +20,8 @@ export class EncryptAndUploadFileOperation {
     this.uploader = new FileUploader(file, this.api);
   }
 
-  public async initializeHeader(): Promise<string> {
-    const header = await this.encryptor.initializeHeader();
+  public initializeHeader(): string {
+    const header = this.encryptor.initializeHeader();
     this.encryptionHeader = header;
 
     return header;
@@ -47,14 +47,14 @@ export class EncryptAndUploadFileOperation {
     return this.file.remoteIdentifier;
   }
 
-  public async pushBytes(
+  public pushBytes(
     decryptedBytes: Uint8Array,
     chunkId: number,
     isFinalChunk: boolean
   ): Promise<boolean> {
     this.rawSize += decryptedBytes.byteLength;
 
-    const encryptedBytes = await this.encryptor.pushBytes(
+    const encryptedBytes = this.encryptor.pushBytes(
       decryptedBytes,
       isFinalChunk
     );

@@ -13,19 +13,17 @@ export class FileDecryptor {
     private crypto: SNPureCrypto
   ) {}
 
-  public async initialize(): Promise<void> {
-    this.decryptor = await this.crypto.xchacha20StreamInitDecryptor(
+  public initialize(): void {
+    this.decryptor = this.crypto.xchacha20StreamInitDecryptor(
       this.file.encryptionHeader,
       this.file.key
     );
   }
 
-  public async decryptBytes(
+  public decryptBytes(
     encryptedBytes: Uint8Array
-  ): Promise<
-    { decryptedBytes: Uint8Array; isFinalChunk: boolean } | undefined
-  > {
-    const result = await this.crypto.xchacha20StreamDecryptorPush(
+  ): { decryptedBytes: Uint8Array; isFinalChunk: boolean } | undefined {
+    const result = this.crypto.xchacha20StreamDecryptorPush(
       this.decryptor,
       encryptedBytes,
       this.file.remoteIdentifier

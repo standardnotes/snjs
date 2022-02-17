@@ -29,7 +29,7 @@ export class DownloadAndDecryptFileOperation {
   }
 
   public async run(): Promise<void> {
-    await this.decryptor.initialize();
+    this.decryptor.initialize();
 
     this.downloader.download();
 
@@ -38,8 +38,8 @@ export class DownloadAndDecryptFileOperation {
     });
   }
 
-  private async onDownloadedBytes(encryptedBytes: Uint8Array): Promise<void> {
-    const result = await this.decryptor.decryptBytes(encryptedBytes);
+  private onDownloadedBytes(encryptedBytes: Uint8Array): void {
+    const result = this.decryptor.decryptBytes(encryptedBytes);
 
     if (!result) {
       this.downloader.abort();

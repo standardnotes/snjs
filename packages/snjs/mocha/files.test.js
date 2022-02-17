@@ -168,7 +168,7 @@ describe.only('files', function () {
     expect(downloadedBytes).to.eql(buffer);
   });
 
-  it.only('should encrypt and upload big file', async function () {
+  it('should encrypt and upload big file', async function () {
     const response = await fetch('/packages/snjs/mocha/assets/two_mb_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
 

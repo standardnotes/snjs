@@ -30,15 +30,25 @@ describe('encrypt and upload', () => {
   });
 
   it('should initialize encryption header', async () => {
-    operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService);
-    const header = await operation.initializeHeader();
+    operation = new EncryptAndUploadFileOperation(
+      file,
+      'api-token',
+      crypto,
+      apiService
+    );
+    const header = operation.initializeHeader();
 
     expect(header.length).toBeGreaterThan(0);
   });
 
   it('should return true when a chunk is uploaded', async () => {
-    operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService);
-    await operation.initializeHeader();
+    operation = new EncryptAndUploadFileOperation(
+      file,
+      'api-token',
+      crypto,
+      apiService
+    );
+    operation.initializeHeader();
 
     const bytes = new Uint8Array();
     const success = await operation.pushBytes(bytes, 2, false);

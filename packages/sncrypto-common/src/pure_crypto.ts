@@ -158,25 +158,25 @@ export interface SNPureCrypto {
     assocData: Utf8String | Uint8Array
   ): Utf8String | null;
 
-  xchacha20StreamInitEncryptor(key: HexString): Promise<StreamEncryptor>;
+  xchacha20StreamInitEncryptor(key: HexString): StreamEncryptor;
 
   xchacha20StreamEncryptorPush(
     encryptor: StreamEncryptor,
     plainBuffer: Uint8Array,
     assocData: Utf8String,
     tag?: SodiumConstant
-  ): Promise<Uint8Array>;
+  ): Uint8Array;
 
   xchacha20StreamInitDecryptor(
     header: Base64String,
     key: HexString
-  ): Promise<StreamDecryptor>;
+  ): StreamDecryptor;
 
   xchacha20StreamDecryptorPush(
     decryptor: StreamDecryptor,
     encryptedBuffer: Uint8Array,
     assocData: Utf8String
-  ): Promise<{ message: Uint8Array; tag: SodiumConstant } | false>;
+  ): { message: Uint8Array; tag: SodiumConstant } | false;
 
   /**
    * Converts a plain string into base64

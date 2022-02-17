@@ -27,8 +27,8 @@ describe('file decryptor', () => {
     decryptor = new FileDecryptor(file, crypto);
   });
 
-  it('initialize', async () => {
-    await decryptor.initialize();
+  it('initialize', () => {
+    decryptor.initialize();
 
     expect(crypto.xchacha20StreamInitDecryptor).toHaveBeenCalledWith(
       file.encryptionHeader,
@@ -36,10 +36,10 @@ describe('file decryptor', () => {
     );
   });
 
-  it('decryptBytes should return decrypted bytes', async () => {
-    await decryptor.initialize();
+  it('decryptBytes should return decrypted bytes', () => {
+    decryptor.initialize();
     const encryptedBytes = new Uint8Array([0xaa]);
-    const result = await decryptor.decryptBytes(encryptedBytes);
+    const result = decryptor.decryptBytes(encryptedBytes);
 
     expect(crypto.xchacha20StreamDecryptorPush).toHaveBeenCalledWith(
       expect.any(Object),
