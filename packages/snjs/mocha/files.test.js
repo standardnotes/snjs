@@ -70,7 +70,7 @@ describe.only('files', function () {
   const downloadFile = async (fileService, itemManager, remoteIdentifier) => {
     const file = itemManager
       .getItems(ContentType.File)
-      .find((file) => file.content.remoteIdentifier === remoteIdentifier);
+      .find((file) => file.remoteIdentifier === remoteIdentifier);
 
     let receivedBytes = new Uint8Array();
 
