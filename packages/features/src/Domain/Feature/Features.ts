@@ -254,7 +254,7 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Bold Editor',
     identifier: FeatureIdentifier.BoldEditor,
-    version: '1.3.3',
+    version: '1.3.5',
     note_type: NoteType.RichText,
     file_type: 'html',
     component_permissions: [
