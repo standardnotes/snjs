@@ -19,8 +19,8 @@ describe('storage manager', function () {
     this.application = await Factory.createInitAppWithRandNamespace(
       Environment.Mobile
     );
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
   });
 
   afterEach(async function () {

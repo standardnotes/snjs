@@ -1,4 +1,5 @@
 export enum FeatureIdentifier {
+  AccountSwitcher = 'com.standardnotes.account-switcher',
   AutobiographyTheme = 'org.standardnotes.theme-autobiography',
   BoldEditor = 'org.standardnotes.bold-editor',
   CloudLink = 'org.standardnotes.cloudlink',
@@ -12,6 +13,7 @@ export enum FeatureIdentifier {
   Files25GB = 'org.standardnotes.files-25-gb',
   Files5GB = 'org.standardnotes.files-5-gb',
   FocusedTheme = 'org.standardnotes.theme-focus',
+  FocusMode = 'org.standardnotes.focus-mode',
   FoldersComponent = 'org.standardnotes.folders',
   FuturaTheme = 'org.standardnotes.theme-futura',
   ListedCustomDomain = 'org.standardnotes.listed-custom-domain',
@@ -26,15 +28,15 @@ export enum FeatureIdentifier {
   NoteHistoryUnlimited = 'org.standardnotes.note-history-unlimited',
   PlusEditor = 'org.standardnotes.plus-editor',
   SheetsEditor = 'org.standardnotes.standard-sheets',
+  SignInAlerts = 'com.standardnotes.sign-in-alerts',
+  SmartFilters = 'org.standardnotes.smart-filters',
   SolarizedDarkTheme = 'org.standardnotes.theme-solarized-dark',
   TagNesting = 'org.standardnotes.tag-nesting',
-  SmartFilters = 'org.standardnotes.smart-filters',
   TaskEditor = 'org.standardnotes.simple-task-editor',
   TitaniumTheme = 'org.standardnotes.theme-titanium',
   TokenVaultEditor = 'org.standardnotes.token-vault',
   TwoFactorAuth = 'org.standardnotes.two-factor-auth',
   TwoFactorAuthManager = 'org.standardnotes.mfa-link',
-  FocusMode = 'org.standardnotes.focus-mode',
 }
 
 export enum DeprecatedFeatureIdentifier {

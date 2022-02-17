@@ -56,7 +56,7 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
-import { Copy } from '..';
+import { Copy, lastElement } from '../utils';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -439,8 +439,22 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.hasOnlineSubscription() || this.hasOfflineRepo();
   }
 
-  public hasRole(role: RoleName): boolean {
-    return this.roles.includes(role);
+  public rolesBySorting(roles: RoleName[]): RoleName[] {
+    return Object.values(RoleName).filter((role) => roles.includes(role));
+  }
+
+  public hasMinimumRole(role: RoleName): boolean {
+    const sortedAllRoles = Object.values(RoleName);
+
+    const sortedUserRoles = this.rolesBySorting(this.roles);
+
+    const highestUserRoleIndex = sortedAllRoles.indexOf(
+      lastElement(sortedUserRoles) as RoleName
+    );
+
+    const indexOfRoleToCheck = sortedAllRoles.indexOf(role);
+
+    return indexOfRoleToCheck <= highestUserRoleIndex;
   }
 
   public isFeatureDeprecated(featureId: string): boolean {

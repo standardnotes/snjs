@@ -29,6 +29,8 @@ export enum SodiumConstant {
  * Interface that clients have to implement to use snjs
  */
 export interface SNPureCrypto {
+  initialize(): Promise<void>;
+
   /**
    * Derives a key from a password and salt using PBKDF2 via WebCrypto.
    * @param password - utf8 string
@@ -49,7 +51,7 @@ export interface SNPureCrypto {
    * @param bits - Length of key in bits
    * @returns A string key in hex format
    */
-  generateRandomKey(bits: number): Promise<string>;
+  generateRandomKey(bits: number): string;
 
   /**
    * @legacy
@@ -124,7 +126,7 @@ export interface SNPureCrypto {
     iterations: number,
     bytes: number,
     length: number
-  ): Promise<HexString>;
+  ): HexString;
 
   /**
    * Encrypt a message (and associated data) with XChaCha20-Poly1305.
@@ -139,7 +141,7 @@ export interface SNPureCrypto {
     nonce: HexString,
     key: HexString,
     assocData: Utf8String
-  ): Promise<Base64String>;
+  ): Base64String;
 
   /**
    * Decrypt a message (and associated data) with XChaCha20-Poly1305
@@ -154,7 +156,7 @@ export interface SNPureCrypto {
     nonce: HexString,
     key: HexString,
     assocData: Utf8String | Uint8Array
-  ): Promise<Utf8String | null>;
+  ): Utf8String | null;
 
   xchacha20StreamInitEncryptor(key: HexString): Promise<StreamEncryptor>;
 
@@ -181,27 +183,21 @@ export interface SNPureCrypto {
    * @param text - A plain string
    * @returns  A base64 encoded string
    */
-  base64Encode(text: Utf8String): Promise<Base64String>;
+  base64Encode(text: Utf8String): Base64String;
 
   /**
    * Converts a base64 string into a plain string
    * @param base64String - A base64 encoded string
    * @returns A plain string
    */
-  base64Decode(base64String: Base64String): Promise<Utf8String>;
+  base64Decode(base64String: Base64String): Utf8String;
 
   deinit(): void;
 
   /**
    * Generates a UUID string syncronously.
    */
-  generateUUIDSync(): string;
-
-  /**
-   * Generates a UUID string asyncronously.
-   * Can be overriden by native platforms to provide async implementation
-   */
-  generateUUID(): Promise<string>;
+  generateUUID(): string;
 
   /**
    * Constant-time string comparison

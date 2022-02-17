@@ -3,6 +3,7 @@ import { SNHistoryManager } from './../history/history_manager';
 import { SyncEvent } from '@Services/sync/events';
 import { StorageKey } from '@Lib/storage_keys';
 import { UuidString } from './../../types';
+import { ApplicationOptions } from './../../options';
 import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
 import { MutationType, SNItem } from '@Models/core/item';
@@ -28,7 +29,6 @@ import { DeltaOutOfSync } from '@Payloads/deltas';
 import { PayloadField } from '@Payloads/fields';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
-import { PayloadsByAlternatingUuid } from '@Payloads/functions';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { EncryptionIntent } from '@Protocol/intents';
 import { ContentType } from '@standardnotes/common';
@@ -39,7 +39,6 @@ import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 import { SNLog } from '@Lib/log';
 
-const DEFAULT_DATABASE_LOAD_BATCH_SIZE = 100;
 const DEFAULT_MAX_DISCORDANCE = 5;
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15;
 const INVALID_SESSION_RESPONSE_STATUS = 401;
@@ -115,7 +114,6 @@ export class SNSyncService extends PureService<
   SyncEvent,
   SyncResponse | { source: SyncSources }
 > {
-  private interval: any;
   private state?: SyncState;
   private opStatus!: SyncOpStatus;
 
@@ -156,17 +154,9 @@ export class SNSyncService extends PureService<
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
     private historyService: SNHistoryManager,
-    interval: any
+    private readonly options: ApplicationOptions
   ) {
     super();
-    this.itemManager = itemManager;
-    this.sessionManager = sessionManager;
-    this.protocolService = protocolService;
-    this.payloadManager = payloadManager;
-    this.storageService = storageService;
-    this.apiService = apiService;
-    this.interval = interval;
-
     this.initializeStatus();
     this.initializeState();
   }
@@ -189,8 +179,7 @@ export class SNSyncService extends PureService<
     (this.payloadManager as unknown) = undefined;
     (this.storageService as unknown) = undefined;
     (this.apiService as unknown) = undefined;
-    this.interval = undefined;
-    this.state!.reset();
+    this.state?.reset();
     this.opStatus.reset();
     this.state = undefined;
     (this.opStatus as unknown) = undefined;
@@ -200,7 +189,7 @@ export class SNSyncService extends PureService<
   }
 
   private initializeStatus() {
-    this.opStatus = new SyncOpStatus(this.interval, (event) => {
+    this.opStatus = new SyncOpStatus(setInterval, (event) => {
       this.notifyEvent(event);
     });
   }
@@ -261,15 +250,17 @@ export class SNSyncService extends PureService<
    * They are fed as a parameter so that callers don't have to await the loading, but can
    * await getting the raw payloads from storage
    */
-  public async loadDatabasePayloads(rawPayloads: any[]) {
+  public async loadDatabasePayloads(rawPayloads: any[]): Promise<void> {
     if (this.databaseLoaded) {
       throw 'Attempting to initialize already initialized local database.';
     }
+
     if (rawPayloads.length === 0) {
       this.databaseLoaded = true;
-      this.opStatus!.setDatabaseLoadStatus(0, 0, true);
+      this.opStatus.setDatabaseLoadStatus(0, 0, true);
       return;
     }
+
     const unsortedPayloads = rawPayloads
       .map((rawPayload) => {
         try {
@@ -290,6 +281,7 @@ export class SNSyncService extends PureService<
       return payload.content_type === ContentType.ItemsKey;
     });
     subtractFromArray(payloads, itemsKeysPayloads);
+
     const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
       itemsKeysPayloads
     );
@@ -297,9 +289,15 @@ export class SNSyncService extends PureService<
       decryptedItemsKeys,
       PayloadSource.LocalRetrieved
     );
-    /** Map in batches to give interface a chance to update */
+
+    /**
+     * Map in batches to give interface a chance to update. Note that total decryption
+     * time is constant regardless of batch size. Decrypting 3000 items all at once or in
+     * batches will result in the same time spent. It's the emitting/painting/rendering
+     * that requires batch size optimization.
+     */
     const payloadCount = payloads.length;
-    const batchSize = DEFAULT_DATABASE_LOAD_BATCH_SIZE;
+    const batchSize = this.options.loadBatchSize;
     const numBatches = Math.ceil(payloadCount / batchSize);
     for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
       const currentPosition = batchIndex * batchSize;
@@ -315,14 +313,12 @@ export class SNSyncService extends PureService<
         PayloadSource.LocalRetrieved
       );
       this.notifyEvent(SyncEvent.LocalDataIncrementalLoad);
-      this.opStatus!.setDatabaseLoadStatus(
-        currentPosition,
-        payloadCount,
-        false
-      );
+      this.opStatus.setDatabaseLoadStatus(currentPosition, payloadCount, false);
+      await sleep(1, false);
     }
+
     this.databaseLoaded = true;
-    this.opStatus!.setDatabaseLoadStatus(0, 0, true);
+    this.opStatus.setDatabaseLoadStatus(0, 0, true);
   }
 
   private async setLastSyncToken(token: string) {
@@ -367,18 +363,6 @@ export class SNSyncService extends PureService<
   private async itemsNeedingSync() {
     const items = this.itemManager.getDirtyItems();
     return items;
-  }
-
-  private async alternateUuidForItem(uuid: UuidString) {
-    const item = this.itemManager.findItem(uuid)!;
-    const payload = CreateMaxPayloadFromAnyObject(item);
-    const results = await PayloadsByAlternatingUuid(
-      payload,
-      this.payloadManager.getMasterCollection()
-    );
-    await this.payloadManager.emitPayloads(results, PayloadSource.LocalChanged);
-    await this.persistPayloads(results);
-    return this.itemManager.findItem(results[0].uuid!);
   }
 
   /**

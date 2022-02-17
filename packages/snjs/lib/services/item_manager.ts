@@ -973,14 +973,23 @@ export class ItemManager extends PureService {
    * @returns Array of tags where the front of the array represents the top of the tree.
    */
   getTagParentChain(tagUuid: UuidString): SNTag[] {
-    const tag = this.findItem(tagUuid) as SNTag;
+    const tag = this.findItem<SNTag>(tagUuid);
+    if (!tag) {
+      return [];
+    }
+
     let parentId = tag.parentId;
     const chain: SNTag[] = [];
+
     while (parentId) {
-      const parent = this.findItem(parentId) as SNTag;
+      const parent = this.findItem<SNTag>(parentId);
+      if (!parent) {
+        return chain;
+      }
       chain.unshift(parent);
       parentId = parent.parentId;
     }
+
     return chain;
   }
 

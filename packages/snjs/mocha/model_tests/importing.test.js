@@ -11,8 +11,8 @@ describe('importing', function () {
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
     Factory.handlePasswordChallenges(this.application, this.password);
     localStorage.clear();
   });
@@ -303,7 +303,7 @@ describe('importing', function () {
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
-    this.email = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
     Factory.handlePasswordChallenges(this.application, this.password);
     await Factory.registerUserToApplication({
       application: this.application,
@@ -334,7 +334,7 @@ describe('importing', function () {
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
-    this.email = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
     Factory.handlePasswordChallenges(this.application, this.password);
     await Factory.registerUserToApplication({
       application: this.application,
@@ -614,7 +614,7 @@ describe('importing', function () {
     await Factory.registerOldUser({
       application: this.application,
       email: this.email,
-      password: Uuid.GenerateUuidSynchronously(),
+      password: Uuid.GenerateUuid(),
       version: oldVersion,
     });
 

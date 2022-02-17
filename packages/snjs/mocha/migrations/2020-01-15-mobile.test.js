@@ -65,7 +65,7 @@ describe('2020-01-15 mobile migration', () => {
         },
       },
     });
-    const encryptedKeyParams = await operator003.generateEncryptedParameters(
+    const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(
       keyPayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -90,7 +90,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -280,7 +280,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -445,7 +445,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -558,7 +558,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -690,8 +690,8 @@ describe('2020-01-15 mobile migration', () => {
       Environment.Mobile,
       Platform.Ios
     );
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
+    const email = Uuid.GenerateUuid();
+    const password = Uuid.GenerateUuid();
     /** Register with 003 account */
     await Factory.registerOldUser({
       application: tempApp,
@@ -726,7 +726,7 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -838,7 +838,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator002.generateEncryptedParameters(
+    const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -929,7 +929,7 @@ describe('2020-01-15 mobile migration', () => {
     });
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator001.generateEncryptedParameters(
+    const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey
@@ -1085,7 +1085,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteParams = await operator003.generateEncryptedParameters(
+    const noteParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.DecryptedBareObject
     );
@@ -1239,7 +1239,7 @@ describe('2020-01-15 mobile migration', () => {
         },
       },
     });
-    const encryptedKeyParams = await operator003.generateEncryptedParameters(
+    const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(
       keyPayload,
       PayloadFormat.EncryptedString,
       passcodeKey
@@ -1267,7 +1267,7 @@ describe('2020-01-15 mobile migration', () => {
     );
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload();
-    const noteEncryptionParams = await operator003.generateEncryptedParameters(
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
       PayloadFormat.EncryptedString,
       accountKey

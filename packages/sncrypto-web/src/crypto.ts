@@ -50,27 +50,27 @@ export class SNWebCrypto implements SNPureCrypto {
     this.ready = sodium.ready
   }
 
+  async initialize(): Promise<void> {
+    await this.ready
+  }
+
   deinit(): void {
     this.ready = null
   }
 
-  public generateUUIDSync(): string {
-    return Utils.generateUUIDSync()
-  }
-
-  public async generateUUID(): Promise<string> {
-    return Utils.generateUUIDSync()
+  public generateUUID(): string {
+    return Utils.generateUUID()
   }
 
   public timingSafeEqual(a: string, b: string): boolean {
     return timingSafeEqual(a, b)
   }
 
-  public async base64Encode(text: Utf8String): Promise<string> {
+  public base64Encode(text: Utf8String): string {
     return Utils.base64Encode(text)
   }
 
-  public async base64Decode(base64String: Base64String): Promise<string> {
+  public base64Decode(base64String: Base64String): string {
     return Utils.base64Decode(base64String)
   }
 
@@ -91,7 +91,7 @@ export class SNWebCrypto implements SNPureCrypto {
     return this.webCryptoDeriveBits(key, salt, iterations, length)
   }
 
-  public async generateRandomKey(bits: number): Promise<string> {
+  public generateRandomKey(bits: number): string {
     const bytes = bits / 8
     const arrayBuffer = Utils.getGlobalScope().crypto.getRandomValues(
       new Uint8Array(bytes),
@@ -167,7 +167,7 @@ export class SNWebCrypto implements SNPureCrypto {
   }
 
   public async sha256(text: string): Promise<string> {
-    const textData = await Utils.stringToArrayBuffer(text)
+    const textData = Utils.stringToArrayBuffer(text)
     const digest = await crypto.subtle.digest(WebCryptoAlgs.Sha256, textData)
     return Utils.arrayBufferToHexString(digest)
   }
@@ -265,18 +265,17 @@ export class SNWebCrypto implements SNPureCrypto {
       })
   }
 
-  public async argon2(
+  public argon2(
     password: Utf8String,
     salt: HexString,
     iterations: number,
     bytes: number,
     length: number,
-  ): Promise<HexString> {
-    await this.ready
+  ): HexString {
     const result = sodium.crypto_pwhash(
       length,
-      await Utils.stringToArrayBuffer(password),
-      await Utils.hexStringToArrayBuffer(salt),
+      Utils.stringToArrayBuffer(password),
+      Utils.hexStringToArrayBuffer(salt),
       iterations,
       bytes,
       sodium.crypto_pwhash_ALG_DEFAULT,
@@ -285,13 +284,12 @@ export class SNWebCrypto implements SNPureCrypto {
     return result
   }
 
-  public async xchacha20Encrypt(
+  public xchacha20Encrypt(
     plaintext: Utf8String,
     nonce: HexString,
     key: HexString,
     assocData: Utf8String,
-  ): Promise<Base64String> {
-    await this.ready
+  ): Base64String {
     if (nonce.length !== 48) {
       throw Error('Nonce must be 24 bytes')
     }
@@ -299,29 +297,28 @@ export class SNWebCrypto implements SNPureCrypto {
       plaintext,
       assocData,
       null,
-      await Utils.hexStringToArrayBuffer(nonce),
-      await Utils.hexStringToArrayBuffer(key),
+      Utils.hexStringToArrayBuffer(nonce),
+      Utils.hexStringToArrayBuffer(key),
     )
     return Utils.arrayBufferToBase64(arrayBuffer)
   }
 
-  public async xchacha20Decrypt(
+  public xchacha20Decrypt(
     ciphertext: Base64String,
     nonce: HexString,
     key: HexString,
     assocData: Utf8String | Uint8Array,
-  ): Promise<Utf8String | null> {
-    await this.ready
+  ): Utf8String | null {
     if (nonce.length !== 48) {
       throw Error('Nonce must be 24 bytes')
     }
     try {
       return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         null,
-        await Utils.base64ToArrayBuffer(ciphertext),
+        Utils.base64ToArrayBuffer(ciphertext),
         assocData,
-        await Utils.hexStringToArrayBuffer(nonce),
-        await Utils.hexStringToArrayBuffer(key),
+        Utils.hexStringToArrayBuffer(nonce),
+        Utils.hexStringToArrayBuffer(key),
         'text',
       )
     } catch {

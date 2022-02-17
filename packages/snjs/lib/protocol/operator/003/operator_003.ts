@@ -1,3 +1,6 @@
+import { splitString } from '@Lib/utils';
+import { CreateItemFromPayload } from '@Models/generator';
+import { SNItemsKey } from '@Models/app/items_key';
 import { ItemsKeyContent } from './../operator';
 import { SNRootKey } from './../../root_key';
 import { V003Algorithm } from './../algorithms';
@@ -8,6 +11,10 @@ import {
 } from './../../key_params';
 import { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002';
 import { ProtocolVersion } from '@Protocol/versions';
+import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { ContentType } from '@standardnotes/common';
+import { FillItemContent } from '@Models/functions';
+import { Uuid } from '@Lib/uuid';
 
 /**
  * @legacy
@@ -16,14 +23,14 @@ import { ProtocolVersion } from '@Protocol/versions';
  * changed, and overrides functions where behavior may differ.
  */
 export class SNProtocolOperator003 extends SNProtocolOperator002 {
-  get version() {
+  get version(): string {
     return ProtocolVersion.V003;
   }
 
-  protected async generateNewItemsKeyContent() {
+  protected generateNewItemsKeyContent(): ItemsKeyContent {
     const keyLength = V003Algorithm.EncryptionKeyLength;
-    const itemsKey = await this.crypto.generateRandomKey(keyLength);
-    const authKey = await this.crypto.generateRandomKey(keyLength);
+    const itemsKey = this.crypto.generateRandomKey(keyLength);
+    const authKey = this.crypto.generateRandomKey(keyLength);
     const response: ItemsKeyContent = {
       itemsKey: itemsKey,
       dataAuthenticationKey: authKey,
@@ -32,11 +39,31 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     return response;
   }
 
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
+  /**
+   * Creates a new random SNItemsKey to use for item encryption.
+   * The consumer must save/sync this item.
+   */
+  public createItemsKey(): SNItemsKey {
+    const content = this.generateNewItemsKeyContent();
+    const payload = CreateMaxPayloadFromAnyObject({
+      uuid: Uuid.GenerateUuid(),
+      content_type: ContentType.ItemsKey,
+      content: FillItemContent(content),
+    });
+    return CreateItemFromPayload(payload) as SNItemsKey;
+  }
+
+  public async computeRootKey(
+    password: string,
+    keyParams: SNRootKeyParams
+  ): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams);
   }
 
-  protected async deriveKey(password: string, keyParams: SNRootKeyParams) {
+  protected async deriveKey(
+    password: string,
+    keyParams: SNRootKeyParams
+  ): Promise<SNRootKey> {
     const salt = await this.generateSalt(
       keyParams.content003.identifier!,
       ProtocolVersion.V003,
@@ -49,7 +76,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
       V003Algorithm.PbkdfCost,
       V003Algorithm.PbkdfOutputLength
     );
-    const partitions = this.splitKey(derivedKey!, 3);
+    const partitions = splitString(derivedKey!, 3);
     const key = await SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],
@@ -64,11 +91,9 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     identifier: string,
     password: string,
     origination: KeyParamsOrigination
-  ) {
+  ): Promise<SNRootKey> {
     const version = ProtocolVersion.V003;
-    const pwNonce = await this.crypto.generateRandomKey(
-      V003Algorithm.SaltSeedLength
-    );
+    const pwNonce = this.crypto.generateRandomKey(V003Algorithm.SaltSeedLength);
     const keyParams = Create003KeyParams({
       identifier: identifier,
       pw_nonce: pwNonce,

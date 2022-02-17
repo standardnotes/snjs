@@ -10,8 +10,8 @@ describe('keys', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
   });
 
   afterEach(async function () {
@@ -559,7 +559,7 @@ describe('keys', function () {
     expect(itemsKeys.length).to.equal(1);
     const defaultItemsKey = application.protocolService.getDefaultItemsKey();
 
-    const newEmail = Uuid.GenerateUuidSynchronously();
+    const newEmail = Uuid.GenerateUuid();
     const result = await application.changeEmail(newEmail, password);
     expect(result.error).to.not.be.ok;
 

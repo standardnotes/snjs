@@ -9,8 +9,8 @@ describe('payload encryption', function () {
     this.timeout(Factory.TenSecondTimeout);
     localStorage.clear();
     this.application = await Factory.createInitAppWithRandNamespace();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,

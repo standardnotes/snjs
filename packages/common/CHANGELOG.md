@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.10.0...@standardnotes/common@1.11.0) (2022-02-16)
+
+
+### Features
+
+* add paid roles definition ([3432608](https://github.com/standardnotes/snjs/commit/34326086c16000397d994054e807dd3589b536db))
+
+
+
+
+
 # [1.10.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.9.0...@standardnotes/common@1.10.0) (2022-02-10)
 
 

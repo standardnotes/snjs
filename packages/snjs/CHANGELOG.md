@@ -3,6 +3,160 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.61.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.1...@standardnotes/snjs@2.61.2) (2022-02-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.61.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.0...@standardnotes/snjs@2.61.1) (2022-02-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.61.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.4...@standardnotes/snjs@2.61.0) (2022-02-16)
+
+
+### Features
+
+* application options in constructor params ([411be7c](https://github.com/standardnotes/snjs/commit/411be7c7f4f25aeae10f67b263296263ba1fda92))
+
+
+
+
+
+## [2.60.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.3...@standardnotes/snjs@2.60.4) (2022-02-16)
+
+
+### Bug Fixes
+
+* readd on load decryption batching ([9e89229](https://github.com/standardnotes/snjs/commit/9e89229ca0724fe5fd2cd48ad4d1ffc2688709c0))
+
+
+
+
+
+## [2.60.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.2...@standardnotes/snjs@2.60.3) (2022-02-16)
+
+
+### Bug Fixes
+
+* safer tag handling in hierarchy check ([3a8b376](https://github.com/standardnotes/snjs/commit/3a8b376b5d7f1d44e8a725fe4638dd64e35507ba))
+
+
+
+
+
+## [2.60.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.1...@standardnotes/snjs@2.60.2) (2022-02-16)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.60.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.60.0...@standardnotes/snjs@2.60.1) (2022-02-16)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.60.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.8...@standardnotes/snjs@2.60.0) (2022-02-16)
+
+
+### Features
+
+* syncronous crypto ([#600](https://github.com/standardnotes/snjs/issues/600)) ([66496f6](https://github.com/standardnotes/snjs/commit/66496f6487630689b76eae6cd15bcb0c31e6b9cc))
+
+
+
+
+
+## [2.59.8](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.7...@standardnotes/snjs@2.59.8) (2022-02-16)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.59.7](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.6...@standardnotes/snjs@2.59.7) (2022-02-16)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.59.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.5...@standardnotes/snjs@2.59.6) (2022-02-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.59.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.4...@standardnotes/snjs@2.59.5) (2022-02-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.59.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.3...@standardnotes/snjs@2.59.4) (2022-02-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.59.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.2...@standardnotes/snjs@2.59.3) (2022-02-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.59.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.1...@standardnotes/snjs@2.59.2) (2022-02-14)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.59.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.59.0...@standardnotes/snjs@2.59.1) (2022-02-14)
+
+
+### Bug Fixes
+
+* export ActionVerb from lib index instead of services ([#597](https://github.com/standardnotes/snjs/issues/597)) ([8eda762](https://github.com/standardnotes/snjs/commit/8eda762f6065762030c03478d170360ea5d2265b))
+
+
+
+
+
+# [2.59.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.58.1...@standardnotes/snjs@2.59.0) (2022-02-14)
+
+
+### Features
+
+* improve hasRole function by checking role hierarchy ([#594](https://github.com/standardnotes/snjs/issues/594)) ([b4945e7](https://github.com/standardnotes/snjs/commit/b4945e794f8a0e47c1160751f4424ec7e904383b))
+
+
+
+
+
 ## [2.58.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.58.0...@standardnotes/snjs@2.58.1) (2022-02-12)
 
 

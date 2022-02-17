@@ -127,7 +127,7 @@ describe('online syncing', function () {
     );
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
-    await this.application.syncService.alternateUuidForItem(note.uuid);
+    await Factory.alternateUuidForItem(this.application, note.uuid);
     await this.application.sync(syncOptions);
 
     const notes = this.application.itemManager.notes;
@@ -1071,7 +1071,7 @@ describe('online syncing', function () {
     expect(item.dirty).to.equal(false);
   });
 
-  it('should call onPresyncSave before sync begins', async function() {
+  it('should call onPresyncSave before sync begins', async function () {
     const events = [];
     this.application.syncService.addEventObserver((event) => {
       if (event === SyncEvent.SyncWillBegin) {

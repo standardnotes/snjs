@@ -28,6 +28,7 @@ import {
   AnyRecord,
   ApplicationEventPayload,
 } from './types';
+import { ApplicationOptionsDefaults, ApplicationOptions } from './options';
 import {
   ApplicationEvent,
   SyncEvent,
@@ -246,7 +247,8 @@ export class SNApplication implements ListedInterface {
     private defaultFilesHost: string,
     private appVersion: string,
     private webSocketUrl?: string,
-    private readonly runtime: Runtime = Runtime.Prod
+    private readonly runtime: Runtime = Runtime.Prod,
+    private readonly options: ApplicationOptions = ApplicationOptionsDefaults
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -299,6 +301,7 @@ export class SNApplication implements ListedInterface {
    * This function will load all services in their correct order.
    */
   async prepareForLaunch(callback: LaunchCallback): Promise<void> {
+    await this.crypto.initialize();
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface
       .openDatabase(this.identifier)
@@ -1711,7 +1714,7 @@ export class SNApplication implements ListedInterface {
     return this.migrationService.hasPendingMigrations();
   }
 
-  public generateUuid(): Promise<string> {
+  public generateUuid(): string {
     return Uuid.GenerateUuid();
   }
 
@@ -1806,8 +1809,8 @@ export class SNApplication implements ListedInterface {
     return this.featuresService.getFeatureStatus(featureId);
   }
 
-  public hasRole(role: RoleName): boolean {
-    return this.featuresService.hasRole(role);
+  public hasMinimumRole(role: RoleName): boolean {
+    return this.featuresService.hasMinimumRole(role);
   }
 
   public getNewSubscriptionToken(): Promise<string | undefined> {
@@ -2156,7 +2159,7 @@ export class SNApplication implements ListedInterface {
       this.payloadManager,
       this.apiService,
       this.historyManager,
-      this.deviceInterface.interval
+      this.options
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName);

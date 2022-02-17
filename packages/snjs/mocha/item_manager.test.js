@@ -7,7 +7,7 @@ const expect = chai.expect;
 describe('item manager', function () {
   before(async function () {
     const crypto = new SNWebCrypto();
-    Uuid.SetGenerators(crypto.generateUUIDSync, crypto.generateUUID);
+    Uuid.SetGenerators(crypto.generateUUID, crypto.generateUUID);
   });
 
   beforeEach(async function () {

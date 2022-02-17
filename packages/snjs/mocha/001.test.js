@@ -108,7 +108,7 @@ describe('001 protocol operations', () => {
   it('generating encryption params includes items_key_id', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
-    const params = await protocol001.generateEncryptedParameters(
+    const params = await protocol001.generateEncryptedParametersAsync(
       payload,
       PayloadFormat.EncryptedString,
       key
@@ -122,13 +122,13 @@ describe('001 protocol operations', () => {
   it('can decrypt encrypted params', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
-    const params = await protocol001.generateEncryptedParameters(
+    const params = await protocol001.generateEncryptedParametersAsync(
       payload,
       PayloadFormat.EncryptedString,
       key
     );
 
-    const decrypted = await protocol001.generateDecryptedParameters(
+    const decrypted = await protocol001.generateDecryptedParametersAsync(
       params,
       key
     );
@@ -138,7 +138,7 @@ describe('001 protocol operations', () => {
   it('payloads missing enc_item_key should decrypt as errorDecrypting', async () => {
     const payload = Factory.createNotePayload();
     const key = await protocol001.createItemsKey();
-    const params = await protocol001.generateEncryptedParameters(
+    const params = await protocol001.generateEncryptedParametersAsync(
       payload,
       PayloadFormat.EncryptedString,
       key
@@ -146,7 +146,7 @@ describe('001 protocol operations', () => {
     const modified = CreateMaxPayloadFromAnyObject(params, {
       enc_item_key: undefined,
     });
-    const decrypted = await protocol001.generateDecryptedParameters(
+    const decrypted = await protocol001.generateDecryptedParametersAsync(
       modified,
       key
     );

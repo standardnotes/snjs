@@ -11470,15 +11470,15 @@ sn-advanced-markdown-editor@1.4.2:
   resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.4.2.tgz#5a516bee6c459e47a9710f85524adfe88cbc87c2"
   integrity sha512-Bx0dhTfoQPgAZyl4QSZ6r/dCpS00TsJxM8vdJXovvVBnS/H06SYftlaciFLWkgfiaXshgQrcappbMO74oOLPtQ==
 
-sn-bold-editor@1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.3.2.tgz#90376d303d2b7d7adfae1fc65a3efb89975f45ec"
-  integrity sha512-PjfS1+GLAMtlxTVd9qv81A9+xCaWrL4rnF7Lm9oFKur4ApAWF8Kjn9pD+nbGZ90Qr1F56Uiygy80RobfhZ+PNw==
+sn-bold-editor@1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.3.3.tgz#6ad9738d063635702955920e5fc32fa8f045bed4"
+  integrity sha512-MTK26KB4edebYjxW+2HRJou/9AZ8vk8G0H1G8D6/r53gcLuobwAoorTPW8TsdhtawSTON0buZuIYfXcSa9feBw==
 
-sn-code-editor@1.3.10:
-  version "1.3.10"
-  resolved "https://registry.yarnpkg.com/sn-code-editor/-/sn-code-editor-1.3.10.tgz#07caa777a8da82dd0513bfbd9743d480514816d2"
-  integrity sha512-jAhqMLFTm4F0481KM9mSrTBMSMfwMhnyD63hDgeK7ziRLHdC5vFH3om00dHCO9IdGVdtkZL6nHo8l1TJ7mi2xA==
+sn-code-editor@1.3.11:
+  version "1.3.11"
+  resolved "https://registry.yarnpkg.com/sn-code-editor/-/sn-code-editor-1.3.11.tgz#9cda40019aa7a83c3f6835ed1bbbde166aa9a7b9"
+  integrity sha512-9EGDL8PEaixWMVYKRMVDlebJ7yBXs5GUFERCK2HKCG2xEFoSG2gkmmhNQwF2q4cvcSyr2gO2ROEjrgOdDV6Kuw==
 
 sn-codemirror-search@1.0.0, sn-codemirror-search@^1.0.0:
   version "1.0.0"
@@ -11522,38 +11522,38 @@ sn-spreadsheets@1.4.4:
   resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.4.tgz#95e2947bb227f5cbb8ba8b88270eaf51ff300d79"
   integrity sha512-nYHT6NjspBZmYrG70ESY6KoGA5UPTvp/Y9OaOIB5PhH/X6K5posiDIfPo5IBqNT4oOZ03QHPkNAW1Q6X4KgdUA==
 
-sn-theme-autobiography@standardnotes/autobiography-theme:
-  version "1.0.2"
-  resolved "https://codeload.github.com/standardnotes/autobiography-theme/tar.gz/8679a48243b1155d6b0eb65a4bd1f76559c1af67"
+sn-theme-autobiography@standardnotes/autobiography-theme#1.0.3:
+  version "1.0.3"
+  resolved "https://codeload.github.com/standardnotes/autobiography-theme/tar.gz/d1be2f748f572e33375f5ddfb35b685ff09b4519"
 
 sn-theme-dynamic@standardnotes/dynamic-theme#1.0.3:
   version "1.0.3"
   resolved "https://codeload.github.com/standardnotes/dynamic-theme/tar.gz/82db279c2e1fa1c89c15fe430685fa784c8984d3"
 
-sn-theme-focus@standardnotes/focus-theme:
+sn-theme-focus@standardnotes/focus-theme#1.2.7:
+  version "1.2.7"
+  resolved "https://codeload.github.com/standardnotes/focus-theme/tar.gz/7a2dd0a7360555765483710ce2895b3310d4e626"
+
+sn-theme-futura@standardnotes/futura-theme#1.2.6:
   version "1.2.6"
-  resolved "https://codeload.github.com/standardnotes/focus-theme/tar.gz/e7c0511591062e89d319b2a2ab5b879694edd8a5"
+  resolved "https://codeload.github.com/standardnotes/futura-theme/tar.gz/f52c99603f44beea51aea7e853024101aab93466"
 
-sn-theme-futura@standardnotes/futura-theme:
+sn-theme-midnight@standardnotes/midnight-theme#1.2.6:
+  version "1.2.6"
+  resolved "https://codeload.github.com/standardnotes/midnight-theme/tar.gz/105582d031746fe3f959f7622a2d4f3b02d3f61f"
+
+sn-theme-solarized-dark@standardnotes/solarized-dark-theme#1.2.5:
   version "1.2.5"
-  resolved "https://codeload.github.com/standardnotes/futura-theme/tar.gz/d12567fbcc9b33c9c6cdfbbff22b78596b538649"
+  resolved "https://codeload.github.com/standardnotes/solarized-dark-theme/tar.gz/1be23808c25955329151731e062c0befaac511b2"
 
-sn-theme-midnight@standardnotes/midnight-theme:
-  version "1.2.5"
-  resolved "https://codeload.github.com/standardnotes/midnight-theme/tar.gz/937ebfe31b34bd68095fec39801b8102540d8a0e"
+sn-theme-titanium@standardnotes/titanium-theme#1.2.6:
+  version "1.2.6"
+  resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/36a609f00ef26d4c9c7df1f9980ed2b6b77e1c6e"
 
-sn-theme-solarized-dark@standardnotes/solarized-dark-theme:
-  version "1.2.4"
-  resolved "https://codeload.github.com/standardnotes/solarized-dark-theme/tar.gz/03e05fb4327e6625c065d4417d19db782d8fc242"
-
-sn-theme-titanium@standardnotes/titanium-theme:
-  version "1.2.5"
-  resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/61be5a3361f263e3d51bce562e4f8f7cdd6bcece"
-
-sn-token-vault@2.0.9:
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.9.tgz#f9d5a2fca14ed79b40bc2f69e1ca4cd4457be3c2"
-  integrity sha512-2D0lL7DeaYGV8j6JankEr0gJA2LA+BvassxhGw7bok3RPQvUOBlicVenI9a7enoKb6K4iiSjScrAlub0jLfubA==
+sn-token-vault@2.0.10:
+  version "2.0.10"
+  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.10.tgz#43f7ffd96f62d6014318a98e990eb0d584c486d1"
+  integrity sha512-arj8YvFpPBRsJ20BPtglOMWlvXlafC3M3XZo/eSSx1uJUBfwWwDNFcgdJSkBsuXweVWc1UBqsfGm4JuUtHIaUQ==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
