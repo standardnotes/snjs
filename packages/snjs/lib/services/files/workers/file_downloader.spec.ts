@@ -1,10 +1,14 @@
-import { RemoteFileInterface, FilesApi } from './../types';
+import {
+  RemoteFileInterface,
+  FilesApi,
+  EncryptedFileInterface,
+} from './../types';
 import { FileDownloader } from './../workers/file_downloader';
 
 describe('file downloader', () => {
   let apiService: FilesApi;
   let downloader: FileDownloader;
-  let file: RemoteFileInterface;
+  let file: RemoteFileInterface & EncryptedFileInterface;
   const numChunks = 5;
 
   beforeEach(() => {
@@ -24,16 +28,24 @@ describe('file downloader', () => {
       );
 
     file = {
+      chunkSize: 100_000,
       remoteIdentifier: '123',
+      encryptionHeader: 'header',
+      key: 'secret',
     };
   });
 
   it('should pass back bytes as they are received', async () => {
     let receivedBytes = new Uint8Array();
 
-    downloader = new FileDownloader('api-token', apiService, (encryptedBytes) => {
-      receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes]);
-    });
+    downloader = new FileDownloader(
+      file.chunkSize,
+      'api-token',
+      apiService,
+      (encryptedBytes) => {
+        receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes]);
+      }
+    );
 
     expect(receivedBytes.length).toBe(0);
 

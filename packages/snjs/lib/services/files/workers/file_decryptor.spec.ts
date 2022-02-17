@@ -19,6 +19,7 @@ describe('file decryptor', () => {
       .mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 });
 
     file = {
+      chunkSize: 100_000,
       remoteIdentifier: '123',
       encryptionHeader: 'some-header',
       key: 'secret',

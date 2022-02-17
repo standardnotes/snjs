@@ -971,11 +971,13 @@ export class SNApiService
   }
 
   public async downloadFile(
+    chunkSize: number,
     apiToken: string,
     contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void> {
     const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
+    const pullChunkSize = chunkSize + FileProtocolV1.EncryptedChunkSizeDelta;
 
     const response:
       | HttpResponse
@@ -986,7 +988,7 @@ export class SNApiService
         { key: 'x-valet-token', value: apiToken },
         {
           key: 'x-chunk-size',
-          value: FileProtocolV1.EncryptedChunkSize.toString(),
+          value: pullChunkSize.toString(),
         },
         { key: 'range', value: `bytes=${contentRangeStart}-` },
       ],
@@ -1022,8 +1024,9 @@ export class SNApiService
 
     if (rangeEnd < totalSize - 1) {
       this.downloadFile(
+        chunkSize,
         apiToken,
-        rangeStart + FileProtocolV1.EncryptedChunkSize,
+        rangeStart + pullChunkSize,
         onBytesReceived
       );
     }

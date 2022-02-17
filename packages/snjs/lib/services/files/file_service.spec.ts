@@ -1,4 +1,3 @@
-import { SNFile } from './../../models/app/file';
 import { SNFileService } from './file_service';
 import { SNSyncService } from '../sync/sync_service';
 import { ItemManager, SNAlertService, SNApiService } from '@Lib/index';
@@ -18,7 +17,10 @@ describe('fileService', () => {
       itemManager,
       syncService,
       alertService,
-      crypto
+      crypto,
+      {
+        filesChunkSize: 100_000,
+      }
     );
   };
 

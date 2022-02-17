@@ -1,3 +1,4 @@
+import { FileOptions } from './../../options';
 import { FillItemContent } from '@Models/functions';
 import { ContentType } from '@standardnotes/common';
 import { DownloadAndDecryptFileOperation } from './operations/download_and_decrypt';
@@ -20,7 +21,8 @@ export class SNFileService extends PureService {
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private alertService: SNAlertService,
-    private crypto: SNPureCrypto
+    private crypto: SNPureCrypto,
+    private options: FileOptions
   ) {
     super();
   }
@@ -91,7 +93,7 @@ export class SNFileService extends PureService {
     }
 
     const fileContent: FileContent = {
-      chunkSize: FileProtocolV1.DecryptedChunkSize,
+      chunkSize: this.options.filesChunkSize,
       encryptionHeader: operation.getEncryptionHeader(),
       ext: fileExt,
       key: operation.getKey(),

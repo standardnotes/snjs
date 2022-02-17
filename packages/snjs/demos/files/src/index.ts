@@ -4,8 +4,9 @@ import {
   Environment,
   Platform,
   SNLog,
-  FileProtocolV1,
   SNFile,
+  Runtime,
+  ApplicationOptionsDefaults,
 } from '../../../';
 import WebDeviceInterface from './web_device_interface';
 import { SNWebCrypto } from '../../../../sncrypto-web';
@@ -40,7 +41,13 @@ const application = new SNApplication(
   [],
   host,
   filesHost,
-  '1.0.0'
+  '1.0.0',
+  undefined,
+  Runtime.Dev,
+  {
+    ...ApplicationOptionsDefaults,
+    filesChunkSize: 1_000_000,
+  }
 );
 
 const fileService = application['fileService'];
@@ -74,7 +81,9 @@ const run = async () => {
 
   console.log('Registering account...');
   await application.register(email, password);
-  console.log(`Registered account ${email}/${password}`);
+  console.log(
+    `Registered account ${email}/${password}. Be sure to edit docker/auth.env to increase session TTL.`
+  );
 
   console.log('Creating mock subscription...');
   await publishMockedEvent('SUBSCRIPTION_PURCHASED', {
@@ -123,7 +132,7 @@ async function readFile(file: File): Promise<Uint8Array> {
 
 const uploadFile = async (file: File) => {
   console.log('Uploading file', file.name);
-  const chunkSize = FileProtocolV1.DecryptedChunkSize;
+  const chunkSize = application.options.filesChunkSize;
   const operation = await fileService.beginNewFileUpload();
   const buffer = await readFile(file);
 
@@ -167,9 +176,12 @@ const downloadFileBytes = async (remoteIdentifier: string) => {
 
   let receivedBytes = new Uint8Array();
 
-  await fileService.downloadFile(file, (decryptedBytes) => {
+  await fileService.downloadFile(file, (decryptedBytes: Uint8Array) => {
+    console.log(`Downloaded ${decryptedBytes.length} bytes`);
     receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes]);
   });
+
+  console.log('Successfully downloaded and decrypted file!');
 
   return receivedBytes;
 };

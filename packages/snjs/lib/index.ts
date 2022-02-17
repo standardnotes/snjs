@@ -5,6 +5,7 @@ export {
 } from './version';
 
 export type { ApplicationDescriptor } from './application_group';
+export { ApplicationOptionsDefaults } from './options';
 export type {
   ActionResponse,
   ListedAccount,

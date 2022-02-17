@@ -8,7 +8,7 @@ export class EncryptAndUploadFileOperation {
   private readonly uploader: FileUploader;
   private encryptionHeader!: string;
   private rawSize = 0;
-  private encryptedSize = 0;
+  public encryptedSize = 0;
 
   constructor(
     private file: DecryptedFileInterface,

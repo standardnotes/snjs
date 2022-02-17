@@ -248,7 +248,7 @@ export class SNApplication implements ListedInterface {
     private appVersion: string,
     private webSocketUrl?: string,
     private readonly runtime: Runtime = Runtime.Prod,
-    private readonly options: ApplicationOptions = ApplicationOptionsDefaults
+    public readonly options: ApplicationOptions = ApplicationOptionsDefaults
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -287,7 +287,9 @@ export class SNApplication implements ListedInterface {
       throw Error('defaultHost must be supplied when creating an application.');
     }
     if (!defaultFilesHost) {
-      throw Error('defaultFilesHost must be supplied when creating an application.');
+      throw Error(
+        'defaultFilesHost must be supplied when creating an application.'
+      );
     }
     if (!appVersion) {
       throw Error('appVersion must be supplied when creating an application.');
@@ -1931,7 +1933,8 @@ export class SNApplication implements ListedInterface {
       this.itemManager,
       this.syncService,
       this.alertService,
-      this.crypto
+      this.crypto,
+      this.options
     );
 
     this.services.push(this.fileService);

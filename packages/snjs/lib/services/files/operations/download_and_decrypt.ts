@@ -22,6 +22,7 @@ export class DownloadAndDecryptFileOperation {
   ) {
     this.decryptor = new FileDecryptor(file, crypto);
     this.downloader = new FileDownloader(
+      file.chunkSize,
       apiToken,
       api,
       this.onDownloadedBytes.bind(this)

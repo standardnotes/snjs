@@ -14,6 +14,7 @@ export interface FilesApi {
   ): Promise<boolean>;
 
   downloadFile(
+    chunkSize: number,
     apiToken: string,
     contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => void
@@ -33,6 +34,7 @@ export interface EncryptedFileInterface {
   remoteIdentifier: string;
   encryptionHeader: string;
   key: string;
+  chunkSize: number;
 }
 
 export interface RemoteFileInterface {
