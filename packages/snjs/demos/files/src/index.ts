@@ -10,6 +10,8 @@ import {
 } from '../../../';
 import WebDeviceInterface from './web_device_interface';
 import { SNWebCrypto } from '../../../../sncrypto-web';
+import { ClassicFileApi } from './classic_file_api';
+import { FileSystemApi } from './file_system_api';
 
 SNLog.onLog = console.log;
 SNLog.onError = console.error;
@@ -96,108 +98,8 @@ const run = async () => {
   });
   console.log('Successfully created mock subscription...');
 
-  openFilePicker();
-};
-
-function openFilePicker() {
-  const input = document.getElementById('filePicker') as HTMLInputElement;
-  input.type = 'file';
-  input.onchange = (event) => {
-    const target = event.target as HTMLInputElement;
-    const file = target.files[0];
-    handleFileSelect(file);
-  };
-
-  console.log('File picker ready.');
-}
-
-async function handleFileSelect(inputFile: File) {
-  const file = await uploadFile(inputFile);
-
-  const bytes = await downloadFileBytes(file.remoteIdentifier);
-
-  saveFileBytesToDisk(`${file.name}.${file.ext}`, bytes);
-}
-
-async function readFile(file: File): Promise<Uint8Array> {
-  const reader = new FileReader();
-  reader.readAsArrayBuffer(file);
-  return new Promise((resolve) => {
-    reader.onload = (readerEvent) => {
-      const content = readerEvent.target.result as ArrayBuffer;
-      resolve(new Uint8Array(content));
-    };
-  });
-}
-
-const uploadFile = async (file: File) => {
-  console.log('Uploading file', file.name);
-  const chunkSize = application.options.filesChunkSize;
-  const operation = await fileService.beginNewFileUpload();
-  const buffer = await readFile(file);
-
-  let chunkId = 1;
-  for (let i = 0; i < buffer.length; i += chunkSize) {
-    const readUntil =
-      i + chunkSize > buffer.length ? buffer.length : i + chunkSize;
-    const chunk = buffer.slice(i, readUntil);
-    const isFinalChunk = readUntil === buffer.length;
-
-    console.log(`Pushing ${chunk.length} bytes`);
-    const bytesUploadedSuccessfully = await fileService.pushBytesForUpload(
-      operation,
-      chunk,
-      chunkId++,
-      isFinalChunk
-    );
-    if (!bytesUploadedSuccessfully) {
-      throw new Error('Could not upload file chunk');
-    }
-  }
-
-  const pattern = /(?:\.([^.]+))?$/;
-  const ext = pattern.exec(file.name)[1];
-  const fileObj = await fileService.finishUpload(
-    operation,
-    file.name.split('.')[0],
-    ext
-  );
-
-  console.log('Successfully uploaded file!');
-
-  return fileObj;
-};
-
-const downloadFileBytes = async (remoteIdentifier: string) => {
-  console.log('Downloading file', remoteIdentifier);
-  const file = application['itemManager']
-    .getItems(ContentType.File)
-    .find((file: SNFile) => file.remoteIdentifier === remoteIdentifier);
-
-  let receivedBytes = new Uint8Array();
-
-  await fileService.downloadFile(file, (decryptedBytes: Uint8Array) => {
-    console.log(`Downloaded ${decryptedBytes.length} bytes`);
-    receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes]);
-  });
-
-  console.log('Successfully downloaded and decrypted file!');
-
-  return receivedBytes;
-};
-
-const saveFileBytesToDisk = (name: string, bytes: Uint8Array) => {
-  console.log('Saving file to disk...');
-  const link = document.createElement('a');
-  const blob = new Blob([bytes], {
-    type: 'text/plain;charset=utf-8',
-  });
-  link.href = window.URL.createObjectURL(blob);
-  link.setAttribute('download', name);
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.URL.revokeObjectURL(link.href);
+  // const classicFileApi = new ClassFileApi(application);
+  const fileSystemApi = new FileSystemApi(application);
 };
 
 run();

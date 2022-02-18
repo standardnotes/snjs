@@ -1166,6 +1166,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/wicg-native-file-system@^2020.6.0":
+  version "2020.6.0"
+  resolved "https://registry.yarnpkg.com/@types/wicg-native-file-system/-/wicg-native-file-system-2020.6.0.tgz#63cbb7bac47bdb9eae4b0d66e63134b33e47e05d"
+  integrity sha512-M7n6jvHfUzUXDtf6UGpL6rVIddV7UzEYrvwZPORApeHvDGQnZJ79fXorLlDj8xJKyUemnEBohRd8yx09k9NBUw==
+
 "@types/ws@^8.2.2":
   version "8.2.2"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.2.2.tgz#7c5be4decb19500ae6b3d563043cd407bf366c21"
