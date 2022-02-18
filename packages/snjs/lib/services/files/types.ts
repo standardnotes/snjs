@@ -1,3 +1,4 @@
+import { SNFile } from './../../models/app/file';
 export interface FilesApi {
   startUploadSession(
     apiToken: string,
@@ -14,7 +15,8 @@ export interface FilesApi {
   ): Promise<boolean>;
 
   downloadFile(
-    chunkSize: number,
+    file: EncryptedFileInterface,
+    chunkIndex: number,
     apiToken: string,
     contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => void
@@ -34,7 +36,7 @@ export interface EncryptedFileInterface {
   remoteIdentifier: string;
   encryptionHeader: string;
   key: string;
-  chunkSize: number;
+  chunkSizes: number[];
 }
 
 export interface RemoteFileInterface {

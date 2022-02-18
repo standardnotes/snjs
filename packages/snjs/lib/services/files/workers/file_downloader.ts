@@ -1,9 +1,9 @@
-import { FilesApi } from '../types';
+import { FilesApi, EncryptedFileInterface } from '../types';
 
 export class FileDownloader {
   private aborted = false;
   constructor(
-    private chunkSize: number,
+    private file: EncryptedFileInterface,
     private apiToken: string,
     private apiService: FilesApi,
     private onEncryptedBytes: (encryptedBytes: Uint8Array) => void
@@ -11,7 +11,8 @@ export class FileDownloader {
 
   public download(): Promise<void> {
     return this.apiService.downloadFile(
-      this.chunkSize,
+      this.file,
+      0,
       this.apiToken,
       0,
       (bytes) => {

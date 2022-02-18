@@ -28,9 +28,7 @@ export class FileSystemApi {
   }
 
   uploadFile = async () => {
-    const operation = await this.application[
-      'fileService'
-    ].beginNewFileUpload();
+    const operation = await this.application.fileService.beginNewFileUpload();
 
     this.uploadHandle = (await window.showOpenFilePicker())[0];
 
@@ -43,23 +41,32 @@ export class FileSystemApi {
 
     let chunkId = 1;
 
+    let previousChunk: Uint8Array;
+
     const processChunk = async ({ done, value }) => {
       if (done) {
+        console.log('Pushing final chunk', previousChunk.length);
         await this.application.fileService.pushBytesForUpload(
           operation,
-          new Uint8Array(),
-          chunkId++,
+          previousChunk,
+          chunkId,
           true
         );
         return;
       }
-      console.log('Read chunk', value.length);
-      await this.application.fileService.pushBytesForUpload(
-        operation,
-        value,
-        chunkId++,
-        false
-      );
+
+      if (previousChunk) {
+        console.log('Pushing chunk', previousChunk.length);
+        await this.application.fileService.pushBytesForUpload(
+          operation,
+          previousChunk,
+          chunkId,
+          false
+        );
+        chunkId++;
+      }
+
+      previousChunk = value;
 
       return reader.read().then(processChunk);
     };

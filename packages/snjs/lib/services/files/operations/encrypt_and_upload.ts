@@ -9,6 +9,7 @@ export class EncryptAndUploadFileOperation {
   private encryptionHeader!: string;
   private rawSize = 0;
   public encryptedSize = 0;
+  public chunkSizes: number[] = [];
 
   constructor(
     private file: DecryptedFileInterface,
@@ -58,6 +59,8 @@ export class EncryptAndUploadFileOperation {
       decryptedBytes,
       isFinalChunk
     );
+
+    this.chunkSizes.push(encryptedBytes.length);
 
     this.encryptedSize += encryptedBytes.length;
 

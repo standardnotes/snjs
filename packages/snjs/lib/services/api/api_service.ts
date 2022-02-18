@@ -1,4 +1,5 @@
-import { FilesApi } from './../files/types';
+import { SNFile } from './../../models/app/file';
+import { FilesApi, EncryptedFileInterface } from './../files/types';
 import { SNFeatureRepo } from './../../models/app/feature_repo';
 import { ErrorObject, UuidString } from './../../types';
 import {
@@ -971,13 +972,16 @@ export class SNApiService
   }
 
   public async downloadFile(
-    chunkSize: number,
+    file: EncryptedFileInterface,
+    chunkIndex = 0,
     apiToken: string,
     contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => void
   ): Promise<void> {
     const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
-    const pullChunkSize = chunkSize + FileProtocolV1.EncryptedChunkSizeDelta;
+    const pullChunkSize = file.chunkSizes[chunkIndex];
+
+    console.log('Downloading chunk', chunkIndex, 'size', pullChunkSize);
 
     const response:
       | HttpResponse
@@ -1024,7 +1028,8 @@ export class SNApiService
 
     if (rangeEnd < totalSize - 1) {
       this.downloadFile(
-        chunkSize,
+        file,
+        ++chunkIndex,
         apiToken,
         rangeStart + pullChunkSize,
         onBytesReceived

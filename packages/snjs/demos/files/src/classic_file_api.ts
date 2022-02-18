@@ -39,9 +39,7 @@ export class ClassicFileApi {
   uploadFile = async (file: File) => {
     console.log('Uploading file', file.name);
     const chunkSize = this.application.options.filesChunkSize;
-    const operation = await this.application[
-      'fileService'
-    ].beginNewFileUpload();
+    const operation = await this.application.fileService.beginNewFileUpload();
     const buffer = await this.readFile(file);
 
     let chunkId = 1;
@@ -52,9 +50,12 @@ export class ClassicFileApi {
       const isFinalChunk = readUntil === buffer.length;
 
       console.log(`Pushing ${chunk.length} bytes`);
-      const bytesUploadedSuccessfully = await this.application[
-        'fileService'
-      ].pushBytesForUpload(operation, chunk, chunkId++, isFinalChunk);
+      const bytesUploadedSuccessfully = await this.application.fileService.pushBytesForUpload(
+        operation,
+        chunk,
+        chunkId++,
+        isFinalChunk
+      );
       if (!bytesUploadedSuccessfully) {
         throw new Error('Could not upload file chunk');
       }
@@ -62,7 +63,7 @@ export class ClassicFileApi {
 
     const pattern = /(?:\.([^.]+))?$/;
     const ext = pattern.exec(file.name)[1];
-    const fileObj = await this.application['fileService'].finishUpload(
+    const fileObj = await this.application.fileService.finishUpload(
       operation,
       file.name.split('.')[0],
       ext
@@ -81,7 +82,7 @@ export class ClassicFileApi {
 
     let receivedBytes = new Uint8Array();
 
-    await this.application['fileService'].downloadFile(
+    await this.application.fileService.downloadFile(
       file,
       (decryptedBytes: Uint8Array) => {
         console.log(`Downloaded ${decryptedBytes.length} bytes`);

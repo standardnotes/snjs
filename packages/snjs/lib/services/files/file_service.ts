@@ -92,8 +92,10 @@ export class SNFileService extends PureService {
       throw new Error('Could not close upload session');
     }
 
+    console.log('Finished upload with sizes', operation.chunkSizes);
+
     const fileContent: FileContent = {
-      chunkSize: this.options.filesChunkSize,
+      chunkSizes: operation.chunkSizes,
       encryptionHeader: operation.getEncryptionHeader(),
       ext: fileExt,
       key: operation.getKey(),

@@ -15,7 +15,7 @@ export interface FileContent {
   ext: string;
   size: number;
   encryptionHeader: string;
-  chunkSize: number;
+  chunkSizes: number[];
 }
 
 type ExtendedFileContent = FileContent & PayloadContent;
@@ -27,7 +27,7 @@ export class SNFile extends SNItem implements ExtendedFileContent {
   public readonly ext: string;
   public readonly size: number;
   public readonly encryptionHeader: string;
-  public readonly chunkSize: number;
+  public readonly chunkSizes: number[];
 
   constructor(payload: PurePayload) {
     super(payload);
@@ -37,11 +37,11 @@ export class SNFile extends SNItem implements ExtendedFileContent {
     this.ext = this.typedContent.ext;
     this.size = this.typedContent.size;
     this.encryptionHeader = this.typedContent.encryptionHeader;
-    this.chunkSize = this.typedContent.chunkSize;
+    this.chunkSizes = this.typedContent.chunkSizes;
   }
 
-  private get typedContent(): ExtendedFileContent {
-    return this.safeContent as ExtendedFileContent;
+  private get typedContent(): FileContent {
+    return (this.safeContent as unknown) as FileContent;
   }
 }
 

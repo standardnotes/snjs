@@ -45,7 +45,7 @@ describe('download and decrypt', () => {
       .mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 });
 
     file = {
-      chunkSize: 100_000,
+      chunkSizes: [100_000],
       remoteIdentifier: '123',
       key: 'secret',
       encryptionHeader: 'some-header',
@@ -56,7 +56,7 @@ describe('download and decrypt', () => {
     let receivedBytes = new Uint8Array();
 
     file = {
-      chunkSize: 100_000,
+      chunkSizes: [100_000],
       remoteIdentifier: '123',
       key: 'secret',
       encryptionHeader: 'some-header',

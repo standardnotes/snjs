@@ -28,7 +28,7 @@ describe('file downloader', () => {
       );
 
     file = {
-      chunkSize: 100_000,
+      chunkSizes: [100_000],
       remoteIdentifier: '123',
       encryptionHeader: 'header',
       key: 'secret',
@@ -39,7 +39,7 @@ describe('file downloader', () => {
     let receivedBytes = new Uint8Array();
 
     downloader = new FileDownloader(
-      file.chunkSize,
+      file,
       'api-token',
       apiService,
       (encryptedBytes) => {
