@@ -870,8 +870,7 @@ export class SNSyncService extends PureService<
       operation.id,
       response.rawResponse
     );
-    this.setLastSyncToken(response.lastSyncToken!);
-    this.setPaginationToken(response.paginationToken!);
+
     this.opStatus.clearError();
     this.opStatus.setDownloadStatus(response.retrievedPayloads.length);
 
@@ -919,7 +918,13 @@ export class SNSyncService extends PureService<
     if (deletedPayloads.length > 0) {
       await this.deletePayloads(deletedPayloads);
     }
-    await this.notifyEvent(SyncEvent.SingleSyncCompleted, response);
+
+    await Promise.all([
+      this.setLastSyncToken(response.lastSyncToken!),
+      this.setPaginationToken(response.paginationToken!),
+      this.notifyEvent(SyncEvent.SingleSyncCompleted, response),
+    ]);
+
     if (response.checkIntegrity) {
       const clientHash = await this.computeDataIntegrityHash();
       await this.state!.setIntegrityHashes(
