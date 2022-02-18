@@ -193,7 +193,7 @@ export class SNApplication implements ListedInterface {
   private settingsService!: SNSettingsService;
   private mfaService!: SNMfaService;
   private listedService!: ListedService;
-  private fileService!: SNFileService;
+  public fileService!: SNFileService;
 
   private eventHandlers: ApplicationObserver[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

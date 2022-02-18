@@ -14,7 +14,7 @@ export class ClassicFileApi {
       this.handleFileSelect(file);
     };
 
-    console.log('File picker ready.');
+    console.log('Classic file picker ready.');
   }
 
   async handleFileSelect(inputFile: File) {

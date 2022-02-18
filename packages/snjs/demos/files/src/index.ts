@@ -1,10 +1,8 @@
-import { ContentType } from '../../../../common';
 import {
   SNApplication,
   Environment,
   Platform,
   SNLog,
-  SNFile,
   Runtime,
   ApplicationOptionsDefaults,
 } from '../../../';
@@ -98,7 +96,7 @@ const run = async () => {
   });
   console.log('Successfully created mock subscription...');
 
-  // const classicFileApi = new ClassFileApi(application);
+  const classicFileApi = new ClassicFileApi(application);
   const fileSystemApi = new FileSystemApi(application);
 };
 
