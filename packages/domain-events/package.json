@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/domain-events",
-  "version": "2.23.10",
+  "version": "2.23.11",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -23,8 +23,8 @@
     "test:unit": "jest spec --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@standardnotes/auth": "^3.16.1",
-    "@standardnotes/features": "^1.32.7"
+    "@standardnotes/auth": "^3.16.2",
+    "@standardnotes/features": "^1.32.8"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.2.0",
