@@ -222,6 +222,7 @@ type SettingData = {
 export type MinimalHttpResponse = {
   status?: StatusCode;
   error?: Error;
+  headers?: Map<string, string | null>;
 };
 
 export type ListSettingsResponse = MinimalHttpResponse & {

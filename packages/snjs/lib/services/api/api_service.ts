@@ -985,20 +985,22 @@ export class SNApiService
 
     const response:
       | HttpResponse
-      | DownloadFileChunkResponse = await this.request({
-      verb: HttpVerb.Get,
-      url,
-      customHeaders: [
-        { key: 'x-valet-token', value: apiToken },
-        {
-          key: 'x-chunk-size',
-          value: pullChunkSize.toString(),
-        },
-        { key: 'range', value: `bytes=${contentRangeStart}-` },
-      ],
-      fallbackErrorMessage: messages.API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK,
-      responseType: 'arraybuffer',
-    });
+      | DownloadFileChunkResponse = await this.tokenRefreshableRequest<DownloadFileChunkResponse>(
+      {
+        verb: HttpVerb.Get,
+        url,
+        customHeaders: [
+          { key: 'x-valet-token', value: apiToken },
+          {
+            key: 'x-chunk-size',
+            value: pullChunkSize.toString(),
+          },
+          { key: 'range', value: `bytes=${contentRangeStart}-` },
+        ],
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK,
+        responseType: 'arraybuffer',
+      }
+    );
 
     const contentRangeHeader = (<Map<string, string | null>>(
       response.headers
