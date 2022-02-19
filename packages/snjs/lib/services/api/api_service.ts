@@ -981,7 +981,7 @@ export class SNApiService
     const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
     const pullChunkSize = file.chunkSizes[chunkIndex];
 
-    console.log('Downloading chunk', chunkIndex, 'size', pullChunkSize);
+    console.log('Downloading chunk', chunkIndex, 'encrypted size', pullChunkSize);
 
     const response:
       | HttpResponse

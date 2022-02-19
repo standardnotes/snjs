@@ -1,130 +1,133 @@
-import { DeviceInterface } from '@standardnotes/snjs';
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-const KEYCHAIN_STORAGE_KEY = 'keychain';
+import { DeviceInterface } from '@standardnotes/snjs'
+
+const KEYCHAIN_STORAGE_KEY = 'keychain'
 
 export default class WebDeviceInterface extends DeviceInterface {
   async getRawStorageValue(key) {
-    return localStorage.getItem(key);
+    return localStorage.getItem(key)
   }
 
   async getAllRawStorageKeyValues() {
-    const results = [];
+    const results = []
     for (const key of Object.keys(localStorage)) {
       results.push({
         key: key,
         value: localStorage[key],
-      });
+      })
     }
-    return results;
+    return results
   }
 
   async setRawStorageValue(key, value) {
-    localStorage.setItem(key, value);
+    localStorage.setItem(key, value)
   }
 
   async removeRawStorageValue(key) {
-    localStorage.removeItem(key);
+    localStorage.removeItem(key)
   }
 
   async removeAllRawStorageValues() {
-    localStorage.clear();
+    localStorage.clear()
   }
 
   async openDatabase(_identifier) {
-    return {};
+    return {}
   }
 
   _getDatabaseKeyPrefix(identifier) {
     if (identifier) {
-      return `${identifier}-item-`;
+      return `${identifier}-item-`
     } else {
-      return 'item-';
+      return 'item-'
     }
   }
 
   _keyForPayloadId(id, identifier) {
-    return `${this._getDatabaseKeyPrefix(identifier)}${id}`;
+    return `${this._getDatabaseKeyPrefix(identifier)}${id}`
   }
 
   async getAllRawDatabasePayloads(identifier) {
-    const models = [];
+    const models = []
     for (const key in localStorage) {
       if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
-        models.push(JSON.parse(localStorage[key]));
+        models.push(JSON.parse(localStorage[key]))
       }
     }
-    return models;
+    return models
   }
 
   async saveRawDatabasePayload(payload, identifier) {
     localStorage.setItem(
       this._keyForPayloadId(payload.uuid, identifier),
-      JSON.stringify(payload)
-    );
+      JSON.stringify(payload),
+    )
   }
 
   async saveRawDatabasePayloads(payloads, identifier) {
     for (const payload of payloads) {
-      await this.saveRawDatabasePayload(payload, identifier);
+      await this.saveRawDatabasePayload(payload, identifier)
     }
   }
 
   async removeRawDatabasePayloadWithId(id, identifier) {
-    localStorage.removeItem(this._keyForPayloadId(id, identifier));
+    localStorage.removeItem(this._keyForPayloadId(id, identifier))
   }
 
   async removeAllRawDatabasePayloads(identifier) {
     for (const key in localStorage) {
       if (key.startsWith(this._getDatabaseKeyPrefix(identifier))) {
-        delete localStorage[key];
+        delete localStorage[key]
       }
     }
   }
 
   /** @keychain */
   async getNamespacedKeychainValue(identifier) {
-    const keychain = await this.getRawKeychainValue(identifier);
+    const keychain = await this.getRawKeychainValue(identifier)
     if (!keychain) {
-      return;
+      return
     }
-    return keychain[identifier];
+    return keychain[identifier]
   }
 
   async setNamespacedKeychainValue(value, identifier) {
-    let keychain = await this.getRawKeychainValue();
+    let keychain = await this.getRawKeychainValue()
     if (!keychain) {
-      keychain = {};
+      keychain = {}
     }
     localStorage.setItem(
       KEYCHAIN_STORAGE_KEY,
       JSON.stringify({
         ...keychain,
         [identifier]: value,
-      })
-    );
+      }),
+    )
   }
 
   async clearNamespacedKeychainValue(identifier) {
-    const keychain = await this.getRawKeychainValue();
+    const keychain = await this.getRawKeychainValue()
     if (!keychain) {
-      return;
+      return
     }
-    delete keychain[identifier];
-    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(keychain));
+    delete keychain[identifier]
+    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(keychain))
   }
 
   /** Allows unit tests to set legacy keychain structure as it was <= 003 */
   // eslint-disable-next-line camelcase
   async legacy_setRawKeychainValue(value) {
-    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(value));
+    localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(value))
   }
 
   async getRawKeychainValue() {
-    const keychain = localStorage.getItem(KEYCHAIN_STORAGE_KEY);
-    return JSON.parse(keychain);
+    const keychain = localStorage.getItem(KEYCHAIN_STORAGE_KEY)
+    return JSON.parse(keychain)
   }
 
   async clearRawKeychainValue() {
-    localStorage.removeItem(KEYCHAIN_STORAGE_KEY);
+    localStorage.removeItem(KEYCHAIN_STORAGE_KEY)
   }
 }

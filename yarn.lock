@@ -2826,6 +2826,11 @@
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.3.4.tgz#bd86a43617df0594787d38b735f55c805becf1bc"
   integrity sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==
 
+"@types/wicg-native-file-system@^2020.6.0":
+  version "2020.6.0"
+  resolved "https://registry.yarnpkg.com/@types/wicg-native-file-system/-/wicg-native-file-system-2020.6.0.tgz#63cbb7bac47bdb9eae4b0d66e63134b33e47e05d"
+  integrity sha512-M7n6jvHfUzUXDtf6UGpL6rVIddV7UzEYrvwZPORApeHvDGQnZJ79fXorLlDj8xJKyUemnEBohRd8yx09k9NBUw==
+
 "@types/yargs-parser@*":
   version "20.2.0"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-20.2.0.tgz#dd3e6699ba3237f0348cd085e4698780204842f9"
