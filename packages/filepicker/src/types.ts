@@ -18,7 +18,7 @@ export interface StreamingFilePickerInterface {
   selectFileAndStream(onChunk: OnChunkCallback): Promise<FileSelectionResponse>
 
   /** This function must be called in response to a user interaction, otherwise, it will be rejected by the browser. */
-  saveFile(): Promise<{ pusher: ChunkDiskPusher; closer: ChunkDiskCloser }>
+  saveFile(name: string): Promise<{ pusher: ChunkDiskPusher; closer: ChunkDiskCloser }>
 }
 
 export interface ClassicFilePickerInterface {

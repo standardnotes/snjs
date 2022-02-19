@@ -40,6 +40,10 @@ export class SNFile extends SNItem implements ExtendedFileContent {
     this.chunkSizes = this.typedContent.chunkSizes;
   }
 
+  public get nameWithExt(): string {
+    return `${this.name}.${this.ext}`;
+  }
+
   private get typedContent(): FileContent {
     return (this.safeContent as unknown) as FileContent;
   }

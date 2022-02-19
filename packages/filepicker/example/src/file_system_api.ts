@@ -56,12 +56,12 @@ export class FileSystemApi {
   downloadFile = async (): Promise<void> => {
     console.log('Downloading file', this.remoteIdentifier)
 
-    const file = this.application['itemManager']
-      .getItems(ContentType.File)
-      .find((file: SNFile) => file.remoteIdentifier === this.remoteIdentifier)
+    const file = this.application
+      .getItems<SNFile>(ContentType.File)
+      .find((file) => file.remoteIdentifier === this.remoteIdentifier)
 
     const picker = new StreamingFilePicker()
-    const { pusher, closer } = await picker.saveFile()
+    const { pusher, closer } = await picker.saveFile(file.nameWithExt)
 
     await this.application.fileService.downloadFile(
       file,

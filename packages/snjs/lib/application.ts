@@ -873,11 +873,11 @@ export class SNApplication implements ListedInterface {
     return unprotectedNotes;
   }
 
-  public getItems(
+  public getItems<T extends SNItem>(
     contentType: ContentType | ContentType[],
     nonerroredOnly = false
-  ): SNItem[] {
-    return this.itemManager.getItems(contentType, nonerroredOnly);
+  ): T[] {
+    return this.itemManager.getItems<T>(contentType, nonerroredOnly);
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[] {

@@ -20,6 +20,10 @@ export class StreamingFilePicker implements StreamingFilePickerInterface {
     console.log(args)
   }
 
+  static available(): boolean {
+    return window.showOpenFilePicker != undefined
+  }
+
   async selectFileAndStream(
     onChunk: OnChunkCallback,
   ): Promise<FileSelectionResponse> {
@@ -69,13 +73,17 @@ export class StreamingFilePicker implements StreamingFilePickerInterface {
     return { name, ext }
   }
 
-  async saveFile(): Promise<{
+  async saveFile(
+    name: string,
+  ): Promise<{
     pusher: ChunkDiskPusher
     closer: ChunkDiskCloser
   }> {
     this.log('Showing save file picker')
 
-    const downloadHandle = await window.showSaveFilePicker()
+    const downloadHandle = await window.showSaveFilePicker({
+      suggestedName: name,
+    })
 
     const writableStream = await downloadHandle.createWritable()
 
