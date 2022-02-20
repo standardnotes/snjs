@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.61.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.4...@standardnotes/snjs@2.61.5) (2022-02-18)
+
+
+### Bug Fixes
+
+* set sync tokens after local processing completes so that if error occurs in between, next sync reattempts to fetch with previous tokens ([#602](https://github.com/standardnotes/snjs/issues/602)) ([355fb22](https://github.com/standardnotes/snjs/commit/355fb22c6e6fdd438734b43a5406e330b40951bb))
+
+
+
+
+
+## [2.61.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.3...@standardnotes/snjs@2.61.4) (2022-02-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.61.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.2...@standardnotes/snjs@2.61.3) (2022-02-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.61.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.1...@standardnotes/snjs@2.61.2) (2022-02-17)
 
 **Note:** Version bump only for package @standardnotes/snjs

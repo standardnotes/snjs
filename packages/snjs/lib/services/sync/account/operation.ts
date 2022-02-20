@@ -65,14 +65,18 @@ export class AccountSyncOperation {
       this.checkIntegrity,
       undefined,
       undefined
-    ) as RawSyncResponse);
+    )) as RawSyncResponse;
     const response = new SyncResponse(rawResponse);
 
     this.responses.push(response);
     this.lastSyncToken = response.lastSyncToken!;
     this.paginationToken = response.paginationToken!;
 
-    await this.receiver(SyncSignal.Response, response);
+    try {
+      await this.receiver(SyncSignal.Response, response);
+    } catch (error) {
+      console.error('Sync handle response error', error);
+    }
 
     if (!this.done) {
       return this.run();

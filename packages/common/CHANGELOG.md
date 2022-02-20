@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.11.0...@standardnotes/common@1.12.0) (2022-02-18)
+
+
+### Features
+
+* add item integrity hash model ([975474a](https://github.com/standardnotes/snjs/commit/975474a04c4b11edea381235fe38273db59fa770))
+
+
+
+
+
 # [1.11.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.10.0...@standardnotes/common@1.11.0) (2022-02-16)
 
 
