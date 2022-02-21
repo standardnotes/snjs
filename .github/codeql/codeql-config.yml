@@ -14,3 +14,4 @@ paths-ignore:
 - packages/sncrypto-node/src/crypto.spec.ts
 - packages/sncrypto-web/test
 - packages/components/all/*
+- packages/filepicker/example
