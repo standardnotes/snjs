@@ -8,7 +8,7 @@ describe('file uploader', () => {
 
   beforeEach(() => {
     apiService = {} as jest.Mocked<FilesApi>;
-    apiService.uploadFileBytes = jest.fn().mockReturnValue({ success: true });
+    apiService.uploadFileBytes = jest.fn().mockReturnValue(true);
 
     file = {
       remoteIdentifier: '123',

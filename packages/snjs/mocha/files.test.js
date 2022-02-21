@@ -2,7 +2,7 @@ import * as Factory from './lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('files', function () {
+describe('files', function () {
   this.timeout(Factory.TwentySecondTimeout);
 
   beforeEach(async function () {

@@ -10,7 +10,7 @@ describe('encrypt and upload', () => {
 
   beforeEach(() => {
     apiService = {} as jest.Mocked<FilesApi>;
-    apiService.uploadFileBytes = jest.fn().mockReturnValue({ success: true });
+    apiService.uploadFileBytes = jest.fn().mockReturnValue(true);
 
     crypto = {} as jest.Mocked<SNPureCrypto>;
 

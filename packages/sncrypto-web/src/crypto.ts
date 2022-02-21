@@ -2,6 +2,7 @@ import {
   StreamEncryptor,
   StreamDecryptor,
   SodiumConstant,
+  StreamDecryptorResult,
 } from '@standardnotes/sncrypto-common'
 import * as Utils from './utils'
 import * as sodium from './libsodium'
@@ -378,7 +379,7 @@ export class SNWebCrypto implements SNPureCrypto {
     decryptor: StreamDecryptor,
     encryptedBuffer: Uint8Array,
     assocData: Utf8String,
-  ): { message: Uint8Array; tag: SodiumConstant } | false {
+  ): StreamDecryptorResult | false {
     if (
       encryptedBuffer.length <
       SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
@@ -396,7 +397,7 @@ export class SNWebCrypto implements SNPureCrypto {
       return false
     }
 
-    return result as { message: Uint8Array; tag: SodiumConstant }
+    return result
   }
 
   /**

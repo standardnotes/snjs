@@ -14,5 +14,5 @@ export type ApplicationOptions = SyncOptions & FileOptions;
 
 export const ApplicationOptionsDefaults: ApplicationOptions = {
   loadBatchSize: 700,
-  filesChunkSize: 1_000_00,
+  filesChunkSize: 1_000_000,
 };

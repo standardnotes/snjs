@@ -13,6 +13,11 @@ export type StreamDecryptor = {
   state: SodiumStateAddress;
 };
 
+export type StreamDecryptorResult = {
+  message: Uint8Array;
+  tag: SodiumConstant;
+};
+
 export enum SodiumConstant {
   CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_STATEBYTES = 52,
   CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES = 17,

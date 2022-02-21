@@ -20,7 +20,13 @@ describe('download and decrypt', () => {
     apiService.downloadFile = jest
       .fn()
       .mockImplementation(
-        (_: string, onBytesReceived: (bytes: Uint8Array) => void) => {
+        (
+          _file: string,
+          _chunkIndex: number,
+          _apiToken: string,
+          _rangeStart: number,
+          onBytesReceived: (bytes: Uint8Array) => void
+        ) => {
           const receiveFile = async () => {
             for (let i = 0; i < NumChunks; i++) {
               onBytesReceived(Uint8Array.from([0xaa]));

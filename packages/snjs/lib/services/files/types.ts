@@ -1,4 +1,3 @@
-import { SNFile } from './../../models/app/file';
 export interface FilesApi {
   startUploadSession(
     apiToken: string,

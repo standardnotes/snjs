@@ -16,7 +16,13 @@ describe('file downloader', () => {
     apiService.downloadFile = jest
       .fn()
       .mockImplementation(
-        (_: string, onBytesReceived: (bytes: Uint8Array) => void) => {
+        (
+          _file: string,
+          _chunkIndex: number,
+          _apiToken: string,
+          _rangeStart: number,
+          onBytesReceived: (bytes: Uint8Array) => void
+        ) => {
           return new Promise<void>((resolve) => {
             for (let i = 0; i < numChunks; i++) {
               onBytesReceived(Uint8Array.from([0xaa]));

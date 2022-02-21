@@ -198,7 +198,7 @@ describe('crypto operations', async function () {
     expect(decrypted).to.equal(plaintext)
   })
 
-  it.only('xchacha20 streaming encrypt/decrypt', async function () {
+  it('xchacha20 streaming encrypt/decrypt', async function () {
     const key = await webCrypto.generateRandomKey(256)
     const bigFile = await fetch(
       'http://localhost:9003/test/resources/big_file.md',
