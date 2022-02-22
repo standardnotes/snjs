@@ -14,7 +14,6 @@ export enum FeatureIdentifier {
   Files5GB = 'org.standardnotes.files-5-gb',
   FocusedTheme = 'org.standardnotes.theme-focus',
   FocusMode = 'org.standardnotes.focus-mode',
-  FoldersComponent = 'org.standardnotes.folders',
   FuturaTheme = 'org.standardnotes.theme-futura',
   ListedCustomDomain = 'org.standardnotes.listed-custom-domain',
   MarkdownBasicEditor = 'org.standardnotes.simple-markdown-editor',
@@ -37,8 +36,12 @@ export enum FeatureIdentifier {
   TokenVaultEditor = 'org.standardnotes.token-vault',
   TwoFactorAuth = 'org.standardnotes.two-factor-auth',
   TwoFactorAuthManager = 'org.standardnotes.mfa-link',
+
+  DeprecatedFoldersComponent = 'org.standardnotes.folders',
+  DeprecatedFileSafe = 'org.standardnotes.file-safe',
 }
 
-export enum DeprecatedFeatureIdentifier {
-  FileSafe = 'org.standardnotes.file-safe',
-}
+export const DeprecatedFeatures = [
+  FeatureIdentifier.DeprecatedFileSafe,
+  FeatureIdentifier.DeprecatedFoldersComponent,
+]

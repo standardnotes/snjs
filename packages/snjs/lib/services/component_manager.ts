@@ -1,5 +1,5 @@
 import { SNPreferencesService } from './preferences_service';
-import { GetFeatures, FeatureDescription } from '@standardnotes/features';
+import { FindNativeFeature } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import { displayStringForContentType } from '@Models/content_types';
@@ -174,7 +174,7 @@ export class SNComponentManager extends AbstractService<
 
     if (this.isDesktop) {
       const thirdPartyComponents = components.filter((component) => {
-        const nativeFeature = this.nativeFeatureForComponent(component);
+        const nativeFeature = FindNativeFeature(component.identifier);
         return nativeFeature ? false : true;
       });
       if (thirdPartyComponents.length > 0) {
@@ -269,21 +269,13 @@ export class SNComponentManager extends AbstractService<
     }) as SNTheme[];
   }
 
-  nativeFeatureForComponent(
-    component: SNComponent
-  ): FeatureDescription | undefined {
-    return GetFeatures(this.runtime).find(
-      (feature) => feature.identifier === component.identifier
-    );
-  }
-
   urlForComponent(component: SNComponent): string | undefined {
     /* offlineOnly is available only on desktop, and not on web or mobile. */
     if (component.offlineOnly && !this.isDesktop) {
       return undefined;
     }
 
-    const nativeFeature = this.nativeFeatureForComponent(component);
+    const nativeFeature = FindNativeFeature(component.identifier);
 
     if (this.isDesktop) {
       if (nativeFeature) {
@@ -379,7 +371,7 @@ export class SNComponentManager extends AbstractService<
       return;
     }
     const component = this.findComponent(componentUuid);
-    const nativeFeature = this.nativeFeatureForComponent(component);
+    const nativeFeature = FindNativeFeature(component.identifier);
     const acquiredPermissions =
       nativeFeature?.component_permissions || component.permissions;
 

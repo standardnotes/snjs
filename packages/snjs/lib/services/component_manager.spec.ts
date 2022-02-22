@@ -3,7 +3,7 @@
  */
 
 import { SNPreferencesService } from './preferences_service';
-import { FeatureDescription } from '@standardnotes/features';
+import { FeatureDescription, FindNativeFeature } from '@standardnotes/features';
 import { DesktopManagerInterface } from '@Services/component_manager/types';
 import { FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
@@ -91,6 +91,20 @@ describe('featuresService', () => {
     } as never);
   };
 
+  const deprecatedComponent = () => {
+    return new SNComponent({
+      uuid: '789',
+      content_type: ContentType.Component,
+      safeContent: {
+        package_info: {
+          hosted_url: 'https://example.com/component',
+          identifier: FeatureIdentifier.DeprecatedFileSafe,
+          valid_until: new Date(),
+        },
+      },
+    } as never);
+  };
+
   const thirdPartyComponent = () => {
     return new SNComponent({
       uuid: '789',
@@ -112,7 +126,17 @@ describe('featuresService', () => {
         const manager = createManager(Environment.Desktop, Platform.MacDesktop);
         const component = nativeComponent();
         const url = manager.urlForComponent(component);
-        const feature = manager.nativeFeatureForComponent(component);
+        const feature = FindNativeFeature(component.identifier);
+        expect(url).toEqual(
+          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`
+        );
+      });
+
+      it('returns native path for deprecated native component', () => {
+        const manager = createManager(Environment.Desktop, Platform.MacDesktop);
+        const component = deprecatedComponent();
+        const url = manager.urlForComponent(component);
+        const feature = FindNativeFeature(component.identifier);
         expect(url).toEqual(
           `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`
         );
@@ -150,8 +174,8 @@ describe('featuresService', () => {
         const manager = createManager(Environment.Web, Platform.MacWeb);
         const component = nativeComponent();
         const url = manager.urlForComponent(component);
-        const feature = manager.nativeFeatureForComponent(
-          component
+        const feature = FindNativeFeature(
+          component.identifier
         ) as FeatureDescription;
         expect(url).toEqual(
           `http://localhost/components/${component.identifier}/${feature.index_path}`

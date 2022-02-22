@@ -17,22 +17,17 @@ export function GetFeatures(runtime: Runtime = Runtime.Prod): FeatureDescription
   return [
     ...themes(runtime),
     ...editors(runtime),
-    ...nonEditorComponents(runtime),
     ...serverFeatures(runtime),
     ...clientFeatures(runtime),
   ]
 }
 
-function githubDownloadUrl(
-  repoUrl: string,
-  version: string,
-  identifier: FeatureIdentifier
-) {
+function githubDownloadUrl(repoUrl: string, version: string, identifier: FeatureIdentifier) {
   return `${repoUrl}/releases/download/${version}/${identifier}.zip`
 }
 
 function FillThemeComponentDefaults(
-  theme: Partial<ThemeFeatureDescription>
+  theme: Partial<ThemeFeatureDescription>,
 ): ThemeFeatureDescription {
   if (!theme.static_files) {
     theme.static_files = ['dist', 'package.json']
@@ -42,7 +37,7 @@ function FillThemeComponentDefaults(
     theme.download_url = githubDownloadUrl(
       theme.git_repo_url,
       theme.version as string,
-      theme.identifier as FeatureIdentifier
+      theme.identifier as FeatureIdentifier,
     )
   }
 
@@ -173,35 +168,26 @@ function themes(_: Runtime): ThemeFeatureDescription[] {
     layerable: true,
     no_mobile: true,
     version: '1.0.3',
-    description:
-      'A smart theme that minimizes the tags and notes panels when they are not in use.',
+    description: 'A smart theme that minimizes the tags and notes panels when they are not in use.',
     git_repo_url: 'https://github.com/standardnotes/dynamic-theme',
     marketing_url: 'https://standardnotes.com/extensions/dynamic',
   })
 
-  return [
-    midnight,
-    futura,
-    solarizedDark,
-    autobiography,
-    focus,
-    titanium,
-    dynamic,
-  ]
+  return [midnight, futura, solarizedDark, autobiography, focus, titanium, dynamic]
 }
 
 function FillEditorComponentDefaults(
-  component: Partial<EditorFeatureDescription>
+  component: Partial<EditorFeatureDescription>,
 ): EditorFeatureDescription {
   component.static_files = ['index.html', 'dist', 'package.json'].concat(
-    component.static_files || []
+    component.static_files || [],
   )
 
   if (component.git_repo_url && !component.download_url) {
     component.download_url = githubDownloadUrl(
       component.git_repo_url,
       component.version as string,
-      component.identifier as FeatureIdentifier
+      component.identifier as FeatureIdentifier,
     )
   }
 
@@ -247,8 +233,7 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
       'languages. Ideal for code snippets and procedures.',
     git_repo_url: 'https://github.com/standardnotes/code-editor',
     marketing_url: 'https://standardnotes.com/extensions/code-editor',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/code.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/code.jpg',
   })
 
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -276,8 +261,7 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
     description:
       'A simple and peaceful rich editor that helps you write and think clearly. Features FileSafe integration, so you can embed your encrypted images, videos, and audio recordings directly inline.',
     marketing_url: '',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/bold.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/bold.jpg',
     git_repo_url: 'https://github.com/standardnotes/bold-editor',
   })
 
@@ -307,8 +291,7 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
     permission_name: PermissionName.MarkdownBasicEditor,
     description: 'A Markdown editor with dynamic split-pane preview.',
     git_repo_url: 'https://github.com/standardnotes/markdown-basic',
-    marketing_url:
-      'https://standardnotes.com/extensions/simple-markdown-editor',
+    marketing_url: 'https://standardnotes.com/extensions/simple-markdown-editor',
     thumbnail_url:
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg',
   })
@@ -329,25 +312,22 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
       'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
   })
 
-  const markdownMinimist: EditorFeatureDescription = FillEditorComponentDefaults(
-    {
-      name: 'Markdown Minimist',
-      identifier: FeatureIdentifier.MarkdownMinimistEditor,
-      note_type: NoteType.Markdown,
-      file_type: 'md',
-      index_path: 'index.html',
-      permission_name: PermissionName.MarkdownMinimistEditor,
-      version: '1.3.9',
-      spellcheckControl: true,
-      description:
-        'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
-      git_repo_url: 'https://github.com/standardnotes/minimal-markdown-editor',
-      marketing_url:
-        'https://standardnotes.com/extensions/minimal-markdown-editor',
-      thumbnail_url:
-        'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
-    } as EditorFeatureDescription
-  )
+  const markdownMinimist: EditorFeatureDescription = FillEditorComponentDefaults({
+    name: 'Markdown Minimist',
+    identifier: FeatureIdentifier.MarkdownMinimistEditor,
+    note_type: NoteType.Markdown,
+    file_type: 'md',
+    index_path: 'index.html',
+    permission_name: PermissionName.MarkdownMinimistEditor,
+    version: '1.3.9',
+    spellcheckControl: true,
+    description:
+      'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
+    git_repo_url: 'https://github.com/standardnotes/minimal-markdown-editor',
+    marketing_url: 'https://standardnotes.com/extensions/minimal-markdown-editor',
+    thumbnail_url:
+      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
+  } as EditorFeatureDescription)
 
   const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Math',
@@ -374,8 +354,7 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
     file_type: 'md',
     permission_name: PermissionName.MarkdownVisualEditor,
     spellcheckControl: true,
-    description:
-      'A lightweight WYSIWYG markdown editor, derivated from Milkdown editor.',
+    description: 'A lightweight WYSIWYG markdown editor, derivated from Milkdown editor.',
     git_repo_url: 'https://github.com/standardnotes/markdown-visual',
     marketing_url: 'https://github.com/standardnotes/markdown-visual',
     static_files: ['build'],
@@ -446,32 +425,6 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
   ]
 }
 
-function nonEditorComponents(_: Runtime): IframeComponentFeatureDescription[] {
-  const folders: IframeComponentFeatureDescription = FillEditorComponentDefaults(
-    {
-      name: 'Folders',
-      identifier: FeatureIdentifier.FoldersComponent,
-      version: '1.3.8',
-      index_path: 'index.html',
-      component_permissions: [
-        {
-          name: ComponentAction.StreamItems,
-          content_types: [ContentType.Tag, ContentType.SmartTag],
-        },
-      ],
-      permission_name: PermissionName.ComponentFolders,
-      area: ComponentArea.TagsList,
-      description: 'Create nested folders with easy drag and drop.',
-      git_repo_url: 'https://github.com/standardnotes/folders-component',
-      marketing_url: 'https://standardnotes.com/extensions/folders',
-      thumbnail_url:
-        'https://s3.amazonaws.com/standard-notes/screenshots/models/components/folders.jpg',
-    }
-  )
-
-  return [folders]
-}
-
 function serverFeatures(_: Runtime): ServerFeatureDescription[] {
   return [
     {
@@ -539,8 +492,7 @@ function clientFeatures(_: Runtime): ClientFeatureDescription[] {
       name: 'Smart Filters',
       identifier: FeatureIdentifier.SmartFilters,
       permission_name: PermissionName.SmartFilters,
-      description:
-        'Create smart filters for viewing notes matching specific criteria.',
+      description: 'Create smart filters for viewing notes matching specific criteria.',
     },
     {
       name: 'Encrypted files (coming soon)',
@@ -567,4 +519,63 @@ function clientFeatures(_: Runtime): ClientFeatureDescription[] {
       description: '',
     },
   ]
+}
+
+export function GetDeprecatedFeatures(): FeatureDescription[] {
+  const filesafe: IframeComponentFeatureDescription = FillEditorComponentDefaults({
+    name: 'FileSafe',
+    identifier: FeatureIdentifier.DeprecatedFileSafe,
+    version: '2.0.10',
+    component_permissions: [
+      {
+        name: ComponentAction.StreamContextItem,
+        content_types: [ContentType.Note],
+      },
+      {
+        name: ComponentAction.StreamItems,
+        content_types: [
+          ContentType.FilesafeCredentials,
+          ContentType.FilesafeFileMetadata,
+          ContentType.FilesafeIntegration,
+        ],
+      },
+    ],
+    permission_name: PermissionName.ComponentFilesafe,
+    area: ComponentArea.EditorStack,
+    deprecated: true,
+    description:
+      'Encrypted attachments for your notes using your Dropbox, Google Drive, or WebDAV server. Limited to 50MB per file.',
+    git_repo_url: 'https://github.com/standardnotes/filesafe-client',
+    marketing_url: 'https://standardnotes.com/extensions/filesafe',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
+  })
+
+  const folders: IframeComponentFeatureDescription = FillEditorComponentDefaults({
+    name: 'Folders',
+    identifier: FeatureIdentifier.DeprecatedFoldersComponent,
+    version: '1.3.8',
+    index_path: 'index.html',
+    component_permissions: [
+      {
+        name: ComponentAction.StreamItems,
+        content_types: [ContentType.Tag, ContentType.SmartTag],
+      },
+    ],
+    permission_name: PermissionName.ComponentFolders,
+    area: ComponentArea.TagsList,
+    deprecated: true,
+    description: 'Create nested folders with easy drag and drop.',
+    git_repo_url: 'https://github.com/standardnotes/folders-component',
+    marketing_url: 'https://standardnotes.com/extensions/folders',
+    thumbnail_url:
+      'https://s3.amazonaws.com/standard-notes/screenshots/models/components/folders.jpg',
+  })
+
+  return [filesafe, folders]
+}
+
+export function FindNativeFeature(identifier: FeatureIdentifier): FeatureDescription | undefined {
+  return GetFeatures()
+    .concat(GetDeprecatedFeatures())
+    .find((f) => f.identifier === identifier)
 }
