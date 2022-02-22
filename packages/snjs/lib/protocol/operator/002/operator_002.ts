@@ -4,7 +4,7 @@ import {
   splitString,
   firstHalfOfString,
   secondHalfOfString,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,

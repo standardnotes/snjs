@@ -26,7 +26,7 @@ import {
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { convertTimestampToMilliseconds } from '@Lib/utils';
+import { convertTimestampToMilliseconds } from '@standardnotes/utils';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;

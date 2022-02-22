@@ -16,7 +16,7 @@ import {
   removeFromIndex,
   sleep,
   subtractFromArray,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { PureService } from '@Services/pure_service';
 import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils';
 import { SyncOpStatus } from '@Services/sync/sync_op_status';

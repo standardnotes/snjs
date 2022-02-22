@@ -28,7 +28,7 @@ import {
   jsonParseEmbeddedKeys,
   objectToValueArray,
   omitByCopy,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
 import { CreateItemFromPayload } from '../models';

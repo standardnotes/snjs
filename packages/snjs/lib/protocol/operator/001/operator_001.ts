@@ -26,7 +26,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { ContentType } from '@standardnotes/common';
 import { FillItemContent } from '@Models/functions';
 import { Uuid } from '@Lib/uuid';
-import { firstHalfOfString, secondHalfOfString, splitString } from '@Lib/utils';
+import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils';
 
 const NO_IV = '00000000000000000000000000000000';
 

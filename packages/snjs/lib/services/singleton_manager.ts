@@ -7,7 +7,7 @@ import {
   arrayByRemovingFromIndex,
   extendArray,
   isNullOrUndefined,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,

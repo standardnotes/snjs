@@ -17,7 +17,7 @@ import {
   deepFreeze,
   omitInPlace,
   sortedCopy,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { SNPredicate } from '@Models/core/predicate';
 import { DefaultAppDomain } from '../content_types';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';

@@ -22,7 +22,7 @@ import {
   filterFromArray,
   removeFromArray,
   sleep,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { Environment, Platform } from '@Lib/platforms';
 import { UuidString } from '@Lib/types';
 import {

@@ -1,4 +1,4 @@
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { ItemCollection } from './item_collection';
 import { SNNote } from '@Lib/models';
 import { SNTag } from '@Lib/index';

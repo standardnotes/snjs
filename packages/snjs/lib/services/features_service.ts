@@ -16,7 +16,7 @@ import {
   MetaReceivedData,
   SNApiService,
 } from './api/api_service';
-import { ErrorObject, UuidString } from '@Lib/types';
+import { UuidString } from '@Lib/types';
 import {
   FeatureDescription,
   ThirdPartyFeatureDescription,
@@ -24,7 +24,7 @@ import {
   GetFeatures,
   DeprecatedFeatureIdentifier,
 } from '@standardnotes/features';
-import { ContentType, Runtime, RoleName } from '@standardnotes/common';
+import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponent } from '@Lib/models';
@@ -42,7 +42,7 @@ import {
   arraysEqual,
   convertTimestampToMilliseconds,
   isErrorObject,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
@@ -56,7 +56,7 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
-import { Copy, lastElement } from '../utils';
+import { Copy, lastElement } from '@standardnotes/utils';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {

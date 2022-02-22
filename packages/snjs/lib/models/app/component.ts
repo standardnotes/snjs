@@ -4,7 +4,7 @@ import {
 } from '@standardnotes/features';
 import { PredicateOperator, SNPredicate } from '@Lib/models/core/predicate';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { addIfUnique, isValidUrl, removeFromArray } from '@Lib/utils';
+import { addIfUnique, isValidUrl, removeFromArray } from '@standardnotes/utils';
 import { UuidString } from './../../types';
 import { AppDataField } from './../core/item';
 import { PurePayload } from '@Payloads/pure_payload';

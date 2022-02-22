@@ -3,7 +3,7 @@ import { ItemDelta } from '@Lib/protocol/collection/indexes';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
 import { PureService } from '@Lib/services/pure_service';
-import { isString, naturalSort, removeFromArray } from '@Lib/utils';
+import { isString, naturalSort, removeFromArray } from '@standardnotes/utils';
 import { SNComponent } from '@Models/app/component';
 import { SNItemsKey } from '@Models/app/items_key';
 import { isTag, SNTag, TagFolderDelimitter } from '@Models/app/tag';

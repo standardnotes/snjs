@@ -1,5 +1,5 @@
 import { PurePayload } from '@Payloads/pure_payload';
-import { arrayByDifference, subtractFromArray } from '@Lib/utils';
+import { arrayByDifference, subtractFromArray } from '@standardnotes/utils';
 import { SyncResponse } from '@Services/sync/response';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';

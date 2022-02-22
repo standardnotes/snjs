@@ -26,7 +26,7 @@ import {
   sortedCopy,
   truncateHexString,
   splitString,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { ContentType } from '@standardnotes/common';
