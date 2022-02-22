@@ -1,5 +1,4 @@
 export type UuidString = string;
-export type ApplicationIdentifier = string;
 
 export enum DeinitSource {
   SignOut = 1,

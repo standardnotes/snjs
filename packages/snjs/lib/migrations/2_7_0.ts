@@ -1,7 +1,6 @@
-import { ApplicationStage } from '../stages';
 import { Migration } from '@Lib/migrations/migration';
 import { SNPredicate } from '@Lib/models';
-import { ContentType } from '@standardnotes/common';
+import { ApplicationStage, ContentType } from '@standardnotes/common';
 import { PredicateOperator } from '@Lib/models/core/predicate';
 
 export class Migration2_7_0 extends Migration {

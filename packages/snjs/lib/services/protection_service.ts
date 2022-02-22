@@ -5,16 +5,16 @@ import {
   ChallengeValidation,
 } from '@Lib/challenges';
 import { ChallengeService } from './challenge/challenge_service';
-import { PureService } from '@Lib/services/pure_service';
 import { SNLog } from '@Lib/log';
 import { NoteMutator, SNNote } from '@Lib/models';
 import { SNProtocolService } from './protocol_service';
 import { SNStorageService, StorageValueModes } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@standardnotes/utils';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { Uuids } from '@Lib/models/functions';
+import { AbstractService } from '@standardnotes/services';
 
 export enum ProtectionEvent {
   UnprotectedSessionBegan = 'UnprotectedSessionBegan',
@@ -61,7 +61,7 @@ export const ProtectionSessionDurations = [
  * like viewing a protected note, as well as managing how long that
  * authentication should be valid for.
  */
-export class SNProtectionService extends PureService<ProtectionEvent> {
+export class SNProtectionService extends AbstractService<ProtectionEvent> {
   private sessionExpiryTimeout = -1;
 
   constructor(

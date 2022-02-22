@@ -17,7 +17,6 @@ import {
   sleep,
   subtractFromArray,
 } from '@standardnotes/utils';
-import { PureService } from '@Services/pure_service';
 import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils';
 import { SyncOpStatus } from '@Services/sync/sync_op_status';
 import { SyncState } from '@Services/sync/sync_state';
@@ -38,6 +37,7 @@ import { SyncSignal, SyncStats } from '@Services/sync/signals';
 import { SNSessionManager } from '../api/session_manager';
 import { SNApiService } from '../api/api_service';
 import { SNLog } from '@Lib/log';
+import { AbstractService } from '@standardnotes/services';
 
 const DEFAULT_MAX_DISCORDANCE = 5;
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15;
@@ -110,7 +110,7 @@ type SyncPromise = {
  * After each sync request, any changes made or retrieved are also persisted locally.
  * The sync service largely does not perform any task unless it is called upon.
  */
-export class SNSyncService extends PureService<
+export class SNSyncService extends AbstractService<
   SyncEvent,
   SyncResponse | { source: SyncSources }
 > {

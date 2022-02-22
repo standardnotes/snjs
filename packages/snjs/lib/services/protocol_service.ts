@@ -9,7 +9,6 @@ import {
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
 } from './../protocol/payloads/generator';
-import { ApplicationIdentifier } from './../types';
 import { FillItemContent, Uuids } from '@Models/functions';
 import {
   ContentTypeUsesRootKeyEncryption,
@@ -46,7 +45,6 @@ import {
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { PayloadManager } from './payload_manager';
-import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Uuid } from '@Lib/uuid';
 import {
@@ -59,10 +57,10 @@ import {
   removeFromArray,
 } from '@standardnotes/utils';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
-import { ContentType } from '@standardnotes/common';
+import { ApplicationIdentifier, ContentType } from '@standardnotes/common';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
-import { DeviceInterface } from '../device_interface';
+import { AbstractService, DeviceInterface } from '@standardnotes/services';
 import { intentRequiresEncryption, isDecryptedIntent } from '@Lib/protocol';
 
 export type BackupFile = {
@@ -130,7 +128,7 @@ function isAsyncOperator(
  * for a particular payload, and also retrieve all available items keys.
 */
 export class SNProtocolService
-  extends PureService
+  extends AbstractService
   implements EncryptionDelegate {
   public crypto: SNPureCrypto;
   private operators: Record<string, AnyOperator> = {};

@@ -44,7 +44,6 @@ import {
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
-import { PureService } from '@Services/pure_service';
 import { isNullOrUndefined, joinPaths } from '@standardnotes/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
@@ -55,6 +54,7 @@ import {
   isUrlFirstParty,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
+import { AbstractService } from '@standardnotes/services';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -130,7 +130,7 @@ export type MetaReceivedData = {
   userRoles: Role[];
 };
 
-export class SNApiService extends PureService<
+export class SNApiService extends AbstractService<
   ApiServiceEvent.MetaReceived,
   MetaReceivedData
 > {

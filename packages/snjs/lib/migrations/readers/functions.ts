@@ -3,9 +3,9 @@ import {
   compareSemVersions,
   isRightVersionGreaterThanLeft,
 } from '@Lib/version';
-import { ApplicationIdentifier } from './../../types';
+import { ApplicationIdentifier } from '@standardnotes/common';
 import { Environment } from '@Lib/platforms';
-import { DeviceInterface } from '@Lib/device_interface';
+import { DeviceInterface } from '@standardnotes/services';
 import { StorageReader } from './reader';
 
 function ReaderClassForVersion(version: string): any {

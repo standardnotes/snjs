@@ -3,7 +3,7 @@ import { SNAlertService } from './alert_service';
 import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
@@ -12,11 +12,10 @@ import { EncryptionDelegate } from './encryption_delegate';
 import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
-import { PureService } from '@Lib/services/pure_service';
 import { ContentType } from '@standardnotes/common';
 import { Copy, isNullOrUndefined } from '@standardnotes/utils';
 import { Uuid } from '@Lib/uuid';
-import { DeviceInterface } from '../device_interface';
+import { AbstractService, DeviceInterface } from '@standardnotes/services';
 
 export enum StoragePersistencePolicies {
   Default = 1,
@@ -61,7 +60,7 @@ export type StorageValuesObject = {
  * decrypt the persisted key/values, and also a method to determine whether a particular
  * key can decrypt wrapped storage.
  */
-export class SNStorageService extends PureService {
+export class SNStorageService extends AbstractService {
   public encryptionDelegate!: EncryptionDelegate;
   /** Wait until application has been unlocked before trying to persist */
   private storagePersistable = false;

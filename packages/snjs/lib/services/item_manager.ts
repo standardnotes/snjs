@@ -2,7 +2,6 @@ import { createMutatorForItem } from '@Lib/models/mutator';
 import { ItemDelta } from '@Lib/protocol/collection/indexes';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
-import { PureService } from '@Lib/services/pure_service';
 import { isString, naturalSort, removeFromArray } from '@standardnotes/utils';
 import { SNComponent } from '@Models/app/component';
 import { SNItemsKey } from '@Models/app/items_key';
@@ -49,6 +48,7 @@ import { PayloadSource } from './../protocol/payloads/sources';
 import { UuidString } from './../types';
 import { Uuid } from './../uuid';
 import { PayloadManager } from './payload_manager';
+import { AbstractService } from '@standardnotes/services';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -87,7 +87,7 @@ export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
  * will then notify  its observers (which is us), we'll convert the payloads to items,
  * and then  we'll propagate them to our listeners.
  */
-export class ItemManager extends PureService {
+export class ItemManager extends AbstractService {
   private unsubChangeObserver: () => void;
   private observers: Observer[] = [];
   private collection!: ItemCollection;

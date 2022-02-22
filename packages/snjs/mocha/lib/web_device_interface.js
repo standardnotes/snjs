@@ -1,8 +1,10 @@
 /* eslint-disable no-undef */
 
+import { AbstractDevice } from '@standardnotes/services';
+
 const KEYCHAIN_STORAGE_KEY = 'keychain';
 
-export default class WebDeviceInterface extends DeviceInterface {
+export default class WebDeviceInterface extends AbstractDevice {
   async getRawStorageValue(key) {
     return localStorage.getItem(key);
   }

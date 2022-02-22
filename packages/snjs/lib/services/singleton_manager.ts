@@ -2,7 +2,6 @@ import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
 import { SNPredicate } from '@Models/core/predicate';
 import { SNItem, SingletonStrategy } from '@Models/core/item';
-import { PureService } from '@Lib/services/pure_service';
 import {
   arrayByRemovingFromIndex,
   extendArray,
@@ -16,6 +15,7 @@ import { Uuid } from '@Lib/uuid';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';
 import { Uuids } from '@Models/functions';
+import { AbstractService } from '@standardnotes/services';
 
 /**
  * The singleton manager allow consumers to ensure that only 1 item exists of a certain
@@ -28,7 +28,7 @@ import { Uuids } from '@Models/functions';
  * 2. Items can override isSingleton, singletonPredicate, and strategyWhenConflictingWithItem (optional)
  *    to automatically gain singleton resolution.
  */
-export class SNSingletonManager extends PureService {
+export class SNSingletonManager extends AbstractService {
   private resolveQueue: SNItem[] = [];
 
   private removeItemObserver!: () => void;

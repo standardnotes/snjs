@@ -1,5 +1,5 @@
 import { SNItem } from '@Models/core/item';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from './../hosts';
 import {
   SNFeatureRepo,
@@ -9,7 +9,6 @@ import { SNSyncService } from './sync/sync_service';
 import { AccountEvent, SNCredentialService } from './credential_service';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
-import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 import {
   ApiServiceEvent,
@@ -57,6 +56,7 @@ import {
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
 import { Copy, lastElement } from '@standardnotes/utils';
+import { AbstractService } from '@standardnotes/services';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -79,7 +79,7 @@ export const enum FeatureStatus {
   Entitled = 'Entitled',
 }
 
-export class SNFeaturesService extends PureService<FeaturesEvent> {
+export class SNFeaturesService extends AbstractService<FeaturesEvent> {
   private deinited = false;
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];
