@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.61.5",
+  "version": "2.63.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -29,7 +29,6 @@
     "@babel/preset-env": "^7.10.4",
     "@standardnotes/sncrypto-web": "^1.7.0",
     "@types/crypto-js": "^4.0.1",
-    "@types/dompurify": "^2.3.2",
     "@types/jest": "^26.0.23",
     "@types/jsdom": "^16.2.11",
     "@types/libsodium-wrappers": "^0.7.9",
@@ -46,7 +45,6 @@
     "crypto-js": "^4.0.0",
     "docdash": "^1.2.0",
     "dom-storage": "^2.1.0",
-    "dompurify": "^2.3.4",
     "eslint": "^7.18.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-config-semistandard": "^15.0.0",
@@ -79,11 +77,13 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@standardnotes/auth": "^3.16.2",
-    "@standardnotes/common": "^1.12.0",
-    "@standardnotes/domain-events": "^2.23.11",
-    "@standardnotes/features": "^1.32.8",
+    "@standardnotes/auth": "^3.16.4",
+    "@standardnotes/common": "^1.14.0",
+    "@standardnotes/domain-events": "^2.23.13",
+    "@standardnotes/features": "^1.32.10",
+    "@standardnotes/services": "^1.1.0",
     "@standardnotes/settings": "^1.11.3",
-    "@standardnotes/sncrypto-common": "^1.7.0"
+    "@standardnotes/sncrypto-common": "^1.7.0",
+    "@standardnotes/utils": "^1.1.1"
   }
 }

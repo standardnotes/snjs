@@ -13,7 +13,6 @@ import { SNAlertService } from '@Services/alert_service';
 import { SNSyncService } from '@Services/sync/sync_service';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
-import { PureService } from '@Lib/services/pure_service';
 import { ComponentArea, SNComponent } from '@Models/app/component';
 import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import {
@@ -22,7 +21,7 @@ import {
   filterFromArray,
   removeFromArray,
   sleep,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { Environment, Platform } from '@Lib/platforms';
 import { UuidString } from '@Lib/types';
 import {
@@ -34,6 +33,7 @@ import {
   ActionObserver,
   ComponentViewer,
 } from '@Services/component_manager/component_viewer';
+import { AbstractService } from '@standardnotes/services';
 
 const DESKTOP_URL_PREFIX = 'sn://';
 const LOCAL_HOST = 'localhost';
@@ -53,7 +53,7 @@ export type EventData = {
  * and other components. The component manager primarily deals with iframes, and orchestrates
  * sending and receiving messages to and from frames via the postMessage API.
  */
-export class SNComponentManager extends PureService<
+export class SNComponentManager extends AbstractService<
   ComponentManagerEvent,
   EventData
 > {

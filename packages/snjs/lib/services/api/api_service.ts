@@ -1,7 +1,6 @@
-import { SNFile } from './../../models/app/file';
 import { FilesApi, EncryptedFileInterface } from './../files/types';
 import { SNFeatureRepo } from './../../models/app/feature_repo';
-import { ErrorObject, UuidString } from './../../types';
+import { UuidString } from './../../types';
 import {
   HttpResponse,
   RegistrationResponse,
@@ -37,7 +36,7 @@ import {
   DownloadFileChunkResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, ErrorObject } from '@standardnotes/common';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
@@ -51,14 +50,13 @@ import {
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
-import { PureService } from '@Services/pure_service';
-import { isNullOrUndefined, joinPaths } from '@Lib/utils';
+import { isNullOrUndefined, joinPaths } from '@standardnotes/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts';
-import { FileProtocolV1 } from '@Lib/index';
+import { AbstractService } from '@standardnotes/services';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -145,7 +143,7 @@ export type MetaReceivedData = {
 };
 
 export class SNApiService
-  extends PureService<ApiServiceEvent.MetaReceived, MetaReceivedData>
+  extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
   implements FilesApi {
   private session?: Session;
   public user?: User;

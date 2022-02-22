@@ -6,7 +6,7 @@ import {
   protocolVersionFromEncryptedString,
 } from '@Protocol/versions';
 import { ContentType } from '@standardnotes/common';
-import { deepFreeze, isNullOrUndefined, isObject, isString } from '@Lib/utils';
+import { deepFreeze, isNullOrUndefined, isObject, isString } from '@standardnotes/utils';
 import {
   ContentReference,
   PayloadContent,

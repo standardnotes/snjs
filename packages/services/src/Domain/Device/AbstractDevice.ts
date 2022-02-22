@@ -1,5 +1,7 @@
-import { ApplicationIdentifier } from './types';
-import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ApplicationIdentifier } from '@standardnotes/common'
+import { getGlobalScope, isNullOrUndefined } from '@standardnotes/utils'
+import { DeviceInterface } from './DeviceInterface'
 
 /**
  * Platforms must override this class to provide platform specific utilities
@@ -7,7 +9,7 @@ import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
  * raw values from the database or value storage.
  * This avoids the need for platforms to override migrations directly.
  */
-export abstract class DeviceInterface {
+export abstract class AbstractDevice implements DeviceInterface {
   public interval: any;
   public timeout: any;
 
@@ -21,17 +23,17 @@ export abstract class DeviceInterface {
        perform repeatedly. Similar to setInterval.
   */
   constructor(timeout: any, interval: any) {
-    this.timeout = timeout || setTimeout.bind(getGlobalScope());
-    this.interval = interval || setInterval.bind(getGlobalScope());
+    this.timeout = timeout || setTimeout.bind(getGlobalScope())
+    this.interval = interval || setInterval.bind(getGlobalScope())
   }
 
-  public deinit() {
-    this.timeout = undefined;
-    this.interval = undefined;
+  public deinit(): void {
+    this.timeout = undefined
+    this.interval = undefined
   }
 
   public cancelTimeout(timeout: unknown): void {
-    clearTimeout(timeout as any);
+    clearTimeout(timeout as any)
   }
 
   abstract getRawStorageValue(key: string): Promise<string | undefined>;
@@ -45,14 +47,14 @@ export abstract class DeviceInterface {
   public async getJsonParsedRawStorageValue(
     key: string
   ): Promise<unknown | undefined> {
-    const value = await this.getRawStorageValue(key);
+    const value = await this.getRawStorageValue(key)
     if (isNullOrUndefined(value)) {
-      return undefined;
+      return undefined
     }
     try {
-      return JSON.parse(value);
+      return JSON.parse(value)
     } catch (e) {
-      return value;
+      return value
     }
   }
 

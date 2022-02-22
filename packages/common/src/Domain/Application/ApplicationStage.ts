@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export enum ApplicationStage {
   PreparingForLaunch_0 = 0.0,
   ReadyForLaunch_05 = 0.5,

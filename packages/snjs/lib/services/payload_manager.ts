@@ -1,4 +1,4 @@
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { DeltaFileImport } from './../protocol/payloads/deltas/file_import';
 import { PayloadSource } from './../protocol/payloads/sources';
@@ -6,9 +6,9 @@ import { ContentType } from '@standardnotes/common';
 import { Uuids } from '@Models/functions';
 import { UuidString } from './../types';
 import { PurePayload } from '@Payloads/pure_payload';
-import { PureService } from '@Lib/services/pure_service';
 import { MutableCollection } from '@Lib/protocol/collection/collection';
 import { ImmutablePayloadCollection } from '@Lib/protocol/collection/payload_collection';
+import { AbstractService } from '@standardnotes/services';
 
 type ChangeCallback = (
   changed: PurePayload[],
@@ -42,7 +42,7 @@ type QueueElement = {
  * It exposes methods that allow consumers to listen to mapping events. This is how
  * applications 'stream' items to display in the interface.
  */
-export class PayloadManager extends PureService {
+export class PayloadManager extends AbstractService {
   private changeObservers: ChangeObserver[] = [];
   public collection: MutableCollection<PurePayload>;
   private emitQueue: QueueElement[] = [];

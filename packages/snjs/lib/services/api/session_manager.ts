@@ -29,8 +29,7 @@ import {
   KeyParamsOrigination,
   SNRootKeyParams,
 } from './../../protocol/key_params';
-import { PureService } from '@Lib/services/pure_service';
-import { isNullOrUndefined } from '@Lib/utils';
+import { isNullOrUndefined } from '@standardnotes/utils';
 import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';
@@ -43,6 +42,7 @@ import {
 } from './messages';
 import { UuidString } from '@Lib/types';
 import { SNWebSocketsService } from './websockets_service';
+import { AbstractService } from '@standardnotes/services';
 
 export const MINIMUM_PASSWORD_LENGTH = 8;
 export const MissingAccountParams = 'missing-params';
@@ -67,7 +67,7 @@ export const enum SessionEvent {
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
-export class SNSessionManager extends PureService<SessionEvent> {
+export class SNSessionManager extends AbstractService<SessionEvent> {
   private user?: User;
   private isSessionRenewChallengePresented = false;
 

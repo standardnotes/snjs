@@ -6,16 +6,16 @@ import { DecryptedFileInterface } from './types';
 import { EncryptAndUploadFileOperation } from './operations/encrypt_and_upload';
 import { SNFile, FileProtocolV1, FileContent } from './../../models/app/file';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { PureService } from '@Services/pure_service';
 import { SNAlertService } from '../alert_service';
 import { SNSyncService } from '../sync/sync_service';
 import { ItemManager } from '@Services/item_manager';
 import { SNApiService } from '../api/api_service';
 import { Uuid } from '@Lib/uuid';
-import { isErrorObject } from '@Lib/utils';
+import { isErrorObject } from '@standardnotes/utils';
 import { PayloadContent } from '@Lib/protocol';
+import { AbstractService } from '@standardnotes/services';
 
-export class SNFileService extends PureService {
+export class SNFileService extends AbstractService {
   constructor(
     private apiService: SNApiService,
     private itemManager: ItemManager,

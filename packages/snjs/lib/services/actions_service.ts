@@ -26,9 +26,8 @@ import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
 
 import { EncryptionIntent } from '@Protocol/intents';
-import { PureService } from '@Lib/services/pure_service';
 import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { DeviceInterface } from '../device_interface';
+import { AbstractService, DeviceInterface } from '@standardnotes/services';
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -44,7 +43,7 @@ import { DeviceInterface } from '../device_interface';
  * `post`: sends an item's data to a remote service. This is used for example by Listed
  *       to allow publishing a note to a user's blog.
  */
-export class SNActionsService extends PureService {
+export class SNActionsService extends AbstractService {
   private previousPasswords: string[] = [];
 
   constructor(

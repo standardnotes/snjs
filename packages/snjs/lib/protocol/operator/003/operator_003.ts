@@ -1,4 +1,4 @@
-import { splitString } from '@Lib/utils';
+import { splitString } from '@standardnotes/utils';
 import { CreateItemFromPayload } from '@Models/generator';
 import { SNItemsKey } from '@Models/app/items_key';
 import { ItemsKeyContent } from './../operator';

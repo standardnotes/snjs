@@ -1,4 +1,4 @@
-import { ApplicationStage } from './../stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { Migration } from '@Lib/migrations/migration';
 
 export class Migration2_0_15 extends Migration {

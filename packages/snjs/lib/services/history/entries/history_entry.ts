@@ -1,5 +1,5 @@
 import { SNItem } from '@Models/core/item';
-import { isNullOrUndefined } from '@Lib/utils';
+import { isNullOrUndefined } from '@standardnotes/utils';
 import { CopyPayload } from '@Payloads/generator';
 import { CreateItemFromPayload } from '@Lib/models';
 import { SurePayload } from '@Lib/protocol/payloads/sure_payload';

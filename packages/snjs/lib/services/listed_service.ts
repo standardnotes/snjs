@@ -1,4 +1,4 @@
-import { lastElement, sleep } from '@Lib/utils';
+import { lastElement, sleep } from '@standardnotes/utils';
 import { UuidString } from '@Lib/types';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
@@ -8,14 +8,14 @@ import { SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './settings_service/SNSettingsService';
 import { ListedInterface } from './../application_interfaces/listed_interface';
 import { SNApiService } from './api/api_service';
-import { PureService } from '@Services/pure_service';
 import {
   ListedAccount,
   ListedAccountInfo,
   ListedAccountInfoResponse,
 } from './api/responses';
+import { AbstractService } from '@standardnotes/services';
 
-export class ListedService extends PureService implements ListedInterface {
+export class ListedService extends AbstractService implements ListedInterface {
   constructor(
     private apiService: SNApiService,
     private itemManager: ItemManager,

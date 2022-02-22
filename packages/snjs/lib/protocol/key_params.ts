@@ -2,7 +2,7 @@ import { V002Algorithm } from './operator/algorithms';
 import { V001Algorithm } from '@Protocol/operator/algorithms';
 import { KeyParamsData, KeyParamsResponse } from './../services/api/responses';
 import { ProtocolVersion } from '@Protocol/versions';
-import { pickByCopy } from '@Lib/utils';
+import { pickByCopy } from '@standardnotes/utils';
 
 /**
  *  001, 002:

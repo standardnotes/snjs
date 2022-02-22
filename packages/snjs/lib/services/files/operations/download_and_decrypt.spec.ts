@@ -1,4 +1,4 @@
-import { sleep } from '@Lib/utils';
+import { sleep } from '@standardnotes/utils';
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common';
 import {
   RemoteFileInterface,

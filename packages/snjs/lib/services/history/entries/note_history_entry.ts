@@ -1,4 +1,4 @@
-import { isEmpty } from '@Lib/utils';
+import { isEmpty } from '@standardnotes/utils';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 
 export class NoteHistoryEntry extends HistoryEntry {

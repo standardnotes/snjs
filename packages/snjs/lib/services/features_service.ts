@@ -1,5 +1,5 @@
 import { SNItem } from '@Models/core/item';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from './../hosts';
 import {
   SNFeatureRepo,
@@ -9,14 +9,13 @@ import { SNSyncService } from './sync/sync_service';
 import { AccountEvent, SNCredentialService } from './credential_service';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
-import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
 import {
   ApiServiceEvent,
   MetaReceivedData,
   SNApiService,
 } from './api/api_service';
-import { ErrorObject, UuidString } from '@Lib/types';
+import { UuidString } from '@Lib/types';
 import {
   FeatureDescription,
   ThirdPartyFeatureDescription,
@@ -24,7 +23,7 @@ import {
   GetFeatures,
   DeprecatedFeatureIdentifier,
 } from '@standardnotes/features';
-import { ContentType, Runtime, RoleName } from '@standardnotes/common';
+import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponent } from '@Lib/models';
@@ -42,7 +41,7 @@ import {
   arraysEqual,
   convertTimestampToMilliseconds,
   isErrorObject,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
@@ -56,7 +55,8 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
-import { Copy, lastElement } from '../utils';
+import { Copy, lastElement } from '@standardnotes/utils';
+import { AbstractService } from '@standardnotes/services';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -79,7 +79,7 @@ export const enum FeatureStatus {
   Entitled = 'Entitled',
 }
 
-export class SNFeaturesService extends PureService<FeaturesEvent> {
+export class SNFeaturesService extends AbstractService<FeaturesEvent> {
   private deinited = false;
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];

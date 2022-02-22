@@ -20,12 +20,10 @@ import {
 } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
 import { PayloadOverride, RawPayload } from './protocol/payloads/generator';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage, ApplicationIdentifier } from '@standardnotes/common';
 import {
-  ApplicationIdentifier,
   DeinitSource,
   UuidString,
-  AnyRecord,
   ApplicationEventPayload,
 } from './types';
 import { ApplicationOptionsDefaults, ApplicationOptions } from './options';
@@ -52,7 +50,6 @@ import {
   ChallengeValue,
 } from './challenges';
 import { ChallengeObserver } from './services/challenge/challenge_service';
-import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
 import {
@@ -62,8 +59,8 @@ import {
   removeFromArray,
   sleep,
   nonSecureRandomIdentifier,
-} from '@Lib/utils';
-import { ContentType, Runtime } from '@standardnotes/common';
+} from '@standardnotes/utils';
+import { AnyRecord, ContentType, Runtime } from '@standardnotes/common';
 import {
   CopyPayload,
   CreateMaxPayloadFromAnyObject,
@@ -96,7 +93,7 @@ import {
   SNFileService,
   SyncModes,
 } from './services';
-import { DeviceInterface } from './device_interface';
+import { DeviceInterface, ServiceInterface } from '@standardnotes/services';
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   ErrorAlertStrings,
@@ -197,7 +194,7 @@ export class SNApplication implements ListedInterface {
 
   private eventHandlers: ApplicationObserver[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private services: PureService<any, any>[] = [];
+  private services: ServiceInterface<any, any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
   private managedSubscribers: ObserverRemover[] = [];

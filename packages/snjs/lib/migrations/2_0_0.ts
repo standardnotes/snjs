@@ -8,7 +8,7 @@ import { SNItemsKey } from './../models/app/items_key';
 import { RootKeyContent, SNRootKey } from './../protocol/root_key';
 import { EncryptionIntent } from './../protocol/intents';
 import { ProtocolVersion } from './../protocol/versions';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
 import { FillItemContent } from '@Models/functions';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -28,7 +28,7 @@ import {
   jsonParseEmbeddedKeys,
   objectToValueArray,
   omitByCopy,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
 import { CreateItemFromPayload } from '../models';

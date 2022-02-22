@@ -2,7 +2,7 @@ import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
-import { extendArray } from '@Lib/utils';
+import { extendArray } from '@standardnotes/utils';
 import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteRetrieved extends PayloadsDelta {

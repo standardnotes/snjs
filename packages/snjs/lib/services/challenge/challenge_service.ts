@@ -1,7 +1,6 @@
 import { ChallengePrompt } from './../../challenges';
 import { SNProtocolService } from '../protocol_service';
 import { SNStorageService } from '../storage_service';
-import { PureService } from '@Lib/services/pure_service';
 import {
   Challenge,
   ChallengeArtifacts,
@@ -11,8 +10,9 @@ import {
   ChallengeValue,
 } from '@Lib/challenges';
 import { ChallengeOperation } from './challenge_operation';
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { isValidProtectionSessionLength } from '../protection_service';
+import { AbstractService } from '@standardnotes/services';
 
 type ChallengeValidationResponse = {
   valid: boolean;
@@ -32,7 +32,7 @@ export type ChallengeObserver = {
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
-export class ChallengeService extends PureService {
+export class ChallengeService extends AbstractService {
   private challengeOperations: Record<string, ChallengeOperation> = {};
   public sendChallenge?: (challenge: Challenge) => void;
   private challengeObservers: Record<string, ChallengeObserver[]> = {};

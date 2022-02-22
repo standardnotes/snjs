@@ -1,7 +1,7 @@
 import { MicrosecondsTimestamp } from '../DataType/MicrosecondsTimestamp'
 import { Uuid } from '../DataType/Uuid'
 
-export type ItemIntegrityHash = {
+export type IntegrityPayload = {
   uuid: Uuid
   updated_at_timestamp: MicrosecondsTimestamp
 }

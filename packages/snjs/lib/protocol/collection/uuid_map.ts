@@ -1,4 +1,4 @@
-import { addIfUnique, removeFromArray } from '@Lib/utils';
+import { addIfUnique, removeFromArray } from '@standardnotes/utils';
 import { UuidString } from './../../types';
 
 /**

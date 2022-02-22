@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.63.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.62.0...@standardnotes/snjs@2.63.0) (2022-02-22)
+
+
+### Features
+
+* extract services package ([#605](https://github.com/standardnotes/snjs/issues/605)) ([3966b10](https://github.com/standardnotes/snjs/commit/3966b10745c10ef5bb92871abb13ceb4ea631362))
+
+
+
+
+
+# [2.62.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.5...@standardnotes/snjs@2.62.0) (2022-02-22)
+
+
+### Features
+
+* extract SNJS utils as a separate package ([#604](https://github.com/standardnotes/snjs/issues/604)) ([b28195c](https://github.com/standardnotes/snjs/commit/b28195c20be788eec8dabc44c5aff518f074cdd9))
+
+
+
+
+
 ## [2.61.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.61.4...@standardnotes/snjs@2.61.5) (2022-02-18)
 
 

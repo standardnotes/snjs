@@ -5,7 +5,7 @@ import {
   ChallengeValidation,
 } from './../challenges';
 import { MigrationServices } from './types';
-import { ApplicationStage } from '../stages';
+import { ApplicationStage } from '@standardnotes/common';
 
 type StageHandler = () => Promise<void>;
 

@@ -14,10 +14,10 @@ export type {
 export type { BackupFile } from '@Services/protocol_service';
 export type {
   UuidString,
-  ApplicationIdentifier,
   ApplicationEventPayload,
   IconType,
 } from './types';
+export type { ApplicationIdentifier } from '@standardnotes/common';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
@@ -35,7 +35,8 @@ export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004';
 
 export { SNRootKey } from '@Protocol/root_key';
 export { SNRootKeyParams } from './protocol/key_params';
-export { DeviceInterface } from '@Lib/device_interface';
+export { AbstractDevice, AbstractService } from '@standardnotes/services';
+export type { DeviceInterface, ServiceInterface } from '@standardnotes/services';
 export {
   SNItem,
   ItemMutator,
@@ -92,7 +93,6 @@ export { ItemManager } from './services/item_manager';
 
 export { SNHttpService } from './services/api/http_service';
 export { ChallengeService } from './services/challenge/challenge_service';
-export { PureService } from '@Services/pure_service';
 export { ApplicationService } from '@Services/application_service';
 export {
   SNStorageService,
@@ -173,7 +173,7 @@ export {
   nonSecureRandomIdentifier,
   sanitizeHtmlString,
   lastElement,
-} from './utils';
+} from '@standardnotes/utils';
 export { Uuid } from '@Lib/uuid';
 export {
   EncryptionIntent,
@@ -261,6 +261,6 @@ export {
 } from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
-export { ApplicationStage } from '@Lib/stages';
+export { ApplicationStage } from '@standardnotes/common';
 
 export { ActionVerb } from '@Lib/models/app/extension';

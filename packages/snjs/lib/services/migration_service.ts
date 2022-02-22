@@ -2,14 +2,14 @@ import { compareSemVersions } from '@Lib/version';
 import { SNLog } from '@Lib/log';
 import { SnjsVersion, isRightVersionGreaterThanLeft } from './../version';
 import { ApplicationEvent } from './../events';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { MigrationServices } from './../migrations/types';
 import { Migration } from '@Lib/migrations/migration';
 import * as migrationImports from '@Lib/migrations';
 import { BaseMigration } from '@Lib/migrations/base';
-import { PureService } from '@Services/pure_service';
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { lastElement } from '@Lib/utils';
+import { lastElement } from '@standardnotes/utils';
+import { AbstractService } from '@standardnotes/services';
 
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -19,7 +19,7 @@ import { lastElement } from '@Lib/utils';
  * first launches, and also other steps after the application is unlocked, or after the
  * first sync completes. Migrations live under /migrations and inherit from the base Migration class.
  */
-export class SNMigrationService extends PureService {
+export class SNMigrationService extends AbstractService {
   private activeMigrations?: Migration[];
   private baseMigration!: BaseMigration;
 
