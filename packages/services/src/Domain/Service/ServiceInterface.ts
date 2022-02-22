@@ -2,10 +2,10 @@ import { ApplicationStage } from '@standardnotes/common'
 import { DeviceInterface } from '../Device/DeviceInterface'
 import { EventObserver } from '../Event/EventObserver'
 
-export interface ServiceInterface<T, V> {
+export interface ServiceInterface<E, D> {
   loggingEnabled: boolean
   deviceInterface?: DeviceInterface
-  addEventObserver(observer: EventObserver<T, V>): () => void
+  addEventObserver(observer: EventObserver<E, D>): () => void
   blockDeinit(): Promise<void>
   deinit(): void
   handleApplicationStage(stage: ApplicationStage): Promise<void>
