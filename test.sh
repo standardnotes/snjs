@@ -45,7 +45,7 @@ function startContainers {
   docker compose -f $COMPOSE_FILE pull
 
   echo "# Building Docker images"
-  docker compose -f $COMPOSE_FILE build
+  docker compose -f $COMPOSE_FILE build --build-arg UID=$(id -u) --build-arg GID=$(id -g)
 
   echo "# Starting all containers for Test Suite"
   docker compose -f $COMPOSE_FILE up -d
