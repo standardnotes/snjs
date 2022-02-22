@@ -1,10 +1,10 @@
-import { log, removeFromArray } from '@standardnotes/utils';
-import { ApplicationStage } from '@Lib/stages';
-import { DeviceInterface } from '../device_interface';
+import { log, removeFromArray } from '@standardnotes/utils'
+import { ApplicationStage } from '@standardnotes/common'
+import { DeviceInterface } from '../Device/DeviceInterface'
+import { EventObserver } from '../Event/EventObserver'
+import { ServiceInterface } from './ServiceInterface'
 
-type EventObserver<E, D> = (eventName: E, data?: D) => Promise<void> | void;
-
-export abstract class PureService<EventName = string, EventData = undefined> {
+export abstract class AbstractService<EventName = string, EventData = undefined> implements ServiceInterface<EventName, EventData> {
   private eventObservers: EventObserver<EventName, EventData>[] = [];
   public loggingEnabled = false;
   public deviceInterface?: DeviceInterface;
@@ -13,10 +13,10 @@ export abstract class PureService<EventName = string, EventData = undefined> {
   public addEventObserver(
     observer: EventObserver<EventName, EventData>
   ): () => void {
-    this.eventObservers.push(observer);
+    this.eventObservers.push(observer)
     return () => {
-      removeFromArray(this.eventObservers, observer);
-    };
+      removeFromArray(this.eventObservers, observer)
+    }
   }
 
   protected async notifyEvent(
@@ -24,7 +24,7 @@ export abstract class PureService<EventName = string, EventData = undefined> {
     data?: EventData
   ): Promise<void> {
     for (const observer of this.eventObservers) {
-      await observer(eventName, data);
+      await observer(eventName, data)
     }
   }
 
@@ -33,7 +33,7 @@ export abstract class PureService<EventName = string, EventData = undefined> {
    * sensitive operations complete.
    */
   public async blockDeinit(): Promise<void> {
-    await Promise.all(this.criticalPromises);
+    await Promise.all(this.criticalPromises)
   }
 
   /**
@@ -41,8 +41,8 @@ export abstract class PureService<EventName = string, EventData = undefined> {
    * Subclasses should deregister any observers/timers
    */
   public deinit(): void {
-    this.eventObservers.length = 0;
-    this.deviceInterface = undefined;
+    this.eventObservers.length = 0
+    this.deviceInterface = undefined
   }
 
   /**
@@ -55,9 +55,9 @@ export abstract class PureService<EventName = string, EventData = undefined> {
   protected async executeCriticalFunction<T = void>(
     func: () => Promise<T>
   ): Promise<T> {
-    const promise = func();
-    this.criticalPromises.push(promise);
-    return promise;
+    const promise = func()
+    this.criticalPromises.push(promise)
+    return promise
   }
 
   /**
@@ -71,7 +71,7 @@ export abstract class PureService<EventName = string, EventData = undefined> {
 
   log(message: string, ...args: unknown[]): void {
     if (this.loggingEnabled) {
-      log(this, message, args);
+      log(this, message, args)
     }
   }
 }

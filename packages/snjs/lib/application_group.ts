@@ -2,8 +2,7 @@ import { RawStorageKey } from '@Lib/storage_keys';
 import { removeFromArray } from '@standardnotes/utils';
 import { DeinitSource, UuidString } from './types';
 import { SNApplication } from './application';
-import { PureService } from '@Services/pure_service';
-import { DeviceInterface } from '@Lib/device_interface';
+import { AbstractService, DeviceInterface } from '@standardnotes/services';
 import { Uuid } from '@Lib/uuid';
 
 export type ApplicationDescriptor = {
@@ -24,7 +23,7 @@ type AppGroupCallback = {
 
 type AppGroupChangeCallback = () => void;
 
-export class SNApplicationGroup extends PureService {
+export class SNApplicationGroup extends AbstractService {
   public primaryApplication?: SNApplication;
   private descriptorRecord!: DescriptorRecord;
   private changeObservers: AppGroupChangeCallback[] = [];

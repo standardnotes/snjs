@@ -1,6 +1,6 @@
-import { ApplicationIdentifier } from './../../types';
+import { ApplicationIdentifier } from '@standardnotes/common';
 import { Environment } from '@Lib/platforms';
-import { DeviceInterface } from '@Lib/device_interface';
+import { DeviceInterface } from '@standardnotes/services';
 
 /**
  * A storage reader reads storage via a device interface

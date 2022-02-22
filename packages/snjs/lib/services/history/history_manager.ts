@@ -1,5 +1,5 @@
 import { CopyPayload, RawPayload } from './../../protocol/payloads/generator';
-import { DeviceInterface } from '@Lib/device_interface';
+import { AbstractService, DeviceInterface } from '@standardnotes/services';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { CreateHistoryEntryForPayload } from '@Services/history/entries/generator';
 import { SurePayload } from './../../protocol/payloads/sure_payload';
@@ -18,7 +18,6 @@ import {
 } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@standardnotes/common';
-import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
@@ -54,7 +53,7 @@ const LargeEntryDeltaThreshold = 25;
  * 2. Remote server history. Entries are automatically added by the server and must be
  *    retrieved per item via an API call.
  */
-export class SNHistoryManager extends PureService {
+export class SNHistoryManager extends AbstractService {
   private persistable = false;
   public autoOptimize = false;
   private removeChangeObserver: () => void;

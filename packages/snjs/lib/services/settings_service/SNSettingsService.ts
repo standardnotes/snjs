@@ -1,13 +1,12 @@
-import { PureService } from '../pure_service';
-
 import { SNApiService } from '../api/api_service';
 import { SettingsGateway } from './SettingsGateway';
 import { SNSessionManager } from '../api/session_manager';
 import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SensitiveSettingName } from './SensitiveSettingName';
 import { ExtensionsServerURL } from '@Lib/hosts';
+import { AbstractService } from '@standardnotes/services';
 
-export class SNSettingsService extends PureService {
+export class SNSettingsService extends AbstractService {
   private provider!: SettingsGateway;
   private frequencyOptionsLabels = {
     [EmailBackupFrequency.Disabled]: 'No email backups',

@@ -20,6 +20,7 @@ packages/sncrypto-common/dist
 packages/sncrypto-node/dist
 packages/sncrypto-web/dist
 packages/utils/dist
+packages/services/dist
 
 yarn-error.log
 package-lock.json

@@ -36,9 +36,9 @@ import {
   SNSessionManager,
   MINIMUM_PASSWORD_LENGTH,
 } from './api/session_manager';
-import { PureService } from '@Services/pure_service';
 import { ChallengeService } from './challenge/challenge_service';
 import { SNItemsKey } from '@Lib/models';
+import { AbstractService } from '@standardnotes/services';
 
 const MINIMUM_PASSCODE_LENGTH = 1;
 
@@ -49,7 +49,7 @@ export const enum AccountEvent {
   SignedInOrRegistered = 'SignedInOrRegistered',
 }
 
-export class SNCredentialService extends PureService<AccountEvent> {
+export class SNCredentialService extends AbstractService<AccountEvent> {
   private signingIn = false;
   private registering = false;
 

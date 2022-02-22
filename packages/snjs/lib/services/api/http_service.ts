@@ -1,9 +1,9 @@
 import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
 import { HttpResponse, StatusCode } from './responses';
-import { PureService } from '@Lib/services/pure_service';
 import { isNullOrUndefined } from '@standardnotes/utils';
 import { SnjsVersion } from '@Lib/version';
 import { Environment } from '@Lib/platforms';
+import { AbstractService } from '@standardnotes/services';
 
 export enum HttpVerb {
   Get = 'GET',
@@ -32,7 +32,7 @@ export type HttpRequest = {
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
-export class SNHttpService extends PureService {
+export class SNHttpService extends AbstractService {
   constructor(
     private readonly environment: Environment,
     private readonly appVersion: string,

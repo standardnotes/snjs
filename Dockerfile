@@ -32,6 +32,7 @@ COPY --chown=$UID:$GID packages/sncrypto-common/package.json /var/www/packages/s
 COPY --chown=$UID:$GID packages/sncrypto-node/package.json /var/www/packages/sncrypto-node/package.json
 COPY --chown=$UID:$GID packages/sncrypto-web/package.json /var/www/packages/sncrypto-web/package.json
 COPY --chown=$UID:$GID packages/utils/package.json /var/www/packages/utils/package.json
+COPY --chown=$UID:$GID packages/services/package.json /var/www/packages/services/package.json
 
 RUN yarn install --pure-lockfile
 

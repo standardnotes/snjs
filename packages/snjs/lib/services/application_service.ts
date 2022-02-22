@@ -1,8 +1,8 @@
-import { PureService } from '@Services/pure_service';
 import { ApplicationEvent } from '@Lib/events';
+import { AbstractService } from '@standardnotes/services';
 import { SNApplication } from '../application';
 
-export class ApplicationService extends PureService {
+export class ApplicationService extends AbstractService {
   private unsubApp: any;
 
   constructor(protected application: SNApplication) {

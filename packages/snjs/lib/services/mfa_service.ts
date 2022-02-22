@@ -1,13 +1,13 @@
 import { SettingName } from '@standardnotes/settings';
 
 import { SNSettingsService } from './settings_service';
-import { PureService } from './pure_service';
 import * as messages from './api/messages';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { SNFeaturesService } from './features_service';
 import { FeatureIdentifier } from '@standardnotes/features';
+import { AbstractService } from '@standardnotes/services';
 
-export class SNMfaService extends PureService {
+export class SNMfaService extends AbstractService {
   constructor(
     private settingsService: SNSettingsService,
     private crypto: SNPureCrypto,
@@ -43,7 +43,7 @@ export class SNMfaService extends PureService {
     const otpTokenValid =
       otpToken != null && otpToken === (await this.getOtpToken(secret));
 
-    if (!otpTokenValid) { 
+    if (!otpTokenValid) {
       throw new Error(messages.SignInStrings.IncorrectMfa);
     }
 
