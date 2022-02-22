@@ -146,7 +146,7 @@ describe('files', function () {
     expect(token.error).to.equal('expired-subscription');
   });
 
-  it.only('should encrypt and upload small file', async function () {
+  it('should encrypt and upload small file', async function () {
     const response = await fetch('/packages/snjs/mocha/assets/small_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
 
