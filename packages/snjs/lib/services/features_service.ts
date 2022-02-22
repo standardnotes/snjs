@@ -21,9 +21,15 @@ import {
   ThirdPartyFeatureDescription,
   FeatureIdentifier,
   GetFeatures,
-  DeprecatedFeatureIdentifier,
+  FindNativeFeature,
+  DeprecatedFeatures,
 } from '@standardnotes/features';
-import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common';
+import {
+  ContentType,
+  ErrorObject,
+  Runtime,
+  RoleName,
+} from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponent } from '@Lib/models';
@@ -358,7 +364,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
     features: FeatureDescription[]
   ): Promise<void> {
     features = features
-      .filter((feature) => !!this.findStaticNativeFeature(feature.identifier))
+      .filter((feature) => !!FindNativeFeature(feature.identifier))
       .map((feature) => this.mapRemoteNativeFeatureToStaticFeature(feature));
 
     this.features = features;
@@ -369,17 +375,8 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
     await this.mapRemoteNativeFeaturesToItems(features);
   }
 
-  /**
-   * Returns the native feature as compiled into @standardnotes/features
-   */
-  private findStaticNativeFeature(
-    identifier: FeatureIdentifier
-  ): FeatureDescription | undefined {
-    return GetFeatures(this.runtime).find((f) => f.identifier === identifier);
-  }
-
   public isThirdPartyFeature(identifier: string): boolean {
-    const isNativeFeature = !!this.findStaticNativeFeature(
+    const isNativeFeature = !!FindNativeFeature(
       identifier as FeatureIdentifier
     );
     return !isNativeFeature;
@@ -395,9 +392,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
       'permission_name',
     ];
 
-    const nativeFeature = this.findStaticNativeFeature(
-      remoteFeature.identifier
-    );
+    const nativeFeature = FindNativeFeature(remoteFeature.identifier);
 
     if (!nativeFeature) {
       throw Error(
@@ -457,10 +452,8 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
     return indexOfRoleToCheck <= highestUserRoleIndex;
   }
 
-  public isFeatureDeprecated(featureId: string): boolean {
-    return Object.values(DeprecatedFeatureIdentifier).includes(
-      featureId as DeprecatedFeatureIdentifier
-    );
+  public isFeatureDeprecated(featureId: FeatureIdentifier): boolean {
+    return DeprecatedFeatures.includes(featureId);
   }
 
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
@@ -473,7 +466,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
       }
     }
 
-    const isThirdParty = this.findStaticNativeFeature(featureId) == undefined;
+    const isThirdParty = FindNativeFeature(featureId) == undefined;
     if (isThirdParty) {
       const component = this.itemManager.components.find(
         (candidate) => candidate.identifier === featureId
@@ -671,7 +664,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
       return;
     }
 
-    const nativeFeature = this.findStaticNativeFeature(rawFeature.identifier);
+    const nativeFeature = FindNativeFeature(rawFeature.identifier);
     if (nativeFeature) {
       await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION);
       return;

@@ -21,7 +21,6 @@ import {
   FeatureDescription,
   FeatureIdentifier,
   GetFeatures,
-  DeprecatedFeatureIdentifier,
 } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
@@ -679,9 +678,7 @@ describe('featuresService', () => {
         .mockReturnValue(true);
 
       expect(
-        featuresService.getFeatureStatus(
-          (DeprecatedFeatureIdentifier.FileSafe as unknown) as FeatureIdentifier
-        )
+        featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)
       ).toBe(FeatureStatus.NoUserSubscription);
 
       await featuresService.updateRolesAndFetchFeatures('123', [
@@ -690,9 +687,7 @@ describe('featuresService', () => {
       ]);
 
       expect(
-        featuresService.getFeatureStatus(
-          (DeprecatedFeatureIdentifier.FileSafe as unknown) as FeatureIdentifier
-        )
+        featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)
       ).toBe(FeatureStatus.Entitled);
     });
 
