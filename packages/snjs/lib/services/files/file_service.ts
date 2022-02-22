@@ -134,7 +134,7 @@ export class SNFileService extends PureService {
       apiToken,
       onDecryptedBytes,
       () => {
-        console.log('Error downloading/decrypting file');
+        console.error('Error downloading/decrypting file');
       }
     );
 

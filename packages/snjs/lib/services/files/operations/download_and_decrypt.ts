@@ -42,7 +42,7 @@ export class DownloadAndDecryptFileOperation {
   private onDownloadedBytes(encryptedBytes: Uint8Array): void {
     const result = this.decryptor.decryptBytes(encryptedBytes);
 
-    if (!result) {
+    if (!result || result.decryptedBytes.length === 0) {
       this.downloader.abort();
       this.onError();
       this.completionResolve();

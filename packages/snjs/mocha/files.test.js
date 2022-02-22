@@ -39,12 +39,10 @@ describe('files', function () {
     localStorage.clear();
   });
 
-  const uploadFile = async (fileService, buffer, name, ext) => {
-    const chunkSize = FileProtocolV1.DecryptedChunkSize;
-
+  const uploadFile = async (fileService, buffer, name, ext, chunkSize) => {
     const operation = await fileService.beginNewFileUpload();
 
-    let chunkId = 1;
+    let chunkId = 0;
     for (let i = 0; i < buffer.length; i += chunkSize) {
       const readUntil =
         i + chunkSize > buffer.length ? buffer.length : i + chunkSize;
@@ -148,7 +146,7 @@ describe('files', function () {
     expect(token.error).to.equal('expired-subscription');
   });
 
-  it('should encrypt and upload small file', async function () {
+  it.only('should encrypt and upload small file', async function () {
     const response = await fetch('/packages/snjs/mocha/assets/small_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
 
@@ -156,7 +154,8 @@ describe('files', function () {
       this.fileService,
       buffer,
       'my-file',
-      'md'
+      'md',
+      1000
     );
 
     const downloadedBytes = await downloadFile(
@@ -176,7 +175,8 @@ describe('files', function () {
       this.fileService,
       buffer,
       'my-file',
-      'md'
+      'md',
+      100000,
     );
 
     const downloadedBytes = await downloadFile(
