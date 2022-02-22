@@ -1,4 +1,4 @@
-import { log, removeFromArray } from '@Lib/utils';
+import { log, removeFromArray } from '@standardnotes/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { DeviceInterface } from '../device_interface';
 

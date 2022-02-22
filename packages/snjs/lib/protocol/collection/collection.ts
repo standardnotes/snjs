@@ -1,5 +1,5 @@
 import { UuidMap } from './uuid_map';
-import { extendArray, isString } from '@Lib/utils';
+import { extendArray, isString } from '@standardnotes/utils';
 import { SNItem } from './../../models/core/item';
 import remove from 'lodash/remove';
 import { ContentType } from '@standardnotes/common';

@@ -11,7 +11,7 @@ import { NoteMutator, SNNote } from '@Lib/models';
 import { SNProtocolService } from './protocol_service';
 import { SNStorageService, StorageValueModes } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
-import { isNullOrUndefined } from '@Lib/utils';
+import { isNullOrUndefined } from '@standardnotes/utils';
 import { ApplicationStage } from '@Lib/stages';
 import { ItemManager } from './item_manager';
 import { Uuids } from '@Lib/models/functions';

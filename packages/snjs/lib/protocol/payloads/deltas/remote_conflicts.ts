@@ -5,7 +5,7 @@ import { ConflictDelta } from '@Payloads/deltas/conflict';
 import { PayloadSource } from '@Payloads/sources';
 import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { PayloadsByAlternatingUuid } from '@Payloads/functions';
-import { extendArray, filterFromArray } from '@Lib/utils';
+import { extendArray, filterFromArray } from '@standardnotes/utils';
 import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteConflicts extends PayloadsDelta {

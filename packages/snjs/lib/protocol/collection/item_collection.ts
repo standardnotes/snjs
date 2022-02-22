@@ -1,5 +1,5 @@
 import { MutableCollection } from './collection';
-import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@Lib/utils';
+import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@standardnotes/utils';
 import { SNItem } from './../../models/core/item';
 import { ContentType } from '@standardnotes/common';
 import { UuidString } from './../../types';

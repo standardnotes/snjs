@@ -11,7 +11,7 @@ import {
   ChallengeValue,
 } from '@Lib/challenges';
 import { ChallengeOperation } from './challenge_operation';
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { isValidProtectionSessionLength } from '../protection_service';
 
 type ChallengeValidationResponse = {

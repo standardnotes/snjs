@@ -1,5 +1,5 @@
 import { SNItem } from '@Models/core/item';
-import { isString } from '@Lib/utils';
+import { isString } from '@standardnotes/utils';
 
 type PredicateType = string[] | SNPredicate;
 type PredicateArray = Array<string[]> | SNPredicate[];

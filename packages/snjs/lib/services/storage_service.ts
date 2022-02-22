@@ -14,7 +14,7 @@ import { SNRootKey } from '@Protocol/root_key';
 import { PurePayload } from '@Payloads/pure_payload';
 import { PureService } from '@Lib/services/pure_service';
 import { ContentType } from '@standardnotes/common';
-import { Copy, isNullOrUndefined } from '@Lib/utils';
+import { Copy, isNullOrUndefined } from '@standardnotes/utils';
 import { Uuid } from '@Lib/uuid';
 import { DeviceInterface } from '../device_interface';
 

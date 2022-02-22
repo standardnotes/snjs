@@ -1,34 +1,30 @@
-import DOMPurify from 'dompurify';
-import find from 'lodash/find';
-import isArray from 'lodash/isArray';
-import mergeWith from 'lodash/mergeWith';
-import remove from 'lodash/remove';
-import uniq from 'lodash/uniq';
-import uniqWith from 'lodash/uniqWith';
-import { AnyRecord, ErrorObject } from './types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as DOMPurify from 'dompurify'
+import { find, isArray, mergeWith, remove, uniq, uniqWith } from 'lodash'
+import { AnyRecord, ErrorObject } from '@standardnotes/common'
 
 const collator =
   typeof Intl !== 'undefined'
     ? new Intl.Collator('en', { numeric: true })
-    : undefined;
+    : undefined
 
 export function getGlobalScope(): Window | unknown | null {
   return typeof window !== 'undefined'
     ? window
     : typeof global !== 'undefined'
-    ? global
-    : null;
+      ? global
+      : null
 }
 
 export function dictToArray<T>(dict: Record<any, T>): T[] {
-  return Object.values(dict);
+  return Object.values(dict)
 }
 
 /**
  * Whether we are in a web browser
  */
 export function isWebEnvironment(): boolean {
-  return getGlobalScope() !== null;
+  return getGlobalScope() !== null
 }
 
 interface IEDocument {
@@ -46,7 +42,7 @@ export function isWebCryptoAvailable(): boolean {
     (/Edge/.test(navigator.userAgent) &&
       window.crypto &&
       !!window.crypto.subtle)
-  );
+  )
 }
 
 /**
@@ -55,7 +51,7 @@ export function isWebCryptoAvailable(): boolean {
 export function isReactNativeEnvironment(): boolean {
   return (
     typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
-  );
+  )
 }
 
 /**
@@ -67,7 +63,7 @@ export function findInArray<T, K extends keyof T>(
   key: K,
   value: T[K]
 ): T | undefined {
-  return array.find((item: T) => item[key] === value);
+  return array.find((item: T) => item[key] === value)
 }
 
 /**
@@ -78,7 +74,7 @@ export function searchArray<T>(
   array: T[],
   predicate: Partial<T>
 ): T | undefined {
-  return find(array, predicate) as T;
+  return find(array, predicate) as T
 }
 
 /**
@@ -86,11 +82,11 @@ export function searchArray<T>(
  * @returns Matching object or null if not found
  */
 export function concatArrays(...args: any[]) {
-  let result: any[] = [];
+  let result: any[] = []
   for (const array of args) {
-    result = result.concat(array);
+    result = result.concat(array)
   }
-  return result;
+  return result
 }
 
 /**
@@ -98,9 +94,9 @@ export function concatArrays(...args: any[]) {
  */
 export function isObject(value: unknown): boolean {
   if (value === null) {
-    return false;
+    return false
   }
-  return typeof value === 'function' || typeof value === 'object';
+  return typeof value === 'function' || typeof value === 'object'
 }
 
 /**
@@ -108,30 +104,30 @@ export function isObject(value: unknown): boolean {
  */
 export function isFunction(value: unknown): boolean {
   if (value === null) {
-    return false;
+    return false
   }
-  return typeof value === 'function';
+  return typeof value === 'function'
 }
 
 /**
  * @returns True if the object is null or undefined, otherwise false
  */
 export function isNullOrUndefined(value: unknown): value is null | undefined {
-  return value === null || value === undefined;
+  return value === null || value === undefined
 }
 
 /**
  * @returns True if the string is empty or undefined
  */
 export function isEmpty(string: string): boolean {
-  return !string || string.length === 0;
+  return !string || string.length === 0
 }
 
 /**
  * @returns Whether the value is a string
  */
 export function isString(value: unknown): value is string {
-  return typeof value === 'string' || value instanceof String;
+  return typeof value === 'string' || value instanceof String
 }
 
 /**
@@ -139,9 +135,9 @@ export function isString(value: unknown): value is string {
  */
 export function greaterOfTwoDates(dateA: Date, dateB: Date): Date {
   if (dateA > dateB) {
-    return dateA;
+    return dateA
   } else {
-    return dateB;
+    return dateB
   }
 }
 
@@ -159,11 +155,11 @@ export function uniqCombineObjArrays<T>(
   return uniqWith(arrayA.concat(arrayB), (a: T, b: T) => {
     for (const key of equalityKeys) {
       if (a[key] !== b[key]) {
-        return false;
+        return false
       }
     }
-    return true;
-  });
+    return true
+  })
 }
 
 /**
@@ -171,7 +167,7 @@ export function uniqCombineObjArrays<T>(
  * @returns Array containing unique values
  */
 export function uniqueArray<T>(array: T[]): T[] {
-  return uniq(array);
+  return uniq(array)
 }
 
 /**
@@ -180,8 +176,8 @@ export function uniqueArray<T>(array: T[]): T[] {
  */
 export function uniqueArrayByKey<T>(array: T[], key: keyof T): T[] {
   return uniqWith(array, (a: T, b: T) => {
-    return a[key] === b[key];
-  });
+    return a[key] === b[key]
+  })
 }
 
 /**
@@ -189,7 +185,7 @@ export function uniqueArrayByKey<T>(array: T[], key: keyof T): T[] {
  * @returns The last element in the array
  */
 export function lastElement<T>(array: T[]): T | undefined {
-  return array[array.length - 1];
+  return array[array.length - 1]
 }
 
 /**
@@ -198,7 +194,7 @@ export function lastElement<T>(array: T[]): T | undefined {
  */
 export function extendArray<T>(inArray: T[], otherArray: T[]): void {
   for (const value of otherArray) {
-    inArray.push(value);
+    inArray.push(value)
   }
 }
 
@@ -208,7 +204,7 @@ export function extendArray<T>(inArray: T[], otherArray: T[]): void {
  */
 export function subtractFromArray<T>(inArray: T[], toSubtract: T[]): void {
   for (const value of toSubtract) {
-    removeFromArray(inArray, value);
+    removeFromArray(inArray, value)
   }
 }
 
@@ -217,11 +213,11 @@ export function subtractFromArray<T>(inArray: T[], toSubtract: T[]): void {
  * If no matchin element is found, the array is left unchanged.
  */
 export function removeFromArray<T>(array: T[], value: T): void {
-  const valueIndex = array.indexOf(value);
+  const valueIndex = array.indexOf(value)
   if (valueIndex === -1) {
-    return;
+    return
   }
-  array.splice(valueIndex, 1);
+  array.splice(valueIndex, 1)
 }
 
 /**
@@ -231,10 +227,10 @@ export function removeFromArray<T>(array: T[], value: T): void {
  */
 export function addIfUnique<T>(array: T[], value: T): boolean {
   if (!array.includes(value)) {
-    array.push(value);
-    return true;
+    array.push(value)
+    return true
   }
-  return false;
+  return false
 }
 
 /**
@@ -245,7 +241,7 @@ export function filterFromArray<T>(
   array: T[],
   predicate: Partial<Record<keyof T, any>> | ((object: T) => boolean)
 ): void {
-  remove(array, predicate);
+  remove(array, predicate)
 }
 
 /**
@@ -254,19 +250,19 @@ export function filterFromArray<T>(
 export function arrayByDifference<T>(array: T[], subtract: T[]): T[] {
   return array
     .filter((x) => !subtract.includes(x))
-    .concat(subtract.filter((x) => !array.includes(x)));
+    .concat(subtract.filter((x) => !array.includes(x)))
 }
 
 export function compareValues<T>(left: T, right: T) {
   if ((left && !right) || (!left && right)) {
-    return false;
+    return false
   }
   if (left instanceof Date && right instanceof Date) {
-    return left.getTime() === right.getTime();
+    return left.getTime() === right.getTime()
   } else if (left instanceof String && right instanceof String) {
-    return left === right;
+    return left === right
   } else {
-    return topLevelCompare(left, right);
+    return topLevelCompare(left, right)
   }
 }
 
@@ -274,23 +270,23 @@ export function compareValues<T>(left: T, right: T) {
  * Removes the value from the array at the given index, in-place.
  */
 export function removeFromIndex(array: any[], index: number) {
-  array.splice(index, 1);
+  array.splice(index, 1)
 }
 
 /**
  * Adds the value from the array at the given index, in-place.
  */
 export function addAtIndex<T>(array: T[], element: T, index: number) {
-  array.splice(index, 0, element);
+  array.splice(index, 0, element)
 }
 
 /**
  * Returns a new array by removeing the value from the array at the given index
  */
 export function arrayByRemovingFromIndex<T>(array: T[], index: number) {
-  const copy = array.slice();
-  removeFromIndex(copy, index);
-  return copy;
+  const copy = array.slice()
+  removeFromIndex(copy, index)
+  return copy
 }
 
 /**
@@ -299,11 +295,11 @@ export function arrayByRemovingFromIndex<T>(array: T[], index: number) {
  * Example: objectToValueArray({a: 1, b: 2}) returns [1, 2]
  */
 export function objectToValueArray(object: AnyRecord) {
-  const values = [];
+  const values = []
   for (const key of Object.keys(object)) {
-    values.push(object[key]);
+    values.push(object[key])
   }
-  return values;
+  return values
 }
 
 /**
@@ -311,43 +307,43 @@ export function objectToValueArray(object: AnyRecord) {
  * For example, sortedCopy({b: '1', a: '2'}) returns {a: '2', b: '1'}
  */
 export function sortedCopy(object: any) {
-  const keys = Object.keys(object).sort();
-  const result: any = {};
+  const keys = Object.keys(object).sort()
+  const result: any = {}
   for (const key of keys) {
-    result[key] = object[key];
+    result[key] = object[key]
   }
-  return Copy(result);
+  return Copy(result)
 }
 
 export const sortByKey = <T>(input: T[], key: keyof T): T[] => {
   const compare = (a: T, b: T): number => {
-    const valueA = a[key];
-    const valueB = b[key];
+    const valueA = a[key]
+    const valueB = b[key]
 
     if (valueA < valueB) {
-      return -1;
+      return -1
     }
     if (valueA > valueB) {
-      return 1;
+      return 1
     }
-    return 0;
-  };
+    return 0
+  }
 
-  const newArray = [...input];
-  newArray.sort(compare);
+  const newArray = [...input]
+  newArray.sort(compare)
 
-  return newArray;
-};
+  return newArray
+}
 
 /** Returns a new object by omitting any keys which have an undefined or null value  */
 export function omitUndefinedCopy(object: any) {
-  const result: any = {};
+  const result: any = {}
   for (const key of Object.keys(object)) {
     if (!isNullOrUndefined(object[key])) {
-      result[key] = object[key];
+      result[key] = object[key]
     }
   }
-  return result;
+  return result
 }
 
 /**
@@ -356,70 +352,70 @@ export function omitUndefinedCopy(object: any) {
  */
 export function dateSorted<T>(elements: T[], key: keyof T, ascending = true) {
   return elements.sort((a, b) => {
-    const aTimestamp = ((a[key] as unknown) as Date).getTime();
-    const bTimestamp = ((b[key] as unknown) as Date).getTime();
-    const vector = ascending ? 1 : -1;
+    const aTimestamp = ((a[key] as unknown) as Date).getTime()
+    const bTimestamp = ((b[key] as unknown) as Date).getTime()
+    const vector = ascending ? 1 : -1
     if (aTimestamp < bTimestamp) {
-      return -1 * vector;
+      return -1 * vector
     } else if (aTimestamp > bTimestamp) {
-      return 1 * vector;
+      return 1 * vector
     } else {
-      return 0;
+      return 0
     }
-  });
+  })
 }
 
 /** Compares for equality by comparing top-level keys value equality (===) */
 export function topLevelCompare<T>(left: T, right: T) {
   if (!left && !right) {
-    return true;
+    return true
   }
   if (!left || !right) {
-    return false;
+    return false
   }
-  const leftKeys = Object.keys(left);
-  const rightKeys = Object.keys(right);
+  const leftKeys = Object.keys(left)
+  const rightKeys = Object.keys(right)
   if (leftKeys.length !== rightKeys.length) {
-    return false;
+    return false
   }
   for (const key of leftKeys) {
     if ((left as any)[key] !== (right as any)[key]) {
-      return false;
+      return false
     }
   }
-  return true;
+  return true
 }
 
 /**
  * Returns a new object by attempting to JSON.parse any top-level object keys.
  */
 export function jsonParseEmbeddedKeys(object: AnyRecord) {
-  const result: AnyRecord = {};
+  const result: AnyRecord = {}
   for (const key of Object.keys(object)) {
-    let value;
+    let value
     try {
-      value = JSON.parse(object[key]);
+      value = JSON.parse(object[key] as string)
     } catch (error) {
-      value = object[key];
+      value = object[key]
     }
-    result[key] = value;
+    result[key] = value
   }
-  return result;
+  return result
 }
 
 export const withoutLastElement = <T>(array: T[]): T[] => {
-  return array.slice(0, -1);
-};
+  return array.slice(0, -1)
+}
 
 /**
  * Deletes keys of the input object.
  */
 export function omitInPlace<T>(object: T, keys: Array<keyof T>) {
   if (!object) {
-    return;
+    return
   }
   for (const key of keys) {
-    delete object[key];
+    delete object[key]
   }
 }
 
@@ -428,17 +424,17 @@ export function omitInPlace<T>(object: T, keys: Array<keyof T>) {
  */
 export function omitByCopy<T>(object: T, keys: Array<keyof T>) {
   if (isNullOrUndefined(object)) {
-    return undefined;
+    return undefined
   }
-  const newObject = Object.assign({}, object);
+  const newObject = Object.assign({}, object)
   /**
    * Lodash's omit, which was previously used, seems to cause unexpected behavior
    * when payload is an ES6 item class. So we instead manually omit each key.
    */
   for (const key of keys) {
-    delete newObject[key];
+    delete newObject[key]
   }
-  return newObject;
+  return newObject
 }
 
 /**
@@ -449,13 +445,13 @@ export function joinPaths(...args: string[]) {
   return args
     .map((part, i) => {
       if (i === 0) {
-        return part.trim().replace(/[/]*$/g, '');
+        return part.trim().replace(/[/]*$/g, '')
       } else {
-        return part.trim().replace(/(^[/]*|[/]*$)/g, '');
+        return part.trim().replace(/(^[/]*|[/]*$)/g, '')
       }
     })
     .filter((x) => x.length)
-    .join('/');
+    .join('/')
 }
 
 /**
@@ -465,11 +461,11 @@ export function joinPaths(...args: string[]) {
  */
 export function Copy(object: any) {
   if (object instanceof Date) {
-    return new Date(object);
+    return new Date(object)
   } else if (isObject(object)) {
-    return JSON.parse(JSON.stringify(object));
+    return JSON.parse(JSON.stringify(object))
   } else {
-    return object;
+    return object
   }
 }
 
@@ -483,51 +479,51 @@ export function deepMerge(a: AnyRecord, b: AnyRecord) {
    * deepMerge will replace arrays wholesale
    */
   if (!a || !b) {
-    throw 'Attempting to deepMerge with null values';
+    throw 'Attempting to deepMerge with null values'
   }
   const customizer = (aValue: any, bValue: any) => {
     if (isArray(aValue)) {
-      return bValue;
+      return bValue
     }
-  };
-  mergeWith(a, b, customizer);
-  return a;
+  }
+  mergeWith(a, b, customizer)
+  return a
 }
 
 /**
  * Returns a new object by selecting certain keys from input object.
  */
 export function pickByCopy<T>(object: T, keys: Array<keyof T>) {
-  const result = {} as T;
+  const result = {} as T
   for (const key of keys) {
-    result[key] = object[key];
+    result[key] = object[key]
   }
-  return Copy(result);
+  return Copy(result)
 }
 
 /**
  * Recursively makes an object immutable via Object.freeze
  */
 export function deepFreeze(object: any) {
-  const propNames = Object.getOwnPropertyNames(object);
+  const propNames = Object.getOwnPropertyNames(object)
   for (const name of propNames) {
-    const value = object[name];
+    const value = object[name]
     if (value && typeof value === 'object' && !Object.isFrozen(value)) {
-      object[name] = deepFreeze(value);
+      object[name] = deepFreeze(value)
     } else {
-      object[name] = value;
+      object[name] = value
     }
   }
 
-  return Object.freeze(object);
+  return Object.freeze(object)
 }
 
 export function isValidUrl(url: string): boolean {
   try {
-    new URL(url);
-    return true;
+    new URL(url)
+    return true
   } catch (error) {
-    return false;
+    return false
   }
 }
 
@@ -538,8 +534,8 @@ export function hasGetter(object: any, property: string) {
   const descriptor = Object.getOwnPropertyDescriptor(
     Object.getPrototypeOf(object),
     property
-  );
-  return descriptor && !isNullOrUndefined(descriptor.get);
+  )
+  return descriptor && !isNullOrUndefined(descriptor.get)
 }
 
 /**
@@ -547,9 +543,9 @@ export function hasGetter(object: any, property: string) {
  * @returns A hexadecimal string truncated to the number of desired bits
  */
 export function truncateHexString(string: string, desiredBits: number) {
-  const BITS_PER_HEX_CHAR = 4;
-  const desiredCharLength = desiredBits / BITS_PER_HEX_CHAR;
-  return string.substring(0, desiredCharLength);
+  const BITS_PER_HEX_CHAR = 4
+  const desiredCharLength = desiredBits / BITS_PER_HEX_CHAR
+  return string.substring(0, desiredCharLength)
 }
 
 /**
@@ -558,17 +554,17 @@ export function truncateHexString(string: string, desiredBits: number) {
  */
 export async function sleep(milliseconds: number, warn = true) {
   if (warn) {
-    console.warn(`Sleeping for ${milliseconds}ms`);
+    console.warn(`Sleeping for ${milliseconds}ms`)
   }
   return new Promise<void>((resolve) => {
     setTimeout(function () {
-      resolve();
-    }, milliseconds);
-  });
+      resolve()
+    }, milliseconds)
+  })
 }
 
 export function assertUnreachable(uncheckedCase: never): never {
-  throw Error('Unchecked case ' + uncheckedCase);
+  throw Error('Unchecked case ' + uncheckedCase)
 }
 
 /**
@@ -579,7 +575,7 @@ export function isSameDay(dateA: Date, dateB: Date) {
     dateA.getFullYear() === dateB.getFullYear() &&
     dateA.getMonth() === dateB.getMonth() &&
     dateA.getDate() === dateB.getDate()
-  );
+  )
 }
 
 /**
@@ -595,35 +591,35 @@ export function naturalSort<T extends AnyRecord>(
   direction: 'asc' | 'desc' = 'asc'
 ): T[] {
   switch (direction) {
-    case 'asc':
-      return [...items].sort(
-        collator
-          ? (a, b) => collator.compare(a[property], b[property])
-          : (a, b) =>
-              a[property].localeCompare(b[property], 'en', { numeric: true })
-      );
-    case 'desc':
-      return [...items].sort(
-        collator
-          ? (a, b) => collator.compare(b[property], a[property])
-          : (a, b) =>
-              b[property].localeCompare(a[property], 'en', { numeric: true })
-      );
+  case 'asc':
+    return [...items].sort(
+      collator
+        ? (a, b) => collator.compare(a[property] as string, b[property] as string)
+        : (a, b) =>
+          (a[property] as string).localeCompare(b[property] as string, 'en', { numeric: true })
+    )
+  case 'desc':
+    return [...items].sort(
+      collator
+        ? (a, b) => collator.compare(b[property] as string, a[property] as string)
+        : (a, b) =>
+          (b[property] as string).localeCompare(a[property] as string, 'en', { numeric: true })
+    )
   }
 }
 
 export function arraysEqual<T>(left: T[], right: T[]): boolean {
   if (left.length !== right.length) {
-    return false;
+    return false
   }
   return (
     left.every((item) => right.includes(item)) &&
     right.every((item) => left.includes(item))
-  );
+  )
 }
 
-const MicrosecondsInAMillisecond = 1_000;
-const MillisecondsInASecond = 1_000;
+const MicrosecondsInAMillisecond = 1_000
+const MillisecondsInASecond = 1_000
 
 enum TimestampDigits {
   Seconds = 10,
@@ -632,29 +628,29 @@ enum TimestampDigits {
 }
 
 export function convertTimestampToMilliseconds(timestamp: number): number {
-  const digits = String(timestamp).length;
+  const digits = String(timestamp).length
   switch (digits) {
-    case TimestampDigits.Seconds:
-      return timestamp * MillisecondsInASecond;
-    case TimestampDigits.Milliseconds:
-      return timestamp;
-    case TimestampDigits.Microseconds:
-      return Math.floor(timestamp / MicrosecondsInAMillisecond);
+  case TimestampDigits.Seconds:
+    return timestamp * MillisecondsInASecond
+  case TimestampDigits.Milliseconds:
+    return timestamp
+  case TimestampDigits.Microseconds:
+    return Math.floor(timestamp / MicrosecondsInAMillisecond)
 
-    default:
-      throw `Unhandled timestamp precision: ${timestamp}`;
+  default:
+    throw `Unhandled timestamp precision: ${timestamp}`
   }
 }
 
 export function isErrorObject(object: any): object is ErrorObject {
-  return typeof object.error !== 'undefined';
+  return typeof object.error !== 'undefined'
 }
 
 export function sanitizeHtmlString(html: string): string {
-  return DOMPurify.sanitize(html);
+  return DOMPurify.sanitize(html)
 }
 
-let sharedDateFormatter: unknown;
+let sharedDateFormatter: unknown
 export function dateToLocalizedString(date: Date): string {
   if (
     typeof Intl !== 'undefined' &&
@@ -665,7 +661,7 @@ export function dateToLocalizedString(date: Date): string {
       const locale =
         navigator.languages && navigator.languages.length
           ? navigator.languages[0]
-          : navigator.language;
+          : navigator.language
       sharedDateFormatter = new Intl.DateTimeFormat(locale, {
         year: 'numeric',
         month: 'short',
@@ -673,58 +669,58 @@ export function dateToLocalizedString(date: Date): string {
         weekday: 'long',
         hour: '2-digit',
         minute: '2-digit',
-      });
+      })
     }
-    return (sharedDateFormatter as Intl.DateTimeFormat).format(date);
+    return (sharedDateFormatter as Intl.DateTimeFormat).format(date)
   } else {
     // IE < 11, Safari <= 9.0.
     // In English, this generates the string most similar to
     // the toLocaleDateString() result above.
-    return date.toDateString() + ' ' + date.toLocaleTimeString();
+    return date.toDateString() + ' ' + date.toLocaleTimeString()
   }
 }
 
 export function nonSecureRandomIdentifier(): string {
-  return `${Math.random() * 100}`.replace('.', '');
+  return `${Math.random() * 100}`.replace('.', '')
 }
 
 export function splitString(string: string, parts: number): string[] {
-  const outputLength = string.length;
-  const partLength = outputLength / parts;
-  const partitions = [];
+  const outputLength = string.length
+  const partLength = outputLength / parts
+  const partitions = []
   for (let i = 0; i < parts; i++) {
-    const partition = string.slice(partLength * i, partLength * (i + 1));
-    partitions.push(partition);
+    const partition = string.slice(partLength * i, partLength * (i + 1))
+    partitions.push(partition)
   }
-  return partitions;
+  return partitions
 }
 
 export function firstHalfOfString(string: string): string {
-  return string.substring(0, string.length / 2);
+  return string.substring(0, string.length / 2)
 }
 
 export function secondHalfOfString(string: string): string {
-  return string.substring(string.length / 2, string.length);
+  return string.substring(string.length / 2, string.length)
 }
 
 export function log(instance: any, message: string, ...args: unknown[]): void {
-  const service = instance.constructor.name;
-  const date = new Date();
+  const service = instance.constructor.name
+  const date = new Date()
   const timeString = date
     .toLocaleTimeString()
     .replace(' PM', '')
-    .replace(' AM', '');
-  const string = `${service}:${timeString}.${date.getMilliseconds()}`;
+    .replace(' AM', '')
+  const string = `${service}:${timeString}.${date.getMilliseconds()}`
   if (args) {
     args = args.map((arg) => {
       if (Array.isArray(arg)) {
-        return arg.slice();
+        return arg.slice()
       } else {
-        return arg;
+        return arg
       }
-    });
-    console.log(string, message, ...args);
+    })
+    console.log(string, message, ...args)
   } else {
-    console.log(string, message);
+    console.log(string, message)
   }
 }

@@ -1,5 +1,5 @@
 import { ApplicationIdentifier } from './types';
-import { getGlobalScope, isNullOrUndefined } from '@Lib/utils';
+import { getGlobalScope, isNullOrUndefined } from '@standardnotes/utils';
 
 /**
  * Platforms must override this class to provide platform specific utilities

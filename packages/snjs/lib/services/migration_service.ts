@@ -9,7 +9,7 @@ import * as migrationImports from '@Lib/migrations';
 import { BaseMigration } from '@Lib/migrations/base';
 import { PureService } from '@Services/pure_service';
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { lastElement } from '@Lib/utils';
+import { lastElement } from '@standardnotes/utils';
 
 /**
  * The migration service orchestrates the execution of multi-stage migrations.

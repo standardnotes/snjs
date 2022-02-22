@@ -50,7 +50,7 @@ import {
   removeFromArray,
   log,
   nonSecureRandomIdentifier,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { MessageData } from '..';
 
 type RunWithPermissionsCallback = (

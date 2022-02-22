@@ -1,4 +1,4 @@
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
 import { DeltaFileImport } from './../protocol/payloads/deltas/file_import';
 import { PayloadSource } from './../protocol/payloads/sources';

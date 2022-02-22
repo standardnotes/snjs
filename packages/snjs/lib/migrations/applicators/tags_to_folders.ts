@@ -1,7 +1,7 @@
 import { SNTag, TagMutator } from '@Lib/models';
 import { TagFolderDelimitter } from '@Lib/models/app/tag';
 import { ItemManager } from '@Lib/services';
-import { lastElement, sortByKey, withoutLastElement } from '@Lib/utils';
+import { lastElement, sortByKey, withoutLastElement } from '@standardnotes/utils';
 import { ContentType } from '@standardnotes/common';
 
 export class TagsToFoldersMigrationApplicator {

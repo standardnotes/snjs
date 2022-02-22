@@ -30,7 +30,7 @@ import {
   SNRootKeyParams,
 } from './../../protocol/key_params';
 import { PureService } from '@Lib/services/pure_service';
-import { isNullOrUndefined } from '@Lib/utils';
+import { isNullOrUndefined } from '@standardnotes/utils';
 import { SNAlertService } from '@Services/alert_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { Session } from '@Lib/services/api/session';

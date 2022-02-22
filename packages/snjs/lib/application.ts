@@ -25,7 +25,6 @@ import {
   ApplicationIdentifier,
   DeinitSource,
   UuidString,
-  AnyRecord,
   ApplicationEventPayload,
 } from './types';
 import { ApplicationOptionsDefaults, ApplicationOptions } from './options';
@@ -62,8 +61,8 @@ import {
   removeFromArray,
   sleep,
   nonSecureRandomIdentifier,
-} from '@Lib/utils';
-import { ContentType, Runtime } from '@standardnotes/common';
+} from '@standardnotes/utils';
+import { AnyRecord, ContentType, Runtime } from '@standardnotes/common';
 import {
   CopyPayload,
   CreateMaxPayloadFromAnyObject,

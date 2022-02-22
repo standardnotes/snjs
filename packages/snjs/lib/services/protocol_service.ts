@@ -57,7 +57,7 @@ import {
   isString,
   isWebCryptoAvailable,
   removeFromArray,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import { ContentType } from '@standardnotes/common';
 import { StorageKey } from '@Lib/storage_keys';

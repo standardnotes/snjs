@@ -1,4 +1,4 @@
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { UuidString } from '@Lib/types';
 import { SNApplication } from './../application';
 import { NoteViewController } from './note_view_controller';

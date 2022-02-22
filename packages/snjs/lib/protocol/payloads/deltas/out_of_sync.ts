@@ -6,7 +6,7 @@ import {
   PayloadsByDuplicating,
 } from '@Payloads/functions';
 
-import { extendArray } from '@Lib/utils';
+import { extendArray } from '@standardnotes/utils';
 
 export class DeltaOutOfSync extends PayloadsDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {

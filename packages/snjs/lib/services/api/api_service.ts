@@ -1,5 +1,5 @@
 import { SNFeatureRepo } from './../../models/app/feature_repo';
-import { ErrorObject, UuidString } from './../../types';
+import { UuidString } from './../../types';
 import {
   HttpResponse,
   RegistrationResponse,
@@ -30,7 +30,7 @@ import {
   User,
 } from './responses';
 import { Session, TokenSession } from './session';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, ErrorObject } from '@standardnotes/common';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
@@ -45,7 +45,7 @@ import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { PureService } from '@Services/pure_service';
-import { isNullOrUndefined, joinPaths } from '@Lib/utils';
+import { isNullOrUndefined, joinPaths } from '@standardnotes/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';

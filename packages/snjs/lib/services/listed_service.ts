@@ -1,4 +1,4 @@
-import { lastElement, sleep } from '@Lib/utils';
+import { lastElement, sleep } from '@standardnotes/utils';
 import { UuidString } from '@Lib/types';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';

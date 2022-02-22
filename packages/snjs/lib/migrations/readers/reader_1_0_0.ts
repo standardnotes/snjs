@@ -1,4 +1,4 @@
-import { isNullOrUndefined } from '@Lib/utils';
+import { isNullOrUndefined } from '@standardnotes/utils';
 import { isEnvironmentMobile } from '@Lib/platforms';
 import { PreviousSnjsVersion1_0_0 } from './../../version';
 import { LegacyKeys1_0_0 } from './../../storage_keys';

@@ -25,7 +25,7 @@ import { SNItemsKey } from './../models/app/items_key';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { PureService } from '@Services/pure_service';
-import { dateSorted, isNullOrUndefined, removeFromArray } from '@Lib/utils';
+import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { PayloadSource } from '@Lib/protocol/payloads';

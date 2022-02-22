@@ -172,7 +172,7 @@ export {
   nonSecureRandomIdentifier,
   sanitizeHtmlString,
   lastElement,
-} from './utils';
+} from '@standardnotes/utils';
 export { Uuid } from '@Lib/uuid';
 export {
   EncryptionIntent,

@@ -21,7 +21,7 @@ import { ContentType } from '@standardnotes/common';
 import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { isNullOrUndefined, removeFromArray } from '@Lib/utils';
+import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
