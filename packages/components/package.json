@@ -29,13 +29,13 @@
     "sn-simple-markdown-editor": "1.4.2",
     "sn-simple-task-editor": "1.3.9",
     "sn-spreadsheets": "1.4.4",
-    "sn-theme-autobiography": "standardnotes/autobiography-theme#1.0.3",
-    "sn-theme-dynamic": "standardnotes/dynamic-theme#1.0.3",
-    "sn-theme-focus": "standardnotes/focus-theme#1.2.7",
-    "sn-theme-futura": "standardnotes/futura-theme#1.2.6",
-    "sn-theme-midnight": "standardnotes/midnight-theme#1.2.6",
-    "sn-theme-solarized-dark": "standardnotes/solarized-dark-theme#1.2.5",
-    "sn-theme-titanium": "standardnotes/titanium-theme#1.2.6",
+    "@standardnotes/autobiography-theme": "1.0.3",
+    "@standardnotes/dynamic-theme": "1.0.3",
+    "@standardnotes/focus-theme": "1.2.7",
+    "@standardnotes/futura-theme": "1.2.6",
+    "@standardnotes/midnight-theme": "1.2.6",
+    "@standardnotes/solarized-dark-theme": "1.2.5",
+    "@standardnotes/titanium-theme": "1.2.6",
     "sn-token-vault": "2.0.10"
   }
 }
