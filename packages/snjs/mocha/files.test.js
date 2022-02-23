@@ -92,7 +92,7 @@ describe('files', function () {
   };
 
   it('should create valet token from server', async function () {
-    await setup({fakeCrypto: true, subscription: true});
+    await setup({ fakeCrypto: true, subscription: true });
     const remoteIdentifier = Factory.generateUuid();
     const token = await application.apiService.createFileValetToken(
       remoteIdentifier,
@@ -103,7 +103,7 @@ describe('files', function () {
   });
 
   it('should not create valet token from server when user has no subscription', async function () {
-    await setup({fakeCrypto: true, subscription: false});
+    await setup({ fakeCrypto: true, subscription: false });
 
     const remoteIdentifier = Factory.generateUuid();
     const token = await application.apiService.createFileValetToken(
@@ -115,7 +115,7 @@ describe('files', function () {
   });
 
   it('should not create valet token from server when user has an expired subscription', async function () {
-    await setup({fakeCrypto: true, subscription: false});
+    await setup({ fakeCrypto: true, subscription: false });
 
     await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
       userEmail: context.email,
@@ -125,6 +125,8 @@ describe('files', function () {
       timestamp: Date.now(),
       offline: false,
     });
+
+    await Factory.sleep(0.25);
 
     const remoteIdentifier = Factory.generateUuid();
     const token = await application.apiService.createFileValetToken(
@@ -136,7 +138,7 @@ describe('files', function () {
   });
 
   it('should encrypt and upload small file', async function () {
-    await setup({fakeCrypto: false, subscription: true});
+    await setup({ fakeCrypto: false, subscription: true });
 
     const response = await fetch('/packages/snjs/mocha/assets/small_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
@@ -159,7 +161,7 @@ describe('files', function () {
   });
 
   it('should encrypt and upload big file', async function () {
-    await setup({fakeCrypto: false, subscription: true});
+    await setup({ fakeCrypto: false, subscription: true });
 
     const response = await fetch('/packages/snjs/mocha/assets/two_mb_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
