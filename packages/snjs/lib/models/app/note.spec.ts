@@ -47,4 +47,15 @@ describe('SNNote Tests', () => {
     expect(note.preview_plain).toBeFalsy()
     expect(note.preview_html).toBeFalsy()
   })
+
+  it('should set mobilePrefersPlainEditor when given a valid choice', () => {
+    const selected = create({
+      mobilePrefersPlainEditor: true
+    })
+
+    const unselected = create()
+
+    expect(selected.mobilePrefersPlainEditor).toBeTruthy()
+    expect(unselected.mobilePrefersPlainEditor).toBe(undefined)
+  })
 });
