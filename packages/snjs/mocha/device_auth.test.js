@@ -28,7 +28,7 @@ describe('device authentication', function () {
     await Factory.safeDeinit(application);
 
     /** Recreate application and initialize */
-    const tmpApplication = await Factory.createApplication(namespace);
+    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace);
     let numPasscodeAttempts = 0;
     const promptValueReply = (prompts) => {
       const values = [];
@@ -81,7 +81,7 @@ describe('device authentication', function () {
     await Factory.safeDeinit(application);
 
     /** Recreate application and initialize */
-    const tmpApplication = await Factory.createApplication(namespace);
+    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace);
     let numPasscodeAttempts = 1;
     const promptValueReply = (prompts) => {
       const values = [];
@@ -152,7 +152,7 @@ describe('device authentication', function () {
     const wrongPasscode = 'barfoo';
     let numPasscodeAttempts = 1;
     /** Recreate application and initialize */
-    const tmpApplication = await Factory.createApplication(namespace);
+    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace);
     const promptValueReply = (prompts) => {
       const values = [];
       for (const prompt of prompts) {

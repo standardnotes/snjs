@@ -8,7 +8,7 @@ describe('002 protocol operations', () => {
   const _identifier = 'hello@test.com';
   const _password = 'password';
   let _keyParams, _key;
-  const application = Factory.createApplication();
+  const application = Factory.createApplicationWithRealCrypto();
   const protocol002 = new SNProtocolOperator002(new SNWebCrypto());
 
   // runs once before all tests in this block

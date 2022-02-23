@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 describe('tags as folders', () => {
   beforeEach(async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
   });
 
   afterEach(async function () {

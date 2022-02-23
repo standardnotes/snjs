@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js';
+import FakeWebCrypto from '../lib/fake_web_crypto.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
@@ -24,7 +25,7 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -170,7 +171,7 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -294,7 +295,7 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
 
     /** Create old version account parameters */
@@ -428,7 +429,7 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     /** Create arbitrary storage values and make sure they're migrated */
     const storage = {
       foo: 'bar',
@@ -503,7 +504,7 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator001 = new SNProtocolOperator001(new SNWebCrypto());
+    const operator001 = new SNProtocolOperator001(new FakeWebCrypto());
     const identifier = 'foo';
 
     /** Create old version account parameters */
@@ -640,7 +641,7 @@ describe('2020-01-15 web migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator002 = new SNProtocolOperator002(new SNWebCrypto());
+    const operator002 = new SNProtocolOperator002(new FakeWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */

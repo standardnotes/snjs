@@ -5,37 +5,49 @@ const expect = chai.expect;
 describe('files', function () {
   this.timeout(Factory.TwentySecondTimeout);
 
+  let application;
+  let context;
+  let fileService;
+  let itemManager;
+
   beforeEach(async function () {
     localStorage.clear();
-
-    this.context = await Factory.createAppContext();
-    await this.context.launch();
-
-    this.application = this.context.application;
-    this.fileService = this.context.application.fileService;
-    this.itemManager = this.context.application.itemManager;
-
-    await Factory.registerUserToApplication({
-      application: this.context.application,
-      email: this.context.email,
-      password: this.context.password,
-    });
-
-    await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
-      userEmail: this.context.email,
-      subscriptionId: 1,
-      subscriptionName: 'PLUS_PLAN',
-      subscriptionExpiresAt: (new Date().getTime() + 3_600_000) * 1_000,
-      timestamp: Date.now(),
-      offline: false,
-    });
-    /** Wait and allow server to apply subscription to user */
-    await Factory.sleep(0.5);
   });
 
+  const setup = async ({ fakeCrypto, subscription = true }) => {
+    if (fakeCrypto) {
+      context = await Factory.createAppContextWithFakeCrypto();
+    } else {
+      context = await Factory.createAppContextWithRealCrypto();
+    }
+
+    await context.launch();
+
+    application = context.application;
+    fileService = context.application.fileService;
+    itemManager = context.application.itemManager;
+
+    await Factory.registerUserToApplication({
+      application: context.application,
+      email: context.email,
+      password: context.password,
+    });
+
+    if (subscription) {
+      await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
+        userEmail: context.email,
+        subscriptionId: 1,
+        subscriptionName: 'PLUS_PLAN',
+        subscriptionExpiresAt: (new Date().getTime() + 3_600_000) * 1_000,
+        timestamp: Date.now(),
+        offline: false,
+      });
+      await Factory.sleep(0.25);
+    }
+  };
+
   afterEach(async function () {
-    expect(this.application.syncService.isOutOfSync()).to.equal(false);
-    await Factory.safeDeinit(this.application);
+    await Factory.safeDeinit(application);
     localStorage.clear();
   });
 
@@ -80,8 +92,9 @@ describe('files', function () {
   };
 
   it('should create valet token from server', async function () {
+    await setup({fakeCrypto: true, subscription: true});
     const remoteIdentifier = Factory.generateUuid();
-    const token = await this.application.apiService.createFileValetToken(
+    const token = await application.apiService.createFileValetToken(
       remoteIdentifier,
       'write'
     );
@@ -90,21 +103,10 @@ describe('files', function () {
   });
 
   it('should not create valet token from server when user has no subscription', async function () {
-    localStorage.clear();
-
-    this.context = await Factory.createAppContext();
-    await this.context.launch();
-
-    this.application = this.context.application;
-
-    await Factory.registerUserToApplication({
-      application: this.context.application,
-      email: this.context.email,
-      password: this.context.password,
-    });
+    await setup({fakeCrypto: true, subscription: false});
 
     const remoteIdentifier = Factory.generateUuid();
-    const token = await this.application.apiService.createFileValetToken(
+    const token = await application.apiService.createFileValetToken(
       remoteIdentifier,
       'write'
     );
@@ -113,32 +115,19 @@ describe('files', function () {
   });
 
   it('should not create valet token from server when user has an expired subscription', async function () {
-    localStorage.clear();
-
-    this.context = await Factory.createAppContext();
-    await this.context.launch();
-
-    this.application = this.context.application;
-
-    await Factory.registerUserToApplication({
-      application: this.context.application,
-      email: this.context.email,
-      password: this.context.password,
-    });
+    await setup({fakeCrypto: true, subscription: false});
 
     await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
-      userEmail: this.context.email,
+      userEmail: context.email,
       subscriptionId: 1,
       subscriptionName: 'PLUS_PLAN',
       subscriptionExpiresAt: (new Date().getTime() - 3_600_000) * 1_000,
       timestamp: Date.now(),
       offline: false,
     });
-    /** Wait and allow server to apply subscription to user */
-    await Factory.sleep(0.5);
 
     const remoteIdentifier = Factory.generateUuid();
-    const token = await this.application.apiService.createFileValetToken(
+    const token = await application.apiService.createFileValetToken(
       remoteIdentifier,
       'write'
     );
@@ -147,11 +136,13 @@ describe('files', function () {
   });
 
   it('should encrypt and upload small file', async function () {
+    await setup({fakeCrypto: false, subscription: true});
+
     const response = await fetch('/packages/snjs/mocha/assets/small_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
 
     const operation = await uploadFile(
-      this.fileService,
+      fileService,
       buffer,
       'my-file',
       'md',
@@ -159,8 +150,8 @@ describe('files', function () {
     );
 
     const downloadedBytes = await downloadFile(
-      this.fileService,
-      this.itemManager,
+      fileService,
+      itemManager,
       operation.getRemoteIdentifier()
     );
 
@@ -168,20 +159,22 @@ describe('files', function () {
   });
 
   it('should encrypt and upload big file', async function () {
+    await setup({fakeCrypto: false, subscription: true});
+
     const response = await fetch('/packages/snjs/mocha/assets/two_mb_file.md');
     const buffer = new Uint8Array(await response.arrayBuffer());
 
     const operation = await uploadFile(
-      this.fileService,
+      fileService,
       buffer,
       'my-file',
       'md',
-      100000,
+      100000
     );
 
     const downloadedBytes = await downloadFile(
-      this.fileService,
-      this.itemManager,
+      fileService,
+      itemManager,
       operation.getRemoteIdentifier()
     );
 

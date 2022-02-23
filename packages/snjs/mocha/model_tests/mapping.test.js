@@ -8,7 +8,7 @@ describe('model manager mapping', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
   });
 
   afterEach(async function () {

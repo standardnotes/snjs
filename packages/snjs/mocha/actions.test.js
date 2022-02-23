@@ -19,7 +19,7 @@ describe('actions service', () => {
 
     localStorage.clear();
 
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.itemManager = this.application.itemManager;
     this.actionsManager = this.application.actionsManager;
     this.email = Uuid.GenerateUuid();

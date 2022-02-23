@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.63.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.63.2...@standardnotes/snjs@2.63.3) (2022-02-23)
+
+
+### Bug Fixes
+
+* **note:** prevents unknown types from breaking note's state when creating from PayloadContent ([#608](https://github.com/standardnotes/snjs/issues/608)) ([1734f6f](https://github.com/standardnotes/snjs/commit/1734f6f4026ed6f644e280a5fc18356f779e8ceb))
+
+
+
+
+
+## [2.63.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.63.1...@standardnotes/snjs@2.63.2) (2022-02-23)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.63.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.63.0...@standardnotes/snjs@2.63.1) (2022-02-22)
 
 
