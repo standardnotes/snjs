@@ -18,7 +18,7 @@ describe('server session', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuid();
     this.password = Uuid.GenerateUuid();
     this.newPassword = Factory.randomString();
@@ -594,7 +594,7 @@ describe('server session', function () {
       password: this.password,
     });
 
-    const appA = await Factory.createApplication(Factory.randomString());
+    const appA = await Factory.createApplicationWithFakeCrypto(Factory.randomString());
     await appA.prepareForLaunch({});
     await appA.launch(true);
 
@@ -608,7 +608,7 @@ describe('server session', function () {
     });
 
     /** Create simultaneous appB signed into same account */
-    const appB = await Factory.createApplication('another-namespace');
+    const appB = await Factory.createApplicationWithFakeCrypto('another-namespace');
     await appB.prepareForLaunch({});
     await appB.launch(true);
     await Factory.loginToApplication({
@@ -649,7 +649,7 @@ describe('server session', function () {
         new ChallengeValue(challenge.prompts[1], password),
       ]);
     };
-    const appA = await Factory.createApplication(Factory.randomString());
+    const appA = await Factory.createApplicationWithFakeCrypto(Factory.randomString());
     await appA.prepareForLaunch({ receiveChallenge });
     await appA.launch(true);
 

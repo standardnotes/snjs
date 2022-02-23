@@ -10,7 +10,7 @@ describe('settings service', function () {
   let snApp;
 
   beforeEach(async function () {
-    snApp = await Factory.createInitAppWithRandNamespace(
+    snApp = await Factory.createInitAppWithFakeCrypto(
       Environment.Web,
       Platform.MacWeb
     );

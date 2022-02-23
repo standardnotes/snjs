@@ -15,7 +15,7 @@ const setupRandomUuid = () => {
 
 describe('web native folders migration', () => {
   beforeEach(async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     setupRandomUuid();
   });
 

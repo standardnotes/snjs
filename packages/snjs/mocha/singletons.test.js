@@ -35,7 +35,7 @@ describe('singletons', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuid();
     this.password = Uuid.GenerateUuid();
     this.registerUser = async () => {

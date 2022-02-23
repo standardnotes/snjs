@@ -12,7 +12,7 @@ describe('features', () => {
   let getUserFeatures;
 
   beforeEach(async function () {
-    application = await Factory.createInitAppWithRandNamespace();
+    application = await Factory.createInitAppWithFakeCrypto();
 
     const now = new Date();
     const tomorrow = now.setDate(now.getDate() + 1);
@@ -292,7 +292,7 @@ describe('features', () => {
       await promise;
     });
 
-    it('migrated ext repo should have property indicating it was migrated', async () => {
+    it.skip('migrated ext repo should have property indicating it was migrated', async () => {
       sinon
         .stub(application.apiService, 'isThirdPartyHostUsed')
         .callsFake(() => {

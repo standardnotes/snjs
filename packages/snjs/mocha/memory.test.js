@@ -18,7 +18,7 @@ describe('memory', function () {
   });
 
   beforeEach(async function () {
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
   });
 
   afterEach(async function () {

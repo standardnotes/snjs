@@ -17,7 +17,7 @@ describe('003 protocol operations', () => {
   const _password = 'password';
   let _keyParams, _key;
 
-  const sharedApplication = Factory.createApplication();
+  const sharedApplication = Factory.createApplicationWithRealCrypto();
   const protocol003 = new SNProtocolOperator003(new SNWebCrypto());
 
   // runs once before all tests in this block

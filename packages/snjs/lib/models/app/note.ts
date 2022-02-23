@@ -23,19 +23,20 @@ export class SNNote extends SNItem implements NoteContent {
   public readonly title: string;
   public readonly text: string;
   public readonly mobilePrefersPlainEditor?: boolean;
-  public readonly hidePreview = false;
+  public readonly hidePreview: boolean = false;
   public readonly preview_plain: string;
   public readonly preview_html: string;
   public readonly prefersPlainEditor!: boolean;
-  public readonly spellcheck?: boolean | undefined;
+  public readonly spellcheck?: boolean;
 
   constructor(payload: PurePayload) {
     super(payload);
-    this.title = this.payload.safeContent.title || '';
-    this.text = this.payload.safeContent.text || '';
-    this.preview_plain = this.payload.safeContent.preview_plain;
-    this.preview_html = this.payload.safeContent.preview_html;
-    this.hidePreview = this.payload.safeContent.hidePreview;
+
+    this.title = String(this.payload.safeContent.title || '');
+    this.text = String(this.payload.safeContent.text || '');
+    this.preview_plain = String(this.payload.safeContent.preview_plain || '');
+    this.preview_html = String(this.payload.safeContent.preview_html || '');
+    this.hidePreview = Boolean(this.payload.safeContent.hidePreview);
     this.spellcheck = this.payload.safeContent.spellcheck;
 
     if (payload.format === PayloadFormat.DecryptedBareObject) {
@@ -43,6 +44,7 @@ export class SNNote extends SNItem implements NoteContent {
         AppDataField.PrefersPlainEditor
       );
     }
+
     if (!isNullOrUndefined(this.payload.safeContent.mobilePrefersPlainEditor)) {
       this.mobilePrefersPlainEditor = this.payload.safeContent.mobilePrefersPlainEditor;
     }

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import WebDeviceInterface from './web_device_interface.js';
+import FakeWebCrypto from './fake_web_crypto.js';
 
 export const TenSecondTimeout = 10_000;
 export const TwentySecondTimeout = 20_000;
@@ -17,7 +18,7 @@ export async function createAndInitSimpleAppContext(
     environment: Environment.Web,
   }
 ) {
-  const application = await createInitAppWithRandNamespace(environment);
+  const application = await createInitAppWithFakeCrypto(environment);
   const email = Uuid.GenerateUuid();
   const password = Uuid.GenerateUuid();
   const newPassword = randomString();
@@ -38,11 +39,25 @@ export async function createAndInitSimpleAppContext(
   };
 }
 
-export async function createAppContext(identifier) {
+export async function createAppContextWithFakeCrypto(identifier) {
+  return createAppContext(identifier, new FakeWebCrypto());
+}
+
+export async function createAppContextWithRealCrypto(identifier) {
+  return createAppContext(identifier, new SNWebCrypto());
+}
+
+export async function createAppContext(identifier, crypto) {
   if (!identifier) {
     identifier = `${Math.random()}`;
   }
-  const application = await createApplication(identifier);
+  const application = await createApplication(
+    identifier,
+    undefined,
+    undefined,
+    undefined,
+    crypto || new FakeWebCrypto()
+  );
   const email = Uuid.GenerateUuid();
   const password = Uuid.GenerateUuid();
   const passcode = 'mypasscode';
@@ -132,7 +147,13 @@ export async function publishMockedEvent(eventType, eventPayload) {
   });
 }
 
-export function createApplication(identifier, environment, platform, host) {
+export function createApplication(
+  identifier,
+  environment,
+  platform,
+  host,
+  crypto
+) {
   const deviceInterface = new WebDeviceInterface(
     setTimeout.bind(window),
     setInterval.bind(window)
@@ -141,7 +162,7 @@ export function createApplication(identifier, environment, platform, host) {
     environment || Environment.Web,
     platform || Platform.MacWeb,
     deviceInterface,
-    new SNWebCrypto(),
+    crypto || new FakeWebCrypto(),
     {
       confirm: async () => true,
       alert: async () => {},
@@ -155,23 +176,77 @@ export function createApplication(identifier, environment, platform, host) {
   );
 }
 
+export function createApplicationWithFakeCrypto(
+  identifier,
+  environment,
+  platform,
+  host
+) {
+  return createApplication(
+    identifier,
+    environment,
+    platform,
+    host,
+    new FakeWebCrypto()
+  );
+}
+
+export function createApplicationWithRealCrypto(
+  identifier,
+  environment,
+  platform,
+  host
+) {
+  return createApplication(
+    identifier,
+    environment,
+    platform,
+    host,
+    new SNWebCrypto()
+  );
+}
+
 export async function createAppWithRandNamespace(environment, platform) {
   const namespace = Math.random().toString(36).substring(2, 15);
   return createApplication(namespace, environment, platform);
 }
 
-export async function createInitAppWithRandNamespace(environment, platform) {
+export async function createInitAppWithFakeCrypto(environment, platform) {
   const namespace = Math.random().toString(36).substring(2, 15);
-  return createAndInitializeApplication(namespace, environment, platform);
+  return createAndInitializeApplication(
+    namespace,
+    environment,
+    platform,
+    undefined,
+    new FakeWebCrypto()
+  );
+}
+
+export async function createInitAppWithRealCrypto(environment, platform) {
+  const namespace = Math.random().toString(36).substring(2, 15);
+  return createAndInitializeApplication(
+    namespace,
+    environment,
+    platform,
+    undefined,
+    new SNWebCrypto()
+  );
 }
 
 export async function createAndInitializeApplication(
   namespace,
   environment,
   platform,
-  host
+  host,
+  crypto
 ) {
-  const application = createApplication(namespace, environment, platform, host);
+  const application = createApplication(
+    namespace,
+    environment,
+    platform,
+    host,
+    crypto
+  );
   await initializeApplication(application);
   return application;
 }
@@ -348,8 +423,10 @@ export async function loginToApplication({
 export async function awaitFunctionInvokation(object, functionName) {
   return new Promise((resolve) => {
     const original = object[functionName];
-    object[functionName] = function () {
-      resolve(original.apply(this, arguments));
+    object[functionName] = async function () {
+      const result = original.apply(this, arguments);
+      resolve(result);
+      return result;
     };
   });
 }
@@ -359,13 +436,21 @@ export async function awaitFunctionInvokation(object, functionName) {
  * A new one must be created.
  */
 export async function signOutApplicationAndReturnNew(application) {
+  const isRealCrypto = application.crypto instanceof SNWebCrypto;
   await application.signOut();
-  return createInitAppWithRandNamespace();
+  if (isRealCrypto) {
+    return createInitAppWithRealCrypto();
+  } else {
+    return createInitAppWithFakeCrypto();
+  }
 }
 
 export async function signOutAndBackIn(application, email, password) {
+  const isRealCrypto = application.crypto instanceof SNWebCrypto;
   await application.signOut();
-  const newApplication = await createInitAppWithRandNamespace();
+  const newApplication = isRealCrypto
+    ? await createInitAppWithRealCrypto()
+    : await createInitAppWithFakeCrypto();
   await this.loginToApplication({
     application: newApplication,
     email,
@@ -394,7 +479,7 @@ export function createItemParams(contentType) {
 }
 
 export function generateUuid() {
-  const crypto = new SNWebCrypto();
+  const crypto = new FakeWebCrypto();
   return crypto.generateUUID();
 }
 
