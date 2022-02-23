@@ -27,7 +27,7 @@ export class SNNote extends SNItem implements NoteContent {
   public readonly preview_plain: string;
   public readonly preview_html: string;
   public readonly prefersPlainEditor!: boolean;
-  public readonly spellcheck?: boolean | undefined;
+  public readonly spellcheck?: boolean;
 
   constructor(payload: PurePayload) {
     super(payload);
