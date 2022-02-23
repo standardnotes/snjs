@@ -4,7 +4,7 @@ import {
 } from '@standardnotes/features';
 import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies';
 import { HistoryEntry } from './../../services/history/entries/history_entry';
-import { PurePayload } from './../../protocol/payloads/pure_payload';
+import { PurePayload } from '@standardnotes/payloads';
 import { ItemMutator, SNItem } from '@Models/core/item';
 
 export enum ActionAccessType {

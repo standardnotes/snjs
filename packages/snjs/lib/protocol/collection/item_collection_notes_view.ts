@@ -1,8 +1,7 @@
 import { ContentType } from '@Lib/index';
 import { SNNote, SNTag } from '../../models';
 import { SNSmartTag } from './../../models/app/smartTag';
-import { ItemDelta, SNIndex } from './indexes';
-import { ItemCollection } from './item_collection';
+import { ItemDelta, SNIndex, ItemCollection } from '@standardnotes/payloads';
 import {
   criteriaForSmartTag,
   NotesDisplayCriteria,

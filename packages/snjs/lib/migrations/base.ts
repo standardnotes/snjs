@@ -1,6 +1,5 @@
 import { SNLog } from '@Lib/log';
-import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
 import { ChallengeReason, ChallengeValidation } from './../challenges';
 import {
   KeychainRecoveryStrings,
@@ -14,7 +13,7 @@ import {
 } from './../version';
 import { Migration } from '@Lib/migrations/migration';
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { ApplicationStage } from '@standardnotes/common';
+import { ApplicationStage, ContentTypeUsesRootKeyEncryption } from '@standardnotes/common';
 import { isNullOrUndefined } from '@standardnotes/utils';
 import { CreateReader } from './readers/functions';
 import { StorageReader } from './readers/reader';

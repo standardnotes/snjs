@@ -4,7 +4,7 @@ import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import { displayStringForContentType } from '@Models/content_types';
 import { ContentType, Runtime } from '@standardnotes/common';
-import { PayloadSource } from '@Protocol/payloads/sources';
+import { PayloadSource } from '@standardnotes/payloads';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from '@Models/app/note';
 import { SNTheme } from '@Models/app/theme';
@@ -13,8 +13,8 @@ import { SNAlertService } from '@Services/alert_service';
 import { SNSyncService } from '@Services/sync/sync_service';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
-import { ComponentArea, SNComponent } from '@Models/app/component';
-import { ComponentAction, ComponentPermission } from '@standardnotes/features';
+import { SNComponent } from '@Models/app/component';
+import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features';
 import {
   Copy,
   concatArrays,

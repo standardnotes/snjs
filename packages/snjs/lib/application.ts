@@ -16,11 +16,27 @@ import { NotesDisplayCriteria } from './protocol/collection/notes_display_criter
 import { SNKeyRecoveryService } from './services/key_recovery_service';
 import {
   CollectionSort,
-  SortDirection,
-} from '@Protocol/collection/item_collection';
+  CollectionSortDirection,
+  PayloadOverride,
+  RawPayload,
+  PurePayload,
+  CopyPayload,
+  CreateMaxPayloadFromAnyObject,
+  PayloadContent,
+  PayloadSource,
+  PayloadFormat
+} from '@standardnotes/payloads';
 import { Uuids } from '@Models/functions';
-import { PayloadOverride, RawPayload } from './protocol/payloads/generator';
-import { ApplicationStage, ApplicationIdentifier } from '@standardnotes/common';
+import {
+  AnyRecord,
+  ContentType,
+  ProtocolVersion,
+  compareVersions,
+  ApplicationStage,
+  ApplicationIdentifier,
+  KeyParamsOrigination,
+  EncryptionIntent,
+} from '@standardnotes/common';
 import { DeinitSource, UuidString, ApplicationEventPayload } from './types';
 import {
   ApplicationOptionsDefaults,
@@ -33,14 +49,11 @@ import {
   applicationEventForSyncEvent,
 } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
-import { Uuid } from '@Lib/uuid';
 import { BackupFile } from './services/protocol_service';
-import { EncryptionIntent } from '@Protocol/intents';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
 import { SNPredicate } from '@Models/core/predicate';
-import { PurePayload } from '@Payloads/pure_payload';
 import {
   Challenge,
   ChallengePrompt,
@@ -58,14 +71,8 @@ import {
   removeFromArray,
   sleep,
   nonSecureRandomIdentifier,
+  UuidGenerator,
 } from '@standardnotes/utils';
-import { AnyRecord, ContentType } from '@standardnotes/common';
-import {
-  CopyPayload,
-  CreateMaxPayloadFromAnyObject,
-  PayloadContent,
-} from '@Payloads/generator';
-import { PayloadSource } from '@Payloads/sources';
 import { CreateItemFromPayload } from '@Models/generator';
 import {
   StoragePersistencePolicies,
@@ -103,8 +110,6 @@ import {
 } from './services/api/messages';
 import { SessionEvent } from './services/api/session_manager';
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models';
-import { ProtocolVersion, compareVersions } from './protocol/versions';
-import { KeyParamsOrigination } from './protocol/key_params';
 import { SNLog } from './log';
 import { SNPreferencesService } from './services/preferences_service';
 import {
@@ -117,7 +122,6 @@ import {
   SignInResponse,
   User,
 } from './services/api/responses';
-import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import {
@@ -655,7 +659,7 @@ export class SNApplication implements ListedInterface {
   public setDisplayOptions<T extends SNItem>(
     contentType: ContentType,
     sortBy?: CollectionSort,
-    direction?: SortDirection,
+    direction?: CollectionSortDirection,
     filter?: (element: T) => boolean
   ): void {
     this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
@@ -1682,7 +1686,7 @@ export class SNApplication implements ListedInterface {
   }
 
   public generateUuid(): string {
-    return Uuid.GenerateUuid();
+    return UuidGenerator.GenerateUuid();
   }
 
   public presentKeyRecoveryWizard(): Promise<void> {

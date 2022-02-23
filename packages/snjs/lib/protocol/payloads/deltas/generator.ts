@@ -2,7 +2,7 @@ import { DeltaRemoteRejected } from './remote_rejected';
 import { DeltaRemoteConflicts } from './remote_conflicts';
 import { DeltaRemoteSaved } from './remote_saved';
 import { DeltaRemoteRetrieved } from './remote_retrieved';
-import { PayloadSource } from '@Payloads/sources';
+import { PayloadSource } from '@standardnotes/payloads';
 
 export function DeltaClassForSource(source: PayloadSource) {
   if (source === PayloadSource.RemoteRetrieved) {

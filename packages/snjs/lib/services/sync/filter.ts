@@ -1,4 +1,4 @@
-import { PayloadFormat, PurePayload } from '@Lib/protocol/payloads';
+import { PayloadFormat, PurePayload } from '@standardnotes/payloads';
 
 export function filterDisallowedRemotePayloads(
   payloads: PurePayload[]

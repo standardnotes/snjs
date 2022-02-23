@@ -1,7 +1,9 @@
-import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import {
+  CreateSourcedPayloadFromObject,
+  PayloadSource,
+  ImmutablePayloadCollection
+} from '@standardnotes/payloads';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 
 export class DeltaRemoteRejected extends PayloadsDelta {
   // eslint-disable-next-line @typescript-eslint/require-await

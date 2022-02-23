@@ -1,9 +1,9 @@
 import { SNTag } from '@Lib/index';
-import { FillItemContent } from '@Models/functions';
 import {
   ContentReference,
   CreateMaxPayloadFromAnyObject,
-} from '@Payloads/generator';
+  FillItemContent
+} from '@standardnotes/payloads';
 import { ContentType } from '@standardnotes/common';
 
 const randUuid = () => String(Math.random());

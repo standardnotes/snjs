@@ -1,7 +1,7 @@
 import { SNFile } from './app/file';
 import { SNFeatureRepo } from './app/feature_repo';
 import { ContentType } from '@standardnotes/common';
-import { PurePayload } from '@Payloads/pure_payload';
+import { PurePayload } from '@standardnotes/payloads';
 import { SNActionsExtension } from './app/extension';
 import { SNComponent } from '@Models/app/component';
 import { SNEditor } from './app/editor';

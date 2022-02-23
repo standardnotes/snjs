@@ -2,13 +2,13 @@ import {
   ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
-} from './../payloads/generator';
+  PurePayload,
+  PayloadFormat
+} from '@standardnotes/payloads';
 import { SNRootKey } from './../root_key';
-import { KeyParamsOrigination, SNRootKeyParams } from './../key_params';
-import { PurePayload } from './../payloads/pure_payload';
+import { SNRootKeyParams } from './../key_params';
+import { KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { SNItemsKey } from '@Models/app/items_key';
-import { PayloadFormat } from '@Payloads/formats';
-import { ProtocolVersion } from '@Protocol/versions';
 
 export type ItemsKeyContent = {
   itemsKey: string;

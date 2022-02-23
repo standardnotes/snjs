@@ -1,16 +1,15 @@
 import { ItemManager, SNItem } from '@Lib/index';
 import { SNNote, NoteMutator } from '@Lib/models';
 import { SmartTagPredicateContent, SNSmartTag } from '@Lib/models/app/smartTag';
-import { Uuid } from '@Lib/uuid';
 import { SNTag, TagMutator } from '@Models/app/tag';
-import { FillItemContent } from '@Models/functions';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
+import { UuidGenerator } from '@standardnotes/utils';
 import { ContentType } from '@standardnotes/common';
 import { NotesDisplayCriteria } from './../protocol/collection/notes_display_criteria';
 import { PayloadManager } from './payload_manager';
 
 const setupRandomUuid = () => {
-  Uuid.SetGenerators(() => String(Math.random()));
+  UuidGenerator.SetGenerators(() => String(Math.random()));
 };
 
 const TAG_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';

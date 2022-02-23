@@ -3,7 +3,7 @@ import { removeFromArray } from '@standardnotes/utils';
 import { DeinitSource, UuidString } from './types';
 import { SNApplication } from './application';
 import { AbstractService, DeviceInterface } from '@standardnotes/services';
-import { Uuid } from '@Lib/uuid';
+import { UuidGenerator } from '@standardnotes/utils';
 
 export type ApplicationDescriptor = {
   identifier: string | UuidString;
@@ -211,7 +211,7 @@ export class SNApplicationGroup extends AbstractService {
   }
 
   public async addNewApplication(label?: string) {
-    const identifier = await Uuid.GenerateUuid();
+    const identifier = await UuidGenerator.GenerateUuid();
     const index = this.getDescriptors().length + 1;
     const descriptor: ApplicationDescriptor = {
       identifier: identifier,

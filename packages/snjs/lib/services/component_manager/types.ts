@@ -1,9 +1,8 @@
-import { ComponentAction, ComponentPermission } from '@standardnotes/features';
+import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features';
 import { SNComponent } from '@Lib/models';
-import { ComponentArea } from '@Models/app/component';
 import { UuidString } from '@Lib/types';
 import { ContentType } from '@standardnotes/common';
-import { RawPayload } from '@Payloads/generator';
+import { RawPayload } from '@standardnotes/payloads';
 
 export interface DesktopManagerInterface {
   syncComponentsInstallation(components: SNComponent[]): void;

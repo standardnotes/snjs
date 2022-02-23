@@ -1,9 +1,7 @@
-import { ContentType } from '@Lib/index';
 import { isNullOrUndefined } from '@standardnotes/utils';
-import { AppDataField, ItemMutator, SNItem } from '@Models/core/item';
-import { PayloadContent } from '@Payloads/generator';
-import { PayloadFormat } from './../../protocol/payloads/formats';
-import { PurePayload } from './../../protocol/payloads/pure_payload';
+import { AppDataField, ContentType } from '@standardnotes/common';
+import { ItemMutator, SNItem } from '@Models/core/item';
+import { ItemInterface, PayloadContent, PayloadFormat, PurePayload } from '@standardnotes/payloads';
 
 export interface NoteContent extends PayloadContent {
   title: string;
@@ -15,7 +13,7 @@ export interface NoteContent extends PayloadContent {
   spellcheck?: boolean;
 }
 
-export const isNote = (x: SNItem): x is SNNote =>
+export const isNote = (x: ItemInterface): x is SNNote =>
   x.content_type === ContentType.Note;
 
 /** A note item */

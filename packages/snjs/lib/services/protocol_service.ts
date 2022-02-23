@@ -2,51 +2,37 @@ import {
   SynchronousOperator,
   AsynchronousOperator,
 } from './../protocol/operator/operator';
-import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { SNLog } from './../log';
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
-} from './../protocol/payloads/generator';
-import { FillItemContent, Uuids } from '@Models/functions';
-import {
-  ContentTypeUsesRootKeyEncryption,
-  EncryptionIntent,
-} from './../protocol/intents';
-import {
-  compareVersions,
-  isVersionLessThanOrEqualTo,
-} from '@Protocol/versions';
-import { ProtocolVersion } from './../protocol/versions';
+  PurePayload,
+  CreateIntentPayloadFromObject,
+  CreateMaxPayloadFromAnyObject,
+  CreateSourcedPayloadFromObject,
+  PayloadFormat,
+  PayloadSource,
+  FillItemContent
+} from '@standardnotes/payloads';
+import { Uuids } from '@Models/functions';
 import { SNProtocolOperator004 } from './../protocol/operator/004/operator_004';
 import { SNProtocolOperator003 } from './../protocol/operator/003/operator_003';
 import { SNProtocolOperator002 } from './../protocol/operator/002/operator_002';
 import { SNProtocolOperator001 } from './../protocol/operator/001/operator_001';
-import { PayloadFormat } from './../protocol/payloads/formats';
-import { PayloadSource } from './../protocol/payloads/sources';
-import {
-  CreateIntentPayloadFromObject,
-  CreateMaxPayloadFromAnyObject,
-  CreateSourcedPayloadFromObject,
-} from '@Payloads/generator';
 import { ItemManager } from '@Services/item_manager';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SyncEvent } from '@Lib/events';
 import { CreateItemFromPayload } from '@Models/generator';
-import { PurePayload } from '@Payloads/pure_payload';
 import { ItemsKeyMutator, SNItemsKey } from '@Models/app/items_key';
 import {
-  AnyKeyParamsContent,
   CreateAnyKeyParams,
-  KeyParamsOrigination,
   SNRootKeyParams,
 } from './../protocol/key_params';
 import { SNStorageService } from './storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import { PayloadManager } from './payload_manager';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { Uuid } from '@Lib/uuid';
 import {
   extendArray,
   isFunction,
@@ -55,13 +41,26 @@ import {
   isString,
   isWebCryptoAvailable,
   removeFromArray,
+  UuidGenerator
 } from '@standardnotes/utils';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
-import { ApplicationIdentifier, ContentType } from '@standardnotes/common';
+import {
+  ApplicationIdentifier,
+  ContentType,
+  compareVersions,
+  isVersionLessThanOrEqualTo,
+  ContentTypeUsesRootKeyEncryption,
+  EncryptionIntent,
+  intentRequiresEncryption,
+  isDecryptedIntent,
+  leftVersionGreaterThanOrEqualToRight,
+  ProtocolVersion,
+  KeyParamsOrigination,
+  AnyKeyParamsContent,
+} from '@standardnotes/common';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { AbstractService, DeviceInterface } from '@standardnotes/services';
-import { intentRequiresEncryption, isDecryptedIntent } from '@Lib/protocol';
 
 export type BackupFile = {
   version?: ProtocolVersion;
@@ -152,7 +151,7 @@ export class SNProtocolService
     this.storageService = storageService;
     this.crypto = crypto;
 
-    Uuid.SetGenerators(this.crypto.generateUUID);
+    UuidGenerator.SetGenerators(this.crypto.generateUUID);
 
     /** Hide rootKey enumeration */
     Object.defineProperty(this, 'rootKey', {
@@ -493,7 +492,7 @@ export class SNProtocolService
       throw Error('Attempting to encrypt payload with no content.');
     }
     if (!payload.uuid) {
-      throw Error('Attempting to encrypt payload with no uuid.');
+      throw Error('Attempting to encrypt payload with no UuidGenerator.');
     }
     if (key?.errorDecrypting || key?.waitingForKey) {
       throw Error('Attempting to encrypt payload with encrypted key.');
@@ -1562,7 +1561,7 @@ export class SNProtocolService
     if (compareVersions(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0) {
       /** Create root key based items key */
       const payload = CreateMaxPayloadFromAnyObject({
-        uuid: await Uuid.GenerateUuid(),
+        uuid: await UuidGenerator.GenerateUuid(),
         content_type: ContentType.ItemsKey,
         content: FillItemContent({
           itemsKey: rootKey.masterKey,

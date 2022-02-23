@@ -1,4 +1,4 @@
-import { PurePayload } from './../../protocol/payloads/pure_payload';
+import { PurePayload } from '@standardnotes/payloads';
 import { SNItem } from '@Models/core/item';
 import { SNNote } from './note';
 

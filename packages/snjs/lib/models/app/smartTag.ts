@@ -1,6 +1,6 @@
 import { SNTag } from '@Models/app/tag';
 import { SNPredicate } from '@Models/core/predicate';
-import { PurePayload } from './../../protocol/payloads/pure_payload';
+import { PurePayload } from '@standardnotes/payloads';
 
 export const SMART_TAG_DSL_PREFIX = '![';
 

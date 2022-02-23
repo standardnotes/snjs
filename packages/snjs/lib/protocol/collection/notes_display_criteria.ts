@@ -1,9 +1,7 @@
-import { SortDirection } from './item_collection';
-import { CollectionSort } from '@Lib/protocol/collection/item_collection';
+import { CollectionSortDirection, CollectionSort, ItemCollection } from '@standardnotes/payloads';
 import { SNTag } from './../../models/app/tag';
 import { SNPredicate } from './../../models/core/predicate';
 import { ContentType } from '@standardnotes/common';
-import { ItemCollection } from './item_collection';
 import { SNNote } from './../../models/app/note';
 import { SNSmartTag } from './../../models/app/smartTag';
 
@@ -20,7 +18,7 @@ export class NotesDisplayCriteria {
   public includeTrashed = false;
   public includeArchived = false;
   public sortProperty?: CollectionSort;
-  public sortDirection?: SortDirection;
+  public sortDirection?: CollectionSortDirection;
 
   static Create(
     properties: Partial<NotesDisplayCriteria>

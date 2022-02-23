@@ -1,7 +1,15 @@
 import { V002Algorithm } from './operator/algorithms';
 import { V001Algorithm } from '@Protocol/operator/algorithms';
 import { KeyParamsData, KeyParamsResponse } from './../services/api/responses';
-import { ProtocolVersion } from '@Protocol/versions';
+import {
+  KeyParamsContent001,
+  KeyParamsContent002,
+  KeyParamsContent003,
+  KeyParamsContent004,
+  AnyKeyParamsContent,
+  ProtocolVersion,
+  KeyParamsOrigination
+} from '@standardnotes/common';
 import { pickByCopy } from '@standardnotes/utils';
 
 /**
@@ -16,15 +24,6 @@ import { pickByCopy } from '@standardnotes/utils';
  *  - Account identifier is returned as 'identifier'
  */
 
-export enum KeyParamsOrigination {
-  Registration = 'registration',
-  EmailChange = 'email-change',
-  PasswordChange = 'password-change',
-  ProtocolUpgrade = 'protocol-upgrade',
-  PasscodeCreate = 'passcode-create',
-  PasscodeChange = 'passcode-change',
-}
-
 const ValidKeyParamsKeys = [
   'identifier',
   'pw_cost',
@@ -34,44 +33,6 @@ const ValidKeyParamsKeys = [
   'origination',
   'created',
 ];
-
-type BaseKeyParams = {
-  /** Seconds since creation date */
-  created?: string;
-  /** The event that lead to the creation of these params */
-  origination?: KeyParamsOrigination;
-  version: ProtocolVersion;
-};
-
-export type KeyParamsContent001 = BaseKeyParams & {
-  email: string;
-  pw_cost: number;
-  pw_salt: string;
-  pw_nonce: string;
-};
-
-export type KeyParamsContent002 = BaseKeyParams & {
-  email: string;
-  pw_cost: number;
-  pw_salt: string;
-  pw_nonce: string;
-};
-
-export type KeyParamsContent003 = BaseKeyParams & {
-  identifier: string;
-  pw_nonce: string;
-};
-
-export type KeyParamsContent004 = Required<BaseKeyParams> & {
-  identifier: string;
-  pw_nonce: string;
-};
-
-export type AnyKeyParamsContent =
-  | KeyParamsContent001
-  | KeyParamsContent002
-  | KeyParamsContent003
-  | KeyParamsContent004;
 
 export function Create001KeyParams(keyParams: KeyParamsContent001) {
   return CreateAnyKeyParams(keyParams);

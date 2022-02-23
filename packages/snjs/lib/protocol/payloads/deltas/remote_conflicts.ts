@@ -2,11 +2,8 @@ import { Uuids } from '@Models/functions';
 import { SNLog } from './../../../log';
 import { PayloadsDelta } from '@Payloads/deltas/delta';
 import { ConflictDelta } from '@Payloads/deltas/conflict';
-import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
-import { PayloadsByAlternatingUuid } from '@Payloads/functions';
+import { PayloadSource, ImmutablePayloadCollection, PayloadsByAlternatingUuid, PurePayload } from '@standardnotes/payloads';
 import { extendArray, filterFromArray } from '@standardnotes/utils';
-import { PurePayload } from '../pure_payload';
 
 export class DeltaRemoteConflicts extends PayloadsDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {

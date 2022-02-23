@@ -1,15 +1,15 @@
 import { SNProtectionService } from './protection_service';
-import { Uuid } from '@Lib/uuid';
 import {
   Challenge,
   ChallengeReason,
   ChallengeValidation,
 } from './../challenges';
+import { KeyParamsOrigination } from '@standardnotes/common';
+import { UuidGenerator } from '@standardnotes/utils';
 import { ChallengePrompt } from '@Lib/challenges';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNAlertService } from '@Services/alert_service';
 import {
-  KeyParamsOrigination,
   SNRootKeyParams,
 } from './../protocol/key_params';
 import {
@@ -403,7 +403,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     passcode: string,
     origination: KeyParamsOrigination
   ) {
-    const identifier = await Uuid.GenerateUuid();
+    const identifier = await UuidGenerator.GenerateUuid();
     const key = await this.protocolService.createRootKey(
       identifier,
       passcode,

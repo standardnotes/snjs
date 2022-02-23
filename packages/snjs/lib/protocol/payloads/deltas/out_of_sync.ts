@@ -1,6 +1,5 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
+import { PayloadSource, ImmutablePayloadCollection } from '@standardnotes/payloads';
 import {
   PayloadContentsEqual,
   PayloadsByDuplicating,

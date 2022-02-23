@@ -1,11 +1,10 @@
 import { removeFromArray } from '@standardnotes/utils';
-import { ItemCollection } from './item_collection';
+import { ItemCollection, ItemDelta, SNIndex } from '@standardnotes/payloads';
 import { SNNote } from '@Lib/models';
 import { SNTag } from '@Lib/index';
 import { UuidString } from '@Lib/types';
 import { isNote } from '@Lib/models/app/note';
 import { isTag } from '@Lib/models/app/tag';
-import { ItemDelta, SNIndex } from './indexes';
 
 /** tagUuid undefined signifies all notes count change */
 export type TagNoteCountChangeObserver = (

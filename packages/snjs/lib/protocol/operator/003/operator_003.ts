@@ -6,15 +6,12 @@ import { SNRootKey } from './../../root_key';
 import { V003Algorithm } from './../algorithms';
 import {
   Create003KeyParams,
-  KeyParamsOrigination,
   SNRootKeyParams,
 } from './../../key_params';
 import { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002';
-import { ProtocolVersion } from '@Protocol/versions';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { ContentType } from '@standardnotes/common';
-import { FillItemContent } from '@Models/functions';
-import { Uuid } from '@Lib/uuid';
+import { CreateMaxPayloadFromAnyObject, FillItemContent } from '@standardnotes/payloads';
+import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common';
+import { UuidGenerator } from '@standardnotes/utils';
 
 /**
  * @legacy
@@ -46,7 +43,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
   public createItemsKey(): SNItemsKey {
     const content = this.generateNewItemsKeyContent();
     const payload = CreateMaxPayloadFromAnyObject({
-      uuid: Uuid.GenerateUuid(),
+      uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
     });

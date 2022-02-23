@@ -17,11 +17,10 @@ export type {
   ApplicationEventPayload,
   IconType,
 } from './types';
-export type { ApplicationIdentifier } from '@standardnotes/common';
+export type { ApplicationIdentifier, EncryptionIntent } from '@standardnotes/common';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
-export { KeyParamsOrigination } from './protocol/key_params';
 export { KeyRecoveryStrings, SessionStrings } from './services/api/messages';
 export type { RemoteSession } from './services/api/session';
 
@@ -40,7 +39,6 @@ export type { DeviceInterface, ServiceInterface } from '@standardnotes/services'
 export {
   SNItem,
   ItemMutator,
-  AppDataField,
   SNItemsKey,
   SNPredicate,
   SNNote,
@@ -62,9 +60,8 @@ export {
 
 export type { PrefValue, Action } from './models';
 export { MutationType } from '@Models/core/item';
-export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from '@standardnotes/features';
-export { ComponentAction } from '@standardnotes/features';
+export { ComponentArea, ComponentAction } from '@standardnotes/features';
 export { LiveItem } from './models/live_item';
 export { FeatureStatus } from '@Lib/services/features_service';
 
@@ -173,20 +170,22 @@ export {
   nonSecureRandomIdentifier,
   sanitizeHtmlString,
   lastElement,
+  UuidGenerator,
 } from '@standardnotes/utils';
-export { Uuid } from '@Lib/uuid';
+export { displayStringForContentType } from '@Models/content_types';
 export {
-  EncryptionIntent,
+  AppDataField,
+  ContentType,
+  Runtime,
+  KeyParamsOrigination,
   isLocalStorageIntent,
   isFileIntent,
   isDecryptedIntent,
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
-} from '@Protocol/intents';
-export { displayStringForContentType } from '@Models/content_types';
-export { ContentType, Runtime } from '@standardnotes/common';
+} from '@standardnotes/common';
 export { CreateItemFromPayload } from '@Models/generator';
-export { Uuids, FillItemContent } from '@Models/functions';
+export { Uuids } from '@Models/functions';
 
 export { ApplicationEvent } from '@Lib/events';
 export {
@@ -200,32 +199,28 @@ export {
 export { SyncEvent } from '@Lib/services/sync/events';
 
 /** Payloads */
-export { MutableCollection } from '@Protocol/collection/collection';
-export { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 export {
+  FillItemContent,
+  MutableCollection,
+  ImmutablePayloadCollection,
   ItemCollection,
   CollectionSort,
-} from '@Protocol/collection/item_collection';
-export {
   CreateMaxPayloadFromAnyObject,
   CreateSourcedPayloadFromObject,
   CreateIntentPayloadFromObject,
   CreateEncryptionParameters,
   PayloadByMerging,
   CopyPayload,
-} from '@Payloads/generator';
-export { PayloadsByAlternatingUuid } from './protocol/payloads';
-export {
+  PayloadsByAlternatingUuid,
   PayloadSource,
   isPayloadSourceRetrieved,
   isPayloadSourceInternalChange,
-} from '@Lib/protocol/payloads/sources';
+  PayloadFormat,
+  PurePayload,
+  PayloadField,
+} from '@standardnotes/payloads';
+export type { PayloadContent } from '@standardnotes/payloads';
 export { DeltaOutOfSync } from '@Payloads/deltas';
-export { ProtocolVersion } from '@Lib/protocol/versions';
-export { PayloadFormat } from '@Payloads/formats';
-export { PurePayload } from '@Payloads/pure_payload';
-export { PayloadField } from '@Payloads/fields';
-export type { PayloadContent } from '@Payloads/generator';
 
 export {
   NotesDisplayCriteria,
@@ -254,7 +249,7 @@ export { SNLog } from './log';
 
 /** Used by e2e tests */
 export { GetFeatures, FeatureIdentifier } from '@standardnotes/features';
-export { RoleName } from '@standardnotes/common';
+export { RoleName, ProtocolVersion } from '@standardnotes/common';
 export {
   SettingName,
   MuteFailedBackupsEmailsOption,

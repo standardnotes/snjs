@@ -1,10 +1,12 @@
-import { PurePayload } from '@Payloads/pure_payload';
+import {
+  PurePayload,
+  PayloadSource,
+  ImmutablePayloadCollection,
+  ImmutablePayloadCollectionSet,
+  CopyPayload,
+} from '@standardnotes/payloads';
 import { SyncResponse } from '@Services/sync/response';
 import { DeltaClassForSource } from '@Payloads/deltas/generator';
-import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
-import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
-import { CopyPayload } from '@Payloads/generator';
 import { HistoryMap } from '@Lib/services/history/history_map';
 import { filterDisallowedRemotePayloads } from '../filter';
 

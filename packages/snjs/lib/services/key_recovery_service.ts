@@ -1,10 +1,14 @@
 import { SNCredentialService } from './credential_service';
-import { PurePayload } from '@Payloads/pure_payload';
+import {
+  PurePayload,
+  PayloadField,
+  CreateMaxPayloadFromAnyObject,
+  RawPayload,
+  PayloadSource,
+} from '@standardnotes/payloads';
 import { SNSyncService } from './sync/sync_service';
-import { PayloadField } from './../protocol/payloads/fields';
 import { CreateItemFromPayload } from '@Models/generator';
 import { StorageKey } from '@Lib/storage_keys';
-import { CreateMaxPayloadFromAnyObject, RawPayload } from '@Payloads/generator';
 import { KeyRecoveryStrings } from './api/messages';
 import { SNStorageService, StorageValueModes } from './storage_service';
 import { SNRootKeyParams } from './../protocol/key_params';
@@ -21,7 +25,7 @@ import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNItemsKey } from './../models/app/items_key';
-import { ApplicationStage, ContentType } from '@standardnotes/common';
+import { ApplicationStage, ContentType, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import {
   dateSorted,
@@ -29,8 +33,6 @@ import {
   removeFromArray,
 } from '@standardnotes/utils';
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
-import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
-import { PayloadSource } from '@Lib/protocol/payloads';
 import { UuidString } from '@Lib/types';
 import { KeyParamsResponse } from './api/responses';
 import { AbstractService } from '@standardnotes/services';

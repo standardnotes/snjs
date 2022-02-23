@@ -1,11 +1,12 @@
-import { PurePayload } from './payloads/pure_payload';
-import { AnyKeyParamsContent, SNRootKeyParams } from './key_params';
-import { FillItemContent } from '@Models/functions';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import {
+  PurePayload,
+  FillItemContent,
+  CreateMaxPayloadFromAnyObject
+} from '@standardnotes/payloads';
+import { SNRootKeyParams } from './key_params';
 import { SNItem } from '@Models/core/item';
-import { ContentType } from '@standardnotes/common';
-import { ProtocolVersion } from '@Protocol/versions';
-import { Uuid } from '@Lib/uuid';
+import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common';
+import { UuidGenerator } from '@standardnotes/utils';
 import { timingSafeEqual } from '@standardnotes/sncrypto-common';
 
 export type RootKeyContent = {
@@ -26,7 +27,7 @@ export class SNRootKey extends SNItem {
 
   static async Create(content: RootKeyContent, uuid?: string) {
     if (!uuid) {
-      uuid = await Uuid.GenerateUuid();
+      uuid = await UuidGenerator.GenerateUuid();
     }
     if (!content.version) {
       if (content.dataAuthenticationKey) {

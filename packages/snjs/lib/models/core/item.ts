@@ -1,16 +1,19 @@
-import { ContentType } from '@standardnotes/common';
-import { HistoryEntry } from '@Services/history/entries/history_entry';
-import { SNLog } from './../../log';
-import { ProtocolVersion } from '@Protocol/versions';
-import { PayloadFormat } from './../../protocol/payloads/formats';
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { UuidString } from './../../types';
+import { AppDataField, ContentType, DefaultAppDomain, ProtocolVersion } from '@standardnotes/common';
 import {
+  ItemInterface,
+  PayloadFormat,
   PayloadContent,
   ContentReference,
-} from './../../protocol/payloads/generator';
-import { CopyPayload, PayloadOverride } from '@Payloads/generator';
-import { PurePayload } from './../../protocol/payloads/pure_payload';
+  CopyPayload,
+  PayloadOverride,
+  PurePayload,
+  PayloadByMerging,
+  PayloadSource
+} from '@standardnotes/payloads'
+import { HistoryEntry } from '@Services/history/entries/history_entry';
+import { SNLog } from './../../log';
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
+import { UuidString } from './../../types';
 import {
   Copy,
   dateToLocalizedString,
@@ -19,9 +22,6 @@ import {
   sortedCopy,
 } from '@standardnotes/utils';
 import { SNPredicate } from '@Models/core/predicate';
-import { DefaultAppDomain } from '../content_types';
-import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
-import { PayloadSource } from '@Lib/protocol/payloads/sources';
 import { PrefKey } from '../app/userPrefs';
 
 export interface ItemContent {
@@ -47,20 +47,6 @@ export enum MutationType {
   NonDirtying = 3,
 }
 
-export enum AppDataField {
-  Pinned = 'pinned',
-  Archived = 'archived',
-  Locked = 'locked',
-  UserModifiedDate = 'client_updated_at',
-  DefaultEditor = 'defaultEditor',
-  MobileRules = 'mobileRules',
-  NotAvailableOnMobile = 'notAvailableOnMobile',
-  MobileActive = 'mobileActive',
-  LastSize = 'lastSize',
-  PrefersPlainEditor = 'prefersPlainEditor',
-  ComponentInstallError = 'installError',
-}
-
 export enum SingletonStrategy {
   KeepEarliest = 1,
 }
@@ -68,7 +54,7 @@ export enum SingletonStrategy {
 /**
  * The most abstract item that any syncable item needs to extend from.
  */
-export class SNItem {
+export class SNItem implements ItemInterface {
   public readonly payload: PurePayload;
   public readonly conflictOf?: UuidString;
   public readonly duplicateOf?: UuidString;

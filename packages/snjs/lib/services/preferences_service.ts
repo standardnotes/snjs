@@ -5,13 +5,13 @@ import {
   PrefValue,
   UserPrefsMutator,
 } from '@Lib/models/app/userPrefs';
-import { FillItemContent } from '@Lib/models/functions';
 import { ItemManager } from './item_manager';
 import { SNSingletonManager } from './singleton_manager';
 import { SNSyncService } from './sync/sync_service';
 import { SyncEvent } from './sync/events';
 import { ApplicationStage } from '@standardnotes/common';
 import { AbstractService } from '@standardnotes/services';
+import { FillItemContent } from '@standardnotes/payloads';
 
 const preferencesChangedEvent = 'preferencesChanged';
 type PreferencesChangedEvent = typeof preferencesChangedEvent;

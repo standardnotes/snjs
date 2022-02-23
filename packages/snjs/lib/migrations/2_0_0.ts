@@ -6,34 +6,32 @@ import { JwtSession } from './../services/api/session';
 import { ContentType } from '@standardnotes/common';
 import { SNItemsKey } from './../models/app/items_key';
 import { RootKeyContent, SNRootKey } from './../protocol/root_key';
-import { EncryptionIntent } from './../protocol/intents';
-import { ProtocolVersion } from './../protocol/versions';
-import { ApplicationStage } from '@standardnotes/common';
+import { ApplicationStage, ProtocolVersion, EncryptionIntent } from '@standardnotes/common';
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
-import { FillItemContent } from '@Models/functions';
-import { PurePayload } from '@Payloads/pure_payload';
+import {
+  PurePayload,
+  CopyPayload,
+  CreateMaxPayloadFromAnyObject,
+  PayloadSource,
+  CollectionSort,
+  FillItemContent
+} from '@standardnotes/payloads';
 import {
   SNStorageService,
   StorageValuesObject,
 } from './../services/storage_service';
 import { Migration } from '@Lib/migrations/migration';
 import {
-  CopyPayload,
-  CreateMaxPayloadFromAnyObject,
-} from '@Payloads/generator';
-import { PayloadSource } from '@Payloads/sources';
-import {
   Copy,
   isNullOrUndefined,
   jsonParseEmbeddedKeys,
   objectToValueArray,
   omitByCopy,
+  UuidGenerator
 } from '@standardnotes/utils';
-import { Uuid } from '@Lib/uuid';
 import { ValueModesKeys } from '@Services/storage_service';
 import { CreateItemFromPayload } from '../models';
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/platforms';
-import { CollectionSort } from '@Lib/protocol/collection/item_collection';
 
 type LegacyMobileKeychainStructure =
   | {
@@ -470,7 +468,7 @@ export class Migration2_0_0 extends Migration {
         /** Passcode only, no account */
         const passcodeKey = await getPasscodeKey();
         const payload = CreateMaxPayloadFromAnyObject({
-          uuid: await Uuid.GenerateUuid(),
+          uuid: await UuidGenerator.GenerateUuid(),
           content: FillItemContent(rawStructure.unwrapped!),
           content_type: ContentType.EncryptedStorage,
         });
@@ -706,7 +704,7 @@ export class Migration2_0_0 extends Migration {
       /** If params are missing a version, it must be 001 */
       const fallbackVersion = ProtocolVersion.V001;
       const payload = CreateMaxPayloadFromAnyObject({
-        uuid: await Uuid.GenerateUuid(),
+        uuid: await UuidGenerator.GenerateUuid(),
         content_type: ContentType.ItemsKey,
         content: FillItemContent({
           itemsKey: rootKey.masterKey,
