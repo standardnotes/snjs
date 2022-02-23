@@ -31,10 +31,10 @@ export class SNNote extends SNItem implements NoteContent {
 
   constructor(payload: PurePayload) {
     super(payload);
-    this.title = this.payload.safeContent.title || '';
-    this.text = this.payload.safeContent.text || '';
-    this.preview_plain = this.payload.safeContent.preview_plain;
-    this.preview_html = this.payload.safeContent.preview_html;
+    this.title = String(this.payload.safeContent.title || '');
+    this.text = String(this.payload.safeContent.text || '');
+    this.preview_plain = String(this.payload.safeContent.preview_plain);
+    this.preview_html = String(this.payload.safeContent.preview_html);
     this.hidePreview = this.payload.safeContent.hidePreview;
     this.spellcheck = this.payload.safeContent.spellcheck;
 
