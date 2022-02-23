@@ -2528,6 +2528,11 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
+"@standardnotes/autobiography-theme@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/autobiography-theme/-/autobiography-theme-1.0.3.tgz#3f8e39b4bb6a3d0306977534a85f9a570e12a22d"
+  integrity sha512-wHvCB6LvFBySkedDnKpkHSeda6Bip+Vw9vXJmQ8X0QaLZI2bAFnx+5PKmWFaRDXkg6VAN2+yVQ3HSAc2CAuSnw==
+
 "@standardnotes/deterministic-zip@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@standardnotes/deterministic-zip/-/deterministic-zip-1.2.0.tgz#b5fc2380fcb048a843988768c7e0f44459ef2d2c"
@@ -2537,14 +2542,44 @@
     crc32-stream "^3.0.0"
     minimatch "^3.0.3"
 
+"@standardnotes/dynamic-theme@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@standardnotes/dynamic-theme/-/dynamic-theme-1.0.3.tgz#90ca1d4e722d73428219303d9f87abd6998ec367"
+  integrity sha512-PUEdIf/DiM3zoRuCJMIZ2MGYhClmiXQT8pXklNF7WGOGu4GSFAoBEiYAGJypS6gnLneZM0HmDrr7vgwqvffdxQ==
+
 "@standardnotes/filesafe-bar@standardnotes/filesafe-client":
   version "2.0.15"
   resolved "https://codeload.github.com/standardnotes/filesafe-client/tar.gz/fc111cc0a81de01d63ba27dea2998100c6f0011f"
+
+"@standardnotes/focus-theme@1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@standardnotes/focus-theme/-/focus-theme-1.2.7.tgz#f309ffcc387f59b912f202a9cab937a7c2d0fd75"
+  integrity sha512-xoiWsZ9H1qvtfPXgYtiBrGE2wVupATYFk6ZqCa6Nzf8A1IZ7WB7itNYTL6OFI3fEjP/MMCrP8NAwTycOPDNfGQ==
+
+"@standardnotes/futura-theme@1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/futura-theme/-/futura-theme-1.2.6.tgz#284561bf76010dd968be430e0f60d9b9a84f4a28"
+  integrity sha512-VfPf2D2zWz6mEQOAZTBGKuX3DLlJ9mK+P4k9dzTgLXYhnFsthnzOKjjUcDREjKDcnbhG6GLeg7dRgO4AxugUuw==
 
 "@standardnotes/markdown-visual@1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@standardnotes/markdown-visual/-/markdown-visual-1.0.1.tgz#512977eae57167098559dde3413d190329675c27"
   integrity sha512-xS9E6FFkyjEBsqJuN3jgNZ6V7/9rh8kLZkSN9Xtne1wLJPJ1C6bf4HBGwUBo7gOZSuKJM9OjuIULOphZQMXTxw==
+
+"@standardnotes/midnight-theme@1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/midnight-theme/-/midnight-theme-1.2.6.tgz#723ff47df5608f7d533b9148289b945de389c275"
+  integrity sha512-5dXYBQ7Coz5uj3AQTG2Z8HgAcAE5ORRVE2H7A7HDQRkNHplpk70ngAg5ZUKHrO3HY+630quV3trOhy8VNe7+rA==
+
+"@standardnotes/solarized-dark-theme@1.2.5":
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/@standardnotes/solarized-dark-theme/-/solarized-dark-theme-1.2.5.tgz#778ea18063745740740e9ea9dccce2c27596253e"
+  integrity sha512-f/RQCi9nHwZAwUBue8qEoL2GtzTs1buMwNdyr4VZ2LghkaB9I6uqsWaXlUnBIKG0rnNKNjayjYh/4dnJUiqM+Q==
+
+"@standardnotes/titanium-theme@1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/titanium-theme/-/titanium-theme-1.2.6.tgz#fe6d6fe36bf3ae4466c256428c3b44c2330b725f"
+  integrity sha512-1uMy/CwNHUEDpC16j77OnTEKH8FFzToh2U5bMGvdjJErwIZkBnsgcKOHSCcbSsFw/bHhNujpp3DYX8eEE6d+sA==
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -11521,34 +11556,6 @@ sn-spreadsheets@1.4.4:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.4.tgz#95e2947bb227f5cbb8ba8b88270eaf51ff300d79"
   integrity sha512-nYHT6NjspBZmYrG70ESY6KoGA5UPTvp/Y9OaOIB5PhH/X6K5posiDIfPo5IBqNT4oOZ03QHPkNAW1Q6X4KgdUA==
-
-sn-theme-autobiography@standardnotes/autobiography-theme#1.0.3:
-  version "1.0.3"
-  resolved "https://codeload.github.com/standardnotes/autobiography-theme/tar.gz/d1be2f748f572e33375f5ddfb35b685ff09b4519"
-
-sn-theme-dynamic@standardnotes/dynamic-theme#1.0.3:
-  version "1.0.3"
-  resolved "https://codeload.github.com/standardnotes/dynamic-theme/tar.gz/82db279c2e1fa1c89c15fe430685fa784c8984d3"
-
-sn-theme-focus@standardnotes/focus-theme#1.2.7:
-  version "1.2.7"
-  resolved "https://codeload.github.com/standardnotes/focus-theme/tar.gz/7a2dd0a7360555765483710ce2895b3310d4e626"
-
-sn-theme-futura@standardnotes/futura-theme#1.2.6:
-  version "1.2.6"
-  resolved "https://codeload.github.com/standardnotes/futura-theme/tar.gz/f52c99603f44beea51aea7e853024101aab93466"
-
-sn-theme-midnight@standardnotes/midnight-theme#1.2.6:
-  version "1.2.6"
-  resolved "https://codeload.github.com/standardnotes/midnight-theme/tar.gz/105582d031746fe3f959f7622a2d4f3b02d3f61f"
-
-sn-theme-solarized-dark@standardnotes/solarized-dark-theme#1.2.5:
-  version "1.2.5"
-  resolved "https://codeload.github.com/standardnotes/solarized-dark-theme/tar.gz/1be23808c25955329151731e062c0befaac511b2"
-
-sn-theme-titanium@standardnotes/titanium-theme#1.2.6:
-  version "1.2.6"
-  resolved "https://codeload.github.com/standardnotes/titanium-theme/tar.gz/36a609f00ef26d4c9c7df1f9980ed2b6b77e1c6e"
 
 sn-token-vault@2.0.10:
   version "2.0.10"
