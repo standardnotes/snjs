@@ -23,6 +23,35 @@ services:
     networks:
       - snjs
 
+  localstack:
+    image: localstack/localstack
+    expose:
+      - 4566
+    environment:
+      - SERVICES=sns,sqs
+      - DEBUG=1
+      - DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOSTNAME_EXTERNAL=localstack
+    volumes:
+      - ./docker/localstack_bootstrap.sh:/docker-entrypoint-initaws.d/localstack_bootstrap.sh
+      - /tmp/localstack:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - snjs
+
+  mock-event-publisher:
+    image: standardnotes/mock-event-publisher
+    entrypoint: [
+      "./wait-for.sh", "localstack", "4566",
+      "./docker/entrypoint.sh", "start-web"
+    ]
+    ports:
+      - 3124:3000
+    env_file: docker/mock-event-publisher.env
+    networks:
+      - snjs
+
   cache:
     image: redis:6.0-alpine
     expose:
@@ -89,6 +118,7 @@ services:
       - auth
     entrypoint: [
       "./wait-for.sh", "auth", "3000",
+      "./wait-for.sh", "localstack", "4566",
       "./docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/auth.env

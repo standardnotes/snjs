@@ -1,5 +1,5 @@
 import { SNFeatureRepo } from './../../models/app/feature_repo';
-import { ErrorObject, UuidString } from './../../types';
+import { UuidString } from './../../types';
 import {
   HttpResponse,
   RegistrationResponse,
@@ -26,9 +26,11 @@ import {
   ChangeCredentialsResponse,
   PostSubscriptionTokensResponse,
   GetOfflineFeaturesResponse,
+  ListedRegistrationResponse,
+  User,
 } from './responses';
 import { Session, TokenSession } from './session';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, ErrorObject } from '@standardnotes/common';
 import { PurePayload } from '@Payloads/pure_payload';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
@@ -42,8 +44,7 @@ import {
 import merge from 'lodash/merge';
 import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
-import { PureService } from '@Services/pure_service';
-import { isNullOrUndefined, joinPaths } from '@Lib/utils';
+import { isNullOrUndefined, joinPaths } from '@standardnotes/utils';
 import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
@@ -53,6 +54,7 @@ import {
   isUrlFirstParty,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
+import { AbstractService } from '@standardnotes/services';
 
 type PathNamesV1 = {
   keyParams: string;
@@ -70,6 +72,7 @@ type PathNamesV1 = {
   settings: (userUuid: string) => string;
   setting: (userUuid: string, settingName: string) => string;
   subscription: (userUuid: string) => string;
+  listedRegistration: (userUuid: string) => string;
   purchase: string;
   subscriptionTokens: string;
   offlineFeatures: string;
@@ -102,6 +105,8 @@ const Paths: {
     setting: (userUuid, settingName) =>
       `/v1/users/${userUuid}/settings/${settingName}`,
     subscription: (userUuid) => `/v1/users/${userUuid}/subscription`,
+    listedRegistration: (userUuid: string) =>
+      `/v1/users/${userUuid}/integrations/listed`,
     purchase: '/v1/purchase',
     subscriptionTokens: '/v1/subscription-tokens',
     offlineFeatures: '/v1/offline/features',
@@ -125,12 +130,12 @@ export type MetaReceivedData = {
   userRoles: Role[];
 };
 
-export class SNApiService extends PureService<
+export class SNApiService extends AbstractService<
   ApiServiceEvent.MetaReceived,
   MetaReceivedData
 > {
   private session?: Session;
-
+  public user?: User;
   private registering = false;
   private authenticating = false;
   private changing = false;
@@ -153,6 +158,10 @@ export class SNApiService extends PureService<
     this.invalidSessionObserver = undefined;
     this.session = undefined;
     super.deinit();
+  }
+
+  public setUser(user?: User): void {
+    this.user = user;
   }
 
   /**
@@ -735,6 +744,23 @@ export class SNApiService extends PureService<
     });
   }
 
+  async deleteRevision(
+    itemUuid: UuidString,
+    entry: RevisionListEntry
+  ): Promise<MinimalHttpResponse> {
+    const url = joinPaths(
+      this.host,
+      Paths.v1.itemRevision(itemUuid, entry.uuid)
+    );
+    const response = await this.tokenRefreshableRequest({
+      verb: HttpVerb.Delete,
+      url,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_DELETE_REVISION,
+      authentication: this.session?.authorizationValue,
+    });
+    return response;
+  }
+
   public downloadFeatureUrl(url: string): Promise<HttpResponse> {
     return this.request({
       verb: HttpVerb.Get,
@@ -812,6 +838,18 @@ export class SNApiService extends PureService<
         error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
       };
     }
+  }
+
+  public async registerForListedAccount(): Promise<ListedRegistrationResponse> {
+    if (!this.user) {
+      throw Error('Cannot register for Listed without user account.');
+    }
+    return await this.tokenRefreshableRequest<ListedRegistrationResponse>({
+      verb: HttpVerb.Post,
+      url: joinPaths(this.host, Paths.v1.listedRegistration(this.user.uuid)),
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_LISTED_REGISTRATION,
+      authentication: this.session?.authorizationValue,
+    });
   }
 
   private preprocessingError() {

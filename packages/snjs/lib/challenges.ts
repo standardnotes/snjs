@@ -3,7 +3,7 @@ import {
   ChallengeStrings,
   PromptTitles,
 } from './services/api/messages';
-import { assertUnreachable, isNullOrUndefined } from './utils';
+import { assertUnreachable, isNullOrUndefined } from '@standardnotes/utils';
 import { SNRootKey } from '@Protocol/root_key';
 
 export type ChallengeArtifacts = {

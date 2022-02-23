@@ -18,19 +18,19 @@ describe('features', () => {
     const tomorrow = now.setDate(now.getDate() + 1);
 
     midnightThemeFeature = {
-      ...Features.find(
+      ...GetFeatures().find(
         (feature) => feature.identifier === FeatureIdentifier.MidnightTheme
       ),
       expires_at: tomorrow,
     };
     boldEditorFeature = {
-      ...Features.find(
+      ...GetFeatures().find(
         (feature) => feature.identifier === FeatureIdentifier.BoldEditor
       ),
       expires_at: tomorrow,
     };
     tagNestingFeature = {
-      ...Features.find(
+      ...GetFeatures().find(
         (feature) => feature.identifier === FeatureIdentifier.TagNesting
       ),
       expires_at: tomorrow,
@@ -53,8 +53,8 @@ describe('features', () => {
         });
       });
 
-    email = Uuid.GenerateUuidSynchronously();
-    password = Uuid.GenerateUuidSynchronously();
+    email = Uuid.GenerateUuid();
+    password = Uuid.GenerateUuid();
 
     await Factory.registerUserToApplication({
       application: application,
@@ -205,7 +205,7 @@ describe('features', () => {
       expect(
         await application.getSensitiveSetting(SettingName.ExtensionKey)
       ).to.equal(false);
-      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      const extensionKey = Uuid.GenerateUuid().split('-').join('');
       const promise = new Promise((resolve) => {
         sinon
           .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
@@ -232,7 +232,7 @@ describe('features', () => {
       sinon
         .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
         .callsFake(() => {});
-      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      const extensionKey = Uuid.GenerateUuid().split('-').join('');
       await application.createManagedItem(
         ContentType.ExtensionRepo,
         FillItemContent({
@@ -269,7 +269,7 @@ describe('features', () => {
         .callsFake(() => {
           return false;
         });
-      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      const extensionKey = Uuid.GenerateUuid().split('-').join('');
       await application.createManagedItem(
         ContentType.ExtensionRepo,
         FillItemContent({
@@ -301,7 +301,7 @@ describe('features', () => {
       expect(
         await application.getSensitiveSetting(SettingName.ExtensionKey)
       ).to.equal(false);
-      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      const extensionKey = Uuid.GenerateUuid().split('-').join('');
       const promise = new Promise((resolve) => {
         application.streamItems(ContentType.ExtensionRepo, (changed) => {
           for (const item of changed) {
@@ -324,7 +324,7 @@ describe('features', () => {
   describe('offline features migration', () => {
     it('previous extension repo should be migrated to offline feature repo', async () => {
       application = await Factory.signOutApplicationAndReturnNew(application);
-      const extensionKey = Uuid.GenerateUuidSynchronously().split('-').join('');
+      const extensionKey = Uuid.GenerateUuid().split('-').join('');
       await application.createManagedItem(
         ContentType.ExtensionRepo,
         FillItemContent({

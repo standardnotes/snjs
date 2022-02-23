@@ -5,7 +5,7 @@ import {
   ChallengeValidation,
 } from './../challenges';
 import { MigrationServices } from './types';
-import { ApplicationStage } from '../stages';
+import { ApplicationStage } from '@standardnotes/common';
 
 type StageHandler = () => Promise<void>;
 
@@ -69,7 +69,7 @@ export abstract class Migration {
     this.onDoneHandler = callback;
   }
 
-  async handleStage(stage: ApplicationStage) {
+  async handleStage(stage: ApplicationStage): Promise<void> {
     const handler = this.stageHandlers[stage];
     if (handler) {
       await handler();

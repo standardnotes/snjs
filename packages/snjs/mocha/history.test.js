@@ -362,8 +362,8 @@ describe('history manager', () => {
       this.application = await Factory.createInitAppWithFakeCrypto();
       this.historyManager = this.application.historyManager;
       this.payloadManager = this.application.payloadManager;
-      this.email = Uuid.GenerateUuidSynchronously();
-      this.password = Uuid.GenerateUuidSynchronously();
+      this.email = Uuid.GenerateUuid();
+      this.password = Uuid.GenerateUuid();
       await Factory.registerUserToApplication({
         application: this.application,
         email: this.email,
@@ -413,15 +413,10 @@ describe('history manager', () => {
       expect(itemHistory.length).to.equal(1);
     });
 
-    it.skip('create consecutive history entries', async function () {
-      // implement remote history fetching more than 1 entry
-      // after 5 minutes delay apart of the updates
-      // setting updated_at is not permitted via the API
-    });
-
-    it.skip('returns revisions from server', async function () {
+    it('returns revisions from server', async function () {
       let item = await Factory.createSyncedNote(this.application);
 
+      await Factory.sleep(Factory.ServerRevisionFrequency);
       /** Sync with different contents, should create new entry */
       const newTitleAfterFirstChange = `The title should be: ${Math.random()}`;
       await this.application.changeAndSaveItem(
@@ -434,12 +429,12 @@ describe('history manager', () => {
         syncOptions
       );
       let itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.length).to.equal(1);
+      expect(itemHistory.length).to.equal(2);
 
-      let revisionEntry = itemHistory[0];
+      const oldestEntry = lastElement(itemHistory);
       let revisionFromServer = await this.historyManager.fetchRemoteRevision(
         item.uuid,
-        revisionEntry
+        oldestEntry
       );
       expect(revisionFromServer).to.be.ok;
 
@@ -450,55 +445,9 @@ describe('history manager', () => {
 
       item = this.application.itemManager.findItem(item.uuid);
       expect(payloadFromServer.content).to.not.eql(item.payload.content);
-
-      const newTitleAfterSecondChange = 'Something totally different.';
-      await this.application.changeAndSaveItem(
-        item.uuid,
-        (mutator) => {
-          mutator.title = newTitleAfterSecondChange;
-        },
-        undefined,
-        undefined,
-        syncOptions
-      );
-      itemHistory = await this.historyManager.remoteHistoryForItem(item);
-      expect(itemHistory.length).to.equal(2);
-
-      /** The first entry from response should be the previous revision before the actual, current item. */
-      revisionEntry = itemHistory[0];
-      revisionFromServer = await this.historyManager.fetchRemoteRevision(
-        item.uuid,
-        revisionEntry
-      );
-      expect(revisionFromServer).to.be.ok;
-
-      payloadFromServer = revisionFromServer.payload;
-      expect(payloadFromServer.errorDecrypting).to.be.false;
-      expect(payloadFromServer.uuid).to.eq(item.payload.uuid);
-      expect(payloadFromServer.content).to.eql(item.payload.content);
-      expect(payloadFromServer.content.title).to.eq(newTitleAfterFirstChange);
     });
 
-    it.skip('revisions count matches original for duplicated items', async function () {
-      const note = await Factory.createSyncedNote(this.application);
-      /** Make a few changes to note */
-      await this.application.saveItem(note.uuid);
-      await this.application.saveItem(note.uuid);
-      await this.application.saveItem(note.uuid);
-      const dupe = await this.application.itemManager.duplicateItem(
-        note.uuid,
-        true
-      );
-      await this.application.saveItem(dupe.uuid);
-
-      const expectedRevisions = 3;
-      const noteHistory = await this.historyManager.remoteHistoryForItem(note);
-      const dupeHistory = await this.historyManager.remoteHistoryForItem(dupe);
-      expect(noteHistory.length).to.equal(expectedRevisions);
-      expect(dupeHistory.length).to.equal(expectedRevisions);
-    });
-
-    it.skip('duplicate revisions should have the originals uuid', async function () {
+    it('duplicate revisions should not have the originals uuid', async function () {
       const note = await Factory.createSyncedNote(this.application);
       await this.application.saveItem(note.uuid);
       const dupe = await this.application.itemManager.duplicateItem(
@@ -512,11 +461,46 @@ describe('history manager', () => {
         dupe.uuid,
         dupeHistory[0]
       );
-      expect(dupeRevision.payload.uuid).to.equal(note.uuid);
+      expect(dupeRevision.payload.uuid).to.equal(dupe.uuid);
     });
 
-    it('can decrypt revisions for duplicate_of items', async function () {
+    it.skip('revisions count matches original for duplicated items', async function () {
+      /**
+       * We can't handle duplicate item revision because the server copies over revisions
+       * via a background job which we can't predict the timing of. This test is thus invalid.
+       */
       const note = await Factory.createSyncedNote(this.application);
+
+      /** Make a few changes to note */
+      await Factory.sleep(Factory.ServerRevisionFrequency);
+      await this.application.saveItem(note.uuid);
+
+      await Factory.sleep(Factory.ServerRevisionFrequency);
+      await this.application.saveItem(note.uuid);
+
+      await Factory.sleep(Factory.ServerRevisionFrequency);
+      await this.application.saveItem(note.uuid);
+
+      const dupe = await this.application.itemManager.duplicateItem(
+        note.uuid,
+        true
+      );
+      await this.application.saveItem(dupe.uuid);
+
+      const expectedRevisions = 3;
+      const noteHistory = await this.historyManager.remoteHistoryForItem(note);
+      const dupeHistory = await this.historyManager.remoteHistoryForItem(dupe);
+      expect(noteHistory.length).to.equal(expectedRevisions);
+      expect(dupeHistory.length).to.equal(expectedRevisions);
+    });
+
+    it.skip('can decrypt revisions for duplicate_of items', async function () {
+      /**
+       * We can't handle duplicate item revision because the server copies over revisions
+       * via a background job which we can't predict the timing of. This test is thus invalid.
+       */
+      const note = await Factory.createSyncedNote(this.application);
+      await Factory.sleep(Factory.ServerRevisionFrequency);
       const changedText = `${Math.random()}`;
       /** Make a few changes to note */
       await this.application.changeAndSaveItem(note.uuid, (mutator) => {
@@ -530,11 +514,12 @@ describe('history manager', () => {
       );
       await this.application.saveItem(dupe.uuid);
       const itemHistory = await this.historyManager.remoteHistoryForItem(dupe);
-      const newestRevision = itemHistory[0];
+      expect(itemHistory.length).to.be.above(1);
+      const oldestRevision = lastElement(itemHistory);
 
       const fetched = await this.historyManager.fetchRemoteRevision(
         dupe.uuid,
-        newestRevision
+        oldestRevision
       );
       expect(fetched.payload.errorDecrypting).to.not.be.ok;
       expect(fetched.payload.content.title).to.equal(changedText);

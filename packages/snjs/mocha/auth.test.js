@@ -16,8 +16,8 @@ describe('basic auth', () => {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithFakeCrypto();
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
   });
 
   afterEach(async function () {
@@ -338,8 +338,8 @@ describe('basic auth', () => {
   }).timeout(20000);
 
   it('registering for new account and completing first after download sync should not put us out of sync', async function () {
-    this.email = Uuid.GenerateUuidSynchronously();
-    this.password = Uuid.GenerateUuidSynchronously();
+    this.email = Uuid.GenerateUuid();
+    this.password = Uuid.GenerateUuid();
 
     let outOfSync = true;
     let didCompletePostDownloadFirstSync = false;

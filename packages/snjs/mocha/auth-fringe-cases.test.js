@@ -12,8 +12,8 @@ describe('auth fringe cases', () => {
     return {
       expectedItemCount: BASE_ITEM_COUNT,
       application: application,
-      email: Uuid.GenerateUuidSynchronously(),
-      password: Uuid.GenerateUuidSynchronously(),
+      email: Uuid.GenerateUuid(),
+      password: Uuid.GenerateUuid(),
       deinit: async () => {
         await Factory.safeDeinit(application);
       },

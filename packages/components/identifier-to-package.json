@@ -17,5 +17,6 @@
   "org.standardnotes.token-vault": "sn-token-vault",
   "org.standardnotes.standard-sheets": "sn-spreadsheets",
   "org.standardnotes.file-safe": "@standardnotes/filesafe-bar",
-  "org.standardnotes.folders": "sn-folders"
+  "org.standardnotes.folders": "sn-folders",
+  "org.standardnotes.markdown-visual-editor": "@standardnotes/markdown-visual"
 }

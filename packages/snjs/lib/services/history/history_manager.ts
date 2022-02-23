@@ -1,10 +1,11 @@
-import { RawPayload } from './../../protocol/payloads/generator';
-import { DeviceInterface } from '@Lib/device_interface';
+import { CopyPayload, RawPayload } from './../../protocol/payloads/generator';
+import { AbstractService, DeviceInterface } from '@standardnotes/services';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { CreateHistoryEntryForPayload } from '@Services/history/entries/generator';
 import { SurePayload } from './../../protocol/payloads/sure_payload';
 import { UuidString } from './../../types';
 import {
+  MinimalHttpResponse,
   RevisionListEntry,
   RevisionListResponse,
   SingleRevisionResponse,
@@ -17,10 +18,9 @@ import {
 } from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@standardnotes/common';
-import { PureService } from '@Lib/services/pure_service';
 import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
-import { isNullOrUndefined, removeFromArray } from '@Lib/utils';
+import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { PayloadFormat } from '@Lib/protocol/payloads';
@@ -53,7 +53,7 @@ const LargeEntryDeltaThreshold = 25;
  * 2. Remote server history. Entries are automatically added by the server and must be
  *    retrieved per item via an API call.
  */
-export class SNHistoryManager extends PureService {
+export class SNHistoryManager extends AbstractService {
   private persistable = false;
   public autoOptimize = false;
   private removeChangeObserver: () => void;
@@ -321,16 +321,32 @@ export class SNHistoryManager extends PureService {
       return undefined;
     }
     const revision = (revisionResponse as SingleRevisionResponse).data;
-    const payload = CreateMaxPayloadFromAnyObject(
-      (revision as unknown) as RawPayload,
+
+    const serverPayload = CreateMaxPayloadFromAnyObject(
+      (revision as unknown) as RawPayload
+    );
+    /**
+     * When an item is duplicated, its revisions also carry over to the newly created item.
+     * However since the new item has a different UUID than the source item, we must decrypt
+     * these olders revisions (which have not been mutated after copy) with the source item's
+     * uuid.
+     */
+    const embeddedParams = await this.protocolService.getEmbeddedPayloadAuthenticatedData(
+      serverPayload
+    );
+    const sourceItemUuid = embeddedParams?.u;
+    const payload = CopyPayload(
+      CreateMaxPayloadFromAnyObject((revision as unknown) as RawPayload),
       {
-        uuid: revision.item_uuid,
+        uuid: sourceItemUuid || revision.item_uuid,
       }
     );
+
     if (!isRemotePayloadAllowed(payload)) {
       console.error('Remote payload is disallowed', payload);
       return undefined;
     }
+
     const encryptedPayload = CreateSourcedPayloadFromObject(
       payload,
       PayloadSource.RemoteHistory
@@ -342,6 +358,14 @@ export class SNHistoryManager extends PureService {
       return undefined;
     }
     return new HistoryEntry(decryptedPayload as SurePayload);
+  }
+
+  async deleteRemoteRevision(
+    itemUuid: UuidString,
+    entry: RevisionListEntry
+  ): Promise<MinimalHttpResponse> {
+    const response = await this.apiService.deleteRevision(itemUuid, entry);
+    return response;
   }
 
   /**

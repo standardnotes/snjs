@@ -1,6 +1,5 @@
-import { ContentType } from '@standardnotes/common';
+import { ApplicationStage, ContentType } from '@standardnotes/common';
 import { FeatureIdentifier } from '@standardnotes/features';
-import { ApplicationStage } from '../stages';
 import { Migration } from '@Lib/migrations/migration';
 import { SNTheme } from '@Lib/models';
 

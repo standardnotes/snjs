@@ -3,7 +3,7 @@ import { NoteContent } from '@Models/app/note';
 import { SNPreferencesService } from './../preferences_service';
 import { FeatureStatus, FeaturesEvent } from '@Lib/services/features_service';
 import { SNFeaturesService } from '@Lib/services';
-import { ComponentArea, Features } from '@standardnotes/features';
+import { ComponentArea, FindNativeFeature } from '@standardnotes/features';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
 import { Uuid } from '@Lib/uuid';
@@ -39,7 +39,7 @@ import { PayloadSource, PayloadFormat } from '@Lib/protocol/payloads';
 import { ItemManager } from '@Services/item_manager';
 import { UuidString } from '@Lib/types';
 import { SNItem, MutationType } from '@Models/core/item';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Runtime } from '@standardnotes/common';
 import { SNComponent, SNNote } from '@Lib/models';
 import {
   concatArrays,
@@ -50,7 +50,7 @@ import {
   removeFromArray,
   log,
   nonSecureRandomIdentifier,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { MessageData } from '..';
 
 type RunWithPermissionsCallback = (
@@ -117,6 +117,7 @@ export class ComponentViewer {
     featuresService: SNFeaturesService,
     private environment: Environment,
     private platform: Platform,
+    private runtime: Runtime,
     private componentManagerFunctions: ComponentManagerFunctions,
     public readonly url?: string,
     private contextItemUuid?: UuidString,
@@ -211,9 +212,7 @@ export class ComponentViewer {
   }
 
   private isNativeFeature(): boolean {
-    return !!Features.find(
-      (feature) => feature.identifier === this.component.identifier
-    );
+    return !!FindNativeFeature(this.component.identifier);
   }
 
   private hasUrlError(): boolean {

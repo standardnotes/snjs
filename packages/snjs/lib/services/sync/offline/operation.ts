@@ -3,7 +3,7 @@ import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { PayloadSource } from '@Payloads/sources';
 import { SyncResponse } from '@Services/sync/response';
-import { Copy } from '@Lib/utils';
+import { Copy } from '@standardnotes/utils';
 
 export class OfflineSyncOperation {
   payloads: PurePayload[];

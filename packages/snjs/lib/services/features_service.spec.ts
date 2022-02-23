@@ -16,17 +16,16 @@ import {
   FeatureStatus,
   SNFeaturesService,
 } from '@Lib/services/features_service';
-import { RoleName } from '@standardnotes/auth';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Runtime, RoleName } from '@standardnotes/common';
 import {
   FeatureDescription,
   FeatureIdentifier,
-  Features,
+  GetFeatures,
 } from '@standardnotes/features';
 import { SNWebSocketsService } from './api/websockets_service';
 import { SNSettingsService } from './settings_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { convertTimestampToMilliseconds } from '@Lib/utils';
+import { convertTimestampToMilliseconds } from '@standardnotes/utils';
 
 describe('featuresService', () => {
   let storageService: SNStorageService;
@@ -58,7 +57,8 @@ describe('featuresService', () => {
       syncService,
       alertService,
       sessionManager,
-      crypto
+      crypto,
+      Runtime.Prod
     );
   };
 
@@ -71,13 +71,15 @@ describe('featuresService', () => {
 
     features = [
       {
-        ...Features.find(
+        ...GetFeatures().find(
           (f) => f.identifier === FeatureIdentifier.MidnightTheme
         ),
         expires_at: tomorrow_server,
       },
       {
-        ...Features.find((f) => f.identifier === FeatureIdentifier.BoldEditor),
+        ...GetFeatures().find(
+          (f) => f.identifier === FeatureIdentifier.BoldEditor
+        ),
         expires_at: tomorrow_server,
       },
     ] as jest.Mocked<FeatureDescription[]>;
@@ -542,6 +544,11 @@ describe('featuresService', () => {
       expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(
         FeatureStatus.InCurrentPlanButExpired
       );
+      expect(
+        featuresService.getFeatureStatus(
+          'missing-feature-identifier' as FeatureIdentifier
+        )
+      ).toBe(FeatureStatus.NoUserSubscription);
     });
 
     it('feature status should be not entitled if no account or offline repo', async () => {
@@ -663,6 +670,27 @@ describe('featuresService', () => {
       ).toBe(FeatureStatus.NotInCurrentPlan);
     });
 
+    it('feature status for deprecated feature', async () => {
+      const featuresService = createService();
+
+      sessionManager.isSignedIntoFirstPartyServer = jest
+        .fn()
+        .mockReturnValue(true);
+
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)
+      ).toBe(FeatureStatus.NoUserSubscription);
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+        RoleName.CoreUser,
+      ]);
+
+      expect(
+        featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)
+      ).toBe(FeatureStatus.Entitled);
+    });
+
     it('has paid subscription', async () => {
       const featuresService = createService();
 
@@ -769,6 +797,94 @@ describe('featuresService', () => {
         installUrl
       );
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe('sortRolesByHierarchy', () => {
+    it('should sort given roles according to role hierarchy', () => {
+      const featuresService = createService();
+
+      const sortedRoles = featuresService.rolesBySorting([
+        RoleName.ProUser,
+        RoleName.CoreUser,
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      expect(sortedRoles).toStrictEqual([
+        RoleName.BasicUser,
+        RoleName.CoreUser,
+        RoleName.PlusUser,
+        RoleName.ProUser,
+      ]);
+    });
+  });
+
+  describe('hasMinimumRole', () => {
+    it('should be false if basic user checks for core role', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.BasicUser,
+      ]);
+
+      const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser);
+
+      expect(hasCoreUserRole).toBe(false);
+    });
+
+    it('should be false if core user checks for plus role', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.CoreUser,
+        RoleName.BasicUser,
+      ]);
+
+      const hasPlusUserRole = featuresService.hasMinimumRole(RoleName.PlusUser);
+
+      expect(hasPlusUserRole).toBe(false);
+    });
+
+    it('should be false if plus user checks for pro role', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.PlusUser,
+        RoleName.BasicUser,
+      ]);
+
+      const hasProUserRole = featuresService.hasMinimumRole(RoleName.ProUser);
+
+      expect(hasProUserRole).toBe(false);
+    });
+
+    it('should be true if pro user checks for core user', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.ProUser,
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser);
+
+      expect(hasCoreUserRole).toBe(true);
+    });
+
+    it('should be true if pro user checks for pro user', async () => {
+      const featuresService = createService();
+
+      await featuresService.updateRolesAndFetchFeatures('123', [
+        RoleName.ProUser,
+        RoleName.BasicUser,
+        RoleName.PlusUser,
+      ]);
+
+      const hasProUserRole = featuresService.hasMinimumRole(RoleName.ProUser);
+
+      expect(hasProUserRole).toBe(true);
     });
   });
 });

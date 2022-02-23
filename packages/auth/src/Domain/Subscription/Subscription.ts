@@ -1,4 +1,4 @@
-import { SubscriptionName } from './SubscriptionName'
+import { SubscriptionName } from '@standardnotes/common'
 
 export type Subscription = {
   planName: SubscriptionName,

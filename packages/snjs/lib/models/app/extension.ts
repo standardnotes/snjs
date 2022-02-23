@@ -6,7 +6,32 @@ import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies';
 import { HistoryEntry } from './../../services/history/entries/history_entry';
 import { PurePayload } from './../../protocol/payloads/pure_payload';
 import { ItemMutator, SNItem } from '@Models/core/item';
-import { Action } from './action';
+
+export enum ActionAccessType {
+  Encrypted = 'encrypted',
+  Decrypted = 'decrypted',
+}
+
+export enum ActionVerb {
+  Get = 'get',
+  Render = 'render',
+  Show = 'show',
+  Post = 'post',
+  Nested = 'nested',
+}
+
+export type Action = {
+  label: string;
+  desc: string;
+  running?: boolean;
+  error?: boolean;
+  lastExecuted?: Date;
+  context?: string;
+  verb: ActionVerb;
+  url: string;
+  access_type: ActionAccessType;
+  subactions?: Action[];
+};
 
 /**
  * Related to the SNActionsService and the local Action model.
@@ -28,15 +53,17 @@ export class SNActionsExtension extends SNItem {
     this.supported_types = payload.safeContent.supported_types;
     this.package_info = this.payload.safeContent.package_info || {};
     this.deprecation = payload.safeContent.deprecation;
-    if (payload.safeContent.actions) {
-      this.actions = payload.safeContent.actions.map((action: any) => {
-        return new Action(action);
-      });
-    }
+    this.actions = payload.safeContent.actions;
   }
 
   public get thirdPartyPackageInfo(): ThirdPartyFeatureDescription {
     return this.package_info as ThirdPartyFeatureDescription;
+  }
+
+  public get isListedExtension(): boolean {
+    return (
+      (this.package_info.identifier as string) === 'org.standardnotes.listed'
+    );
   }
 
   actionsWithContextForItem(item: SNItem): Action[] {
@@ -71,7 +98,7 @@ export class ActionsExtensionMutator extends ItemMutator {
     this.content!.actions = actions;
   }
 
-  set deprecation(deprecation: string) {
+  set deprecation(deprecation: string | undefined) {
     this.content!.deprecation = deprecation;
   }
 }

@@ -2,14 +2,14 @@ import { compareSemVersions } from '@Lib/version';
 import { SNLog } from '@Lib/log';
 import { SnjsVersion, isRightVersionGreaterThanLeft } from './../version';
 import { ApplicationEvent } from './../events';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { MigrationServices } from './../migrations/types';
 import { Migration } from '@Lib/migrations/migration';
 import * as migrationImports from '@Lib/migrations';
 import { BaseMigration } from '@Lib/migrations/base';
-import { PureService } from '@Services/pure_service';
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { lastElement } from '@Lib/utils';
+import { lastElement } from '@standardnotes/utils';
+import { AbstractService } from '@standardnotes/services';
 
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -19,7 +19,7 @@ import { lastElement } from '@Lib/utils';
  * first launches, and also other steps after the application is unlocked, or after the
  * first sync completes. Migrations live under /migrations and inherit from the base Migration class.
  */
-export class SNMigrationService extends PureService {
+export class SNMigrationService extends AbstractService {
   private activeMigrations?: Migration[];
   private baseMigration!: BaseMigration;
 
@@ -27,7 +27,7 @@ export class SNMigrationService extends PureService {
     super();
   }
 
-  public deinit() {
+  public deinit(): void {
     (this.services as any) = undefined;
     if (this.activeMigrations) {
       this.activeMigrations.length = 0;
@@ -35,7 +35,7 @@ export class SNMigrationService extends PureService {
     super.deinit();
   }
 
-  public async initialize() {
+  public async initialize(): Promise<void> {
     await this.runBaseMigrationPreRun();
 
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
@@ -73,7 +73,7 @@ export class SNMigrationService extends PureService {
    * Application instances will call this function directly when they arrive
    * at a certain migratory state.
    */
-  public async handleApplicationStage(stage: ApplicationStage) {
+  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
     await this.handleStage(stage);
   }
@@ -81,13 +81,13 @@ export class SNMigrationService extends PureService {
   /**
    * Called by application
    */
-  public async handleApplicationEvent(event: ApplicationEvent) {
+  public async handleApplicationEvent(event: ApplicationEvent): Promise<void> {
     if (event === ApplicationEvent.SignedIn) {
       await this.handleStage(ApplicationStage.SignedIn_30);
     }
   }
 
-  public async hasPendingMigrations() {
+  public async hasPendingMigrations(): Promise<boolean> {
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
       await this.getStoredSnjsVersion()
     );
@@ -97,7 +97,7 @@ export class SNMigrationService extends PureService {
     );
   }
 
-  public async getStoredSnjsVersion() {
+  public async getStoredSnjsVersion(): Promise<string> {
     const version = await this.services.deviceInterface.getRawStorageValue(
       namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion)
     );
@@ -130,7 +130,7 @@ export class SNMigrationService extends PureService {
     return resultingClasses;
   }
 
-  private instantiateMigrationClasses(classes: any[]) {
+  private instantiateMigrationClasses(classes: any[]): Migration[] {
     return classes.map((migrationClass) => {
       return new migrationClass(this.services);
     });
@@ -138,7 +138,12 @@ export class SNMigrationService extends PureService {
 
   private async handleStage(stage: ApplicationStage) {
     await this.baseMigration.handleStage(stage);
-    for (const migration of this.activeMigrations!) {
+
+    if (!this.activeMigrations) {
+      throw new Error('Invalid active migrations');
+    }
+
+    for (const migration of this.activeMigrations) {
       await migration.handleStage(stage);
     }
   }

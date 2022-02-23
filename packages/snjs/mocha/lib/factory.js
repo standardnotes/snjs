@@ -19,8 +19,8 @@ export async function createAndInitSimpleAppContext(
   }
 ) {
   const application = await createInitAppWithFakeCrypto(environment);
-  const email = Uuid.GenerateUuidSynchronously();
-  const password = Uuid.GenerateUuidSynchronously();
+  const email = Uuid.GenerateUuid();
+  const password = Uuid.GenerateUuid();
   const newPassword = randomString();
 
   if (registerUser) {
@@ -58,8 +58,8 @@ export async function createAppContext(identifier, crypto) {
     undefined,
     crypto || new FakeWebCrypto()
   );
-  const email = Uuid.GenerateUuidSynchronously();
-  const password = Uuid.GenerateUuidSynchronously();
+  const email = Uuid.GenerateUuid();
+  const password = Uuid.GenerateUuid();
   const passcode = 'mypasscode';
   const handleChallenge = (challenge) => {
     const responses = [];
@@ -172,7 +172,6 @@ export function createApplication(
     [],
     host || getDefaultHost(),
     getAppVersion(),
-    true,
     getDefaultWebSocketUrl()
   );
 }
@@ -479,7 +478,7 @@ export function createItemParams(contentType) {
 
 export function generateUuid() {
   const crypto = new FakeWebCrypto();
-  return crypto.generateUUIDSync();
+  return crypto.generateUUID();
 }
 
 export function createNoteParams({ title, text, dirty = true } = {}) {
@@ -496,9 +495,13 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
   return params;
 }
 
-export function createTagParams({ title, dirty = true } = {}) {
+export function createTagParams({
+  title,
+  dirty = true,
+  uuid = undefined,
+} = {}) {
   const params = {
-    uuid: generateUuid(),
+    uuid: uuid || generateUuid(),
     content_type: ContentType.Tag,
     dirty: dirty,
     content: {
@@ -544,6 +547,12 @@ export async function storagePayloadCount(application) {
   const payloads = await application.storageService.getAllRawPayloads();
   return payloads.length;
 }
+
+/**
+ * The number of seconds between changes before a server creates a new revision.
+ * Controlled via docker/syncing-server-js.env
+ */
+export const ServerRevisionFrequency = 1.1;
 
 export function yesterday() {
   return new Date(new Date().setDate(new Date().getDate() - 1));
@@ -667,4 +676,19 @@ export async function pinNote(application, note) {
   return application.changeItem(note.uuid, (mutator) => {
     mutator.pinned = true;
   });
+}
+
+export async function alternateUuidForItem(application, uuid) {
+  const item = application.itemManager.findItem(uuid);
+  const payload = CreateMaxPayloadFromAnyObject(item);
+  const results = await PayloadsByAlternatingUuid(
+    payload,
+    application.payloadManager.getMasterCollection()
+  );
+  await application.payloadManager.emitPayloads(
+    results,
+    PayloadSource.LocalChanged
+  );
+  await application.syncService.persistPayloads(results);
+  return application.itemManager.findItem(results[0].uuid);
 }

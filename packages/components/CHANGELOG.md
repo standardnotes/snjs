@@ -3,6 +3,82 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.5](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.4...@standardnotes/components@1.7.5) (2022-02-22)
+
+
+### Bug Fixes
+
+* deprecated features should still be packaged ([#606](https://github.com/standardnotes/snjs/issues/606)) ([5176080](https://github.com/standardnotes/snjs/commit/5176080753a5720a0abf434923b1d8103b1261d0))
+
+
+
+
+
+## [1.7.4](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.3...@standardnotes/components@1.7.4) (2022-02-17)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+## [1.7.3](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.2...@standardnotes/components@1.7.3) (2022-02-16)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+## [1.7.2](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.1...@standardnotes/components@1.7.2) (2022-02-15)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+## [1.7.1](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.0...@standardnotes/components@1.7.1) (2022-02-14)
+
+**Note:** Version bump only for package @standardnotes/components
+
+
+
+
+
+# [1.7.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.6.0...@standardnotes/components@1.7.0) (2022-02-08)
+
+
+### Features
+
+* markdown visual editor ([#589](https://github.com/standardnotes/snjs/issues/589)) ([a6c9e74](https://github.com/standardnotes/snjs/commit/a6c9e742acef2c8d027646bf0f7a963b4de712ce))
+
+
+
+
+
+# [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.5.0...@standardnotes/components@1.6.0) (2022-02-07)
+
+
+### Features
+
+* dynamic features based on runtime env ([#590](https://github.com/standardnotes/snjs/issues/590)) ([060861a](https://github.com/standardnotes/snjs/commit/060861a6c5bc179e3e1987c2b63490888e153bbb))
+
+
+
+
+
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.4...@standardnotes/components@1.5.0) (2022-02-01)
+
+
+### Features
+
+* enable spellcheck control for editors ([#578](https://github.com/standardnotes/snjs/issues/578)) ([24e7add](https://github.com/standardnotes/snjs/commit/24e7add3b6217703d142509b2dfd2ecfcc3ceb74))
+
+
+
+
+
 ## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.4.3...@standardnotes/components@1.4.4) (2022-01-28)
 
 **Note:** Version bump only for package @standardnotes/components

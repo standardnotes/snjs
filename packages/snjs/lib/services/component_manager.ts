@@ -1,9 +1,9 @@
 import { SNPreferencesService } from './preferences_service';
-import { Features, FeatureDescription } from '@standardnotes/features';
+import { FindNativeFeature } from '@standardnotes/features';
 import { SNFeaturesService } from '@Services/features_service';
 import { ComponentMutator } from '@Models/app/component';
 import { displayStringForContentType } from '@Models/content_types';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Runtime } from '@standardnotes/common';
 import { PayloadSource } from '@Protocol/payloads/sources';
 import { ItemManager } from '@Services/item_manager';
 import { SNNote } from '@Models/app/note';
@@ -13,7 +13,6 @@ import { SNAlertService } from '@Services/alert_service';
 import { SNSyncService } from '@Services/sync/sync_service';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
-import { PureService } from '@Lib/services/pure_service';
 import { ComponentArea, SNComponent } from '@Models/app/component';
 import { ComponentAction, ComponentPermission } from '@standardnotes/features';
 import {
@@ -22,7 +21,7 @@ import {
   filterFromArray,
   removeFromArray,
   sleep,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { Environment, Platform } from '@Lib/platforms';
 import { UuidString } from '@Lib/types';
 import {
@@ -34,6 +33,7 @@ import {
   ActionObserver,
   ComponentViewer,
 } from '@Services/component_manager/component_viewer';
+import { AbstractService } from '@standardnotes/services';
 
 const DESKTOP_URL_PREFIX = 'sn://';
 const LOCAL_HOST = 'localhost';
@@ -53,11 +53,10 @@ export type EventData = {
  * and other components. The component manager primarily deals with iframes, and orchestrates
  * sending and receiving messages to and from frames via the postMessage API.
  */
-export class SNComponentManager extends PureService<
+export class SNComponentManager extends AbstractService<
   ComponentManagerEvent,
   EventData
 > {
-  private timeout: any;
   private desktopManager?: DesktopManagerInterface;
   private viewers: ComponentViewer[] = [];
   private removeItemObserver!: () => void;
@@ -71,10 +70,9 @@ export class SNComponentManager extends PureService<
     protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
-    timeout: any
+    private runtime: Runtime
   ) {
     super();
-    this.timeout = timeout || setTimeout.bind(window);
     this.loggingEnabled = false;
     this.addItemObserver();
     if (environment !== Environment.Mobile) {
@@ -91,11 +89,7 @@ export class SNComponentManager extends PureService<
   }
 
   get components(): SNComponent[] {
-    const components = this.itemManager.getDisplayableItems(
-      ContentType.Component
-    );
-    const themes = this.itemManager.getDisplayableItems(ContentType.Theme);
-    return components.concat(themes) as SNComponent[];
+    return this.itemManager.components;
   }
 
   componentsForArea(area: ComponentArea): SNComponent[] {
@@ -141,6 +135,7 @@ export class SNComponentManager extends PureService<
       this.featuresService,
       this.environment,
       this.platform,
+      this.runtime,
       {
         runWithPermissions: this.runWithPermissions.bind(this),
         urlsForActiveThemes: this.urlsForActiveThemes.bind(this),
@@ -179,7 +174,7 @@ export class SNComponentManager extends PureService<
 
     if (this.isDesktop) {
       const thirdPartyComponents = components.filter((component) => {
-        const nativeFeature = this.nativeFeatureForComponent(component);
+        const nativeFeature = FindNativeFeature(component.identifier);
         return nativeFeature ? false : true;
       });
       if (thirdPartyComponents.length > 0) {
@@ -213,7 +208,7 @@ export class SNComponentManager extends PureService<
     const activeIframes = this.allComponentIframes();
     for (const iframe of activeIframes) {
       if (document.activeElement === iframe) {
-        this.timeout(() => {
+        setTimeout(() => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const viewer = this.findComponentViewer(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -274,21 +269,13 @@ export class SNComponentManager extends PureService<
     }) as SNTheme[];
   }
 
-  nativeFeatureForComponent(
-    component: SNComponent
-  ): FeatureDescription | undefined {
-    return Features.find(
-      (feature) => feature.identifier === component.identifier
-    );
-  }
-
   urlForComponent(component: SNComponent): string | undefined {
     /* offlineOnly is available only on desktop, and not on web or mobile. */
     if (component.offlineOnly && !this.isDesktop) {
       return undefined;
     }
 
-    const nativeFeature = this.nativeFeatureForComponent(component);
+    const nativeFeature = FindNativeFeature(component.identifier);
 
     if (this.isDesktop) {
       if (nativeFeature) {
@@ -384,7 +371,7 @@ export class SNComponentManager extends PureService<
       return;
     }
     const component = this.findComponent(componentUuid);
-    const nativeFeature = this.nativeFeatureForComponent(component);
+    const nativeFeature = FindNativeFeature(component.identifier);
     const acquiredPermissions =
       nativeFeature?.component_permissions || component.permissions;
 
@@ -435,7 +422,7 @@ export class SNComponentManager extends PureService<
     permissions: ComponentPermission[],
     callback: (approved: boolean) => Promise<void>
   ): void {
-    this.timeout(() => {
+    setTimeout(() => {
       this.promptForPermissions(component, permissions, callback);
     });
   }
@@ -696,5 +683,34 @@ export class SNComponentManager extends PureService<
       return '.';
     }
     return contentTypeStrings.concat(contextAreaStrings).join(', ') + '.';
+  }
+
+  doesEditorChangeRequireAlert(
+    from: SNComponent | undefined,
+    to: SNComponent | undefined
+  ): boolean {
+    const isEitherPlainEditor = !from || !to;
+    const isEitherMarkdown =
+      from?.package_info.file_type === 'md' ||
+      to?.package_info.file_type === 'md';
+    const areBothHtml =
+      from?.package_info.file_type === 'html' &&
+      to?.package_info.file_type === 'html';
+
+    if (isEitherPlainEditor || isEitherMarkdown || areBothHtml) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  async showEditorChangeAlert(): Promise<boolean> {
+    const shouldChangeEditor = await this.alertService.confirm(
+      'Doing so might result in minor formatting changes.',
+      'Are you sure you want to change the editor?',
+      'Yes, change it'
+    );
+
+    return shouldChangeEditor;
   }
 }

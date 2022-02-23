@@ -1,13 +1,13 @@
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
-import { PureService } from '../pure_service';
 import { SNStorageService } from '../storage_service';
+import { AbstractService } from '@standardnotes/services';
 
 export enum WebSocketsServiceEvent {
   UserRoleMessageReceived = 'WebSocketMessageReceived',
 }
 
-export class SNWebSocketsService extends PureService<
+export class SNWebSocketsService extends AbstractService<
   WebSocketsServiceEvent,
   UserRolesChangedEvent
 > {

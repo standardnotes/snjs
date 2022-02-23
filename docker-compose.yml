@@ -23,37 +23,27 @@ services:
     networks:
       - snjs
 
-  sns:
-    image: s12v/sns
+  localstack:
+    image: localstack/localstack
     expose:
-      - 9911
+      - 4566
+    environment:
+      - SERVICES=sns,sqs
+      - DEBUG=1
+      - DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOSTNAME_EXTERNAL=localstack
     volumes:
-      - ./docker/sns.json:/etc/sns/db.json
-      - ./wait-for.sh:/etc/scripts/wait-for.sh
-    restart: unless-stopped
-    entrypoint: [
-      "./etc/scripts/wait-for.sh", "sqs", "9324",
-      "java", "-jar", "/sns.jar"
-    ]
-    networks:
-      snjs:
-        aliases:
-          - sns
-
-  sqs:
-    image: s12v/elasticmq
-    expose:
-      - 9324
-    volumes:
-      - ./docker/sqs.conf:/etc/elasticmq/elasticmq.conf
-    restart: unless-stopped
+      - ./docker/localstack_bootstrap.sh:/docker-entrypoint-initaws.d/localstack_bootstrap.sh
+      - /tmp/localstack:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - snjs
 
   mock-event-publisher:
     image: standardnotes/mock-event-publisher:1.0.4
     entrypoint: [
-      "./wait-for.sh", "sns", "9911",
+      "./wait-for.sh", "localstack", "4566",
       "./docker/entrypoint.sh", "start-web"
     ]
     ports:
@@ -128,7 +118,7 @@ services:
       - auth
     entrypoint: [
       "./wait-for.sh", "auth", "3000",
-      "./wait-for.sh", "sqs", "9324",
+      "./wait-for.sh", "localstack", "4566",
       "./docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/auth.env

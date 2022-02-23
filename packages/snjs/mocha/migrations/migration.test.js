@@ -9,7 +9,7 @@ describe('migrations', () => {
     '2.7.0',
     '2.20.0',
     '2.36.0',
-    '2.42.0',
+    '2.42.0'
   ];
 
   beforeEach(async () => {

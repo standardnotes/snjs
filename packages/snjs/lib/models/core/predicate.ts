@@ -1,5 +1,5 @@
 import { SNItem } from '@Models/core/item';
-import { isString } from '@Lib/utils';
+import { isString } from '@standardnotes/utils';
 
 type PredicateType = string[] | SNPredicate;
 type PredicateArray = Array<string[]> | SNPredicate[];
@@ -58,15 +58,26 @@ export class SNPredicate {
     }
   }
 
-  static FromJson(values: any) {
+  static FromJson(values: any): SNPredicate {
     return new SNPredicate(values.keypath, values.operator, values.value);
   }
 
-  static FromArray(array: string[]) {
+  static FromArray(array: string[]): SNPredicate {
     return new SNPredicate(array[0], array[1] as PredicateOperator, array[2]);
   }
 
-  isRecursive() {
+  static FromDSLString(dsl: string): SNPredicate {
+    let components = null;
+    try {
+      components = JSON.parse(dsl.substring(1, dsl.length));
+    } catch (e) {
+      throw Error('Invalid smart tag syntax');
+    }
+
+    return new SNPredicate(components[1], components[2], components[3]);
+  }
+
+  isRecursive(): boolean {
     return [PredicateOperator.And, PredicateOperator.Or].includes(
       this.operator
     );
@@ -93,7 +104,7 @@ export class SNPredicate {
     }
   }
 
-  static CompoundPredicate(predicates: PredicateArray) {
+  static CompoundPredicate(predicates: PredicateArray): SNPredicate {
     return new SNPredicate('ignored', PredicateOperator.And, predicates);
   }
 
@@ -129,6 +140,10 @@ export class SNPredicate {
       targetValue = this.DateFromString(targetValue);
     }
 
+    if (typeof targetValue === 'string') {
+      targetValue = targetValue.toLowerCase();
+    }
+
     /* Process not before handling the keypath, because not does not use it. */
     if (predicate.operator === PredicateOperator.Not) {
       return !this.ObjectSatisfiesPredicate(
@@ -137,11 +152,15 @@ export class SNPredicate {
       );
     }
 
-    const valueAtKeyPath = predicate.keypath
+    let valueAtKeyPath = predicate.keypath
       .split('.')
       .reduce((previous, current) => {
         return previous && previous[current];
       }, object);
+
+    if (typeof valueAtKeyPath === 'string') {
+      valueAtKeyPath = valueAtKeyPath.toLowerCase();
+    }
 
     const falseyValues = [false, '', null, undefined, NaN];
     /* If the value at keyPath is undefined, either because the
@@ -197,7 +216,7 @@ export class SNPredicate {
   static resolveIncludesPredicate(
     itemValueArray: Array<any>,
     containsValue: any
-  ) {
+  ): boolean {
     // includes can be a string or a predicate (in array form)
     if (isString(containsValue)) {
       // if string, simply check if the itemValueArray includes the predicate value
@@ -219,11 +238,14 @@ export class SNPredicate {
     }
   }
 
-  static ItemSatisfiesPredicate(item: SNItem, predicate: SNPredicate) {
+  static ItemSatisfiesPredicate(item: SNItem, predicate: SNPredicate): boolean {
     return this.ObjectSatisfiesPredicate(item, predicate);
   }
 
-  static ItemSatisfiesPredicates(item: SNItem, predicates: SNPredicate[]) {
+  static ItemSatisfiesPredicates(
+    item: SNItem,
+    predicates: SNPredicate[]
+  ): boolean {
     for (const predicate of predicates) {
       if (!this.ItemSatisfiesPredicate(item, predicate)) {
         return false;
@@ -235,7 +257,7 @@ export class SNPredicate {
   /**
    * Predicate date strings are of form "x.days.ago" or "x.hours.ago"
    */
-  static DateFromString(string: string) {
+  static DateFromString(string: string): Date {
     const comps = string.split('.');
     const unit = comps[1];
     const date = new Date();

@@ -9,6 +9,10 @@ export class Timer implements TimerInterface {
     dayjs.extend(utc)
   }
 
+  formatDate(date: Date, format: string): string {
+    return dayjs.utc(date).format(format)
+  }
+
   convertDateToMilliseconds(date: Date): number {
     return this.convertStringDateToMilliseconds(date.toString())
   }
@@ -47,6 +51,14 @@ export class Timer implements TimerInterface {
 
   convertStringDateToDate(date: string): Date {
     return dayjs.utc(date).toDate()
+  }
+
+  convertDateToISOString(date: Date): string {
+    return dayjs.utc(date).toISOString()
+  }
+
+  dateWasNDaysAgo(date: Date): number {
+    return dayjs.utc().diff(date, 'days')
   }
 
   convertStringDateToMicroseconds(date: string): number {

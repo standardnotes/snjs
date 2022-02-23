@@ -5,14 +5,18 @@ export {
 } from './version';
 
 export type { ApplicationDescriptor } from './application_group';
-export type { ActionResponse } from './services/actions_service';
+export type {
+  ActionResponse,
+  ListedAccount,
+  ListedAccountInfo,
+} from './services/api/responses';
 export type { BackupFile } from '@Services/protocol_service';
 export type {
   UuidString,
-  ApplicationIdentifier,
   ApplicationEventPayload,
   IconType,
 } from './types';
+export type { ApplicationIdentifier } from '@standardnotes/common';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
@@ -21,14 +25,17 @@ export { KeyRecoveryStrings, SessionStrings } from './services/api/messages';
 export type { RemoteSession } from './services/api/session';
 
 export { SNApplication } from '@Lib/application';
+
 export { SNProtocolService, KeyMode } from '@Services/protocol_service';
 export { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';
 export { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002';
 export { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003';
 export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004';
+
 export { SNRootKey } from '@Protocol/root_key';
 export { SNRootKeyParams } from './protocol/key_params';
-export { DeviceInterface } from '@Lib/device_interface';
+export { AbstractDevice, AbstractService } from '@standardnotes/services';
+export type { DeviceInterface, ServiceInterface } from '@standardnotes/services';
 export {
   SNItem,
   ItemMutator,
@@ -42,7 +49,6 @@ export {
   SNSmartTag,
   SNActionsExtension,
   ActionsExtensionMutator,
-  Action,
   SNTheme,
   ThemeMutator,
   SNComponent,
@@ -53,7 +59,7 @@ export {
   PrefKey,
 } from './models';
 
-export type { PrefValue } from './models';
+export type { PrefValue, Action } from './models';
 export { MutationType } from '@Models/core/item';
 export { ComponentArea } from './models/app/component';
 export type { ComponentPermission } from '@standardnotes/features';
@@ -86,7 +92,6 @@ export { ItemManager } from './services/item_manager';
 
 export { SNHttpService } from './services/api/http_service';
 export { ChallengeService } from './services/challenge/challenge_service';
-export { PureService } from '@Services/pure_service';
 export { ApplicationService } from '@Services/application_service';
 export {
   SNStorageService,
@@ -166,7 +171,8 @@ export {
   dateToLocalizedString,
   nonSecureRandomIdentifier,
   sanitizeHtmlString,
-} from './utils';
+  lastElement,
+} from '@standardnotes/utils';
 export { Uuid } from '@Lib/uuid';
 export {
   EncryptionIntent,
@@ -176,10 +182,8 @@ export {
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
 } from '@Protocol/intents';
-export {
-  displayStringForContentType,
-} from '@Models/content_types';
-export { ContentType } from '@standardnotes/common';
+export { displayStringForContentType } from '@Models/content_types';
+export { ContentType, Runtime } from '@standardnotes/common';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids, FillItemContent } from '@Models/functions';
 
@@ -209,6 +213,7 @@ export {
   PayloadByMerging,
   CopyPayload,
 } from '@Payloads/generator';
+export { PayloadsByAlternatingUuid } from './protocol/payloads';
 export {
   PayloadSource,
   isPayloadSourceRetrieved,
@@ -245,9 +250,14 @@ export { ProtectionSessionDurations } from '@Lib/services/protection_service';
 export { SNLog } from './log';
 
 /** Used by e2e tests */
-export { Features, FeatureIdentifier } from '@standardnotes/features';
-export { RoleName } from '@standardnotes/auth';
-export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/settings';
+export { GetFeatures, FeatureIdentifier } from '@standardnotes/features';
+export { RoleName } from '@standardnotes/common';
+export {
+  SettingName,
+  MuteFailedBackupsEmailsOption,
+} from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
-export { ApplicationStage } from '@Lib/stages';
+export { ApplicationStage } from '@standardnotes/common';
+
+export { ActionVerb } from '@Lib/models/app/extension';

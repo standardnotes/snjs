@@ -1,6 +1,4 @@
-import { Uuid } from '@standardnotes/common'
-
-import { RoleName } from './RoleName'
+import { Uuid, RoleName } from '@standardnotes/common'
 
 export type Role = {
   uuid: Uuid

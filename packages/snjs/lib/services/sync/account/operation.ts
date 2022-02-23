@@ -1,5 +1,5 @@
 import { PurePayload } from '@Payloads/pure_payload';
-import { arrayByDifference, subtractFromArray } from '@Lib/utils';
+import { arrayByDifference, subtractFromArray } from '@standardnotes/utils';
 import { SyncResponse } from '@Services/sync/response';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';
@@ -65,14 +65,18 @@ export class AccountSyncOperation {
       this.checkIntegrity,
       undefined,
       undefined
-    ) as RawSyncResponse);
+    )) as RawSyncResponse;
     const response = new SyncResponse(rawResponse);
 
     this.responses.push(response);
     this.lastSyncToken = response.lastSyncToken!;
     this.paginationToken = response.paginationToken!;
 
-    await this.receiver(SyncSignal.Response, response);
+    try {
+      await this.receiver(SyncSignal.Response, response);
+    } catch (error) {
+      console.error('Sync handle response error', error);
+    }
 
     if (!this.done) {
       return this.run();

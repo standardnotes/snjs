@@ -1,3 +1,5 @@
+import { SNPureCrypto } from '@standardnotes/sncrypto-common';
+import { CreateItemFromPayload } from '@Models/generator';
 import { SNLog } from './../../../log';
 import {
   ItemAuthenticatedData,
@@ -10,17 +12,21 @@ import {
   KeyParamsOrigination,
   SNRootKeyParams,
 } from './../../key_params';
-import { ItemsKeyContent } from './../operator';
-import { SNProtocolOperator } from '@Protocol/operator/operator';
+import { ItemsKeyContent, AsynchronousOperator } from './../operator';
 import { PayloadFormat } from '@Payloads/formats';
-import {
-  CopyEncryptionParameters,
-  CreateEncryptionParameters,
-} from '@Payloads/generator';
 import { ProtocolVersion, ProtocolVersionLength } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
 import { V001Algorithm } from '@Protocol/operator/algorithms';
+import {
+  CopyEncryptionParameters,
+  CreateEncryptionParameters,
+  CreateMaxPayloadFromAnyObject,
+} from '@Payloads/generator';
 import { PurePayload } from '@Payloads/pure_payload';
+import { ContentType } from '@standardnotes/common';
+import { FillItemContent } from '@Models/functions';
+import { Uuid } from '@Lib/uuid';
+import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils';
 
 const NO_IV = '00000000000000000000000000000000';
 
@@ -28,18 +34,24 @@ const NO_IV = '00000000000000000000000000000000';
  * @deprecated
  * A legacy operator no longer used to generate new accounts
  */
-export class SNProtocolOperator001 extends SNProtocolOperator {
+export class SNProtocolOperator001 implements AsynchronousOperator {
+  protected readonly crypto: SNPureCrypto;
+
+  constructor(crypto: SNPureCrypto) {
+    this.crypto = crypto;
+  }
+
   public getEncryptionDisplayName(): string {
     return 'AES-256';
   }
 
-  get version() {
+  get version(): string {
     return ProtocolVersion.V001;
   }
 
-  protected async generateNewItemsKeyContent() {
+  protected generateNewItemsKeyContent(): ItemsKeyContent {
     const keyLength = V001Algorithm.EncryptionKeyLength;
-    const itemsKey = await this.crypto.generateRandomKey(keyLength);
+    const itemsKey = this.crypto.generateRandomKey(keyLength);
     const response: ItemsKeyContent = {
       itemsKey: itemsKey,
       version: ProtocolVersion.V001,
@@ -47,11 +59,25 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     return response;
   }
 
+  /**
+   * Creates a new random SNItemsKey to use for item encryption.
+   * The consumer must save/sync this item.
+   */
+  public createItemsKey(): SNItemsKey {
+    const content = this.generateNewItemsKeyContent();
+    const payload = CreateMaxPayloadFromAnyObject({
+      uuid: Uuid.GenerateUuid(),
+      content_type: ContentType.ItemsKey,
+      content: FillItemContent(content),
+    });
+    return CreateItemFromPayload(payload) as SNItemsKey;
+  }
+
   public async createRootKey(
     identifier: string,
     password: string,
     origination: KeyParamsOrigination
-  ) {
+  ): Promise<SNRootKey> {
     const pwCost = V001Algorithm.PbkdfMinCost as number;
     const pwNonce = await this.crypto.generateRandomKey(
       V001Algorithm.SaltSeedLength
@@ -69,18 +95,21 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     return this.deriveKey(password, keyParams);
   }
 
-  public async getPayloadAuthenticatedData(
+  public getPayloadAuthenticatedData(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _payload: PurePayload
-  ): Promise<
+  ):
     | RootKeyEncryptedAuthenticatedData
     | ItemAuthenticatedData
     | LegacyAttachedData
-    | undefined
-  > {
+    | undefined {
     return undefined;
   }
 
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
+  public async computeRootKey(
+    password: string,
+    keyParams: SNRootKeyParams
+  ): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams);
   }
 
@@ -92,13 +121,15 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     return this.crypto.aes256CbcEncrypt(text, NO_IV, key);
   }
 
-  public async generateEncryptedParameters(
+  public async generateEncryptedParametersAsync(
     payload: PurePayload,
     format: PayloadFormat,
     key?: SNItemsKey | SNRootKey
-  ) {
+  ): Promise<PurePayload> {
     if (format === PayloadFormat.DecryptedBareObject) {
-      return super.generateEncryptedParameters(payload, format, key);
+      return CreateEncryptionParameters({
+        content: payload.content,
+      });
     }
     if (format !== PayloadFormat.EncryptedString) {
       throw `Unsupport format for generateEncryptedParameters ${format}`;
@@ -110,13 +141,13 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
      * Generate new item key that is double the key size.
      * Will be split to create encryption key and authentication key.
      */
-    const itemKey = await this.crypto.generateRandomKey(
+    const itemKey = this.crypto.generateRandomKey(
       V001Algorithm.EncryptionKeyLength * 2
     );
     const encItemKey = await this.encryptString(itemKey, key.itemsKey);
     /** Encrypt content */
-    const ek = await this.firstHalfOfKey(itemKey);
-    const ak = await this.secondHalfOfKey(itemKey);
+    const ek = firstHalfOfString(itemKey);
+    const ak = secondHalfOfString(itemKey);
     const contentCiphertext = await this.encryptString(
       JSON.stringify(payload.content),
       ek
@@ -132,13 +163,14 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     });
   }
 
-  public async generateDecryptedParameters(
+  public async generateDecryptedParametersAsync(
     encryptedParameters: PurePayload,
     key?: SNItemsKey | SNRootKey
-  ) {
+  ): Promise<PurePayload> {
     const format = encryptedParameters.format;
     if (format === PayloadFormat.DecryptedBareObject) {
-      return super.generateDecryptedParameters(encryptedParameters, key);
+      /** No decryption required */
+      return encryptedParameters;
     }
     if (!encryptedParameters.enc_item_key) {
       SNLog.error(Error('Missing item encryption key, skipping decryption.'));
@@ -165,7 +197,7 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
         errorDecryptingValueChanged: !encryptedParameters.errorDecrypting,
       });
     }
-    const ek = await this.firstHalfOfKey(itemKey);
+    const ek = firstHalfOfString(itemKey);
     const itemParams = this.encryptionComponentsFromString(
       encryptedParameters.contentString,
       ek
@@ -197,28 +229,25 @@ export class SNProtocolOperator001 extends SNProtocolOperator {
     string: string,
     encryptionKey: string
   ) {
-    const encryptionVersion = string.substring(
-      0,
-      ProtocolVersionLength
-    );
+    const encryptionVersion = string.substring(0, ProtocolVersionLength);
     return {
-      ciphertext: string.substring(
-        ProtocolVersionLength,
-        string.length
-      ),
+      ciphertext: string.substring(ProtocolVersionLength, string.length),
       version: encryptionVersion,
       key: encryptionKey,
     };
   }
 
-  protected async deriveKey(password: string, keyParams: SNRootKeyParams) {
+  protected async deriveKey(
+    password: string,
+    keyParams: SNRootKeyParams
+  ): Promise<SNRootKey> {
     const derivedKey = await this.crypto.pbkdf2(
       password,
       keyParams.content001.pw_salt,
       keyParams.content001.pw_cost,
       V001Algorithm.PbkdfOutputLength
     );
-    const partitions = this.splitKey(derivedKey!, 2);
+    const partitions = splitString(derivedKey!, 2);
     const key = await SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],

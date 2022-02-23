@@ -304,7 +304,8 @@ describe('app models', () => {
       this.application.itemManager.itemsReferencingItem(item2.uuid).length
     ).to.equal(1);
 
-    const alternatedItem = await this.application.syncService.alternateUuidForItem(
+    const alternatedItem = await Factory.alternateUuidForItem(
+      this.application,
       item1.uuid
     );
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid);
@@ -328,7 +329,8 @@ describe('app models', () => {
 
   it('alterating uuid of item should fill its duplicateOf value', async function () {
     const item1 = await Factory.createMappedNote(this.application);
-    const alternatedItem = await this.application.syncService.alternateUuidForItem(
+    const alternatedItem = await Factory.alternateUuidForItem(
+      this.application,
       item1.uuid
     );
     expect(alternatedItem.duplicateOf).to.equal(item1.uuid);
@@ -353,12 +355,17 @@ describe('app models', () => {
     expect(this.application.findItem(item1.uuid).payload.items_key_id).to.equal(
       itemsKey.uuid
     );
-    const alternatedKey = await this.application.syncService.alternateUuidForItem(
+    sinon
+      .stub(this.application.protocolService, 'decryptErroredItems')
+      .callsFake(() => {
+        // prevent auto decryption
+      });
+    const alternatedKey = await Factory.alternateUuidForItem(
+      this.application,
       itemsKey.uuid
     );
-    expect(this.application.findItem(item1.uuid).payload.items_key_id).to.equal(
-      alternatedKey.uuid
-    );
+    const updatedItem = this.application.findItem(item1.uuid);
+    expect(updatedItem.payload.items_key_id).to.equal(alternatedKey.uuid);
   });
 
   it('properly handles mutli item uuid alternation', async function () {
@@ -374,10 +381,12 @@ describe('app models', () => {
       this.application.itemManager.itemsReferencingItem(item2.uuid).length
     ).to.equal(1);
 
-    const alternatedItem1 = await this.application.syncService.alternateUuidForItem(
+    const alternatedItem1 = await Factory.alternateUuidForItem(
+      this.application,
       item1.uuid
     );
-    const alternatedItem2 = await this.application.syncService.alternateUuidForItem(
+    const alternatedItem2 = await Factory.alternateUuidForItem(
+      this.application,
       item2.uuid
     );
 

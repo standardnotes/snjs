@@ -5,7 +5,7 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { PayloadSource } from '@Payloads/sources';
 import { ContentType } from '@standardnotes/common';
 import { EncryptionIntent } from '@Protocol/intents';
-import { Copy, pickByCopy, uniqueArray } from '@Lib/utils';
+import { Copy, pickByCopy, uniqueArray } from '@standardnotes/utils';
 import { PayloadField } from '@Payloads/fields';
 import { SNItem } from '@Lib/models';
 

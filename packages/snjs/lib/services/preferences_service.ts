@@ -7,16 +7,16 @@ import {
 } from '@Lib/models/app/userPrefs';
 import { FillItemContent } from '@Lib/models/functions';
 import { ItemManager } from './item_manager';
-import { PureService } from './pure_service';
 import { SNSingletonManager } from './singleton_manager';
 import { SNSyncService } from './sync/sync_service';
 import { SyncEvent } from './sync/events';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
+import { AbstractService } from '@standardnotes/services';
 
 const preferencesChangedEvent = 'preferencesChanged';
 type PreferencesChangedEvent = typeof preferencesChangedEvent;
 
-export class SNPreferencesService extends PureService<PreferencesChangedEvent> {
+export class SNPreferencesService extends AbstractService<PreferencesChangedEvent> {
   private shouldReload = true;
   private reloading = false;
   private preferences?: SNUserPrefs;

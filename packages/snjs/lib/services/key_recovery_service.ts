@@ -3,7 +3,6 @@ import { PurePayload } from '@Payloads/pure_payload';
 import { SNSyncService } from './sync/sync_service';
 import { PayloadField } from './../protocol/payloads/fields';
 import { CreateItemFromPayload } from '@Models/generator';
-import { ApplicationStage } from './../stages';
 import { StorageKey } from '@Lib/storage_keys';
 import { CreateMaxPayloadFromAnyObject, RawPayload } from '@Payloads/generator';
 import { KeyRecoveryStrings } from './api/messages';
@@ -22,15 +21,15 @@ import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNItemsKey } from './../models/app/items_key';
-import { ContentType } from '@standardnotes/common';
+import { ApplicationStage, ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
-import { PureService } from '@Services/pure_service';
-import { dateSorted, isNullOrUndefined, removeFromArray } from '@Lib/utils';
+import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { PayloadSource } from '@Lib/protocol/payloads';
 import { UuidString } from '@Lib/types';
 import { KeyParamsResponse } from './api/responses';
+import { AbstractService } from '@standardnotes/services';
 
 /**
  * The key recovery service listens to items key changes to detect any that cannot be decrypted.
@@ -84,7 +83,7 @@ type DecryptionQueueItem = {
   resolve?: (result: DecryptionResponse) => void;
 };
 
-export class SNKeyRecoveryService extends PureService {
+export class SNKeyRecoveryService extends AbstractService {
   private removeItemObserver: any;
   private decryptionQueue: DecryptionQueueItem[] = [];
   private serverParams?: SNRootKeyParams;

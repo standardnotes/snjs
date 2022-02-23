@@ -1,3 +1,5 @@
+import { ListedService } from './services/listed_service';
+import { ListedInterface } from './application_interfaces/listed_interface';
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index';
 import { TransactionalMutation } from './services/item_manager';
 import { FeatureStatus } from '@Lib/services/features_service';
@@ -18,14 +20,13 @@ import {
 } from '@Protocol/collection/item_collection';
 import { Uuids } from '@Models/functions';
 import { PayloadOverride, RawPayload } from './protocol/payloads/generator';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage, ApplicationIdentifier } from '@standardnotes/common';
 import {
-  ApplicationIdentifier,
   DeinitSource,
   UuidString,
-  AnyRecord,
   ApplicationEventPayload,
 } from './types';
+import { ApplicationOptionsDefaults, ApplicationOptions } from './options';
 import {
   ApplicationEvent,
   SyncEvent,
@@ -49,7 +50,6 @@ import {
   ChallengeValue,
 } from './challenges';
 import { ChallengeObserver } from './services/challenge/challenge_service';
-import { PureService } from '@Lib/services/pure_service';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
 import {
@@ -58,8 +58,9 @@ import {
   isString,
   removeFromArray,
   sleep,
-} from '@Lib/utils';
-import { ContentType } from '@standardnotes/common';
+  nonSecureRandomIdentifier,
+} from '@standardnotes/utils';
+import { AnyRecord, ContentType, Runtime } from '@standardnotes/common';
 import {
   CopyPayload,
   CreateMaxPayloadFromAnyObject,
@@ -91,7 +92,7 @@ import {
   SNFeaturesService,
   SyncModes,
 } from './services';
-import { DeviceInterface } from './device_interface';
+import { DeviceInterface, ServiceInterface } from '@standardnotes/services';
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   ErrorAlertStrings,
@@ -111,12 +112,13 @@ import {
   GetAvailableSubscriptionsResponse,
   GetSubscriptionResponse,
   HttpResponse,
+  ListedAccount,
+  ListedAccountInfo,
   SignInResponse,
   User,
 } from './services/api/responses';
 import { PayloadFormat } from './protocol/payloads';
 import { ProtectionEvent } from './services/protection_service';
-import { RemoteSession } from '.';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import {
   CloudProvider,
@@ -132,6 +134,9 @@ import {
   FeaturesEvent,
   SetOfflineFeaturesFunctionResponse,
 } from '@Services/features_service';
+import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders';
+import { RemoteSession } from './services/api/session';
+import { RoleName } from '.';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -151,8 +156,15 @@ type ItemStream = (items: SNItem[], source: PayloadSource) => void;
 type ObserverRemover = () => void;
 
 /** The main entrypoint of an application. */
-export class SNApplication {
+export class SNApplication implements ListedInterface {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void;
+
+  /**
+   * A runtime based identifier for each dynamic instantiation of the application instance.
+   * This differs from the persistent application.identifier which persists in storage
+   * across instantiations.
+   */
+  public readonly ephemeralIdentifier = nonSecureRandomIdentifier();
 
   private migrationService!: SNMigrationService;
   private httpService!: SNHttpService;
@@ -176,10 +188,11 @@ export class SNApplication {
   private webSocketsService!: SNWebSocketsService;
   private settingsService!: SNSettingsService;
   private mfaService!: SNMfaService;
+  private listedService!: ListedService;
 
   private eventHandlers: ApplicationObserver[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private services: PureService<any, any>[] = [];
+  private services: ServiceInterface<any, any>[] = [];
   private streamRemovers: ObserverRemover[] = [];
   private serviceObservers: ObserverRemover[] = [];
   private managedSubscribers: ObserverRemover[] = [];
@@ -204,9 +217,8 @@ export class SNApplication {
    * @param crypto The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    * @param alertService The platform-dependent implementation of alert service.
-   * @param identifier A unique identifier to namespace storage and other
-   * persistent properties. This parameter is kept for backward compatibility and/or in case
-   * you don't want SNNamespaceService to assign a dynamic namespace for you.
+   * @param identifier A unique persistent identifier to namespace storage and other
+   * persistent properties. For an ephemeral runtime identifier, use ephemeralIdentifier.
    * @param swapClasses Gives consumers the ability to provide their own custom
    * subclass for a service. swapClasses should be an array of key/value pairs
    * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
@@ -214,22 +226,22 @@ export class SNApplication {
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
    * @param appVersion Version of client application.
-   * @param enableV4 Flag indicating whether V4 features should be enabled.
    * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
   constructor(
-    public environment: Environment,
-    public platform: Platform,
+    public readonly environment: Environment,
+    public readonly platform: Platform,
     public deviceInterface: DeviceInterface,
     private crypto: SNPureCrypto,
     public alertService: SNAlertService,
-    public identifier: ApplicationIdentifier,
+    public readonly identifier: ApplicationIdentifier,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
     private appVersion: string,
-    private enableV4 = false,
-    private webSocketUrl?: string
+    private webSocketUrl?: string,
+    private readonly runtime: Runtime = Runtime.Prod,
+    private readonly options: ApplicationOptions = ApplicationOptionsDefaults
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -279,6 +291,7 @@ export class SNApplication {
    * This function will load all services in their correct order.
    */
   async prepareForLaunch(callback: LaunchCallback): Promise<void> {
+    await this.crypto.initialize();
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface
       .openDatabase(this.identifier)
@@ -911,6 +924,14 @@ export class SNApplication {
     return this.itemManager.findTagByTitle(title);
   }
 
+  public getTagPrefixTitle(tag: SNTag): string | undefined {
+    return this.itemManager.getTagPrefixTitle(tag);
+  }
+
+  public getTagLongTitle(tag: SNTag): string {
+    return this.itemManager.getTagLongTitle(tag);
+  }
+
   /**
    * Finds tags with title or component starting with a search query and (optionally) not associated with a note
    * @param searchQuery - The query string to match
@@ -926,6 +947,21 @@ export class SNApplication {
     childTagUuid: UuidString
   ): boolean {
     return this.itemManager.isValidTagParent(parentTagUuid, childTagUuid);
+  }
+
+  public hasTagsNeedingFoldersMigration(): boolean {
+    return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(
+      this.itemManager
+    );
+  }
+
+  /**
+   * Migrates any tags containing a '.' character to sa chema-based heirarchy, removing
+   * the dot from the tag's title.
+   */
+  public async migrateTagsToFolders(): Promise<void> {
+    await TagsToFoldersMigrationApplicator.run(this.itemManager);
+    return this.sync();
   }
 
   /**
@@ -992,6 +1028,7 @@ export class SNApplication {
     return this.itemManager.findOrCreateTagByTitle(title);
   }
 
+  /** Creates and returns the tag but does not run sync. Callers must perform sync. */
   public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
     return this.itemManager.createTagOrSmartTag(title);
   }
@@ -1166,6 +1203,25 @@ export class SNApplication {
 
   public authorizeSearchingProtectedNotesText(): Promise<boolean> {
     return this.protectionService.authorizeSearchingProtectedNotesText();
+  }
+
+  public canRegisterNewListedAccount(): boolean {
+    return this.listedService.canRegisterNewListedAccount();
+  }
+
+  public async requestNewListedAccount(): Promise<ListedAccount | undefined> {
+    return this.listedService.requestNewListedAccount();
+  }
+
+  public async getListedAccounts(): Promise<ListedAccount[]> {
+    return this.listedService.getListedAccounts();
+  }
+
+  public getListedAccountInfo(
+    account: ListedAccount,
+    inContextOfItem?: UuidString
+  ): Promise<ListedAccountInfo | undefined> {
+    return this.listedService.getListedAccountInfo(account, inContextOfItem);
   }
 
   /**
@@ -1359,7 +1415,7 @@ export class SNApplication {
    * @param maxWait The maximum number of milliseconds to wait for services
    * to finish tasks. 0 means no limit.
    */
-  async prepareForDeinit(maxWait = 0): Promise<void> {
+  private async prepareForDeinit(maxWait = 0): Promise<void> {
     const promise = Promise.all(
       this.services.map((service) => service.blockDeinit())
     );
@@ -1406,7 +1462,10 @@ export class SNApplication {
    * Destroys the application instance.
    */
   public deinit(source: DeinitSource): void {
+    this.dealloced = true;
+
     clearInterval(this.autoSyncInterval);
+
     for (const uninstallObserver of this.serviceObservers) {
       uninstallObserver();
     }
@@ -1416,8 +1475,7 @@ export class SNApplication {
     for (const service of this.services) {
       service.deinit();
     }
-    this.onDeinit?.(this, source);
-    this.onDeinit = undefined;
+
     (this.crypto as unknown) = undefined;
     this.createdNewDatabase = false;
     this.services.length = 0;
@@ -1425,8 +1483,10 @@ export class SNApplication {
     this.managedSubscribers.length = 0;
     this.streamRemovers.length = 0;
     this.clearServices();
-    this.dealloced = true;
     this.started = false;
+
+    this.onDeinit?.(this, source);
+    this.onDeinit = undefined;
   }
 
   /**
@@ -1635,7 +1695,7 @@ export class SNApplication {
     return this.migrationService.hasPendingMigrations();
   }
 
-  public generateUuid(): Promise<string> {
+  public generateUuid(): string {
     return Uuid.GenerateUuid();
   }
 
@@ -1730,6 +1790,10 @@ export class SNApplication {
     return this.featuresService.getFeatureStatus(featureId);
   }
 
+  public hasMinimumRole(role: RoleName): boolean {
+    return this.featuresService.hasMinimumRole(role);
+  }
+
   public getNewSubscriptionToken(): Promise<string | undefined> {
     return this.apiService.getNewSubscriptionToken();
   }
@@ -1791,13 +1855,14 @@ export class SNApplication {
     this.createCredentialService();
     this.createKeyRecoveryService();
     this.createSingletonManager();
-    this.createActionsManager();
     this.createPreferencesService();
     this.createSettingsService();
     this.createFeaturesService();
     this.createComponentManager();
     this.createMigrationService();
     this.createMfaService();
+    this.createListedService();
+    this.createActionsManager();
   }
 
   private clearServices() {
@@ -1824,8 +1889,19 @@ export class SNApplication {
     (this.webSocketsService as unknown) = undefined;
     (this.settingsService as unknown) = undefined;
     (this.mfaService as unknown) = undefined;
+    (this.listedService as unknown) = undefined;
 
     this.services = [];
+  }
+
+  private createListedService(): void {
+    this.listedService = new ListedService(
+      this.apiService,
+      this.itemManager,
+      this.settingsService,
+      this.httpService
+    );
+    this.services.push(this.listedService);
   }
 
   private createFeaturesService() {
@@ -1839,7 +1915,8 @@ export class SNApplication {
       this.syncService,
       this.alertService,
       this.sessionManager,
-      this.crypto
+      this.crypto,
+      this.runtime
     );
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
@@ -1938,7 +2015,7 @@ export class SNApplication {
       this.alertService,
       this.environment,
       this.platform,
-      this.deviceInterface.timeout
+      this.runtime
     );
     this.services.push(this.componentManager);
   }
@@ -2048,7 +2125,7 @@ export class SNApplication {
       this.payloadManager,
       this.apiService,
       this.historyManager,
-      this.deviceInterface.interval
+      this.options
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName);
@@ -2114,7 +2191,9 @@ export class SNApplication {
       this.httpService,
       this.payloadManager,
       this.protocolService,
-      this.syncService
+      this.syncService,
+      this.challengeService,
+      this.listedService
     );
     this.services.push(this.actionsManager);
   }

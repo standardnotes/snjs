@@ -1,5 +1,5 @@
 import { SNItem } from '@Models/core/item';
-import { ApplicationStage } from '@Lib/stages';
+import { ApplicationStage } from '@standardnotes/common';
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from './../hosts';
 import {
   SNFeatureRepo,
@@ -9,22 +9,27 @@ import { SNSyncService } from './sync/sync_service';
 import { AccountEvent, SNCredentialService } from './credential_service';
 import { UserRolesChangedEvent } from '@standardnotes/domain-events';
 import { StorageKey } from '@Lib/storage_keys';
-import { PureService } from './pure_service';
 import { SNStorageService } from './storage_service';
-import { RoleName } from '@standardnotes/auth';
 import {
   ApiServiceEvent,
   MetaReceivedData,
   SNApiService,
 } from './api/api_service';
-import { ErrorObject, UuidString } from '@Lib/types';
+import { UuidString } from '@Lib/types';
 import {
   FeatureDescription,
   ThirdPartyFeatureDescription,
   FeatureIdentifier,
-  Features,
+  GetFeatures,
+  FindNativeFeature,
+  DeprecatedFeatures,
 } from '@standardnotes/features';
-import { ContentType } from '@standardnotes/common';
+import {
+  ContentType,
+  ErrorObject,
+  Runtime,
+  RoleName,
+} from '@standardnotes/common';
 import { ItemManager } from './item_manager';
 import { UserFeaturesResponse } from './api/responses';
 import { SNComponent } from '@Lib/models';
@@ -42,7 +47,7 @@ import {
   arraysEqual,
   convertTimestampToMilliseconds,
   isErrorObject,
-} from '@Lib/utils';
+} from '@standardnotes/utils';
 import { SNSessionManager } from '@Services/api/session_manager';
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
@@ -56,7 +61,8 @@ import {
   TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
   TRUSTED_FEATURE_HOSTS,
 } from '@Lib/hosts';
-import { Copy } from '..';
+import { Copy, lastElement } from '@standardnotes/utils';
+import { AbstractService } from '@standardnotes/services';
 
 export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined;
 export type OfflineSubscriptionEntitlements = {
@@ -79,7 +85,7 @@ export const enum FeatureStatus {
   Entitled = 'Entitled',
 }
 
-export class SNFeaturesService extends PureService<FeaturesEvent> {
+export class SNFeaturesService extends AbstractService<FeaturesEvent> {
   private deinited = false;
   private roles: RoleName[] = [];
   private features: FeatureDescription[] = [];
@@ -100,7 +106,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
-    private crypto: SNPureCrypto
+    private crypto: SNPureCrypto,
+    private runtime: Runtime
   ) {
     super();
 
@@ -174,9 +181,11 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
   async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage);
     if (stage === ApplicationStage.FullSyncCompleted_13) {
-      const offlineRepo = this.getOfflineRepo();
-      if (offlineRepo) {
-        this.downloadOfflineFeatures(offlineRepo);
+      if (!this.hasOnlineSubscription()) {
+        const offlineRepo = this.getOfflineRepo();
+        if (offlineRepo) {
+          this.downloadOfflineFeatures(offlineRepo);
+        }
       }
     }
   }
@@ -355,7 +364,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     features: FeatureDescription[]
   ): Promise<void> {
     features = features
-      .filter((feature) => !!this.findStaticNativeFeature(feature.identifier))
+      .filter((feature) => !!FindNativeFeature(feature.identifier))
       .map((feature) => this.mapRemoteNativeFeatureToStaticFeature(feature));
 
     this.features = features;
@@ -366,17 +375,8 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     await this.mapRemoteNativeFeaturesToItems(features);
   }
 
-  /**
-   * Returns the native feature as compiled into @standardnotes/features
-   */
-  private findStaticNativeFeature(
-    identifier: FeatureIdentifier
-  ): FeatureDescription | undefined {
-    return Features.find((f) => f.identifier === identifier);
-  }
-
   public isThirdPartyFeature(identifier: string): boolean {
-    const isNativeFeature = !!this.findStaticNativeFeature(
+    const isNativeFeature = !!FindNativeFeature(
       identifier as FeatureIdentifier
     );
     return !isNativeFeature;
@@ -392,9 +392,7 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       'permission_name',
     ];
 
-    const nativeFeature = this.findStaticNativeFeature(
-      remoteFeature.identifier
-    );
+    const nativeFeature = FindNativeFeature(remoteFeature.identifier);
 
     if (!nativeFeature) {
       throw Error(
@@ -422,23 +420,61 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     return this.features.find((feature) => feature.identifier === featureId);
   }
 
-  public hasPaidOnlineOrOfflineSubscription(): boolean {
+  private hasOnlineSubscription(): boolean {
     if (this.sessionManager.isSignedIntoFirstPartyServer()) {
       const roles = this.roles;
       const unpaidRoles = [RoleName.BasicUser];
       return roles.some((role) => !unpaidRoles.includes(role));
     } else {
-      return this.hasOfflineRepo();
+      return false;
     }
   }
 
+  public hasPaidOnlineOrOfflineSubscription(): boolean {
+    return this.hasOnlineSubscription() || this.hasOfflineRepo();
+  }
+
+  public rolesBySorting(roles: RoleName[]): RoleName[] {
+    return Object.values(RoleName).filter((role) => roles.includes(role));
+  }
+
+  public hasMinimumRole(role: RoleName): boolean {
+    const sortedAllRoles = Object.values(RoleName);
+
+    const sortedUserRoles = this.rolesBySorting(this.roles);
+
+    const highestUserRoleIndex = sortedAllRoles.indexOf(
+      lastElement(sortedUserRoles) as RoleName
+    );
+
+    const indexOfRoleToCheck = sortedAllRoles.indexOf(role);
+
+    return indexOfRoleToCheck <= highestUserRoleIndex;
+  }
+
+  public isFeatureDeprecated(featureId: FeatureIdentifier): boolean {
+    return DeprecatedFeatures.includes(featureId);
+  }
+
   public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
-    const isThirdParty = this.findStaticNativeFeature(featureId) == undefined;
+    const isDeprecated = this.isFeatureDeprecated(featureId);
+    if (isDeprecated) {
+      if (this.hasPaidOnlineOrOfflineSubscription()) {
+        return FeatureStatus.Entitled;
+      } else {
+        return FeatureStatus.NoUserSubscription;
+      }
+    }
+
+    const isThirdParty = FindNativeFeature(featureId) == undefined;
     if (isThirdParty) {
       const component = this.itemManager.components.find(
         (candidate) => candidate.identifier === featureId
       );
-      if (component?.isExpired) {
+      if (!component) {
+        return FeatureStatus.NoUserSubscription;
+      }
+      if (component.isExpired) {
         return FeatureStatus.InCurrentPlanButExpired;
       }
       return FeatureStatus.Entitled;
@@ -546,16 +582,16 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
     let resultingItem: SNComponent | undefined = existingItem as SNComponent;
 
     if (existingItem) {
-      const expiresAt = new Date(feature.expires_at || 0);
+      const featureExpiresAt = new Date(feature.expires_at || 0);
       const hasChange =
         feature.version !== existingItem.package_info.version ||
-        expiresAt.getTime() !== existingItem.valid_until.getTime();
+        featureExpiresAt.getTime() !== existingItem.valid_until.getTime();
       if (hasChange) {
         resultingItem = await this.itemManager.changeComponent(
           existingItem.uuid,
           (mutator) => {
             mutator.package_info = feature;
-            mutator.valid_until = expiresAt;
+            mutator.valid_until = featureExpiresAt;
           }
         );
         hasChanges = true;
@@ -628,14 +664,14 @@ export class SNFeaturesService extends PureService<FeaturesEvent> {
       return;
     }
 
-    const nativeFeature = this.findStaticNativeFeature(rawFeature.identifier);
+    const nativeFeature = FindNativeFeature(rawFeature.identifier);
     if (nativeFeature) {
       await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION);
       return;
     }
 
     if (rawFeature.url) {
-      for (const nativeFeature of Features) {
+      for (const nativeFeature of GetFeatures(this.runtime)) {
         if (rawFeature.url.includes(nativeFeature.identifier)) {
           await this.alertService.alert(
             API_MESSAGE_FAILED_DOWNLOADING_EXTENSION

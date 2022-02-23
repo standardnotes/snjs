@@ -1,4 +1,4 @@
-import { extendArray } from '@Lib/utils';
+import { extendArray } from '@standardnotes/utils';
 import { Uuid } from '@Lib/uuid';
 import { CreateItemFromPayload } from '@Models/generator';
 import { CopyPayload, PayloadOverride } from '@Payloads/generator';

@@ -189,8 +189,8 @@ function matchTypeForNoteAndStringQuery(
   if (searchString.length === 0) {
     return Match.TitleAndText;
   }
-  const title = note.safeTitle().toLowerCase();
-  const text = note.safeText().toLowerCase();
+  const title = note.title.toLowerCase();
+  const text = note.text.toLowerCase();
   const lowercaseText = searchString.toLowerCase();
   const words = lowercaseText.split(' ');
   const quotedText = stringBetweenQuotes(lowercaseText);

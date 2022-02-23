@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.6.0...@standardnotes/time@1.6.1) (2022-02-10)
+
+
+### Bug Fixes
+
+* timer tests with utc dates ([c0b15a2](https://github.com/standardnotes/snjs/commit/c0b15a2ae45632615fa5e4064d5210bdd97ff237))
+
+
+
+
+
+# [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.5.0...@standardnotes/time@1.6.0) (2022-02-09)
+
+
+### Features
+
+* add date formatting ([4c65cb8](https://github.com/standardnotes/snjs/commit/4c65cb82b1acd842f7e35fb79389de95bef0ddcf))
+
+
+
+
+
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.5...@standardnotes/time@1.5.0) (2022-02-09)
+
+
+### Features
+
+* add calculating time difference in days ([1348065](https://github.com/standardnotes/snjs/commit/1348065eb2bd7a559046a0f125751b32ad224d93))
+
+
+
+
+
 ## [1.4.5](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.4.4...@standardnotes/time@1.4.5) (2021-12-29)
 
 **Note:** Version bump only for package @standardnotes/time

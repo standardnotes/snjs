@@ -10,7 +10,7 @@ import {
   PayloadContentsEqual,
   PayloadsByDuplicating,
 } from '@Payloads/functions';
-import { greaterOfTwoDates, uniqCombineObjArrays } from '@Lib/utils';
+import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils';
 import { PayloadField } from '../fields';
 import { HistoryMap } from '@Lib/services/history/history_map';
 

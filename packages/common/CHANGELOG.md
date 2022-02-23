@@ -3,6 +3,72 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.13.0...@standardnotes/common@1.14.0) (2022-02-22)
+
+
+### Features
+
+* extract services package ([#605](https://github.com/standardnotes/snjs/issues/605)) ([3966b10](https://github.com/standardnotes/snjs/commit/3966b10745c10ef5bb92871abb13ceb4ea631362))
+
+
+
+
+
+# [1.13.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.12.0...@standardnotes/common@1.13.0) (2022-02-22)
+
+
+### Features
+
+* extract SNJS utils as a separate package ([#604](https://github.com/standardnotes/snjs/issues/604)) ([b28195c](https://github.com/standardnotes/snjs/commit/b28195c20be788eec8dabc44c5aff518f074cdd9))
+
+
+
+
+
+# [1.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.11.0...@standardnotes/common@1.12.0) (2022-02-18)
+
+
+### Features
+
+* add item integrity hash model ([975474a](https://github.com/standardnotes/snjs/commit/975474a04c4b11edea381235fe38273db59fa770))
+
+
+
+
+
+# [1.11.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.10.0...@standardnotes/common@1.11.0) (2022-02-16)
+
+
+### Features
+
+* add paid roles definition ([3432608](https://github.com/standardnotes/snjs/commit/34326086c16000397d994054e807dd3589b536db))
+
+
+
+
+
+# [1.10.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.9.0...@standardnotes/common@1.10.0) (2022-02-10)
+
+
+### Features
+
+* move role names and suscription names from auth to common package ([5358c03](https://github.com/standardnotes/snjs/commit/5358c03ef113597bcdcf7b0f3e730c8014885a0f))
+
+
+
+
+
+# [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.8.0...@standardnotes/common@1.9.0) (2022-02-07)
+
+
+### Features
+
+* dynamic features based on runtime env ([#590](https://github.com/standardnotes/snjs/issues/590)) ([060861a](https://github.com/standardnotes/snjs/commit/060861a6c5bc179e3e1987c2b63490888e153bbb))
+
+
+
+
+
 # [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.7.0...@standardnotes/common@1.8.0) (2022-01-15)
 
 

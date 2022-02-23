@@ -2,11 +2,10 @@ import { createMutatorForItem } from '@Lib/models/mutator';
 import { ItemDelta } from '@Lib/protocol/collection/indexes';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
-import { PureService } from '@Lib/services/pure_service';
-import { isString, naturalSort, removeFromArray } from '@Lib/utils';
+import { isString, naturalSort, removeFromArray } from '@standardnotes/utils';
 import { SNComponent } from '@Models/app/component';
 import { SNItemsKey } from '@Models/app/items_key';
-import { SNTag } from '@Models/app/tag';
+import { isTag, SNTag, TagFolderDelimitter } from '@Models/app/tag';
 import { FillItemContent, Uuids } from '@Models/functions';
 import { CreateItemFromPayload } from '@Models/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
@@ -49,6 +48,7 @@ import { PayloadSource } from './../protocol/payloads/sources';
 import { UuidString } from './../types';
 import { Uuid } from './../uuid';
 import { PayloadManager } from './payload_manager';
+import { AbstractService } from '@standardnotes/services';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -87,7 +87,7 @@ export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
  * will then notify  its observers (which is us), we'll convert the payloads to items,
  * and then  we'll propagate them to our listeners.
  */
-export class ItemManager extends PureService {
+export class ItemManager extends AbstractService {
   private unsubChangeObserver: () => void;
   private observers: Observer[] = [];
   private collection!: ItemCollection;
@@ -136,10 +136,13 @@ export class ItemManager extends PureService {
     this.collection.setDisplayOptions(
       ContentType.SmartTag,
       CollectionSort.Title,
-      'asc'
+      'dsc'
     );
     this.notesView = new ItemCollectionNotesView(this.collection);
-    this.tagNotesIndex = new TagNotesIndex(this.collection);
+    this.tagNotesIndex = new TagNotesIndex(
+      this.collection,
+      this.tagNotesIndex?.observers
+    );
   }
 
   public setDisplayOptions(
@@ -257,10 +260,14 @@ export class ItemManager extends PureService {
   /**
    * Returns all non-deleted components
    */
-  get components() {
-    return this.collection.displayElements(
+  get components(): SNComponent[] {
+    const components = this.collection.displayElements(
       ContentType.Component
     ) as SNComponent[];
+    const themes = this.collection.displayElements(
+      ContentType.Theme
+    ) as SNComponent[];
+    return components.concat(themes);
   }
 
   public addNoteCountChangeObserver(
@@ -816,26 +823,30 @@ export class ItemManager extends PureService {
    * @param contentType - A string or array of strings representing
    *    content types.
    */
-  public getItems(
+  public getItems<T extends SNItem>(
     contentType: ContentType | ContentType[],
     nonerroredOnly = false
-  ): SNItem[] {
+  ): T[] {
     const items = this.collection.all(contentType);
     if (nonerroredOnly) {
       return items.filter(
         (item) => !item.errorDecrypting && !item.waitingForKey
-      );
+      ) as T[];
     } else {
-      return items;
+      return items as T[];
     }
   }
 
   /**
    * Returns all items which are properly decrypted
    */
-  nonErroredItemsForContentType(contentType: ContentType): SNItem[] {
+  nonErroredItemsForContentType<T extends SNItem>(
+    contentType: ContentType
+  ): T[] {
     const items = this.collection.all(contentType);
-    return items.filter((item) => !item.errorDecrypting && !item.waitingForKey);
+    return items.filter(
+      (item) => !item.errorDecrypting && !item.waitingForKey
+    ) as T[];
   }
 
   /**
@@ -881,12 +892,29 @@ export class ItemManager extends PureService {
     return results;
   }
 
+  public getRootTags(): SNTag[] {
+    return this.tags.filter((tag) => tag.parentId === undefined);
+  }
+
   /**
    * Finds the first tag matching a given title
    */
   public findTagByTitle(title: string): SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase();
     return this.tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle);
+  }
+
+  public findTagByTitleAndParent(
+    title: string,
+    parentUuid: UuidString | undefined
+  ): SNTag | undefined {
+    const lowerCaseTitle = title.toLowerCase();
+
+    const tags = parentUuid
+      ? this.getTagChildren(parentUuid)
+      : this.getRootTags();
+
+    return tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle);
   }
 
   /**
@@ -896,14 +924,14 @@ export class ItemManager extends PureService {
    * @returns Array containing tags matching search query and not associated with note
    */
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
-    const delimiter = '.';
     return naturalSort(
       this.tags.filter((tag) => {
         const regex = new RegExp(
-          `^${searchQuery}|${delimiter}${searchQuery}`,
+          `^${searchQuery}|${TagFolderDelimitter}${searchQuery}`,
           'i'
         );
-        const matchesQuery = regex.test(tag.title);
+        const expandedTitle = this.getTagLongTitle(tag);
+        const matchesQuery = regex.test(expandedTitle);
         const tagInNote = note
           ? this.itemsReferencingItem(note.uuid).some(
               (item) => item?.uuid === tag.uuid
@@ -923,22 +951,69 @@ export class ItemManager extends PureService {
     }
   }
 
+  public getTagPrefixTitle(tag: SNTag): string | undefined {
+    const hierarchy = this.getTagParentChain(tag.uuid);
+
+    if (hierarchy.length === 0) {
+      return undefined;
+    }
+
+    const prefixTitle = hierarchy.map((tag) => tag.title).join('/');
+    return `${prefixTitle}/`;
+  }
+
+  public getTagLongTitle(tag: SNTag): string {
+    const hierarchy = this.getTagParentChain(tag.uuid);
+    const tags = [...hierarchy, tag];
+    const longTitle = tags.map((tag) => tag.title).join('/');
+    return longTitle;
+  }
+
   /**
    * @returns Array of tags where the front of the array represents the top of the tree.
    */
   getTagParentChain(tagUuid: UuidString): SNTag[] {
-    const tag = this.findItem(tagUuid) as SNTag;
+    const tag = this.findItem<SNTag>(tagUuid);
+    if (!tag) {
+      return [];
+    }
+
     let parentId = tag.parentId;
     const chain: SNTag[] = [];
+
     while (parentId) {
-      const parent = this.findItem(parentId) as SNTag;
+      const parent = this.findItem<SNTag>(parentId);
+      if (!parent) {
+        return chain;
+      }
       chain.unshift(parent);
       parentId = parent.parentId;
     }
+
     return chain;
   }
 
-  getTagChildren(tagUuid: UuidString): SNTag[] {
+  public async findOrCreateTagParentChain(
+    titlesHierarchy: string[]
+  ): Promise<SNTag> {
+    let current: SNTag | undefined = undefined;
+
+    for (const title of titlesHierarchy) {
+      const currentUuid: string | undefined = current
+        ? current.uuid
+        : undefined;
+
+      current = await this.findOrCreateTagByTitle(title, currentUuid);
+    }
+
+    if (!current) {
+      throw new Error('Invalid tag hierarchy');
+    }
+
+    return current;
+  }
+
+  public getTagChildren(tagUuid: UuidString): SNTag[] {
     const tag = this.findItem(tagUuid) as SNTag;
     const tags = this.collection.elementsReferencingElement(
       tag,
@@ -984,11 +1059,11 @@ export class ItemManager extends PureService {
    */
   public setTagParent(parentTag: SNTag, childTag: SNTag): Promise<SNTag> {
     if (parentTag.uuid === childTag.uuid) {
-      throw new Error('can not set a tag parent of itself');
+      throw new Error('Can not set a tag parent of itself');
     }
 
     if (this.isTagAncestor(childTag.uuid, parentTag.uuid)) {
-      throw new Error('can not set a tag ancestor of itself');
+      throw new Error('Can not set a tag ancestor of itself');
     }
 
     return this.changeTag(childTag.uuid, (m) => {
@@ -1042,12 +1117,27 @@ export class ItemManager extends PureService {
     );
   }
 
-  public async createTag(title: string): Promise<SNTag> {
-    return this.createItem(
+  public async createTag(
+    title: string,
+    parentUuid?: UuidString
+  ): Promise<SNTag> {
+    const newTag = (await this.createItem(
       ContentType.Tag,
       FillItemContent({ title }),
       true
-    ) as Promise<SNTag>;
+    )) as SNTag;
+
+    if (parentUuid) {
+      const parentTag = this.findItem(parentUuid);
+      if (!parentTag || !isTag(parentTag)) {
+        throw new Error('Invalid parent tag');
+      }
+      return this.changeTag(newTag.uuid, (m) => {
+        m.makeChildOf(parentTag);
+      });
+    }
+
+    return newTag;
   }
 
   public async createSmartTag(
@@ -1063,15 +1153,13 @@ export class ItemManager extends PureService {
 
   public async createSmartTagFromDSL(dsl: string): Promise<SNSmartTag> {
     let components = null;
-
     try {
       components = JSON.parse(dsl.substring(1, dsl.length));
     } catch (e) {
-      throw Error('invalid syntax');
+      throw Error('Invalid smart tag syntax');
     }
 
     const [title, keypath, operator, value] = components;
-
     return this.createSmartTag(title, { keypath, operator, value });
   }
 
@@ -1090,9 +1178,12 @@ export class ItemManager extends PureService {
   /**
    * Finds or creates a tag with a given title
    */
-  public async findOrCreateTagByTitle(title: string): Promise<SNTag> {
-    const tag = this.findTagByTitle(title);
-    return tag || this.createTag(title);
+  public async findOrCreateTagByTitle(
+    title: string,
+    parentUuid?: UuidString
+  ): Promise<SNTag> {
+    const tag = this.findTagByTitleAndParent(title, parentUuid);
+    return tag || this.createTag(title, parentUuid);
   }
 
   /**

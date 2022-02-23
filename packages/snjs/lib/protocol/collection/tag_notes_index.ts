@@ -1,4 +1,4 @@
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { ItemCollection } from './item_collection';
 import { SNNote } from '@Lib/models';
 import { SNTag } from '@Lib/index';
@@ -15,12 +15,14 @@ export type TagNoteCountChangeObserver = (
 export class TagNotesIndex implements SNIndex {
   private tagToNotesMap: Partial<Record<UuidString, Set<UuidString>>> = {};
   private allCountableNotes = new Set<UuidString>();
-  private observers: TagNoteCountChangeObserver[] = [];
 
-  constructor(private collection: ItemCollection) {}
+  constructor(
+    private collection: ItemCollection,
+    public observers: TagNoteCountChangeObserver[] = []
+  ) {}
 
   private isNoteCountable = (note: SNNote) => {
-    return !note.archived && !note.trashed;
+    return !note.archived && !note.trashed && !note.deleted;
   };
 
   public addCountChangeObserver(
@@ -72,16 +74,13 @@ export class TagNotesIndex implements SNIndex {
   }
 
   private receiveNoteChanges(notes: SNNote[]): void {
+    const previousAllCount = this.allCountableNotes.size;
     for (const note of notes) {
       const isCountable = this.isNoteCountable(note);
-      const previousAllCount = this.allCountableNotes.size;
       if (isCountable) {
         this.allCountableNotes.add(note.uuid);
       } else {
         this.allCountableNotes.delete(note.uuid);
-      }
-      if (previousAllCount !== this.allCountableNotes.size) {
-        this.notifyObservers(undefined);
       }
 
       const associatedTagUuids = this.collection.uuidsThatReferenceUuid(
@@ -99,6 +98,9 @@ export class TagNotesIndex implements SNIndex {
           this.notifyObservers(tagUuid);
         }
       }
+    }
+    if (previousAllCount !== this.allCountableNotes.size) {
+      this.notifyObservers(undefined);
     }
   }
 

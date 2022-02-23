@@ -3,12 +3,13 @@
  */
 
 import { SNPreferencesService } from './preferences_service';
-import { FeatureDescription } from '@standardnotes/features';
+import { FeatureDescription, FindNativeFeature } from '@standardnotes/features';
 import { DesktopManagerInterface } from '@Services/component_manager/types';
 import { FeatureIdentifier } from '@standardnotes/features';
 import { ContentType } from '@standardnotes/common';
 import { SNComponent } from '@Lib/models';
 import { Environment, Platform } from '@Lib/platforms';
+import { Runtime } from '@standardnotes/common';
 import { SNAlertService } from '@Services/alert_service';
 import { SNItem } from '@Models/core/item';
 import { ItemManager } from '@Services/item_manager';
@@ -44,9 +45,7 @@ describe('featuresService', () => {
       alertService,
       environment,
       platform,
-      (func: () => void) => {
-        func();
-      }
+      Runtime.Prod
     );
     manager.setDesktopManager(desktopManager);
     manager.configureForNonMobileUsage = jest.fn().mockReturnValue(0);
@@ -77,7 +76,7 @@ describe('featuresService', () => {
     alertService.alert = jest.fn();
   });
 
-  const nativeComponent = () => {
+  const nativeComponent = (file_type?: FeatureDescription['file_type']) => {
     return new SNComponent({
       uuid: '789',
       content_type: ContentType.Component,
@@ -85,6 +84,21 @@ describe('featuresService', () => {
         package_info: {
           hosted_url: 'https://example.com/component',
           identifier: FeatureIdentifier.BoldEditor,
+          file_type: file_type ?? 'html',
+          valid_until: new Date(),
+        },
+      },
+    } as never);
+  };
+
+  const deprecatedComponent = () => {
+    return new SNComponent({
+      uuid: '789',
+      content_type: ContentType.Component,
+      safeContent: {
+        package_info: {
+          hosted_url: 'https://example.com/component',
+          identifier: FeatureIdentifier.DeprecatedFileSafe,
           valid_until: new Date(),
         },
       },
@@ -112,7 +126,17 @@ describe('featuresService', () => {
         const manager = createManager(Environment.Desktop, Platform.MacDesktop);
         const component = nativeComponent();
         const url = manager.urlForComponent(component);
-        const feature = manager.nativeFeatureForComponent(component);
+        const feature = FindNativeFeature(component.identifier);
+        expect(url).toEqual(
+          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`
+        );
+      });
+
+      it('returns native path for deprecated native component', () => {
+        const manager = createManager(Environment.Desktop, Platform.MacDesktop);
+        const component = deprecatedComponent();
+        const url = manager.urlForComponent(component);
+        const feature = FindNativeFeature(component.identifier);
         expect(url).toEqual(
           `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`
         );
@@ -150,8 +174,8 @@ describe('featuresService', () => {
         const manager = createManager(Environment.Web, Platform.MacWeb);
         const component = nativeComponent();
         const url = manager.urlForComponent(component);
-        const feature = manager.nativeFeatureForComponent(
-          component
+        const feature = FindNativeFeature(
+          component.identifier
         ) as FeatureDescription;
         expect(url).toEqual(
           `http://localhost/components/${component.identifier}/${feature.index_path}`
@@ -164,6 +188,92 @@ describe('featuresService', () => {
         const url = manager.urlForComponent(component);
         expect(url).toEqual(component.hosted_url);
       });
+    });
+  });
+
+  describe('editor change alert', () => {
+    it('should not require alert switching from plain editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const component = nativeComponent();
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        undefined,
+        component
+      );
+      expect(requiresAlert).toBe(false);
+    });
+
+    it('should not require alert switching to plain editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const component = nativeComponent();
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        component,
+        undefined
+      );
+      expect(requiresAlert).toBe(false);
+    });
+
+    it('should not require alert switching from a markdown editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const htmlEditor = nativeComponent();
+      const markdownEditor = nativeComponent('md');
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        markdownEditor,
+        htmlEditor
+      );
+      expect(requiresAlert).toBe(false);
+    });
+
+    it('should not require alert switching to a markdown editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const htmlEditor = nativeComponent();
+      const markdownEditor = nativeComponent('md');
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        htmlEditor,
+        markdownEditor
+      );
+      expect(requiresAlert).toBe(false);
+    });
+
+    it('should not require alert switching from & to a html editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const htmlEditor = nativeComponent();
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        htmlEditor,
+        htmlEditor
+      );
+      expect(requiresAlert).toBe(false);
+    });
+
+    it('should require alert switching from a html editor to custom editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const htmlEditor = nativeComponent();
+      const customEditor = nativeComponent('json');
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        htmlEditor,
+        customEditor
+      );
+      expect(requiresAlert).toBe(true);
+    });
+
+    it('should require alert switching from a custom editor to html editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const htmlEditor = nativeComponent();
+      const customEditor = nativeComponent('json');
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        customEditor,
+        htmlEditor
+      );
+      expect(requiresAlert).toBe(true);
+    });
+
+    it('should require alert switching from a custom editor to custom editor', () => {
+      const manager = createManager(Environment.Web, Platform.MacWeb);
+      const customEditor = nativeComponent('json');
+      const requiresAlert = manager.doesEditorChangeRequireAlert(
+        customEditor,
+        customEditor
+      );
+      expect(requiresAlert).toBe(true);
     });
   });
 });

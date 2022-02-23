@@ -1,9 +1,8 @@
 import { RawStorageKey } from '@Lib/storage_keys';
-import { removeFromArray } from '@Lib/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import { DeinitSource, UuidString } from './types';
 import { SNApplication } from './application';
-import { PureService } from '@Services/pure_service';
-import { DeviceInterface } from '@Lib/device_interface';
+import { AbstractService, DeviceInterface } from '@standardnotes/services';
 import { Uuid } from '@Lib/uuid';
 
 export type ApplicationDescriptor = {
@@ -24,7 +23,7 @@ type AppGroupCallback = {
 
 type AppGroupChangeCallback = () => void;
 
-export class SNApplicationGroup extends PureService {
+export class SNApplicationGroup extends AbstractService {
   public primaryApplication?: SNApplication;
   private descriptorRecord!: DescriptorRecord;
   private changeObservers: AppGroupChangeCallback[] = [];
@@ -41,20 +40,23 @@ export class SNApplicationGroup extends PureService {
     (this.deviceInterface as any) = undefined;
   }
 
-  public async initialize(callback: AppGroupCallback) {
+  public async initialize(callback: AppGroupCallback): Promise<void> {
     this.callback = callback;
-    this.descriptorRecord = (await this.deviceInterface!.getJsonParsedRawStorageValue(
+    this.descriptorRecord = (await this.deviceInterface.getJsonParsedRawStorageValue(
       RawStorageKey.DescriptorRecord
     )) as DescriptorRecord;
+
     if (!this.descriptorRecord) {
       await this.createDescriptorRecord();
     }
+
     const primaryDescriptor = this.findPrimaryDescriptor();
     if (!primaryDescriptor) {
       throw Error(
         'No primary application descriptor found. Ensure migrations have been run.'
       );
     }
+
     const application = this.buildApplication(primaryDescriptor);
     this.applications.push(application);
     this.setPrimaryApplication(application, false);
@@ -103,7 +105,9 @@ export class SNApplicationGroup extends PureService {
     if (this.primaryApplication === application) {
       this.primaryApplication = undefined;
     }
+
     removeFromArray(this.applications, application);
+
     if (source === DeinitSource.SignOut) {
       this.removeDescriptor(this.descriptorForApplication(application));
       if (sideffects) {
@@ -128,7 +132,9 @@ export class SNApplicationGroup extends PureService {
    * Any application which is no longer active is destroyed, and
    * must be removed from the interface.
    */
-  public addApplicationChangeObserver(callback: AppGroupChangeCallback) {
+  public addApplicationChangeObserver(
+    callback: AppGroupChangeCallback
+  ): () => void {
     this.changeObservers.push(callback);
     if (this.primaryApplication) {
       callback();
@@ -147,22 +153,28 @@ export class SNApplicationGroup extends PureService {
   public async setPrimaryApplication(
     application: SNApplication,
     persist = true
-  ) {
+  ): Promise<void> {
     if (this.primaryApplication === application) {
       return;
     }
+
     if (!this.applications.includes(application)) {
       throw Error(
         'Application must be inserted before attempting to switch to it'
       );
     }
+
     if (this.primaryApplication) {
       this.primaryApplication.deinit(DeinitSource.AppGroupUnload);
     }
+
     this.primaryApplication = application;
+
     const descriptor = this.descriptorForApplication(application);
     this.setDescriptorAsPrimary(descriptor);
+
     this.notifyObserversOfAppChange();
+
     if (persist) {
       await this.persistDescriptors();
     }

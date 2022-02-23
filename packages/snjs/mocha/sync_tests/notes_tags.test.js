@@ -16,8 +16,8 @@ describe('notes + tags syncing', async function () {
 
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithFakeCrypto();
-    const email = Uuid.GenerateUuidSynchronously();
-    const password = Uuid.GenerateUuidSynchronously();
+    const email = Uuid.GenerateUuid();
+    const password = Uuid.GenerateUuid();
     await Factory.registerUserToApplication({
       application: this.application,
       email,
