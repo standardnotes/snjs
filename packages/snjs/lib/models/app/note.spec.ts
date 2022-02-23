@@ -27,12 +27,14 @@ describe('SNNote Tests', () => {
       typeof note.title,
       typeof note.text,
       typeof note.preview_html,
-      typeof note.preview_plain
+      typeof note.preview_plain,
+      typeof note.hidePreview
     ]).toStrictEqual([
       'string',
       'string',
       'string',
-      'string'
+      'string',
+      'boolean'
     ])
   });
 

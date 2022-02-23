@@ -23,7 +23,7 @@ export class SNNote extends SNItem implements NoteContent {
   public readonly title: string;
   public readonly text: string;
   public readonly mobilePrefersPlainEditor?: boolean;
-  public readonly hidePreview = false;
+  public readonly hidePreview: boolean = false;
   public readonly preview_plain: string;
   public readonly preview_html: string;
   public readonly prefersPlainEditor!: boolean;
@@ -35,7 +35,7 @@ export class SNNote extends SNItem implements NoteContent {
     this.text = String(this.payload.safeContent.text || '');
     this.preview_plain = String(this.payload.safeContent.preview_plain);
     this.preview_html = String(this.payload.safeContent.preview_html);
-    this.hidePreview = this.payload.safeContent.hidePreview;
+    this.hidePreview = Boolean(this.payload.safeContent.hidePreview);
     this.spellcheck = this.payload.safeContent.spellcheck;
 
     if (payload.format === PayloadFormat.DecryptedBareObject) {
