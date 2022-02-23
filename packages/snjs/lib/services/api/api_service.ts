@@ -49,11 +49,7 @@ import { StorageKey } from '@Lib/storage_keys';
 import { Role } from '@standardnotes/auth';
 import { FeatureDescription } from '@standardnotes/features';
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Services/api/messages';
-import {
-  APPLICATION_DEFAULT_HOSTS,
-  isUrlFirstParty,
-  TRUSTED_FEATURE_HOSTS,
-} from '@Lib/hosts';
+import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts';
 import { AbstractService } from '@standardnotes/services';
 
 type PathNamesV1 = {

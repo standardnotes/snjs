@@ -1,4 +1,4 @@
-import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
+import { removeFromArray } from '@standardnotes/utils';
 import {
   Challenge,
   ChallengeArtifacts,
