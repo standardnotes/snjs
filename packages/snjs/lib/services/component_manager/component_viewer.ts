@@ -3,7 +3,7 @@ import { NoteContent } from '@Models/app/note';
 import { SNPreferencesService } from './../preferences_service';
 import { FeatureStatus, FeaturesEvent } from '@Lib/services/features_service';
 import { SNFeaturesService } from '@Lib/services';
-import { ComponentArea, GetFeatures } from '@standardnotes/features';
+import { ComponentArea, FindNativeFeature } from '@standardnotes/features';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
 import { Uuid } from '@Lib/uuid';
@@ -212,9 +212,7 @@ export class ComponentViewer {
   }
 
   private isNativeFeature(): boolean {
-    return !!GetFeatures(this.runtime).find(
-      (feature) => feature.identifier === this.component.identifier
-    );
+    return !!FindNativeFeature(this.component.identifier);
   }
 
   private hasUrlError(): boolean {

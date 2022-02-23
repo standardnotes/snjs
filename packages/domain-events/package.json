@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/domain-events",
-  "version": "2.23.13",
+  "version": "2.23.14",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@standardnotes/auth": "^3.16.4",
-    "@standardnotes/features": "^1.32.10"
+    "@standardnotes/features": "^1.32.11"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.2.0",
