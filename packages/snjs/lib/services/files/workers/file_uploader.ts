@@ -1,8 +1,7 @@
-import { FilesApi, RemoteFileInterface } from '../types';
+import { FilesApi } from '../types';
 
 export class FileUploader {
   constructor(
-    private readonly file: RemoteFileInterface,
     private apiService: FilesApi
   ) {}
 

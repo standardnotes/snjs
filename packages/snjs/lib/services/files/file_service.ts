@@ -71,7 +71,7 @@ export class SNFileService extends AbstractService {
     return uploadOperation;
   }
 
-  public pushBytesForUpload(
+  public async pushBytesForUpload(
     operation: EncryptAndUploadFileOperation,
     bytes: Uint8Array,
     chunkId: number,

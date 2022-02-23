@@ -18,7 +18,7 @@ export class EncryptAndUploadFileOperation {
     private api: FilesApi
   ) {
     this.encryptor = new FileEncryptor(file, this.crypto);
-    this.uploader = new FileUploader(file, this.api);
+    this.uploader = new FileUploader(this.api);
   }
 
   public initializeHeader(): string {
