@@ -40,6 +40,3 @@ files.env
 codeqldb
 
 packages/components/tmp
-
-# File Service uploads
-docker/uploads/*
