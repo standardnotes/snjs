@@ -15,10 +15,11 @@ describe('2020-01-15 mobile migration', () => {
   });
 
   it('2020-01-15 migration with passcode and account', async function () {
-    let application = await Factory.createInitAppWithFakeCrypto(
+    let application = await Factory.createAppWithRandNamespace(
       Environment.Mobile,
       Platform.Ios
     );
+
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'migrations',
