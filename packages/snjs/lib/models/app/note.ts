@@ -31,10 +31,11 @@ export class SNNote extends SNItem implements NoteContent {
 
   constructor(payload: PurePayload) {
     super(payload);
+
     this.title = String(this.payload.safeContent.title || '');
     this.text = String(this.payload.safeContent.text || '');
-    this.preview_plain = String(this.payload.safeContent.preview_plain);
-    this.preview_html = String(this.payload.safeContent.preview_html);
+    this.preview_plain = String(this.payload.safeContent.preview_plain || '');
+    this.preview_html = String(this.payload.safeContent.preview_html || '');
     this.hidePreview = Boolean(this.payload.safeContent.hidePreview);
     this.spellcheck = this.payload.safeContent.spellcheck;
 
@@ -43,6 +44,7 @@ export class SNNote extends SNItem implements NoteContent {
         AppDataField.PrefersPlainEditor
       );
     }
+
     if (!isNullOrUndefined(this.payload.safeContent.mobilePrefersPlainEditor)) {
       this.mobilePrefersPlainEditor = this.payload.safeContent.mobilePrefersPlainEditor;
     }
