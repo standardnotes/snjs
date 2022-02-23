@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js';
+import FakeWebCrypto from '../lib/fake_web_crypto.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('2020-01-15 mobile migration', () => {
+describe.only('2020-01-15 mobile migration', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -23,7 +24,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -246,7 +247,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -419,7 +420,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */
@@ -522,7 +523,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
@@ -712,7 +713,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     /** Create old version account parameters */
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
@@ -816,7 +817,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator002 = new SNProtocolOperator002(new SNWebCrypto());
+    const operator002 = new SNProtocolOperator002(new FakeWebCrypto());
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
@@ -905,7 +906,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator001 = new SNProtocolOperator001(new SNWebCrypto());
+    const operator001 = new SNProtocolOperator001(new FakeWebCrypto());
     const identifier = 'foo';
     /** Create old version account parameters */
     const password = 'tar';
@@ -994,7 +995,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const password = 'tar';
     const accountKey = await operator003.createRootKey(identifier, password);
@@ -1032,7 +1033,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const password = 'tar';
     const accountKey = await operator003.createRootKey(identifier, password);
@@ -1069,7 +1070,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const biometricPrefs = {
       enabled: true,
       timing: 'immediately',
@@ -1203,7 +1204,7 @@ describe('2020-01-15 mobile migration', () => {
       'migrations',
       JSON.stringify(['anything'])
     );
-    const operator003 = new SNProtocolOperator003(new SNWebCrypto());
+    const operator003 = new SNProtocolOperator003(new FakeWebCrypto());
     const identifier = 'foo';
     const passcode = 'bar';
     /** Create old version passcode parameters */

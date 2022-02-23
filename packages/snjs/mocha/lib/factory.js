@@ -121,7 +121,7 @@ export async function safeDeinit(application) {
 }
 
 export function getDefaultHost() {
-  return 'http://localhost:4000';
+  return 'http://localhost:3123';
 }
 
 export function getDefaultMockedEventServiceUrl() {
