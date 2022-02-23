@@ -423,8 +423,10 @@ export async function loginToApplication({
 export async function awaitFunctionInvokation(object, functionName) {
   return new Promise((resolve) => {
     const original = object[functionName];
-    object[functionName] = function () {
-      resolve(original.apply(this, arguments));
+    object[functionName] = async function () {
+      const result = original.apply(this, arguments);
+      resolve(result);
+      return result;
     };
   });
 }

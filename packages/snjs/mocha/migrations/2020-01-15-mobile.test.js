@@ -5,7 +5,7 @@ import FakeWebCrypto from '../lib/fake_web_crypto.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe.only('2020-01-15 mobile migration', () => {
+describe('2020-01-15 mobile migration', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -15,7 +15,7 @@ describe.only('2020-01-15 mobile migration', () => {
   });
 
   it('2020-01-15 migration with passcode and account', async function () {
-    let application = await Factory.createAppWithRandNamespace(
+    let application = await Factory.createInitAppWithFakeCrypto(
       Environment.Mobile,
       Platform.Ios
     );
@@ -214,7 +214,7 @@ describe.only('2020-01-15 mobile migration', () => {
     await Factory.safeDeinit(application);
 
     /** Recreate application and ensure storage values are consistent */
-    application = Factory.createApplicationWithRealCrypto(appId);
+    application = Factory.createApplicationWithFakeCrypto(appId);
     await application.prepareForLaunch({
       receiveChallenge,
     });
@@ -1390,7 +1390,7 @@ describe.only('2020-01-15 mobile migration', () => {
     await Factory.safeDeinit(application);
 
     /** Recreate application and ensure storage values are consistent */
-    application = Factory.createApplicationWithRealCrypto(appId);
+    application = Factory.createApplicationWithFakeCrypto(appId);
     await application.prepareForLaunch({
       receiveChallenge,
     });

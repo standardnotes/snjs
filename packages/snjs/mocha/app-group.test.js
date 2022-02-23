@@ -23,7 +23,7 @@ describe('application group', function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplicationWithRealCrypto(
+        return Factory.createApplicationWithFakeCrypto(
           descriptor.identifier,
           deviceInterface
         );
@@ -37,7 +37,7 @@ describe('application group', function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplicationWithRealCrypto(
+        return Factory.createApplicationWithFakeCrypto(
           descriptor.identifier,
           deviceInterface
         );
@@ -51,7 +51,7 @@ describe('application group', function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplicationWithRealCrypto(
+        return Factory.createApplicationWithFakeCrypto(
           descriptor.identifier,
           deviceInterface
         );
@@ -81,7 +81,7 @@ describe('application group', function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplicationWithRealCrypto(
+        return Factory.createApplicationWithFakeCrypto(
           descriptor.identifier,
           deviceInterface
         );
@@ -98,7 +98,7 @@ describe('application group', function () {
     const group = new SNApplicationGroup(deviceInterface);
     await group.initialize({
       applicationCreator: (descriptor, deviceInterface) => {
-        return Factory.createApplicationWithRealCrypto(
+        return Factory.createApplicationWithFakeCrypto(
           descriptor.identifier,
           deviceInterface
         );
@@ -133,7 +133,7 @@ describe('application group', function () {
       });
       await group.initialize({
         applicationCreator: (descriptor, deviceInterface) => {
-          return Factory.createApplicationWithRealCrypto(
+          return Factory.createApplicationWithFakeCrypto(
             descriptor.identifier,
             deviceInterface
           );

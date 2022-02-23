@@ -9,7 +9,7 @@ describe('keys', function () {
 
   beforeEach(async function () {
     localStorage.clear();
-    this.application = await Factory.createInitAppWithRealCrypto();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuid();
     this.password = Uuid.GenerateUuid();
   });
@@ -730,7 +730,7 @@ describe('keys', function () {
     await this.application.deviceInterface.clearRawKeychainValue();
     await Factory.safeDeinit(this.application);
 
-    const recreatedApp = await Factory.createApplicationWithRealCrypto(id);
+    const recreatedApp = await Factory.createApplicationWithFakeCrypto(id);
     let totalChallenges = 0;
     const expectedChallenges = 1;
     const receiveChallenge = async (challenge) => {
@@ -873,7 +873,7 @@ describe('keys', function () {
       );
       await Factory.safeDeinit(this.application);
 
-      const refreshedApp = await Factory.createApplicationWithRealCrypto(identifier);
+      const refreshedApp = await Factory.createApplicationWithFakeCrypto(identifier);
       await Factory.initializeApplication(refreshedApp);
 
       /** Expect a new items key to be created based on the new root key */
@@ -937,7 +937,7 @@ describe('keys', function () {
   });
 
   it('having key while offline then signing into account with key should only have 1 default items key', async function () {
-    const otherClient = await Factory.createInitAppWithRealCrypto();
+    const otherClient = await Factory.createInitAppWithFakeCrypto();
     /** Invert order of keys */
     otherClient.itemManager.collection.setDisplayOptions(
       ContentType.ItemsKey,

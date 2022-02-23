@@ -71,7 +71,7 @@ export default class FakeWebCrypto {
   }
 
   async pbkdf2(password, salt, iterations, length) {
-    return btoa(password);
+    return btoa(password + salt + iterations);
   }
 
   generateRandomKey(bits) {
@@ -136,5 +136,13 @@ export default class FakeWebCrypto {
       return undefined;
     }
     return data.plaintext;
+  }
+
+  generateOtpSecret() {
+    return 'WQVV2GFBRQWU3UQZWQFZC37PSNRXKTA6'
+  }
+
+  totpToken(secret, timestamp, tokenLength, step) {
+    return '123456';
   }
 }

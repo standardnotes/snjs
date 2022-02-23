@@ -50,7 +50,6 @@ describe('2020-01-15 web migration', () => {
     /** Create old version account parameters */
     const password = 'tar';
     const accountKey = await operator003.createRootKey(identifier, password);
-    console.log("SN ~ file: 2020-01-15-web.test.js ~ line 52 ~ accountKey", accountKey);
 
     /** Create legacy storage and encrypt it with passcode */
     const embeddedStorage = {

@@ -22,7 +22,7 @@ describe('key recovery service', function () {
 
   it('when encountering an undecryptable items key, should recover through recovery wizard', async function () {
     const namespace = Factory.randomString();
-    const context = await Factory.createAppContextWithRealCrypto(namespace);
+    const context = await Factory.createAppContextWithFakeCrypto(namespace);
     const unassociatedPassword = 'randfoo';
     const unassociatedIdentifier = 'foorand';
 
@@ -88,7 +88,7 @@ describe('key recovery service', function () {
     const unassociatedIdentifier = 'foorand';
     let totalPromptCount = 0;
 
-    const context = await Factory.createAppContextWithRealCrypto(namespace);
+    const context = await Factory.createAppContextWithFakeCrypto(namespace);
     const application = context.application;
     const receiveChallenge = async (challenge) => {
       totalPromptCount++;
@@ -159,7 +159,7 @@ describe('key recovery service', function () {
      */
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
-    const contextA = await Factory.createAppContextWithCrypto(namespace);
+    const contextA = await Factory.createAppContextWithFakeCrypto(namespace);
     const appA = contextA.application;
     const receiveChallenge = async (challenge) => {
       const responses = [];
@@ -180,7 +180,7 @@ describe('key recovery service', function () {
           responses.push(new ChallengeValue(prompt, newPassword));
         } else {
           console.error(
-            `Unhandled custom challenge in Factory.createAppContextWithRealCrypto`,
+            `Unhandled custom challenge in Factory.createAppContextWithFakeCrypto`,
             challenge,
             prompt
           );
@@ -200,7 +200,7 @@ describe('key recovery service', function () {
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
 
     /** Create simultaneous appB signed into same account */
-    const contextB = await Factory.createAppContextWithRealCrypto('another-namespace');
+    const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace');
     const appB = contextB.application;
     await appB.prepareForLaunch({});
     await appB.launch(true);
@@ -219,8 +219,9 @@ describe('key recovery service', function () {
 
     /** Sync appA and expect a new items key to be downloaded and errored */
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
-    await appA.sync(syncOptions);
+    const syncPromise = appA.sync(syncOptions);
     await contextA.awaitNextSucessfulSync();
+    await syncPromise;
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(2);
 
     /** Same previously errored key should now no longer be errored, */
@@ -248,7 +249,7 @@ describe('key recovery service', function () {
   it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
     const namespace = Factory.randomString();
     const newPassword = `${Math.random()}`;
-    const contextA = await Factory.createAppContextWithRealCrypto(namespace);
+    const contextA = await Factory.createAppContextWithFakeCrypto(namespace);
     const appA = contextA.application;
     const receiveChallenge = async (challenge) => {
       const prompt = challenge.prompts[0];
@@ -269,7 +270,7 @@ describe('key recovery service', function () {
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
 
     /** Create simultaneous appB signed into same account */
-    const appB = await Factory.createApplicationWithRealCrypto('another-namespace');
+    const appB = await Factory.createApplicationWithFakeCrypto('another-namespace');
     await appB.prepareForLaunch({ receiveChallenge: () => {} });
     await appB.launch(true);
     await Factory.loginToApplication({
@@ -292,7 +293,7 @@ describe('key recovery service', function () {
     await Factory.safeDeinit(appA);
     await Factory.safeDeinit(appB);
 
-    const recreatedAppA = await Factory.createApplicationWithRealCrypto(namespace);
+    const recreatedAppA = await Factory.createApplicationWithFakeCrypto(namespace);
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} });
     await recreatedAppA.launch(true);
 
@@ -308,7 +309,7 @@ describe('key recovery service', function () {
      * root key other than by signing in.
      */
     const unassociatedPassword = 'randfoo';
-    const context = await Factory.createAppContextWithRealCrypto('some-namespace');
+    const context = await Factory.createAppContextWithFakeCrypto('some-namespace');
     const application = context.application;
     const receiveChallenge = async (challenge) => {
       /** This is the sign in prompt, return proper value */
@@ -377,7 +378,7 @@ describe('key recovery service', function () {
 
   it(`when encountering an items key that cannot be decrypted, for which we already have a decrypted value,
           it should be temporarily ignored and recovered separately`, async function () {
-    const context = await Factory.createAppContextWithRealCrypto(Factory.randomString());
+    const context = await Factory.createAppContextWithFakeCrypto(Factory.randomString());
     const application = context.application;
     const receiveChallenge = async (challenge) => {
       application.submitValuesForChallenge(challenge, [
@@ -443,7 +444,7 @@ describe('key recovery service', function () {
 
   it('application should prompt to recover undecryptables on launch', async function () {
     const namespace = Factory.randomString();
-    const context = await Factory.createAppContextWithRealCrypto(namespace);
+    const context = await Factory.createAppContextWithFakeCrypto(namespace);
     const application = context.application;
     await application.prepareForLaunch({});
     await application.launch(true);
@@ -476,7 +477,7 @@ describe('key recovery service', function () {
     await context.deinit();
 
     /** Recreate application, and expect key recovery wizard to complete */
-    const recreatedApp = await Factory.createApplicationWithRealCrypto(namespace);
+    const recreatedApp = await Factory.createApplicationWithFakeCrypto(namespace);
     let didReceivePasswordPrompt = false;
     const receiveChallenge = async (challenge) => {
       didReceivePasswordPrompt = true;
@@ -508,7 +509,7 @@ describe('key recovery service', function () {
     const unassociatedPassword = 'randfoo';
     const unassociatedIdentifier = 'foorand';
 
-    const context = await Factory.createAppContextWithRealCrypto(namespace);
+    const context = await Factory.createAppContextWithFakeCrypto(namespace);
     const application = context.application;
     const receiveChallenge = async (challenge) => {
       /** Give unassociated password when prompted */
@@ -570,7 +571,7 @@ describe('key recovery service', function () {
   it('when replacing root key, new root key should be set before items key are re-saved to disk', async function () {
     const namespace = Factory.randomString();
     const newPassword = `new-password`;
-    const contextA = await Factory.createAppContextWithRealCrypto(namespace);
+    const contextA = await Factory.createAppContextWithFakeCrypto(namespace);
     const appA = contextA.application;
     const receiveChallenge = async (challenge) => {
       const responses = [];
@@ -591,7 +592,7 @@ describe('key recovery service', function () {
           responses.push(new ChallengeValue(prompt, newPassword));
         } else {
           console.error(
-            `Unhandled custom challenge in Factory.createAppContextWithRealCrypto`,
+            `Unhandled custom challenge in Factory.createAppContextWithFakeCrypto`,
             challenge,
             prompt
           );
@@ -609,7 +610,7 @@ describe('key recovery service', function () {
     });
 
     /** Create simultaneous appB signed into same account */
-    const contextB = await Factory.createAppContextWithRealCrypto('another-namespace');
+    const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace');
     const appB = contextB.application;
     await appB.prepareForLaunch({});
     await appB.launch(true);

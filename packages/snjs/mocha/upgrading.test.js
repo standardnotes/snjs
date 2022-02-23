@@ -7,7 +7,7 @@ const expect = chai.expect;
 describe('upgrading', () => {
   beforeEach(async function () {
     localStorage.clear();
-    this.application = await Factory.createInitAppWithRealCrypto();
+    this.application = await Factory.createInitAppWithFakeCrypto();
     this.email = Uuid.GenerateUuid();
     this.password = Uuid.GenerateUuid();
     this.passcode = '1234';
@@ -162,7 +162,7 @@ describe('upgrading', () => {
     await Factory.safeDeinit(this.application);
 
     /** Recreate the app once */
-    const appFirst = Factory.createApplicationWithRealCrypto(identifier);
+    const appFirst = Factory.createApplicationWithFakeCrypto(identifier);
     await appFirst.prepareForLaunch({
       receiveChallenge: (challenge) => {
         this.receiveChallengeWithApp(appFirst, challenge);
@@ -175,7 +175,7 @@ describe('upgrading', () => {
     await Factory.safeDeinit(appFirst);
 
     /** Recreate the once more */
-    const appSecond = Factory.createApplicationWithRealCrypto(identifier);
+    const appSecond = Factory.createApplicationWithFakeCrypto(identifier);
     await appSecond.prepareForLaunch({
       receiveChallenge: (challenge) => {
         this.receiveChallengeWithApp(appSecond, challenge);

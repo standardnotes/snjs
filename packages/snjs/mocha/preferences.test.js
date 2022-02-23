@@ -97,7 +97,7 @@ describe('preferences', function () {
 
     await Factory.safeDeinit(this.application);
 
-    this.application = Factory.createApplicationWithRealCrypto(identifier);
+    this.application = Factory.createApplicationWithFakeCrypto(identifier);
     const willSyncPromise = new Promise((resolve) => {
       this.application.addEventObserver(resolve, ApplicationEvent.WillSync);
     });
