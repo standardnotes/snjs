@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 describe('app models', () => {
   const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
-  const sharedApplication = Factory.createApplication();
+  const sharedApplication = Factory.createApplicationWithFakeCrypto();
 
   before(async function () {
     localStorage.clear();
@@ -21,7 +21,7 @@ describe('app models', () => {
 
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace();
+    this.application = await Factory.createInitAppWithFakeCrypto();
   });
 
   afterEach(async function () {

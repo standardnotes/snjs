@@ -16,7 +16,7 @@ describe('storage manager', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.expectedKeyCount = BASE_KEY_COUNT;
-    this.application = await Factory.createInitAppWithRandNamespace(
+    this.application = await Factory.createInitAppWithFakeCrypto(
       Environment.Mobile
     );
     this.email = Uuid.GenerateUuid();
@@ -129,7 +129,7 @@ describe('storage manager', function () {
   });
 
   it('storage after adding passcode then removing passcode should not be encrypted', async function () {
-    const passcode = '123🌂';
+    const passcode = '123';
     Factory.handlePasswordChallenges(this.application, passcode);
     await this.application.setValue('foo', 'bar');
     await this.application.addPasscode(passcode);
@@ -143,7 +143,7 @@ describe('storage manager', function () {
   });
 
   it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
-    const passcode = '123🌂';
+    const passcode = '123';
     /**
      * After setting passcode, we expect that the keychain has been cleared, as the account keys
      * are now wrapped in storage with the passcode. Once the passcode is removed, we expect

@@ -875,7 +875,7 @@ describe('online syncing', function () {
 
   it('marking item dirty after dirty items are prepared for sync but before they are synced should sync again', async function () {
     /** There is a twilight zone where items needing sync are popped, and then say about 100ms of processing before
-     * we set those items lastSyncBegan. If the item is dirtied in between these times, then item.dirtiedDate will be less than
+     * we set those items' lastSyncBegan. If the item is dirtied in between these times, then item.dirtiedDate will be less than
      * item.lastSyncBegan, and it will not by synced again.
      */
     const expectedSaveCount = 2;

@@ -23,7 +23,11 @@ import { SNApiService } from '@Lib/services/api/api_service';
 import { SNItemsKey } from './../models/app/items_key';
 import { ApplicationStage, ContentType } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
-import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
+import {
+  dateSorted,
+  isNullOrUndefined,
+  removeFromArray,
+} from '@standardnotes/utils';
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
 import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
 import { PayloadSource } from '@Lib/protocol/payloads';
@@ -170,7 +174,7 @@ export class SNKeyRecoveryService extends AbstractService {
       await this.saveToUndecryptables(keys);
     }
 
-    await this.addKeysToQueue(keys, (key, result) => {
+    this.addKeysToQueue(keys, (key, result) => {
       if (result.success) {
         /** If it succeeds, remove the key from isolated storage. */
         this.removeFromUndecryptables(key);
@@ -181,7 +185,7 @@ export class SNKeyRecoveryService extends AbstractService {
   }
 
   private async handleUndecryptableItemsKeys(keys: SNItemsKey[]) {
-    await this.addKeysToQueue(keys);
+    this.addKeysToQueue(keys);
     await this.beginProcessingQueue();
   }
 
@@ -309,12 +313,9 @@ export class SNKeyRecoveryService extends AbstractService {
     return wrappingKey;
   }
 
-  private async addKeysToQueue(
-    keys: SNItemsKey[],
-    callback?: DecryptionCallback
-  ) {
+  private addKeysToQueue(keys: SNItemsKey[], callback?: DecryptionCallback) {
     for (const key of keys) {
-      const keyParams = await this.protocolService.getKeyEmbeddedKeyParams(key);
+      const keyParams = this.protocolService.getKeyEmbeddedKeyParams(key);
       if (!keyParams) {
         continue;
       }
@@ -504,7 +505,7 @@ export class SNKeyRecoveryService extends AbstractService {
     rootKey: SNRootKey,
     replacesRootKey: boolean,
     additionalKeys: PurePayload[] = []
-  ) {
+  ): Promise<DecryptionQueueItem[]> {
     if (replacesRootKey) {
       /** Replace our root key with the generated root key */
       const wrappingKey = await this.getWrappingKeyIfApplicable();
