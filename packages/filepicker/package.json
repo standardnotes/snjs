@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/filepicker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -21,7 +21,6 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts"
   },
-  "dependencies": {},
   "devDependencies": {
     "@standardnotes/config": "^2.2.0",
     "@types/wicg-file-system-access": "^2020.9.5",
