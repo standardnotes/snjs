@@ -241,7 +241,7 @@ export class SNApplication implements ListedInterface {
       'appVersion',
     ];
     for (const optionName of requiredOptions) {
-      if (!options[optionName]) {
+      if (!fullyResovledOptions[optionName]) {
         throw Error(
           `${optionName} must be supplied when creating an application.`
         );
