@@ -1,4 +1,3 @@
-import { FileOptions } from './../../options';
 import { FillItemContent } from '@Models/functions';
 import { ContentType } from '@standardnotes/common';
 import { DownloadAndDecryptFileOperation } from './operations/download_and_decrypt';
@@ -21,8 +20,7 @@ export class SNFileService extends AbstractService {
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private alertService: SNAlertService,
-    private crypto: SNPureCrypto,
-    private options: FileOptions
+    private crypto: SNPureCrypto
   ) {
     super();
   }

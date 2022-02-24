@@ -3,7 +3,7 @@ import { SNHistoryManager } from './../history/history_manager';
 import { SyncEvent } from '@Services/sync/events';
 import { StorageKey } from '@Lib/storage_keys';
 import { UuidString } from './../../types';
-import { ApplicationOptions } from './../../options';
+import { ApplicationSyncOptions } from './../../options';
 import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
 import { MutationType, SNItem } from '@Models/core/item';
@@ -154,7 +154,7 @@ export class SNSyncService extends AbstractService<
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
     private historyService: SNHistoryManager,
-    private readonly options: ApplicationOptions
+    private readonly options: ApplicationSyncOptions
   ) {
     super();
     this.initializeStatus();

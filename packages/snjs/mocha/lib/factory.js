@@ -165,23 +165,22 @@ export function createApplication(
     setTimeout.bind(window),
     setInterval.bind(window)
   );
-  return new SNApplication(
-    environment || Environment.Web,
-    platform || Platform.MacWeb,
+  return new SNApplication({
+    environment: environment || Environment.Web,
+    platform: platform || Platform.MacWeb,
     deviceInterface,
-    crypto || new FakeWebCrypto(),
-    {
+    crypto: crypto || new FakeWebCrypto(),
+    alertService: {
       confirm: async () => true,
       alert: async () => {},
       blockingDialog: () => () => {},
     },
-    identifier || `${Math.random()}`,
-    [],
-    host || getDefaultHost(),
-    getDefaultFilesHost(),
-    getAppVersion(),
-    getDefaultWebSocketUrl()
-  );
+    identifier: identifier || `${Math.random()}`,
+    defaultHost: host || getDefaultHost(),
+    defaultFilesHost: getDefaultFilesHost(),
+    appVersion: getAppVersion(),
+    webSocketUrl: getDefaultWebSocketUrl(),
+  });
 }
 
 export function createApplicationWithFakeCrypto(

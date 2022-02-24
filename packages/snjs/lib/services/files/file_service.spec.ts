@@ -17,10 +17,7 @@ describe('fileService', () => {
       itemManager,
       syncService,
       alertService,
-      crypto,
-      {
-        filesChunkSize: 100_000,
-      }
+      crypto
     );
   };
 

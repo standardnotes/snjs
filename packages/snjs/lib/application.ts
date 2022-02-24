@@ -21,12 +21,12 @@ import {
 import { Uuids } from '@Models/functions';
 import { PayloadOverride, RawPayload } from './protocol/payloads/generator';
 import { ApplicationStage, ApplicationIdentifier } from '@standardnotes/common';
+import { DeinitSource, UuidString, ApplicationEventPayload } from './types';
 import {
-  DeinitSource,
-  UuidString,
-  ApplicationEventPayload,
-} from './types';
-import { ApplicationOptionsDefaults, ApplicationOptions } from './options';
+  ApplicationOptionsDefaults,
+  ApplicationOptions,
+  FullyResolvedApplicationOptions,
+} from './options';
 import {
   ApplicationEvent,
   SyncEvent,
@@ -50,7 +50,6 @@ import {
   ChallengeValue,
 } from './challenges';
 import { ChallengeObserver } from './services/challenge/challenge_service';
-import { SNPureCrypto } from '@standardnotes/sncrypto-common';
 import { Environment, Platform } from './platforms';
 import {
   assertUnreachable,
@@ -60,7 +59,7 @@ import {
   sleep,
   nonSecureRandomIdentifier,
 } from '@standardnotes/utils';
-import { AnyRecord, ContentType, Runtime } from '@standardnotes/common';
+import { AnyRecord, ContentType } from '@standardnotes/common';
 import {
   CopyPayload,
   CreateMaxPayloadFromAnyObject,
@@ -211,86 +210,50 @@ export class SNApplication implements ListedInterface {
   private revokingSession = false;
   private handledFullSyncStage = false;
 
-  /**
-   * @param environment The Environment that identifies your application.
-   * @param platform The Platform that identifies your application.
-   * @param deviceInterface The device interface that provides platform specific
-   * utilities that are used to read/write raw values from/to the database or value storage.
-   * @param crypto The platform-dependent implementation of SNPureCrypto to use.
-   * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
-   * @param alertService The platform-dependent implementation of alert service.
-   * @param identifier A unique persistent identifier to namespace storage and other
-   * persistent properties. For an ephemeral runtime identifier, use ephemeralIdentifier.
-   * @param swapClasses Gives consumers the ability to provide their own custom
-   * subclass for a service. swapClasses should be an array of key/value pairs
-   * consisting of keys 'swap' and 'with'. 'swap' is the base class you wish to replace,
-   * and 'with' is the custom subclass to use.
-   * @param skipClasses An array of classes to skip making services for.
-   * @param defaultHost Default host to use in ApiService.
-   * @param defaultFilesHost Default files host to use in ApiService.
-   * @param appVersion Version of client application.
-   * @param webSocketUrl URL for WebSocket providing permissions and roles information.
-   */
-  constructor(
-    public readonly environment: Environment,
-    public readonly platform: Platform,
-    public deviceInterface: DeviceInterface,
-    private crypto: SNPureCrypto,
-    public alertService: SNAlertService,
-    public readonly identifier: ApplicationIdentifier,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private swapClasses: { swap: any; with: any }[],
-    private defaultHost: string,
-    private defaultFilesHost: string,
-    private appVersion: string,
-    private webSocketUrl?: string,
-    private readonly runtime: Runtime = Runtime.Prod,
-    public readonly options: ApplicationOptions = ApplicationOptionsDefaults
-  ) {
+  public readonly environment: Environment;
+  public readonly platform: Platform;
+  public deviceInterface: DeviceInterface;
+  public alertService: SNAlertService;
+  public readonly identifier: ApplicationIdentifier;
+  public readonly options: FullyResolvedApplicationOptions;
+
+  constructor(options: ApplicationOptions) {
+    const fullyResovledOptions = {
+      ...ApplicationOptionsDefaults,
+      ...options,
+    } as FullyResolvedApplicationOptions;
+
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
     }
     if (!SNLog.onError) {
       throw Error('SNLog.onError must be set.');
     }
-    if (!deviceInterface) {
-      throw Error('Device Interface must be supplied.');
+    const requiredOptions: (keyof ApplicationOptions)[] = [
+      'deviceInterface',
+      'environment',
+      'platform',
+      'crypto',
+      'alertService',
+      'identifier',
+      'defaultHost',
+      'defaultFilesHost',
+      'appVersion',
+    ];
+    for (const optionName of requiredOptions) {
+      if (!fullyResovledOptions[optionName]) {
+        throw Error(
+          `${optionName} must be supplied when creating an application.`
+        );
+      }
     }
-    if (!environment) {
-      throw Error('Environment must be supplied when creating an application.');
-    }
-    if (!platform) {
-      throw Error('Platform must be supplied when creating an application.');
-    }
-    if (!crypto) {
-      throw Error('Crypto has to be supplied when creating an application.');
-    }
-    if (!alertService) {
-      throw Error(
-        'AlertService must be supplied when creating an application.'
-      );
-    }
-    if (!identifier) {
-      throw Error(
-        'ApplicationIdentifier must be supplied when creating an application.'
-      );
-    }
-    if (!swapClasses) {
-      throw Error(
-        'SwapClasses array must be supplied when creating an application.'
-      );
-    }
-    if (!defaultHost) {
-      throw Error('defaultHost must be supplied when creating an application.');
-    }
-    if (!defaultFilesHost) {
-      throw Error(
-        'defaultFilesHost must be supplied when creating an application.'
-      );
-    }
-    if (!appVersion) {
-      throw Error('appVersion must be supplied when creating an application.');
-    }
+
+    this.environment = options.environment;
+    this.platform = options.platform;
+    this.deviceInterface = options.deviceInterface;
+    this.alertService = options.alertService;
+    this.identifier = options.identifier;
+    this.options = Object.freeze(fullyResovledOptions);
 
     this.constructServices();
   }
@@ -300,7 +263,7 @@ export class SNApplication implements ListedInterface {
    * This function will load all services in their correct order.
    */
   async prepareForLaunch(callback: LaunchCallback): Promise<void> {
-    await this.crypto.initialize();
+    await this.options.crypto.initialize();
     this.setLaunchCallback(callback);
     const databaseResult = await this.deviceInterface
       .openDatabase(this.identifier)
@@ -1494,7 +1457,7 @@ export class SNApplication implements ListedInterface {
       service.deinit();
     }
 
-    (this.crypto as unknown) = undefined;
+    (this.options as unknown) = undefined;
     this.createdNewDatabase = false;
     this.services.length = 0;
     this.serviceObservers.length = 0;
@@ -1930,8 +1893,7 @@ export class SNApplication implements ListedInterface {
       this.itemManager,
       this.syncService,
       this.alertService,
-      this.crypto,
-      this.options
+      this.options.crypto
     );
 
     this.services.push(this.fileService);
@@ -1948,8 +1910,8 @@ export class SNApplication implements ListedInterface {
       this.syncService,
       this.alertService,
       this.sessionManager,
-      this.crypto,
-      this.runtime
+      this.options.crypto,
+      this.options.runtime
     );
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
@@ -1974,7 +1936,7 @@ export class SNApplication implements ListedInterface {
   private createWebSocketsService() {
     this.webSocketsService = new SNWebSocketsService(
       this.storageService,
-      this.webSocketUrl
+      this.options.webSocketUrl
     );
     this.services.push(this.webSocketsService);
   }
@@ -2026,8 +1988,8 @@ export class SNApplication implements ListedInterface {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.defaultHost,
-      this.defaultFilesHost
+      this.options.defaultHost,
+      this.options.defaultFilesHost
     );
     this.services.push(this.apiService);
   }
@@ -2049,13 +2011,16 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.environment,
       this.platform,
-      this.runtime
+      this.options.runtime
     );
     this.services.push(this.componentManager);
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService(this.environment, this.appVersion);
+    this.httpService = new SNHttpService(
+      this.environment,
+      this.options.appVersion
+    );
     this.services.push(this.httpService);
   }
 
@@ -2089,7 +2054,7 @@ export class SNApplication implements ListedInterface {
       this.deviceInterface,
       this.storageService,
       this.identifier,
-      this.crypto
+      this.options.crypto
     );
     this.protocolService.onKeyStatusChange(async () => {
       await this.notifyEvent(ApplicationEvent.KeyStatusChanged);
@@ -2159,7 +2124,9 @@ export class SNApplication implements ListedInterface {
       this.payloadManager,
       this.apiService,
       this.historyManager,
-      this.options
+      {
+        loadBatchSize: this.options.loadBatchSize,
+      }
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName);
@@ -2257,14 +2224,14 @@ export class SNApplication implements ListedInterface {
   private createMfaService() {
     this.mfaService = new SNMfaService(
       this.settingsService,
-      this.crypto,
+      this.options.crypto,
       this.featuresService
     );
     this.services.push(this.mfaService);
   }
 
   private getClass<T>(base: T) {
-    const swapClass = this.swapClasses.find(
+    const swapClass = this.options.swapClasses?.find(
       (candidate) => candidate.swap === base
     );
     if (swapClass) {
