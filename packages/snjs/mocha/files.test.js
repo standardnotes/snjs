@@ -54,7 +54,7 @@ describe('files', function () {
   const uploadFile = async (fileService, buffer, name, ext, chunkSize) => {
     const operation = await fileService.beginNewFileUpload();
 
-    let chunkId = 0;
+    let chunkId = 1;
     for (let i = 0; i < buffer.length; i += chunkSize) {
       const readUntil =
         i + chunkSize > buffer.length ? buffer.length : i + chunkSize;

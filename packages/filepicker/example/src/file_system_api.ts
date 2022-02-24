@@ -1,5 +1,5 @@
+import { StreamingFileReader, StreamingFileSaver } from '../../../filepicker'
 import { SNApplication, ContentType, SNFile } from '../../../snjs'
-import { StreamingFilePicker } from '../../../filepicker'
 
 export class FileSystemApi {
   private remoteIdentifier!: string
@@ -29,8 +29,8 @@ export class FileSystemApi {
   uploadFile = async (): Promise<SNFile> => {
     const operation = await this.application.fileService.beginNewFileUpload()
 
-    const picker = new StreamingFilePicker()
-    const fileResult = await picker.selectFileAndStream(
+    const reader = new StreamingFileReader(
+      2_000_000,
       async (chunk, index, isLast) => {
         await this.application.fileService.pushBytesForUpload(
           operation,
@@ -40,6 +40,8 @@ export class FileSystemApi {
         )
       },
     )
+    reader.loggingEnabled = true
+    const fileResult = await reader.selectFileAndStream()
 
     const fileObj = await this.application.fileService.finishUpload(
       operation,
@@ -60,18 +62,19 @@ export class FileSystemApi {
       .getItems<SNFile>(ContentType.File)
       .find((file) => file.remoteIdentifier === this.remoteIdentifier)
 
-    const picker = new StreamingFilePicker()
-    const { pusher, closer } = await picker.saveFile(file.nameWithExt)
+    const saver = new StreamingFileSaver(file.nameWithExt)
+    await saver.selectFileToSaveTo()
+    saver.loggingEnabled = true
 
     await this.application.fileService.downloadFile(
       file,
       async (decryptedBytes: Uint8Array) => {
         console.log(`Pushing ${decryptedBytes.length} decrypted bytes to disk`)
-        await pusher(decryptedBytes)
+        await saver.pushBytes(decryptedBytes)
       },
     )
     console.log('Closing file saver reader')
-    await closer()
+    await saver.finish()
 
     console.log('Successfully downloaded and decrypted file!')
   }
