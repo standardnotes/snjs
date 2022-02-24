@@ -79,7 +79,7 @@ describe('application instances', () => {
     );
     await Factory.registerUserToApplication({
       application: app,
-      email: Uuid.GenerateUuid(),
+      email: UuidGenerator.GenerateUuid(),
       password: 'password',
     });
     await app.prepareForDeinit();

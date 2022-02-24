@@ -24,8 +24,8 @@ describe('importing', function () {
     } else {
       application = await Factory.createInitAppWithRealCrypto();
     }
-    email = Uuid.GenerateUuid();
-    password = Uuid.GenerateUuid();
+    email = UuidGenerator.GenerateUuid();
+    password = UuidGenerator.GenerateUuid();
     Factory.handlePasswordChallenges(application, password);
   };
 
@@ -317,7 +317,7 @@ describe('importing', function () {
 
     /** Sign into another account and import the same item. It should get a different UUID. */
     application = await Factory.signOutApplicationAndReturnNew(application);
-    email = Uuid.GenerateUuid();
+    email = UuidGenerator.GenerateUuid();
     Factory.handlePasswordChallenges(application, password);
     await Factory.registerUserToApplication({
       application: application,
@@ -347,7 +347,7 @@ describe('importing', function () {
 
     /** Sign into another account and import the same items. They should get a different UUID. */
     application = await Factory.signOutApplicationAndReturnNew(application);
-    email = Uuid.GenerateUuid();
+    email = UuidGenerator.GenerateUuid();
     Factory.handlePasswordChallenges(application, password);
     await Factory.registerUserToApplication({
       application: application,
@@ -635,7 +635,7 @@ describe('importing', function () {
     await Factory.registerOldUser({
       application: application,
       email: email,
-      password: Uuid.GenerateUuid(),
+      password: UuidGenerator.GenerateUuid(),
       version: oldVersion,
     });
 

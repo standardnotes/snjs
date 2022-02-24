@@ -19,8 +19,8 @@ describe('server session', function () {
     localStorage.clear();
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithFakeCrypto();
-    this.email = Uuid.GenerateUuid();
-    this.password = Uuid.GenerateUuid();
+    this.email = UuidGenerator.GenerateUuid();
+    this.password = UuidGenerator.GenerateUuid();
     this.newPassword = Factory.randomString();
   });
 
@@ -214,7 +214,7 @@ describe('server session', function () {
     let { application, password } = await Factory.createAndInitSimpleAppContext({
       registerUser: true
     });
-    const newEmail = Uuid.GenerateUuid();
+    const newEmail = UuidGenerator.GenerateUuid();
     const changeEmailResponse = await application.changeEmail(
       newEmail,
       password
@@ -246,7 +246,7 @@ describe('server session', function () {
     const fakeSession = application.apiService.getSession();
     fakeSession.accessToken = 'this-is-a-fake-token-1234';
     Factory.ignoreChallenges(application);
-    const newEmail = Uuid.GenerateUuid();
+    const newEmail = UuidGenerator.GenerateUuid();
     const changeEmailResponse = await application.changeEmail(
       newEmail,
       password
@@ -277,7 +277,7 @@ describe('server session', function () {
     await sleepUntilSessionExpires(application, false);
 
     Factory.ignoreChallenges(application);
-    const newEmail = Uuid.GenerateUuid();
+    const newEmail = UuidGenerator.GenerateUuid();
     const changeEmailResponse = await application.changeEmail(
       newEmail,
       password

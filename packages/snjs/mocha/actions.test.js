@@ -16,8 +16,8 @@ describe('actions service', () => {
     this.application = await Factory.createInitAppWithFakeCrypto();
     this.itemManager = this.application.itemManager;
     this.actionsManager = this.application.actionsManager;
-    this.email = Uuid.GenerateUuid();
-    this.password = Uuid.GenerateUuid();
+    this.email = UuidGenerator.GenerateUuid();
+    this.password = UuidGenerator.GenerateUuid();
 
     await Factory.registerUserToApplication({
       application: this.application,

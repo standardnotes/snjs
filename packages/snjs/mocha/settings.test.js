@@ -14,8 +14,8 @@ describe('settings service', function () {
       Environment.Web,
       Platform.MacWeb
     );
-    const email = Uuid.GenerateUuid();
-    const password = Uuid.GenerateUuid();
+    const email = UuidGenerator.GenerateUuid();
+    const password = UuidGenerator.GenerateUuid();
     const ephemeral = false;
     const mergeLocal = true;
 
