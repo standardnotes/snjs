@@ -4,7 +4,6 @@ import {
   Platform,
   SNLog,
   Runtime,
-  ApplicationOptionsDefaults,
 } from '../../../snjs'
 import WebDeviceInterface from './web_device_interface'
 import { SNWebCrypto } from '../../../sncrypto-web'
@@ -27,12 +26,12 @@ const host = 'http://localhost:3123'
 const filesHost = 'http://localhost:3125'
 const mocksHost = 'http://localhost:3124'
 
-const application = new SNApplication(
-  Environment.Web,
-  Platform.MacWeb,
-  new WebDeviceInterface(),
-  new SNWebCrypto(),
-  {
+const application = new SNApplication({
+  environment: Environment.Web,
+  platform: Platform.MacWeb,
+  deviceInterface: new WebDeviceInterface(),
+  crypto: new SNWebCrypto(),
+  alertService: {
     confirm: async () => true,
     alert: async () => {
       alert()
@@ -41,18 +40,12 @@ const application = new SNApplication(
       confirm()
     },
   },
-  `${Math.random()}`,
-  [],
-  host,
-  filesHost,
-  '1.0.0',
-  undefined,
-  Runtime.Dev,
-  {
-    ...ApplicationOptionsDefaults,
-    filesChunkSize: 1_000_000,
-  },
-)
+  identifier: `${Math.random()}`,
+  defaultHost: host,
+  defaultFilesHost: filesHost,
+  appVersion: '1.0.0',
+  runtime: Runtime.Dev,
+})
 
 console.log('Created application', application)
 
