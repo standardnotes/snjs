@@ -1,6 +1,5 @@
 import { SNNote } from '@Lib/index';
-import { FillItemContent } from '@Models/functions';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
+import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
 import { ContentType } from '@standardnotes/common';
 
 const randUuid = () => String(Math.random());
@@ -43,7 +42,7 @@ describe('SNNote Tests', () => {
       preview_plain: null,
       preview_html: undefined
     })
-    
+
     expect(note.preview_plain).toBeFalsy()
     expect(note.preview_html).toBeFalsy()
   })
