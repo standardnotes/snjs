@@ -19,6 +19,7 @@ export enum StorageKey {
   Session = 'session',
   User = 'user',
   ServerHost = 'server',
+  FilesServerHost = 'files_server',
   LegacyUuid = 'uuid',
   LastSyncToken = 'syncToken',
   PaginationToken = 'cursorToken',

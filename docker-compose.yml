@@ -41,7 +41,7 @@ services:
       - snjs
 
   mock-event-publisher:
-    image: standardnotes/mock-event-publisher:1.0.4
+    image: standardnotes/mock-event-publisher:1.0.5
     entrypoint: [
       "./wait-for.sh", "localstack", "4566",
       "./docker/entrypoint.sh", "start-web"
@@ -60,7 +60,7 @@ services:
       - snjs
 
   syncing-server-js:
-    image: standardnotes/syncing-server-js:1.45.1
+    image: standardnotes/syncing-server-js:1.48.0
     entrypoint: [
       "./wait-for.sh", "db", "3306",
       "./wait-for.sh", "cache", "6379",
@@ -71,7 +71,7 @@ services:
       - snjs
 
   syncing-server-js-worker:
-    image: standardnotes/syncing-server-js:1.45.1
+    image: standardnotes/syncing-server-js:1.48.0
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -83,13 +83,14 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.31.0
+    image: standardnotes/api-gateway:1.32.0
     depends_on:
       - syncing-server-js
       - auth
     entrypoint: [
       "./wait-for.sh", "syncing-server-js", "3000",
       "./wait-for.sh", "auth", "3000",
+      "./wait-for.sh", "files", "3000",
       "./docker/entrypoint.sh", "start-web"
     ]
     env_file: docker/api-gateway.env
@@ -122,6 +123,21 @@ services:
       "./docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/auth.env
+    networks:
+      - snjs
+
+  files:
+    image: standardnotes/files:1.5.0
+    entrypoint: [
+      "./wait-for.sh", "db", "3306",
+      "./wait-for.sh", "cache", "6379",
+      "./docker/entrypoint.sh", "start-web"
+    ]
+    ports:
+      - 3125:3000
+    env_file: docker/files.env
+    volumes:
+      - ./docker/uploads:/var/www/dist/src/Infra/FS/tmp
     networks:
       - snjs
 

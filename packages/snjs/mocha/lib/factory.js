@@ -124,6 +124,10 @@ export function getDefaultHost() {
   return 'http://localhost:3123';
 }
 
+export function getDefaultFilesHost() {
+  return 'http://localhost:3125';
+}
+
 export function getDefaultMockedEventServiceUrl() {
   return 'http://localhost:3124';
 }
@@ -137,9 +141,12 @@ function getAppVersion() {
 }
 
 export async function publishMockedEvent(eventType, eventPayload) {
-  await fetch({
-    url: `${getDefaultMockedEventServiceUrl()}/events`,
-    method: 'post',
+  await fetch(`${getDefaultMockedEventServiceUrl()}/events`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
       eventType,
       eventPayload,
@@ -171,6 +178,7 @@ export function createApplication(
     identifier || `${Math.random()}`,
     [],
     host || getDefaultHost(),
+    getDefaultFilesHost(),
     getAppVersion(),
     getDefaultWebSocketUrl()
   );

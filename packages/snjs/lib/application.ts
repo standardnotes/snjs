@@ -90,6 +90,7 @@ import {
   SNStorageService,
   SNSyncService,
   SNFeaturesService,
+  SNFileService,
   SyncModes,
 } from './services';
 import { DeviceInterface, ServiceInterface } from '@standardnotes/services';
@@ -189,6 +190,7 @@ export class SNApplication implements ListedInterface {
   private settingsService!: SNSettingsService;
   private mfaService!: SNMfaService;
   private listedService!: ListedService;
+  public fileService!: SNFileService;
 
   private eventHandlers: ApplicationObserver[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -225,6 +227,7 @@ export class SNApplication implements ListedInterface {
    * and 'with' is the custom subclass to use.
    * @param skipClasses An array of classes to skip making services for.
    * @param defaultHost Default host to use in ApiService.
+   * @param defaultFilesHost Default files host to use in ApiService.
    * @param appVersion Version of client application.
    * @param webSocketUrl URL for WebSocket providing permissions and roles information.
    */
@@ -238,10 +241,11 @@ export class SNApplication implements ListedInterface {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private swapClasses: { swap: any; with: any }[],
     private defaultHost: string,
+    private defaultFilesHost: string,
     private appVersion: string,
     private webSocketUrl?: string,
     private readonly runtime: Runtime = Runtime.Prod,
-    private readonly options: ApplicationOptions = ApplicationOptionsDefaults
+    public readonly options: ApplicationOptions = ApplicationOptionsDefaults
   ) {
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.');
@@ -278,6 +282,11 @@ export class SNApplication implements ListedInterface {
     }
     if (!defaultHost) {
       throw Error('defaultHost must be supplied when creating an application.');
+    }
+    if (!defaultFilesHost) {
+      throw Error(
+        'defaultFilesHost must be supplied when creating an application.'
+      );
     }
     if (!appVersion) {
       throw Error('appVersion must be supplied when creating an application.');
@@ -346,6 +355,7 @@ export class SNApplication implements ListedInterface {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09);
     await this.apiService.loadHost();
+    await this.apiService.loadFilesHost();
     await this.webSocketsService.loadWebSocketUrl();
     await this.sessionManager.initializeFromDisk();
     this.historyManager.initializeFromDisk();
@@ -860,11 +870,11 @@ export class SNApplication implements ListedInterface {
     return unprotectedNotes;
   }
 
-  public getItems(
+  public getItems<T extends SNItem>(
     contentType: ContentType | ContentType[],
     nonerroredOnly = false
-  ): SNItem[] {
-    return this.itemManager.getItems(contentType, nonerroredOnly);
+  ): T[] {
+    return this.itemManager.getItems<T>(contentType, nonerroredOnly);
   }
 
   public notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[] {
@@ -1096,6 +1106,14 @@ export class SNApplication implements ListedInterface {
 
   public getHost(): string | undefined {
     return this.apiService.getHost();
+  }
+
+  public async setFilesHost(filesHost: string): Promise<void> {
+    return this.apiService.setFilesHost(filesHost);
+  }
+
+  public getFilesHost(): string | undefined {
+    return this.apiService.getFilesHost();
   }
 
   public async setCustomHost(host: string): Promise<void> {
@@ -1863,6 +1881,7 @@ export class SNApplication implements ListedInterface {
     this.createMfaService();
     this.createListedService();
     this.createActionsManager();
+    this.createFileService();
   }
 
   private clearServices() {
@@ -1890,6 +1909,7 @@ export class SNApplication implements ListedInterface {
     (this.settingsService as unknown) = undefined;
     (this.mfaService as unknown) = undefined;
     (this.listedService as unknown) = undefined;
+    (this.fileService as unknown) = undefined;
 
     this.services = [];
   }
@@ -1902,6 +1922,19 @@ export class SNApplication implements ListedInterface {
       this.httpService
     );
     this.services.push(this.listedService);
+  }
+
+  private createFileService() {
+    this.fileService = new SNFileService(
+      this.apiService,
+      this.itemManager,
+      this.syncService,
+      this.alertService,
+      this.crypto,
+      this.options
+    );
+
+    this.services.push(this.fileService);
   }
 
   private createFeaturesService() {
@@ -1993,7 +2026,8 @@ export class SNApplication implements ListedInterface {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.defaultHost
+      this.defaultHost,
+      this.defaultFilesHost
     );
     this.services.push(this.apiService);
   }

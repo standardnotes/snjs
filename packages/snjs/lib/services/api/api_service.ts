@@ -1,3 +1,4 @@
+import { FilesApi, EncryptedFileInterface } from './../files/types';
 import { SNFeatureRepo } from './../../models/app/feature_repo';
 import { UuidString } from './../../types';
 import {
@@ -28,6 +29,11 @@ import {
   GetOfflineFeaturesResponse,
   ListedRegistrationResponse,
   User,
+  CreateValetTokenResponse,
+  StartUploadSessionResponse,
+  CloseUploadSessionResponse,
+  UploadFileChunkResponse,
+  DownloadFileChunkResponse,
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType, ErrorObject } from '@standardnotes/common';
@@ -72,6 +78,11 @@ type PathNamesV1 = {
   purchase: string;
   subscriptionTokens: string;
   offlineFeatures: string;
+  createFileValetToken: string;
+  startUploadSession: string;
+  uploadFileChunk: string;
+  closeUploadSession: string;
+  downloadFileChunk: string;
 };
 
 type PathNamesV2 = {
@@ -106,6 +117,11 @@ const Paths: {
     purchase: '/v1/purchase',
     subscriptionTokens: '/v1/subscription-tokens',
     offlineFeatures: '/v1/offline/features',
+    createFileValetToken: '/v1/files/valet-tokens',
+    startUploadSession: '/v1/files/upload/create-session',
+    uploadFileChunk: '/v1/files/upload/chunk',
+    closeUploadSession: '/v1/files/upload/close-session',
+    downloadFileChunk: '/v1/files',
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -126,10 +142,9 @@ export type MetaReceivedData = {
   userRoles: Role[];
 };
 
-export class SNApiService extends AbstractService<
-  ApiServiceEvent.MetaReceived,
-  MetaReceivedData
-> {
+export class SNApiService
+  extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
+  implements FilesApi {
   private session?: Session;
   public user?: User;
   private registering = false;
@@ -142,7 +157,8 @@ export class SNApiService extends AbstractService<
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private host: string
+    private host: string,
+    private filesHost: string
   ) {
     super();
   }
@@ -196,6 +212,32 @@ export class SNApiService extends AbstractService<
   public isThirdPartyHostUsed(): boolean {
     const applicationHost = this.getHost() || '';
     return !isUrlFirstParty(applicationHost);
+  }
+
+  public async loadFilesHost(): Promise<void> {
+    const storedValue = await this.storageService.getValue(
+      StorageKey.FilesServerHost
+    );
+    this.filesHost =
+      storedValue ||
+      this.filesHost ||
+      (window as {
+        _default_files_server?: string;
+      })._default_files_server;
+  }
+
+  public async setFilesHost(filesHost: string): Promise<void> {
+    this.filesHost = filesHost;
+    await this.storageService.setValue(StorageKey.FilesServerHost, filesHost);
+  }
+
+  public getFilesHost(): string {
+    return this.filesHost;
+  }
+
+  public isThirdPartyFilesHostUsed(): boolean {
+    const filesHost = this.getFilesHost() || '';
+    return !isUrlFirstParty(filesHost);
   }
 
   public async setSession(session: Session, persist = true): Promise<void> {
@@ -266,6 +308,7 @@ export class SNApiService extends AbstractService<
     params?: HttpParams;
     authentication?: string;
     customHeaders?: Record<string, string>[];
+    responseType?: XMLHttpRequestResponseType;
   }) {
     try {
       const response = await this.httpService.runHttp(params);
@@ -846,6 +889,152 @@ export class SNApiService extends AbstractService<
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_LISTED_REGISTRATION,
       authentication: this.session?.authorizationValue,
     });
+  }
+
+  public async createFileValetToken(
+    remoteIdentifier: string,
+    operation: 'write' | 'read'
+  ): Promise<string | ErrorObject> {
+    const url = joinPaths(this.host, Paths.v1.createFileValetToken);
+    const params = {
+      operation,
+      resources: [remoteIdentifier],
+    };
+    const response = await this.tokenRefreshableRequest<CreateValetTokenResponse>(
+      {
+        verb: HttpVerb.Post,
+        url: url,
+        authentication: this.session?.authorizationValue,
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_CREATE_FILE_TOKEN,
+        params,
+      }
+    );
+
+    if (!response.data?.success) {
+      return {
+        error: response.data?.reason as string,
+      };
+    }
+
+    return response.data?.valetToken;
+  }
+
+  public async startUploadSession(apiToken: string): Promise<boolean> {
+    const url = joinPaths(this.filesHost, Paths.v1.startUploadSession);
+
+    const response:
+      | HttpResponse
+      | StartUploadSessionResponse = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_START_UPLOAD_SESSION,
+    });
+
+    return (response as StartUploadSessionResponse).success;
+  }
+
+  public async uploadFileBytes(
+    apiToken: string,
+    chunkId: number,
+    encryptedBytes: Uint8Array
+  ): Promise<boolean> {
+    const url = joinPaths(this.filesHost, Paths.v1.uploadFileChunk);
+
+    const response: HttpResponse | UploadFileChunkResponse = await this.request(
+      {
+        verb: HttpVerb.Post,
+        url,
+        params: this.params({ chunk: encryptedBytes, chunkId }),
+        customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK,
+      }
+    );
+
+    return (response as UploadFileChunkResponse).success;
+  }
+
+  public async closeUploadSession(apiToken: string): Promise<boolean> {
+    const url = joinPaths(this.filesHost, Paths.v1.closeUploadSession);
+
+    const response:
+      | HttpResponse
+      | CloseUploadSessionResponse = await this.request({
+      verb: HttpVerb.Post,
+      url,
+      customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_CLOSE_UPLOAD_SESSION,
+    });
+
+    return (response as CloseUploadSessionResponse).success;
+  }
+
+  public async downloadFile(
+    file: EncryptedFileInterface,
+    chunkIndex = 0,
+    apiToken: string,
+    contentRangeStart: number,
+    onBytesReceived: (bytes: Uint8Array) => void
+  ): Promise<void> {
+    const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
+    const pullChunkSize = file.chunkSizes[chunkIndex];
+
+    console.log('Downloading chunk', chunkIndex, 'encrypted size', pullChunkSize);
+
+    const response:
+      | HttpResponse
+      | DownloadFileChunkResponse = await this.tokenRefreshableRequest<DownloadFileChunkResponse>(
+      {
+        verb: HttpVerb.Get,
+        url,
+        customHeaders: [
+          { key: 'x-valet-token', value: apiToken },
+          {
+            key: 'x-chunk-size',
+            value: pullChunkSize.toString(),
+          },
+          { key: 'range', value: `bytes=${contentRangeStart}-` },
+        ],
+        fallbackErrorMessage: messages.API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK,
+        responseType: 'arraybuffer',
+      }
+    );
+
+    const contentRangeHeader = (<Map<string, string | null>>(
+      response.headers
+    )).get('content-range');
+    if (!contentRangeHeader) {
+      throw new Error(
+        'Could not obtain content-range header while downloading file chunk'
+      );
+    }
+
+    const matches = contentRangeHeader.match(
+      /(^[a-zA-Z][\w]*)\s+(\d+)\s?-\s?(\d+)?\s?\/?\s?(\d+|\*)?/
+    );
+    if (!matches || matches.length !== 5) {
+      throw new Error(
+        'Malformed content-range header in response when downloading file chunk'
+      );
+    }
+
+    const rangeStart = +matches[2];
+    const rangeEnd = +matches[3];
+    const totalSize = +matches[4];
+
+    const bytesReceived = new Uint8Array(response.data as ArrayBuffer);
+
+    onBytesReceived(bytesReceived);
+
+    if (rangeEnd < totalSize - 1) {
+      this.downloadFile(
+        file,
+        ++chunkIndex,
+        apiToken,
+        rangeStart + pullChunkSize,
+        onBytesReceived
+      );
+    }
   }
 
   private preprocessingError() {

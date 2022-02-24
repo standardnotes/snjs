@@ -45,6 +45,7 @@ export type HttpResponse = {
     error?: Error;
   };
   meta?: ResponseMeta;
+  headers?: Map<string, string | null>;
 };
 
 export type ResponseMeta = {
@@ -221,6 +222,7 @@ type SettingData = {
 export type MinimalHttpResponse = {
   status?: StatusCode;
   error?: Error;
+  headers?: Map<string, string | null>;
 };
 
 export type ListSettingsResponse = MinimalHttpResponse & {
@@ -242,6 +244,16 @@ export type GetSubscriptionResponse = MinimalHttpResponse & {
     subscription?: Subscription;
   };
 };
+
+export type CreateValetTokenResponse = MinimalHttpResponse & {
+  data?: {
+    success: true
+    valetToken: string
+  } | {
+    success: false
+    reason: 'no-subscription' | 'expired-subscription'
+  }
+}
 
 export type AvailableSubscriptions = {
   [key in SubscriptionName]: {
@@ -298,4 +310,22 @@ export type ActionResponse = HttpResponse & {
   item?: any;
   keyParams?: any;
   auth_params?: any;
+};
+
+export type StartUploadSessionResponse = MinimalHttpResponse & {
+  success: boolean;
+  uploadId: string;
+};
+
+export type UploadFileChunkResponse = MinimalHttpResponse & {
+  success: boolean;
+};
+
+export type CloseUploadSessionResponse = MinimalHttpResponse & {
+  success: boolean;
+  message: string;
+};
+
+export type DownloadFileChunkResponse = MinimalHttpResponse & {
+  data: ArrayBuffer
 };

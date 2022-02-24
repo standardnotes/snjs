@@ -552,7 +552,7 @@ export function truncateHexString(string: string, desiredBits: number) {
  * When awaited, this function allows code execution to pause for a set time.
  * Should be used primarily for testing.
  */
-export async function sleep(milliseconds: number, warn = true) {
+export async function sleep(milliseconds: number, warn = true): Promise<void> {
   if (warn) {
     console.warn(`Sleeping for ${milliseconds}ms`)
   }

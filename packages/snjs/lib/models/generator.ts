@@ -1,3 +1,4 @@
+import { SNFile } from './app/file';
 import { SNFeatureRepo } from './app/feature_repo';
 import { ContentType } from '@standardnotes/common';
 import { PurePayload } from '@Payloads/pure_payload';
@@ -25,6 +26,7 @@ const ContentTypeClassMapping: Partial<
   [ContentType.Component]: SNComponent,
   [ContentType.UserPrefs]: SNUserPrefs,
   [ContentType.ExtensionRepo]: SNFeatureRepo,
+  [ContentType.File]: SNFile,
 };
 
 export function CreateItemFromPayload(payload: PurePayload): SNItem {

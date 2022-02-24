@@ -5,6 +5,7 @@ export {
 } from './version';
 
 export type { ApplicationDescriptor } from './application_group';
+export { ApplicationOptionsDefaults } from './options';
 export type {
   ActionResponse,
   ListedAccount,
@@ -241,6 +242,8 @@ export {
 export { NoteViewController } from './ui/note_view_controller';
 export { NoteGroupController } from './ui/note_group_controller';
 export { IconsController } from './ui/icons_controller';
+
+export { SNFile, FileProtocolV1 } from '@Models/app/file';
 
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';

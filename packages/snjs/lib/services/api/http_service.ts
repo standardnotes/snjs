@@ -1,6 +1,6 @@
 import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
 import { HttpResponse, StatusCode } from './responses';
-import { isNullOrUndefined } from '@standardnotes/utils';
+import { isNullOrUndefined, isString } from '@standardnotes/utils';
 import { SnjsVersion } from '@Lib/version';
 import { Environment } from '@Lib/platforms';
 import { AbstractService } from '@standardnotes/services';
@@ -27,6 +27,7 @@ export type HttpRequest = {
   verb: HttpVerb;
   authentication?: string;
   customHeaders?: Record<string, string>[];
+  responseType?: XMLHttpRequestResponseType;
 };
 
 /**
@@ -35,7 +36,7 @@ export type HttpRequest = {
 export class SNHttpService extends AbstractService {
   constructor(
     private readonly environment: Environment,
-    private readonly appVersion: string,
+    private readonly appVersion: string
   ) {
     super();
   }
@@ -97,10 +98,14 @@ export class SNHttpService extends AbstractService {
       );
     }
     request.open(httpRequest.verb, httpRequest.url, true);
+    request.responseType = httpRequest.responseType ?? '';
+
     request.setRequestHeader('Content-type', 'application/json');
     request.setRequestHeader('X-SNJS-Version', SnjsVersion);
 
-    const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
+    const appVersionHeaderValue = `${Environment[this.environment]}-${
+      this.appVersion
+    }`;
     request.setRequestHeader('X-Application-Version', appVersionHeaderValue);
 
     if (httpRequest.authentication) {
@@ -111,7 +116,7 @@ export class SNHttpService extends AbstractService {
     }
 
     if (httpRequest.customHeaders && httpRequest.customHeaders.length > 0) {
-      httpRequest.customHeaders.forEach(({key, value}) => {
+      httpRequest.customHeaders.forEach(({ key, value }) => {
         request.setRequestHeader(key, value);
       });
     }
@@ -151,10 +156,34 @@ export class SNHttpService extends AbstractService {
     const httpStatus = request.status;
     const response: HttpResponse = {
       status: httpStatus,
+      headers: new Map<string, string | null>(),
     };
+
+    const responseHeaderLines = request
+      .getAllResponseHeaders()
+      .trim()
+      .split(/[\r\n]+/);
+    responseHeaderLines.forEach((responseHeaderLine) => {
+      const parts = responseHeaderLine.split(': ');
+      const name = parts.shift() as string;
+      const value = parts.join(': ');
+
+      (<Map<string, string | null>>response.headers).set(name, value);
+    });
+
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
-        const body = JSON.parse(request.responseText);
+        let body;
+
+        const contentTypeHeader =
+          response.headers?.get('content-type') ||
+          response.headers?.get('Content-Type');
+
+        if (contentTypeHeader?.includes('application/json')) {
+          body = JSON.parse(request.responseText);
+        } else {
+          body = request.response;
+        }
         /**
          * v0 APIs do not have a `data` top-level object. In such cases, mimic
          * the newer response body style by putting all the top-level
@@ -163,7 +192,9 @@ export class SNHttpService extends AbstractService {
         if (!body.data) {
           response.data = body;
         }
-        Object.assign(response, body);
+        if (!isString(body)) {
+          Object.assign(response, body);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -180,7 +211,10 @@ export class SNHttpService extends AbstractService {
           status: httpStatus,
         };
       } else if (isNullOrUndefined(response.error)) {
-        if (isNullOrUndefined(response.data) || isNullOrUndefined(response.data.error)) {
+        if (
+          isNullOrUndefined(response.data) ||
+          isNullOrUndefined(response.data.error)
+        ) {
           response.error = { message: UNKNOWN_ERROR, status: httpStatus };
         } else {
           response.error = response.data.error;

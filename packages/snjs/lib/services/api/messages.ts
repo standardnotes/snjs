@@ -36,6 +36,8 @@ export const API_MESSAGE_FAILED_GET_SETTINGS = 'Failed to get settings.';
 export const API_MESSAGE_FAILED_UPDATE_SETTINGS = 'Failed to update settings.';
 export const API_MESSAGE_FAILED_LISTED_REGISTRATION = 'Unable to register for Listed. Please try again later.';
 
+export const API_MESSAGE_FAILED_CREATE_FILE_TOKEN = 'Failed to create file token.';
+
 export const API_MESSAGE_FAILED_SUBSCRIPTION_INFO =
   "Failed to get subscription's information.";
 
@@ -43,6 +45,18 @@ export const API_MESSAGE_FAILED_ACCESS_PURCHASE =
   'Failed to access purchase flow.';
 
 export const API_MESSAGE_FAILED_DELETE_REVISION = 'Failed to delete revision.';
+
+export const API_MESSAGE_FAILED_START_UPLOAD_SESSION =
+  'Failed to start an upload session.';
+
+export const API_MESSAGE_FAILED_CLOSE_UPLOAD_SESSION =
+  'Failed to close an upload session.';
+
+export const API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK =
+  'Failed to upload file chunk.';
+
+export const API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK =
+  'Failed to download file chunk.';
 
 export const API_MESSAGE_FAILED_OFFLINE_FEATURES =
   'Failed to get offline features.';

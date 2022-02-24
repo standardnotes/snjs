@@ -1,3 +1,9 @@
+import {
+  StreamEncryptor,
+  StreamDecryptor,
+  SodiumConstant,
+  StreamDecryptorResult,
+} from '@standardnotes/sncrypto-common'
 import * as Utils from './utils'
 import * as sodium from './libsodium'
 
@@ -8,8 +14,6 @@ import {
   Utf8String,
   timingSafeEqual,
 } from '@standardnotes/sncrypto-common'
-
-const subtleCrypto = Utils.getSubtleCrypto()
 
 enum WebCryptoAlgs {
   AesCbc = 'AES-CBC',
@@ -225,7 +229,7 @@ export class SNWebCrypto implements SNPureCrypto {
     actions: Array<WebCryptoActions>,
     hash?: WebCryptoParams,
   ): Promise<CryptoKey> {
-    return subtleCrypto.importKey(
+    return Utils.getSubtleCrypto().importKey(
       'raw',
       keyData,
       {
@@ -255,9 +259,11 @@ export class SNWebCrypto implements SNPureCrypto {
       hash: { name: WebCryptoAlgs.Sha512 },
     }
 
-    return subtleCrypto.deriveBits(params, key, length).then((bits) => {
-      return Utils.arrayBufferToHexString(new Uint8Array(bits))
-    })
+    return Utils.getSubtleCrypto()
+      .deriveBits(params, key, length)
+      .then((bits) => {
+        return Utils.arrayBufferToHexString(new Uint8Array(bits))
+      })
   }
 
   public argon2(
@@ -319,6 +325,79 @@ export class SNWebCrypto implements SNPureCrypto {
     } catch {
       return null
     }
+  }
+
+  public xchacha20StreamInitEncryptor(key: HexString): StreamEncryptor {
+    const res = sodium.crypto_secretstream_xchacha20poly1305_init_push(
+      Utils.hexStringToArrayBuffer(key),
+    )
+    return {
+      state: res.state,
+      header: Utils.arrayBufferToBase64(res.header),
+    }
+  }
+
+  public xchacha20StreamEncryptorPush(
+    encryptor: StreamEncryptor,
+    plainBuffer: Uint8Array,
+    assocData: Utf8String,
+    tag: SodiumConstant = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH,
+  ): Uint8Array {
+    const encryptedBuffer = sodium.crypto_secretstream_xchacha20poly1305_push(
+      encryptor.state as sodium.StateAddress,
+      plainBuffer,
+      assocData.length > 0 ? Utils.stringToArrayBuffer(assocData) : null,
+      tag,
+    )
+    return encryptedBuffer
+  }
+
+  public xchacha20StreamInitDecryptor(
+    header: Base64String,
+    key: HexString,
+  ): StreamDecryptor {
+    const rawHeader = Utils.base64ToArrayBuffer(header)
+
+    if (
+      rawHeader.length !==
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES
+    ) {
+      throw new Error(
+        `Header must be ${SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES} bytes long`,
+      )
+    }
+
+    const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(
+      rawHeader,
+      Utils.hexStringToArrayBuffer(key),
+    )
+
+    return { state }
+  }
+
+  public xchacha20StreamDecryptorPush(
+    decryptor: StreamDecryptor,
+    encryptedBuffer: Uint8Array,
+    assocData: Utf8String,
+  ): StreamDecryptorResult | false {
+    if (
+      encryptedBuffer.length <
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES
+    ) {
+      throw new Error('Invalid ciphertext size')
+    }
+
+    const result = sodium.crypto_secretstream_xchacha20poly1305_pull(
+      decryptor.state as sodium.StateAddress,
+      encryptedBuffer,
+      assocData.length > 0 ? Utils.stringToArrayBuffer(assocData) : null,
+    )
+
+    if ((result as unknown) === false) {
+      return false
+    }
+
+    return result
   }
 
   /**

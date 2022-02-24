@@ -19,6 +19,7 @@ function setup {
   cp docker/auth.env.sample docker/auth.env
   cp docker/syncing-server-js.env.sample docker/syncing-server-js.env
   cp docker/mock-event-publisher.env.sample docker/mock-event-publisher.env
+  cp docker/files.env.sample docker/files.env
 
   echo "# Installing project dependecies (Host Machine)"
   yarn install --pure-lockfile
@@ -44,7 +45,7 @@ function startContainers {
   docker compose -f $COMPOSE_FILE pull
 
   echo "# Building Docker images"
-  docker compose -f $COMPOSE_FILE build
+  docker compose -f $COMPOSE_FILE build --build-arg UID=$(id -u) --build-arg GID=$(id -g)
 
   echo "# Starting all containers for Test Suite"
   docker compose -f $COMPOSE_FILE up -d

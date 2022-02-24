@@ -19,6 +19,8 @@ packages/time/dist
 packages/sncrypto-common/dist
 packages/sncrypto-node/dist
 packages/sncrypto-web/dist
+packages/filepicker/dist
+packages/filepicker/example/dist
 packages/utils/dist
 packages/services/dist
 
@@ -34,6 +36,7 @@ api-gateway.env
 syncing-server-js.env
 syncing-server.env
 mock-event-publisher.env
+files.env
 codeqldb
 
 packages/components/tmp

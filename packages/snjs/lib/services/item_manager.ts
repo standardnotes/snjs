@@ -703,12 +703,12 @@ export class ItemManager extends AbstractService {
    * Creates an item and conditionally maps it and marks it as dirty.
    * @param needsSync - Whether to mark the item as needing sync
    */
-  public async createItem(
+  public async createItem<T extends SNItem>(
     contentType: ContentType,
     content?: PayloadContent,
     needsSync = false,
     override?: PayloadOverride
-  ): Promise<SNItem> {
+  ): Promise<T> {
     if (!contentType) {
       throw 'Attempting to create item with no contentType';
     }
@@ -722,7 +722,7 @@ export class ItemManager extends AbstractService {
       override
     );
     await this.payloadManager.emitPayload(payload, PayloadSource.Constructor);
-    return this.findItem(payload.uuid!)!;
+    return this.findItem(payload.uuid!) as T;
   }
 
   /**

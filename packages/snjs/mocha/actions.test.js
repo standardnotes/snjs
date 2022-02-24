@@ -7,14 +7,8 @@ const expect = chai.expect;
 describe('actions service', () => {
   const errorProcessingActionMessage =
     'An issue occurred while processing this action. Please try again.';
-  const errorDecryptingRevisionMessage =
-    'We were unable to decrypt this revision using your current keys, ' +
-    'and this revision is missing metadata that would allow us to try different ' +
-    'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
-    'Please email hello@standardnotes.org for assistance.';
 
   before(async function () {
-    // Set timeout for all tests.
     this.timeout(20000);
 
     localStorage.clear();
@@ -142,7 +136,7 @@ describe('actions service', () => {
     this.fakeServer.respondWith(
       'GET',
       /http:\/\/my-extension.sn.org\/action_[1,2]\/(.*)/,
-      (request, params) => {
+      (request) => {
         request.respond(
           200,
           { 'Content-Type': 'application/json' },
@@ -182,7 +176,7 @@ describe('actions service', () => {
     this.fakeServer.respondWith(
       'GET',
       'http://my-extension.sn.org/action_5/',
-      (request, params) => {
+      (request) => {
         const encryptedPayloadClone = JSON.parse(
           JSON.stringify(encryptedPayload)
         );
@@ -193,13 +187,15 @@ describe('actions service', () => {
         encryptedPayloadClone.version = '003';
         encryptedPayloadClone.uuid = 'fake-uuid';
 
+        const payload = {
+          item: encryptedPayloadClone,
+          auth_params: this.authParams,
+        };
+
         request.respond(
           200,
           { 'Content-Type': 'application/json' },
-          JSON.stringify({
-            item: encryptedPayloadClone,
-            auth_params: this.authParams,
-          })
+          JSON.stringify(payload)
         );
       }
     );
@@ -334,7 +330,7 @@ describe('actions service', () => {
 
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
-        this.noteItem,
+        this.noteItem
       );
 
       sinon.assert.calledOnceWithExactly(
@@ -351,7 +347,7 @@ describe('actions service', () => {
     it('should return a response if payload is valid', async function () {
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
-        this.noteItem,
+        this.noteItem
       );
 
       expect(actionResponse).to.have.property('item');
@@ -365,7 +361,7 @@ describe('actions service', () => {
 
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
-        this.noteItem,
+        this.noteItem
       );
       expect(actionResponse).to.be.undefined;
     });
@@ -379,7 +375,7 @@ describe('actions service', () => {
       )[0];
       const actionResponse = await this.actionsManager.runAction(
         this.renderAction,
-        this.noteItem,
+        this.noteItem
       );
 
       expect(actionResponse.item).to.be.ok;
