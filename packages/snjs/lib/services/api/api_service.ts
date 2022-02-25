@@ -939,6 +939,9 @@ export class SNApiService
     chunkId: number,
     encryptedBytes: Uint8Array
   ): Promise<boolean> {
+    if (chunkId === 0) {
+      throw Error('chunkId must start with 1');
+    }
     const url = joinPaths(this.filesHost, Paths.v1.uploadFileChunk);
 
     const response: HttpResponse | UploadFileChunkResponse = await this.request(
@@ -978,8 +981,6 @@ export class SNApiService
   ): Promise<void> {
     const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk);
     const pullChunkSize = file.chunkSizes[chunkIndex];
-
-    console.log('Downloading chunk', chunkIndex, 'encrypted size', pullChunkSize);
 
     const response:
       | HttpResponse

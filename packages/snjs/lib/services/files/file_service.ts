@@ -14,7 +14,33 @@ import { isErrorObject } from '@standardnotes/utils';
 import { PayloadContent } from '@Lib/protocol';
 import { AbstractService } from '@standardnotes/services';
 
-export class SNFileService extends AbstractService {
+export interface FilesClientInterface {
+  beginNewFileUpload(): Promise<EncryptAndUploadFileOperation>;
+
+  pushBytesForUpload(
+    operation: EncryptAndUploadFileOperation,
+    bytes: Uint8Array,
+    chunkId: number,
+    isFinalChunk: boolean
+  ): Promise<boolean>;
+
+  finishUpload(
+    operation: EncryptAndUploadFileOperation,
+    fileName: string,
+    fileExt: string
+  ): Promise<SNFile>;
+
+  downloadFile(
+    file: SNFile,
+    onDecryptedBytes: (bytes: Uint8Array) => void
+  ): Promise<void>;
+
+  minimumChunkSize(): number;
+}
+
+export class SNFileService
+  extends AbstractService
+  implements FilesClientInterface {
   constructor(
     private apiService: SNApiService,
     private itemManager: ItemManager,
@@ -32,6 +58,10 @@ export class SNFileService extends AbstractService {
     (this.syncService as unknown) = undefined;
     (this.alertService as unknown) = undefined;
     (this.crypto as unknown) = undefined;
+  }
+
+  public minimumChunkSize(): number {
+    return 5_000_000;
   }
 
   public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {

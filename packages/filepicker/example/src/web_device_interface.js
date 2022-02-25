@@ -1,11 +1,11 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { DeviceInterface } from '@standardnotes/snjs'
+import { AbstractDevice } from '@standardnotes/snjs'
 
 const KEYCHAIN_STORAGE_KEY = 'keychain'
 
-export default class WebDeviceInterface extends DeviceInterface {
+export default class WebDeviceInterface extends AbstractDevice {
   async getRawStorageValue(key) {
     return localStorage.getItem(key)
   }

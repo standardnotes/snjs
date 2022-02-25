@@ -137,6 +137,7 @@ import {
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders';
 import { RemoteSession } from './services/api/session';
 import { RoleName } from '.';
+import { FilesClientInterface } from './services/files/file_service';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
@@ -189,7 +190,7 @@ export class SNApplication implements ListedInterface {
   private settingsService!: SNSettingsService;
   private mfaService!: SNMfaService;
   private listedService!: ListedService;
-  public fileService!: SNFileService;
+  private fileService!: SNFileService;
 
   private eventHandlers: ApplicationObserver[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -256,6 +257,10 @@ export class SNApplication implements ListedInterface {
     this.options = Object.freeze(fullyResovledOptions);
 
     this.constructServices();
+  }
+
+  public get files(): FilesClientInterface {
+    return this.fileService;
   }
 
   /**

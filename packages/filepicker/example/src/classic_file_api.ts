@@ -1,5 +1,5 @@
 import { SNApplication, ContentType, SNFile } from '../../../snjs'
-import { ClassicFilePicker } from '../../../filepicker'
+import { ClassicFileReader, ClassicFileSaver } from '../../../filepicker'
 
 export class ClassicFileApi {
   constructor(private application: SNApplication) {
@@ -8,22 +8,20 @@ export class ClassicFileApi {
 
   configureFilePicker(): void {
     const input = document.getElementById('filePicker') as HTMLInputElement
-    input.type = 'file'
-    input.onchange = (event) => {
-      const target = event.target as HTMLInputElement
-      const file = target.files[0]
-      void this.handleFileSelect(file)
+    input.onclick = () => {
+      void this.openFilePicker()
     }
-
     console.log('Classic file picker ready.')
   }
 
-  async handleFileSelect(inputFile: File): Promise<void> {
-    const filePicker = new ClassicFilePicker(inputFile, 100_000)
-
-    const operation = await this.application.fileService.beginNewFileUpload()
-    const fileResult = await filePicker.readFileAndSplit(
+  async openFilePicker(): Promise<void> {
+    let operation
+    const filePicker = new ClassicFileReader(
+      2_000_000,
       async (chunk, index, isLast) => {
+        if (index === 1) {
+          operation = await this.application.fileService.beginNewFileUpload()
+        }
         await this.application.fileService.pushBytesForUpload(
           operation,
           chunk,
@@ -32,7 +30,8 @@ export class ClassicFileApi {
         )
       },
     )
-
+    filePicker.loggingEnabled = true
+    const fileResult = await filePicker.selectFileAndStream()
     const fileObj = await this.application.fileService.finishUpload(
       operation,
       fileResult.name,
@@ -41,7 +40,7 @@ export class ClassicFileApi {
 
     const bytes = await this.downloadFileBytes(fileObj.remoteIdentifier)
 
-    await filePicker.saveFile(`${fileObj.name}.${fileObj.ext}`, bytes)
+    new ClassicFileSaver().saveFile(`${fileObj.name}.${fileObj.ext}`, bytes)
   }
 
   downloadFileBytes = async (remoteIdentifier: string): Promise<Uint8Array> => {
