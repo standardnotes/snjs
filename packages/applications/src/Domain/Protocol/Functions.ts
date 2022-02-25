@@ -1,4 +1,4 @@
-import { ProtocolVersion } from './ProtocolVersion'
+import { ProtocolVersion } from '@standardnotes/common'
 
 export const ProtocolVersionLength = 3
 

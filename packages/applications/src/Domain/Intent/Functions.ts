@@ -1,4 +1,4 @@
-import { ContentType } from '../Content/ContentType'
+import { ContentType } from '@standardnotes/common'
 import { EncryptionIntent } from './EncryptionIntent'
 
 /**
