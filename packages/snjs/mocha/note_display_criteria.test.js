@@ -7,7 +7,7 @@ const expect = chai.expect;
 describe('note display criteria', function () {
   before(async function () {
     const crypto = new SNWebCrypto();
-    Uuid.SetGenerators(crypto.generateUUID, crypto.generateUUID);
+    UuidGenerator.SetGenerators(crypto.generateUUID, crypto.generateUUID);
   });
 
   beforeEach(async function () {

@@ -7,7 +7,7 @@ const expect = chai.expect;
 const setupRandomUuid = () => {
   let currentId = 0;
 
-  Uuid.SetGenerators(
+  UuidGenerator.SetGenerators(
     () => Promise.resolve(String(currentId++)),
     () => String(currentId++)
   );
