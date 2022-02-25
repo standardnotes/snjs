@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.33.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.32.12...@standardnotes/features@1.33.0) (2022-02-25)
+
+
+### Features
+
+* extract core functionalities to separate packages ([#610](https://github.com/standardnotes/snjs/issues/610)) ([801547a](https://github.com/standardnotes/snjs/commit/801547a71614ad51a92fb249eaa184ed46a44aac))
+
+
+
+
+
 ## [1.32.12](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.32.11...@standardnotes/features@1.32.12) (2022-02-24)
 
 **Note:** Version bump only for package @standardnotes/features

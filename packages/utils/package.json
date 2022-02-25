@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/utils",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -24,7 +24,7 @@
     "test:unit": "jest spec --coverage"
   },
   "dependencies": {
-    "@standardnotes/common": "^1.14.1",
+    "@standardnotes/common": "^1.15.0",
     "dompurify": "^2.3.4",
     "lodash": "^4.17.19"
   },
