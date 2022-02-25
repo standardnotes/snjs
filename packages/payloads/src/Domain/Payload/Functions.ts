@@ -6,7 +6,7 @@ import { remove } from 'lodash'
 import { PurePayload } from '../Payload/PurePayload'
 import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
 import { RawEncryptionParameters } from '../Encryption/RawEncryptionParameters'
-import { ContentReference } from '../Tag/ContentReference'
+import { ContentReference } from '../Reference/ContentReference'
 
 import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'

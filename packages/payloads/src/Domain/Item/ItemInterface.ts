@@ -3,7 +3,7 @@ import { AppDataField, Uuid, ProtocolVersion, ContentType } from '@standardnotes
 import { PayloadContent } from '../Payload/PayloadContent'
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { PayloadOverride } from '../Payload/PayloadOverride'
-import { ContentReference } from '../Tag/ContentReference'
+import { ContentReference } from '../Reference/ContentReference'
 
 export interface ItemInterface {
   readonly payload: PayloadInterface

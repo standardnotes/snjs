@@ -2,7 +2,7 @@
 import { protocolVersionFromEncryptedString, ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@standardnotes/utils'
 
-import { ContentReference } from '../Tag/ContentReference'
+import { ContentReference } from '../Reference/ContentReference'
 import { FillItemContent } from './Functions'
 import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'

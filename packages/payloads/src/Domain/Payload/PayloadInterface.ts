@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
 
-import { ContentReference } from '../Tag/ContentReference'
+import { ContentReference } from '../Reference/ContentReference'
 import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'
 import { PayloadFormat } from './PayloadFormat'
