@@ -17,7 +17,7 @@ export type {
   ApplicationEventPayload,
   IconType,
 } from './types';
-export type { ApplicationIdentifier, EncryptionIntent } from '@standardnotes/applications';
+export type { ApplicationIdentifier } from '@standardnotes/applications';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
@@ -181,12 +181,13 @@ export {
 export {
   AppDataField,
   ApplicationStage,
+  EncryptionIntent,
   isLocalStorageIntent,
   isFileIntent,
   isDecryptedIntent,
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
-} from '@standardnotes/applications'
+} from '@standardnotes/applications';
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids } from '@Models/functions';
 
