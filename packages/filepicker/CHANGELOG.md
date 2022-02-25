@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.1.0...@standardnotes/filepicker@1.1.1) (2022-02-25)
+
+
+### Bug Fixes
+
+* variable reference ([960fce3](https://github.com/standardnotes/snjs/commit/960fce3d56f4a9204c373253cb75874766e6cf85))
+
+
+
+
+
 # [1.1.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.0.1...@standardnotes/filepicker@1.1.0) (2022-02-25)
 
 
