@@ -1,7 +1,6 @@
 import { SodiumConstant } from '@standardnotes/sncrypto-common';
 import { ItemMutator, SNItem } from '@Models/core/item';
-import { PayloadContent } from '@Payloads/generator';
-import { PurePayload } from './../../protocol/payloads/pure_payload';
+import { PayloadContent, PurePayload } from '@standardnotes/payloads';
 
 export enum FileProtocolV1 {
   EncryptedChunkSizeDelta = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES,

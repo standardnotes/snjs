@@ -1,4 +1,3 @@
-import { FillItemContent } from '@Models/functions';
 import { ContentType } from '@standardnotes/common';
 import { DownloadAndDecryptFileOperation } from './operations/download_and_decrypt';
 import { DecryptedFileInterface } from './types';
@@ -9,9 +8,8 @@ import { SNAlertService } from '../alert_service';
 import { SNSyncService } from '../sync/sync_service';
 import { ItemManager } from '@Services/item_manager';
 import { SNApiService } from '../api/api_service';
-import { Uuid } from '@Lib/uuid';
-import { isErrorObject } from '@standardnotes/utils';
-import { PayloadContent } from '@Lib/protocol';
+import { isErrorObject, UuidGenerator } from '@standardnotes/utils';
+import { PayloadContent, FillItemContent } from '@standardnotes/payloads';
 import { AbstractService } from '@standardnotes/services';
 
 export interface FilesClientInterface {
@@ -65,7 +63,7 @@ export class SNFileService
   }
 
   public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
-    const remoteIdentifier = Uuid.GenerateUuid();
+    const remoteIdentifier = UuidGenerator.GenerateUuid();
     const apiToken = await this.apiService.createFileValetToken(
       remoteIdentifier,
       'write'
