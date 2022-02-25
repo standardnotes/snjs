@@ -6,12 +6,12 @@ import {
   arrayByRemovingFromIndex,
   extendArray,
   isNullOrUndefined,
+  UuidGenerator,
 } from '@standardnotes/utils';
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
-} from '@Payloads/generator';
-import { Uuid } from '@Lib/uuid';
+} from '@standardnotes/payloads';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';
 import { Uuids } from '@Models/functions';
@@ -241,7 +241,7 @@ export class SNSingletonManager extends AbstractService {
 
     /** Safe to create */
     const dirtyPayload = CreateMaxPayloadFromAnyObject({
-      uuid: await Uuid.GenerateUuid(),
+      uuid: await UuidGenerator.GenerateUuid(),
       content_type: createContentType,
       content: createContent,
       dirty: true,

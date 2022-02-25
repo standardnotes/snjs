@@ -15,8 +15,8 @@ describe('backups', function () {
 
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithFakeCrypto();
-    this.email = Uuid.GenerateUuid();
-    this.password = Uuid.GenerateUuid();
+    this.email = UuidGenerator.GenerateUuid();
+    this.password = UuidGenerator.GenerateUuid();
   });
 
   afterEach(async function () {
@@ -221,8 +221,8 @@ describe('backups', function () {
     const application = await Factory.createInitAppWithFakeCrypto();
     await Factory.registerUserToApplication({
       application: application,
-      email: Uuid.GenerateUuid(),
-      password: Uuid.GenerateUuid(),
+      email: UuidGenerator.GenerateUuid(),
+      password: UuidGenerator.GenerateUuid(),
     });
     const backup = await application.createBackupFile(
       EncryptionIntent.FileDecrypted

@@ -3,7 +3,7 @@ import {
   compareSemVersions,
   isRightVersionGreaterThanLeft,
 } from '@Lib/version';
-import { ApplicationIdentifier } from '@standardnotes/common';
+import { ApplicationIdentifier } from '@standardnotes/applications';
 import { Environment } from '@Lib/platforms';
 import { DeviceInterface } from '@standardnotes/services';
 import { StorageReader } from './reader';

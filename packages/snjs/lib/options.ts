@@ -1,4 +1,5 @@
-import { ApplicationIdentifier, Runtime } from '@standardnotes/common';
+import { Runtime } from '@standardnotes/common';
+import { ApplicationIdentifier } from '@standardnotes/applications';
 import { SNAlertService } from './services/alert_service';
 import { DeviceInterface } from '@standardnotes/services';
 import { SNPureCrypto } from '@standardnotes/sncrypto-common';

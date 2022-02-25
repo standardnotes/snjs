@@ -11,7 +11,7 @@ import { SNProtocolService } from './protocol_service';
 import { SNStorageService, StorageValueModes } from '@Services/storage_service';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined } from '@standardnotes/utils';
-import { ApplicationStage } from '@standardnotes/common';
+import { ApplicationStage } from '@standardnotes/applications';
 import { ItemManager } from './item_manager';
 import { Uuids } from '@Lib/models/functions';
 import { AbstractService } from '@standardnotes/services';

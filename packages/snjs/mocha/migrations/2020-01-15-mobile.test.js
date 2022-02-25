@@ -692,8 +692,8 @@ describe('2020-01-15 mobile migration', () => {
       Environment.Mobile,
       Platform.Ios
     );
-    const email = Uuid.GenerateUuid();
-    const password = Uuid.GenerateUuid();
+    const email = UuidGenerator.GenerateUuid();
+    const password = UuidGenerator.GenerateUuid();
     /** Register with 003 account */
     await Factory.registerOldUser({
       application: tempApp,

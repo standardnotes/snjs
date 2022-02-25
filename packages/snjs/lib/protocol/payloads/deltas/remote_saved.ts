@@ -1,7 +1,5 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
-import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import { PayloadSource, ImmutablePayloadCollection, CreateSourcedPayloadFromObject } from '@standardnotes/payloads';
 
 export class DeltaRemoteSaved extends PayloadsDelta {
   public async resultingCollection() {

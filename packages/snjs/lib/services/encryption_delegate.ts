@@ -1,7 +1,7 @@
 import { SNItemsKey } from '@Models/app/items_key';
 import { SNRootKey } from '@Protocol/root_key';
-import { EncryptionIntent } from '@Protocol/intents';
-import { PurePayload } from '@Payloads/pure_payload';
+import { EncryptionIntent } from '@standardnotes/applications';
+import { PurePayload } from '@standardnotes/payloads';
 
 export interface EncryptionDelegate {
   payloadByEncryptingPayload(

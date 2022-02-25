@@ -1,6 +1,6 @@
 import { PredicateOperator } from './../core/predicate';
 import { ItemMutator, SNItem } from '@Models/core/item';
-import { CollectionSort } from '@Lib/protocol/collection/item_collection';
+import { CollectionSort } from '@standardnotes/payloads';
 import { SNPredicate } from '@Models/core/predicate';
 import { ContentType } from '@standardnotes/common';
 import { FeatureIdentifier } from '@standardnotes/features';

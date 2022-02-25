@@ -45,7 +45,7 @@ describe('online conflict handling', function () {
 
   function createDirtyPayload(contentType) {
     const params = {
-      uuid: Uuid.GenerateUuid(),
+      uuid: UuidGenerator.GenerateUuid(),
       content_type: contentType,
       content: {
         foo: 'bar',

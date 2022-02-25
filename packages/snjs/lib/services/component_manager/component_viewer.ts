@@ -6,7 +6,6 @@ import { SNFeaturesService } from '@Lib/services';
 import { ComponentArea, FindNativeFeature } from '@standardnotes/features';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
-import { Uuid } from '@Lib/uuid';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import remove from 'lodash/remove';
@@ -22,7 +21,9 @@ import {
   PayloadContent,
   RawPayload,
   CreateSourcedPayloadFromObject,
-} from '@Payloads/generator';
+  PayloadSource,
+  PayloadFormat
+} from '@standardnotes/payloads';
 import {
   ComponentMessage,
   MessageReplyData,
@@ -35,7 +36,6 @@ import {
   DeleteItemsMessageData,
 } from './types';
 import { ComponentAction, ComponentPermission } from '@standardnotes/features';
-import { PayloadSource, PayloadFormat } from '@Lib/protocol/payloads';
 import { ItemManager } from '@Services/item_manager';
 import { UuidString } from '@Lib/types';
 import { SNItem, MutationType } from '@Models/core/item';
@@ -50,6 +50,7 @@ import {
   removeFromArray,
   log,
   nonSecureRandomIdentifier,
+  UuidGenerator
 } from '@standardnotes/utils';
 import { MessageData } from '..';
 
@@ -500,7 +501,7 @@ export class ComponentViewer {
     }
     this.log('setWindow', 'component: ', this.component, 'window: ', window);
     this.window = window;
-    this.sessionKey = await Uuid.GenerateUuid();
+    this.sessionKey = await UuidGenerator.GenerateUuid();
     this.sendMessage({
       action: ComponentAction.ComponentRegistered,
       sessionKey: this.sessionKey,
@@ -801,7 +802,7 @@ export class ComponentViewer {
         const processedItems = [];
         for (const responseItem of responseItems) {
           if (!responseItem.uuid) {
-            responseItem.uuid = await Uuid.GenerateUuid();
+            responseItem.uuid = await UuidGenerator.GenerateUuid();
           }
           const payload = CreateSourcedPayloadFromObject(
             responseItem,

@@ -19,8 +19,8 @@ describe('storage manager', function () {
     this.application = await Factory.createInitAppWithFakeCrypto(
       Environment.Mobile
     );
-    this.email = Uuid.GenerateUuid();
-    this.password = Uuid.GenerateUuid();
+    this.email = UuidGenerator.GenerateUuid();
+    this.password = UuidGenerator.GenerateUuid();
   });
 
   afterEach(async function () {

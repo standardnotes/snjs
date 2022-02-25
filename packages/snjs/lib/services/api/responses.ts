@@ -1,12 +1,13 @@
-import { RawPayload } from '@Payloads/generator';
+import { RawPayload } from '@standardnotes/payloads';
 import { ApiEndpointParam } from './keys';
+import { Role, Subscription } from '@standardnotes/auth';
 import {
+  RoleName,
+  SubscriptionName,
   AnyKeyParamsContent,
   KeyParamsOrigination,
-} from './../../protocol/key_params';
-import { ProtocolVersion } from './../../protocol/versions';
-import { Role, Subscription } from '@standardnotes/auth';
-import { RoleName, SubscriptionName } from '@standardnotes/common';
+  ProtocolVersion,
+} from '@standardnotes/common';
 import { FeatureDescription } from '@standardnotes/features';
 import { UuidString } from '@Lib/types';
 

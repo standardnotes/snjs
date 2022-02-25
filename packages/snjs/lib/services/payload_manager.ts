@@ -1,13 +1,15 @@
 import { removeFromArray } from '@standardnotes/utils';
-import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
+import {
+  PayloadByMerging,
+  PayloadSource,
+  PurePayload,
+  MutableCollection,
+  ImmutablePayloadCollection
+} from '@standardnotes/payloads';
 import { DeltaFileImport } from './../protocol/payloads/deltas/file_import';
-import { PayloadSource } from './../protocol/payloads/sources';
 import { ContentType } from '@standardnotes/common';
 import { Uuids } from '@Models/functions';
 import { UuidString } from './../types';
-import { PurePayload } from '@Payloads/pure_payload';
-import { MutableCollection } from '@Lib/protocol/collection/collection';
-import { ImmutablePayloadCollection } from '@Lib/protocol/collection/payload_collection';
 import { AbstractService } from '@standardnotes/services';
 
 type ChangeCallback = (

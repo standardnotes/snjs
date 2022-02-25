@@ -1,8 +1,7 @@
 import { SNItem } from '@Models/core/item';
 import { isNullOrUndefined } from '@standardnotes/utils';
-import { CopyPayload } from '@Payloads/generator';
+import { CopyPayload, SurePayload } from '@standardnotes/payloads';
 import { CreateItemFromPayload } from '@Lib/models';
-import { SurePayload } from '@Lib/protocol/payloads/sure_payload';
 
 export class HistoryEntry {
   public readonly payload: SurePayload;

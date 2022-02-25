@@ -1,20 +1,25 @@
 import { createMutatorForItem } from '@Lib/models/mutator';
-import { ItemDelta } from '@Lib/protocol/collection/indexes';
+import {
+  ItemDelta,
+  FillItemContent,
+  CollectionSort,
+  ItemCollection,
+  CollectionSortDirection,
+  CreateMaxPayloadFromAnyObject,
+  PayloadContent,
+  PayloadOverride,
+  PurePayload,
+  PayloadSource
+} from '@standardnotes/payloads';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
-import { isString, naturalSort, removeFromArray } from '@standardnotes/utils';
+import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils';
 import { SNComponent } from '@Models/app/component';
 import { SNItemsKey } from '@Models/app/items_key';
 import { isTag, SNTag, TagFolderDelimitter } from '@Models/app/tag';
-import { FillItemContent, Uuids } from '@Models/functions';
+import { Uuids } from '@Models/functions';
 import { CreateItemFromPayload } from '@Models/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import {
-  CollectionSort,
-  ItemCollection,
-  SortDirection,
-} from '@Protocol/collection/item_collection';
 import { ContentType } from '@standardnotes/common';
 import { ComponentMutator } from './../models/app/component';
 import {
@@ -39,14 +44,7 @@ import {
   TagNoteCountChangeObserver,
   TagNotesIndex,
 } from './../protocol/collection/tag_notes_index';
-import {
-  PayloadContent,
-  PayloadOverride,
-} from './../protocol/payloads/generator';
-import { PurePayload } from './../protocol/payloads/pure_payload';
-import { PayloadSource } from './../protocol/payloads/sources';
 import { UuidString } from './../types';
-import { Uuid } from './../uuid';
 import { PayloadManager } from './payload_manager';
 import { AbstractService } from '@standardnotes/services';
 
@@ -148,7 +146,7 @@ export class ItemManager extends AbstractService {
   public setDisplayOptions(
     contentType: ContentType,
     sortBy?: CollectionSort,
-    direction?: SortDirection,
+    direction?: CollectionSortDirection,
     filter?: (element: any) => boolean
   ): void {
     if (contentType === ContentType.Note) {
@@ -714,7 +712,7 @@ export class ItemManager extends AbstractService {
     }
     const payload = CreateMaxPayloadFromAnyObject(
       {
-        uuid: await Uuid.GenerateUuid(),
+        uuid: await UuidGenerator.GenerateUuid(),
         content_type: contentType,
         content: content ? FillItemContent(content) : undefined,
         dirty: needsSync,
@@ -733,7 +731,7 @@ export class ItemManager extends AbstractService {
     content?: PayloadContent
   ): Promise<SNItem> {
     const payload = CreateMaxPayloadFromAnyObject({
-      uuid: await Uuid.GenerateUuid(),
+      uuid: await UuidGenerator.GenerateUuid(),
       content_type: contentType,
       content: FillItemContent(content || {}),
     });

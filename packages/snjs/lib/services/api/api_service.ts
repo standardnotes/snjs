@@ -37,7 +37,7 @@ import {
 } from './responses';
 import { Session, TokenSession } from './session';
 import { ContentType, ErrorObject } from '@standardnotes/common';
-import { PurePayload } from '@Payloads/pure_payload';
+import { PurePayload } from '@standardnotes/payloads';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
 import {

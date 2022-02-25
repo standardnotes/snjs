@@ -2,7 +2,7 @@ import { compareSemVersions } from '@Lib/version';
 import { SNLog } from '@Lib/log';
 import { SnjsVersion, isRightVersionGreaterThanLeft } from './../version';
 import { ApplicationEvent } from './../events';
-import { ApplicationStage } from '@standardnotes/common';
+import { ApplicationStage } from '@standardnotes/applications';
 import { MigrationServices } from './../migrations/types';
 import { Migration } from '@Lib/migrations/migration';
 import * as migrationImports from '@Lib/migrations';

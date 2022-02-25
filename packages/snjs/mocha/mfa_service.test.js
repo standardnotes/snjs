@@ -8,7 +8,7 @@ const createApp = async () =>
 const accountPassword = 'password';
 
 const registerApp = async (snApp) => {
-  const email = Uuid.GenerateUuid();
+  const email = UuidGenerator.GenerateUuid();
   const password = accountPassword;
   const ephemeral = false;
   const mergeLocal = true;

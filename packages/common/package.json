@@ -31,6 +31,14 @@
     "typescript": "^4.0.5"
   },
   "jest": {
-    "preset": "../../node_modules/@standardnotes/config/src/jest.json"
+    "preset": "../../node_modules/@standardnotes/config/src/jest.json",
+    "coverageThreshold": {
+      "global": {
+        "branches": 14,
+        "functions": 13,
+        "lines": 14,
+        "statements": 14
+      }
+    }
   }
 }

@@ -7,7 +7,13 @@ import { ApplicationSyncOptions } from './../../options';
 import { ItemManager } from '@Services/item_manager';
 import { SyncResponse } from '@Services/sync/response';
 import { MutationType, SNItem } from '@Models/core/item';
-import { PurePayload } from '@Payloads/pure_payload';
+import {
+  PurePayload,
+  PayloadField,
+  PayloadSource,
+  ImmutablePayloadCollection,
+  CreateMaxPayloadFromAnyObject
+} from '@standardnotes/payloads';
 import { PayloadManager } from './../payload_manager';
 import { SNStorageService } from './../storage_service';
 import { SNProtocolService } from './../protocol_service';
@@ -25,12 +31,8 @@ import { SyncResponseResolver } from '@Services/sync/account/response_resolver';
 import { AccountSyncOperation } from '@Services/sync/account/operation';
 import { OfflineSyncOperation } from '@Services/sync/offline/operation';
 import { DeltaOutOfSync } from '@Payloads/deltas';
-import { PayloadField } from '@Payloads/fields';
-import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { EncryptionIntent } from '@Protocol/intents';
 import { ContentType } from '@standardnotes/common';
+import { EncryptionIntent } from '@standardnotes/applications';
 import { CreateItemFromPayload } from '@Models/generator';
 import { Uuids } from '@Models/functions';
 import { SyncSignal, SyncStats } from '@Services/sync/signals';

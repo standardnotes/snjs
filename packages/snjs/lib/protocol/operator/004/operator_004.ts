@@ -4,34 +4,34 @@ import {
   ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
-} from './../../payloads/generator';
+  PurePayload,
+  PayloadFormat,
+  CopyEncryptionParameters,
+  CreateEncryptionParameters,
+  FillItemContent,
+  CreateMaxPayloadFromAnyObject
+} from '@standardnotes/payloads';
 import { SNItemsKey } from '@Models/app/items_key';
-import { PurePayload } from './../../payloads/pure_payload';
 import {
   Create004KeyParams,
-  KeyParamsOrigination,
   SNRootKeyParams,
 } from './../../key_params';
 import { V004Algorithm } from './../algorithms';
 import { ItemsKeyContent, SynchronousOperator } from './../operator';
-import { PayloadFormat } from '@Payloads/formats';
-import {
-  CopyEncryptionParameters,
-  CreateEncryptionParameters,
-} from '@Payloads/generator';
-import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
 import {
   omitUndefinedCopy,
   sortedCopy,
   truncateHexString,
   splitString,
+  UuidGenerator,
 } from '@standardnotes/utils';
-import { ContentTypeUsesRootKeyEncryption } from '@Lib/protocol/intents';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
-import { ContentType } from '@standardnotes/common';
-import { FillItemContent } from '@Models/functions';
-import { Uuid } from '@Lib/uuid';
+import {
+  ContentType,
+  KeyParamsOrigination,
+  ProtocolVersion,
+} from '@standardnotes/common';
+import { ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications';
 
 const PARTITION_CHARACTER = ':';
 
@@ -68,7 +68,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   public createItemsKey(): SNItemsKey {
     const content = this.generateNewItemsKeyContent();
     const payload = CreateMaxPayloadFromAnyObject({
-      uuid: Uuid.GenerateUuid(),
+      uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
     });

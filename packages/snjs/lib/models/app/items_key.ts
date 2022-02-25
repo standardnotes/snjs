@@ -1,7 +1,7 @@
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { ProtocolVersion } from '@Protocol/versions';
+import { ProtocolVersion } from '@standardnotes/common';
 
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.

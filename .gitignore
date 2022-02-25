@@ -23,6 +23,8 @@ packages/filepicker/dist
 packages/filepicker/example/dist
 packages/utils/dist
 packages/services/dist
+packages/payloads/dist
+packages/applications/dist
 
 yarn-error.log
 package-lock.json

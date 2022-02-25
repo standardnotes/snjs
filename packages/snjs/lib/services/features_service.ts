@@ -1,5 +1,5 @@
 import { SNItem } from '@Models/core/item';
-import { ApplicationStage } from '@standardnotes/common';
+import { ApplicationStage } from '@standardnotes/applications';
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from './../hosts';
 import {
   SNFeatureRepo,
@@ -23,6 +23,7 @@ import {
   GetFeatures,
   FindNativeFeature,
   DeprecatedFeatures,
+  ComponentContent
 } from '@standardnotes/features';
 import {
   ContentType,
@@ -37,12 +38,13 @@ import {
   SNWebSocketsService,
   WebSocketsServiceEvent,
 } from './api/websockets_service';
-import { FillItemContent } from '@Lib/models/functions';
-import { PayloadContent } from '@Lib/protocol';
-import { ComponentContent } from '@Lib/models/app/component';
+import {
+  FillItemContent,
+  PayloadContent,
+  PayloadSource
+} from '@standardnotes/payloads';
 import { SNSettingsService } from './settings_service';
 import { SettingName } from '@standardnotes/settings';
-import { PayloadSource } from '@Payloads/sources';
 import {
   arraysEqual,
   convertTimestampToMilliseconds,

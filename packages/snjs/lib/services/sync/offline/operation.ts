@@ -1,7 +1,5 @@
-import { PurePayload } from '@Payloads/pure_payload';
-import { CreateSourcedPayloadFromObject } from '@Payloads/generator';
+import { PurePayload, CreateSourcedPayloadFromObject, PayloadSource } from '@standardnotes/payloads';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
-import { PayloadSource } from '@Payloads/sources';
 import { SyncResponse } from '@Services/sync/response';
 import { Copy } from '@standardnotes/utils';
 

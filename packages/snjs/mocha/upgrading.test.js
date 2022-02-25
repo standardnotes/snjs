@@ -8,8 +8,8 @@ describe('upgrading', () => {
   beforeEach(async function () {
     localStorage.clear();
     this.application = await Factory.createInitAppWithFakeCrypto();
-    this.email = Uuid.GenerateUuid();
-    this.password = Uuid.GenerateUuid();
+    this.email = UuidGenerator.GenerateUuid();
+    this.password = UuidGenerator.GenerateUuid();
     this.passcode = '1234';
 
     const promptValueReply = (prompts) => {

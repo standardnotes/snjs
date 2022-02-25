@@ -1,20 +1,18 @@
-import { RawPayload } from './../protocol/payloads/generator';
 import { SNAlertService } from './alert_service';
 import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
-import { ApplicationStage } from '@standardnotes/common';
+import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications';
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
-} from '@Payloads/generator';
+  RawPayload,
+  PurePayload
+} from '@standardnotes/payloads';
 import { EncryptionDelegate } from './encryption_delegate';
-import { EncryptionIntent } from '@Protocol/intents';
 import { SNRootKey } from '@Protocol/root_key';
-import { PurePayload } from '@Payloads/pure_payload';
 import { ContentType } from '@standardnotes/common';
-import { Copy, isNullOrUndefined } from '@standardnotes/utils';
-import { Uuid } from '@Lib/uuid';
+import { Copy, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils';
 import { AbstractService, DeviceInterface } from '@standardnotes/services';
 
 export enum StoragePersistencePolicies {
@@ -235,7 +233,7 @@ export class SNStorageService extends AbstractService {
     const rawContent = Object.assign({}, this.values);
     const valuesToWrap = rawContent[ValueModesKeys.Unwrapped];
     const payload = CreateMaxPayloadFromAnyObject({
-      uuid: await Uuid.GenerateUuid(),
+      uuid: await UuidGenerator.GenerateUuid(),
       content: valuesToWrap as PayloadContent,
       content_type: ContentType.EncryptedStorage,
     });

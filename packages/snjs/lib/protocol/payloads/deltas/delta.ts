@@ -1,7 +1,5 @@
 import { HistoryMap } from '@Lib/services/history/history_map';
-import { PayloadSource } from '@Payloads/sources';
-import { ImmutablePayloadCollectionSet } from '@Protocol/collection/collection_set';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
+import { PayloadSource, ImmutablePayloadCollectionSet, ImmutablePayloadCollection } from '@standardnotes/payloads';
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,

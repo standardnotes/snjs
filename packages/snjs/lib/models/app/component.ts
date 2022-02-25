@@ -1,45 +1,20 @@
-import {
-  FeatureIdentifier,
-  ThirdPartyFeatureDescription,
-} from '@standardnotes/features';
 import { PredicateOperator, SNPredicate } from '@Lib/models/core/predicate';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@standardnotes/utils';
-import { UuidString } from './../../types';
-import { AppDataField } from './../core/item';
-import { PurePayload } from '@Payloads/pure_payload';
+import { PurePayload } from '@standardnotes/payloads';
 import { ItemMutator, SNItem } from '@Models/core/item';
-import { ContentType } from '@standardnotes/common';
+import { ContentType, Uuid } from '@standardnotes/common';
+import { AppDataField } from '@standardnotes/applications';
 import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
 import {
+  FeatureIdentifier,
+  ThirdPartyFeatureDescription,
   ComponentArea,
   ComponentFlag,
   FeatureDescription,
   ComponentPermission,
+  ComponentContent,
 } from '@standardnotes/features';
-
-export { ComponentArea };
-
-export interface ComponentContent {
-  componentData: Record<string, any>;
-  /** Items that have requested a component to be disabled in its context */
-  disassociatedItemIds: string[];
-  /** Items that have requested a component to be enabled in its context */
-  associatedItemIds: string[];
-  local_url: string | null;
-  hosted_url?: string;
-  offlineOnly: boolean;
-  name: string;
-  autoupdateDisabled: boolean;
-  package_info: FeatureDescription;
-  area: ComponentArea;
-  permissions: ComponentPermission[];
-  valid_until: Date | number;
-  active: boolean;
-  legacy_url?: string;
-  isMobileDefault: boolean;
-  isDeprecated: boolean;
-}
 
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
@@ -185,11 +160,11 @@ export class SNComponent extends SNItem implements ComponentContent {
     return SNComponent.associativeAreas().includes(this.area);
   }
 
-  public isExplicitlyEnabledForItem(uuid: UuidString): boolean {
+  public isExplicitlyEnabledForItem(uuid: Uuid): boolean {
     return this.associatedItemIds.indexOf(uuid) !== -1;
   }
 
-  public isExplicitlyDisabledForItem(uuid: UuidString): boolean {
+  public isExplicitlyDisabledForItem(uuid: Uuid): boolean {
     return this.disassociatedItemIds.indexOf(uuid) !== -1;
   }
 
@@ -257,23 +232,23 @@ export class ComponentMutator extends ItemMutator {
     this.typedContent.permissions = permissions;
   }
 
-  public associateWithItem(uuid: UuidString): void {
+  public associateWithItem(uuid: Uuid): void {
     const associated = this.typedContent.associatedItemIds || [];
     addIfUnique(associated, uuid);
     this.typedContent.associatedItemIds = associated;
   }
 
-  public disassociateWithItem(uuid: UuidString): void {
+  public disassociateWithItem(uuid: Uuid): void {
     const disassociated = this.typedContent.disassociatedItemIds || [];
     addIfUnique(disassociated, uuid);
     this.typedContent.disassociatedItemIds = disassociated;
   }
 
-  public removeAssociatedItemId(uuid: UuidString): void {
+  public removeAssociatedItemId(uuid: Uuid): void {
     removeFromArray(this.typedContent.associatedItemIds || [], uuid);
   }
 
-  public removeDisassociatedItemId(uuid: UuidString): void {
+  public removeDisassociatedItemId(uuid: Uuid): void {
     removeFromArray(this.typedContent.disassociatedItemIds || [], uuid);
   }
 

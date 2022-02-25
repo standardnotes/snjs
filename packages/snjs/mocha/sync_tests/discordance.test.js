@@ -23,8 +23,8 @@ describe.skip('sync discordance', () => {
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT;
     this.application = await Factory.createInitAppWithFakeCrypto();
-    this.email = Uuid.GenerateUuid();
-    this.password = Uuid.GenerateUuid();
+    this.email = UuidGenerator.GenerateUuid();
+    this.password = UuidGenerator.GenerateUuid();
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,

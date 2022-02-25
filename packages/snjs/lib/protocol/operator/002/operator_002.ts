@@ -9,31 +9,31 @@ import {
   ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
-} from './../../payloads/generator';
+  CopyEncryptionParameters,
+  CreateEncryptionParameters,
+  CreateMaxPayloadFromAnyObject,
+  PayloadFormat,
+  PurePayload,
+  FillItemContent
+} from '@standardnotes/payloads';
 import { ItemsKeyContent } from './../operator';
 import { SNItemsKey } from '@Models/app/items_key';
 import {
-  AnyKeyParamsContent,
   Create002KeyParams,
-  KeyParamsOrigination,
   SNRootKeyParams,
 } from './../../key_params';
 import { V002Algorithm } from './../algorithms';
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001';
-import { PayloadFormat } from '@Payloads/formats';
 
-import { ProtocolVersion } from '@Protocol/versions';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNLog } from '@Lib/log';
 import {
-  CopyEncryptionParameters,
-  CreateEncryptionParameters,
-  CreateMaxPayloadFromAnyObject,
-} from '@Payloads/generator';
-import { PurePayload } from '@Payloads/pure_payload';
-import { ContentType } from '@standardnotes/common';
-import { FillItemContent } from '@Models/functions';
-import { Uuid } from '@Lib/uuid';
+  ContentType,
+  AnyKeyParamsContent,
+  KeyParamsOrigination,
+  ProtocolVersion,
+} from '@standardnotes/common';
+import { UuidGenerator } from '@standardnotes/utils';
 
 /**
  * @deprecated
@@ -63,7 +63,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   public createItemsKey(): SNItemsKey {
     const content = this.generateNewItemsKeyContent();
     const payload = CreateMaxPayloadFromAnyObject({
-      uuid: Uuid.GenerateUuid(),
+      uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
     });

@@ -1,5 +1,9 @@
-import { leftVersionGreaterThanOrEqualToRight } from '@Lib/protocol/versions';
-import { ProtocolVersion } from '@Protocol/versions';
+import {
+  ProtocolVersion,
+  AnyKeyParamsContent,
+  KeyParamsOrigination,
+} from '@standardnotes/common';
+import { leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
 import {
   ChallengeKeyboardType,
@@ -24,9 +28,7 @@ import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';
 import { SNRootKey } from '@Protocol/root_key';
 import {
-  AnyKeyParamsContent,
   KeyParamsFromApiResponse,
-  KeyParamsOrigination,
   SNRootKeyParams,
 } from './../../protocol/key_params';
 import { isNullOrUndefined } from '@standardnotes/utils';

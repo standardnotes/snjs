@@ -1,7 +1,5 @@
 import { ContentType } from '@standardnotes/common';
 
-export const DefaultAppDomain = 'org.standardnotes.sn';
-
 export function displayStringForContentType(
   contentType: ContentType
 ): string | undefined {

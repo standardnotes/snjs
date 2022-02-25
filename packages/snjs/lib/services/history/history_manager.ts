@@ -1,8 +1,15 @@
-import { CopyPayload, RawPayload } from './../../protocol/payloads/generator';
+import {
+  CopyPayload,
+  RawPayload,
+  SurePayload,
+  CreateMaxPayloadFromAnyObject,
+  CreateSourcedPayloadFromObject,
+  PayloadSource,
+  PayloadFormat
+} from '@standardnotes/payloads';
 import { AbstractService, DeviceInterface } from '@standardnotes/services';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { CreateHistoryEntryForPayload } from '@Services/history/entries/generator';
-import { SurePayload } from './../../protocol/payloads/sure_payload';
 import { UuidString } from './../../types';
 import {
   MinimalHttpResponse,
@@ -12,18 +19,12 @@ import {
 } from './../api/responses';
 import { SNStorageService } from '@Services/storage_service';
 import { ItemManager } from '@Services/item_manager';
-import {
-  CreateMaxPayloadFromAnyObject,
-  CreateSourcedPayloadFromObject,
-} from '@Payloads/generator';
 import { SNItem } from '@Models/core/item';
 import { ContentType } from '@standardnotes/common';
-import { PayloadSource } from '@Payloads/sources';
 import { StorageKey } from '@Lib/storage_keys';
 import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNProtocolService } from '@Lib/services/protocol_service';
-import { PayloadFormat } from '@Lib/protocol/payloads';
 import { HistoryMap, historyMapFunctions } from './history_map';
 import { isRemotePayloadAllowed } from '../sync/filter';
 

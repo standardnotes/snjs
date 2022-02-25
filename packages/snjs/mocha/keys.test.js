@@ -10,8 +10,8 @@ describe('keys', function () {
   beforeEach(async function () {
     localStorage.clear();
     this.application = await Factory.createInitAppWithFakeCrypto();
-    this.email = Uuid.GenerateUuid();
-    this.password = Uuid.GenerateUuid();
+    this.email = UuidGenerator.GenerateUuid();
+    this.password = UuidGenerator.GenerateUuid();
   });
 
   afterEach(async function () {
@@ -559,7 +559,7 @@ describe('keys', function () {
     expect(itemsKeys.length).to.equal(1);
     const defaultItemsKey = application.protocolService.getDefaultItemsKey();
 
-    const newEmail = Uuid.GenerateUuid();
+    const newEmail = UuidGenerator.GenerateUuid();
     const result = await application.changeEmail(newEmail, password);
     expect(result.error).to.not.be.ok;
 

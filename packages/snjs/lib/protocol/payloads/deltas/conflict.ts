@@ -1,17 +1,19 @@
+import {
+  PayloadSource,
+  PurePayload,
+  ImmutablePayloadCollection,
+  CopyPayload,
+  PayloadByMerging,
+  PayloadField
+} from '@standardnotes/payloads';
 import { historyMapFunctions } from './../../../services/history/history_map';
-import { PayloadByMerging } from '@Lib/protocol/payloads/generator';
-import { PayloadSource } from './../sources';
-import { PurePayload } from './../pure_payload';
 import { CreateItemFromPayload } from '@Models/generator';
-import { ImmutablePayloadCollection } from '@Protocol/collection/payload_collection';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { CopyPayload } from '@Payloads/generator';
 import {
   PayloadContentsEqual,
   PayloadsByDuplicating,
 } from '@Payloads/functions';
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils';
-import { PayloadField } from '../fields';
 import { HistoryMap } from '@Lib/services/history/history_map';
 
 export class ConflictDelta {

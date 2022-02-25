@@ -2,7 +2,6 @@ export {
   SNItem,
   ItemMutator,
   SingletonStrategy,
-  AppDataField,
 } from '@Models/core/item';
 export { SNItemsKey } from '@Models/app/items_key';
 export { SNPredicate } from '@Models/core/predicate';

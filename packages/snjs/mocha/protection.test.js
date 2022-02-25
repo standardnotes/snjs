@@ -20,7 +20,7 @@ describe('protections', function () {
     let challengePrompts = 0;
 
     this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString());
-    const password = Uuid.GenerateUuid();
+    const password = UuidGenerator.GenerateUuid();
     await this.application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1;
@@ -46,7 +46,7 @@ describe('protections', function () {
     await this.application.launch(true);
     await Factory.registerUserToApplication({
       application: this.application,
-      email: Uuid.GenerateUuid(),
+      email: UuidGenerator.GenerateUuid(),
       password,
     });
 
@@ -198,7 +198,7 @@ describe('protections', function () {
 
   it('prompts for password when adding a passcode', async function () {
     const application = Factory.createApplicationWithFakeCrypto(Factory.randomString());
-    const password = Uuid.GenerateUuid();
+    const password = UuidGenerator.GenerateUuid();
     const passcode = 'passcode';
     let didPromptForPassword = false;
     await application.prepareForLaunch({
@@ -230,7 +230,7 @@ describe('protections', function () {
     await application.launch(true);
     await Factory.registerUserToApplication({
       application: application,
-      email: Uuid.GenerateUuid(),
+      email: UuidGenerator.GenerateUuid(),
       password,
     });
 
@@ -358,8 +358,8 @@ describe('protections', function () {
       this.application = await Factory.createInitAppWithFakeCrypto();
       await Factory.registerUserToApplication({
         application: this.application,
-        email: Uuid.GenerateUuid(),
-        password: Uuid.GenerateUuid(),
+        email: UuidGenerator.GenerateUuid(),
+        password: UuidGenerator.GenerateUuid(),
       });
       expect(this.application.hasProtectionSources()).to.be.true;
     });
@@ -368,8 +368,8 @@ describe('protections', function () {
       this.application = await Factory.createInitAppWithFakeCrypto();
       await Factory.registerUserToApplication({
         application: this.application,
-        email: Uuid.GenerateUuid(),
-        password: Uuid.GenerateUuid(),
+        email: UuidGenerator.GenerateUuid(),
+        password: UuidGenerator.GenerateUuid(),
       });
       await this.application.enableBiometrics();
       expect(this.application.hasProtectionSources()).to.be.true;
@@ -377,10 +377,10 @@ describe('protections', function () {
 
     it('account, passcode, no biometrics', async function () {
       this.application = await Factory.createInitAppWithFakeCrypto();
-      const password = Uuid.GenerateUuid();
+      const password = UuidGenerator.GenerateUuid();
       await Factory.registerUserToApplication({
         application: this.application,
-        email: Uuid.GenerateUuid(),
+        email: UuidGenerator.GenerateUuid(),
         password,
       });
       Factory.handlePasswordChallenges(this.application, password);
@@ -390,10 +390,10 @@ describe('protections', function () {
 
     it('account, passcode, biometrics', async function () {
       this.application = await Factory.createInitAppWithFakeCrypto();
-      const password = Uuid.GenerateUuid();
+      const password = UuidGenerator.GenerateUuid();
       await Factory.registerUserToApplication({
         application: this.application,
-        email: Uuid.GenerateUuid(),
+        email: UuidGenerator.GenerateUuid(),
         password,
       });
       Factory.handlePasswordChallenges(this.application, password);
@@ -428,7 +428,7 @@ describe('protections', function () {
     it('prompts for password once with the right challenge reason when one or more notes are protected', async function () {
       let challengePrompts = 0;
       this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString());
-      const password = Uuid.GenerateUuid();
+      const password = UuidGenerator.GenerateUuid();
 
       await this.application.prepareForLaunch({
         receiveChallenge: (challenge) => {
@@ -455,7 +455,7 @@ describe('protections', function () {
       await this.application.launch(true);
       await Factory.registerUserToApplication({
         application: this.application,
-        email: Uuid.GenerateUuid(),
+        email: UuidGenerator.GenerateUuid(),
         password,
       });
 

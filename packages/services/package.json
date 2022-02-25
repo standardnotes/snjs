@@ -24,6 +24,7 @@
     "test:unit": "jest spec --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@standardnotes/applications": "^1.0.0",
     "@standardnotes/common": "^1.14.1",
     "@standardnotes/utils": "^1.1.2"
   },

@@ -9,8 +9,9 @@ import { ListedService } from './listed_service';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ActionResponse, HttpResponse } from './api/responses';
 import { ContentType } from '@standardnotes/common';
+import { EncryptionIntent } from '@standardnotes/applications';
 import { ItemManager } from '@Services/item_manager';
-import { PurePayload } from '@Payloads/pure_payload';
+import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
 import { SNRootKey } from '@Protocol/root_key';
 import {
   ActionsExtensionMutator,
@@ -25,8 +26,6 @@ import { PayloadManager } from './payload_manager';
 import { SNHttpService } from './api/http_service';
 import { SNAlertService } from './alert_service';
 
-import { EncryptionIntent } from '@Protocol/intents';
-import { CreateMaxPayloadFromAnyObject } from '@Payloads/generator';
 import { AbstractService, DeviceInterface } from '@standardnotes/services';
 
 /**

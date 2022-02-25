@@ -19,8 +19,8 @@ export async function createAndInitSimpleAppContext(
   }
 ) {
   const application = await createInitAppWithFakeCrypto(environment);
-  const email = Uuid.GenerateUuid();
-  const password = Uuid.GenerateUuid();
+  const email = UuidGenerator.GenerateUuid();
+  const password = UuidGenerator.GenerateUuid();
   const newPassword = randomString();
 
   if (registerUser) {
@@ -58,8 +58,8 @@ export async function createAppContext(identifier, crypto) {
     undefined,
     crypto || new FakeWebCrypto()
   );
-  const email = Uuid.GenerateUuid();
-  const password = Uuid.GenerateUuid();
+  const email = UuidGenerator.GenerateUuid();
+  const password = UuidGenerator.GenerateUuid();
   const passcode = 'mypasscode';
   const handleChallenge = (challenge) => {
     const responses = [];

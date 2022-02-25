@@ -5,27 +5,28 @@ import {
   ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
-} from './../../payloads/generator';
-import { SNItemsKey } from '@Models/app/items_key';
-import {
-  Create001KeyParams,
-  KeyParamsOrigination,
-  SNRootKeyParams,
-} from './../../key_params';
-import { ItemsKeyContent, AsynchronousOperator } from './../operator';
-import { PayloadFormat } from '@Payloads/formats';
-import { ProtocolVersion, ProtocolVersionLength } from '@Protocol/versions';
-import { SNRootKey } from '@Protocol/root_key';
-import { V001Algorithm } from '@Protocol/operator/algorithms';
-import {
+  FillItemContent,
+  PurePayload,
   CopyEncryptionParameters,
   CreateEncryptionParameters,
   CreateMaxPayloadFromAnyObject,
-} from '@Payloads/generator';
-import { PurePayload } from '@Payloads/pure_payload';
-import { ContentType } from '@standardnotes/common';
-import { FillItemContent } from '@Models/functions';
-import { Uuid } from '@Lib/uuid';
+  PayloadFormat
+} from '@standardnotes/payloads';
+import { SNItemsKey } from '@Models/app/items_key';
+import {
+  Create001KeyParams,
+  SNRootKeyParams,
+} from './../../key_params';
+import { ItemsKeyContent, AsynchronousOperator } from './../operator';
+import { SNRootKey } from '@Protocol/root_key';
+import { V001Algorithm } from '@Protocol/operator/algorithms';
+import {
+  ContentType,
+  KeyParamsOrigination,
+  ProtocolVersion,
+} from '@standardnotes/common';
+import { ProtocolVersionLength } from '@standardnotes/applications';
+import { UuidGenerator } from '@standardnotes/utils';
 import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils';
 
 const NO_IV = '00000000000000000000000000000000';
@@ -66,7 +67,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   public createItemsKey(): SNItemsKey {
     const content = this.generateNewItemsKeyContent();
     const payload = CreateMaxPayloadFromAnyObject({
-      uuid: Uuid.GenerateUuid(),
+      uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
     });
