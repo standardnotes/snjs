@@ -32,7 +32,7 @@ export class FileSystemApi {
     const reader = new StreamingFileReader(
       2_000_000,
       async (chunk, index, isLast) => {
-        await this.application.fileService.pushBytesForUpload(
+        await this.application.files.pushBytesForUpload(
           operation,
           chunk,
           index,
@@ -43,7 +43,7 @@ export class FileSystemApi {
     reader.loggingEnabled = true
     const fileResult = await reader.selectFileAndStream()
 
-    const fileObj = await this.application.fileService.finishUpload(
+    const fileObj = await this.application.files.finishUpload(
       operation,
       fileResult.name,
       fileResult.ext,
@@ -66,7 +66,7 @@ export class FileSystemApi {
     await saver.selectFileToSaveTo()
     saver.loggingEnabled = true
 
-    await this.application.fileService.downloadFile(
+    await this.application.files.downloadFile(
       file,
       async (decryptedBytes: Uint8Array) => {
         console.log(`Pushing ${decryptedBytes.length} decrypted bytes to disk`)
