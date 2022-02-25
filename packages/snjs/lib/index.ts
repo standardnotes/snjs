@@ -17,7 +17,7 @@ export type {
   ApplicationEventPayload,
   IconType,
 } from './types';
-export type { ApplicationIdentifier, EncryptionIntent } from '@standardnotes/common';
+export type { ApplicationIdentifier, EncryptionIntent } from '@standardnotes/applications';
 
 export { SNApplicationGroup } from './application_group';
 export { DeinitSource } from './types';
@@ -174,16 +174,19 @@ export {
 } from '@standardnotes/utils';
 export { displayStringForContentType } from '@Models/content_types';
 export {
-  AppDataField,
   ContentType,
   Runtime,
   KeyParamsOrigination,
+} from '@standardnotes/common';
+export {
+  AppDataField,
+  ApplicationStage,
   isLocalStorageIntent,
   isFileIntent,
   isDecryptedIntent,
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
-} from '@standardnotes/common';
+} from '@standardnotes/applications'
 export { CreateItemFromPayload } from '@Models/generator';
 export { Uuids } from '@Models/functions';
 
@@ -256,6 +259,5 @@ export {
 } from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
-export { ApplicationStage } from '@standardnotes/common';
 
 export { ActionVerb } from '@Lib/models/app/extension';

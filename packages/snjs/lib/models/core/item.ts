@@ -1,4 +1,5 @@
-import { AppDataField, ContentType, DefaultAppDomain, ProtocolVersion } from '@standardnotes/common';
+import { ContentType, ProtocolVersion } from '@standardnotes/common';
+import { AppDataField, DefaultAppDomain } from '@standardnotes/applications';
 import {
   ItemInterface,
   PayloadFormat,

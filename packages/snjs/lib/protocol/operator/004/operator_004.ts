@@ -30,8 +30,8 @@ import {
   ContentType,
   KeyParamsOrigination,
   ProtocolVersion,
-  ContentTypeUsesRootKeyEncryption
 } from '@standardnotes/common';
+import { ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications';
 
 const PARTITION_CHARACTER = ':';
 

@@ -3,7 +3,8 @@ import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@standardnotes/utils';
 import { PurePayload } from '@standardnotes/payloads';
 import { ItemMutator, SNItem } from '@Models/core/item';
-import { AppDataField, ContentType, Uuid } from '@standardnotes/common';
+import { ContentType, Uuid } from '@standardnotes/common';
+import { AppDataField } from '@standardnotes/applications';
 import { HistoryEntry } from '@Lib/services/history/entries/history_entry';
 import {
   FeatureIdentifier,

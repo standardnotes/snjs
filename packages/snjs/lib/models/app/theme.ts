@@ -1,4 +1,4 @@
-import { AppDataField } from '@standardnotes/common';
+import { AppDataField } from '@standardnotes/applications';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { SNComponent } from '@Models/app/component';

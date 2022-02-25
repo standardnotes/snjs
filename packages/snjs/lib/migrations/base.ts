@@ -13,7 +13,7 @@ import {
 } from './../version';
 import { Migration } from '@Lib/migrations/migration';
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys';
-import { ApplicationStage, ContentTypeUsesRootKeyEncryption } from '@standardnotes/common';
+import { ApplicationStage, ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications';
 import { isNullOrUndefined } from '@standardnotes/utils';
 import { CreateReader } from './readers/functions';
 import { StorageReader } from './readers/reader';

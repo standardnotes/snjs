@@ -8,7 +8,8 @@ import {
 import { ListedService } from './listed_service';
 import { CreateItemFromPayload } from '@Models/generator';
 import { ActionResponse, HttpResponse } from './api/responses';
-import { ContentType, EncryptionIntent } from '@standardnotes/common';
+import { ContentType } from '@standardnotes/common';
+import { EncryptionIntent } from '@standardnotes/applications';
 import { ItemManager } from '@Services/item_manager';
 import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
 import { SNRootKey } from '@Protocol/root_key';

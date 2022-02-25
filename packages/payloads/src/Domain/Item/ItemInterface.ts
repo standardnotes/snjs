@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppDataField, Uuid, ProtocolVersion, ContentType } from '@standardnotes/common'
+import { Uuid, ProtocolVersion, ContentType } from '@standardnotes/common'
+import { AppDataField } from '@standardnotes/applications'
 import { PayloadContent } from '../Payload/PayloadContent'
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { PayloadOverride } from '../Payload/PayloadOverride'

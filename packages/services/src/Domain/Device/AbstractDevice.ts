@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ApplicationIdentifier } from '@standardnotes/common'
+import { ApplicationIdentifier } from '@standardnotes/applications'
 import { getGlobalScope, isNullOrUndefined } from '@standardnotes/utils'
 import { DeviceInterface } from './DeviceInterface'
 

@@ -34,6 +34,7 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json"
   },
   "dependencies": {
+    "@standardnotes/applications": "^1.0.0",
     "@standardnotes/common": "^1.14.0",
     "@standardnotes/features": "^1.32.11",
     "@standardnotes/utils": "^1.1.1"

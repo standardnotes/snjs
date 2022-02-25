@@ -1,4 +1,4 @@
-import { ApplicationIdentifier } from '@standardnotes/common';
+import { ApplicationIdentifier } from '@standardnotes/applications';
 import { Environment } from '@Lib/platforms';
 import { DeviceInterface } from '@standardnotes/services';
 

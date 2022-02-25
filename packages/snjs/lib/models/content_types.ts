@@ -1,4 +1,4 @@
-import { ContentType, DefaultAppDomain } from '@standardnotes/common';
+import { ContentType } from '@standardnotes/common';
 
 export function displayStringForContentType(
   contentType: ContentType

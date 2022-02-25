@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { protocolVersionFromEncryptedString, ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
+import { protocolVersionFromEncryptedString } from '@standardnotes/applications'
+import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@standardnotes/utils'
 
 import { ContentReference } from '../Reference/ContentReference'

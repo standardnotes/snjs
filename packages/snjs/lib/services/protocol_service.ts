@@ -45,8 +45,12 @@ import {
 } from '@standardnotes/utils';
 import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
 import {
-  ApplicationIdentifier,
   ContentType,
+  ProtocolVersion,
+  KeyParamsOrigination,
+  AnyKeyParamsContent,
+} from '@standardnotes/common';
+import {
   compareVersions,
   isVersionLessThanOrEqualTo,
   ContentTypeUsesRootKeyEncryption,
@@ -54,10 +58,8 @@ import {
   intentRequiresEncryption,
   isDecryptedIntent,
   leftVersionGreaterThanOrEqualToRight,
-  ProtocolVersion,
-  KeyParamsOrigination,
-  AnyKeyParamsContent,
-} from '@standardnotes/common';
+  ApplicationIdentifier,
+} from '@standardnotes/applications';
 import { StorageKey } from '@Lib/storage_keys';
 import { StorageValueModes } from '@Lib/services/storage_service';
 import { AbstractService, DeviceInterface } from '@standardnotes/services';

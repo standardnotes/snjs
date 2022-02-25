@@ -25,7 +25,8 @@ import { SNRootKey } from '@Protocol/root_key';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { SNApiService } from '@Lib/services/api/api_service';
 import { SNItemsKey } from './../models/app/items_key';
-import { ApplicationStage, ContentType, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/common';
+import { ContentType } from '@standardnotes/common';
+import { ApplicationStage, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications';
 import { ItemManager } from './item_manager';
 import {
   dateSorted,

@@ -1,5 +1,6 @@
 import { isNullOrUndefined } from '@standardnotes/utils';
-import { AppDataField, ContentType } from '@standardnotes/common';
+import { ContentType } from '@standardnotes/common';
+import { AppDataField } from '@standardnotes/applications';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ItemInterface, PayloadContent, PayloadFormat, PurePayload } from '@standardnotes/payloads';
 

@@ -24,8 +24,8 @@ import {
   ContentType,
   KeyParamsOrigination,
   ProtocolVersion,
-  ProtocolVersionLength
 } from '@standardnotes/common';
+import { ProtocolVersionLength } from '@standardnotes/applications';
 import { UuidGenerator } from '@standardnotes/utils';
 import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils';
 

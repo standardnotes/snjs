@@ -31,12 +31,14 @@ import {
   AnyRecord,
   ContentType,
   ProtocolVersion,
+  KeyParamsOrigination,
+} from '@standardnotes/common';
+import {
   compareVersions,
   ApplicationStage,
   ApplicationIdentifier,
-  KeyParamsOrigination,
   EncryptionIntent,
-} from '@standardnotes/common';
+} from '@standardnotes/applications'
 import { DeinitSource, UuidString, ApplicationEventPayload } from './types';
 import {
   ApplicationOptionsDefaults,

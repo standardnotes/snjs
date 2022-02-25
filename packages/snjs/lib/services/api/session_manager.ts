@@ -1,9 +1,9 @@
 import {
-  leftVersionGreaterThanOrEqualToRight,
   ProtocolVersion,
   AnyKeyParamsContent,
   KeyParamsOrigination,
 } from '@standardnotes/common';
+import { leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications';
 import { Challenge, ChallengePrompt } from '@Lib/challenges';
 import {
   ChallengeKeyboardType,

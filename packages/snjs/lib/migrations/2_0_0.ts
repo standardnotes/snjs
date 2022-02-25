@@ -6,7 +6,8 @@ import { JwtSession } from './../services/api/session';
 import { ContentType } from '@standardnotes/common';
 import { SNItemsKey } from './../models/app/items_key';
 import { RootKeyContent, SNRootKey } from './../protocol/root_key';
-import { ApplicationStage, ProtocolVersion, EncryptionIntent } from '@standardnotes/common';
+import { ProtocolVersion } from '@standardnotes/common';
+import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications';
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
 import {
   PurePayload,

@@ -2,7 +2,7 @@ import { SNAlertService } from './alert_service';
 import { SNLog } from './../log';
 import { Environment } from '@Lib/platforms';
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys';
-import { ApplicationStage } from '@standardnotes/common';
+import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications';
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
@@ -11,7 +11,7 @@ import {
 } from '@standardnotes/payloads';
 import { EncryptionDelegate } from './encryption_delegate';
 import { SNRootKey } from '@Protocol/root_key';
-import { ContentType, EncryptionIntent } from '@standardnotes/common';
+import { ContentType } from '@standardnotes/common';
 import { Copy, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils';
 import { AbstractService, DeviceInterface } from '@standardnotes/services';
 

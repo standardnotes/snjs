@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppDataField, DefaultAppDomain, ContentType, EncryptionIntent, Uuid } from '@standardnotes/common'
+import { AppDataField, DefaultAppDomain, EncryptionIntent } from '@standardnotes/applications'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, pickByCopy, uniqueArray, UuidGenerator } from '@standardnotes/utils'
 import { remove } from 'lodash'
 
