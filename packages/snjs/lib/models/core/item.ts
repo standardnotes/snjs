@@ -9,8 +9,9 @@ import {
   PayloadOverride,
   PurePayload,
   PayloadByMerging,
-  PayloadSource
-} from '@standardnotes/payloads'
+  PayloadSource,
+  PredicateInterface,
+} from '@standardnotes/payloads';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { SNLog } from './../../log';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
@@ -22,7 +23,6 @@ import {
   omitInPlace,
   sortedCopy,
 } from '@standardnotes/utils';
-import { SNPredicate } from '@Models/core/predicate';
 import { PrefKey } from '../app/userPrefs';
 
 export interface ItemContent {
@@ -282,7 +282,7 @@ export class SNItem implements ItemInterface {
   }
 
   /** The predicate by which singleton items should be unique */
-  public get singletonPredicate(): SNPredicate {
+  public singletonPredicate<T extends SNItem>(): PredicateInterface<T> {
     throw 'Must override SNItem.singletonPredicate';
   }
 
@@ -382,8 +382,8 @@ export class SNItem implements ItemInterface {
     );
   }
 
-  public satisfiesPredicate(predicate: SNPredicate) {
-    return SNPredicate.ItemSatisfiesPredicate(this, predicate);
+  public satisfiesPredicate(predicate: PredicateInterface<SNItem>): boolean {
+    return predicate.matchesItem(this);
   }
 }
 

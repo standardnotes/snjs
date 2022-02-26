@@ -1,7 +1,6 @@
-import { PredicateOperator, SNPredicate } from '@Lib/models/core/predicate';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@standardnotes/utils';
-import { PurePayload } from '@standardnotes/payloads';
+import { Predicate, PurePayload } from '@standardnotes/payloads';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType, Uuid } from '@standardnotes/common';
 import { AppDataField } from '@standardnotes/applications';
@@ -93,13 +92,13 @@ export class SNComponent extends SNItem implements ComponentContent {
     return true;
   }
 
-  get singletonPredicate(): SNPredicate {
-    const uniqueIdentifierPredicate = new SNPredicate(
+  public singletonPredicate<T extends SNItem>(): Predicate<T> {
+    const uniqueIdentifierPredicate = new Predicate<SNComponent>(
       'identifier',
-      PredicateOperator.Equals,
+      '=',
       this.identifier
     );
-    return uniqueIdentifierPredicate;
+    return (uniqueIdentifierPredicate as unknown) as Predicate<T>;
   }
 
   public isEditor(): boolean {

@@ -12,11 +12,7 @@ export type {
   ListedAccountInfo,
 } from './services/api/responses';
 export type { BackupFile } from '@Services/protocol_service';
-export type {
-  UuidString,
-  ApplicationEventPayload,
-  IconType,
-} from './types';
+export type { UuidString, ApplicationEventPayload, IconType } from './types';
 export type { ApplicationIdentifier } from '@standardnotes/applications';
 
 export { SNApplicationGroup } from './application_group';
@@ -35,12 +31,14 @@ export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004';
 export { SNRootKey } from '@Protocol/root_key';
 export { SNRootKeyParams } from './protocol/key_params';
 export { AbstractDevice, AbstractService } from '@standardnotes/services';
-export type { DeviceInterface, ServiceInterface } from '@standardnotes/services';
+export type {
+  DeviceInterface,
+  ServiceInterface,
+} from '@standardnotes/services';
 export {
   SNItem,
   ItemMutator,
   SNItemsKey,
-  SNPredicate,
   SNNote,
   NoteMutator,
   SNTag,
@@ -260,5 +258,5 @@ export {
 } from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
-
 export { ActionVerb } from '@Lib/models/app/extension';
+export { Predicate, CompoundPredicate, predicateFromFlatArray } from '@standardnotes/payloads';

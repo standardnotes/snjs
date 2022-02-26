@@ -24,7 +24,8 @@ import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
   PayloadSource,
-  PayloadFormat
+  PayloadFormat,
+  PredicateInterface,
 } from '@standardnotes/payloads';
 import { Uuids } from '@Models/functions';
 import {
@@ -38,7 +39,7 @@ import {
   ApplicationStage,
   ApplicationIdentifier,
   EncryptionIntent,
-} from '@standardnotes/applications'
+} from '@standardnotes/applications';
 import { DeinitSource, UuidString, ApplicationEventPayload } from './types';
 import {
   ApplicationOptionsDefaults,
@@ -55,7 +56,6 @@ import { BackupFile } from './services/protocol_service';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
-import { SNPredicate } from '@Models/core/predicate';
 import {
   Challenge,
   ChallengePrompt,
@@ -491,7 +491,10 @@ export class SNApplication implements ListedInterface {
   /**
    * Finds an item by predicate.
    */
-  public findItems(contentType: ContentType, predicate: SNPredicate): SNItem[] {
+  public findItems<T extends SNItem>(
+    contentType: ContentType,
+    predicate: PredicateInterface<T>
+  ): SNItem[] {
     return this.itemManager.itemsMatchingPredicate(contentType, predicate);
   }
 

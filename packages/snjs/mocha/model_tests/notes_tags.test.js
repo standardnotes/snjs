@@ -817,14 +817,13 @@ describe('notes and tags', () => {
       const smartTag = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartTag, {
           title: 'Pinned & Locked',
-          predicate: SNPredicate.FromArray([
-            'ignored',
-            'and',
-            [
+          predicate: {
+            operator: 'and',
+            value: [
               ['pinned', '=', true],
               ['locked', '=', true],
             ],
-          ]),
+          },
         })
       );
       const matches = this.application.notesMatchingSmartTag(smartTag);
@@ -880,14 +879,13 @@ describe('notes and tags', () => {
       const smartTag = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartTag, {
           title: 'Protected or Pinned',
-          predicate: SNPredicate.FromArray([
-            'ignored',
-            'or',
-            [
+          predicate: {
+            operator: 'or',
+            value: [
               ['content.protected', '=', true],
               ['pinned', '=', true],
             ],
-          ]),
+          },
         })
       );
       const matches = this.application.notesMatchingSmartTag(smartTag);
@@ -911,23 +909,19 @@ describe('notes and tags', () => {
   });
 
   it('include notes that have tag titles that match search query', async function () {
-    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
-      noteTitle: 'A simple note',
-      noteText: 'This is just a note.',
-      tagTitle: 'Test'
-    });
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload(
+      {
+        noteTitle: 'A simple note',
+        noteText: 'This is just a note.',
+        tagTitle: 'Test',
+      }
+    );
     const notePayload2 = Factory.createNotePayload('Foo');
     const notePayload3 = Factory.createNotePayload('Bar');
     const notePayload4 = Factory.createNotePayload('Testing');
 
     await this.application.itemManager.emitItemsFromPayloads(
-      [
-        notePayload1,
-        notePayload2,
-        notePayload3,
-        notePayload4,
-        tagPayload1
-      ],
+      [notePayload1, notePayload2, notePayload3, notePayload4, tagPayload1],
       PayloadSource.LocalChanged
     );
 
@@ -937,7 +931,7 @@ describe('notes and tags', () => {
         sortDirection: 'dsc',
         searchQuery: {
           query: 'Test',
-        }
+        },
       })
     );
 
@@ -950,23 +944,19 @@ describe('notes and tags', () => {
   });
 
   it('search query should be case insensitive and match notes and tags title', async function () {
-    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
-      noteTitle: 'A simple note',
-      noteText: 'Just a note. Nothing to see.',
-      tagTitle: 'Foo'
-    });
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload(
+      {
+        noteTitle: 'A simple note',
+        noteText: 'Just a note. Nothing to see.',
+        tagTitle: 'Foo',
+      }
+    );
     const notePayload2 = Factory.createNotePayload('Another bar (foo)');
     const notePayload3 = Factory.createNotePayload('Testing FOO (Bar)');
     const notePayload4 = Factory.createNotePayload('This should not match');
 
     await this.application.itemManager.emitItemsFromPayloads(
-      [
-        notePayload1,
-        notePayload2,
-        notePayload3,
-        notePayload4,
-        tagPayload1
-      ],
+      [notePayload1, notePayload2, notePayload3, notePayload4, tagPayload1],
       PayloadSource.LocalChanged
     );
 
@@ -976,7 +966,7 @@ describe('notes and tags', () => {
         sortDirection: 'dsc',
         searchQuery: {
           query: 'foo',
-        }
+        },
       })
     );
 

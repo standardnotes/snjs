@@ -29,9 +29,11 @@ const ContentTypeClassMapping: Partial<
   [ContentType.File]: SNFile,
 };
 
-export function CreateItemFromPayload(payload: PurePayload): SNItem {
+export function CreateItemFromPayload<T extends SNItem>(
+  payload: PurePayload
+): T {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const itemClass = ContentTypeClassMapping[payload.content_type!] || SNItem;
   const item = new itemClass(payload);
-  return item;
+  return item as T;
 }
