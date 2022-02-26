@@ -26,7 +26,7 @@ describe('singletons', function () {
 
   function findOrCreatePrefsSingleton(application) {
     return application.singletonManager.findOrCreateSingleton(
-      new SNPredicate('content_type', '=', ContentType.UserPrefs),
+      new Predicate('content_type', '=', ContentType.UserPrefs),
       ContentType.UserPrefs,
       FillItemContent({})
     );
@@ -61,9 +61,9 @@ describe('singletons', function () {
       );
     };
     this.extManagerId = 'org.standardnotes.extensions-manager';
-    this.extPred = SNPredicate.CompoundPredicate([
-      new SNPredicate('content_type', '=', ContentType.Component),
-      new SNPredicate('package_info.identifier', '=', this.extManagerId),
+    this.extPred = Predicate.CompoundPredicate([
+      new Predicate('content_type', '=', ContentType.Component),
+      new Predicate('package_info.identifier', '=', this.extManagerId),
     ]);
     this.createExtMgr = async () => {
       return this.application.createManagedItem(
@@ -133,7 +133,7 @@ describe('singletons', function () {
     this.application.syncService.ut_clearLastSyncDate();
     this.application.syncService.ut_setDatabaseLoaded(false);
     const contentType = ContentType.UserPrefs;
-    const predicate = new SNPredicate('content_type', '=', contentType);
+    const predicate = new Predicate('content_type', '=', contentType);
     /* Start a sync right after we await singleton resolve below */
     setTimeout(() => {
       this.application.syncService.ut_setDatabaseLoaded(true);
@@ -270,7 +270,7 @@ describe('singletons', function () {
       mutator.errorDecrypting = true;
     });
 
-    const predicate = new SNPredicate('content_type', '=', item.content_type);
+    const predicate = new Predicate('content_type', '=', item.content_type);
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
       item.content_type,
@@ -347,7 +347,7 @@ describe('singletons', function () {
       PayloadSource.LocalChanged
     );
     await this.application.syncService.sync(syncOptions);
-    const predicate = new SNPredicate('content_type', '=', item.content_type);
+    const predicate = new Predicate('content_type', '=', item.content_type);
     let resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
       predicate,
       payload.content_type,

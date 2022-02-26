@@ -1,7 +1,6 @@
-import { CompoundPredicate } from './../models/core/compound_predicate';
+import { CompoundPredicate, Predicate } from '@standardnotes/payloads';
 import { SNComponent } from './../models/app/component';
 import { Migration } from '@Lib/migrations/migration';
-import { SNPredicate } from '@Lib/models';
 import { ContentType } from '@standardnotes/common';
 import { ApplicationStage } from '@standardnotes/applications';
 
@@ -23,8 +22,8 @@ export class Migration2_7_0 extends Migration {
   private async deleteBatchManagerSingleton() {
     const batchMgrId = 'org.standardnotes.batch-manager';
     const batchMgrPred = new CompoundPredicate('and', [
-      new SNPredicate('content_type', '=', ContentType.Component),
-      new SNPredicate<SNComponent>(
+      new Predicate<SNComponent>('content_type', '=', ContentType.Component),
+      new Predicate<SNComponent>(
         'package_info.identifier' as never,
         '=',
         batchMgrId

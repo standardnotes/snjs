@@ -1,4 +1,3 @@
-import { PredicateInterface } from './interface';
 import { ContentType, ProtocolVersion } from '@standardnotes/common';
 import { AppDataField, DefaultAppDomain } from '@standardnotes/applications';
 import {
@@ -11,6 +10,7 @@ import {
   PurePayload,
   PayloadByMerging,
   PayloadSource,
+  PredicateInterface,
 } from '@standardnotes/payloads';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { SNLog } from './../../log';
@@ -23,7 +23,6 @@ import {
   omitInPlace,
   sortedCopy,
 } from '@standardnotes/utils';
-import { Predicate } from '@Models/core/predicate';
 import { PrefKey } from '../app/userPrefs';
 
 export interface ItemContent {

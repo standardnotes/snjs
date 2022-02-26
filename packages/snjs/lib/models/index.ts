@@ -1,10 +1,5 @@
-export {
-  SNItem,
-  ItemMutator,
-  SingletonStrategy,
-} from '@Models/core/item';
+export { SNItem, ItemMutator, SingletonStrategy } from '@Models/core/item';
 export { SNItemsKey } from '@Models/app/items_key';
-export { Predicate as SNPredicate } from '@Models/core/predicate';
 export { SNComponent, ComponentMutator } from './app/component';
 export { SNEditor } from '@Models/app/editor';
 export {

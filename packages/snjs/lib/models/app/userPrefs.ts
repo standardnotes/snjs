@@ -1,7 +1,9 @@
-import { PredicateInterface } from './../core/interface';
 import { ItemMutator, SNItem } from '@Models/core/item';
-import { CollectionSort } from '@standardnotes/payloads';
-import { Predicate } from '@Models/core/predicate';
+import {
+  CollectionSort,
+  Predicate,
+  PredicateInterface,
+} from '@standardnotes/payloads';
 import { ContentType } from '@standardnotes/common';
 import { FeatureIdentifier } from '@standardnotes/features';
 

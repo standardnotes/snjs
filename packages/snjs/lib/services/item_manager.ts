@@ -1,6 +1,6 @@
-import { PredicateInterface } from './../models/core/interface';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
+  PredicateInterface,
   ItemDelta,
   FillItemContent,
   CollectionSort,
@@ -40,7 +40,6 @@ import {
 } from './../models/app/smartTag';
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
-import { Predicate } from './../models/core/predicate';
 import {
   TagNoteCountChangeObserver,
   TagNotesIndex,

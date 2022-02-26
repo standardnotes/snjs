@@ -1,7 +1,5 @@
-import { PredicateInterface } from './../models/core/interface';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
-import { Predicate } from '@Models/core/predicate';
 import { SNItem, SingletonStrategy } from '@Models/core/item';
 import {
   arrayByRemovingFromIndex,
@@ -12,6 +10,7 @@ import {
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
+  PredicateInterface,
 } from '@standardnotes/payloads';
 import { SyncEvent } from '@Services/sync/events';
 import { SNSyncService } from './sync/sync_service';

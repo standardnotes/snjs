@@ -25,6 +25,7 @@ import {
   PayloadContent,
   PayloadSource,
   PayloadFormat,
+  PredicateInterface,
 } from '@standardnotes/payloads';
 import { Uuids } from '@Models/functions';
 import {
@@ -55,7 +56,6 @@ import { BackupFile } from './services/protocol_service';
 import { SyncOptions } from './services/sync/sync_service';
 import { SNSmartTag } from './models/app/smartTag';
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
-import { Predicate } from '@Models/core/predicate';
 import {
   Challenge,
   ChallengePrompt,
@@ -493,7 +493,7 @@ export class SNApplication implements ListedInterface {
    */
   public findItems<T extends SNItem>(
     contentType: ContentType,
-    predicate: Predicate<T>
+    predicate: PredicateInterface<T>
   ): SNItem[] {
     return this.itemManager.itemsMatchingPredicate(contentType, predicate);
   }

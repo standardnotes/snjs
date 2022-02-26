@@ -1,7 +1,7 @@
-import { Predicate } from '@Lib/models/core/predicate';
+import { PredicateInterface } from './../../../dist/@types/models/core/interface.d';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@standardnotes/utils';
-import { PurePayload } from '@standardnotes/payloads';
+import { Predicate, PurePayload } from '@standardnotes/payloads';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType, Uuid } from '@standardnotes/common';
 import { AppDataField } from '@standardnotes/applications';

@@ -42,7 +42,7 @@ export interface ItemInterface {
   updated_at: Date | undefined
   auth_hash: string | undefined
   auth_params: any | undefined
-  singletonPredicate: any
+  singletonPredicate(): any
   singletonStrategy: any
   strategyWhenConflictingWithItem(item: ItemInterface, previousRevision?: any): any
   satisfiesPredicate(predicate: any): boolean

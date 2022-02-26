@@ -4,12 +4,11 @@ import {
   ItemCollection,
 } from '@standardnotes/payloads';
 import { SNTag } from './../../models/app/tag';
-import { Predicate } from './../../models/core/predicate';
 import { ContentType } from '@standardnotes/common';
 import { SNNote } from './../../models/app/note';
 import { SNSmartTag } from './../../models/app/smartTag';
 import { NoteWithTags } from './note_with_tags';
-import { CompoundPredicate } from '@Lib/models/core/compound_predicate';
+import { CompoundPredicate } from '@standardnotes/payloads';
 
 export type SearchQuery = {
   query: string;
@@ -71,7 +70,7 @@ export class NotesDisplayCriteria {
         userSmartTags.map((t) => t.predicate)
       );
       filters.push((note) => {
-        if (predicate.keypathIncludesVerb('tags')) {
+        if (predicate.keypathIncludesString('tags')) {
           /**
            * A note object doesn't come with its tags, so we map the list to
            * flattened note-like objects that also contain

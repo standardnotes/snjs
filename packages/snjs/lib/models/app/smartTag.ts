@@ -1,8 +1,11 @@
-import { PredicateInterface, PredicateOperator } from './../core/interface';
+import {
+  PredicateInterface,
+  PredicateOperator,
+  predicateFromJson,
+} from '@standardnotes/payloads';
 import { SNItem } from '@Models/core/item';
 import { SNTag } from '@Models/app/tag';
 import { PurePayload } from '@standardnotes/payloads';
-import { predicateFromJson } from '../core/generators';
 
 export const SMART_TAG_DSL_PREFIX = '![';
 
