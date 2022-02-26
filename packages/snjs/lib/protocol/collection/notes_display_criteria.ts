@@ -4,11 +4,12 @@ import {
   ItemCollection,
 } from '@standardnotes/payloads';
 import { SNTag } from './../../models/app/tag';
-import { SNPredicate } from './../../models/core/predicate';
+import { Predicate } from './../../models/core/predicate';
 import { ContentType } from '@standardnotes/common';
 import { SNNote } from './../../models/app/note';
 import { SNSmartTag } from './../../models/app/smartTag';
 import { NoteWithTags } from './note_with_tags';
+import { CompoundPredicate } from '@Lib/models/core/compound_predicate';
 
 export type SearchQuery = {
   query: string;
@@ -65,7 +66,8 @@ export class NotesDisplayCriteria {
       }
     }
     if (userSmartTags.length > 0) {
-      const predicate = SNPredicate.CompoundPredicate(
+      const predicate = new CompoundPredicate(
+        'and',
         userSmartTags.map((t) => t.predicate)
       );
       filters.push((note) => {
@@ -82,9 +84,9 @@ export class NotesDisplayCriteria {
               ContentType.Tag
             ) as SNTag[]
           );
-          return SNPredicate.ObjectSatisfiesPredicate(noteWithTags, predicate);
+          return predicate.matchesItem(noteWithTags);
         } else {
-          return SNPredicate.ObjectSatisfiesPredicate(note, predicate);
+          return predicate.matchesItem(note);
         }
       });
     } else if (nonSmartTags.length > 0) {

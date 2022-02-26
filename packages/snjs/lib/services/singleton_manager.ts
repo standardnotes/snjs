@@ -1,6 +1,7 @@
+import { PredicateInterface } from './../models/core/interface';
 import { ContentType } from '@standardnotes/common';
 import { ItemManager } from '@Services/item_manager';
-import { SNPredicate } from '@Models/core/predicate';
+import { Predicate } from '@Models/core/predicate';
 import { SNItem, SingletonStrategy } from '@Models/core/item';
 import {
   arrayByRemovingFromIndex,
@@ -113,7 +114,7 @@ export class SNSingletonManager extends AbstractService {
 
   private validItemsMatchingPredicate<T extends SNItem>(
     contentType: ContentType,
-    predicate: SNPredicate<T>
+    predicate: PredicateInterface<T>
   ) {
     return this.itemManager
       .itemsMatchingPredicate(contentType, predicate)
@@ -172,7 +173,7 @@ export class SNSingletonManager extends AbstractService {
 
   public findSingleton<T extends SNItem>(
     contentType: ContentType,
-    predicate: SNPredicate<T>
+    predicate: PredicateInterface<T>
   ): T | undefined {
     const matchingItems = this.validItemsMatchingPredicate(
       contentType,
@@ -185,7 +186,7 @@ export class SNSingletonManager extends AbstractService {
   }
 
   public async findOrCreateSingleton<T extends SNItem = SNItem>(
-    predicate: SNPredicate<T>,
+    predicate: PredicateInterface<T>,
     createContentType: ContentType,
     createContent: PayloadContent
   ): Promise<T> {

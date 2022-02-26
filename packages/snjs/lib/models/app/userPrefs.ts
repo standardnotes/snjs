@@ -1,7 +1,7 @@
-import { PredicateOperator } from './../core/predicate';
+import { PredicateInterface } from './../core/interface';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { CollectionSort } from '@standardnotes/payloads';
-import { SNPredicate } from '@Models/core/predicate';
+import { Predicate } from '@Models/core/predicate';
 import { ContentType } from '@standardnotes/common';
 import { FeatureIdentifier } from '@standardnotes/features';
 
@@ -52,9 +52,9 @@ export type PrefValue = {
 };
 
 export class SNUserPrefs extends SNItem {
-  static singletonPredicate = new SNPredicate(
+  static singletonPredicate = new Predicate(
     'content_type',
-    PredicateOperator.Equals,
+    '=',
     ContentType.UserPrefs
   );
 
@@ -62,7 +62,7 @@ export class SNUserPrefs extends SNItem {
     return true;
   }
 
-  singletonPredicate<T extends SNItem>(): SNPredicate<T> {
+  singletonPredicate<T extends SNItem>(): PredicateInterface<T> {
     return SNUserPrefs.singletonPredicate;
   }
 

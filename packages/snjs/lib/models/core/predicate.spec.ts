@@ -8,8 +8,18 @@ import {
 import { CreateItemFromPayload } from '@Models/generator';
 import { nonSecureRandomIdentifier, SNTag } from '@Lib/index';
 import { SNNote } from './../app/note';
-import { PredicateOperator, SNPredicate } from './predicate';
+import { Predicate } from './predicate';
 import { NoteWithTags } from '@Lib/protocol/collection/note_with_tags';
+import {
+  compoundPredicateFromArguments,
+  includesPredicateFromArguments,
+  notPredicateFromArguments,
+  predicateFromArguments,
+  predicateFromDSLString,
+} from './generators';
+import { CompoundPredicate } from './compound_predicate';
+import { NotPredicate } from './not_predicate';
+import { IncludesPredicate } from './includes_predicate';
 
 const randUuid = () => String(nonSecureRandomIdentifier());
 
@@ -75,23 +85,19 @@ const tags = [
 describe('predicates', () => {
   it('string comparisons should be case insensitive', () => {
     const string = '!["Not notes", "title", "startsWith", "foo"]';
-    const predicate = SNPredicate.FromDSLString(string);
+    const predicate = predicateFromDSLString(string);
 
     const matchingItem1 = {
       title: 'foo',
     } as jest.Mocked<SNNote>;
 
-    expect(
-      SNPredicate.ItemSatisfiesPredicate(matchingItem1, predicate)
-    ).toEqual(true);
+    expect(predicate.matchesItem(matchingItem1)).toEqual(true);
 
     const matchingItem2 = {
       title: 'Foo',
     } as jest.Mocked<SNNote>;
 
-    expect(
-      SNPredicate.ItemSatisfiesPredicate(matchingItem2, predicate)
-    ).toEqual(true);
+    expect(predicate.matchesItem(matchingItem2)).toEqual(true);
   });
 
   describe('includes operator', () => {
@@ -103,7 +109,7 @@ describe('predicates', () => {
     it('includes string', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<SNNote>('title', PredicateOperator.Includes, 'ello')
+          new Predicate<SNNote>('title', 'includes', 'ello')
         )
       ).toEqual(true);
     });
@@ -111,37 +117,9 @@ describe('predicates', () => {
     it('includes raw array subpredicate', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('tags', PredicateOperator.Includes, [
-            'title',
-            PredicateOperator.Equals,
-            'bar',
-          ])
+          new Predicate<NoteWithTags>('tags', 'includes', ['title', '=', 'bar'])
         )
       ).toEqual(true);
-    });
-
-    it('includes matching instantiated subpredicate', () => {
-      expect(
-        item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>(
-            'tags',
-            PredicateOperator.Includes,
-            new SNPredicate('title', PredicateOperator.Equals, 'bar')
-          )
-        )
-      ).toEqual(true);
-    });
-
-    it('includes nonmatching instantiated subpredicate', () => {
-      expect(
-        item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>(
-            'tags',
-            PredicateOperator.Includes,
-            new SNPredicate('title', PredicateOperator.Equals, 'foobar')
-          )
-        )
-      ).toEqual(false);
     });
   });
 
@@ -155,9 +133,9 @@ describe('predicates', () => {
     it('both matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.Or, [
-            ['content.title', PredicateOperator.Equals, 'Hello'],
-            ['content_type', PredicateOperator.Equals, ContentType.Note],
+          compoundPredicateFromArguments<SNNote>('or', [
+            ['content.title', '=', 'Hello'],
+            ['content_type', '=', ContentType.Note],
           ])
         )
       ).toEqual(true);
@@ -166,9 +144,9 @@ describe('predicates', () => {
     it('first matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.Or, [
-            ['content.title', PredicateOperator.Equals, 'Hello'],
-            ['content_type', PredicateOperator.Equals, 'Wrong'],
+          compoundPredicateFromArguments<SNNote>('or', [
+            ['content.title', '=', 'Hello'],
+            ['content_type', '=', 'Wrong'],
           ])
         )
       ).toEqual(true);
@@ -177,9 +155,9 @@ describe('predicates', () => {
     it('second matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.Or, [
-            ['content.title', PredicateOperator.Equals, 'Wrong'],
-            ['content_type', PredicateOperator.Equals, ContentType.Note],
+          compoundPredicateFromArguments<SNNote>('or', [
+            ['content.title', '=', 'Wrong'],
+            ['content_type', '=', ContentType.Note],
           ])
         )
       ).toEqual(true);
@@ -188,16 +166,16 @@ describe('predicates', () => {
     it('both nonmatching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.Or, [
-            ['content.title', PredicateOperator.Equals, 'Wrong'],
-            ['content_type', PredicateOperator.Equals, 'Wrong'],
+          compoundPredicateFromArguments<SNNote>('or', [
+            ['content.title', '=', 'Wrong'],
+            ['content_type', '=', 'Wrong'],
           ])
         )
       ).toEqual(false);
     });
   });
 
-  describe('in operator', () => {
+  describe('includes operator', () => {
     let item: NoteWithTags;
     const title = 'Foo';
     beforeEach(() => {
@@ -205,10 +183,9 @@ describe('predicates', () => {
     });
 
     it('all matching', () => {
-      const predicate = new SNPredicate<NoteWithTags>(
+      const predicate = new IncludesPredicate<NoteWithTags>(
         'tags',
-        PredicateOperator.Includes,
-        ['title', PredicateOperator.In, ['sobar', 'foo']] as never
+        new Predicate<NoteWithTags>('title', 'in', ['sobar', 'foo'])
       );
 
       expect(item.satisfiesPredicate(predicate)).toEqual(true);
@@ -225,9 +202,9 @@ describe('predicates', () => {
     it('all matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.And, [
-            ['content.title', PredicateOperator.Equals, title],
-            ['content_type', PredicateOperator.Equals, ContentType.Note],
+          compoundPredicateFromArguments<SNNote>('and', [
+            ['content.title', '=', title],
+            ['content_type', '=', ContentType.Note],
           ])
         )
       ).toEqual(true);
@@ -236,9 +213,9 @@ describe('predicates', () => {
     it('one matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.And, [
-            ['content.title', PredicateOperator.Equals, 'Wrong'],
-            ['content_type', PredicateOperator.Equals, ContentType.Note],
+          compoundPredicateFromArguments<SNNote>('and', [
+            ['content.title', '=', 'Wrong'],
+            ['content_type', '=', ContentType.Note],
           ])
         )
       ).toEqual(false);
@@ -247,22 +224,18 @@ describe('predicates', () => {
     it('none matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.And, [
-            ['content.title', PredicateOperator.Equals, '123'],
-            ['content_type', PredicateOperator.Equals, '456'],
+          compoundPredicateFromArguments<SNNote>('and', [
+            ['content.title', '=', '123'],
+            ['content_type', '=', '456'],
           ])
         )
       ).toEqual(false);
     });
 
     it('explicit compound syntax', () => {
-      const compoundProd = SNPredicate.CompoundPredicate([
-        new SNPredicate<SNNote>('title', PredicateOperator.Equals, title),
-        new SNPredicate(
-          'content_type',
-          PredicateOperator.Equals,
-          ContentType.Note
-        ),
+      const compoundProd = new CompoundPredicate('and', [
+        new Predicate<SNNote>('title', '=', title),
+        new Predicate('content_type', '=', ContentType.Note),
       ]);
       expect(item.satisfiesPredicate(compoundProd)).toEqual(true);
     });
@@ -277,11 +250,12 @@ describe('predicates', () => {
     it('basic not predicate', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.Not, [
-            'tags',
-            PredicateOperator.Includes,
-            ['title', PredicateOperator.Equals, 'far'] as never,
-          ])
+          new NotPredicate<NoteWithTags>(
+            new IncludesPredicate<NoteWithTags>(
+              'tags',
+              new Predicate<SNTag>('title', '=', 'far')
+            )
+          )
         )
       ).toEqual(false);
     });
@@ -289,151 +263,119 @@ describe('predicates', () => {
     it('recursive compound predicate', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.And, [
-            [
-              '',
-              PredicateOperator.Not,
-              [
+          new CompoundPredicate<NoteWithTags>('and', [
+            new NotPredicate<NoteWithTags>(
+              new IncludesPredicate<NoteWithTags>(
                 'tags',
-                PredicateOperator.Includes,
-                ['title', PredicateOperator.Equals, 'far'],
-              ],
-            ] as never,
-            [
+                new Predicate<SNTag>('title', '=', 'far')
+              )
+            ),
+            new IncludesPredicate<NoteWithTags>(
               'tags',
-              PredicateOperator.Includes,
-              ['title', PredicateOperator.Equals, 'foo'],
-            ] as never,
+              new Predicate<SNTag>('title', '=', 'foo')
+            ),
           ])
         )
       ).toEqual(false);
     });
 
-    it('', () => {
+    it('matching basic operator', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.Not, [
+          notPredicateFromArguments<NoteWithTags>([
             'title',
-            PredicateOperator.Equals,
+            '=',
             'Not This Title',
           ])
         )
       ).toEqual(true);
+    });
+
+    it('nonmatching basic operator', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.Not, [
-            'title',
-            PredicateOperator.Equals,
-            'Hello',
+          notPredicateFromArguments<NoteWithTags>(['title', '=', 'Hello'])
+        )
+      ).toEqual(false);
+    });
+
+    it('matching compound', () => {
+      expect(
+        item.satisfiesPredicate(
+          new CompoundPredicate<NoteWithTags>('and', [
+            new NotPredicate<NoteWithTags>(
+              new IncludesPredicate<NoteWithTags>(
+                'tags',
+                new Predicate<SNTag>('title', '=', 'boo')
+              )
+            ),
+            new IncludesPredicate<NoteWithTags>(
+              'tags',
+              new Predicate<SNTag>('title', '=', 'foo')
+            ),
           ])
         )
-      ).toEqual(false);
-
-      expect(
-        item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.And, [
-            [
-              '',
-              PredicateOperator.Not,
-              [
-                'tags',
-                PredicateOperator.Includes,
-                ['title', PredicateOperator.Equals, 'far'],
-              ],
-            ],
-            [
-              'tags',
-              PredicateOperator.Includes,
-              ['title', PredicateOperator.Equals, 'foo'],
-            ],
-          ] as never)
-        )
-      ).toEqual(false);
-
-      expect(
-        item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.And, [
-            [
-              '',
-              PredicateOperator.Not,
-              [
-                'tags',
-                PredicateOperator.Includes,
-                ['title', PredicateOperator.Equals, 'boo'],
-              ],
-            ],
-            [
-              'tags',
-              PredicateOperator.Includes,
-              ['title', PredicateOperator.Equals, 'foo'],
-            ],
-          ] as never)
-        )
       ).toEqual(true);
+    });
 
+    it('matching compound includes', () => {
+      const andPredicate = new CompoundPredicate<NoteWithTags>('and', [
+        predicateFromArguments('title', 'startsWith', 'H'),
+        includesPredicateFromArguments<NoteWithTags>('tags', [
+          'title',
+          '=',
+          'falsify',
+        ]),
+      ]);
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.Not, [
-            '',
-            PredicateOperator.And,
-            [
-              ['title', 'startsWith', 'H'],
-              [
-                'tags',
-                PredicateOperator.Includes,
-                ['title', PredicateOperator.Equals, 'falsify'],
-              ],
-            ],
-          ] as never)
-        )
+        item.satisfiesPredicate(new NotPredicate<NoteWithTags>(andPredicate))
       ).toEqual(true);
-      expect(
-        item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.Not, [
-            '',
-            PredicateOperator.And,
-            [
-              ['title', 'startsWith', 'H'],
-              [
-                'tags',
-                PredicateOperator.Includes,
-                ['title', PredicateOperator.Equals, 'foo'],
-              ],
-            ],
-          ] as never)
-        )
-      ).toEqual(false);
+    });
 
+    it('nonmatching compound includes', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.Not, [
-            '',
-            PredicateOperator.Or,
-            [
-              ['title', 'startsWith', 'H'],
-              [
+          new NotPredicate<NoteWithTags>(
+            new CompoundPredicate<NoteWithTags>('and', [
+              new Predicate<NoteWithTags>('title', 'startsWith', 'H'),
+              new IncludesPredicate<NoteWithTags>(
                 'tags',
-                PredicateOperator.Includes,
-                ['title', PredicateOperator.Equals, 'falsify'],
-              ],
-            ],
-          ] as never)
+                new Predicate<SNTag>('title', '=', 'foo')
+              ),
+            ])
+          )
         )
       ).toEqual(false);
+    });
+
+    it('nonmatching compound or', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<NoteWithTags>('' as never, PredicateOperator.Not, [
-            '',
-            PredicateOperator.Or,
-            [
-              ['title', 'startsWith', 'Z'],
-              [
+          new NotPredicate<NoteWithTags>(
+            new CompoundPredicate<NoteWithTags>('or', [
+              new Predicate<NoteWithTags>('title', 'startsWith', 'H'),
+              new IncludesPredicate<NoteWithTags>(
                 'tags',
-                PredicateOperator.Includes,
-                ['title', PredicateOperator.Equals, 'falsify'],
-              ],
-            ],
-          ] as never)
+                new Predicate<SNTag>('title', '=', 'falsify')
+              ),
+            ])
+          )
+        )
+      ).toEqual(false);
+    });
+
+    it('matching compound or', () => {
+      expect(
+        item.satisfiesPredicate(
+          new NotPredicate<NoteWithTags>(
+            new CompoundPredicate<NoteWithTags>('or', [
+              new Predicate<NoteWithTags>('title', 'startsWith', 'Z'),
+              new IncludesPredicate<NoteWithTags>(
+                'tags',
+                new Predicate<SNTag>('title', '=', 'falsify')
+              ),
+            ])
+          )
         )
       ).toEqual(true);
     });
@@ -442,9 +384,9 @@ describe('predicates', () => {
   describe('regex', () => {
     it('matching', () => {
       const item = createNote(createNoteContent('abc'));
-      const onlyLetters = new SNPredicate<SNNote>(
+      const onlyLetters = new Predicate<SNNote>(
         'title',
-        PredicateOperator.Matches,
+        'matches',
         '^[a-zA-Z]+$'
       );
       expect(item.satisfiesPredicate(onlyLetters)).toEqual(true);
@@ -452,9 +394,9 @@ describe('predicates', () => {
 
     it('nonmatching', () => {
       const item = createNote(createNoteContent('123'));
-      const onlyLetters = new SNPredicate<SNNote>(
+      const onlyLetters = new Predicate<SNNote>(
         'title',
-        PredicateOperator.Matches,
+        'matches',
         '^[a-zA-Z]+$'
       );
       expect(item.satisfiesPredicate(onlyLetters)).toEqual(false);
@@ -471,18 +413,14 @@ describe('predicates', () => {
     it('matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.And, [
-            ['content.title', PredicateOperator.Equals, 'Hello'],
-            [
-              'this_field_ignored',
-              PredicateOperator.Or,
-              [
-                ['content.title', PredicateOperator.Equals, 'Wrong'],
-                ['content.title', PredicateOperator.Equals, 'Wrong again'],
-                ['content.title', PredicateOperator.Equals, 'Hello'],
-              ],
-            ],
-          ] as never)
+          new CompoundPredicate<SNNote>('and', [
+            new Predicate<SNNote>('title', '=', 'Hello'),
+            new CompoundPredicate<SNNote>('or', [
+              new Predicate<SNNote>('title', '=', 'Wrong'),
+              new Predicate<SNNote>('title', '=', 'Wrong again'),
+              new Predicate<SNNote>('title', '=', 'Hello'),
+            ]),
+          ])
         )
       ).toEqual(true);
     });
@@ -490,18 +428,14 @@ describe('predicates', () => {
     it('nonmatching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate('' as never, PredicateOperator.And, [
-            ['content.title', PredicateOperator.Equals, 'Hello'],
-            [
-              'this_field_ignored',
-              PredicateOperator.Or,
-              [
-                ['content.title', PredicateOperator.Equals, 'Wrong'],
-                ['content.title', PredicateOperator.Equals, 'Wrong again'],
-                ['content.title', PredicateOperator.Equals, 'All wrong'],
-              ],
-            ],
-          ] as never)
+          new CompoundPredicate<SNNote>('and', [
+            new Predicate<SNNote>('title', '=', 'Hello'),
+            new CompoundPredicate<SNNote>('or', [
+              new Predicate<SNNote>('title', '=', 'Wrong'),
+              new Predicate<SNNote>('title', '=', 'Wrong again'),
+              new Predicate<SNNote>('title', '=', 'All wrong'),
+            ]),
+          ])
         )
       ).toEqual(false);
     });
@@ -519,29 +453,21 @@ describe('predicates', () => {
     it('matching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>(
-            'content.body',
-            PredicateOperator.NotEqual,
-            'NotBody'
-          )
+          new Predicate<any>('content.body', '!=', 'NotBody')
         )
       ).toEqual(true);
     });
 
     it('nonmatching', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('content.body', PredicateOperator.NotEqual, body)
-        )
+        item.satisfiesPredicate(new Predicate<any>('content.body', '!=', body))
       ).toEqual(false);
     });
 
     it('matching array', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>('content.numbers', PredicateOperator.NotEqual, [
-            '1',
-          ])
+          new Predicate<any>('content.numbers', '!=', ['1'])
         )
       ).toEqual(true);
     });
@@ -549,11 +475,7 @@ describe('predicates', () => {
     it('nonmatching array', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>('content.numbers', PredicateOperator.NotEqual, [
-            '1',
-            '2',
-            '3',
-          ])
+          new Predicate<any>('content.numbers', '!=', ['1', '2', '3'])
         )
       ).toEqual(false);
     });
@@ -570,20 +492,14 @@ describe('predicates', () => {
 
     it('matching', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('content.body', PredicateOperator.Equals, body)
-        )
+        item.satisfiesPredicate(new Predicate<any>('content.body', '=', body))
       ).toEqual(true);
     });
 
     it('nonmatching', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>(
-            'content.body',
-            PredicateOperator.Equals,
-            'NotBody'
-          )
+          new Predicate<any>('content.body', '=', 'NotBody')
         )
       ).toEqual(false);
     });
@@ -591,11 +507,7 @@ describe('predicates', () => {
     it('false and undefined should be equivalent', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>(
-            'content.undefinedProperty',
-            PredicateOperator.Equals,
-            false
-          )
+          new Predicate<any>('content.undefinedProperty', '=', false)
         )
       ).toEqual(true);
     });
@@ -603,9 +515,7 @@ describe('predicates', () => {
     it('nonmatching array', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>('content.numbers', PredicateOperator.Equals, [
-            '1',
-          ])
+          new Predicate<any>('content.numbers', '=', ['1'])
         )
       ).toEqual(false);
     });
@@ -613,11 +523,7 @@ describe('predicates', () => {
     it('matching array', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>('content.numbers', PredicateOperator.Equals, [
-            '1',
-            '2',
-            '3',
-          ])
+          new Predicate<any>('content.numbers', '=', ['1', '2', '3'])
         )
       ).toEqual(true);
     });
@@ -625,11 +531,7 @@ describe('predicates', () => {
     it('nested keypath', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>(
-            'content.numbers.length',
-            PredicateOperator.Equals,
-            numbers.length
-          )
+          new Predicate<any>('content.numbers.length', '=', numbers.length)
         )
       ).toEqual(true);
     });
@@ -646,58 +548,32 @@ describe('predicates', () => {
     it('nonmatching date value', () => {
       const date = new Date();
       date.setSeconds(date.getSeconds() + 1);
-      const predicate = new SNPredicate(
-        'updated_at',
-        PredicateOperator.GreaterThan,
-        date
-      );
+      const predicate = new Predicate('updated_at', '>', date);
       expect(item.satisfiesPredicate(predicate)).toEqual(false);
     });
 
     it('matching date value', () => {
       const date = new Date();
       date.setSeconds(date.getSeconds() + 1);
-      const predicate = new SNPredicate(
-        'updated_at',
-        PredicateOperator.LessThan,
-        date
-      );
+      const predicate = new Predicate('updated_at', '<', date);
       expect(item.satisfiesPredicate(predicate)).toEqual(true);
     });
 
     it('matching days ago value', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate(
-            'updated_at',
-            PredicateOperator.GreaterThan,
-            '30.days.ago'
-          )
-        )
+        item.satisfiesPredicate(new Predicate('updated_at', '>', '30.days.ago'))
       ).toEqual(true);
     });
 
     it('nonmatching days ago value', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate(
-            'updated_at',
-            PredicateOperator.LessThan,
-            '30.days.ago'
-          )
-        )
+        item.satisfiesPredicate(new Predicate('updated_at', '<', '30.days.ago'))
       ).toEqual(false);
     });
 
     it('hours ago value', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate(
-            'updated_at',
-            PredicateOperator.GreaterThan,
-            '1.hours.ago'
-          )
-        )
+        item.satisfiesPredicate(new Predicate('updated_at', '>', '1.hours.ago'))
       ).toEqual(true);
     });
   });
@@ -712,60 +588,44 @@ describe('predicates', () => {
     it('nested keypath', () => {
       expect(
         item.satisfiesPredicate(
-          new SNPredicate<any>(
-            'content.foobar.length',
-            PredicateOperator.Equals,
-            0
-          )
+          new Predicate<any>('content.foobar.length', '=', 0)
         )
       ).toEqual(false);
     });
 
     it('inequality operator', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('foobar', PredicateOperator.NotEqual, 'NotFoo')
-        )
+        item.satisfiesPredicate(new Predicate<any>('foobar', '!=', 'NotFoo'))
       ).toEqual(true);
     });
 
     it('equals operator', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('foobar', PredicateOperator.Equals, 'NotFoo')
-        )
+        item.satisfiesPredicate(new Predicate<any>('foobar', '=', 'NotFoo'))
       ).toEqual(false);
     });
 
     it('less than operator', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('foobar', PredicateOperator.LessThan, 3)
-        )
+        item.satisfiesPredicate(new Predicate<any>('foobar', '<', 3))
       ).toEqual(false);
     });
 
     it('greater than operator', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('foobar', PredicateOperator.GreaterThan, 3)
-        )
+        item.satisfiesPredicate(new Predicate<any>('foobar', '>', 3))
       ).toEqual(false);
     });
 
     it('less than or equal to operator', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('foobar', PredicateOperator.LessThanOrEqualTo, 3)
-        )
+        item.satisfiesPredicate(new Predicate<any>('foobar', '<=', 3))
       ).toEqual(false);
     });
 
     it('includes operator', () => {
       expect(
-        item.satisfiesPredicate(
-          new SNPredicate<any>('foobar', PredicateOperator.Includes, 3)
-        )
+        item.satisfiesPredicate(new Predicate<any>('foobar', 'includes', 3))
       ).toEqual(false);
     });
   });

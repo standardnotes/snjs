@@ -1,28 +1,14 @@
+import { PredicateInterface, PredicateOperator } from './../core/interface';
 import { SNItem } from '@Models/core/item';
 import { SNTag } from '@Models/app/tag';
-import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@standardnotes/payloads';
+import { predicateFromJson } from '../core/generators';
 
 export const SMART_TAG_DSL_PREFIX = '![';
 
-type SmartTagPredicateOperator =
-  | 'and'
-  | 'or'
-  | 'not'
-  | '!='
-  | '='
-  | '<'
-  | '>'
-  | '>='
-  | '<='
-  | 'startsWith'
-  | 'in'
-  | 'includes'
-  | 'matches';
-
 export interface SmartTagPredicateContent {
   keypath: string;
-  operator: SmartTagPredicateOperator;
+  operator: PredicateOperator;
   value: string | Date | boolean | number | boolean | SmartTagPredicateContent;
 }
 
@@ -31,12 +17,12 @@ export interface SmartTagPredicateContent {
  * list of notes.
  */
 export class SNSmartTag extends SNTag {
-  public readonly predicate!: SNPredicate<SNItem>;
+  public readonly predicate!: PredicateInterface<SNItem>;
 
   constructor(payload: PurePayload) {
     super(payload);
     if (payload.safeContent.predicate) {
-      this.predicate = SNPredicate.FromJson(payload.safeContent.predicate);
+      this.predicate = predicateFromJson(payload.safeContent.predicate);
     }
   }
 }

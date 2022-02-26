@@ -1,3 +1,4 @@
+import { PredicateInterface } from './interface';
 import { ContentType, ProtocolVersion } from '@standardnotes/common';
 import { AppDataField, DefaultAppDomain } from '@standardnotes/applications';
 import {
@@ -22,7 +23,7 @@ import {
   omitInPlace,
   sortedCopy,
 } from '@standardnotes/utils';
-import { SNPredicate } from '@Models/core/predicate';
+import { Predicate } from '@Models/core/predicate';
 import { PrefKey } from '../app/userPrefs';
 
 export interface ItemContent {
@@ -282,7 +283,7 @@ export class SNItem implements ItemInterface {
   }
 
   /** The predicate by which singleton items should be unique */
-  public singletonPredicate<T extends SNItem>(): SNPredicate<T> {
+  public singletonPredicate<T extends SNItem>(): PredicateInterface<T> {
     throw 'Must override SNItem.singletonPredicate';
   }
 
@@ -382,8 +383,10 @@ export class SNItem implements ItemInterface {
     );
   }
 
-  public satisfiesPredicate<T extends SNItem>(predicate: SNPredicate<T>) {
-    return SNPredicate.ItemSatisfiesPredicate(this as never, predicate);
+  public satisfiesPredicate<T extends SNItem>(
+    predicate: PredicateInterface<T>
+  ): boolean {
+    return predicate.matchesItem(this as never);
   }
 }
 

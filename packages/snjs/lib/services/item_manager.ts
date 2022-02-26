@@ -1,3 +1,4 @@
+import { PredicateInterface } from './../models/core/interface';
 import { createMutatorForItem } from '@Lib/models/mutator';
 import {
   ItemDelta,
@@ -39,7 +40,7 @@ import {
 } from './../models/app/smartTag';
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
-import { SNPredicate } from './../models/core/predicate';
+import { Predicate } from './../models/core/predicate';
 import {
   TagNoteCountChangeObserver,
   TagNotesIndex,
@@ -852,7 +853,7 @@ export class ItemManager extends AbstractService {
    */
   public itemsMatchingPredicate<T extends SNItem>(
     contentType: ContentType,
-    predicate: SNPredicate<T>
+    predicate: PredicateInterface<T>
   ): SNItem[] {
     return this.itemsMatchingPredicates(contentType, [predicate]);
   }
@@ -862,7 +863,7 @@ export class ItemManager extends AbstractService {
    */
   public itemsMatchingPredicates<T extends SNItem>(
     contentType: ContentType,
-    predicates: SNPredicate<T>[]
+    predicates: PredicateInterface<T>[]
   ): SNItem[] {
     const subItems = this.getItems<T>(contentType);
     return this.subItemsMatchingPredicates(subItems, predicates);
@@ -874,7 +875,7 @@ export class ItemManager extends AbstractService {
    */
   public subItemsMatchingPredicates<T extends SNItem>(
     items: T[],
-    predicates: SNPredicate<T>[]
+    predicates: PredicateInterface<T>[]
   ): T[] {
     const results = items.filter((item) => {
       if (item.deleted) {
