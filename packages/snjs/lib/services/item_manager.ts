@@ -569,7 +569,7 @@ export class ItemManager extends AbstractService {
     }
     const mutator = new ComponentMutator(component, mutationType);
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
-    return this.findItem(uuid) as SNComponent;
+    return this.findItem<SNComponent>(uuid)!;
   }
 
   async changeFeatureRepo(
@@ -850,9 +850,9 @@ export class ItemManager extends AbstractService {
   /**
    * Returns all items matching a given predicate
    */
-  public itemsMatchingPredicate(
+  public itemsMatchingPredicate<T extends SNItem>(
     contentType: ContentType,
-    predicate: SNPredicate
+    predicate: SNPredicate<T>
   ): SNItem[] {
     return this.itemsMatchingPredicates(contentType, [predicate]);
   }
@@ -860,11 +860,11 @@ export class ItemManager extends AbstractService {
   /**
    * Returns all items matching an array of predicates
    */
-  public itemsMatchingPredicates(
+  public itemsMatchingPredicates<T extends SNItem>(
     contentType: ContentType,
-    predicates: SNPredicate[]
+    predicates: SNPredicate<T>[]
   ): SNItem[] {
-    const subItems = this.getItems(contentType);
+    const subItems = this.getItems<T>(contentType);
     return this.subItemsMatchingPredicates(subItems, predicates);
   }
 
@@ -872,10 +872,10 @@ export class ItemManager extends AbstractService {
    * Performs actual predicate filtering for public methods above.
    * Does not return deleted items.
    */
-  public subItemsMatchingPredicates(
-    items: SNItem[],
-    predicates: SNPredicate[]
-  ): SNItem[] {
+  public subItemsMatchingPredicates<T extends SNItem>(
+    items: T[],
+    predicates: SNPredicate<T>[]
+  ): T[] {
     const results = items.filter((item) => {
       if (item.deleted) {
         return false;

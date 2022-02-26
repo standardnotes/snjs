@@ -93,13 +93,13 @@ export class SNComponent extends SNItem implements ComponentContent {
     return true;
   }
 
-  get singletonPredicate(): SNPredicate {
-    const uniqueIdentifierPredicate = new SNPredicate(
+  public singletonPredicate<T extends SNItem>(): SNPredicate<T> {
+    const uniqueIdentifierPredicate = new SNPredicate<SNComponent>(
       'identifier',
       PredicateOperator.Equals,
       this.identifier
     );
-    return uniqueIdentifierPredicate;
+    return (uniqueIdentifierPredicate as unknown) as SNPredicate<T>;
   }
 
   public isEditor(): boolean {

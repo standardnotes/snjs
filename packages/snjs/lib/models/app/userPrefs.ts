@@ -62,7 +62,7 @@ export class SNUserPrefs extends SNItem {
     return true;
   }
 
-  get singletonPredicate(): SNPredicate {
+  singletonPredicate<T extends SNItem>(): SNPredicate<T> {
     return SNUserPrefs.singletonPredicate;
   }
 

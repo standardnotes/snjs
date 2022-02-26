@@ -817,7 +817,7 @@ describe('notes and tags', () => {
       const smartTag = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartTag, {
           title: 'Pinned & Locked',
-          predicate: SNPredicate.FromArray([
+          predicate: SNPredicate.FromFlatArray([
             'ignored',
             'and',
             [
@@ -880,7 +880,7 @@ describe('notes and tags', () => {
       const smartTag = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartTag, {
           title: 'Protected or Pinned',
-          predicate: SNPredicate.FromArray([
+          predicate: SNPredicate.FromFlatArray([
             'ignored',
             'or',
             [

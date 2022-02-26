@@ -1,9 +1,14 @@
-import { CollectionSortDirection, CollectionSort, ItemCollection } from '@standardnotes/payloads';
+import {
+  CollectionSortDirection,
+  CollectionSort,
+  ItemCollection,
+} from '@standardnotes/payloads';
 import { SNTag } from './../../models/app/tag';
 import { SNPredicate } from './../../models/core/predicate';
 import { ContentType } from '@standardnotes/common';
 import { SNNote } from './../../models/app/note';
 import { SNSmartTag } from './../../models/app/smartTag';
+import { NoteWithTags } from './note_with_tags';
 
 export type SearchQuery = {
   query: string;
@@ -68,15 +73,15 @@ export class NotesDisplayCriteria {
           /**
            * A note object doesn't come with its tags, so we map the list to
            * flattened note-like objects that also contain
-           * their tags. Having the payload properties on the same level as the note
-           * properties is necessary because SNNote has many getters that are
-           * proxies to its inner payload object.
+           * their tags.
            */
-          const noteWithTags = {
-            ...note,
-            ...note.payload,
-            tags: collection.elementsReferencingElement(note, ContentType.Tag),
-          };
+          const noteWithTags = new NoteWithTags(
+            note.payload,
+            collection.elementsReferencingElement(
+              note,
+              ContentType.Tag
+            ) as SNTag[]
+          );
           return SNPredicate.ObjectSatisfiesPredicate(noteWithTags, predicate);
         } else {
           return SNPredicate.ObjectSatisfiesPredicate(note, predicate);

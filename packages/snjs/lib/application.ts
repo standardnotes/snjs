@@ -24,7 +24,7 @@ import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
   PayloadSource,
-  PayloadFormat
+  PayloadFormat,
 } from '@standardnotes/payloads';
 import { Uuids } from '@Models/functions';
 import {
@@ -38,7 +38,7 @@ import {
   ApplicationStage,
   ApplicationIdentifier,
   EncryptionIntent,
-} from '@standardnotes/applications'
+} from '@standardnotes/applications';
 import { DeinitSource, UuidString, ApplicationEventPayload } from './types';
 import {
   ApplicationOptionsDefaults,
@@ -491,7 +491,10 @@ export class SNApplication implements ListedInterface {
   /**
    * Finds an item by predicate.
    */
-  public findItems(contentType: ContentType, predicate: SNPredicate): SNItem[] {
+  public findItems<T extends SNItem>(
+    contentType: ContentType,
+    predicate: SNPredicate<T>
+  ): SNItem[] {
     return this.itemManager.itemsMatchingPredicate(contentType, predicate);
   }
 

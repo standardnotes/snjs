@@ -111,9 +111,9 @@ export class SNSingletonManager extends AbstractService {
     );
   }
 
-  private validItemsMatchingPredicate(
+  private validItemsMatchingPredicate<T extends SNItem>(
     contentType: ContentType,
-    predicate: SNPredicate
+    predicate: SNPredicate<T>
   ) {
     return this.itemManager
       .itemsMatchingPredicate(contentType, predicate)
@@ -131,9 +131,9 @@ export class SNSingletonManager extends AbstractService {
       if (handled.includes(item) || !item.isSingleton) {
         continue;
       }
-      const matchingItems = this.validItemsMatchingPredicate(
+      const matchingItems = this.validItemsMatchingPredicate<SNItem>(
         item.content_type,
-        item.singletonPredicate
+        item.singletonPredicate()
       );
       extendArray(handled, matchingItems || []);
       if (!matchingItems || matchingItems.length <= 1) {
@@ -172,7 +172,7 @@ export class SNSingletonManager extends AbstractService {
 
   public findSingleton<T extends SNItem>(
     contentType: ContentType,
-    predicate: SNPredicate
+    predicate: SNPredicate<T>
   ): T | undefined {
     const matchingItems = this.validItemsMatchingPredicate(
       contentType,
@@ -185,7 +185,7 @@ export class SNSingletonManager extends AbstractService {
   }
 
   public async findOrCreateSingleton<T extends SNItem = SNItem>(
-    predicate: SNPredicate,
+    predicate: SNPredicate<T>,
     createContentType: ContentType,
     createContent: PayloadContent
   ): Promise<T> {
@@ -205,8 +205,8 @@ export class SNSingletonManager extends AbstractService {
         createContentType,
         (_, inserted) => {
           if (inserted.length > 0) {
-            const matchingItems = this.itemManager.subItemsMatchingPredicates(
-              inserted,
+            const matchingItems = this.itemManager.subItemsMatchingPredicates<T>(
+              inserted as T[],
               [predicate]
             );
             if (matchingItems.length > 0) {

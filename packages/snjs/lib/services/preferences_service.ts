@@ -56,7 +56,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     await super.handleApplicationStage(stage);
     if (stage === ApplicationStage.LoadedDatabase_12) {
       /** Try to read preferences singleton from storage */
-      this.preferences = this.singletonManager.findSingleton(
+      this.preferences = this.singletonManager.findSingleton<SNUserPrefs>(
         ContentType.UserPrefs,
         SNUserPrefs.singletonPredicate
       );

@@ -9,8 +9,8 @@ import {
   PayloadOverride,
   PurePayload,
   PayloadByMerging,
-  PayloadSource
-} from '@standardnotes/payloads'
+  PayloadSource,
+} from '@standardnotes/payloads';
 import { HistoryEntry } from '@Services/history/entries/history_entry';
 import { SNLog } from './../../log';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
@@ -282,7 +282,7 @@ export class SNItem implements ItemInterface {
   }
 
   /** The predicate by which singleton items should be unique */
-  public get singletonPredicate(): SNPredicate {
+  public singletonPredicate<T extends SNItem>(): SNPredicate<T> {
     throw 'Must override SNItem.singletonPredicate';
   }
 
@@ -382,8 +382,8 @@ export class SNItem implements ItemInterface {
     );
   }
 
-  public satisfiesPredicate(predicate: SNPredicate) {
-    return SNPredicate.ItemSatisfiesPredicate(this, predicate);
+  public satisfiesPredicate<T extends SNItem>(predicate: SNPredicate<T>) {
+    return SNPredicate.ItemSatisfiesPredicate(this as never, predicate);
   }
 }
 

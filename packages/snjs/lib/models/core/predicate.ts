@@ -1,9 +1,19 @@
 import { SNItem } from '@Models/core/item';
 import { isString } from '@standardnotes/utils';
 
-type PredicateType = string[] | SNPredicate;
-type PredicateArray = Array<string[]> | SNPredicate[];
-type PredicateValue = string | Date | boolean | PredicateType | PredicateArray;
+type FalseyValue = false | '' | null | undefined | typeof NaN;
+
+type RawPredicateInArrayForm = string[];
+
+type PredicateValue<T extends SNItem> =
+  | string
+  | RawPredicateInArrayForm
+  | RawPredicateInArrayForm[]
+  | Date
+  | boolean
+  | SNPredicate<T>
+  | SNPredicate<T>[]
+  | FalseyValue;
 
 export enum PredicateOperator {
   And = 'and',
@@ -21,52 +31,67 @@ export enum PredicateOperator {
   Matches = 'matches',
 }
 
-function toPredicate(object: unknown): SNPredicate {
+function toPredicate<T extends SNItem>(
+  object: RawPredicateInArrayForm | SNPredicate<T>
+): SNPredicate<T> {
   if (object instanceof SNPredicate) {
     return object;
   }
   if (Array.isArray(object)) {
-    return SNPredicate.FromArray(object);
+    return SNPredicate.FromFlatArray<T>(object as RawPredicateInArrayForm);
   }
   return SNPredicate.FromJson(object);
 }
+
+type StringKey<T extends SNItem> = keyof T & string;
 
 /**
  * A local-only construct that defines a built query that can be used to
  * dynamically search items.
  */
-export class SNPredicate {
-  private keypath: string;
-  private operator: PredicateOperator;
-  private value: PredicateValue;
-
+export class SNPredicate<T extends SNItem> {
   constructor(
-    keypath: string,
-    operator: PredicateOperator,
-    value: PredicateValue
+    private keypath: StringKey<T>,
+    private operator: PredicateOperator,
+    private value: PredicateValue<T>
   ) {
     this.keypath = keypath;
     this.operator = operator;
     this.value = value;
 
     if (this.isRecursive()) {
-      const array = this.value as unknown[];
-      this.value = array.map((element) => toPredicate(element));
+      const array = this.value as RawPredicateInArrayForm[] | SNPredicate<T>[];
+      this.value = (array as any[]).map(
+        (element: RawPredicateInArrayForm | SNPredicate<T>) =>
+          toPredicate<T>(element)
+      );
+    } else if (isArrayFlatPredicateRepresentation(value as string[])) {
+      this.value = SNPredicate.FromFlatArray(this.value as string[]);
     } else if (this.value === 'true' || this.value === 'false') {
       /* If value is boolean string, convert to boolean */
       this.value = JSON.parse(this.value);
     }
   }
 
-  static FromJson(values: any): SNPredicate {
+  static FromJson<T extends SNItem>(values: {
+    keypath: StringKey<T>;
+    operator: PredicateOperator;
+    value: PredicateValue<T>;
+  }): SNPredicate<T> {
     return new SNPredicate(values.keypath, values.operator, values.value);
   }
 
-  static FromArray(array: string[]): SNPredicate {
-    return new SNPredicate(array[0], array[1] as PredicateOperator, array[2]);
+  static FromFlatArray<T extends SNItem>(
+    array: RawPredicateInArrayForm
+  ): SNPredicate<T> {
+    return new SNPredicate(
+      array[0] as StringKey<T>,
+      array[1] as PredicateOperator,
+      array[2]
+    );
   }
 
-  static FromDSLString(dsl: string): SNPredicate {
+  static FromDSLString<T extends SNItem>(dsl: string): SNPredicate<T> {
     let components = null;
     try {
       components = JSON.parse(dsl.substring(1, dsl.length));
@@ -78,44 +103,44 @@ export class SNPredicate {
   }
 
   isRecursive(): boolean {
-    return [PredicateOperator.And, PredicateOperator.Or].includes(
-      this.operator
+    return (
+      Array.isArray(this.value) &&
+      [PredicateOperator.And, PredicateOperator.Or].includes(this.operator)
     );
   }
 
-  arrayRepresentation() {
-    return [this.keypath, this.operator, this.value];
-  }
-
-  valueAsArray() {
-    return this.value as PredicateArray;
+  private valueAsArray() {
+    return this.value as SNPredicate<T>[];
   }
 
   keypathIncludesVerb(verb: string): boolean {
     if (this.isRecursive()) {
-      for (const value of this.value as SNPredicate[]) {
-        if (value.keypathIncludesVerb(verb)) {
+      const subPredicates = this.value as SNPredicate<T>[];
+      for (const subPredicate of subPredicates) {
+        if (subPredicate.keypathIncludesVerb(verb)) {
           return true;
         }
       }
       return false;
     } else {
-      return this.keypath.includes(verb);
+      return (this.keypath as string).includes(verb);
     }
   }
 
-  static CompoundPredicate(predicates: PredicateArray): SNPredicate {
-    return new SNPredicate('ignored', PredicateOperator.And, predicates);
+  static CompoundPredicate<T extends SNItem>(
+    predicates: SNPredicate<T>[]
+  ): SNPredicate<T> {
+    return new SNPredicate(
+      'ignored' as StringKey<T>,
+      PredicateOperator.And,
+      predicates
+    );
   }
 
-  static ObjectSatisfiesPredicate(
-    object: any,
-    predicate: PredicateType
+  static ObjectSatisfiesPredicate<T extends SNItem>(
+    object: T,
+    predicate: SNPredicate<T>
   ): boolean {
-    /* Predicates may not always be created using the official constructor
-       so if it's still an array here, convert to object */
-    predicate = toPredicate(predicate);
-
     if (predicate.isRecursive()) {
       if (predicate.operator === PredicateOperator.And) {
         for (const subPredicate of predicate.valueAsArray()) {
@@ -148,103 +173,82 @@ export class SNPredicate {
     if (predicate.operator === PredicateOperator.Not) {
       return !this.ObjectSatisfiesPredicate(
         object,
-        targetValue as PredicateType
+        targetValue as SNPredicate<T>
       );
     }
 
-    let valueAtKeyPath = predicate.keypath
-      .split('.')
-      .reduce((previous, current) => {
+    const keyPathComponents = predicate.keypath.split('.');
+
+    let valueAtKeyPath: PredicateValue<T> = keyPathComponents.reduce<any>(
+      (previous, current) => {
         return previous && previous[current];
-      }, object);
+      },
+      object
+    );
 
     if (typeof valueAtKeyPath === 'string') {
       valueAtKeyPath = valueAtKeyPath.toLowerCase();
     }
 
     const falseyValues = [false, '', null, undefined, NaN];
-    /* If the value at keyPath is undefined, either because the
-      property is nonexistent or the value is null. */
+    /**
+     * The valueAtKeyPath is undefined either because the
+     * property is nonexistent or the value is null.
+     */
     if (valueAtKeyPath === undefined) {
+      const isExpectingFalseyValue = falseyValues.includes(
+        targetValue as FalseyValue
+      );
       if (predicate.operator === PredicateOperator.NotEqual) {
-        return !falseyValues.includes(predicate.value as any);
+        return !isExpectingFalseyValue;
       } else {
-        return falseyValues.includes(predicate.value as any);
+        return isExpectingFalseyValue;
       }
     }
 
     if (predicate.operator === PredicateOperator.Equals) {
-      /* Use array comparison */
       if (Array.isArray(valueAtKeyPath)) {
         return JSON.stringify(valueAtKeyPath) === JSON.stringify(targetValue);
       } else {
         return valueAtKeyPath === targetValue;
       }
     } else if (predicate.operator === PredicateOperator.NotEqual) {
-      // Use array comparison
       if (Array.isArray(valueAtKeyPath)) {
         return JSON.stringify(valueAtKeyPath) !== JSON.stringify(targetValue);
       } else {
         return valueAtKeyPath !== targetValue;
       }
     } else if (predicate.operator === PredicateOperator.LessThan) {
-      return valueAtKeyPath < targetValue;
+      return (valueAtKeyPath as number) < (targetValue as number);
     } else if (predicate.operator === PredicateOperator.GreaterThan) {
-      return valueAtKeyPath > targetValue;
+      return (valueAtKeyPath as number) > (targetValue as number);
     } else if (predicate.operator === PredicateOperator.LessThanOrEqualTo) {
-      return valueAtKeyPath <= targetValue;
+      return (valueAtKeyPath as number) <= (targetValue as number);
     } else if (predicate.operator === PredicateOperator.GreaterThanOrEqualTo) {
-      return valueAtKeyPath >= targetValue;
+      return (valueAtKeyPath as number) >= (targetValue as number);
     } else if (predicate.operator === PredicateOperator.StartsWith) {
-      return valueAtKeyPath.startsWith(targetValue);
+      return (valueAtKeyPath as string).startsWith(targetValue as string);
     } else if (predicate.operator === PredicateOperator.In) {
       return (targetValue as any[]).indexOf(valueAtKeyPath) !== -1;
     } else if (predicate.operator === PredicateOperator.Includes) {
-      return this.resolveIncludesPredicate(valueAtKeyPath, targetValue);
+      return doesValueIncludeTargetValue(valueAtKeyPath, targetValue);
     } else if (predicate.operator === PredicateOperator.Matches) {
       const regex = new RegExp(targetValue as string);
-      return regex.test(valueAtKeyPath);
+      return regex.test(valueAtKeyPath as string);
     }
     return false;
   }
 
-  /**
-   * @param itemValueArray Because we are resolving the `includes` operator, the given
-   * value should be an array.
-   * @param containsValue  The value we are checking to see if exists in itemValueArray
-   */
-  static resolveIncludesPredicate(
-    itemValueArray: Array<any>,
-    containsValue: any
+  static ItemSatisfiesPredicate<T extends SNItem>(
+    item: T,
+    predicate: SNPredicate<T>
   ): boolean {
-    // includes can be a string or a predicate (in array form)
-    if (isString(containsValue)) {
-      // if string, simply check if the itemValueArray includes the predicate value
-      return itemValueArray.includes(containsValue);
-    } else {
-      // is a predicate array or predicate object
-      let innerPredicate;
-      if (Array.isArray(containsValue)) {
-        innerPredicate = SNPredicate.FromArray(containsValue);
-      } else {
-        innerPredicate = containsValue;
-      }
-      for (const obj of itemValueArray) {
-        if (this.ObjectSatisfiesPredicate(obj, innerPredicate)) {
-          return true;
-        }
-      }
-      return false;
-    }
-  }
-
-  static ItemSatisfiesPredicate(item: SNItem, predicate: SNPredicate): boolean {
     return this.ObjectSatisfiesPredicate(item, predicate);
   }
 
-  static ItemSatisfiesPredicates(
-    item: SNItem,
-    predicates: SNPredicate[]
+  static ItemSatisfiesPredicates<T extends SNItem>(
+    item: T,
+    predicates: SNPredicate<T>[]
   ): boolean {
     for (const predicate of predicates) {
       if (!this.ItemSatisfiesPredicate(item, predicate)) {
@@ -269,4 +273,50 @@ export class SNPredicate {
     }
     return date;
   }
+}
+
+function isArrayFlatPredicateRepresentation(array: string[]): boolean {
+  return (
+    array.length === 3 &&
+    Object.values(PredicateOperator).includes(array[1] as PredicateOperator)
+  );
+}
+
+/**
+ * @param value Because we are resolving the `includes` operator, the given
+ * value should be an array.
+ * @param targetValue  The value we are checking to see if exists in itemValueArray
+ */
+function doesValueIncludeTargetValue<T extends SNItem>(
+  value: PredicateValue<T>,
+  targetValue: PredicateValue<T>
+): boolean {
+  // includes can be a string or a predicate (in array form)
+  if (isString(value)) {
+    return value.includes(targetValue as string);
+  }
+
+  if (isString(targetValue)) {
+    return (value as string[] | string).includes(targetValue);
+  }
+
+  if (!Array.isArray(value)) {
+    return false;
+  }
+
+  // is a predicate array or predicate object
+  let innerValue: SNPredicate<T>;
+  if (Array.isArray(targetValue)) {
+    innerValue = SNPredicate.FromFlatArray(targetValue as string[]);
+  } else {
+    innerValue = targetValue as SNPredicate<T>;
+  }
+
+  for (const object of value) {
+    if (SNPredicate.ObjectSatisfiesPredicate<T>(object as any, innerValue)) {
+      return true;
+    }
+  }
+
+  return false;
 }

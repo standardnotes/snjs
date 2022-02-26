@@ -1,3 +1,4 @@
+import { SNItem } from '@Models/core/item';
 import { SNTag } from '@Models/app/tag';
 import { SNPredicate } from '@Models/core/predicate';
 import { PurePayload } from '@standardnotes/payloads';
@@ -30,7 +31,7 @@ export interface SmartTagPredicateContent {
  * list of notes.
  */
 export class SNSmartTag extends SNTag {
-  public readonly predicate!: SNPredicate;
+  public readonly predicate!: SNPredicate<SNItem>;
 
   constructor(payload: PurePayload) {
     super(payload);

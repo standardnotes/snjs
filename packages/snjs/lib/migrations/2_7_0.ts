@@ -1,3 +1,4 @@
+import { SNComponent } from './../models/app/component';
 import { Migration } from '@Lib/migrations/migration';
 import { SNPredicate } from '@Lib/models';
 import { ContentType } from '@standardnotes/common';
@@ -27,8 +28,8 @@ export class Migration2_7_0 extends Migration {
         PredicateOperator.Equals,
         ContentType.Component
       ),
-      new SNPredicate(
-        'package_info.identifier',
+      new SNPredicate<SNComponent>(
+        'package_info.identifier' as never,
         PredicateOperator.Equals,
         batchMgrId
       ),
