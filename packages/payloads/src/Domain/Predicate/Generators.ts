@@ -7,7 +7,7 @@ import {
   PredicateInterface,
   PredicateOperator,
   SureValue,
-} from './interface'
+} from './Interface'
 import { NotPredicate } from './NotPredicate'
 import { Predicate } from './Predicate'
 import { StringKey } from './Utils'
