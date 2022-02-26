@@ -10,11 +10,18 @@ import {
   PayloadContent,
   PayloadOverride,
   PurePayload,
-  PayloadSource
+  PayloadSource,
+  ItemInterface,
+  predicateFromDSLString,
 } from '@standardnotes/payloads';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
-import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils';
+import {
+  isString,
+  naturalSort,
+  removeFromArray,
+  UuidGenerator,
+} from '@standardnotes/utils';
 import { SNComponent } from '@Models/app/component';
 import { SNItemsKey } from '@Models/app/items_key';
 import { isTag, SNTag, TagFolderDelimitter } from '@Models/app/tag';
@@ -34,9 +41,9 @@ import {
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { NoteMutator, SNNote } from './../models/app/note';
 import {
-  SmartTagPredicateContent,
   SMART_TAG_DSL_PREFIX,
-  SNSmartTag,
+  SmartView,
+  SystemViewId,
 } from './../models/app/smartTag';
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
@@ -47,6 +54,7 @@ import {
 import { UuidString } from './../types';
 import { PayloadManager } from './payload_manager';
 import { AbstractService } from '@standardnotes/services';
+import { BuildSmartViews } from '@Lib/protocol/collection/smart_view_builder';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -90,18 +98,25 @@ export class ItemManager extends AbstractService {
   private observers: Observer[] = [];
   private collection!: ItemCollection;
   private notesView!: ItemCollectionNotesView;
-  private systemSmartTags: SNSmartTag[];
+  private systemSmartViews: SmartView[];
   private tagNotesIndex!: TagNotesIndex;
 
   constructor(private payloadManager: PayloadManager) {
     super();
     this.payloadManager = payloadManager;
-    this.systemSmartTags = BuildSmartTags();
+    this.systemSmartViews = this.rebuildSystemSmartViews(
+      NotesDisplayCriteria.Create({})
+    );
     this.createCollection();
     this.unsubChangeObserver = this.payloadManager.addObserver(
       ContentType.Any,
       this.setPayloads.bind(this)
     );
+  }
+
+  private rebuildSystemSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
+    this.systemSmartViews = BuildSmartViews(criteria);
+    return this.systemSmartViews;
   }
 
   private createCollection() {
@@ -132,7 +147,7 @@ export class ItemManager extends AbstractService {
       'asc'
     );
     this.collection.setDisplayOptions(
-      ContentType.SmartTag,
+      ContentType.SmartView,
       CollectionSort.Title,
       'dsc'
     );
@@ -159,7 +174,16 @@ export class ItemManager extends AbstractService {
   }
 
   public setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void {
-    this.notesView.setCriteria(criteria);
+    this.rebuildSystemSmartViews(criteria);
+    const updatedCriteria = NotesDisplayCriteria.Copy(criteria, {
+      views: criteria.views.map((tag) => {
+        const matchingSystemTag = this.systemSmartViews.find(
+          (view) => view.uuid === tag.uuid
+        );
+        return matchingSystemTag || tag;
+      }),
+    });
+    this.notesView.setCriteria(updatedCriteria);
   }
 
   public getDisplayableItems(contentType: ContentType): SNItem[] {
@@ -191,12 +215,12 @@ export class ItemManager extends AbstractService {
       return itemFromCollection as T;
     }
 
-    const itemFromSmartTags = this.systemSmartTags.find(
+    const itemFromSmartViews = this.systemSmartViews.find(
       (tag) => tag.uuid === uuid
     );
 
-    if (itemFromSmartTags) {
-      return (itemFromSmartTags as unknown) as T;
+    if (itemFromSmartViews) {
+      return (itemFromSmartViews as unknown) as T;
     }
 
     return undefined;
@@ -278,9 +302,9 @@ export class ItemManager extends AbstractService {
     return this.tagNotesIndex.allCountableNotesCount();
   }
 
-  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
-    if (tag.isSmartTag) {
-      if (tag.isAllTag) {
+  public countableNotesForTag(tag: SNTag | SmartView): number {
+    if (tag instanceof SmartView) {
+      if (tag.uuid === SystemViewId.AllNotes) {
         return this.tagNotesIndex.allCountableNotesCount();
       }
 
@@ -764,13 +788,13 @@ export class ItemManager extends AbstractService {
     source = PayloadSource.Constructor
   ): Promise<SNItem> {
     await this.payloadManager.emitPayload(payload, source);
-    return this.findItem(payload.uuid!)!;
+    return this.findItem(payload.uuid) as SNItem;
   }
 
   public async emitItemsFromPayloads(
     payloads: PurePayload[],
     source = PayloadSource.Constructor
-  ) {
+  ): Promise<SNItem[]> {
     await this.payloadManager.emitPayloads(payloads, source);
     const uuids = Uuids(payloads);
     return this.findItems(uuids);
@@ -779,7 +803,10 @@ export class ItemManager extends AbstractService {
   /**
    * Marks the item as deleted and needing sync.
    */
-  public async setItemToBeDeleted(uuid: UuidString, source?: PayloadSource) {
+  public async setItemToBeDeleted(
+    uuid: UuidString,
+    source?: PayloadSource
+  ): Promise<SNItem | undefined> {
     /** Capture referencing ids before we delete the item below, otherwise
      * the index may be updated before we get a chance to act on it */
     const referencingIds = this.collection.uuidsThatReferenceUuid(uuid);
@@ -1138,18 +1165,20 @@ export class ItemManager extends AbstractService {
     return newTag;
   }
 
-  public async createSmartTag(
+  public async createSmartView<T extends ItemInterface>(
     title: string,
-    predicate: SmartTagPredicateContent
-  ): Promise<SNSmartTag> {
+    predicate: PredicateInterface<T>
+  ): Promise<SmartView> {
     return this.createItem(
-      ContentType.SmartTag,
+      ContentType.SmartView,
       FillItemContent({ title, predicate }),
       true
-    ) as Promise<SNSmartTag>;
+    ) as Promise<SmartView>;
   }
 
-  public async createSmartTagFromDSL(dsl: string): Promise<SNSmartTag> {
+  public async createSmartViewFromDSL<T extends ItemInterface>(
+    dsl: string
+  ): Promise<SmartView> {
     let components = null;
     try {
       components = JSON.parse(dsl.substring(1, dsl.length));
@@ -1157,19 +1186,20 @@ export class ItemManager extends AbstractService {
       throw Error('Invalid smart tag syntax');
     }
 
-    const [title, keypath, operator, value] = components;
-    return this.createSmartTag(title, { keypath, operator, value });
+    const title = components[0];
+    const predicate = predicateFromDSLString<T>(dsl);
+    return this.createSmartView(title, predicate);
   }
 
-  public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
-    if (this.isSmartTagTitle(title)) {
-      return this.createSmartTagFromDSL(title);
+  public async createTagOrSmartView(title: string): Promise<SNTag | SmartView> {
+    if (this.isSmartViewTitle(title)) {
+      return this.createSmartViewFromDSL(title);
     } else {
       return this.createTag(title);
     }
   }
 
-  public isSmartTagTitle(title: string): boolean {
+  public isSmartViewTitle(title: string): boolean {
     return title.startsWith(SMART_TAG_DSL_PREFIX);
   }
 
@@ -1184,49 +1214,42 @@ export class ItemManager extends AbstractService {
     return tag || this.createTag(title, parentUuid);
   }
 
-  /**
-   * Returns all notes matching the smart tag
-   */
-  public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    return this.notesView.notesMatchingSmartTag(smartTag);
+  public notesMatchingSmartView(view: SmartView): SNNote[] {
+    return this.notesView.notesMatchingSmartView(view);
   }
 
-  /**
-   * Returns the smart tag corresponding to the "Trash" tag.
-   */
-  public get trashSmartTag() {
-    return this.systemSmartTags.find((tag) => tag.isTrashTag)!;
+  public get trashSmartView(): SmartView {
+    return this.systemSmartViews.find(
+      (tag) => tag.uuid === SystemViewId.TrashedNotes
+    ) as SmartView;
   }
 
-  /**
-   * Returns all items currently in the trash
-   */
-  public get trashedItems() {
-    return this.notesMatchingSmartTag(this.trashSmartTag);
+  public get trashedItems(): SNNote[] {
+    return this.notesMatchingSmartView(this.trashSmartView);
   }
 
   /**
    * Permanently deletes any items currently in the trash. Consumer must manually call sync.
    */
-  public async emptyTrash() {
+  public async emptyTrash(): Promise<void> {
     const notes = this.trashedItems;
-    return this.setItemsToBeDeleted(Uuids(notes));
+    await this.setItemsToBeDeleted(Uuids(notes));
   }
 
   /**
    * Returns all smart tags, sorted by title.
    */
-  public getSmartTags() {
+  public getSmartViews(): SmartView[] {
     const userTags = this.collection.displayElements(
-      ContentType.SmartTag
-    ) as SNSmartTag[];
-    return this.systemSmartTags.concat(userTags);
+      ContentType.SmartView
+    ) as SmartView[];
+    return this.systemSmartViews.concat(userTags);
   }
 
   /**
    * The number of notes currently managed
    */
-  public get noteCount() {
+  public get noteCount(): number {
     return this.collection.all(ContentType.Note).length;
   }
 
@@ -1235,7 +1258,7 @@ export class ItemManager extends AbstractService {
    * Used primarily when signing into an account and wanting to discard any current
    * local data.
    */
-  public async removeAllItemsFromMemory() {
+  public async removeAllItemsFromMemory(): Promise<void> {
     const uuids = Uuids(this.items);
     /** We don't want to set as dirty, since we want to dispose of immediately. */
     await this.changeItems(
@@ -1253,43 +1276,4 @@ export class ItemManager extends AbstractService {
     this.collection.discard(item);
     this.payloadManager.removePayloadLocally(item.payload);
   }
-}
-
-const SYSTEM_TAG_ALL_NOTES = 'all-notes';
-const SYSTEM_TAG_ARCHIVED_NOTES = 'archived-notes';
-const SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
-
-function BuildSmartTags() {
-  const allNotes = CreateMaxPayloadFromAnyObject({
-    uuid: SYSTEM_TAG_ALL_NOTES,
-    content_type: ContentType.SmartTag,
-    content: FillItemContent({
-      title: 'All notes',
-      isSystemTag: true,
-      isAllTag: true,
-    }),
-  });
-  const archived = CreateMaxPayloadFromAnyObject({
-    uuid: SYSTEM_TAG_ARCHIVED_NOTES,
-    content_type: ContentType.SmartTag,
-    content: FillItemContent({
-      title: 'Archived',
-      isSystemTag: true,
-      isArchiveTag: true,
-    }),
-  });
-  const trash = CreateMaxPayloadFromAnyObject({
-    uuid: SYSTEM_TAG_TRASHED_NOTES,
-    content_type: ContentType.SmartTag,
-    content: FillItemContent({
-      title: 'Trash',
-      isSystemTag: true,
-      isTrashTag: true,
-    }),
-  });
-  return [
-    CreateItemFromPayload(allNotes) as SNSmartTag,
-    CreateItemFromPayload(archived) as SNSmartTag,
-    CreateItemFromPayload(trash) as SNSmartTag,
-  ];
 }

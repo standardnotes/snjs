@@ -21,7 +21,7 @@ export const AllowedBatchPermissions = Object.freeze([
   ContentType.FilesafeCredentials,
   ContentType.FilesafeFileMetadata,
   ContentType.FilesafeIntegration,
-  ContentType.SmartTag,
+  ContentType.SmartView,
   ContentType.Tag,
 ]);
 

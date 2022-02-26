@@ -8,7 +8,7 @@ import { SNEditor } from './app/editor';
 import { SNItem } from './core/item';
 import { SNItemsKey } from './app/items_key';
 import { SNNote } from './app/note';
-import { SNSmartTag } from './app/smartTag';
+import { SmartView } from './app/smartTag';
 import { SNTag } from './app/tag';
 import { SNTheme } from './app/theme';
 import { SNUserPrefs } from './app/userPrefs';
@@ -19,7 +19,7 @@ const ContentTypeClassMapping: Partial<
   [ContentType.Note]: SNNote,
   [ContentType.Tag]: SNTag,
   [ContentType.ItemsKey]: SNItemsKey,
-  [ContentType.SmartTag]: SNSmartTag,
+  [ContentType.SmartView]: SmartView,
   [ContentType.ActionsExtension]: SNActionsExtension,
   [ContentType.Editor]: SNEditor,
   [ContentType.Theme]: SNTheme,

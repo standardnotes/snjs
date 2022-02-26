@@ -8,7 +8,7 @@ export enum ContentType {
   Privileges = 'SN|Privileges',
   Note = 'Note',
   Tag = 'Tag',
-  SmartTag = 'SN|SmartTag',
+  SmartView = 'SN|SmartTag',
   Component = 'SN|Component',
   Editor = 'SN|Editor',
   ActionsExtension = 'Extension',

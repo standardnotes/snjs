@@ -507,7 +507,7 @@ describe('notes and tags', () => {
         })
       );
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Foo Notes',
           predicate: {
             keypath: 'title',
@@ -516,7 +516,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -549,7 +549,7 @@ describe('notes and tags', () => {
         })
       );
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Pinned',
           predicate: {
             keypath: 'pinned',
@@ -558,7 +558,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -590,7 +590,7 @@ describe('notes and tags', () => {
         })
       );
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Not pinned',
           predicate: {
             keypath: 'pinned',
@@ -599,7 +599,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -630,7 +630,7 @@ describe('notes and tags', () => {
         })
       );
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Long',
           predicate: {
             keypath: 'text.length',
@@ -639,7 +639,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -686,7 +686,7 @@ describe('notes and tags', () => {
         })
       );
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'One day ago',
           predicate: {
             keypath: 'serverUpdatedAt',
@@ -695,7 +695,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -724,7 +724,7 @@ describe('notes and tags', () => {
       });
 
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Untagged',
           predicate: {
             keypath: 'tags.length',
@@ -733,7 +733,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -762,7 +762,7 @@ describe('notes and tags', () => {
       );
 
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'B-tags',
           predicate: {
             keypath: 'tags',
@@ -771,7 +771,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -815,7 +815,7 @@ describe('notes and tags', () => {
       });
 
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Pinned & Locked',
           predicate: {
             operator: 'and',
@@ -826,7 +826,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
@@ -877,7 +877,7 @@ describe('notes and tags', () => {
       );
 
       const smartTag = await this.application.insertItem(
-        await this.application.createTemplateItem(ContentType.SmartTag, {
+        await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Protected or Pinned',
           predicate: {
             operator: 'or',
@@ -888,7 +888,7 @@ describe('notes and tags', () => {
           },
         })
       );
-      const matches = this.application.notesMatchingSmartTag(smartTag);
+      const matches = this.application.notesMatchingSmartView(smartTag);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'created_at',

@@ -412,7 +412,7 @@ describe('item manager', function () {
       }
     );
 
-    expect(this.itemManager.trashSmartTag).to.be.ok;
+    expect(this.itemManager.trashSmartView).to.be.ok;
     expect(versionTwo.trashed).to.equal(true);
     expect(versionTwo.dirty).to.equal(true);
     expect(versionTwo.content).to.be.ok;

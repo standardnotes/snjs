@@ -54,7 +54,7 @@ import {
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { BackupFile } from './services/protocol_service';
 import { SyncOptions } from './services/sync/sync_service';
-import { SNSmartTag } from './models/app/smartTag';
+import { SmartView } from './models/app/smartTag';
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
 import {
   Challenge,
@@ -854,8 +854,8 @@ export class SNApplication implements ListedInterface {
     return this.itemManager.getItems<T>(contentType, nonerroredOnly);
   }
 
-  public notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[] {
-    return this.itemManager.notesMatchingSmartTag(smartTag);
+  public notesMatchingSmartView(smartTag: SmartView): SNNote[] {
+    return this.itemManager.notesMatchingSmartView(smartTag);
   }
 
   public addNoteCountChangeObserver(
@@ -868,7 +868,7 @@ export class SNApplication implements ListedInterface {
     return this.itemManager.allCountableNotesCount();
   }
 
-  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
+  public countableNotesForTag(tag: SNTag | SmartView): number {
     return this.itemManager.countableNotesForTag(tag);
   }
 
@@ -1016,16 +1016,16 @@ export class SNApplication implements ListedInterface {
   }
 
   /** Creates and returns the tag but does not run sync. Callers must perform sync. */
-  public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
-    return this.itemManager.createTagOrSmartTag(title);
+  public async createTagOrSmartView(title: string): Promise<SNTag | SmartView> {
+    return this.itemManager.createTagOrSmartView(title);
   }
 
-  public isSmartTagTitle(title: string): boolean {
-    return this.itemManager.isSmartTagTitle(title);
+  public isSmartViewTitle(title: string): boolean {
+    return this.itemManager.isSmartViewTitle(title);
   }
 
-  public getSmartTags(): SNSmartTag[] {
-    return this.itemManager.getSmartTags();
+  public getSmartTags(): SmartView[] {
+    return this.itemManager.getSmartViews();
   }
 
   public getNoteCount(): number {

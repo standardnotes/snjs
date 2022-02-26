@@ -6,7 +6,7 @@ import {
 import { SNTag } from './../../models/app/tag';
 import { ContentType } from '@standardnotes/common';
 import { SNNote } from './../../models/app/note';
-import { SNSmartTag } from './../../models/app/smartTag';
+import { SmartView, SystemViewId } from './../../models/app/smartTag';
 import { NoteWithTags } from './note_with_tags';
 import { CompoundPredicate } from '@standardnotes/payloads';
 
@@ -18,6 +18,7 @@ export type SearchQuery = {
 export class NotesDisplayCriteria {
   public searchQuery?: SearchQuery;
   public tags: SNTag[] = [];
+  public views: SmartView[] = [];
   public includePinned = true;
   public includeProtected = true;
   public includeTrashed = false;
@@ -44,38 +45,23 @@ export class NotesDisplayCriteria {
   }
 
   computeFilters(collection: ItemCollection): NoteFilter[] {
-    const nonSmartTags = this.tags.filter((tag) => !tag.isSmartTag);
-    const allSmartTags = this.tags.filter((tag) => tag.isSmartTag) as [
-      SNSmartTag
-    ];
-    const systemSmartTags = allSmartTags.filter((t) => t.isSystemSmartTag);
-    const userSmartTags = allSmartTags.filter((t) => !t.isSystemSmartTag);
-
-    let usesArchiveSmartTag = false;
-    let usesTrashSmartTag = false;
+    const systemViews = this.views.filter((t) =>
+      Object.values(SystemViewId).includes(t.uuid as SystemViewId)
+    );
+    const userSmartViews = this.views.filter(
+      (t) => !Object.values(SystemViewId).includes(t.uuid as SystemViewId)
+    );
 
     const filters: NoteFilter[] = [];
-    for (const systemTag of systemSmartTags) {
-      if (systemTag.isArchiveTag) {
-        filters.push((note) => note.archived && !note.deleted);
-        usesArchiveSmartTag = true;
-      } else if (systemTag.isTrashTag) {
-        filters.push((note) => note.trashed && !note.deleted);
-        usesTrashSmartTag = true;
-      }
-    }
-    if (userSmartTags.length > 0) {
-      const predicate = new CompoundPredicate(
+    const allViews = systemViews.concat(userSmartViews);
+    if (allViews.length > 0) {
+      const compoundPredicate = new CompoundPredicate(
         'and',
-        userSmartTags.map((t) => t.predicate)
+        allViews.map((t) => t.predicate)
       );
+
       filters.push((note) => {
-        if (predicate.keypathIncludesString('tags')) {
-          /**
-           * A note object doesn't come with its tags, so we map the list to
-           * flattened note-like objects that also contain
-           * their tags.
-           */
+        if (compoundPredicate.keypathIncludesString('tags')) {
           const noteWithTags = new NoteWithTags(
             note.payload,
             collection.elementsReferencingElement(
@@ -83,36 +69,35 @@ export class NotesDisplayCriteria {
               ContentType.Tag
             ) as SNTag[]
           );
-          return predicate.matchesItem(noteWithTags);
+          return compoundPredicate.matchesItem(noteWithTags);
         } else {
-          return predicate.matchesItem(note);
+          return compoundPredicate.matchesItem(note);
         }
       });
-    } else if (nonSmartTags.length > 0) {
-      for (const tag of nonSmartTags) {
+    }
+
+    if (this.tags.length > 0) {
+      for (const tag of this.tags) {
         filters.push((note) => tag.hasRelationshipWithItem(note));
       }
+      if (!this.includePinned) {
+        filters.push((note) => !note.pinned);
+      }
+      if (!this.includeProtected) {
+        filters.push((note) => !note.protected);
+      }
+      if (!this.includeTrashed) {
+        filters.push((note) => !note.trashed);
+      }
+      if (!this.includeArchived) {
+        filters.push((note) => !note.archived);
+      }
     }
-    if (this.searchQuery) {
+
+    if (this.searchQuery != undefined) {
       filters.push((note) =>
         noteMatchesQuery(note, this.searchQuery!, collection)
       );
-    }
-    if (!this.includePinned) {
-      filters.push((note) => !note.pinned);
-    }
-    if (!this.includeProtected) {
-      filters.push((note) => !note.protected);
-    }
-    if (!this.includeTrashed && !usesTrashSmartTag) {
-      filters.push((note) => !note.trashed);
-    }
-    /**
-     * Archived notes should still appear in trash by default,
-     * but trashed notes don't appear in Archived
-     */
-    if (!this.includeArchived && !usesArchiveSmartTag && !usesTrashSmartTag) {
-      filters.push((note) => !note.archived);
     }
 
     return filters;
@@ -121,9 +106,9 @@ export class NotesDisplayCriteria {
 
 type NoteFilter = (note: SNNote) => boolean;
 
-export function criteriaForSmartTag(tag: SNSmartTag): NotesDisplayCriteria {
+export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
   const criteria = NotesDisplayCriteria.Create({
-    tags: [tag],
+    views: [view],
   });
   return criteria;
 }

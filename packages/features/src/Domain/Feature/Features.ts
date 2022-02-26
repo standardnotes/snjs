@@ -558,7 +558,7 @@ export function GetDeprecatedFeatures(): FeatureDescription[] {
     component_permissions: [
       {
         name: ComponentAction.StreamItems,
-        content_types: [ContentType.Tag, ContentType.SmartTag],
+        content_types: [ContentType.Tag, ContentType.SmartView],
       },
     ],
     permission_name: PermissionName.ComponentFolders,
