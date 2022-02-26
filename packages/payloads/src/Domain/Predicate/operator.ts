@@ -1,6 +1,6 @@
 import { isString } from '@standardnotes/utils'
-import { FalseyValue, PredicateOperator, PrimitiveOperand, SureValue } from './interface'
-import { dateFromDSLDateString } from './utils'
+import { FalseyValue, PredicateOperator, PrimitiveOperand, SureValue } from './Interface'
+import { dateFromDSLDateString } from './Utils'
 
 export function valueMatchesTargetValue(
   value: PrimitiveOperand,

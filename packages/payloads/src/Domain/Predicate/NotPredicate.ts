@@ -1,5 +1,5 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface } from './interface'
+import { PredicateInterface } from './Interface'
 
 export class NotPredicate<T extends ItemInterface> implements PredicateInterface<T> {
   constructor(public readonly predicate: PredicateInterface<T>) {}

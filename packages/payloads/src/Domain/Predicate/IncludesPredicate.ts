@@ -1,6 +1,6 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface } from './interface'
-import { StringKey } from './utils'
+import { PredicateInterface } from './Interface'
+import { StringKey } from './Utils'
 
 export class IncludesPredicate<T extends ItemInterface> implements PredicateInterface<T> {
   constructor(

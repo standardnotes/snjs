@@ -2,17 +2,17 @@
 
 import { ItemInterface } from './../Item/ItemInterface'
 import { ContentType } from '@standardnotes/common'
-import { Predicate } from './predicate'
 import {
+  CompoundPredicate,
+  NotPredicate,
+  IncludesPredicate,
+  Predicate,
   compoundPredicateFromArguments,
   includesPredicateFromArguments,
   notPredicateFromArguments,
   predicateFromArguments,
   predicateFromDSLString,
-} from './generators'
-import { CompoundPredicate } from './compound_predicate'
-import { NotPredicate } from './not_predicate'
-import { IncludesPredicate } from './includes_predicate'
+} from '.'
 
 interface Item extends ItemInterface {
   content_type: ContentType

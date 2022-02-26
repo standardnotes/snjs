@@ -1,5 +1,5 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateCompoundOperator, PredicateInterface } from './interface'
+import { PredicateCompoundOperator, PredicateInterface } from './Interface'
 
 export class CompoundPredicate<T extends ItemInterface> implements PredicateInterface<T> {
   constructor(

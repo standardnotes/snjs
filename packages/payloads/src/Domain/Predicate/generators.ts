@@ -1,6 +1,6 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { CompoundPredicate } from './compound_predicate'
-import { IncludesPredicate } from './includes_predicate'
+import { CompoundPredicate } from './CompoundPredicate'
+import { IncludesPredicate } from './IncludesPredicate'
 import {
   AllPredicateCompoundOperators,
   PredicateCompoundOperator,
@@ -8,9 +8,9 @@ import {
   PredicateOperator,
   SureValue,
 } from './interface'
-import { NotPredicate } from './not_predicate'
-import { Predicate } from './predicate'
-import { StringKey } from './utils'
+import { NotPredicate } from './NotPredicate'
+import { Predicate } from './Predicate'
+import { StringKey } from './Utils'
 
 type RawPredicateInArrayForm = string[]
 

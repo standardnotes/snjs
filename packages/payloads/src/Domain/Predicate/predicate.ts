@@ -1,7 +1,7 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface, PredicateOperator, PrimitiveOperand, SureValue } from './interface'
-import { valueMatchesTargetValue } from './operator'
-import { StringKey } from './utils'
+import { PredicateInterface, PredicateOperator, PrimitiveOperand, SureValue } from './Interface'
+import { valueMatchesTargetValue } from './Operator'
+import { StringKey } from './Utils'
 
 /**
  * A local-only construct that defines a built query that
