@@ -382,10 +382,8 @@ export class SNItem implements ItemInterface {
     );
   }
 
-  public satisfiesPredicate<T extends SNItem>(
-    predicate: PredicateInterface<T>
-  ): boolean {
-    return predicate.matchesItem(this as never);
+  public satisfiesPredicate(predicate: PredicateInterface<SNItem>): boolean {
+    return predicate.matchesItem(this);
   }
 }
 

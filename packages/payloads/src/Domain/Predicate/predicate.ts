@@ -32,16 +32,4 @@ export class Predicate<T extends ItemInterface> implements PredicateInterface<T>
 
     return valueMatchesTargetValue(valueAtKeyPath, this.operator, this.targetValue)
   }
-
-  static ItemSatisfiesPredicates<T extends ItemInterface>(
-    item: T,
-    predicates: Predicate<T>[],
-  ): boolean {
-    for (const predicate of predicates) {
-      if (!predicate.matchesItem(item)) {
-        return false
-      }
-    }
-    return true
-  }
 }

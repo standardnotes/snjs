@@ -61,7 +61,7 @@ describe('singletons', function () {
       );
     };
     this.extManagerId = 'org.standardnotes.extensions-manager';
-    this.extPred = Predicate.CompoundPredicate([
+    this.extPred = new CompoundPredicate('and', [
       new Predicate('content_type', '=', ContentType.Component),
       new Predicate('package_info.identifier', '=', this.extManagerId),
     ]);

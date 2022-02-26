@@ -23,11 +23,7 @@ export class Migration2_7_0 extends Migration {
     const batchMgrId = 'org.standardnotes.batch-manager';
     const batchMgrPred = new CompoundPredicate('and', [
       new Predicate<SNComponent>('content_type', '=', ContentType.Component),
-      new Predicate<SNComponent>(
-        'package_info.identifier' as never,
-        '=',
-        batchMgrId
-      ),
+      new Predicate<SNComponent>('identifier', '=', batchMgrId),
     ]);
     const batchMgrSingleton = this.services.singletonManager.findSingleton(
       ContentType.Component,
