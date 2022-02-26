@@ -1,4 +1,3 @@
-import { PredicateInterface } from './../../../dist/@types/models/core/interface.d';
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
 import { addIfUnique, isValidUrl, removeFromArray } from '@standardnotes/utils';
 import { Predicate, PurePayload } from '@standardnotes/payloads';
