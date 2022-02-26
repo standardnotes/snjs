@@ -24,6 +24,6 @@ export class IncludesPredicate<T extends ItemInterface> implements PredicateInte
   }
 
   keypathIncludesString(verb: string): boolean {
-    return this.predicate.keypathIncludesString(verb)
+    return this.keypath.includes(verb)
   }
 }

@@ -30,8 +30,7 @@ export class CompoundPredicate<T extends ItemInterface> implements PredicateInte
   }
 
   keypathIncludesString(verb: string): boolean {
-    const subPredicates = this.predicates
-    for (const subPredicate of subPredicates) {
+    for (const subPredicate of this.predicates) {
       if (subPredicate.keypathIncludesString(verb)) {
         return true
       }
