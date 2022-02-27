@@ -11,9 +11,9 @@ const generateLongString = (minLength = 600) => {
   return BASE.repeat(repeatCount);
 };
 
-const getFilteredNotes = (application, { tags }) => {
+const getFilteredNotes = (application, { views }) => {
   const criteria = NotesDisplayCriteria.Create({
-    tags,
+    views,
     includePinned: true,
   });
   application.setNotesDisplayCriteria(criteria);
@@ -25,7 +25,7 @@ const titles = (items) => {
   return items.map((item) => item.title).sort();
 };
 
-describe('notes and smart tags', () => {
+describe('notes and smart views', () => {
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithFakeCrypto();
   });
@@ -34,7 +34,7 @@ describe('notes and smart tags', () => {
     await Factory.safeDeinit(this.application);
   });
 
-  it('lets me create a smart tag an use it', async function () {
+  it('lets me create a smart view and use it', async function () {
     // ## The user creates 3 notes
     const [note_1, note_2, note_3] = await Promise.all([
       Factory.createMappedNote(
@@ -60,24 +60,24 @@ describe('notes and smart tags', () => {
       Factory.pinNote(this.application, note_3),
     ]);
 
-    // ## The user creates smart tags (long & pinned)
+    // ## The user creates smart views (long & pinned)
     const not_pinned = '!["Not Pinned", "pinned", "=", false]';
     const long = '!["Long", "text.length", ">", 500]';
 
-    const tag_not_pinned = await this.application.createTagOrSmartTag(
+    const tag_not_pinned = await this.application.createTagOrSmartView(
       not_pinned
     );
-    const tag_long = await this.application.createTagOrSmartTag(long);
+    const tag_long = await this.application.createTagOrSmartView(long);
 
     // ## The user can filter and see the pinned notes
     const notes_not_pinned = getFilteredNotes(this.application, {
-      tags: [tag_not_pinned],
+      views: [tag_not_pinned],
     });
 
     expect(titles(notes_not_pinned)).to.eql(['long & !pinned']);
 
     // ## The user can filter and see the long notes
-    const notes_long = getFilteredNotes(this.application, { tags: [tag_long] });
+    const notes_long = getFilteredNotes(this.application, { views: [tag_long] });
     expect(titles(notes_long)).to.eql(['long & !pinned', 'long & pinned']);
 
     // ## The user creates a new long note
@@ -89,7 +89,7 @@ describe('notes and smart tags', () => {
 
     // ## The user can filter and see the new long note
     const notes_long2 = getFilteredNotes(this.application, {
-      tags: [tag_long],
+      views: [tag_long],
     });
     expect(titles(notes_long2)).to.eql([
       'long & !pinned',

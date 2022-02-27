@@ -1,6 +1,15 @@
 export interface PredicateInterface<T> {
   matchesItem(item: T): boolean
   keypathIncludesString(verb: string): boolean
+  toJson(): PredicateJsonForm
+}
+
+export type RawPredicateInArrayForm = string[]
+
+export interface PredicateJsonForm {
+  keypath?: string
+  operator: PredicateOperator
+  value: SureValue | PredicateJsonForm | PredicateJsonForm[] | RawPredicateInArrayForm
 }
 
 export const AllPredicateCompoundOperators = ['and', 'or'] as const

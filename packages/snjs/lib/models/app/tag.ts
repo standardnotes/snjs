@@ -4,7 +4,7 @@ import {
   isTagToParentTagReference,
   TagToParentTagReference,
   PurePayload,
-  ItemInterface
+  ItemInterface,
 } from '@standardnotes/payloads';
 import { ItemMutator, SNItem } from '@Models/core/item';
 import { ContentType } from '@standardnotes/common';
@@ -46,26 +46,6 @@ export class SNTag extends SNItem implements TagContent {
 
   get noteCount(): number {
     return this.noteReferences.length;
-  }
-
-  public get isSmartTag(): boolean {
-    return this.content_type === ContentType.SmartTag;
-  }
-
-  public get isSystemSmartTag(): boolean {
-    return this.payload.safeContent.isSystemTag;
-  }
-
-  public get isAllTag(): boolean {
-    return this.payload.safeContent.isAllTag;
-  }
-
-  public get isTrashTag(): boolean {
-    return this.payload.safeContent.isTrashTag;
-  }
-
-  public get isArchiveTag(): boolean {
-    return this.payload.safeContent.isArchiveTag;
   }
 
   public get parentId(): UuidString | undefined {

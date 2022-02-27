@@ -4,7 +4,7 @@ import {
   PayloadSource,
   PurePayload,
   MutableCollection,
-  ImmutablePayloadCollection
+  ImmutablePayloadCollection,
 } from '@standardnotes/payloads';
 import { DeltaFileImport } from './../protocol/payloads/deltas/file_import';
 import { ContentType } from '@standardnotes/common';

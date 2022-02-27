@@ -1,5 +1,5 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateCompoundOperator, PredicateInterface } from './Interface'
+import { PredicateCompoundOperator, PredicateInterface, PredicateJsonForm } from './Interface'
 
 export class CompoundPredicate<T extends ItemInterface> implements PredicateInterface<T> {
   constructor(
@@ -36,5 +36,12 @@ export class CompoundPredicate<T extends ItemInterface> implements PredicateInte
       }
     }
     return false
+  }
+
+  toJson(): PredicateJsonForm {
+    return {
+      operator: this.operator,
+      value: this.predicates.map((predicate) => predicate.toJson()),
+    }
   }
 }

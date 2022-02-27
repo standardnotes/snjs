@@ -1,5 +1,5 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface } from './Interface'
+import { PredicateInterface, PredicateJsonForm } from './Interface'
 
 export class NotPredicate<T extends ItemInterface> implements PredicateInterface<T> {
   constructor(public readonly predicate: PredicateInterface<T>) {}
@@ -10,5 +10,12 @@ export class NotPredicate<T extends ItemInterface> implements PredicateInterface
 
   keypathIncludesString(verb: string): boolean {
     return this.predicate.keypathIncludesString(verb)
+  }
+
+  toJson(): PredicateJsonForm {
+    return {
+      operator: 'not',
+      value: this.predicate.toJson(),
+    }
   }
 }

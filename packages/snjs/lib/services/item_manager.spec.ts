@@ -1,38 +1,42 @@
 import { ItemManager, SNItem } from '@Lib/index';
 import { SNNote, NoteMutator } from '@Lib/models';
-import { SmartTagPredicateContent, SNSmartTag } from '@Lib/models/app/smartTag';
+import { SmartView, SystemViewId } from '@Lib/models/app/SmartView';
 import { SNTag, TagMutator } from '@Models/app/tag';
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
+import {
+  FillItemContent,
+  CreateMaxPayloadFromAnyObject,
+  predicateFromJson,
+} from '@standardnotes/payloads';
 import { UuidGenerator } from '@standardnotes/utils';
 import { ContentType } from '@standardnotes/common';
 import { NotesDisplayCriteria } from './../protocol/collection/notes_display_criteria';
 import { PayloadManager } from './payload_manager';
 
 const setupRandomUuid = () => {
-  UuidGenerator.SetGenerators(() => String(Math.random()));
+  UuidGenerator.SetGenerator(() => String(Math.random()));
 };
 
-const TAG_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';
-const TAG_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]';
-const TAG_LONG = '!["Long", "text.length", ">", 500]';
+const VIEW_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';
+const VIEW_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]';
+const VIEW_LONG = '!["Long", "text.length", ">", 500]';
 
-const TAG_NOT_PINNED_JSON: SmartTagPredicateContent = {
+const NotPinnedPredicate = predicateFromJson<SNTag>({
   keypath: 'pinned',
   operator: '=',
   value: false,
-};
+});
 
-const TAG_LAST_DAY_JSON: SmartTagPredicateContent = {
+const LastDayPredicate = predicateFromJson<SNTag>({
   keypath: 'updated_at',
   operator: '>',
   value: '1.days.ago',
-};
+});
 
-const TAG_LONG_JSON: SmartTagPredicateContent = {
-  keypath: 'text.length',
+const LongTextPredicate = predicateFromJson<SNTag>({
+  keypath: 'text.length' as never,
   operator: '>',
   value: 500,
-};
+});
 
 describe('itemManager', () => {
   let payloadManager: PayloadManager;
@@ -387,19 +391,23 @@ describe('itemManager', () => {
       expect(itemManager.isTemplateItem(item)).toEqual(false);
     });
 
-    it('isTemplateItem return the correct value for system smart tags', async () => {
+    it('isTemplateItem return the correct value for system smart views', () => {
       itemManager = createService();
       setupRandomUuid();
 
       const [
         systemTag1,
-        ...restOfSystemTags
-      ] = itemManager.getSmartTags().filter((tag) => tag.isSystemSmartTag);
+        ...restOfSystemViews
+      ] = itemManager
+        .getSmartViews()
+        .filter((view) =>
+          Object.values(SystemViewId).includes(view.uuid as SystemViewId)
+        );
 
       const isSystemTemplate = itemManager.isTemplateItem(systemTag1);
       expect(isSystemTemplate).toEqual(false);
 
-      const areTemplates = restOfSystemTags
+      const areTemplates = restOfSystemViews
         .map((tag) => itemManager.isTemplateItem(tag))
         .every((value) => !!value);
       expect(areTemplates).toEqual(false);
@@ -471,116 +479,116 @@ describe('itemManager', () => {
     });
   });
 
-  describe('tags and smart tags', () => {
-    it('lets me create a smart tag', async () => {
+  describe('tags and smart views', () => {
+    it('lets me create a smart view', async () => {
       itemManager = createService();
       setupRandomUuid();
 
-      const [tag1, tag2, tag3] = await Promise.all([
-        itemManager.createSmartTag('Not Pinned', TAG_NOT_PINNED_JSON),
-        itemManager.createSmartTag('Last Day', TAG_LAST_DAY_JSON),
-        itemManager.createSmartTag('Long', TAG_LONG_JSON),
+      const [view1, view2, view3] = await Promise.all([
+        itemManager.createSmartView('Not Pinned', NotPinnedPredicate),
+        itemManager.createSmartView('Last Day', LastDayPredicate),
+        itemManager.createSmartView('Long', LongTextPredicate),
       ]);
 
-      expect(tag1).toBeTruthy();
-      expect(tag2).toBeTruthy();
-      expect(tag3).toBeTruthy();
+      expect(view1).toBeTruthy();
+      expect(view2).toBeTruthy();
+      expect(view3).toBeTruthy();
 
-      expect(tag1.content_type).toEqual(ContentType.SmartTag);
-      expect(tag2.content_type).toEqual(ContentType.SmartTag);
-      expect(tag3.content_type).toEqual(ContentType.SmartTag);
+      expect(view1.content_type).toEqual(ContentType.SmartView);
+      expect(view2.content_type).toEqual(ContentType.SmartView);
+      expect(view3.content_type).toEqual(ContentType.SmartView);
     });
 
-    it('lets me use a smart tag', async () => {
+    it('lets me use a smart view', async () => {
       itemManager = createService();
       setupRandomUuid();
 
-      const tag = await itemManager.createSmartTag(
+      const view = await itemManager.createSmartView(
         'Not Pinned',
-        TAG_NOT_PINNED_JSON
+        NotPinnedPredicate
       );
 
-      const notes = itemManager.notesMatchingSmartTag(tag);
+      const notes = itemManager.notesMatchingSmartView(view);
 
       expect(notes).toEqual([]);
     });
 
-    it('lets me test if a title is a smart tag', () => {
+    it('lets me test if a title is a smart view', () => {
       itemManager = createService();
       setupRandomUuid();
 
-      expect(itemManager.isSmartTagTitle(TAG_NOT_PINNED)).toEqual(true);
-      expect(itemManager.isSmartTagTitle(TAG_LAST_DAY)).toEqual(true);
-      expect(itemManager.isSmartTagTitle(TAG_LONG)).toEqual(true);
+      expect(itemManager.isSmartViewTitle(VIEW_NOT_PINNED)).toEqual(true);
+      expect(itemManager.isSmartViewTitle(VIEW_LAST_DAY)).toEqual(true);
+      expect(itemManager.isSmartViewTitle(VIEW_LONG)).toEqual(true);
 
-      expect(itemManager.isSmartTagTitle('Helloworld')).toEqual(false);
-      expect(itemManager.isSmartTagTitle('@^![ some title')).toEqual(false);
+      expect(itemManager.isSmartViewTitle('Helloworld')).toEqual(false);
+      expect(itemManager.isSmartViewTitle('@^![ some title')).toEqual(false);
     });
 
-    it('lets me create a smart tag from the DSL', async () => {
+    it('lets me create a smart view from the DSL', async () => {
       itemManager = createService();
       setupRandomUuid();
 
       const [tag1, tag2, tag3] = await Promise.all([
-        itemManager.createSmartTagFromDSL(TAG_NOT_PINNED),
-        itemManager.createSmartTagFromDSL(TAG_LAST_DAY),
-        itemManager.createSmartTagFromDSL(TAG_LONG),
+        itemManager.createSmartViewFromDSL(VIEW_NOT_PINNED),
+        itemManager.createSmartViewFromDSL(VIEW_LAST_DAY),
+        itemManager.createSmartViewFromDSL(VIEW_LONG),
       ]);
 
       expect(tag1).toBeTruthy();
       expect(tag2).toBeTruthy();
       expect(tag3).toBeTruthy();
 
-      expect(tag1.content_type).toEqual(ContentType.SmartTag);
-      expect(tag2.content_type).toEqual(ContentType.SmartTag);
-      expect(tag3.content_type).toEqual(ContentType.SmartTag);
+      expect(tag1.content_type).toEqual(ContentType.SmartView);
+      expect(tag2.content_type).toEqual(ContentType.SmartView);
+      expect(tag3.content_type).toEqual(ContentType.SmartView);
     });
 
-    it('will create smart tag or tags from the generic method', async () => {
+    it('will create smart view or tags from the generic method', async () => {
       itemManager = createService();
       setupRandomUuid();
 
-      const someTag = await itemManager.createTagOrSmartTag('some-tag');
-      const someSmartTag = await itemManager.createTagOrSmartTag(TAG_LONG);
+      const someTag = await itemManager.createTagOrSmartView('some-tag');
+      const someView = await itemManager.createTagOrSmartView(VIEW_LONG);
 
       expect(someTag.content_type).toEqual(ContentType.Tag);
-      expect(someSmartTag.content_type).toEqual(ContentType.SmartTag);
+      expect(someView.content_type).toEqual(ContentType.SmartView);
     });
   });
 
-  it('lets me rename a smart tag', async () => {
+  it('lets me rename a smart view', async () => {
     itemManager = createService();
     setupRandomUuid();
 
-    const tag = await itemManager.createSmartTag(
+    const tag = await itemManager.createSmartView(
       'Not Pinned',
-      TAG_NOT_PINNED_JSON
+      NotPinnedPredicate
     );
 
     await itemManager.changeItem<TagMutator>(tag.uuid, (m) => {
       m.title = 'New Title';
     });
 
-    const smartTag = itemManager.findItem(tag.uuid) as SNSmartTag;
-    const smartTags = itemManager.getSmartTags();
+    const view = itemManager.findItem(tag.uuid) as SmartView;
+    const views = itemManager.getSmartViews();
 
-    expect(smartTag.title).toEqual('New Title');
-    expect(
-      smartTags.some((tag: SNSmartTag) => tag.title === 'New Title')
-    ).toEqual(true);
+    expect(view.title).toEqual('New Title');
+    expect(views.some((tag: SmartView) => tag.title === 'New Title')).toEqual(
+      true
+    );
   });
 
-  it('lets me find a smart tag', async () => {
+  it('lets me find a smart view', async () => {
     itemManager = createService();
     setupRandomUuid();
 
-    const tag = await itemManager.createSmartTag(
+    const tag = await itemManager.createSmartView(
       'Not Pinned',
-      TAG_NOT_PINNED_JSON
+      NotPinnedPredicate
     );
 
-    const smartTag = itemManager.findItem(tag.uuid) as SNSmartTag;
+    const view = itemManager.findItem(tag.uuid) as SmartView;
 
-    expect(smartTag).toBeDefined();
+    expect(view).toBeDefined();
   });
 });

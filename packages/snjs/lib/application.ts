@@ -46,15 +46,11 @@ import {
   ApplicationOptions,
   FullyResolvedApplicationOptions,
 } from './options';
-import {
-  ApplicationEvent,
-  SyncEvent,
-  applicationEventForSyncEvent,
-} from '@Lib/events';
+import { ApplicationEvent, SyncEvent, applicationEventForSyncEvent } from '@Lib/events';
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { BackupFile } from './services/protocol_service';
 import { SyncOptions } from './services/sync/sync_service';
-import { SNSmartTag } from './models/app/smartTag';
+import { SmartView } from './models/app/SmartView';
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
 import {
   Challenge,
@@ -76,10 +72,7 @@ import {
   UuidGenerator,
 } from '@standardnotes/utils';
 import { CreateItemFromPayload } from '@Models/generator';
-import {
-  StoragePersistencePolicies,
-  StorageValueModes,
-} from '@Services/storage_service';
+import { StoragePersistencePolicies, StorageValueModes } from '@Services/storage_service';
 import {
   ChallengeService,
   ItemManager,
@@ -126,20 +119,13 @@ import {
 } from './services/api/responses';
 import { ProtectionEvent } from './services/protection_service';
 import { SNWebSocketsService } from './services/api/websockets_service';
-import {
-  CloudProvider,
-  EmailBackupFrequency,
-  SettingName,
-} from '@standardnotes/settings';
+import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';
 import { SNSettingsService } from './services/settings_service';
 import { SNMfaService } from './services/mfa_service';
 import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName';
 import { Subscription } from '@standardnotes/auth';
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features';
-import {
-  FeaturesEvent,
-  SetOfflineFeaturesFunctionResponse,
-} from '@Services/features_service';
+import { FeaturesEvent, SetOfflineFeaturesFunctionResponse } from '@Services/features_service';
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders';
 import { RemoteSession } from './services/api/session';
 import { RoleName } from '.';
@@ -151,10 +137,7 @@ const DEFAULT_AUTO_SYNC_INTERVAL = 30_000;
 type LaunchCallback = {
   receiveChallenge: (challenge: Challenge) => void;
 };
-type ApplicationEventCallback = (
-  event: ApplicationEvent,
-  data?: unknown
-) => Promise<void>;
+type ApplicationEventCallback = (event: ApplicationEvent, data?: unknown) => Promise<void>;
 type ApplicationObserver = {
   singleEvent?: ApplicationEvent;
   callback: ApplicationEventCallback;
@@ -249,9 +232,7 @@ export class SNApplication implements ListedInterface {
     ];
     for (const optionName of requiredOptions) {
       if (!fullyResovledOptions[optionName]) {
-        throw Error(
-          `${optionName} must be supplied when creating an application.`
-        );
+        throw Error(`${optionName} must be supplied when creating an application.`);
       }
     }
 
@@ -309,9 +290,7 @@ export class SNApplication implements ListedInterface {
     this.launched = false;
     const launchChallenge = this.getLaunchChallenge();
     if (launchChallenge) {
-      const response = await this.challengeService.promptForChallengeResponse(
-        launchChallenge
-      );
+      const response = await this.challengeService.promptForChallengeResponse(launchChallenge);
       if (!response) {
         throw Error('Launch challenge was cancelled.');
       }
@@ -323,7 +302,7 @@ export class SNApplication implements ListedInterface {
       } catch (_error) {
         void this.alertService.alert(
           ErrorAlertStrings.StorageDecryptErrorBody,
-          ErrorAlertStrings.StorageDecryptErrorTitle
+          ErrorAlertStrings.StorageDecryptErrorTitle,
         );
       }
     }
@@ -351,18 +330,16 @@ export class SNApplication implements ListedInterface {
      * before local data has been loaded fully. We await only initial
      * `getDatabasePayloads` to lock in on database state.
      */
-    const loadPromise = this.syncService
-      .loadDatabasePayloads(databasePayloads)
-      .then(async () => {
-        if (this.dealloced) {
-          throw 'Application has been destroyed.';
-        }
-        await this.handleStage(ApplicationStage.LoadedDatabase_12);
-        this.beginAutoSyncTimer();
-        await this.syncService.sync({
-          mode: SyncModes.DownloadFirst,
-        });
+    const loadPromise = this.syncService.loadDatabasePayloads(databasePayloads).then(async () => {
+      if (this.dealloced) {
+        throw 'Application has been destroyed.';
+      }
+      await this.handleStage(ApplicationStage.LoadedDatabase_12);
+      this.beginAutoSyncTimer();
+      await this.syncService.sync({
+        mode: SyncModes.DownloadFirst,
       });
+    });
     if (awaitDatabaseLoad) {
       await loadPromise;
     }
@@ -381,19 +358,11 @@ export class SNApplication implements ListedInterface {
   }
 
   private async handleLaunchChallengeResponse(response: ChallengeResponse) {
-    if (
-      response.challenge.hasPromptForValidationType(
-        ChallengeValidation.LocalPasscode
-      )
-    ) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts?.wrappingKey;
       if (!wrappingKey) {
-        const value = response.getValueForType(
-          ChallengeValidation.LocalPasscode
-        );
-        wrappingKey = await this.protocolService.computeWrappingKey(
-          value.value as string
-        );
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        wrappingKey = await this.protocolService.computeWrappingKey(value.value as string);
       }
       await this.protocolService.unwrapRootKey(wrappingKey);
     }
@@ -417,7 +386,7 @@ export class SNApplication implements ListedInterface {
    */
   public addEventObserver(
     callback: ApplicationEventCallback,
-    singleEvent?: ApplicationEvent
+    singleEvent?: ApplicationEvent,
   ): () => void {
     const observer = { callback, singleEvent };
     this.eventHandlers.push(observer);
@@ -428,7 +397,7 @@ export class SNApplication implements ListedInterface {
 
   public addSingleEventObserver(
     event: ApplicationEvent,
-    callback: ApplicationEventCallback
+    callback: ApplicationEventCallback,
   ): () => void {
     // eslint-disable-next-line @typescript-eslint/require-await
     const filteredCallback = async (firedEvent: ApplicationEvent) => {
@@ -439,10 +408,7 @@ export class SNApplication implements ListedInterface {
     return this.addEventObserver(filteredCallback, event);
   }
 
-  private async notifyEvent(
-    event: ApplicationEvent,
-    data?: ApplicationEventPayload
-  ) {
+  private async notifyEvent(event: ApplicationEvent, data?: ApplicationEventPayload) {
     if (event === ApplicationEvent.Started) {
       this.onStart();
     } else if (event === ApplicationEvent.Launched) {
@@ -493,7 +459,7 @@ export class SNApplication implements ListedInterface {
    */
   public findItems<T extends SNItem>(
     contentType: ContentType,
-    predicate: PredicateInterface<T>
+    predicate: PredicateInterface<T>,
   ): SNItem[] {
     return this.itemManager.itemsMatchingPredicate(contentType, predicate);
   }
@@ -509,10 +475,7 @@ export class SNApplication implements ListedInterface {
    * Takes the values of the input item and emits it onto global state.
    */
   public async mergeItem(item: SNItem, source: PayloadSource): Promise<SNItem> {
-    return this.itemManager.emitItemFromPayload(
-      item.payloadRepresentation(),
-      source
-    );
+    return this.itemManager.emitItemFromPayload(item.payloadRepresentation(), source);
   }
 
   /**
@@ -523,14 +486,9 @@ export class SNApplication implements ListedInterface {
     contentType: ContentType,
     content: PayloadContent,
     needsSync = false,
-    override?: PayloadOverride
+    override?: PayloadOverride,
   ): Promise<SNItem> {
-    return this.itemManager.createItem(
-      contentType,
-      content,
-      needsSync,
-      override
-    );
+    return this.itemManager.createItem(contentType, content, needsSync, override);
   }
 
   /**
@@ -538,7 +496,7 @@ export class SNApplication implements ListedInterface {
    */
   public async createTemplateItem(
     contentType: ContentType,
-    content?: PayloadContent
+    content?: PayloadContent,
   ): Promise<SNItem> {
     return this.itemManager.createTemplateItem(contentType, content);
   }
@@ -577,15 +535,11 @@ export class SNApplication implements ListedInterface {
     return this.syncService.getStatus();
   }
 
-  public getSessions(): Promise<
-    (HttpResponse & { data: RemoteSession[] }) | HttpResponse
-  > {
+  public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpResponse> {
     return this.sessionManager.getSessionsList();
   }
 
-  public async revokeSession(
-    sessionId: UuidString
-  ): Promise<HttpResponse | undefined> {
+  public async revokeSession(sessionId: UuidString): Promise<HttpResponse | undefined> {
     if (await this.protectionService.authorizeSessionRevoking()) {
       return this.sessionManager.revokeSession(sessionId);
     }
@@ -617,9 +571,7 @@ export class SNApplication implements ListedInterface {
     return undefined;
   }
 
-  public async getAvailableSubscriptions(): Promise<
-    AvailableSubscriptions | undefined
-  > {
+  public async getAvailableSubscriptions(): Promise<AvailableSubscriptions | undefined> {
     const response = await this.apiService.getAvailableSubscriptions();
     if (response.error) {
       throw new Error(response.error.message);
@@ -634,16 +586,11 @@ export class SNApplication implements ListedInterface {
    * @param isUserModified  Whether to change the modified date the user
    * sees of the item.
    */
-  public async setItemNeedsSync(
-    item: SNItem,
-    isUserModified = false
-  ): Promise<SNItem | undefined> {
+  public async setItemNeedsSync(item: SNItem, isUserModified = false): Promise<SNItem | undefined> {
     return this.itemManager.setItemDirty(item.uuid, isUserModified);
   }
 
-  public async setItemsNeedsSync(
-    items: SNItem[]
-  ): Promise<(SNItem | undefined)[]> {
+  public async setItemsNeedsSync(items: SNItem[]): Promise<(SNItem | undefined)[]> {
     return this.itemManager.setItemsDirty(Uuids(items));
   }
 
@@ -665,7 +612,7 @@ export class SNApplication implements ListedInterface {
     contentType: ContentType,
     sortBy?: CollectionSort,
     direction?: CollectionSortDirection,
-    filter?: (element: T) => boolean
+    filter?: (element: T) => boolean,
   ): void {
     this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter);
   }
@@ -674,7 +621,7 @@ export class SNApplication implements ListedInterface {
     this.itemManager.setNotesDisplayCriteria(criteria);
   }
 
-  public getDisplayableItems(contentType: ContentType): SNItem[] {
+  public getDisplayableItems<T extends SNItem>(contentType: ContentType): T[] {
     return this.itemManager.getDisplayableItems(contentType);
   }
 
@@ -685,9 +632,7 @@ export class SNApplication implements ListedInterface {
   public async insertItem(item: SNItem): Promise<SNItem> {
     const mutator = createMutatorForItem(item, MutationType.UserInteraction);
     const dirtiedPayload = mutator.getResult();
-    const insertedItem = await this.itemManager.emitItemFromPayload(
-      dirtiedPayload
-    );
+    const insertedItem = await this.itemManager.emitItemFromPayload(dirtiedPayload);
     return insertedItem;
   }
 
@@ -714,7 +659,7 @@ export class SNApplication implements ListedInterface {
     mutate?: (mutator: M) => void,
     isUserModified = true,
     payloadSource?: PayloadSource,
-    syncOptions?: SyncOptions
+    syncOptions?: SyncOptions,
   ): Promise<SNItem | undefined> {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
@@ -723,7 +668,7 @@ export class SNApplication implements ListedInterface {
       [uuid],
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined,
-      payloadSource
+      payloadSource,
     );
     await this.syncService.sync(syncOptions);
     return this.findItem(uuid);
@@ -737,13 +682,13 @@ export class SNApplication implements ListedInterface {
     mutate?: (mutator: M) => void,
     isUserModified = true,
     payloadSource?: PayloadSource,
-    syncOptions?: SyncOptions
+    syncOptions?: SyncOptions,
   ): Promise<void> {
     await this.itemManager.changeItems(
       uuids,
       mutate,
       isUserModified ? MutationType.UserInteraction : undefined,
-      payloadSource
+      payloadSource,
     );
     await this.syncService.sync(syncOptions);
   }
@@ -754,7 +699,7 @@ export class SNApplication implements ListedInterface {
   public async changeItem<M extends ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    isUserModified = true
+    isUserModified = true,
   ): Promise<SNItem | undefined> {
     if (!isString(uuid)) {
       throw Error('Must use uuid to change item');
@@ -762,7 +707,7 @@ export class SNApplication implements ListedInterface {
     await this.itemManager.changeItems(
       [uuid],
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined
+      isUserModified ? MutationType.UserInteraction : undefined,
     );
     return this.findItem(uuid);
   }
@@ -773,12 +718,12 @@ export class SNApplication implements ListedInterface {
   public async changeItems<M extends ItemMutator = ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    isUserModified = true
+    isUserModified = true,
   ): Promise<(SNItem | undefined)[]> {
     return this.itemManager.changeItems(
       uuids,
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined
+      isUserModified ? MutationType.UserInteraction : undefined,
     );
   }
 
@@ -790,25 +735,21 @@ export class SNApplication implements ListedInterface {
   public async runTransactionalMutations(
     transactions: TransactionalMutation[],
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<(SNItem | undefined)[]> {
     return this.itemManager.runTransactionalMutations(
       transactions,
       payloadSource,
-      payloadSourceKey
+      payloadSourceKey,
     );
   }
 
   public async runTransactionalMutation(
     transaction: TransactionalMutation,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNItem | undefined> {
-    return this.itemManager.runTransactionalMutation(
-      transaction,
-      payloadSource,
-      payloadSourceKey
-    );
+    return this.itemManager.runTransactionalMutation(transaction, payloadSource, payloadSourceKey);
   }
 
   public async protectNote(note: SNNote): Promise<SNNote> {
@@ -827,12 +768,9 @@ export class SNApplication implements ListedInterface {
 
   public async authorizeProtectedActionForNotes(
     notes: SNNote[],
-    challengeReason: ChallengeReason
+    challengeReason: ChallengeReason,
   ): Promise<SNNote[]> {
-    return await this.protectionService.authorizeProtectedActionForNotes(
-      notes,
-      challengeReason
-    );
+    return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason);
   }
 
   public async protectNotes(notes: SNNote[]): Promise<SNNote[]> {
@@ -849,18 +787,16 @@ export class SNApplication implements ListedInterface {
 
   public getItems<T extends SNItem>(
     contentType: ContentType | ContentType[],
-    nonerroredOnly = false
+    nonerroredOnly = false,
   ): T[] {
     return this.itemManager.getItems<T>(contentType, nonerroredOnly);
   }
 
-  public notesMatchingSmartTag(smartTag: SNSmartTag): SNNote[] {
-    return this.itemManager.notesMatchingSmartTag(smartTag);
+  public notesMatchingSmartView(view: SmartView): SNNote[] {
+    return this.itemManager.notesMatchingSmartView(view);
   }
 
-  public addNoteCountChangeObserver(
-    observer: TagNoteCountChangeObserver
-  ): () => void {
+  public addNoteCountChangeObserver(observer: TagNoteCountChangeObserver): () => void {
     return this.itemManager.addNoteCountChangeObserver(observer);
   }
 
@@ -868,7 +804,7 @@ export class SNApplication implements ListedInterface {
     return this.itemManager.allCountableNotesCount();
   }
 
-  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
+  public countableNotesForTag(tag: SNTag | SmartView): number {
     return this.itemManager.countableNotesForTag(tag);
   }
 
@@ -896,13 +832,9 @@ export class SNApplication implements ListedInterface {
 
   public duplicateItem<T extends SNItem>(
     item: T,
-    additionalContent?: Partial<PayloadContent>
+    additionalContent?: Partial<PayloadContent>,
   ): Promise<T> {
-    const duplicate = this.itemManager.duplicateItem<T>(
-      item.uuid,
-      false,
-      additionalContent
-    );
+    const duplicate = this.itemManager.duplicateItem<T>(item.uuid, false, additionalContent);
     this.sync();
     return duplicate;
   }
@@ -929,17 +861,12 @@ export class SNApplication implements ListedInterface {
     return this.itemManager.searchTags(searchQuery, note);
   }
 
-  public isValidTagParent(
-    parentTagUuid: UuidString,
-    childTagUuid: UuidString
-  ): boolean {
+  public isValidTagParent(parentTagUuid: UuidString, childTagUuid: UuidString): boolean {
     return this.itemManager.isValidTagParent(parentTagUuid, childTagUuid);
   }
 
   public hasTagsNeedingFoldersMigration(): boolean {
-    return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(
-      this.itemManager
-    );
+    return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(this.itemManager);
   }
 
   /**
@@ -1016,16 +943,16 @@ export class SNApplication implements ListedInterface {
   }
 
   /** Creates and returns the tag but does not run sync. Callers must perform sync. */
-  public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
-    return this.itemManager.createTagOrSmartTag(title);
+  public async createTagOrSmartView(title: string): Promise<SNTag | SmartView> {
+    return this.itemManager.createTagOrSmartView(title);
   }
 
-  public isSmartTagTitle(title: string): boolean {
-    return this.itemManager.isSmartTagTitle(title);
+  public isSmartViewTitle(title: string): boolean {
+    return this.itemManager.isSmartViewTitle(title);
   }
 
-  public getSmartTags(): SNSmartTag[] {
-    return this.itemManager.getSmartTags();
+  public getSmartViews(): SmartView[] {
+    return this.itemManager.getSmartViews();
   }
 
   public getNoteCount(): number {
@@ -1037,16 +964,13 @@ export class SNApplication implements ListedInterface {
    * immediately with the present items that match the constraint, and over time whenever
    * items matching the constraint are added, changed, or deleted.
    */
-  public streamItems(
-    contentType: ContentType | ContentType[],
-    stream: ItemStream
-  ): () => void {
+  public streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void {
     const observer = this.itemManager.addObserver(
       contentType,
       (changed, inserted, discarded, _ignored, source) => {
         const all = changed.concat(inserted).concat(discarded);
         stream(all, source);
-      }
+      },
     );
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType);
@@ -1143,9 +1067,7 @@ export class SNApplication implements ListedInterface {
       if (this.hasAccount()) {
         void this.alertService.alert(ProtocolUpgradeStrings.SuccessAccount);
       } else {
-        void this.alertService.alert(
-          ProtocolUpgradeStrings.SuccessPasscodeOnly
-        );
+        void this.alertService.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly);
       }
     } else if (result.error) {
       void this.alertService.alert(ProtocolUpgradeStrings.Fail);
@@ -1214,7 +1136,7 @@ export class SNApplication implements ListedInterface {
 
   public getListedAccountInfo(
     account: ListedAccount,
-    inContextOfItem?: UuidString
+    inContextOfItem?: UuidString,
   ): Promise<ListedAccountInfo | undefined> {
     return this.listedService.getListedAccountInfo(account, inContextOfItem);
   }
@@ -1226,7 +1148,7 @@ export class SNApplication implements ListedInterface {
    */
   public async importData(
     data: BackupFile,
-    awaitSync = false
+    awaitSync = false,
   ): Promise<
     | {
         affectedItems: SNItem[];
@@ -1267,15 +1189,13 @@ export class SNApplication implements ListedInterface {
             ChallengeValidation.None,
             ImportStrings.FileAccountPassword,
             undefined,
-            true
+            true,
           ),
         ],
         ChallengeReason.DecryptEncryptedFile,
-        true
+        true,
       );
-      const passwordResponse = await this.challengeService.promptForChallengeResponse(
-        challenge
-      );
+      const passwordResponse = await this.challengeService.promptForChallengeResponse(challenge);
       if (isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return;
@@ -1289,22 +1209,16 @@ export class SNApplication implements ListedInterface {
     }
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
       data,
-      password
+      password,
     );
     const validPayloads = decryptedPayloads
       .filter((payload) => {
-        return (
-          !payload.errorDecrypting &&
-          payload.format !== PayloadFormat.EncryptedString
-        );
+        return !payload.errorDecrypting && payload.format !== PayloadFormat.EncryptedString;
       })
       .map((payload) => {
         /* Don't want to activate any components during import process in
          * case of exceptions breaking up the import proccess */
-        if (
-          payload.content_type === ContentType.Component &&
-          payload.safeContent.active
-        ) {
+        if (payload.content_type === ContentType.Component && payload.safeContent.active) {
           return CopyPayload(payload, {
             content: {
               ...payload.safeContent,
@@ -1315,9 +1229,7 @@ export class SNApplication implements ListedInterface {
           return payload;
         }
       });
-    const affectedUuids = await this.payloadManager.importPayloads(
-      validPayloads
-    );
+    const affectedUuids = await this.payloadManager.importPayloads(validPayloads);
     const promise = this.sync();
     if (awaitSync) {
       await promise;
@@ -1334,16 +1246,13 @@ export class SNApplication implements ListedInterface {
    */
   public async createBackupFile(
     intent: EncryptionIntent,
-    authorizeEncrypted = false
+    authorizeEncrypted = false,
   ): Promise<BackupFile | undefined> {
     const encrypted = intent === EncryptionIntent.FileEncrypted;
     const decrypted = intent === EncryptionIntent.FileDecrypted;
     const authorize = (encrypted && authorizeEncrypted) || decrypted;
 
-    if (
-      authorize &&
-      !(await this.protectionService.authorizeBackupCreation(encrypted))
-    ) {
+    if (authorize && !(await this.protectionService.authorizeBackupCreation(encrypted))) {
       return;
     }
 
@@ -1367,11 +1276,7 @@ export class SNApplication implements ListedInterface {
     return this.syncService.resolveOutOfSync();
   }
 
-  public async setValue(
-    key: string,
-    value: unknown,
-    mode?: StorageValueModes
-  ): Promise<void> {
+  public async setValue(key: string, value: unknown, mode?: StorageValueModes): Promise<void> {
     return this.storageService.setValue(key, value, mode);
   }
 
@@ -1379,29 +1284,20 @@ export class SNApplication implements ListedInterface {
     return this.storageService.getValue(key, mode);
   }
 
-  public async removeValue(
-    key: string,
-    mode?: StorageValueModes
-  ): Promise<void> {
+  public async removeValue(key: string, mode?: StorageValueModes): Promise<void> {
     return this.storageService.removeValue(key, mode);
   }
 
   public getPreference<K extends PrefKey>(key: K): PrefValue[K] | undefined;
+  public getPreference<K extends PrefKey>(key: K, defaultValue: PrefValue[K]): PrefValue[K];
   public getPreference<K extends PrefKey>(
     key: K,
-    defaultValue: PrefValue[K]
-  ): PrefValue[K];
-  public getPreference<K extends PrefKey>(
-    key: K,
-    defaultValue?: PrefValue[K]
+    defaultValue?: PrefValue[K],
   ): PrefValue[K] | undefined {
     return this.preferencesService.getValue(key, defaultValue);
   }
 
-  public async setPreference<K extends PrefKey>(
-    key: K,
-    value: PrefValue[K]
-  ): Promise<void> {
+  public async setPreference<K extends PrefKey>(key: K, value: PrefValue[K]): Promise<void> {
     return this.preferencesService.setValue(key, value);
   }
 
@@ -1411,9 +1307,7 @@ export class SNApplication implements ListedInterface {
    * to finish tasks. 0 means no limit.
    */
   private async prepareForDeinit(maxWait = 0): Promise<void> {
-    const promise = Promise.all(
-      this.services.map((service) => service.blockDeinit())
-    );
+    const promise = Promise.all(this.services.map((service) => service.blockDeinit()));
     if (maxWait === 0) {
       await promise;
     } else {
@@ -1422,23 +1316,15 @@ export class SNApplication implements ListedInterface {
     }
   }
 
-  public promptForCustomChallenge(
-    challenge: Challenge
-  ): Promise<ChallengeResponse | undefined> {
+  public promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | undefined> {
     return this.challengeService?.promptForChallengeResponse(challenge);
   }
 
-  public addChallengeObserver(
-    challenge: Challenge,
-    observer: ChallengeObserver
-  ): () => void {
+  public addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): () => void {
     return this.challengeService.addChallengeObserver(challenge, observer);
   }
 
-  public submitValuesForChallenge(
-    challenge: Challenge,
-    values: ChallengeValue[]
-  ): Promise<void> {
+  public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void> {
     return this.challengeService.submitValuesForChallenge(challenge, values);
   }
 
@@ -1447,9 +1333,7 @@ export class SNApplication implements ListedInterface {
   }
 
   /** Set a function to be called when this application deinits */
-  public setOnDeinit(
-    onDeinit: (app: SNApplication, source: DeinitSource) => void
-  ): void {
+  public setOnDeinit(onDeinit: (app: SNApplication, source: DeinitSource) => void): void {
     this.onDeinit = onDeinit;
   }
 
@@ -1492,14 +1376,9 @@ export class SNApplication implements ListedInterface {
     email: string,
     password: string,
     ephemeral = false,
-    mergeLocal = true
+    mergeLocal = true,
   ): Promise<AccountServiceResponse> {
-    return this.credentialService.register(
-      email,
-      password,
-      ephemeral,
-      mergeLocal
-    );
+    return this.credentialService.register(email, password, ephemeral, mergeLocal);
   }
 
   /**
@@ -1512,23 +1391,16 @@ export class SNApplication implements ListedInterface {
     strict = false,
     ephemeral = false,
     mergeLocal = true,
-    awaitSync = false
+    awaitSync = false,
   ): Promise<HttpResponse | SignInResponse> {
-    return this.credentialService.signIn(
-      email,
-      password,
-      strict,
-      ephemeral,
-      mergeLocal,
-      awaitSync
-    );
+    return this.credentialService.signIn(email, password, strict, ephemeral, mergeLocal, awaitSync);
   }
 
   public async changeEmail(
     newEmail: string,
     currentPassword: string,
     passcode?: string,
-    origination = KeyParamsOrigination.EmailChange
+    origination = KeyParamsOrigination.EmailChange,
   ): Promise<CredentialsChangeFunctionResponse> {
     return this.credentialService.changeCredentials({
       currentPassword,
@@ -1544,7 +1416,7 @@ export class SNApplication implements ListedInterface {
     newPassword: string,
     passcode?: string,
     origination = KeyParamsOrigination.PasswordChange,
-    validateNewPasswordStrength = true
+    validateNewPasswordStrength = true,
   ): Promise<CredentialsChangeFunctionResponse> {
     return this.credentialService.changeCredentials({
       currentPassword,
@@ -1574,7 +1446,7 @@ export class SNApplication implements ListedInterface {
       const didConfirm = await this.alertService.confirm(
         `There ${singular ? 'is' : 'are'} ${dirtyItems.length} ${
           singular ? 'item' : 'items'
-        } with unsynced changes. If you sign out, these changes will be lost forever. Are you sure you want to sign out?`
+        } with unsynced changes. If you sign out, these changes will be lost forever. Are you sure you want to sign out?`,
       );
       if (didConfirm) {
         await performSignOut();
@@ -1600,9 +1472,7 @@ export class SNApplication implements ListedInterface {
   }
 
   public async validateAccountPassword(password: string): Promise<boolean> {
-    const { valid } = await this.protocolService.validateAccountPassword(
-      password
-    );
+    const { valid } = await this.protocolService.validateAccountPassword(password);
     return valid;
   }
 
@@ -1664,7 +1534,7 @@ export class SNApplication implements ListedInterface {
 
   public async changePasscode(
     newPasscode: string,
-    origination = KeyParamsOrigination.PasscodeChange
+    origination = KeyParamsOrigination.PasscodeChange,
   ): Promise<boolean> {
     return this.credentialService.changePasscode(newPasscode, origination);
   }
@@ -1674,16 +1544,14 @@ export class SNApplication implements ListedInterface {
   }
 
   public async setStorageEncryptionPolicy(
-    encryptionPolicy: StorageEncryptionPolicies
+    encryptionPolicy: StorageEncryptionPolicies,
   ): Promise<void> {
     await this.storageService.setEncryptionPolicy(encryptionPolicy);
     return this.protocolService.repersistAllItems();
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
-    return this.storageService.setPersistencePolicy(
-      StoragePersistencePolicies.Ephemeral
-    );
+    return this.storageService.setPersistencePolicy(StoragePersistencePolicies.Ephemeral);
   }
 
   public hasPendingMigrations(): Promise<boolean> {
@@ -1719,17 +1587,11 @@ export class SNApplication implements ListedInterface {
     return this.settingsService.getSetting(name);
   }
 
-  public async getSensitiveSetting(
-    name: SensitiveSettingName
-  ): Promise<boolean> {
+  public async getSensitiveSetting(name: SensitiveSettingName): Promise<boolean> {
     return this.settingsService.getSensitiveSetting(name);
   }
 
-  public async updateSetting(
-    name: SettingName,
-    payload: string,
-    sensitive = false
-  ): Promise<void> {
+  public async updateSetting(name: SettingName, payload: string, sensitive = false): Promise<void> {
     return this.settingsService.updateSetting(name, payload, sensitive);
   }
 
@@ -1737,9 +1599,7 @@ export class SNApplication implements ListedInterface {
     return this.settingsService.deleteSetting(name);
   }
 
-  public getEmailBackupFrequencyOptionLabel(
-    frequency: EmailBackupFrequency
-  ): string {
+  public getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
     return this.settingsService.getEmailBackupFrequencyOptionLabel(frequency);
   }
 
@@ -1769,15 +1629,11 @@ export class SNApplication implements ListedInterface {
     }
   }
 
-  public downloadExternalFeature(
-    urlOrCode: string
-  ): Promise<SNComponent | undefined> {
+  public downloadExternalFeature(urlOrCode: string): Promise<SNComponent | undefined> {
     return this.featuresService.validateAndDownloadExternalFeature(urlOrCode);
   }
 
-  public getFeature(
-    featureId: FeatureIdentifier
-  ): FeatureDescription | undefined {
+  public getFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
     return this.featuresService.getFeature(featureId);
   }
 
@@ -1793,9 +1649,7 @@ export class SNApplication implements ListedInterface {
     return this.apiService.getNewSubscriptionToken();
   }
 
-  public setOfflineFeaturesCode(
-    code: string
-  ): Promise<SetOfflineFeaturesFunctionResponse> {
+  public setOfflineFeaturesCode(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
     return this.featuresService.setOfflineFeaturesCode(code);
   }
 
@@ -1817,12 +1671,9 @@ export class SNApplication implements ListedInterface {
 
   public getCloudProviderIntegrationUrl(
     cloudProviderName: CloudProvider,
-    isDevEnvironment: boolean
+    isDevEnvironment: boolean,
   ): string {
-    return this.settingsService.getCloudProviderIntegrationUrl(
-      cloudProviderName,
-      isDevEnvironment
-    );
+    return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName, isDevEnvironment);
   }
 
   private constructServices() {
@@ -1832,10 +1683,10 @@ export class SNApplication implements ListedInterface {
     this.createProtocolService();
     const encryptionDelegate = {
       payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
-        this.protocolService
+        this.protocolService,
       ),
       payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
-        this.protocolService
+        this.protocolService,
       ),
     };
     this.storageService.encryptionDelegate = encryptionDelegate;
@@ -1896,7 +1747,7 @@ export class SNApplication implements ListedInterface {
       this.apiService,
       this.itemManager,
       this.settingsService,
-      this.httpService
+      this.httpService,
     );
     this.services.push(this.listedService);
   }
@@ -1907,7 +1758,7 @@ export class SNApplication implements ListedInterface {
       this.itemManager,
       this.syncService,
       this.alertService,
-      this.options.crypto
+      this.options.crypto,
     );
 
     this.services.push(this.fileService);
@@ -1925,7 +1776,7 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.sessionManager,
       this.options.crypto,
-      this.options.runtime
+      this.options.runtime,
     );
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
@@ -1942,7 +1793,7 @@ export class SNApplication implements ListedInterface {
             assertUnreachable(event);
           }
         }
-      })
+      }),
     );
     this.services.push(this.featuresService);
   }
@@ -1950,7 +1801,7 @@ export class SNApplication implements ListedInterface {
   private createWebSocketsService() {
     this.webSocketsService = new SNWebSocketsService(
       this.storageService,
-      this.options.webSocketUrl
+      this.options.webSocketUrl,
     );
     this.services.push(this.webSocketsService);
   }
@@ -1980,7 +1831,7 @@ export class SNApplication implements ListedInterface {
       this.protocolService,
       this.alertService,
       this.challengeService,
-      this.protectionService
+      this.protectionService,
     );
     this.serviceObservers.push(
       this.credentialService.addEventObserver((event) => {
@@ -1993,7 +1844,7 @@ export class SNApplication implements ListedInterface {
             assertUnreachable(event);
           }
         }
-      })
+      }),
     );
     this.services.push(this.credentialService);
   }
@@ -2003,7 +1854,7 @@ export class SNApplication implements ListedInterface {
       this.httpService,
       this.storageService,
       this.options.defaultHost,
-      this.options.defaultFilesHost
+      this.options.defaultFilesHost,
     );
     this.services.push(this.apiService);
   }
@@ -2014,9 +1865,9 @@ export class SNApplication implements ListedInterface {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager = this.getClass<
-      typeof SNComponentManager
-    >(SNComponentManager);
+    const MaybeSwappedComponentManager = this.getClass<typeof SNComponentManager>(
+      SNComponentManager,
+    );
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
@@ -2025,16 +1876,13 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.environment,
       this.platform,
-      this.options.runtime
+      this.options.runtime,
     );
     this.services.push(this.componentManager);
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService(
-      this.environment,
-      this.options.appVersion
-    );
+    this.httpService = new SNHttpService(this.environment, this.options.appVersion);
     this.services.push(this.httpService);
   }
 
@@ -2044,10 +1892,7 @@ export class SNApplication implements ListedInterface {
   }
 
   private createSingletonManager() {
-    this.singletonManager = new SNSingletonManager(
-      this.itemManager,
-      this.syncService
-    );
+    this.singletonManager = new SNSingletonManager(this.itemManager, this.syncService);
     this.services.push(this.singletonManager);
   }
 
@@ -2056,7 +1901,7 @@ export class SNApplication implements ListedInterface {
       this.deviceInterface,
       this.alertService,
       this.identifier,
-      this.environment
+      this.environment,
     );
     this.services.push(this.storageService);
   }
@@ -2068,7 +1913,7 @@ export class SNApplication implements ListedInterface {
       this.deviceInterface,
       this.storageService,
       this.identifier,
-      this.options.crypto
+      this.options.crypto,
     );
     this.protocolService.onKeyStatusChange(async () => {
       await this.notifyEvent(ApplicationEvent.KeyStatusChanged);
@@ -2086,7 +1931,7 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.storageService,
       this.syncService,
-      this.credentialService
+      this.credentialService,
     );
     this.services.push(this.keyRecoveryService);
   }
@@ -2098,7 +1943,7 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.protocolService,
       this.challengeService,
-      this.webSocketsService
+      this.webSocketsService,
     );
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
@@ -2107,11 +1952,9 @@ export class SNApplication implements ListedInterface {
             void (async () => {
               await this.sync();
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-                void this.protocolService
-                  .createNewDefaultItemsKey()
-                  .then(() => {
-                    void this.sync();
-                  });
+                void this.protocolService.createNewDefaultItemsKey().then(() => {
+                  void this.sync();
+                });
               }
             })();
             break;
@@ -2124,7 +1967,7 @@ export class SNApplication implements ListedInterface {
             assertUnreachable(event);
           }
         }
-      })
+      }),
     );
     this.services.push(this.sessionManager);
   }
@@ -2140,7 +1983,7 @@ export class SNApplication implements ListedInterface {
       this.historyManager,
       {
         loadBatchSize: this.options.loadBatchSize,
-      }
+      },
     );
     const syncEventCallback = async (eventName: SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName);
@@ -2161,10 +2004,7 @@ export class SNApplication implements ListedInterface {
   }
 
   private createChallengeService() {
-    this.challengeService = new ChallengeService(
-      this.storageService,
-      this.protocolService
-    );
+    this.challengeService = new ChallengeService(this.storageService, this.protocolService);
     this.services.push(this.challengeService);
   }
 
@@ -2173,7 +2013,7 @@ export class SNApplication implements ListedInterface {
       this.protocolService,
       this.challengeService,
       this.storageService,
-      this.itemManager
+      this.itemManager,
     );
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
@@ -2182,7 +2022,7 @@ export class SNApplication implements ListedInterface {
         } else if (event === ProtectionEvent.UnprotectedSessionExpired) {
           void this.notifyEvent(ApplicationEvent.UnprotectedSessionExpired);
         }
-      })
+      }),
     );
     this.services.push(this.protectionService);
   }
@@ -2193,7 +2033,7 @@ export class SNApplication implements ListedInterface {
       this.storageService,
       this.apiService,
       this.protocolService,
-      this.deviceInterface
+      this.deviceInterface,
     );
     this.services.push(this.historyManager);
   }
@@ -2208,7 +2048,7 @@ export class SNApplication implements ListedInterface {
       this.protocolService,
       this.syncService,
       this.challengeService,
-      this.listedService
+      this.listedService,
     );
     this.services.push(this.actionsManager);
   }
@@ -2217,21 +2057,18 @@ export class SNApplication implements ListedInterface {
     this.preferencesService = new SNPreferencesService(
       this.singletonManager,
       this.itemManager,
-      this.syncService
+      this.syncService,
     );
     this.serviceObservers.push(
       this.preferencesService.addEventObserver(() => {
         void this.notifyEvent(ApplicationEvent.PreferencesChanged);
-      })
+      }),
     );
     this.services.push(this.preferencesService);
   }
 
   private createSettingsService() {
-    this.settingsService = new SNSettingsService(
-      this.sessionManager,
-      this.apiService
-    );
+    this.settingsService = new SNSettingsService(this.sessionManager, this.apiService);
     this.services.push(this.settingsService);
   }
 
@@ -2239,15 +2076,13 @@ export class SNApplication implements ListedInterface {
     this.mfaService = new SNMfaService(
       this.settingsService,
       this.options.crypto,
-      this.featuresService
+      this.featuresService,
     );
     this.services.push(this.mfaService);
   }
 
   private getClass<T>(base: T) {
-    const swapClass = this.options.swapClasses?.find(
-      (candidate) => candidate.swap === base
-    );
+    const swapClass = this.options.swapClasses?.find((candidate) => candidate.swap === base);
     if (swapClass) {
       return swapClass.with as T;
     } else {

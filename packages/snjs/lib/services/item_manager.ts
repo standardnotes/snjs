@@ -10,7 +10,9 @@ import {
   PayloadContent,
   PayloadOverride,
   PurePayload,
-  PayloadSource
+  PayloadSource,
+  ItemInterface,
+  predicateFromDSLString,
 } from '@standardnotes/payloads';
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view';
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria';
@@ -23,21 +25,16 @@ import { CreateItemFromPayload } from '@Models/generator';
 import { PayloadsByDuplicating } from '@Payloads/functions';
 import { ContentType } from '@standardnotes/common';
 import { ComponentMutator } from './../models/app/component';
-import {
-  ActionsExtensionMutator,
-  SNActionsExtension,
-} from './../models/app/extension';
-import {
-  FeatureRepoMutator,
-  SNFeatureRepo,
-} from './../models/app/feature_repo';
+import { ActionsExtensionMutator, SNActionsExtension } from './../models/app/extension';
+import { FeatureRepoMutator, SNFeatureRepo } from './../models/app/feature_repo';
 import { ItemsKeyMutator } from './../models/app/items_key';
 import { NoteMutator, SNNote } from './../models/app/note';
 import {
-  SmartTagPredicateContent,
   SMART_TAG_DSL_PREFIX,
-  SNSmartTag,
-} from './../models/app/smartTag';
+  SmartView,
+  SmartViewContent,
+  SystemViewId,
+} from './../models/app/SmartView';
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
 import {
@@ -47,6 +44,7 @@ import {
 import { UuidString } from './../types';
 import { PayloadManager } from './payload_manager';
 import { AbstractService } from '@standardnotes/services';
+import { BuildSmartViews } from '@Lib/protocol/collection/smart_view_builder';
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -58,7 +56,7 @@ type ObserverCallback = (
   /** Items for which encrypted overwrite protection is enabled and enacted */
   ignored: SNItem[],
   source: PayloadSource,
-  sourceKey?: string
+  sourceKey?: string,
 ) => void;
 
 type Observer = {
@@ -90,83 +88,93 @@ export class ItemManager extends AbstractService {
   private observers: Observer[] = [];
   private collection!: ItemCollection;
   private notesView!: ItemCollectionNotesView;
-  private systemSmartTags: SNSmartTag[];
+  private systemSmartViews: SmartView[];
   private tagNotesIndex!: TagNotesIndex;
 
   constructor(private payloadManager: PayloadManager) {
     super();
     this.payloadManager = payloadManager;
-    this.systemSmartTags = BuildSmartTags();
+    this.systemSmartViews = this.rebuildSystemSmartViews(NotesDisplayCriteria.Create({}));
     this.createCollection();
     this.unsubChangeObserver = this.payloadManager.addObserver(
       ContentType.Any,
-      this.setPayloads.bind(this)
+      this.setPayloads.bind(this),
     );
+  }
+
+  private rebuildSystemSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
+    this.systemSmartViews = BuildSmartViews(criteria);
+    return this.systemSmartViews;
   }
 
   private createCollection() {
     this.collection = new ItemCollection();
-    this.collection.setDisplayOptions(
-      ContentType.Note,
-      CollectionSort.CreatedAt,
-      'dsc'
-    );
-    this.collection.setDisplayOptions(
-      ContentType.Tag,
-      CollectionSort.Title,
-      'dsc'
-    );
-    this.collection.setDisplayOptions(
-      ContentType.ItemsKey,
-      CollectionSort.CreatedAt,
-      'asc'
-    );
-    this.collection.setDisplayOptions(
-      ContentType.Component,
-      CollectionSort.CreatedAt,
-      'asc'
-    );
-    this.collection.setDisplayOptions(
-      ContentType.Theme,
-      CollectionSort.Title,
-      'asc'
-    );
-    this.collection.setDisplayOptions(
-      ContentType.SmartTag,
-      CollectionSort.Title,
-      'dsc'
-    );
+    this.collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc');
+    this.collection.setDisplayOptions(ContentType.Tag, CollectionSort.Title, 'dsc');
+    this.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(ContentType.Component, CollectionSort.CreatedAt, 'asc');
+    this.collection.setDisplayOptions(ContentType.Theme, CollectionSort.Title, 'asc');
+    this.collection.setDisplayOptions(ContentType.SmartView, CollectionSort.Title, 'dsc');
     this.notesView = new ItemCollectionNotesView(this.collection);
-    this.tagNotesIndex = new TagNotesIndex(
-      this.collection,
-      this.tagNotesIndex?.observers
-    );
+    this.tagNotesIndex = new TagNotesIndex(this.collection, this.tagNotesIndex?.observers);
   }
 
   public setDisplayOptions(
     contentType: ContentType,
     sortBy?: CollectionSort,
     direction?: CollectionSortDirection,
-    filter?: (element: any) => boolean
+    filter?: (element: any) => boolean,
   ): void {
     if (contentType === ContentType.Note) {
       console.warn(
         'Called setDisplayOptions with ContentType.Note. ' +
-          'setNotesDisplayCriteria should be used instead.'
+          'setNotesDisplayCriteria should be used instead.',
       );
     }
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter);
   }
 
   public setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void {
-    this.notesView.setCriteria(criteria);
+    const override: Partial<NotesDisplayCriteria> = {};
+    if (criteria.views.find((view) => view.uuid === SystemViewId.AllNotes)) {
+      if (criteria.includeArchived == undefined) {
+        override.includeArchived = false;
+      }
+      if (criteria.includeTrashed == undefined) {
+        override.includeTrashed = false;
+      }
+    }
+    if (criteria.views.find((view) => view.uuid === SystemViewId.ArchivedNotes)) {
+      if (criteria.includeTrashed == undefined) {
+        override.includeTrashed = false;
+      }
+    }
+    if (criteria.views.find((view) => view.uuid === SystemViewId.TrashedNotes)) {
+      if (criteria.includeArchived == undefined) {
+        override.includeArchived = true;
+      }
+    }
+
+    this.rebuildSystemSmartViews(NotesDisplayCriteria.Copy(criteria, override));
+
+    const updatedViews = criteria.views.map((tag) => {
+      const matchingSystemTag = this.systemSmartViews.find((view) => view.uuid === tag.uuid);
+      return matchingSystemTag || tag;
+    });
+
+    const updatedCriteria = NotesDisplayCriteria.Copy(criteria, {
+      views: updatedViews,
+      ...override,
+    });
+
+    this.notesView.setCriteria(updatedCriteria);
   }
 
-  public getDisplayableItems(contentType: ContentType): SNItem[] {
+  public getDisplayableItems<T extends SNItem>(contentType: ContentType): T[] {
     if (contentType === ContentType.Note) {
-      return this.notesView.displayElements();
+      return (this.notesView.displayElements() as unknown) as T[];
     }
-    return this.collection.displayElements(contentType);
+    return (this.collection.displayElements(contentType) as unknown) as T[];
   }
 
   public deinit(): void {
@@ -191,12 +199,10 @@ export class ItemManager extends AbstractService {
       return itemFromCollection as T;
     }
 
-    const itemFromSmartTags = this.systemSmartTags.find(
-      (tag) => tag.uuid === uuid
-    );
+    const itemFromSmartViews = this.systemSmartViews.find((tag) => tag.uuid === uuid);
 
-    if (itemFromSmartTags) {
-      return (itemFromSmartTags as unknown) as T;
+    if (itemFromSmartViews) {
+      return (itemFromSmartViews as unknown) as T;
     }
 
     return undefined;
@@ -236,9 +242,7 @@ export class ItemManager extends AbstractService {
    * Returns all non-deleted items keys
    */
   itemsKeys() {
-    return this.collection.displayElements(
-      ContentType.ItemsKey
-    ) as SNItemsKey[];
+    return this.collection.displayElements(ContentType.ItemsKey) as SNItemsKey[];
   }
 
   /**
@@ -259,18 +263,12 @@ export class ItemManager extends AbstractService {
    * Returns all non-deleted components
    */
   get components(): SNComponent[] {
-    const components = this.collection.displayElements(
-      ContentType.Component
-    ) as SNComponent[];
-    const themes = this.collection.displayElements(
-      ContentType.Theme
-    ) as SNComponent[];
+    const components = this.collection.displayElements(ContentType.Component) as SNComponent[];
+    const themes = this.collection.displayElements(ContentType.Theme) as SNComponent[];
     return components.concat(themes);
   }
 
-  public addNoteCountChangeObserver(
-    observer: TagNoteCountChangeObserver
-  ): () => void {
+  public addNoteCountChangeObserver(observer: TagNoteCountChangeObserver): () => void {
     return this.tagNotesIndex.addCountChangeObserver(observer);
   }
 
@@ -278,22 +276,20 @@ export class ItemManager extends AbstractService {
     return this.tagNotesIndex.allCountableNotesCount();
   }
 
-  public countableNotesForTag(tag: SNTag | SNSmartTag): number {
-    if (tag.isSmartTag) {
-      if (tag.isAllTag) {
+  public countableNotesForTag(tag: SNTag | SmartView): number {
+    if (tag instanceof SmartView) {
+      if (tag.uuid === SystemViewId.AllNotes) {
         return this.tagNotesIndex.allCountableNotesCount();
       }
 
-      throw Error(
-        'countableNotesForTag is not meant to be used for smart tags.'
-      );
+      throw Error('countableNotesForTag is not meant to be used for smart views.');
     }
     return this.tagNotesIndex.countableNotesForTag(tag);
   }
 
   public addObserver(
     contentType: ContentType | ContentType[],
-    callback: ObserverCallback
+    callback: ObserverCallback,
   ): () => void {
     if (!Array.isArray(contentType)) {
       contentType = [contentType];
@@ -337,10 +333,9 @@ export class ItemManager extends AbstractService {
     discarded: PurePayload[],
     ignored: PurePayload[],
     source: PayloadSource,
-    sourceKey?: string
+    sourceKey?: string,
   ) {
-    const createItems = (items: PurePayload[]) =>
-      items.map((item) => CreateItemFromPayload(item));
+    const createItems = (items: PurePayload[]) => items.map((item) => CreateItemFromPayload(item));
 
     const delta: ItemDelta = {
       changed: createItems(changed),
@@ -359,7 +354,7 @@ export class ItemManager extends AbstractService {
       delta.discarded,
       delta.ignored,
       source,
-      sourceKey
+      sourceKey,
     );
   }
 
@@ -369,13 +364,11 @@ export class ItemManager extends AbstractService {
     discarded: SNItem[],
     ignored: SNItem[],
     source: PayloadSource,
-    sourceKey?: string
+    sourceKey?: string,
   ) {
     const filter = (items: SNItem[], types: ContentType[]) => {
       return items.filter((item) => {
-        return (
-          types.includes(ContentType.Any) || types.includes(item.content_type)
-        );
+        return types.includes(ContentType.Any) || types.includes(item.content_type);
       });
     };
     const observers = this.observers.slice();
@@ -398,7 +391,7 @@ export class ItemManager extends AbstractService {
         filteredDiscarded,
         filteredIgnored,
         source,
-        sourceKey
+        sourceKey,
       );
     }
   }
@@ -417,7 +410,7 @@ export class ItemManager extends AbstractService {
     mutate?: (mutator: M) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNItem | undefined> {
     if (!isString(uuid)) {
       throw Error('Invalid uuid for changeItem');
@@ -427,7 +420,7 @@ export class ItemManager extends AbstractService {
       mutate,
       mutationType,
       payloadSource,
-      payloadSourceKey
+      payloadSourceKey,
     );
     return results[0];
   }
@@ -440,7 +433,7 @@ export class ItemManager extends AbstractService {
     mutate?: (mutator: M) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<(SNItem | undefined)[]> {
     const items = this.findItems(uuids as UuidString[], true);
     const payloads = [];
@@ -455,11 +448,7 @@ export class ItemManager extends AbstractService {
       const payload = mutator.getResult();
       payloads.push(payload);
     }
-    await this.payloadManager.emitPayloads(
-      payloads,
-      payloadSource,
-      payloadSourceKey
-    );
+    await this.payloadManager.emitPayloads(payloads, payloadSource, payloadSourceKey);
     const results = this.findItems(payloads.map((p) => p.uuid!));
     return results;
   }
@@ -472,7 +461,7 @@ export class ItemManager extends AbstractService {
   public async runTransactionalMutations(
     transactions: TransactionalMutation[],
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<(SNItem | undefined)[]> {
     const payloads: PurePayload[] = [];
     for (const transaction of transactions) {
@@ -482,18 +471,14 @@ export class ItemManager extends AbstractService {
       }
       const mutator = createMutatorForItem(
         item,
-        transaction.mutationType || MutationType.UserInteraction
+        transaction.mutationType || MutationType.UserInteraction,
       );
       transaction.mutate(mutator);
       const payload = mutator.getResult();
       payloads.push(payload);
     }
 
-    await this.payloadManager.emitPayloads(
-      payloads,
-      payloadSource,
-      payloadSourceKey
-    );
+    await this.payloadManager.emitPayloads(payloads, payloadSource, payloadSourceKey);
     const results = this.findItems(payloads.map((p) => p.uuid!));
     return results;
   }
@@ -501,21 +486,17 @@ export class ItemManager extends AbstractService {
   public async runTransactionalMutation(
     transaction: TransactionalMutation,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNItem | undefined> {
     const item = this.findItem(transaction.itemUuid);
     const mutator = createMutatorForItem(
       item!,
-      transaction.mutationType || MutationType.UserInteraction
+      transaction.mutationType || MutationType.UserInteraction,
     );
     transaction.mutate(mutator);
     const payload = mutator.getResult();
 
-    await this.payloadManager.emitPayloads(
-      [payload],
-      payloadSource,
-      payloadSourceKey
-    );
+    await this.payloadManager.emitPayloads([payload], payloadSource, payloadSourceKey);
     const result = this.findItem(payload.uuid);
     return result;
   }
@@ -525,19 +506,14 @@ export class ItemManager extends AbstractService {
     mutate: (mutator: NoteMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<PurePayload[]> {
     const note = this.findItem(uuid);
     if (!note) {
       throw Error('Attempting to change non-existant note');
     }
     const mutator = new NoteMutator(note, mutationType);
-    return this.applyTransform(
-      mutator,
-      mutate,
-      payloadSource,
-      payloadSourceKey
-    );
+    return this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey);
   }
 
   async changeTag(
@@ -545,7 +521,7 @@ export class ItemManager extends AbstractService {
     mutate: (mutator: TagMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNTag> {
     const tag = this.findItem(uuid);
     if (!tag) {
@@ -561,7 +537,7 @@ export class ItemManager extends AbstractService {
     mutate: (mutator: ComponentMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNComponent> {
     const component = this.findItem(uuid);
     if (!component) {
@@ -577,7 +553,7 @@ export class ItemManager extends AbstractService {
     mutate: (mutator: FeatureRepoMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNFeatureRepo> {
     const repo = this.findItem(uuid);
     if (!repo) {
@@ -593,7 +569,7 @@ export class ItemManager extends AbstractService {
     mutate: (mutator: ActionsExtensionMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNActionsExtension> {
     const extension = this.findItem(uuid);
     if (!extension) {
@@ -609,7 +585,7 @@ export class ItemManager extends AbstractService {
     mutate: (mutator: ItemsKeyMutator) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ): Promise<SNItemsKey> {
     const itemsKey = this.findItem(uuid);
     if (!itemsKey) {
@@ -624,15 +600,11 @@ export class ItemManager extends AbstractService {
     mutator: T,
     mutate: (mutator: T) => void,
     payloadSource = PayloadSource.LocalChanged,
-    payloadSourceKey?: string
+    payloadSourceKey?: string,
   ) {
     mutate(mutator);
     const payload = mutator.getResult();
-    return this.payloadManager.emitPayload(
-      payload,
-      payloadSource,
-      payloadSourceKey
-    );
+    return this.payloadManager.emitPayload(payload, payloadSource, payloadSourceKey);
   }
 
   /**
@@ -658,7 +630,7 @@ export class ItemManager extends AbstractService {
     return this.changeItems(
       uuids,
       undefined,
-      isUserModified ? MutationType.UserInteraction : MutationType.Internal
+      isUserModified ? MutationType.UserInteraction : MutationType.Internal,
     );
   }
 
@@ -679,7 +651,7 @@ export class ItemManager extends AbstractService {
   public async duplicateItem<T extends SNItem>(
     uuid: UuidString,
     isConflict = false,
-    additionalContent?: Partial<PayloadContent>
+    additionalContent?: Partial<PayloadContent>,
   ) {
     const item = this.findItem(uuid)!;
     const payload = CreateMaxPayloadFromAnyObject(item);
@@ -687,12 +659,9 @@ export class ItemManager extends AbstractService {
       payload,
       this.payloadManager.getMasterCollection(),
       isConflict,
-      additionalContent
+      additionalContent,
     );
-    await this.payloadManager.emitPayloads(
-      resultingPayloads,
-      PayloadSource.LocalChanged
-    );
+    await this.payloadManager.emitPayloads(resultingPayloads, PayloadSource.LocalChanged);
     const duplicate = this.findItem(resultingPayloads[0].uuid!);
     return duplicate! as T;
   }
@@ -705,19 +674,19 @@ export class ItemManager extends AbstractService {
     contentType: ContentType,
     content?: PayloadContent,
     needsSync = false,
-    override?: PayloadOverride
+    override?: PayloadOverride,
   ): Promise<T> {
     if (!contentType) {
       throw 'Attempting to create item with no contentType';
     }
     const payload = CreateMaxPayloadFromAnyObject(
       {
-        uuid: await UuidGenerator.GenerateUuid(),
+        uuid: UuidGenerator.GenerateUuid(),
         content_type: contentType,
         content: content ? FillItemContent(content) : undefined,
         dirty: needsSync,
       },
-      override
+      override,
     );
     await this.payloadManager.emitPayload(payload, PayloadSource.Constructor);
     return this.findItem(payload.uuid!) as T;
@@ -728,7 +697,7 @@ export class ItemManager extends AbstractService {
    */
   public async createTemplateItem(
     contentType: ContentType,
-    content?: PayloadContent
+    content?: PayloadContent,
   ): Promise<SNItem> {
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: await UuidGenerator.GenerateUuid(),
@@ -761,16 +730,16 @@ export class ItemManager extends AbstractService {
 
   public async emitItemFromPayload(
     payload: PurePayload,
-    source = PayloadSource.Constructor
+    source = PayloadSource.Constructor,
   ): Promise<SNItem> {
     await this.payloadManager.emitPayload(payload, source);
-    return this.findItem(payload.uuid!)!;
+    return this.findItem(payload.uuid) as SNItem;
   }
 
   public async emitItemsFromPayloads(
     payloads: PurePayload[],
-    source = PayloadSource.Constructor
-  ) {
+    source = PayloadSource.Constructor,
+  ): Promise<SNItem[]> {
     await this.payloadManager.emitPayloads(payloads, source);
     const uuids = Uuids(payloads);
     return this.findItems(uuids);
@@ -779,7 +748,10 @@ export class ItemManager extends AbstractService {
   /**
    * Marks the item as deleted and needing sync.
    */
-  public async setItemToBeDeleted(uuid: UuidString, source?: PayloadSource) {
+  public async setItemToBeDeleted(
+    uuid: UuidString,
+    source?: PayloadSource,
+  ): Promise<SNItem | undefined> {
     /** Capture referencing ids before we delete the item below, otherwise
      * the index may be updated before we get a chance to act on it */
     const referencingIds = this.collection.uuidsThatReferenceUuid(uuid);
@@ -791,7 +763,7 @@ export class ItemManager extends AbstractService {
         mutator.setDeleted();
       },
       undefined,
-      source
+      source,
     );
 
     /** Handle indirect relationships.
@@ -810,9 +782,7 @@ export class ItemManager extends AbstractService {
   /**
    * Like `setItemToBeDeleted`, but acts on an array of items.
    */
-  public async setItemsToBeDeleted(
-    uuids: UuidString[]
-  ): Promise<(SNItem | undefined)[]> {
+  public async setItemsToBeDeleted(uuids: UuidString[]): Promise<(SNItem | undefined)[]> {
     return Promise.all(uuids.map((uuid) => this.setItemToBeDeleted(uuid)));
   }
 
@@ -823,13 +793,11 @@ export class ItemManager extends AbstractService {
    */
   public getItems<T extends SNItem>(
     contentType: ContentType | ContentType[],
-    nonerroredOnly = false
+    nonerroredOnly = false,
   ): T[] {
     const items = this.collection.all(contentType);
     if (nonerroredOnly) {
-      return items.filter(
-        (item) => !item.errorDecrypting && !item.waitingForKey
-      ) as T[];
+      return items.filter((item) => !item.errorDecrypting && !item.waitingForKey) as T[];
     } else {
       return items as T[];
     }
@@ -838,13 +806,9 @@ export class ItemManager extends AbstractService {
   /**
    * Returns all items which are properly decrypted
    */
-  nonErroredItemsForContentType<T extends SNItem>(
-    contentType: ContentType
-  ): T[] {
+  nonErroredItemsForContentType<T extends SNItem>(contentType: ContentType): T[] {
     const items = this.collection.all(contentType);
-    return items.filter(
-      (item) => !item.errorDecrypting && !item.waitingForKey
-    ) as T[];
+    return items.filter((item) => !item.errorDecrypting && !item.waitingForKey) as T[];
   }
 
   /**
@@ -852,7 +816,7 @@ export class ItemManager extends AbstractService {
    */
   public itemsMatchingPredicate<T extends SNItem>(
     contentType: ContentType,
-    predicate: PredicateInterface<T>
+    predicate: PredicateInterface<T>,
   ): SNItem[] {
     return this.itemsMatchingPredicates(contentType, [predicate]);
   }
@@ -862,7 +826,7 @@ export class ItemManager extends AbstractService {
    */
   public itemsMatchingPredicates<T extends SNItem>(
     contentType: ContentType,
-    predicates: PredicateInterface<T>[]
+    predicates: PredicateInterface<T>[],
   ): SNItem[] {
     const subItems = this.getItems<T>(contentType);
     return this.subItemsMatchingPredicates(subItems, predicates);
@@ -874,7 +838,7 @@ export class ItemManager extends AbstractService {
    */
   public subItemsMatchingPredicates<T extends SNItem>(
     items: T[],
-    predicates: PredicateInterface<T>[]
+    predicates: PredicateInterface<T>[],
   ): T[] {
     const results = items.filter((item) => {
       if (item.deleted) {
@@ -904,13 +868,11 @@ export class ItemManager extends AbstractService {
 
   public findTagByTitleAndParent(
     title: string,
-    parentUuid: UuidString | undefined
+    parentUuid: UuidString | undefined,
   ): SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase();
 
-    const tags = parentUuid
-      ? this.getTagChildren(parentUuid)
-      : this.getRootTags();
+    const tags = parentUuid ? this.getTagChildren(parentUuid) : this.getRootTags();
 
     return tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle);
   }
@@ -924,20 +886,15 @@ export class ItemManager extends AbstractService {
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
     return naturalSort(
       this.tags.filter((tag) => {
-        const regex = new RegExp(
-          `^${searchQuery}|${TagFolderDelimitter}${searchQuery}`,
-          'i'
-        );
+        const regex = new RegExp(`^${searchQuery}|${TagFolderDelimitter}${searchQuery}`, 'i');
         const expandedTitle = this.getTagLongTitle(tag);
         const matchesQuery = regex.test(expandedTitle);
         const tagInNote = note
-          ? this.itemsReferencingItem(note.uuid).some(
-              (item) => item?.uuid === tag.uuid
-            )
+          ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
           : false;
         return matchesQuery && !tagInNote;
       }),
-      'title'
+      'title',
     );
   }
 
@@ -991,15 +948,11 @@ export class ItemManager extends AbstractService {
     return chain;
   }
 
-  public async findOrCreateTagParentChain(
-    titlesHierarchy: string[]
-  ): Promise<SNTag> {
+  public async findOrCreateTagParentChain(titlesHierarchy: string[]): Promise<SNTag> {
     let current: SNTag | undefined = undefined;
 
     for (const title of titlesHierarchy) {
-      const currentUuid: string | undefined = current
-        ? current.uuid
-        : undefined;
+      const currentUuid: string | undefined = current ? current.uuid : undefined;
 
       current = await this.findOrCreateTagByTitle(title, currentUuid);
     }
@@ -1013,10 +966,7 @@ export class ItemManager extends AbstractService {
 
   public getTagChildren(tagUuid: UuidString): SNTag[] {
     const tag = this.findItem(tagUuid) as SNTag;
-    const tags = this.collection.elementsReferencingElement(
-      tag,
-      ContentType.Tag
-    ) as SNTag[];
+    const tags = this.collection.elementsReferencingElement(tag, ContentType.Tag) as SNTag[];
 
     return tags.filter((tag) => tag.parentId === tagUuid);
   }
@@ -1037,10 +987,7 @@ export class ItemManager extends AbstractService {
     return false;
   }
 
-  public isValidTagParent(
-    parentTagUuid: UuidString,
-    childTagUuid: UuidString
-  ): boolean {
+  public isValidTagParent(parentTagUuid: UuidString, childTagUuid: UuidString): boolean {
     if (parentTagUuid === childTagUuid) {
       return false;
     }
@@ -1090,15 +1037,10 @@ export class ItemManager extends AbstractService {
     }) as Promise<SNTag>;
   }
 
-  public async addTagHierarchyToNote(
-    note: SNNote,
-    tag: SNTag
-  ): Promise<SNTag[]> {
+  public async addTagHierarchyToNote(note: SNNote, tag: SNTag): Promise<SNTag[]> {
     const parentChainTags = this.getTagParentChain(tag.uuid);
     const tagsToAdd = [...parentChainTags, tag];
-    return Promise.all(
-      tagsToAdd.map((tagToAdd) => this.addTagToNote(note, tagToAdd))
-    );
+    return Promise.all(tagsToAdd.map((tagToAdd) => this.addTagToNote(note, tagToAdd)));
   }
 
   /**
@@ -1111,18 +1053,15 @@ export class ItemManager extends AbstractService {
       this.itemsReferencingItem(note.uuid).filter((ref) => {
         return ref?.content_type === ContentType.Tag;
       }) as SNTag[],
-      'title'
+      'title',
     );
   }
 
-  public async createTag(
-    title: string,
-    parentUuid?: UuidString
-  ): Promise<SNTag> {
+  public async createTag(title: string, parentUuid?: UuidString): Promise<SNTag> {
     const newTag = (await this.createItem(
       ContentType.Tag,
       FillItemContent({ title }),
-      true
+      true,
     )) as SNTag;
 
     if (parentUuid) {
@@ -1138,95 +1077,95 @@ export class ItemManager extends AbstractService {
     return newTag;
   }
 
-  public async createSmartTag(
+  public async createSmartView<T extends ItemInterface>(
     title: string,
-    predicate: SmartTagPredicateContent
-  ): Promise<SNSmartTag> {
+    predicate: PredicateInterface<T>,
+  ): Promise<SmartView> {
     return this.createItem(
-      ContentType.SmartTag,
-      FillItemContent({ title, predicate }),
-      true
-    ) as Promise<SNSmartTag>;
+      ContentType.SmartView,
+      FillItemContent({
+        title,
+        predicate: predicate.toJson(),
+      } as SmartViewContent),
+      true,
+    ) as Promise<SmartView>;
   }
 
-  public async createSmartTagFromDSL(dsl: string): Promise<SNSmartTag> {
+  public async createSmartViewFromDSL<T extends ItemInterface>(dsl: string): Promise<SmartView> {
     let components = null;
     try {
       components = JSON.parse(dsl.substring(1, dsl.length));
     } catch (e) {
-      throw Error('Invalid smart tag syntax');
+      throw Error('Invalid smart view syntax');
     }
 
-    const [title, keypath, operator, value] = components;
-    return this.createSmartTag(title, { keypath, operator, value });
+    const title = components[0];
+    const predicate = predicateFromDSLString<T>(dsl);
+    return this.createSmartView(title, predicate);
   }
 
-  public async createTagOrSmartTag(title: string): Promise<SNTag | SNSmartTag> {
-    if (this.isSmartTagTitle(title)) {
-      return this.createSmartTagFromDSL(title);
+  public async createTagOrSmartView(title: string): Promise<SNTag | SmartView> {
+    if (this.isSmartViewTitle(title)) {
+      return this.createSmartViewFromDSL(title);
     } else {
       return this.createTag(title);
     }
   }
 
-  public isSmartTagTitle(title: string): boolean {
+  public isSmartViewTitle(title: string): boolean {
     return title.startsWith(SMART_TAG_DSL_PREFIX);
   }
 
   /**
    * Finds or creates a tag with a given title
    */
-  public async findOrCreateTagByTitle(
-    title: string,
-    parentUuid?: UuidString
-  ): Promise<SNTag> {
+  public async findOrCreateTagByTitle(title: string, parentUuid?: UuidString): Promise<SNTag> {
     const tag = this.findTagByTitleAndParent(title, parentUuid);
     return tag || this.createTag(title, parentUuid);
   }
 
-  /**
-   * Returns all notes matching the smart tag
-   */
-  public notesMatchingSmartTag(smartTag: SNSmartTag) {
-    return this.notesView.notesMatchingSmartTag(smartTag);
+  public notesMatchingSmartView(view: SmartView): SNNote[] {
+    return this.notesView.notesMatchingSmartView(view);
   }
 
-  /**
-   * Returns the smart tag corresponding to the "Trash" tag.
-   */
-  public get trashSmartTag() {
-    return this.systemSmartTags.find((tag) => tag.isTrashTag)!;
+  public get allNotesSmartView(): SmartView {
+    return this.systemSmartViews.find((tag) => tag.uuid === SystemViewId.AllNotes) as SmartView;
   }
 
-  /**
-   * Returns all items currently in the trash
-   */
-  public get trashedItems() {
-    return this.notesMatchingSmartTag(this.trashSmartTag);
+  public get archivedSmartView(): SmartView {
+    return this.systemSmartViews.find(
+      (tag) => tag.uuid === SystemViewId.ArchivedNotes,
+    ) as SmartView;
+  }
+
+  public get trashSmartView(): SmartView {
+    return this.systemSmartViews.find((tag) => tag.uuid === SystemViewId.TrashedNotes) as SmartView;
+  }
+
+  public get trashedItems(): SNNote[] {
+    return this.notesMatchingSmartView(this.trashSmartView);
   }
 
   /**
    * Permanently deletes any items currently in the trash. Consumer must manually call sync.
    */
-  public async emptyTrash() {
+  public async emptyTrash(): Promise<void> {
     const notes = this.trashedItems;
-    return this.setItemsToBeDeleted(Uuids(notes));
+    await this.setItemsToBeDeleted(Uuids(notes));
   }
 
   /**
-   * Returns all smart tags, sorted by title.
+   * Returns all smart views, sorted by title.
    */
-  public getSmartTags() {
-    const userTags = this.collection.displayElements(
-      ContentType.SmartTag
-    ) as SNSmartTag[];
-    return this.systemSmartTags.concat(userTags);
+  public getSmartViews(): SmartView[] {
+    const userTags = this.collection.displayElements(ContentType.SmartView) as SmartView[];
+    return this.systemSmartViews.concat(userTags);
   }
 
   /**
    * The number of notes currently managed
    */
-  public get noteCount() {
+  public get noteCount(): number {
     return this.collection.all(ContentType.Note).length;
   }
 
@@ -1235,7 +1174,7 @@ export class ItemManager extends AbstractService {
    * Used primarily when signing into an account and wanting to discard any current
    * local data.
    */
-  public async removeAllItemsFromMemory() {
+  public async removeAllItemsFromMemory(): Promise<void> {
     const uuids = Uuids(this.items);
     /** We don't want to set as dirty, since we want to dispose of immediately. */
     await this.changeItems(
@@ -1243,7 +1182,7 @@ export class ItemManager extends AbstractService {
       (mutator) => {
         mutator.setDeleted();
       },
-      MutationType.NonDirtying
+      MutationType.NonDirtying,
     );
     this.resetState();
     this.payloadManager.resetState();
@@ -1253,43 +1192,4 @@ export class ItemManager extends AbstractService {
     this.collection.discard(item);
     this.payloadManager.removePayloadLocally(item.payload);
   }
-}
-
-const SYSTEM_TAG_ALL_NOTES = 'all-notes';
-const SYSTEM_TAG_ARCHIVED_NOTES = 'archived-notes';
-const SYSTEM_TAG_TRASHED_NOTES = 'trashed-notes';
-
-function BuildSmartTags() {
-  const allNotes = CreateMaxPayloadFromAnyObject({
-    uuid: SYSTEM_TAG_ALL_NOTES,
-    content_type: ContentType.SmartTag,
-    content: FillItemContent({
-      title: 'All notes',
-      isSystemTag: true,
-      isAllTag: true,
-    }),
-  });
-  const archived = CreateMaxPayloadFromAnyObject({
-    uuid: SYSTEM_TAG_ARCHIVED_NOTES,
-    content_type: ContentType.SmartTag,
-    content: FillItemContent({
-      title: 'Archived',
-      isSystemTag: true,
-      isArchiveTag: true,
-    }),
-  });
-  const trash = CreateMaxPayloadFromAnyObject({
-    uuid: SYSTEM_TAG_TRASHED_NOTES,
-    content_type: ContentType.SmartTag,
-    content: FillItemContent({
-      title: 'Trash',
-      isSystemTag: true,
-      isTrashTag: true,
-    }),
-  });
-  return [
-    CreateItemFromPayload(allNotes) as SNSmartTag,
-    CreateItemFromPayload(archived) as SNSmartTag,
-    CreateItemFromPayload(trash) as SNSmartTag,
-  ];
 }

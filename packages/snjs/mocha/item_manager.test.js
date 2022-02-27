@@ -7,7 +7,7 @@ const expect = chai.expect;
 describe('item manager', function () {
   before(async function () {
     const crypto = new SNWebCrypto();
-    UuidGenerator.SetGenerators(crypto.generateUUID, crypto.generateUUID);
+    UuidGenerator.SetGenerator(crypto.generateUUID);
   });
 
   beforeEach(async function () {
@@ -46,8 +46,7 @@ describe('item manager', function () {
     this.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged);
     const result = await this.itemManager.setItemDirty(payload.uuid);
     const appData = result.payload.content.appData;
-    expect(appData[SNItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to
-      .be.ok;
+    expect(appData[SNItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok;
   });
 
   it('find items with valid uuid', async function () {
@@ -60,19 +59,13 @@ describe('item manager', function () {
 
   it('find items with invalid uuid no blanks', async function () {
     const includeBlanks = false;
-    const results = await this.itemManager.findItems(
-      [Factory.generateUuidish()],
-      includeBlanks
-    );
+    const results = await this.itemManager.findItems([Factory.generateUuidish()], includeBlanks);
     expect(results.length).to.equal(0);
   });
 
   it('find items with invalid uuid include blanks', async function () {
     const includeBlanks = true;
-    const results = await this.itemManager.findItems(
-      [Factory.generateUuidish()],
-      includeBlanks
-    );
+    const results = await this.itemManager.findItems([Factory.generateUuidish()], includeBlanks);
     expect(results.length).to.equal(1);
     expect(results[0]).to.not.be.ok;
   });
@@ -95,18 +88,14 @@ describe('item manager', function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql(
-      [note.uuid]
-    );
+    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([note.uuid]);
   });
 
   it('inverse reference map', async function () {
     const note = await this.createNote();
     const tag = await this.createTag([note]);
 
-    expect(
-      this.itemManager.collection.referenceMap.inverseMap[note.uuid]
-    ).to.eql([tag.uuid]);
+    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.eql([tag.uuid]);
   });
 
   it('inverse reference map should not have duplicates', async function () {
@@ -114,9 +103,7 @@ describe('item manager', function () {
     const tag = await this.createTag([note]);
     await this.itemManager.changeItem(tag.uuid);
 
-    expect(
-      this.itemManager.collection.referenceMap.inverseMap[note.uuid]
-    ).to.eql([tag.uuid]);
+    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.eql([tag.uuid]);
   });
 
   it('deleting from reference map', async function () {
@@ -124,11 +111,8 @@ describe('item manager', function () {
     const tag = await this.createTag([note]);
     await this.itemManager.setItemToBeDeleted(note.uuid);
 
-    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql(
-      []
-    );
-    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to
-      .not.be.ok;
+    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([]);
+    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.not.be.ok;
   });
 
   it('deleting referenced item should update referencing item references', async function () {
@@ -147,12 +131,8 @@ describe('item manager', function () {
       mutator.removeItemAsRelationship(note);
     });
 
-    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql(
-      []
-    );
-    expect(
-      this.itemManager.collection.referenceMap.inverseMap[note.uuid]
-    ).to.eql([]);
+    expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([]);
+    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.eql([]);
   });
 
   it('emitting discardable payload should remove it from our collection', async function () {
@@ -182,7 +162,7 @@ describe('item manager', function () {
       ContentType.Any,
       (changed, inserted, discarded, ignored, source, sourceKey) => {
         observed.push({ changed, inserted, discarded, source, sourceKey });
-      }
+      },
     );
     const note = await this.createNote();
     const tag = await this.createTag([note]);
@@ -218,10 +198,7 @@ describe('item manager', function () {
         mutator.title = newTitle;
       });
     };
-    await Factory.expectThrowsAsync(
-      () => changeFn(),
-      'Attempting to change non-existant item'
-    );
+    await Factory.expectThrowsAsync(() => changeFn(), 'Attempting to change non-existant item');
   });
 
   it('set items dirty', async function () {
@@ -235,36 +212,22 @@ describe('item manager', function () {
   });
 
   it('dirty items should not include errored items', async function () {
-    const note = await this.itemManager.setItemDirty(
-      (
-        await this.createNote()
-      ).uuid
-    );
+    const note = await this.itemManager.setItemDirty((await this.createNote()).uuid);
     const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
       errorDecrypting: true,
     });
-    await this.itemManager.emitItemsFromPayloads(
-      [errorred],
-      PayloadSource.LocalChanged
-    );
+    await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged);
     const dirtyItems = this.itemManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(0);
   });
 
   it('dirty items should include errored items if they are being deleted', async function () {
-    const note = await this.itemManager.setItemDirty(
-      (
-        await this.createNote()
-      ).uuid
-    );
+    const note = await this.itemManager.setItemDirty((await this.createNote()).uuid);
     const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
       errorDecrypting: true,
       deleted: true,
     });
-    await this.itemManager.emitItemsFromPayloads(
-      [errorred],
-      PayloadSource.LocalChanged
-    );
+    await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged);
     const dirtyItems = this.itemManager.getDirtyItems();
     expect(dirtyItems.length).to.equal(1);
   });
@@ -273,10 +236,7 @@ describe('item manager', function () {
     const sandbox = sinon.createSandbox();
 
     beforeEach(async function () {
-      this.emitPayloads = sandbox.spy(
-        this.itemManager.payloadManager,
-        'emitPayloads'
-      );
+      this.emitPayloads = sandbox.spy(this.itemManager.payloadManager, 'emitPayloads');
     });
 
     afterEach(async function () {
@@ -314,9 +274,7 @@ describe('item manager', function () {
       expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf);
       expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of);
       expect(originalNote.uuid).to.equal(duplicatedNote.conflictOf);
-      expect(originalNote.uuid).to.equal(
-        duplicatedNote.payload.content.conflict_of
-      );
+      expect(originalNote.uuid).to.equal(duplicatedNote.payload.content.conflict_of);
     });
 
     it('duplicate item with relationships', async function () {
@@ -346,13 +304,9 @@ describe('item manager', function () {
         title: 'hello',
         text: 'world',
       });
-      const duplicateNote = await this.itemManager.duplicateItem(
-        note.uuid,
-        false,
-        {
-          title: 'hello (copy)',
-        }
-      );
+      const duplicateNote = await this.itemManager.duplicateItem(note.uuid, false, {
+        title: 'hello (copy)',
+      });
 
       expect(duplicateNote.title).to.equal('hello (copy)');
       expect(duplicateNote.text).to.equal('world');
@@ -376,8 +330,8 @@ describe('item manager', function () {
     expect(this.itemManager.notes.length).to.equal(0);
   });
 
-  it('system smart tags', async function () {
-    expect(this.itemManager.systemSmartTags.length).to.equal(3);
+  it('system smart views', async function () {
+    expect(this.itemManager.systemSmartViews.length).to.equal(3);
   });
 
   it('find tag by title', async function () {
@@ -405,14 +359,11 @@ describe('item manager', function () {
 
   it('trash', async function () {
     const note = await this.createNote();
-    const versionTwo = await this.itemManager.changeItem(
-      note.uuid,
-      (mutator) => {
-        mutator.trashed = true;
-      }
-    );
+    const versionTwo = await this.itemManager.changeItem(note.uuid, (mutator) => {
+      mutator.trashed = true;
+    });
 
-    expect(this.itemManager.trashSmartTag).to.be.ok;
+    expect(this.itemManager.trashSmartView).to.be.ok;
     expect(versionTwo.trashed).to.equal(true);
     expect(versionTwo.dirty).to.equal(true);
     expect(versionTwo.content).to.be.ok;
@@ -428,12 +379,9 @@ describe('item manager', function () {
 
   it('remove all items from memory', async function () {
     const observed = [];
-    this.itemManager.addObserver(
-      ContentType.Any,
-      (changed, inserted, discarded, ignored) => {
-        observed.push({ changed, inserted, discarded, ignored });
-      }
-    );
+    this.itemManager.addObserver(ContentType.Any, (changed, inserted, discarded, ignored) => {
+      observed.push({ changed, inserted, discarded, ignored });
+    });
     await this.createNote();
     await this.itemManager.removeAllItemsFromMemory();
 
@@ -444,12 +392,9 @@ describe('item manager', function () {
 
   it('remove item locally', async function () {
     const observed = [];
-    this.itemManager.addObserver(
-      ContentType.Any,
-      (changed, inserted, discarded, ignored) => {
-        observed.push({ changed, inserted, discarded, ignored });
-      }
-    );
+    this.itemManager.addObserver(ContentType.Any, (changed, inserted, discarded, ignored) => {
+      observed.push({ changed, inserted, discarded, ignored });
+    });
     const note = await this.createNote();
     await this.itemManager.removeItemLocally(note);
 
@@ -470,23 +415,20 @@ describe('item manager', function () {
     const changedTitle = 'changed title';
     let didEmit = false;
     let latestVersion;
-    this.itemManager.addObserver(
-      ContentType.Note,
-      (changed, inserted, _discarded, _ignored) => {
-        const all = changed.concat(inserted);
-        if (!didEmit) {
-          didEmit = true;
-          const changedPayload = CopyPayload(payload, {
-            content: {
-              ...payload.content,
-              title: changedTitle,
-            },
-          });
-          this.itemManager.emitItemFromPayload(changedPayload);
-        }
-        latestVersion = all[0];
+    this.itemManager.addObserver(ContentType.Note, (changed, inserted, _discarded, _ignored) => {
+      const all = changed.concat(inserted);
+      if (!didEmit) {
+        didEmit = true;
+        const changedPayload = CopyPayload(payload, {
+          content: {
+            ...payload.content,
+            title: changedTitle,
+          },
+        });
+        this.itemManager.emitItemFromPayload(changedPayload);
       }
-    );
+      latestVersion = all[0];
+    });
     await this.itemManager.emitItemFromPayload(payload);
     expect(latestVersion.title).to.equal(changedTitle);
   });
@@ -501,9 +443,7 @@ describe('item manager', function () {
     });
     it('should return all tags with query partially matching title', async function () {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag one');
-      const secondTag = await this.itemManager.findOrCreateTagByTitle(
-        'tag two'
-      );
+      const secondTag = await this.itemManager.findOrCreateTagByTitle('tag two');
 
       const results = this.itemManager.searchTags('tag');
       expect(results).lengthOf(2);
@@ -531,6 +471,7 @@ describe('item manager', function () {
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(tag.title);
     });
+
     it('should return tags in natural order', async function () {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag 100');
       const secondTag = await this.itemManager.findOrCreateTagByTitle('tag 2');
@@ -544,11 +485,10 @@ describe('item manager', function () {
       expect(results[2].title).to.equal(fourthTag.title);
       expect(results[3].title).to.equal(thirdTag.title);
     });
+
     it('should not return tags associated with note', async function () {
       const firstTag = await this.itemManager.findOrCreateTagByTitle('tag one');
-      const secondTag = await this.itemManager.findOrCreateTagByTitle(
-        'tag two'
-      );
+      const secondTag = await this.itemManager.findOrCreateTagByTitle('tag two');
 
       const note = await this.createNote();
       await this.itemManager.changeItem(firstTag.uuid, (mutator) => {
@@ -558,6 +498,59 @@ describe('item manager', function () {
       const results = this.itemManager.searchTags('tag', note);
       expect(results).lengthOf(1);
       expect(results[0].title).to.equal(secondTag.title);
+    });
+  });
+
+  describe('smart views', async function () {
+
+    it('all view should not include archived notes by default', async function() {
+      const normal = await this.createNote();
+
+      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+        mutator.archived = true;
+      });
+
+      this.itemManager.setNotesDisplayCriteria(
+        NotesDisplayCriteria.Create({
+          views: [this.itemManager.allNotesSmartView],
+        }),
+      );
+
+      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(0);
+    });
+
+    it('archived view should not include trashed notes by default', async function() {
+      const normal = await this.createNote();
+
+      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+        mutator.archived = true;
+        mutator.trashed = true;
+      });
+
+      this.itemManager.setNotesDisplayCriteria(
+        NotesDisplayCriteria.Create({
+          views: [this.itemManager.archivedSmartView],
+        }),
+      );
+
+      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(0);
+    });
+
+    it('trashed view should include archived notes by default', async function() {
+      const normal = await this.createNote();
+
+      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+        mutator.archived = true;
+        mutator.trashed = true;
+      });
+
+      this.itemManager.setNotesDisplayCriteria(
+        NotesDisplayCriteria.Create({
+          views: [this.itemManager.trashSmartView],
+        }),
+      );
+
+      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(1);
     });
   });
 

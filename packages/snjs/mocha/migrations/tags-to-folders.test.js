@@ -7,10 +7,7 @@ const expect = chai.expect;
 const setupRandomUuid = () => {
   let currentId = 0;
 
-  UuidGenerator.SetGenerators(
-    () => Promise.resolve(String(currentId++)),
-    () => String(currentId++)
-  );
+  UuidGenerator.SetGenerator(() => String(currentId++));
 };
 
 describe('web native folders migration', () => {

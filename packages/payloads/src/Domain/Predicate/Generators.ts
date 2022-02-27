@@ -7,74 +7,70 @@ import {
   PredicateInterface,
   PredicateOperator,
   SureValue,
+  PredicateJsonForm,
+  AllPredicateOperators,
+  RawPredicateInArrayForm,
 } from './Interface'
 import { NotPredicate } from './NotPredicate'
 import { Predicate } from './Predicate'
 import { StringKey } from './Utils'
 
-type RawPredicateInArrayForm = string[]
-
 export function predicateFromArguments<T extends ItemInterface>(
-  keypath: StringKey<T>,
+  keypath: StringKey<T> | undefined,
   operator: PredicateOperator,
-  value: SureValue | RawPredicateInArrayForm[],
+  value: SureValue | PredicateJsonForm,
 ): PredicateInterface<T> {
   if (AllPredicateCompoundOperators.includes(operator as PredicateCompoundOperator)) {
-    return compoundPredicateFromArguments(operator, value)
+    return compoundPredicateFromArguments(operator, (value as unknown) as PredicateJsonForm[])
   } else if (operator === 'not') {
-    return new NotPredicate(predicateFromFlatArray(value as RawPredicateInArrayForm[]))
-  } else if (operator === 'includes') {
-    return new IncludesPredicate(
-      keypath,
-      predicateFromFlatArray(value as RawPredicateInArrayForm[]),
-    )
-  } else {
+    return new NotPredicate(predicateFromJson(value as PredicateJsonForm))
+  } else if (operator === 'includes' && keypath) {
+    return new IncludesPredicate(keypath, predicateFromJson(value as PredicateJsonForm))
+  } else if (keypath) {
     return new Predicate(keypath, operator, value as SureValue)
   }
+
+  throw Error('Invalid predicate arguments')
 }
 
 export function compoundPredicateFromArguments<T extends ItemInterface>(
   operator: PredicateOperator,
-  value: SureValue | RawPredicateInArrayForm[],
+  value: PredicateJsonForm[],
 ): PredicateInterface<T> {
-  const subPredicateJsons = value as RawPredicateInArrayForm[]
-  const subPredicates = subPredicateJsons.map((jsonArray) => {
-    return predicateFromFlatArray(jsonArray)
+  const subPredicates = value.map((jsonPredicate) => {
+    return predicateFromJson(jsonPredicate)
   })
   return new CompoundPredicate(operator as PredicateCompoundOperator, subPredicates)
 }
 
 export function notPredicateFromArguments<T extends ItemInterface>(
-  value: RawPredicateInArrayForm,
+  value: PredicateJsonForm,
 ): PredicateInterface<T> {
-  const subPredicate = predicateFromFlatArray(value)
+  const subPredicate = predicateFromJson(value)
   return new NotPredicate(subPredicate)
 }
 
 export function includesPredicateFromArguments<T extends ItemInterface>(
   keypath: StringKey<T>,
-  value: RawPredicateInArrayForm,
+  value: PredicateJsonForm,
 ): PredicateInterface<T> {
-  const subPredicate = predicateFromFlatArray(value)
+  const subPredicate = predicateFromJson(value)
   return new IncludesPredicate<T>(keypath, subPredicate)
 }
 
-export function predicateFromJson<T extends ItemInterface>(values: {
-  keypath: StringKey<T>
-  operator: PredicateOperator
-  value: SureValue | RawPredicateInArrayForm[]
-}): PredicateInterface<T> {
-  return predicateFromArguments(values.keypath, values.operator, values.value)
-}
-
-export function predicateFromFlatArray<T extends ItemInterface>(
-  array: RawPredicateInArrayForm | RawPredicateInArrayForm[],
+export function predicateFromJson<T extends ItemInterface>(
+  values: PredicateJsonForm,
 ): PredicateInterface<T> {
-  return predicateFromJson<T>({
-    keypath: array[0] as StringKey<T>,
-    operator: array[1] as PredicateOperator,
-    value: array[2],
-  })
+  if (Array.isArray(values)) {
+    throw Error('Invalid predicateFromJson value')
+  }
+  return predicateFromArguments(
+    values.keypath as StringKey<T>,
+    values.operator,
+    isValuePredicateInArrayForm(values.value)
+      ? predicateDSLArrayToJsonPredicate(values.value)
+      : (values.value as PredicateJsonForm),
+  )
 }
 
 export function predicateFromDSLString<T extends ItemInterface>(
@@ -83,8 +79,56 @@ export function predicateFromDSLString<T extends ItemInterface>(
   try {
     const components = JSON.parse(dsl.substring(1, dsl.length)) as string[]
     components.shift()
-    return predicateFromFlatArray(components)
+    const predicateJson = predicateDSLArrayToJsonPredicate(components as RawPredicateInArrayForm)
+    return predicateFromJson(predicateJson)
   } catch (e) {
-    throw Error('Invalid smart tag syntax')
+    throw Error(`Invalid smart view syntax ${e}`)
+  }
+}
+
+function isValuePredicateInArrayForm(
+  value: SureValue | PredicateJsonForm | PredicateJsonForm[] | RawPredicateInArrayForm,
+): value is RawPredicateInArrayForm {
+  return Array.isArray(value) && AllPredicateOperators.includes(value[1] as PredicateOperator)
+}
+
+function predicateDSLArrayToJsonPredicate(
+  predicateArray: RawPredicateInArrayForm,
+): PredicateJsonForm {
+  const predicateValue = predicateArray[2] as
+    | SureValue
+    | SureValue[]
+    | RawPredicateInArrayForm
+    | RawPredicateInArrayForm[]
+
+  let resolvedPredicateValue: PredicateJsonForm | SureValue | PredicateJsonForm[]
+
+  if (Array.isArray(predicateValue)) {
+    const level1CondensedValue = predicateValue as
+      | SureValue[]
+      | RawPredicateInArrayForm
+      | RawPredicateInArrayForm[]
+
+    if (Array.isArray(level1CondensedValue[0])) {
+      const level2CondensedValue = level1CondensedValue as RawPredicateInArrayForm[]
+      resolvedPredicateValue = level2CondensedValue.map((subPredicate) =>
+        predicateDSLArrayToJsonPredicate(subPredicate),
+      )
+    } else if (isValuePredicateInArrayForm(predicateValue[1])) {
+      const level2CondensedValue = level1CondensedValue as RawPredicateInArrayForm
+      resolvedPredicateValue = predicateDSLArrayToJsonPredicate(level2CondensedValue)
+    } else {
+      const level2CondensedValue = predicateValue as SureValue
+      resolvedPredicateValue = level2CondensedValue
+    }
+  } else {
+    const level1CondensedValue = predicateValue as SureValue
+    resolvedPredicateValue = level1CondensedValue
+  }
+
+  return {
+    keypath: predicateArray[0],
+    operator: predicateArray[1] as PredicateOperator,
+    value: resolvedPredicateValue,
   }
 }
