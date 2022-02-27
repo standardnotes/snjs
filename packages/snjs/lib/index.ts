@@ -38,11 +38,8 @@ export type {
 
 export * from './models';
 
-export type { PrefValue, Action } from './models';
-export { MutationType } from '@Models/core/item';
 export type { ComponentPermission } from '@standardnotes/features';
 export { ComponentArea, ComponentAction } from '@standardnotes/features';
-export { LiveItem } from './models/live_item';
 export { FeatureStatus } from '@Lib/services/features_service';
 
 export type {
@@ -152,7 +149,7 @@ export {
   lastElement,
   UuidGenerator,
 } from '@standardnotes/utils';
-export { displayStringForContentType } from '@Models/content_types';
+
 export {
   ContentType,
   Runtime,
@@ -168,8 +165,6 @@ export {
   intentRequiresEncryption,
   ContentTypeUsesRootKeyEncryption,
 } from '@standardnotes/applications';
-export { CreateItemFromPayload } from '@Models/generator';
-export { Uuids } from '@Models/functions';
 
 export { ApplicationEvent } from '@Lib/events';
 export {
@@ -222,7 +217,6 @@ export { NoteViewController } from './ui/note_view_controller';
 export { NoteGroupController } from './ui/note_group_controller';
 export { IconsController } from './ui/icons_controller';
 
-export { SNFile, FileProtocolV1 } from '@Models/app/file';
 
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base';
@@ -240,5 +234,4 @@ export {
 } from '@standardnotes/settings';
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
-export { ActionVerb } from '@Lib/models/app/extension';
 export { Predicate, CompoundPredicate } from '@standardnotes/payloads';
