@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.65.1",
+  "version": "2.65.2",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -77,14 +77,14 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@standardnotes/applications": "^1.1.0",
-    "@standardnotes/auth": "^3.17.0",
-    "@standardnotes/common": "^1.15.0",
-    "@standardnotes/domain-events": "^2.23.16",
-    "@standardnotes/features": "^1.33.0",
-    "@standardnotes/services": "^1.2.0",
+    "@standardnotes/applications": "^1.1.1",
+    "@standardnotes/auth": "^3.17.1",
+    "@standardnotes/common": "^1.15.1",
+    "@standardnotes/domain-events": "^2.23.17",
+    "@standardnotes/features": "^1.33.1",
+    "@standardnotes/services": "^1.2.1",
     "@standardnotes/settings": "^1.11.3",
     "@standardnotes/sncrypto-common": "^1.7.1",
-    "@standardnotes/utils": "^1.2.0"
+    "@standardnotes/utils": "^1.2.1"
   }
 }
