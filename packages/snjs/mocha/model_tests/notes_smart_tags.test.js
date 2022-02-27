@@ -11,9 +11,9 @@ const generateLongString = (minLength = 600) => {
   return BASE.repeat(repeatCount);
 };
 
-const getFilteredNotes = (application, { tags }) => {
+const getFilteredNotes = (application, { views }) => {
   const criteria = NotesDisplayCriteria.Create({
-    tags,
+    views,
     includePinned: true,
   });
   application.setNotesDisplayCriteria(criteria);
@@ -71,13 +71,13 @@ describe('notes and smart tags', () => {
 
     // ## The user can filter and see the pinned notes
     const notes_not_pinned = getFilteredNotes(this.application, {
-      tags: [tag_not_pinned],
+      views: [tag_not_pinned],
     });
 
     expect(titles(notes_not_pinned)).to.eql(['long & !pinned']);
 
     // ## The user can filter and see the long notes
-    const notes_long = getFilteredNotes(this.application, { tags: [tag_long] });
+    const notes_long = getFilteredNotes(this.application, { views: [tag_long] });
     expect(titles(notes_long)).to.eql(['long & !pinned', 'long & pinned']);
 
     // ## The user creates a new long note
@@ -89,7 +89,7 @@ describe('notes and smart tags', () => {
 
     // ## The user can filter and see the new long note
     const notes_long2 = getFilteredNotes(this.application, {
-      tags: [tag_long],
+      views: [tag_long],
     });
     expect(titles(notes_long2)).to.eql([
       'long & !pinned',

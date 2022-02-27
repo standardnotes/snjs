@@ -259,4 +259,4 @@ export {
 export { Migration2_20_0 } from './migrations/2_20_0';
 export { Migration2_42_0 } from './migrations/2_42_0';
 export { ActionVerb } from '@Lib/models/app/extension';
-export { Predicate, CompoundPredicate, predicateFromFlatArray } from '@standardnotes/payloads';
+export { Predicate, CompoundPredicate } from '@standardnotes/payloads';

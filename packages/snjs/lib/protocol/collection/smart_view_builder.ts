@@ -18,7 +18,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
         title: 'Notes',
         predicate: allNotesPredicate(criteria).toJson(),
       } as SmartViewContent),
-    })
+    }),
   );
 
   const archived = new SmartView(
@@ -29,7 +29,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
         title: 'Archived',
         predicate: archivedNotesPredicate(criteria).toJson(),
       } as SmartViewContent),
-    })
+    }),
   );
 
   const trash = new SmartView(
@@ -40,44 +40,66 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
         title: 'Trash',
         predicate: trashedNotesPredicate(criteria).toJson(),
       } as SmartViewContent),
-    })
+    }),
   );
 
   return [notes, archived, trash];
 }
 
 function allNotesPredicate(criteria: NotesDisplayCriteria) {
-  const predicate = new CompoundPredicate('and', [
-    new Predicate('content_type', '=', ContentType.Note),
-    new Predicate('trashed', '=', criteria.includeTrashed),
-    new Predicate('protected', '=', criteria.includeProtected),
-    new Predicate('archived', '=', criteria.includeArchived),
-    new Predicate('pinned', '=', criteria.includePinned),
-  ]);
+  const subPredicates = [new Predicate('content_type', '=', ContentType.Note)];
+
+  if (criteria.includeTrashed === false) {
+    subPredicates.push(new Predicate('trashed', '=', false));
+  }
+  if (criteria.includeArchived === false) {
+    subPredicates.push(new Predicate('archived', '=', false));
+  }
+  if (criteria.includeProtected === false) {
+    subPredicates.push(new Predicate('protected', '=', false));
+  }
+  if (criteria.includePinned === false) {
+    subPredicates.push(new Predicate('pinned', '=', false));
+  }
+  const predicate = new CompoundPredicate('and', subPredicates);
 
   return predicate;
 }
 
 function archivedNotesPredicate(criteria: NotesDisplayCriteria) {
-  const predicate = new CompoundPredicate('and', [
+  const subPredicates = [
     new Predicate('archived', '=', true),
     new Predicate('content_type', '=', ContentType.Note),
-    new Predicate('trashed', '=', criteria.includeTrashed),
-    new Predicate('protected', '=', criteria.includeProtected),
-    new Predicate('pinned', '=', criteria.includePinned),
-  ]);
+  ];
+  if (criteria.includeTrashed === false) {
+    subPredicates.push(new Predicate('trashed', '=', false));
+  }
+  if (criteria.includeProtected === false) {
+    subPredicates.push(new Predicate('protected', '=', false));
+  }
+  if (criteria.includePinned === false) {
+    subPredicates.push(new Predicate('pinned', '=', false));
+  }
+  const predicate = new CompoundPredicate('and', subPredicates);
 
   return predicate;
 }
 
 function trashedNotesPredicate(criteria: NotesDisplayCriteria) {
-  const predicate = new CompoundPredicate('and', [
+  const subPredicates = [
     new Predicate('trashed', '=', true),
     new Predicate('content_type', '=', ContentType.Note),
-    new Predicate('archived', '=', criteria.includeArchived),
-    new Predicate('protected', '=', criteria.includeProtected),
-    new Predicate('pinned', '=', criteria.includePinned),
-  ]);
+  ];
+  if (criteria.includeArchived === false) {
+    subPredicates.push(new Predicate('archived', '=', false));
+  }
+  if (criteria.includeProtected === false) {
+    subPredicates.push(new Predicate('protected', '=', false));
+  }
+  if (criteria.includePinned === false) {
+    subPredicates.push(new Predicate('pinned', '=', false));
+  }
+  const predicate = new CompoundPredicate('and', subPredicates);
 
   return predicate;
 }

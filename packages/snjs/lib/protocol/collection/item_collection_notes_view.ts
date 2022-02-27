@@ -1,6 +1,6 @@
 import { ContentType } from '@Lib/index';
 import { SNNote, SNTag } from '../../models';
-import { SmartView } from './../../models/app/smartTag';
+import { isSystemView, SmartView } from './../../models/app/smartTag';
 import { ItemDelta, SNIndex, ItemCollection } from '@standardnotes/payloads';
 import {
   criteriaForSmartView,
@@ -17,7 +17,7 @@ export class ItemCollectionNotesView implements SNIndex {
 
   constructor(
     private collection: ItemCollection,
-    private criteria: NotesDisplayCriteria = NotesDisplayCriteria.Create({})
+    private criteria: NotesDisplayCriteria = NotesDisplayCriteria.Create({}),
   ) {}
 
   public setCriteria(criteria: NotesDisplayCriteria): void {
@@ -25,7 +25,7 @@ export class ItemCollectionNotesView implements SNIndex {
     this.collection.setDisplayOptions(
       ContentType.Note,
       criteria.sortProperty,
-      criteria.sortDirection
+      criteria.sortDirection,
     );
     this.needsRebuilding = true;
   }
@@ -43,10 +43,7 @@ export class ItemCollectionNotesView implements SNIndex {
   }
 
   private rebuildList(): void {
-    this.displayedNotes = notesMatchingCriteria(
-      this.currentCriteria,
-      this.collection
-    );
+    this.displayedNotes = notesMatchingCriteria(this.currentCriteria, this.collection);
     this.needsRebuilding = false;
   }
 
@@ -59,6 +56,9 @@ export class ItemCollectionNotesView implements SNIndex {
 
     const mostRecentVersionOfViews = this.criteria.views
       .map((view) => {
+        if (isSystemView(view)) {
+          return view;
+        }
         return this.collection.find(view.uuid) as SmartView;
       })
       .filter((view) => view != undefined);

@@ -99,8 +99,8 @@ describe('predicates', () => {
     it('both matching', () => {
       expect(
         compoundPredicateFromArguments<Note>('or', [
-          ['title', '=', 'Hello'],
-          ['content_type', '=', ContentType.Note],
+          { keypath: 'title', operator: '=', value: 'Hello' },
+          { keypath: 'content_type', operator: '=', value: ContentType.Note },
         ]).matchesItem(item),
       ).toEqual(true)
     })
@@ -108,8 +108,8 @@ describe('predicates', () => {
     it('first matching', () => {
       expect(
         compoundPredicateFromArguments<Note>('or', [
-          ['title', '=', 'Hello'],
-          ['content_type', '=', 'Wrong'],
+          { keypath: 'title', operator: '=', value: 'Hello' },
+          { keypath: 'content_type', operator: '=', value: 'Wrong' },
         ]).matchesItem(item),
       ).toEqual(true)
     })
@@ -117,8 +117,8 @@ describe('predicates', () => {
     it('second matching', () => {
       expect(
         compoundPredicateFromArguments<Note>('or', [
-          ['title', '=', 'Wrong'],
-          ['content_type', '=', ContentType.Note],
+          { keypath: 'title', operator: '=', value: 'Wrong' },
+          { keypath: 'content_type', operator: '=', value: ContentType.Note },
         ]).matchesItem(item),
       ).toEqual(true)
     })
@@ -126,8 +126,8 @@ describe('predicates', () => {
     it('both nonmatching', () => {
       expect(
         compoundPredicateFromArguments<Note>('or', [
-          ['title', '=', 'Wrong'],
-          ['content_type', '=', 'Wrong'],
+          { keypath: 'title', operator: '=', value: 'Wrong' },
+          { keypath: 'content_type', operator: '=', value: 'Wrong' },
         ]).matchesItem(item),
       ).toEqual(false)
     })
@@ -160,8 +160,8 @@ describe('predicates', () => {
     it('all matching', () => {
       expect(
         compoundPredicateFromArguments<Note>('and', [
-          ['title', '=', title],
-          ['content_type', '=', ContentType.Note],
+          { keypath: 'title', operator: '=', value: title },
+          { keypath: 'content_type', operator: '=', value: ContentType.Note },
         ]).matchesItem(item),
       ).toEqual(true)
     })
@@ -169,8 +169,8 @@ describe('predicates', () => {
     it('one matching', () => {
       expect(
         compoundPredicateFromArguments<Note>('and', [
-          ['title', '=', 'Wrong'],
-          ['content_type', '=', ContentType.Note],
+          { keypath: 'title', operator: '=', value: 'Wrong' },
+          { keypath: 'content_type', operator: '=', value: ContentType.Note },
         ]).matchesItem(item),
       ).toEqual(false)
     })
@@ -178,8 +178,8 @@ describe('predicates', () => {
     it('none matching', () => {
       expect(
         compoundPredicateFromArguments<Note>('and', [
-          ['title', '=', '123'],
-          ['content_type', '=', '456'],
+          { keypath: 'title', operator: '=', value: '123' },
+          { keypath: 'content_type', operator: '=', value: '456' },
         ]).matchesItem(item),
       ).toEqual(false)
     })
@@ -220,13 +220,21 @@ describe('predicates', () => {
 
     it('matching basic operator', () => {
       expect(
-        notPredicateFromArguments<Note>(['title', '=', 'Not This Title']).matchesItem(item),
+        notPredicateFromArguments<Note>({
+          keypath: 'title',
+          operator: '=',
+          value: 'Not This Title',
+        }).matchesItem(item),
       ).toEqual(true)
     })
 
     it('nonmatching basic operator', () => {
       expect(
-        notPredicateFromArguments<Note>(['title', '=', 'Hello']).matchesItem(item),
+        notPredicateFromArguments<Note>({
+          keypath: 'title',
+          operator: '=',
+          value: 'Hello',
+        }).matchesItem(item),
       ).toEqual(false)
     })
 
@@ -244,7 +252,11 @@ describe('predicates', () => {
     it('matching compound includes', () => {
       const andPredicate = new CompoundPredicate<Note>('and', [
         predicateFromArguments('title', 'startsWith', 'H'),
-        includesPredicateFromArguments<Note>('tags', ['title', '=', 'falsify']),
+        includesPredicateFromArguments<Note>('tags', {
+          keypath: 'title',
+          operator: '=',
+          value: 'falsify',
+        }),
       ])
       expect(new NotPredicate<Note>(andPredicate).matchesItem(item)).toEqual(true)
     })

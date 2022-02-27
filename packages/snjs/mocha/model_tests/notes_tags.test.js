@@ -23,10 +23,7 @@ describe('notes and tags', () => {
 
   it('uses proper class for note', async function () {
     const payload = Factory.createNotePayload();
-    await this.application.itemManager.emitItemFromPayload(
-      payload,
-      PayloadSource.LocalChanged
-    );
+    await this.application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged);
     const note = this.application.itemManager.getItems([ContentType.Note])[0];
     expect(note.constructor === SNNote).to.equal(true);
   });
@@ -74,15 +71,13 @@ describe('notes and tags', () => {
 
     await this.application.itemManager.emitItemsFromPayloads(
       [mutatedNote, mutatedTag],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
     const note = this.application.itemManager.getItems([ContentType.Note])[0];
     const tag = this.application.itemManager.getItems([ContentType.Tag])[0];
 
     expect(note.content.references.length).to.equal(1);
-    expect(
-      this.application.itemManager.itemsReferencingItem(tag.uuid).length
-    ).to.equal(1);
+    expect(this.application.itemManager.itemsReferencingItem(tag.uuid).length).to.equal(1);
   });
 
   it('creates relationship between note and tag', async function () {
@@ -95,7 +90,7 @@ describe('notes and tags', () => {
 
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
     let note = this.application.itemManager.notes[0];
     let tag = this.application.itemManager.tags[0];
@@ -109,9 +104,7 @@ describe('notes and tags', () => {
     expect(note.hasRelationshipWithItem(tag)).to.equal(false);
     expect(tag.hasRelationshipWithItem(note)).to.equal(true);
 
-    expect(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(1);
+    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
     expect(note.payload.safeReferences.length).to.equal(0);
     expect(tag.noteCount).to.equal(1);
 
@@ -122,9 +115,7 @@ describe('notes and tags', () => {
     expect(tag.dirty).to.be.true;
     await this.application.syncService.sync(syncOptions);
     expect(tag.content.references.length).to.equal(0);
-    expect(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(0);
+    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0);
     expect(tag.noteCount).to.equal(0);
 
     note = this.application.itemManager.notes[0];
@@ -138,10 +129,7 @@ describe('notes and tags', () => {
     const notePayload = pair[0];
     const tagPayload = pair[1];
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      pair,
-      PayloadSource.LocalChanged
-    );
+    await this.application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged);
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0];
 
@@ -159,16 +147,14 @@ describe('notes and tags', () => {
     });
     await this.application.itemManager.emitItemsFromPayloads(
       [mutatedTag],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
 
     note = this.application.itemManager.findItem(note.uuid);
     tag = this.application.itemManager.findItem(tag.uuid);
 
     expect(tag.content.references.length).to.equal(0);
-    expect(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(0);
+    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0);
     expect(tag.noteCount).to.equal(0);
 
     // expect to be false
@@ -194,7 +180,7 @@ describe('notes and tags', () => {
 
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
     const note = this.application.itemManager.getItems([ContentType.Note])[0];
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0];
@@ -209,28 +195,20 @@ describe('notes and tags', () => {
       },
       undefined,
       undefined,
-      syncOptions
+      syncOptions,
     );
 
-    expect(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(0);
+    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0);
     expect(tag.noteCount).to.equal(0);
   });
 
   it('properly handles tag duplication', async function () {
     const pair = Factory.createRelatedNoteTagPairPayload();
-    await this.application.itemManager.emitItemsFromPayloads(
-      pair,
-      PayloadSource.LocalChanged
-    );
+    await this.application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged);
     let note = this.application.itemManager.notes[0];
     let tag = this.application.itemManager.tags[0];
 
-    const duplicateTag = await this.application.itemManager.duplicateItem(
-      tag.uuid,
-      true
-    );
+    const duplicateTag = await this.application.itemManager.duplicateItem(tag.uuid, true);
     await this.application.syncService.sync(syncOptions);
 
     note = this.application.itemManager.findItem(note.uuid);
@@ -242,9 +220,7 @@ describe('notes and tags', () => {
     expect(duplicateTag.content.references.length).to.equal(1);
     expect(duplicateTag.noteCount).to.equal(1);
 
-    const noteTags = this.application.itemManager.itemsReferencingItem(
-      note.uuid
-    );
+    const noteTags = this.application.itemManager.itemsReferencingItem(note.uuid);
     expect(noteTags.length).to.equal(2);
 
     const noteTag1 = noteTags[0];
@@ -262,20 +238,14 @@ describe('notes and tags', () => {
     const tagPayload = pair[1];
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
     const note = this.application.itemManager.getItems([ContentType.Note])[0];
-    const duplicateNote = await this.application.itemManager.duplicateItem(
-      note.uuid,
-      true
-    );
+    const duplicateNote = await this.application.itemManager.duplicateItem(note.uuid, true);
     expect(note.uuid).to.not.equal(duplicateNote.uuid);
 
-    expect(
-      this.application.itemManager.itemsReferencingItem(duplicateNote.uuid)
-        .length
-    ).to.equal(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
+    expect(this.application.itemManager.itemsReferencingItem(duplicateNote.uuid).length).to.equal(
+      this.application.itemManager.itemsReferencingItem(note.uuid).length,
     );
   });
 
@@ -285,7 +255,7 @@ describe('notes and tags', () => {
     const tagPayload = pair[1];
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
     const note = this.application.itemManager.getItems([ContentType.Note])[0];
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0];
@@ -294,9 +264,7 @@ describe('notes and tags', () => {
     expect(tag.noteCount).to.equal(1);
 
     expect(note.content.references.length).to.equal(0);
-    expect(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(1);
+    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1);
 
     await this.application.itemManager.setItemToBeDeleted(tag.uuid);
     tag = this.application.itemManager.findItem(tag.uuid);
@@ -307,7 +275,7 @@ describe('notes and tags', () => {
     const notePayload = Factory.createNotePayload();
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
     note = await this.application.changeAndSaveItem(
@@ -317,7 +285,7 @@ describe('notes and tags', () => {
       },
       undefined,
       undefined,
-      syncOptions
+      syncOptions,
     );
     expect(note.content.title).to.not.equal(notePayload.content.title);
   });
@@ -332,7 +300,7 @@ describe('notes and tags', () => {
 
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
     let note = this.application.itemManager.getItems([ContentType.Note])[0];
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0];
@@ -351,19 +319,17 @@ describe('notes and tags', () => {
     await Promise.all(
       ['Y', 'Z', 'A', 'B'].map(async (title) => {
         return this.application.insertItem(
-          await this.application.createTemplateItem(ContentType.Note, { title })
+          await this.application.createTemplateItem(ContentType.Note, { title }),
         );
-      })
+      }),
     );
     this.application.setNotesDisplayCriteria(
       NotesDisplayCriteria.Create({
         sortProperty: 'title',
         sortDirection: 'dsc',
-      })
+      }),
     );
-    const titles = this.application
-      .getDisplayableItems(ContentType.Note)
-      .map((note) => note.title);
+    const titles = this.application.getDisplayableItems(ContentType.Note).map((note) => note.title);
     expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z']);
   });
 
@@ -378,29 +344,21 @@ describe('notes and tags', () => {
 
   describe('Tags', function () {
     it('should sort tags in ascending alphabetical order by default', async function () {
-      const titles = ['1', 'A', 'a', 'b', '1', '2', 'B'];
+      const titles = ['1', 'A', 'b', '2'];
       const sortedTitles = titles.sort((a, b) => a.localeCompare(b));
-      await Promise.all(
-        titles.map((title) => this.application.findOrCreateTag(title))
-      );
+      await Promise.all(titles.map((title) => this.application.findOrCreateTag(title)));
       expect(
-        this.application
-          .getDisplayableItems(ContentType.Tag)
-          .map((t) => t.title)
+        this.application.getDisplayableItems(ContentType.Tag).map((t) => t.title),
       ).to.deep.equal(sortedTitles);
     });
 
     it('should sort tags in reverse alphabetical order', async function () {
-      const titles = ['1', 'A', 'a', 'b', '1', '2', 'B'];
+      const titles = ['1', 'A', 'b', '2'];
       const sortedTitles = titles.sort((a, b) => b.localeCompare(a));
-      await Promise.all(
-        titles.map((title) => this.application.findOrCreateTag(title))
-      );
+      await Promise.all(titles.map((title) => this.application.findOrCreateTag(title)));
       this.application.setDisplayOptions(ContentType.Tag, 'title', 'asc');
       expect(
-        this.application
-          .getDisplayableItems(ContentType.Tag)
-          .map((t) => t.title)
+        this.application.getDisplayableItems(ContentType.Tag).map((t) => t.title),
       ).to.deep.equal(sortedTitles);
     });
 
@@ -413,18 +371,16 @@ describe('notes and tags', () => {
       await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'dsc',
           tags: [tag],
-        })
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
     });
@@ -445,11 +401,10 @@ describe('notes and tags', () => {
           sortProperty: 'title',
           sortDirection: 'dsc',
           tags: [tag],
-        })
+          includeTrashed: false,
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(1);
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid);
     });
@@ -460,13 +415,11 @@ describe('notes and tags', () => {
           return this.application.insertItem(
             await this.application.createTemplateItem(ContentType.Note, {
               title,
-            })
+            }),
           );
-        })
+        }),
       );
-      const Bnote = this.application.itemManager.notes.find(
-        (note) => note.title === 'B'
-      );
+      const Bnote = this.application.itemManager.notes.find((note) => note.title === 'B');
       await this.application.changeItem(Bnote.uuid, (mutator) => {
         mutator.pinned = true;
       });
@@ -482,31 +435,29 @@ describe('notes and tags', () => {
           sortProperty: 'title',
           sortDirection: 'dsc',
           tags: [tag],
-        })
+        }),
       );
 
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.have.length(4);
       expect(displayedNotes[0].title).to.equal('B');
       expect(displayedNotes[1].title).to.equal('A');
     });
   });
 
-  describe('Smart tags', function () {
+  describe('Smart views', function () {
     it('"title", "startsWith", "Foo"', async function () {
       const note = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'Foo 🎲',
-        })
+        }),
       );
       await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'Not Foo 🎲',
-        })
+        }),
       );
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Foo Notes',
           predicate: {
@@ -514,20 +465,18 @@ describe('notes and tags', () => {
             operator: 'startsWith',
             value: 'Foo',
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
 
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(note.uuid);
@@ -537,7 +486,7 @@ describe('notes and tags', () => {
       const note = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       await this.application.changeItem(note.uuid, (mutator) => {
         mutator.pinned = true;
@@ -546,9 +495,9 @@ describe('notes and tags', () => {
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'B',
           pinned: false,
-        })
+        }),
       );
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Pinned',
           predicate: {
@@ -556,20 +505,18 @@ describe('notes and tags', () => {
             operator: '=',
             value: true,
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
 
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(note.uuid);
@@ -579,7 +526,7 @@ describe('notes and tags', () => {
       const pinnedNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       await this.application.changeItem(pinnedNote.uuid, (mutator) => {
         mutator.pinned = true;
@@ -587,9 +534,9 @@ describe('notes and tags', () => {
       const unpinnedNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'B',
-        })
+        }),
       );
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Not pinned',
           predicate: {
@@ -597,20 +544,18 @@ describe('notes and tags', () => {
             operator: '=',
             value: false,
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
 
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(unpinnedNote.uuid);
@@ -621,15 +566,15 @@ describe('notes and tags', () => {
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
           text: Array(501).fill(0).join(''),
-        })
+        }),
       );
       await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'B',
           text: 'b',
-        })
+        }),
       );
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Long',
           predicate: {
@@ -637,19 +582,17 @@ describe('notes and tags', () => {
             operator: '>',
             value: 500,
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(longNote.uuid);
@@ -664,14 +607,14 @@ describe('notes and tags', () => {
       const recentNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       await this.application.sync();
       const olderNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'B',
           text: 'b',
-        })
+        }),
       );
       await this.application.changeItem(olderNote.uuid, (mutator) => {
         const threeDays = 3 * 24 * 60 * 60 * 1000;
@@ -683,9 +626,9 @@ describe('notes and tags', () => {
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'B',
           text: 'b',
-        })
+        }),
       );
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'One day ago',
           predicate: {
@@ -693,19 +636,17 @@ describe('notes and tags', () => {
             operator: '>',
             value: '1.days.ago',
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(recentNote.uuid);
@@ -715,7 +656,7 @@ describe('notes and tags', () => {
       const untaggedNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       const taggedNote = await Factory.createMappedNote(this.application);
       const tag = await this.application.findOrCreateTag('A');
@@ -723,7 +664,7 @@ describe('notes and tags', () => {
         mutator.addItemAsRelationship(taggedNote);
       });
 
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Untagged',
           predicate: {
@@ -731,19 +672,17 @@ describe('notes and tags', () => {
             operator: '=',
             value: 0,
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(untaggedNote.uuid);
@@ -758,39 +697,35 @@ describe('notes and tags', () => {
       await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
 
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'B-tags',
           predicate: {
             keypath: 'tags',
             operator: 'includes',
-            value: ['title', 'startsWith', 'B'],
+            value: { keypath: 'title', operator: 'startsWith', value: 'B' },
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(taggedNote.uuid);
     });
 
     it('"ignored", "and", [["pinned", "=", true], ["locked", "=", true]]', async function () {
-      const pinnedAndLockedNote = await Factory.createMappedNote(
-        this.application
-      );
+      const pinnedAndLockedNote = await Factory.createMappedNote(this.application);
       await this.application.changeItem(pinnedAndLockedNote.uuid, (mutator) => {
         mutator.pinned = true;
         mutator.locked = true;
@@ -799,7 +734,7 @@ describe('notes and tags', () => {
       const pinnedNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       await this.application.changeItem(pinnedNote.uuid, (mutator) => {
         mutator.pinned = true;
@@ -808,35 +743,33 @@ describe('notes and tags', () => {
       const lockedNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       await this.application.changeItem(lockedNote.uuid, (mutator) => {
         mutator.locked = true;
       });
 
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Pinned & Locked',
           predicate: {
             operator: 'and',
             value: [
-              ['pinned', '=', true],
-              ['locked', '=', true],
+              { keypath: 'pinned', operator: '=', value: true },
+              { keypath: 'locked', operator: '=', value: true },
             ],
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes).to.deep.equal(matches);
       expect(matches.length).to.equal(1);
       expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid);
@@ -851,7 +784,7 @@ describe('notes and tags', () => {
       const pinnedNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
       await this.application.changeItem(pinnedNote.uuid, (mutator) => {
         mutator.pinned = true;
@@ -860,69 +793,61 @@ describe('notes and tags', () => {
       const pinnedAndProtectedNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
-      await this.application.changeItem(
-        pinnedAndProtectedNote.uuid,
-        (mutator) => {
-          mutator.pinned = true;
-          mutator.protected = true;
-        }
-      );
+      await this.application.changeItem(pinnedAndProtectedNote.uuid, (mutator) => {
+        mutator.pinned = true;
+        mutator.protected = true;
+      });
 
       await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'A',
-        })
+        }),
       );
 
-      const smartTag = await this.application.insertItem(
+      const view = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.SmartView, {
           title: 'Protected or Pinned',
           predicate: {
             operator: 'or',
             value: [
-              ['content.protected', '=', true],
-              ['pinned', '=', true],
+              { keypath: 'content.protected', operator: '=', value: true },
+              { keypath: 'pinned', operator: '=', value: true },
             ],
           },
-        })
+        }),
       );
-      const matches = this.application.notesMatchingSmartView(smartTag);
+      const matches = this.application.notesMatchingSmartView(view);
       this.application.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'created_at',
           sortDirection: 'asc',
-          tags: [smartTag],
-        })
+          views: [view],
+        }),
       );
-      const displayedNotes = this.application.getDisplayableItems(
-        ContentType.Note
-      );
+      const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
       expect(displayedNotes.length).to.equal(matches.length);
       expect(matches.length).to.equal(3);
       expect(matches.find((note) => note.uuid === protectedNote.uuid)).to.exist;
       expect(matches.find((note) => note.uuid === pinnedNote.uuid)).to.exist;
-      expect(matches.find((note) => note.uuid === pinnedAndProtectedNote.uuid))
-        .to.exist;
+      expect(matches.find((note) => note.uuid === pinnedAndProtectedNote.uuid)).to.exist;
     });
   });
 
   it('include notes that have tag titles that match search query', async function () {
-    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload(
-      {
-        noteTitle: 'A simple note',
-        noteText: 'This is just a note.',
-        tagTitle: 'Test',
-      }
-    );
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
+      noteTitle: 'A simple note',
+      noteText: 'This is just a note.',
+      tagTitle: 'Test',
+    });
     const notePayload2 = Factory.createNotePayload('Foo');
     const notePayload3 = Factory.createNotePayload('Bar');
     const notePayload4 = Factory.createNotePayload('Testing');
 
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload1, notePayload2, notePayload3, notePayload4, tagPayload1],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
 
     this.application.setNotesDisplayCriteria(
@@ -932,32 +857,28 @@ describe('notes and tags', () => {
         searchQuery: {
           query: 'Test',
         },
-      })
+      }),
     );
 
-    const displayedNotes = this.application.getDisplayableItems(
-      ContentType.Note
-    );
+    const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
     expect(displayedNotes.length).to.equal(2);
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid);
     expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid);
   });
 
   it('search query should be case insensitive and match notes and tags title', async function () {
-    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload(
-      {
-        noteTitle: 'A simple note',
-        noteText: 'Just a note. Nothing to see.',
-        tagTitle: 'Foo',
-      }
-    );
+    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
+      noteTitle: 'A simple note',
+      noteText: 'Just a note. Nothing to see.',
+      tagTitle: 'Foo',
+    });
     const notePayload2 = Factory.createNotePayload('Another bar (foo)');
     const notePayload3 = Factory.createNotePayload('Testing FOO (Bar)');
     const notePayload4 = Factory.createNotePayload('This should not match');
 
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload1, notePayload2, notePayload3, notePayload4, tagPayload1],
-      PayloadSource.LocalChanged
+      PayloadSource.LocalChanged,
     );
 
     this.application.setNotesDisplayCriteria(
@@ -967,12 +888,10 @@ describe('notes and tags', () => {
         searchQuery: {
           query: 'foo',
         },
-      })
+      }),
     );
 
-    const displayedNotes = this.application.getDisplayableItems(
-      ContentType.Note
-    );
+    const displayedNotes = this.application.getDisplayableItems(ContentType.Note);
     expect(displayedNotes.length).to.equal(3);
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid);
     expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid);

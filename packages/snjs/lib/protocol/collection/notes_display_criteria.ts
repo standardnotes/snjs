@@ -1,14 +1,11 @@
-import {
-  CollectionSortDirection,
-  CollectionSort,
-  ItemCollection,
-} from '@standardnotes/payloads';
+import { CollectionSortDirection, CollectionSort, ItemCollection } from '@standardnotes/payloads';
 import { SNTag } from './../../models/app/tag';
 import { ContentType } from '@standardnotes/common';
 import { SNNote } from './../../models/app/note';
-import { SmartView, SystemViewId } from './../../models/app/smartTag';
+import { SmartView } from './../../models/app/smartTag';
 import { NoteWithTags } from './note_with_tags';
 import { CompoundPredicate } from '@standardnotes/payloads';
+import { SNItem } from '@Lib/models';
 
 export type SearchQuery = {
   query: string;
@@ -19,16 +16,14 @@ export class NotesDisplayCriteria {
   public searchQuery?: SearchQuery;
   public tags: SNTag[] = [];
   public views: SmartView[] = [];
-  public includePinned = true;
-  public includeProtected = true;
-  public includeTrashed = false;
-  public includeArchived = false;
+  public includePinned?: boolean;
+  public includeProtected?: boolean;
+  public includeTrashed?: boolean;
+  public includeArchived?: boolean;
   public sortProperty?: CollectionSort;
   public sortDirection?: CollectionSortDirection;
 
-  static Create(
-    properties: Partial<NotesDisplayCriteria>
-  ): NotesDisplayCriteria {
+  static Create(properties: Partial<NotesDisplayCriteria>): NotesDisplayCriteria {
     const criteria = new NotesDisplayCriteria();
     Object.assign(criteria, properties);
     return Object.freeze(criteria);
@@ -36,7 +31,7 @@ export class NotesDisplayCriteria {
 
   static Copy(
     criteria: NotesDisplayCriteria,
-    override: Partial<NotesDisplayCriteria>
+    override: Partial<NotesDisplayCriteria>,
   ): NotesDisplayCriteria {
     const copy = new NotesDisplayCriteria();
     Object.assign(copy, criteria);
@@ -45,29 +40,21 @@ export class NotesDisplayCriteria {
   }
 
   computeFilters(collection: ItemCollection): NoteFilter[] {
-    const systemViews = this.views.filter((t) =>
-      Object.values(SystemViewId).includes(t.uuid as SystemViewId)
-    );
-    const userSmartViews = this.views.filter(
-      (t) => !Object.values(SystemViewId).includes(t.uuid as SystemViewId)
-    );
-
     const filters: NoteFilter[] = [];
-    const allViews = systemViews.concat(userSmartViews);
-    if (allViews.length > 0) {
+
+    let viewsPredicate: CompoundPredicate<SNItem> | undefined = undefined;
+    if (this.views.length > 0) {
       const compoundPredicate = new CompoundPredicate(
         'and',
-        allViews.map((t) => t.predicate)
+        this.views.map((t) => t.predicate),
       );
+      viewsPredicate = compoundPredicate;
 
       filters.push((note) => {
         if (compoundPredicate.keypathIncludesString('tags')) {
           const noteWithTags = new NoteWithTags(
             note.payload,
-            collection.elementsReferencingElement(
-              note,
-              ContentType.Tag
-            ) as SNTag[]
+            collection.elementsReferencingElement(note, ContentType.Tag) as SNTag[],
           );
           return compoundPredicate.matchesItem(noteWithTags);
         } else {
@@ -80,24 +67,26 @@ export class NotesDisplayCriteria {
       for (const tag of this.tags) {
         filters.push((note) => tag.hasRelationshipWithItem(note));
       }
-      if (!this.includePinned) {
-        filters.push((note) => !note.pinned);
-      }
-      if (!this.includeProtected) {
-        filters.push((note) => !note.protected);
-      }
-      if (!this.includeTrashed) {
-        filters.push((note) => !note.trashed);
-      }
-      if (!this.includeArchived) {
-        filters.push((note) => !note.archived);
-      }
+    }
+
+    if (this.includePinned === false && !viewsPredicate?.keypathIncludesString('pinned')) {
+      filters.push((note) => !note.pinned);
+    }
+
+    if (this.includeProtected === false && !viewsPredicate?.keypathIncludesString('protected')) {
+      filters.push((note) => !note.protected);
+    }
+
+    if (this.includeTrashed === false && !viewsPredicate?.keypathIncludesString('trashed')) {
+      filters.push((note) => !note.trashed);
+    }
+
+    if (this.includeArchived === false && !viewsPredicate?.keypathIncludesString('archived')) {
+      filters.push((note) => !note.archived);
     }
 
     if (this.searchQuery != undefined) {
-      filters.push((note) =>
-        noteMatchesQuery(note, this.searchQuery!, collection)
-      );
+      filters.push((note) => noteMatchesQuery(note, this.searchQuery!, collection));
     }
 
     return filters;
@@ -115,7 +104,7 @@ export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
 
 export function notesMatchingCriteria(
   criteria: NotesDisplayCriteria,
-  collection: ItemCollection
+  collection: ItemCollection,
 ): SNNote[] {
   const filters = criteria.computeFilters(collection);
   const allNotes = collection.displayElements(ContentType.Note) as SNNote[];
@@ -136,30 +125,23 @@ function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
 export function noteMatchesQuery(
   noteToMatch: SNNote,
   searchQuery: SearchQuery,
-  noteCollection: ItemCollection
+  noteCollection: ItemCollection,
 ): boolean {
   const noteTags = noteCollection.elementsReferencingElement(
     noteToMatch,
-    ContentType.Tag
+    ContentType.Tag,
   ) as SNTag[];
   const someTagsMatches = noteTags.some(
-    (tag) =>
-      matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None
+    (tag) => matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None,
   );
 
   if (noteToMatch.protected && !searchQuery.includeProtectedNoteText) {
-    const match = matchTypeForNoteAndStringQuery(
-      noteToMatch,
-      searchQuery.query
-    );
+    const match = matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query);
     /** Only true if there is a match in the titles (note and/or tags) */
-    return (
-      match === Match.Title || match === Match.TitleAndText || someTagsMatches
-    );
+    return match === Match.Title || match === Match.TitleAndText || someTagsMatches;
   }
   return (
-    matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query) !==
-      Match.None || someTagsMatches
+    matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query) !== Match.None || someTagsMatches
   );
 }
 
@@ -171,10 +153,7 @@ enum Match {
   Uuid = 5,
 }
 
-function matchTypeForNoteAndStringQuery(
-  note: SNNote,
-  searchString: string
-): Match {
+function matchTypeForNoteAndStringQuery(note: SNNote, searchString: string): Match {
   if (searchString.length === 0) {
     return Match.TitleAndText;
   }
@@ -201,10 +180,7 @@ function matchTypeForNoteAndStringQuery(
   return (matchesTitle ? Match.Title : 0) + (matchesBody ? Match.Text : 0);
 }
 
-function matchTypeForTagAndStringQuery(
-  tag: SNTag,
-  searchString: string
-): Match {
+function matchTypeForTagAndStringQuery(tag: SNTag, searchString: string): Match {
   if (!tag.title || searchString.length === 0) {
     return Match.None;
   }
@@ -228,7 +204,7 @@ function stringBetweenQuotes(text: string) {
 
 function stringIsUuid(text: string) {
   const matches = text.match(
-    /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/
+    /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/,
   );
   // eslint-disable-next-line no-unneeded-ternary
   return matches ? true : false;
