@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.66.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.65.3...@standardnotes/snjs@2.66.0) (2022-02-27)
+
+
+### Features
+
+* untagged notes smart view ([#615](https://github.com/standardnotes/snjs/issues/615)) ([5b6a715](https://github.com/standardnotes/snjs/commit/5b6a7155243bbc86f1f24cd972f313d5de3811c2))
+
+
+
+
+
 ## [2.65.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.65.2...@standardnotes/snjs@2.65.3) (2022-02-27)
 
 **Note:** Version bump only for package @standardnotes/snjs
