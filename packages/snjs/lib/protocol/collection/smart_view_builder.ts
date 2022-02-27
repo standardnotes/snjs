@@ -16,7 +16,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
       content_type: ContentType.SmartView,
       content: FillItemContent({
         title: 'Notes',
-        predicate: allNotesPredicate(criteria),
+        predicate: allNotesPredicate(criteria).toJson(),
       } as SmartViewContent),
     })
   );
@@ -27,7 +27,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
       content_type: ContentType.SmartView,
       content: FillItemContent({
         title: 'Archived',
-        predicate: archivedNotesPredicate(criteria),
+        predicate: archivedNotesPredicate(criteria).toJson(),
       } as SmartViewContent),
     })
   );
@@ -38,7 +38,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
       content_type: ContentType.SmartView,
       content: FillItemContent({
         title: 'Trash',
-        predicate: trasheddNotesPredicate(criteria),
+        predicate: trashedNotesPredicate(criteria).toJson(),
       } as SmartViewContent),
     })
   );
@@ -70,7 +70,7 @@ function archivedNotesPredicate(criteria: NotesDisplayCriteria) {
   return predicate;
 }
 
-function trasheddNotesPredicate(criteria: NotesDisplayCriteria) {
+function trashedNotesPredicate(criteria: NotesDisplayCriteria) {
   const predicate = new CompoundPredicate('and', [
     new Predicate('trashed', '=', true),
     new Predicate('content_type', '=', ContentType.Note),

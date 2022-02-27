@@ -7,12 +7,17 @@ import {
   PredicateInterface,
   PredicateOperator,
   SureValue,
+  RawPredicateInArrayForm,
 } from './Interface'
 import { NotPredicate } from './NotPredicate'
 import { Predicate } from './Predicate'
 import { StringKey } from './Utils'
 
-type RawPredicateInArrayForm = string[]
+export function instanceOfPredicate<T extends ItemInterface>(
+  value: Predicate<T> | CompoundPredicate<T> | NotPredicate<T> | IncludesPredicate<T>,
+): value is Predicate<T> | CompoundPredicate<T> | NotPredicate<T> | IncludesPredicate<T> {
+  return 'matchesItem' in value
+}
 
 export function predicateFromArguments<T extends ItemInterface>(
   keypath: StringKey<T>,

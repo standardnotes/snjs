@@ -1,4 +1,8 @@
-import { PredicateInterface, predicateFromJson } from '@standardnotes/payloads';
+import {
+  predicateFromJson,
+  PredicateInterface,
+  PredicateJsonForm,
+} from '@standardnotes/payloads';
 import { SNItem } from '@Models/core/item';
 import { PurePayload } from '@standardnotes/payloads';
 
@@ -12,20 +16,22 @@ export enum SystemViewId {
 
 export interface SmartViewContent {
   title: string;
-  predicate: PredicateInterface<SNItem>;
+  predicate: PredicateJsonForm;
 }
 
 /**
  * A tag that defines a predicate that consumers can use
  * to retrieve a dynamic list of items.
  */
-export class SmartView extends SNItem implements SmartViewContent {
+export class SmartView extends SNItem {
   public readonly predicate: PredicateInterface<SNItem>;
   public readonly title: string;
 
   constructor(payload: PurePayload) {
     super(payload);
-    this.predicate = predicateFromJson(payload.safeContent.predicate);
+    this.predicate =
+      payload.safeContent.predicatewValue &&
+      predicateFromJson(payload.safeContent.predicatewValue);
     this.title = String(payload.safeContent.title || '');
   }
 }

@@ -43,6 +43,7 @@ import { NoteMutator, SNNote } from './../models/app/note';
 import {
   SMART_TAG_DSL_PREFIX,
   SmartView,
+  SmartViewContent,
   SystemViewId,
 } from './../models/app/smartTag';
 import { TagMutator } from './../models/app/tag';
@@ -736,7 +737,7 @@ export class ItemManager extends AbstractService {
     }
     const payload = CreateMaxPayloadFromAnyObject(
       {
-        uuid: await UuidGenerator.GenerateUuid(),
+        uuid: UuidGenerator.GenerateUuid(),
         content_type: contentType,
         content: content ? FillItemContent(content) : undefined,
         dirty: needsSync,
@@ -1171,7 +1172,10 @@ export class ItemManager extends AbstractService {
   ): Promise<SmartView> {
     return this.createItem(
       ContentType.SmartView,
-      FillItemContent({ title, predicate }),
+      FillItemContent({
+        title,
+        predicate: predicate.toJson(),
+      } as SmartViewContent),
       true
     ) as Promise<SmartView>;
   }

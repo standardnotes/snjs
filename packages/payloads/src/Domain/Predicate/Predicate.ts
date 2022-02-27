@@ -1,5 +1,11 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface, PredicateOperator, PrimitiveOperand, SureValue } from './Interface'
+import {
+  PredicateInterface,
+  PredicateJsonForm,
+  PredicateOperator,
+  PrimitiveOperand,
+  SureValue,
+} from './Interface'
 import { valueMatchesTargetValue } from './Operator'
 import { StringKey } from './Utils'
 
@@ -31,5 +37,13 @@ export class Predicate<T extends ItemInterface> implements PredicateInterface<T>
     }, item)
 
     return valueMatchesTargetValue(valueAtKeyPath, this.operator, this.targetValue)
+  }
+
+  toJson(): PredicateJsonForm {
+    return {
+      keypath: this.keypath,
+      operator: this.operator,
+      value: this.targetValue,
+    }
   }
 }

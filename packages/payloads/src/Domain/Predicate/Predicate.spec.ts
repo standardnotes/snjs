@@ -472,6 +472,91 @@ describe('predicates', () => {
     })
   })
 
+  describe('toJson', () => {
+    it('basic predicate', () => {
+      const predicate = new Predicate<Note>('title', 'startsWith', 'H')
+      const json = predicate.toJson()
+
+      expect(json).toStrictEqual({
+        keypath: 'title',
+        operator: 'startsWith',
+        value: 'H',
+      })
+    })
+
+    it('compound and', () => {
+      const predicate = new CompoundPredicate<Note>('and', [
+        new Predicate<Note>('title', 'startsWith', 'H'),
+        new Predicate<Note>('title', '=', 'Hello'),
+      ])
+      const json = predicate.toJson()
+
+      expect(json).toStrictEqual({
+        operator: 'and',
+        value: [
+          {
+            keypath: 'title',
+            operator: 'startsWith',
+            value: 'H',
+          },
+          {
+            keypath: 'title',
+            operator: '=',
+            value: 'Hello',
+          },
+        ],
+      })
+    })
+
+    it('not', () => {
+      const predicate = new NotPredicate<Note>(new Predicate<Note>('title', 'startsWith', 'H'))
+      const json = predicate.toJson()
+
+      expect(json).toStrictEqual({
+        operator: 'not',
+        value: {
+          keypath: 'title',
+          operator: 'startsWith',
+          value: 'H',
+        },
+      })
+    })
+
+    it('not compound', () => {
+      const predicate = new NotPredicate<Note>(
+        new CompoundPredicate<Note>('or', [
+          new Predicate<Note>('title', 'startsWith', 'H'),
+          new IncludesPredicate<Note>('tags', new Predicate<Tag>('title', '=', 'falsify')),
+        ]),
+      )
+
+      const json = predicate.toJson()
+
+      expect(json).toStrictEqual({
+        operator: 'not',
+        value: {
+          operator: 'or',
+          value: [
+            {
+              keypath: 'title',
+              operator: 'startsWith',
+              value: 'H',
+            },
+            {
+              keypath: 'tags',
+              operator: 'includes',
+              value: {
+                keypath: 'title',
+                operator: '=',
+                value: 'falsify',
+              },
+            },
+          ],
+        },
+      })
+    })
+  })
+
   describe('generators', () => {
     it('simple includes', () => {
       const json = ['B-tags', 'tags', 'includes', ['title', 'startsWith', 'b']]

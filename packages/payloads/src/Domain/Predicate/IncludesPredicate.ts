@@ -1,5 +1,5 @@
 import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface } from './Interface'
+import { PredicateInterface, PredicateJsonForm } from './Interface'
 import { StringKey } from './Utils'
 
 export class IncludesPredicate<T extends ItemInterface> implements PredicateInterface<T> {
@@ -25,5 +25,13 @@ export class IncludesPredicate<T extends ItemInterface> implements PredicateInte
 
   keypathIncludesString(verb: string): boolean {
     return this.keypath.includes(verb)
+  }
+
+  toJson(): PredicateJsonForm {
+    return {
+      keypath: this.keypath,
+      operator: 'includes',
+      value: this.predicate.toJson(),
+    }
   }
 }
