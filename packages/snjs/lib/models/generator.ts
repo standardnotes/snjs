@@ -8,7 +8,7 @@ import { SNEditor } from './app/editor';
 import { SNItem } from './core/item';
 import { SNItemsKey } from './app/items_key';
 import { SNNote } from './app/note';
-import { SmartView } from './app/smartTag';
+import { SmartView } from './app/SmartView';
 import { SNTag } from './app/tag';
 import { SNTheme } from './app/theme';
 import { SNUserPrefs } from './app/userPrefs';

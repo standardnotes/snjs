@@ -2,7 +2,7 @@ import { CollectionSortDirection, CollectionSort, ItemCollection } from '@standa
 import { SNTag } from './../../models/app/tag';
 import { ContentType } from '@standardnotes/common';
 import { SNNote } from './../../models/app/note';
-import { SmartView } from './../../models/app/smartTag';
+import { SmartView } from './../../models/app/SmartView';
 import { NoteWithTags } from './note_with_tags';
 import { CompoundPredicate } from '@standardnotes/payloads';
 import { SNItem } from '@Lib/models';

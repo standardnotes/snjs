@@ -25,7 +25,7 @@ const titles = (items) => {
   return items.map((item) => item.title).sort();
 };
 
-describe('notes and smart tags', () => {
+describe('notes and smart views', () => {
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithFakeCrypto();
   });
@@ -34,7 +34,7 @@ describe('notes and smart tags', () => {
     await Factory.safeDeinit(this.application);
   });
 
-  it('lets me create a smart tag an use it', async function () {
+  it('lets me create a smart view and use it', async function () {
     // ## The user creates 3 notes
     const [note_1, note_2, note_3] = await Promise.all([
       Factory.createMappedNote(
@@ -60,7 +60,7 @@ describe('notes and smart tags', () => {
       Factory.pinNote(this.application, note_3),
     ]);
 
-    // ## The user creates smart tags (long & pinned)
+    // ## The user creates smart views (long & pinned)
     const not_pinned = '!["Not Pinned", "pinned", "=", false]';
     const long = '!["Long", "text.length", ">", 500]';
 

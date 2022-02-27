@@ -34,7 +34,7 @@ import {
   SmartView,
   SmartViewContent,
   SystemViewId,
-} from './../models/app/smartTag';
+} from './../models/app/SmartView';
 import { TagMutator } from './../models/app/tag';
 import { ItemMutator, MutationType, SNItem } from './../models/core/item';
 import {
@@ -282,7 +282,7 @@ export class ItemManager extends AbstractService {
         return this.tagNotesIndex.allCountableNotesCount();
       }
 
-      throw Error('countableNotesForTag is not meant to be used for smart tags.');
+      throw Error('countableNotesForTag is not meant to be used for smart views.');
     }
     return this.tagNotesIndex.countableNotesForTag(tag);
   }
@@ -1096,7 +1096,7 @@ export class ItemManager extends AbstractService {
     try {
       components = JSON.parse(dsl.substring(1, dsl.length));
     } catch (e) {
-      throw Error('Invalid smart tag syntax');
+      throw Error('Invalid smart view syntax');
     }
 
     const title = components[0];
@@ -1155,7 +1155,7 @@ export class ItemManager extends AbstractService {
   }
 
   /**
-   * Returns all smart tags, sorted by title.
+   * Returns all smart views, sorted by title.
    */
   public getSmartViews(): SmartView[] {
     const userTags = this.collection.displayElements(ContentType.SmartView) as SmartView[];

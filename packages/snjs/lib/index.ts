@@ -43,7 +43,7 @@ export {
   NoteMutator,
   SNTag,
   TagMutator,
-  SNSmartTag,
+  SmartView,
   SNActionsExtension,
   ActionsExtensionMutator,
   SNTheme,

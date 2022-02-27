@@ -54,7 +54,7 @@ import {
 import { StorageEncryptionPolicies } from './services/storage_service';
 import { BackupFile } from './services/protocol_service';
 import { SyncOptions } from './services/sync/sync_service';
-import { SmartView } from './models/app/smartTag';
+import { SmartView } from './models/app/SmartView';
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item';
 import {
   Challenge,
@@ -854,8 +854,8 @@ export class SNApplication implements ListedInterface {
     return this.itemManager.getItems<T>(contentType, nonerroredOnly);
   }
 
-  public notesMatchingSmartView(smartTag: SmartView): SNNote[] {
-    return this.itemManager.notesMatchingSmartView(smartTag);
+  public notesMatchingSmartView(view: SmartView): SNNote[] {
+    return this.itemManager.notesMatchingSmartView(view);
   }
 
   public addNoteCountChangeObserver(
@@ -1024,7 +1024,7 @@ export class SNApplication implements ListedInterface {
     return this.itemManager.isSmartViewTitle(title);
   }
 
-  public getSmartTags(): SmartView[] {
+  public getSmartViews(): SmartView[] {
     return this.itemManager.getSmartViews();
   }
 

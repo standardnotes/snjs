@@ -85,7 +85,7 @@ export function predicateFromDSLString<T extends ItemInterface>(
     const predicateJson = predicateDSLArrayToJsonPredicate(components as RawPredicateInArrayForm)
     return predicateFromJson(predicateJson)
   } catch (e) {
-    throw Error(`Invalid smart tag syntax ${e}`)
+    throw Error(`Invalid smart view syntax ${e}`)
   }
 }
 

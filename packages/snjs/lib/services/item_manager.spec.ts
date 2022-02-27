@@ -1,6 +1,6 @@
 import { ItemManager, SNItem } from '@Lib/index';
 import { SNNote, NoteMutator } from '@Lib/models';
-import { SmartView, SystemViewId } from '@Lib/models/app/smartTag';
+import { SmartView, SystemViewId } from '@Lib/models/app/SmartView';
 import { SNTag, TagMutator } from '@Models/app/tag';
 import {
   FillItemContent,

@@ -1,6 +1,6 @@
 import { ContentType } from '@Lib/index';
 import { SNNote, SNTag } from '../../models';
-import { isSystemView, SmartView } from './../../models/app/smartTag';
+import { isSystemView, SmartView } from './../../models/app/SmartView';
 import { ItemDelta, SNIndex, ItemCollection } from '@standardnotes/payloads';
 import {
   criteriaForSmartView,
@@ -9,7 +9,7 @@ import {
 } from './notes_display_criteria';
 
 /**
- * A view into ItemCollection that allows filtering by tag and smart tag.
+ * A view into ItemCollection that allows filtering by tag and smart view.
  */
 export class ItemCollectionNotesView implements SNIndex {
   private displayedNotes: SNNote[] = [];
