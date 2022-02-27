@@ -8,6 +8,7 @@ export enum SystemViewId {
   AllNotes = 'all-notes',
   ArchivedNotes = 'archived-notes',
   TrashedNotes = 'trashed-notes',
+  UntaggedNotes = 'untagged-notes'
 }
 
 export interface SmartViewContent {

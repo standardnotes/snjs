@@ -1142,6 +1142,12 @@ export class ItemManager extends AbstractService {
     return this.systemSmartViews.find((tag) => tag.uuid === SystemViewId.TrashedNotes) as SmartView;
   }
 
+  public get untaggedNotesSmartView(): SmartView {
+    return this.systemSmartViews.find(
+      (tag) => tag.uuid === SystemViewId.UntaggedNotes,
+    ) as SmartView;
+  }
+
   public get trashedItems(): SNNote[] {
     return this.notesMatchingSmartView(this.trashSmartView);
   }
