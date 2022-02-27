@@ -67,7 +67,9 @@ export function predicateFromJson<T extends ItemInterface>(
   return predicateFromArguments(
     values.keypath as StringKey<T>,
     values.operator,
-    values.value as PredicateJsonForm,
+    isValuePredicateInArrayForm(values.value)
+      ? predicateDSLArrayToJsonPredicate(values.value)
+      : (values.value as PredicateJsonForm),
   )
 }
 
@@ -82,6 +84,12 @@ export function predicateFromDSLString<T extends ItemInterface>(
   } catch (e) {
     throw Error(`Invalid smart view syntax ${e}`)
   }
+}
+
+function isValuePredicateInArrayForm(
+  value: SureValue | PredicateJsonForm | PredicateJsonForm[] | RawPredicateInArrayForm,
+): value is RawPredicateInArrayForm {
+  return Array.isArray(value) && AllPredicateOperators.includes(value[1] as PredicateOperator)
 }
 
 function predicateDSLArrayToJsonPredicate(
@@ -106,7 +114,7 @@ function predicateDSLArrayToJsonPredicate(
       resolvedPredicateValue = level2CondensedValue.map((subPredicate) =>
         predicateDSLArrayToJsonPredicate(subPredicate),
       )
-    } else if (AllPredicateOperators.includes(predicateValue[1] as PredicateOperator)) {
+    } else if (isValuePredicateInArrayForm(predicateValue[1])) {
       const level2CondensedValue = level1CondensedValue as RawPredicateInArrayForm
       resolvedPredicateValue = predicateDSLArrayToJsonPredicate(level2CondensedValue)
     } else {

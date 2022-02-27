@@ -35,26 +35,8 @@ export type {
   DeviceInterface,
   ServiceInterface,
 } from '@standardnotes/services';
-export {
-  SNItem,
-  ItemMutator,
-  SNItemsKey,
-  SNNote,
-  NoteMutator,
-  SNTag,
-  TagMutator,
-  SmartView,
-  SNActionsExtension,
-  ActionsExtensionMutator,
-  SNTheme,
-  ThemeMutator,
-  SNComponent,
-  ComponentMutator,
-  SNEditor,
-  SNUserPrefs,
-  UserPrefsMutator,
-  PrefKey,
-} from './models';
+
+export * from './models';
 
 export type { PrefValue, Action } from './models';
 export { MutationType } from '@Models/core/item';

@@ -9,7 +9,7 @@ export type RawPredicateInArrayForm = string[]
 export interface PredicateJsonForm {
   keypath?: string
   operator: PredicateOperator
-  value: SureValue | PredicateJsonForm | PredicateJsonForm[]
+  value: SureValue | PredicateJsonForm | PredicateJsonForm[] | RawPredicateInArrayForm
 }
 
 export const AllPredicateCompoundOperators = ['and', 'or'] as const

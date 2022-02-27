@@ -170,11 +170,11 @@ export class ItemManager extends AbstractService {
     this.notesView.setCriteria(updatedCriteria);
   }
 
-  public getDisplayableItems(contentType: ContentType): SNItem[] {
+  public getDisplayableItems<T extends SNItem>(contentType: ContentType): T[] {
     if (contentType === ContentType.Note) {
-      return this.notesView.displayElements();
+      return (this.notesView.displayElements() as unknown) as T[];
     }
-    return this.collection.displayElements(contentType);
+    return (this.collection.displayElements(contentType) as unknown) as T[];
   }
 
   public deinit(): void {
