@@ -7,4 +7,8 @@ export class NoteWithTags extends SNNote {
     super(payload);
     this.tags = tags || payload.safeContent.tags;
   }
+
+  get tagsCount(): number {
+    return this.tags?.length || 0;
+  }
 }

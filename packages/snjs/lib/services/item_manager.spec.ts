@@ -54,9 +54,7 @@ describe('itemManager', () => {
     itemManager = {} as jest.Mocked<ItemManager>;
     itemManager.getItems = jest.fn().mockReturnValue(items);
     itemManager.createItem = jest.fn();
-    itemManager.changeComponent = jest
-      .fn()
-      .mockReturnValue({} as jest.Mocked<SNItem>);
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<SNItem>);
     itemManager.setItemsToBeDeleted = jest.fn();
     itemManager.addObserver = jest.fn();
     itemManager.changeItem = jest.fn();
@@ -71,7 +69,7 @@ describe('itemManager', () => {
         content: FillItemContent({
           title: title,
         }),
-      })
+      }),
     );
   };
 
@@ -83,7 +81,7 @@ describe('itemManager', () => {
         content: FillItemContent({
           title: title,
         }),
-      })
+      }),
     );
   };
 
@@ -161,10 +159,7 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, duplicateNameChild);
 
       const a = await itemManager.findTagByTitleAndParent('name1', undefined);
-      const b = await itemManager.findTagByTitleAndParent(
-        'name1',
-        parent?.uuid
-      );
+      const b = await itemManager.findTagByTitleAndParent('name1', parent?.uuid);
       const c = await itemManager.findTagByTitleAndParent('name1', child?.uuid);
 
       expect(a?.uuid).toEqual(parent.uuid);
@@ -181,18 +176,9 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child);
 
       const childA = await itemManager.findOrCreateTagByTitle('child');
-      const childB = await itemManager.findOrCreateTagByTitle(
-        'child',
-        parent.uuid
-      );
-      const childC = await itemManager.findOrCreateTagByTitle(
-        'child-bis',
-        parent.uuid
-      );
-      const childD = await itemManager.findOrCreateTagByTitle(
-        'child-bis',
-        parent.uuid
-      );
+      const childB = await itemManager.findOrCreateTagByTitle('child', parent.uuid);
+      const childC = await itemManager.findOrCreateTagByTitle('child-bis', parent.uuid);
+      const childD = await itemManager.findOrCreateTagByTitle('child-bis', parent.uuid);
 
       expect(childA.uuid).not.toEqual(child.uuid);
       expect(childB.uuid).toEqual(child.uuid);
@@ -213,18 +199,9 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child);
 
       const a = await itemManager.findOrCreateTagParentChain(['parent']);
-      const b = await itemManager.findOrCreateTagParentChain([
-        'parent',
-        'child',
-      ]);
-      const c = await itemManager.findOrCreateTagParentChain([
-        'parent',
-        'child2',
-      ]);
-      const d = await itemManager.findOrCreateTagParentChain([
-        'parent2',
-        'child1',
-      ]);
+      const b = await itemManager.findOrCreateTagParentChain(['parent', 'child']);
+      const c = await itemManager.findOrCreateTagParentChain(['parent', 'child2']);
+      const d = await itemManager.findOrCreateTagParentChain(['parent2', 'child1']);
 
       expect(a?.uuid).toEqual(parent.uuid);
       expect(b?.uuid).toEqual(child.uuid);
@@ -249,31 +226,17 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child);
       await itemManager.setTagParent(grandParent, parent);
 
-      expect(itemManager.isTagAncestor(grandParent.uuid, parent.uuid)).toEqual(
-        true
-      );
-      expect(itemManager.isTagAncestor(grandParent.uuid, child.uuid)).toEqual(
-        true
-      );
+      expect(itemManager.isTagAncestor(grandParent.uuid, parent.uuid)).toEqual(true);
+      expect(itemManager.isTagAncestor(grandParent.uuid, child.uuid)).toEqual(true);
       expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toEqual(true);
 
-      expect(
-        itemManager.isTagAncestor(parent.uuid, grandParent.uuid)
-      ).toBeFalsy();
-      expect(
-        itemManager.isTagAncestor(child.uuid, grandParent.uuid)
-      ).toBeFalsy();
-      expect(
-        itemManager.isTagAncestor(grandParent.uuid, grandParent.uuid)
-      ).toBeFalsy();
+      expect(itemManager.isTagAncestor(parent.uuid, grandParent.uuid)).toBeFalsy();
+      expect(itemManager.isTagAncestor(child.uuid, grandParent.uuid)).toBeFalsy();
+      expect(itemManager.isTagAncestor(grandParent.uuid, grandParent.uuid)).toBeFalsy();
 
-      expect(
-        itemManager.isTagAncestor(another.uuid, grandParent.uuid)
-      ).toBeFalsy();
+      expect(itemManager.isTagAncestor(another.uuid, grandParent.uuid)).toBeFalsy();
       expect(itemManager.isTagAncestor(child.uuid, another.uuid)).toBeFalsy();
-      expect(
-        itemManager.isTagAncestor(grandParent.uuid, another.uuid)
-      ).toBeFalsy();
+      expect(itemManager.isTagAncestor(grandParent.uuid, another.uuid)).toBeFalsy();
     });
 
     it('unsetTagRelationship', async () => {
@@ -295,26 +258,15 @@ describe('itemManager', () => {
       const grandParent = createTag('grandParent');
       const parent = createTag('parent');
       const child = createTag('child');
-      await itemManager.insertItems([
-        greatGrandParent,
-        grandParent,
-        parent,
-        child,
-      ]);
+      await itemManager.insertItems([greatGrandParent, grandParent, parent, child]);
       await itemManager.setTagParent(parent, child);
       await itemManager.setTagParent(grandParent, parent);
       await itemManager.setTagParent(greatGrandParent, grandParent);
 
-      const uuidChain = itemManager
-        .getTagParentChain(child.uuid)
-        .map((tag) => tag.uuid);
+      const uuidChain = itemManager.getTagParentChain(child.uuid).map((tag) => tag.uuid);
 
       expect(uuidChain).toHaveLength(3);
-      expect(uuidChain).toEqual([
-        greatGrandParent.uuid,
-        grandParent.uuid,
-        parent.uuid,
-      ]);
+      expect(uuidChain).toEqual([greatGrandParent.uuid, grandParent.uuid, parent.uuid]);
     });
 
     it('viewing notes for parent tag should not display notes of children', async () => {
@@ -395,14 +347,9 @@ describe('itemManager', () => {
       itemManager = createService();
       setupRandomUuid();
 
-      const [
-        systemTag1,
-        ...restOfSystemViews
-      ] = itemManager
+      const [systemTag1, ...restOfSystemViews] = itemManager
         .getSmartViews()
-        .filter((view) =>
-          Object.values(SystemViewId).includes(view.uuid as SystemViewId)
-        );
+        .filter((view) => Object.values(SystemViewId).includes(view.uuid as SystemViewId));
 
       const isSystemTemplate = itemManager.isTemplateItem(systemTag1);
       expect(isSystemTemplate).toEqual(false);
@@ -479,7 +426,7 @@ describe('itemManager', () => {
     });
   });
 
-  describe('tags and smart views', () => {
+  describe('smart views', () => {
     it('lets me create a smart view', async () => {
       itemManager = createService();
       setupRandomUuid();
@@ -503,10 +450,7 @@ describe('itemManager', () => {
       itemManager = createService();
       setupRandomUuid();
 
-      const view = await itemManager.createSmartView(
-        'Not Pinned',
-        NotPinnedPredicate
-      );
+      const view = await itemManager.createSmartView('Not Pinned', NotPinnedPredicate);
 
       const notes = itemManager.notesMatchingSmartView(view);
 
@@ -560,10 +504,7 @@ describe('itemManager', () => {
     itemManager = createService();
     setupRandomUuid();
 
-    const tag = await itemManager.createSmartView(
-      'Not Pinned',
-      NotPinnedPredicate
-    );
+    const tag = await itemManager.createSmartView('Not Pinned', NotPinnedPredicate);
 
     await itemManager.changeItem<TagMutator>(tag.uuid, (m) => {
       m.title = 'New Title';
@@ -573,21 +514,36 @@ describe('itemManager', () => {
     const views = itemManager.getSmartViews();
 
     expect(view.title).toEqual('New Title');
-    expect(views.some((tag: SmartView) => tag.title === 'New Title')).toEqual(
-      true
-    );
+    expect(views.some((tag: SmartView) => tag.title === 'New Title')).toEqual(true);
   });
 
   it('lets me find a smart view', async () => {
     itemManager = createService();
     setupRandomUuid();
 
-    const tag = await itemManager.createSmartView(
-      'Not Pinned',
-      NotPinnedPredicate
-    );
+    const tag = await itemManager.createSmartView('Not Pinned', NotPinnedPredicate);
 
     const view = itemManager.findItem(tag.uuid) as SmartView;
+
+    expect(view).toBeDefined();
+  });
+
+  it('untagged notes smart view', async () => {
+    itemManager = createService();
+    setupRandomUuid();
+
+    const view = itemManager.untaggedNotesSmartView;
+
+    const tag = createTag('tag');
+    const untaggedNote = createNote('note');
+    const taggedNote = createNote('taggedNote');
+    await itemManager.insertItems([tag, untaggedNote, taggedNote]);
+
+    expect(itemManager.notesMatchingSmartView(view)).toHaveLength(2);
+
+    await itemManager.addTagToNote(taggedNote, tag);
+
+    expect(itemManager.notesMatchingSmartView(view)).toHaveLength(1);
 
     expect(view).toBeDefined();
   });
