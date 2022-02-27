@@ -1,4 +1,3 @@
-import { AllPredicateOperators, RawPredicateInArrayForm } from '.'
 import { ItemInterface } from './../Item/ItemInterface'
 import { CompoundPredicate } from './CompoundPredicate'
 import { IncludesPredicate } from './IncludesPredicate'
@@ -9,16 +8,12 @@ import {
   PredicateOperator,
   SureValue,
   PredicateJsonForm,
+  AllPredicateOperators,
+  RawPredicateInArrayForm,
 } from './Interface'
 import { NotPredicate } from './NotPredicate'
 import { Predicate } from './Predicate'
 import { StringKey } from './Utils'
-
-export function instanceOfPredicate<T extends ItemInterface>(
-  value: Predicate<T> | CompoundPredicate<T> | NotPredicate<T> | IncludesPredicate<T>,
-): value is Predicate<T> | CompoundPredicate<T> | NotPredicate<T> | IncludesPredicate<T> {
-  return 'matchesItem' in value
-}
 
 export function predicateFromArguments<T extends ItemInterface>(
   keypath: StringKey<T> | undefined,

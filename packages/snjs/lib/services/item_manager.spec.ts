@@ -13,7 +13,7 @@ import { NotesDisplayCriteria } from './../protocol/collection/notes_display_cri
 import { PayloadManager } from './payload_manager';
 
 const setupRandomUuid = () => {
-  UuidGenerator.SetGenerators(() => String(Math.random()));
+  UuidGenerator.SetGenerator(() => String(Math.random()));
 };
 
 const VIEW_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]';

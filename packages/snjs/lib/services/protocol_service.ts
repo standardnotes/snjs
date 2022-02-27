@@ -153,7 +153,7 @@ export class SNProtocolService
     this.storageService = storageService;
     this.crypto = crypto;
 
-    UuidGenerator.SetGenerators(this.crypto.generateUUID);
+    UuidGenerator.SetGenerator(this.crypto.generateUUID);
 
     /** Hide rootKey enumeration */
     Object.defineProperty(this, 'rootKey', {

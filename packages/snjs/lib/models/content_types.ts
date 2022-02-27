@@ -6,7 +6,7 @@ export function displayStringForContentType(
   const map: Record<string, string> = {
     [ContentType.Note]: 'note',
     [ContentType.Tag]: 'tag',
-    [ContentType.SmartView]: 'smart tag',
+    [ContentType.SmartView]: 'smart view',
     [ContentType.ActionsExtension]: 'action-based extension',
     [ContentType.Component]: 'component',
     [ContentType.Editor]: 'editor',

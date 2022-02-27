@@ -1,6 +1,6 @@
 /**
  * An abstract class with no instance methods. Used globally to generate uuids by any
- * consumer. Application must call SetGenerators before use.
+ * consumer. Application must call SetGenerator before use.
  */
 export class UuidGenerator {
   private static syncUuidFunc: () => string;
@@ -8,7 +8,7 @@ export class UuidGenerator {
   /**
    * @param {function} syncImpl - A syncronous function that returns a UUID.
    */
-  static SetGenerators(syncImpl: () => string): void {
+  static SetGenerator(syncImpl: () => string): void {
     this.syncUuidFunc = syncImpl
   }
 
