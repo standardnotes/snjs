@@ -20,7 +20,7 @@ export class ListedService extends AbstractService implements ListedInterface {
     private apiService: SNApiService,
     private itemManager: ItemManager,
     private settingsService: SNSettingsService,
-    private httpSerivce: SNHttpService
+    private httpSerivce: SNHttpService,
   ) {
     super()
   }
@@ -61,16 +61,14 @@ export class ListedService extends AbstractService implements ListedInterface {
 
   public async getListedAccountInfo(
     account: ListedAccount,
-    inContextOfItem?: UuidString
+    inContextOfItem?: UuidString,
   ): Promise<ListedAccountInfo | undefined> {
     const hostUrl = account.hostUrl
     let url = `${hostUrl}/authors/${account.authorId}/extension?secret=${account.secret}`
     if (inContextOfItem) {
       url += `&item_uuid=${inContextOfItem}`
     }
-    const response = (await this.httpSerivce.getAbsolute(
-      url
-    )) as ListedAccountInfoResponse
+    const response = (await this.httpSerivce.getAbsolute(url)) as ListedAccountInfoResponse
     if (response.error || !response.data) {
       return undefined
     }
@@ -79,9 +77,7 @@ export class ListedService extends AbstractService implements ListedInterface {
   }
 
   private async getSettingsBasedListedAccounts(): Promise<ListedAccount[]> {
-    const response = await this.settingsService.getSetting(
-      SettingName.ListedAuthorSecrets
-    )
+    const response = await this.settingsService.getSetting(SettingName.ListedAuthorSecrets)
     if (!response) {
       return []
     }
@@ -91,9 +87,7 @@ export class ListedService extends AbstractService implements ListedInterface {
 
   private getLegacyListedAccounts(): ListedAccount[] {
     const extensions = this.itemManager
-      .nonErroredItemsForContentType<SNActionsExtension>(
-        ContentType.ActionsExtension
-      )
+      .nonErroredItemsForContentType<SNActionsExtension>(ContentType.ActionsExtension)
       .filter((extension) => extension.isListedExtension)
 
     const accounts: ListedAccount[] = []

@@ -10,12 +10,12 @@ import { UuidGenerator } from '@standardnotes/utils'
 import { timingSafeEqual } from '@standardnotes/sncrypto-common'
 
 export type RootKeyContent = {
-  version: ProtocolVersion;
-  masterKey: string;
-  serverPassword?: string;
-  dataAuthenticationKey?: string;
-  keyParams: AnyKeyParamsContent;
-};
+  version: ProtocolVersion
+  masterKey: string
+  serverPassword?: string
+  dataAuthenticationKey?: string
+  keyParams: AnyKeyParamsContent
+}
 
 /**
  * A root key is a local only construct that houses the key used for the encryption
@@ -121,13 +121,10 @@ export class SNRootKey extends SNItem {
     if (this.keyVersion !== otherKey.keyVersion) {
       return false
     }
-    const hasServerPassword = !!(
-      this.serverPassword && otherKey.serverPassword
-    )
+    const hasServerPassword = !!(this.serverPassword && otherKey.serverPassword)
     return (
       timingSafeEqual(this.masterKey, otherKey.masterKey) &&
-      (!hasServerPassword ||
-        timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
+      (!hasServerPassword || timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
     )
   }
 

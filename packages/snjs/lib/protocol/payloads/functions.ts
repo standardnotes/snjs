@@ -12,24 +12,19 @@ import {
 import { CreateItemFromPayload } from '@Models/generator'
 import { ContentType } from '@standardnotes/common'
 import { UuidGenerator, extendArray } from '@standardnotes/utils'
-import {
-  ComponentMutator,
-  SNComponent,
-} from './../../models/app/component'
+import { ComponentMutator, SNComponent } from './../../models/app/component'
 import { ComponentArea } from '@standardnotes/features'
 import { MutationType } from './../../models/core/item'
 
 function NoteDuplicationAffectedPayloads(
   basePayload: PurePayload,
   duplicatePayload: PurePayload,
-  baseCollection: ImmutablePayloadCollection
+  baseCollection: ImmutablePayloadCollection,
 ) {
   /** If note has editor, maintain editor relationship in duplicate note */
-  const components = baseCollection
-    .all(ContentType.Component)
-    .map((payload) => {
-      return CreateItemFromPayload(payload)
-    }) as SNComponent[]
+  const components = baseCollection.all(ContentType.Component).map((payload) => {
+    return CreateItemFromPayload(payload)
+  }) as SNComponent[]
   const editor = components
     .filter((c) => c.area === ComponentArea.Editor)
     .find((e) => {
@@ -57,7 +52,7 @@ export async function PayloadsByDuplicating(
   payload: PayloadInterface,
   baseCollection: ImmutablePayloadCollection,
   isConflict: boolean,
-  additionalContent?: Partial<PayloadContent>
+  additionalContent?: Partial<PayloadContent>,
 ): Promise<PayloadInterface[]> {
   if (payload.errorDecrypting) {
     throw Error('Attempting to duplicate errored payload')
@@ -88,7 +83,7 @@ export async function PayloadsByDuplicating(
   const updatedReferencing = PayloadsByUpdatingReferencingPayloadReferences(
     payload,
     baseCollection,
-    [copy]
+    [copy],
   )
   extendArray(results, updatedReferencing)
 
@@ -107,10 +102,7 @@ export async function PayloadsByDuplicating(
  * Compares the .content fields for equality, creating new SNItem objects
  * to properly handle .content intricacies.
  */
-export function PayloadContentsEqual(
-  payloadA: PurePayload,
-  payloadB: PurePayload
-): boolean {
+export function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload): boolean {
   const itemA = CreateItemFromPayload(payloadA)
   const itemB = CreateItemFromPayload(payloadB)
   return itemA.isItemContentEqualWith(itemB)

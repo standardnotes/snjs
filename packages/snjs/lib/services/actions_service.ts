@@ -1,10 +1,5 @@
 import { ChallengeService } from './challenge/challenge_service'
-import {
-  Challenge,
-  ChallengePrompt,
-  ChallengeValidation,
-  ChallengeReason,
-} from './../challenges'
+import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from './../challenges'
 import { ListedService } from './listed_service'
 import { CreateItemFromPayload } from '@Models/generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
@@ -54,7 +49,7 @@ export class SNActionsService extends AbstractService {
     private protocolService: SNProtocolService,
     private syncService: SNSyncService,
     private challengeService: ChallengeService,
-    private listedService: ListedService
+    private listedService: ListedService,
   ) {
     super()
     this.previousPasswords = []
@@ -62,26 +57,24 @@ export class SNActionsService extends AbstractService {
 
   /** @override */
   public deinit(): void {
-    (this.itemManager as unknown) = undefined;
-    (this.alertService as unknown) = undefined;
-    (this.deviceInterface as unknown) = undefined;
-    (this.httpService as unknown) = undefined;
-    (this.payloadManager as unknown) = undefined;
-    (this.listedService as unknown) = undefined;
-    (this.challengeService as unknown) = undefined;
-    (this.protocolService as unknown) = undefined;
-    (this.syncService as unknown) = undefined
+    ;(this.itemManager as unknown) = undefined
+    ;(this.alertService as unknown) = undefined
+    ;(this.deviceInterface as unknown) = undefined
+    ;(this.httpService as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    ;(this.listedService as unknown) = undefined
+    ;(this.challengeService as unknown) = undefined
+    ;(this.protocolService as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
     this.previousPasswords.length = 0
     super.deinit()
   }
 
   public getExtensions(): SNActionsExtension[] {
     const extensionItems = this.itemManager.nonErroredItemsForContentType<SNActionsExtension>(
-      ContentType.ActionsExtension
+      ContentType.ActionsExtension,
     )
-    const excludingListed = extensionItems.filter(
-      (extension) => !extension.isListedExtension
-    )
+    const excludingListed = extensionItems.filter((extension) => !extension.isListedExtension)
     return excludingListed
   }
 
@@ -102,7 +95,7 @@ export class SNActionsService extends AbstractService {
    */
   public async loadExtensionInContextOfItem(
     extension: SNActionsExtension,
-    item: SNItem
+    item: SNItem,
   ): Promise<SNActionsExtension | undefined> {
     const params = {
       content_type: item.content_type,
@@ -118,13 +111,9 @@ export class SNActionsService extends AbstractService {
       return
     }
     const description = response.description || extension.description
-    const supported_types =
-      response.supported_types || extension.supported_types
+    const supported_types = response.supported_types || extension.supported_types
     const actions = response.actions || []
-    const mutator = new ActionsExtensionMutator(
-      extension,
-      MutationType.UserInteraction
-    )
+    const mutator = new ActionsExtensionMutator(extension, MutationType.UserInteraction)
 
     mutator.deprecation = response.deprecation
     mutator.description = description
@@ -135,23 +124,20 @@ export class SNActionsService extends AbstractService {
     return CreateItemFromPayload(payloadResult) as SNActionsExtension
   }
 
-  public async runAction(
-    action: Action,
-    item: SNItem
-  ): Promise<ActionResponse | undefined> {
+  public async runAction(action: Action, item: SNItem): Promise<ActionResponse | undefined> {
     let result
     switch (action.verb) {
-    case 'render':
-      result = await this.handleRenderAction(action)
-      break
-    case 'show':
-      result = await this.handleShowAction(action)
-      break
-    case 'post':
-      result = await this.handlePostAction(action, item)
-      break
-    default:
-      break
+      case 'render':
+        result = await this.handleRenderAction(action)
+        break
+      case 'show':
+        result = await this.handleShowAction(action)
+        break
+      case 'post':
+        result = await this.handlePostAction(action, item)
+        break
+      default:
+        break
     }
     return result
   }
@@ -160,9 +146,7 @@ export class SNActionsService extends AbstractService {
     const response = await this.httpService
       .getAbsolute(action.url)
       .then(async (response) => {
-        const payload = await this.payloadByDecryptingResponse(
-          response as ActionResponse
-        )
+        const payload = await this.payloadByDecryptingResponse(response as ActionResponse)
         if (payload) {
           const item = CreateItemFromPayload(payload)
           return {
@@ -173,8 +157,7 @@ export class SNActionsService extends AbstractService {
       })
       .catch((response) => {
         const error = (response && response.error) || {
-          message:
-            'An issue occurred while processing this action. Please try again.',
+          message: 'An issue occurred while processing this action. Please try again.',
         }
         this.alertService.alert(error.message)
         return { error } as HttpResponse
@@ -186,21 +169,16 @@ export class SNActionsService extends AbstractService {
   private async payloadByDecryptingResponse(
     response: ActionResponse,
     key?: SNRootKey,
-    triedPasswords: string[] = []
+    triedPasswords: string[] = [],
   ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item)
 
     if (!payload.enc_item_key) {
-      this.alertService.alert(
-        'This revision is missing its key and cannot be recovered.'
-      )
+      this.alertService.alert('This revision is missing its key and cannot be recovered.')
       return
     }
 
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
-      payload,
-      key
-    )
+    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(payload, key)
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload
     }
@@ -208,7 +186,7 @@ export class SNActionsService extends AbstractService {
     for (const itemsKey of this.itemManager.itemsKeys()) {
       const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
         payload,
-        itemsKey
+        itemsKey,
       )
       if (!decryptedPayload.errorDecrypting) {
         return decryptedPayload
@@ -225,7 +203,7 @@ export class SNActionsService extends AbstractService {
         'We were unable to decrypt this revision using your current keys, ' +
           'and this revision is missing metadata that would allow us to try different ' +
           'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
-          'Please email help@standardnotes.com for assistance.'
+          'Please email help@standardnotes.com for assistance.',
       )
       return undefined
     }
@@ -237,17 +215,14 @@ export class SNActionsService extends AbstractService {
         continue
       }
       triedPasswords.push(passwordCandidate)
-      const key = await this.protocolService.computeRootKey(
-        passwordCandidate,
-        keyParams
-      )
+      const key = await this.protocolService.computeRootKey(passwordCandidate, keyParams)
       if (!key) {
         continue
       }
       const nestedResponse: any = await this.payloadByDecryptingResponse(
         response,
         key,
-        triedPasswords
+        triedPasswords,
       )
       if (nestedResponse) {
         return nestedResponse
@@ -270,22 +245,13 @@ export class SNActionsService extends AbstractService {
 
   private async promptForLegacyPassword(): Promise<string | undefined> {
     const challenge = new Challenge(
-      [
-        new ChallengePrompt(
-          ChallengeValidation.None,
-          'Previous Password',
-          undefined,
-          true
-        ),
-      ],
+      [new ChallengePrompt(ChallengeValidation.None, 'Previous Password', undefined, true)],
       ChallengeReason.Custom,
       true,
-      'Unable to find key for revision. Please enter the account password you may have used at the time of the revision.'
+      'Unable to find key for revision. Please enter the account password you may have used at the time of the revision.',
     )
 
-    const response = await this.challengeService.promptForChallengeResponse(
-      challenge
-    )
+    const response = await this.challengeService.promptForChallengeResponse(challenge)
 
     return response?.getDefaultValue().value as string
   }
@@ -303,7 +269,7 @@ export class SNActionsService extends AbstractService {
       .catch((response) => {
         console.error('Action error response:', response)
         this.alertService!.alert(
-          'An issue occurred while processing this action. Please try again.'
+          'An issue occurred while processing this action. Please try again.',
         )
         return response as ActionResponse
       })
@@ -315,12 +281,10 @@ export class SNActionsService extends AbstractService {
   }
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
-    const intent = decrypted
-      ? EncryptionIntent.FileDecrypted
-      : EncryptionIntent.FileEncrypted
+    const intent = decrypted ? EncryptionIntent.FileDecrypted : EncryptionIntent.FileEncrypted
     const encrypted = await this.protocolService!.payloadByEncryptingPayload(
       item.payloadRepresentation(),
-      intent
+      intent,
     )
     return encrypted.ejected()
   }

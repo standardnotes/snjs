@@ -17,7 +17,7 @@ const create = (title: string, references?: ContentReference[]): SNTag => {
         title,
         references,
       }),
-    })
+    }),
   )
 
   return tag

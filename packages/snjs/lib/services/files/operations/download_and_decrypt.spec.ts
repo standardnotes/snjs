@@ -1,10 +1,6 @@
 import { sleep } from '@standardnotes/utils'
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import {
-  RemoteFileInterface,
-  FilesApi,
-  EncryptedFileInterface,
-} from './../types'
+import { RemoteFileInterface, FilesApi, EncryptedFileInterface } from './../types'
 import { DownloadAndDecryptFileOperation } from './download_and_decrypt'
 
 describe('download and decrypt', () => {
@@ -25,7 +21,7 @@ describe('download and decrypt', () => {
           _chunkIndex: number,
           _apiToken: string,
           _rangeStart: number,
-          onBytesReceived: (bytes: Uint8Array) => void
+          onBytesReceived: (bytes: Uint8Array) => void,
         ) => {
           const receiveFile = async () => {
             for (let i = 0; i < NumChunks; i++) {
@@ -37,7 +33,7 @@ describe('download and decrypt', () => {
           return new Promise<void>((resolve) => {
             receiveFile().then(resolve)
           })
-        }
+        },
       )
 
     crypto = {} as jest.Mocked<SNPureCrypto>
@@ -79,7 +75,7 @@ describe('download and decrypt', () => {
         }
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      () => {}
+      () => {},
     )
 
     operation['decryptor'].decryptBytes = jest.fn().mockImplementation(() => {

@@ -40,13 +40,13 @@ export enum ValueModesKeys {
   /* Lives outside of wrapped/unwrapped */
   Nonwrapped = 'nonwrapped',
 }
-type ValuesObjectRecord = Record<string, any>;
+type ValuesObjectRecord = Record<string, any>
 
 export type StorageValuesObject = {
-  [ValueModesKeys.Wrapped]: ValuesObjectRecord;
-  [ValueModesKeys.Unwrapped]?: ValuesObjectRecord;
-  [ValueModesKeys.Nonwrapped]: ValuesObjectRecord;
-};
+  [ValueModesKeys.Wrapped]: ValuesObjectRecord
+  [ValueModesKeys.Unwrapped]?: ValuesObjectRecord
+  [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
+}
 
 /**
  * The storage service is responsible for persistence of both simple key-values, and payload
@@ -72,7 +72,7 @@ export class SNStorageService extends AbstractService {
     deviceInterface: DeviceInterface,
     private alertService: SNAlertService,
     private identifier: string,
-    private environment: Environment
+    private environment: Environment,
   ) {
     super()
     this.deviceInterface = deviceInterface
@@ -81,8 +81,8 @@ export class SNStorageService extends AbstractService {
   }
 
   public deinit() {
-    this.deviceInterface = undefined;
-    (this.encryptionDelegate as unknown) = undefined
+    this.deviceInterface = undefined
+    ;(this.encryptionDelegate as unknown) = undefined
     this.storagePersistable = false
     super.deinit()
   }
@@ -95,18 +95,14 @@ export class SNStorageService extends AbstractService {
         this.persistValuesToDisk()
       }
     } else if (stage === ApplicationStage.StorageDecrypted_09) {
-      const persistedPolicy = await this.getValue(
-        StorageKey.StorageEncryptionPolicy
-      )
+      const persistedPolicy = await this.getValue(StorageKey.StorageEncryptionPolicy)
       if (persistedPolicy) {
         this.setEncryptionPolicy(persistedPolicy, false)
       }
     }
   }
 
-  public async setPersistencePolicy(
-    persistencePolicy: StoragePersistencePolicies
-  ) {
+  public async setPersistencePolicy(persistencePolicy: StoragePersistencePolicies) {
     this.persistencePolicy = persistencePolicy
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       await this.deviceInterface!.removeAllRawStorageValues()
@@ -114,10 +110,7 @@ export class SNStorageService extends AbstractService {
     }
   }
 
-  public async setEncryptionPolicy(
-    encryptionPolicy: StorageEncryptionPolicies,
-    persist = true
-  ) {
+  public async setEncryptionPolicy(encryptionPolicy: StorageEncryptionPolicies, persist = true) {
     if (
       encryptionPolicy === StorageEncryptionPolicies.Disabled &&
       this.environment !== Environment.Mobile
@@ -135,9 +128,7 @@ export class SNStorageService extends AbstractService {
   }
 
   public async initializeFromDisk() {
-    const value = await this.deviceInterface!.getRawStorageValue(
-      this.getPersistenceKey()
-    )
+    const value = await this.deviceInterface!.getRawStorageValue(this.getPersistenceKey())
     const values = value ? JSON.parse(value as any) : undefined
     this.setInitialValues(values)
   }
@@ -158,9 +149,7 @@ export class SNStorageService extends AbstractService {
 
   public isStorageWrapped() {
     const wrappedValue = this.values[ValueModesKeys.Wrapped]
-    return (
-      !isNullOrUndefined(wrappedValue) && Object.keys(wrappedValue).length > 0
-    )
+    return !isNullOrUndefined(wrappedValue) && Object.keys(wrappedValue).length > 0
   }
 
   public async canDecryptWithKey(key: SNRootKey) {
@@ -181,10 +170,7 @@ export class SNStorageService extends AbstractService {
     const payload = CreateMaxPayloadFromAnyObject(wrappedValue, {
       content_type: ContentType.EncryptedStorage,
     })
-    const decryptedPayload = await this.encryptionDelegate!.payloadByDecryptingPayload(
-      payload,
-      key
-    )
+    const decryptedPayload = await this.encryptionDelegate!.payloadByDecryptingPayload(payload, key)
     return decryptedPayload
   }
 
@@ -194,9 +180,7 @@ export class SNStorageService extends AbstractService {
     if (decryptedPayload.errorDecrypting) {
       throw SNLog.error(Error('Unable to decrypt storage.'))
     }
-    this.values[ValueModesKeys.Unwrapped] = Copy(
-      decryptedPayload.contentObject
-    )
+    this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject)
   }
 
   /** @todo This function should be debounced. */
@@ -219,7 +203,7 @@ export class SNStorageService extends AbstractService {
       const values = await this.generatePersistableValues()
       await this.deviceInterface?.setRawStorageValue(
         this.getPersistenceKey(),
-        JSON.stringify(values)
+        JSON.stringify(values),
       )
       return values
     })
@@ -239,7 +223,7 @@ export class SNStorageService extends AbstractService {
     })
     const encryptedPayload = await this.encryptionDelegate?.payloadByEncryptingPayload(
       payload,
-      EncryptionIntent.LocalStoragePreferEncrypted
+      EncryptionIntent.LocalStoragePreferEncrypted,
     )
     if (encryptedPayload) {
       rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected()
@@ -248,29 +232,17 @@ export class SNStorageService extends AbstractService {
     return rawContent
   }
 
-  public async setValue(
-    key: string,
-    value: any,
-    mode = StorageValueModes.Default
-  ) {
+  public async setValue(key: string, value: any, mode = StorageValueModes.Default) {
     if (!this.values) {
-      throw Error(
-        `Attempting to set storage key ${key} before loading local storage.`
-      )
+      throw Error(`Attempting to set storage key ${key} before loading local storage.`)
     }
     this.values[this.domainKeyForMode(mode)]![key] = value
     return this.persistValuesToDisk()
   }
 
-  public getValue(
-    key: string,
-    mode = StorageValueModes.Default,
-    defaultValue?: any
-  ) {
+  public getValue(key: string, mode = StorageValueModes.Default, defaultValue?: any) {
     if (!this.values) {
-      throw Error(
-        `Attempting to get storage key ${key} before loading local storage.`
-      )
+      throw Error(`Attempting to get storage key ${key} before loading local storage.`)
     }
     if (!this.values[this.domainKeyForMode(mode)]) {
       throw Error(`Storage domain mode not available ${mode} for key ${key}`)
@@ -281,9 +253,7 @@ export class SNStorageService extends AbstractService {
 
   public async removeValue(key: string, mode = StorageValueModes.Default) {
     if (!this.values) {
-      throw Error(
-        `Attempting to remove storage key ${key} before loading local storage.`
-      )
+      throw Error(`Attempting to remove storage key ${key} before loading local storage.`)
     }
     const domain = this.values[this.domainKeyForMode(mode)]
     if (domain?.[key]) {
@@ -306,7 +276,7 @@ export class SNStorageService extends AbstractService {
   private defaultValuesObject(
     wrapped?: ValuesObjectRecord,
     unwrapped?: ValuesObjectRecord,
-    nonwrapped?: ValuesObjectRecord
+    nonwrapped?: ValuesObjectRecord,
   ) {
     return SNStorageService.defaultValuesObject(wrapped, unwrapped, nonwrapped)
   }
@@ -314,7 +284,7 @@ export class SNStorageService extends AbstractService {
   public static defaultValuesObject(
     wrapped: ValuesObjectRecord = {},
     unwrapped: ValuesObjectRecord = {},
-    nonwrapped: ValuesObjectRecord = {}
+    nonwrapped: ValuesObjectRecord = {},
   ) {
     return {
       [ValueModesKeys.Wrapped]: wrapped,
@@ -367,17 +337,14 @@ export class SNStorageService extends AbstractService {
           payload,
           this.encryptionPolicy === StorageEncryptionPolicies.Default
             ? EncryptionIntent.LocalStoragePreferEncrypted
-            : EncryptionIntent.LocalStorageDecrypted
+            : EncryptionIntent.LocalStorageDecrypted,
         )
         nondeleted.push(encrypted.ejected())
       }
     }
 
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface?.saveRawDatabasePayloads(
-        nondeleted,
-        this.identifier
-      )
+      return this.deviceInterface?.saveRawDatabasePayloads(nondeleted, this.identifier)
     })
   }
 
@@ -389,18 +356,13 @@ export class SNStorageService extends AbstractService {
 
   public async deletePayloadWithId(id: string) {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.removeRawDatabasePayloadWithId(
-        id,
-        this.identifier
-      )
+      return this.deviceInterface!.removeRawDatabasePayloadWithId(id, this.identifier)
     })
   }
 
   public async clearAllPayloads() {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface!.removeAllRawDatabasePayloads(
-        this.identifier
-      )
+      return this.deviceInterface!.removeAllRawDatabasePayloads(this.identifier)
     })
   }
 
@@ -409,11 +371,9 @@ export class SNStorageService extends AbstractService {
       await this.clearValues()
       await this.clearAllPayloads()
       await this.deviceInterface!.removeRawStorageValue(
-        namespacedKey(this.identifier, RawStorageKey.SnjsVersion)
+        namespacedKey(this.identifier, RawStorageKey.SnjsVersion),
       )
-      await this.deviceInterface!.removeRawStorageValue(
-        this.getPersistenceKey()
-      )
+      await this.deviceInterface!.removeRawStorageValue(this.getPersistenceKey())
     })
   }
 }

@@ -53,14 +53,14 @@ export function Create004KeyParams(keyParams: KeyParamsContent004) {
 export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
   if ((keyParams as any).content) {
     throw Error(
-      'Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.'
+      'Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.',
     )
   }
   return new SNRootKeyParams(keyParams)
 }
 
 function protocolVersionForKeyParams(
-  response: KeyParamsData | AnyKeyParamsContent
+  response: KeyParamsData | AnyKeyParamsContent,
 ): ProtocolVersion {
   if (response.version) {
     return response.version
@@ -107,10 +107,7 @@ function protocolVersionForKeyParams(
   }
 }
 
-export function KeyParamsFromApiResponse(
-  response: KeyParamsResponse,
-  identifier?: string
-) {
+export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier?: string) {
   const rawKeyParams: AnyKeyParamsContent = {
     identifier: identifier || response.data.identifier!,
     pw_cost: response.data.pw_cost!,
@@ -192,12 +189,9 @@ export class SNRootKeyParams {
         this.identifier === other.identifier &&
         this.content004.pw_nonce === other.content003.pw_nonce
       )
-    } else if (
-      [ProtocolVersion.V002, ProtocolVersion.V001].includes(this.version)
-    ) {
+    } else if ([ProtocolVersion.V002, ProtocolVersion.V001].includes(this.version)) {
       return (
-        this.identifier === other.identifier &&
-        this.content002.pw_salt === other.content001.pw_salt
+        this.identifier === other.identifier && this.content002.pw_salt === other.content001.pw_salt
       )
     } else {
       throw Error('Unhandled version in KeyParams.compare')

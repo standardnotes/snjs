@@ -1,10 +1,5 @@
 import { removeFromArray } from '@standardnotes/utils'
-import {
-  Challenge,
-  ChallengeArtifacts,
-  ChallengeResponse,
-  ChallengeValue,
-} from '@Lib/challenges'
+import { Challenge, ChallengeArtifacts, ChallengeResponse, ChallengeValue } from '@Lib/challenges'
 import { ValueCallback } from './challenge_service'
 
 /**
@@ -27,7 +22,7 @@ export class ChallengeOperation {
     public onInvalidValue: ValueCallback,
     public onNonvalidatedSubmit: (response: ChallengeResponse) => void,
     public onComplete: (response: ChallengeResponse) => void,
-    public onCancel: () => void
+    public onCancel: () => void,
   ) {}
 
   /**
@@ -36,11 +31,7 @@ export class ChallengeOperation {
    */
   public complete(response?: ChallengeResponse) {
     if (!response) {
-      response = new ChallengeResponse(
-        this.challenge,
-        this.validValues,
-        this.artifacts
-      )
+      response = new ChallengeResponse(this.challenge, this.validValues, this.artifacts)
     }
     this.onComplete?.(response)
   }
@@ -49,7 +40,7 @@ export class ChallengeOperation {
     const response = new ChallengeResponse(
       this.challenge,
       this.nonvalidatedValues.slice(),
-      this.artifacts
+      this.artifacts,
     )
     this.onNonvalidatedSubmit?.(response)
     /** Reset values */
@@ -88,15 +79,9 @@ export class ChallengeOperation {
    * such as completing the operation if all valid values are supplied, as well as
    * notifying the client of this new value's validation status.
    */
-  public setValueStatus(
-    value: ChallengeValue,
-    valid: boolean,
-    artifacts?: ChallengeArtifacts
-  ) {
+  public setValueStatus(value: ChallengeValue, valid: boolean, artifacts?: ChallengeArtifacts) {
     const valuesArray = valid ? this.validValues : this.invalidValues
-    const matching = valuesArray.find(
-      (v) => v.prompt.validation === value.prompt.validation
-    )
+    const matching = valuesArray.find((v) => v.prompt.validation === value.prompt.validation)
     if (matching) {
       removeFromArray(valuesArray, matching)
     }

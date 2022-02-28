@@ -61,8 +61,7 @@ export class SNComponent extends SNItem implements ComponentContent {
     this.permissions = this.payload.safeContent.permissions || []
     this.active = this.payload.safeContent.active
     this.autoupdateDisabled = this.payload.safeContent.autoupdateDisabled
-    this.disassociatedItemIds =
-      this.payload.safeContent.disassociatedItemIds || []
+    this.disassociatedItemIds = this.payload.safeContent.disassociatedItemIds || []
     this.associatedItemIds = this.payload.safeContent.associatedItemIds || []
     this.isMobileDefault = this.payload.safeContent.isMobileDefault
     /**
@@ -80,7 +79,7 @@ export class SNComponent extends SNItem implements ComponentContent {
   /** Do not duplicate components under most circumstances. Always keep original */
   public strategyWhenConflictingWithItem(
     item: SNItem,
-    previousRevision?: HistoryEntry
+    previousRevision?: HistoryEntry,
   ): ConflictStrategy {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item, previousRevision)
@@ -93,12 +92,8 @@ export class SNComponent extends SNItem implements ComponentContent {
   }
 
   public singletonPredicate<T extends SNItem>(): Predicate<T> {
-    const uniqueIdentifierPredicate = new Predicate<SNComponent>(
-      'identifier',
-      '=',
-      this.identifier
-    )
-    return (uniqueIdentifierPredicate as unknown) as Predicate<T>
+    const uniqueIdentifierPredicate = new Predicate<SNComponent>('identifier', '=', this.identifier)
+    return uniqueIdentifierPredicate as unknown as Predicate<T>
   }
 
   public isEditor(): boolean {
@@ -106,10 +101,7 @@ export class SNComponent extends SNItem implements ComponentContent {
   }
 
   public isTheme(): boolean {
-    return (
-      this.content_type === ContentType.Theme ||
-      this.area === ComponentArea.Themes
-    )
+    return this.content_type === ContentType.Theme || this.area === ComponentArea.Themes
   }
 
   public isDefaultEditor(): boolean {
@@ -142,7 +134,7 @@ export class SNComponent extends SNItem implements ComponentContent {
 
   public contentKeysToIgnoreWhenCheckingEquality(): string[] {
     return ['active', 'disassociatedItemIds', 'associatedItemIds'].concat(
-      super.contentKeysToIgnoreWhenCheckingEquality()
+      super.contentKeysToIgnoreWhenCheckingEquality(),
     )
   }
 

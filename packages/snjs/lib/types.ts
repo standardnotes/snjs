@@ -1,4 +1,4 @@
-export type UuidString = string;
+export type UuidString = string
 
 export enum DeinitSource {
   SignOut = 1,
@@ -180,4 +180,4 @@ export type IconType =
   | 'user'
   | 'view'
   | 'warning'
-  | 'window';
+  | 'window'

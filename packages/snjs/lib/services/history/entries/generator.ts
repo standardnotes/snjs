@@ -5,7 +5,7 @@ import { NoteHistoryEntry } from './note_history_entry'
 
 export function CreateHistoryEntryForPayload(
   payload: SurePayload,
-  previousEntry?: HistoryEntry
+  previousEntry?: HistoryEntry,
 ): HistoryEntry {
   const type = payload[PayloadField.ContentType] as ContentType
   const historyItemClass = historyClassForContentType(type)
@@ -16,9 +16,9 @@ export function CreateHistoryEntryForPayload(
 
 function historyClassForContentType(contentType: ContentType) {
   switch (contentType) {
-  case ContentType.Note:
-    return NoteHistoryEntry
-  default:
-    return HistoryEntry
+    case ContentType.Note:
+      return NoteHistoryEntry
+    default:
+      return HistoryEntry
   }
 }

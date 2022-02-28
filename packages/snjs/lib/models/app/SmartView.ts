@@ -8,12 +8,12 @@ export enum SystemViewId {
   AllNotes = 'all-notes',
   ArchivedNotes = 'archived-notes',
   TrashedNotes = 'trashed-notes',
-  UntaggedNotes = 'untagged-notes'
+  UntaggedNotes = 'untagged-notes',
 }
 
 export interface SmartViewContent {
-  title: string;
-  predicate: PredicateJsonForm;
+  title: string
+  predicate: PredicateJsonForm
 }
 
 export function isSystemView(view: SmartView): boolean {
@@ -35,6 +35,6 @@ export class SmartView extends SNItem {
   }
 
   get typedContent(): SmartViewContent {
-    return (this.payload.safeContent as unknown) as SmartViewContent
+    return this.payload.safeContent as unknown as SmartViewContent
   }
 }

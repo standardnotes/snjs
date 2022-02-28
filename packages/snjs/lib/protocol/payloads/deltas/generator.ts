@@ -9,10 +9,7 @@ export function DeltaClassForSource(source: PayloadSource) {
     return DeltaRemoteRetrieved
   } else if (source === PayloadSource.RemoteSaved) {
     return DeltaRemoteSaved
-  } else if (
-    source === PayloadSource.ConflictData ||
-    source === PayloadSource.ConflictUuid
-  ) {
+  } else if (source === PayloadSource.ConflictData || source === PayloadSource.ConflictUuid) {
     return DeltaRemoteConflicts
   } else if (source === PayloadSource.RemoteRejected) {
     return DeltaRemoteRejected

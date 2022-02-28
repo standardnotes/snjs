@@ -12,16 +12,9 @@ import {
   SNStorageService,
   StorageKey,
 } from '@Lib/index'
-import {
-  FeatureStatus,
-  SNFeaturesService,
-} from '@Lib/services/features_service'
+import { FeatureStatus, SNFeaturesService } from '@Lib/services/features_service'
 import { ContentType, Runtime, RoleName } from '@standardnotes/common'
-import {
-  FeatureDescription,
-  FeatureIdentifier,
-  GetFeatures,
-} from '@standardnotes/features'
+import { FeatureDescription, FeatureIdentifier, GetFeatures } from '@standardnotes/features'
 import { SNWebSocketsService } from './api/websockets_service'
 import { SNSettingsService } from './settings_service'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
@@ -58,7 +51,7 @@ describe('featuresService', () => {
       alertService,
       sessionManager,
       crypto,
-      Runtime.Prod
+      Runtime.Prod,
     )
   }
 
@@ -71,15 +64,11 @@ describe('featuresService', () => {
 
     features = [
       {
-        ...GetFeatures().find(
-          (f) => f.identifier === FeatureIdentifier.MidnightTheme
-        ),
+        ...GetFeatures().find((f) => f.identifier === FeatureIdentifier.MidnightTheme),
         expires_at: tomorrow_server,
       },
       {
-        ...GetFeatures().find(
-          (f) => f.identifier === FeatureIdentifier.BoldEditor
-        ),
+        ...GetFeatures().find((f) => f.identifier === FeatureIdentifier.BoldEditor),
         expires_at: tomorrow_server,
       },
     ] as jest.Mocked<FeatureDescription[]>
@@ -106,9 +95,7 @@ describe('featuresService', () => {
     itemManager.getItems = jest.fn().mockReturnValue(items)
     itemManager.createItem = jest.fn()
     itemManager.createTemplateItem = jest.fn().mockReturnValue({})
-    itemManager.changeComponent = jest
-      .fn()
-      .mockReturnValue({} as jest.Mocked<SNItem>)
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<SNItem>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
@@ -141,16 +128,8 @@ describe('featuresService', () => {
   describe('loadUserRoles()', () => {
     it('retrieves user roles and features from storage', async () => {
       await createService().initializeFromDisk()
-      expect(storageService.getValue).toHaveBeenCalledWith(
-        StorageKey.UserRoles,
-        undefined,
-        []
-      )
-      expect(storageService.getValue).toHaveBeenCalledWith(
-        StorageKey.UserFeatures,
-        undefined,
-        []
-      )
+      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserRoles, undefined, [])
+      expect(storageService.getValue).toHaveBeenCalledWith(StorageKey.UserFeatures, undefined, [])
     })
   })
 
@@ -162,10 +141,7 @@ describe('featuresService', () => {
       const featuresService = createService()
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
-      expect(storageService.setValue).toHaveBeenCalledWith(
-        StorageKey.UserRoles,
-        newRoles
-      )
+      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles)
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123')
     })
 
@@ -176,10 +152,7 @@ describe('featuresService', () => {
       const featuresService = createService()
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
-      expect(storageService.setValue).toHaveBeenCalledWith(
-        StorageKey.UserRoles,
-        newRoles
-      )
+      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles)
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123')
     })
 
@@ -190,10 +163,7 @@ describe('featuresService', () => {
       const featuresService = createService()
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
-      expect(storageService.setValue).toHaveBeenCalledWith(
-        StorageKey.UserFeatures,
-        features
-      )
+      expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserFeatures, features)
     })
 
     it('creates items for non-expired features with content type if they do not exist', async () => {
@@ -213,7 +183,7 @@ describe('featuresService', () => {
             identifier: FeatureIdentifier.MidnightTheme,
           }),
         }),
-        true
+        true,
       )
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
@@ -224,7 +194,7 @@ describe('featuresService', () => {
             identifier: FeatureIdentifier.BoldEditor,
           }),
         }),
-        true
+        true,
       )
     })
 
@@ -248,10 +218,7 @@ describe('featuresService', () => {
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
 
-      expect(itemManager.changeComponent).toHaveBeenCalledWith(
-        '789',
-        expect.any(Function)
-      )
+      expect(itemManager.changeComponent).toHaveBeenCalledWith('789', expect.any(Function))
     })
 
     it('creates items for expired components if they do not exist', async () => {
@@ -285,7 +252,7 @@ describe('featuresService', () => {
             identifier: FeatureIdentifier.BoldEditor,
           }),
         }),
-        true
+        true,
       )
     })
 
@@ -378,16 +345,14 @@ describe('featuresService', () => {
       })
 
       const featuresService = createService()
-      const nativeFeature = featuresService[
-        'mapRemoteNativeFeatureToStaticFeature'
-      ](remoteFeature)
+      const nativeFeature = featuresService['mapRemoteNativeFeatureToStaticFeature'](remoteFeature)
       featuresService['mapNativeFeatureToItem'] = jest.fn()
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(featuresService['mapNativeFeatureToItem']).toHaveBeenCalledWith(
         nativeFeature,
         expect.anything(),
-        expect.anything()
+        expect.anything(),
       )
     })
 
@@ -415,38 +380,34 @@ describe('featuresService', () => {
         },
       })
 
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(true)
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
       await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
         RoleName.CoreUser,
       ])
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.Entitled)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.Entitled,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.BasicUser,
-      ])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.NoUserSubscription)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)
-      ).toBe(FeatureStatus.NoUserSubscription)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
-      ).toBe(FeatureStatus.NoUserSubscription)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
 
       features = [
         {
@@ -474,15 +435,15 @@ describe('featuresService', () => {
         RoleName.CoreUser,
       ])
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.InCurrentPlanButExpired)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.InCurrentPlanButExpired,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
     })
 
     it('third party feature status', async () => {
@@ -502,9 +463,7 @@ describe('featuresService', () => {
         role_name: RoleName.PlusUser,
       }
 
-      features = [themeFeature, editorFeature] as jest.Mocked<
-        FeatureDescription[]
-      >
+      features = [themeFeature, editorFeature] as jest.Mocked<FeatureDescription[]>
 
       featuresService['features'] = features
 
@@ -534,42 +493,32 @@ describe('featuresService', () => {
         set: jest.fn(),
       })
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.BasicUser,
-      ])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
 
-      expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(
-        FeatureStatus.Entitled
-      )
+      expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(FeatureStatus.Entitled)
       expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(
-        FeatureStatus.InCurrentPlanButExpired
+        FeatureStatus.InCurrentPlanButExpired,
       )
       expect(
-        featuresService.getFeatureStatus(
-          'missing-feature-identifier' as FeatureIdentifier
-        )
+        featuresService.getFeatureStatus('missing-feature-identifier' as FeatureIdentifier),
       ).toBe(FeatureStatus.NoUserSubscription)
     })
 
     it('feature status should be not entitled if no account or offline repo', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.BasicUser,
-      ])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
 
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(false)
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.NoUserSubscription)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
-      ).toBe(FeatureStatus.NoUserSubscription)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
     })
 
     it('feature status should be entitled for subscriber until first successful features request made if no cached features', async () => {
@@ -586,27 +535,25 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ])
 
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(true)
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.Entitled)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
-      ).toBe(FeatureStatus.Entitled)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.Entitled,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(
+        FeatureStatus.Entitled,
+      )
 
       await featuresService.didDownloadFeatures(features)
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.Entitled)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.Entitled,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
     })
 
     it('feature status should be dynamic for subscriber if cached features and no successful features request made yet', async () => {
@@ -619,25 +566,23 @@ describe('featuresService', () => {
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false
 
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(true)
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.Entitled)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.Entitled,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.Entitled)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.Entitled,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
     })
 
     it('feature status for offline subscription', async () => {
@@ -648,58 +593,50 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ])
 
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(false)
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
       featuresService['completedSuccessfulFeaturesRetrieval'] = true
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.NoUserSubscription)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
-      ).toBe(FeatureStatus.NoUserSubscription)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
 
       featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true)
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)
-      ).toBe(FeatureStatus.Entitled)
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)
-      ).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
+        FeatureStatus.Entitled,
+      )
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.TokenVaultEditor)).toBe(
+        FeatureStatus.NotInCurrentPlan,
+      )
     })
 
     it('feature status for deprecated feature', async () => {
       const featuresService = createService()
 
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(true)
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)
-      ).toBe(FeatureStatus.NoUserSubscription)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)).toBe(
+        FeatureStatus.NoUserSubscription,
+      )
 
       await featuresService.updateRolesAndFetchFeatures('123', [
         RoleName.BasicUser,
         RoleName.CoreUser,
       ])
 
-      expect(
-        featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)
-      ).toBe(FeatureStatus.Entitled)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)).toBe(
+        FeatureStatus.Entitled,
+      )
     })
 
     it('has paid subscription', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.BasicUser,
-      ])
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(true)
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
       expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy
 
@@ -708,26 +645,18 @@ describe('featuresService', () => {
         RoleName.PlusUser,
       ])
 
-      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(
-        true
-      )
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true)
     })
 
     it('has paid subscription should be true if offline repo and signed into third party server', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.BasicUser,
-      ])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
 
       featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true)
-      sessionManager.isSignedIntoFirstPartyServer = jest
-        .fn()
-        .mockReturnValue(false)
+      sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
 
-      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(
-        true
-      )
+      expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true)
     })
   })
 
@@ -743,13 +672,11 @@ describe('featuresService', () => {
       } as never)
 
       const featuresService = createService()
-      await featuresService.migrateFeatureRepoToUserSetting([
-        extensionRepoItem,
-      ])
+      await featuresService.migrateFeatureRepoToUserSetting([extensionRepoItem])
       expect(settingsService.updateSetting).toHaveBeenCalledWith(
         SettingName.ExtensionKey,
         extensionKey,
-        true
+        true,
       )
     })
   })
@@ -771,9 +698,7 @@ describe('featuresService', () => {
       crypto.base64Decode = jest.fn().mockReturnValue(installUrl)
 
       const featuresService = createService()
-      const result = await featuresService.validateAndDownloadExternalFeature(
-        installUrl
-      )
+      const result = await featuresService.validateAndDownloadExternalFeature(installUrl)
       expect(result).toBeUndefined()
     })
 
@@ -793,9 +718,7 @@ describe('featuresService', () => {
       crypto.base64Decode = jest.fn().mockReturnValue(installUrl)
 
       const featuresService = createService()
-      const result = await featuresService.validateAndDownloadExternalFeature(
-        installUrl
-      )
+      const result = await featuresService.validateAndDownloadExternalFeature(installUrl)
       expect(result).toBeUndefined()
     })
   })
@@ -824,9 +747,7 @@ describe('featuresService', () => {
     it('should be false if basic user checks for core role', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.BasicUser,
-      ])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
 
       const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser)
 

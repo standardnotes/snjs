@@ -18,12 +18,11 @@ export class SNSettingsService extends AbstractService {
     [CloudProvider.Dropbox]: 'dropbox',
     [CloudProvider.Google]: 'gdrive',
     [CloudProvider.OneDrive]: 'onedrive',
-
   }
 
   constructor(
     private readonly sessionManager: SNSessionManager,
-    private readonly apiService: SNApiService
+    private readonly apiService: SNApiService,
   ) {
     super()
   }
@@ -55,16 +54,19 @@ export class SNSettingsService extends AbstractService {
     return this.frequencyOptionsLabels[frequency]
   }
 
-  getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider, isDevEnvironment: boolean): string {
+  getCloudProviderIntegrationUrl(
+    cloudProviderName: CloudProvider,
+    isDevEnvironment: boolean,
+  ): string {
     const { Dev, Prod } = ExtensionsServerURL
     const extServerUrl = isDevEnvironment ? Dev : Prod
     return `${extServerUrl}/${this.cloudProviderIntegrationUrlEndpoints[cloudProviderName]}?redirect_url=${extServerUrl}/components/cloudlink?`
   }
 
   deinit(): void {
-    this.provider?.deinit();
-    (this.provider as unknown) = undefined;
-    (this.sessionManager as unknown) = undefined;
-    (this.apiService as unknown) = undefined
+    this.provider?.deinit()
+    ;(this.provider as unknown) = undefined
+    ;(this.sessionManager as unknown) = undefined
+    ;(this.apiService as unknown) = undefined
   }
 }

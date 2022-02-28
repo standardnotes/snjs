@@ -23,9 +23,7 @@ export class HistoryEntry {
           propertyValue.length -
           previousEntry.payload.content[this.defaultContentKeyToDiffOn].length
       } else {
-        this.textCharDiffLength = this.payload.content[
-          this.defaultContentKeyToDiffOn
-        ].length
+        this.textCharDiffLength = this.payload.content[this.defaultContentKeyToDiffOn].length
       }
     } else {
       this.textCharDiffLength = 0
@@ -42,8 +40,7 @@ export class HistoryEntry {
     }
     const lhs = this.itemFromPayload()
     const rhs = entry.itemFromPayload()
-    const datesEqual =
-      lhs.userModifiedDate.getTime() === rhs.userModifiedDate.getTime()
+    const datesEqual = lhs.userModifiedDate.getTime() === rhs.userModifiedDate.getTime()
     if (!datesEqual) {
       return false
     }

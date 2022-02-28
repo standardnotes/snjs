@@ -9,15 +9,15 @@ import { ChallengeService, SNSingletonManager, SNFeaturesService } from '@Lib/se
 
 /** Services that the migration service needs to function */
 export type MigrationServices = {
-  protocolService: SNProtocolService;
-  deviceInterface: DeviceInterface;
-  storageService: SNStorageService;
-  challengeService: ChallengeService;
-  sessionManager: SNSessionManager;
-  itemManager: ItemManager;
-  singletonManager: SNSingletonManager;
-  featuresService: SNFeaturesService;
-  environment: Environment;
+  protocolService: SNProtocolService
+  deviceInterface: DeviceInterface
+  storageService: SNStorageService
+  challengeService: ChallengeService
+  sessionManager: SNSessionManager
+  itemManager: ItemManager
+  singletonManager: SNSingletonManager
+  featuresService: SNFeaturesService
+  environment: Environment
   /** The application identifier */
-  identifier: ApplicationIdentifier;
-};
+  identifier: ApplicationIdentifier
+}

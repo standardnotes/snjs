@@ -19,42 +19,26 @@ export class SyncResponse {
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse
-    this.savedPayloads = this.filterRawItemArray(
-      rawResponse.data?.saved_items
-    ).map((rawItem) => {
+    this.savedPayloads = this.filterRawItemArray(rawResponse.data?.saved_items).map((rawItem) => {
       return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteSaved)
     })
-    this.retrievedPayloads = this.filterRawItemArray(
-      rawResponse.data?.retrieved_items
-    ).map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        PayloadSource.RemoteRetrieved
-      )
-    })
-    this.dataConflictPayloads = this.filterRawItemArray(
-      this.rawDataConflictItems
-    ).map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        PayloadSource.ConflictData
-      )
-    })
-    this.uuidConflictPayloads = this.filterRawItemArray(
-      this.rawUuidConflictItems
-    ).map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        PayloadSource.ConflictUuid
-      )
-    })
-    this.rejectedPayloads = this.filterRawItemArray(
-      this.rawRejectedPayloads
-    ).map((rawItem) => {
-      return CreateSourcedPayloadFromObject(
-        rawItem,
-        PayloadSource.RemoteRejected
-      )
+    this.retrievedPayloads = this.filterRawItemArray(rawResponse.data?.retrieved_items).map(
+      (rawItem) => {
+        return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteRetrieved)
+      },
+    )
+    this.dataConflictPayloads = this.filterRawItemArray(this.rawDataConflictItems).map(
+      (rawItem) => {
+        return CreateSourcedPayloadFromObject(rawItem, PayloadSource.ConflictData)
+      },
+    )
+    this.uuidConflictPayloads = this.filterRawItemArray(this.rawUuidConflictItems).map(
+      (rawItem) => {
+        return CreateSourcedPayloadFromObject(rawItem, PayloadSource.ConflictUuid)
+      },
+    )
+    this.rejectedPayloads = this.filterRawItemArray(this.rawRejectedPayloads).map((rawItem) => {
+      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteRejected)
     })
     /**
      * Items may be deleted from a combination of sources, such as from RemoteSaved,

@@ -18,16 +18,16 @@ export abstract class StorageReader {
     throw Error('Must override')
   }
 
-  public abstract getAccountKeyParams(): Promise<unknown | undefined>;
+  public abstract getAccountKeyParams(): Promise<unknown | undefined>
 
   /**
    * Returns true if the state of storage has account keys present
    * in version-specific storage (either keychain or raw storage)
    */
-  public abstract hasNonWrappedAccountKeys(): Promise<boolean>;
+  public abstract hasNonWrappedAccountKeys(): Promise<boolean>
 
-  public abstract hasPasscode(): Promise<boolean>;
+  public abstract hasPasscode(): Promise<boolean>
 
   /** Whether this version used the keychain to store keys */
-  public abstract usesKeychain(): boolean;
+  public abstract usesKeychain(): boolean
 }

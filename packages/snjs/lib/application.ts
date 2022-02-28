@@ -135,15 +135,15 @@ import { FilesClientInterface } from './services/files/file_service'
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
 
 type LaunchCallback = {
-  receiveChallenge: (challenge: Challenge) => void;
-};
-type ApplicationEventCallback = (event: ApplicationEvent, data?: unknown) => Promise<void>;
+  receiveChallenge: (challenge: Challenge) => void
+}
+type ApplicationEventCallback = (event: ApplicationEvent, data?: unknown) => Promise<void>
 type ApplicationObserver = {
-  singleEvent?: ApplicationEvent;
-  callback: ApplicationEventCallback;
-};
-type ItemStream = (items: SNItem[], source: PayloadSource) => void;
-type ObserverRemover = () => void;
+  singleEvent?: ApplicationEvent
+  callback: ApplicationEventCallback
+}
+type ItemStream = (items: SNItem[], source: PayloadSource) => void
+type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
 export class SNApplication implements ListedInterface {
@@ -737,11 +737,7 @@ export class SNApplication implements ListedInterface {
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<(SNItem | undefined)[]> {
-    return this.itemManager.runTransactionalMutations(
-      transactions,
-      payloadSource,
-      payloadSourceKey,
-    )
+    return this.itemManager.runTransactionalMutations(transactions, payloadSource, payloadSourceKey)
   }
 
   public async runTransactionalMutation(
@@ -1056,11 +1052,11 @@ export class SNApplication implements ListedInterface {
   }
 
   public async upgradeProtocolVersion(): Promise<{
-    success?: true;
-    canceled?: true;
+    success?: true
+    canceled?: true
     error?: {
-      message: string;
-    };
+      message: string
+    }
   }> {
     const result = await this.credentialService.performProtocolUpgrade()
     if (result.success) {
@@ -1151,11 +1147,11 @@ export class SNApplication implements ListedInterface {
     awaitSync = false,
   ): Promise<
     | {
-        affectedItems: SNItem[];
-        errorCount: number;
+        affectedItems: SNItem[]
+        errorCount: number
       }
     | {
-        error: string;
+        error: string
       }
     | undefined
   > {
@@ -1288,8 +1284,8 @@ export class SNApplication implements ListedInterface {
     return this.storageService.removeValue(key, mode)
   }
 
-  public getPreference<K extends PrefKey>(key: K): PrefValue[K] | undefined;
-  public getPreference<K extends PrefKey>(key: K, defaultValue: PrefValue[K]): PrefValue[K];
+  public getPreference<K extends PrefKey>(key: K): PrefValue[K] | undefined
+  public getPreference<K extends PrefKey>(key: K, defaultValue: PrefValue[K]): PrefValue[K]
   public getPreference<K extends PrefKey>(
     key: K,
     defaultValue?: PrefValue[K],
@@ -1355,7 +1351,7 @@ export class SNApplication implements ListedInterface {
       service.deinit()
     }
 
-    (this.options as unknown) = undefined
+    ;(this.options as unknown) = undefined
     this.createdNewDatabase = false
     this.services.length = 0
     this.serviceObservers.length = 0
@@ -1713,31 +1709,31 @@ export class SNApplication implements ListedInterface {
   }
 
   private clearServices() {
-    (this.migrationService as unknown) = undefined;
-    (this.alertService as unknown) = undefined;
-    (this.httpService as unknown) = undefined;
-    (this.payloadManager as unknown) = undefined;
-    (this.protocolService as unknown) = undefined;
-    (this.storageService as unknown) = undefined;
-    (this.apiService as unknown) = undefined;
-    (this.sessionManager as unknown) = undefined;
-    (this.syncService as unknown) = undefined;
-    (this.challengeService as unknown) = undefined;
-    (this.singletonManager as unknown) = undefined;
-    (this.componentManager as unknown) = undefined;
-    (this.protectionService as unknown) = undefined;
-    (this.actionsManager as unknown) = undefined;
-    (this.historyManager as unknown) = undefined;
-    (this.itemManager as unknown) = undefined;
-    (this.keyRecoveryService as unknown) = undefined;
-    (this.preferencesService as unknown) = undefined;
-    (this.featuresService as unknown) = undefined;
-    (this.credentialService as unknown) = undefined;
-    (this.webSocketsService as unknown) = undefined;
-    (this.settingsService as unknown) = undefined;
-    (this.mfaService as unknown) = undefined;
-    (this.listedService as unknown) = undefined;
-    (this.fileService as unknown) = undefined
+    ;(this.migrationService as unknown) = undefined
+    ;(this.alertService as unknown) = undefined
+    ;(this.httpService as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    ;(this.protocolService as unknown) = undefined
+    ;(this.storageService as unknown) = undefined
+    ;(this.apiService as unknown) = undefined
+    ;(this.sessionManager as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.challengeService as unknown) = undefined
+    ;(this.singletonManager as unknown) = undefined
+    ;(this.componentManager as unknown) = undefined
+    ;(this.protectionService as unknown) = undefined
+    ;(this.actionsManager as unknown) = undefined
+    ;(this.historyManager as unknown) = undefined
+    ;(this.itemManager as unknown) = undefined
+    ;(this.keyRecoveryService as unknown) = undefined
+    ;(this.preferencesService as unknown) = undefined
+    ;(this.featuresService as unknown) = undefined
+    ;(this.credentialService as unknown) = undefined
+    ;(this.webSocketsService as unknown) = undefined
+    ;(this.settingsService as unknown) = undefined
+    ;(this.mfaService as unknown) = undefined
+    ;(this.listedService as unknown) = undefined
+    ;(this.fileService as unknown) = undefined
 
     this.services = []
   }
@@ -1781,17 +1777,17 @@ export class SNApplication implements ListedInterface {
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
         switch (event) {
-        case FeaturesEvent.UserRolesChanged: {
-          void this.notifyEvent(ApplicationEvent.UserRolesChanged)
-          break
-        }
-        case FeaturesEvent.FeaturesUpdated: {
-          void this.notifyEvent(ApplicationEvent.FeaturesUpdated)
-          break
-        }
-        default: {
-          assertUnreachable(event)
-        }
+          case FeaturesEvent.UserRolesChanged: {
+            void this.notifyEvent(ApplicationEvent.UserRolesChanged)
+            break
+          }
+          case FeaturesEvent.FeaturesUpdated: {
+            void this.notifyEvent(ApplicationEvent.FeaturesUpdated)
+            break
+          }
+          default: {
+            assertUnreachable(event)
+          }
         }
       }),
     )
@@ -1799,10 +1795,7 @@ export class SNApplication implements ListedInterface {
   }
 
   private createWebSocketsService() {
-    this.webSocketsService = new SNWebSocketsService(
-      this.storageService,
-      this.options.webSocketUrl,
-    )
+    this.webSocketsService = new SNWebSocketsService(this.storageService, this.options.webSocketUrl)
     this.services.push(this.webSocketsService)
   }
 
@@ -1836,13 +1829,13 @@ export class SNApplication implements ListedInterface {
     this.serviceObservers.push(
       this.credentialService.addEventObserver((event) => {
         switch (event) {
-        case AccountEvent.SignedInOrRegistered: {
-          void this.notifyEvent(ApplicationEvent.SignedIn)
-          break
-        }
-        default: {
-          assertUnreachable(event)
-        }
+          case AccountEvent.SignedInOrRegistered: {
+            void this.notifyEvent(ApplicationEvent.SignedIn)
+            break
+          }
+          default: {
+            assertUnreachable(event)
+          }
         }
       }),
     )
@@ -1865,9 +1858,8 @@ export class SNApplication implements ListedInterface {
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager = this.getClass<typeof SNComponentManager>(
-      SNComponentManager,
-    )
+    const MaybeSwappedComponentManager =
+      this.getClass<typeof SNComponentManager>(SNComponentManager)
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
@@ -1948,24 +1940,24 @@ export class SNApplication implements ListedInterface {
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
         switch (event) {
-        case SessionEvent.Restored: {
-          void (async () => {
-            await this.sync()
-            if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-              void this.protocolService.createNewDefaultItemsKey().then(() => {
-                void this.sync()
-              })
-            }
-          })()
-          break
-        }
-        case SessionEvent.Revoked: {
-          await this.handleRevokedSession()
-          break
-        }
-        default: {
-          assertUnreachable(event)
-        }
+          case SessionEvent.Restored: {
+            void (async () => {
+              await this.sync()
+              if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
+                void this.protocolService.createNewDefaultItemsKey().then(() => {
+                  void this.sync()
+                })
+              }
+            })()
+            break
+          }
+          case SessionEvent.Revoked: {
+            await this.handleRevokedSession()
+            break
+          }
+          default: {
+            assertUnreachable(event)
+          }
         }
       }),
     )

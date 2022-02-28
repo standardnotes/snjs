@@ -6,22 +6,22 @@ import { AbstractService, DeviceInterface } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
 
 export type ApplicationDescriptor = {
-  identifier: string | UuidString;
-  label: string;
+  identifier: string | UuidString
+  label: string
   /** Whether the application is the primary user-facing selected application */
-  primary: boolean;
-};
+  primary: boolean
+}
 
-export type DescriptorRecord = Record<string, ApplicationDescriptor>;
+export type DescriptorRecord = Record<string, ApplicationDescriptor>
 
 type AppGroupCallback = {
   applicationCreator: (
     descriptor: ApplicationDescriptor,
-    deviceInterface: DeviceInterface
-  ) => SNApplication;
-};
+    deviceInterface: DeviceInterface,
+  ) => SNApplication
+}
 
-type AppGroupChangeCallback = () => void;
+type AppGroupChangeCallback = () => void
 
 export class SNApplicationGroup extends AbstractService {
   public primaryApplication?: SNApplication
@@ -36,14 +36,14 @@ export class SNApplicationGroup extends AbstractService {
 
   deinit() {
     super.deinit()
-    this.deviceInterface.deinit();
-    (this.deviceInterface as any) = undefined
+    this.deviceInterface.deinit()
+    ;(this.deviceInterface as any) = undefined
   }
 
   public async initialize(callback: AppGroupCallback): Promise<void> {
     this.callback = callback
     this.descriptorRecord = (await this.deviceInterface.getJsonParsedRawStorageValue(
-      RawStorageKey.DescriptorRecord
+      RawStorageKey.DescriptorRecord,
     )) as DescriptorRecord
 
     if (!this.descriptorRecord) {
@@ -52,9 +52,7 @@ export class SNApplicationGroup extends AbstractService {
 
     const primaryDescriptor = this.findPrimaryDescriptor()
     if (!primaryDescriptor) {
-      throw Error(
-        'No primary application descriptor found. Ensure migrations have been run.'
-      )
+      throw Error('No primary application descriptor found. Ensure migrations have been run.')
     }
 
     const application = this.buildApplication(primaryDescriptor)
@@ -75,7 +73,7 @@ export class SNApplicationGroup extends AbstractService {
     }
     this.deviceInterface.setRawStorageValue(
       RawStorageKey.DescriptorRecord,
-      JSON.stringify(descriptorRecord)
+      JSON.stringify(descriptorRecord),
     )
     this.descriptorRecord = descriptorRecord
     this.persistDescriptors()
@@ -132,9 +130,7 @@ export class SNApplicationGroup extends AbstractService {
    * Any application which is no longer active is destroyed, and
    * must be removed from the interface.
    */
-  public addApplicationChangeObserver(
-    callback: AppGroupChangeCallback
-  ): () => void {
+  public addApplicationChangeObserver(callback: AppGroupChangeCallback): () => void {
     this.changeObservers.push(callback)
     if (this.primaryApplication) {
       callback()
@@ -150,18 +146,13 @@ export class SNApplicationGroup extends AbstractService {
     }
   }
 
-  public async setPrimaryApplication(
-    application: SNApplication,
-    persist = true
-  ): Promise<void> {
+  public async setPrimaryApplication(application: SNApplication, persist = true): Promise<void> {
     if (this.primaryApplication === application) {
       return
     }
 
     if (!this.applications.includes(application)) {
-      throw Error(
-        'Application must be inserted before attempting to switch to it'
-      )
+      throw Error('Application must be inserted before attempting to switch to it')
     }
 
     if (this.primaryApplication) {
@@ -189,14 +180,11 @@ export class SNApplicationGroup extends AbstractService {
   private async persistDescriptors() {
     this.deviceInterface!.setRawStorageValue(
       RawStorageKey.DescriptorRecord,
-      JSON.stringify(this.descriptorRecord)
+      JSON.stringify(this.descriptorRecord),
     )
   }
 
-  public async renameDescriptor(
-    descriptor: ApplicationDescriptor,
-    label: string
-  ) {
+  public async renameDescriptor(descriptor: ApplicationDescriptor, label: string) {
     descriptor.label = label
     await this.persistDescriptors()
   }
@@ -226,9 +214,7 @@ export class SNApplicationGroup extends AbstractService {
   }
 
   private applicationForDescriptor(descriptor: ApplicationDescriptor) {
-    return this.applications.find(
-      (app) => app.identifier === descriptor.identifier
-    )
+    return this.applications.find((app) => app.identifier === descriptor.identifier)
   }
 
   public async loadApplicationForDescriptor(descriptor: ApplicationDescriptor) {
@@ -241,10 +227,7 @@ export class SNApplicationGroup extends AbstractService {
   }
 
   private buildApplication(descriptor: ApplicationDescriptor) {
-    const application = this.callback.applicationCreator(
-      descriptor,
-      this.deviceInterface
-    )
+    const application = this.callback.applicationCreator(descriptor, this.deviceInterface)
     application.setOnDeinit(this.onApplicationDeinit)
     return application
   }

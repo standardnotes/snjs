@@ -7,9 +7,7 @@ import { isNote } from '@Lib/models/app/note'
 import { isTag } from '@Lib/models/app/tag'
 
 /** tagUuid undefined signifies all notes count change */
-export type TagNoteCountChangeObserver = (
-  tagUuid: UuidString | undefined
-) => void;
+export type TagNoteCountChangeObserver = (tagUuid: UuidString | undefined) => void
 
 export class TagNotesIndex implements SNIndex {
   private tagToNotesMap: Partial<Record<UuidString, Set<UuidString>>> = {}
@@ -17,16 +15,14 @@ export class TagNotesIndex implements SNIndex {
 
   constructor(
     private collection: ItemCollection,
-    public observers: TagNoteCountChangeObserver[] = []
+    public observers: TagNoteCountChangeObserver[] = [],
   ) {}
 
   private isNoteCountable = (note: SNNote) => {
     return !note.archived && !note.trashed && !note.deleted
   }
 
-  public addCountChangeObserver(
-    observer: TagNoteCountChangeObserver
-  ): () => void {
+  public addCountChangeObserver(observer: TagNoteCountChangeObserver): () => void {
     this.observers.push(observer)
 
     return () => {
@@ -60,9 +56,7 @@ export class TagNotesIndex implements SNIndex {
   private receiveTagChanges(tags: SNTag[]): void {
     for (const tag of tags) {
       const uuids = tag.noteReferences.map((ref) => ref.uuid)
-      const countableUuids = uuids.filter((uuid) =>
-        this.allCountableNotes.has(uuid)
-      )
+      const countableUuids = uuids.filter((uuid) => this.allCountableNotes.has(uuid))
       const previousSet = this.tagToNotesMap[tag.uuid]
       this.tagToNotesMap[tag.uuid] = new Set(countableUuids)
 
@@ -82,9 +76,7 @@ export class TagNotesIndex implements SNIndex {
         this.allCountableNotes.delete(note.uuid)
       }
 
-      const associatedTagUuids = this.collection.uuidsThatReferenceUuid(
-        note.uuid
-      )
+      const associatedTagUuids = this.collection.uuidsThatReferenceUuid(note.uuid)
       for (const tagUuid of associatedTagUuids) {
         const set = this.setForTag(tagUuid)
         const previousCount = set.size

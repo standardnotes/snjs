@@ -18,21 +18,21 @@ type ChangeCallback = (
   discarded: PurePayload[],
   ignored: PurePayload[],
   source: PayloadSource,
-  sourceKey?: string
-) => void;
+  sourceKey?: string,
+) => void
 
 type ChangeObserver = {
-  types: ContentType[];
-  priority: number;
-  callback: ChangeCallback;
-};
+  types: ContentType[]
+  priority: number
+  callback: ChangeCallback
+}
 
 type QueueElement = {
-  payloads: PurePayload[];
-  source: PayloadSource;
-  sourceKey?: string;
-  resolve: (alteredPayloads: PurePayload[]) => void;
-};
+  payloads: PurePayload[]
+  source: PayloadSource
+  sourceKey?: string
+  resolve: (alteredPayloads: PurePayload[]) => void
+}
 
 /**
  * The model manager is responsible for keeping state regarding what items exist in the
@@ -89,10 +89,7 @@ export class PayloadManager extends AbstractService {
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
    */
-  public async emitCollection(
-    collection: ImmutablePayloadCollection,
-    sourceKey?: string
-  ) {
+  public async emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string) {
     return this.emitPayloads(collection.all(), collection.source!, sourceKey)
   }
 
@@ -105,7 +102,7 @@ export class PayloadManager extends AbstractService {
   public async emitPayload(
     payload: PurePayload,
     source: PayloadSource,
-    sourceKey?: string
+    sourceKey?: string,
   ): Promise<PurePayload[]> {
     return this.emitPayloads([payload], source, sourceKey)
   }
@@ -119,7 +116,7 @@ export class PayloadManager extends AbstractService {
   public async emitPayloads(
     payloads: PurePayload[],
     source: PayloadSource,
-    sourceKey?: string
+    sourceKey?: string,
   ): Promise<PurePayload[]> {
     if (payloads.length === 0) {
       console.warn('Attempting to emit 0 payloads.')
@@ -139,20 +136,8 @@ export class PayloadManager extends AbstractService {
 
   private async popQueue() {
     const first = this.emitQueue[0]
-    const {
-      changed,
-      inserted,
-      discarded,
-      ignored,
-    } = this.mergePayloadsOntoMaster(first.payloads)
-    this.notifyChangeObservers(
-      changed,
-      inserted,
-      discarded,
-      ignored,
-      first.source,
-      first.sourceKey
-    )
+    const { changed, inserted, discarded, ignored } = this.mergePayloadsOntoMaster(first.payloads)
+    this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey)
     removeFromArray(this.emitQueue, first)
     first.resolve(changed.concat(inserted, discarded))
     if (this.emitQueue.length > 0) {
@@ -180,9 +165,7 @@ export class PayloadManager extends AbstractService {
         ignored.push(payload)
         continue
       }
-      const newPayload = masterPayload
-        ? PayloadByMerging(masterPayload, payload)
-        : payload
+      const newPayload = masterPayload ? PayloadByMerging(masterPayload, payload) : payload
       if (newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */
@@ -206,11 +189,7 @@ export class PayloadManager extends AbstractService {
    * @param priority - The lower the priority, the earlier the function is called
    *  wrt to other observers
    */
-  public addObserver(
-    types: ContentType | ContentType[],
-    callback: ChangeCallback,
-    priority = 1
-  ) {
+  public addObserver(types: ContentType | ContentType[], callback: ChangeCallback, priority = 1) {
     if (!Array.isArray(types)) {
       types = [types]
     }
@@ -235,7 +214,7 @@ export class PayloadManager extends AbstractService {
     discarded: PurePayload[],
     ignored: PurePayload[],
     source: PayloadSource,
-    sourceKey?: string
+    sourceKey?: string,
   ) {
     /** Slice the observers array as sort modifies in-place */
     const observers = this.changeObservers.slice().sort((a, b) => {
@@ -245,8 +224,8 @@ export class PayloadManager extends AbstractService {
       return types.includes(ContentType.Any)
         ? payloads.slice()
         : payloads.slice().filter((payload) => {
-          return types.includes(payload.content_type!)
-        })
+            return types.includes(payload.content_type!)
+          })
     }
     for (const observer of observers) {
       observer.callback(
@@ -255,7 +234,7 @@ export class PayloadManager extends AbstractService {
         filter(discarded, observer.types),
         filter(ignored, observer.types),
         source,
-        sourceKey
+        sourceKey,
       )
     }
   }
@@ -268,11 +247,8 @@ export class PayloadManager extends AbstractService {
   public async importPayloads(payloads: PurePayload[]) {
     const delta = new DeltaFileImport(
       this.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(
-        payloads,
-        PayloadSource.FileImport
-      ),
-      undefined
+      ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.FileImport),
+      undefined,
     )
     const collection = await delta.resultingCollection()
     await this.emitCollection(collection)

@@ -19,9 +19,7 @@ describe('encrypt and upload', () => {
       state: {},
     } as StreamEncryptor)
 
-    crypto.xchacha20StreamEncryptorPush = jest
-      .fn()
-      .mockReturnValue(new Uint8Array())
+    crypto.xchacha20StreamEncryptorPush = jest.fn().mockReturnValue(new Uint8Array())
 
     file = {
       remoteIdentifier: '123',
@@ -30,24 +28,14 @@ describe('encrypt and upload', () => {
   })
 
   it('should initialize encryption header', async () => {
-    operation = new EncryptAndUploadFileOperation(
-      file,
-      'api-token',
-      crypto,
-      apiService
-    )
+    operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService)
     const header = operation.initializeHeader()
 
     expect(header.length).toBeGreaterThan(0)
   })
 
   it('should return true when a chunk is uploaded', async () => {
-    operation = new EncryptAndUploadFileOperation(
-      file,
-      'api-token',
-      crypto,
-      apiService
-    )
+    operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService)
     operation.initializeHeader()
 
     const bytes = new Uint8Array()

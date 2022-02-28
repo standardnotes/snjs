@@ -12,7 +12,7 @@ export const STRING_SAVING_WHILE_DOCUMENT_HIDDEN =
 export const STRING_DELETED_NOTE =
   'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
 export const STRING_INVALID_NOTE =
-  'The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note\'s text and start a new note.'
+  "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
 
 export const STRING_ELLIPSES = '...'
 
@@ -21,17 +21,14 @@ const SAVE_TIMEOUT_DEBOUNCE = 350
 const SAVE_TIMEOUT_NO_DEBOUNCE = 100
 
 export type EditorValues = {
-  title: string;
-  text: string;
-};
+  title: string
+  text: string
+}
 
 export class NoteViewController {
   public note!: SNNote
   private application: SNApplication
-  private innerValueChangeObservers: ((
-    note: SNNote,
-    source: PayloadSource
-  ) => void)[] = []
+  private innerValueChangeObservers: ((note: SNNote, source: PayloadSource) => void)[] = []
   private removeStreamObserver?: () => void
   public isTemplateNote = false
   private saveTimeout?: Promise<void>
@@ -40,7 +37,7 @@ export class NoteViewController {
     application: SNApplication,
     noteUuid: string | undefined,
     private defaultTitle: string | undefined,
-    private defaultTag: UuidString | undefined
+    private defaultTag: UuidString | undefined,
   ) {
     this.application = application
     if (noteUuid) {
@@ -50,14 +47,11 @@ export class NoteViewController {
 
   async initialize(): Promise<void> {
     if (!this.note) {
-      const note = (await this.application.createTemplateItem(
-        ContentType.Note,
-        {
-          text: '',
-          title: this.defaultTitle,
-          references: [],
-        }
-      )) as SNNote
+      const note = (await this.application.createTemplateItem(ContentType.Note, {
+        text: '',
+        title: this.defaultTitle,
+        references: [],
+      })) as SNNote
       if (this.defaultTag) {
         const tag = this.application.findItem(this.defaultTag) as SNTag
         await this.application.addTagHierarchyToNote(note, tag)
@@ -76,18 +70,15 @@ export class NoteViewController {
   }
 
   private streamItems() {
-    this.removeStreamObserver = this.application.streamItems(
-      ContentType.Note,
-      (items, source) => {
-        this.handleNoteStream(items as SNNote[], source)
-      }
-    )
+    this.removeStreamObserver = this.application.streamItems(ContentType.Note, (items, source) => {
+      this.handleNoteStream(items as SNNote[], source)
+    })
   }
 
   deinit(): void {
-    this.removeStreamObserver?.();
-    (this.removeStreamObserver as unknown) = undefined;
-    (this.application as unknown) = undefined
+    this.removeStreamObserver?.()
+    ;(this.removeStreamObserver as unknown) = undefined
+    ;(this.application as unknown) = undefined
     this.innerValueChangeObservers.length = 0
     this.saveTimeout = undefined
   }
@@ -114,7 +105,7 @@ export class NoteViewController {
    * (and thus a new object reference is created)
    */
   public addNoteInnerValueChangeObserver(
-    callback: (note: SNNote, source: PayloadSource) => void
+    callback: (note: SNNote, source: PayloadSource) => void,
   ): () => void {
     this.innerValueChangeObservers.push(callback)
     if (this.note) {
@@ -136,11 +127,11 @@ export class NoteViewController {
    * @param customMutate A custom mutator function.
    */
   public async save(dto: {
-    editorValues: EditorValues;
-    bypassDebouncer?: boolean;
-    isUserModified?: boolean;
-    dontUpdatePreviews?: boolean;
-    customMutate?: (mutator: NoteMutator) => void;
+    editorValues: EditorValues
+    bypassDebouncer?: boolean
+    isUserModified?: boolean
+    dontUpdatePreviews?: boolean
+    customMutate?: (mutator: NoteMutator) => void
   }): Promise<void> {
     const title = dto.editorValues.title
     const text = dto.editorValues.text
@@ -186,7 +177,7 @@ export class NoteViewController {
           noteMutator.preview_html = undefined
         }
       },
-      dto.isUserModified
+      dto.isUserModified,
     )
 
     if (this.saveTimeout) {
@@ -194,9 +185,7 @@ export class NoteViewController {
     }
 
     const noDebounce = dto.bypassDebouncer || this.application.noAccount()
-    const syncDebouceMs = noDebounce
-      ? SAVE_TIMEOUT_NO_DEBOUNCE
-      : SAVE_TIMEOUT_DEBOUNCE
+    const syncDebouceMs = noDebounce ? SAVE_TIMEOUT_NO_DEBOUNCE : SAVE_TIMEOUT_DEBOUNCE
     this.saveTimeout = this.application.deviceInterface.timeout(() => {
       this.application.sync()
     }, syncDebouceMs)

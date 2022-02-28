@@ -12,21 +12,18 @@ export class Migration2_42_0 extends Migration {
   }
 
   protected registerStageHandlers(): void {
-    this.registerStageHandler(
-      ApplicationStage.FullSyncCompleted_13,
-      async () => {
-        await this.deleteNoDistraction()
-        this.markDone()
-      }
-    )
+    this.registerStageHandler(ApplicationStage.FullSyncCompleted_13, async () => {
+      await this.deleteNoDistraction()
+      this.markDone()
+    })
   }
 
   private async deleteNoDistraction(): Promise<void> {
-    const themes = (this.services.itemManager.getItems(
-      ContentType.Theme
-    ) as SNTheme[]).filter((theme) => {
-      return theme.identifier === NoDistractionIdentifier
-    })
+    const themes = (this.services.itemManager.getItems(ContentType.Theme) as SNTheme[]).filter(
+      (theme) => {
+        return theme.identifier === NoDistractionIdentifier
+      },
+    )
 
     for (const theme of themes) {
       await this.services.itemManager.setItemToBeDeleted(theme.uuid)

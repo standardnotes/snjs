@@ -12,10 +12,7 @@ import {
   CreateMaxPayloadFromAnyObject,
 } from '@standardnotes/payloads'
 import { SNItemsKey } from '@Models/app/items_key'
-import {
-  Create004KeyParams,
-  SNRootKeyParams,
-} from './../../key_params'
+import { Create004KeyParams, SNRootKeyParams } from './../../key_params'
 import { V004Algorithm } from './../algorithms'
 import { ItemsKeyContent, SynchronousOperator } from './../operator'
 import { SNRootKey } from '@Protocol/root_key'
@@ -26,11 +23,7 @@ import {
   splitString,
   UuidGenerator,
 } from '@standardnotes/utils'
-import {
-  ContentType,
-  KeyParamsOrigination,
-  ProtocolVersion,
-} from '@standardnotes/common'
+import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
 
 const PARTITION_CHARACTER = ':'
@@ -51,9 +44,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   private generateNewItemsKeyContent() {
-    const itemsKey = this.crypto.generateRandomKey(
-      V004Algorithm.EncryptionKeyLength
-    )
+    const itemsKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
     const response: ItemsKeyContent = {
       itemsKey: itemsKey,
       version: ProtocolVersion.V004,
@@ -84,9 +75,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * @param seed
    */
   private async generateSalt004(identifier: string, seed: string) {
-    const hash = await this.crypto.sha256(
-      [identifier, seed].join(PARTITION_CHARACTER)
-    )
+    const hash = await this.crypto.sha256([identifier, seed].join(PARTITION_CHARACTER))
     return truncateHexString(hash, V004Algorithm.ArgonSaltLength)
   }
 
@@ -96,10 +85,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * @param password - Plain string representing raw user password
    * @param keyParams - KeyParams object
    */
-  public async computeRootKey(
-    password: string,
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey> {
+  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams)
   }
 
@@ -111,12 +97,10 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   public async createRootKey(
     identifier: string,
     password: string,
-    origination: KeyParamsOrigination
+    origination: KeyParamsOrigination,
   ): Promise<SNRootKey> {
     const version = ProtocolVersion.V004
-    const seed = this.crypto.generateRandomKey(
-      V004Algorithm.ArgonSaltSeedLength
-    )
+    const seed = this.crypto.generateRandomKey(V004Algorithm.ArgonSaltSeedLength)
     const keyParams = Create004KeyParams({
       identifier: identifier,
       pw_nonce: seed,
@@ -138,7 +122,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     plaintext: string,
     rawKey: string,
     nonce: string,
-    authenticatedData: ItemAuthenticatedData
+    authenticatedData: ItemAuthenticatedData,
   ) {
     if (!nonce) {
       throw 'encryptString null nonce'
@@ -150,7 +134,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       plaintext,
       nonce,
       rawKey,
-      this.authenticatedDataToString(authenticatedData)
+      this.authenticatedDataToString(authenticatedData),
     )
   }
 
@@ -165,14 +149,9 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     ciphertext: string,
     rawKey: string,
     nonce: string,
-    rawAuthenticatedData: string
+    rawAuthenticatedData: string,
   ) {
-    return this.crypto.xchacha20Decrypt(
-      ciphertext,
-      nonce,
-      rawKey,
-      rawAuthenticatedData
-    )
+    return this.crypto.xchacha20Decrypt(ciphertext, nonce, rawKey, rawAuthenticatedData)
   }
 
   /**
@@ -183,18 +162,11 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   private generateEncryptedProtocolString(
     plaintext: string,
     rawKey: string,
-    authenticatedData: ItemAuthenticatedData
+    authenticatedData: ItemAuthenticatedData,
   ) {
-    const nonce = this.crypto.generateRandomKey(
-      V004Algorithm.EncryptionNonceLength
-    )
+    const nonce = this.crypto.generateRandomKey(V004Algorithm.EncryptionNonceLength)
     const version = ProtocolVersion.V004
-    const ciphertext = this.encryptString004(
-      plaintext,
-      rawKey,
-      nonce,
-      authenticatedData
-    )
+    const ciphertext = this.encryptString004(plaintext, rawKey, nonce, authenticatedData)
     const components: string[] = [
       version as string,
       nonce,
@@ -205,20 +177,12 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   public getPayloadAuthenticatedData(
-    payload: PurePayload
-  ):
-    | RootKeyEncryptedAuthenticatedData
-    | ItemAuthenticatedData
-    | LegacyAttachedData
-    | undefined {
+    payload: PurePayload,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     if (payload.format !== PayloadFormat.EncryptedString) {
-      throw Error(
-        'Attempting to get embedded key params of already decrypted item'
-      )
+      throw Error('Attempting to get embedded key params of already decrypted item')
     }
-    const itemKeyComponents = this.deconstructEncryptedPayloadString(
-      payload.enc_item_key!
-    )
+    const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key!)
     const authenticatedData = itemKeyComponents.rawAuthenticatedData
     const result = this.stringToAuthenticatedData(authenticatedData)
     return result
@@ -231,7 +195,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    */
   private generateAuthenticatedDataForPayload(
     payload: PurePayload,
-    key: SNItemsKey | SNRootKey
+    key: SNItemsKey | SNRootKey,
   ): ItemAuthenticatedData | RootKeyEncryptedAuthenticatedData {
     const baseData: ItemAuthenticatedData = {
       u: payload.uuid,
@@ -251,14 +215,12 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   private authenticatedDataToString(attachedData: ItemAuthenticatedData) {
-    return this.crypto.base64Encode(
-      JSON.stringify(sortedCopy(omitUndefinedCopy(attachedData)))
-    )
+    return this.crypto.base64Encode(JSON.stringify(sortedCopy(omitUndefinedCopy(attachedData))))
   }
 
   private stringToAuthenticatedData(
     rawAuthenticatedData: string,
-    override?: Partial<ItemAuthenticatedData>
+    override?: Partial<ItemAuthenticatedData>,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData {
     const base = JSON.parse(this.crypto.base64Decode(rawAuthenticatedData))
     return sortedCopy({
@@ -270,7 +232,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   public generateEncryptedParametersSync(
     payload: PurePayload,
     format: PayloadFormat,
-    key?: SNItemsKey | SNRootKey
+    key?: SNItemsKey | SNRootKey,
   ): PurePayload {
     if (format === PayloadFormat.DecryptedBareObject) {
       return CreateEncryptionParameters({
@@ -286,25 +248,20 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     if (!key || !key.itemsKey) {
       throw 'Attempting to generateEncryptedParameters with no itemsKey.'
     }
-    const itemKey = this.crypto.generateRandomKey(
-      V004Algorithm.EncryptionKeyLength
-    )
+    const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
     /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content)
-    const authenticatedData = this.generateAuthenticatedDataForPayload(
-      payload,
-      key
-    )
+    const authenticatedData = this.generateAuthenticatedDataForPayload(payload, key)
     const encryptedContentString = this.generateEncryptedProtocolString(
       contentPlaintext,
       itemKey,
-      authenticatedData
+      authenticatedData,
     )
     /** Encrypt item_key with master itemEncryptionKey */
     const encryptedItemKey = this.generateEncryptedProtocolString(
       itemKey,
       key.itemsKey,
-      authenticatedData
+      authenticatedData,
     )
     return CreateEncryptionParameters({
       uuid: payload.uuid,
@@ -316,7 +273,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
 
   public generateDecryptedParametersSync(
     payload: PurePayload,
-    key?: SNItemsKey | SNRootKey
+    key?: SNItemsKey | SNRootKey,
   ): PurePayload {
     const format = payload.format
     if (format === PayloadFormat.DecryptedBareObject) {
@@ -327,29 +284,23 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       throw Error('encryptedParameters.uuid cannot be null')
     }
     if (!key || !key.itemsKey) {
-      throw Error(
-        'Attempting to generateDecryptedParameters with no itemsKey.'
-      )
+      throw Error('Attempting to generateDecryptedParameters with no itemsKey.')
     }
     /** Decrypt item_key payload. */
-    const itemKeyComponents = this.deconstructEncryptedPayloadString(
-      payload.enc_item_key!
-    )
+    const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key!)
     const authenticatedData = this.stringToAuthenticatedData(
       itemKeyComponents.rawAuthenticatedData,
       {
         u: payload.uuid,
         v: payload.version,
-      }
+      },
     )
-    const useAuthenticatedString = this.authenticatedDataToString(
-      authenticatedData
-    )
+    const useAuthenticatedString = this.authenticatedDataToString(authenticatedData)
     const itemKey = this.decryptString004(
       itemKeyComponents.ciphertext,
       key.itemsKey,
       itemKeyComponents.nonce,
-      useAuthenticatedString
+      useAuthenticatedString,
     )
     if (!itemKey) {
       console.error('Error decrypting itemKey parameters', payload)
@@ -359,14 +310,12 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       })
     }
     /** Decrypt content payload. */
-    const contentComponents = this.deconstructEncryptedPayloadString(
-      payload.contentString
-    )
+    const contentComponents = this.deconstructEncryptedPayloadString(payload.contentString)
     const content = this.decryptString004(
       contentComponents.ciphertext,
       itemKey,
       contentComponents.nonce,
-      useAuthenticatedString
+      useAuthenticatedString,
     )
     if (!content) {
       return CopyEncryptionParameters(payload, {
@@ -396,20 +345,17 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     }
   }
 
-  private async deriveKey(
-    password: string,
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey> {
+  private async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     const salt = await this.generateSalt004(
       keyParams.content004.identifier,
-      keyParams.content004.pw_nonce
+      keyParams.content004.pw_nonce,
     )
     const derivedKey = this.crypto.argon2(
       password,
       salt,
       V004Algorithm.ArgonIterations,
       V004Algorithm.ArgonMemLimit,
-      V004Algorithm.ArgonOutputKeyBytes
+      V004Algorithm.ArgonOutputKeyBytes,
     )
     const partitions = splitString(derivedKey, 2)
     const masterKey = partitions[0]

@@ -5,17 +5,16 @@ import { ItemMutator, SNItem } from '@Models/core/item'
 import { ItemInterface, PayloadContent, PayloadFormat, PurePayload } from '@standardnotes/payloads'
 
 export interface NoteContent extends PayloadContent {
-  title: string;
-  text: string;
-  mobilePrefersPlainEditor?: boolean;
-  hidePreview: boolean;
-  preview_plain?: string;
-  preview_html?: string;
-  spellcheck?: boolean;
+  title: string
+  text: string
+  mobilePrefersPlainEditor?: boolean
+  hidePreview: boolean
+  preview_plain?: string
+  preview_html?: string
+  spellcheck?: boolean
 }
 
-export const isNote = (x: ItemInterface): x is SNNote =>
-  x.content_type === ContentType.Note
+export const isNote = (x: ItemInterface): x is SNNote => x.content_type === ContentType.Note
 
 /** A note item */
 export class SNNote extends SNItem implements NoteContent {
@@ -39,9 +38,7 @@ export class SNNote extends SNItem implements NoteContent {
     this.spellcheck = this.payload.safeContent.spellcheck
 
     if (payload.format === PayloadFormat.DecryptedBareObject) {
-      this.prefersPlainEditor = this.getAppDomainValue(
-        AppDataField.PrefersPlainEditor
-      )
+      this.prefersPlainEditor = this.getAppDomainValue(AppDataField.PrefersPlainEditor)
     }
 
     if (!isNullOrUndefined(this.payload.safeContent.mobilePrefersPlainEditor)) {

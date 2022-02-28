@@ -1,10 +1,6 @@
 import { FileDownloader } from './../workers/file_downloader'
 import { FileDecryptor } from './../workers/file_decryptor'
-import {
-  FilesApi,
-  RemoteFileInterface,
-  EncryptedFileInterface,
-} from './../types'
+import { FilesApi, RemoteFileInterface, EncryptedFileInterface } from './../types'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 export class DownloadAndDecryptFileOperation {
@@ -18,15 +14,10 @@ export class DownloadAndDecryptFileOperation {
     api: FilesApi,
     apiToken: string,
     private onDecryptedBytes: (decryptedBytes: Uint8Array) => void,
-    private onError: () => void
+    private onError: () => void,
   ) {
     this.decryptor = new FileDecryptor(file, crypto)
-    this.downloader = new FileDownloader(
-      file,
-      apiToken,
-      api,
-      this.onDownloadedBytes.bind(this)
-    )
+    this.downloader = new FileDownloader(file, apiToken, api, this.onDownloadedBytes.bind(this))
   }
 
   public async run(): Promise<void> {

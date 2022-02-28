@@ -26,7 +26,7 @@ import {
 import { PrefKey } from '../app/userPrefs'
 
 export interface ItemContent {
-  references?: ContentReference[];
+  references?: ContentReference[]
 }
 
 export enum MutationType {
@@ -77,21 +77,15 @@ export class SNItem implements ItemInterface {
       payload.format === PayloadFormat.DecryptedBareObject &&
       (payload.enc_item_key || payload.items_key_id || payload.auth_hash)
     ) {
-      SNLog.error(
-        Error(
-          'Creating an item from a decrypted payload should not contain enc params'
-        )
-      )
+      SNLog.error(Error('Creating an item from a decrypted payload should not contain enc params'))
     }
     this.payload = payload
     this.conflictOf = payload.safeContent.conflict_of
     this.duplicateOf = payload.duplicate_of
-    this.createdAtString =
-      this.created_at && dateToLocalizedString(this.created_at)
+    this.createdAtString = this.created_at && dateToLocalizedString(this.created_at)
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.userModifiedDate = new Date(
-        this.getAppDomainValue(AppDataField.UserModifiedDate) ||
-          this.serverUpdatedAt
+        this.getAppDomainValue(AppDataField.UserModifiedDate) || this.serverUpdatedAt,
       )
       this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
       this.protected = this.payload.safeContent.protected
@@ -312,7 +306,7 @@ export class SNItem implements ItemInterface {
    */
   public strategyWhenConflictingWithItem(
     item: SNItem,
-    previousRevision?: HistoryEntry
+    previousRevision?: HistoryEntry,
   ): ConflictStrategy {
     if (this.errorDecrypting) {
       return ConflictStrategy.KeepLeftDuplicateRight
@@ -334,9 +328,7 @@ export class SNItem implements ItemInterface {
     if (!contentDiffers) {
       return ConflictStrategy.KeepRight
     }
-    const itemsAreDifferentExcludingRefs = ItemContentsDiffer(this, item, [
-      'references',
-    ])
+    const itemsAreDifferentExcludingRefs = ItemContentsDiffer(this, item, ['references'])
     if (itemsAreDifferentExcludingRefs) {
       if (previousRevision) {
         /**
@@ -378,7 +370,7 @@ export class SNItem implements ItemInterface {
       this.payload.contentObject,
       otherItem.payload.contentObject,
       this.contentKeysToIgnoreWhenCheckingEquality(),
-      this.appDataContentKeysToIgnoreWhenCheckingEquality()
+      this.appDataContentKeysToIgnoreWhenCheckingEquality(),
     )
   }
 
@@ -572,11 +564,7 @@ export class ItemMutator {
   }
 }
 
-function ItemContentsDiffer(
-  item1: SNItem,
-  item2: SNItem,
-  excludeContentKeys?: string[]
-) {
+function ItemContentsDiffer(item1: SNItem, item2: SNItem, excludeContentKeys?: string[]) {
   if (!excludeContentKeys) {
     excludeContentKeys = []
   }
@@ -584,7 +572,7 @@ function ItemContentsDiffer(
     item1.content as PayloadContent,
     item2.content as PayloadContent,
     item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
-    item1.appDataContentKeysToIgnoreWhenCheckingEquality()
+    item1.appDataContentKeysToIgnoreWhenCheckingEquality(),
   )
 }
 
@@ -592,7 +580,7 @@ function ItemContentsEqual(
   leftContent: PayloadContent,
   rightContent: PayloadContent,
   keysToIgnore: string[],
-  appDataKeysToIgnore: string[]
+  appDataKeysToIgnore: string[],
 ) {
   /* Create copies of objects before running omit as not to modify source values directly. */
   leftContent = sortedCopy(leftContent)

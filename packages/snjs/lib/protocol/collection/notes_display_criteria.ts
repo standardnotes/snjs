@@ -8,9 +8,9 @@ import { CompoundPredicate } from '@standardnotes/payloads'
 import { SNItem } from '@Lib/models'
 
 export type SearchQuery = {
-  query: string;
-  includeProtectedNoteText: boolean;
-};
+  query: string
+  includeProtectedNoteText: boolean
+}
 
 export class NotesDisplayCriteria {
   public searchQuery?: SearchQuery
@@ -93,7 +93,7 @@ export class NotesDisplayCriteria {
   }
 }
 
-type NoteFilter = (note: SNNote) => boolean;
+type NoteFilter = (note: SNNote) => boolean
 
 export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
   const criteria = NotesDisplayCriteria.Create({
@@ -203,9 +203,7 @@ function stringBetweenQuotes(text: string) {
 }
 
 function stringIsUuid(text: string) {
-  const matches = text.match(
-    /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/,
-  )
+  const matches = text.match(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/)
   // eslint-disable-next-line no-unneeded-ternary
   return matches ? true : false
 }

@@ -1,13 +1,8 @@
-import {
-  Challenge,
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeValidation,
-} from './../challenges'
+import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from './../challenges'
 import { MigrationServices } from './types'
 import { ApplicationStage } from '@standardnotes/applications'
 
-type StageHandler = () => Promise<void>;
+type StageHandler = () => Promise<void>
 
 export abstract class Migration {
   private stageHandlers: Partial<Record<ApplicationStage, StageHandler>> = {}
@@ -21,12 +16,9 @@ export abstract class Migration {
     throw 'Must override'
   }
 
-  protected abstract registerStageHandlers(): void;
+  protected abstract registerStageHandlers(): void
 
-  protected registerStageHandler(
-    stage: ApplicationStage,
-    handler: StageHandler
-  ) {
+  protected registerStageHandler(stage: ApplicationStage, handler: StageHandler) {
     this.stageHandlers[stage] = handler
   }
 
@@ -36,12 +28,12 @@ export abstract class Migration {
   }
 
   protected async promptForPasscodeUntilCorrect(
-    validationCallback: (passcode: string) => Promise<boolean>
+    validationCallback: (passcode: string) => Promise<boolean>,
   ) {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.None)],
       ChallengeReason.Migration,
-      false
+      false,
     )
     return new Promise((resolve) => {
       this.services.challengeService.addChallengeObserver(challenge, {
@@ -53,11 +45,7 @@ export abstract class Migration {
             this.services.challengeService.completeChallenge(challenge)
             resolve(passcode)
           } else {
-            this.services.challengeService.setValidationStatusForChallenge(
-              challenge,
-              value,
-              false
-            )
+            this.services.challengeService.setValidationStatusForChallenge(challenge, value, false)
           }
         },
       })

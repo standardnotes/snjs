@@ -15,13 +15,7 @@ import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import { SNComponent } from '@Models/app/component'
 import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
-import {
-  Copy,
-  concatArrays,
-  filterFromArray,
-  removeFromArray,
-  sleep,
-} from '@standardnotes/utils'
+import { Copy, concatArrays, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/platforms'
 import { UuidString } from '@Lib/types'
 import {
@@ -29,10 +23,7 @@ import {
   DesktopManagerInterface,
   AllowedBatchPermissions,
 } from '@Services/component_manager/types'
-import {
-  ActionObserver,
-  ComponentViewer,
-} from '@Services/component_manager/component_viewer'
+import { ActionObserver, ComponentViewer } from '@Services/component_manager/component_viewer'
 import { AbstractService } from '@standardnotes/services'
 
 const DESKTOP_URL_PREFIX = 'sn://'
@@ -45,18 +36,15 @@ export const enum ComponentManagerEvent {
 }
 
 export type EventData = {
-  componentViewer?: ComponentViewer;
-};
+  componentViewer?: ComponentViewer
+}
 
 /**
  * Responsible for orchestrating component functionality, including editors, themes,
  * and other components. The component manager primarily deals with iframes, and orchestrates
  * sending and receiving messages to and from frames via the postMessage API.
  */
-export class SNComponentManager extends AbstractService<
-  ComponentManagerEvent,
-  EventData
-> {
+export class SNComponentManager extends AbstractService<ComponentManagerEvent, EventData> {
   private desktopManager?: DesktopManagerInterface
   private viewers: ComponentViewer[] = []
   private removeItemObserver!: () => void
@@ -70,7 +58,7 @@ export class SNComponentManager extends AbstractService<
     protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
-    private runtime: Runtime
+    private runtime: Runtime,
   ) {
     super()
     this.loggingEnabled = false
@@ -106,13 +94,13 @@ export class SNComponentManager extends AbstractService<
     }
     this.viewers.length = 0
     this.permissionDialogs.length = 0
-    this.desktopManager = undefined;
-    (this.itemManager as unknown) = undefined;
-    (this.syncService as unknown) = undefined;
-    (this.alertService as unknown) = undefined;
-    (this.preferencesSerivce as unknown) = undefined
-    this.removeItemObserver();
-    (this.removeItemObserver as unknown) = undefined
+    this.desktopManager = undefined
+    ;(this.itemManager as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.alertService as unknown) = undefined
+    ;(this.preferencesSerivce as unknown) = undefined
+    this.removeItemObserver()
+    ;(this.removeItemObserver as unknown) = undefined
     if (window && !this.isMobile) {
       window.removeEventListener('focus', this.detectFocusChange, true)
       window.removeEventListener('blur', this.detectFocusChange, true)
@@ -124,7 +112,7 @@ export class SNComponentManager extends AbstractService<
     component: SNComponent,
     contextItem?: UuidString,
     actionObserver?: ActionObserver,
-    urlOverride?: string
+    urlOverride?: string,
   ): ComponentViewer {
     const viewer = new ComponentViewer(
       component,
@@ -142,7 +130,7 @@ export class SNComponentManager extends AbstractService<
       },
       urlOverride || this.urlForComponent(component),
       contextItem,
-      actionObserver
+      actionObserver,
     )
     this.viewers.push(viewer)
     return viewer
@@ -158,10 +146,7 @@ export class SNComponentManager extends AbstractService<
     this.configureForDesktop()
   }
 
-  handleChangedComponents(
-    components: SNComponent[],
-    source: PayloadSource
-  ): void {
+  handleChangedComponents(components: SNComponent[], source: PayloadSource): void {
     const acceptableSources = [
       PayloadSource.LocalChanged,
       PayloadSource.RemoteRetrieved,
@@ -195,12 +180,11 @@ export class SNComponentManager extends AbstractService<
         const items = concatArrays(changed, inserted, discarded) as SNItem[]
         const syncedComponents = items.filter((item) => {
           return (
-            item.content_type === ContentType.Component ||
-            item.content_type === ContentType.Theme
+            item.content_type === ContentType.Component || item.content_type === ContentType.Theme
           )
         }) as SNComponent[]
         this.handleChangedComponents(syncedComponents, source)
-      }
+      },
     )
   }
 
@@ -212,7 +196,7 @@ export class SNComponentManager extends AbstractService<
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const viewer = this.findComponentViewer(
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            iframe.dataset.componentViewerId!
+            iframe.dataset.componentViewerId!,
           )!
           this.notifyEvent(ComponentManagerEvent.ViewerDidFocus, {
             componentViewer: viewer,
@@ -227,9 +211,7 @@ export class SNComponentManager extends AbstractService<
     /** Make sure this message is for us */
     if (event.data.sessionKey) {
       this.log('Component manager received message', event.data)
-      this.componentViewerForSessionKey(event.data.sessionKey)?.handleMessage(
-        event.data
-      )
+      this.componentViewerForSessionKey(event.data.sessionKey)?.handleMessage(event.data)
     }
   }
 
@@ -279,13 +261,13 @@ export class SNComponentManager extends AbstractService<
 
     if (this.isDesktop) {
       if (nativeFeature) {
-        return `${this.desktopManager!.getExtServerHost()}/components/${
-          component.identifier
-        }/${nativeFeature.index_path}`
+        return `${this.desktopManager!.getExtServerHost()}/components/${component.identifier}/${
+          nativeFeature.index_path
+        }`
       } else if (component.local_url) {
         return component.local_url.replace(
           DESKTOP_URL_PREFIX,
-          this.desktopManager!.getExtServerHost() + '/'
+          this.desktopManager!.getExtServerHost() + '/',
         )
       } else {
         return component.hosted_url || component.legacy_url
@@ -295,9 +277,7 @@ export class SNComponentManager extends AbstractService<
     const isWeb = this.environment === Environment.Web
     if (nativeFeature) {
       if (!isWeb) {
-        throw Error(
-          'Mobile must override urlForComponent to handle native paths'
-        )
+        throw Error('Mobile must override urlForComponent to handle native paths')
       }
       return `${window.location.origin}/components/${component.identifier}/${nativeFeature.index_path}`
     }
@@ -307,11 +287,8 @@ export class SNComponentManager extends AbstractService<
       return undefined
     }
     if (this.isMobile) {
-      const localReplacement =
-        this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST
-      url = url
-        .replace(LOCAL_HOST, localReplacement)
-        .replace(CUSTOM_LOCAL_HOST, localReplacement)
+      const localReplacement = this.platform === Platform.Ios ? LOCAL_HOST : ANDROID_LOCAL_HOST
+      url = url.replace(LOCAL_HOST, localReplacement).replace(CUSTOM_LOCAL_HOST, localReplacement)
     }
     return url
   }
@@ -340,13 +317,11 @@ export class SNComponentManager extends AbstractService<
     return this.viewers.find((viewer) => viewer.sessionKey === key)
   }
 
-  private areRequestedPermissionsValid(
-    permissions: ComponentPermission[]
-  ): boolean {
+  private areRequestedPermissionsValid(permissions: ComponentPermission[]): boolean {
     for (const permission of permissions) {
       if (permission.name === ComponentAction.StreamItems) {
         const hasNonAllowedBatchPermission = permission.content_types?.some(
-          (type) => !AllowedBatchPermissions.includes(type)
+          (type) => !AllowedBatchPermissions.includes(type),
         )
         if (hasNonAllowedBatchPermission) {
           return false
@@ -360,27 +335,26 @@ export class SNComponentManager extends AbstractService<
   runWithPermissions(
     componentUuid: UuidString,
     requiredPermissions: ComponentPermission[],
-    runFunction: () => void
+    runFunction: () => void,
   ): void {
     if (!this.areRequestedPermissionsValid(requiredPermissions)) {
       console.error(
         'Component is requesting invalid permissions',
         componentUuid,
-        requiredPermissions
+        requiredPermissions,
       )
       return
     }
     const component = this.findComponent(componentUuid)
     const nativeFeature = FindNativeFeature(component.identifier)
-    const acquiredPermissions =
-      nativeFeature?.component_permissions || component.permissions
+    const acquiredPermissions = nativeFeature?.component_permissions || component.permissions
 
     /* Make copy as not to mutate input values */
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[]
     for (const required of requiredPermissions.slice()) {
       /* Remove anything we already have */
       const respectiveAcquired = acquiredPermissions.find(
-        (candidate) => candidate.name === required.name
+        (candidate) => candidate.name === required.name,
       )
       if (!respectiveAcquired) {
         continue
@@ -410,7 +384,7 @@ export class SNComponentManager extends AbstractService<
           if (approved) {
             runFunction()
           }
-        }
+        },
       )
     } else {
       runFunction()
@@ -420,7 +394,7 @@ export class SNComponentManager extends AbstractService<
   promptForPermissionsWithAngularAsyncRendering(
     component: SNComponent,
     permissions: ComponentPermission[],
-    callback: (approved: boolean) => Promise<void>
+    callback: (approved: boolean) => Promise<void>,
   ): void {
     setTimeout(() => {
       this.promptForPermissions(component, permissions, callback)
@@ -430,26 +404,21 @@ export class SNComponentManager extends AbstractService<
   promptForPermissions(
     component: SNComponent,
     permissions: ComponentPermission[],
-    callback: (approved: boolean) => Promise<void>
+    callback: (approved: boolean) => Promise<void>,
   ): void {
     const params: PermissionDialog = {
       component: component,
       permissions: permissions,
-      permissionsString: this.permissionsStringForPermissions(
-        permissions,
-        component
-      ),
+      permissionsString: this.permissionsStringForPermissions(permissions, component),
       actionBlock: callback,
       callback: async (approved: boolean) => {
         const latestComponent = this.findComponent(component.uuid)
         if (approved) {
           this.log('Changing component to expand permissions', component)
-          const componentPermissions = Copy(
-            latestComponent.permissions
-          ) as ComponentPermission[]
+          const componentPermissions = Copy(latestComponent.permissions) as ComponentPermission[]
           for (const permission of permissions) {
             const matchingPermission = componentPermissions.find(
-              (candidate) => candidate.name === permission.name
+              (candidate) => candidate.name === permission.name,
             )
             if (!matchingPermission) {
               componentPermissions.push(permission)
@@ -457,7 +426,7 @@ export class SNComponentManager extends AbstractService<
               /* Permission already exists, but content_types may have been expanded */
               const contentTypes = matchingPermission.content_types || []
               matchingPermission.content_types = uniq(
-                contentTypes.concat(permission.content_types!)
+                contentTypes.concat(permission.content_types!),
               )
             }
           }
@@ -467,43 +436,37 @@ export class SNComponentManager extends AbstractService<
           })
           this.syncService.sync()
         }
-        this.permissionDialogs = this.permissionDialogs.filter(
-          (pendingDialog) => {
-            /* Remove self */
-            if (pendingDialog === params) {
-              pendingDialog.actionBlock && pendingDialog.actionBlock(approved)
+        this.permissionDialogs = this.permissionDialogs.filter((pendingDialog) => {
+          /* Remove self */
+          if (pendingDialog === params) {
+            pendingDialog.actionBlock && pendingDialog.actionBlock(approved)
+            return false
+          }
+          const containsObjectSubset = (
+            source: ComponentPermission[],
+            target: ComponentPermission[],
+          ) => {
+            return !target.some(
+              (val) =>
+                !source.find((candidate) => JSON.stringify(candidate) === JSON.stringify(val)),
+            )
+          }
+          if (pendingDialog.component === component) {
+            /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
+            if (
+              pendingDialog.permissions === permissions ||
+              containsObjectSubset(permissions, pendingDialog.permissions)
+            ) {
+              /* If approved, run the action block. Otherwise, if canceled, cancel any
+              pending ones as well, since the user was explicit in their intentions */
+              if (approved) {
+                pendingDialog.actionBlock && pendingDialog.actionBlock(approved)
+              }
               return false
             }
-            const containsObjectSubset = (
-              source: ComponentPermission[],
-              target: ComponentPermission[]
-            ) => {
-              return !target.some(
-                (val) =>
-                  !source.find(
-                    (candidate) =>
-                      JSON.stringify(candidate) === JSON.stringify(val)
-                  )
-              )
-            }
-            if (pendingDialog.component === component) {
-              /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
-              if (
-                pendingDialog.permissions === permissions ||
-                containsObjectSubset(permissions, pendingDialog.permissions)
-              ) {
-                /* If approved, run the action block. Otherwise, if canceled, cancel any
-              pending ones as well, since the user was explicit in their intentions */
-                if (approved) {
-                  pendingDialog.actionBlock &&
-                    pendingDialog.actionBlock(approved)
-                }
-                return false
-              }
-            }
-            return true
           }
-        )
+          return true
+        })
         if (this.permissionDialogs.length > 0) {
           this.presentPermissionsDialog(this.permissionDialogs[0])
         }
@@ -550,12 +513,9 @@ export class SNComponentManager extends AbstractService<
         await sleep(10)
         for (const candidate of activeThemes) {
           if (candidate && !candidate.isLayerable()) {
-            await this.itemManager.changeComponent(
-              candidate.uuid,
-              (mutator) => {
-                mutator.active = false
-              }
-            )
+            await this.itemManager.changeComponent(candidate.uuid, (mutator) => {
+              mutator.active = false
+            })
           }
         }
       }
@@ -590,9 +550,7 @@ export class SNComponentManager extends AbstractService<
     return Array.from(document.getElementsByTagName('iframe'))
   }
 
-  iframeForComponentViewer(
-    viewer: ComponentViewer
-  ): HTMLIFrameElement | undefined {
+  iframeForComponentViewer(viewer: ComponentViewer): HTMLIFrameElement | undefined {
     return viewer.getIframe()
   }
 
@@ -614,10 +572,7 @@ export class SNComponentManager extends AbstractService<
         defaultEditor = this.getDefaultEditor()
       }
     }
-    if (
-      defaultEditor &&
-      !defaultEditor.isExplicitlyDisabledForItem(note.uuid)
-    ) {
+    if (defaultEditor && !defaultEditor.isExplicitlyDisabledForItem(note.uuid)) {
       return defaultEditor
     } else {
       return undefined
@@ -637,7 +592,7 @@ export class SNComponentManager extends AbstractService<
 
   permissionsStringForPermissions(
     permissions: ComponentPermission[],
-    component: SNComponent
+    component: SNComponent,
   ): string {
     if (permissions.length === 0) {
       return '.'
@@ -648,31 +603,29 @@ export class SNComponentManager extends AbstractService<
 
     permissions.forEach((permission) => {
       switch (permission.name) {
-      case ComponentAction.StreamItems:
-        if (!permission.content_types) {
-          return
-        }
-        permission.content_types.forEach((contentType) => {
-          const desc = displayStringForContentType(contentType)
-          if (desc) {
-            contentTypeStrings.push(`${desc}s`)
-          } else {
-            contentTypeStrings.push(`items of type ${contentType}`)
+        case ComponentAction.StreamItems:
+          if (!permission.content_types) {
+            return
           }
-        })
-        break
-      case ComponentAction.StreamContextItem:
-        {
-          const componentAreaMapping = {
-            [ComponentArea.EditorStack]: 'working note',
-            [ComponentArea.NoteTags]: 'working note',
-            [ComponentArea.Editor]: 'working note',
+          permission.content_types.forEach((contentType) => {
+            const desc = displayStringForContentType(contentType)
+            if (desc) {
+              contentTypeStrings.push(`${desc}s`)
+            } else {
+              contentTypeStrings.push(`items of type ${contentType}`)
+            }
+          })
+          break
+        case ComponentAction.StreamContextItem:
+          {
+            const componentAreaMapping = {
+              [ComponentArea.EditorStack]: 'working note',
+              [ComponentArea.NoteTags]: 'working note',
+              [ComponentArea.Editor]: 'working note',
+            }
+            contextAreaStrings.push((componentAreaMapping as any)[component.area])
           }
-          contextAreaStrings.push(
-            (componentAreaMapping as any)[component.area]
-          )
-        }
-        break
+          break
       }
     })
 
@@ -687,15 +640,13 @@ export class SNComponentManager extends AbstractService<
 
   doesEditorChangeRequireAlert(
     from: SNComponent | undefined,
-    to: SNComponent | undefined
+    to: SNComponent | undefined,
   ): boolean {
     const isEitherPlainEditor = !from || !to
     const isEitherMarkdown =
-      from?.package_info.file_type === 'md' ||
-      to?.package_info.file_type === 'md'
+      from?.package_info.file_type === 'md' || to?.package_info.file_type === 'md'
     const areBothHtml =
-      from?.package_info.file_type === 'html' &&
-      to?.package_info.file_type === 'html'
+      from?.package_info.file_type === 'html' && to?.package_info.file_type === 'html'
 
     if (isEitherPlainEditor || isEitherMarkdown || areBothHtml) {
       return false
@@ -708,7 +659,7 @@ export class SNComponentManager extends AbstractService<
     const shouldChangeEditor = await this.alertService.confirm(
       'Doing so might result in minor formatting changes.',
       'Are you sure you want to change the editor?',
-      'Yes, change it'
+      'Yes, change it',
     )
 
     return shouldChangeEditor

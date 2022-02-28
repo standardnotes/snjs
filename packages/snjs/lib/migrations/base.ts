@@ -1,16 +1,9 @@
 import { SNLog } from '@Lib/log'
 import { CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { ChallengeReason, ChallengeValidation } from './../challenges'
-import {
-  KeychainRecoveryStrings,
-  SessionStrings,
-} from './../services/api/messages'
+import { KeychainRecoveryStrings, SessionStrings } from './../services/api/messages'
 import { Challenge, ChallengePrompt } from '@Lib/challenges'
-import {
-  PreviousSnjsVersion1_0_0,
-  PreviousSnjsVersion2_0_0,
-  SnjsVersion,
-} from './../version'
+import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from './../version'
 import { Migration } from '@Lib/migrations/migration'
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys'
 import { ApplicationStage, ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
@@ -35,22 +28,16 @@ export class BaseMigration extends Migration {
   }
 
   protected registerStageHandlers() {
-    this.registerStageHandler(
-      ApplicationStage.PreparingForLaunch_0,
-      async () => {
-        if (await this.needsKeychainRepair()) {
-          await this.repairMissingKeychain()
-        }
-        this.markDone()
+    this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
+      if (await this.needsKeychainRepair()) {
+        await this.repairMissingKeychain()
       }
-    )
+      this.markDone()
+    })
   }
 
   private getStoredVersion() {
-    const storageKey = namespacedKey(
-      this.services.identifier,
-      RawStorageKey.SnjsVersion
-    )
+    const storageKey = namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion)
     return this.services.deviceInterface.getRawStorageValue(storageKey)
   }
 
@@ -60,10 +47,7 @@ export class BaseMigration extends Migration {
    * value if we do not find it in storage.
    */
   private async storeVersionNumber() {
-    const storageKey = namespacedKey(
-      this.services.identifier,
-      RawStorageKey.SnjsVersion
-    )
+    const storageKey = namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion)
     const version = await this.getStoredVersion()
     if (!version) {
       /** Determine if we are 1.0.0 or 2.0.0 */
@@ -78,9 +62,7 @@ export class BaseMigration extends Migration {
       ]
       let hasLegacyValue = false
       for (const legacyKey of possibleLegacyKeys) {
-        const value = await this.services.deviceInterface.getRawStorageValue(
-          legacyKey
-        )
+        const value = await this.services.deviceInterface.getRawStorageValue(legacyKey)
         if (value) {
           hasLegacyValue = true
           break
@@ -88,34 +70,24 @@ export class BaseMigration extends Migration {
       }
       if (hasLegacyValue) {
         /** Coming from 1.0.0 */
-        await this.services.deviceInterface.setRawStorageValue(
-          storageKey,
-          PreviousSnjsVersion1_0_0
-        )
+        await this.services.deviceInterface.setRawStorageValue(storageKey, PreviousSnjsVersion1_0_0)
       } else {
         /** Coming from 2.0.0 (which did not store version) OR is brand new application */
         const migrationKey = namespacedKey(
           this.services!.identifier,
-          LastMigrationTimeStampKey2_0_0
+          LastMigrationTimeStampKey2_0_0,
         )
-        const migrationValue = await this.services.deviceInterface.getRawStorageValue(
-          migrationKey
-        )
+        const migrationValue = await this.services.deviceInterface.getRawStorageValue(migrationKey)
         const is_2_0_0_application = !isNullOrUndefined(migrationValue)
         if (is_2_0_0_application) {
           await this.services.deviceInterface.setRawStorageValue(
             storageKey,
-            PreviousSnjsVersion2_0_0
+            PreviousSnjsVersion2_0_0,
           )
-          await this.services.deviceInterface.removeRawStorageValue(
-            LastMigrationTimeStampKey2_0_0
-          )
+          await this.services.deviceInterface.removeRawStorageValue(LastMigrationTimeStampKey2_0_0)
         } else {
           /** Is new application, use current version as not to run any migrations */
-          await this.services.deviceInterface.setRawStorageValue(
-            storageKey,
-            SnjsVersion
-          )
+          await this.services.deviceInterface.setRawStorageValue(storageKey, SnjsVersion)
         }
       }
     }
@@ -130,7 +102,7 @@ export class BaseMigration extends Migration {
       version,
       this.services.deviceInterface,
       this.services.identifier,
-      this.services.environment
+      this.services.environment,
     )
   }
 
@@ -196,28 +168,28 @@ export class BaseMigration extends Migration {
           ChallengeValidation.None,
           undefined,
           SessionStrings.PasswordInputPlaceholder,
-          true
+          true,
         ),
       ],
       ChallengeReason.Custom,
       false,
       KeychainRecoveryStrings.Title,
-      KeychainRecoveryStrings.Text
+      KeychainRecoveryStrings.Text,
     )
     return new Promise((resolve) => {
       this.services.challengeService.addChallengeObserver(challenge, {
         onNonvalidatedSubmit: async (challengeResponse) => {
           const password = challengeResponse.values[0].value as string
           const accountParams = this.services.protocolService.createKeyParams(
-            rawAccountParams as any
+            rawAccountParams as any,
           )
           const rootKey = await this.services.protocolService.computeRootKey(
             password,
-            accountParams
+            accountParams,
           )
           /** Choose an item to decrypt */
           const allItems = (await this.services.deviceInterface.getAllRawDatabasePayloads(
-            this.services.identifier
+            this.services.identifier,
           )) as any[]
           let itemToDecrypt = allItems.find((item) => {
             const payload = CreateMaxPayloadFromAnyObject(item)
@@ -229,21 +201,19 @@ export class BaseMigration extends Migration {
           }
           if (!itemToDecrypt) {
             throw SNLog.error(
-              Error(
-                'Attempting keychain recovery validation but no items present.'
-              )
+              Error('Attempting keychain recovery validation but no items present.'),
             )
           }
           const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(
             CreateMaxPayloadFromAnyObject(itemToDecrypt),
-            rootKey
+            rootKey,
           )
           if (decryptedItem.errorDecrypting) {
             /** Wrong password, try again */
             this.services.challengeService.setValidationStatusForChallenge(
               challenge,
               challengeResponse!.values[0],
-              false
+              false,
             )
           } else {
             /**
@@ -262,7 +232,7 @@ export class BaseMigration extends Migration {
               const rawKey = rootKey.getKeychainValue()
               await this.services.deviceInterface.setNamespacedKeychainValue(
                 rawKey,
-                this.services.identifier
+                this.services.identifier,
               )
             }
             resolve(true)

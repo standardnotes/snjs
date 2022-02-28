@@ -7,12 +7,11 @@ import { PurePayload } from '@standardnotes/payloads'
  */
 export function SortPayloadsByRecentAndContentPriority(
   payloads: PurePayload[],
-  priorityList: ContentType[]
+  priorityList: ContentType[],
 ): PurePayload[] {
   return payloads.sort((a: PurePayload, b: PurePayload) => {
     const dateResult =
-      new Date(b.serverUpdatedAt!).getTime() -
-      new Date(a.serverUpdatedAt!).getTime()
+      new Date(b.serverUpdatedAt!).getTime() - new Date(a.serverUpdatedAt!).getTime()
     let aPriority = 0
     let bPriority = 0
     if (priorityList) {

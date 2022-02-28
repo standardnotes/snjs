@@ -17,12 +17,7 @@ import {
 import { PayloadManager } from './../payload_manager'
 import { SNStorageService } from './../storage_service'
 import { SNProtocolService } from './../protocol_service'
-import {
-  isNullOrUndefined,
-  removeFromIndex,
-  sleep,
-  subtractFromArray,
-} from '@standardnotes/utils'
+import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@standardnotes/utils'
 import { SortPayloadsByRecentAndContentPriority } from '@Services/sync/utils'
 import { SyncOpStatus } from '@Services/sync/sync_op_status'
 import { SyncState } from '@Services/sync/sync_state'
@@ -82,26 +77,26 @@ export enum SyncSources {
 }
 
 export type SyncOptions = {
-  queueStrategy?: SyncQueueStrategy;
-  mode?: SyncModes;
+  queueStrategy?: SyncQueueStrategy
+  mode?: SyncModes
   /** Whether the server should compute and return an integrity hash. */
-  checkIntegrity?: boolean;
+  checkIntegrity?: boolean
   /** Internally used to keep track of how sync requests were spawned. */
-  source?: SyncSources;
+  source?: SyncSources
   /** Whether to await any sync requests that may be queued from this call. */
-  awaitAll?: boolean;
+  awaitAll?: boolean
   /**
    * A callback that is triggered after pre-sync save completes,
    * and before the sync request is network dispatched
    */
-  onPresyncSave?: () => void;
-};
+  onPresyncSave?: () => void
+}
 
 type SyncPromise = {
-  resolve: (value?: unknown) => void;
-  reject: () => void;
-  options?: SyncOptions;
-};
+  resolve: (value?: unknown) => void
+  reject: () => void
+  options?: SyncOptions
+}
 
 /**
  * The sync service orchestrates with the model manager, api service, and storage service
@@ -156,7 +151,7 @@ export class SNSyncService extends AbstractService<
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
     private historyService: SNHistoryManager,
-    private readonly options: ApplicationSyncOptions
+    private readonly options: ApplicationSyncOptions,
   ) {
     super()
     this.initializeStatus()
@@ -174,17 +169,17 @@ export class SNSyncService extends AbstractService<
   }
 
   public deinit(): void {
-    this.dealloced = true;
-    (this.sessionManager as unknown) = undefined;
-    (this.itemManager as unknown) = undefined;
-    (this.protocolService as unknown) = undefined;
-    (this.payloadManager as unknown) = undefined;
-    (this.storageService as unknown) = undefined;
-    (this.apiService as unknown) = undefined
+    this.dealloced = true
+    ;(this.sessionManager as unknown) = undefined
+    ;(this.itemManager as unknown) = undefined
+    ;(this.protocolService as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    ;(this.storageService as unknown) = undefined
+    ;(this.apiService as unknown) = undefined
     this.state?.reset()
     this.opStatus.reset()
-    this.state = undefined;
-    (this.opStatus as unknown) = undefined
+    this.state = undefined
+    ;(this.opStatus as unknown) = undefined
     this.resolveQueue.length = 0
     this.spawnQueue.length = 0
     super.deinit()
@@ -276,7 +271,7 @@ export class SNSyncService extends AbstractService<
 
     const payloads = SortPayloadsByRecentAndContentPriority(
       unsortedPayloads as PurePayload[],
-      this.localLoadPriorty
+      this.localLoadPriorty,
     )
     /** Decrypt and map items keys first */
     const itemsKeysPayloads = payloads.filter((payload: PurePayload) => {
@@ -285,12 +280,9 @@ export class SNSyncService extends AbstractService<
     subtractFromArray(payloads, itemsKeysPayloads)
 
     const decryptedItemsKeys = await this.protocolService.payloadsByDecryptingPayloads(
-      itemsKeysPayloads
+      itemsKeysPayloads,
     )
-    await this.payloadManager.emitPayloads(
-      decryptedItemsKeys,
-      PayloadSource.LocalRetrieved
-    )
+    await this.payloadManager.emitPayloads(decryptedItemsKeys, PayloadSource.LocalRetrieved)
 
     /**
      * Map in batches to give interface a chance to update. Note that total decryption
@@ -303,17 +295,9 @@ export class SNSyncService extends AbstractService<
     const numBatches = Math.ceil(payloadCount / batchSize)
     for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
       const currentPosition = batchIndex * batchSize
-      const batch = payloads.slice(
-        currentPosition,
-        currentPosition + batchSize
-      )
-      const decrypted = await this.protocolService.payloadsByDecryptingPayloads(
-        batch
-      )
-      await this.payloadManager.emitPayloads(
-        decrypted,
-        PayloadSource.LocalRetrieved
-      )
+      const batch = payloads.slice(currentPosition, currentPosition + batchSize)
+      const decrypted = await this.protocolService.payloadsByDecryptingPayloads(batch)
+      await this.payloadManager.emitPayloads(decrypted, PayloadSource.LocalRetrieved)
       this.notifyEvent(SyncEvent.LocalDataIncrementalLoad)
       this.opStatus.setDatabaseLoadStatus(currentPosition, payloadCount, false)
       await sleep(1, false)
@@ -339,18 +323,14 @@ export class SNSyncService extends AbstractService<
 
   private async getLastSyncToken() {
     if (!this.syncToken) {
-      this.syncToken = await this.storageService.getValue(
-        StorageKey.LastSyncToken
-      )
+      this.syncToken = await this.storageService.getValue(StorageKey.LastSyncToken)
     }
     return this.syncToken!
   }
 
   private async getPaginationToken() {
     if (!this.cursorToken) {
-      this.cursorToken = await this.storageService.getValue(
-        StorageKey.PaginationToken
-      )
+      this.cursorToken = await this.storageService.getValue(StorageKey.PaginationToken)
     }
     return this.cursorToken!
   }
@@ -379,10 +359,7 @@ export class SNSyncService extends AbstractService<
         dirtiedDate: new Date(),
       })
     })
-    await this.payloadManager.emitPayloads(
-      payloads,
-      PayloadSource.LocalChanged
-    )
+    await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
 
@@ -441,15 +418,12 @@ export class SNSyncService extends AbstractService<
   }
 
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
-    return this.protocolService.payloadsByEncryptingPayloads(
-      payloads,
-      EncryptionIntent.Sync
-    )
+    return this.protocolService.payloadsByEncryptingPayloads(payloads, EncryptionIntent.Sync)
   }
 
   public async downloadFirstSync(
     waitTimeOnFailureMs: number,
-    otherSyncOptions?: SyncOptions
+    otherSyncOptions?: SyncOptions,
   ): Promise<void> {
     const maxTries = 5
     for (let i = 0; i < maxTries; i++) {
@@ -528,9 +502,7 @@ export class SNSyncService extends AbstractService<
       return item.payloadRepresentation()
     })
 
-    const payloadsNeedingSave = await this.popPayloadsNeedingPreSyncSave(
-      decryptedPayloads
-    )
+    const payloadsNeedingSave = await this.popPayloadsNeedingPreSyncSave(decryptedPayloads)
     await this.persistPayloads(payloadsNeedingSave)
 
     if (options.onPresyncSave) {
@@ -551,8 +523,8 @@ export class SNSyncService extends AbstractService<
         !canExecuteSync
           ? 'Another function call has begun preparing for sync.'
           : syncInProgress
-            ? 'Attempting to sync while existing sync in progress.'
-            : 'Attempting to sync before local database has loaded.'
+          ? 'Attempting to sync while existing sync in progress.'
+          : 'Attempting to sync before local database has loaded.',
       )
       if (useStrategy === SyncQueueStrategy.ResolveOnNext) {
         return this.queueStrategyResolveOnNext()
@@ -585,12 +557,11 @@ export class SNSyncService extends AbstractService<
           mutator.lastSyncBegan = beginDate
         },
         MutationType.NonDirtying,
-        PayloadSource.PreSyncSave
+        PayloadSource.PreSyncSave,
       )
     }
 
-    const erroredState =
-      this.protocolService.hasAccount() !== this.sessionManager!.online()
+    const erroredState = this.protocolService.hasAccount() !== this.sessionManager!.online()
     if (erroredState) {
       this.handleInvalidSessionState()
     }
@@ -609,14 +580,10 @@ export class SNSyncService extends AbstractService<
     let uploadPayloads: PurePayload[] = []
     if (useMode === SyncModes.Default) {
       if (online && !this.completedOnlineDownloadFirstSync) {
-        throw Error(
-          'Attempting to default mode sync without having completed initial.'
-        )
+        throw Error('Attempting to default mode sync without having completed initial.')
       }
       if (online) {
-        uploadPayloads = await this.payloadsByPreparingForServer(
-          decryptedPayloads
-        )
+        uploadPayloads = await this.payloadsByPreparingForServer(decryptedPayloads)
       } else {
         uploadPayloads = decryptedPayloads
       }
@@ -630,14 +597,10 @@ export class SNSyncService extends AbstractService<
         uploadPayloads,
         options.checkIntegrity!,
         options.source!,
-        useMode
+        useMode,
       )
     } else {
-      operation = await this.syncOfflineOperation(
-        uploadPayloads,
-        options.source,
-        useMode
-      )
+      operation = await this.syncOfflineOperation(uploadPayloads, options.source, useMode)
     }
 
     this.currentSyncRequestPromise = operation.run()
@@ -703,10 +666,7 @@ export class SNSyncService extends AbstractService<
         checkIntegrity: options.checkIntegrity,
         awaitAll: options.awaitAll,
       })
-    } else if (
-      operation instanceof AccountSyncOperation &&
-      operation.checkIntegrity
-    ) {
+    } else if (operation instanceof AccountSyncOperation && operation.checkIntegrity) {
       if (this.state!.needsSync && operation.done) {
         this.log('Syncing again from integrity check')
         const promise = this.sync({
@@ -751,7 +711,7 @@ export class SNSyncService extends AbstractService<
     payloads: PurePayload[],
     checkIntegrity: boolean,
     source: SyncSources,
-    mode: SyncModes
+    mode: SyncModes,
   ) {
     const syncToken = await this.getLastSyncToken()
     const paginationToken = await this.getPaginationToken()
@@ -759,28 +719,25 @@ export class SNSyncService extends AbstractService<
       payloads,
       async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
         switch (type) {
-        case SyncSignal.Response:
-          if (this.dealloced) {
-            return
-          }
-          if (response!.hasError) {
-            await this.handleErrorServerResponse(response!)
-          } else {
-            await this.handleSuccessServerResponse(operation, response!)
-          }
-          break
-        case SyncSignal.StatusChanged:
-            this.opStatus!.setUploadStatus(
-              stats!.completedUploadCount,
-              stats!.totalUploadCount
-            )
-          break
+          case SyncSignal.Response:
+            if (this.dealloced) {
+              return
+            }
+            if (response!.hasError) {
+              await this.handleErrorServerResponse(response!)
+            } else {
+              await this.handleSuccessServerResponse(operation, response!)
+            }
+            break
+          case SyncSignal.StatusChanged:
+            this.opStatus!.setUploadStatus(stats!.completedUploadCount, stats!.totalUploadCount)
+            break
         }
       },
       syncToken,
       paginationToken,
       checkIntegrity,
-      this.apiService
+      this.apiService,
     )
     this.log(
       'Syncing online user',
@@ -791,7 +748,7 @@ export class SNSyncService extends AbstractService<
       `syncToken: ${syncToken}`,
       `cursorToken: ${paginationToken}`,
       'payloads:',
-      payloads
+      payloads,
     )
     return operation
   }
@@ -799,17 +756,9 @@ export class SNSyncService extends AbstractService<
   private async syncOfflineOperation(
     payloads: PurePayload[],
     source: SyncSources,
-    mode: SyncModes
+    mode: SyncModes,
   ) {
-    this.log(
-      'Syncing offline user',
-      'source:',
-      source,
-      'mode:',
-      mode,
-      'payloads:',
-      payloads
-    )
+    this.log('Syncing offline user', 'source:', source, 'mode:', mode, 'payloads:', payloads)
     const operation = new OfflineSyncOperation(
       payloads,
       async (type: SyncSignal, response?: SyncResponse) => {
@@ -819,7 +768,7 @@ export class SNSyncService extends AbstractService<
         if (type === SyncSignal.Response) {
           await this.handleOfflineResponse(response!)
         }
-      }
+      },
     )
     return operation
   }
@@ -828,13 +777,8 @@ export class SNSyncService extends AbstractService<
     this.log('Offline Sync Response', response.rawResponse)
     const payloadsToEmit = response.savedPayloads
     if (payloadsToEmit.length > 0) {
-      await this.payloadManager.emitPayloads(
-        payloadsToEmit,
-        PayloadSource.LocalSaved
-      )
-      const payloadsToPersist = this.payloadManager.find(
-        Uuids(payloadsToEmit)
-      ) as PurePayload[]
+      await this.payloadManager.emitPayloads(payloadsToEmit, PayloadSource.LocalSaved)
+      const payloadsToPersist = this.payloadManager.find(Uuids(payloadsToEmit)) as PurePayload[]
       await this.persistPayloads(payloadsToPersist)
     }
 
@@ -861,17 +805,12 @@ export class SNSyncService extends AbstractService<
 
   private async handleSuccessServerResponse(
     operation: AccountSyncOperation,
-    response: SyncResponse
+    response: SyncResponse,
   ) {
     if (this._simulate_latency) {
       await sleep(this._simulate_latency.latency)
     }
-    this.log(
-      'Online Sync Response',
-      'operation id',
-      operation.id,
-      response.rawResponse
-    )
+    this.log('Online Sync Response', 'operation id', operation.id, response.rawResponse)
 
     this.opStatus.clearError()
     this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
@@ -890,10 +829,7 @@ export class SNSyncService extends AbstractService<
       const itemsKey = itemsKeyPayload
         ? (CreateItemFromPayload(itemsKeyPayload) as SNItemsKey)
         : undefined
-      const decrypted = await this.protocolService.payloadByDecryptingPayload(
-        payload,
-        itemsKey
-      )
+      const decrypted = await this.protocolService.payloadByDecryptingPayload(payload, itemsKey)
       if (decrypted.content_type === ContentType.ItemsKey) {
         processedItemsKeys[decrypted.uuid] = decrypted
       }
@@ -906,14 +842,12 @@ export class SNSyncService extends AbstractService<
       decryptedPayloads,
       masterCollection,
       operation.payloadsSavedOrSaving,
-      historyMap
+      historyMap,
     )
 
     const collections = await resolver.collectionsByProcessingResponse()
     for (const collection of collections) {
-      const payloadsToPersist = await this.payloadManager.emitCollection(
-        collection
-      )
+      const payloadsToPersist = await this.payloadManager.emitCollection(collection)
       await this.persistPayloads(payloadsToPersist)
     }
     const deletedPayloads = response.deletedPayloads
@@ -929,10 +863,7 @@ export class SNSyncService extends AbstractService<
 
     if (response.checkIntegrity) {
       const clientHash = await this.computeDataIntegrityHash()
-      await this.state!.setIntegrityHashes(
-        clientHash!,
-        response.integrityHash!
-      )
+      await this.state!.setIntegrityHashes(clientHash!, response.integrityHash!)
     }
   }
 
@@ -946,10 +877,7 @@ export class SNSyncService extends AbstractService<
         dirty: false,
       })
     })
-    await this.payloadManager.emitPayloads(
-      payloads,
-      PayloadSource.LocalChanged
-    )
+    await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
 
@@ -987,9 +915,7 @@ export class SNSyncService extends AbstractService<
         if (!updatedAtTimestamp) {
           return undefined
         }
-        const toMilliseconds = Math.floor(
-          updatedAtTimestamp / MicrosecondsInMillisecond
-        )
+        const toMilliseconds = Math.floor(updatedAtTimestamp / MicrosecondsInMillisecond)
         timestamps.push(toMilliseconds)
       }
       const string = timestamps.join(',')
@@ -1008,17 +934,14 @@ export class SNSyncService extends AbstractService<
       this.apiService,
       this.protocolService,
       undefined,
-      'resolve-out-of-sync'
+      'resolve-out-of-sync',
     )
     const payloads = await downloader.run()
     const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(
-        payloads,
-        PayloadSource.RemoteRetrieved
-      ),
+      ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteRetrieved),
       undefined,
-      this.historyService.getHistoryMapCopy()
+      this.historyService.getHistoryMapCopy(),
     )
     const collection = await delta.resultingCollection()
     await this.payloadManager.emitCollection(collection)
@@ -1031,13 +954,13 @@ export class SNSyncService extends AbstractService<
 
   public async statelessDownloadAllItems(
     contentType?: ContentType,
-    customEvent?: string
+    customEvent?: string,
   ): Promise<SNItem[]> {
     const downloader = new AccountDownloader(
       this.apiService,
       this.protocolService,
       contentType,
-      customEvent
+      customEvent,
     )
 
     const payloads = await downloader.run()

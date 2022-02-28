@@ -10,9 +10,7 @@ export class StorageReader1_0_0 extends StorageReader {
   }
 
   public async getAccountKeyParams() {
-    return this.deviceInterface.getJsonParsedRawStorageValue(
-      LegacyKeys1_0_0.AllAccountKeyParamsKey
-    )
+    return this.deviceInterface.getJsonParsedRawStorageValue(LegacyKeys1_0_0.AllAccountKeyParamsKey)
   }
 
   /**
@@ -32,12 +30,12 @@ export class StorageReader1_0_0 extends StorageReader {
   public async hasPasscode() {
     if (isEnvironmentMobile(this.environment)) {
       const rawPasscodeParams = await this.deviceInterface.getJsonParsedRawStorageValue(
-        LegacyKeys1_0_0.MobilePasscodeParamsKey
+        LegacyKeys1_0_0.MobilePasscodeParamsKey,
       )
       return !isNullOrUndefined(rawPasscodeParams)
     } else {
       const encryptedStorage = await this.deviceInterface.getJsonParsedRawStorageValue(
-        LegacyKeys1_0_0.WebEncryptedStorageKey
+        LegacyKeys1_0_0.WebEncryptedStorageKey,
       )
       return !isNullOrUndefined(encryptedStorage)
     }

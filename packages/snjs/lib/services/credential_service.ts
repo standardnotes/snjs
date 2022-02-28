@@ -30,8 +30,8 @@ import { AbstractService } from '@standardnotes/services'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
-export type CredentialsChangeFunctionResponse = { error?: { message: string } };
-export type AccountServiceResponse = HttpResponse;
+export type CredentialsChangeFunctionResponse = { error?: { message: string } }
+export type AccountServiceResponse = HttpResponse
 
 export const enum AccountEvent {
   SignedInOrRegistered = 'SignedInOrRegistered',
@@ -55,15 +55,15 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
   }
 
   public deinit(): void {
-    super.deinit();
-    (this.sessionManager as unknown) = undefined;
-    (this.syncService as unknown) = undefined;
-    (this.storageService as unknown) = undefined;
-    (this.itemManager as unknown) = undefined;
-    (this.protocolService as unknown) = undefined;
-    (this.alertService as unknown) = undefined;
-    (this.challengeService as unknown) = undefined;
-    (this.protectionService as unknown) = undefined
+    super.deinit()
+    ;(this.sessionManager as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.storageService as unknown) = undefined
+    ;(this.itemManager as unknown) = undefined
+    ;(this.protocolService as unknown) = undefined
+    ;(this.alertService as unknown) = undefined
+    ;(this.challengeService as unknown) = undefined
+    ;(this.protectionService as unknown) = undefined
   }
 
   /**
@@ -200,12 +200,12 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
    * is not prompted again.
    */
   public async changeCredentials(parameters: {
-    currentPassword: string;
-    origination: KeyParamsOrigination;
-    validateNewPasswordStrength: boolean;
-    newEmail?: string;
-    newPassword?: string;
-    passcode?: string;
+    currentPassword: string
+    origination: KeyParamsOrigination
+    validateNewPasswordStrength: boolean
+    newEmail?: string
+    newPassword?: string
+    passcode?: string
   }): Promise<CredentialsChangeFunctionResponse> {
     const result = await this.performCredentialsChange(parameters)
     if (result.error) {
@@ -221,9 +221,9 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
   }
 
   public async performProtocolUpgrade(): Promise<{
-    success?: true;
-    canceled?: true;
-    error?: { message: string };
+    success?: true
+    canceled?: true
+    error?: { message: string }
   }> {
     const hasPasscode = this.protocolService.hasPasscode()
     const hasAccount = this.protocolService.hasAccount()
@@ -400,12 +400,12 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
   }
 
   private async performCredentialsChange(parameters: {
-    currentPassword: string;
-    origination: KeyParamsOrigination;
-    validateNewPasswordStrength: boolean;
-    newEmail?: string;
-    newPassword?: string;
-    passcode?: string;
+    currentPassword: string
+    origination: KeyParamsOrigination
+    validateNewPasswordStrength: boolean
+    newEmail?: string
+    newPassword?: string
+    passcode?: string
   }): Promise<CredentialsChangeFunctionResponse> {
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable(
       parameters.passcode,
@@ -471,11 +471,11 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
   }
 
   private async recomputeRootKeysForCredentialChange(parameters: {
-    currentPassword: string;
-    currentEmail: string;
-    origination: KeyParamsOrigination;
-    newEmail?: string;
-    newPassword?: string;
+    currentPassword: string
+    currentEmail: string
+    origination: KeyParamsOrigination
+    newEmail?: string
+    newPassword?: string
   }): Promise<{ currentRootKey: SNRootKey; newRootKey: SNRootKey }> {
     const currentRootKey = await this.protocolService.computeRootKey(
       parameters.currentPassword,

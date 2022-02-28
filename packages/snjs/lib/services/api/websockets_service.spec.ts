@@ -1,7 +1,4 @@
-import {
-  StorageKey,
-  SNStorageService,
-} from '@Lib/index'
+import { StorageKey, SNStorageService } from '@Lib/index'
 import { SNWebSocketsService } from './websockets_service'
 
 describe('webSocketsService', () => {
@@ -10,10 +7,7 @@ describe('webSocketsService', () => {
   let storageService: SNStorageService
 
   const createService = () => {
-    return new SNWebSocketsService(
-      storageService,
-      webSocketUrl,
-    )
+    return new SNWebSocketsService(storageService, webSocketUrl)
   }
 
   beforeEach(() => {
@@ -26,6 +20,6 @@ describe('webSocketsService', () => {
       const webSocketUrl = 'wss://test-websocket'
       await createService().setWebSocketUrl(webSocketUrl)
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.WebSocketUrl, webSocketUrl)
-    }) 
+    })
   })
 })

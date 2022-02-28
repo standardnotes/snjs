@@ -9,10 +9,7 @@ import {
 import { historyMapFunctions } from './../../../services/history/history_map'
 import { CreateItemFromPayload } from '@Models/generator'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
-import {
-  PayloadContentsEqual,
-  PayloadsByDuplicating,
-} from '@Payloads/functions'
+import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions'
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils'
 import { HistoryMap } from '@Lib/services/history/history_map'
 
@@ -22,20 +19,15 @@ export class ConflictDelta {
     protected readonly basePayload: PurePayload,
     protected readonly applyPayload: PurePayload,
     protected readonly source: PayloadSource,
-    protected readonly historyMap?: HistoryMap
+    protected readonly historyMap?: HistoryMap,
   ) {}
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const tmpBaseItem = CreateItemFromPayload(this.basePayload)
     const tmpApplyItem = CreateItemFromPayload(this.applyPayload)
     const historyEntries = this.historyMap?.[this.basePayload.uuid] || []
-    const previousRevision = historyMapFunctions.getNewestRevision(
-      historyEntries
-    )
-    const strategy = tmpBaseItem.strategyWhenConflictingWithItem(
-      tmpApplyItem,
-      previousRevision
-    )
+    const previousRevision = historyMapFunctions.getNewestRevision(historyEntries)
+    const strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem, previousRevision)
     const results = await this.payloadsByHandlingStrategy(strategy)
     return ImmutablePayloadCollection.WithPayloads(results, this.source)
   }
@@ -46,24 +38,19 @@ export class ConflictDelta {
      * we make changes to many items, including duplicating, but since we are still not
      * uploading the changes until after the multi-page request completes, we may have
      * already conflicted this item. */
-    const existingConflict = this.baseCollection.conflictsOf(
-      this.applyPayload.uuid
-    )[0]
-    if (
-      existingConflict &&
-      PayloadContentsEqual(existingConflict, this.applyPayload)
-    ) {
+    const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0]
+    if (existingConflict && PayloadContentsEqual(existingConflict, this.applyPayload)) {
       /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
       strategy = ConflictStrategy.KeepLeft
     }
     if (strategy === ConflictStrategy.KeepLeft) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt!,
-        this.applyPayload.serverUpdatedAt!
+        this.applyPayload.serverUpdatedAt!,
       )
       const updatedAtTimestamp = Math.max(
         this.basePayload.updated_at_timestamp!,
-        this.applyPayload.updated_at_timestamp!
+        this.applyPayload.updated_at_timestamp!,
       )
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
@@ -80,18 +67,18 @@ export class ConflictDelta {
         [PayloadField.LastSyncBegan],
         {
           lastSyncEnd: new Date(),
-        }
+        },
       )
       return [result]
     }
     if (strategy === ConflictStrategy.KeepLeftDuplicateRight) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt!,
-        this.applyPayload.serverUpdatedAt!
+        this.applyPayload.serverUpdatedAt!,
       )
       const updatedAtTimestamp = Math.max(
         this.basePayload.updated_at_timestamp!,
-        this.applyPayload.updated_at_timestamp!
+        this.applyPayload.updated_at_timestamp!,
       )
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
@@ -102,24 +89,20 @@ export class ConflictDelta {
       const rightPayloads = await PayloadsByDuplicating(
         this.applyPayload,
         this.baseCollection,
-        true
+        true,
       )
       return [leftPayload].concat(rightPayloads)
     }
 
     if (strategy === ConflictStrategy.DuplicateLeftKeepRight) {
-      const leftPayloads = await PayloadsByDuplicating(
-        this.basePayload,
-        this.baseCollection,
-        true
-      )
+      const leftPayloads = await PayloadsByDuplicating(this.basePayload, this.baseCollection, true)
       const rightPayload = PayloadByMerging(
         this.applyPayload,
         this.basePayload,
         [PayloadField.LastSyncBegan],
         {
           lastSyncEnd: new Date(),
-        }
+        },
       )
       return leftPayloads.concat([rightPayload])
     }
@@ -128,15 +111,15 @@ export class ConflictDelta {
       const refs = uniqCombineObjArrays(
         this.basePayload.contentObject.references,
         this.applyPayload.contentObject.references,
-        ['uuid', 'content_type']
+        ['uuid', 'content_type'],
       )
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt!,
-        this.applyPayload.serverUpdatedAt!
+        this.applyPayload.serverUpdatedAt!,
       )
       const updatedAtTimestamp = Math.max(
         this.basePayload.updated_at_timestamp!,
-        this.applyPayload.updated_at_timestamp!
+        this.applyPayload.updated_at_timestamp!,
       )
       const payload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,

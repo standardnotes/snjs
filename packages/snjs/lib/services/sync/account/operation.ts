@@ -27,7 +27,7 @@ export class AccountSyncOperation {
     private lastSyncToken: string,
     private paginationToken: string,
     public checkIntegrity: boolean,
-    private apiService: SNApiService
+    private apiService: SNApiService,
   ) {
     this.payloads = payloads
     this.lastSyncToken = lastSyncToken
@@ -64,7 +64,7 @@ export class AccountSyncOperation {
       this.downLimit,
       this.checkIntegrity,
       undefined,
-      undefined
+      undefined,
     )) as RawSyncResponse
     const response = new SyncResponse(rawResponse)
 

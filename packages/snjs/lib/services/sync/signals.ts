@@ -6,12 +6,12 @@ export enum SyncSignal {
 }
 
 export type SyncStats = {
-  completedUploadCount: number;
-  totalUploadCount: number;
-};
+  completedUploadCount: number
+  totalUploadCount: number
+}
 
 export type ResponseSignalReceiver = (
   signal: SyncSignal,
   response?: SyncResponse,
-  stats?: SyncStats
-) => Promise<void>;
+  stats?: SyncStats,
+) => Promise<void>

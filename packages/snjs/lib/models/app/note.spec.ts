@@ -4,13 +4,14 @@ import { ContentType } from '@standardnotes/common'
 
 const randUuid = () => String(Math.random())
 
-const create = (payload?: Record<string, unknown>): SNNote => (new SNNote(
-  CreateMaxPayloadFromAnyObject({
-    uuid: randUuid(),
-    content_type: ContentType.Note,
-    content: FillItemContent({ ...payload }),
-  })
-))
+const create = (payload?: Record<string, unknown>): SNNote =>
+  new SNNote(
+    CreateMaxPayloadFromAnyObject({
+      uuid: randUuid(),
+      content_type: ContentType.Note,
+      content: FillItemContent({ ...payload }),
+    }),
+  )
 
 describe('SNNote Tests', () => {
   it('should safely type required fields of Note when creating from PayloadContent', () => {
@@ -28,13 +29,7 @@ describe('SNNote Tests', () => {
       typeof note.preview_html,
       typeof note.preview_plain,
       typeof note.hidePreview,
-    ]).toStrictEqual([
-      'string',
-      'string',
-      'string',
-      'string',
-      'boolean',
-    ])
+    ]).toStrictEqual(['string', 'string', 'string', 'string', 'boolean'])
   })
 
   it('should preserve falsy values when casting from PayloadContent', () => {

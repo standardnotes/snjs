@@ -4,10 +4,7 @@ import { SNItemsKey } from '@Models/app/items_key'
 import { ItemsKeyContent } from './../operator'
 import { SNRootKey } from './../../root_key'
 import { V003Algorithm } from './../algorithms'
-import {
-  Create003KeyParams,
-  SNRootKeyParams,
-} from './../../key_params'
+import { Create003KeyParams, SNRootKeyParams } from './../../key_params'
 import { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002'
 import { CreateMaxPayloadFromAnyObject, FillItemContent } from '@standardnotes/payloads'
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
@@ -50,28 +47,22 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     return CreateItemFromPayload(payload) as SNItemsKey
   }
 
-  public async computeRootKey(
-    password: string,
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey> {
+  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams)
   }
 
-  protected async deriveKey(
-    password: string,
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey> {
+  protected async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     const salt = await this.generateSalt(
       keyParams.content003.identifier!,
       ProtocolVersion.V003,
       V003Algorithm.PbkdfCost,
-      keyParams.content003.pw_nonce
+      keyParams.content003.pw_nonce,
     )
     const derivedKey = await this.crypto.pbkdf2(
       password,
       salt,
       V003Algorithm.PbkdfCost,
-      V003Algorithm.PbkdfOutputLength
+      V003Algorithm.PbkdfOutputLength,
     )
     const partitions = splitString(derivedKey!, 3)
     const key = await SNRootKey.Create({
@@ -87,7 +78,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
   public async createRootKey(
     identifier: string,
     password: string,
-    origination: KeyParamsOrigination
+    origination: KeyParamsOrigination,
   ): Promise<SNRootKey> {
     const version = ProtocolVersion.V003
     const pwNonce = this.crypto.generateRandomKey(V003Algorithm.SaltSeedLength)
@@ -105,11 +96,9 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     identifier: string,
     version: ProtocolVersion,
     cost: number,
-    nonce: string
+    nonce: string,
   ) {
-    const result = await this.crypto.sha256(
-      [identifier, 'SF', version, cost, nonce].join(':')
-    )
+    const result = await this.crypto.sha256([identifier, 'SF', version, cost, nonce].join(':'))
     return result
   }
 }

@@ -1,8 +1,5 @@
 import * as readerClasses from '@Lib/migrations/readers'
-import {
-  compareSemVersions,
-  isRightVersionGreaterThanLeft,
-} from '@Lib/version'
+import { compareSemVersions, isRightVersionGreaterThanLeft } from '@Lib/version'
 import { ApplicationIdentifier } from '@standardnotes/applications'
 import { Environment } from '@Lib/platforms'
 import { DeviceInterface } from '@standardnotes/services'
@@ -29,7 +26,7 @@ export function CreateReader(
   version: string,
   deviceInterface: DeviceInterface,
   identifier: ApplicationIdentifier,
-  environment: Environment
+  environment: Environment,
 ): StorageReader {
   const readerClass = ReaderClassForVersion(version)
   return new readerClass(deviceInterface, identifier, environment)

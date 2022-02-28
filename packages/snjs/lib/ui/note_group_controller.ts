@@ -3,9 +3,7 @@ import { UuidString } from '@Lib/types'
 import { SNApplication } from './../application'
 import { NoteViewController } from './note_view_controller'
 
-type NoteControllerGroupChangeCallback = (
-  activeController: NoteViewController
-) => void;
+type NoteControllerGroupChangeCallback = (activeController: NoteViewController) => void
 
 export class NoteGroupController {
   public noteControllers: NoteViewController[] = []
@@ -17,23 +15,14 @@ export class NoteGroupController {
   }
 
   public deinit(): void {
-    (this.application as unknown) = undefined
+    ;(this.application as unknown) = undefined
     for (const controller of this.noteControllers) {
       this.closeNoteView(controller, false)
     }
   }
 
-  async createNoteView(
-    noteUuid?: string,
-    noteTitle?: string,
-    noteTag?: UuidString
-  ): Promise<void> {
-    const controller = new NoteViewController(
-      this.application,
-      noteUuid,
-      noteTitle,
-      noteTag
-    )
+  async createNoteView(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<void> {
+    const controller = new NoteViewController(this.application, noteUuid, noteTitle, noteTag)
     await controller.initialize()
     this.noteControllers.push(controller)
     this.notifyObservers()
@@ -70,7 +59,7 @@ export class NoteGroupController {
    * Notifies observer when the active controller has changed.
    */
   public addActiveControllerChangeObserver(
-    callback: NoteControllerGroupChangeCallback
+    callback: NoteControllerGroupChangeCallback,
   ): () => void {
     this.changeObservers.push(callback)
     if (this.activeNoteViewController) {

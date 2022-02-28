@@ -1,8 +1,6 @@
 import { PayloadFormat, PurePayload } from '@standardnotes/payloads'
 
-export function filterDisallowedRemotePayloads(
-  payloads: PurePayload[]
-): PurePayload[] {
+export function filterDisallowedRemotePayloads(payloads: PurePayload[]): PurePayload[] {
   return payloads.filter(isRemotePayloadAllowed)
 }
 
@@ -11,10 +9,7 @@ export function isRemotePayloadAllowed(payload: PurePayload): boolean {
     return payload.content == undefined
   }
 
-  const acceptableFormats = [
-    PayloadFormat.EncryptedString,
-    PayloadFormat.MetadataOnly,
-  ]
+  const acceptableFormats = [PayloadFormat.EncryptedString, PayloadFormat.MetadataOnly]
 
   return acceptableFormats.includes(payload.format)
 }

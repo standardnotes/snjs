@@ -1,8 +1,4 @@
-export {
-  SnjsVersion,
-  isRightVersionGreaterThanLeft,
-  compareSemVersions,
-} from './version'
+export { SnjsVersion, isRightVersionGreaterThanLeft, compareSemVersions } from './version'
 
 export type { ApplicationDescriptor } from './application_group'
 export { ApplicationOptionsDefaults } from './options'
@@ -33,10 +29,7 @@ export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004'
 export { SNRootKey } from '@Protocol/root_key'
 export { SNRootKeyParams } from './protocol/key_params'
 export { AbstractDevice, AbstractService } from '@standardnotes/services'
-export type {
-  DeviceInterface,
-  ServiceInterface,
-} from '@standardnotes/services'
+export type { DeviceInterface, ServiceInterface } from '@standardnotes/services'
 
 export * from './models'
 
@@ -50,10 +43,7 @@ export type {
   PermissionDialog,
   DesktopManagerInterface,
 } from './services/component_manager/types'
-export {
-  SNComponentManager,
-  ComponentManagerEvent,
-} from './services/component_manager'
+export { SNComponentManager, ComponentManagerEvent } from './services/component_manager'
 export {
   ComponentViewer,
   ComponentViewerEvent,
@@ -101,10 +91,7 @@ export { SyncUpDownLimit } from './services/sync/account/operation'
 export { SNSessionManager, SessionEvent } from './services/api/session_manager'
 export { SNMigrationService } from './services/migration_service'
 export { ButtonType } from './services/alert_service'
-export type {
-  DismissBlockingDialog,
-  SNAlertService,
-} from './services/alert_service'
+export type { DismissBlockingDialog, SNAlertService } from './services/alert_service'
 export { SNHistoryManager } from './services/history/history_manager'
 export {
   SNProtectionService,
@@ -148,11 +135,7 @@ export {
   UuidGenerator,
 } from '@standardnotes/utils'
 
-export {
-  ContentType,
-  Runtime,
-  KeyParamsOrigination,
-} from '@standardnotes/common'
+export { ContentType, Runtime, KeyParamsOrigination } from '@standardnotes/common'
 export {
   AppDataField,
   ApplicationStage,
@@ -204,17 +187,11 @@ export {
   notesMatchingCriteria,
 } from '@Lib/protocol/collection/notes_display_criteria'
 
-export {
-  StorageKey,
-  RawStorageKey,
-  NonwrappedStorageKey,
-  namespacedKey,
-} from '@Lib/storage_keys'
+export { StorageKey, RawStorageKey, NonwrappedStorageKey, namespacedKey } from '@Lib/storage_keys'
 
 export { NoteViewController } from './ui/note_view_controller'
 export { NoteGroupController } from './ui/note_group_controller'
 export { IconsController } from './ui/icons_controller'
-
 
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base'
@@ -226,10 +203,7 @@ export { SNLog } from './log'
 /** Used by e2e tests */
 export { GetFeatures, FeatureIdentifier } from '@standardnotes/features'
 export { RoleName, ProtocolVersion } from '@standardnotes/common'
-export {
-  SettingName,
-  MuteFailedBackupsEmailsOption,
-} from '@standardnotes/settings'
+export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/settings'
 export { Migration2_20_0 } from './migrations/2_20_0'
 export { Migration2_42_0 } from './migrations/2_42_0'
 export { Predicate, CompoundPredicate } from '@standardnotes/payloads'

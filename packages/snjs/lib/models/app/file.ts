@@ -8,16 +8,16 @@ export enum FileProtocolV1 {
 }
 
 export interface FileContent {
-  remoteIdentifier: string;
-  name: string;
-  key: string;
-  ext: string;
-  size: number;
-  encryptionHeader: string;
-  chunkSizes: number[];
+  remoteIdentifier: string
+  name: string
+  key: string
+  ext: string
+  size: number
+  encryptionHeader: string
+  chunkSizes: number[]
 }
 
-type ExtendedFileContent = FileContent & PayloadContent;
+type ExtendedFileContent = FileContent & PayloadContent
 
 export class SNFile extends SNItem implements ExtendedFileContent {
   public readonly remoteIdentifier: string
@@ -44,7 +44,7 @@ export class SNFile extends SNItem implements ExtendedFileContent {
   }
 
   private get typedContent(): FileContent {
-    return (this.safeContent as unknown) as FileContent
+    return this.safeContent as unknown as FileContent
   }
 }
 

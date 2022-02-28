@@ -11,7 +11,8 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "../../node_modules/@standardnotes/config/src/.eslintrc"
+    "../../node_modules/@standardnotes/config/src/.eslintrc",
+    "prettier"
   ],
   rules: {
     "sort-imports": "off",

@@ -33,7 +33,7 @@ describe('file decryptor', () => {
 
     expect(crypto.xchacha20StreamInitDecryptor).toHaveBeenCalledWith(
       file.encryptionHeader,
-      file.key
+      file.key,
     )
   })
 
@@ -45,7 +45,7 @@ describe('file decryptor', () => {
     expect(crypto.xchacha20StreamDecryptorPush).toHaveBeenCalledWith(
       expect.any(Object),
       encryptedBytes,
-      file.remoteIdentifier
+      file.remoteIdentifier,
     )
 
     expect(result!.decryptedBytes.length).toEqual(1)

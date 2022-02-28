@@ -45,7 +45,7 @@ describe('featuresService', () => {
       alertService,
       environment,
       platform,
-      Runtime.Prod
+      Runtime.Prod,
     )
     manager.setDesktopManager(desktopManager)
     manager.configureForNonMobileUsage = jest.fn().mockReturnValue(0)
@@ -59,9 +59,7 @@ describe('featuresService', () => {
     itemManager = {} as jest.Mocked<ItemManager>
     itemManager.getItems = jest.fn().mockReturnValue([])
     itemManager.createItem = jest.fn()
-    itemManager.changeComponent = jest
-      .fn()
-      .mockReturnValue({} as jest.Mocked<SNItem>)
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<SNItem>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
@@ -128,7 +126,7 @@ describe('featuresService', () => {
         const url = manager.urlForComponent(component)
         const feature = FindNativeFeature(component.identifier)
         expect(url).toEqual(
-          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`
+          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`,
         )
       })
 
@@ -138,7 +136,7 @@ describe('featuresService', () => {
         const url = manager.urlForComponent(component)
         const feature = FindNativeFeature(component.identifier)
         expect(url).toEqual(
-          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`
+          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`,
         )
       })
 
@@ -146,9 +144,7 @@ describe('featuresService', () => {
         const manager = createManager(Environment.Desktop, Platform.MacDesktop)
         const component = thirdPartyComponent()
         const url = manager.urlForComponent(component)
-        expect(url).toEqual(
-          `${desktopExtHost}/Extensions/${component.identifier}/dist/index.html`
-        )
+        expect(url).toEqual(`${desktopExtHost}/Extensions/${component.identifier}/dist/index.html`)
       })
 
       it('returns hosted url for third party component with no local_url', () => {
@@ -174,11 +170,9 @@ describe('featuresService', () => {
         const manager = createManager(Environment.Web, Platform.MacWeb)
         const component = nativeComponent()
         const url = manager.urlForComponent(component)
-        const feature = FindNativeFeature(
-          component.identifier
-        ) as FeatureDescription
+        const feature = FindNativeFeature(component.identifier) as FeatureDescription
         expect(url).toEqual(
-          `http://localhost/components/${component.identifier}/${feature.index_path}`
+          `http://localhost/components/${component.identifier}/${feature.index_path}`,
         )
       })
 
@@ -195,20 +189,14 @@ describe('featuresService', () => {
     it('should not require alert switching from plain editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const component = nativeComponent()
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        undefined,
-        component
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(undefined, component)
       expect(requiresAlert).toBe(false)
     })
 
     it('should not require alert switching to plain editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const component = nativeComponent()
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        component,
-        undefined
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(component, undefined)
       expect(requiresAlert).toBe(false)
     })
 
@@ -216,10 +204,7 @@ describe('featuresService', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
       const markdownEditor = nativeComponent('md')
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        markdownEditor,
-        htmlEditor
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(markdownEditor, htmlEditor)
       expect(requiresAlert).toBe(false)
     })
 
@@ -227,20 +212,14 @@ describe('featuresService', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
       const markdownEditor = nativeComponent('md')
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        htmlEditor,
-        markdownEditor
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(htmlEditor, markdownEditor)
       expect(requiresAlert).toBe(false)
     })
 
     it('should not require alert switching from & to a html editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        htmlEditor,
-        htmlEditor
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(htmlEditor, htmlEditor)
       expect(requiresAlert).toBe(false)
     })
 
@@ -248,10 +227,7 @@ describe('featuresService', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
       const customEditor = nativeComponent('json')
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        htmlEditor,
-        customEditor
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(htmlEditor, customEditor)
       expect(requiresAlert).toBe(true)
     })
 
@@ -259,20 +235,14 @@ describe('featuresService', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
       const customEditor = nativeComponent('json')
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        customEditor,
-        htmlEditor
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(customEditor, htmlEditor)
       expect(requiresAlert).toBe(true)
     })
 
     it('should require alert switching from a custom editor to custom editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const customEditor = nativeComponent('json')
-      const requiresAlert = manager.doesEditorChangeRequireAlert(
-        customEditor,
-        customEditor
-      )
+      const requiresAlert = manager.doesEditorChangeRequireAlert(customEditor, customEditor)
       expect(requiresAlert).toBe(true)
     })
   })

@@ -22,12 +22,9 @@ describe('folders component to hierarchy', () => {
     const titles = ['a', 'a.b', 'a.b.c']
 
     const itemManager = itemManagerMock(titles)
-    await TagsToFoldersMigrationApplicator.run(
-      (itemManager as unknown) as ItemManager
-    )
+    await TagsToFoldersMigrationApplicator.run(itemManager as unknown as ItemManager)
 
-    const findOrCreateTagParentChainCalls =
-      itemManager.findOrCreateTagParentChain.mock.calls
+    const findOrCreateTagParentChainCalls = itemManager.findOrCreateTagParentChain.mock.calls
     const changeItemCalls = itemManager.changeItem.mock.calls
 
     expect(findOrCreateTagParentChainCalls.length).toEqual(2)
@@ -43,12 +40,9 @@ describe('folders component to hierarchy', () => {
     const titles = ['a', 'x', 'y', 'z']
 
     const itemManager = itemManagerMock(titles)
-    await TagsToFoldersMigrationApplicator.run(
-      (itemManager as unknown) as ItemManager
-    )
+    await TagsToFoldersMigrationApplicator.run(itemManager as unknown as ItemManager)
 
-    const findOrCreateTagParentChainCalls =
-      itemManager.findOrCreateTagParentChain.mock.calls
+    const findOrCreateTagParentChainCalls = itemManager.findOrCreateTagParentChain.mock.calls
     const changeItemCalls = itemManager.changeItem.mock.calls
 
     expect(findOrCreateTagParentChainCalls.length).toEqual(0)
@@ -60,12 +54,9 @@ describe('folders component to hierarchy', () => {
     const titles = ['a.b', 'c', 'a.b']
 
     const itemManager = itemManagerMock(titles)
-    await TagsToFoldersMigrationApplicator.run(
-      (itemManager as unknown) as ItemManager
-    )
+    await TagsToFoldersMigrationApplicator.run(itemManager as unknown as ItemManager)
 
-    const findOrCreateTagParentChainCalls =
-      itemManager.findOrCreateTagParentChain.mock.calls
+    const findOrCreateTagParentChainCalls = itemManager.findOrCreateTagParentChain.mock.calls
     const changeItemCalls = itemManager.changeItem.mock.calls
 
     expect(findOrCreateTagParentChainCalls.length).toEqual(2)
@@ -81,12 +72,9 @@ describe('folders component to hierarchy', () => {
     const titles = ['y.2', 'w.3', 'y']
 
     const itemManager = itemManagerMock(titles)
-    await TagsToFoldersMigrationApplicator.run(
-      (itemManager as unknown) as ItemManager
-    )
+    await TagsToFoldersMigrationApplicator.run(itemManager as unknown as ItemManager)
 
-    const findOrCreateTagParentChainCalls =
-      itemManager.findOrCreateTagParentChain.mock.calls
+    const findOrCreateTagParentChainCalls = itemManager.findOrCreateTagParentChain.mock.calls
     const changeItemCalls = itemManager.changeItem.mock.calls
 
     expect(findOrCreateTagParentChainCalls.length).toEqual(2)
@@ -102,12 +90,9 @@ describe('folders component to hierarchy', () => {
     const titles = ['.something', '.something...something']
 
     const itemManager = itemManagerMock(titles)
-    await TagsToFoldersMigrationApplicator.run(
-      (itemManager as unknown) as ItemManager
-    )
+    await TagsToFoldersMigrationApplicator.run(itemManager as unknown as ItemManager)
 
-    const findOrCreateTagParentChainCalls =
-      itemManager.findOrCreateTagParentChain.mock.calls
+    const findOrCreateTagParentChainCalls = itemManager.findOrCreateTagParentChain.mock.calls
     const changeItemCalls = itemManager.changeItem.mock.calls
 
     expect(findOrCreateTagParentChainCalls.length).toEqual(0)
@@ -125,12 +110,9 @@ describe('folders component to hierarchy', () => {
     ]
 
     const itemManager = itemManagerMock(titles)
-    await TagsToFoldersMigrationApplicator.run(
-      (itemManager as unknown) as ItemManager
-    )
+    await TagsToFoldersMigrationApplicator.run(itemManager as unknown as ItemManager)
 
-    const findOrCreateTagParentChainCalls =
-      itemManager.findOrCreateTagParentChain.mock.calls
+    const findOrCreateTagParentChainCalls = itemManager.findOrCreateTagParentChain.mock.calls
     const changeItemCalls = itemManager.changeItem.mock.calls
 
     expect(findOrCreateTagParentChainCalls.length).toEqual(1)

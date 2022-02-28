@@ -1,9 +1,6 @@
 import { PayloadsDelta } from '@Payloads/deltas/delta'
 import { PayloadSource, ImmutablePayloadCollection } from '@standardnotes/payloads'
-import {
-  PayloadContentsEqual,
-  PayloadsByDuplicating,
-} from '@Payloads/functions'
+import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions'
 
 import { extendArray } from '@standardnotes/utils'
 
@@ -29,16 +26,9 @@ export class DeltaOutOfSync extends PayloadsDelta {
        * We create a copy of the local existing item and sync that up.
        * It will be a 'conflict' of itself
        */
-      const copyResults = await PayloadsByDuplicating(
-        current,
-        this.baseCollection,
-        true
-      )
+      const copyResults = await PayloadsByDuplicating(current, this.baseCollection, true)
       extendArray(results, copyResults)
     }
-    return ImmutablePayloadCollection.WithPayloads(
-      results,
-      PayloadSource.RemoteRetrieved
-    )
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved)
   }
 }

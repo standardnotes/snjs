@@ -14,12 +14,11 @@ import { ItemContent } from './../core/item'
 export const TagFolderDelimitter = '.'
 
 export interface TagContent extends ItemContent {
-  title: string;
-  expanded: boolean;
+  title: string
+  expanded: boolean
 }
 
-export const isTag = (x: ItemInterface): x is SNTag =>
-  x.content_type === ContentType.Tag
+export const isTag = (x: ItemInterface): x is SNTag => x.content_type === ContentType.Tag
 
 /**
  * Allows organization of notes into groups.
@@ -34,9 +33,7 @@ export class SNTag extends SNItem implements TagContent {
     super(payload)
     this.title = this.payload.safeContent.title || ''
     this.expanded =
-      this.payload.safeContent.expanded != undefined
-        ? this.payload.safeContent.expanded
-        : true
+      this.payload.safeContent.expanded != undefined ? this.payload.safeContent.expanded : true
   }
 
   get noteReferences(): ContentReference[] {
@@ -79,9 +76,7 @@ export class TagMutator extends ItemMutator {
   }
 
   public makeChildOf(tag: SNTag): void {
-    const references = this.item.references.filter(
-      (ref) => !isTagToParentTagReference(ref)
-    )
+    const references = this.item.references.filter((ref) => !isTagToParentTagReference(ref))
 
     const reference: TagToParentTagReference = {
       reference_type: ContenteReferenceType.TagToParentTag,
@@ -95,9 +90,7 @@ export class TagMutator extends ItemMutator {
   }
 
   public unsetParent(): void {
-    const references = this.item.references.filter(
-      (ref) => !isTagToParentTagReference(ref)
-    )
+    const references = this.item.references.filter((ref) => !isTagToParentTagReference(ref))
     this.typedContent.references = references
   }
 }

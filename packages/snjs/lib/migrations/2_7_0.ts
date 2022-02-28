@@ -10,13 +10,10 @@ export class Migration2_7_0 extends Migration {
   }
 
   protected registerStageHandlers(): void {
-    this.registerStageHandler(
-      ApplicationStage.FullSyncCompleted_13,
-      async () => {
-        await this.deleteBatchManagerSingleton()
-        this.markDone()
-      }
-    )
+    this.registerStageHandler(ApplicationStage.FullSyncCompleted_13, async () => {
+      await this.deleteBatchManagerSingleton()
+      this.markDone()
+    })
   }
 
   private async deleteBatchManagerSingleton() {
@@ -27,12 +24,10 @@ export class Migration2_7_0 extends Migration {
     ])
     const batchMgrSingleton = this.services.singletonManager.findSingleton(
       ContentType.Component,
-      batchMgrPred
+      batchMgrPred,
     )
     if (batchMgrSingleton) {
-      await this.services.itemManager.setItemToBeDeleted(
-        batchMgrSingleton.uuid
-      )
+      await this.services.itemManager.setItemToBeDeleted(batchMgrSingleton.uuid)
     }
   }
 }

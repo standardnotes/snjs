@@ -1,41 +1,32 @@
-import {
-  SNPureCrypto,
-  StreamDecryptor,
-  SodiumConstant,
-} from '@standardnotes/sncrypto-common'
+import { SNPureCrypto, StreamDecryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
 import { EncryptedFileInterface } from '../types'
 
 export class FileDecryptor {
   private decryptor!: StreamDecryptor
 
-  constructor(
-    private file: EncryptedFileInterface,
-    private crypto: SNPureCrypto
-  ) {}
+  constructor(private file: EncryptedFileInterface, private crypto: SNPureCrypto) {}
 
   public initialize(): void {
     this.decryptor = this.crypto.xchacha20StreamInitDecryptor(
       this.file.encryptionHeader,
-      this.file.key
+      this.file.key,
     )
   }
 
   public decryptBytes(
-    encryptedBytes: Uint8Array
+    encryptedBytes: Uint8Array,
   ): { decryptedBytes: Uint8Array; isFinalChunk: boolean } | undefined {
     const result = this.crypto.xchacha20StreamDecryptorPush(
       this.decryptor,
       encryptedBytes,
-      this.file.remoteIdentifier
+      this.file.remoteIdentifier,
     )
 
     if (result === false) {
       return undefined
     }
 
-    const isFinal =
-      result.tag ===
-      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
+    const isFinal = result.tag === SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
 
     return { decryptedBytes: result.message, isFinalChunk: isFinal }
   }

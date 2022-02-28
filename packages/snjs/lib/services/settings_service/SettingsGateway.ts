@@ -13,24 +13,18 @@ import { SensitiveSettingName } from './SensitiveSettingName'
 import { Settings } from './Settings'
 
 interface SettingsAPI {
-  listSettings(userUuid: UuidString): Promise<ListSettingsResponse>;
+  listSettings(userUuid: UuidString): Promise<ListSettingsResponse>
 
   updateSetting(
     userUuid: UuidString,
     settingName: string,
     settingValue: string,
-    sensitive: boolean
-  ): Promise<UpdateSettingResponse>;
+    sensitive: boolean,
+  ): Promise<UpdateSettingResponse>
 
-  getSetting(
-    userUuid: UuidString,
-    settingName: string
-  ): Promise<GetSettingResponse>;
+  getSetting(userUuid: UuidString, settingName: string): Promise<GetSettingResponse>
 
-  deleteSetting(
-    userUuid: UuidString,
-    settingName: string
-  ): Promise<DeleteSettingResponse>;
+  deleteSetting(userUuid: UuidString, settingName: string): Promise<DeleteSettingResponse>
 }
 
 /**
@@ -40,7 +34,7 @@ interface SettingsAPI {
 export class SettingsGateway {
   constructor(
     private readonly settingsApi: SettingsAPI,
-    private readonly userProvider: { getUser: () => User | undefined }
+    private readonly userProvider: { getUser: () => User | undefined },
   ) {}
 
   isReadyForModification(): boolean {
@@ -61,8 +55,12 @@ export class SettingsGateway {
 
   async listSettings() {
     const { error, data } = await this.settingsApi.listSettings(this.userUuid)
-    if (error != null) {throw new Error(error.message)}
-    if (data == null || data.settings == null) {return {}}
+    if (error != null) {
+      throw new Error(error.message)
+    }
+    if (data == null || data.settings == null) {
+      return {}
+    }
 
     const settings: Partial<Settings> = {}
     for (const setting of data.settings) {
@@ -75,9 +73,13 @@ export class SettingsGateway {
     const response = await this.settingsApi.getSetting(this.userUuid, name)
 
     // Backend responds with 400 when setting doesn't exist
-    if (response.status === StatusCode.HttpBadRequest) {return null}
+    if (response.status === StatusCode.HttpBadRequest) {
+      return null
+    }
 
-    if (response.error != null) {throw new Error(response.error.message)}
+    if (response.error != null) {
+      throw new Error(response.error.message)
+    }
 
     return response?.data?.setting?.value ?? null
   }
@@ -86,34 +88,33 @@ export class SettingsGateway {
     const response = await this.settingsApi.getSetting(this.userUuid, name)
 
     // Backend responds with 400 when setting doesn't exist
-    if (response.status === StatusCode.HttpBadRequest) {return false}
+    if (response.status === StatusCode.HttpBadRequest) {
+      return false
+    }
 
-    if (response.error != null) {throw new Error(response.error.message)}
+    if (response.error != null) {
+      throw new Error(response.error.message)
+    }
 
     return response.data?.success ?? false
   }
 
-  async updateSetting(
-    name: SettingName,
-    payload: string,
-    sensitive: boolean
-  ): Promise<void> {
-    const { error } = await this.settingsApi.updateSetting(
-      this.userUuid,
-      name,
-      payload,
-      sensitive
-    )
-    if (error != null) {throw new Error(error.message)}
+  async updateSetting(name: SettingName, payload: string, sensitive: boolean): Promise<void> {
+    const { error } = await this.settingsApi.updateSetting(this.userUuid, name, payload, sensitive)
+    if (error != null) {
+      throw new Error(error.message)
+    }
   }
 
   async deleteSetting(name: SettingName): Promise<void> {
     const { error } = await this.settingsApi.deleteSetting(this.userUuid, name)
-    if (error != null) {throw new Error(error.message)}
+    if (error != null) {
+      throw new Error(error.message)
+    }
   }
 
   deinit() {
-    (this.settingsApi as unknown) = undefined;
-    (this.userProvider as unknown) = undefined
+    ;(this.settingsApi as unknown) = undefined
+    ;(this.userProvider as unknown) = undefined
   }
 }

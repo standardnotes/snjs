@@ -37,10 +37,7 @@ import {
 } from './../models/app/SmartView'
 import { TagMutator } from './../models/app/tag'
 import { ItemMutator, MutationType, SNItem } from './../models/core/item'
-import {
-  TagNoteCountChangeObserver,
-  TagNotesIndex,
-} from './../protocol/collection/tag_notes_index'
+import { TagNoteCountChangeObserver, TagNotesIndex } from './../protocol/collection/tag_notes_index'
 import { UuidString } from './../types'
 import { PayloadManager } from './payload_manager'
 import { AbstractService } from '@standardnotes/services'
@@ -57,18 +54,18 @@ type ObserverCallback = (
   ignored: SNItem[],
   source: PayloadSource,
   sourceKey?: string,
-) => void;
+) => void
 
 type Observer = {
-  contentType: ContentType[];
-  callback: ObserverCallback;
-};
+  contentType: ContentType[]
+  callback: ObserverCallback
+}
 
 export type TransactionalMutation = {
-  itemUuid: UuidString;
-  mutate: (mutator: ItemMutator) => void;
-  mutationType?: MutationType;
-};
+  itemUuid: UuidString
+  mutate: (mutator: ItemMutator) => void
+  mutationType?: MutationType
+}
 
 export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
   x.content_type === ContentType.Note || x.content_type === ContentType.Tag
@@ -172,17 +169,17 @@ export class ItemManager extends AbstractService {
 
   public getDisplayableItems<T extends SNItem>(contentType: ContentType): T[] {
     if (contentType === ContentType.Note) {
-      return (this.notesView.displayElements() as unknown) as T[]
+      return this.notesView.displayElements() as unknown as T[]
     }
-    return (this.collection.displayElements(contentType) as unknown) as T[]
+    return this.collection.displayElements(contentType) as unknown as T[]
   }
 
   public deinit(): void {
-    this.unsubChangeObserver();
-    (this.unsubChangeObserver as unknown) = undefined;
-    (this.payloadManager as unknown) = undefined;
-    (this.collection as unknown) = undefined;
-    (this.notesView as unknown) = undefined
+    this.unsubChangeObserver()
+    ;(this.unsubChangeObserver as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    ;(this.collection as unknown) = undefined
+    ;(this.notesView as unknown) = undefined
   }
 
   resetState(): void {
@@ -202,7 +199,7 @@ export class ItemManager extends AbstractService {
     const itemFromSmartViews = this.systemSmartViews.find((tag) => tag.uuid === uuid)
 
     if (itemFromSmartViews) {
-      return (itemFromSmartViews as unknown) as T
+      return itemFromSmartViews as unknown as T
     }
 
     return undefined
@@ -1133,9 +1130,7 @@ export class ItemManager extends AbstractService {
   }
 
   public get archivedSmartView(): SmartView {
-    return this.systemSmartViews.find(
-      (tag) => tag.uuid === SystemViewId.ArchivedNotes,
-    ) as SmartView
+    return this.systemSmartViews.find((tag) => tag.uuid === SystemViewId.ArchivedNotes) as SmartView
   }
 
   public get trashSmartView(): SmartView {
@@ -1143,9 +1138,7 @@ export class ItemManager extends AbstractService {
   }
 
   public get untaggedNotesSmartView(): SmartView {
-    return this.systemSmartViews.find(
-      (tag) => tag.uuid === SystemViewId.UntaggedNotes,
-    ) as SmartView
+    return this.systemSmartViews.find((tag) => tag.uuid === SystemViewId.UntaggedNotes) as SmartView
   }
 
   public get trashedItems(): SNNote[] {

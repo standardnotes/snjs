@@ -11,10 +11,10 @@ import { SNProtocolService } from '../../protocol_service'
 import { RawSyncResponse } from '@standardnotes/responses'
 
 type Progress = {
-  retrievedPayloads: PurePayload[];
-  lastSyncToken?: string;
-  paginationToken?: string;
-};
+  retrievedPayloads: PurePayload[]
+  lastSyncToken?: string
+  paginationToken?: string
+}
 
 export class AccountDownloader {
   private apiService: SNApiService
@@ -29,7 +29,7 @@ export class AccountDownloader {
     protocolService: SNProtocolService,
     contentType?: ContentType,
     customEvent?: string,
-    limit?: number
+    limit?: number,
   ) {
     this.apiService = apiService
     this.protocolService = protocolService
@@ -51,23 +51,18 @@ export class AccountDownloader {
       this.limit || 500,
       false,
       this.contentType,
-      this.customEvent
+      this.customEvent,
     )) as RawSyncResponse
 
     const encryptedPayloads = filterDisallowedRemotePayloads(
       response.data.retrieved_items!.map((rawPayload: RawPayload) => {
-        return CreateSourcedPayloadFromObject(
-          rawPayload,
-          PayloadSource.RemoteRetrieved
-        )
-      })
+        return CreateSourcedPayloadFromObject(rawPayload, PayloadSource.RemoteRetrieved)
+      }),
     )
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingPayloads(
-      encryptedPayloads
+      encryptedPayloads,
     )
-    this.progress.retrievedPayloads = this.progress.retrievedPayloads.concat(
-      decryptedPayloads
-    )
+    this.progress.retrievedPayloads = this.progress.retrievedPayloads.concat(decryptedPayloads)
     this.progress.lastSyncToken = response.data?.sync_token
     this.progress.paginationToken = response.data?.cursor_token
 

@@ -19,32 +19,29 @@ export enum ErrorTag {
 
 const REQUEST_READY_STATE_COMPLETED = 4
 
-export type HttpParams = Record<string, unknown>;
+export type HttpParams = Record<string, unknown>
 
 export type HttpRequest = {
-  url: string;
-  params?: HttpParams;
-  rawBytes?: Uint8Array;
-  verb: HttpVerb;
-  authentication?: string;
-  customHeaders?: Record<string, string>[];
-  responseType?: XMLHttpRequestResponseType;
-};
+  url: string
+  params?: HttpParams
+  rawBytes?: Uint8Array
+  verb: HttpVerb
+  authentication?: string
+  customHeaders?: Record<string, string>[]
+  responseType?: XMLHttpRequestResponseType
+}
 
 /**
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export class SNHttpService extends AbstractService {
-  constructor(
-    private readonly environment: Environment,
-    private readonly appVersion: string
-  ) {
+  constructor(private readonly environment: Environment, private readonly appVersion: string) {
     super()
   }
   public async getAbsolute(
     url: string,
     params?: HttpParams,
-    authentication?: string
+    authentication?: string,
   ): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Get, authentication })
   }
@@ -52,7 +49,7 @@ export class SNHttpService extends AbstractService {
   public async postAbsolute(
     url: string,
     params?: HttpParams,
-    authentication?: string
+    authentication?: string,
   ): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Post, authentication })
   }
@@ -60,7 +57,7 @@ export class SNHttpService extends AbstractService {
   public async putAbsolute(
     url: string,
     params?: HttpParams,
-    authentication?: string
+    authentication?: string,
   ): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Put, authentication })
   }
@@ -68,7 +65,7 @@ export class SNHttpService extends AbstractService {
   public async patchAbsolute(
     url: string,
     params: HttpParams,
-    authentication?: string
+    authentication?: string,
   ): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication })
   }
@@ -76,7 +73,7 @@ export class SNHttpService extends AbstractService {
   public async deleteAbsolute(
     url: string,
     params?: HttpParams,
-    authentication?: string
+    authentication?: string,
   ): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Delete, authentication })
   }
@@ -88,8 +85,10 @@ export class SNHttpService extends AbstractService {
   }
 
   private createRequestBody(httpRequest: HttpRequest): string | Uint8Array | undefined {
-    if (httpRequest.params !== undefined &&
-      [HttpVerb.Post, HttpVerb.Put, HttpVerb.Patch, HttpVerb.Delete].includes(httpRequest.verb)) {
+    if (
+      httpRequest.params !== undefined &&
+      [HttpVerb.Post, HttpVerb.Put, HttpVerb.Patch, HttpVerb.Delete].includes(httpRequest.verb)
+    ) {
       return JSON.stringify(httpRequest.params)
     }
 
@@ -103,26 +102,18 @@ export class SNHttpService extends AbstractService {
       httpRequest.verb === HttpVerb.Get &&
       Object.keys(httpRequest.params).length > 0
     ) {
-      httpRequest.url = this.urlForUrlAndParams(
-        httpRequest.url,
-        httpRequest.params
-      )
+      httpRequest.url = this.urlForUrlAndParams(httpRequest.url, httpRequest.params)
     }
     request.open(httpRequest.verb, httpRequest.url, true)
     request.responseType = httpRequest.responseType ?? ''
 
     request.setRequestHeader('X-SNJS-Version', SnjsVersion)
 
-    const appVersionHeaderValue = `${Environment[this.environment]}-${
-      this.appVersion
-    }`
+    const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
     request.setRequestHeader('X-Application-Version', appVersionHeaderValue)
 
     if (httpRequest.authentication) {
-      request.setRequestHeader(
-        'Authorization',
-        'Bearer ' + httpRequest.authentication
-      )
+      request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication)
     }
 
     let contenTypeIsSet = false
@@ -143,7 +134,7 @@ export class SNHttpService extends AbstractService {
 
   private async runRequest(
     request: XMLHttpRequest,
-    body?: string | Uint8Array
+    body?: string | Uint8Array,
   ): Promise<HttpResponse> {
     return new Promise((resolve, reject) => {
       request.onreadystatechange = () => {
@@ -156,7 +147,7 @@ export class SNHttpService extends AbstractService {
   private stateChangeHandlerForRequest(
     request: XMLHttpRequest,
     resolve: (response: HttpResponse) => void,
-    reject: (response: HttpResponse) => void
+    reject: (response: HttpResponse) => void,
   ) {
     if (request.readyState !== REQUEST_READY_STATE_COMPLETED) {
       return
@@ -174,9 +165,9 @@ export class SNHttpService extends AbstractService {
     responseHeaderLines.forEach((responseHeaderLine) => {
       const parts = responseHeaderLine.split(': ')
       const name = parts.shift() as string
-      const value = parts.join(': ');
+      const value = parts.join(': ')
 
-      (<Map<string, string | null>>response.headers).set(name, value)
+      ;(<Map<string, string | null>>response.headers).set(name, value)
     })
 
     try {
@@ -184,8 +175,7 @@ export class SNHttpService extends AbstractService {
         let body
 
         const contentTypeHeader =
-          response.headers?.get('content-type') ||
-          response.headers?.get('Content-Type')
+          response.headers?.get('content-type') || response.headers?.get('Content-Type')
 
         if (contentTypeHeader?.includes('application/json')) {
           body = JSON.parse(request.responseText)
@@ -219,10 +209,7 @@ export class SNHttpService extends AbstractService {
           status: httpStatus,
         }
       } else if (isNullOrUndefined(response.error)) {
-        if (
-          isNullOrUndefined(response.data) ||
-          isNullOrUndefined(response.data.error)
-        ) {
+        if (isNullOrUndefined(response.data) || isNullOrUndefined(response.data.error)) {
           response.error = { message: UNKNOWN_ERROR, status: httpStatus }
         } else {
           response.error = response.data.error

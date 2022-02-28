@@ -8,10 +8,7 @@ import { ProtocolVersion } from '@standardnotes/common'
  */
 export class SNItemsKey extends SNItem {
   /** Do not duplicate items keys. Always keep original */
-  strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntry
-  ): ConflictStrategy {
+  strategyWhenConflictingWithItem(item: SNItem, previousRevision?: HistoryEntry): ConflictStrategy {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item, previousRevision)
     }

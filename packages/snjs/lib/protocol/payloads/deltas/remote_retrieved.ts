@@ -14,11 +14,11 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     for (const received of this.applyCollection.all()) {
       const savedOrSaving = this.findRelatedPayload(
         received.uuid as string,
-        PayloadSource.SavedOrSaving
+        PayloadSource.SavedOrSaving,
       )
       const decrypted = this.findRelatedPayload(
         received.uuid as string,
-        PayloadSource.DecryptedTransient
+        PayloadSource.DecryptedTransient,
       )
       if (!decrypted) {
         /** Decrypted should only be missing in case of deleted retrieved item */
@@ -48,10 +48,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
      */
     const conflictResults: Array<PurePayload> = []
     for (const conflict of conflicted) {
-      const decrypted = this.findRelatedPayload(
-        conflict.uuid!,
-        PayloadSource.DecryptedTransient
-      )
+      const decrypted = this.findRelatedPayload(conflict.uuid!, PayloadSource.DecryptedTransient)
       if (!decrypted) {
         continue
       }
@@ -63,7 +60,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
         this.baseCollection,
         current,
         decrypted,
-        PayloadSource.ConflictData
+        PayloadSource.ConflictData,
       )
       const deltaCollection = await delta.resultingCollection()
       const payloads = deltaCollection.all()
@@ -72,7 +69,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
 
     return ImmutablePayloadCollection.WithPayloads(
       filtered.concat(conflictResults),
-      PayloadSource.RemoteRetrieved
+      PayloadSource.RemoteRetrieved,
     )
   }
 }

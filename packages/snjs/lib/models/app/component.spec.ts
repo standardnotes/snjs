@@ -3,7 +3,6 @@ import { ContentType } from '@standardnotes/common'
 import { SNComponent } from '@Models/app/component'
 
 describe('component model', () => {
-
   it('valid hosted url should ignore url', () => {
     const component = new SNComponent(
       CreateMaxPayloadFromAnyObject({
@@ -13,7 +12,7 @@ describe('component model', () => {
           url: 'http://foo.com',
           hosted_url: 'http://bar.com',
         }),
-      })
+      }),
     )
 
     expect(component.hasValidHostedUrl()).toBe(true)
@@ -29,7 +28,7 @@ describe('component model', () => {
           url: 'http://foo.com',
           hosted_url: '#{foo.zoo}',
         }),
-      })
+      }),
     )
 
     expect(component.hasValidHostedUrl()).toBe(true)

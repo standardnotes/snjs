@@ -28,7 +28,7 @@ export class SNMigrationService extends AbstractService {
   }
 
   public deinit(): void {
-    (this.services as any) = undefined
+    ;(this.services as any) = undefined
     if (this.activeMigrations) {
       this.activeMigrations.length = 0
     }
@@ -39,11 +39,9 @@ export class SNMigrationService extends AbstractService {
     await this.runBaseMigrationPreRun()
 
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
-      await this.getStoredSnjsVersion()
+      await this.getStoredSnjsVersion(),
     )
-    this.activeMigrations = this.instantiateMigrationClasses(
-      requiredMigrations
-    )
+    this.activeMigrations = this.instantiateMigrationClasses(requiredMigrations)
     if (this.activeMigrations.length > 0) {
       const lastMigration = lastElement(this.activeMigrations) as Migration
       lastMigration.onDone(async () => {
@@ -52,7 +50,7 @@ export class SNMigrationService extends AbstractService {
     } else {
       await this.services.deviceInterface.setRawStorageValue(
         namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
-        SnjsVersion
+        SnjsVersion,
       )
     }
   }
@@ -60,7 +58,7 @@ export class SNMigrationService extends AbstractService {
   private async markMigrationsAsDone() {
     await this.services.deviceInterface.setRawStorageValue(
       namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
-      SnjsVersion
+      SnjsVersion,
     )
   }
 
@@ -89,22 +87,17 @@ export class SNMigrationService extends AbstractService {
 
   public async hasPendingMigrations(): Promise<boolean> {
     const requiredMigrations = await SNMigrationService.getRequiredMigrations(
-      await this.getStoredSnjsVersion()
+      await this.getStoredSnjsVersion(),
     )
-    return (
-      requiredMigrations.length > 0 ||
-      (await this.baseMigration.needsKeychainRepair())
-    )
+    return requiredMigrations.length > 0 || (await this.baseMigration.needsKeychainRepair())
   }
 
   public async getStoredSnjsVersion(): Promise<string> {
     const version = await this.services.deviceInterface.getRawStorageValue(
-      namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion)
+      namespacedKey(this.services.identifier, RawStorageKey.SnjsVersion),
     )
     if (!version) {
-      throw SNLog.error(
-        Error('Snjs version missing from storage, run base migration.')
-      )
+      throw SNLog.error(Error('Snjs version missing from storage, run base migration.'))
     }
     return version
   }

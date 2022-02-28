@@ -2,7 +2,12 @@ import { Uuids } from '@Models/functions'
 import { SNLog } from './../../../log'
 import { PayloadsDelta } from '@Payloads/deltas/delta'
 import { ConflictDelta } from '@Payloads/deltas/conflict'
-import { PayloadSource, ImmutablePayloadCollection, PayloadsByAlternatingUuid, PurePayload } from '@standardnotes/payloads'
+import {
+  PayloadSource,
+  ImmutablePayloadCollection,
+  PayloadsByAlternatingUuid,
+  PurePayload,
+} from '@standardnotes/payloads'
 import { extendArray, filterFromArray } from '@standardnotes/utils'
 
 export class DeltaRemoteConflicts extends PayloadsDelta {
@@ -25,10 +30,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         results.push(payload)
         continue
       }
-      const decrypted = this.findRelatedPayload(
-        payload.uuid!,
-        PayloadSource.DecryptedTransient
-      )
+      const decrypted = this.findRelatedPayload(payload.uuid!, PayloadSource.DecryptedTransient)
       if (!decrypted && !payload.deleted) {
         /** Decrypted should only be missing in case of deleted payload */
         throw 'Unable to find decrypted counterpart for data conflict.'
@@ -38,16 +40,13 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
         current,
         decrypted || payload,
         PayloadSource.ConflictData,
-        this.historyMap
+        this.historyMap,
       )
       const deltaCollection = await delta.resultingCollection()
       const payloads = deltaCollection.all()
       extendArray(results, payloads)
     }
-    return ImmutablePayloadCollection.WithPayloads(
-      results,
-      PayloadSource.RemoteRetrieved
-    )
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved)
   }
 
   /**
@@ -67,33 +66,21 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
        */
       const moreRecent = results.find((r) => r.uuid === payload.uuid)
       const decrypted =
-        moreRecent ||
-        this.findRelatedPayload(
-          payload.uuid!,
-          PayloadSource.DecryptedTransient
-        )
+        moreRecent || this.findRelatedPayload(payload.uuid!, PayloadSource.DecryptedTransient)
       if (!decrypted) {
-        SNLog.error(
-          Error('Cannot find decrypted payload in conflict handling')
-        )
-        console.error(
-          'Unable to find decrypted counterpart for payload',
-          payload
-        )
+        SNLog.error(Error('Cannot find decrypted payload in conflict handling'))
+        console.error('Unable to find decrypted counterpart for payload', payload)
         continue
       }
       const alternateResults = await PayloadsByAlternatingUuid(
         decrypted,
-        ImmutablePayloadCollection.FromCollection(collection)
+        ImmutablePayloadCollection.FromCollection(collection),
       )
       collection.set(alternateResults)
       filterFromArray(results, (r) => Uuids(alternateResults).includes(r.uuid))
       extendArray(results, alternateResults)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(
-      results,
-      PayloadSource.RemoteRetrieved
-    )
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved)
   }
 }

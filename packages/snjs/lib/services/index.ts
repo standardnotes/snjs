@@ -1,13 +1,7 @@
 export { ButtonType } from '@Services/alert_service'
-export type {
-  DismissBlockingDialog,
-  SNAlertService,
-} from '@Services/alert_service'
+export type { DismissBlockingDialog, SNAlertService } from '@Services/alert_service'
 export type { BackupFile } from '@Services/protocol_service'
-export type {
-  RevisionListEntry,
-  SingleRevision,
-} from '@standardnotes/responses'
+export type { RevisionListEntry, SingleRevision } from '@standardnotes/responses'
 export { SNSessionManager } from '@Services/api/session_manager'
 export { SNApiService } from '@Services/api/api_service'
 export { SNComponentManager } from '@Services/component_manager'
@@ -29,11 +23,7 @@ export { SNSettingsService } from '@Services/settings_service'
 export { SyncEvent as SyncEvent } from '@Services/sync/events'
 export { SyncOpStatus } from '@Services/sync/sync_op_status'
 export { ItemManager } from '@Services/item_manager'
-export {
-  SNSyncService,
-  SyncModes,
-  SyncQueueStrategy,
-} from '@Services/sync/sync_service'
+export { SNSyncService, SyncModes, SyncQueueStrategy } from '@Services/sync/sync_service'
 export { ChallengeService } from '@Lib/services/challenge/challenge_service'
 export {
   SNStorageService,

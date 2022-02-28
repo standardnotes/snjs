@@ -1,10 +1,10 @@
 import { ItemMutator, SNItem } from '@Models/core/item'
 
 export interface FeatureRepoContent {
-  migratedToUserSetting?: boolean;
-  migratedToOfflineEntitlements?: boolean;
-  offlineFeaturesUrl?: string;
-  offlineKey?: string;
+  migratedToUserSetting?: boolean
+  migratedToOfflineEntitlements?: boolean
+  offlineFeaturesUrl?: string
+  offlineKey?: string
 }
 
 export class SNFeatureRepo extends SNItem {

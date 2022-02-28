@@ -10,10 +10,7 @@ export class StorageReader2_0_0 extends StorageReader {
   }
 
   private async getStorage() {
-    const storageKey = namespacedKey(
-      this.identifier,
-      RawStorageKey.StorageObject
-    )
+    const storageKey = namespacedKey(this.identifier, RawStorageKey.StorageObject)
     const storage = await this.deviceInterface!.getRawStorageValue(storageKey)
     const values = storage ? JSON.parse(storage as any) : undefined
     return values
@@ -35,16 +32,12 @@ export class StorageReader2_0_0 extends StorageReader {
   }
 
   public async hasNonWrappedAccountKeys() {
-    const value = await this.deviceInterface.getNamespacedKeychainValue(
-      this.identifier
-    )
+    const value = await this.deviceInterface.getNamespacedKeychainValue(this.identifier)
     return !isNullOrUndefined(value)
   }
 
   public async hasPasscode() {
-    const wrappedRootKey = await this.getNonWrappedValue(
-      StorageKey.WrappedRootKey
-    )
+    const wrappedRootKey = await this.getNonWrappedValue(StorageKey.WrappedRootKey)
     return !isNullOrUndefined(wrappedRootKey)
   }
 

@@ -1,8 +1,4 @@
-import {
-  SNPureCrypto,
-  StreamEncryptor,
-  SodiumConstant,
-} from '@standardnotes/sncrypto-common'
+import { SNPureCrypto, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
 import { DecryptedFileInterface } from './../types'
 import { FileEncryptor } from './../workers/file_encryptor'
 
@@ -18,9 +14,7 @@ describe('file encryptor', () => {
       state: {},
     } as StreamEncryptor)
 
-    crypto.xchacha20StreamEncryptorPush = jest
-      .fn()
-      .mockReturnValue(new Uint8Array())
+    crypto.xchacha20StreamEncryptorPush = jest.fn().mockReturnValue(new Uint8Array())
 
     file = {
       remoteIdentifier: '123',
@@ -52,7 +46,7 @@ describe('file encryptor', () => {
       expect.any(Object),
       decryptedBytes,
       file.remoteIdentifier,
-      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL,
     )
   })
 
@@ -65,7 +59,7 @@ describe('file encryptor', () => {
       expect.any(Object),
       decryptedBytes,
       file.remoteIdentifier,
-      undefined
+      undefined,
     )
   })
 })

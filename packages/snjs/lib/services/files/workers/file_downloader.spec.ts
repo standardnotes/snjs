@@ -1,8 +1,4 @@
-import {
-  RemoteFileInterface,
-  FilesApi,
-  EncryptedFileInterface,
-} from './../types'
+import { RemoteFileInterface, FilesApi, EncryptedFileInterface } from './../types'
 import { FileDownloader } from './../workers/file_downloader'
 
 describe('file downloader', () => {
@@ -21,7 +17,7 @@ describe('file downloader', () => {
           _chunkIndex: number,
           _apiToken: string,
           _rangeStart: number,
-          onBytesReceived: (bytes: Uint8Array) => void
+          onBytesReceived: (bytes: Uint8Array) => void,
         ) => {
           return new Promise<void>((resolve) => {
             for (let i = 0; i < numChunks; i++) {
@@ -30,7 +26,7 @@ describe('file downloader', () => {
 
             resolve()
           })
-        }
+        },
       )
 
     file = {
@@ -44,14 +40,9 @@ describe('file downloader', () => {
   it('should pass back bytes as they are received', async () => {
     let receivedBytes = new Uint8Array()
 
-    downloader = new FileDownloader(
-      file,
-      'api-token',
-      apiService,
-      (encryptedBytes) => {
-        receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes])
-      }
-    )
+    downloader = new FileDownloader(file, 'api-token', apiService, (encryptedBytes) => {
+      receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes])
+    })
 
     expect(receivedBytes.length).toBe(0)
 

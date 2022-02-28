@@ -34,10 +34,7 @@ export class SNSingletonManager extends AbstractService {
   private removeItemObserver!: () => void
   private removeSyncObserver!: () => void
 
-  constructor(
-    private itemManager: ItemManager,
-    private syncService: SNSyncService
-  ) {
+  constructor(private itemManager: ItemManager, private syncService: SNSyncService) {
     super()
     this.itemManager = itemManager
     this.syncService = syncService
@@ -45,13 +42,13 @@ export class SNSingletonManager extends AbstractService {
   }
 
   public deinit(): void {
-    (this.syncService as unknown) = undefined;
-    (this.itemManager as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.itemManager as unknown) = undefined
     this.resolveQueue.length = 0
-    this.removeItemObserver();
-    (this.removeItemObserver as unknown) = undefined
-    this.removeSyncObserver();
-    (this.removeSyncObserver as unknown) = undefined
+    this.removeItemObserver()
+    ;(this.removeItemObserver as unknown) = undefined
+    this.removeSyncObserver()
+    ;(this.removeSyncObserver as unknown) = undefined
     super.deinit()
   }
 
@@ -71,61 +68,44 @@ export class SNSingletonManager extends AbstractService {
    * all items keys have been downloaded.
    */
   private addObservers() {
-    this.removeItemObserver = this.itemManager.addObserver(
-      ContentType.Any,
-      (changed, inserted) => {
-        if (changed.length > 0) {
-          /**
-           * For performance reasons, we typically only queue items in the resolveQueue once,
-           * when they are inserted. However, items recently inserted could still be errorDecrypting.
-           * We want to re-run singleton logic on any items whose decryption status has changed,
-           * due to the fact that singleton logic does not apply properly if an item is not
-           * decrypted.
-           */
-          const decryptionStatusChanged = changed.filter(
-            (i) => i.errorDecryptingValueChanged
-          )
-          if (decryptionStatusChanged.length > 0) {
-            this.resolveQueue = this.resolveQueue.concat(
-              decryptionStatusChanged
-            )
-          }
-        }
-        if (inserted.length > 0) {
-          this.resolveQueue = this.resolveQueue.concat(inserted)
+    this.removeItemObserver = this.itemManager.addObserver(ContentType.Any, (changed, inserted) => {
+      if (changed.length > 0) {
+        /**
+         * For performance reasons, we typically only queue items in the resolveQueue once,
+         * when they are inserted. However, items recently inserted could still be errorDecrypting.
+         * We want to re-run singleton logic on any items whose decryption status has changed,
+         * due to the fact that singleton logic does not apply properly if an item is not
+         * decrypted.
+         */
+        const decryptionStatusChanged = changed.filter((i) => i.errorDecryptingValueChanged)
+        if (decryptionStatusChanged.length > 0) {
+          this.resolveQueue = this.resolveQueue.concat(decryptionStatusChanged)
         }
       }
-    )
-    this.removeSyncObserver = this.syncService.addEventObserver(
-      async (eventName) => {
-        if (
-          eventName === SyncEvent.DownloadFirstSyncCompleted ||
-          eventName === SyncEvent.FullSyncCompleted
-        ) {
-          await this.resolveSingletonsForItems(
-            this.popResolveQueue(),
-            eventName
-          )
-        }
+      if (inserted.length > 0) {
+        this.resolveQueue = this.resolveQueue.concat(inserted)
       }
-    )
+    })
+    this.removeSyncObserver = this.syncService.addEventObserver(async (eventName) => {
+      if (
+        eventName === SyncEvent.DownloadFirstSyncCompleted ||
+        eventName === SyncEvent.FullSyncCompleted
+      ) {
+        await this.resolveSingletonsForItems(this.popResolveQueue(), eventName)
+      }
+    })
   }
 
   private validItemsMatchingPredicate<T extends SNItem>(
     contentType: ContentType,
-    predicate: PredicateInterface<T>
+    predicate: PredicateInterface<T>,
   ) {
-    return this.itemManager
-      .itemsMatchingPredicate(contentType, predicate)
-      .filter((item) => {
-        return !item.errorDecrypting
-      })
+    return this.itemManager.itemsMatchingPredicate(contentType, predicate).filter((item) => {
+      return !item.errorDecrypting
+    })
   }
 
-  private async resolveSingletonsForItems(
-    items: SNItem[],
-    eventSource: SyncEvent
-  ) {
+  private async resolveSingletonsForItems(items: SNItem[], eventSource: SyncEvent) {
     const handled: SNItem[] = []
     for (const item of items) {
       if (handled.includes(item) || !item.isSingleton) {
@@ -133,7 +113,7 @@ export class SNSingletonManager extends AbstractService {
       }
       const matchingItems = this.validItemsMatchingPredicate<SNItem>(
         item.content_type,
-        item.singletonPredicate()
+        item.singletonPredicate(),
       )
       extendArray(handled, matchingItems || [])
       if (!matchingItems || matchingItems.length <= 1) {
@@ -172,12 +152,9 @@ export class SNSingletonManager extends AbstractService {
 
   public findSingleton<T extends SNItem>(
     contentType: ContentType,
-    predicate: PredicateInterface<T>
+    predicate: PredicateInterface<T>,
   ): T | undefined {
-    const matchingItems = this.validItemsMatchingPredicate(
-      contentType,
-      predicate
-    )
+    const matchingItems = this.validItemsMatchingPredicate(contentType, predicate)
     if (matchingItems.length > 0) {
       return matchingItems[0] as T
     }
@@ -187,12 +164,9 @@ export class SNSingletonManager extends AbstractService {
   public async findOrCreateSingleton<T extends SNItem = SNItem>(
     predicate: PredicateInterface<T>,
     createContentType: ContentType,
-    createContent: PayloadContent
+    createContent: PayloadContent,
   ): Promise<T> {
-    const existingSingleton = this.findSingleton<T>(
-      createContentType,
-      predicate
-    )
+    const existingSingleton = this.findSingleton<T>(createContentType, predicate)
     if (!isNullOrUndefined(existingSingleton)) {
       return existingSingleton
     }
@@ -201,30 +175,23 @@ export class SNSingletonManager extends AbstractService {
       /** Add a temporary observer in case of long-running sync request, where
        * the item we're looking for ends up resolving early or in the middle. */
       let matchingItem: SNItem | undefined
-      const removeObserver = this.itemManager.addObserver(
-        createContentType,
-        (_, inserted) => {
-          if (inserted.length > 0) {
-            const matchingItems = this.itemManager.subItemsMatchingPredicates<T>(
-              inserted as T[],
-              [predicate]
-            )
-            if (matchingItems.length > 0) {
-              matchingItem = matchingItems[0]
-            }
+      const removeObserver = this.itemManager.addObserver(createContentType, (_, inserted) => {
+        if (inserted.length > 0) {
+          const matchingItems = this.itemManager.subItemsMatchingPredicates<T>(inserted as T[], [
+            predicate,
+          ])
+          if (matchingItems.length > 0) {
+            matchingItem = matchingItems[0]
           }
         }
-      )
+      })
       await this.syncService.sync()
       removeObserver()
       if (matchingItem) {
         return matchingItem as T
       }
       /** Check again */
-      const refreshedItems = this.validItemsMatchingPredicate(
-        createContentType,
-        predicate
-      )
+      const refreshedItems = this.validItemsMatchingPredicate(createContentType, predicate)
       if (refreshedItems.length > 0) {
         return refreshedItems[0] as T
       }

@@ -1,7 +1,4 @@
-import {
-  FeatureDescription,
-  ThirdPartyFeatureDescription,
-} from '@standardnotes/features'
+import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
 import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies'
 import { HistoryEntry } from './../../services/history/entries/history_entry'
 import { PurePayload } from '@standardnotes/payloads'
@@ -21,17 +18,17 @@ export enum ActionVerb {
 }
 
 export type Action = {
-  label: string;
-  desc: string;
-  running?: boolean;
-  error?: boolean;
-  lastExecuted?: Date;
-  context?: string;
-  verb: ActionVerb;
-  url: string;
-  access_type: ActionAccessType;
-  subactions?: Action[];
-};
+  label: string
+  desc: string
+  running?: boolean
+  error?: boolean
+  lastExecuted?: Date
+  context?: string
+  verb: ActionVerb
+  url: string
+  access_type: ActionAccessType
+  subactions?: Action[]
+}
 
 /**
  * Related to the SNActionsService and the local Action model.
@@ -61,9 +58,7 @@ export class SNActionsExtension extends SNItem {
   }
 
   public get isListedExtension(): boolean {
-    return (
-      (this.package_info.identifier as string) === 'org.standardnotes.listed'
-    )
+    return (this.package_info.identifier as string) === 'org.standardnotes.listed'
   }
 
   actionsWithContextForItem(item: SNItem): Action[] {
@@ -73,10 +68,7 @@ export class SNActionsExtension extends SNItem {
   }
 
   /** Do not duplicate. Always keep original */
-  strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntry
-  ): ConflictStrategy {
+  strategyWhenConflictingWithItem(item: SNItem, previousRevision?: HistoryEntry): ConflictStrategy {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item, previousRevision)
     }

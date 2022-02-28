@@ -1,9 +1,4 @@
-import {
-  Challenge,
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeValidation,
-} from '@Lib/challenges'
+import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from '@Lib/challenges'
 import { ChallengeService } from './challenge/challenge_service'
 import { SNLog } from '@Lib/log'
 import { NoteMutator, SNNote } from '@Lib/models'
@@ -32,8 +27,7 @@ export enum UnprotectedAccessSecondsDuration {
 
 export function isValidProtectionSessionLength(number: unknown): boolean {
   return (
-    typeof number === 'number' &&
-    Object.values(UnprotectedAccessSecondsDuration).includes(number)
+    typeof number === 'number' && Object.values(UnprotectedAccessSecondsDuration).includes(number)
   )
 }
 
@@ -68,17 +62,17 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
     private storageService: SNStorageService,
-    private itemManager: ItemManager
+    private itemManager: ItemManager,
   ) {
     super()
   }
 
   public deinit(): void {
-    clearTimeout(this.sessionExpiryTimeout);
-    (this.protocolService as unknown) = undefined;
-    (this.challengeService as unknown) = undefined;
-    (this.storageService as unknown) = undefined;
-    (this.itemManager as unknown) = undefined
+    clearTimeout(this.sessionExpiryTimeout)
+    ;(this.protocolService as unknown) = undefined
+    ;(this.challengeService as unknown) = undefined
+    ;(this.storageService as unknown) = undefined
+    ;(this.itemManager as unknown) = undefined
     super.deinit()
   }
 
@@ -107,38 +101,34 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
   public hasBiometricsEnabled(): boolean {
     const biometricsState = this.storageService.getValue(
       StorageKey.BiometricsState,
-      StorageValueModes.Nonwrapped
+      StorageValueModes.Nonwrapped,
     )
     return Boolean(biometricsState)
   }
 
   public async enableBiometrics(): Promise<boolean> {
     if (this.hasBiometricsEnabled()) {
-      SNLog.onError(
-        Error('Tried to enable biometrics when they already are enabled.')
-      )
+      SNLog.onError(Error('Tried to enable biometrics when they already are enabled.'))
       return false
     }
     await this.storageService.setValue(
       StorageKey.BiometricsState,
       true,
-      StorageValueModes.Nonwrapped
+      StorageValueModes.Nonwrapped,
     )
     return true
   }
 
   public async disableBiometrics(): Promise<boolean> {
     if (!this.hasBiometricsEnabled()) {
-      SNLog.onError(
-        Error('Tried to disable biometrics when they already are disabled.')
-      )
+      SNLog.onError(Error('Tried to disable biometrics when they already are disabled.'))
       return false
     }
     if (await this.validateOrRenewSession(ChallengeReason.DisableBiometrics)) {
       await this.storageService.setValue(
         StorageKey.BiometricsState,
         false,
-        StorageValueModes.Nonwrapped
+        StorageValueModes.Nonwrapped,
       )
       return true
     } else {
@@ -177,13 +167,12 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
 
   async authorizeProtectedActionForNotes(
     notes: SNNote[],
-    challengeReason: ChallengeReason
+    challengeReason: ChallengeReason,
   ): Promise<SNNote[]> {
     let sessionValidation: Promise<boolean> | undefined
     const authorizedNotes = []
     for (const note of notes) {
-      const needsAuthorization =
-        note.protected && !this.hasUnprotectedAccessSession()
+      const needsAuthorization = note.protected && !this.hasUnprotectedAccessSession()
       if (needsAuthorization && !sessionValidation) {
         sessionValidation = this.validateOrRenewSession(challengeReason)
       }
@@ -195,25 +184,19 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
   }
 
   protectNotes(notes: SNNote[]): Promise<SNNote[]> {
-    return this.itemManager.changeItems<NoteMutator>(
-      Uuids(notes),
-      (mutator) => {
-        mutator.protected = true
-      }
-    ) as Promise<SNNote[]>
+    return this.itemManager.changeItems<NoteMutator>(Uuids(notes), (mutator) => {
+      mutator.protected = true
+    }) as Promise<SNNote[]>
   }
 
   async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
     const authorizedNotes = await this.authorizeProtectedActionForNotes(
       notes,
-      ChallengeReason.UnprotectNote
+      ChallengeReason.UnprotectNote,
     )
-    return this.itemManager.changeItems<NoteMutator>(
-      Uuids(authorizedNotes),
-      (mutator) => {
-        mutator.protected = false
-      }
-    ) as Promise<SNNote[]>
+    return this.itemManager.changeItems<NoteMutator>(Uuids(authorizedNotes), (mutator) => {
+      mutator.protected = false
+    }) as Promise<SNNote[]>
   }
 
   async authorizeNoteAccess(note: SNNote): Promise<boolean> {
@@ -237,9 +220,7 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
   }
 
   authorizeSearchingProtectedNotesText(): Promise<boolean> {
-    return this.validateOrRenewSession(
-      ChallengeReason.SearchProtectedNotesText
-    )
+    return this.validateOrRenewSession(ChallengeReason.SearchProtectedNotesText)
   }
 
   authorizeFileImport(): Promise<boolean> {
@@ -268,7 +249,7 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
 
   private async validateOrRenewSession(
     reason: ChallengeReason,
-    { fallBackToAccountPassword = true, requireAccountPassword = false } = {}
+    { fallBackToAccountPassword = true, requireAccountPassword = false } = {},
   ): Promise<boolean> {
     if (this.getSessionExpiryDate() > new Date()) {
       return true
@@ -295,9 +276,7 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
       }
     }
     const lastSessionLength = this.getLastSessionLength()
-    const chosenSessionLength = isValidProtectionSessionLength(
-      lastSessionLength
-    )
+    const chosenSessionLength = isValidProtectionSessionLength(lastSessionLength)
       ? lastSessionLength
       : UnprotectedAccessSecondsDuration.OneMinute
     prompts.push(
@@ -307,22 +286,18 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
         undefined,
         undefined,
         undefined,
-        chosenSessionLength
-      )
+        chosenSessionLength,
+      ),
     )
     const response = await this.challengeService.promptForChallengeResponse(
-      new Challenge(prompts, reason, true)
+      new Challenge(prompts, reason, true),
     )
     if (response) {
       const length = response.values.find(
-        (value) =>
-          value.prompt.validation ===
-          ChallengeValidation.ProtectionSessionDuration
+        (value) => value.prompt.validation === ChallengeValidation.ProtectionSessionDuration,
       )?.value
       if (isNullOrUndefined(length)) {
-        SNLog.error(
-          Error('No valid protection session length found. Got ' + length)
-        )
+        SNLog.error(Error('No valid protection session length found. Got ' + length))
       } else {
         await this.setSessionLength(length as UnprotectedAccessSecondsDuration)
       }
@@ -333,9 +308,7 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
   }
 
   public getSessionExpiryDate(): Date {
-    const expiresAt = this.storageService.getValue(
-      StorageKey.ProtectionExpirey
-    )
+    const expiresAt = this.storageService.getValue(StorageKey.ProtectionExpirey)
     if (expiresAt) {
       return new Date(expiresAt)
     } else {
@@ -356,13 +329,8 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
     return this.storageService.getValue(StorageKey.ProtectionSessionLength)
   }
 
-  private async setSessionLength(
-    length: UnprotectedAccessSecondsDuration
-  ): Promise<void> {
-    await this.storageService.setValue(
-      StorageKey.ProtectionSessionLength,
-      length
-    )
+  private async setSessionLength(length: UnprotectedAccessSecondsDuration): Promise<void> {
+    await this.storageService.setValue(StorageKey.ProtectionSessionLength, length)
     const expiresAt = new Date()
     expiresAt.setSeconds(expiresAt.getSeconds() + length)
     await this.setSessionExpiryDate(expiresAt)
@@ -375,9 +343,6 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
     const timer: TimerHandler = () => {
       this.clearSession()
     }
-    this.sessionExpiryTimeout = setTimeout(
-      timer,
-      expiryDate.getTime() - Date.now()
-    )
+    this.sessionExpiryTimeout = setTimeout(timer, expiryDate.getTime() - Date.now())
   }
 }

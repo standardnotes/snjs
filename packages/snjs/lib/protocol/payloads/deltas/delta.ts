@@ -1,5 +1,9 @@
 import { HistoryMap } from '@Lib/services/history/history_map'
-import { PayloadSource, ImmutablePayloadCollectionSet, ImmutablePayloadCollection } from '@standardnotes/payloads'
+import {
+  PayloadSource,
+  ImmutablePayloadCollectionSet,
+  ImmutablePayloadCollection,
+} from '@standardnotes/payloads'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,
@@ -28,9 +32,7 @@ export class PayloadsDelta {
     protected readonly applyCollection: ImmutablePayloadCollection,
     protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
     protected readonly historyMap?: HistoryMap,
-  ) {
-
-  }
+  ) {}
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     throw 'Must override PayloadDelta.resultingCollection.'

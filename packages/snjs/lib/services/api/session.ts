@@ -2,28 +2,28 @@ import { SessionRenewalResponse } from '@standardnotes/responses'
 import { Uuid } from '@standardnotes/common'
 
 type RawJwtPayload = {
-  jwt?: string;
-};
+  jwt?: string
+}
 type RawSessionPayload = {
-  accessToken: string;
-  refreshToken: string;
-  accessExpiration: number;
-  refreshExpiration: number;
-};
-type RawStorageValue = RawJwtPayload | RawSessionPayload;
+  accessToken: string
+  refreshToken: string
+  accessExpiration: number
+  refreshExpiration: number
+}
+type RawStorageValue = RawJwtPayload | RawSessionPayload
 
 export type RemoteSession = {
-  uuid: Uuid;
-  updated_at: Date;
-  device_info: string;
-  current: boolean;
-};
+  uuid: Uuid
+  updated_at: Date
+  device_info: string
+  current: boolean
+}
 
 export abstract class Session {
-  public abstract canExpire(): boolean;
+  public abstract canExpire(): boolean
 
   /** Return the token that should be included in the header of authorized network requests */
-  public abstract get authorizationValue(): string;
+  public abstract get authorizationValue(): string
 
   static FromRawStorageValue(raw: RawStorageValue): JwtSession | TokenSession {
     if ((raw as RawJwtPayload).jwt) {
@@ -34,7 +34,7 @@ export abstract class Session {
         rawSession.accessToken,
         rawSession.accessExpiration,
         rawSession.refreshToken,
-        rawSession.refreshExpiration
+        rawSession.refreshExpiration,
       )
     }
   }
@@ -70,19 +70,14 @@ export class TokenSession extends Session {
     const refreshToken: string = response.data.session!.refresh_token
     const accessExpiration: number = response.data.session!.access_expiration
     const refreshExpiration: number = response.data.session!.refresh_expiration
-    return new TokenSession(
-      accessToken,
-      accessExpiration,
-      refreshToken,
-      refreshExpiration
-    )
+    return new TokenSession(accessToken, accessExpiration, refreshToken, refreshExpiration)
   }
 
   constructor(
     accessToken: string,
     accessExpiration: number,
     refreshToken: string,
-    refreshExpiration: number
+    refreshExpiration: number,
   ) {
     super()
     this.accessToken = accessToken

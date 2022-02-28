@@ -15,7 +15,7 @@ export class EncryptAndUploadFileOperation {
     private file: DecryptedFileInterface,
     private apiToken: string,
     private crypto: SNPureCrypto,
-    private api: FilesApi
+    private api: FilesApi,
   ) {
     this.encryptor = new FileEncryptor(file, this.crypto)
     this.uploader = new FileUploader(this.api)
@@ -51,14 +51,11 @@ export class EncryptAndUploadFileOperation {
   public pushBytes(
     decryptedBytes: Uint8Array,
     chunkId: number,
-    isFinalChunk: boolean
+    isFinalChunk: boolean,
   ): Promise<boolean> {
     this.rawSize += decryptedBytes.byteLength
 
-    const encryptedBytes = this.encryptor.pushBytes(
-      decryptedBytes,
-      isFinalChunk
-    )
+    const encryptedBytes = this.encryptor.pushBytes(decryptedBytes, isFinalChunk)
 
     this.chunkSizes.push(encryptedBytes.length)
 

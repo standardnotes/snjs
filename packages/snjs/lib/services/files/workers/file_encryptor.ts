@@ -1,17 +1,10 @@
 import { DecryptedFileInterface } from './../types'
-import {
-  SNPureCrypto,
-  StreamEncryptor,
-  SodiumConstant,
-} from '@standardnotes/sncrypto-common'
+import { SNPureCrypto, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
 
 export class FileEncryptor {
   private stream!: StreamEncryptor
 
-  constructor(
-    private readonly file: DecryptedFileInterface,
-    private crypto: SNPureCrypto
-  ) {}
+  constructor(private readonly file: DecryptedFileInterface, private crypto: SNPureCrypto) {}
 
   public initializeHeader(): string {
     this.stream = this.crypto.xchacha20StreamInitEncryptor(this.file.key)
@@ -19,10 +12,7 @@ export class FileEncryptor {
     return this.stream.header
   }
 
-  public pushBytes(
-    decryptedBytes: Uint8Array,
-    isFinalChunk: boolean
-  ): Uint8Array {
+  public pushBytes(decryptedBytes: Uint8Array, isFinalChunk: boolean): Uint8Array {
     if (!this.stream) {
       throw new Error('FileEncryptor must call initializeHeader first')
     }
@@ -35,7 +25,7 @@ export class FileEncryptor {
       this.stream,
       decryptedBytes,
       this.file.remoteIdentifier,
-      tag
+      tag,
     )
 
     return encryptedBytes

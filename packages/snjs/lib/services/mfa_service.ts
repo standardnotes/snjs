@@ -11,23 +11,17 @@ export class SNMfaService extends AbstractService {
   constructor(
     private settingsService: SNSettingsService,
     private crypto: SNPureCrypto,
-    private featuresService: SNFeaturesService
+    private featuresService: SNFeaturesService,
   ) {
     super()
   }
 
   private async saveMfaSetting(secret: string): Promise<void> {
-    return await this.settingsService.updateSetting(
-      SettingName.MfaSecret,
-      secret,
-      true
-    )
+    return await this.settingsService.updateSetting(SettingName.MfaSecret, secret, true)
   }
 
   async isMfaActivated(): Promise<boolean> {
-    const mfaSetting = await this.settingsService.getSensitiveSetting(
-      SettingName.MfaSecret
-    )
+    const mfaSetting = await this.settingsService.getSensitiveSetting(SettingName.MfaSecret)
     return mfaSetting != null && mfaSetting != false
   }
 
@@ -40,8 +34,7 @@ export class SNMfaService extends AbstractService {
   }
 
   async enableMfa(secret: string, otpToken: string): Promise<void> {
-    const otpTokenValid =
-      otpToken != null && otpToken === (await this.getOtpToken(secret))
+    const otpTokenValid = otpToken != null && otpToken === (await this.getOtpToken(secret))
 
     if (!otpTokenValid) {
       throw new Error(messages.SignInStrings.IncorrectMfa)
@@ -55,9 +48,7 @@ export class SNMfaService extends AbstractService {
   }
 
   isMfaFeatureAvailable(): boolean {
-    const feature = this.featuresService.getFeature(
-      FeatureIdentifier.TwoFactorAuth
-    )
+    const feature = this.featuresService.getFeature(FeatureIdentifier.TwoFactorAuth)
 
     // If the feature is not present in the collection, we don't want to block it
     if (feature == undefined) {
@@ -68,9 +59,9 @@ export class SNMfaService extends AbstractService {
   }
 
   deinit(): void {
-    (this.settingsService as unknown) = undefined;
-    (this.crypto as unknown) = undefined;
-    (this.featuresService as unknown) = undefined
+    ;(this.settingsService as unknown) = undefined
+    ;(this.crypto as unknown) = undefined
+    ;(this.featuresService as unknown) = undefined
     super.deinit()
   }
 }

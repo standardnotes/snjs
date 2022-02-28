@@ -24,28 +24,23 @@ export class SyncResponseResolver {
     decryptedResponsePayloads: PurePayload[],
     private baseCollection: ImmutablePayloadCollection,
     payloadsSavedOrSaving: PurePayload[],
-    private historyMap: HistoryMap
+    private historyMap: HistoryMap,
   ) {
     this.relatedCollectionSet = new ImmutablePayloadCollectionSet([
       ImmutablePayloadCollection.WithPayloads(
         decryptedResponsePayloads,
-        PayloadSource.DecryptedTransient
+        PayloadSource.DecryptedTransient,
       ),
-      ImmutablePayloadCollection.WithPayloads(
-        payloadsSavedOrSaving,
-        PayloadSource.SavedOrSaving
-      ),
+      ImmutablePayloadCollection.WithPayloads(payloadsSavedOrSaving, PayloadSource.SavedOrSaving),
     ])
   }
 
-  public async collectionsByProcessingResponse(): Promise<
-    ImmutablePayloadCollection[]
-    > {
+  public async collectionsByProcessingResponse(): Promise<ImmutablePayloadCollection[]> {
     const collections = []
 
     const collectionRetrieved = await this.collectionByProcessingPayloads(
       this.response.retrievedPayloads,
-      PayloadSource.RemoteRetrieved
+      PayloadSource.RemoteRetrieved,
     )
     if (collectionRetrieved.all().length > 0) {
       collections.push(collectionRetrieved)
@@ -53,7 +48,7 @@ export class SyncResponseResolver {
 
     const collectionSaved = await this.collectionByProcessingPayloads(
       this.response.savedPayloads,
-      PayloadSource.RemoteSaved
+      PayloadSource.RemoteSaved,
     )
     if (collectionSaved.all().length > 0) {
       collections.push(collectionSaved)
@@ -62,7 +57,7 @@ export class SyncResponseResolver {
     if (this.response.uuidConflictPayloads.length > 0) {
       const collectionUuidConflicts = await this.collectionByProcessingPayloads(
         this.response.uuidConflictPayloads,
-        PayloadSource.ConflictUuid
+        PayloadSource.ConflictUuid,
       )
       if (collectionUuidConflicts.all().length > 0) {
         collections.push(collectionUuidConflicts)
@@ -72,7 +67,7 @@ export class SyncResponseResolver {
     if (this.response.dataConflictPayloads.length > 0) {
       const collectionDataConflicts = await this.collectionByProcessingPayloads(
         this.response.dataConflictPayloads,
-        PayloadSource.ConflictData
+        PayloadSource.ConflictData,
       )
       if (collectionDataConflicts.all().length > 0) {
         collections.push(collectionDataConflicts)
@@ -82,7 +77,7 @@ export class SyncResponseResolver {
     if (this.response.rejectedPayloads.length > 0) {
       const collectionRejected = await this.collectionByProcessingPayloads(
         this.response.rejectedPayloads,
-        PayloadSource.RemoteRejected
+        PayloadSource.RemoteRejected,
       )
       if (collectionRejected.all().length > 0) {
         collections.push(collectionRejected)
@@ -94,11 +89,11 @@ export class SyncResponseResolver {
 
   private async collectionByProcessingPayloads(
     payloads: PurePayload[],
-    source: PayloadSource
+    source: PayloadSource,
   ): Promise<ImmutablePayloadCollection> {
     const collection = ImmutablePayloadCollection.WithPayloads(
       filterDisallowedRemotePayloads(payloads),
-      source
+      source,
     )
     const deltaClass = DeltaClassForSource(source)!
     // eslint-disable-next-line new-cap
@@ -116,10 +111,7 @@ export class SyncResponseResolver {
         dirtiedDate: stillDirty ? new Date() : undefined,
       })
     })
-    return ImmutablePayloadCollection.WithPayloads(
-      updatedDirtyPayloads,
-      source
-    )
+    return ImmutablePayloadCollection.WithPayloads(updatedDirtyPayloads, source)
   }
 
   private finalDirtyStateForPayload(payload: PurePayload): boolean | undefined {

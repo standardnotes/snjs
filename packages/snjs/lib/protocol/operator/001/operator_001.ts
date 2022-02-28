@@ -13,18 +13,11 @@ import {
   PayloadFormat,
 } from '@standardnotes/payloads'
 import { SNItemsKey } from '@Models/app/items_key'
-import {
-  Create001KeyParams,
-  SNRootKeyParams,
-} from './../../key_params'
+import { Create001KeyParams, SNRootKeyParams } from './../../key_params'
 import { ItemsKeyContent, AsynchronousOperator } from './../operator'
 import { SNRootKey } from '@Protocol/root_key'
 import { V001Algorithm } from '@Protocol/operator/algorithms'
-import {
-  ContentType,
-  KeyParamsOrigination,
-  ProtocolVersion,
-} from '@standardnotes/common'
+import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { ProtocolVersionLength } from '@standardnotes/applications'
 import { UuidGenerator } from '@standardnotes/utils'
 import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils'
@@ -77,12 +70,10 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   public async createRootKey(
     identifier: string,
     password: string,
-    origination: KeyParamsOrigination
+    origination: KeyParamsOrigination,
   ): Promise<SNRootKey> {
     const pwCost = V001Algorithm.PbkdfMinCost as number
-    const pwNonce = await this.crypto.generateRandomKey(
-      V001Algorithm.SaltSeedLength
-    )
+    const pwNonce = await this.crypto.generateRandomKey(V001Algorithm.SaltSeedLength)
     const pwSalt = await this.crypto.unsafeSha1(identifier + 'SN' + pwNonce)
     const keyParams = Create001KeyParams({
       email: identifier,
@@ -98,19 +89,12 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
 
   public getPayloadAuthenticatedData(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _payload: PurePayload
-  ):
-    | RootKeyEncryptedAuthenticatedData
-    | ItemAuthenticatedData
-    | LegacyAttachedData
-    | undefined {
+    _payload: PurePayload,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     return undefined
   }
 
-  public async computeRootKey(
-    password: string,
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey> {
+  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams)
   }
 
@@ -125,7 +109,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   public async generateEncryptedParametersAsync(
     payload: PurePayload,
     format: PayloadFormat,
-    key?: SNItemsKey | SNRootKey
+    key?: SNItemsKey | SNRootKey,
   ): Promise<PurePayload> {
     if (format === PayloadFormat.DecryptedBareObject) {
       return CreateEncryptionParameters({
@@ -142,17 +126,12 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
      * Generate new item key that is double the key size.
      * Will be split to create encryption key and authentication key.
      */
-    const itemKey = this.crypto.generateRandomKey(
-      V001Algorithm.EncryptionKeyLength * 2
-    )
+    const itemKey = this.crypto.generateRandomKey(V001Algorithm.EncryptionKeyLength * 2)
     const encItemKey = await this.encryptString(itemKey, key.itemsKey)
     /** Encrypt content */
     const ek = firstHalfOfString(itemKey)
     const ak = secondHalfOfString(itemKey)
-    const contentCiphertext = await this.encryptString(
-      JSON.stringify(payload.content),
-      ek
-    )
+    const contentCiphertext = await this.encryptString(JSON.stringify(payload.content), ek)
     const ciphertext = key.keyVersion + contentCiphertext
     const authHash = await this.crypto.hmac256(ciphertext, ak)
     return CreateEncryptionParameters({
@@ -166,7 +145,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
 
   public async generateDecryptedParametersAsync(
     encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey
+    key?: SNItemsKey | SNRootKey,
   ): Promise<PurePayload> {
     const format = encryptedParameters.format
     if (format === PayloadFormat.DecryptedBareObject) {
@@ -183,14 +162,8 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
     /** Decrypt encrypted key */
     let encryptedItemKey = encryptedParameters.enc_item_key
     encryptedItemKey = this.version + encryptedItemKey
-    const itemKeyComponents = this.encryptionComponentsFromString(
-      encryptedItemKey,
-      key!.itemsKey
-    )
-    const itemKey = await this.decryptString(
-      itemKeyComponents.ciphertext,
-      itemKeyComponents.key
-    )
+    const itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key!.itemsKey)
+    const itemKey = await this.decryptString(itemKeyComponents.ciphertext, itemKeyComponents.key)
     if (!itemKey) {
       console.error('Error decrypting parameters', encryptedParameters)
       return CopyEncryptionParameters(encryptedParameters, {
@@ -199,14 +172,8 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
       })
     }
     const ek = firstHalfOfString(itemKey)
-    const itemParams = this.encryptionComponentsFromString(
-      encryptedParameters.contentString,
-      ek
-    )
-    const content = await this.decryptString(
-      itemParams.ciphertext,
-      itemParams.key
-    )
+    const itemParams = this.encryptionComponentsFromString(encryptedParameters.contentString, ek)
+    const content = await this.decryptString(itemParams.ciphertext, itemParams.key)
     if (!content) {
       return CopyEncryptionParameters(encryptedParameters, {
         errorDecrypting: true,
@@ -219,17 +186,13 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
         enc_item_key: undefined,
         auth_hash: undefined,
         errorDecrypting: false,
-        errorDecryptingValueChanged:
-          encryptedParameters.errorDecrypting === true,
+        errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
         waitingForKey: false,
       })
     }
   }
 
-  private encryptionComponentsFromString(
-    string: string,
-    encryptionKey: string
-  ) {
+  private encryptionComponentsFromString(string: string, encryptionKey: string) {
     const encryptionVersion = string.substring(0, ProtocolVersionLength)
     return {
       ciphertext: string.substring(ProtocolVersionLength, string.length),
@@ -238,15 +201,12 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
     }
   }
 
-  protected async deriveKey(
-    password: string,
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey> {
+  protected async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     const derivedKey = await this.crypto.pbkdf2(
       password,
       keyParams.content001.pw_salt,
       keyParams.content001.pw_cost,
-      V001Algorithm.PbkdfOutputLength
+      V001Algorithm.PbkdfOutputLength,
     )
     const partitions = splitString(derivedKey!, 2)
     const key = await SNRootKey.Create({

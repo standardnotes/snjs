@@ -15,19 +15,19 @@ import { isValidProtectionSessionLength } from '../protection_service'
 import { AbstractService } from '@standardnotes/services'
 
 type ChallengeValidationResponse = {
-  valid: boolean;
-  artifacts?: ChallengeArtifacts;
-};
+  valid: boolean
+  artifacts?: ChallengeArtifacts
+}
 
-export type ValueCallback = (value: ChallengeValue) => void;
+export type ValueCallback = (value: ChallengeValue) => void
 
 export type ChallengeObserver = {
-  onValidValue?: ValueCallback;
-  onInvalidValue?: ValueCallback;
-  onNonvalidatedSubmit?: (response: ChallengeResponse) => void;
-  onComplete?: (response: ChallengeResponse) => void;
-  onCancel?: () => void;
-};
+  onValidValue?: ValueCallback
+  onInvalidValue?: ValueCallback
+  onNonvalidatedSubmit?: (response: ChallengeResponse) => void
+  onComplete?: (response: ChallengeResponse) => void
+  onCancel?: () => void
+}
 
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
@@ -39,18 +39,18 @@ export class ChallengeService extends AbstractService {
 
   constructor(
     private storageService: SNStorageService,
-    private protocolService: SNProtocolService
+    private protocolService: SNProtocolService,
   ) {
     super()
   }
 
   /** @override */
   public deinit() {
-    (this.storageService as any) = undefined;
-    (this.protocolService as any) = undefined
-    this.sendChallenge = undefined;
-    (this.challengeOperations as any) = undefined;
-    (this.challengeObservers as any) = undefined
+    ;(this.storageService as any) = undefined
+    ;(this.protocolService as any) = undefined
+    this.sendChallenge = undefined
+    ;(this.challengeOperations as any) = undefined
+    ;(this.challengeObservers as any) = undefined
     super.deinit()
   }
 
@@ -58,41 +58,33 @@ export class ChallengeService extends AbstractService {
    * Resolves when the challenge has been completed.
    * For non-validated challenges, will resolve when the first value is submitted.
    */
-  public promptForChallengeResponse(
-    challenge: Challenge
-  ): Promise<ChallengeResponse | undefined> {
+  public promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined> {
     return new Promise<ChallengeResponse | undefined>((resolve) => {
       this.createOrGetChallengeOperation(challenge, resolve)
       this.sendChallenge!(challenge)
     })
   }
 
-  public async validateChallengeValue(
-    value: ChallengeValue
-  ): Promise<ChallengeValidationResponse> {
+  public async validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse> {
     switch (value.prompt.validation) {
-    case ChallengeValidation.LocalPasscode:
-      return this.protocolService!.validatePasscode(value.value as string)
-    case ChallengeValidation.AccountPassword:
-      return this.protocolService!.validateAccountPassword(
-          value.value as string
-      )
-    case ChallengeValidation.Biometric:
-      return { valid: value.value === true }
-    case ChallengeValidation.ProtectionSessionDuration:
-      return { valid: isValidProtectionSessionLength(value.value) }
-    default:
-      throw Error(`Unhandled validation mode ${value.prompt.validation}`)
+      case ChallengeValidation.LocalPasscode:
+        return this.protocolService!.validatePasscode(value.value as string)
+      case ChallengeValidation.AccountPassword:
+        return this.protocolService!.validateAccountPassword(value.value as string)
+      case ChallengeValidation.Biometric:
+        return { valid: value.value === true }
+      case ChallengeValidation.ProtectionSessionDuration:
+        return { valid: isValidProtectionSessionLength(value.value) }
+      default:
+        throw Error(`Unhandled validation mode ${value.prompt.validation}`)
     }
   }
 
-  public async promptForCorrectPasscode(
-    reason: ChallengeReason
-  ): Promise<string | undefined> {
+  public async promptForCorrectPasscode(reason: ChallengeReason): Promise<string | undefined> {
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
       reason,
-      true
+      true,
     )
     const response = await this.promptForChallengeResponse(challenge)
     if (!response) {
@@ -116,9 +108,7 @@ export class ChallengeService extends AbstractService {
       return {}
     }
     if (!passcode) {
-      passcode = await this.promptForCorrectPasscode(
-        ChallengeReason.ResaveRootKey
-      )
+      passcode = await this.promptForCorrectPasscode(ChallengeReason.ResaveRootKey)
       if (!passcode) {
         return { canceled: true }
       }
@@ -131,10 +121,7 @@ export class ChallengeService extends AbstractService {
     return this.protocolService!.rootKeyNeedsUnwrapping()
   }
 
-  public addChallengeObserver(
-    challenge: Challenge,
-    observer: ChallengeObserver
-  ) {
+  public addChallengeObserver(challenge: Challenge, observer: ChallengeObserver) {
     const observers = this.challengeObservers[challenge.id] || []
     observers.push(observer)
     this.challengeObservers[challenge.id] = observers
@@ -145,7 +132,7 @@ export class ChallengeService extends AbstractService {
 
   private createOrGetChallengeOperation(
     challenge: Challenge,
-    resolve: (response: ChallengeResponse | undefined) => void
+    resolve: (response: ChallengeResponse | undefined) => void,
   ): ChallengeOperation {
     let operation = this.getChallengeOperation(challenge)
     if (!operation) {
@@ -168,17 +155,14 @@ export class ChallengeService extends AbstractService {
         () => {
           this.onChallengeCancel(challenge)
           resolve(undefined)
-        }
+        },
       )
       this.challengeOperations[challenge.id] = operation
     }
     return operation
   }
 
-  private performOnObservers(
-    challenge: Challenge,
-    perform: (observer: ChallengeObserver) => void
-  ) {
+  private performOnObservers(challenge: Challenge, perform: (observer: ChallengeObserver) => void) {
     const observers = this.challengeObservers[challenge.id] || []
     for (const observer of observers) {
       perform(observer)
@@ -197,19 +181,13 @@ export class ChallengeService extends AbstractService {
     })
   }
 
-  private onChallengeNonvalidatedSubmit(
-    challenge: Challenge,
-    response: ChallengeResponse
-  ) {
+  private onChallengeNonvalidatedSubmit(challenge: Challenge, response: ChallengeResponse) {
     this.performOnObservers(challenge, (observer) => {
       observer.onNonvalidatedSubmit?.(response)
     })
   }
 
-  private onChallengeComplete(
-    challenge: Challenge,
-    response: ChallengeResponse
-  ) {
+  private onChallengeComplete(challenge: Challenge, response: ChallengeResponse) {
     this.performOnObservers(challenge, (observer) => {
       observer.onComplete?.(response)
     })
@@ -241,10 +219,7 @@ export class ChallengeService extends AbstractService {
     this.deleteChallengeOperation(operation)
   }
 
-  public async submitValuesForChallenge(
-    challenge: Challenge,
-    values: ChallengeValue[]
-  ) {
+  public async submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]) {
     if (values.length === 0) {
       throw Error('Attempting to submit 0 values for challenge')
     }
@@ -254,12 +229,7 @@ export class ChallengeService extends AbstractService {
         operation.addNonvalidatedValue(value)
       } else {
         const { valid, artifacts } = await this.validateChallengeValue(value)
-        this.setValidationStatusForChallenge(
-          challenge,
-          value,
-          valid,
-          artifacts
-        )
+        this.setValidationStatusForChallenge(challenge, value, valid, artifacts)
       }
     }
   }
@@ -268,7 +238,7 @@ export class ChallengeService extends AbstractService {
     challenge: Challenge,
     value: ChallengeValue,
     valid: boolean,
-    artifacts?: ChallengeArtifacts
+    artifacts?: ChallengeArtifacts,
   ) {
     const operation = this.getChallengeOperation(challenge)
     operation.setValueStatus(value, valid, artifacts)

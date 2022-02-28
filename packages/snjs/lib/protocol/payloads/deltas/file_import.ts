@@ -22,15 +22,12 @@ export class DeltaFileImport extends PayloadsDelta {
       })
       extendArray(results, payloads)
     }
-    return ImmutablePayloadCollection.WithPayloads(
-      results,
-      PayloadSource.FileImport
-    )
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.FileImport)
   }
 
   private async payloadsByHandlingPayload(
     payload: PurePayload,
-    currentResults: Array<PurePayload>
+    currentResults: Array<PurePayload>,
   ) {
     /**
      * Check to see if we've already processed a payload for this id.
@@ -64,12 +61,7 @@ export class DeltaFileImport extends PayloadsDelta {
       return [payload]
     }
 
-    const delta = new ConflictDelta(
-      this.baseCollection,
-      current,
-      payload,
-      PayloadSource.FileImport
-    )
+    const delta = new ConflictDelta(this.baseCollection, current, payload, PayloadSource.FileImport)
     const deltaCollection = await delta.resultingCollection()
     return deltaCollection.all()
   }

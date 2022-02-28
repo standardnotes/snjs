@@ -8,13 +8,10 @@ export class Migration2_20_0 extends Migration {
   }
 
   protected registerStageHandlers(): void {
-    this.registerStageHandler(
-      ApplicationStage.LoadedDatabase_12,
-      async () => {
-        await this.deleteMfaItems()
-        this.markDone()
-      }
-    )
+    this.registerStageHandler(ApplicationStage.LoadedDatabase_12, async () => {
+      await this.deleteMfaItems()
+      this.markDone()
+    })
   }
 
   private async deleteMfaItems(): Promise<void> {

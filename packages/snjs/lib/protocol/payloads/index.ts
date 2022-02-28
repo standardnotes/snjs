@@ -1,6 +1,4 @@
-export {
-  PayloadsByDuplicating,
-} from '@Payloads/functions'
+export { PayloadsByDuplicating } from '@Payloads/functions'
 
 export {
   PayloadsDelta,

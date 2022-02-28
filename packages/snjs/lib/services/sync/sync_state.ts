@@ -46,10 +46,7 @@ export class SyncState {
     this.lastClientHash = clientHash
     this.lastServerHash = serverHash
     const isInSync =
-      !serverHash ||
-      serverHash.length === 0 ||
-      !clientHash ||
-      clientHash === serverHash
+      !serverHash || serverHash.length === 0 || !clientHash || clientHash === serverHash
 
     if (isInSync) {
       if (this.outOfSync) {

@@ -43,9 +43,7 @@ describe('fileService', () => {
       state: {},
     } as StreamEncryptor)
 
-    crypto.xchacha20StreamEncryptorPush = jest
-      .fn()
-      .mockReturnValue(new Uint8Array())
+    crypto.xchacha20StreamEncryptorPush = jest.fn().mockReturnValue(new Uint8Array())
   })
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
