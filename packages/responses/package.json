@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/responses",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -37,6 +37,6 @@
     "@standardnotes/auth": "^3.17.1",
     "@standardnotes/common": "^1.15.1",
     "@standardnotes/features": "^1.33.1",
-    "@standardnotes/payloads": "^1.1.2"
+    "@standardnotes/payloads": "^1.2.0"
   }
 }

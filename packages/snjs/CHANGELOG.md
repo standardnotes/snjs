@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.67.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.66.1...@standardnotes/snjs@2.67.0) (2022-02-28)
+
+
+### Features
+
+* extract responses package ([#617](https://github.com/standardnotes/snjs/issues/617)) ([1169747](https://github.com/standardnotes/snjs/commit/11697471052f94b37202df7fb560a79c5d65d573))
+
+
+
+
+
 ## [2.66.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.66.0...@standardnotes/snjs@2.66.1) (2022-02-28)
 
 
