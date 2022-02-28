@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/utils",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -25,12 +25,12 @@
     "test:unit": "jest spec"
   },
   "dependencies": {
-    "@standardnotes/common": "^1.15.1",
+    "@standardnotes/common": "^1.15.2",
     "dompurify": "^2.3.6",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.2.0",
+    "@standardnotes/config": "^2.2.1",
     "@types/dompurify": "^2.3.3",
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.179",
