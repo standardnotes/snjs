@@ -1,8 +1,5 @@
-import {
-  SynchronousOperator,
-  AsynchronousOperator,
-} from './../protocol/operator/operator';
-import { SNLog } from './../log';
+import { SynchronousOperator, AsynchronousOperator } from './../protocol/operator/operator'
+import { SNLog } from './../log'
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,
@@ -13,26 +10,23 @@ import {
   CreateSourcedPayloadFromObject,
   PayloadFormat,
   PayloadSource,
-  FillItemContent
-} from '@standardnotes/payloads';
-import { Uuids } from '@Models/functions';
-import { SNProtocolOperator004 } from './../protocol/operator/004/operator_004';
-import { SNProtocolOperator003 } from './../protocol/operator/003/operator_003';
-import { SNProtocolOperator002 } from './../protocol/operator/002/operator_002';
-import { SNProtocolOperator001 } from './../protocol/operator/001/operator_001';
-import { ItemManager } from '@Services/item_manager';
-import { EncryptionDelegate } from './encryption_delegate';
-import { SyncEvent } from '@Lib/events';
-import { CreateItemFromPayload } from '@Models/generator';
-import { ItemsKeyMutator, SNItemsKey } from '@Models/app/items_key';
-import {
-  CreateAnyKeyParams,
-  SNRootKeyParams,
-} from './../protocol/key_params';
-import { SNStorageService } from './storage_service';
-import { SNRootKey } from '@Protocol/root_key';
-import { PayloadManager } from './payload_manager';
-import { SNPureCrypto } from '@standardnotes/sncrypto-common';
+  FillItemContent,
+} from '@standardnotes/payloads'
+import { Uuids } from '@Models/functions'
+import { SNProtocolOperator004 } from './../protocol/operator/004/operator_004'
+import { SNProtocolOperator003 } from './../protocol/operator/003/operator_003'
+import { SNProtocolOperator002 } from './../protocol/operator/002/operator_002'
+import { SNProtocolOperator001 } from './../protocol/operator/001/operator_001'
+import { ItemManager } from '@Services/item_manager'
+import { EncryptionDelegate } from './encryption_delegate'
+import { SyncEvent } from '@Lib/events'
+import { CreateItemFromPayload } from '@Models/generator'
+import { ItemsKeyMutator, SNItemsKey } from '@Models/app/items_key'
+import { CreateAnyKeyParams, SNRootKeyParams } from './../protocol/key_params'
+import { SNStorageService } from './storage_service'
+import { SNRootKey } from '@Protocol/root_key'
+import { PayloadManager } from './payload_manager'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import {
   extendArray,
   isFunction,
@@ -41,15 +35,15 @@ import {
   isString,
   isWebCryptoAvailable,
   removeFromArray,
-  UuidGenerator
-} from '@standardnotes/utils';
-import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms';
+  UuidGenerator,
+} from '@standardnotes/utils'
+import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms'
 import {
   ContentType,
   ProtocolVersion,
   KeyParamsOrigination,
   AnyKeyParamsContent,
-} from '@standardnotes/common';
+} from '@standardnotes/common'
 import {
   compareVersions,
   isVersionLessThanOrEqualTo,
@@ -59,19 +53,19 @@ import {
   isDecryptedIntent,
   leftVersionGreaterThanOrEqualToRight,
   ApplicationIdentifier,
-} from '@standardnotes/applications';
-import { StorageKey } from '@Lib/storage_keys';
-import { StorageValueModes } from '@Lib/services/storage_service';
-import { AbstractService, DeviceInterface } from '@standardnotes/services';
+} from '@standardnotes/applications'
+import { StorageKey } from '@Lib/storage_keys'
+import { StorageValueModes } from '@Lib/services/storage_service'
+import { AbstractService, DeviceInterface } from '@standardnotes/services'
 
 export type BackupFile = {
-  version?: ProtocolVersion;
-  keyParams?: any;
-  auth_params?: any;
-  items: any[];
-};
+  version?: ProtocolVersion
+  keyParams?: any
+  auth_params?: any
+  items: any[]
+}
 
-type KeyChangeObserver = () => Promise<void>;
+type KeyChangeObserver = () => Promise<void>
 
 export enum KeyMode {
   /** i.e No account and no passcode */
@@ -85,21 +79,18 @@ export enum KeyMode {
 }
 
 /** The last protocol version to not use root-key based items keys */
-const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003;
+const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003
 
 type AnyOperator =
   | SNProtocolOperator001
   | SNProtocolOperator002
   | SNProtocolOperator003
-  | SNProtocolOperator004;
+  | SNProtocolOperator004
 
 function isAsyncOperator(
-  operator: AsynchronousOperator | SynchronousOperator
+  operator: AsynchronousOperator | SynchronousOperator,
 ): operator is AsynchronousOperator {
-  return (
-    (operator as AsynchronousOperator).generateDecryptedParametersAsync !==
-    undefined
-  );
+  return (operator as AsynchronousOperator).generateDecryptedParametersAsync !== undefined
 }
 /**
  * The protocol service is responsible for the encryption and decryption of payloads, and
@@ -128,15 +119,13 @@ function isAsyncOperator(
  * It also exposes public methods that allows consumers to retrieve an items key
  * for a particular payload, and also retrieve all available items keys.
 */
-export class SNProtocolService
-  extends AbstractService
-  implements EncryptionDelegate {
-  public crypto: SNPureCrypto;
-  private operators: Record<string, AnyOperator> = {};
-  private keyMode = KeyMode.RootKeyNone;
-  private keyObservers: KeyChangeObserver[] = [];
-  private rootKey?: SNRootKey;
-  private removeItemsObserver: any;
+export class SNProtocolService extends AbstractService implements EncryptionDelegate {
+  public crypto: SNPureCrypto
+  private operators: Record<string, AnyOperator> = {}
+  private keyMode = KeyMode.RootKeyNone
+  private keyObservers: KeyChangeObserver[] = []
+  private rootKey?: SNRootKey
+  private removeItemsObserver: any
 
   constructor(
     private itemManager: ItemManager,
@@ -144,80 +133,78 @@ export class SNProtocolService
     deviceInterface: DeviceInterface,
     private storageService: SNStorageService,
     private identifier: ApplicationIdentifier,
-    crypto: SNPureCrypto
+    crypto: SNPureCrypto,
   ) {
-    super();
-    this.itemManager = itemManager;
-    this.payloadManager = payloadManager;
-    this.deviceInterface = deviceInterface;
-    this.storageService = storageService;
-    this.crypto = crypto;
+    super()
+    this.itemManager = itemManager
+    this.payloadManager = payloadManager
+    this.deviceInterface = deviceInterface
+    this.storageService = storageService
+    this.crypto = crypto
 
-    UuidGenerator.SetGenerator(this.crypto.generateUUID);
+    UuidGenerator.SetGenerator(this.crypto.generateUUID)
 
     /** Hide rootKey enumeration */
     Object.defineProperty(this, 'rootKey', {
       enumerable: false,
       writable: true,
-    });
+    })
 
     this.removeItemsObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
       (changed, inserted) => {
         if (changed.concat(inserted).length > 0) {
-          this.decryptErroredItems();
+          this.decryptErroredItems()
         }
-      }
-    );
+      },
+    )
   }
 
   /** @override */
   public deinit(): void {
-    (this.itemManager as unknown) = undefined;
-    (this.payloadManager as unknown) = undefined;
-    this.deviceInterface = undefined;
-    (this.storageService as unknown) = undefined;
-    this.crypto.deinit();
-    (this.crypto as unknown) = undefined;
-    this.operators = {};
-    this.keyObservers.length = 0;
-    this.removeItemsObserver();
-    this.removeItemsObserver = null;
-    this.rootKey = undefined;
-    super.deinit();
+    ;(this.itemManager as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    this.deviceInterface = undefined
+    ;(this.storageService as unknown) = undefined
+    this.crypto.deinit()
+    ;(this.crypto as unknown) = undefined
+    this.operators = {}
+    this.keyObservers.length = 0
+    this.removeItemsObserver()
+    this.removeItemsObserver = null
+    this.rootKey = undefined
+    super.deinit()
   }
 
   public async initialize() {
-    const wrappedRootKey = await this.getWrappedRootKey();
-    const accountKeyParams = await this.getAccountKeyParams();
-    const hasWrapper = await this.hasRootKeyWrapper();
-    const hasRootKey =
-      !isNullOrUndefined(wrappedRootKey) ||
-      !isNullOrUndefined(accountKeyParams);
+    const wrappedRootKey = await this.getWrappedRootKey()
+    const accountKeyParams = await this.getAccountKeyParams()
+    const hasWrapper = await this.hasRootKeyWrapper()
+    const hasRootKey = !isNullOrUndefined(wrappedRootKey) || !isNullOrUndefined(accountKeyParams)
     if (hasWrapper && hasRootKey) {
-      this.keyMode = KeyMode.RootKeyPlusWrapper;
+      this.keyMode = KeyMode.RootKeyPlusWrapper
     } else if (hasWrapper && !hasRootKey) {
-      this.keyMode = KeyMode.WrapperOnly;
+      this.keyMode = KeyMode.WrapperOnly
     } else if (!hasWrapper && hasRootKey) {
-      this.keyMode = KeyMode.RootKeyOnly;
+      this.keyMode = KeyMode.RootKeyOnly
     } else if (!hasWrapper && !hasRootKey) {
-      this.keyMode = KeyMode.RootKeyNone;
+      this.keyMode = KeyMode.RootKeyNone
     } else {
-      throw 'Invalid key mode condition';
+      throw 'Invalid key mode condition'
     }
 
     if (this.keyMode === KeyMode.RootKeyOnly) {
-      this.rootKey = await this.getRootKeyFromKeychain();
-      await this.notifyObserversOfKeyChange();
+      this.rootKey = await this.getRootKeyFromKeychain()
+      await this.notifyObserversOfKeyChange()
     }
   }
 
   private async getEncryptionSourceVersion() {
     if (this.hasAccount()) {
-      return this.getUserVersion();
+      return this.getUserVersion()
     } else if (this.hasPasscode()) {
-      const passcodeParams = await this.getRootKeyWrapperKeyParams();
-      return passcodeParams!.version;
+      const passcodeParams = await this.getRootKeyWrapperKeyParams()
+      return passcodeParams!.version
     }
   }
 
@@ -225,9 +212,9 @@ export class SNProtocolService
    * Returns encryption protocol display name for active account/wrapper
    */
   public async getEncryptionDisplayName() {
-    const version = await this.getEncryptionSourceVersion();
+    const version = await this.getEncryptionSourceVersion()
     if (version) {
-      return this.operatorForVersion(version).getEncryptionDisplayName();
+      return this.operatorForVersion(version).getEncryptionDisplayName()
     }
   }
 
@@ -235,19 +222,19 @@ export class SNProtocolService
    * Returns the latest protocol version
    */
   public getLatestVersion() {
-    return ProtocolVersion.V004;
+    return ProtocolVersion.V004
   }
 
   public hasAccount() {
     switch (this.keyMode) {
       case KeyMode.RootKeyNone:
       case KeyMode.WrapperOnly:
-        return false;
+        return false
       case KeyMode.RootKeyOnly:
       case KeyMode.RootKeyPlusWrapper:
-        return true;
+        return true
       default:
-        throw Error(`Unhandled keyMode value '${this.keyMode}'.`);
+        throw Error(`Unhandled keyMode value '${this.keyMode}'.`)
     }
   }
 
@@ -255,39 +242,39 @@ export class SNProtocolService
    * Returns the protocol version associated with the user's account
    */
   public async getUserVersion() {
-    const keyParams = await this.getAccountKeyParams();
-    return keyParams?.version;
+    const keyParams = await this.getAccountKeyParams()
+    return keyParams?.version
   }
 
   /**
    * Returns true if there is an upgrade available for the account or passcode
    */
   public async upgradeAvailable() {
-    const accountUpgradeAvailable = await this.accountUpgradeAvailable();
-    const passcodeUpgradeAvailable = await this.passcodeUpgradeAvailable();
-    return accountUpgradeAvailable || passcodeUpgradeAvailable;
+    const accountUpgradeAvailable = await this.accountUpgradeAvailable()
+    const passcodeUpgradeAvailable = await this.passcodeUpgradeAvailable()
+    return accountUpgradeAvailable || passcodeUpgradeAvailable
   }
 
   /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
   public async accountUpgradeAvailable() {
-    const userVersion = await this.getUserVersion();
+    const userVersion = await this.getUserVersion()
     if (!userVersion) {
-      return false;
+      return false
     }
-    return userVersion !== this.getLatestVersion();
+    return userVersion !== this.getLatestVersion()
   }
 
   /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
   public async passcodeUpgradeAvailable() {
-    const passcodeParams = await this.getRootKeyWrapperKeyParams();
+    const passcodeParams = await this.getRootKeyWrapperKeyParams()
     if (!passcodeParams) {
-      return false;
+      return false
     }
-    return passcodeParams.version !== this.getLatestVersion();
+    return passcodeParams.version !== this.getLatestVersion()
   }
 
   /**
@@ -303,9 +290,9 @@ export class SNProtocolService
      */
     if (compareVersions(keyParams.version, ProtocolVersion.V004) >= 0) {
       /* keyParams.version >= 004 */
-      return true;
+      return true
     } else {
-      return !!isWebCryptoAvailable() || isReactNativeEnvironment();
+      return !!isWebCryptoAvailable() || isReactNativeEnvironment()
     }
   }
 
@@ -313,20 +300,15 @@ export class SNProtocolService
    * @returns The versions that this library supports.
    */
   public supportedVersions() {
-    return [
-      ProtocolVersion.V001,
-      ProtocolVersion.V002,
-      ProtocolVersion.V003,
-      ProtocolVersion.V004,
-    ];
+    return [ProtocolVersion.V001, ProtocolVersion.V002, ProtocolVersion.V003, ProtocolVersion.V004]
   }
 
   /**
    * Determines whether the input version is greater than the latest supported library version.
    */
   public isVersionNewerThanLibraryVersion(version: ProtocolVersion) {
-    const libraryVersion = this.getLatestVersion();
-    return compareVersions(version, libraryVersion) === 1;
+    const libraryVersion = this.getLatestVersion()
+    return compareVersions(version, libraryVersion) === 1
   }
 
   /**
@@ -336,14 +318,14 @@ export class SNProtocolService
     const expirationDates: Partial<Record<ProtocolVersion, number>> = {
       [ProtocolVersion.V001]: Date.parse('2018-01-01'),
       [ProtocolVersion.V002]: Date.parse('2020-01-01'),
-    };
-    const date = expirationDates[version];
+    }
+    const date = expirationDates[version]
     if (!date) {
       /* No expiration date, is active version */
-      return false;
+      return false
     }
-    const expired = new Date().getTime() > date;
-    return expired;
+    const expired = new Date().getTime() > date
+    return expired
   }
 
   /**
@@ -353,46 +335,46 @@ export class SNProtocolService
    */
   public costMinimumForVersion(version: ProtocolVersion) {
     if (compareVersions(version, ProtocolVersion.V003) >= 0) {
-      throw 'Cost minimums only apply to versions <= 002';
+      throw 'Cost minimums only apply to versions <= 002'
     }
     if (version === ProtocolVersion.V001) {
-      return V001Algorithm.PbkdfMinCost;
+      return V001Algorithm.PbkdfMinCost
     } else if (version === ProtocolVersion.V002) {
-      return V002Algorithm.PbkdfMinCost;
+      return V002Algorithm.PbkdfMinCost
     } else {
-      throw `Invalid version for cost minimum: ${version}`;
+      throw `Invalid version for cost minimum: ${version}`
     }
   }
 
   private createOperatorForVersion(version: ProtocolVersion): AnyOperator {
     if (version === ProtocolVersion.V001) {
-      return new SNProtocolOperator001(this.crypto);
+      return new SNProtocolOperator001(this.crypto)
     } else if (version === ProtocolVersion.V002) {
-      return new SNProtocolOperator002(this.crypto);
+      return new SNProtocolOperator002(this.crypto)
     } else if (version === ProtocolVersion.V003) {
-      return new SNProtocolOperator003(this.crypto);
+      return new SNProtocolOperator003(this.crypto)
     } else if (version === ProtocolVersion.V004) {
-      return new SNProtocolOperator004(this.crypto);
+      return new SNProtocolOperator004(this.crypto)
     } else {
-      throw Error(`Unable to find operator for version ${version}`);
+      throw Error(`Unable to find operator for version ${version}`)
     }
   }
 
   private operatorForVersion(version: ProtocolVersion) {
-    const operatorKey = version;
-    let operator = this.operators[operatorKey];
+    const operatorKey = version
+    let operator = this.operators[operatorKey]
     if (!operator) {
-      operator = this.createOperatorForVersion(version);
-      this.operators[operatorKey] = operator;
+      operator = this.createOperatorForVersion(version)
+      this.operators[operatorKey] = operator
     }
-    return operator;
+    return operator
   }
 
   /**
    * Returns the operator corresponding to the latest protocol version
    */
   private defaultOperator() {
-    return this.operatorForVersion(this.getLatestVersion());
+    return this.operatorForVersion(this.getLatestVersion())
   }
 
   /**
@@ -400,9 +382,9 @@ export class SNProtocolService
    * Delegates computation to respective protocol operator.
    */
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
-    const version = keyParams.version;
-    const operator = this.operatorForVersion(version);
-    return operator.computeRootKey(password, keyParams);
+    const version = keyParams.version
+    const operator = this.operatorForVersion(version)
+    return operator.computeRootKey(password, keyParams)
   }
 
   /**
@@ -412,22 +394,17 @@ export class SNProtocolService
     identifier: string,
     password: string,
     origination: KeyParamsOrigination,
-    version?: ProtocolVersion
+    version?: ProtocolVersion,
   ) {
-    const operator = version
-      ? this.operatorForVersion(version)
-      : this.defaultOperator();
-    return operator.createRootKey(identifier, password, origination);
+    const operator = version ? this.operatorForVersion(version) : this.defaultOperator()
+    return operator.createRootKey(identifier, password, origination)
   }
 
   /**
    * Given a key and intent, returns the proper PayloadFormat,
    * or throws an exception if unsupported configuration of parameters.
    */
-  private payloadContentFormatForIntent(
-    intent: EncryptionIntent,
-    key?: SNRootKey | SNItemsKey
-  ) {
+  private payloadContentFormatForIntent(intent: EncryptionIntent, key?: SNRootKey | SNItemsKey) {
     if (!key) {
       /** Decrypted */
       if (
@@ -436,9 +413,9 @@ export class SNProtocolService
         intent === EncryptionIntent.FileDecrypted ||
         intent === EncryptionIntent.FilePreferEncrypted
       ) {
-        return PayloadFormat.DecryptedBareObject;
+        return PayloadFormat.DecryptedBareObject
       } else {
-        throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.';
+        throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.'
       }
     } else {
       /** Encrypted */
@@ -449,9 +426,9 @@ export class SNProtocolService
         intent === EncryptionIntent.LocalStorageEncrypted ||
         intent === EncryptionIntent.LocalStoragePreferEncrypted
       ) {
-        return PayloadFormat.EncryptedString;
+        return PayloadFormat.EncryptedString
       } else {
-        throw 'Unhandled encrypted case in protocolService.payloadContentFormatForIntent.';
+        throw 'Unhandled encrypted case in protocolService.payloadContentFormatForIntent.'
       }
     }
   }
@@ -470,61 +447,49 @@ export class SNProtocolService
   public async payloadByEncryptingPayload(
     payload: PurePayload,
     intent: EncryptionIntent,
-    key?: SNRootKey | SNItemsKey
+    key?: SNRootKey | SNItemsKey,
   ): Promise<PurePayload> {
     if (payload.errorDecrypting) {
-      return payload;
+      return payload
     }
     if (payload.deleted) {
-      return payload;
+      return payload
     }
     if (isNullOrUndefined(intent)) {
-      throw Error('Attempting to encrypt payload with null intent');
+      throw Error('Attempting to encrypt payload with null intent')
     }
     if (!key && !isDecryptedIntent(intent)) {
-      key = await this.keyToUseForEncryptionOfPayload(payload, intent);
+      key = await this.keyToUseForEncryptionOfPayload(payload, intent)
     }
     if (!key && intentRequiresEncryption(intent)) {
-      throw Error('Attempting to generate encrypted payload with no key.');
+      throw Error('Attempting to generate encrypted payload with no key.')
     }
     if (payload.format !== PayloadFormat.DecryptedBareObject) {
-      throw Error('Attempting to encrypt already encrypted payload.');
+      throw Error('Attempting to encrypt already encrypted payload.')
     }
     if (!payload.content) {
-      throw Error('Attempting to encrypt payload with no content.');
+      throw Error('Attempting to encrypt payload with no content.')
     }
     if (!payload.uuid) {
-      throw Error('Attempting to encrypt payload with no UuidGenerator.');
+      throw Error('Attempting to encrypt payload with no UuidGenerator.')
     }
     if (key?.errorDecrypting || key?.waitingForKey) {
-      throw Error('Attempting to encrypt payload with encrypted key.');
+      throw Error('Attempting to encrypt payload with encrypted key.')
     }
-    const version = key ? key.keyVersion : this.getLatestVersion();
-    const format = this.payloadContentFormatForIntent(intent, key);
-    const operator = this.operatorForVersion(version);
-    let encryptionParameters;
+    const version = key ? key.keyVersion : this.getLatestVersion()
+    const format = this.payloadContentFormatForIntent(intent, key)
+    const operator = this.operatorForVersion(version)
+    let encryptionParameters
     if (isAsyncOperator(operator)) {
-      encryptionParameters = await operator.generateEncryptedParametersAsync(
-        payload,
-        format,
-        key
-      );
+      encryptionParameters = await operator.generateEncryptedParametersAsync(payload, format, key)
     } else {
-      encryptionParameters = operator.generateEncryptedParametersSync(
-        payload,
-        format,
-        key
-      );
+      encryptionParameters = operator.generateEncryptedParametersSync(payload, format, key)
     }
     if (!encryptionParameters) {
-      throw 'Unable to generate encryption parameters';
+      throw 'Unable to generate encryption parameters'
     }
-    const result = CreateIntentPayloadFromObject(
-      payload,
-      intent,
-      encryptionParameters
-    );
-    return result;
+    const result = CreateIntentPayloadFromObject(payload, intent, encryptionParameters)
+    return result
   }
 
   /**
@@ -534,19 +499,15 @@ export class SNProtocolService
   public async payloadsByEncryptingPayloads(
     payloads: PurePayload[],
     intent: EncryptionIntent | ((payload: PurePayload) => EncryptionIntent),
-    key?: SNRootKey | SNItemsKey
+    key?: SNRootKey | SNItemsKey,
   ) {
-    const results = [];
+    const results = []
     for (const payload of payloads) {
-      const useIntent = isFunction(intent) ? (intent as any)(payload) : intent;
-      const encryptedPayload = await this.payloadByEncryptingPayload(
-        payload,
-        useIntent,
-        key
-      );
-      results.push(encryptedPayload);
+      const useIntent = isFunction(intent) ? (intent as any)(payload) : intent
+      const encryptedPayload = await this.payloadByEncryptingPayload(payload, useIntent, key)
+      results.push(encryptedPayload)
     }
-    return results;
+    return results
   }
 
   /**
@@ -558,60 +519,50 @@ export class SNProtocolService
    */
   public async payloadByDecryptingPayload(
     payload: PurePayload,
-    key?: SNRootKey | SNItemsKey
+    key?: SNRootKey | SNItemsKey,
   ): Promise<PurePayload> {
     if (!payload.content) {
-      SNLog.error(Error('Attempting to decrypt payload that has no content.'));
+      SNLog.error(Error('Attempting to decrypt payload that has no content.'))
       return CreateMaxPayloadFromAnyObject(payload, {
         errorDecrypting: true,
-      });
+      })
     }
-    const format = payload.format;
+    const format = payload.format
     if (format === PayloadFormat.DecryptedBareObject) {
-      return payload;
+      return payload
     }
     if (!key && format === PayloadFormat.EncryptedString) {
-      key = this.keyToUseForDecryptionOfPayload(payload);
+      key = this.keyToUseForDecryptionOfPayload(payload)
       if (!key) {
         return CreateMaxPayloadFromAnyObject(payload, {
           waitingForKey: true,
           errorDecrypting: true,
-        });
+        })
       }
     }
     if (key?.errorDecrypting) {
       return CreateMaxPayloadFromAnyObject(payload, {
         waitingForKey: true,
         errorDecrypting: true,
-      });
+      })
     }
-    const version = payload.version!;
-    const source = payload.source;
-    const operator = this.operatorForVersion(version);
+    const version = payload.version!
+    const source = payload.source
+    const operator = this.operatorForVersion(version)
     try {
-      let decryptedParameters;
+      let decryptedParameters
       if (isAsyncOperator(operator)) {
-        decryptedParameters = await operator.generateDecryptedParametersAsync(
-          payload,
-          key
-        );
+        decryptedParameters = await operator.generateDecryptedParametersAsync(payload, key)
       } else {
-        decryptedParameters = operator.generateDecryptedParametersSync(
-          payload,
-          key
-        ) as PurePayload;
+        decryptedParameters = operator.generateDecryptedParametersSync(payload, key) as PurePayload
       }
-      return CreateMaxPayloadFromAnyObject(
-        payload,
-        decryptedParameters,
-        source
-      );
+      return CreateMaxPayloadFromAnyObject(payload, decryptedParameters, source)
     } catch (e) {
-      console.error('Error decrypting payload', payload, e);
+      console.error('Error decrypting payload', payload, e)
       return CreateMaxPayloadFromAnyObject(payload, {
         errorDecrypting: true,
         errorDecryptingValueChanged: !payload.errorDecrypting,
-      });
+      })
     }
   }
 
@@ -620,31 +571,28 @@ export class SNProtocolService
    */
   public async payloadsByDecryptingPayloads(
     payloads: PurePayload[],
-    key?: SNRootKey | SNItemsKey
+    key?: SNRootKey | SNItemsKey,
   ): Promise<PurePayload[]> {
     const decryptItem = (encryptedPayload: PurePayload) => {
       if (!encryptedPayload) {
         /** Keep in-counts similar to out-counts */
-        return encryptedPayload;
+        return encryptedPayload
       }
       /**
        * We still want to decrypt deleted payloads if they have content in case
        * they were marked as dirty but not yet synced.
        */
-      if (
-        encryptedPayload.deleted === true &&
-        isNullOrUndefined(encryptedPayload.content)
-      ) {
-        return encryptedPayload;
+      if (encryptedPayload.deleted === true && isNullOrUndefined(encryptedPayload.content)) {
+        return encryptedPayload
       }
-      const isDecryptable = isString(encryptedPayload.content);
+      const isDecryptable = isString(encryptedPayload.content)
       if (!isDecryptable) {
-        return encryptedPayload;
+        return encryptedPayload
       }
-      return this.payloadByDecryptingPayload(encryptedPayload, key);
-    };
+      return this.payloadByDecryptingPayload(encryptedPayload, key)
+    }
 
-    return Promise.all(payloads.map((payload) => decryptItem(payload)));
+    return Promise.all(payloads.map((payload) => decryptItem(payload)))
   }
 
   /**
@@ -655,71 +603,63 @@ export class SNProtocolService
    */
   public async decryptErroredItems() {
     const items = this.itemManager.invalidItems.filter(
-      (i) => i.content_type !== ContentType.ItemsKey
-    );
+      (i) => i.content_type !== ContentType.ItemsKey,
+    )
     if (items.length === 0) {
-      return;
+      return
     }
     const payloads = items.map((item) => {
-      return item.payloadRepresentation();
-    });
-    const decrypted = await this.payloadsByDecryptingPayloads(payloads);
-    await this.payloadManager!.emitPayloads(
-      decrypted,
-      PayloadSource.LocalChanged
-    );
+      return item.payloadRepresentation()
+    })
+    const decrypted = await this.payloadsByDecryptingPayloads(payloads)
+    await this.payloadManager!.emitPayloads(decrypted, PayloadSource.LocalChanged)
   }
 
   /**
    * Decrypts a backup file using user-inputted password
    * @param password - The raw user password associated with this backup file
    */
-  public async payloadsByDecryptingBackupFile(
-    data: BackupFile,
-    password?: string
-  ) {
-    const keyParamsData = data.keyParams || data.auth_params;
-    const rawItems = data.items;
+  public async payloadsByDecryptingBackupFile(data: BackupFile, password?: string) {
+    const keyParamsData = data.keyParams || data.auth_params
+    const rawItems = data.items
     const encryptedPayloads = rawItems.map((rawItem) => {
-      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.FileImport);
-    });
-    let decryptedPayloads: PurePayload[] = [];
+      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.FileImport)
+    })
+    let decryptedPayloads: PurePayload[] = []
     if (keyParamsData) {
-      const keyParams = this.createKeyParams(keyParamsData);
-      const rootKey = await this.computeRootKey(password!, keyParams);
+      const keyParams = this.createKeyParams(keyParamsData)
+      const rootKey = await this.computeRootKey(password!, keyParams)
       const itemsKeysPayloads = encryptedPayloads.filter((payload) => {
-        return payload.content_type === ContentType.ItemsKey;
-      });
+        return payload.content_type === ContentType.ItemsKey
+      })
       /**
        * First decrypt items keys, in case we need to reference these keys for the
        * decryption of other items below
        */
       const decryptedItemsKeysPayloads = await this.payloadsByDecryptingPayloads(
         itemsKeysPayloads,
-        rootKey
-      );
+        rootKey,
+      )
       const decryptedItemsKeys = decryptedItemsKeysPayloads.map(
-        (p) => CreateItemFromPayload(p) as SNItemsKey
-      );
-      extendArray(decryptedPayloads, decryptedItemsKeysPayloads);
+        (p) => CreateItemFromPayload(p) as SNItemsKey,
+      )
+      extendArray(decryptedPayloads, decryptedItemsKeysPayloads)
       for (const encryptedPayload of encryptedPayloads) {
         if (encryptedPayload.content_type === ContentType.ItemsKey) {
-          continue;
+          continue
         }
         try {
-          let itemsKey: SNItemsKey | SNRootKey | undefined;
+          let itemsKey: SNItemsKey | SNRootKey | undefined
           if (encryptedPayload.items_key_id) {
-            itemsKey = this.itemsKeyForPayload(encryptedPayload);
+            itemsKey = this.itemsKeyForPayload(encryptedPayload)
           }
           if (!itemsKey) {
-            const candidate = decryptedItemsKeysPayloads.find(
-              (itemsKeyPayload) => {
-                return encryptedPayload.items_key_id === itemsKeyPayload.uuid;
-              }
-            );
-            const payloadVersion = encryptedPayload.version as ProtocolVersion;
+            const candidate = decryptedItemsKeysPayloads.find((itemsKeyPayload) => {
+              return encryptedPayload.items_key_id === itemsKeyPayload.uuid
+            })
+            const payloadVersion = encryptedPayload.version as ProtocolVersion
             if (candidate) {
-              itemsKey = CreateItemFromPayload(candidate) as SNItemsKey;
+              itemsKey = CreateItemFromPayload(candidate) as SNItemsKey
             } else {
               /**
                * Payloads with versions <= 003 use root key directly for encryption.
@@ -727,42 +667,29 @@ export class SNProtocolService
                * have an items key based off the 003 root key. We can't use the 004
                * root key directly because it's missing dataAuthenticationKey.
                */
-              if (
-                leftVersionGreaterThanOrEqualToRight(
-                  keyParams.version,
-                  ProtocolVersion.V004
-                )
-              ) {
-                itemsKey = this.defaultItemsKeyForItemVersion(
-                  payloadVersion,
-                  decryptedItemsKeys
-                );
-              } else if (
-                compareVersions(payloadVersion, ProtocolVersion.V003) <= 0
-              ) {
-                itemsKey = rootKey;
+              if (leftVersionGreaterThanOrEqualToRight(keyParams.version, ProtocolVersion.V004)) {
+                itemsKey = this.defaultItemsKeyForItemVersion(payloadVersion, decryptedItemsKeys)
+              } else if (compareVersions(payloadVersion, ProtocolVersion.V003) <= 0) {
+                itemsKey = rootKey
               }
             }
           }
-          const decryptedPayload = await this.payloadByDecryptingPayload(
-            encryptedPayload,
-            itemsKey
-          );
-          decryptedPayloads.push(decryptedPayload);
+          const decryptedPayload = await this.payloadByDecryptingPayload(encryptedPayload, itemsKey)
+          decryptedPayloads.push(decryptedPayload)
         } catch (e) {
           decryptedPayloads.push(
             CreateMaxPayloadFromAnyObject(encryptedPayload, {
               errorDecrypting: true,
               errorDecryptingValueChanged: !encryptedPayload.errorDecrypting,
-            })
-          );
-          console.error('Error decrypting payload', encryptedPayload, e);
+            }),
+          )
+          console.error('Error decrypting payload', encryptedPayload, e)
         }
       }
     } else {
-      decryptedPayloads = encryptedPayloads;
+      decryptedPayloads = encryptedPayloads
     }
-    return decryptedPayloads;
+    return decryptedPayloads
   }
 
   /**
@@ -770,7 +697,7 @@ export class SNProtocolService
    * @param keyParams - The raw key params object to create a KeyParams object from
    */
   public createKeyParams(keyParams: AnyKeyParamsContent) {
-    return CreateAnyKeyParams(keyParams);
+    return CreateAnyKeyParams(keyParams)
   }
 
   /**
@@ -782,41 +709,34 @@ export class SNProtocolService
    * @returns JSON stringified representation of data, including keyParams.
    */
   public async createBackupFile(intent: EncryptionIntent): Promise<BackupFile> {
-    let items = this.itemManager.items;
+    let items = this.itemManager.items
 
     if (intent === EncryptionIntent.FileDecrypted) {
-      items = items.filter(
-        (item) => item.content_type !== ContentType.ItemsKey
-      );
+      items = items.filter((item) => item.content_type !== ContentType.ItemsKey)
     }
 
     const ejectedPayloadsPromise = Promise.all(
       items.map((item) => {
         if (item.errorDecrypting) {
           /** Keep payload as-is */
-          return item.payload.ejected();
+          return item.payload.ejected()
         } else {
-          const payload = CreateSourcedPayloadFromObject(
-            item.payload,
-            PayloadSource.FileImport
-          );
-          return this.payloadByEncryptingPayload(payload, intent).then((p) =>
-            p.ejected()
-          );
+          const payload = CreateSourcedPayloadFromObject(item.payload, PayloadSource.FileImport)
+          return this.payloadByEncryptingPayload(payload, intent).then((p) => p.ejected())
         }
-      })
-    );
+      }),
+    )
 
     const data: BackupFile = {
       version: this.getLatestVersion(),
       items: await ejectedPayloadsPromise,
-    };
+    }
 
     if (intent === EncryptionIntent.FileEncrypted) {
-      const keyParams = await this.getRootKeyParams();
-      data.keyParams = keyParams?.getPortableValue();
+      const keyParams = await this.getRootKeyParams()
+      data.keyParams = keyParams?.getPortableValue()
     }
-    return data;
+    return data
   }
 
   /**
@@ -825,54 +745,49 @@ export class SNProtocolService
    *                  key or wrapper status has changed.
    */
   public onKeyStatusChange(callback: KeyChangeObserver) {
-    this.keyObservers.push(callback);
+    this.keyObservers.push(callback)
     return () => {
-      removeFromArray(this.keyObservers, callback);
-    };
+      removeFromArray(this.keyObservers, callback)
+    }
   }
 
   private async notifyObserversOfKeyChange() {
     for (const observer of this.keyObservers) {
-      await observer();
+      await observer()
     }
   }
 
   private async getRootKeyFromKeychain() {
-    const rawKey = await this.deviceInterface!.getNamespacedKeychainValue(
-      this.identifier
-    );
+    const rawKey = await this.deviceInterface!.getNamespacedKeychainValue(this.identifier)
     if (isNullOrUndefined(rawKey)) {
-      return undefined;
+      return undefined
     }
     const rootKey = await SNRootKey.Create({
       ...rawKey,
       keyParams: await this.getRootKeyParams(),
-    });
-    return rootKey;
+    })
+    return rootKey
   }
 
   private async saveRootKeyToKeychain() {
     if (isNullOrUndefined(this.rootKey)) {
-      throw 'Attempting to non-existent root key to the keychain.';
+      throw 'Attempting to non-existent root key to the keychain.'
     }
     if (this.keyMode !== KeyMode.RootKeyOnly) {
-      throw 'Should not be persisting wrapped key to keychain.';
+      throw 'Should not be persisting wrapped key to keychain.'
     }
-    const rawKey = this.rootKey!.getKeychainValue();
+    const rawKey = this.rootKey!.getKeychainValue()
     return this.executeCriticalFunction(() => {
-      return this.deviceInterface!.setNamespacedKeychainValue(
-        rawKey,
-        this.identifier
-      );
-    });
+      return this.deviceInterface!.setNamespacedKeychainValue(rawKey, this.identifier)
+    })
   }
 
   /**
    * @returns True if a root key wrapper (passcode) is configured.
    */
   public async hasRootKeyWrapper() {
-    const wrapper = await this.getRootKeyWrapperKeyParams();
-    return !isNullOrUndefined(wrapper);
+    const wrapper = await this.getRootKeyWrapperKeyParams()
+    return !isNullOrUndefined(wrapper)
   }
 
   /**
@@ -880,17 +795,14 @@ export class SNProtocolService
    * to determine if a passcode is configured.
    */
   public hasPasscode() {
-    return (
-      this.keyMode === KeyMode.WrapperOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    );
+    return this.keyMode === KeyMode.WrapperOnly || this.keyMode === KeyMode.RootKeyPlusWrapper
   }
 
   /**
    * @returns True if the root key has not yet been unwrapped (passcode locked).
    */
   public async rootKeyNeedsUnwrapping() {
-    return (await this.hasRootKeyWrapper()) && isNullOrUndefined(this.rootKey);
+    return (await this.hasRootKeyWrapper()) && isNullOrUndefined(this.rootKey)
   }
 
   /**
@@ -899,22 +811,19 @@ export class SNProtocolService
   public async getRootKeyWrapperKeyParams() {
     const rawKeyParams = await this.storageService.getValue(
       StorageKey.RootKeyWrapperKeyParams,
-      StorageValueModes.Nonwrapped
-    );
+      StorageValueModes.Nonwrapped,
+    )
     if (!rawKeyParams) {
-      return undefined;
+      return undefined
     }
-    return this.createKeyParams(rawKeyParams);
+    return this.createKeyParams(rawKeyParams)
   }
 
   /**
    * @returns Object containing persisted wrapped (encrypted) root key
    */
   private async getWrappedRootKey() {
-    return this.storageService.getValue(
-      StorageKey.WrappedRootKey,
-      StorageValueModes.Nonwrapped
-    );
+    return this.storageService.getValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped)
   }
 
   /**
@@ -922,16 +831,16 @@ export class SNProtocolService
    */
   public async getRootKeyParams() {
     if (this.keyMode === KeyMode.WrapperOnly) {
-      return this.getRootKeyWrapperKeyParams();
+      return this.getRootKeyWrapperKeyParams()
     } else if (
       this.keyMode === KeyMode.RootKeyOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
     ) {
-      return this.getAccountKeyParams();
+      return this.getAccountKeyParams()
     } else if (this.keyMode === KeyMode.RootKeyNone) {
-      return undefined;
+      return undefined
     } else {
-      throw `Unhandled key mode for getRootKeyParams ${this.keyMode}`;
+      throw `Unhandled key mode for getRootKeyParams ${this.keyMode}`
     }
   }
 
@@ -942,12 +851,12 @@ export class SNProtocolService
   public async getAccountKeyParams() {
     const rawKeyParams = await this.storageService.getValue(
       StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped
-    );
+      StorageValueModes.Nonwrapped,
+    )
     if (!rawKeyParams) {
-      return undefined;
+      return undefined
     }
-    return this.createKeyParams(rawKeyParams);
+    return this.createKeyParams(rawKeyParams)
   }
 
   /**
@@ -955,10 +864,10 @@ export class SNProtocolService
    * wrapped root key.
    */
   public async validateWrappingKey(wrappingKey: SNRootKey) {
-    const wrappedRootKey = await this.getWrappedRootKey();
+    const wrappedRootKey = await this.getWrappedRootKey()
     /** If wrapper only, storage is encrypted directly with wrappingKey */
     if (this.keyMode === KeyMode.WrapperOnly) {
-      return this.storageService.canDecryptWithKey(wrappingKey);
+      return this.storageService.canDecryptWithKey(wrappingKey)
     } else if (
       this.keyMode === KeyMode.RootKeyOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
@@ -968,14 +877,11 @@ export class SNProtocolService
        * account keys are encrypted with wrappingKey. Here we validate
        * by attempting to decrypt account keys.
        */
-      const wrappedKeyPayload = CreateMaxPayloadFromAnyObject(wrappedRootKey);
-      const decrypted = await this.payloadByDecryptingPayload(
-        wrappedKeyPayload,
-        wrappingKey
-      );
-      return !decrypted.errorDecrypting;
+      const wrappedKeyPayload = CreateMaxPayloadFromAnyObject(wrappedRootKey)
+      const decrypted = await this.payloadByDecryptingPayload(wrappedKeyPayload, wrappingKey)
+      return !decrypted.errorDecrypting
     } else {
-      throw 'Unhandled case in validateWrappingKey';
+      throw 'Unhandled case in validateWrappingKey'
     }
   }
 
@@ -984,9 +890,9 @@ export class SNProtocolService
    * Wrapping key params are read from disk.
    */
   public async computeWrappingKey(passcode: string) {
-    const keyParams = await this.getRootKeyWrapperKeyParams();
-    const key = await this.computeRootKey(passcode, keyParams!);
-    return key;
+    const keyParams = await this.getRootKeyWrapperKeyParams()
+    const key = await this.computeRootKey(passcode, keyParams!)
+    return key
   }
 
   /**
@@ -997,26 +903,20 @@ export class SNProtocolService
    */
   public async unwrapRootKey(wrappingKey: SNRootKey) {
     if (this.keyMode === KeyMode.WrapperOnly) {
-      this.rootKey = wrappingKey;
-      return;
+      this.rootKey = wrappingKey
+      return
     }
     if (this.keyMode !== KeyMode.RootKeyPlusWrapper) {
-      throw 'Invalid key mode condition for unwrapping.';
+      throw 'Invalid key mode condition for unwrapping.'
     }
-    const wrappedKey = await this.getWrappedRootKey();
-    const payload = CreateMaxPayloadFromAnyObject(wrappedKey);
-    const decrypted = await this.payloadByDecryptingPayload(
-      payload,
-      wrappingKey
-    );
+    const wrappedKey = await this.getWrappedRootKey()
+    const payload = CreateMaxPayloadFromAnyObject(wrappedKey)
+    const decrypted = await this.payloadByDecryptingPayload(payload, wrappingKey)
     if (decrypted.errorDecrypting) {
-      throw Error('Unable to decrypt root key with provided wrapping key.');
+      throw Error('Unable to decrypt root key with provided wrapping key.')
     } else {
-      this.rootKey = await SNRootKey.Create(
-        decrypted.contentObject as any,
-        decrypted.uuid
-      );
-      await this.notifyObserversOfKeyChange();
+      this.rootKey = await SNRootKey.Create(decrypted.contentObject as any, decrypted.uuid)
+      await this.notifyObserversOfKeyChange()
     }
   }
 
@@ -1028,31 +928,28 @@ export class SNProtocolService
    */
   public async setNewRootKeyWrapper(wrappingKey: SNRootKey) {
     if (this.keyMode === KeyMode.RootKeyNone) {
-      this.keyMode = KeyMode.WrapperOnly;
+      this.keyMode = KeyMode.WrapperOnly
     } else if (this.keyMode === KeyMode.RootKeyOnly) {
-      this.keyMode = KeyMode.RootKeyPlusWrapper;
+      this.keyMode = KeyMode.RootKeyPlusWrapper
     } else {
-      throw Error('Attempting to set wrapper on already wrapped key.');
+      throw Error('Attempting to set wrapper on already wrapped key.')
     }
-    await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier);
-    if (
-      this.keyMode === KeyMode.WrapperOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    ) {
+    await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier)
+    if (this.keyMode === KeyMode.WrapperOnly || this.keyMode === KeyMode.RootKeyPlusWrapper) {
       if (this.keyMode === KeyMode.WrapperOnly) {
-        this.rootKey = wrappingKey;
-        await this.reencryptItemsKeys();
+        this.rootKey = wrappingKey
+        await this.reencryptItemsKeys()
       } else {
-        await this.wrapAndPersistRootKey(wrappingKey);
+        await this.wrapAndPersistRootKey(wrappingKey)
       }
       await this.storageService.setValue(
         StorageKey.RootKeyWrapperKeyParams,
         wrappingKey.keyParams.getPortableValue(),
-        StorageValueModes.Nonwrapped
-      );
-      await this.notifyObserversOfKeyChange();
+        StorageValueModes.Nonwrapped,
+      )
+      await this.notifyObserversOfKeyChange()
     } else {
-      throw Error('Invalid keyMode on setNewRootKeyWrapper');
+      throw Error('Invalid keyMode on setNewRootKeyWrapper')
     }
   }
 
@@ -1063,47 +960,41 @@ export class SNProtocolService
   private async wrapAndPersistRootKey(wrappingKey: SNRootKey) {
     const payload = CreateMaxPayloadFromAnyObject(this.rootKey!, {
       content: this.rootKey!.persistableValueWhenWrapping(),
-    });
+    })
     const wrappedKey = await this.payloadByEncryptingPayload(
       payload,
       EncryptionIntent.LocalStorageEncrypted,
-      wrappingKey
-    );
+      wrappingKey,
+    )
     await this.storageService.setValue(
       StorageKey.WrappedRootKey,
       wrappedKey.ejected(),
-      StorageValueModes.Nonwrapped
-    );
+      StorageValueModes.Nonwrapped,
+    )
   }
 
   /**
    * Removes root key wrapper from local storage and stores root key bare in secure keychain.
    */
   public async removeRootKeyWrapper(): Promise<void> {
-    if (
-      this.keyMode !== KeyMode.WrapperOnly &&
-      this.keyMode !== KeyMode.RootKeyPlusWrapper
-    ) {
-      throw Error('Attempting to remove root key wrapper on unwrapped key.');
+    if (this.keyMode !== KeyMode.WrapperOnly && this.keyMode !== KeyMode.RootKeyPlusWrapper) {
+      throw Error('Attempting to remove root key wrapper on unwrapped key.')
     }
     if (this.keyMode === KeyMode.WrapperOnly) {
-      this.keyMode = KeyMode.RootKeyNone;
-      this.rootKey = undefined;
+      this.keyMode = KeyMode.RootKeyNone
+      this.rootKey = undefined
     } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
-      this.keyMode = KeyMode.RootKeyOnly;
+      this.keyMode = KeyMode.RootKeyOnly
     }
-    await this.storageService.removeValue(
-      StorageKey.WrappedRootKey,
-      StorageValueModes.Nonwrapped
-    );
+    await this.storageService.removeValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped)
     await this.storageService.removeValue(
       StorageKey.RootKeyWrapperKeyParams,
-      StorageValueModes.Nonwrapped
-    );
+      StorageValueModes.Nonwrapped,
+    )
     if (this.keyMode === KeyMode.RootKeyOnly) {
-      await this.saveRootKeyToKeychain();
+      await this.saveRootKeyToKeychain()
     }
-    await this.notifyObserversOfKeyChange();
+    await this.notifyObserversOfKeyChange()
   }
 
   /**
@@ -1115,15 +1006,15 @@ export class SNProtocolService
    */
   public async setRootKey(key: SNRootKey, wrappingKey?: SNRootKey) {
     if (!key.keyParams) {
-      throw Error('keyParams must be supplied if setting root key.');
+      throw Error('keyParams must be supplied if setting root key.')
     }
     if (this.rootKey === key) {
-      throw Error('Attempting to set root key as same current value.');
+      throw Error('Attempting to set root key as same current value.')
     }
     if (this.keyMode === KeyMode.WrapperOnly) {
-      this.keyMode = KeyMode.RootKeyPlusWrapper;
+      this.keyMode = KeyMode.RootKeyPlusWrapper
     } else if (this.keyMode === KeyMode.RootKeyNone) {
-      this.keyMode = KeyMode.RootKeyOnly;
+      this.keyMode = KeyMode.RootKeyOnly
     } else if (
       this.keyMode === KeyMode.RootKeyOnly ||
       this.keyMode === KeyMode.RootKeyPlusWrapper
@@ -1131,65 +1022,59 @@ export class SNProtocolService
       /** Root key is simply changing, mode stays the same */
       /** this.keyMode = this.keyMode; */
     } else {
-      throw Error(`Unhandled key mode for setNewRootKey ${this.keyMode}`);
+      throw Error(`Unhandled key mode for setNewRootKey ${this.keyMode}`)
     }
-    this.rootKey = key;
+    this.rootKey = key
     await this.storageService.setValue(
       StorageKey.RootKeyParams,
       key.keyParams.getPortableValue(),
-      StorageValueModes.Nonwrapped
-    );
+      StorageValueModes.Nonwrapped,
+    )
     if (this.keyMode === KeyMode.RootKeyOnly) {
-      await this.saveRootKeyToKeychain();
+      await this.saveRootKeyToKeychain()
     } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
       if (!wrappingKey) {
-        throw Error('wrappingKey must be supplied');
+        throw Error('wrappingKey must be supplied')
       }
-      await this.wrapAndPersistRootKey(wrappingKey);
+      await this.wrapAndPersistRootKey(wrappingKey)
     }
-    await this.notifyObserversOfKeyChange();
+    await this.notifyObserversOfKeyChange()
   }
 
   /**
    * Returns the in-memory root key value.
    */
   public getRootKey() {
-    return this.rootKey;
+    return this.rootKey
   }
 
   /**
    * Deletes root key and wrapper from keychain. Used when signing out of application.
    */
   public async clearLocalKeyState() {
-    await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier);
-    await this.storageService.removeValue(
-      StorageKey.WrappedRootKey,
-      StorageValueModes.Nonwrapped
-    );
+    await this.deviceInterface!.clearNamespacedKeychainValue(this.identifier)
+    await this.storageService.removeValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped)
     await this.storageService.removeValue(
       StorageKey.RootKeyWrapperKeyParams,
-      StorageValueModes.Nonwrapped
-    );
-    await this.storageService.removeValue(
-      StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped
-    );
-    this.keyMode = KeyMode.RootKeyNone;
-    this.rootKey = undefined;
-    await this.notifyObserversOfKeyChange();
+      StorageValueModes.Nonwrapped,
+    )
+    await this.storageService.removeValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
+    this.keyMode = KeyMode.RootKeyNone
+    this.rootKey = undefined
+    await this.notifyObserversOfKeyChange()
   }
 
   /**
    * @param password  The password string to generate a root key from.
    */
   public async validateAccountPassword(password: string) {
-    const keyParams = await this.getRootKeyParams();
-    const key = await this.computeRootKey(password, keyParams!);
-    const valid = this.rootKey!.compare(key);
+    const keyParams = await this.getRootKeyParams()
+    const key = await this.computeRootKey(password, keyParams!)
+    const valid = this.rootKey!.compare(key)
     if (valid) {
-      return { valid, artifacts: { rootKey: key } };
+      return { valid, artifacts: { rootKey: key } }
     } else {
-      return { valid: false };
+      return { valid: false }
     }
   }
 
@@ -1197,13 +1082,13 @@ export class SNProtocolService
    * @param passcode  The passcode string to generate a root key from.
    */
   public async validatePasscode(passcode: string) {
-    const keyParams = await this.getRootKeyWrapperKeyParams();
-    const key = await this.computeRootKey(passcode, keyParams!);
-    const valid = await this.validateWrappingKey(key);
+    const keyParams = await this.getRootKeyWrapperKeyParams()
+    const key = await this.computeRootKey(passcode, keyParams!)
+    const valid = await this.validateWrappingKey(key)
     if (valid) {
-      return { valid, artifacts: { wrappingKey: key } };
+      return { valid, artifacts: { wrappingKey: key } }
     } else {
-      return { valid: false };
+      return { valid: false }
     }
   }
 
@@ -1211,38 +1096,33 @@ export class SNProtocolService
    * Determines which key to use for encryption of the payload
    * The key object to use for encrypting the payload.
    */
-  private async keyToUseForEncryptionOfPayload(
-    payload: PurePayload,
-    intent: EncryptionIntent
-  ) {
+  private async keyToUseForEncryptionOfPayload(payload: PurePayload, intent: EncryptionIntent) {
     if (isNullOrUndefined(intent)) {
-      throw 'Intent must be supplied when looking up key for encryption of item.';
+      throw 'Intent must be supplied when looking up key for encryption of item.'
     }
     if (ContentTypeUsesRootKeyEncryption(payload.content_type!)) {
-      const rootKey = this.getRootKey();
+      const rootKey = this.getRootKey()
       if (!rootKey) {
         if (intentRequiresEncryption(intent)) {
-          throw Error(
-            'Root key encryption is required but no root key is available.'
-          );
+          throw Error('Root key encryption is required but no root key is available.')
         } else {
-          return undefined;
+          return undefined
         }
       }
-      return rootKey;
+      return rootKey
     } else {
-      const defaultKey = this.getDefaultItemsKey();
-      const userVersion = await this.getUserVersion();
+      const defaultKey = this.getDefaultItemsKey()
+      const userVersion = await this.getUserVersion()
       if (userVersion && userVersion !== defaultKey?.keyVersion) {
         /**
          * The default key appears to be either newer or older than the user's account version
          * We could throw an exception here, but will instead fall back to a corrective action:
          * return any items key that corresponds to the user's version
          */
-        const itemsKeys = this.latestItemsKeys();
-        return itemsKeys.find((key) => key.keyVersion === userVersion);
+        const itemsKeys = this.latestItemsKeys()
+        return itemsKeys.find((key) => key.keyVersion === userVersion)
       } else {
-        return defaultKey;
+        return defaultKey
       }
     }
   }
@@ -1256,34 +1136,28 @@ export class SNProtocolService
    * to the version of this payload.
    * @returns The key object to use for decrypting this payload.
    */
-  private keyToUseForDecryptionOfPayload(
-    payload: PurePayload
-  ): SNRootKey | SNItemsKey | undefined {
+  private keyToUseForDecryptionOfPayload(payload: PurePayload): SNRootKey | SNItemsKey | undefined {
     if (ContentTypeUsesRootKeyEncryption(payload.content_type!)) {
-      return this.getRootKey();
+      return this.getRootKey()
     }
     if (payload.items_key_id) {
-      const itemsKey = this.itemsKeyForPayload(payload);
-      return itemsKey;
+      const itemsKey = this.itemsKeyForPayload(payload)
+      return itemsKey
     }
-    const payloadVersion = payload.version!;
+    const payloadVersion = payload.version!
     if (payloadVersion === this.getLatestVersion()) {
-      SNLog.error(
-        Error(
-          'No associated key found for item encrypted with latest protocol version.'
-        )
-      );
-      return undefined;
+      SNLog.error(Error('No associated key found for item encrypted with latest protocol version.'))
+      return undefined
     }
-    return this.defaultItemsKeyForItemVersion(payloadVersion);
+    return this.defaultItemsKeyForItemVersion(payloadVersion)
   }
 
   public async onSyncEvent(eventName: SyncEvent) {
     if (eventName === SyncEvent.FullSyncCompleted) {
-      await this.handleFullSyncCompletion();
+      await this.handleFullSyncCompletion()
     }
     if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
-      await this.handleDownloadFirstSyncCompletion();
+      await this.handleDownloadFirstSyncCompletion()
     }
   }
 
@@ -1298,26 +1172,26 @@ export class SNProtocolService
   private async handleDownloadFirstSyncCompletion() {
     /** The below logic only pertains to account setups */
     if (!this.hasAccount()) {
-      return;
+      return
     }
-    const itemsKeys = this.latestItemsKeys();
+    const itemsKeys = this.latestItemsKeys()
     const neverSyncedKeys = itemsKeys.filter((key) => {
-      return key.neverSynced;
-    });
+      return key.neverSynced
+    })
     const syncedKeys = itemsKeys.filter((key) => {
-      return !key.neverSynced;
-    });
+      return !key.neverSynced
+    })
     /**
      * Find isDefault items key that have been previously synced.
      * If we find one, this means we can delete any non-synced keys.
      */
     const defaultSyncedKey = syncedKeys.find((key) => {
-      return key.isDefault;
-    });
-    const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey);
+      return key.isDefault
+    })
+    const hasSyncedItemsKey = !isNullOrUndefined(defaultSyncedKey)
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager.setItemsToBeDeleted(Uuids(neverSyncedKeys));
+      await this.itemManager.setItemsToBeDeleted(Uuids(neverSyncedKeys))
     } else {
       /**
        * No previous synced items key.
@@ -1326,39 +1200,37 @@ export class SNProtocolService
        * we end up with 0 items keys, create a new one. This covers the case when you open
        * the app offline and it creates an 004 key, and then you sign into an 003 account.
        */
-      const rootKey = this.getRootKey();
+      const rootKey = this.getRootKey()
       if (rootKey) {
         /** If neverSynced.version != rootKey.version, delete. */
         const toDelete = neverSyncedKeys.filter((itemsKey) => {
-          return itemsKey.keyVersion !== rootKey.keyVersion;
-        });
+          return itemsKey.keyVersion !== rootKey.keyVersion
+        })
         if (toDelete.length > 0) {
-          await this.itemManager.setItemsToBeDeleted(Uuids(toDelete));
+          await this.itemManager.setItemsToBeDeleted(Uuids(toDelete))
         }
         if (this.latestItemsKeys().length === 0) {
-          await this.createNewDefaultItemsKey();
+          await this.createNewDefaultItemsKey()
         }
       }
     }
     /** If we do not have an items key for our current account version, create one */
-    const userVersion = await this.getUserVersion();
-    const accountVersionedKey = this.latestItemsKeys().find(
-      (key) => key.keyVersion === userVersion
-    );
+    const userVersion = await this.getUserVersion()
+    const accountVersionedKey = this.latestItemsKeys().find((key) => key.keyVersion === userVersion)
     if (isNullOrUndefined(accountVersionedKey)) {
-      await this.createNewDefaultItemsKey();
+      await this.createNewDefaultItemsKey()
     }
 
-    this.syncUnsycnedItemsKeys();
+    this.syncUnsycnedItemsKeys()
   }
 
   private async handleFullSyncCompletion() {
     /** Always create a new items key after full sync, if no items key is found */
-    const currentItemsKey = this.getDefaultItemsKey();
+    const currentItemsKey = this.getDefaultItemsKey()
     if (!currentItemsKey) {
-      await this.createNewDefaultItemsKey();
+      await this.createNewDefaultItemsKey()
       if (this.keyMode === KeyMode.WrapperOnly) {
-        return this.repersistAllItems();
+        return this.repersistAllItems()
       }
     }
   }
@@ -1371,14 +1243,14 @@ export class SNProtocolService
    */
   private syncUnsycnedItemsKeys(): void {
     if (!this.hasAccount()) {
-      return;
+      return
     }
 
     const unsyncedKeys = this.latestItemsKeys().filter(
-      (key) => key.neverSynced && !key.dirty && !key.deleted
-    );
+      (key) => key.neverSynced && !key.dirty && !key.deleted,
+    )
     if (unsyncedKeys.length > 0) {
-      void this.itemManager.setItemsDirty(Uuids(unsyncedKeys));
+      void this.itemManager.setItemsDirty(Uuids(unsyncedKeys))
     }
   }
 
@@ -1389,16 +1261,16 @@ export class SNProtocolService
    * @access public
    */
   async repersistAllItems() {
-    const items = this.itemManager.items;
-    const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item));
-    return this.storageService.savePayloads(payloads);
+    const items = this.itemManager.items
+    const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item))
+    return this.storageService.savePayloads(payloads)
   }
 
   /**
    * @returns All SN|ItemsKey objects synced to the account.
    */
   private latestItemsKeys() {
-    return this.itemManager.itemsKeys();
+    return this.itemManager.itemsKeys()
   }
 
   /**
@@ -1406,29 +1278,27 @@ export class SNProtocolService
    */
   public itemsKeyForPayload(payload: PurePayload) {
     return this.latestItemsKeys().find(
-      (key) =>
-        key.uuid === payload.items_key_id ||
-        key.duplicateOf === payload.items_key_id
-    );
+      (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
+    )
   }
 
   /**
    * @returns The SNItemsKey object to use to encrypt new or updated items.
    */
   public getDefaultItemsKey(): SNItemsKey | undefined {
-    const itemsKeys = this.latestItemsKeys();
+    const itemsKeys = this.latestItemsKeys()
     if (itemsKeys.length === 1) {
-      return itemsKeys[0];
+      return itemsKeys[0]
     }
     const defaultKeys = itemsKeys.filter((key) => {
-      return key.isDefault;
-    });
+      return key.isDefault
+    })
     if (defaultKeys.length > 1) {
       /**
        * Prioritize one that is synced, as neverSynced keys will likely be deleted after
        * DownloadFirst sync.
        */
-      const syncedKeys = defaultKeys.filter((key) => !key.neverSynced);
+      const syncedKeys = defaultKeys.filter((key) => !key.neverSynced)
       if (syncedKeys.length > 1) {
         /**
          * @todo enable dev-only logging
@@ -1436,48 +1306,41 @@ export class SNProtocolService
          */
       }
       if (syncedKeys.length > 0) {
-        return syncedKeys[0];
+        return syncedKeys[0]
       }
     }
-    return defaultKeys[0];
+    return defaultKeys[0]
   }
 
   /** Returns the key params attached to this key's encrypted payload */
   public getEmbeddedPayloadAuthenticatedData(
-    payload: PurePayload
-  ):
-    | RootKeyEncryptedAuthenticatedData
-    | ItemAuthenticatedData
-    | LegacyAttachedData
-    | undefined {
-    const version = payload.version;
+    payload: PurePayload,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
+    const version = payload.version
     if (!version) {
-      return undefined;
+      return undefined
     }
-    const operator = this.operatorForVersion(version);
-    const authenticatedData = operator.getPayloadAuthenticatedData(payload);
-    return authenticatedData;
+    const operator = this.operatorForVersion(version)
+    const authenticatedData = operator.getPayloadAuthenticatedData(payload)
+    return authenticatedData
   }
 
   /** Returns the key params attached to this key's encrypted payload */
   public getKeyEmbeddedKeyParams(key: SNItemsKey): SNRootKeyParams | undefined {
     /** We can only look up key params for keys that are encrypted (as strings) */
     if (key.payload.format === PayloadFormat.DecryptedBareObject) {
-      return undefined;
+      return undefined
     }
-    const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(
-      key.payload
-    );
+    const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(key.payload)
     if (!authenticatedData) {
-      return undefined;
+      return undefined
     }
     if (isVersionLessThanOrEqualTo(key.version, ProtocolVersion.V003)) {
-      const rawKeyParams = authenticatedData as LegacyAttachedData;
-      return this.createKeyParams(rawKeyParams);
+      const rawKeyParams = authenticatedData as LegacyAttachedData
+      return this.createKeyParams(rawKeyParams)
     } else {
-      const rawKeyParams = (authenticatedData as RootKeyEncryptedAuthenticatedData)
-        .kp;
-      return this.createKeyParams(rawKeyParams);
+      const rawKeyParams = (authenticatedData as RootKeyEncryptedAuthenticatedData).kp
+      return this.createKeyParams(rawKeyParams)
     }
   }
 
@@ -1486,14 +1349,14 @@ export class SNProtocolService
    * keys with this new root key (by simply re-syncing).
    */
   public async reencryptItemsKeys(): Promise<void> {
-    const itemsKeys = this.latestItemsKeys();
+    const itemsKeys = this.latestItemsKeys()
     if (itemsKeys.length > 0) {
       /**
        * Do not call sync after marking dirty.
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
        */
-      await this.itemManager.setItemsDirty(Uuids(itemsKeys));
+      await this.itemManager.setItemsDirty(Uuids(itemsKeys))
     }
   }
 
@@ -1506,19 +1369,19 @@ export class SNProtocolService
    */
   public defaultItemsKeyForItemVersion(
     version: ProtocolVersion,
-    fromKeys?: SNItemsKey[]
+    fromKeys?: SNItemsKey[],
   ): SNItemsKey | undefined {
     /** Try to find one marked default first */
-    const searchKeys = fromKeys || this.latestItemsKeys();
+    const searchKeys = fromKeys || this.latestItemsKeys()
     const priorityKey = searchKeys.find((key) => {
-      return key.isDefault && key.keyVersion === version;
-    });
+      return key.isDefault && key.keyVersion === version
+    })
     if (priorityKey) {
-      return priorityKey;
+      return priorityKey
     }
     return searchKeys.find((key) => {
-      return key.keyVersion === version;
-    });
+      return key.keyVersion === version
+    })
   }
 
   /**
@@ -1527,26 +1390,24 @@ export class SNProtocolService
    */
   public needsNewRootKeyBasedItemsKey(): boolean {
     if (!this.hasAccount()) {
-      return false;
+      return false
     }
-    const rootKey = this.getRootKey();
+    const rootKey = this.getRootKey()
     if (!rootKey) {
-      return false;
+      return false
     }
-    if (
-      compareVersions(rootKey.keyVersion, LAST_NONROOT_ITEMS_KEY_VERSION) > 0
-    ) {
+    if (compareVersions(rootKey.keyVersion, LAST_NONROOT_ITEMS_KEY_VERSION) > 0) {
       /** Is >= 004, not needed */
-      return false;
+      return false
     }
     /** A new root key based items key is needed if our default items key content
      * isnt equal to our current root key */
-    const defaultItemsKey = this.getDefaultItemsKey();
+    const defaultItemsKey = this.getDefaultItemsKey()
     /** Shouldn't be undefined, but if it is, we'll take the corrective action */
     if (!defaultItemsKey) {
-      return true;
+      return true
     }
-    return defaultItemsKey.itemsKey !== rootKey.itemsKey;
+    return defaultItemsKey.itemsKey !== rootKey.itemsKey
   }
 
   /**
@@ -1555,11 +1416,9 @@ export class SNProtocolService
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
   public async createNewDefaultItemsKey(): Promise<SNItemsKey> {
-    const rootKey = this.getRootKey() as SNRootKey;
-    const operatorVersion = rootKey
-      ? rootKey.keyVersion
-      : this.getLatestVersion();
-    let itemTemplate: SNItemsKey;
+    const rootKey = this.getRootKey() as SNRootKey
+    const operatorVersion = rootKey ? rootKey.keyVersion : this.getLatestVersion()
+    let itemTemplate: SNItemsKey
     if (compareVersions(operatorVersion, LAST_NONROOT_ITEMS_KEY_VERSION) <= 0) {
       /** Create root key based items key */
       const payload = CreateMaxPayloadFromAnyObject({
@@ -1570,51 +1429,44 @@ export class SNProtocolService
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: operatorVersion,
         }),
-      });
-      itemTemplate = CreateItemFromPayload(payload) as SNItemsKey;
+      })
+      itemTemplate = CreateItemFromPayload(payload) as SNItemsKey
     } else {
       /** Create independent items key */
-      itemTemplate = await this.operatorForVersion(
-        operatorVersion
-      ).createItemsKey();
+      itemTemplate = await this.operatorForVersion(operatorVersion).createItemsKey()
     }
-    const itemsKeys = this.latestItemsKeys();
+    const itemsKeys = this.latestItemsKeys()
     const defaultKeys = itemsKeys.filter((key) => {
-      return key.isDefault;
-    });
+      return key.isDefault
+    })
     for (const key of defaultKeys) {
       await this.itemManager.changeItemsKey(key.uuid, (mutator) => {
-        mutator.isDefault = false;
-      });
+        mutator.isDefault = false
+      })
     }
-    const itemsKey = (await this.itemManager.insertItem(
-      itemTemplate
-    )) as SNItemsKey;
+    const itemsKey = (await this.itemManager.insertItem(itemTemplate)) as SNItemsKey
     await this.itemManager.changeItemsKey(itemsKey.uuid, (mutator) => {
-      mutator.isDefault = true;
-    });
-    return itemsKey;
+      mutator.isDefault = true
+    })
+    return itemsKey
   }
 
   public async createNewItemsKeyWithRollback(): Promise<() => Promise<void>> {
-    const currentDefaultItemsKey = this.getDefaultItemsKey();
-    const newDefaultItemsKey = await this.createNewDefaultItemsKey();
+    const currentDefaultItemsKey = this.getDefaultItemsKey()
+    const newDefaultItemsKey = await this.createNewDefaultItemsKey()
     const rollback = async () => {
       await Promise.all([
         this.itemManager.setItemToBeDeleted(newDefaultItemsKey.uuid),
-        this.itemManager.changeItem<ItemsKeyMutator>(
-          currentDefaultItemsKey!.uuid,
-          (mutator) => {
-            mutator.isDefault = true;
-          }
-        ),
-      ]);
-    };
-    return rollback;
+        this.itemManager.changeItem<ItemsKeyMutator>(currentDefaultItemsKey!.uuid, (mutator) => {
+          mutator.isDefault = true
+        }),
+      ])
+    }
+    return rollback
   }
 
   public getPasswordCreatedDate(): Date | undefined {
-    const rootKey = this.getRootKey();
-    return rootKey ? rootKey.keyParams.createdDate : undefined;
+    const rootKey = this.getRootKey()
+    return rootKey ? rootKey.keyParams.createdDate : undefined
   }
 }

@@ -1,67 +1,64 @@
-import { SyncEvent, SyncEventReceiver } from '@Lib/services/sync/events';
+import { SyncEvent, SyncEventReceiver } from '@Lib/services/sync/events'
 
 export class SyncState {
-  public lastPreSyncSave?: Date;
-  public lastSyncDate?: Date;
+  public lastPreSyncSave?: Date
+  public lastSyncDate?: Date
 
-  private receiver: SyncEventReceiver;
-  private discordance = 0;
-  private maxDiscordance: number;
-  private outOfSync = false;
+  private receiver: SyncEventReceiver
+  private discordance = 0
+  private maxDiscordance: number
+  private outOfSync = false
 
-  private lastClientHash?: string;
-  private lastServerHash?: string;
+  private lastClientHash?: string
+  private lastServerHash?: string
 
   constructor(receiver: SyncEventReceiver, maxDiscordance: number) {
-    this.receiver = receiver;
-    this.maxDiscordance = maxDiscordance;
-    this.reset();
+    this.receiver = receiver
+    this.maxDiscordance = maxDiscordance
+    this.reset()
   }
 
   isOutOfSync() {
-    return this.outOfSync;
+    return this.outOfSync
   }
 
   reset() {
-    this.lastPreSyncSave = undefined;
-    this.lastSyncDate = undefined;
-    this.discordance = 0;
-    this.outOfSync = false;
+    this.lastPreSyncSave = undefined
+    this.lastSyncDate = undefined
+    this.discordance = 0
+    this.outOfSync = false
   }
 
   get needsSync() {
-    return this.discordance > 0 && this.discordance < this.maxDiscordance;
+    return this.discordance > 0 && this.discordance < this.maxDiscordance
   }
 
   getLastClientIntegrityHash() {
-    return this.lastClientHash;
+    return this.lastClientHash
   }
 
   clearIntegrityHashes() {
-    this.lastClientHash = undefined;
-    this.lastServerHash = undefined;
+    this.lastClientHash = undefined
+    this.lastServerHash = undefined
   }
 
   async setIntegrityHashes(clientHash: string, serverHash: string) {
-    this.lastClientHash = clientHash;
-    this.lastServerHash = serverHash;
+    this.lastClientHash = clientHash
+    this.lastServerHash = serverHash
     const isInSync =
-      !serverHash ||
-      serverHash.length === 0 ||
-      !clientHash ||
-      clientHash === serverHash;
+      !serverHash || serverHash.length === 0 || !clientHash || clientHash === serverHash
 
     if (isInSync) {
       if (this.outOfSync) {
-        this.outOfSync = false;
-        this.receiver(SyncEvent.ExitOutOfSync);
+        this.outOfSync = false
+        this.receiver(SyncEvent.ExitOutOfSync)
       }
-      this.discordance = 0;
+      this.discordance = 0
     } else {
-      this.discordance++;
+      this.discordance++
       if (this.discordance >= this.maxDiscordance && !this.outOfSync) {
-        this.outOfSync = true;
-        this.receiver(SyncEvent.EnterOutOfSync);
+        this.outOfSync = true
+        this.receiver(SyncEvent.EnterOutOfSync)
       }
     }
   }

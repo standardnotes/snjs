@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export class SNLog {
   static log(...message: any): void {
-    this.onLog(...message);
+    this.onLog(...message)
   }
   static error<T extends Error>(error: T): T {
-    this.onError(error);
-    return error;
+    this.onError(error)
+    return error
   }
-  static onLog: (...message: any) => void;
-  static onError: (error: Error) => void;
+  static onLog: (...message: any) => void
+  static onError: (error: Error) => void
 }

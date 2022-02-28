@@ -1,5 +1,5 @@
-import { SettingName } from '@standardnotes/settings';
+import { SettingName } from '@standardnotes/settings'
 
 export type Settings = {
-  [key in SettingName]: string;
-};
+  [key in SettingName]: string
+}

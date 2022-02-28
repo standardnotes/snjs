@@ -1,5 +1,5 @@
-import { SyncEvent } from '@Services/sync/events';
-export { SyncEvent };
+import { SyncEvent } from '@Services/sync/events'
+export { SyncEvent }
 
 export enum ApplicationEvent {
   SignedIn = 2,
@@ -68,23 +68,23 @@ export enum ApplicationEvent {
 }
 
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
-  return ({
-    [SyncEvent.FullSyncCompleted]: ApplicationEvent.CompletedFullSync,
-    [SyncEvent.SingleSyncCompleted]: ApplicationEvent.CompletedIncrementalSync,
-    [SyncEvent.SyncError]: ApplicationEvent.FailedSync,
-    [SyncEvent.SyncTakingTooLong]: ApplicationEvent.HighLatencySync,
-    [SyncEvent.EnterOutOfSync]: ApplicationEvent.EnteredOutOfSync,
-    [SyncEvent.ExitOutOfSync]: ApplicationEvent.ExitedOutOfSync,
-    [SyncEvent.LocalDataLoaded]: ApplicationEvent.LocalDataLoaded,
-    [SyncEvent.MajorDataChange]: ApplicationEvent.MajorDataChange,
-    [SyncEvent.LocalDataIncrementalLoad]:
-      ApplicationEvent.LocalDataIncrementalLoad,
-    [SyncEvent.StatusChanged]: ApplicationEvent.SyncStatusChanged,
-    [SyncEvent.SyncWillBegin]: ApplicationEvent.WillSync,
-    [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
-    [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
-    [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
-    [SyncEvent.DownloadFirstSyncCompleted]:
-      ApplicationEvent.CompletedInitialSync,
-  } as any)[syncEvent];
+  return (
+    {
+      [SyncEvent.FullSyncCompleted]: ApplicationEvent.CompletedFullSync,
+      [SyncEvent.SingleSyncCompleted]: ApplicationEvent.CompletedIncrementalSync,
+      [SyncEvent.SyncError]: ApplicationEvent.FailedSync,
+      [SyncEvent.SyncTakingTooLong]: ApplicationEvent.HighLatencySync,
+      [SyncEvent.EnterOutOfSync]: ApplicationEvent.EnteredOutOfSync,
+      [SyncEvent.ExitOutOfSync]: ApplicationEvent.ExitedOutOfSync,
+      [SyncEvent.LocalDataLoaded]: ApplicationEvent.LocalDataLoaded,
+      [SyncEvent.MajorDataChange]: ApplicationEvent.MajorDataChange,
+      [SyncEvent.LocalDataIncrementalLoad]: ApplicationEvent.LocalDataIncrementalLoad,
+      [SyncEvent.StatusChanged]: ApplicationEvent.SyncStatusChanged,
+      [SyncEvent.SyncWillBegin]: ApplicationEvent.WillSync,
+      [SyncEvent.InvalidSession]: ApplicationEvent.InvalidSyncSession,
+      [SyncEvent.DatabaseReadError]: ApplicationEvent.LocalDatabaseReadError,
+      [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
+      [SyncEvent.DownloadFirstSyncCompleted]: ApplicationEvent.CompletedInitialSync,
+    } as any
+  )[syncEvent]
 }

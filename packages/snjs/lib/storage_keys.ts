@@ -38,7 +38,7 @@ export enum StorageKey {
   StorageEncryptionPolicy = 'storage_policy',
   WebSocketUrl = 'webSocket_url',
   UserRoles = 'user_roles',
-  UserFeatures = 'user_features'
+  UserFeatures = 'user_features',
 }
 
 export enum NonwrappedStorageKey {
@@ -47,9 +47,9 @@ export enum NonwrappedStorageKey {
 
 export function namespacedKey(namespace: string, key: string) {
   if (namespace) {
-    return `${namespace}-${key}`;
+    return `${namespace}-${key}`
   } else {
-    return key;
+    return key
   }
 }
 
@@ -68,4 +68,4 @@ export const LegacyKeys1_0_0 = {
   MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
   MobileOptionsState: 'options',
   MobilePasscodeKeyboardType: 'passcodeKeyboardType',
-};
+}

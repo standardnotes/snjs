@@ -3,18 +3,18 @@ import {
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
   PurePayload,
-  PayloadFormat
-} from '@standardnotes/payloads';
-import { SNRootKey } from './../root_key';
-import { SNRootKeyParams } from './../key_params';
+  PayloadFormat,
+} from '@standardnotes/payloads'
+import { SNRootKey } from './../root_key'
+import { SNRootKeyParams } from './../key_params'
 import { KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
-import { SNItemsKey } from '@Models/app/items_key';
+import { SNItemsKey } from '@Models/app/items_key'
 
 export type ItemsKeyContent = {
-  itemsKey: string;
-  dataAuthenticationKey?: string;
-  version: ProtocolVersion;
-};
+  itemsKey: string
+  dataAuthenticationKey?: string
+  version: ProtocolVersion
+}
 
 /**w
  * An operator is responsible for performing crypto operations, such as generating keys
@@ -24,34 +24,27 @@ export type ItemsKeyContent = {
  * across all versions appear in this generic parent class.
  */
 export interface OperatorCommon {
-  createItemsKey(): SNItemsKey;
+  createItemsKey(): SNItemsKey
   /**
    * Returns encryption protocol display name
    */
-  getEncryptionDisplayName(): string;
+  getEncryptionDisplayName(): string
 
-  readonly version: string;
+  readonly version: string
 
   /**
    * Returns the payload's authenticated data. The passed payload must be in a
    * non-decrypted, ciphertext state.
    */
   getPayloadAuthenticatedData(
-    payload: PurePayload
-  ):
-    | RootKeyEncryptedAuthenticatedData
-    | ItemAuthenticatedData
-    | LegacyAttachedData
-    | undefined;
+    payload: PurePayload,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined
 
   /**
    * Computes a root key given a password and previous keyParams
    * @param password - Plain string representing raw user password
    */
-  computeRootKey(
-    password: string,
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey>;
+  computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey>
 
   /**
    * Creates a new root key given an identifier and a user password
@@ -62,8 +55,8 @@ export interface OperatorCommon {
   createRootKey(
     identifier: string,
     password: string,
-    origination: KeyParamsOrigination
-  ): Promise<SNRootKey>;
+    origination: KeyParamsOrigination,
+  ): Promise<SNRootKey>
 }
 
 export interface SynchronousOperator extends OperatorCommon {
@@ -78,13 +71,13 @@ export interface SynchronousOperator extends OperatorCommon {
   generateEncryptedParametersSync(
     payload: PurePayload,
     format: PayloadFormat,
-    _key?: SNItemsKey | SNRootKey
-  ): PurePayload;
+    _key?: SNItemsKey | SNRootKey,
+  ): PurePayload
 
   generateDecryptedParametersSync(
     encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey
-  ): PurePayload;
+    key?: SNItemsKey | SNRootKey,
+  ): PurePayload
 }
 
 export interface AsynchronousOperator extends OperatorCommon {
@@ -99,11 +92,11 @@ export interface AsynchronousOperator extends OperatorCommon {
   generateEncryptedParametersAsync(
     payload: PurePayload,
     format: PayloadFormat,
-    _key?: SNItemsKey | SNRootKey
-  ): Promise<PurePayload>;
+    _key?: SNItemsKey | SNRootKey,
+  ): Promise<PurePayload>
 
   generateDecryptedParametersAsync(
     encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey
-  ): Promise<PurePayload>;
+    key?: SNItemsKey | SNRootKey,
+  ): Promise<PurePayload>
 }

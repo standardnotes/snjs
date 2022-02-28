@@ -1,6 +1,4 @@
-export {
-  PayloadsByDuplicating,
-} from '@Payloads/functions';
+export { PayloadsByDuplicating } from '@Payloads/functions'
 
 export {
   PayloadsDelta,
@@ -10,4 +8,4 @@ export {
   DeltaRemoteRetrieved,
   DeltaRemoteSaved,
   ConflictDelta,
-} from '@Payloads/deltas';
+} from '@Payloads/deltas'

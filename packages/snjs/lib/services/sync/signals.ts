@@ -1,4 +1,4 @@
-import { SyncResponse } from '@Services/sync/response';
+import { SyncResponse } from '@Services/sync/response'
 
 export enum SyncSignal {
   Response = 1,
@@ -6,12 +6,12 @@ export enum SyncSignal {
 }
 
 export type SyncStats = {
-  completedUploadCount: number;
-  totalUploadCount: number;
-};
+  completedUploadCount: number
+  totalUploadCount: number
+}
 
 export type ResponseSignalReceiver = (
   signal: SyncSignal,
   response?: SyncResponse,
-  stats?: SyncStats
-) => Promise<void>;
+  stats?: SyncStats,
+) => Promise<void>

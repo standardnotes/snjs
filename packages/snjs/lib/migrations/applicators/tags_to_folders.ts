@@ -1,51 +1,51 @@
-import { SNTag, TagMutator } from '@Lib/models';
-import { TagFolderDelimitter } from '@Lib/models/app/tag';
-import { ItemManager } from '@Lib/services';
-import { lastElement, sortByKey, withoutLastElement } from '@standardnotes/utils';
-import { ContentType } from '@standardnotes/common';
+import { SNTag, TagMutator } from '@Lib/models'
+import { TagFolderDelimitter } from '@Lib/models/app/tag'
+import { ItemManager } from '@Lib/services'
+import { lastElement, sortByKey, withoutLastElement } from '@standardnotes/utils'
+import { ContentType } from '@standardnotes/common'
 
 export class TagsToFoldersMigrationApplicator {
   public static isApplicableToCurrentData(itemManager: ItemManager): boolean {
-    const tags = itemManager.getItems<SNTag>(ContentType.Tag);
+    const tags = itemManager.getItems<SNTag>(ContentType.Tag)
     for (const tag of tags) {
       if (tag.title.includes(TagFolderDelimitter) && !tag.parentId) {
-        return true;
+        return true
       }
     }
 
-    return false;
+    return false
   }
 
   public static async run(itemManager: ItemManager): Promise<void> {
-    const tags = itemManager.getItems(ContentType.Tag) as SNTag[];
-    const sortedTags = sortByKey(tags, 'title');
+    const tags = itemManager.getItems(ContentType.Tag) as SNTag[]
+    const sortedTags = sortByKey(tags, 'title')
 
     for (const tag of sortedTags) {
-      const hierarchy = tag.title.split(TagFolderDelimitter);
-      const hasSimpleTitle = hierarchy.length === 1;
-      const hasParent = !!tag.parentId;
-      const hasUnsupportedTitle = hierarchy.some((title) => title.length === 0);
+      const hierarchy = tag.title.split(TagFolderDelimitter)
+      const hasSimpleTitle = hierarchy.length === 1
+      const hasParent = !!tag.parentId
+      const hasUnsupportedTitle = hierarchy.some((title) => title.length === 0)
 
       if (hasParent || hasSimpleTitle || hasUnsupportedTitle) {
-        continue;
+        continue
       }
 
-      const parents = withoutLastElement(hierarchy);
-      const newTitle = lastElement(hierarchy);
+      const parents = withoutLastElement(hierarchy)
+      const newTitle = lastElement(hierarchy)
 
       if (!newTitle) {
-        return;
+        return
       }
 
-      const parent = await itemManager.findOrCreateTagParentChain(parents);
+      const parent = await itemManager.findOrCreateTagParentChain(parents)
 
       await itemManager.changeItem(tag.uuid, (mutator: TagMutator) => {
-        mutator.title = newTitle;
+        mutator.title = newTitle
 
         if (parent) {
-          mutator.makeChildOf(parent);
+          mutator.makeChildOf(parent)
         }
-      });
+      })
     }
   }
 }

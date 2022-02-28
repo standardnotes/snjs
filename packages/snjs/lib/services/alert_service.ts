@@ -3,7 +3,7 @@ export enum ButtonType {
   Danger = 1,
 }
 
-export type DismissBlockingDialog = () => void;
+export type DismissBlockingDialog = () => void
 
 export type SNAlertService = {
   confirm(
@@ -11,11 +11,11 @@ export type SNAlertService = {
     title?: string,
     confirmButtonText?: string,
     confirmButtonType?: ButtonType,
-    cancelButtonText?: string
-  ): Promise<boolean>;
-  alert(text: string, title?: string, closeButtonText?: string): Promise<void>;
+    cancelButtonText?: string,
+  ): Promise<boolean>
+  alert(text: string, title?: string, closeButtonText?: string): Promise<void>
   blockingDialog(
     text: string,
-    title?: string
-  ): DismissBlockingDialog | Promise<DismissBlockingDialog>;
-};
+    title?: string,
+  ): DismissBlockingDialog | Promise<DismissBlockingDialog>
+}

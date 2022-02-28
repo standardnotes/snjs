@@ -1,16 +1,12 @@
-import { FileDownloader } from './../workers/file_downloader';
-import { FileDecryptor } from './../workers/file_decryptor';
-import {
-  FilesApi,
-  RemoteFileInterface,
-  EncryptedFileInterface,
-} from './../types';
-import { SNPureCrypto } from '@standardnotes/sncrypto-common';
+import { FileDownloader } from './../workers/file_downloader'
+import { FileDecryptor } from './../workers/file_decryptor'
+import { FilesApi, RemoteFileInterface, EncryptedFileInterface } from './../types'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 export class DownloadAndDecryptFileOperation {
-  private readonly decryptor: FileDecryptor;
-  private readonly downloader: FileDownloader;
-  private completionResolve!: () => void;
+  private readonly decryptor: FileDecryptor
+  private readonly downloader: FileDownloader
+  private completionResolve!: () => void
 
   constructor(
     file: RemoteFileInterface & EncryptedFileInterface,
@@ -18,41 +14,36 @@ export class DownloadAndDecryptFileOperation {
     api: FilesApi,
     apiToken: string,
     private onDecryptedBytes: (decryptedBytes: Uint8Array) => void,
-    private onError: () => void
+    private onError: () => void,
   ) {
-    this.decryptor = new FileDecryptor(file, crypto);
-    this.downloader = new FileDownloader(
-      file,
-      apiToken,
-      api,
-      this.onDownloadedBytes.bind(this)
-    );
+    this.decryptor = new FileDecryptor(file, crypto)
+    this.downloader = new FileDownloader(file, apiToken, api, this.onDownloadedBytes.bind(this))
   }
 
   public async run(): Promise<void> {
-    this.decryptor.initialize();
+    this.decryptor.initialize()
 
-    this.downloader.download();
+    this.downloader.download()
 
     return new Promise((resolve) => {
-      this.completionResolve = resolve;
-    });
+      this.completionResolve = resolve
+    })
   }
 
   private onDownloadedBytes(encryptedBytes: Uint8Array): void {
-    const result = this.decryptor.decryptBytes(encryptedBytes);
+    const result = this.decryptor.decryptBytes(encryptedBytes)
 
     if (!result || result.decryptedBytes.length === 0) {
-      this.downloader.abort();
-      this.onError();
-      this.completionResolve();
-      return;
+      this.downloader.abort()
+      this.onError()
+      this.completionResolve()
+      return
     }
 
-    this.onDecryptedBytes(result.decryptedBytes);
+    this.onDecryptedBytes(result.decryptedBytes)
 
     if (result.isFinalChunk) {
-      this.completionResolve();
+      this.completionResolve()
     }
   }
 }

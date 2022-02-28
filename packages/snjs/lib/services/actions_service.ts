@@ -1,32 +1,27 @@
-import { ChallengeService } from './challenge/challenge_service';
-import {
-  Challenge,
-  ChallengePrompt,
-  ChallengeValidation,
-  ChallengeReason,
-} from './../challenges';
-import { ListedService } from './listed_service';
-import { CreateItemFromPayload } from '@Models/generator';
-import { ActionResponse, HttpResponse } from '@standardnotes/responses';
-import { ContentType } from '@standardnotes/common';
-import { EncryptionIntent } from '@standardnotes/applications';
-import { ItemManager } from '@Services/item_manager';
-import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
-import { SNRootKey } from '@Protocol/root_key';
+import { ChallengeService } from './challenge/challenge_service'
+import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from './../challenges'
+import { ListedService } from './listed_service'
+import { CreateItemFromPayload } from '@Models/generator'
+import { ActionResponse, HttpResponse } from '@standardnotes/responses'
+import { ContentType } from '@standardnotes/common'
+import { EncryptionIntent } from '@standardnotes/applications'
+import { ItemManager } from '@Services/item_manager'
+import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
+import { SNRootKey } from '@Protocol/root_key'
 import {
   ActionsExtensionMutator,
   SNActionsExtension,
   Action,
   ActionAccessType,
-} from './../models/app/extension';
-import { MutationType, SNItem } from '@Models/core/item';
-import { SNSyncService } from './sync/sync_service';
-import { SNProtocolService } from './protocol_service';
-import { PayloadManager } from './payload_manager';
-import { SNHttpService } from './api/http_service';
-import { SNAlertService } from './alert_service';
+} from './../models/app/extension'
+import { MutationType, SNItem } from '@Models/core/item'
+import { SNSyncService } from './sync/sync_service'
+import { SNProtocolService } from './protocol_service'
+import { PayloadManager } from './payload_manager'
+import { SNHttpService } from './api/http_service'
+import { SNAlertService } from './alert_service'
 
-import { AbstractService, DeviceInterface } from '@standardnotes/services';
+import { AbstractService, DeviceInterface } from '@standardnotes/services'
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -43,7 +38,7 @@ import { AbstractService, DeviceInterface } from '@standardnotes/services';
  *       to allow publishing a note to a user's blog.
  */
 export class SNActionsService extends AbstractService {
-  private previousPasswords: string[] = [];
+  private previousPasswords: string[] = []
 
   constructor(
     private itemManager: ItemManager,
@@ -54,35 +49,33 @@ export class SNActionsService extends AbstractService {
     private protocolService: SNProtocolService,
     private syncService: SNSyncService,
     private challengeService: ChallengeService,
-    private listedService: ListedService
+    private listedService: ListedService,
   ) {
-    super();
-    this.previousPasswords = [];
+    super()
+    this.previousPasswords = []
   }
 
   /** @override */
   public deinit(): void {
-    (this.itemManager as unknown) = undefined;
-    (this.alertService as unknown) = undefined;
-    (this.deviceInterface as unknown) = undefined;
-    (this.httpService as unknown) = undefined;
-    (this.payloadManager as unknown) = undefined;
-    (this.listedService as unknown) = undefined;
-    (this.challengeService as unknown) = undefined;
-    (this.protocolService as unknown) = undefined;
-    (this.syncService as unknown) = undefined;
-    this.previousPasswords.length = 0;
-    super.deinit();
+    ;(this.itemManager as unknown) = undefined
+    ;(this.alertService as unknown) = undefined
+    ;(this.deviceInterface as unknown) = undefined
+    ;(this.httpService as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    ;(this.listedService as unknown) = undefined
+    ;(this.challengeService as unknown) = undefined
+    ;(this.protocolService as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    this.previousPasswords.length = 0
+    super.deinit()
   }
 
   public getExtensions(): SNActionsExtension[] {
     const extensionItems = this.itemManager.nonErroredItemsForContentType<SNActionsExtension>(
-      ContentType.ActionsExtension
-    );
-    const excludingListed = extensionItems.filter(
-      (extension) => !extension.isListedExtension
-    );
-    return excludingListed;
+      ContentType.ActionsExtension,
+    )
+    const excludingListed = extensionItems.filter((extension) => !extension.isListedExtension)
+    return excludingListed
   }
 
   public extensionsInContextOfItem(item: SNItem) {
@@ -90,8 +83,8 @@ export class SNActionsService extends AbstractService {
       return (
         ext.supported_types.includes(item.content_type) ||
         ext.actionsWithContextForItem(item).length > 0
-      );
-    });
+      )
+    })
   }
 
   /**
@@ -102,120 +95,105 @@ export class SNActionsService extends AbstractService {
    */
   public async loadExtensionInContextOfItem(
     extension: SNActionsExtension,
-    item: SNItem
+    item: SNItem,
   ): Promise<SNActionsExtension | undefined> {
     const params = {
       content_type: item.content_type,
       item_uuid: item.uuid,
-    };
+    }
     const response = (await this.httpService
       .getAbsolute(extension.url, params)
       .catch((response) => {
-        console.error('Error loading extension', response);
-        return null;
-      })) as ActionResponse;
+        console.error('Error loading extension', response)
+        return null
+      })) as ActionResponse
     if (!response) {
-      return;
+      return
     }
-    const description = response.description || extension.description;
-    const supported_types =
-      response.supported_types || extension.supported_types;
-    const actions = response.actions || [];
-    const mutator = new ActionsExtensionMutator(
-      extension,
-      MutationType.UserInteraction
-    );
+    const description = response.description || extension.description
+    const supported_types = response.supported_types || extension.supported_types
+    const actions = response.actions || []
+    const mutator = new ActionsExtensionMutator(extension, MutationType.UserInteraction)
 
-    mutator.deprecation = response.deprecation;
-    mutator.description = description;
-    mutator.supported_types = supported_types;
-    mutator.actions = actions;
+    mutator.deprecation = response.deprecation
+    mutator.description = description
+    mutator.supported_types = supported_types
+    mutator.actions = actions
 
-    const payloadResult = mutator.getResult();
-    return CreateItemFromPayload(payloadResult) as SNActionsExtension;
+    const payloadResult = mutator.getResult()
+    return CreateItemFromPayload(payloadResult) as SNActionsExtension
   }
 
-  public async runAction(
-    action: Action,
-    item: SNItem
-  ): Promise<ActionResponse | undefined> {
-    let result;
+  public async runAction(action: Action, item: SNItem): Promise<ActionResponse | undefined> {
+    let result
     switch (action.verb) {
       case 'render':
-        result = await this.handleRenderAction(action);
-        break;
+        result = await this.handleRenderAction(action)
+        break
       case 'show':
-        result = await this.handleShowAction(action);
-        break;
+        result = await this.handleShowAction(action)
+        break
       case 'post':
-        result = await this.handlePostAction(action, item);
-        break;
+        result = await this.handlePostAction(action, item)
+        break
       default:
-        break;
+        break
     }
-    return result;
+    return result
   }
 
   private async handleRenderAction(action: Action) {
     const response = await this.httpService
       .getAbsolute(action.url)
       .then(async (response) => {
-        const payload = await this.payloadByDecryptingResponse(
-          response as ActionResponse
-        );
+        const payload = await this.payloadByDecryptingResponse(response as ActionResponse)
         if (payload) {
-          const item = CreateItemFromPayload(payload);
+          const item = CreateItemFromPayload(payload)
           return {
             ...response,
             item,
-          } as ActionResponse;
+          } as ActionResponse
         }
       })
       .catch((response) => {
         const error = (response && response.error) || {
-          message:
-            'An issue occurred while processing this action. Please try again.',
-        };
-        this.alertService.alert(error.message);
-        return { error } as HttpResponse;
-      });
+          message: 'An issue occurred while processing this action. Please try again.',
+        }
+        this.alertService.alert(error.message)
+        return { error } as HttpResponse
+      })
 
-    return response as ActionResponse;
+    return response as ActionResponse
   }
 
   private async payloadByDecryptingResponse(
     response: ActionResponse,
     key?: SNRootKey,
-    triedPasswords: string[] = []
+    triedPasswords: string[] = [],
   ): Promise<PurePayload | undefined> {
-    const payload = CreateMaxPayloadFromAnyObject(response.item);
+    const payload = CreateMaxPayloadFromAnyObject(response.item)
 
     if (!payload.enc_item_key) {
-      this.alertService.alert(
-        'This revision is missing its key and cannot be recovered.'
-      );
-      return;
+      this.alertService.alert('This revision is missing its key and cannot be recovered.')
+      return
     }
 
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
-      payload,
-      key
-    );
+    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(payload, key)
     if (!decryptedPayload.errorDecrypting) {
-      return decryptedPayload;
+      return decryptedPayload
     }
 
     for (const itemsKey of this.itemManager.itemsKeys()) {
       const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
         payload,
-        itemsKey
-      );
+        itemsKey,
+      )
       if (!decryptedPayload.errorDecrypting) {
-        return decryptedPayload;
+        return decryptedPayload
       }
     }
 
-    const keyParamsData = response.keyParams || response.auth_params;
+    const keyParamsData = response.keyParams || response.auth_params
     if (!keyParamsData) {
       /**
        * In some cases revisions were missing auth params.
@@ -225,103 +203,89 @@ export class SNActionsService extends AbstractService {
         'We were unable to decrypt this revision using your current keys, ' +
           'and this revision is missing metadata that would allow us to try different ' +
           'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
-          'Please email help@standardnotes.com for assistance.'
-      );
-      return undefined;
+          'Please email help@standardnotes.com for assistance.',
+      )
+      return undefined
     }
-    const keyParams = this.protocolService.createKeyParams(keyParamsData);
+    const keyParams = this.protocolService.createKeyParams(keyParamsData)
 
     /* Try previous passwords */
     for (const passwordCandidate of this.previousPasswords) {
       if (triedPasswords.includes(passwordCandidate)) {
-        continue;
+        continue
       }
-      triedPasswords.push(passwordCandidate);
-      const key = await this.protocolService.computeRootKey(
-        passwordCandidate,
-        keyParams
-      );
+      triedPasswords.push(passwordCandidate)
+      const key = await this.protocolService.computeRootKey(passwordCandidate, keyParams)
       if (!key) {
-        continue;
+        continue
       }
       const nestedResponse: any = await this.payloadByDecryptingResponse(
         response,
         key,
-        triedPasswords
-      );
+        triedPasswords,
+      )
       if (nestedResponse) {
-        return nestedResponse;
+        return nestedResponse
       }
     }
 
     /** Prompt for other passwords */
-    const password = await this.promptForLegacyPassword();
+    const password = await this.promptForLegacyPassword()
     if (!password) {
-      return undefined;
+      return undefined
     }
 
     if (this.previousPasswords.includes(password)) {
-      return undefined;
+      return undefined
     }
 
-    this.previousPasswords.push(password);
-    return this.payloadByDecryptingResponse(response, key);
+    this.previousPasswords.push(password)
+    return this.payloadByDecryptingResponse(response, key)
   }
 
   private async promptForLegacyPassword(): Promise<string | undefined> {
     const challenge = new Challenge(
-      [
-        new ChallengePrompt(
-          ChallengeValidation.None,
-          'Previous Password',
-          undefined,
-          true
-        ),
-      ],
+      [new ChallengePrompt(ChallengeValidation.None, 'Previous Password', undefined, true)],
       ChallengeReason.Custom,
       true,
-      'Unable to find key for revision. Please enter the account password you may have used at the time of the revision.'
-    );
+      'Unable to find key for revision. Please enter the account password you may have used at the time of the revision.',
+    )
 
-    const response = await this.challengeService.promptForChallengeResponse(
-      challenge
-    );
+    const response = await this.challengeService.promptForChallengeResponse(challenge)
 
-    return response?.getDefaultValue().value as string;
+    return response?.getDefaultValue().value as string
   }
 
   private async handlePostAction(action: Action, item: SNItem) {
-    const decrypted = action.access_type === ActionAccessType.Decrypted;
-    const itemParams = await this.outgoingPayloadForItem(item, decrypted);
+    const decrypted = action.access_type === ActionAccessType.Decrypted
+    const itemParams = await this.outgoingPayloadForItem(item, decrypted)
     const params = {
       items: [itemParams],
-    };
+    }
     return this.httpService!.postAbsolute(action.url, params)
       .then((response) => {
-        return response as ActionResponse;
+        return response as ActionResponse
       })
       .catch((response) => {
-        console.error('Action error response:', response);
+        console.error('Action error response:', response)
         this.alertService!.alert(
-          'An issue occurred while processing this action. Please try again.'
-        );
-        return response as ActionResponse;
-      });
+          'An issue occurred while processing this action. Please try again.',
+        )
+        return response as ActionResponse
+      })
   }
 
   private async handleShowAction(action: Action) {
-    this.deviceInterface!.openUrl(action.url);
-    return {} as ActionResponse;
+    this.deviceInterface!.openUrl(action.url)
+    return {} as ActionResponse
   }
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
-    const intent = decrypted
-      ? EncryptionIntent.FileDecrypted
-      : EncryptionIntent.FileEncrypted;
+    const intent = decrypted ? EncryptionIntent.FileDecrypted : EncryptionIntent.FileEncrypted
     const encrypted = await this.protocolService!.payloadByEncryptingPayload(
       item.payloadRepresentation(),
-      intent
-    );
-    return encrypted.ejected();
+      intent,
+    )
+    return encrypted.ejected()
   }
 }

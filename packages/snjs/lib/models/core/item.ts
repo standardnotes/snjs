@@ -1,5 +1,5 @@
-import { ContentType, ProtocolVersion } from '@standardnotes/common';
-import { AppDataField, DefaultAppDomain } from '@standardnotes/applications';
+import { ContentType, ProtocolVersion } from '@standardnotes/common'
+import { AppDataField, DefaultAppDomain } from '@standardnotes/applications'
 import {
   ItemInterface,
   PayloadFormat,
@@ -11,22 +11,22 @@ import {
   PayloadByMerging,
   PayloadSource,
   PredicateInterface,
-} from '@standardnotes/payloads';
-import { HistoryEntry } from '@Services/history/entries/history_entry';
-import { SNLog } from './../../log';
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { UuidString } from './../../types';
+} from '@standardnotes/payloads'
+import { HistoryEntry } from '@Services/history/entries/history_entry'
+import { SNLog } from './../../log'
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
+import { UuidString } from './../../types'
 import {
   Copy,
   dateToLocalizedString,
   deepFreeze,
   omitInPlace,
   sortedCopy,
-} from '@standardnotes/utils';
-import { PrefKey } from '../app/userPrefs';
+} from '@standardnotes/utils'
+import { PrefKey } from '../app/userPrefs'
 
 export interface ItemContent {
-  references?: ContentReference[];
+  references?: ContentReference[]
 }
 
 export enum MutationType {
@@ -56,68 +56,62 @@ export enum SingletonStrategy {
  * The most abstract item that any syncable item needs to extend from.
  */
 export class SNItem implements ItemInterface {
-  public readonly payload: PurePayload;
-  public readonly conflictOf?: UuidString;
-  public readonly duplicateOf?: UuidString;
-  public readonly createdAtString?: string;
-  public readonly updatedAtString?: string;
-  public readonly protected = false;
-  public readonly trashed = false;
-  public readonly pinned = false;
-  public readonly archived = false;
-  public readonly locked = false;
-  public readonly userModifiedDate: Date;
-  private static sharedDateFormatter: Intl.DateTimeFormat;
+  public readonly payload: PurePayload
+  public readonly conflictOf?: UuidString
+  public readonly duplicateOf?: UuidString
+  public readonly createdAtString?: string
+  public readonly updatedAtString?: string
+  public readonly protected = false
+  public readonly trashed = false
+  public readonly pinned = false
+  public readonly archived = false
+  public readonly locked = false
+  public readonly userModifiedDate: Date
+  private static sharedDateFormatter: Intl.DateTimeFormat
 
   constructor(payload: PurePayload) {
     if (!payload.uuid || !payload.content_type) {
-      throw Error('Cannot create item without both uuid and content_type');
+      throw Error('Cannot create item without both uuid and content_type')
     }
     if (
       payload.format === PayloadFormat.DecryptedBareObject &&
       (payload.enc_item_key || payload.items_key_id || payload.auth_hash)
     ) {
-      SNLog.error(
-        Error(
-          'Creating an item from a decrypted payload should not contain enc params'
-        )
-      );
+      SNLog.error(Error('Creating an item from a decrypted payload should not contain enc params'))
     }
-    this.payload = payload;
-    this.conflictOf = payload.safeContent.conflict_of;
-    this.duplicateOf = payload.duplicate_of;
-    this.createdAtString =
-      this.created_at && dateToLocalizedString(this.created_at);
+    this.payload = payload
+    this.conflictOf = payload.safeContent.conflict_of
+    this.duplicateOf = payload.duplicate_of
+    this.createdAtString = this.created_at && dateToLocalizedString(this.created_at)
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.userModifiedDate = new Date(
-        this.getAppDomainValue(AppDataField.UserModifiedDate) ||
-          this.serverUpdatedAt
-      );
-      this.updatedAtString = dateToLocalizedString(this.userModifiedDate);
-      this.protected = this.payload.safeContent.protected;
-      this.trashed = this.payload.safeContent.trashed;
-      this.pinned = this.getAppDomainValue(AppDataField.Pinned);
-      this.archived = this.getAppDomainValue(AppDataField.Archived);
-      this.locked = this.getAppDomainValue(AppDataField.Locked);
+        this.getAppDomainValue(AppDataField.UserModifiedDate) || this.serverUpdatedAt,
+      )
+      this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
+      this.protected = this.payload.safeContent.protected
+      this.trashed = this.payload.safeContent.trashed
+      this.pinned = this.getAppDomainValue(AppDataField.Pinned)
+      this.archived = this.getAppDomainValue(AppDataField.Archived)
+      this.locked = this.getAppDomainValue(AppDataField.Locked)
     } else {
-      this.userModifiedDate = this.serverUpdatedAt || new Date();
+      this.userModifiedDate = this.serverUpdatedAt || new Date()
     }
     /** Allow the subclass constructor to complete initialization before deep freezing */
     setTimeout(() => {
-      deepFreeze(this);
-    }, 0);
+      deepFreeze(this)
+    }, 0)
   }
 
   public static DefaultAppDomain() {
-    return DefaultAppDomain;
+    return DefaultAppDomain
   }
 
   get uuid() {
-    return this.payload.uuid!;
+    return this.payload.uuid!
   }
 
   get content() {
-    return this.payload.content;
+    return this.payload.content
   }
 
   /**
@@ -126,29 +120,29 @@ export class SNItem implements ItemInterface {
    */
   get version() {
     if (this.payload.format === PayloadFormat.DecryptedBareObject) {
-      throw Error('Attempting to access version of decrypted payload');
+      throw Error('Attempting to access version of decrypted payload')
     }
-    return this.payload.version as ProtocolVersion;
+    return this.payload.version as ProtocolVersion
   }
 
   get safeContent() {
-    return this.payload.safeContent;
+    return this.payload.safeContent
   }
 
   get references(): ContentReference[] {
-    return this.payload.safeContent.references || [];
+    return this.payload.safeContent.references || []
   }
 
   get deleted() {
-    return this.payload.deleted;
+    return this.payload.deleted
   }
 
   get content_type(): ContentType {
-    return this.payload.content_type!;
+    return this.payload.content_type!
   }
 
   get created_at() {
-    return this.payload.created_at!;
+    return this.payload.created_at!
   }
 
   /**
@@ -156,69 +150,69 @@ export class SNItem implements ItemInterface {
    * Undefined if never synced to a remote server.
    */
   public get serverUpdatedAt(): Date | undefined {
-    return this.payload.serverUpdatedAt;
+    return this.payload.serverUpdatedAt
   }
 
   public get serverUpdatedAtTimestamp(): number | undefined {
-    return this.payload.updated_at_timestamp;
+    return this.payload.updated_at_timestamp
   }
 
   /** @deprecated Use serverUpdatedAt instead */
   public get updated_at(): Date | undefined {
-    return this.serverUpdatedAt;
+    return this.serverUpdatedAt
   }
 
   get dirtiedDate() {
-    return this.payload.dirtiedDate;
+    return this.payload.dirtiedDate
   }
 
   get dirty() {
-    return this.payload.dirty;
+    return this.payload.dirty
   }
 
   get errorDecrypting() {
-    return this.payload.errorDecrypting;
+    return this.payload.errorDecrypting
   }
 
   get waitingForKey() {
-    return this.payload.waitingForKey;
+    return this.payload.waitingForKey
   }
 
   get errorDecryptingValueChanged() {
-    return this.payload.errorDecryptingValueChanged;
+    return this.payload.errorDecryptingValueChanged
   }
 
   get lastSyncBegan() {
-    return this.payload.lastSyncBegan;
+    return this.payload.lastSyncBegan
   }
 
   get lastSyncEnd() {
-    return this.payload.lastSyncEnd;
+    return this.payload.lastSyncEnd
   }
 
   /** @deprecated */
   get auth_hash() {
-    return this.payload.auth_hash;
+    return this.payload.auth_hash
   }
 
   /** @deprecated */
   get auth_params() {
-    return this.payload.auth_params;
+    return this.payload.auth_params
   }
 
   get duplicate_of() {
-    return this.payload.duplicate_of;
+    return this.payload.duplicate_of
   }
 
   public payloadRepresentation(override?: PayloadOverride) {
-    return CopyPayload(this.payload, override);
+    return CopyPayload(this.payload, override)
   }
 
   public hasRelationshipWithItem(item: SNItem): boolean {
     const target = this.references?.find((r) => {
-      return r.uuid === item.uuid;
-    });
-    return !!target;
+      return r.uuid === item.uuid
+    })
+    return !!target
   }
 
   /**
@@ -236,17 +230,17 @@ export class SNItem implements ItemInterface {
    * And appData['org.standardnotes.sn.components] returns an object of type ComponentData
    */
   public getDomainData(domain: string): undefined | Record<string, any> {
-    const domainData = this.payload.safeContent.appData;
+    const domainData = this.payload.safeContent.appData
     if (!domainData) {
-      return undefined;
+      return undefined
     }
-    const data = domainData[domain];
-    return data;
+    const data = domainData[domain]
+    return data
   }
 
   public getAppDomainValue(key: AppDataField | PrefKey) {
-    const appData = this.getDomainData(SNItem.DefaultAppDomain());
-    return appData![key];
+    const appData = this.getDomainData(SNItem.DefaultAppDomain())
+    return appData![key]
   }
 
   /**
@@ -256,21 +250,21 @@ export class SNItem implements ItemInterface {
    * it would be needless to duplicate them, so instead we ignore that value.
    */
   public contentKeysToIgnoreWhenCheckingEquality() {
-    return ['conflict_of'];
+    return ['conflict_of']
   }
 
   /** Same as `contentKeysToIgnoreWhenCheckingEquality`, but keys inside appData[Item.AppDomain] */
   public appDataContentKeysToIgnoreWhenCheckingEquality() {
-    return [AppDataField.UserModifiedDate];
+    return [AppDataField.UserModifiedDate]
   }
 
   public getContentCopy() {
-    return JSON.parse(JSON.stringify(this.content));
+    return JSON.parse(JSON.stringify(this.content))
   }
 
   /** Whether the item has never been synced to a server */
   public get neverSynced(): boolean {
-    return !this.serverUpdatedAt || this.serverUpdatedAt.getTime() === 0;
+    return !this.serverUpdatedAt || this.serverUpdatedAt.getTime() === 0
   }
 
   /**
@@ -278,16 +272,16 @@ export class SNItem implements ItemInterface {
    * one of this item to exist, depending on custom criteria.
    */
   public get isSingleton(): boolean {
-    return false;
+    return false
   }
 
   /** The predicate by which singleton items should be unique */
   public singletonPredicate<T extends SNItem>(): PredicateInterface<T> {
-    throw 'Must override SNItem.singletonPredicate';
+    throw 'Must override SNItem.singletonPredicate'
   }
 
   public get singletonStrategy(): SingletonStrategy {
-    return SingletonStrategy.KeepEarliest;
+    return SingletonStrategy.KeepEarliest
   }
 
   /**
@@ -295,7 +289,7 @@ export class SNItem implements ItemInterface {
    * Otherwise, we don't want to save corrupted content locally or send it to the server.
    */
   public get isSyncable(): boolean {
-    return !this.errorDecrypting || this.deleted === true;
+    return !this.errorDecrypting || this.deleted === true
   }
 
   /**
@@ -312,31 +306,29 @@ export class SNItem implements ItemInterface {
    */
   public strategyWhenConflictingWithItem(
     item: SNItem,
-    previousRevision?: HistoryEntry
+    previousRevision?: HistoryEntry,
   ): ConflictStrategy {
     if (this.errorDecrypting) {
-      return ConflictStrategy.KeepLeftDuplicateRight;
+      return ConflictStrategy.KeepLeftDuplicateRight
     }
     if (this.isSingleton) {
-      return ConflictStrategy.KeepLeft;
+      return ConflictStrategy.KeepLeft
     }
     if (this.deleted) {
-      return ConflictStrategy.KeepRight;
+      return ConflictStrategy.KeepRight
     }
     if (item.deleted) {
       if (this.payload.source === PayloadSource.FileImport) {
         /** Imported items take precedence */
-        return ConflictStrategy.KeepLeft;
+        return ConflictStrategy.KeepLeft
       }
-      return ConflictStrategy.KeepRight;
+      return ConflictStrategy.KeepRight
     }
-    const contentDiffers = ItemContentsDiffer(this, item);
+    const contentDiffers = ItemContentsDiffer(this, item)
     if (!contentDiffers) {
-      return ConflictStrategy.KeepRight;
+      return ConflictStrategy.KeepRight
     }
-    const itemsAreDifferentExcludingRefs = ItemContentsDiffer(this, item, [
-      'references',
-    ]);
+    const itemsAreDifferentExcludingRefs = ItemContentsDiffer(this, item, ['references'])
     if (itemsAreDifferentExcludingRefs) {
       if (previousRevision) {
         /**
@@ -347,10 +339,10 @@ export class SNItem implements ItemInterface {
          * be chosen as the winner, with no need for a conflict.
          */
         if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
-          return ConflictStrategy.KeepLeft;
+          return ConflictStrategy.KeepLeft
         }
       }
-      const twentySeconds = 20_000;
+      const twentySeconds = 20_000
       if (
         /**
          * If the incoming item comes from an import, treat it as
@@ -363,13 +355,13 @@ export class SNItem implements ItemInterface {
          */
         Date.now() - this.userModifiedDate.getTime() < twentySeconds
       ) {
-        return ConflictStrategy.KeepLeftDuplicateRight;
+        return ConflictStrategy.KeepLeftDuplicateRight
       } else {
-        return ConflictStrategy.DuplicateLeftKeepRight;
+        return ConflictStrategy.DuplicateLeftKeepRight
       }
     } else {
       /** Only the references have changed; merge them. */
-      return ConflictStrategy.KeepLeftMergeRefs;
+      return ConflictStrategy.KeepLeftMergeRefs
     }
   }
 
@@ -378,12 +370,12 @@ export class SNItem implements ItemInterface {
       this.payload.contentObject,
       otherItem.payload.contentObject,
       this.contentKeysToIgnoreWhenCheckingEquality(),
-      this.appDataContentKeysToIgnoreWhenCheckingEquality()
-    );
+      this.appDataContentKeysToIgnoreWhenCheckingEquality(),
+    )
   }
 
   public satisfiesPredicate(predicate: PredicateInterface<SNItem>): boolean {
-    return predicate.matchesItem(this);
+    return predicate.matchesItem(this)
   }
 }
 
@@ -393,42 +385,42 @@ export class SNItem implements ItemInterface {
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 export class ItemMutator {
-  public readonly item: SNItem;
-  protected readonly type: MutationType;
-  protected payload: PurePayload;
-  protected content?: PayloadContent;
+  public readonly item: SNItem
+  protected readonly type: MutationType
+  protected payload: PurePayload
+  protected content?: PayloadContent
 
   constructor(item: SNItem, type: MutationType) {
-    this.item = item;
-    this.type = type;
-    this.payload = item.payload;
+    this.item = item
+    this.type = type
+    this.payload = item.payload
     if (this.payload.content) {
       /** this.content needs to be mutable, so we make a copy */
-      this.content = Copy(this.payload.content);
+      this.content = Copy(this.payload.content)
     }
   }
 
   public getUuid() {
-    return this.payload.uuid!;
+    return this.payload.uuid!
   }
 
   public getItem() {
-    return this.item;
+    return this.item
   }
 
   public getResult() {
     if (this.type === MutationType.NonDirtying) {
       return CopyPayload(this.payload, {
         content: this.content,
-      });
+      })
     }
     if (!this.payload.deleted) {
       if (this.type === MutationType.UserInteraction) {
-        this.userModifiedDate = new Date();
+        this.userModifiedDate = new Date()
       } else {
-        const currentValue = this.item.userModifiedDate;
+        const currentValue = this.item.userModifiedDate
         if (!currentValue) {
-          this.userModifiedDate = new Date(this.item.serverUpdatedAt!);
+          this.userModifiedDate = new Date(this.item.serverUpdatedAt!)
         }
       }
     }
@@ -436,86 +428,86 @@ export class ItemMutator {
       content: this.content,
       dirty: true,
       dirtiedDate: new Date(),
-    });
-    return result;
+    })
+    return result
   }
 
   /** Merges the input payload with the base payload */
   public mergePayload(payload: PurePayload) {
-    this.payload = PayloadByMerging(this.payload, payload);
+    this.payload = PayloadByMerging(this.payload, payload)
     if (this.payload.content) {
       /** this.content needs to be mutable, so we make a copy */
-      this.content = Copy(this.payload.safeContent);
+      this.content = Copy(this.payload.safeContent)
     } else {
-      this.content = undefined;
+      this.content = undefined
     }
   }
 
   /** Not recommended to use as this might break item schema if used incorrectly */
   public unsafe_setCustomContent(content: PayloadContent): void {
-    this.content = Copy(content);
+    this.content = Copy(content)
   }
 
   public setDeleted() {
-    this.content = undefined;
+    this.content = undefined
     this.payload = CopyPayload(this.payload, {
       content: this.content,
       deleted: true,
-    });
+    })
   }
 
   public set lastSyncBegan(began: Date) {
     this.payload = CopyPayload(this.payload, {
       content: this.content,
       lastSyncBegan: began,
-    });
+    })
   }
 
   public set errorDecrypting(errorDecrypting: boolean) {
     this.payload = CopyPayload(this.payload, {
       content: this.content,
       errorDecrypting: errorDecrypting,
-    });
+    })
   }
 
   public set updated_at(updated_at: Date) {
     this.payload = CopyPayload(this.payload, {
       updated_at: updated_at,
-    });
+    })
   }
 
   public set updated_at_timestamp(updated_at_timestamp: number) {
     this.payload = CopyPayload(this.payload, {
       updated_at_timestamp,
-    });
+    })
   }
 
   public set userModifiedDate(date: Date) {
-    this.setAppDataItem(AppDataField.UserModifiedDate, date);
+    this.setAppDataItem(AppDataField.UserModifiedDate, date)
   }
 
   public set conflictOf(conflictOf: UuidString | undefined) {
-    this.content!.conflict_of = conflictOf;
+    this.content!.conflict_of = conflictOf
   }
 
   public set protected(isProtected: boolean) {
-    this.content!.protected = isProtected;
+    this.content!.protected = isProtected
   }
 
   public set trashed(trashed: boolean) {
-    this.content!.trashed = trashed;
+    this.content!.trashed = trashed
   }
 
   public set pinned(pinned: boolean) {
-    this.setAppDataItem(AppDataField.Pinned, pinned);
+    this.setAppDataItem(AppDataField.Pinned, pinned)
   }
 
   public set archived(archived: boolean) {
-    this.setAppDataItem(AppDataField.Archived, archived);
+    this.setAppDataItem(AppDataField.Archived, archived)
   }
 
   public set locked(locked: boolean) {
-    this.setAppDataItem(AppDataField.Locked, locked);
+    this.setAppDataItem(AppDataField.Locked, locked)
   }
 
   /**
@@ -523,12 +515,12 @@ export class ItemMutator {
    */
   public setDomainData(data: any, domain: string) {
     if (this.payload.errorDecrypting) {
-      return undefined;
+      return undefined
     }
     if (!this.content!.appData) {
-      this.content!.appData = {};
+      this.content!.appData = {}
     }
-    this.content!.appData[domain] = data;
+    this.content!.appData[domain] = data
   }
 
   /**
@@ -537,68 +529,64 @@ export class ItemMutator {
    */
   public setDomainDataKey(key: string, value: any, domain: string) {
     if (this.payload.errorDecrypting) {
-      return undefined;
+      return undefined
     }
     if (!this.content!.appData) {
-      this.content!.appData = {};
+      this.content!.appData = {}
     }
-    const globalData = this.content!.appData;
+    const globalData = this.content!.appData
     if (!globalData[domain]) {
-      globalData[domain] = {};
+      globalData[domain] = {}
     }
-    const domainData = globalData[domain];
-    domainData[key] = value;
+    const domainData = globalData[domain]
+    domainData[key] = value
   }
 
   public setAppDataItem(key: AppDataField | PrefKey, value: any) {
-    this.setDomainDataKey(key, value, SNItem.DefaultAppDomain());
+    this.setDomainDataKey(key, value, SNItem.DefaultAppDomain())
   }
 
   public addItemAsRelationship(item: SNItem) {
-    const references = this.content!.references || [];
+    const references = this.content!.references || []
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
         uuid: item.uuid,
         content_type: item.content_type!,
-      });
+      })
     }
-    this.content!.references = references;
+    this.content!.references = references
   }
 
   public removeItemAsRelationship(item: SNItem) {
-    let references = this.content!.references || [];
-    references = references.filter((r) => r.uuid !== item.uuid);
-    this.content!.references = references;
+    let references = this.content!.references || []
+    references = references.filter((r) => r.uuid !== item.uuid)
+    this.content!.references = references
   }
 }
 
-function ItemContentsDiffer(
-  item1: SNItem,
-  item2: SNItem,
-  excludeContentKeys?: string[]
-) {
+function ItemContentsDiffer(item1: SNItem, item2: SNItem, excludeContentKeys?: string[]) {
   if (!excludeContentKeys) {
-    excludeContentKeys = [];
+    excludeContentKeys = []
   }
   return !ItemContentsEqual(
     item1.content as PayloadContent,
     item2.content as PayloadContent,
     item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
-    item1.appDataContentKeysToIgnoreWhenCheckingEquality()
-  );
+    item1.appDataContentKeysToIgnoreWhenCheckingEquality(),
+  )
 }
 
 function ItemContentsEqual(
   leftContent: PayloadContent,
   rightContent: PayloadContent,
   keysToIgnore: string[],
-  appDataKeysToIgnore: string[]
+  appDataKeysToIgnore: string[],
 ) {
   /* Create copies of objects before running omit as not to modify source values directly. */
-  leftContent = sortedCopy(leftContent);
+  leftContent = sortedCopy(leftContent)
   if (leftContent.appData) {
-    const domainData = leftContent.appData[DefaultAppDomain];
-    omitInPlace(domainData, appDataKeysToIgnore);
+    const domainData = leftContent.appData[DefaultAppDomain]
+    omitInPlace(domainData, appDataKeysToIgnore)
     /**
      * We don't want to disqualify comparison if one object contains an empty domain object
      * and the other doesn't contain a domain object. This can happen if you create an item
@@ -606,27 +594,27 @@ function ItemContentsEqual(
      */
     if (domainData) {
       if (Object.keys(domainData).length === 0) {
-        delete leftContent.appData;
+        delete leftContent.appData
       }
     } else {
-      delete leftContent.appData;
+      delete leftContent.appData
     }
   }
-  omitInPlace(leftContent, keysToIgnore);
+  omitInPlace(leftContent, keysToIgnore)
 
-  rightContent = sortedCopy(rightContent);
+  rightContent = sortedCopy(rightContent)
   if (rightContent.appData) {
-    const domainData = rightContent.appData[DefaultAppDomain];
-    omitInPlace(domainData, appDataKeysToIgnore);
+    const domainData = rightContent.appData[DefaultAppDomain]
+    omitInPlace(domainData, appDataKeysToIgnore)
     if (domainData) {
       if (Object.keys(domainData).length === 0) {
-        delete rightContent.appData;
+        delete rightContent.appData
       }
     } else {
-      delete rightContent.appData;
+      delete rightContent.appData
     }
   }
-  omitInPlace(rightContent, keysToIgnore);
+  omitInPlace(rightContent, keysToIgnore)
 
-  return JSON.stringify(leftContent) === JSON.stringify(rightContent);
+  return JSON.stringify(leftContent) === JSON.stringify(rightContent)
 }

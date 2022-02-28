@@ -25,8 +25,8 @@ export function platformFromString(string: string) {
     'windows-desktop': Platform.WindowsDesktop,
     ios: Platform.Ios,
     android: Platform.Android,
-  };
-  return map[string];
+  }
+  return map[string]
 }
 
 export function platformToString(platform: Platform) {
@@ -39,8 +39,8 @@ export function platformToString(platform: Platform) {
     [Platform.WindowsDesktop]: 'windows-desktop',
     [Platform.Ios]: 'ios',
     [Platform.Android]: 'android',
-  };
-  return map[platform];
+  }
+  return map[platform]
 }
 
 export function environmentFromString(string: string) {
@@ -48,8 +48,8 @@ export function environmentFromString(string: string) {
     web: Environment.Web,
     desktop: Environment.Desktop,
     mobile: Environment.Mobile,
-  };
-  return map[string];
+  }
+  return map[string]
 }
 
 export function environmentToString(environment: Environment) {
@@ -57,14 +57,14 @@ export function environmentToString(environment: Environment) {
     [Environment.Web]: 'web',
     [Environment.Desktop]: 'desktop',
     [Environment.Mobile]: 'mobile',
-  };
-  return map[environment];
+  }
+  return map[environment]
 }
 
 export function isEnvironmentWebOrDesktop(environment: Environment) {
-  return environment === Environment.Web || environment === Environment.Desktop;
+  return environment === Environment.Web || environment === Environment.Desktop
 }
 
 export function isEnvironmentMobile(environment: Environment) {
-  return environment === Environment.Mobile;
+  return environment === Environment.Mobile
 }

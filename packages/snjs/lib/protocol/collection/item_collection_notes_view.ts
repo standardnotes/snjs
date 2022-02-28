@@ -1,19 +1,19 @@
-import { ContentType } from '@Lib/index';
-import { SNNote, SNTag } from '../../models';
-import { isSystemView, SmartView } from './../../models/app/SmartView';
-import { ItemDelta, SNIndex, ItemCollection } from '@standardnotes/payloads';
+import { ContentType } from '@Lib/index'
+import { SNNote, SNTag } from '../../models'
+import { isSystemView, SmartView } from './../../models/app/SmartView'
+import { ItemDelta, SNIndex, ItemCollection } from '@standardnotes/payloads'
 import {
   criteriaForSmartView,
   NotesDisplayCriteria,
   notesMatchingCriteria,
-} from './notes_display_criteria';
+} from './notes_display_criteria'
 
 /**
  * A view into ItemCollection that allows filtering by tag and smart view.
  */
 export class ItemCollectionNotesView implements SNIndex {
-  private displayedNotes: SNNote[] = [];
-  private needsRebuilding = true;
+  private displayedNotes: SNNote[] = []
+  private needsRebuilding = true
 
   constructor(
     private collection: ItemCollection,
@@ -21,57 +21,57 @@ export class ItemCollectionNotesView implements SNIndex {
   ) {}
 
   public setCriteria(criteria: NotesDisplayCriteria): void {
-    this.criteria = criteria;
+    this.criteria = criteria
     this.collection.setDisplayOptions(
       ContentType.Note,
       criteria.sortProperty,
       criteria.sortDirection,
-    );
-    this.needsRebuilding = true;
+    )
+    this.needsRebuilding = true
   }
 
   public notesMatchingSmartView(view: SmartView): SNNote[] {
-    const criteria = criteriaForSmartView(view);
-    return notesMatchingCriteria(criteria, this.collection);
+    const criteria = criteriaForSmartView(view)
+    return notesMatchingCriteria(criteria, this.collection)
   }
 
   public displayElements(): SNNote[] {
     if (this.needsRebuilding) {
-      this.rebuildList();
+      this.rebuildList()
     }
-    return this.displayedNotes.slice();
+    return this.displayedNotes.slice()
   }
 
   private rebuildList(): void {
-    this.displayedNotes = notesMatchingCriteria(this.currentCriteria, this.collection);
-    this.needsRebuilding = false;
+    this.displayedNotes = notesMatchingCriteria(this.currentCriteria, this.collection)
+    this.needsRebuilding = false
   }
 
   private get currentCriteria(): NotesDisplayCriteria {
     const mostRecentVersionOfTags = this.criteria.tags
       .map((tag) => {
-        return this.collection.find(tag.uuid) as SNTag;
+        return this.collection.find(tag.uuid) as SNTag
       })
-      .filter((tag) => tag != undefined);
+      .filter((tag) => tag != undefined)
 
     const mostRecentVersionOfViews = this.criteria.views
       .map((view) => {
         if (isSystemView(view)) {
-          return view;
+          return view
         }
-        return this.collection.find(view.uuid) as SmartView;
+        return this.collection.find(view.uuid) as SmartView
       })
-      .filter((view) => view != undefined);
+      .filter((view) => view != undefined)
 
     const criteria = NotesDisplayCriteria.Copy(this.criteria, {
       tags: mostRecentVersionOfTags,
       views: mostRecentVersionOfViews,
-    });
+    })
 
-    return criteria;
+    return criteria
   }
 
   public onChange(_delta: ItemDelta): void {
-    this.needsRebuilding = true;
+    this.needsRebuilding = true
   }
 }

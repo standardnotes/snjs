@@ -1,6 +1,6 @@
-import { ApplicationIdentifier } from '@standardnotes/applications';
-import { Environment } from '@Lib/platforms';
-import { DeviceInterface } from '@standardnotes/services';
+import { ApplicationIdentifier } from '@standardnotes/applications'
+import { Environment } from '@Lib/platforms'
+import { DeviceInterface } from '@standardnotes/services'
 
 /**
  * A storage reader reads storage via a device interface
@@ -15,19 +15,19 @@ export abstract class StorageReader {
   ) {}
 
   public static version(): string {
-    throw Error('Must override');
+    throw Error('Must override')
   }
 
-  public abstract getAccountKeyParams(): Promise<unknown | undefined>;
+  public abstract getAccountKeyParams(): Promise<unknown | undefined>
 
   /**
    * Returns true if the state of storage has account keys present
    * in version-specific storage (either keychain or raw storage)
    */
-  public abstract hasNonWrappedAccountKeys(): Promise<boolean>;
+  public abstract hasNonWrappedAccountKeys(): Promise<boolean>
 
-  public abstract hasPasscode(): Promise<boolean>;
+  public abstract hasPasscode(): Promise<boolean>
 
   /** Whether this version used the keychain to store keys */
-  public abstract usesKeychain(): boolean;
+  public abstract usesKeychain(): boolean
 }

@@ -1,42 +1,33 @@
-import { SNCredentialService } from './credential_service';
+import { SNCredentialService } from './credential_service'
 import {
   PurePayload,
   PayloadField,
   CreateMaxPayloadFromAnyObject,
   RawPayload,
   PayloadSource,
-} from '@standardnotes/payloads';
-import { SNSyncService } from './sync/sync_service';
-import { CreateItemFromPayload } from '@Models/generator';
-import { StorageKey } from '@Lib/storage_keys';
-import { KeyRecoveryStrings } from './api/messages';
-import { SNStorageService, StorageValueModes } from './storage_service';
-import { SNRootKeyParams } from './../protocol/key_params';
-import { PayloadManager } from './payload_manager';
-import {
-  Challenge,
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeValidation,
-} from './../challenges';
-import { SNAlertService } from './alert_service';
-import { ChallengeService } from './challenge/challenge_service';
-import { SNRootKey } from '@Protocol/root_key';
-import { SNProtocolService } from '@Lib/services/protocol_service';
-import { SNApiService } from '@Lib/services/api/api_service';
-import { SNItemsKey } from './../models/app/items_key';
-import { ContentType } from '@standardnotes/common';
-import { ApplicationStage, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications';
-import { ItemManager } from './item_manager';
-import {
-  dateSorted,
-  isNullOrUndefined,
-  removeFromArray,
-} from '@standardnotes/utils';
-import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
-import { UuidString } from '@Lib/types';
-import { KeyParamsResponse } from '@standardnotes/responses';
-import { AbstractService } from '@standardnotes/services';
+} from '@standardnotes/payloads'
+import { SNSyncService } from './sync/sync_service'
+import { CreateItemFromPayload } from '@Models/generator'
+import { StorageKey } from '@Lib/storage_keys'
+import { KeyRecoveryStrings } from './api/messages'
+import { SNStorageService, StorageValueModes } from './storage_service'
+import { SNRootKeyParams } from './../protocol/key_params'
+import { PayloadManager } from './payload_manager'
+import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from './../challenges'
+import { SNAlertService } from './alert_service'
+import { ChallengeService } from './challenge/challenge_service'
+import { SNRootKey } from '@Protocol/root_key'
+import { SNProtocolService } from '@Lib/services/protocol_service'
+import { SNApiService } from '@Lib/services/api/api_service'
+import { SNItemsKey } from './../models/app/items_key'
+import { ContentType } from '@standardnotes/common'
+import { ApplicationStage, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications'
+import { ItemManager } from './item_manager'
+import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
+import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params'
+import { UuidString } from '@Lib/types'
+import { KeyParamsResponse } from '@standardnotes/responses'
+import { AbstractService } from '@standardnotes/services'
 
 /**
  * The key recovery service listens to items key changes to detect any that cannot be decrypted.
@@ -74,27 +65,27 @@ import { AbstractService } from '@standardnotes/services';
  * decrypt it.
  */
 
-type UndecryptableItemsStorage = Record<UuidString, RawPayload>;
-type DecryptionCallback = (key: SNItemsKey, result: DecryptionResponse) => void;
+type UndecryptableItemsStorage = Record<UuidString, RawPayload>
+type DecryptionCallback = (key: SNItemsKey, result: DecryptionResponse) => void
 
 type DecryptionResponse = {
-  success: boolean;
-  rootKey?: SNRootKey;
-};
+  success: boolean
+  rootKey?: SNRootKey
+}
 
 type DecryptionQueueItem = {
-  key: SNItemsKey;
-  keyParams: SNRootKeyParams;
-  callback?: DecryptionCallback;
-  promise?: Promise<DecryptionResponse>;
-  resolve?: (result: DecryptionResponse) => void;
-};
+  key: SNItemsKey
+  keyParams: SNRootKeyParams
+  callback?: DecryptionCallback
+  promise?: Promise<DecryptionResponse>
+  resolve?: (result: DecryptionResponse) => void
+}
 
 export class SNKeyRecoveryService extends AbstractService {
-  private removeItemObserver: any;
-  private decryptionQueue: DecryptionQueueItem[] = [];
-  private serverParams?: SNRootKeyParams;
-  private isProcessingQueue = false;
+  private removeItemObserver: any
+  private decryptionQueue: DecryptionQueueItem[] = []
+  private serverParams?: SNRootKeyParams
+  private isProcessingQueue = false
 
   constructor(
     private itemManager: ItemManager,
@@ -105,47 +96,47 @@ export class SNKeyRecoveryService extends AbstractService {
     private alertService: SNAlertService,
     private storageService: SNStorageService,
     private syncService: SNSyncService,
-    private credentialService: SNCredentialService
+    private credentialService: SNCredentialService,
   ) {
-    super();
+    super()
     this.removeItemObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
       (changed, inserted, _discarded, ignored, source) => {
         if (source === PayloadSource.LocalChanged) {
-          return;
+          return
         }
         const changedOrInserted = changed
           .concat(inserted)
-          .filter((k) => k.errorDecrypting) as SNItemsKey[];
+          .filter((k) => k.errorDecrypting) as SNItemsKey[]
         if (changedOrInserted.length > 0) {
-          this.handleUndecryptableItemsKeys(changedOrInserted);
+          this.handleUndecryptableItemsKeys(changedOrInserted)
         }
         if (ignored.length > 0) {
-          this.handleIgnoredItemsKeys(ignored as SNItemsKey[]);
+          this.handleIgnoredItemsKeys(ignored as SNItemsKey[])
         }
-      }
-    );
+      },
+    )
   }
 
   public deinit(): void {
-    (this.itemManager as unknown) = undefined;
-    (this.payloadManager as unknown) = undefined;
-    (this.apiService as unknown) = undefined;
-    (this.protocolService as unknown) = undefined;
-    (this.challengeService as unknown) = undefined;
-    (this.alertService as unknown) = undefined;
-    (this.credentialService as unknown) = undefined;
-    (this.syncService as unknown) = undefined;
-    (this.storageService as unknown) = undefined;
-    this.removeItemObserver();
-    this.removeItemObserver = undefined;
-    super.deinit();
+    ;(this.itemManager as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    ;(this.apiService as unknown) = undefined
+    ;(this.protocolService as unknown) = undefined
+    ;(this.challengeService as unknown) = undefined
+    ;(this.alertService as unknown) = undefined
+    ;(this.credentialService as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.storageService as unknown) = undefined
+    this.removeItemObserver()
+    this.removeItemObserver = undefined
+    super.deinit()
   }
 
   async handleApplicationStage(stage: ApplicationStage) {
-    super.handleApplicationStage(stage);
+    super.handleApplicationStage(stage)
     if (stage === ApplicationStage.LoadedDatabase_12) {
-      this.processPersistedUndecryptables();
+      this.processPersistedUndecryptables()
     }
   }
 
@@ -164,264 +155,224 @@ export class SNKeyRecoveryService extends AbstractService {
    * When the app first launches, we will query the isolated storage to see if there are any
    * keys we need to decrypt.
    */
-  private async handleIgnoredItemsKeys(
-    keys: SNItemsKey[],
-    persistIncoming = true
-  ) {
+  private async handleIgnoredItemsKeys(keys: SNItemsKey[], persistIncoming = true) {
     /**
      * Persist the keys locally in isolated storage, so that if we don't properly decrypt
      * them in this app session, the user has a chance to later. If there already exists
      * the same items key in this storage, replace it with this latest incoming value.
      */
     if (persistIncoming) {
-      await this.saveToUndecryptables(keys);
+      await this.saveToUndecryptables(keys)
     }
 
     this.addKeysToQueue(keys, (key, result) => {
       if (result.success) {
         /** If it succeeds, remove the key from isolated storage. */
-        this.removeFromUndecryptables(key);
+        this.removeFromUndecryptables(key)
       }
-    });
+    })
 
-    await this.beginProcessingQueue();
+    await this.beginProcessingQueue()
   }
 
   private async handleUndecryptableItemsKeys(keys: SNItemsKey[]) {
-    this.addKeysToQueue(keys);
-    await this.beginProcessingQueue();
+    this.addKeysToQueue(keys)
+    await this.beginProcessingQueue()
   }
 
   public async processPersistedUndecryptables() {
-    const record = await this.getUndecryptables();
-    const rawPayloads = Object.values(record);
+    const record = await this.getUndecryptables()
+    const rawPayloads = Object.values(record)
     if (rawPayloads.length === 0) {
-      return;
+      return
     }
     const keys = rawPayloads
       .map((raw) => CreateMaxPayloadFromAnyObject(raw))
-      .map((p) => CreateItemFromPayload(p)) as SNItemsKey[];
-    return this.handleIgnoredItemsKeys(keys, false);
+      .map((p) => CreateItemFromPayload(p)) as SNItemsKey[]
+    return this.handleIgnoredItemsKeys(keys, false)
   }
 
   private async getUndecryptables() {
     return this.storageService.getValue(
       StorageKey.KeyRecoveryUndecryptableItems,
       StorageValueModes.Default,
-      {}
-    ) as Promise<UndecryptableItemsStorage>;
+      {},
+    ) as Promise<UndecryptableItemsStorage>
   }
 
   private async persistUndecryptables(record: UndecryptableItemsStorage) {
-    await this.storageService.setValue(
-      StorageKey.KeyRecoveryUndecryptableItems,
-      record
-    );
+    await this.storageService.setValue(StorageKey.KeyRecoveryUndecryptableItems, record)
   }
 
   private async saveToUndecryptables(keys: SNItemsKey[]) {
     /** Get the current persisted value */
-    const record = await this.getUndecryptables();
+    const record = await this.getUndecryptables()
     /** Persist incoming keys */
     for (const key of keys) {
-      record[key.uuid] = key.payload.ejected();
+      record[key.uuid] = key.payload.ejected()
     }
-    await this.persistUndecryptables(record);
+    await this.persistUndecryptables(record)
   }
 
   private async removeFromUndecryptables(key: SNItemsKey) {
     /** Get the current persisted value */
-    const record = await this.getUndecryptables();
-    delete record[key.uuid];
-    await this.persistUndecryptables(record);
+    const record = await this.getUndecryptables()
+    delete record[key.uuid]
+    await this.persistUndecryptables(record)
   }
 
   private get queuePromise() {
-    return Promise.all(this.decryptionQueue.map((q) => q.promise));
+    return Promise.all(this.decryptionQueue.map((q) => q.promise))
   }
 
   private async getClientKeyParams() {
-    return this.protocolService.getAccountKeyParams();
+    return this.protocolService.getAccountKeyParams()
   }
 
   private serverKeyParamsAreSafe(clientParams: SNRootKeyParams) {
-    return leftVersionGreaterThanOrEqualToRight(
-      this.serverParams!.version,
-      clientParams.version
-    );
+    return leftVersionGreaterThanOrEqualToRight(this.serverParams!.version, clientParams.version)
   }
 
-  private async performServerSignIn(
-    keyParams: SNRootKeyParams
-  ): Promise<SNRootKey | undefined> {
+  private async performServerSignIn(keyParams: SNRootKeyParams): Promise<SNRootKey | undefined> {
     /** Get the user's account password */
     const challenge = new Challenge(
-      [
-        new ChallengePrompt(
-          ChallengeValidation.None,
-          undefined,
-          undefined,
-          true
-        ),
-      ],
+      [new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)],
       ChallengeReason.Custom,
       true,
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
-      KeyRecoveryStrings.KeyRecoveryLoginFlowReason
-    );
-    const challengeResponse = await this.challengeService.promptForChallengeResponse(
-      challenge
-    );
+      KeyRecoveryStrings.KeyRecoveryLoginFlowReason,
+    )
+    const challengeResponse = await this.challengeService.promptForChallengeResponse(challenge)
     if (!challengeResponse) {
-      return undefined;
+      return undefined
     }
-    this.challengeService.completeChallenge(challenge);
-    const password = challengeResponse.values[0].value as string;
+    this.challengeService.completeChallenge(challenge)
+    const password = challengeResponse.values[0].value as string
     /** Generate a root key using the input */
-    const rootKey = await this.protocolService.computeRootKey(
-      password,
-      keyParams
-    );
-    const signInResponse = await this.credentialService.correctiveSignIn(
-      rootKey
-    );
+    const rootKey = await this.protocolService.computeRootKey(password, keyParams)
+    const signInResponse = await this.credentialService.correctiveSignIn(rootKey)
     if (!signInResponse.error) {
-      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
-      return rootKey;
+      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
+      return rootKey
     } else {
-      await this.alertService.alert(
-        KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword
-      );
-      return this.performServerSignIn(keyParams);
+      await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword)
+      return this.performServerSignIn(keyParams)
     }
   }
 
   private async getWrappingKeyIfApplicable(): Promise<SNRootKey | undefined> {
     if (!this.protocolService.hasPasscode()) {
-      return undefined;
+      return undefined
     }
-    const {
-      wrappingKey,
-      canceled,
-    } = await this.challengeService.getWrappingKeyIfApplicable();
+    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
     if (canceled) {
       /** Show an alert saying they must enter the correct passcode to update
        * their root key, and try again */
       await this.alertService.alert(
         KeyRecoveryStrings.KeyRecoveryPasscodeRequiredText,
-        KeyRecoveryStrings.KeyRecoveryPasscodeRequiredTitle
-      );
-      return this.getWrappingKeyIfApplicable();
+        KeyRecoveryStrings.KeyRecoveryPasscodeRequiredTitle,
+      )
+      return this.getWrappingKeyIfApplicable()
     }
-    return wrappingKey;
+    return wrappingKey
   }
 
   private addKeysToQueue(keys: SNItemsKey[], callback?: DecryptionCallback) {
     for (const key of keys) {
-      const keyParams = this.protocolService.getKeyEmbeddedKeyParams(key);
+      const keyParams = this.protocolService.getKeyEmbeddedKeyParams(key)
       if (!keyParams) {
-        continue;
+        continue
       }
       const queueItem: DecryptionQueueItem = {
         key,
         keyParams,
         callback,
-      };
+      }
       const promise: Promise<DecryptionResponse> = new Promise((resolve) => {
-        queueItem.resolve = resolve;
-      });
-      queueItem.promise = promise;
-      this.decryptionQueue.push(queueItem);
+        queueItem.resolve = resolve
+      })
+      queueItem.promise = promise
+      this.decryptionQueue.push(queueItem)
     }
   }
 
   private readdQueueItem(queueItem: DecryptionQueueItem) {
     const promise: Promise<DecryptionResponse> = new Promise((resolve) => {
-      queueItem.resolve = resolve;
-    });
-    queueItem.promise = promise;
-    this.decryptionQueue.unshift(queueItem);
+      queueItem.resolve = resolve
+    })
+    queueItem.promise = promise
+    this.decryptionQueue.unshift(queueItem)
   }
 
   private async beginProcessingQueue() {
     if (this.isProcessingQueue) {
-      return;
+      return
     }
-    this.isProcessingQueue = true;
+    this.isProcessingQueue = true
 
-    const clientParams = await this.getClientKeyParams();
+    const clientParams = await this.getClientKeyParams()
     if (!this.serverParams && clientParams) {
       /** Get the user's latest key params from the server */
-      const paramsResponse = await this.apiService.getAccountKeyParams(
-        clientParams.identifier
-      );
+      const paramsResponse = await this.apiService.getAccountKeyParams(clientParams.identifier)
       if (!paramsResponse.error && paramsResponse.data) {
-        this.serverParams = KeyParamsFromApiResponse(
-          paramsResponse as KeyParamsResponse
-        );
+        this.serverParams = KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse)
       }
     }
 
-    const hasAccount = this.protocolService.hasAccount();
-    const hasPasscode = this.protocolService.hasPasscode();
-    const credentialsMissing = !hasAccount && !hasPasscode;
-    let queueItem = this.decryptionQueue[0];
+    const hasAccount = this.protocolService.hasAccount()
+    const hasPasscode = this.protocolService.hasPasscode()
+    const credentialsMissing = !hasAccount && !hasPasscode
+    let queueItem = this.decryptionQueue[0]
     if (credentialsMissing) {
-      const rootKey = await this.performServerSignIn(queueItem.keyParams);
+      const rootKey = await this.performServerSignIn(queueItem.keyParams)
       if (rootKey) {
-        await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
-          rootKey,
-          true
-        );
-        removeFromArray(this.decryptionQueue, queueItem);
-        queueItem = this.decryptionQueue[0];
+        await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, true)
+        removeFromArray(this.decryptionQueue, queueItem)
+        queueItem = this.decryptionQueue[0]
       }
     }
     while (queueItem) {
-      this.popQueueItem(queueItem);
-      await queueItem.promise!;
+      this.popQueueItem(queueItem)
+      await queueItem.promise!
       /** Always start from the beginning */
-      queueItem = this.decryptionQueue[0];
+      queueItem = this.decryptionQueue[0]
     }
 
     this.queuePromise.then(async () => {
-      this.isProcessingQueue = false;
+      this.isProcessingQueue = false
       if (this.serverParams) {
-        const latestClientParams = (await this.getClientKeyParams())!;
+        const latestClientParams = (await this.getClientKeyParams())!
         const serverParamsDifferFromClients =
-          latestClientParams && !this.serverParams.compare(latestClientParams);
-        if (
-          this.serverKeyParamsAreSafe(latestClientParams) &&
-          serverParamsDifferFromClients
-        ) {
+          latestClientParams && !this.serverParams.compare(latestClientParams)
+        if (this.serverKeyParamsAreSafe(latestClientParams) && serverParamsDifferFromClients) {
           /**
            * The only way left to validate our password is to sign in with the server,
            * creating an all new session.
            */
-          await this.performServerSignIn(this.serverParams);
+          await this.performServerSignIn(this.serverParams)
         }
       }
       if (this.syncService.isOutOfSync()) {
-        this.syncService.sync({ checkIntegrity: true });
+        this.syncService.sync({ checkIntegrity: true })
       }
-    });
+    })
   }
 
   private async popQueueItem(queueItem: DecryptionQueueItem): Promise<void> {
     if (!queueItem.resolve) {
-      throw Error('Attempting to pop queue element with no resolve function');
+      throw Error('Attempting to pop queue element with no resolve function')
     }
-    removeFromArray(this.decryptionQueue, queueItem);
-    const keyParams = queueItem.keyParams;
-    const key = queueItem.key;
-    const resolve = queueItem.resolve!;
+    removeFromArray(this.decryptionQueue, queueItem)
+    const keyParams = queueItem.keyParams
+    const key = queueItem.key
+    const resolve = queueItem.resolve!
 
     /**
      * We replace our current root key if the server params differ from our own params,
      * and if we can validate the params based on this items key's params.
      * */
-    let replacesRootKey = false;
-    const clientParams = await this.getClientKeyParams();
+    let replacesRootKey = false
+    const clientParams = await this.getClientKeyParams()
     if (
       this.serverParams &&
       clientParams &&
@@ -431,53 +382,39 @@ export class SNKeyRecoveryService extends AbstractService {
     ) {
       /** Get the latest items key we _can_ decrypt */
       const latest = dateSorted(
-        this.itemManager.nonErroredItemsForContentType(
-          ContentType.ItemsKey
-        ) as SNItemsKey[],
+        this.itemManager.nonErroredItemsForContentType(ContentType.ItemsKey) as SNItemsKey[],
         PayloadField.CreatedAt,
-        false
-      )[0];
-      const hasLocalItemsKey = !isNullOrUndefined(latest);
-      const isNewerThanLatest = key.created_at > latest?.created_at;
-      replacesRootKey = !hasLocalItemsKey || isNewerThanLatest;
+        false,
+      )[0]
+      const hasLocalItemsKey = !isNullOrUndefined(latest)
+      const isNewerThanLatest = key.created_at > latest?.created_at
+      replacesRootKey = !hasLocalItemsKey || isNewerThanLatest
     }
     const challenge = new Challenge(
-      [
-        new ChallengePrompt(
-          ChallengeValidation.None,
-          undefined,
-          undefined,
-          true
-        ),
-      ],
+      [new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)],
       ChallengeReason.Custom,
       true,
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
-      KeyRecoveryStrings.KeyRecoveryPasswordRequired
-    );
-    const response = await this.challengeService.promptForChallengeResponse(
-      challenge
-    );
+      KeyRecoveryStrings.KeyRecoveryPasswordRequired,
+    )
+    const response = await this.challengeService.promptForChallengeResponse(challenge)
     if (!response) {
-      const result = { success: false };
-      resolve(result);
-      queueItem.callback?.(key, result);
-      return;
+      const result = { success: false }
+      resolve(result)
+      queueItem.callback?.(key, result)
+      return
     }
 
-    const password = response!.values[0].value as string;
+    const password = response!.values[0].value as string
     /** Generate a root key using the input */
-    const rootKey = await this.protocolService.computeRootKey(
-      password,
-      keyParams
-    );
+    const rootKey = await this.protocolService.computeRootKey(password, keyParams)
     /** Attempt to decrypt this items key using the root key */
     const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
       key.payload,
-      rootKey
-    );
+      rootKey,
+    )
     /** Dismiss challenge */
-    this.challengeService.completeChallenge(challenge);
+    this.challengeService.completeChallenge(challenge)
 
     /** If it succeeds, re-emit this items key */
     if (!decryptedPayload.errorDecrypting) {
@@ -485,65 +422,60 @@ export class SNKeyRecoveryService extends AbstractService {
       const matching = await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
         rootKey,
         replacesRootKey,
-        [decryptedPayload]
-      );
-      const result = { success: true };
-      resolve(result);
-      queueItem.callback?.(key, result);
+        [decryptedPayload],
+      )
+      const result = { success: true }
+      resolve(result)
+      queueItem.callback?.(key, result)
       for (const match of matching) {
-        match.resolve!(result);
-        match.callback?.(match.key, result);
+        match.resolve!(result)
+        match.callback?.(match.key, result)
       }
     } else {
-      await this.alertService.alert(
-        KeyRecoveryStrings.KeyRecoveryUnableToRecover
-      );
+      await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryUnableToRecover)
       /** If it fails, add back to queue */
-      this.readdQueueItem(queueItem);
-      resolve({ success: false });
+      this.readdQueueItem(queueItem)
+      resolve({ success: false })
     }
   }
 
   private async handleDecryptionOfAllKeysMatchingCorrectRootKey(
     rootKey: SNRootKey,
     replacesRootKey: boolean,
-    additionalKeys: PurePayload[] = []
+    additionalKeys: PurePayload[] = [],
   ): Promise<DecryptionQueueItem[]> {
     if (replacesRootKey) {
       /** Replace our root key with the generated root key */
-      const wrappingKey = await this.getWrappingKeyIfApplicable();
-      await this.protocolService.setRootKey(rootKey, wrappingKey);
+      const wrappingKey = await this.getWrappingKeyIfApplicable()
+      await this.protocolService.setRootKey(rootKey, wrappingKey)
     }
-    const matching = this.popQueueForKeyParams(rootKey.keyParams);
+    const matching = this.popQueueForKeyParams(rootKey.keyParams)
     const decryptedMatching = await this.protocolService.payloadsByDecryptingPayloads(
       matching.map((m) => m.key.payload),
-      rootKey
-    );
-    const allRelevantKeyPayloads = additionalKeys.concat(decryptedMatching);
-    this.payloadManager.emitPayloads(
-      allRelevantKeyPayloads,
-      PayloadSource.DecryptedTransient
-    );
-    await this.storageService.savePayloads(allRelevantKeyPayloads);
+      rootKey,
+    )
+    const allRelevantKeyPayloads = additionalKeys.concat(decryptedMatching)
+    this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadSource.DecryptedTransient)
+    await this.storageService.savePayloads(allRelevantKeyPayloads)
     if (replacesRootKey) {
-      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced);
+      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
     } else {
-      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered);
+      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered)
     }
-    return matching;
+    return matching
   }
 
   private popQueueForKeyParams(keyParams: SNRootKeyParams) {
-    const matching = [];
-    const nonmatching = [];
+    const matching = []
+    const nonmatching = []
     for (const queueItem of this.decryptionQueue) {
       if (queueItem.keyParams.compare(keyParams)) {
-        matching.push(queueItem);
+        matching.push(queueItem)
       } else {
-        nonmatching.push(queueItem);
+        nonmatching.push(queueItem)
       }
     }
-    this.decryptionQueue = nonmatching;
-    return matching;
+    this.decryptionQueue = nonmatching
+    return matching
   }
 }

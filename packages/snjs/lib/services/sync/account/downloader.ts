@@ -1,42 +1,42 @@
-import { filterDisallowedRemotePayloads } from '@Lib/services/sync/filter';
+import { filterDisallowedRemotePayloads } from '@Lib/services/sync/filter'
 import {
   PurePayload,
   RawPayload,
   CreateSourcedPayloadFromObject,
-  PayloadSource
-} from '@standardnotes/payloads';
-import { ContentType } from '@standardnotes/common';
-import { SNApiService } from '../../api/api_service';
-import { SNProtocolService } from '../../protocol_service';
-import { RawSyncResponse } from '@standardnotes/responses';
+  PayloadSource,
+} from '@standardnotes/payloads'
+import { ContentType } from '@standardnotes/common'
+import { SNApiService } from '../../api/api_service'
+import { SNProtocolService } from '../../protocol_service'
+import { RawSyncResponse } from '@standardnotes/responses'
 
 type Progress = {
-  retrievedPayloads: PurePayload[];
-  lastSyncToken?: string;
-  paginationToken?: string;
-};
+  retrievedPayloads: PurePayload[]
+  lastSyncToken?: string
+  paginationToken?: string
+}
 
 export class AccountDownloader {
-  private apiService: SNApiService;
-  private protocolService: SNProtocolService;
-  private contentType?: ContentType;
-  private customEvent?: string;
-  private limit?: number;
-  private progress: Progress;
+  private apiService: SNApiService
+  private protocolService: SNProtocolService
+  private contentType?: ContentType
+  private customEvent?: string
+  private limit?: number
+  private progress: Progress
 
   constructor(
     apiService: SNApiService,
     protocolService: SNProtocolService,
     contentType?: ContentType,
     customEvent?: string,
-    limit?: number
+    limit?: number,
   ) {
-    this.apiService = apiService;
-    this.protocolService = protocolService;
-    this.contentType = contentType;
-    this.customEvent = customEvent;
-    this.limit = limit;
-    this.progress = { retrievedPayloads: [] };
+    this.apiService = apiService
+    this.protocolService = protocolService
+    this.contentType = contentType
+    this.customEvent = customEvent
+    this.limit = limit
+    this.progress = { retrievedPayloads: [] }
   }
 
   /**
@@ -51,30 +51,25 @@ export class AccountDownloader {
       this.limit || 500,
       false,
       this.contentType,
-      this.customEvent
-    )) as RawSyncResponse;
+      this.customEvent,
+    )) as RawSyncResponse
 
     const encryptedPayloads = filterDisallowedRemotePayloads(
       response.data.retrieved_items!.map((rawPayload: RawPayload) => {
-        return CreateSourcedPayloadFromObject(
-          rawPayload,
-          PayloadSource.RemoteRetrieved
-        );
-      })
-    );
+        return CreateSourcedPayloadFromObject(rawPayload, PayloadSource.RemoteRetrieved)
+      }),
+    )
     const decryptedPayloads = await this.protocolService.payloadsByDecryptingPayloads(
-      encryptedPayloads
-    );
-    this.progress.retrievedPayloads = this.progress.retrievedPayloads.concat(
-      decryptedPayloads
-    );
-    this.progress.lastSyncToken = response.data?.sync_token;
-    this.progress.paginationToken = response.data?.cursor_token;
+      encryptedPayloads,
+    )
+    this.progress.retrievedPayloads = this.progress.retrievedPayloads.concat(decryptedPayloads)
+    this.progress.lastSyncToken = response.data?.sync_token
+    this.progress.paginationToken = response.data?.cursor_token
 
     if (response.data?.cursor_token) {
-      return this.run();
+      return this.run()
     } else {
-      return this.progress.retrievedPayloads;
+      return this.progress.retrievedPayloads
     }
   }
 }

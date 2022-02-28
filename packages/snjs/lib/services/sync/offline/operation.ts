@@ -1,19 +1,19 @@
-import { PurePayload, CreateSourcedPayloadFromObject, PayloadSource } from '@standardnotes/payloads';
-import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
-import { SyncResponse } from '@Services/sync/response';
-import { Copy } from '@standardnotes/utils';
+import { PurePayload, CreateSourcedPayloadFromObject, PayloadSource } from '@standardnotes/payloads'
+import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals'
+import { SyncResponse } from '@Services/sync/response'
+import { Copy } from '@standardnotes/utils'
 
 export class OfflineSyncOperation {
-  payloads: PurePayload[];
-  receiver: ResponseSignalReceiver;
+  payloads: PurePayload[]
+  receiver: ResponseSignalReceiver
 
   /**
    * @param payloads  An array of payloads to sync offline
    * @param receiver  A function that receives callback multiple times during the operation
    */
   constructor(payloads: PurePayload[], receiver: ResponseSignalReceiver) {
-    this.payloads = payloads;
-    this.receiver = receiver;
+    this.payloads = payloads
+    this.receiver = receiver
   }
 
   async run() {
@@ -21,11 +21,11 @@ export class OfflineSyncOperation {
       return CreateSourcedPayloadFromObject(payload, PayloadSource.LocalSaved, {
         dirty: false,
         lastSyncEnd: new Date(),
-      });
-    });
+      })
+    })
     /* Since we are simulating a server response, they should be pure JS objects */
-    const savedItems = Copy(responsePayloads) as any[];
-    const response = new SyncResponse({ data: { saved_items: savedItems }});
-    await this.receiver(SyncSignal.Response, response);
+    const savedItems = Copy(responsePayloads) as any[]
+    const response = new SyncResponse({ data: { saved_items: savedItems } })
+    await this.receiver(SyncSignal.Response, response)
   }
 }

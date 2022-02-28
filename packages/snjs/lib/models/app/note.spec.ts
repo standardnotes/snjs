@@ -1,16 +1,17 @@
-import { SNNote } from '@Lib/index';
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
-import { ContentType } from '@standardnotes/common';
+import { SNNote } from '@Lib/index'
+import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
+import { ContentType } from '@standardnotes/common'
 
-const randUuid = () => String(Math.random());
+const randUuid = () => String(Math.random())
 
-const create = (payload?: Record<string, unknown>): SNNote => (new SNNote(
-  CreateMaxPayloadFromAnyObject({
-    uuid: randUuid(),
-    content_type: ContentType.Note,
-    content: FillItemContent({ ...payload }),
-  })
-));
+const create = (payload?: Record<string, unknown>): SNNote =>
+  new SNNote(
+    CreateMaxPayloadFromAnyObject({
+      uuid: randUuid(),
+      content_type: ContentType.Note,
+      content: FillItemContent({ ...payload }),
+    }),
+  )
 
 describe('SNNote Tests', () => {
   it('should safely type required fields of Note when creating from PayloadContent', () => {
@@ -20,27 +21,21 @@ describe('SNNote Tests', () => {
       preview_plain: 'Expected preview',
       preview_html: {},
       hidePreview: 'string',
-    });
+    })
 
     expect([
       typeof note.title,
       typeof note.text,
       typeof note.preview_html,
       typeof note.preview_plain,
-      typeof note.hidePreview
-    ]).toStrictEqual([
-      'string',
-      'string',
-      'string',
-      'string',
-      'boolean'
-    ])
-  });
+      typeof note.hidePreview,
+    ]).toStrictEqual(['string', 'string', 'string', 'string', 'boolean'])
+  })
 
   it('should preserve falsy values when casting from PayloadContent', () => {
     const note = create({
       preview_plain: null,
-      preview_html: undefined
+      preview_html: undefined,
     })
 
     expect(note.preview_plain).toBeFalsy()
@@ -49,7 +44,7 @@ describe('SNNote Tests', () => {
 
   it('should set mobilePrefersPlainEditor when given a valid choice', () => {
     const selected = create({
-      mobilePrefersPlainEditor: true
+      mobilePrefersPlainEditor: true,
     })
 
     const unselected = create()
@@ -57,4 +52,4 @@ describe('SNNote Tests', () => {
     expect(selected.mobilePrefersPlainEditor).toBeTruthy()
     expect(unselected.mobilePrefersPlainEditor).toBe(undefined)
   })
-});
+})

@@ -1,8 +1,6 @@
-import { ContentType } from '@standardnotes/common';
+import { ContentType } from '@standardnotes/common'
 
-export function displayStringForContentType(
-  contentType: ContentType
-): string | undefined {
+export function displayStringForContentType(contentType: ContentType): string | undefined {
   const map: Record<string, string> = {
     [ContentType.Note]: 'note',
     [ContentType.Tag]: 'tag',
@@ -14,6 +12,6 @@ export function displayStringForContentType(
     [ContentType.FilesafeCredentials]: 'FileSafe credential',
     [ContentType.FilesafeFileMetadata]: 'FileSafe file',
     [ContentType.FilesafeIntegration]: 'FileSafe integration',
-  };
-  return map[contentType];
+  }
+  return map[contentType]
 }

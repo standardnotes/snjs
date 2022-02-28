@@ -1,35 +1,25 @@
 import {
   CreateSourcedPayloadFromObject,
   PayloadSource,
-  ImmutablePayloadCollection
-} from '@standardnotes/payloads';
-import { PayloadsDelta } from '@Payloads/deltas/delta';
+  ImmutablePayloadCollection,
+} from '@standardnotes/payloads'
+import { PayloadsDelta } from '@Payloads/deltas/delta'
 
 export class DeltaRemoteRejected extends PayloadsDelta {
   // eslint-disable-next-line @typescript-eslint/require-await
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
-    const results = [];
+    const results = []
     for (const payload of this.applyCollection.all()) {
-      const decrypted = this.findRelatedPayload(
-        payload.uuid!,
-        PayloadSource.DecryptedTransient
-      );
+      const decrypted = this.findRelatedPayload(payload.uuid!, PayloadSource.DecryptedTransient)
       if (!decrypted) {
-        throw 'Unable to find decrypted counterpart for rejected payload.';
+        throw 'Unable to find decrypted counterpart for rejected payload.'
       }
-      const result = CreateSourcedPayloadFromObject(
-        decrypted,
-        PayloadSource.RemoteRejected,
-        {
-          lastSyncEnd: new Date(),
-          dirty: false,
-        }
-      );
-      results.push(result);
+      const result = CreateSourcedPayloadFromObject(decrypted, PayloadSource.RemoteRejected, {
+        lastSyncEnd: new Date(),
+        dirty: false,
+      })
+      results.push(result)
     }
-    return ImmutablePayloadCollection.WithPayloads(
-      results,
-      PayloadSource.RemoteRejected
-    );
+    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRejected)
   }
 }
