@@ -1,6 +1,7 @@
 {
   "name": "@standardnotes/snjs-monorepo",
   "private": true,
+  "author": "Standard Notes",
   "workspaces": [
     "packages/*"
   ],
