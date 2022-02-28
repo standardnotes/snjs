@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.66.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.66.0...@standardnotes/snjs@2.66.1) (2022-02-28)
+
+
+### Bug Fixes
+
+* uploading file chunks as raw bytes in request ([#616](https://github.com/standardnotes/snjs/issues/616)) ([c1a431b](https://github.com/standardnotes/snjs/commit/c1a431b1f2427aafe6a6fc35adfd6e5102c2e177))
+
+
+
+
+
 # [2.66.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.65.3...@standardnotes/snjs@2.66.0) (2022-02-27)
 
 
