@@ -8,6 +8,10 @@ export const API_MESSAGE_GENERIC_CHANGE_CREDENTIALS_FAIL =
   'Something went wrong while changing your credentials. Your credentials were not changed. Please try again.'
 export const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.'
 
+export const API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL = 'Could not check your data integrity with the server.'
+
+export const API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL = 'Could not retrieve conflicting item.'
+
 export const API_MESSAGE_REGISTRATION_IN_PROGRESS =
   'An existing registration request is already in progress.'
 export const API_MESSAGE_LOGIN_IN_PROGRESS = 'An existing sign in request is already in progress.'

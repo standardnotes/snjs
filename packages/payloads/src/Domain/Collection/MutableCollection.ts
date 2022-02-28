@@ -5,6 +5,7 @@ import { remove } from 'lodash'
 
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { ItemInterface } from '../Item/ItemInterface'
+import { IntegrityPayload } from '../Payload/IntegrityPayload'
 
 export class MutableCollection<T extends PayloadInterface | ItemInterface> {
   readonly map: Partial<Record<Uuid, T>> = {}
@@ -93,6 +94,15 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
   public nondeletedElements(): T[] {
     const uuids = Array.from(this.nondeletedIndex)
     return this.findAll(uuids)
+  }
+
+  public integrityPayloads(): IntegrityPayload[] {
+    const nondeletedElements = this.nondeletedElements()
+
+    return nondeletedElements.map((item) => ({
+      uuid: item.uuid,
+      updated_at_timestamp: item.serverUpdatedAtTimestamp as number,
+    }))
   }
 
   /**

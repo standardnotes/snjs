@@ -13,7 +13,7 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
   private criticalPromises: Promise<unknown>[] = []
 
   constructor(
-    protected internalEventBus: InternalEventBusInterface
+    protected internalEventBus: InternalEventBusInterface,
   ) {
   }
 

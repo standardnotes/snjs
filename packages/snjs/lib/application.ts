@@ -99,6 +99,7 @@ import {
   ServiceInterface,
   InternalEventBusInterface,
   InternalEventBus,
+  IntegrityService,
 } from '@standardnotes/services'
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
@@ -183,6 +184,7 @@ export class SNApplication implements ListedInterface {
   private mfaService!: SNMfaService
   private listedService!: ListedService
   private fileService!: SNFileService
+  private integrityService!: IntegrityService
 
   private internalEventBus!: InternalEventBusInterface
 
@@ -1692,6 +1694,7 @@ export class SNApplication implements ListedInterface {
     this.createListedService()
     this.createActionsManager()
     this.createFileService()
+    this.createIntegrityService()
   }
 
   private clearServices() {
@@ -1720,6 +1723,7 @@ export class SNApplication implements ListedInterface {
     ;(this.mfaService as unknown) = undefined
     ;(this.listedService as unknown) = undefined
     ;(this.fileService as unknown) = undefined
+    ;(this.integrityService as unknown) = undefined
 
     this.services = []
   }
@@ -1730,6 +1734,7 @@ export class SNApplication implements ListedInterface {
 
   private defineInternalEventHandlers(): void {
     this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
+    this.internalEventBus.addEventHandler(this.integrityService, SyncEvent.FullSyncCompleted)
   }
 
   private clearInternalEventBus(): void {
@@ -1758,6 +1763,17 @@ export class SNApplication implements ListedInterface {
     )
 
     this.services.push(this.fileService)
+  }
+
+  private createIntegrityService() {
+    this.integrityService = new IntegrityService(
+      this.apiService,
+      this.apiService,
+      this.itemManager,
+      this.internalEventBus,
+    )
+
+    this.services.push(this.integrityService)
   }
 
   private createFeaturesService() {

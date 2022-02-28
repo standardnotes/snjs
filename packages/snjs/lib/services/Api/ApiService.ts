@@ -34,10 +34,12 @@ import {
   CloseUploadSessionResponse,
   UploadFileChunkResponse,
   DownloadFileChunkResponse,
+  GetSingleItemResponse,
+  CheckIntegrityResponse,
 } from '@standardnotes/responses'
 import { Session, TokenSession } from './Session'
-import { ContentType, ErrorObject } from '@standardnotes/common'
-import { ApiEndpointParam, PurePayload } from '@standardnotes/payloads'
+import { ContentType, ErrorObject, Uuid } from '@standardnotes/common'
+import { ApiEndpointParam, IntegrityPayload, PurePayload } from '@standardnotes/payloads'
 import { SNRootKeyParams } from '../../protocol/key_params'
 import { SNStorageService } from '../StorageService'
 import { ErrorTag, HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
@@ -49,7 +51,12 @@ import { Role } from '@standardnotes/auth'
 import { FeatureDescription } from '@standardnotes/features'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/services/Api/Messages'
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  IntegrityApiInterface,
+  ItemApiInterface
+} from '@standardnotes/services'
 
 type PathNamesV1 = {
   keyParams: string
@@ -76,6 +83,8 @@ type PathNamesV1 = {
   uploadFileChunk: string
   closeUploadSession: string
   downloadFileChunk: string
+  checkIntegrity: string
+  getSingleItem: (uuid: Uuid) => string
 }
 
 type PathNamesV2 = {
@@ -112,6 +121,8 @@ const Paths: {
     uploadFileChunk: '/v1/files/upload/chunk',
     closeUploadSession: '/v1/files/upload/close-session',
     downloadFileChunk: '/v1/files',
+    checkIntegrity: '/v1/items/check-integrity',
+    getSingleItem: (uuid: Uuid) => `/v1/items/${uuid}`,
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -134,7 +145,10 @@ export type MetaReceivedData = {
 
 export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
-  implements FilesApi
+  implements
+    FilesApi,
+    IntegrityApiInterface,
+    ItemApiInterface
 {
   private session?: Session
   public user?: User
@@ -956,6 +970,69 @@ export class SNApiService
     if (rangeEnd < totalSize - 1) {
       this.downloadFile(file, ++chunkIndex, apiToken, rangeStart + pullChunkSize, onBytesReceived)
     }
+  }
+
+  async checkIntegrity(
+    integrityPayloads: IntegrityPayload[],
+  ): Promise<CheckIntegrityResponse | HttpResponse> {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
+    }
+    const url = joinPaths(this.host, Paths.v1.checkIntegrity);
+
+    const params = {
+      integrityPayloads,
+    }
+
+    const response = await this.httpService
+      .postAbsolute(url, params, this.session!.authorizationValue)
+      .catch<HttpResponse>(async (errorResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Post,
+            url,
+            params,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL,
+        );
+      });
+    this.processResponse(response);
+
+    return response;
+  }
+
+  async getSingleItem(
+    itemUuid: Uuid,
+  ): Promise<GetSingleItemResponse | HttpResponse> {
+    const preprocessingError = this.preprocessingError();
+    if (preprocessingError) {
+      return preprocessingError;
+    }
+    const url = joinPaths(this.host, Paths.v1.getSingleItem(itemUuid));
+
+    const response = await this.httpService
+      .getAbsolute(url, {}, this.session!.authorizationValue)
+      .catch<HttpResponse>(async (errorResponse) => {
+        this.preprocessAuthenticatedErrorResponse(errorResponse);
+        if (isErrorResponseExpiredToken(errorResponse)) {
+          return this.refreshSessionThenRetryRequest({
+            verb: HttpVerb.Get,
+            url,
+          });
+        }
+        return this.errorResponseWithFallbackMessage(
+          errorResponse,
+          messages.API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL,
+        );
+      });
+    this.processResponse(response);
+
+    return response;
   }
 
   private preprocessingError() {
