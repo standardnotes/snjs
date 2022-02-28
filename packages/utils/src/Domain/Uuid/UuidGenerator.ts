@@ -3,7 +3,7 @@
  * consumer. Application must call SetGenerator before use.
  */
 export class UuidGenerator {
-  private static syncUuidFunc: () => string;
+  private static syncUuidFunc: () => string
 
   /**
    * @param {function} syncImpl - A syncronous function that returns a UUID.
