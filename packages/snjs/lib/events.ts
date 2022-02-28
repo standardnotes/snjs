@@ -1,5 +1,5 @@
-import { SyncEvent } from '@Services/sync/events';
-export { SyncEvent };
+import { SyncEvent } from '@Services/sync/events'
+export { SyncEvent }
 
 export enum ApplicationEvent {
   SignedIn = 2,
@@ -86,5 +86,5 @@ export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
     [SyncEvent.DatabaseWriteError]: ApplicationEvent.LocalDatabaseWriteError,
     [SyncEvent.DownloadFirstSyncCompleted]:
       ApplicationEvent.CompletedInitialSync,
-  } as any)[syncEvent];
+  } as any)[syncEvent]
 }

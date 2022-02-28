@@ -1,4 +1,4 @@
-import { ContentType } from '@standardnotes/common';
+import { ContentType } from '@standardnotes/common'
 
 export function displayStringForContentType(
   contentType: ContentType
@@ -14,6 +14,6 @@ export function displayStringForContentType(
     [ContentType.FilesafeCredentials]: 'FileSafe credential',
     [ContentType.FilesafeFileMetadata]: 'FileSafe file',
     [ContentType.FilesafeIntegration]: 'FileSafe integration',
-  };
-  return map[contentType];
+  }
+  return map[contentType]
 }

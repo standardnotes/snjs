@@ -1,6 +1,6 @@
-import { ApplicationIdentifier } from '@standardnotes/applications';
-import { Environment } from '@Lib/platforms';
-import { DeviceInterface } from '@standardnotes/services';
+import { ApplicationIdentifier } from '@standardnotes/applications'
+import { Environment } from '@Lib/platforms'
+import { DeviceInterface } from '@standardnotes/services'
 
 /**
  * A storage reader reads storage via a device interface
@@ -15,7 +15,7 @@ export abstract class StorageReader {
   ) {}
 
   public static version(): string {
-    throw Error('Must override');
+    throw Error('Must override')
   }
 
   public abstract getAccountKeyParams(): Promise<unknown | undefined>;

@@ -1,21 +1,21 @@
-import { ContentType } from '@standardnotes/common';
-import { ItemManager } from '@Services/item_manager';
-import { SNItem, SingletonStrategy } from '@Models/core/item';
+import { ContentType } from '@standardnotes/common'
+import { ItemManager } from '@Services/item_manager'
+import { SNItem, SingletonStrategy } from '@Models/core/item'
 import {
   arrayByRemovingFromIndex,
   extendArray,
   isNullOrUndefined,
   UuidGenerator,
-} from '@standardnotes/utils';
+} from '@standardnotes/utils'
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
   PredicateInterface,
-} from '@standardnotes/payloads';
-import { SyncEvent } from '@Services/sync/events';
-import { SNSyncService } from './sync/sync_service';
-import { Uuids } from '@Models/functions';
-import { AbstractService } from '@standardnotes/services';
+} from '@standardnotes/payloads'
+import { SyncEvent } from '@Services/sync/events'
+import { SNSyncService } from './sync/sync_service'
+import { Uuids } from '@Models/functions'
+import { AbstractService } from '@standardnotes/services'
 
 /**
  * The singleton manager allow consumers to ensure that only 1 item exists of a certain
@@ -29,36 +29,36 @@ import { AbstractService } from '@standardnotes/services';
  *    to automatically gain singleton resolution.
  */
 export class SNSingletonManager extends AbstractService {
-  private resolveQueue: SNItem[] = [];
+  private resolveQueue: SNItem[] = []
 
-  private removeItemObserver!: () => void;
-  private removeSyncObserver!: () => void;
+  private removeItemObserver!: () => void
+  private removeSyncObserver!: () => void
 
   constructor(
     private itemManager: ItemManager,
     private syncService: SNSyncService
   ) {
-    super();
-    this.itemManager = itemManager;
-    this.syncService = syncService;
-    this.addObservers();
+    super()
+    this.itemManager = itemManager
+    this.syncService = syncService
+    this.addObservers()
   }
 
   public deinit(): void {
     (this.syncService as unknown) = undefined;
-    (this.itemManager as unknown) = undefined;
-    this.resolveQueue.length = 0;
+    (this.itemManager as unknown) = undefined
+    this.resolveQueue.length = 0
     this.removeItemObserver();
-    (this.removeItemObserver as unknown) = undefined;
+    (this.removeItemObserver as unknown) = undefined
     this.removeSyncObserver();
-    (this.removeSyncObserver as unknown) = undefined;
-    super.deinit();
+    (this.removeSyncObserver as unknown) = undefined
+    super.deinit()
   }
 
   private popResolveQueue() {
-    const queue = this.resolveQueue.slice();
-    this.resolveQueue = [];
-    return queue;
+    const queue = this.resolveQueue.slice()
+    this.resolveQueue = []
+    return queue
   }
 
   /**
@@ -84,18 +84,18 @@ export class SNSingletonManager extends AbstractService {
            */
           const decryptionStatusChanged = changed.filter(
             (i) => i.errorDecryptingValueChanged
-          );
+          )
           if (decryptionStatusChanged.length > 0) {
             this.resolveQueue = this.resolveQueue.concat(
               decryptionStatusChanged
-            );
+            )
           }
         }
         if (inserted.length > 0) {
-          this.resolveQueue = this.resolveQueue.concat(inserted);
+          this.resolveQueue = this.resolveQueue.concat(inserted)
         }
       }
-    );
+    )
     this.removeSyncObserver = this.syncService.addEventObserver(
       async (eventName) => {
         if (
@@ -105,10 +105,10 @@ export class SNSingletonManager extends AbstractService {
           await this.resolveSingletonsForItems(
             this.popResolveQueue(),
             eventName
-          );
+          )
         }
       }
-    );
+    )
   }
 
   private validItemsMatchingPredicate<T extends SNItem>(
@@ -118,28 +118,28 @@ export class SNSingletonManager extends AbstractService {
     return this.itemManager
       .itemsMatchingPredicate(contentType, predicate)
       .filter((item) => {
-        return !item.errorDecrypting;
-      });
+        return !item.errorDecrypting
+      })
   }
 
   private async resolveSingletonsForItems(
     items: SNItem[],
     eventSource: SyncEvent
   ) {
-    const handled: SNItem[] = [];
+    const handled: SNItem[] = []
     for (const item of items) {
       if (handled.includes(item) || !item.isSingleton) {
-        continue;
+        continue
       }
       const matchingItems = this.validItemsMatchingPredicate<SNItem>(
         item.content_type,
         item.singletonPredicate()
-      );
-      extendArray(handled, matchingItems || []);
+      )
+      extendArray(handled, matchingItems || [])
       if (!matchingItems || matchingItems.length <= 1) {
-        continue;
+        continue
       }
-      await this.handleStrategy(matchingItems, item.singletonStrategy);
+      await this.handleStrategy(matchingItems, item.singletonStrategy)
     }
     /**
      * Only sync if event source is FullSyncCompleted.
@@ -148,26 +148,26 @@ export class SNSingletonManager extends AbstractService {
      * of a download-first request.
      */
     if (handled.length > 0 && eventSource === SyncEvent.FullSyncCompleted) {
-      await this.syncService?.sync();
+      await this.syncService?.sync()
     }
   }
 
   private async handleStrategy(items: SNItem[], strategy: SingletonStrategy) {
     if (strategy !== SingletonStrategy.KeepEarliest) {
-      throw 'Unhandled singleton strategy';
+      throw 'Unhandled singleton strategy'
     }
     const earliestFirst = items.sort((a, b) => {
       /** -1: a comes first, 1: b comes first */
       if (a.errorDecrypting) {
-        return 1;
+        return 1
       }
       if (b.errorDecrypting) {
-        return -1;
+        return -1
       }
-      return a.created_at < b.created_at ? -1 : 1;
-    });
-    const deleteItems = arrayByRemovingFromIndex(earliestFirst, 0);
-    await this.itemManager.setItemsToBeDeleted(Uuids(deleteItems));
+      return a.created_at < b.created_at ? -1 : 1
+    })
+    const deleteItems = arrayByRemovingFromIndex(earliestFirst, 0)
+    await this.itemManager.setItemsToBeDeleted(Uuids(deleteItems))
   }
 
   public findSingleton<T extends SNItem>(
@@ -177,11 +177,11 @@ export class SNSingletonManager extends AbstractService {
     const matchingItems = this.validItemsMatchingPredicate(
       contentType,
       predicate
-    );
+    )
     if (matchingItems.length > 0) {
-      return matchingItems[0] as T;
+      return matchingItems[0] as T
     }
-    return undefined;
+    return undefined
   }
 
   public async findOrCreateSingleton<T extends SNItem = SNItem>(
@@ -192,15 +192,15 @@ export class SNSingletonManager extends AbstractService {
     const existingSingleton = this.findSingleton<T>(
       createContentType,
       predicate
-    );
+    )
     if (!isNullOrUndefined(existingSingleton)) {
-      return existingSingleton;
+      return existingSingleton
     }
     /** Item not found, safe to create after full sync has completed */
     if (!this.syncService.getLastSyncDate()) {
       /** Add a temporary observer in case of long-running sync request, where
        * the item we're looking for ends up resolving early or in the middle. */
-      let matchingItem: SNItem | undefined;
+      let matchingItem: SNItem | undefined
       const removeObserver = this.itemManager.addObserver(
         createContentType,
         (_, inserted) => {
@@ -208,35 +208,35 @@ export class SNSingletonManager extends AbstractService {
             const matchingItems = this.itemManager.subItemsMatchingPredicates<T>(
               inserted as T[],
               [predicate]
-            );
+            )
             if (matchingItems.length > 0) {
-              matchingItem = matchingItems[0];
+              matchingItem = matchingItems[0]
             }
           }
         }
-      );
-      await this.syncService.sync();
-      removeObserver();
+      )
+      await this.syncService.sync()
+      removeObserver()
       if (matchingItem) {
-        return matchingItem as T;
+        return matchingItem as T
       }
       /** Check again */
       const refreshedItems = this.validItemsMatchingPredicate(
         createContentType,
         predicate
-      );
+      )
       if (refreshedItems.length > 0) {
-        return refreshedItems[0] as T;
+        return refreshedItems[0] as T
       }
     }
     /** Delete any items that are errored */
     const errorDecrypting = this.itemManager
       .itemsMatchingPredicate(createContentType, predicate)
       .filter((item) => {
-        return item.errorDecrypting;
-      });
+        return item.errorDecrypting
+      })
     if (errorDecrypting.length) {
-      await this.itemManager.setItemsToBeDeleted(Uuids(errorDecrypting));
+      await this.itemManager.setItemsToBeDeleted(Uuids(errorDecrypting))
     }
 
     /** Safe to create */
@@ -246,9 +246,9 @@ export class SNSingletonManager extends AbstractService {
       content: createContent,
       dirty: true,
       dirtiedDate: new Date(),
-    });
-    const item = await this.itemManager.emitItemFromPayload(dirtyPayload);
-    this.syncService.sync();
-    return item as T;
+    })
+    const item = await this.itemManager.emitItemFromPayload(dirtyPayload)
+    this.syncService.sync()
+    return item as T
   }
 }

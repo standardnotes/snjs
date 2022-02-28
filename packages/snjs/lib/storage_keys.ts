@@ -47,9 +47,9 @@ export enum NonwrappedStorageKey {
 
 export function namespacedKey(namespace: string, key: string) {
   if (namespace) {
-    return `${namespace}-${key}`;
+    return `${namespace}-${key}`
   } else {
-    return key;
+    return key
   }
 }
 
@@ -68,4 +68,4 @@ export const LegacyKeys1_0_0 = {
   MobileDoNotWarnUnsupportedEditors: 'DoNotShowAgainUnsupportedEditorsKey',
   MobileOptionsState: 'options',
   MobilePasscodeKeyboardType: 'passcodeKeyboardType',
-};
+}

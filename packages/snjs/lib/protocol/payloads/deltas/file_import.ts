@@ -2,30 +2,30 @@ import {
   CopyPayload,
   PayloadSource,
   ImmutablePayloadCollection,
-  PurePayload
-} from '@standardnotes/payloads';
-import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { ConflictDelta } from '@Payloads/deltas/conflict';
-import { extendArray } from '@standardnotes/utils';
+  PurePayload,
+} from '@standardnotes/payloads'
+import { PayloadsDelta } from '@Payloads/deltas/delta'
+import { ConflictDelta } from '@Payloads/deltas/conflict'
+import { extendArray } from '@standardnotes/utils'
 
 export class DeltaFileImport extends PayloadsDelta {
   public async resultingCollection() {
-    const results: Array<PurePayload> = [];
+    const results: Array<PurePayload> = []
     for (const payload of this.applyCollection!.all()) {
-      const handled = await this.payloadsByHandlingPayload(payload, results);
+      const handled = await this.payloadsByHandlingPayload(payload, results)
       const payloads = handled.map((result) => {
         return CopyPayload(result, {
           dirty: true,
           dirtiedDate: new Date(),
           deleted: false,
-        });
-      });
-      extendArray(results, payloads);
+        })
+      })
+      extendArray(results, payloads)
     }
     return ImmutablePayloadCollection.WithPayloads(
       results,
       PayloadSource.FileImport
-    );
+    )
   }
 
   private async payloadsByHandlingPayload(
@@ -41,27 +41,27 @@ export class DeltaFileImport extends PayloadsDelta {
      * would contain the most recent value.
      */
     let current = currentResults.find((candidate) => {
-      return candidate.contentObject.conflict_of === payload.uuid;
-    });
+      return candidate.contentObject.conflict_of === payload.uuid
+    })
     /**
      * If no latest conflict, find by uuid directly.
      */
     if (!current) {
       current = currentResults.find((candidate) => {
-        return candidate.uuid === payload.uuid;
-      });
+        return candidate.uuid === payload.uuid
+      })
     }
     /**
      * If not found in current results, use the base value.
      */
     if (!current) {
-      current = this.findBasePayload(payload.uuid!);
+      current = this.findBasePayload(payload.uuid!)
     }
     /**
      * If the current doesn't exist, we're creating a new item from payload.
      */
     if (!current) {
-      return [payload];
+      return [payload]
     }
 
     const delta = new ConflictDelta(
@@ -69,8 +69,8 @@ export class DeltaFileImport extends PayloadsDelta {
       current,
       payload,
       PayloadSource.FileImport
-    );
-    const deltaCollection = await delta.resultingCollection();
-    return deltaCollection.all();
+    )
+    const deltaCollection = await delta.resultingCollection()
+    return deltaCollection.all()
   }
 }

@@ -10,7 +10,8 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "../../node_modules/@standardnotes/config/src/.eslintrc"
   ],
   rules: {
     "sort-imports": "off",
@@ -18,7 +19,8 @@ module.exports = {
     "@typescript-eslint/require-await": "warn",
     "@typescript-eslint/no-floating-promises": "warn",
     "quotes": ["warn", "single"],
-    "no-restricted-globals": ["error", "history"]
+    "no-restricted-globals": ["error", "history"],
+    "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }]
   },
   ignorePatterns: [
     "test",

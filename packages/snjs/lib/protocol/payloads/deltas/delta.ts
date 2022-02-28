@@ -1,5 +1,5 @@
-import { HistoryMap } from '@Lib/services/history/history_map';
-import { PayloadSource, ImmutablePayloadCollectionSet, ImmutablePayloadCollection } from '@standardnotes/payloads';
+import { HistoryMap } from '@Lib/services/history/history_map'
+import { PayloadSource, ImmutablePayloadCollectionSet, ImmutablePayloadCollection } from '@standardnotes/payloads'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,
@@ -33,18 +33,18 @@ export class PayloadsDelta {
   }
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
-    throw 'Must override PayloadDelta.resultingCollection.';
+    throw 'Must override PayloadDelta.resultingCollection.'
   }
 
   /**
    * @param id  - The uuid of the payload to find
    */
   protected findBasePayload(id: string) {
-    return this.baseCollection.find(id);
+    return this.baseCollection.find(id)
   }
 
   protected findRelatedPayload(id: string, source: PayloadSource) {
-    const collection = this.relatedCollectionSet?.collectionForSource(source);
-    return collection?.find(id);
+    const collection = this.relatedCollectionSet?.collectionForSource(source)
+    return collection?.find(id)
   }
 }

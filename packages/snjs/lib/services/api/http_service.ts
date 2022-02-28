@@ -1,9 +1,9 @@
-import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages';
-import { HttpResponse, StatusCode } from '@standardnotes/responses';
-import { isNullOrUndefined, isString } from '@standardnotes/utils';
-import { SnjsVersion } from '@Lib/version';
-import { Environment } from '@Lib/platforms';
-import { AbstractService } from '@standardnotes/services';
+import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './messages'
+import { HttpResponse, StatusCode } from '@standardnotes/responses'
+import { isNullOrUndefined, isString } from '@standardnotes/utils'
+import { SnjsVersion } from '@Lib/version'
+import { Environment } from '@Lib/platforms'
+import { AbstractService } from '@standardnotes/services'
 
 export enum HttpVerb {
   Get = 'GET',
@@ -17,7 +17,7 @@ export enum ErrorTag {
   RevokedSession = 'revoked-session',
 }
 
-const REQUEST_READY_STATE_COMPLETED = 4;
+const REQUEST_READY_STATE_COMPLETED = 4
 
 export type HttpParams = Record<string, unknown>;
 
@@ -39,14 +39,14 @@ export class SNHttpService extends AbstractService {
     private readonly environment: Environment,
     private readonly appVersion: string
   ) {
-    super();
+    super()
   }
   public async getAbsolute(
     url: string,
     params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Get, authentication });
+    return this.runHttp({ url, params, verb: HttpVerb.Get, authentication })
   }
 
   public async postAbsolute(
@@ -54,7 +54,7 @@ export class SNHttpService extends AbstractService {
     params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Post, authentication });
+    return this.runHttp({ url, params, verb: HttpVerb.Post, authentication })
   }
 
   public async putAbsolute(
@@ -62,7 +62,7 @@ export class SNHttpService extends AbstractService {
     params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Put, authentication });
+    return this.runHttp({ url, params, verb: HttpVerb.Put, authentication })
   }
 
   public async patchAbsolute(
@@ -70,7 +70,7 @@ export class SNHttpService extends AbstractService {
     params: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication });
+    return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication })
   }
 
   public async deleteAbsolute(
@@ -78,26 +78,26 @@ export class SNHttpService extends AbstractService {
     params?: HttpParams,
     authentication?: string
   ): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Delete, authentication });
+    return this.runHttp({ url, params, verb: HttpVerb.Delete, authentication })
   }
 
   public async runHttp(httpRequest: HttpRequest): Promise<HttpResponse> {
-    const request = this.createXmlRequest(httpRequest);
+    const request = this.createXmlRequest(httpRequest)
 
-    return this.runRequest(request, this.createRequestBody(httpRequest));
+    return this.runRequest(request, this.createRequestBody(httpRequest))
   }
 
   private createRequestBody(httpRequest: HttpRequest): string | Uint8Array | undefined {
     if (httpRequest.params !== undefined &&
       [HttpVerb.Post, HttpVerb.Put, HttpVerb.Patch, HttpVerb.Delete].includes(httpRequest.verb)) {
-      return JSON.stringify(httpRequest.params);
+      return JSON.stringify(httpRequest.params)
     }
 
-    return httpRequest.rawBytes;
+    return httpRequest.rawBytes
   }
 
   private createXmlRequest(httpRequest: HttpRequest) {
-    const request = new XMLHttpRequest();
+    const request = new XMLHttpRequest()
     if (
       httpRequest.params &&
       httpRequest.verb === HttpVerb.Get &&
@@ -106,39 +106,39 @@ export class SNHttpService extends AbstractService {
       httpRequest.url = this.urlForUrlAndParams(
         httpRequest.url,
         httpRequest.params
-      );
+      )
     }
-    request.open(httpRequest.verb, httpRequest.url, true);
-    request.responseType = httpRequest.responseType ?? '';
+    request.open(httpRequest.verb, httpRequest.url, true)
+    request.responseType = httpRequest.responseType ?? ''
 
-    request.setRequestHeader('X-SNJS-Version', SnjsVersion);
+    request.setRequestHeader('X-SNJS-Version', SnjsVersion)
 
     const appVersionHeaderValue = `${Environment[this.environment]}-${
       this.appVersion
-    }`;
-    request.setRequestHeader('X-Application-Version', appVersionHeaderValue);
+    }`
+    request.setRequestHeader('X-Application-Version', appVersionHeaderValue)
 
     if (httpRequest.authentication) {
       request.setRequestHeader(
         'Authorization',
         'Bearer ' + httpRequest.authentication
-      );
+      )
     }
 
-    let contenTypeIsSet = false;
+    let contenTypeIsSet = false
     if (httpRequest.customHeaders && httpRequest.customHeaders.length > 0) {
       httpRequest.customHeaders.forEach(({ key, value }) => {
-        request.setRequestHeader(key, value);
+        request.setRequestHeader(key, value)
         if (key === 'Content-Type') {
-          contenTypeIsSet = true;
+          contenTypeIsSet = true
         }
-      });
+      })
     }
     if (!contenTypeIsSet) {
-      request.setRequestHeader('Content-Type', 'application/json');
+      request.setRequestHeader('Content-Type', 'application/json')
     }
 
-    return request;
+    return request
   }
 
   private async runRequest(
@@ -147,10 +147,10 @@ export class SNHttpService extends AbstractService {
   ): Promise<HttpResponse> {
     return new Promise((resolve, reject) => {
       request.onreadystatechange = () => {
-        this.stateChangeHandlerForRequest(request, resolve, reject);
-      };
-      request.send(body);
-    });
+        this.stateChangeHandlerForRequest(request, resolve, reject)
+      }
+      request.send(body)
+    })
   }
 
   private stateChangeHandlerForRequest(
@@ -159,38 +159,38 @@ export class SNHttpService extends AbstractService {
     reject: (response: HttpResponse) => void
   ) {
     if (request.readyState !== REQUEST_READY_STATE_COMPLETED) {
-      return;
+      return
     }
-    const httpStatus = request.status;
+    const httpStatus = request.status
     const response: HttpResponse = {
       status: httpStatus,
       headers: new Map<string, string | null>(),
-    };
+    }
 
     const responseHeaderLines = request
       .getAllResponseHeaders()
       .trim()
-      .split(/[\r\n]+/);
+      .split(/[\r\n]+/)
     responseHeaderLines.forEach((responseHeaderLine) => {
-      const parts = responseHeaderLine.split(': ');
-      const name = parts.shift() as string;
+      const parts = responseHeaderLine.split(': ')
+      const name = parts.shift() as string
       const value = parts.join(': ');
 
-      (<Map<string, string | null>>response.headers).set(name, value);
-    });
+      (<Map<string, string | null>>response.headers).set(name, value)
+    })
 
     try {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
-        let body;
+        let body
 
         const contentTypeHeader =
           response.headers?.get('content-type') ||
-          response.headers?.get('Content-Type');
+          response.headers?.get('Content-Type')
 
         if (contentTypeHeader?.includes('application/json')) {
-          body = JSON.parse(request.responseText);
+          body = JSON.parse(request.responseText)
         } else {
-          body = request.response;
+          body = request.response
         }
         /**
          * v0 APIs do not have a `data` top-level object. In such cases, mimic
@@ -198,51 +198,51 @@ export class SNHttpService extends AbstractService {
          * properties inside a `data` object.
          */
         if (!body.data) {
-          response.data = body;
+          response.data = body
         }
         if (!isString(body)) {
-          Object.assign(response, body);
+          Object.assign(response, body)
         }
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
     if (
       httpStatus >= StatusCode.HttpStatusMinSuccess &&
       httpStatus <= StatusCode.HttpStatusMaxSuccess
     ) {
-      resolve(response);
+      resolve(response)
     } else {
       if (httpStatus === StatusCode.HttpStatusForbidden) {
         response.error = {
           message: API_MESSAGE_RATE_LIMITED,
           status: httpStatus,
-        };
+        }
       } else if (isNullOrUndefined(response.error)) {
         if (
           isNullOrUndefined(response.data) ||
           isNullOrUndefined(response.data.error)
         ) {
-          response.error = { message: UNKNOWN_ERROR, status: httpStatus };
+          response.error = { message: UNKNOWN_ERROR, status: httpStatus }
         } else {
-          response.error = response.data.error;
+          response.error = response.data.error
         }
       }
-      reject(response);
+      reject(response)
     }
   }
 
   private urlForUrlAndParams(url: string, params: HttpParams) {
     const keyValueString = Object.keys(params)
       .map((key) => {
-        return key + '=' + encodeURIComponent(params[key] as string);
+        return key + '=' + encodeURIComponent(params[key] as string)
       })
-      .join('&');
+      .join('&')
 
     if (url.includes('?')) {
-      return url + '&' + keyValueString;
+      return url + '&' + keyValueString
     } else {
-      return url + '?' + keyValueString;
+      return url + '?' + keyValueString
     }
   }
 }

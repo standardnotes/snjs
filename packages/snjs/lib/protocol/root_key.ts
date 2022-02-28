@@ -1,13 +1,13 @@
 import {
   PurePayload,
   FillItemContent,
-  CreateMaxPayloadFromAnyObject
-} from '@standardnotes/payloads';
-import { SNRootKeyParams } from './key_params';
-import { SNItem } from '@Models/core/item';
-import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common';
-import { UuidGenerator } from '@standardnotes/utils';
-import { timingSafeEqual } from '@standardnotes/sncrypto-common';
+  CreateMaxPayloadFromAnyObject,
+} from '@standardnotes/payloads'
+import { SNRootKeyParams } from './key_params'
+import { SNItem } from '@Models/core/item'
+import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common'
+import { UuidGenerator } from '@standardnotes/utils'
+import { timingSafeEqual } from '@standardnotes/sncrypto-common'
 
 export type RootKeyContent = {
   version: ProtocolVersion;
@@ -23,11 +23,11 @@ export type RootKeyContent = {
  * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
 export class SNRootKey extends SNItem {
-  public readonly keyParams: SNRootKeyParams;
+  public readonly keyParams: SNRootKeyParams
 
   static async Create(content: RootKeyContent, uuid?: string) {
     if (!uuid) {
-      uuid = await UuidGenerator.GenerateUuid();
+      uuid = await UuidGenerator.GenerateUuid()
     }
     if (!content.version) {
       if (content.dataAuthenticationKey) {
@@ -35,26 +35,26 @@ export class SNRootKey extends SNItem {
          * If there's no version stored, it must be either 001 or 002.
          * If there's a dataAuthenticationKey, it has to be 002. Otherwise it's 001.
          */
-        content.version = ProtocolVersion.V002;
+        content.version = ProtocolVersion.V002
       } else {
-        content.version = ProtocolVersion.V001;
+        content.version = ProtocolVersion.V001
       }
     }
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: uuid,
       content_type: ContentType.RootKey,
       content: FillItemContent(content),
-    });
-    const keyParamsInput = content.keyParams;
+    })
+    const keyParamsInput = content.keyParams
     if (!keyParamsInput) {
-      throw Error('Attempting to create root key without key params');
+      throw Error('Attempting to create root key without key params')
     }
     const keyParams =
       keyParamsInput instanceof SNRootKeyParams
         ? keyParamsInput
-        : new SNRootKeyParams(keyParamsInput);
+        : new SNRootKeyParams(keyParamsInput)
 
-    return new SNRootKey(payload, keyParams);
+    return new SNRootKey(payload, keyParams)
   }
 
   /**
@@ -62,43 +62,43 @@ export class SNRootKey extends SNItem {
    * the inputted key params. Used to expand locally created key params after signing in
    */
   static async ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent) {
-    const content = key.typedContent as RootKeyContent;
+    const content = key.typedContent as RootKeyContent
     const copiedKey = await this.Create({
       ...content,
       keyParams: keyParams ? keyParams : content.keyParams,
-    });
-    return copiedKey;
+    })
+    return copiedKey
   }
 
   constructor(payload: PurePayload, keyParams: SNRootKeyParams) {
-    super(payload);
-    this.keyParams = keyParams;
+    super(payload)
+    this.keyParams = keyParams
   }
 
   private get typedContent() {
-    return this.safeContent as Partial<RootKeyContent>;
+    return this.safeContent as Partial<RootKeyContent>
   }
 
   public get keyVersion() {
     if (!this.payload.safeContent.version) {
-      throw 'Attempting to create key without version.';
+      throw 'Attempting to create key without version.'
     }
-    return this.payload.safeContent.version;
+    return this.payload.safeContent.version
   }
 
   public get isRootKey() {
-    return true;
+    return true
   }
 
   /**
    * When the root key is used to encrypt items, we use the masterKey directly.
    */
   public get itemsKey() {
-    return this.masterKey;
+    return this.masterKey
   }
 
   public get masterKey() {
-    return this.payload.safeContent.masterKey;
+    return this.payload.safeContent.masterKey
   }
 
   /**
@@ -106,12 +106,12 @@ export class SNRootKey extends SNItem {
    * this value may be undefined.
    */
   public get serverPassword(): string | undefined {
-    return this.payload.safeContent.serverPassword;
+    return this.payload.safeContent.serverPassword
   }
 
   /** 003 and below only. */
   public get dataAuthenticationKey() {
-    return this.payload.safeContent.dataAuthenticationKey;
+    return this.payload.safeContent.dataAuthenticationKey
   }
 
   /**
@@ -119,25 +119,25 @@ export class SNRootKey extends SNItem {
    */
   public compare(otherKey: SNRootKey) {
     if (this.keyVersion !== otherKey.keyVersion) {
-      return false;
+      return false
     }
     const hasServerPassword = !!(
       this.serverPassword && otherKey.serverPassword
-    );
+    )
     return (
       timingSafeEqual(this.masterKey, otherKey.masterKey) &&
       (!hasServerPassword ||
         timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
-    );
+    )
   }
 
   /**
    * @returns Object suitable for persist in storage when wrapped
    */
   public persistableValueWhenWrapping() {
-    const keychainValue = this.getKeychainValue();
-    keychainValue.keyParams = this.keyParams.getPortableValue();
-    return keychainValue;
+    const keychainValue = this.getKeychainValue()
+    keychainValue.keyParams = this.keyParams.getPortableValue()
+    return keychainValue
   }
 
   /**
@@ -146,13 +146,13 @@ export class SNRootKey extends SNItem {
   public getKeychainValue() {
     const values: Partial<RootKeyContent> = {
       version: this.keyVersion,
-    };
+    }
     if (this.masterKey) {
-      values.masterKey = this.masterKey;
+      values.masterKey = this.masterKey
     }
     if (this.dataAuthenticationKey) {
-      values.dataAuthenticationKey = this.dataAuthenticationKey;
+      values.dataAuthenticationKey = this.dataAuthenticationKey
     }
-    return values;
+    return values
   }
 }

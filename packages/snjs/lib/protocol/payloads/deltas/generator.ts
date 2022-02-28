@@ -1,22 +1,22 @@
-import { DeltaRemoteRejected } from './remote_rejected';
-import { DeltaRemoteConflicts } from './remote_conflicts';
-import { DeltaRemoteSaved } from './remote_saved';
-import { DeltaRemoteRetrieved } from './remote_retrieved';
-import { PayloadSource } from '@standardnotes/payloads';
+import { DeltaRemoteRejected } from './remote_rejected'
+import { DeltaRemoteConflicts } from './remote_conflicts'
+import { DeltaRemoteSaved } from './remote_saved'
+import { DeltaRemoteRetrieved } from './remote_retrieved'
+import { PayloadSource } from '@standardnotes/payloads'
 
 export function DeltaClassForSource(source: PayloadSource) {
   if (source === PayloadSource.RemoteRetrieved) {
-    return DeltaRemoteRetrieved;
+    return DeltaRemoteRetrieved
   } else if (source === PayloadSource.RemoteSaved) {
-    return DeltaRemoteSaved;
+    return DeltaRemoteSaved
   } else if (
     source === PayloadSource.ConflictData ||
     source === PayloadSource.ConflictUuid
   ) {
-    return DeltaRemoteConflicts;
+    return DeltaRemoteConflicts
   } else if (source === PayloadSource.RemoteRejected) {
-    return DeltaRemoteRejected;
+    return DeltaRemoteRejected
   } else {
-    throw `No delta class found for source ${PayloadSource[source]}`;
+    throw `No delta class found for source ${PayloadSource[source]}`
   }
 }

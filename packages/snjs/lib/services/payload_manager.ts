@@ -1,16 +1,16 @@
-import { removeFromArray } from '@standardnotes/utils';
+import { removeFromArray } from '@standardnotes/utils'
 import {
   PayloadByMerging,
   PayloadSource,
   PurePayload,
   MutableCollection,
   ImmutablePayloadCollection,
-} from '@standardnotes/payloads';
-import { DeltaFileImport } from './../protocol/payloads/deltas/file_import';
-import { ContentType } from '@standardnotes/common';
-import { Uuids } from '@Models/functions';
-import { UuidString } from './../types';
-import { AbstractService } from '@standardnotes/services';
+} from '@standardnotes/payloads'
+import { DeltaFileImport } from './../protocol/payloads/deltas/file_import'
+import { ContentType } from '@standardnotes/common'
+import { Uuids } from '@Models/functions'
+import { UuidString } from './../types'
+import { AbstractService } from '@standardnotes/services'
 
 type ChangeCallback = (
   changed: PurePayload[],
@@ -45,9 +45,9 @@ type QueueElement = {
  * applications 'stream' items to display in the interface.
  */
 export class PayloadManager extends AbstractService {
-  private changeObservers: ChangeObserver[] = [];
-  public collection: MutableCollection<PurePayload>;
-  private emitQueue: QueueElement[] = [];
+  private changeObservers: ChangeObserver[] = []
+  public collection: MutableCollection<PurePayload>
+  private emitQueue: QueueElement[] = []
   /**
    * An array of content types for which we enable encrypted overwrite protection.
    * If a payload attempting to be emitted is errored, yet our current local version
@@ -55,11 +55,11 @@ export class PayloadManager extends AbstractService {
    * our local version. We instead notify observers of this interaction for them to handle
    * as needed
    */
-  private overwriteProtection: ContentType[] = [ContentType.ItemsKey];
+  private overwriteProtection: ContentType[] = [ContentType.ItemsKey]
 
   constructor() {
-    super();
-    this.collection = new MutableCollection();
+    super()
+    this.collection = new MutableCollection()
   }
 
   /**
@@ -68,21 +68,21 @@ export class PayloadManager extends AbstractService {
    * as needed to make decisions, like about duplication or uuid alteration.
    */
   public getMasterCollection() {
-    return ImmutablePayloadCollection.FromCollection(this.collection);
+    return ImmutablePayloadCollection.FromCollection(this.collection)
   }
 
   public deinit() {
-    super.deinit();
-    this.changeObservers.length = 0;
-    this.resetState();
+    super.deinit()
+    this.changeObservers.length = 0
+    this.resetState()
   }
 
   public resetState() {
-    this.collection = new MutableCollection();
+    this.collection = new MutableCollection()
   }
 
   public find(uuids: UuidString[]) {
-    return this.collection.findAll(uuids);
+    return this.collection.findAll(uuids)
   }
 
   /**
@@ -93,7 +93,7 @@ export class PayloadManager extends AbstractService {
     collection: ImmutablePayloadCollection,
     sourceKey?: string
   ) {
-    return this.emitPayloads(collection.all(), collection.source!, sourceKey);
+    return this.emitPayloads(collection.all(), collection.source!, sourceKey)
   }
 
   /**
@@ -107,7 +107,7 @@ export class PayloadManager extends AbstractService {
     source: PayloadSource,
     sourceKey?: string
   ): Promise<PurePayload[]> {
-    return this.emitPayloads([payload], source, sourceKey);
+    return this.emitPayloads([payload], source, sourceKey)
   }
 
   /**
@@ -122,7 +122,7 @@ export class PayloadManager extends AbstractService {
     sourceKey?: string
   ): Promise<PurePayload[]> {
     if (payloads.length === 0) {
-      console.warn('Attempting to emit 0 payloads.');
+      console.warn('Attempting to emit 0 payloads.')
     }
     return new Promise((resolve) => {
       this.emitQueue.push({
@@ -130,21 +130,21 @@ export class PayloadManager extends AbstractService {
         source,
         sourceKey,
         resolve,
-      });
+      })
       if (this.emitQueue.length === 1) {
-        this.popQueue();
+        this.popQueue()
       }
-    });
+    })
   }
 
   private async popQueue() {
-    const first = this.emitQueue[0];
+    const first = this.emitQueue[0]
     const {
       changed,
       inserted,
       discarded,
       ignored,
-    } = this.mergePayloadsOntoMaster(first.payloads);
+    } = this.mergePayloadsOntoMaster(first.payloads)
     this.notifyChangeObservers(
       changed,
       inserted,
@@ -152,52 +152,52 @@ export class PayloadManager extends AbstractService {
       ignored,
       first.source,
       first.sourceKey
-    );
-    removeFromArray(this.emitQueue, first);
-    first.resolve(changed.concat(inserted, discarded));
+    )
+    removeFromArray(this.emitQueue, first)
+    first.resolve(changed.concat(inserted, discarded))
     if (this.emitQueue.length > 0) {
-      this.popQueue();
+      this.popQueue()
     }
   }
 
   private mergePayloadsOntoMaster(payloads: PurePayload[]) {
-    const changed: PurePayload[] = [];
-    const inserted: PurePayload[] = [];
-    const discarded: PurePayload[] = [];
-    const ignored: PurePayload[] = [];
+    const changed: PurePayload[] = []
+    const inserted: PurePayload[] = []
+    const discarded: PurePayload[] = []
+    const ignored: PurePayload[] = []
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
-        console.error('Payload is corrupt:', payload);
-        continue;
+        console.error('Payload is corrupt:', payload)
+        continue
       }
-      const masterPayload = this.collection.find(payload.uuid!);
+      const masterPayload = this.collection.find(payload.uuid!)
       if (
         payload.errorDecrypting &&
         masterPayload &&
         !masterPayload.errorDecrypting &&
         this.overwriteProtection.includes(payload.content_type)
       ) {
-        ignored.push(payload);
-        continue;
+        ignored.push(payload)
+        continue
       }
       const newPayload = masterPayload
         ? PayloadByMerging(masterPayload, payload)
-        : payload;
+        : payload
       if (newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */
-        this.collection.discard(newPayload);
-        discarded.push(newPayload);
+        this.collection.discard(newPayload)
+        discarded.push(newPayload)
       } else {
-        this.collection.set(newPayload);
+        this.collection.set(newPayload)
         if (!masterPayload) {
-          inserted.push(newPayload);
+          inserted.push(newPayload)
         } else {
-          changed.push(newPayload);
+          changed.push(newPayload)
         }
       }
     }
-    return { changed, inserted, discarded, ignored };
+    return { changed, inserted, discarded, ignored }
   }
 
   /**
@@ -212,17 +212,17 @@ export class PayloadManager extends AbstractService {
     priority = 1
   ) {
     if (!Array.isArray(types)) {
-      types = [types];
+      types = [types]
     }
     const observer: ChangeObserver = {
       types,
       priority,
       callback,
-    };
-    this.changeObservers.push(observer);
+    }
+    this.changeObservers.push(observer)
     return () => {
-      removeFromArray(this.changeObservers, observer);
-    };
+      removeFromArray(this.changeObservers, observer)
+    }
   }
 
   /**
@@ -239,15 +239,15 @@ export class PayloadManager extends AbstractService {
   ) {
     /** Slice the observers array as sort modifies in-place */
     const observers = this.changeObservers.slice().sort((a, b) => {
-      return a.priority < b.priority ? -1 : 1;
-    });
+      return a.priority < b.priority ? -1 : 1
+    })
     const filter = (payloads: PurePayload[], types: ContentType[]) => {
       return types.includes(ContentType.Any)
         ? payloads.slice()
         : payloads.slice().filter((payload) => {
-            return types.includes(payload.content_type!);
-          });
-    };
+          return types.includes(payload.content_type!)
+        })
+    }
     for (const observer of observers) {
       observer.callback(
         filter(changed, observer.types),
@@ -256,7 +256,7 @@ export class PayloadManager extends AbstractService {
         filter(ignored, observer.types),
         source,
         sourceKey
-      );
+      )
     }
   }
 
@@ -273,13 +273,13 @@ export class PayloadManager extends AbstractService {
         PayloadSource.FileImport
       ),
       undefined
-    );
-    const collection = await delta.resultingCollection();
-    await this.emitCollection(collection);
-    return Uuids(collection.payloads);
+    )
+    const collection = await delta.resultingCollection()
+    await this.emitCollection(collection)
+    return Uuids(collection.payloads)
   }
 
   public removePayloadLocally(payload: PurePayload) {
-    this.collection.discard(payload);
+    this.collection.discard(payload)
   }
 }

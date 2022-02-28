@@ -7,7 +7,7 @@ export const V001Algorithm = Object.freeze({
   PbkdfCostsUsed: [3000, 5000, 10_000, 60_000],
   PbkdfOutputLength: 512,
   EncryptionKeyLength: 256,
-});
+})
 
 export const V002Algorithm = Object.freeze({
   SaltSeedLength: 128,
@@ -30,7 +30,7 @@ export const V002Algorithm = Object.freeze({
   PbkdfOutputLength: 768,
   EncryptionKeyLength: 256,
   EncryptionIvLength: 128,
-});
+})
 
 export enum V003Algorithm {
   SaltSeedLength = 256,

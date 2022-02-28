@@ -1,11 +1,11 @@
-import { ItemMutator, SNItem } from '@Models/core/item';
+import { ItemMutator, SNItem } from '@Models/core/item'
 import {
   CollectionSort,
   Predicate,
   PredicateInterface,
-} from '@standardnotes/payloads';
-import { ContentType } from '@standardnotes/common';
-import { FeatureIdentifier } from '@standardnotes/features';
+} from '@standardnotes/payloads'
+import { ContentType } from '@standardnotes/common'
+import { FeatureIdentifier } from '@standardnotes/features'
 
 export enum PrefKey {
   TagsPanelWidth = 'tagsPanelWidth',
@@ -58,23 +58,23 @@ export class SNUserPrefs extends SNItem {
     'content_type',
     '=',
     ContentType.UserPrefs
-  );
+  )
 
   get isSingleton(): true {
-    return true;
+    return true
   }
 
   singletonPredicate<T extends SNItem>(): PredicateInterface<T> {
-    return SNUserPrefs.singletonPredicate;
+    return SNUserPrefs.singletonPredicate
   }
 
   getPref<K extends PrefKey>(key: K): PrefValue[K] | undefined {
-    return this.getAppDomainValue(key);
+    return this.getAppDomainValue(key)
   }
 }
 
 export class UserPrefsMutator extends ItemMutator {
   setPref<K extends PrefKey>(key: K, value: PrefValue[K]): void {
-    this.setAppDataItem(key, value);
+    this.setAppDataItem(key, value)
   }
 }

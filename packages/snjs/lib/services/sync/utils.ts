@@ -1,5 +1,5 @@
-import { ContentType } from '@standardnotes/common';
-import { PurePayload } from '@standardnotes/payloads';
+import { ContentType } from '@standardnotes/common'
+import { PurePayload } from '@standardnotes/payloads'
 /**
  * Sorts payloads according by most recently modified first, according to the priority,
  * whereby the earlier a content_type appears in the priorityList,
@@ -12,28 +12,28 @@ export function SortPayloadsByRecentAndContentPriority(
   return payloads.sort((a: PurePayload, b: PurePayload) => {
     const dateResult =
       new Date(b.serverUpdatedAt!).getTime() -
-      new Date(a.serverUpdatedAt!).getTime();
-    let aPriority = 0;
-    let bPriority = 0;
+      new Date(a.serverUpdatedAt!).getTime()
+    let aPriority = 0
+    let bPriority = 0
     if (priorityList) {
-      aPriority = priorityList.indexOf(a.content_type!);
-      bPriority = priorityList.indexOf(b.content_type!);
+      aPriority = priorityList.indexOf(a.content_type!)
+      bPriority = priorityList.indexOf(b.content_type!)
       if (aPriority === -1) {
         /** Not found in list, not prioritized. Set it to max value */
-        aPriority = priorityList.length;
+        aPriority = priorityList.length
       }
       if (bPriority === -1) {
         /** Not found in list, not prioritized. Set it to max value */
-        bPriority = priorityList.length;
+        bPriority = priorityList.length
       }
     }
     if (aPriority === bPriority) {
-      return dateResult;
+      return dateResult
     }
     if (aPriority < bPriority) {
-      return -1;
+      return -1
     } else {
-      return 1;
+      return 1
     }
-  });
+  })
 }

@@ -1,21 +1,21 @@
-import { removeFromArray } from '@standardnotes/utils';
+import { removeFromArray } from '@standardnotes/utils'
 import {
   Challenge,
   ChallengeArtifacts,
   ChallengeResponse,
   ChallengeValue,
-} from '@Lib/challenges';
-import { ValueCallback } from './challenge_service';
+} from '@Lib/challenges'
+import { ValueCallback } from './challenge_service'
 
 /**
  * A challenge operation stores user-submitted values and callbacks.
  * When its values are updated, it will trigger the associated callbacks (valid/invalid/complete)
  */
 export class ChallengeOperation {
-  private nonvalidatedValues: ChallengeValue[] = [];
-  private validValues: ChallengeValue[] = [];
-  private invalidValues: ChallengeValue[] = [];
-  private artifacts: ChallengeArtifacts = {};
+  private nonvalidatedValues: ChallengeValue[] = []
+  private validValues: ChallengeValue[] = []
+  private invalidValues: ChallengeValue[] = []
+  private artifacts: ChallengeArtifacts = {}
 
   /**
    * @param resolve the promise resolve function to be called
@@ -40,9 +40,9 @@ export class ChallengeOperation {
         this.challenge,
         this.validValues,
         this.artifacts
-      );
+      )
     }
-    this.onComplete?.(response);
+    this.onComplete?.(response)
   }
 
   public nonvalidatedSubmit() {
@@ -50,36 +50,36 @@ export class ChallengeOperation {
       this.challenge,
       this.nonvalidatedValues.slice(),
       this.artifacts
-    );
-    this.onNonvalidatedSubmit?.(response);
+    )
+    this.onNonvalidatedSubmit?.(response)
     /** Reset values */
-    this.nonvalidatedValues = [];
+    this.nonvalidatedValues = []
   }
 
   public cancel() {
-    this.onCancel?.();
+    this.onCancel?.()
   }
 
   /**
    * @returns Returns true if the challenge has received all valid responses
    */
   public isFinished() {
-    return this.validValues.length === this.challenge.prompts.length;
+    return this.validValues.length === this.challenge.prompts.length
   }
 
   private nonvalidatedPrompts() {
-    return this.challenge.prompts.filter((p) => !p.validates);
+    return this.challenge.prompts.filter((p) => !p.validates)
   }
 
   public addNonvalidatedValue(value: ChallengeValue) {
-    const valuesArray = this.nonvalidatedValues;
-    const matching = valuesArray.find((v) => v.prompt.id === value.prompt.id);
+    const valuesArray = this.nonvalidatedValues
+    const matching = valuesArray.find((v) => v.prompt.id === value.prompt.id)
     if (matching) {
-      removeFromArray(valuesArray, matching);
+      removeFromArray(valuesArray, matching)
     }
-    valuesArray.push(value);
+    valuesArray.push(value)
     if (this.nonvalidatedValues.length === this.nonvalidatedPrompts().length) {
-      this.nonvalidatedSubmit();
+      this.nonvalidatedSubmit()
     }
   }
 
@@ -93,22 +93,22 @@ export class ChallengeOperation {
     valid: boolean,
     artifacts?: ChallengeArtifacts
   ) {
-    const valuesArray = valid ? this.validValues : this.invalidValues;
+    const valuesArray = valid ? this.validValues : this.invalidValues
     const matching = valuesArray.find(
       (v) => v.prompt.validation === value.prompt.validation
-    );
+    )
     if (matching) {
-      removeFromArray(valuesArray, matching);
+      removeFromArray(valuesArray, matching)
     }
-    valuesArray.push(value);
-    Object.assign(this.artifacts, artifacts);
+    valuesArray.push(value)
+    Object.assign(this.artifacts, artifacts)
     if (this.isFinished()) {
-      this.complete();
+      this.complete()
     } else {
       if (valid) {
-        this.onValidValue?.(value);
+        this.onValidValue?.(value)
       } else {
-        this.onInvalidValue?.(value);
+        this.onInvalidValue?.(value)
       }
     }
   }

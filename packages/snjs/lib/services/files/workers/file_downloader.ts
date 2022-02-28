@@ -1,7 +1,7 @@
-import { FilesApi, EncryptedFileInterface } from '../types';
+import { FilesApi, EncryptedFileInterface } from '../types'
 
 export class FileDownloader {
-  private aborted = false;
+  private aborted = false
   constructor(
     private file: EncryptedFileInterface,
     private apiToken: string,
@@ -18,14 +18,14 @@ export class FileDownloader {
       (bytes) => {
         /** @TODO Abort apiService call instead */
         if (!this.aborted) {
-          this.onEncryptedBytes(bytes);
+          this.onEncryptedBytes(bytes)
         }
       }
-    );
+    )
   }
 
   public abort(): void {
     /** @TODO Abort apiService call */
-    this.aborted = true;
+    this.aborted = true
   }
 }

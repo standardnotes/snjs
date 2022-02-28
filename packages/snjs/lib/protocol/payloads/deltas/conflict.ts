@@ -4,17 +4,17 @@ import {
   ImmutablePayloadCollection,
   CopyPayload,
   PayloadByMerging,
-  PayloadField
-} from '@standardnotes/payloads';
-import { historyMapFunctions } from './../../../services/history/history_map';
-import { CreateItemFromPayload } from '@Models/generator';
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
+  PayloadField,
+} from '@standardnotes/payloads'
+import { historyMapFunctions } from './../../../services/history/history_map'
+import { CreateItemFromPayload } from '@Models/generator'
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import {
   PayloadContentsEqual,
   PayloadsByDuplicating,
-} from '@Payloads/functions';
-import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils';
-import { HistoryMap } from '@Lib/services/history/history_map';
+} from '@Payloads/functions'
+import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils'
+import { HistoryMap } from '@Lib/services/history/history_map'
 
 export class ConflictDelta {
   constructor(
@@ -26,18 +26,18 @@ export class ConflictDelta {
   ) {}
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
-    const tmpBaseItem = CreateItemFromPayload(this.basePayload);
-    const tmpApplyItem = CreateItemFromPayload(this.applyPayload);
-    const historyEntries = this.historyMap?.[this.basePayload.uuid] || [];
+    const tmpBaseItem = CreateItemFromPayload(this.basePayload)
+    const tmpApplyItem = CreateItemFromPayload(this.applyPayload)
+    const historyEntries = this.historyMap?.[this.basePayload.uuid] || []
     const previousRevision = historyMapFunctions.getNewestRevision(
       historyEntries
-    );
+    )
     const strategy = tmpBaseItem.strategyWhenConflictingWithItem(
       tmpApplyItem,
       previousRevision
-    );
-    const results = await this.payloadsByHandlingStrategy(strategy);
-    return ImmutablePayloadCollection.WithPayloads(results, this.source);
+    )
+    const results = await this.payloadsByHandlingStrategy(strategy)
+    return ImmutablePayloadCollection.WithPayloads(results, this.source)
   }
 
   private async payloadsByHandlingStrategy(strategy: ConflictStrategy) {
@@ -48,30 +48,30 @@ export class ConflictDelta {
      * already conflicted this item. */
     const existingConflict = this.baseCollection.conflictsOf(
       this.applyPayload.uuid
-    )[0];
+    )[0]
     if (
       existingConflict &&
       PayloadContentsEqual(existingConflict, this.applyPayload)
     ) {
       /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
-      strategy = ConflictStrategy.KeepLeft;
+      strategy = ConflictStrategy.KeepLeft
     }
     if (strategy === ConflictStrategy.KeepLeft) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt!,
         this.applyPayload.serverUpdatedAt!
-      );
+      )
       const updatedAtTimestamp = Math.max(
         this.basePayload.updated_at_timestamp!,
         this.applyPayload.updated_at_timestamp!
-      );
+      )
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
         dirtiedDate: new Date(),
-      });
-      return [leftPayload];
+      })
+      return [leftPayload]
     }
     if (strategy === ConflictStrategy.KeepRight) {
       const result = PayloadByMerging(
@@ -81,30 +81,30 @@ export class ConflictDelta {
         {
           lastSyncEnd: new Date(),
         }
-      );
-      return [result];
+      )
+      return [result]
     }
     if (strategy === ConflictStrategy.KeepLeftDuplicateRight) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt!,
         this.applyPayload.serverUpdatedAt!
-      );
+      )
       const updatedAtTimestamp = Math.max(
         this.basePayload.updated_at_timestamp!,
         this.applyPayload.updated_at_timestamp!
-      );
+      )
       const leftPayload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
         dirtiedDate: new Date(),
-      });
+      })
       const rightPayloads = await PayloadsByDuplicating(
         this.applyPayload,
         this.baseCollection,
         true
-      );
-      return [leftPayload].concat(rightPayloads);
+      )
+      return [leftPayload].concat(rightPayloads)
     }
 
     if (strategy === ConflictStrategy.DuplicateLeftKeepRight) {
@@ -112,7 +112,7 @@ export class ConflictDelta {
         this.basePayload,
         this.baseCollection,
         true
-      );
+      )
       const rightPayload = PayloadByMerging(
         this.applyPayload,
         this.basePayload,
@@ -120,8 +120,8 @@ export class ConflictDelta {
         {
           lastSyncEnd: new Date(),
         }
-      );
-      return leftPayloads.concat([rightPayload]);
+      )
+      return leftPayloads.concat([rightPayload])
     }
 
     if (strategy === ConflictStrategy.KeepLeftMergeRefs) {
@@ -129,15 +129,15 @@ export class ConflictDelta {
         this.basePayload.contentObject.references,
         this.applyPayload.contentObject.references,
         ['uuid', 'content_type']
-      );
+      )
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt!,
         this.applyPayload.serverUpdatedAt!
-      );
+      )
       const updatedAtTimestamp = Math.max(
         this.basePayload.updated_at_timestamp!,
         this.applyPayload.updated_at_timestamp!
-      );
+      )
       const payload = CopyPayload(this.basePayload, {
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
@@ -147,10 +147,10 @@ export class ConflictDelta {
           ...this.basePayload.safeContent,
           references: refs,
         },
-      });
-      return [payload];
+      })
+      return [payload]
     }
 
-    throw Error('Unhandled strategy');
+    throw Error('Unhandled strategy')
   }
 }

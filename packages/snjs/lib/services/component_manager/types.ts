@@ -1,8 +1,8 @@
-import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features';
-import { SNComponent } from '@Lib/models';
-import { UuidString } from '@Lib/types';
-import { ContentType } from '@standardnotes/common';
-import { RawPayload } from '@standardnotes/payloads';
+import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
+import { SNComponent } from '@Lib/models'
+import { UuidString } from '@Lib/types'
+import { ContentType } from '@standardnotes/common'
+import { RawPayload } from '@standardnotes/payloads'
 
 export interface DesktopManagerInterface {
   syncComponentsInstallation(components: SNComponent[]): void;
@@ -23,10 +23,10 @@ export const AllowedBatchPermissions = Object.freeze([
   ContentType.FilesafeIntegration,
   ContentType.SmartView,
   ContentType.Tag,
-]);
+])
 
 /* This domain will be used to save context item client data */
-export const ComponentDataDomain = 'org.standardnotes.sn.components';
+export const ComponentDataDomain = 'org.standardnotes.sn.components'
 
 export type StreamObserver = {
   identifier: string;

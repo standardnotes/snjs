@@ -1,7 +1,7 @@
-import { HistoryEntry } from '@Services/history/entries/history_entry';
-import { ItemMutator, SNItem } from '@Models/core/item';
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies';
-import { ProtocolVersion } from '@standardnotes/common';
+import { HistoryEntry } from '@Services/history/entries/history_entry'
+import { ItemMutator, SNItem } from '@Models/core/item'
+import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
+import { ProtocolVersion } from '@standardnotes/common'
 
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
@@ -13,38 +13,38 @@ export class SNItemsKey extends SNItem {
     previousRevision?: HistoryEntry
   ): ConflictStrategy {
     if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision);
+      return super.strategyWhenConflictingWithItem(item, previousRevision)
     }
 
-    return ConflictStrategy.KeepLeft;
+    return ConflictStrategy.KeepLeft
   }
 
   get keyVersion(): string | undefined {
-    return this.payload.safeContent.version;
+    return this.payload.safeContent.version
   }
 
   get isItemsKey(): boolean {
-    return true;
+    return true
   }
 
   get isDefault(): boolean | undefined {
-    return this.payload.safeContent.isDefault;
+    return this.payload.safeContent.isDefault
   }
 
   get itemsKey(): string | undefined {
-    return this.payload.safeContent.itemsKey;
+    return this.payload.safeContent.itemsKey
   }
 
   get dataAuthenticationKey(): string | undefined {
     if (this.keyVersion === ProtocolVersion.V004) {
-      throw 'Attempting to access legacy data authentication key.';
+      throw 'Attempting to access legacy data authentication key.'
     }
-    return this.payload.safeContent.dataAuthenticationKey;
+    return this.payload.safeContent.dataAuthenticationKey
   }
 }
 
 export class ItemsKeyMutator extends ItemMutator {
   set isDefault(isDefault: boolean) {
-    this.content!.isDefault = isDefault;
+    this.content!.isDefault = isDefault
   }
 }

@@ -1,5 +1,5 @@
-import { Uuid } from '@standardnotes/common';
-import { ListedAccount, ListedAccountInfo } from '@standardnotes/responses';
+import { Uuid } from '@standardnotes/common'
+import { ListedAccount, ListedAccountInfo } from '@standardnotes/responses'
 
 export interface ListedInterface {
   canRegisterNewListedAccount: () => boolean;

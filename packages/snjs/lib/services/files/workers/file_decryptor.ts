@@ -2,11 +2,11 @@ import {
   SNPureCrypto,
   StreamDecryptor,
   SodiumConstant,
-} from '@standardnotes/sncrypto-common';
-import { EncryptedFileInterface } from '../types';
+} from '@standardnotes/sncrypto-common'
+import { EncryptedFileInterface } from '../types'
 
 export class FileDecryptor {
-  private decryptor!: StreamDecryptor;
+  private decryptor!: StreamDecryptor
 
   constructor(
     private file: EncryptedFileInterface,
@@ -17,7 +17,7 @@ export class FileDecryptor {
     this.decryptor = this.crypto.xchacha20StreamInitDecryptor(
       this.file.encryptionHeader,
       this.file.key
-    );
+    )
   }
 
   public decryptBytes(
@@ -27,16 +27,16 @@ export class FileDecryptor {
       this.decryptor,
       encryptedBytes,
       this.file.remoteIdentifier
-    );
+    )
 
     if (result === false) {
-      return undefined;
+      return undefined
     }
 
     const isFinal =
       result.tag ===
-      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
+      SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL
 
-    return { decryptedBytes: result.message, isFinalChunk: isFinal };
+    return { decryptedBytes: result.message, isFinalChunk: isFinal }
   }
 }

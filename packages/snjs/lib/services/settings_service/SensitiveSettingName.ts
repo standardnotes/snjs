@@ -1,4 +1,4 @@
-import { SettingName } from '@standardnotes/settings';
+import { SettingName } from '@standardnotes/settings'
 
 export type SensitiveSettingName =
   | SettingName.MfaSecret

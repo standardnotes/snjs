@@ -1,5 +1,5 @@
-import { SessionRenewalResponse } from '@standardnotes/responses';
-import { Uuid } from '@standardnotes/common';
+import { SessionRenewalResponse } from '@standardnotes/responses'
+import { Uuid } from '@standardnotes/common'
 
 type RawJwtPayload = {
   jwt?: string;
@@ -27,55 +27,55 @@ export abstract class Session {
 
   static FromRawStorageValue(raw: RawStorageValue): JwtSession | TokenSession {
     if ((raw as RawJwtPayload).jwt) {
-      return new JwtSession((raw as RawJwtPayload).jwt!);
+      return new JwtSession((raw as RawJwtPayload).jwt!)
     } else {
-      const rawSession = raw as RawSessionPayload;
+      const rawSession = raw as RawSessionPayload
       return new TokenSession(
         rawSession.accessToken,
         rawSession.accessExpiration,
         rawSession.refreshToken,
         rawSession.refreshExpiration
-      );
+      )
     }
   }
 }
 
 /** Legacy, for protocol versions <= 003 */
 export class JwtSession extends Session {
-  public jwt: string;
+  public jwt: string
 
   constructor(jwt: string) {
-    super();
-    this.jwt = jwt;
+    super()
+    this.jwt = jwt
   }
 
   public get authorizationValue(): string {
-    return this.jwt;
+    return this.jwt
   }
 
   public canExpire(): false {
-    return false;
+    return false
   }
 }
 
 /** For protocol versions >= 004 */
 export class TokenSession extends Session {
-  public accessToken: string;
-  public accessExpiration: number;
-  public refreshToken: string;
-  public refreshExpiration: number;
+  public accessToken: string
+  public accessExpiration: number
+  public refreshToken: string
+  public refreshExpiration: number
 
   static FromApiResponse(response: SessionRenewalResponse) {
-    const accessToken: string = response.data.session!.access_token;
-    const refreshToken: string = response.data.session!.refresh_token;
-    const accessExpiration: number = response.data.session!.access_expiration;
-    const refreshExpiration: number = response.data.session!.refresh_expiration;
+    const accessToken: string = response.data.session!.access_token
+    const refreshToken: string = response.data.session!.refresh_token
+    const accessExpiration: number = response.data.session!.access_expiration
+    const refreshExpiration: number = response.data.session!.refresh_expiration
     return new TokenSession(
       accessToken,
       accessExpiration,
       refreshToken,
       refreshExpiration
-    );
+    )
   }
 
   constructor(
@@ -84,26 +84,26 @@ export class TokenSession extends Session {
     refreshToken: string,
     refreshExpiration: number
   ) {
-    super();
-    this.accessToken = accessToken;
-    this.accessExpiration = accessExpiration;
-    this.refreshToken = refreshToken;
-    this.refreshExpiration = refreshExpiration;
+    super()
+    this.accessToken = accessToken
+    this.accessExpiration = accessExpiration
+    this.refreshToken = refreshToken
+    this.refreshExpiration = refreshExpiration
   }
 
   private getExpireAt() {
-    return this.accessExpiration || 0;
+    return this.accessExpiration || 0
   }
 
   public get authorizationValue() {
-    return this.accessToken;
+    return this.accessToken
   }
 
   public canExpire() {
-    return true;
+    return true
   }
 
   public isExpired() {
-    return this.getExpireAt() < Date.now();
+    return this.getExpireAt() < Date.now()
   }
 }

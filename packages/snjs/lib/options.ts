@@ -1,9 +1,9 @@
-import { Runtime } from '@standardnotes/common';
-import { ApplicationIdentifier } from '@standardnotes/applications';
-import { SNAlertService } from './services/alert_service';
-import { DeviceInterface } from '@standardnotes/services';
-import { SNPureCrypto } from '@standardnotes/sncrypto-common';
-import { Environment, Platform } from './platforms';
+import { Runtime } from '@standardnotes/common'
+import { ApplicationIdentifier } from '@standardnotes/applications'
+import { SNAlertService } from './services/alert_service'
+import { DeviceInterface } from '@standardnotes/services'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { Environment, Platform } from './platforms'
 
 export interface ApplicationSyncOptions {
   /**
@@ -78,7 +78,7 @@ interface OptionsWithDefaults {
 export const ApplicationOptionsDefaults: Partial<ApplicationOptions> = {
   loadBatchSize: 700,
   runtime: Runtime.Prod,
-};
+}
 
 /** ApplicationOptions with defaults populated */
 export type FullyResolvedApplicationOptions = ConstructorOptions &

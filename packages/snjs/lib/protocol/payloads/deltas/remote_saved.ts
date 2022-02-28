@@ -1,14 +1,14 @@
-import { PayloadsDelta } from '@Payloads/deltas/delta';
-import { PayloadSource, ImmutablePayloadCollection, CreateSourcedPayloadFromObject } from '@standardnotes/payloads';
+import { PayloadsDelta } from '@Payloads/deltas/delta'
+import { PayloadSource, ImmutablePayloadCollection, CreateSourcedPayloadFromObject } from '@standardnotes/payloads'
 
 export class DeltaRemoteSaved extends PayloadsDelta {
   public async resultingCollection() {
-    const processed = [];
+    const processed = []
     for (const payload of this.applyCollection.all()) {
-      const current = this.findBasePayload(payload.uuid!);
+      const current = this.findBasePayload(payload.uuid!)
       /** If we save an item, but while in transit it is deleted locally, we want to keep
        * local deletion status, and not old deleted value that was sent to server. */
-      const deletedState = current ? current.deleted : payload.deleted;
+      const deletedState = current ? current.deleted : payload.deleted
       const result = CreateSourcedPayloadFromObject(
         payload,
         PayloadSource.RemoteSaved,
@@ -17,12 +17,12 @@ export class DeltaRemoteSaved extends PayloadsDelta {
           deleted: deletedState,
           dirty: deletedState,
         }
-      );
-      processed.push(result);
+      )
+      processed.push(result)
     }
     return ImmutablePayloadCollection.WithPayloads(
       processed,
       PayloadSource.RemoteSaved
-    );
+    )
   }
 }

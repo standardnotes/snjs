@@ -1,4 +1,4 @@
-import { FilesApi } from '../types';
+import { FilesApi } from '../types'
 
 export class FileUploader {
   constructor(
@@ -14,8 +14,8 @@ export class FileUploader {
       apiToken,
       chunkId,
       encryptedBytes
-    );
+    )
 
-    return result;
+    return result
   }
 }

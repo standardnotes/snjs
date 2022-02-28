@@ -3,22 +3,22 @@ import {
   ChallengePrompt,
   ChallengeReason,
   ChallengeValidation,
-} from './../challenges';
-import { MigrationServices } from './types';
-import { ApplicationStage } from '@standardnotes/applications';
+} from './../challenges'
+import { MigrationServices } from './types'
+import { ApplicationStage } from '@standardnotes/applications'
 
 type StageHandler = () => Promise<void>;
 
 export abstract class Migration {
-  private stageHandlers: Partial<Record<ApplicationStage, StageHandler>> = {};
-  private onDoneHandler?: () => void;
+  private stageHandlers: Partial<Record<ApplicationStage, StageHandler>> = {}
+  private onDoneHandler?: () => void
 
   constructor(protected services: MigrationServices) {
-    this.registerStageHandlers();
+    this.registerStageHandlers()
   }
 
   public static version(): string {
-    throw 'Must override';
+    throw 'Must override'
   }
 
   protected abstract registerStageHandlers(): void;
@@ -27,12 +27,12 @@ export abstract class Migration {
     stage: ApplicationStage,
     handler: StageHandler
   ) {
-    this.stageHandlers[stage] = handler;
+    this.stageHandlers[stage] = handler
   }
 
   protected markDone() {
-    this.onDoneHandler?.();
-    this.onDoneHandler = undefined;
+    this.onDoneHandler?.()
+    this.onDoneHandler = undefined
   }
 
   protected async promptForPasscodeUntilCorrect(
@@ -42,37 +42,37 @@ export abstract class Migration {
       [new ChallengePrompt(ChallengeValidation.None)],
       ChallengeReason.Migration,
       false
-    );
+    )
     return new Promise((resolve) => {
       this.services.challengeService.addChallengeObserver(challenge, {
         onNonvalidatedSubmit: async (challengeResponse) => {
-          const value = challengeResponse.values[0];
-          const passcode = value.value as string;
-          const valid = await validationCallback(passcode);
+          const value = challengeResponse.values[0]
+          const passcode = value.value as string
+          const valid = await validationCallback(passcode)
           if (valid) {
-            this.services.challengeService.completeChallenge(challenge);
-            resolve(passcode);
+            this.services.challengeService.completeChallenge(challenge)
+            resolve(passcode)
           } else {
             this.services.challengeService.setValidationStatusForChallenge(
               challenge,
               value,
               false
-            );
+            )
           }
         },
-      });
-      this.services.challengeService.promptForChallengeResponse(challenge);
-    });
+      })
+      this.services.challengeService.promptForChallengeResponse(challenge)
+    })
   }
 
   onDone(callback: () => void) {
-    this.onDoneHandler = callback;
+    this.onDoneHandler = callback
   }
 
   async handleStage(stage: ApplicationStage): Promise<void> {
-    const handler = this.stageHandlers[stage];
+    const handler = this.stageHandlers[stage]
     if (handler) {
-      await handler();
+      await handler()
     }
   }
 }

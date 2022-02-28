@@ -1,2 +1,2 @@
-export * from './SNSettingsService';
-export * from './Settings';
+export * from './SNSettingsService'
+export * from './Settings'

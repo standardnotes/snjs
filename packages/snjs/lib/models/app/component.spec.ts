@@ -1,6 +1,6 @@
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads';
-import { ContentType } from '@standardnotes/common';
-import { SNComponent } from '@Models/app/component';
+import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
+import { ContentType } from '@standardnotes/common'
+import { SNComponent } from '@Models/app/component'
 
 describe('component model', () => {
 
@@ -14,11 +14,11 @@ describe('component model', () => {
           hosted_url: 'http://bar.com',
         }),
       })
-    );
+    )
 
-    expect(component.hasValidHostedUrl()).toBe(true);
-    expect(component.hosted_url).toBe('http://bar.com');
-  });
+    expect(component.hasValidHostedUrl()).toBe(true)
+    expect(component.hosted_url).toBe('http://bar.com')
+  })
 
   it('invalid hosted url should fallback to url', () => {
     const component = new SNComponent(
@@ -30,9 +30,9 @@ describe('component model', () => {
           hosted_url: '#{foo.zoo}',
         }),
       })
-    );
+    )
 
-    expect(component.hasValidHostedUrl()).toBe(true);
-    expect(component.hosted_url).toBe('http://foo.com');
-  });
-});
+    expect(component.hasValidHostedUrl()).toBe(true)
+    expect(component.hosted_url).toBe('http://foo.com')
+  })
+})
