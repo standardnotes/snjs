@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@standardnotes/config": "^2.2.0",
-    "@typescript-eslint/eslint-plugin": "^5.12.1",
-    "@typescript-eslint/parser": "^5.12.1"
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0"
   }
 }

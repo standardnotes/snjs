@@ -7,9 +7,9 @@ import { addIfUnique, removeFromArray } from '../Utils/Utils'
  */
 export class UuidMap {
   /** uuid to uuids that we have a relationship with */
-  private directMap: Partial<Record<Uuid, Uuid[]>> = {}
+  private directMap: Partial<Record<Uuid, Uuid[]>> = {};
   /** uuid to uuids that have a relationship with us */
-  private inverseMap: Partial<Record<Uuid, Uuid[]>> = {}
+  private inverseMap: Partial<Record<Uuid, Uuid[]>> = {};
 
   public makeCopy(): UuidMap {
     const copy = new UuidMap()

@@ -13,7 +13,7 @@ import { ItemInterface } from '../Item/ItemInterface'
 export class ItemCollection
   extends MutableCollection<ItemInterface>
   implements SNIndex {
-  private displaySortBy: Partial<
+ private displaySortBy: Partial<
    Record<
      ContentType,
      {
@@ -21,38 +21,38 @@ export class ItemCollection
        dir: CollectionSortDirection;
      }
    >
- > = {}
-  private displayFilter: Partial<
+ > = {};
+ private displayFilter: Partial<
    Record<ContentType, (element: ItemInterface) => boolean>
- > = {}
+ > = {};
 
-  /** A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
+ /** A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
   * returns {uuid_123: 1, uuid_456: 2}, where 1 and 2 are the positions of the element
   * in the sorted array. We keep track of positions so that when we want to re-sort or remove
   * and element, we don't have to search the entire sorted array to do so. */
-  private filteredMap: Partial<
+ private filteredMap: Partial<
    Record<ContentType, Record<Uuid, number>>
- > = {}
-  /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
+ > = {};
+ /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
   * an array of sorted elements, based on the current displaySortBy */
-  private sortedMap: Partial<Record<ContentType, ItemInterface[]>> = {}
+ private sortedMap: Partial<Record<ContentType, ItemInterface[]>> = {};
 
-  public set(elements: ItemInterface | ItemInterface[]): void {
-    elements = uniqueArrayByKey(
-      Array.isArray(elements) ? elements : [elements],
-      'uuid'
-    )
-    super.set(elements)
-    this.filterSortElements(elements)
-  }
+ public set(elements: ItemInterface | ItemInterface[]): void {
+   elements = uniqueArrayByKey(
+     Array.isArray(elements) ? elements : [elements],
+     'uuid'
+   )
+   super.set(elements)
+   this.filterSortElements(elements)
+ }
 
-  public discard(elements: ItemInterface | ItemInterface[]): void {
-    elements = Array.isArray(elements) ? elements : [elements]
-    super.discard(elements)
-    this.filterSortElements(elements)
-  }
+ public discard(elements: ItemInterface | ItemInterface[]): void {
+   elements = Array.isArray(elements) ? elements : [elements]
+   super.discard(elements)
+   this.filterSortElements(elements)
+ }
 
-  /**
+ /**
   * Sets an optional sortBy and filter for a given content type. These options will be
   * applied against a separate "display-only" record and not the master record. Passing
   * null options removes any existing options. sortBy is always required, but a filter is
@@ -62,212 +62,212 @@ export class ItemCollection
   * @param filter A function that receives an element and returns a boolean indicating
   * whether the element passes the filter and should be in displayable results.
   */
-  public setDisplayOptions(
-    contentType: ContentType,
-    sortBy = CollectionSort.CreatedAt,
-    direction: CollectionSortDirection = 'asc',
-    filter?: (element: ItemInterface) => boolean
-  ): void {
-    const existingSortBy = this.displaySortBy[contentType]
-    const existingFilter = this.displayFilter[contentType]
-    /** If the sort value is unchanged, and we are not setting a new filter,
+ public setDisplayOptions(
+   contentType: ContentType,
+   sortBy = CollectionSort.CreatedAt,
+   direction: CollectionSortDirection = 'asc',
+   filter?: (element: ItemInterface) => boolean
+ ): void {
+   const existingSortBy = this.displaySortBy[contentType]
+   const existingFilter = this.displayFilter[contentType]
+   /** If the sort value is unchanged, and we are not setting a new filter,
     * we return, as to not rebuild and resort all elements */
-    if (
-      existingSortBy &&
+   if (
+     existingSortBy &&
      existingSortBy.key === sortBy &&
      existingSortBy.dir === direction &&
      !existingFilter &&
      !filter
-    ) {
-      return
-    }
-    this.displaySortBy[contentType] = sortBy
-      ? { key: sortBy, dir: direction }
-      : undefined
-    this.displayFilter[contentType] = filter
-    /** Reset existing maps */
-    this.filteredMap[contentType] = {}
-    this.sortedMap[contentType] = []
-    /** Re-process all elements */
-    const elements = this.all(contentType)
-    if (elements.length > 0) {
-      this.filterSortElements(elements)
-    }
-  }
+   ) {
+     return
+   }
+   this.displaySortBy[contentType] = sortBy
+     ? { key: sortBy, dir: direction }
+     : undefined
+   this.displayFilter[contentType] = filter
+   /** Reset existing maps */
+   this.filteredMap[contentType] = {}
+   this.sortedMap[contentType] = []
+   /** Re-process all elements */
+   const elements = this.all(contentType)
+   if (elements.length > 0) {
+     this.filterSortElements(elements)
+   }
+ }
 
-  /** Returns the filtered and sorted list of elements for this content type,
+ /** Returns the filtered and sorted list of elements for this content type,
   * according to the options set via `setDisplayOptions` */
-  public displayElements(contentType: ContentType): ItemInterface[] {
-    const elements = this.sortedMap[contentType]
-    if (!elements) {
-      throw Error(
-        `Attempting to access display elements for
+ public displayElements(contentType: ContentType): ItemInterface[] {
+   const elements = this.sortedMap[contentType]
+   if (!elements) {
+     throw Error(
+       `Attempting to access display elements for
        non-configured content type ${contentType}`
-      )
-    }
-    return elements.slice()
-  }
+     )
+   }
+   return elements.slice()
+ }
 
-  private filterSortElements(elements: ItemInterface[]) {
-    if (Object.keys(this.displaySortBy).length === 0) {
-      return
-    }
-    /** If a content type is added to this set, we are indicating the entire sorted
+ private filterSortElements(elements: ItemInterface[]) {
+   if (Object.keys(this.displaySortBy).length === 0) {
+     return
+   }
+   /** If a content type is added to this set, we are indicating the entire sorted
     * array will need to be re-sorted. The reason for sorting the entire array and not
     * just inserting an element using binary search is that we need to keep track of the
     * sorted index of an item so that we can look up and change its value without having
     * to search the array for it. */
-    const typesNeedingResort = new Set<ContentType>()
-    for (const element of elements) {
-      const contentType = element.content_type
-      const sortBy = this.displaySortBy[contentType]
-      /** Sort by is required, but filter is not */
-      if (!sortBy) {
-        continue
-      }
-      const filter = this.displayFilter[contentType]
-      /** Filtered content type map */
-      const filteredCTMap = this.filteredMap[contentType]!
-      const sortedElements = this.sortedMap[contentType]!
-      const previousIndex = filteredCTMap[element.uuid]
-      const previousElement = !isNullOrUndefined(previousIndex)
-        ? sortedElements[previousIndex]
-        : undefined
+   const typesNeedingResort = new Set<ContentType>()
+   for (const element of elements) {
+     const contentType = element.content_type
+     const sortBy = this.displaySortBy[contentType]
+     /** Sort by is required, but filter is not */
+     if (!sortBy) {
+       continue
+     }
+     const filter = this.displayFilter[contentType]
+     /** Filtered content type map */
+     const filteredCTMap = this.filteredMap[contentType]!
+     const sortedElements = this.sortedMap[contentType]!
+     const previousIndex = filteredCTMap[element.uuid]
+     const previousElement = !isNullOrUndefined(previousIndex)
+       ? sortedElements[previousIndex]
+       : undefined
 
-      /**
+     /**
       *  If the element is deleted, or if it no longer exists in the primary map (because
       * it was discarded without neccessarily being marked as deleted), it does not pass
       * the filter. If no filter the element passes by default.
       */
-      const passes =
+     const passes =
        element.deleted || !this.map[element.uuid]
          ? false
          : filter
            ? filter(element)
            : true
-      if (passes) {
-        if (!isNullOrUndefined(previousElement)) {
-          /** Check to see if the element has changed its sort value. If so, we need to re-sort.
+     if (passes) {
+       if (!isNullOrUndefined(previousElement)) {
+         /** Check to see if the element has changed its sort value. If so, we need to re-sort.
           * Previous element might be encrypted. */
-          const previousValue = previousElement.errorDecrypting
-            ? undefined
-            : previousElement[sortBy.key as keyof ItemInterface]
-          const newValue = (element as any)[sortBy.key]
-          /** Replace the current element with the new one. */
-          sortedElements[previousIndex] = element
-          /** If the pinned status of the element has changed, it needs to be resorted */
-          const pinChanged = previousElement!.pinned !== element.pinned
-          if (!compareValues(previousValue, newValue) || pinChanged) {
-            /** Needs resort because its re-sort value has changed,
+         const previousValue = previousElement.errorDecrypting
+           ? undefined
+           : previousElement[sortBy.key as keyof ItemInterface]
+         const newValue = (element as any)[sortBy.key]
+         /** Replace the current element with the new one. */
+         sortedElements[previousIndex] = element
+         /** If the pinned status of the element has changed, it needs to be resorted */
+         const pinChanged = previousElement!.pinned !== element.pinned
+         if (!compareValues(previousValue, newValue) || pinChanged) {
+           /** Needs resort because its re-sort value has changed,
             * and thus its position might change */
-            typesNeedingResort.add(contentType)
-          }
-        } else {
-          /** Has not yet been inserted */
-          sortedElements.push(element)
-          /** Needs re-sort because we're just pushing the element to the end here */
-          typesNeedingResort.add(contentType)
-        }
-      } else {
-        /** Doesn't pass filter, remove from sorted and filtered */
-        if (!isNullOrUndefined(previousIndex)) {
-          delete filteredCTMap[element.uuid];
-          /** We don't yet remove the element directly from the array, since mutating
+           typesNeedingResort.add(contentType)
+         }
+       } else {
+         /** Has not yet been inserted */
+         sortedElements.push(element)
+         /** Needs re-sort because we're just pushing the element to the end here */
+         typesNeedingResort.add(contentType)
+       }
+     } else {
+       /** Doesn't pass filter, remove from sorted and filtered */
+       if (!isNullOrUndefined(previousIndex)) {
+         delete filteredCTMap[element.uuid];
+         /** We don't yet remove the element directly from the array, since mutating
           * the array inside a loop could render all other upcoming indexes invalid */
-          (sortedElements[previousIndex] as any) = undefined
-          /** Since an element is being removed from the array, we need to recompute
+         (sortedElements[previousIndex] as any) = undefined
+         /** Since an element is being removed from the array, we need to recompute
           * the new positions for elements that are staying */
-          typesNeedingResort.add(contentType)
-        }
-      }
-    }
+         typesNeedingResort.add(contentType)
+       }
+     }
+   }
 
-    for (const contentType of typesNeedingResort.values()) {
-      this.resortContentType(contentType)
-    }
-  }
+   for (const contentType of typesNeedingResort.values()) {
+     this.resortContentType(contentType)
+   }
+ }
 
-  private resortContentType(contentType: ContentType) {
-    const sortedElements = this.sortedMap[contentType]!
-    const sortBy = this.displaySortBy[contentType]!
-    const filteredCTMap = this.filteredMap[contentType]!
-    /** Resort the elements array, and update the saved positions */
-    /** @O(n * log(n)) */
-    const sortFn = (
-      a?: ItemInterface,
-      b?: ItemInterface,
-      skipPinnedCheck = false
-    ): number => {
-      /** If the elements are undefined, move to beginning */
-      if (!a) {
-        return -1
-      }
-      if (!b) {
-        return 1
-      }
-      if (!skipPinnedCheck) {
-        if (a.pinned && b.pinned) {
-          return sortFn(a, b, true)
-        }
-        if (a.pinned) {
-          return -1
-        }
-        if (b.pinned) {
-          return 1
-        }
-      }
-      const aValue: string = (a as any)[sortBy.key] || ''
-      const bValue: string = (b as any)[sortBy.key] || ''
-      let vector = 1
-      if (sortBy.dir === 'asc') {
-        vector *= -1
-      }
-      /**
+ private resortContentType(contentType: ContentType) {
+   const sortedElements = this.sortedMap[contentType]!
+   const sortBy = this.displaySortBy[contentType]!
+   const filteredCTMap = this.filteredMap[contentType]!
+   /** Resort the elements array, and update the saved positions */
+   /** @O(n * log(n)) */
+   const sortFn = (
+     a?: ItemInterface,
+     b?: ItemInterface,
+     skipPinnedCheck = false
+   ): number => {
+     /** If the elements are undefined, move to beginning */
+     if (!a) {
+       return -1
+     }
+     if (!b) {
+       return 1
+     }
+     if (!skipPinnedCheck) {
+       if (a.pinned && b.pinned) {
+         return sortFn(a, b, true)
+       }
+       if (a.pinned) {
+         return -1
+       }
+       if (b.pinned) {
+         return 1
+       }
+     }
+     const aValue: string = (a as any)[sortBy.key] || ''
+     const bValue: string = (b as any)[sortBy.key] || ''
+     let vector = 1
+     if (sortBy.dir === 'asc') {
+       vector *= -1
+     }
+     /**
       * Check for string length due to issue on React Native 0.65.1
       * where empty strings causes crash:
       * https://github.com/facebook/react-native/issues/32174
       * */
-      if (
-        sortBy.key === CollectionSort.Title &&
+     if (
+       sortBy.key === CollectionSort.Title &&
        aValue.length > 0 &&
        bValue.length > 0
-      ) {
-        return vector * aValue.localeCompare(bValue, 'en', { numeric: true })
-      } else if (aValue > bValue) {
-        return -1 * vector
-      } else if (aValue < bValue) {
-        return 1 * vector
-      } else {
-        return 0
-      }
-    }
-    const resorted = sortedElements.sort((a, b) => {
-      return sortFn(a, b)
-    })
-    /** Now that resorted contains the sorted elements (but also can contain undefined element)
+     ) {
+       return vector * aValue.localeCompare(bValue, 'en', { numeric: true })
+     } else if (aValue > bValue) {
+       return -1 * vector
+     } else if (aValue < bValue) {
+       return 1 * vector
+     } else {
+       return 0
+     }
+   }
+   const resorted = sortedElements.sort((a, b) => {
+     return sortFn(a, b)
+   })
+   /** Now that resorted contains the sorted elements (but also can contain undefined element)
     * we create another array that filters out any of the undefinedes. We also keep track of the
     * current index while we loop and set that in the filteredCTMap. */
-    const cleaned = [] as ItemInterface[]
-    let currentIndex = 0
-    /** @O(n) */
-    for (const element of resorted) {
-      if (!element) {
-        continue
-      }
-      cleaned.push(element)
-      filteredCTMap[element.uuid] = currentIndex
-      currentIndex++
-    }
-    this.sortedMap[contentType] = cleaned
-  }
+   const cleaned = [] as ItemInterface[]
+   let currentIndex = 0
+   /** @O(n) */
+   for (const element of resorted) {
+     if (!element) {
+       continue
+     }
+     cleaned.push(element)
+     filteredCTMap[element.uuid] = currentIndex
+     currentIndex++
+   }
+   this.sortedMap[contentType] = cleaned
+ }
 
-  public onChange(delta: ItemDelta): void {
-    const changedOrInserted = delta.changed.concat(delta.inserted)
+ public onChange(delta: ItemDelta): void {
+   const changedOrInserted = delta.changed.concat(delta.inserted)
 
-    if (changedOrInserted.length > 0) {
-      this.set(changedOrInserted)
-    }
+   if (changedOrInserted.length > 0) {
+     this.set(changedOrInserted)
+   }
 
-    this.discard(delta.discarded)
-  }
+   this.discard(delta.discarded)
+ }
 }

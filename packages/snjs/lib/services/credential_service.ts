@@ -1,11 +1,17 @@
 import { SNProtectionService } from './protection_service';
-import { Challenge, ChallengeReason, ChallengeValidation } from './../challenges';
+import {
+  Challenge,
+  ChallengeReason,
+  ChallengeValidation,
+} from './../challenges';
 import { KeyParamsOrigination } from '@standardnotes/common';
 import { UuidGenerator } from '@standardnotes/utils';
 import { ChallengePrompt } from '@Lib/challenges';
 import { SNRootKey } from '@Protocol/root_key';
 import { SNAlertService } from '@Services/alert_service';
-import { SNRootKeyParams } from './../protocol/key_params';
+import {
+  SNRootKeyParams,
+} from './../protocol/key_params';
 import {
   CredentialsChangeStrings,
   INVALID_PASSWORD,
@@ -21,9 +27,15 @@ import {
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { ItemManager } from '@Services/item_manager';
-import { SNStorageService, StoragePersistencePolicies } from '@Services/storage_service';
+import {
+  SNStorageService,
+  StoragePersistencePolicies,
+} from '@Services/storage_service';
 import { SNSyncService } from './sync/sync_service';
-import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from './api/session_manager';
+import {
+  SNSessionManager,
+  MINIMUM_PASSWORD_LENGTH,
+} from './api/session_manager';
 import { ChallengeService } from './challenge/challenge_service';
 import { SNItemsKey } from '@Lib/models';
 import { AbstractService } from '@standardnotes/services';
@@ -49,7 +61,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     private protocolService: SNProtocolService,
     private alertService: SNAlertService,
     private challengeService: ChallengeService,
-    private protectionService: SNProtectionService,
+    private protectionService: SNProtectionService
   ) {
     super();
   }
@@ -74,7 +86,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     email: string,
     password: string,
     ephemeral = false,
-    mergeLocal = true,
+    mergeLocal = true
   ): Promise<AccountServiceResponse> {
     if (this.protocolService.hasAccount()) {
       throw Error('Tried to register when an account already exists.');
@@ -85,11 +97,17 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     this.registering = true;
     try {
       this.lockSyncing();
-      const result = await this.sessionManager.register(email, password, ephemeral);
+      const result = await this.sessionManager.register(
+        email,
+        password,
+        ephemeral
+      );
       if (!result.response.error) {
         this.syncService.resetSyncState();
         await this.storageService.setPersistencePolicy(
-          ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
+          ephemeral
+            ? StoragePersistencePolicies.Ephemeral
+            : StoragePersistencePolicies.Default
         );
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSync();
@@ -120,7 +138,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     strict = false,
     ephemeral = false,
     mergeLocal = true,
-    awaitSync = false,
+    awaitSync = false
   ): Promise<AccountServiceResponse> {
     if (this.protocolService.hasAccount()) {
       throw Error('Tried to sign in when an account already exists.');
@@ -132,11 +150,18 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     try {
       /** Prevent a timed sync from occuring while signing in. */
       this.lockSyncing();
-      const result = await this.sessionManager.signIn(email, password, strict, ephemeral);
+      const result = await this.sessionManager.signIn(
+        email,
+        password,
+        strict,
+        ephemeral
+      );
       if (!result.response.error) {
         this.syncService.resetSyncState();
         await this.storageService.setPersistencePolicy(
-          ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
+          ephemeral
+            ? StoragePersistencePolicies.Ephemeral
+            : StoragePersistencePolicies.Default
         );
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSync();
@@ -178,7 +203,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     this.lockSyncing();
     const response = await this.sessionManager.bypassChecksAndSignInWithRootKey(
       rootKey.keyParams.identifier,
-      rootKey,
+      rootKey
     );
     if (!response.error) {
       await this.notifyEvent(AccountEvent.SignedInOrRegistered);
@@ -199,14 +224,16 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
    * already has reference to the passcode, they can pass it in here so that the user
    * is not prompted again.
    */
-  public async changeCredentials(parameters: {
-    currentPassword: string;
-    origination: KeyParamsOrigination;
-    validateNewPasswordStrength: boolean;
-    newEmail?: string;
-    newPassword?: string;
-    passcode?: string;
-  }): Promise<CredentialsChangeFunctionResponse> {
+  public async changeCredentials(
+    parameters: {
+      currentPassword: string,
+      origination: KeyParamsOrigination,
+      validateNewPasswordStrength: boolean
+      newEmail?: string,
+      newPassword?: string,
+      passcode?: string,
+    }
+  ): Promise<CredentialsChangeFunctionResponse> {
     const result = await this.performCredentialsChange(parameters);
     if (result.error) {
       void this.alertService.alert(result.error.message);
@@ -233,8 +260,8 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
         new ChallengePrompt(
           ChallengeValidation.LocalPasscode,
           undefined,
-          ChallengeStrings.LocalPasscodePlaceholder,
-        ),
+          ChallengeStrings.LocalPasscodePlaceholder
+        )
       );
     }
     if (hasAccount) {
@@ -242,36 +269,46 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
         new ChallengePrompt(
           ChallengeValidation.AccountPassword,
           undefined,
-          ChallengeStrings.AccountPasswordPlaceholder,
-        ),
+          ChallengeStrings.AccountPasswordPlaceholder
+        )
       );
     }
-    const challenge = new Challenge(prompts, ChallengeReason.ProtocolUpgrade, true);
-    const response = await this.challengeService.promptForChallengeResponse(challenge);
+    const challenge = new Challenge(
+      prompts,
+      ChallengeReason.ProtocolUpgrade,
+      true
+    );
+    const response = await this.challengeService.promptForChallengeResponse(
+      challenge
+    );
     if (!response) {
       return { canceled: true };
     }
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
-      UPGRADING_ENCRYPTION,
+      UPGRADING_ENCRYPTION
     );
     try {
       let passcode: string | undefined;
       if (hasPasscode) {
         /* Upgrade passcode version */
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode);
+        const value = response.getValueForType(
+          ChallengeValidation.LocalPasscode
+        );
         passcode = value.value as string;
       }
       if (hasAccount) {
         /* Upgrade account version */
-        const value = response.getValueForType(ChallengeValidation.AccountPassword);
+        const value = response.getValueForType(
+          ChallengeValidation.AccountPassword
+        );
         const password = value.value as string;
         const changeResponse = await this.changeCredentials({
           currentPassword: password,
           newPassword: password,
           passcode,
           origination: KeyParamsOrigination.ProtocolUpgrade,
-          validateNewPasswordStrength: false,
+          validateNewPasswordStrength: false
         });
         if (changeResponse?.error) {
           return { error: changeResponse.error };
@@ -282,12 +319,12 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
         await this.removePasscodeWithoutWarning();
         await this.setPasscodeWithoutWarning(
           passcode as string,
-          KeyParamsOrigination.ProtocolUpgrade,
+          KeyParamsOrigination.ProtocolUpgrade
         );
       }
       return { success: true };
     } catch (error) {
-      return { error: error as Error };
+      return { error };
     } finally {
       dismissBlockingDialog();
     }
@@ -303,10 +340,13 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
-      SETTING_PASSCODE,
+      SETTING_PASSCODE
     );
     try {
-      await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeCreate);
+      await this.setPasscodeWithoutWarning(
+        passcode,
+        KeyParamsOrigination.PasscodeCreate
+      );
       return true;
     } finally {
       dismissBlockingDialog();
@@ -320,7 +360,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
       DO_NOT_CLOSE_APPLICATION,
-      REMOVING_PASSCODE,
+      REMOVING_PASSCODE
     );
     try {
       await this.removePasscodeWithoutWarning();
@@ -335,7 +375,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
    */
   public async changePasscode(
     newPasscode: string,
-    origination = KeyParamsOrigination.PasscodeChange,
+    origination = KeyParamsOrigination.PasscodeChange
   ): Promise<boolean> {
     if (newPasscode.length < MINIMUM_PASSCODE_LENGTH) {
       return false;
@@ -348,7 +388,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
       DO_NOT_CLOSE_APPLICATION,
       origination === KeyParamsOrigination.ProtocolUpgrade
         ? ProtocolUpgradeStrings.UpgradingPasscode
-        : CHANGING_PASSCODE,
+        : CHANGING_PASSCODE
     );
     try {
       await this.removePasscodeWithoutWarning();
@@ -359,9 +399,16 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     }
   }
 
-  private async setPasscodeWithoutWarning(passcode: string, origination: KeyParamsOrigination) {
+  private async setPasscodeWithoutWarning(
+    passcode: string,
+    origination: KeyParamsOrigination
+  ) {
     const identifier = await UuidGenerator.GenerateUuid();
-    const key = await this.protocolService.createRootKey(identifier, passcode, origination);
+    const key = await this.protocolService.createRootKey(
+      identifier,
+      passcode,
+      origination
+    );
     await this.protocolService.setNewRootKeyWrapper(key);
     await this.rewriteItemsKeys();
     await this.syncService.sync();
@@ -399,17 +446,20 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     return this.storageService.clearAllPayloads();
   }
 
-  private async performCredentialsChange(parameters: {
-    currentPassword: string;
-    origination: KeyParamsOrigination;
-    validateNewPasswordStrength: boolean;
-    newEmail?: string;
-    newPassword?: string;
-    passcode?: string;
-  }): Promise<CredentialsChangeFunctionResponse> {
-    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable(
-      parameters.passcode,
-    );
+  private async performCredentialsChange(
+    parameters: {
+      currentPassword: string,
+      origination: KeyParamsOrigination,
+      validateNewPasswordStrength: boolean
+      newEmail?: string,
+      newPassword?: string,
+      passcode?: string,
+    }
+  ): Promise<CredentialsChangeFunctionResponse> {
+    const {
+      wrappingKey,
+      canceled,
+    } = await this.challengeService.getWrappingKeyIfApplicable(parameters.passcode);
     if (canceled) {
       return { error: Error(CredentialsChangeStrings.PasscodeRequired) };
     }
@@ -421,7 +471,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
       }
     }
     const accountPasswordValidation = await this.protocolService.validateAccountPassword(
-      parameters.currentPassword,
+      parameters.currentPassword
     );
     if (!accountPasswordValidation.valid) {
       return {
@@ -471,20 +521,20 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
   }
 
   private async recomputeRootKeysForCredentialChange(parameters: {
-    currentPassword: string;
-    currentEmail: string;
-    origination: KeyParamsOrigination;
-    newEmail?: string;
-    newPassword?: string;
-  }): Promise<{ currentRootKey: SNRootKey; newRootKey: SNRootKey }> {
+    currentPassword: string,
+    currentEmail: string,
+    origination: KeyParamsOrigination,
+    newEmail?: string,
+    newPassword?: string,
+  }): Promise<{currentRootKey: SNRootKey, newRootKey: SNRootKey}> {
     const currentRootKey = await this.protocolService.computeRootKey(
       parameters.currentPassword,
-      (await this.protocolService.getRootKeyParams()) as SNRootKeyParams,
+      (await this.protocolService.getRootKeyParams()) as SNRootKeyParams
     );
     const newRootKey = await this.protocolService.createRootKey(
       parameters.newEmail ?? parameters.currentEmail,
       parameters.newPassword ?? parameters.currentPassword,
-      parameters.origination,
+      parameters.origination
     );
 
     return {
