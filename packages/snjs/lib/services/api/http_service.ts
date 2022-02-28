@@ -24,6 +24,7 @@ export type HttpParams = Record<string, unknown>;
 export type HttpRequest = {
   url: string;
   params?: HttpParams;
+  rawBytes?: Uint8Array;
   verb: HttpVerb;
   authentication?: string;
   customHeaders?: Record<string, string>[];
@@ -82,7 +83,17 @@ export class SNHttpService extends AbstractService {
 
   public async runHttp(httpRequest: HttpRequest): Promise<HttpResponse> {
     const request = this.createXmlRequest(httpRequest);
-    return this.runRequest(request, httpRequest.verb, httpRequest.params);
+
+    return this.runRequest(request, this.createRequestBody(httpRequest));
+  }
+
+  private createRequestBody(httpRequest: HttpRequest): string | Uint8Array | undefined {
+    if (httpRequest.params !== undefined &&
+      [HttpVerb.Post, HttpVerb.Put, HttpVerb.Patch, HttpVerb.Delete].includes(httpRequest.verb)) {
+      return JSON.stringify(httpRequest.params);
+    }
+
+    return httpRequest.rawBytes;
   }
 
   private createXmlRequest(httpRequest: HttpRequest) {
@@ -100,7 +111,6 @@ export class SNHttpService extends AbstractService {
     request.open(httpRequest.verb, httpRequest.url, true);
     request.responseType = httpRequest.responseType ?? '';
 
-    request.setRequestHeader('Content-type', 'application/json');
     request.setRequestHeader('X-SNJS-Version', SnjsVersion);
 
     const appVersionHeaderValue = `${Environment[this.environment]}-${
@@ -115,33 +125,31 @@ export class SNHttpService extends AbstractService {
       );
     }
 
+    let contenTypeIsSet = false;
     if (httpRequest.customHeaders && httpRequest.customHeaders.length > 0) {
       httpRequest.customHeaders.forEach(({ key, value }) => {
         request.setRequestHeader(key, value);
+        if (key === 'Content-Type') {
+          contenTypeIsSet = true;
+        }
       });
     }
+    if (!contenTypeIsSet) {
+      request.setRequestHeader('Content-Type', 'application/json');
+    }
+
     return request;
   }
 
   private async runRequest(
     request: XMLHttpRequest,
-    verb: HttpVerb,
-    params?: HttpParams
+    body?: string | Uint8Array
   ): Promise<HttpResponse> {
     return new Promise((resolve, reject) => {
       request.onreadystatechange = () => {
         this.stateChangeHandlerForRequest(request, resolve, reject);
       };
-      if (
-        verb === HttpVerb.Post ||
-        verb === HttpVerb.Put ||
-        verb === HttpVerb.Patch ||
-        verb === HttpVerb.Delete
-      ) {
-        request.send(JSON.stringify(params));
-      } else {
-        request.send();
-      }
+      request.send(body);
     });
   }
 

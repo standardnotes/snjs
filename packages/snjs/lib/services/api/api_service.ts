@@ -306,6 +306,7 @@ export class SNApiService
     url: string;
     fallbackErrorMessage: string;
     params?: HttpParams;
+    rawBytes?: Uint8Array;
     authentication?: string;
     customHeaders?: Record<string, string>[];
     responseType?: XMLHttpRequestResponseType;
@@ -948,8 +949,12 @@ export class SNApiService
       {
         verb: HttpVerb.Post,
         url,
-        params: this.params({ chunk: encryptedBytes, chunkId }),
-        customHeaders: [{ key: 'x-valet-token', value: apiToken }],
+        rawBytes: encryptedBytes,
+        customHeaders: [
+          { key: 'x-valet-token', value: apiToken },
+          { key: 'x-chunk-id', value: chunkId.toString() },
+          { key: 'Content-Type', value: 'application/octet-stream' },
+        ],
         fallbackErrorMessage: messages.API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK,
       }
     );
