@@ -5,6 +5,7 @@
     "node": ">=14.0.0 <17.0.0"
   },
   "main": "dist/snjs.js",
+  "author": "Standard Notes",
   "types": "dist/@types",
   "files": [
     "dist"

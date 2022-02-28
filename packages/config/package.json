@@ -8,7 +8,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Karol Sójko <karol@standardnotes.com>",
+  "author": "Standard Notes",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "lint": "yarn lint:formatting",

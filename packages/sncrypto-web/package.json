@@ -3,7 +3,6 @@
   "version": "1.7.1",
   "description": "SNCrypto Web",
   "main": "dist/index.js",
-  "author": "Standard Notes",
   "types": "dist/index.d.ts",
   "files": [
     "dist"

@@ -2,6 +2,7 @@
   "name": "@standardnotes/components",
   "version": "1.7.6",
   "main": "index.js",
+  "author": "Standard Notes",
   "files": [
     "dist"
   ],

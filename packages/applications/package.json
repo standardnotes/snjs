@@ -6,6 +6,7 @@
   },
   "description": "Common types and utilities for Standard Notes client applications",
   "main": "dist/index.js",
+  "author": "Standard Notes",
   "types": "dist/index.d.ts",
   "files": [
     "dist"

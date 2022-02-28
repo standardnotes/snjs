@@ -6,6 +6,7 @@
   },
   "description": "Auth SDK for Standard Notes projects",
   "main": "dist/index.js",
+  "author": "Standard Notes",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -13,7 +14,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Karol Sójko <karol@standardnotes.com>",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "clean": "rm -fr dist",
