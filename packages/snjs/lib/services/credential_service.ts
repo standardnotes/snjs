@@ -18,7 +18,7 @@ import {
   CHANGING_PASSCODE,
   ProtocolUpgradeStrings,
 } from './api/messages';
-import { HttpResponse, SignInResponse, User } from './api/responses';
+import { HttpResponse, SignInResponse, User } from '@standardnotes/responses';
 import { SNProtocolService } from '@Lib/services/protocol_service';
 import { ItemManager } from '@Services/item_manager';
 import { SNStorageService, StoragePersistencePolicies } from '@Services/storage_service';

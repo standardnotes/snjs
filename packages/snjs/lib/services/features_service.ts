@@ -32,7 +32,7 @@ import {
   RoleName,
 } from '@standardnotes/common';
 import { ItemManager } from './item_manager';
-import { UserFeaturesResponse } from './api/responses';
+import { UserFeaturesResponse } from '@standardnotes/responses';
 import { SNComponent } from '@Lib/models';
 import {
   SNWebSocketsService,

@@ -10,7 +10,9 @@ export type {
   ActionResponse,
   ListedAccount,
   ListedAccountInfo,
-} from './services/api/responses';
+  RevisionListEntry,
+  SingleRevision,
+} from '@standardnotes/responses';
 export type { BackupFile } from '@Services/protocol_service';
 export type { UuidString, ApplicationEventPayload, IconType } from './types';
 export type { ApplicationIdentifier } from '@standardnotes/applications';
@@ -111,10 +113,6 @@ export {
 } from './services/protection_service';
 export { SNSingletonManager } from './services/singleton_manager';
 export { SNApiService } from './services/api/api_service';
-export type {
-  RevisionListEntry,
-  SingleRevision,
-} from './services/api/responses';
 export {
   addIfUnique,
   arrayByDifference,

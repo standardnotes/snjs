@@ -83,6 +83,7 @@
     "@standardnotes/domain-events": "^2.23.17",
     "@standardnotes/features": "^1.33.1",
     "@standardnotes/payloads": "^1.1.2",
+    "@standardnotes/responses": "^1.0.0",
     "@standardnotes/services": "^1.2.1",
     "@standardnotes/settings": "^1.11.3",
     "@standardnotes/sncrypto-common": "^1.7.1",

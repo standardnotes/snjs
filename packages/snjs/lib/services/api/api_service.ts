@@ -34,10 +34,10 @@ import {
   CloseUploadSessionResponse,
   UploadFileChunkResponse,
   DownloadFileChunkResponse,
-} from './responses';
+} from '@standardnotes/responses';
 import { Session, TokenSession } from './session';
 import { ContentType, ErrorObject } from '@standardnotes/common';
-import { PurePayload } from '@standardnotes/payloads';
+import { ApiEndpointParam, PurePayload } from '@standardnotes/payloads';
 import { SNRootKeyParams } from './../../protocol/key_params';
 import { SNStorageService } from './../storage_service';
 import {
@@ -48,7 +48,6 @@ import {
   SNHttpService,
 } from './http_service';
 import merge from 'lodash/merge';
-import { ApiEndpointParam } from '@Services/api/keys';
 import * as messages from '@Services/api/messages';
 import { isNullOrUndefined, joinPaths } from '@standardnotes/utils';
 import { StorageKey } from '@Lib/storage_keys';

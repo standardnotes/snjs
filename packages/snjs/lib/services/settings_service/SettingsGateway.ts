@@ -7,7 +7,7 @@ import {
   StatusCode,
   UpdateSettingResponse,
   User,
-} from '../api/responses';
+} from '@standardnotes/responses';
 import { UuidString } from '@Lib/types';
 import { SensitiveSettingName } from './SensitiveSettingName';
 import { Settings } from './Settings';

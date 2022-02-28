@@ -1,6 +1,6 @@
 import { V002Algorithm } from './operator/algorithms';
 import { V001Algorithm } from '@Protocol/operator/algorithms';
-import { KeyParamsData, KeyParamsResponse } from './../services/api/responses';
+import { KeyParamsData, KeyParamsResponse } from '@standardnotes/responses';
 import {
   KeyParamsContent001,
   KeyParamsContent002,

@@ -16,7 +16,7 @@ import {
   RevisionListEntry,
   RevisionListResponse,
   SingleRevisionResponse,
-} from './../api/responses';
+} from '@standardnotes/responses';
 import { SNStorageService } from '@Services/storage_service';
 import { ItemManager } from '@Services/item_manager';
 import { SNItem } from '@Models/core/item';

@@ -8,7 +8,7 @@ import {
 import { ContentType } from '@standardnotes/common';
 import { SNApiService } from '../../api/api_service';
 import { SNProtocolService } from '../../protocol_service';
-import { RawSyncResponse } from '@Lib/services/api/responses';
+import { RawSyncResponse } from '@standardnotes/responses';
 
 type Progress = {
   retrievedPayloads: PurePayload[];
