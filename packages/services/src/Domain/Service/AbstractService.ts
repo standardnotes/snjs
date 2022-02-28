@@ -5,10 +5,10 @@ import { EventObserver } from '../Event/EventObserver'
 import { ServiceInterface } from './ServiceInterface'
 
 export abstract class AbstractService<EventName = string, EventData = undefined> implements ServiceInterface<EventName, EventData> {
-  private eventObservers: EventObserver<EventName, EventData>[] = [];
-  public loggingEnabled = false;
-  public deviceInterface?: DeviceInterface;
-  private criticalPromises: Promise<unknown>[] = [];
+  private eventObservers: EventObserver<EventName, EventData>[] = []
+  public loggingEnabled = false
+  public deviceInterface?: DeviceInterface
+  private criticalPromises: Promise<unknown>[] = []
 
   public addEventObserver(
     observer: EventObserver<EventName, EventData>

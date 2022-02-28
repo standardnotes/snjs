@@ -8,9 +8,9 @@ export class ApplicationService extends AbstractService {
   constructor(protected application: SNApplication) {
     super();
     /* Allow caller constructor to finish setting instance variables before triggering callbacks */
-    setImmediate(() => {
+    setTimeout(() => {
       this.addAppEventObserver();
-    });
+    }, 0);
   }
 
   deinit() {

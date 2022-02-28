@@ -6,8 +6,7 @@ export enum DeinitSource {
   AppGroupUnload = 3,
 }
 
-export type ApplicationEventPayload = Partial<{
-}>
+export type ApplicationEventPayload = Partial<Record<string, unknown>>
 
 export type IconType =
   | 'accessibility'
