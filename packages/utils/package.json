@@ -1,11 +1,12 @@
 {
   "name": "@standardnotes/utils",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
   "description": "Common utilities for Standard Notes projects",
   "main": "dist/index.js",
+  "author": "Standard Notes",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -24,12 +25,12 @@
     "test:unit": "jest spec"
   },
   "dependencies": {
-    "@standardnotes/common": "^1.15.1",
+    "@standardnotes/common": "^1.15.3",
     "dompurify": "^2.3.6",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.2.0",
+    "@standardnotes/config": "^2.2.2",
     "@types/dompurify": "^2.3.3",
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.179",

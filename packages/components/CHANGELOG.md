@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.8](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.6...@standardnotes/components@1.7.8) (2022-02-28)
+
+
+### Bug Fixes
+
+* add pseudo change to get lerna to trigger ([41e6817](https://github.com/standardnotes/snjs/commit/41e6817bbf726b0932cdf16f58622328b9e42803))
+
+
+
+
+
+## [1.7.7](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.6...@standardnotes/components@1.7.7) (2022-02-28)
+
+
+### Bug Fixes
+
+* add pseudo change to get lerna to trigger ([41e6817](https://github.com/standardnotes/snjs/commit/41e6817bbf726b0932cdf16f58622328b9e42803))
+
+
+
+
+
 ## [1.7.6](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.5...@standardnotes/components@1.7.6) (2022-02-23)
 
 **Note:** Version bump only for package @standardnotes/components

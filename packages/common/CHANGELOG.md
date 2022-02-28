@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.15.3](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.15.1...@standardnotes/common@1.15.3) (2022-02-28)
+
+
+### Bug Fixes
+
+* add pseudo change to get lerna to trigger ([41e6817](https://github.com/standardnotes/snjs/commit/41e6817bbf726b0932cdf16f58622328b9e42803))
+
+
+
+
+
+## [1.15.2](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.15.1...@standardnotes/common@1.15.2) (2022-02-28)
+
+
+### Bug Fixes
+
+* add pseudo change to get lerna to trigger ([41e6817](https://github.com/standardnotes/snjs/commit/41e6817bbf726b0932cdf16f58622328b9e42803))
+
+
+
+
+
 ## [1.15.1](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.15.0...@standardnotes/common@1.15.1) (2022-02-27)
 
 **Note:** Version bump only for package @standardnotes/common

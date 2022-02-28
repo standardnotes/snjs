@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/config",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -8,7 +8,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Karol Sójko <karol@standardnotes.com>",
+  "author": "Standard Notes",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "lint": "yarn lint:formatting",

@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/time",
-  "version": "1.6.1",
+  "version": "1.6.3",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -13,7 +13,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Karol Sójko <karol@standardnotes.com>",
+  "author": "Standard Notes",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "clean": "rm -fr dist",
@@ -28,7 +28,7 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.2.0",
+    "@standardnotes/config": "^2.2.2",
     "@types/jest": "^27.4.1",
     "@types/microtime": "^2.1.0",
     "jest": "^27.5.1",

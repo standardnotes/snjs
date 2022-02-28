@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.23.19](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.17...@standardnotes/domain-events@2.23.19) (2022-02-28)
+
+
+### Bug Fixes
+
+* add pseudo change to get lerna to trigger ([41e6817](https://github.com/standardnotes/snjs/commit/41e6817bbf726b0932cdf16f58622328b9e42803))
+
+
+
+
+
+## [2.23.18](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.17...@standardnotes/domain-events@2.23.18) (2022-02-28)
+
+
+### Bug Fixes
+
+* add pseudo change to get lerna to trigger ([41e6817](https://github.com/standardnotes/snjs/commit/41e6817bbf726b0932cdf16f58622328b9e42803))
+
+
+
+
+
 ## [2.23.17](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.16...@standardnotes/domain-events@2.23.17) (2022-02-27)
 
 **Note:** Version bump only for package @standardnotes/domain-events
