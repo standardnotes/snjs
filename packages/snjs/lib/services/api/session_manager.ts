@@ -22,7 +22,7 @@ import {
   SignInResponse,
   StatusCode,
   User,
-} from './responses';
+} from '@standardnotes/responses';
 import { SNProtocolService } from './../protocol_service';
 import { SNApiService } from './api_service';
 import { SNStorageService } from './../storage_service';

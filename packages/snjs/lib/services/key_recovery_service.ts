@@ -35,7 +35,7 @@ import {
 } from '@standardnotes/utils';
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params';
 import { UuidString } from '@Lib/types';
-import { KeyParamsResponse } from './api/responses';
+import { KeyParamsResponse } from '@standardnotes/responses';
 import { AbstractService } from '@standardnotes/services';
 
 /**

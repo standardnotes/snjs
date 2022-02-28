@@ -7,7 +7,7 @@ import {
 } from './../challenges';
 import { ListedService } from './listed_service';
 import { CreateItemFromPayload } from '@Models/generator';
-import { ActionResponse, HttpResponse } from './api/responses';
+import { ActionResponse, HttpResponse } from '@standardnotes/responses';
 import { ContentType } from '@standardnotes/common';
 import { EncryptionIntent } from '@standardnotes/applications';
 import { ItemManager } from '@Services/item_manager';
