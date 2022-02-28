@@ -12,7 +12,7 @@ import {
   ListedAccount,
   ListedAccountInfo,
   ListedAccountInfoResponse,
-} from './api/responses';
+} from '@standardnotes/responses';
 import { AbstractService } from '@standardnotes/services';
 
 export class ListedService extends AbstractService implements ListedInterface {

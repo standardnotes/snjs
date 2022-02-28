@@ -1,13 +1,12 @@
-import { ConflictType } from './../api/responses';
-import { RawSyncResponse } from '@Lib/services/api/responses';
+import { ConflictType, RawSyncResponse } from '@standardnotes/responses';
 import {
+  ApiEndpointParam,
   PurePayload,
   PayloadSource,
   CreateSourcedPayloadFromObject,
   RawPayload,
 } from '@standardnotes/payloads';
 import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils';
-import { ApiEndpointParam } from '@Services/api/keys';
 
 export class SyncResponse {
   public readonly rawResponse: RawSyncResponse;

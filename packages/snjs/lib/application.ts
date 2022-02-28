@@ -116,7 +116,7 @@ import {
   ListedAccountInfo,
   SignInResponse,
   User,
-} from './services/api/responses';
+} from '@standardnotes/responses';
 import { ProtectionEvent } from './services/protection_service';
 import { SNWebSocketsService } from './services/api/websockets_service';
 import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings';

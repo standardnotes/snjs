@@ -3,7 +3,7 @@ import { arrayByDifference, subtractFromArray } from '@standardnotes/utils';
 import { SyncResponse } from '@Services/sync/response';
 import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals';
 import { SNApiService } from '../../api/api_service';
-import { RawSyncResponse } from '@Lib/services/api/responses';
+import { RawSyncResponse } from '@standardnotes/responses';
 
 export const SyncUpDownLimit = 150;
 

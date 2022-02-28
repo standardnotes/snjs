@@ -1,5 +1,5 @@
-import { ListedAccount, ListedAccountInfo } from '@Lib/services/api/responses';
-import { UuidString } from '@Lib/types';
+import { Uuid } from '@standardnotes/common';
+import { ListedAccount, ListedAccountInfo } from '@standardnotes/responses';
 
 export interface ListedInterface {
   canRegisterNewListedAccount: () => boolean;
@@ -7,6 +7,6 @@ export interface ListedInterface {
   getListedAccounts(): Promise<ListedAccount[]>;
   getListedAccountInfo(
     account: ListedAccount,
-    inContextOfItem?: UuidString
+    inContextOfItem?: Uuid
   ): Promise<ListedAccountInfo | undefined>;
 }

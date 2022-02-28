@@ -7,7 +7,7 @@ export type { BackupFile } from '@Services/protocol_service';
 export type {
   RevisionListEntry,
   SingleRevision,
-} from '@Services/api/responses';
+} from '@standardnotes/responses';
 export { SNSessionManager } from '@Services/api/session_manager';
 export { SNApiService } from '@Services/api/api_service';
 export { SNComponentManager } from '@Services/component_manager';

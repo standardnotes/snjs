@@ -1,5 +1,5 @@
-import { SessionRenewalResponse } from './responses';
-import { UuidString } from '@Lib/types';
+import { SessionRenewalResponse } from '@standardnotes/responses';
+import { Uuid } from '@standardnotes/common';
 
 type RawJwtPayload = {
   jwt?: string;
@@ -13,7 +13,7 @@ type RawSessionPayload = {
 type RawStorageValue = RawJwtPayload | RawSessionPayload;
 
 export type RemoteSession = {
-  uuid: UuidString;
+  uuid: Uuid;
   updated_at: Date;
   device_info: string;
   current: boolean;
