@@ -265,7 +265,7 @@ export class BaseMigration extends Migration {
                 this.services.identifier
               );
             }
-            resolve();
+            resolve(true);
             this.services.challengeService.completeChallenge(challenge);
           }
         },
