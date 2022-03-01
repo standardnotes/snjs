@@ -45,3 +45,8 @@ export const DeprecatedFeatures = [
   FeatureIdentifier.DeprecatedFileSafe,
   FeatureIdentifier.DeprecatedFoldersComponent,
 ]
+
+export const ExperimentalFeatures = [
+  FeatureIdentifier.MarkdownVisualEditor,
+  FeatureIdentifier.AccountSwitcher,
+]

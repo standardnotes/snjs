@@ -35,7 +35,7 @@ export * from './models'
 
 export type { ComponentPermission } from '@standardnotes/features'
 export { ComponentArea, ComponentAction } from '@standardnotes/features'
-export { FeatureStatus } from '@Lib/services/FeaturesService'
+export { FeatureStatus } from '@Lib/services/Features/FeaturesService'
 
 export type {
   ItemMessagePayload,

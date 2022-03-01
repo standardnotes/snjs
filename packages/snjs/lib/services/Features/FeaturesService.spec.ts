@@ -1,6 +1,6 @@
-import { SNFeatureRepo } from '../models/app/feature_repo'
+import { SNFeatureRepo } from '../../models/app/feature_repo'
 import { SNComponent } from '@Models/app/component'
-import { SNSyncService } from './Sync/SyncService'
+import { SNSyncService } from '../Sync/SyncService'
 import { SettingName } from '@standardnotes/settings'
 import {
   ItemManager,
@@ -12,11 +12,11 @@ import {
   SNStorageService,
   StorageKey,
 } from '@Lib/index'
-import { FeatureStatus, SNFeaturesService } from '@Lib/services/FeaturesService'
+import { FeatureStatus, SNFeaturesService } from '@Lib/services/Features/FeaturesService'
 import { ContentType, Runtime, RoleName } from '@standardnotes/common'
 import { FeatureDescription, FeatureIdentifier, GetFeatures } from '@standardnotes/features'
-import { SNWebSocketsService } from './Api/WebsocketsService'
-import { SNSettingsService } from './Settings'
+import { SNWebSocketsService } from '../Api/WebsocketsService'
+import { SNSettingsService } from '../Settings'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { convertTimestampToMilliseconds } from '@standardnotes/utils'
 
@@ -314,6 +314,68 @@ describe('featuresService', () => {
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.createItem).not.toHaveBeenCalled()
+    })
+
+    it('does not create a component for not enabled experimental feature', async () => {
+      const features = [
+        {
+          identifier: FeatureIdentifier.BoldEditor,
+          expires_at: tomorrow_server,
+          content_type: ContentType.Component,
+        },
+      ]
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      })
+
+      const newRoles = [...roles, RoleName.PlusUser]
+
+      storageService.getValue = jest.fn().mockReturnValue(roles)
+
+      const featuresService = createService()
+      featuresService.getExperimentalFeatures = jest
+        .fn()
+        .mockReturnValue([FeatureIdentifier.BoldEditor])
+
+      await featuresService.initializeFromDisk()
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles)
+      expect(itemManager.createItem).not.toHaveBeenCalled()
+    })
+
+    it('does create a component for enabled experimental feature', async () => {
+      const features = [
+        {
+          identifier: FeatureIdentifier.BoldEditor,
+          expires_at: tomorrow_server,
+          content_type: ContentType.Component,
+        },
+      ]
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      })
+
+      const newRoles = [...roles, RoleName.PlusUser]
+
+      storageService.getValue = jest.fn().mockReturnValue(roles)
+
+      const featuresService = createService()
+      featuresService.getExperimentalFeatures = jest
+        .fn()
+        .mockReturnValue([FeatureIdentifier.BoldEditor])
+
+      featuresService.getEnabledExperimentalFeatures = jest
+        .fn()
+        .mockReturnValue([FeatureIdentifier.BoldEditor])
+
+      await featuresService.initializeFromDisk()
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles)
+      expect(itemManager.createItem).toHaveBeenCalled()
     })
 
     it('does nothing after initial update if roles have not changed', async () => {
