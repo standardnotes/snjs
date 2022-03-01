@@ -1,8 +1,8 @@
+import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
 import { ListedService } from './services/ListedService'
 import { ListedInterface } from './application_interfaces/listed_interface'
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
 import { TransactionalMutation } from './services/ItemManager'
-import { FeatureStatus } from '@Lib/services/Features/FeaturesService'
 import { Settings } from './services/Settings'
 import { SyncOpStatus } from './services/Sync/SyncOpStatus'
 import { createMutatorForItem } from '@Lib/models/mutator'
@@ -124,11 +124,8 @@ import { SNSettingsService } from './services/Settings'
 import { SNMfaService } from './services/MfaService'
 import { SensitiveSettingName } from './services/Settings/SensitiveSettingName'
 import { Subscription } from '@standardnotes/auth'
-import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features'
-import { FeaturesEvent, SetOfflineFeaturesFunctionResponse } from '@Lib/services/Features/FeaturesService'
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders'
 import { RemoteSession } from './services/Api/Session'
-import { RoleName } from '.'
 import { FilesClientInterface } from './services/Files/FileService'
 
 /** How often to automatically sync, in milliseconds */
@@ -250,6 +247,10 @@ export class SNApplication implements ListedInterface {
     return this.fileService
   }
 
+  public get features(): FeaturesClientInterface {
+    return this.featuresService
+  }
+
   /**
    * The first thing consumers should call when starting their app.
    * This function will load all services in their correct order.
@@ -311,7 +312,7 @@ export class SNApplication implements ListedInterface {
     await this.apiService.loadFilesHost()
     await this.webSocketsService.loadWebSocketUrl()
     await this.sessionManager.initializeFromDisk()
-    this.historyManager.initializeFromDisk()
+    void this.historyManager.initializeFromDisk()
     this.settingsService.initializeFromDisk()
     await this.featuresService.initializeFromDisk()
 
@@ -831,7 +832,7 @@ export class SNApplication implements ListedInterface {
     additionalContent?: Partial<PayloadContent>,
   ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(item.uuid, false, additionalContent)
-    this.sync()
+    void this.sync()
     return duplicate
   }
 
@@ -1197,7 +1198,7 @@ export class SNApplication implements ListedInterface {
         return
       }
       this.challengeService.completeChallenge(challenge)
-      password = passwordResponse.values[0].value as string
+      password = passwordResponse?.values[0].value as string
     }
 
     if (!(await this.protectionService.authorizeFileImport())) {
@@ -1625,40 +1626,8 @@ export class SNApplication implements ListedInterface {
     }
   }
 
-  public downloadExternalFeature(urlOrCode: string): Promise<SNComponent | undefined> {
-    return this.featuresService.validateAndDownloadExternalFeature(urlOrCode)
-  }
-
-  public getFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
-    return this.featuresService.getFeature(featureId)
-  }
-
-  public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
-    return this.featuresService.getFeatureStatus(featureId)
-  }
-
-  public hasMinimumRole(role: RoleName): boolean {
-    return this.featuresService.hasMinimumRole(role)
-  }
-
   public getNewSubscriptionToken(): Promise<string | undefined> {
     return this.apiService.getNewSubscriptionToken()
-  }
-
-  public setOfflineFeaturesCode(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
-    return this.featuresService.setOfflineFeaturesCode(code)
-  }
-
-  public hasOfflineRepo(): boolean {
-    return this.featuresService.hasOfflineRepo()
-  }
-
-  public async deleteOfflineFeatureRepo(): Promise<void> {
-    return this.featuresService.deleteOfflineFeatureRepo()
-  }
-
-  public isThirdPartyFeature(identifier: string): boolean {
-    return this.featuresService.isThirdPartyFeature(identifier)
   }
 
   public isThirdPartyHostUsed(): boolean {

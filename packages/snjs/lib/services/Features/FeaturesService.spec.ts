@@ -12,7 +12,7 @@ import {
   SNStorageService,
   StorageKey,
 } from '@Lib/index'
-import { FeatureStatus, SNFeaturesService } from '@Lib/services/Features/FeaturesService'
+import { FeatureStatus, SNFeaturesService } from '@Lib/services/Features'
 import { ContentType, Runtime, RoleName } from '@standardnotes/common'
 import { FeatureDescription, FeatureIdentifier, GetFeatures } from '@standardnotes/features'
 import { SNWebSocketsService } from '../Api/WebsocketsService'
@@ -123,6 +123,90 @@ describe('featuresService', () => {
 
     crypto = {} as jest.Mocked<SNPureCrypto>
     crypto.base64Decode = jest.fn()
+  })
+
+  describe('experimental features', () => {
+    it('enables/disables an experimental feature', async () => {
+      storageService.getValue = jest.fn().mockReturnValue([])
+
+      const featuresService = createService()
+
+      await featuresService.initializeFromDisk()
+
+      featuresService.enableExperimentalFeature(FeatureIdentifier.MarkdownVisualEditor)
+
+      expect(
+        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.MarkdownVisualEditor),
+      ).toEqual(true)
+
+      featuresService.disableExperimentalFeature(FeatureIdentifier.MarkdownVisualEditor)
+
+      expect(
+        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.MarkdownVisualEditor),
+      ).toEqual(false)
+    })
+
+    it('does not create a component for not enabled experimental feature', async () => {
+      const features = [
+        {
+          identifier: FeatureIdentifier.BoldEditor,
+          expires_at: tomorrow_server,
+          content_type: ContentType.Component,
+        },
+      ]
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      })
+
+      const newRoles = [...roles, RoleName.PlusUser]
+
+      storageService.getValue = jest.fn().mockReturnValue(roles)
+
+      const featuresService = createService()
+      featuresService.getExperimentalFeatures = jest
+        .fn()
+        .mockReturnValue([FeatureIdentifier.BoldEditor])
+
+      await featuresService.initializeFromDisk()
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles)
+      expect(itemManager.createItem).not.toHaveBeenCalled()
+    })
+
+    it('does create a component for enabled experimental feature', async () => {
+      const features = [
+        {
+          identifier: FeatureIdentifier.BoldEditor,
+          expires_at: tomorrow_server,
+          content_type: ContentType.Component,
+        },
+      ]
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      })
+
+      const newRoles = [...roles, RoleName.PlusUser]
+
+      storageService.getValue = jest.fn().mockReturnValue(roles)
+
+      const featuresService = createService()
+      featuresService.getExperimentalFeatures = jest
+        .fn()
+        .mockReturnValue([FeatureIdentifier.BoldEditor])
+
+      featuresService.getEnabledExperimentalFeatures = jest
+        .fn()
+        .mockReturnValue([FeatureIdentifier.BoldEditor])
+
+      await featuresService.initializeFromDisk()
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles)
+      expect(itemManager.createItem).toHaveBeenCalled()
+    })
   })
 
   describe('loadUserRoles()', () => {
@@ -314,68 +398,6 @@ describe('featuresService', () => {
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.createItem).not.toHaveBeenCalled()
-    })
-
-    it('does not create a component for not enabled experimental feature', async () => {
-      const features = [
-        {
-          identifier: FeatureIdentifier.BoldEditor,
-          expires_at: tomorrow_server,
-          content_type: ContentType.Component,
-        },
-      ]
-
-      apiService.getUserFeatures = jest.fn().mockReturnValue({
-        data: {
-          features,
-        },
-      })
-
-      const newRoles = [...roles, RoleName.PlusUser]
-
-      storageService.getValue = jest.fn().mockReturnValue(roles)
-
-      const featuresService = createService()
-      featuresService.getExperimentalFeatures = jest
-        .fn()
-        .mockReturnValue([FeatureIdentifier.BoldEditor])
-
-      await featuresService.initializeFromDisk()
-      await featuresService.updateRolesAndFetchFeatures('123', newRoles)
-      expect(itemManager.createItem).not.toHaveBeenCalled()
-    })
-
-    it('does create a component for enabled experimental feature', async () => {
-      const features = [
-        {
-          identifier: FeatureIdentifier.BoldEditor,
-          expires_at: tomorrow_server,
-          content_type: ContentType.Component,
-        },
-      ]
-
-      apiService.getUserFeatures = jest.fn().mockReturnValue({
-        data: {
-          features,
-        },
-      })
-
-      const newRoles = [...roles, RoleName.PlusUser]
-
-      storageService.getValue = jest.fn().mockReturnValue(roles)
-
-      const featuresService = createService()
-      featuresService.getExperimentalFeatures = jest
-        .fn()
-        .mockReturnValue([FeatureIdentifier.BoldEditor])
-
-      featuresService.getEnabledExperimentalFeatures = jest
-        .fn()
-        .mockReturnValue([FeatureIdentifier.BoldEditor])
-
-      await featuresService.initializeFromDisk()
-      await featuresService.updateRolesAndFetchFeatures('123', newRoles)
-      expect(itemManager.createItem).toHaveBeenCalled()
     })
 
     it('does nothing after initial update if roles have not changed', async () => {
@@ -760,7 +782,7 @@ describe('featuresService', () => {
       crypto.base64Decode = jest.fn().mockReturnValue(installUrl)
 
       const featuresService = createService()
-      const result = await featuresService.validateAndDownloadExternalFeature(installUrl)
+      const result = await featuresService.downloadExternalFeature(installUrl)
       expect(result).toBeUndefined()
     })
 
@@ -780,7 +802,7 @@ describe('featuresService', () => {
       crypto.base64Decode = jest.fn().mockReturnValue(installUrl)
 
       const featuresService = createService()
-      const result = await featuresService.validateAndDownloadExternalFeature(installUrl)
+      const result = await featuresService.downloadExternalFeature(installUrl)
       expect(result).toBeUndefined()
     })
   })

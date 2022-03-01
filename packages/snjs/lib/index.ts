@@ -32,10 +32,10 @@ export { AbstractDevice, AbstractService } from '@standardnotes/services'
 export type { DeviceInterface, ServiceInterface } from '@standardnotes/services'
 
 export * from './models'
+export * from '@Lib/services/Features'
 
 export type { ComponentPermission } from '@standardnotes/features'
 export { ComponentArea, ComponentAction } from '@standardnotes/features'
-export { FeatureStatus } from '@Lib/services/Features/FeaturesService'
 
 export type {
   ItemMessagePayload,
@@ -43,7 +43,10 @@ export type {
   PermissionDialog,
   DesktopManagerInterface,
 } from './services/ComponentManager/types'
-export { SNComponentManager, ComponentManagerEvent } from './services/ComponentManager/ComponentManager'
+export {
+  SNComponentManager,
+  ComponentManagerEvent,
+} from './services/ComponentManager/ComponentManager'
 export {
   ComponentViewer,
   ComponentViewerEvent,

@@ -27,7 +27,12 @@ import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsSe
 import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/payloads'
 import { SNSettingsService } from '../Settings'
 import { SettingName } from '@standardnotes/settings'
-import { arraysEqual, convertTimestampToMilliseconds, isErrorObject } from '@standardnotes/utils'
+import {
+  arraysEqual,
+  convertTimestampToMilliseconds,
+  isErrorObject,
+  removeFromArray,
+} from '@standardnotes/utils'
 import { SNSessionManager } from '@Lib/services/Api/SessionManager'
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
@@ -40,30 +45,24 @@ import { ButtonType, SNAlertService } from '@Lib/services/AlertService'
 import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
 import { Copy, lastElement } from '@standardnotes/utils'
 import { AbstractService } from '@standardnotes/services'
+import { FeaturesClientInterface } from './ClientInterface'
+import {
+  FeaturesEvent,
+  FeatureStatus,
+  OfflineSubscriptionEntitlements,
+  SetOfflineFeaturesFunctionResponse,
+} from './Types'
 
-export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined
-export type OfflineSubscriptionEntitlements = {
-  featuresUrl: string
-  extensionKey: string
-}
 type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject
 
-export const enum FeaturesEvent {
-  UserRolesChanged = 'UserRolesChanged',
-  FeaturesUpdated = 'FeaturesUpdated',
-}
-
-export const enum FeatureStatus {
-  NoUserSubscription = 'NoUserSubscription',
-  NotInCurrentPlan = 'NotInCurrentPlan',
-  InCurrentPlanButExpired = 'InCurrentPlanButExpired',
-  Entitled = 'Entitled',
-}
-
-export class SNFeaturesService extends AbstractService<FeaturesEvent> {
+export class SNFeaturesService
+  extends AbstractService<FeaturesEvent>
+  implements FeaturesClientInterface
+{
   private deinited = false
   private roles: RoleName[] = []
   private features: FeatureDescription[] = []
+  private enabledExperimentalFeatures: FeatureIdentifier[] = []
   private removeApiServiceObserver: () => void
   private removeWebSocketsServiceObserver: () => void
   private removefeatureReposObserver: () => void
@@ -155,10 +154,26 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
       if (!this.hasOnlineSubscription()) {
         const offlineRepo = this.getOfflineRepo()
         if (offlineRepo) {
-          this.downloadOfflineFeatures(offlineRepo)
+          void this.downloadOfflineFeatures(offlineRepo)
         }
       }
     }
+  }
+
+  public enableExperimentalFeature(identifier: FeatureIdentifier): void {
+    this.enabledExperimentalFeatures.push(identifier)
+    void this.storageService.setValue(
+      StorageKey.ExperimentalFeatures,
+      this.enabledExperimentalFeatures,
+    )
+  }
+
+  public disableExperimentalFeature(identifier: FeatureIdentifier): void {
+    removeFromArray(this.enabledExperimentalFeatures, identifier)
+    void this.storageService.setValue(
+      StorageKey.ExperimentalFeatures,
+      this.enabledExperimentalFeatures,
+    )
   }
 
   public getExperimentalFeatures(): FeatureIdentifier[] {
@@ -166,17 +181,17 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
   }
 
   public getEnabledExperimentalFeatures(): FeatureIdentifier[] {
-    if (this.runtime === Runtime.Dev) {
-      return [FeatureIdentifier.AccountSwitcher, FeatureIdentifier.MarkdownVisualEditor]
-    } else {
-      return []
-    }
+    return this.enabledExperimentalFeatures
+  }
+
+  public isExperimentalFeatureEnabled(feature: FeatureIdentifier): boolean {
+    return this.enabledExperimentalFeatures.includes(feature)
   }
 
   public async setOfflineFeaturesCode(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
     try {
       const activationCodeWithoutSpaces = code.replace(/\s/g, '')
-      const decodedData = await this.crypto.base64Decode(activationCodeWithoutSpaces)
+      const decodedData = this.crypto.base64Decode(activationCodeWithoutSpaces)
       const result = this.parseOfflineEntitlementsCode(decodedData)
       if (isErrorObject(result)) {
         return result
@@ -190,7 +205,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
         } as FeatureRepoContent),
         true,
       )) as SNFeatureRepo
-      this.syncService.sync()
+      void this.syncService.sync()
       return this.downloadOfflineFeatures(offlineRepo)
     } catch (err) {
       return {
@@ -212,7 +227,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
     const repo = this.getOfflineRepo()
     if (repo) {
       await this.itemManager.setItemToBeDeleted(repo.uuid)
-      this.syncService.sync()
+      void this.syncService.sync()
     }
     await this.storageService.removeValue(StorageKey.UserFeatures)
   }
@@ -291,6 +306,12 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
     this.roles = await this.storageService.getValue(StorageKey.UserRoles, undefined, [])
 
     this.features = await this.storageService.getValue(StorageKey.UserFeatures, undefined, [])
+
+    this.enabledExperimentalFeatures = await this.storageService.getValue(
+      StorageKey.ExperimentalFeatures,
+      undefined,
+      [],
+    )
   }
 
   public async updateRolesAndFetchFeatures(userUuid: UuidString, roles: RoleName[]): Promise<void> {
@@ -309,7 +330,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
   private async setRoles(roles: RoleName[]): Promise<void> {
     this.roles = roles
     if (!arraysEqual(this.roles, roles)) {
-      this.notifyEvent(FeaturesEvent.UserRolesChanged)
+      void this.notifyEvent(FeaturesEvent.UserRolesChanged)
     }
     await this.storageService.setValue(StorageKey.UserRoles, this.roles)
   }
@@ -321,8 +342,8 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
 
     this.features = features
     this.completedSuccessfulFeaturesRetrieval = true
-    this.notifyEvent(FeaturesEvent.FeaturesUpdated)
-    this.storageService.setValue(StorageKey.UserFeatures, this.features)
+    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
+    void this.storageService.setValue(StorageKey.UserFeatures, this.features)
 
     await this.mapRemoteNativeFeaturesToItems(features)
   }
@@ -484,7 +505,7 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
 
     await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids)
     if (hasChanges) {
-      this.syncService.sync()
+      void this.syncService.sync()
     }
   }
 
@@ -551,12 +572,10 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
     return hasChanges
   }
 
-  public async validateAndDownloadExternalFeature(
-    urlOrCode: string,
-  ): Promise<SNComponent | undefined> {
+  public async downloadExternalFeature(urlOrCode: string): Promise<SNComponent | undefined> {
     let url = urlOrCode
     try {
-      url = await this.crypto.base64Decode(urlOrCode)
+      url = this.crypto.base64Decode(urlOrCode)
       // eslint-disable-next-line no-empty
     } catch (err) {}
 
@@ -575,17 +594,17 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
           'Cancel',
         )
         if (didConfirm) {
-          return this.downloadExternalFeature(url)
+          return this.performDownloadExternalFeature(url)
         }
       } else {
-        return this.downloadExternalFeature(url)
+        return this.performDownloadExternalFeature(url)
       }
     } catch (err) {
-      this.alertService.alert(INVALID_EXTENSION_URL)
+      void this.alertService.alert(INVALID_EXTENSION_URL)
     }
   }
 
-  private async downloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+  private async performDownloadExternalFeature(url: string): Promise<SNComponent | undefined> {
     const response = await this.apiService.downloadFeatureUrl(url)
     if (response.error) {
       await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)

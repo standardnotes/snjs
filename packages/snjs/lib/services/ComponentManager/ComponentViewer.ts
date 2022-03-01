@@ -1,7 +1,7 @@
 import { PrefKey } from '@Models/app/userPrefs'
 import { NoteContent } from '@Models/app/note'
 import { SNPreferencesService } from '../PreferencesService'
-import { FeatureStatus, FeaturesEvent } from '@Lib/services/Features/FeaturesService'
+import { FeatureStatus, FeaturesEvent } from '@Lib/services/Features'
 import { SNFeaturesService } from '@Lib/services'
 import { ComponentArea, FindNativeFeature } from '@standardnotes/features'
 import { CreateItemFromPayload } from '@Models/generator'
