@@ -9,18 +9,18 @@ export type {
   RevisionListEntry,
   SingleRevision,
 } from '@standardnotes/responses'
-export type { BackupFile } from '@Services/protocol_service'
+export type { BackupFile } from '@Lib/services/ProtocolService'
 export type { UuidString, ApplicationEventPayload, IconType } from './types'
 export type { ApplicationIdentifier } from '@standardnotes/applications'
 
 export { SNApplicationGroup } from './application_group'
 export { DeinitSource } from './types'
-export { KeyRecoveryStrings, SessionStrings } from './services/api/messages'
-export type { RemoteSession } from './services/api/session'
+export { KeyRecoveryStrings, SessionStrings } from './services/Api/Messages'
+export type { RemoteSession } from './services/Api/Session'
 
 export { SNApplication } from '@Lib/application'
 
-export { SNProtocolService, KeyMode } from '@Services/protocol_service'
+export { SNProtocolService, KeyMode } from '@Lib/services/ProtocolService'
 export { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001'
 export { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002'
 export { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003'
@@ -35,38 +35,38 @@ export * from './models'
 
 export type { ComponentPermission } from '@standardnotes/features'
 export { ComponentArea, ComponentAction } from '@standardnotes/features'
-export { FeatureStatus } from '@Lib/services/features_service'
+export { FeatureStatus } from '@Lib/services/FeaturesService'
 
 export type {
   ItemMessagePayload,
   MessageData,
   PermissionDialog,
   DesktopManagerInterface,
-} from './services/component_manager/types'
-export { SNComponentManager, ComponentManagerEvent } from './services/component_manager'
+} from './services/ComponentManager/types'
+export { SNComponentManager, ComponentManagerEvent } from './services/ComponentManager/ComponentManager'
 export {
   ComponentViewer,
   ComponentViewerEvent,
   ComponentViewerError,
-} from './services/component_manager/component_viewer'
+} from './services/ComponentManager/ComponentViewer'
 
-export { HistoryEntry } from '@Services/history/entries/history_entry'
-export { NoteHistoryEntry } from './services/history/entries/note_history_entry'
-export { PayloadManager } from './services/payload_manager'
+export { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
+export { NoteHistoryEntry } from './services/History/Entries/NoteHistoryEntry'
+export { PayloadManager } from './services/PayloadManager'
 
-export type { TransactionalMutation } from './services/item_manager'
-export { ItemManager } from './services/item_manager'
+export type { TransactionalMutation } from './services/ItemManager'
+export { ItemManager } from './services/ItemManager'
 
-export { SNHttpService } from './services/api/http_service'
-export { ChallengeService } from './services/challenge/challenge_service'
-export { ApplicationService } from '@Services/application_service'
+export { SNHttpService } from './services/Api/HttpService'
+export { ChallengeService } from './services/Challenge/ChallengeService'
+export { ApplicationService } from '@Lib/services/ApplicationService'
 export {
   SNStorageService,
   StoragePersistencePolicies,
   StorageEncryptionPolicies,
   StorageValueModes,
   ValueModesKeys,
-} from './services/storage_service'
+} from './services/StorageService'
 export {
   Challenge,
   ChallengeReason,
@@ -81,25 +81,25 @@ export {
   SyncSources,
   SyncModes,
   SyncQueueStrategy,
-} from './services/sync/sync_service'
-export { SNCredentialService } from './services/credential_service'
-export { SyncResponse } from './services/sync/response'
-export { SyncResponseResolver } from '@Services/sync/account/response_resolver'
-export { SyncOpStatus } from './services/sync/sync_op_status'
-export { SortPayloadsByRecentAndContentPriority } from './services/sync/utils'
-export { SyncUpDownLimit } from './services/sync/account/operation'
-export { SNSessionManager, SessionEvent } from './services/api/session_manager'
-export { SNMigrationService } from './services/migration_service'
-export { ButtonType } from './services/alert_service'
-export type { DismissBlockingDialog, SNAlertService } from './services/alert_service'
-export { SNHistoryManager } from './services/history/history_manager'
+} from './services/Sync/SyncService'
+export { SNCredentialService } from './services/CredentialService'
+export { SyncResponse } from './services/Sync/Response'
+export { SyncResponseResolver } from '@Lib/services/Sync/Account/ResponseResolver'
+export { SyncOpStatus } from './services/Sync/SyncOpStatus'
+export { SortPayloadsByRecentAndContentPriority } from './services/Sync/Utils'
+export { SyncUpDownLimit } from './services/Sync/Account/Operation'
+export { SNSessionManager, SessionEvent } from './services/Api/SessionManager'
+export { SNMigrationService } from './services/MigrationService'
+export { ButtonType } from './services/AlertService'
+export type { DismissBlockingDialog, SNAlertService } from './services/AlertService'
+export { SNHistoryManager } from './services/History/HistoryManager'
 export {
   SNProtectionService,
   UnprotectedAccessSecondsDuration,
   ProposedSecondsToDeferUILevelSessionExpirationDuringActiveInteraction,
-} from './services/protection_service'
-export { SNSingletonManager } from './services/singleton_manager'
-export { SNApiService } from './services/api/api_service'
+} from './services/ProtectionService'
+export { SNSingletonManager } from './services/SingletonManager'
+export { SNApiService } from './services/Api/ApiService'
 export {
   addIfUnique,
   arrayByDifference,
@@ -156,7 +156,7 @@ export {
   platformFromString,
   environmentFromString,
 } from '@Lib/platforms'
-export { SyncEvent } from '@Lib/services/sync/events'
+export { SyncEvent } from '@Lib/services/Sync/Events'
 
 /** Payloads */
 export {
@@ -196,7 +196,7 @@ export { IconsController } from './ui/icons_controller'
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base'
 
-export { ProtectionSessionDurations } from '@Lib/services/protection_service'
+export { ProtectionSessionDurations } from '@Lib/services/ProtectionService'
 
 export { SNLog } from './log'
 

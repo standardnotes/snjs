@@ -1,5 +1,5 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { ValueModesKeys } from './../../services/storage_service'
+import { ValueModesKeys } from '../../services/StorageService'
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/storage_keys'
 import { StorageReader } from './reader'
 import { PreviousSnjsVersion2_0_0 } from '@Lib/version'

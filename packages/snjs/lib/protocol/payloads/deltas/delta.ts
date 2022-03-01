@@ -1,4 +1,4 @@
-import { HistoryMap } from '@Lib/services/history/history_map'
+import { HistoryMap } from '@Lib/services/History/HistoryMap'
 import {
   PayloadSource,
   ImmutablePayloadCollectionSet,

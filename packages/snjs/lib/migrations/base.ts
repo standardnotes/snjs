@@ -1,7 +1,7 @@
 import { SNLog } from '@Lib/log'
 import { CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { ChallengeReason, ChallengeValidation } from './../challenges'
-import { KeychainRecoveryStrings, SessionStrings } from './../services/api/messages'
+import { KeychainRecoveryStrings, SessionStrings } from '../services/Api/Messages'
 import { Challenge, ChallengePrompt } from '@Lib/challenges'
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from './../version'
 import { Migration } from '@Lib/migrations/migration'
