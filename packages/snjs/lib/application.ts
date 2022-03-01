@@ -94,7 +94,12 @@ import {
   SNFileService,
   SyncModes,
 } from './services'
-import { DeviceInterface, ServiceInterface } from '@standardnotes/services'
+import {
+  DeviceInterface,
+  ServiceInterface,
+  InternalEventBusInterface,
+  InternalEventBus,
+} from '@standardnotes/services'
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
   ErrorAlertStrings,
@@ -178,6 +183,8 @@ export class SNApplication implements ListedInterface {
   private listedService!: ListedService
   private fileService!: SNFileService
 
+  private internalEventBus!: InternalEventBusInterface
+
   private eventHandlers: ApplicationObserver[] = []
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private services: ServiceInterface<any, any>[] = []
@@ -239,6 +246,8 @@ export class SNApplication implements ListedInterface {
     this.alertService = options.alertService
     this.identifier = options.identifier
     this.options = Object.freeze(fullyResovledOptions)
+
+    this.constructInternalEventBus()
 
     this.constructServices()
   }
@@ -1358,6 +1367,7 @@ export class SNApplication implements ListedInterface {
     this.serviceObservers.length = 0
     this.managedSubscribers.length = 0
     this.streamRemovers.length = 0
+    this.clearInternalEventBus()
     this.clearServices()
     this.started = false
 
@@ -1707,6 +1717,14 @@ export class SNApplication implements ListedInterface {
     this.services = []
   }
 
+  private constructInternalEventBus(): void {
+    this.internalEventBus = new InternalEventBus()
+  }
+
+  private clearInternalEventBus(): void {
+    ;(this.internalEventBus as unknown) = undefined
+  }
+
   private createListedService(): void {
     this.listedService = new ListedService(
       this.apiService,
@@ -1815,6 +1833,7 @@ export class SNApplication implements ListedInterface {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
+      this.internalEventBus,
       this.options.defaultHost,
       this.options.defaultFilesHost,
     )

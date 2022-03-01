@@ -44,7 +44,6 @@ import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { ButtonType, SNAlertService } from '@Lib/services/AlertService'
 import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
 import { Copy, lastElement } from '@standardnotes/utils'
-import { AbstractService } from '@standardnotes/services'
 import { FeaturesClientInterface } from './ClientInterface'
 import {
   FeaturesEvent,
@@ -52,18 +51,31 @@ import {
   OfflineSubscriptionEntitlements,
   SetOfflineFeaturesFunctionResponse,
 } from './Types'
+import { AbstractService, InternalEventHandlerInterface, InternalEventInterface } from '@standardnotes/services'
 
 type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject
 
+export const enum FeaturesEvent {
+  UserRolesChanged = 'UserRolesChanged',
+  FeaturesUpdated = 'FeaturesUpdated',
+}
+
+export const enum FeatureStatus {
+  NoUserSubscription = 'NoUserSubscription',
+  NotInCurrentPlan = 'NotInCurrentPlan',
+  InCurrentPlanButExpired = 'InCurrentPlanButExpired',
+  Entitled = 'Entitled',
+}
+
 export class SNFeaturesService
   extends AbstractService<FeaturesEvent>
-  implements FeaturesClientInterface
-{
+  implements
+    FeaturesClientInterface,
+    InternalEventHandlerInterface {
   private deinited = false
   private roles: RoleName[] = []
   private features: FeatureDescription[] = []
   private enabledExperimentalFeatures: FeatureIdentifier[] = []
-  private removeApiServiceObserver: () => void
   private removeWebSocketsServiceObserver: () => void
   private removefeatureReposObserver: () => void
   private removeSignInObserver: () => void
@@ -84,24 +96,6 @@ export class SNFeaturesService
     private runtime: Runtime,
   ) {
     super()
-
-    this.removeApiServiceObserver = apiService.addEventObserver(async (eventName, data) => {
-      if (eventName === ApiServiceEvent.MetaReceived) {
-        /**
-         * All user data must be downloaded before we map features. Otherwise, feature mapping
-         * may think a component doesn't exist and create a new one, when in reality the component
-         * already exists but hasn't been downloaded yet.
-         */
-        if (!this.syncService.completedOnlineDownloadFirstSync) {
-          return
-        }
-        const { userUuid, userRoles } = data as MetaReceivedData
-        await this.updateRolesAndFetchFeatures(
-          userUuid,
-          userRoles.map((role) => role.name),
-        )
-      }
-    })
 
     this.removeWebSocketsServiceObserver = webSocketsService.addEventObserver(
       async (eventName, data) => {
@@ -146,6 +140,24 @@ export class SNFeaturesService
         }
       },
     )
+  }
+
+  async handleEvent(event: InternalEventInterface): Promise<void> {
+    if (event.type === ApiServiceEvent.MetaReceived) {
+      /**
+       * All user data must be downloaded before we map features. Otherwise, feature mapping
+       * may think a component doesn't exist and create a new one, when in reality the component
+       * already exists but hasn't been downloaded yet.
+       */
+        if (!this.syncService.completedOnlineDownloadFirstSync) {
+        return
+      }
+      const { userUuid, userRoles } = event.payload as MetaReceivedData
+      await this.updateRolesAndFetchFeatures(
+        userUuid,
+        userRoles.map((role) => role.name),
+      )
+    }
   }
 
   async handleApplicationStage(stage: ApplicationStage): Promise<void> {
@@ -670,8 +682,6 @@ export class SNFeaturesService
     super.deinit()
     this.removeSignInObserver()
     ;(this.removeSignInObserver as unknown) = undefined
-    this.removeApiServiceObserver()
-    ;(this.removeApiServiceObserver as unknown) = undefined
     this.removeWebSocketsServiceObserver()
     ;(this.removeWebSocketsServiceObserver as unknown) = undefined
     this.removefeatureReposObserver()

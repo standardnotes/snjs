@@ -9,6 +9,7 @@ import { DeviceInterface } from './DeviceInterface'
  * raw values from the database or value storage.
  * This avoids the need for platforms to override migrations directly.
  */
+/* istanbul ignore file */
 export abstract class AbstractDevice implements DeviceInterface {
   public interval: any
   public timeout: any
