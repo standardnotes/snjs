@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.69.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.69.0...@standardnotes/snjs@2.69.1) (2022-03-01)
+
+
+### Bug Fixes
+
+* map component after enabling experimental feature ([2dfa59e](https://github.com/standardnotes/snjs/commit/2dfa59e318e79ba9fadd42846b60f3be6437ccdf))
+
+
+
+
+
 # [2.69.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.68.0...@standardnotes/snjs@2.69.0) (2022-03-01)
 
 
