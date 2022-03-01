@@ -248,9 +248,9 @@ export class SNApplication implements ListedInterface {
     this.identifier = options.identifier
     this.options = Object.freeze(fullyResovledOptions)
 
-    this.constructInternalEventBus()
-
     this.constructServices()
+
+    this.constructInternalEventBus()
   }
 
   public get files(): FilesClientInterface {
