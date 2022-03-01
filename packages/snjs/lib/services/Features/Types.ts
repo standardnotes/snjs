@@ -6,6 +6,7 @@ export type OfflineSubscriptionEntitlements = {
   featuresUrl: string
   extensionKey: string
 }
+
 export const enum FeaturesEvent {
   UserRolesChanged = 'UserRolesChanged',
   FeaturesUpdated = 'FeaturesUpdated',

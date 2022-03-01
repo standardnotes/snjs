@@ -22,7 +22,7 @@ import {
 import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
-import { SNComponent } from '@Lib/models'
+import { SNComponent, SNTheme } from '@Lib/models'
 import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
 import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/payloads'
 import { SNSettingsService } from '../Settings'
@@ -162,18 +162,40 @@ export class SNFeaturesService
 
   public enableExperimentalFeature(identifier: FeatureIdentifier): void {
     this.enabledExperimentalFeatures.push(identifier)
+
     void this.storageService.setValue(
       StorageKey.ExperimentalFeatures,
       this.enabledExperimentalFeatures,
     )
+
+    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
+
+    const feature = this.getFeature(identifier)
+    if (!feature) {
+      return
+    }
+
+    void this.mapRemoteNativeFeaturesToItems([feature])
   }
 
   public disableExperimentalFeature(identifier: FeatureIdentifier): void {
     removeFromArray(this.enabledExperimentalFeatures, identifier)
+
     void this.storageService.setValue(
       StorageKey.ExperimentalFeatures,
       this.enabledExperimentalFeatures,
     )
+
+    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
+
+    const component = this.itemManager
+      .getItems<SNComponent | SNTheme>([ContentType.Component, ContentType.Theme])
+      .find((component) => component.identifier === identifier)
+    if (component) {
+      void this.itemManager.setItemToBeDeleted(component.uuid).then(() => {
+        void this.syncService.sync()
+      })
+    }
   }
 
   public getExperimentalFeatures(): FeatureIdentifier[] {
