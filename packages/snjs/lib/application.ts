@@ -248,9 +248,11 @@ export class SNApplication implements ListedInterface {
     this.identifier = options.identifier
     this.options = Object.freeze(fullyResovledOptions)
 
+    this.constructInternalEventBus()
+
     this.constructServices()
 
-    this.constructInternalEventBus()
+    this.defineInternalEventHandlers()
   }
 
   public get files(): FilesClientInterface {
@@ -1720,7 +1722,9 @@ export class SNApplication implements ListedInterface {
 
   private constructInternalEventBus(): void {
     this.internalEventBus = new InternalEventBus()
+  }
 
+  private defineInternalEventHandlers(): void {
     this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
   }
 
