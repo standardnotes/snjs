@@ -149,9 +149,10 @@ export class SNFeaturesService
        * may think a component doesn't exist and create a new one, when in reality the component
        * already exists but hasn't been downloaded yet.
        */
-        if (!this.syncService.completedOnlineDownloadFirstSync) {
+      if (!this.syncService.completedOnlineDownloadFirstSync) {
         return
       }
+
       const { userUuid, userRoles } = event.payload as MetaReceivedData
       await this.updateRolesAndFetchFeatures(
         userUuid,
