@@ -6,12 +6,12 @@ import {
   PayloadByMerging,
   PayloadField,
 } from '@standardnotes/payloads'
-import { historyMapFunctions } from './../../../services/history/history_map'
+import { historyMapFunctions } from '../../../services/History/HistoryMap'
 import { CreateItemFromPayload } from '@Models/generator'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions'
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils'
-import { HistoryMap } from '@Lib/services/history/history_map'
+import { HistoryMap } from '@Lib/services/History/HistoryMap'
 
 export class ConflictDelta {
   constructor(

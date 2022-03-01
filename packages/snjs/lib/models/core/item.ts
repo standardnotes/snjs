@@ -12,7 +12,7 @@ import {
   PayloadSource,
   PredicateInterface,
 } from '@standardnotes/payloads'
-import { HistoryEntry } from '@Services/history/entries/history_entry'
+import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 import { SNLog } from './../../log'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import { UuidString } from './../../types'

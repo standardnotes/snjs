@@ -1,4 +1,4 @@
-import { filterDisallowedRemotePayloads } from '@Lib/services/sync/filter'
+import { filterDisallowedRemotePayloads } from '@Lib/services/Sync/Filter'
 import {
   PurePayload,
   RawPayload,
@@ -6,8 +6,8 @@ import {
   PayloadSource,
 } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
-import { SNApiService } from '../../api/api_service'
-import { SNProtocolService } from '../../protocol_service'
+import { SNApiService } from '../../Api/ApiService'
+import { SNProtocolService } from '../../ProtocolService'
 import { RawSyncResponse } from '@standardnotes/responses'
 
 type Progress = {

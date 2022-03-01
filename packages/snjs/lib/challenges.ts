@@ -1,4 +1,4 @@
-import { ChallengeModalTitle, ChallengeStrings, PromptTitles } from './services/api/messages'
+import { ChallengeModalTitle, ChallengeStrings, PromptTitles } from './services/Api/Messages'
 import { assertUnreachable, isNullOrUndefined } from '@standardnotes/utils'
 import { SNRootKey } from '@Protocol/root_key'
 

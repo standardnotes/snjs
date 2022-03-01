@@ -4,7 +4,7 @@ import { Predicate, PurePayload } from '@standardnotes/payloads'
 import { ItemMutator, SNItem } from '@Models/core/item'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { AppDataField } from '@standardnotes/applications'
-import { HistoryEntry } from '@Lib/services/history/entries/history_entry'
+import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 import {
   FeatureIdentifier,
   ThirdPartyFeatureDescription,

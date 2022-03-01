@@ -2,7 +2,7 @@ import { StorageReader1_0_0 } from './readers/reader_1_0_0'
 import { MigrationServices } from './types'
 import { PreviousSnjsVersion2_0_0 } from './../version'
 import { LegacyKeys1_0_0, NonwrappedStorageKey } from './../storage_keys'
-import { JwtSession } from './../services/api/session'
+import { JwtSession } from '../services/Api/Session'
 import { ContentType } from '@standardnotes/common'
 import { SNItemsKey } from './../models/app/items_key'
 import { RootKeyContent, SNRootKey } from './../protocol/root_key'
@@ -17,7 +17,7 @@ import {
   CollectionSort,
   FillItemContent,
 } from '@standardnotes/payloads'
-import { SNStorageService, StorageValuesObject } from './../services/storage_service'
+import { SNStorageService, StorageValuesObject } from '../services/StorageService'
 import { Migration } from '@Lib/migrations/migration'
 import {
   Copy,
@@ -27,7 +27,7 @@ import {
   omitByCopy,
   UuidGenerator,
 } from '@standardnotes/utils'
-import { ValueModesKeys } from '@Services/storage_service'
+import { ValueModesKeys } from '@Lib/services/StorageService'
 import { CreateItemFromPayload } from '../models'
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/platforms'
 

@@ -1,19 +1,19 @@
-import { ListedService } from './services/listed_service'
+import { ListedService } from './services/ListedService'
 import { ListedInterface } from './application_interfaces/listed_interface'
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
-import { TransactionalMutation } from './services/item_manager'
-import { FeatureStatus } from '@Lib/services/features_service'
-import { Settings } from './services/settings_service'
-import { SyncOpStatus } from './services/sync/sync_op_status'
+import { TransactionalMutation } from './services/ItemManager'
+import { FeatureStatus } from '@Lib/services/FeaturesService'
+import { Settings } from './services/Settings'
+import { SyncOpStatus } from './services/Sync/SyncOpStatus'
 import { createMutatorForItem } from '@Lib/models/mutator'
 import {
   SNCredentialService,
   CredentialsChangeFunctionResponse,
   AccountServiceResponse,
   AccountEvent,
-} from './services/credential_service'
+} from './services/CredentialService'
 import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria'
-import { SNKeyRecoveryService } from './services/key_recovery_service'
+import { SNKeyRecoveryService } from './services/KeyRecoveryService'
 import {
   CollectionSort,
   CollectionSortDirection,
@@ -47,9 +47,9 @@ import {
   FullyResolvedApplicationOptions,
 } from './options'
 import { ApplicationEvent, SyncEvent, applicationEventForSyncEvent } from '@Lib/events'
-import { StorageEncryptionPolicies } from './services/storage_service'
-import { BackupFile } from './services/protocol_service'
-import { SyncOptions } from './services/sync/sync_service'
+import { StorageEncryptionPolicies } from './services/StorageService'
+import { BackupFile } from './services/ProtocolService'
+import { SyncOptions } from './services/Sync/SyncService'
 import { SmartView } from './models/app/SmartView'
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item'
 import {
@@ -60,7 +60,7 @@ import {
   ChallengeValidation,
   ChallengeValue,
 } from './challenges'
-import { ChallengeObserver } from './services/challenge/challenge_service'
+import { ChallengeObserver } from './services/Challenge/ChallengeService'
 import { Environment, Platform } from './platforms'
 import {
   assertUnreachable,
@@ -72,7 +72,7 @@ import {
   UuidGenerator,
 } from '@standardnotes/utils'
 import { CreateItemFromPayload } from '@Models/generator'
-import { StoragePersistencePolicies, StorageValueModes } from '@Services/storage_service'
+import { StoragePersistencePolicies, StorageValueModes } from '@Lib/services/StorageService'
 import {
   ChallengeService,
   ItemManager,
@@ -102,11 +102,11 @@ import {
   UNSUPPORTED_BACKUP_FILE_VERSION,
   SessionStrings,
   ImportStrings,
-} from './services/api/messages'
-import { SessionEvent } from './services/api/session_manager'
+} from './services/Api/Messages'
+import { SessionEvent } from './services/Api/SessionManager'
 import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models'
 import { SNLog } from './log'
-import { SNPreferencesService } from './services/preferences_service'
+import { SNPreferencesService } from './services/PreferencesService'
 import {
   AvailableSubscriptions,
   GetAvailableSubscriptionsResponse,
@@ -117,19 +117,19 @@ import {
   SignInResponse,
   User,
 } from '@standardnotes/responses'
-import { ProtectionEvent } from './services/protection_service'
-import { SNWebSocketsService } from './services/api/websockets_service'
+import { ProtectionEvent } from './services/ProtectionService'
+import { SNWebSocketsService } from './services/Api/WebsocketsService'
 import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings'
-import { SNSettingsService } from './services/settings_service'
-import { SNMfaService } from './services/mfa_service'
-import { SensitiveSettingName } from './services/settings_service/SensitiveSettingName'
+import { SNSettingsService } from './services/Settings'
+import { SNMfaService } from './services/MfaService'
+import { SensitiveSettingName } from './services/Settings/SensitiveSettingName'
 import { Subscription } from '@standardnotes/auth'
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features'
-import { FeaturesEvent, SetOfflineFeaturesFunctionResponse } from '@Services/features_service'
+import { FeaturesEvent, SetOfflineFeaturesFunctionResponse } from '@Lib/services/FeaturesService'
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders'
-import { RemoteSession } from './services/api/session'
+import { RemoteSession } from './services/Api/Session'
 import { RoleName } from '.'
-import { FilesClientInterface } from './services/files/file_service'
+import { FilesClientInterface } from './services/Files/FileService'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000

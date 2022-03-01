@@ -1,4 +1,4 @@
-import { SNRootKeyParams } from './../../protocol/key_params'
+import { SNRootKeyParams } from '../../protocol/key_params'
 import { ProtocolVersion, KeyParamsOrigination } from '@standardnotes/common'
 export const API_MESSAGE_GENERIC_INVALID_LOGIN =
   'A server error occurred while trying to sign in. Please try again.'

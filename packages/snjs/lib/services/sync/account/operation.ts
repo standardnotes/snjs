@@ -1,8 +1,8 @@
 import { PurePayload } from '@standardnotes/payloads'
 import { arrayByDifference, subtractFromArray } from '@standardnotes/utils'
-import { SyncResponse } from '@Services/sync/response'
-import { ResponseSignalReceiver, SyncSignal } from '@Services/sync/signals'
-import { SNApiService } from '../../api/api_service'
+import { SyncResponse } from '@Lib/services/Sync/Response'
+import { ResponseSignalReceiver, SyncSignal } from '@Lib/services/Sync/Signals'
+import { SNApiService } from '../../Api/ApiService'
 import { RawSyncResponse } from '@standardnotes/responses'
 
 export const SyncUpDownLimit = 150

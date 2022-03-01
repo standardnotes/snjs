@@ -1,4 +1,4 @@
-import { SyncEvent } from '@Services/sync/events'
+import { SyncEvent } from '@Lib/services/Sync/Events'
 export { SyncEvent }
 
 export enum ApplicationEvent {

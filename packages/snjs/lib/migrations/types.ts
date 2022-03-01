@@ -1,9 +1,9 @@
-import { SNSessionManager } from './../services/api/session_manager'
+import { SNSessionManager } from '../services/Api/SessionManager'
 import { ApplicationIdentifier } from '@standardnotes/applications'
-import { ItemManager } from '@Services/item_manager'
+import { ItemManager } from '@Lib/services/ItemManager'
 import { Environment } from './../platforms'
-import { SNStorageService } from '@Services/storage_service'
-import { SNProtocolService } from './../services/protocol_service'
+import { SNStorageService } from '@Lib/services/StorageService'
+import { SNProtocolService } from '../services/ProtocolService'
 import { DeviceInterface } from '@standardnotes/services'
 import { ChallengeService, SNSingletonManager, SNFeaturesService } from '@Lib/services'
 

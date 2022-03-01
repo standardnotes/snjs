@@ -1,4 +1,4 @@
-import { HistoryEntry } from '@Services/history/entries/history_entry'
+import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 import { ItemMutator, SNItem } from '@Models/core/item'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import { ProtocolVersion } from '@standardnotes/common'

@@ -1,4 +1,4 @@
-import { SyncResponse } from '@Services/sync/response'
+import { SyncResponse } from '@Lib/services/Sync/Response'
 
 export enum SyncSignal {
   Response = 1,

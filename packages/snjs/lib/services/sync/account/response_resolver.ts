@@ -5,10 +5,10 @@ import {
   ImmutablePayloadCollectionSet,
   CopyPayload,
 } from '@standardnotes/payloads'
-import { SyncResponse } from '@Services/sync/response'
+import { SyncResponse } from '@Lib/services/Sync/Response'
 import { DeltaClassForSource } from '@Payloads/deltas/generator'
-import { HistoryMap } from '@Lib/services/history/history_map'
-import { filterDisallowedRemotePayloads } from '../filter'
+import { HistoryMap } from '@Lib/services/History/HistoryMap'
+import { filterDisallowedRemotePayloads } from '../Filter'
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top

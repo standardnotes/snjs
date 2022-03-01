@@ -1,7 +1,7 @@
 import { PayloadField, SurePayload } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
-import { HistoryEntry } from './history_entry'
-import { NoteHistoryEntry } from './note_history_entry'
+import { HistoryEntry } from './HistoryEntry'
+import { NoteHistoryEntry } from './NoteHistoryEntry'
 
 export function CreateHistoryEntryForPayload(
   payload: SurePayload,
