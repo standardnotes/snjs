@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.68.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.67.5...@standardnotes/snjs@2.68.0) (2022-03-01)
+
+
+### Features
+
+* add experimental feature support ([#622](https://github.com/standardnotes/snjs/issues/622)) ([533c920](https://github.com/standardnotes/snjs/commit/533c92074826e496e6240dff2f11410f72064d8a))
+
+
+
+
+
 ## [2.67.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.67.4...@standardnotes/snjs@2.67.5) (2022-03-01)
 
 **Note:** Version bump only for package @standardnotes/snjs
