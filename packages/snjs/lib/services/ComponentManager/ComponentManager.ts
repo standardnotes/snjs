@@ -1,6 +1,6 @@
 import { SNPreferencesService } from '../PreferencesService'
 import { FindNativeFeature } from '@standardnotes/features'
-import { SNFeaturesService } from '@Lib/services/FeaturesService'
+import { SNFeaturesService } from '@Lib/services/Features/FeaturesService'
 import { ComponentMutator } from '@Models/app/component'
 import { displayStringForContentType } from '@Models/content_types'
 import { ContentType, Runtime } from '@standardnotes/common'

@@ -13,7 +13,7 @@ import { Runtime } from '@standardnotes/common'
 import { SNAlertService } from '@Lib/services/AlertService'
 import { SNItem } from '@Models/core/item'
 import { ItemManager } from '@Lib/services/ItemManager'
-import { SNFeaturesService } from '@Lib/services/FeaturesService'
+import { SNFeaturesService } from '@Lib/services/Features/FeaturesService'
 import { SNComponentManager } from './ComponentManager'
 import { SNSyncService } from '../Sync/SyncService'
 

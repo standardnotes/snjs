@@ -3,7 +3,7 @@ import { SettingName } from '@standardnotes/settings'
 import { SNSettingsService } from './Settings'
 import * as messages from './Api/Messages'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
-import { SNFeaturesService } from './FeaturesService'
+import { SNFeaturesService } from './Features/FeaturesService'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { AbstractService } from '@standardnotes/services'
 

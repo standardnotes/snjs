@@ -1,13 +1,13 @@
 import { SNItem } from '@Models/core/item'
 import { ApplicationStage } from '@standardnotes/applications'
-import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../hosts'
-import { SNFeatureRepo, FeatureRepoContent } from '../models/app/feature_repo'
-import { SNSyncService } from './Sync/SyncService'
-import { AccountEvent, SNCredentialService } from './CredentialService'
+import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../hosts'
+import { SNFeatureRepo, FeatureRepoContent } from '../../models/app/feature_repo'
+import { SNSyncService } from '../Sync/SyncService'
+import { AccountEvent, SNCredentialService } from '../CredentialService'
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { StorageKey } from '@Lib/storage_keys'
-import { SNStorageService } from './StorageService'
-import { ApiServiceEvent, MetaReceivedData, SNApiService } from './Api/ApiService'
+import { SNStorageService } from '../StorageService'
+import { ApiServiceEvent, MetaReceivedData, SNApiService } from '../Api/ApiService'
 import { UuidString } from '@Lib/types'
 import {
   FeatureDescription,
@@ -17,14 +17,15 @@ import {
   FindNativeFeature,
   DeprecatedFeatures,
   ComponentContent,
+  ExperimentalFeatures,
 } from '@standardnotes/features'
 import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common'
-import { ItemManager } from './ItemManager'
+import { ItemManager } from '../ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
 import { SNComponent } from '@Lib/models'
-import { SNWebSocketsService, WebSocketsServiceEvent } from './Api/WebsocketsService'
+import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
 import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/payloads'
-import { SNSettingsService } from './Settings'
+import { SNSettingsService } from '../Settings'
 import { SettingName } from '@standardnotes/settings'
 import { arraysEqual, convertTimestampToMilliseconds, isErrorObject } from '@standardnotes/utils'
 import { SNSessionManager } from '@Lib/services/Api/SessionManager'
@@ -157,6 +158,18 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
           this.downloadOfflineFeatures(offlineRepo)
         }
       }
+    }
+  }
+
+  public getExperimentalFeatures(): FeatureIdentifier[] {
+    return ExperimentalFeatures
+  }
+
+  public getEnabledExperimentalFeatures(): FeatureIdentifier[] {
+    if (this.runtime === Runtime.Dev) {
+      return [FeatureIdentifier.AccountSwitcher, FeatureIdentifier.MarkdownVisualEditor]
+    } else {
+      return []
     }
   }
 
@@ -481,6 +494,13 @@ export class SNFeaturesService extends AbstractService<FeaturesEvent> {
     itemsToDeleteUuids: UuidString[],
   ): Promise<boolean> {
     if (!feature.content_type) {
+      return false
+    }
+
+    if (
+      this.getExperimentalFeatures().includes(feature.identifier) &&
+      !this.getEnabledExperimentalFeatures().includes(feature.identifier)
+    ) {
       return false
     }
 
