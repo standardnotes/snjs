@@ -132,6 +132,7 @@ import { Subscription } from '@standardnotes/auth'
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders'
 import { RemoteSession } from './services/Api/Session'
 import { FilesClientInterface } from './services/Files/FileService'
+import { ApiServiceEvent } from './services/Api/ApiService'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -1719,6 +1720,8 @@ export class SNApplication implements ListedInterface {
 
   private constructInternalEventBus(): void {
     this.internalEventBus = new InternalEventBus()
+
+    this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
   }
 
   private clearInternalEventBus(): void {
