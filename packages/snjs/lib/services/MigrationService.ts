@@ -23,8 +23,10 @@ export class SNMigrationService extends AbstractService {
   private activeMigrations?: Migration[]
   private baseMigration!: BaseMigration
 
-  constructor(private services: MigrationServices) {
-    super()
+  constructor(
+    private services: MigrationServices,
+  ) {
+    super(services.internalEventBus)
   }
 
   public deinit(): void {

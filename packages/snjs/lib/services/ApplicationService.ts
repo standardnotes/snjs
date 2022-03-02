@@ -1,12 +1,15 @@
 import { ApplicationEvent } from '@Lib/events'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { SNApplication } from '../application'
 
 export class ApplicationService extends AbstractService {
   private unsubApp: any
 
-  constructor(protected application: SNApplication) {
-    super()
+  constructor(
+    protected application: SNApplication,
+    protected internalEventBus: InternalEventBusInterface,
+  ) {
+    super(internalEventBus)
     /* Allow caller constructor to finish setting instance variables before triggering callbacks */
     setTimeout(() => {
       this.addAppEventObserver()

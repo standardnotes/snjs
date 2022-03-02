@@ -40,7 +40,7 @@ import { ItemMutator, MutationType, SNItem } from '../models/core/item'
 import { TagNoteCountChangeObserver, TagNotesIndex } from '../protocol/collection/tag_notes_index'
 import { UuidString } from '../types'
 import { PayloadManager } from './PayloadManager'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { BuildSmartViews } from '@Lib/protocol/collection/smart_view_builder'
 
 type ObserverCallback = (
@@ -88,8 +88,11 @@ export class ItemManager extends AbstractService {
   private systemSmartViews: SmartView[]
   private tagNotesIndex!: TagNotesIndex
 
-  constructor(private payloadManager: PayloadManager) {
-    super()
+  constructor(
+    private payloadManager: PayloadManager,
+    protected internalEventBus: InternalEventBusInterface,
+  ) {
+    super(internalEventBus)
     this.payloadManager = payloadManager
     this.systemSmartViews = this.rebuildSystemSmartViews(NotesDisplayCriteria.Create({}))
     this.createCollection()

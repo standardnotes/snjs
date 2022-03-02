@@ -13,7 +13,7 @@ import {
   ListedAccountInfo,
   ListedAccountInfoResponse,
 } from '@standardnotes/responses'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export class ListedService extends AbstractService implements ListedInterface {
   constructor(
@@ -21,8 +21,9 @@ export class ListedService extends AbstractService implements ListedInterface {
     private itemManager: ItemManager,
     private settingsService: SNSettingsService,
     private httpSerivce: SNHttpService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   public canRegisterNewListedAccount(): boolean {

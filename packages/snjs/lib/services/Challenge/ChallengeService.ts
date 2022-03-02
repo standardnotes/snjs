@@ -12,7 +12,7 @@ import {
 import { ChallengeOperation } from './ChallengeOperation'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../ProtectionService'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 type ChallengeValidationResponse = {
   valid: boolean
@@ -40,8 +40,9 @@ export class ChallengeService extends AbstractService {
   constructor(
     private storageService: SNStorageService,
     private protocolService: SNProtocolService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   /** @override */

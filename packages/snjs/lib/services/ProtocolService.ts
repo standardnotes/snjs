@@ -56,7 +56,7 @@ import {
 } from '@standardnotes/applications'
 import { StorageKey } from '@Lib/storage_keys'
 import { StorageValueModes } from '@Lib/services/StorageService'
-import { AbstractService, DeviceInterface } from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 
 export type BackupFile = {
   version?: ProtocolVersion
@@ -134,8 +134,9 @@ export class SNProtocolService extends AbstractService implements EncryptionDele
     private storageService: SNStorageService,
     private identifier: ApplicationIdentifier,
     crypto: SNPureCrypto,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     this.itemManager = itemManager
     this.payloadManager = payloadManager
     this.deviceInterface = deviceInterface

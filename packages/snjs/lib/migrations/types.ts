@@ -4,7 +4,7 @@ import { ItemManager } from '@Lib/services/ItemManager'
 import { Environment } from './../platforms'
 import { SNStorageService } from '@Lib/services/StorageService'
 import { SNProtocolService } from '../services/ProtocolService'
-import { DeviceInterface } from '@standardnotes/services'
+import { DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 import { ChallengeService, SNSingletonManager, SNFeaturesService } from '@Lib/services'
 
 /** Services that the migration service needs to function */
@@ -20,4 +20,5 @@ export type MigrationServices = {
   environment: Environment
   /** The application identifier */
   identifier: ApplicationIdentifier
+  internalEventBus: InternalEventBusInterface,
 }

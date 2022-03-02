@@ -4,12 +4,18 @@ import { ApplicationStage } from '@standardnotes/applications'
 import { DeviceInterface } from '../Device/DeviceInterface'
 import { EventObserver } from '../Event/EventObserver'
 import { ServiceInterface } from './ServiceInterface'
+import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
 
 export abstract class AbstractService<EventName = string, EventData = undefined> implements ServiceInterface<EventName, EventData> {
   private eventObservers: EventObserver<EventName, EventData>[] = []
   public loggingEnabled = false
   public deviceInterface?: DeviceInterface
   private criticalPromises: Promise<unknown>[] = []
+
+  constructor(
+    protected internalEventBus: InternalEventBusInterface
+  ) {
+  }
 
   public addEventObserver(
     observer: EventObserver<EventName, EventData>
@@ -27,6 +33,11 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
     for (const observer of this.eventObservers) {
       await observer(eventName, data)
     }
+
+    this.internalEventBus.publish({
+      type: (eventName as unknown) as string,
+      payload: data,
+    })
   }
 
   /**

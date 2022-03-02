@@ -148,11 +148,11 @@ export class SNApiService
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
-    private internalEventBus: InternalEventBusInterface,
     private host: string,
     private filesHost: string,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   /** @override */
@@ -275,14 +275,6 @@ export class SNApiService
       this.notifyEvent(ApiServiceEvent.MetaReceived, {
         userUuid: meta.auth.userUuid,
         userRoles: meta.auth.roles,
-      })
-
-      this.internalEventBus.publish({
-        type: ApiServiceEvent.MetaReceived,
-        payload: {
-          userUuid: meta.auth.userUuid,
-          userRoles: meta.auth.roles,
-        }
       })
     }
   }

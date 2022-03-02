@@ -5,15 +5,16 @@ import * as messages from './Api/Messages'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNFeaturesService } from './Features/FeaturesService'
 import { FeatureIdentifier } from '@standardnotes/features'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export class SNMfaService extends AbstractService {
   constructor(
     private settingsService: SNSettingsService,
     private crypto: SNPureCrypto,
     private featuresService: SNFeaturesService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   private async saveMfaSetting(secret: string): Promise<void> {

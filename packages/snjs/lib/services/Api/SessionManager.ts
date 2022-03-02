@@ -28,7 +28,7 @@ import * as messages from './Messages'
 import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from './Messages'
 import { UuidString } from '@Lib/types'
 import { SNWebSocketsService } from './WebsocketsService'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
 export const MissingAccountParams = 'missing-params'
@@ -64,8 +64,9 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
     private webSocketsService: SNWebSocketsService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     apiService.setInvalidSessionObserver((revoked) => {
       if (revoked) {
         void this.notifyEvent(SessionEvent.Revoked)

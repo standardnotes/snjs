@@ -16,6 +16,7 @@ import { ItemManager } from '@Lib/services/ItemManager'
 import { SNFeaturesService } from '@Lib/services/Features/FeaturesService'
 import { SNComponentManager } from './ComponentManager'
 import { SNSyncService } from '../Sync/SyncService'
+import { InternalEventBusInterface } from '@standardnotes/services'
 
 describe('featuresService', () => {
   let itemManager: ItemManager
@@ -23,6 +24,7 @@ describe('featuresService', () => {
   let alertService: SNAlertService
   let syncService: SNSyncService
   let prefsService: SNPreferencesService
+  let internalEventBus: InternalEventBusInterface
 
   const desktopExtHost = 'http://localhost:123'
 
@@ -46,6 +48,7 @@ describe('featuresService', () => {
       environment,
       platform,
       Runtime.Prod,
+      internalEventBus,
     )
     manager.setDesktopManager(desktopManager)
     manager.configureForNonMobileUsage = jest.fn().mockReturnValue(0)
@@ -72,6 +75,9 @@ describe('featuresService', () => {
     alertService = {} as jest.Mocked<SNAlertService>
     alertService.confirm = jest.fn()
     alertService.alert = jest.fn()
+
+    internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
+    internalEventBus.publish = jest.fn()
   })
 
   const nativeComponent = (file_type?: FeatureDescription['file_type']) => {

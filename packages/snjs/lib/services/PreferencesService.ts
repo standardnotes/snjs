@@ -6,7 +6,7 @@ import { SNSingletonManager } from './SingletonManager'
 import { SNSyncService } from './Sync/SyncService'
 import { SyncEvent } from './Sync/Events'
 import { ApplicationStage } from '@standardnotes/applications'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { FillItemContent } from '@standardnotes/payloads'
 
 const preferencesChangedEvent = 'preferencesChanged'
@@ -23,8 +23,9 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     private singletonManager: SNSingletonManager,
     private itemManager: ItemManager,
     private syncService: SNSyncService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
 
     this.removeItemObserver = itemManager.addObserver(ContentType.UserPrefs, () => {
       this.shouldReload = true

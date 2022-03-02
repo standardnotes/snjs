@@ -4,7 +4,7 @@ import { SNSessionManager } from '../Api/SessionManager'
 import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import { SensitiveSettingName } from './SensitiveSettingName'
 import { ExtensionsServerURL } from '@Lib/hosts'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export class SNSettingsService extends AbstractService {
   private provider!: SettingsGateway
@@ -23,8 +23,9 @@ export class SNSettingsService extends AbstractService {
   constructor(
     private readonly sessionManager: SNSessionManager,
     private readonly apiService: SNApiService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   initializeFromDisk(): void {

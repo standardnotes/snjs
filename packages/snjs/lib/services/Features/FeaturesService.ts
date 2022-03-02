@@ -51,7 +51,7 @@ import {
   OfflineSubscriptionEntitlements,
   SetOfflineFeaturesFunctionResponse,
 } from './Types'
-import { AbstractService, InternalEventHandlerInterface, InternalEventInterface } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, InternalEventHandlerInterface, InternalEventInterface } from '@standardnotes/services'
 
 type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject
 
@@ -82,8 +82,9 @@ export class SNFeaturesService
     private sessionManager: SNSessionManager,
     private crypto: SNPureCrypto,
     private runtime: Runtime,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
 
     this.removeWebSocketsServiceObserver = webSocketsService.addEventObserver(
       async (eventName, data) => {

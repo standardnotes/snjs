@@ -34,7 +34,7 @@ import { SyncSignal, SyncStats } from '@Lib/services/Sync/Signals'
 import { SNSessionManager } from '../Api/SessionManager'
 import { SNApiService } from '../Api/ApiService'
 import { SNLog } from '@Lib/log'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 const DEFAULT_MAX_DISCORDANCE = 5
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
@@ -152,8 +152,9 @@ export class SNSyncService extends AbstractService<
     private apiService: SNApiService,
     private historyService: SNHistoryManager,
     private readonly options: ApplicationSyncOptions,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     this.initializeStatus()
     this.initializeState()
   }

@@ -1,3 +1,4 @@
+import { InternalEventBusInterface } from '@standardnotes/services'
 import { StorageKey, SNStorageService } from '@Lib/index'
 import { SNWebSocketsService } from './WebsocketsService'
 
@@ -5,14 +6,18 @@ describe('webSocketsService', () => {
   const webSocketUrl = ''
 
   let storageService: SNStorageService
+  let internalEventBus: InternalEventBusInterface
 
   const createService = () => {
-    return new SNWebSocketsService(storageService, webSocketUrl)
+    return new SNWebSocketsService(storageService, webSocketUrl, internalEventBus)
   }
 
   beforeEach(() => {
     storageService = {} as jest.Mocked<SNStorageService>
     storageService.setValue = jest.fn()
+
+    internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
+    internalEventBus.publish = jest.fn()
   })
 
   describe('setWebSocketUrl()', () => {

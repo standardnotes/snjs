@@ -3,7 +3,7 @@ import { HttpResponse, StatusCode } from '@standardnotes/responses'
 import { isNullOrUndefined, isString } from '@standardnotes/utils'
 import { SnjsVersion } from '@Lib/version'
 import { Environment } from '@Lib/platforms'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export enum HttpVerb {
   Get = 'GET',
@@ -35,9 +35,14 @@ export type HttpRequest = {
  * A non-SNJS specific wrapper for XMLHttpRequests
  */
 export class SNHttpService extends AbstractService {
-  constructor(private readonly environment: Environment, private readonly appVersion: string) {
-    super()
+  constructor(
+    private readonly environment: Environment,
+    private readonly appVersion: string,
+    protected internalEventBus: InternalEventBusInterface,
+  ) {
+    super(internalEventBus)
   }
+
   public async getAbsolute(
     url: string,
     params?: HttpParams,

@@ -2,7 +2,7 @@ import { RawStorageKey } from '@Lib/storage_keys'
 import { removeFromArray } from '@standardnotes/utils'
 import { DeinitSource, UuidString } from './types'
 import { SNApplication } from './application'
-import { AbstractService, DeviceInterface } from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBus, InternalEventBusInterface } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
 
 export type ApplicationDescriptor = {
@@ -30,8 +30,10 @@ export class SNApplicationGroup extends AbstractService {
   callback!: AppGroupCallback
   private applications: SNApplication[] = []
 
-  constructor(public deviceInterface: DeviceInterface) {
-    super()
+  constructor(
+    public deviceInterface: DeviceInterface,
+  ) {
+    super(new InternalEventBus())
   }
 
   deinit() {

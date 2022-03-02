@@ -19,6 +19,7 @@ import { SNWebSocketsService } from '../Api/WebsocketsService'
 import { SNSettingsService } from '../Settings'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { convertTimestampToMilliseconds } from '@standardnotes/utils'
+import { InternalEventBusInterface } from '@standardnotes/services'
 
 describe('featuresService', () => {
   let storageService: SNStorageService
@@ -37,6 +38,7 @@ describe('featuresService', () => {
   let now: Date
   let tomorrow_server: number
   let tomorrow_client: number
+  let internalEventBus: InternalEventBusInterface
   const expiredDate = new Date(new Date().getTime() - 1000).getTime()
 
   const createService = () => {
@@ -52,6 +54,7 @@ describe('featuresService', () => {
       sessionManager,
       crypto,
       Runtime.Prod,
+      internalEventBus,
     )
   }
 
@@ -123,6 +126,9 @@ describe('featuresService', () => {
 
     crypto = {} as jest.Mocked<SNPureCrypto>
     crypto.base64Decode = jest.fn()
+
+    internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
+    internalEventBus.publish = jest.fn()
   })
 
   describe('experimental features', () => {
