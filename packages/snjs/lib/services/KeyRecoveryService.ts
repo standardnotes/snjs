@@ -27,7 +27,7 @@ import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/u
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params'
 import { UuidString } from '@Lib/types'
 import { KeyParamsResponse } from '@standardnotes/responses'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 /**
  * The key recovery service listens to items key changes to detect any that cannot be decrypted.
@@ -97,8 +97,9 @@ export class SNKeyRecoveryService extends AbstractService {
     private storageService: SNStorageService,
     private syncService: SNSyncService,
     private credentialService: SNCredentialService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     this.removeItemObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
       (changed, inserted, _discarded, ignored, source) => {

@@ -7,7 +7,7 @@ import {
   PayloadSource,
   PayloadFormat,
 } from '@standardnotes/payloads'
-import { AbstractService, DeviceInterface } from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 import { CreateHistoryEntryForPayload } from '@Lib/services/History/Entries/Generator'
 import { UuidString } from '../../types'
@@ -82,8 +82,9 @@ export class SNHistoryManager extends AbstractService {
     private apiService: SNApiService,
     private protocolService: SNProtocolService,
     public deviceInterface: DeviceInterface,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     this.removeChangeObserver = this.itemManager.addObserver(
       this.historyTypes,
       (changed, inserted) => {

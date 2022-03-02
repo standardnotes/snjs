@@ -11,6 +11,7 @@ import { UuidGenerator } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
 import { NotesDisplayCriteria } from '../protocol/collection/notes_display_criteria'
 import { PayloadManager } from './PayloadManager'
+import { InternalEventBusInterface } from '@standardnotes/services'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))
@@ -42,13 +43,20 @@ describe('itemManager', () => {
   let payloadManager: PayloadManager
   let itemManager: ItemManager
   let items: SNItem[]
+  let internalEventBus: InternalEventBusInterface
 
   const createService = () => {
-    return new ItemManager(payloadManager)
+    return new ItemManager(
+      payloadManager,
+      internalEventBus,
+    )
   }
 
   beforeEach(() => {
-    payloadManager = new PayloadManager()
+    internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
+    internalEventBus.publish = jest.fn()
+
+    payloadManager = new PayloadManager(internalEventBus)
 
     items = [] as jest.Mocked<SNItem[]>
     itemManager = {} as jest.Mocked<ItemManager>

@@ -9,7 +9,7 @@ import { isNullOrUndefined } from '@standardnotes/utils'
 import { ApplicationStage } from '@standardnotes/applications'
 import { ItemManager } from './ItemManager'
 import { Uuids } from '@Lib/models/functions'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export enum ProtectionEvent {
   UnprotectedSessionBegan = 'UnprotectedSessionBegan',
@@ -63,8 +63,9 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
     private challengeService: ChallengeService,
     private storageService: SNStorageService,
     private itemManager: ItemManager,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   public deinit(): void {

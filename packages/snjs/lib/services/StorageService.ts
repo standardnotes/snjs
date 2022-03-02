@@ -13,7 +13,7 @@ import { EncryptionDelegate } from './EncryptionDelegate'
 import { SNRootKey } from '@Protocol/root_key'
 import { ContentType } from '@standardnotes/common'
 import { Copy, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils'
-import { AbstractService, DeviceInterface } from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 
 export enum StoragePersistencePolicies {
   Default = 1,
@@ -73,8 +73,9 @@ export class SNStorageService extends AbstractService {
     private alertService: SNAlertService,
     private identifier: string,
     private environment: Environment,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     this.deviceInterface = deviceInterface
     this.setPersistencePolicy(StoragePersistencePolicies.Default)
     this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false)

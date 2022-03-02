@@ -1,7 +1,7 @@
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { StorageKey } from '@Lib/storage_keys'
 import { SNStorageService } from '../StorageService'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export enum WebSocketsServiceEvent {
   UserRoleMessageReceived = 'WebSocketMessageReceived',
@@ -13,8 +13,12 @@ export class SNWebSocketsService extends AbstractService<
 > {
   private webSocket?: WebSocket
 
-  constructor(private storageService: SNStorageService, private webSocketUrl: string | undefined) {
-    super()
+  constructor(
+    private storageService: SNStorageService,
+    private webSocketUrl: string | undefined,
+    protected internalEventBus: InternalEventBusInterface,
+  ) {
+    super(internalEventBus)
   }
 
   public async setWebSocketUrl(url: string | undefined): Promise<void> {

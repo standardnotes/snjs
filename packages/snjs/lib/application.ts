@@ -1738,6 +1738,7 @@ export class SNApplication implements ListedInterface {
       this.itemManager,
       this.settingsService,
       this.httpService,
+      this.internalEventBus,
     )
     this.services.push(this.listedService)
   }
@@ -1749,6 +1750,7 @@ export class SNApplication implements ListedInterface {
       this.syncService,
       this.alertService,
       this.options.crypto,
+      this.internalEventBus,
     )
 
     this.services.push(this.fileService)
@@ -1767,6 +1769,7 @@ export class SNApplication implements ListedInterface {
       this.sessionManager,
       this.options.crypto,
       this.options.runtime,
+      this.internalEventBus,
     )
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
@@ -1789,7 +1792,11 @@ export class SNApplication implements ListedInterface {
   }
 
   private createWebSocketsService() {
-    this.webSocketsService = new SNWebSocketsService(this.storageService, this.options.webSocketUrl)
+    this.webSocketsService = new SNWebSocketsService(
+      this.storageService,
+      this.options.webSocketUrl,
+      this.internalEventBus,
+    )
     this.services.push(this.webSocketsService)
   }
 
@@ -1805,6 +1812,7 @@ export class SNApplication implements ListedInterface {
       featuresService: this.featuresService,
       environment: this.environment,
       identifier: this.identifier,
+      internalEventBus: this.internalEventBus,
     })
     this.services.push(this.migrationService)
   }
@@ -1819,6 +1827,7 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.challengeService,
       this.protectionService,
+      this.internalEventBus,
     )
     this.serviceObservers.push(
       this.credentialService.addEventObserver((event) => {
@@ -1840,15 +1849,18 @@ export class SNApplication implements ListedInterface {
     this.apiService = new SNApiService(
       this.httpService,
       this.storageService,
-      this.internalEventBus,
       this.options.defaultHost,
       this.options.defaultFilesHost,
+      this.internalEventBus,
     )
     this.services.push(this.apiService)
   }
 
   private createItemManager() {
-    this.itemManager = new ItemManager(this.payloadManager)
+    this.itemManager = new ItemManager(
+      this.payloadManager,
+      this.internalEventBus,
+    )
     this.services.push(this.itemManager)
   }
 
@@ -1864,22 +1876,33 @@ export class SNApplication implements ListedInterface {
       this.environment,
       this.platform,
       this.options.runtime,
+      this.internalEventBus,
     )
     this.services.push(this.componentManager)
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService(this.environment, this.options.appVersion)
+    this.httpService = new SNHttpService(
+      this.environment,
+      this.options.appVersion,
+      this.internalEventBus,
+    )
     this.services.push(this.httpService)
   }
 
   private createPayloadManager() {
-    this.payloadManager = new PayloadManager()
+    this.payloadManager = new PayloadManager(
+      this.internalEventBus,
+    )
     this.services.push(this.payloadManager)
   }
 
   private createSingletonManager() {
-    this.singletonManager = new SNSingletonManager(this.itemManager, this.syncService)
+    this.singletonManager = new SNSingletonManager(
+      this.itemManager,
+      this.syncService,
+      this.internalEventBus,
+    )
     this.services.push(this.singletonManager)
   }
 
@@ -1889,6 +1912,7 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.identifier,
       this.environment,
+      this.internalEventBus,
     )
     this.services.push(this.storageService)
   }
@@ -1901,6 +1925,7 @@ export class SNApplication implements ListedInterface {
       this.storageService,
       this.identifier,
       this.options.crypto,
+      this.internalEventBus,
     )
     this.protocolService.onKeyStatusChange(async () => {
       await this.notifyEvent(ApplicationEvent.KeyStatusChanged)
@@ -1919,6 +1944,7 @@ export class SNApplication implements ListedInterface {
       this.storageService,
       this.syncService,
       this.credentialService,
+      this.internalEventBus,
     )
     this.services.push(this.keyRecoveryService)
   }
@@ -1931,6 +1957,7 @@ export class SNApplication implements ListedInterface {
       this.protocolService,
       this.challengeService,
       this.webSocketsService,
+      this.internalEventBus,
     )
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
@@ -1971,6 +1998,7 @@ export class SNApplication implements ListedInterface {
       {
         loadBatchSize: this.options.loadBatchSize,
       },
+      this.internalEventBus,
     )
     const syncEventCallback = async (eventName: SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName)
@@ -1991,7 +2019,11 @@ export class SNApplication implements ListedInterface {
   }
 
   private createChallengeService() {
-    this.challengeService = new ChallengeService(this.storageService, this.protocolService)
+    this.challengeService = new ChallengeService(
+      this.storageService,
+      this.protocolService,
+      this.internalEventBus,
+    )
     this.services.push(this.challengeService)
   }
 
@@ -2001,6 +2033,7 @@ export class SNApplication implements ListedInterface {
       this.challengeService,
       this.storageService,
       this.itemManager,
+      this.internalEventBus,
     )
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
@@ -2021,6 +2054,7 @@ export class SNApplication implements ListedInterface {
       this.apiService,
       this.protocolService,
       this.deviceInterface,
+      this.internalEventBus,
     )
     this.services.push(this.historyManager)
   }
@@ -2036,6 +2070,7 @@ export class SNApplication implements ListedInterface {
       this.syncService,
       this.challengeService,
       this.listedService,
+      this.internalEventBus,
     )
     this.services.push(this.actionsManager)
   }
@@ -2045,6 +2080,7 @@ export class SNApplication implements ListedInterface {
       this.singletonManager,
       this.itemManager,
       this.syncService,
+      this.internalEventBus,
     )
     this.serviceObservers.push(
       this.preferencesService.addEventObserver(() => {
@@ -2055,7 +2091,11 @@ export class SNApplication implements ListedInterface {
   }
 
   private createSettingsService() {
-    this.settingsService = new SNSettingsService(this.sessionManager, this.apiService)
+    this.settingsService = new SNSettingsService(
+      this.sessionManager,
+      this.apiService,
+      this.internalEventBus,
+    )
     this.services.push(this.settingsService)
   }
 
@@ -2064,6 +2104,7 @@ export class SNApplication implements ListedInterface {
       this.settingsService,
       this.options.crypto,
       this.featuresService,
+      this.internalEventBus,
     )
     this.services.push(this.mfaService)
   }

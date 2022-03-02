@@ -24,7 +24,7 @@ import {
   AllowedBatchPermissions,
 } from '@Lib/services/ComponentManager/types'
 import { ActionObserver, ComponentViewer } from '@Lib/services/ComponentManager/ComponentViewer'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 const DESKTOP_URL_PREFIX = 'sn://'
 const LOCAL_HOST = 'localhost'
@@ -59,8 +59,9 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     private environment: Environment,
     private platform: Platform,
     private runtime: Runtime,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     this.loggingEnabled = false
     this.addItemObserver()
     if (environment !== Environment.Mobile) {

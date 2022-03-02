@@ -10,7 +10,7 @@ import { ItemManager } from '@Lib/services/ItemManager'
 import { SNApiService } from '../Api/ApiService'
 import { isErrorObject, UuidGenerator } from '@standardnotes/utils'
 import { PayloadContent, FillItemContent } from '@standardnotes/payloads'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 export interface FilesClientInterface {
   beginNewFileUpload(): Promise<EncryptAndUploadFileOperation>
@@ -40,8 +40,9 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private crypto: SNPureCrypto,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   deinit(): void {

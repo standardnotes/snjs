@@ -21,7 +21,7 @@ import { PayloadManager } from './PayloadManager'
 import { SNHttpService } from './Api/HttpService'
 import { SNAlertService } from './AlertService'
 
-import { AbstractService, DeviceInterface } from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -50,8 +50,9 @@ export class SNActionsService extends AbstractService {
     private syncService: SNSyncService,
     private challengeService: ChallengeService,
     private listedService: ListedService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
     this.previousPasswords = []
   }
 

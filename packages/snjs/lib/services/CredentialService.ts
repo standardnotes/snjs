@@ -26,7 +26,7 @@ import { SNSyncService } from './Sync/SyncService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from './Api/SessionManager'
 import { ChallengeService } from './Challenge/ChallengeService'
 import { SNItemsKey } from '@Lib/models'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -50,8 +50,9 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     private alertService: SNAlertService,
     private challengeService: ChallengeService,
     private protectionService: SNProtectionService,
+    protected internalEventBus: InternalEventBusInterface,
   ) {
-    super()
+    super(internalEventBus)
   }
 
   public deinit(): void {
