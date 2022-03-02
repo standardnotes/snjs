@@ -49,7 +49,7 @@ import { Role } from '@standardnotes/auth'
 import { FeatureDescription } from '@standardnotes/features'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/services/Api/Messages'
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
-import { AbstractService } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 type PathNamesV1 = {
   keyParams: string
@@ -148,6 +148,7 @@ export class SNApiService
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
+    private internalEventBus: InternalEventBusInterface,
     private host: string,
     private filesHost: string,
   ) {
@@ -274,6 +275,14 @@ export class SNApiService
       this.notifyEvent(ApiServiceEvent.MetaReceived, {
         userUuid: meta.auth.userUuid,
         userRoles: meta.auth.roles,
+      })
+
+      this.internalEventBus.publish({
+        type: ApiServiceEvent.MetaReceived,
+        payload: {
+          userUuid: meta.auth.userUuid,
+          userRoles: meta.auth.roles,
+        }
       })
     }
   }

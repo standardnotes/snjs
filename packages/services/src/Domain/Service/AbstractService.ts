@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { log, removeFromArray } from '@standardnotes/utils'
 import { ApplicationStage } from '@standardnotes/applications'
 import { DeviceInterface } from '../Device/DeviceInterface'
