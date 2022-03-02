@@ -4,7 +4,6 @@ import { ListedInterface } from './application_interfaces/listed_interface'
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
 import { TransactionalMutation } from './services/ItemManager'
 import { Settings } from './services/Settings'
-import { SyncOpStatus } from './services/Sync/SyncOpStatus'
 import { createMutatorForItem } from '@Lib/models/mutator'
 import {
   SNCredentialService,
@@ -49,7 +48,7 @@ import {
 import { ApplicationEvent, SyncEvent, applicationEventForSyncEvent } from '@Lib/events'
 import { StorageEncryptionPolicies } from './services/StorageService'
 import { BackupFile } from './services/ProtocolService'
-import { SyncOptions } from './services/Sync/SyncService'
+import { SyncOptions, SyncOpStatus } from './services/Sync'
 import { SmartView } from './models/app/SmartView'
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item'
 import {

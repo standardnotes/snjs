@@ -1,6 +1,6 @@
+import { SyncEvent } from '@Lib/services/Sync/Events'
 import { SNItemsKey } from '@Models/app/items_key'
 import { SNHistoryManager } from '../History/HistoryManager'
-import { SyncEvent } from '@Lib/services/Sync/Events'
 import { StorageKey } from '@Lib/storage_keys'
 import { UuidString } from '../../types'
 import { ApplicationSyncOptions } from '../../options'
@@ -35,68 +35,11 @@ import { SNSessionManager } from '../Api/SessionManager'
 import { SNApiService } from '../Api/ApiService'
 import { SNLog } from '@Lib/log'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { SyncModes, SyncOptions, SyncPromise, SyncQueueStrategy, SyncSources } from './Types'
 
 const DEFAULT_MAX_DISCORDANCE = 5
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
-
-export enum SyncQueueStrategy {
-  /**
-   * Promise will be resolved on the next sync request after the current one completes.
-   * If there is no scheduled sync request, one will be scheduled.
-   */
-  ResolveOnNext = 1,
-  /**
-   * A new sync request is guarenteed to be generated for your request, no matter how long it takes.
-   * Promise will be resolved whenever this sync request is processed in the serial queue.
-   */
-  ForceSpawnNew = 2,
-}
-
-export enum SyncModes {
-  /**
-   * Performs a standard sync, uploading any dirty items and retrieving items.
-   */
-  Default = 1,
-  /**
-   * The first sync for an account, where we first want to download all remote items first
-   * before uploading any dirty items. This allows a consumer, for example, to download
-   * all data to see if user has an items key, and if not, only then create a new one.
-   */
-  DownloadFirst = 2,
-}
-
-export enum SyncSources {
-  External = 1,
-  SpawnQueue = 2,
-  ResolveQueue = 3,
-  MoreDirtyItems = 4,
-  AfterDownloadFirst = 5,
-  IntegrityCheck = 6,
-  ResolveOutOfSync = 7,
-}
-
-export type SyncOptions = {
-  queueStrategy?: SyncQueueStrategy
-  mode?: SyncModes
-  /** Whether the server should compute and return an integrity hash. */
-  checkIntegrity?: boolean
-  /** Internally used to keep track of how sync requests were spawned. */
-  source?: SyncSources
-  /** Whether to await any sync requests that may be queued from this call. */
-  awaitAll?: boolean
-  /**
-   * A callback that is triggered after pre-sync save completes,
-   * and before the sync request is network dispatched
-   */
-  onPresyncSave?: () => void
-}
-
-type SyncPromise = {
-  resolve: (value?: unknown) => void
-  reject: () => void
-  options?: SyncOptions
-}
 
 /**
  * The sync service orchestrates with the model manager, api service, and storage service
@@ -122,7 +65,7 @@ export class SNSyncService extends AbstractService<
 
   private majorChangeThreshold = DEFAULT_MAJOR_CHANGE_THRESHOLD
   private maxDiscordance = DEFAULT_MAX_DISCORDANCE
-  private locked = false
+  private clientLocked = false
   private databaseLoaded = false
 
   private syncToken?: string
@@ -203,11 +146,11 @@ export class SNSyncService extends AbstractService<
   }
 
   public lockSyncing(): void {
-    this.locked = true
+    this.clientLocked = true
   }
 
   public unlockSyncing(): void {
-    this.locked = false
+    this.clientLocked = false
   }
 
   public isOutOfSync(): boolean {
@@ -452,48 +395,19 @@ export class SNSyncService extends AbstractService<
     return this.lastSyncInvokationPromise
   }
 
-  private async performSync(options: SyncOptions = {}): Promise<unknown> {
-    /** Hard locking, does not apply to locking modes below */
-    if (this.locked) {
-      this.log('Sync Locked')
-      return
-    }
+  private async prepareForSync(options: SyncOptions) {
+    const items = await this.itemsNeedingSync()
 
     /**
-     * Allows us to lock this function from triggering duplicate network requests.
-     * There are two types of locking checks:
-     * 1. syncLocked(): If a call to sync() call has begun preparing to be sent to the server.
-     *                  but not yet completed all the code below before reaching that point.
-     *                  (before reaching opStatus.setDidBegin).
-     * 2. syncOpInProgress: If a sync() call is in flight to the server.
+     * Freeze the begin date immediately after getting items needing sync. This way an
+     * item dirtied at any point after this date is marked as needing another sync
      */
-    const syncLocked = () => {
-      return this.syncLock
-    }
-    const captureLock = () => {
-      this.syncLock = true
-    }
-    const releaseLock = () => {
-      this.syncLock = false
-    }
-
-    const syncInProgress = this.opStatus.syncInProgress
-    const databaseLoaded = this.databaseLoaded
-    const canExecuteSync = !syncLocked()
-    if (canExecuteSync && databaseLoaded && !syncInProgress) {
-      captureLock()
-    }
-
-    if (!options.source) {
-      options.source = SyncSources.External
-    }
-
-    const items = await this.itemsNeedingSync()
-    /** Freeze the begin date immediately after getting items needing sync. This way an
-     * item dirtied at any point after this date is marked as needing another sync */
     const beginDate = new Date()
-    /** Items that have never been synced and marked as deleted should not be
-     * uploaded to server, and instead deleted directly after sync completion. */
+
+    /**
+     * Items that have never been synced and marked as deleted should not be
+     * uploaded to server, and instead deleted directly after sync completion.
+     */
     const neverSyncedDeleted = items.filter((item) => {
       return item.neverSynced && item.deleted
     })
@@ -510,16 +424,26 @@ export class SNSyncService extends AbstractService<
       options.onPresyncSave()
     }
 
-    /** The in time resolve queue refers to any sync requests that were made while we still
-     * have not sent out the current request. So, anything in the in time resolve queue
-     * will have made it in time to piggyback on the current request. Anything that comes
-     * _after_ in-time will schedule a new sync request. */
-    const inTimeResolveQueue = this.resolveQueue.slice()
+    return { items, beginDate, decryptedPayloads, neverSyncedDeleted }
+  }
 
-    const useStrategy = !isNullOrUndefined(options.queueStrategy)
-      ? options.queueStrategy
-      : SyncQueueStrategy.ResolveOnNext
-    if (syncInProgress || !databaseLoaded || !canExecuteSync) {
+  /**
+   * Allows us to lock this function from triggering duplicate network requests.
+   * There are two types of locking checks:
+   * 1. syncLocked(): If a call to sync() call has begun preparing to be sent to the server.
+   *                  but not yet completed all the code below before reaching that point.
+   *                  (before reaching opStatus.setDidBegin).
+   * 2. syncOpInProgress: If a sync() call is in flight to the server.
+   */
+  private configureSyncLock() {
+    const syncInProgress = this.opStatus.syncInProgress
+    const databaseLoaded = this.databaseLoaded
+    const canExecuteSync = !this.syncLock
+    const shouldExecuteSync = canExecuteSync && databaseLoaded && !syncInProgress
+
+    if (shouldExecuteSync) {
+      this.syncLock = true
+    } else {
       this.log(
         !canExecuteSync
           ? 'Another function call has begun preparing for sync.'
@@ -527,30 +451,52 @@ export class SNSyncService extends AbstractService<
           ? 'Attempting to sync while existing sync in progress.'
           : 'Attempting to sync before local database has loaded.',
       )
-      if (useStrategy === SyncQueueStrategy.ResolveOnNext) {
-        return this.queueStrategyResolveOnNext()
-      } else if (useStrategy === SyncQueueStrategy.ForceSpawnNew) {
-        return this.queueStrategyForceSpawnNew({
-          mode: options.mode,
-          checkIntegrity: options.checkIntegrity,
-          source: options.source,
-        })
-      } else {
-        throw Error(`Unhandled timing strategy ${useStrategy}`)
-      }
     }
-    if (this.dealloced) {
-      return
+
+    const releaseLock = () => {
+      this.syncLock = false
     }
-    /** Lock syncing immediately after checking in progress above */
+
+    return { shouldExecuteSync, releaseLock }
+  }
+
+  private deferSyncRequest(options: SyncOptions) {
+    const useStrategy = !isNullOrUndefined(options.queueStrategy)
+      ? options.queueStrategy
+      : SyncQueueStrategy.ResolveOnNext
+
+    if (useStrategy === SyncQueueStrategy.ResolveOnNext) {
+      return this.queueStrategyResolveOnNext()
+    } else if (useStrategy === SyncQueueStrategy.ForceSpawnNew) {
+      return this.queueStrategyForceSpawnNew({
+        mode: options.mode,
+        checkIntegrity: options.checkIntegrity,
+        source: options.source,
+      })
+    } else {
+      throw Error(`Unhandled timing strategy ${useStrategy}`)
+    }
+  }
+
+  private async prepareForSyncExecution(
+    items: SNItem[],
+    inTimeResolveQueue: SyncPromise[],
+    beginDate: Date,
+  ) {
     this.opStatus.setDidBegin()
+
     await this.notifyEvent(SyncEvent.SyncWillBegin)
-    /* Subtract from array as soon as we're sure they'll be called.
-    resolves are triggered at the end of this function call */
+
+    /**
+     * Subtract from array as soon as we're sure they'll be called.
+     * resolves are triggered at the end of this function call
+     */
     subtractFromArray(this.resolveQueue, inTimeResolveQueue)
 
-    /** lastSyncBegan must be set *after* any point we may have returned above.
-     * Setting this value means the item was 100% sent to the server. */
+    /**
+     * lastSyncBegan must be set *after* any point we may have returned above.
+     * Setting this value means the item was 100% sent to the server.
+     */
     if (items.length > 0) {
       await this.itemManager.changeItems(
         Uuids(items),
@@ -561,17 +507,24 @@ export class SNSyncService extends AbstractService<
         PayloadSource.PreSyncSave,
       )
     }
+  }
 
-    const erroredState = this.protocolService.hasAccount() !== this.sessionManager!.online()
-    if (erroredState) {
-      this.handleInvalidSessionState()
-    }
+  /**
+   * The InTime resolve queue refers to any sync requests that were made while we still
+   * have not sent out the current request. So, anything in the InTime resolve queue
+   * will have made it "in time" to piggyback on the current request. Anything that comes
+   * after InTime will schedule a new sync request.
+   */
+  private getPendingRequestsMadeInTimeToPiggyBackOnCurrentRequest() {
+    return this.resolveQueue.slice()
+  }
 
-    const online = this.sessionManager!.online()
+  private async prepareSyncOperationPayloads(payloads: PurePayload[], options: SyncOptions) {
+    const online = this.sessionManager.online()
     const useMode = ((tryMode) => {
       if (online && !this.completedOnlineDownloadFirstSync) {
         return SyncModes.DownloadFirst
-      } else if (!isNullOrUndefined(tryMode)) {
+      } else if (tryMode != undefined) {
         return tryMode
       } else {
         return SyncModes.Default
@@ -584,128 +537,246 @@ export class SNSyncService extends AbstractService<
         throw Error('Attempting to default mode sync without having completed initial.')
       }
       if (online) {
-        uploadPayloads = await this.payloadsByPreparingForServer(decryptedPayloads)
+        uploadPayloads = await this.payloadsByPreparingForServer(payloads)
       } else {
-        uploadPayloads = decryptedPayloads
+        uploadPayloads = payloads
       }
     } else if (useMode === SyncModes.DownloadFirst) {
       uploadPayloads = []
     }
 
+    return { uploadPayloads, syncMode: useMode, online }
+  }
+
+  private async createSyncOperation(
+    payloads: PurePayload[],
+    options: SyncOptions,
+    syncMode: SyncModes,
+  ) {
     let operation: AccountSyncOperation | OfflineSyncOperation
-    if (online) {
+    if (this.sessionManager.online()) {
       operation = await this.syncOnlineOperation(
-        uploadPayloads,
+        payloads,
         options.checkIntegrity!,
         options.source!,
-        useMode,
+        syncMode,
       )
     } else {
-      operation = await this.syncOfflineOperation(uploadPayloads, options.source, useMode)
+      operation = await this.syncOfflineOperation(payloads, options.source!, syncMode)
     }
 
-    this.currentSyncRequestPromise = operation.run()
+    return operation
+  }
 
-    await this.currentSyncRequestPromise
+  private async handleSyncOperationFinish(
+    operation: AccountSyncOperation | OfflineSyncOperation,
+    options: SyncOptions,
+    neverSyncedDeleted: SNItem[],
+    syncMode: SyncModes,
+  ) {
+    this.opStatus.setDidEnd()
 
-    if (this.dealloced) {
-      return
+    if (this.opStatus.hasError()) {
+      return { hasError: true }
     }
-    this.opStatus!.setDidEnd()
-    releaseLock()
 
-    if (this.opStatus!.hasError()) {
-      return
-    }
+    this.opStatus.reset()
 
-    this.opStatus!.reset()
     this.state!.lastSyncDate = new Date()
+
     if (
       operation instanceof AccountSyncOperation &&
       operation.numberOfItemsInvolved >= this.majorChangeThreshold
     ) {
-      this.notifyEvent(SyncEvent.MajorDataChange)
+      void this.notifyEvent(SyncEvent.MajorDataChange)
     }
+
     if (neverSyncedDeleted.length > 0) {
       await this.handleNeverSyncedDeleted(neverSyncedDeleted)
     }
-    if (useMode !== SyncModes.DownloadFirst) {
+
+    if (syncMode !== SyncModes.DownloadFirst) {
       await this.notifyEvent(SyncEvent.FullSyncCompleted, {
-        source: options.source,
+        source: options.source!,
       })
     }
 
-    if (useMode === SyncModes.DownloadFirst) {
-      if (online) {
-        this.completedOnlineDownloadFirstSync = true
-      }
-      await this.notifyEvent(SyncEvent.DownloadFirstSyncCompleted)
-      /** Perform regular sync now that we've finished download first sync */
-      await this.sync({
-        source: SyncSources.AfterDownloadFirst,
-        checkIntegrity: true,
-        awaitAll: options.awaitAll,
-      })
-    } else if (!this.popSpawnQueue() && this.resolveQueue.length > 0) {
-      this.log('Syncing again from resolve queue')
-      /** No need to await. */
-      const promise = this.sync({
-        source: SyncSources.ResolveQueue,
-        checkIntegrity: options.checkIntegrity,
-      })
-      if (options.awaitAll) {
-        await promise
-      }
-    } else if ((await this.itemsNeedingSync()).length > 0) {
-      /**
-       * As part of the just concluded sync operation, more items may have
-       * been dirtied (like conflicts), and the caller may want to await the
-       * full resolution of these items.
-       */
-      await this.sync({
-        source: SyncSources.MoreDirtyItems,
-        checkIntegrity: options.checkIntegrity,
-        awaitAll: options.awaitAll,
-      })
-    } else if (operation instanceof AccountSyncOperation && operation.checkIntegrity) {
-      if (this.state!.needsSync && operation.done) {
-        this.log('Syncing again from integrity check')
-        const promise = this.sync({
-          checkIntegrity: true,
-          queueStrategy: SyncQueueStrategy.ForceSpawnNew,
-          source: SyncSources.IntegrityCheck,
-          awaitAll: options.awaitAll,
-        })
-        if (options.awaitAll) {
-          await promise
-        }
-      }
-    } else {
-      this.state!.clearIntegrityHashes()
+    return { hasError: false }
+  }
+
+  private async handleDownloadFirstCompletionAndSyncAgain(online: boolean, options: SyncOptions) {
+    if (online) {
+      this.completedOnlineDownloadFirstSync = true
     }
-    /**
-     * For timing strategy SyncQueueStrategy.ResolveOnNext.
-     * Execute any callbacks pulled before this sync request began.
-     * Calling resolve on the callbacks should be the last thing we do in this function,
-     * to simulate calling .sync as if it went through straight to the end without having
-     * to be queued.
-     */
+    await this.notifyEvent(SyncEvent.DownloadFirstSyncCompleted)
+    await this.sync({
+      source: SyncSources.AfterDownloadFirst,
+      checkIntegrity: true,
+      awaitAll: options.awaitAll,
+    })
+  }
+
+  private async syncAgainByHandlingRequestsWaitingInResolveQueue(options: SyncOptions) {
+    this.log('Syncing again from resolve queue')
+    const promise = this.sync({
+      source: SyncSources.ResolveQueue,
+      checkIntegrity: options.checkIntegrity,
+    })
+    if (options.awaitAll) {
+      await promise
+    }
+  }
+
+  /**
+   * As part of the just concluded sync operation, more items may have
+   * been dirtied (like conflicts), and the caller may want to await the
+   * full resolution of these items.
+   */
+  private async syncAgainByHandlingNewDirtyItems(options: SyncOptions) {
+    await this.sync({
+      source: SyncSources.MoreDirtyItems,
+      checkIntegrity: options.checkIntegrity,
+      awaitAll: options.awaitAll,
+    })
+  }
+
+  /**
+   * For timing strategy SyncQueueStrategy.ResolveOnNext.
+   * Execute any callbacks pulled before this sync request began.
+   * Calling resolve on the callbacks should be the last thing we do in this function,
+   * to simulate calling .sync as if it went through straight to the end without having
+   * to be queued.
+   */
+  private resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(
+    inTimeResolveQueue: SyncPromise[],
+  ) {
     for (const callback of inTimeResolveQueue) {
       callback.resolve()
     }
   }
 
-  /**
-   * This is a temporary patch for users in mobile where for some reason the session+user
-   * object go missing, and results in errorless sync in mistaken no account state.
-   * Mobile will use protocolService.hasAccount(), which checks key state for account status,
-   * to display a sign out button, whereas sync below will use sessionManager for account status,
-   * which checks for existence of session object. These two states should be equivalent,
-   * but if they're not, it means we're in an errored state.
-   */
-  private handleInvalidSessionState() {
-    SNLog.error(Error('Session missing while attempting to sync.'))
-    this.sessionManager!.reauthenticateInvalidSession()
+  private async potentiallySyncAgainAfterSyncCompletion(
+    operation: AccountSyncOperation | OfflineSyncOperation,
+    syncMode: SyncModes,
+    options: SyncOptions,
+    inTimeResolveQueue: SyncPromise[],
+    online: boolean,
+  ) {
+    if (syncMode === SyncModes.DownloadFirst) {
+      await this.handleDownloadFirstCompletionAndSyncAgain(online, options)
+      this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
+      return true
+    }
+
+    const didSpawnNewRequest = this.popSpawnQueue()
+    const resolveQueueHasRequestsThatDidntMakeItInTime = this.resolveQueue.length > 0
+    if (!didSpawnNewRequest && resolveQueueHasRequestsThatDidntMakeItInTime) {
+      await this.syncAgainByHandlingRequestsWaitingInResolveQueue(options)
+      this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
+      return true
+    }
+
+    const newItemsNeedingSync = await this.itemsNeedingSync()
+    if (newItemsNeedingSync.length > 0) {
+      await this.syncAgainByHandlingNewDirtyItems(options)
+      this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
+      return true
+    }
+
+    const needsAnotherSyncToAttemptToCorrectOutOfSync =
+      operation instanceof AccountSyncOperation &&
+      operation.checkIntegrity &&
+      this.state?.needsSync &&
+      operation.done
+    if (needsAnotherSyncToAttemptToCorrectOutOfSync) {
+      this.log('Syncing again from integrity check')
+      const promise = this.sync({
+        checkIntegrity: true,
+        queueStrategy: SyncQueueStrategy.ForceSpawnNew,
+        source: SyncSources.IntegrityCheck,
+        awaitAll: options.awaitAll,
+      })
+      if (options.awaitAll) {
+        await promise
+      }
+      this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
+      return true
+    }
+
+    return false
+  }
+
+  private async performSync(options: SyncOptions = {}): Promise<unknown> {
+    if (this.clientLocked) {
+      this.log('Sync locked by client')
+      return
+    }
+
+    if (!options.source) {
+      options.source = SyncSources.External
+    }
+
+    const { shouldExecuteSync, releaseLock } = this.configureSyncLock()
+
+    const { items, beginDate, decryptedPayloads, neverSyncedDeleted } = await this.prepareForSync(
+      options,
+    )
+
+    const inTimeResolveQueue = this.getPendingRequestsMadeInTimeToPiggyBackOnCurrentRequest()
+
+    if (!shouldExecuteSync) {
+      return this.deferSyncRequest(options)
+    }
+
+    if (this.dealloced) {
+      return
+    }
+
+    await this.prepareForSyncExecution(items, inTimeResolveQueue, beginDate)
+
+    const { uploadPayloads, syncMode, online } = await this.prepareSyncOperationPayloads(
+      decryptedPayloads,
+      options,
+    )
+
+    const operation = await this.createSyncOperation(uploadPayloads, options, syncMode)
+
+    const operationPromise = operation.run()
+
+    this.currentSyncRequestPromise = operationPromise
+
+    await operationPromise
+
+    if (this.dealloced) {
+      return
+    }
+
+    releaseLock()
+
+    const { hasError } = await this.handleSyncOperationFinish(
+      operation,
+      options,
+      neverSyncedDeleted,
+      syncMode,
+    )
+    if (hasError) {
+      return
+    }
+
+    const didSyncAgain = await this.potentiallySyncAgainAfterSyncCompletion(
+      operation,
+      syncMode,
+      options,
+      inTimeResolveQueue,
+      online,
+    )
+    if (didSyncAgain) {
+      return
+    }
+
+    this.state?.clearIntegrityHashes()
+
+    this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
   }
 
   private async syncOnlineOperation(
