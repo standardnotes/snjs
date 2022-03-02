@@ -32,8 +32,13 @@ export class SNApplicationGroup extends AbstractService {
 
   constructor(
     public deviceInterface: DeviceInterface,
+    internalEventBus?: InternalEventBusInterface,
   ) {
-    super(new InternalEventBus())
+    if (internalEventBus === undefined) {
+      internalEventBus = new InternalEventBus()
+    }
+
+    super(internalEventBus)
   }
 
   deinit() {
