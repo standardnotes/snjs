@@ -132,6 +132,12 @@ export class SNFeaturesService
 
   async handleEvent(event: InternalEventInterface): Promise<void> {
     if (event.type === ApiServiceEvent.MetaReceived) {
+      if (!this.syncService) {
+        this.log('[Features Service] Handling events interrupted. Sync service is not yet initialized.', event)
+
+        return
+      }
+
       /**
        * All user data must be downloaded before we map features. Otherwise, feature mapping
        * may think a component doesn't exist and create a new one, when in reality the component
