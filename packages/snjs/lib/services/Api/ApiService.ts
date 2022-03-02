@@ -974,65 +974,27 @@ export class SNApiService
 
   async checkIntegrity(
     integrityPayloads: IntegrityPayload[],
-  ): Promise<CheckIntegrityResponse | HttpResponse> {
-    const preprocessingError = this.preprocessingError();
-    if (preprocessingError) {
-      return preprocessingError;
-    }
-    const url = joinPaths(this.host, Paths.v1.checkIntegrity);
-
-    const params = {
-      integrityPayloads,
-    }
-
-    const response = await this.httpService
-      .postAbsolute(url, params, this.session!.authorizationValue)
-      .catch<HttpResponse>(async (errorResponse) => {
-        this.preprocessAuthenticatedErrorResponse(errorResponse);
-        if (isErrorResponseExpiredToken(errorResponse)) {
-          return this.refreshSessionThenRetryRequest({
-            verb: HttpVerb.Post,
-            url,
-            params,
-          });
-        }
-        return this.errorResponseWithFallbackMessage(
-          errorResponse,
-          messages.API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL,
-        );
-      });
-    this.processResponse(response);
-
-    return response;
+  ): Promise<CheckIntegrityResponse> {
+    return await this.tokenRefreshableRequest<CheckIntegrityResponse>({
+      verb: HttpVerb.Post,
+      url: joinPaths(this.host, Paths.v1.checkIntegrity),
+      params: {
+        integrityPayloads,
+      },
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL,
+      authentication: this.session?.authorizationValue,
+    })
   }
 
   async getSingleItem(
     itemUuid: Uuid,
-  ): Promise<GetSingleItemResponse | HttpResponse> {
-    const preprocessingError = this.preprocessingError();
-    if (preprocessingError) {
-      return preprocessingError;
-    }
-    const url = joinPaths(this.host, Paths.v1.getSingleItem(itemUuid));
-
-    const response = await this.httpService
-      .getAbsolute(url, {}, this.session!.authorizationValue)
-      .catch<HttpResponse>(async (errorResponse) => {
-        this.preprocessAuthenticatedErrorResponse(errorResponse);
-        if (isErrorResponseExpiredToken(errorResponse)) {
-          return this.refreshSessionThenRetryRequest({
-            verb: HttpVerb.Get,
-            url,
-          });
-        }
-        return this.errorResponseWithFallbackMessage(
-          errorResponse,
-          messages.API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL,
-        );
-      });
-    this.processResponse(response);
-
-    return response;
+  ): Promise<GetSingleItemResponse> {
+    return await this.tokenRefreshableRequest<GetSingleItemResponse>({
+      verb: HttpVerb.Get,
+      url: joinPaths(this.host, Paths.v1.getSingleItem(itemUuid)),
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL,
+      authentication: this.session?.authorizationValue,
+    })
   }
 
   private preprocessingError() {

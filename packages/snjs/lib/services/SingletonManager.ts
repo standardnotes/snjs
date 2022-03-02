@@ -12,10 +12,9 @@ import {
   PayloadContent,
   PredicateInterface,
 } from '@standardnotes/payloads'
-import { SyncEvent } from '@Lib/services/Sync/Events'
 import { SNSyncService } from './Sync/SyncService'
 import { Uuids } from '@Models/functions'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 
 /**
  * The singleton manager allow consumers to ensure that only 1 item exists of a certain

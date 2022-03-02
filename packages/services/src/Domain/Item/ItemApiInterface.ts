@@ -1,6 +1,6 @@
 import { Uuid } from '@standardnotes/common'
-import { GetSingleItemResponse, HttpResponse } from '@standardnotes/responses'
+import { GetSingleItemResponse } from '@standardnotes/responses'
 
 export interface ItemApiInterface {
-  getSingleItem(itemUuid: Uuid): Promise<GetSingleItemResponse | HttpResponse>
+  getSingleItem(itemUuid: Uuid): Promise<GetSingleItemResponse>
 }

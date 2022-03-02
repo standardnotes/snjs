@@ -1,4 +1,4 @@
-import { SyncEvent, SyncEventReceiver } from '@Lib/services/Sync/Events'
+import { SyncEvent, SyncEventReceiver } from '@standardnotes/services'
 
 export class SyncState {
   public lastPreSyncSave?: Date

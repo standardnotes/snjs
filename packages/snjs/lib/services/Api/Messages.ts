@@ -10,7 +10,7 @@ export const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.'
 
 export const API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL = 'Could not check your data integrity with the server.'
 
-export const API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL = 'Could not retrieve conflicting item.'
+export const API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL = 'Could not retrieve item.'
 
 export const API_MESSAGE_REGISTRATION_IN_PROGRESS =
   'An existing registration request is already in progress.'

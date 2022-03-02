@@ -1,4 +1,3 @@
-import { SyncEvent } from '@Lib/services/Sync/Events'
 import { SNItemsKey } from '@Models/app/items_key'
 import { SNHistoryManager } from '../History/HistoryManager'
 import { StorageKey } from '@Lib/storage_keys'
@@ -34,8 +33,8 @@ import { SyncSignal, SyncStats } from '@Lib/services/Sync/Signals'
 import { SNSessionManager } from '../Api/SessionManager'
 import { SNApiService } from '../Api/ApiService'
 import { SNLog } from '@Lib/log'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { SyncModes, SyncOptions, SyncPromise, SyncQueueStrategy, SyncSources } from './Types'
+import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 
 const DEFAULT_MAX_DISCORDANCE = 5
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15

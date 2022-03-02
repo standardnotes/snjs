@@ -154,7 +154,7 @@ export {
   platformFromString,
   environmentFromString,
 } from '@Lib/platforms'
-export { SyncEvent } from '@Lib/services/Sync/Events'
+export { SyncEvent } from '@standardnotes/services'
 
 /** Payloads */
 export {

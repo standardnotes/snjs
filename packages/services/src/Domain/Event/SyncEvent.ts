@@ -16,6 +16,5 @@ export enum SyncEvent {
   StatusChanged = 'status-changed',
   DatabaseWriteError = 'database-write-error',
   DatabaseReadError = 'database-read-error',
+  SyncRequestsIntegrityCheck = 'sync:requests-integrity-check',
 }
-
-export type SyncEventReceiver = (event: SyncEvent) => void
