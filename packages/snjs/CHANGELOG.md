@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.71.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.70.0...@standardnotes/snjs@2.71.0) (2022-03-02)
+
+
+### Features
+
+* inject internal event bus to services for seamless event publishing ([#624](https://github.com/standardnotes/snjs/issues/624)) ([24b1e5c](https://github.com/standardnotes/snjs/commit/24b1e5c3e5ffe3c8ff228b97e91b83cb6c4077a5))
+
+
+
+
+
 # [2.70.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.69.1...@standardnotes/snjs@2.70.0) (2022-03-02)
 
 
