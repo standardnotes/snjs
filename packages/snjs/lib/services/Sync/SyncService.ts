@@ -524,7 +524,7 @@ export class SNSyncService extends AbstractService<
     const useMode = ((tryMode) => {
       if (online && !this.completedOnlineDownloadFirstSync) {
         return SyncModes.DownloadFirst
-      } else if (!isNullOrUndefined(tryMode)) {
+      } else if (tryMode != undefined) {
         return tryMode
       } else {
         return SyncModes.Default
@@ -577,10 +577,11 @@ export class SNSyncService extends AbstractService<
     this.opStatus.setDidEnd()
 
     if (this.opStatus.hasError()) {
-      return
+      return { hasError: true }
     }
 
     this.opStatus.reset()
+
     this.state!.lastSyncDate = new Date()
 
     if (
@@ -599,6 +600,8 @@ export class SNSyncService extends AbstractService<
         source: options.source!,
       })
     }
+
+    return { hasError: false }
   }
 
   private async handleDownloadFirstCompletionAndSyncAgain(online: boolean, options: SyncOptions) {
@@ -750,7 +753,15 @@ export class SNSyncService extends AbstractService<
 
     releaseLock()
 
-    await this.handleSyncOperationFinish(operation, options, neverSyncedDeleted, syncMode)
+    const { hasError } = await this.handleSyncOperationFinish(
+      operation,
+      options,
+      neverSyncedDeleted,
+      syncMode,
+    )
+    if (hasError) {
+      return
+    }
 
     const didSyncAgain = await this.potentiallySyncAgainAfterSyncCompletion(
       operation,
