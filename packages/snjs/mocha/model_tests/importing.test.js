@@ -899,6 +899,7 @@ describe('importing', function () {
         version: '003',
       },
     };
+    application.syncService.lockSyncing();
     const result = await application.importData(backupFile, true);
     expect(result.errorCount).to.equal(0);
     await Factory.safeDeinit(application);
