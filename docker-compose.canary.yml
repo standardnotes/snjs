@@ -90,6 +90,7 @@ services:
     entrypoint: [
       "./wait-for.sh", "syncing-server-js", "3000",
       "./wait-for.sh", "auth", "3000",
+      "./wait-for.sh", "files", "3000",
       "./docker/entrypoint.sh", "start-web"
     ]
     env_file: docker/api-gateway.env
@@ -122,6 +123,21 @@ services:
       "./docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/auth.env
+    networks:
+      - snjs
+
+  files:
+    image: standardnotes/files:dev
+    entrypoint: [
+      "./wait-for.sh", "db", "3306",
+      "./wait-for.sh", "cache", "6379",
+      "./docker/entrypoint.sh", "start-web"
+    ]
+    ports:
+      - 3125:3000
+    env_file: docker/files.env
+    volumes:
+      - ./docker/uploads:/var/www/dist/src/Infra/FS/tmp
     networks:
       - snjs
 
