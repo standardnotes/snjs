@@ -79,12 +79,7 @@ export {
   ChallengePrompt,
 } from '@Lib/challenges'
 
-export {
-  SNSyncService,
-  SyncSources,
-  SyncModes,
-  SyncQueueStrategy,
-} from './services/Sync/SyncService'
+export * from './services/Sync'
 export { SNCredentialService } from './services/CredentialService'
 export { SyncResponse } from './services/Sync/Response'
 export { SyncResponseResolver } from '@Lib/services/Sync/Account/ResponseResolver'

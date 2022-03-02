@@ -982,38 +982,6 @@ describe('online syncing', function () {
     expect(updatedNote.lastSyncEnd.getTime()).to.equal(lastSyncEnd.getTime());
   });
 
-  it('syncing with missing session object should prompt for re-auth', async function () {
-    /**
-     * This covers the temporary function syncService.handleInvalidSessionState
-     * where mobile could be missing storage/session object
-     */
-    let didPromptForSignIn = false;
-    const receiveChallenge = async (challenge) => {
-      didPromptForSignIn = true;
-      this.application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], this.email),
-        new ChallengeValue(challenge.prompts[1], this.password),
-      ]);
-    };
-    this.application.setLaunchCallback({ receiveChallenge });
-    this.application.apiService.setSession(undefined);
-
-    const sessionRestored = new Promise((resolve) => {
-      this.application.sessionManager.addEventObserver(async (event) => {
-        if (event === SessionEvent.Restored) {
-          resolve();
-        }
-      });
-    });
-
-    await this.application.sync();
-    await sessionRestored;
-
-    expect(didPromptForSignIn).to.equal(true);
-    expect(this.application.apiService.session.accessToken).to.be.ok;
-    expect(this.application.apiService.session.refreshToken).to.be.ok;
-  });
-
   it('should not allow receiving decrypted payloads from server', async function () {
     const masterCollection = this.application.payloadManager.getMasterCollection();
     const historyMap = this.application.historyManager.getHistoryMapCopy();
