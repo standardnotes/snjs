@@ -42,9 +42,9 @@ export class IntegrityService
 
     for (const serverItemResponse of serverItemResponses) {
       if (serverItemResponse.data === undefined || serverItemResponse.error || !('item' in serverItemResponse.data)) {
-        this.log(`Could not obtain item for integrity adjustments: ${serverItemResponse?.error?.message}`)
+        this.log(`Could not obtain item for integrity adjustments: ${serverItemResponse.error}`)
 
-        throw new Error('Could not obtain item for integrity adjustments')
+        continue
       }
 
       void this.itemManager.emitItemFromPayload(
