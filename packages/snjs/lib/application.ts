@@ -46,7 +46,7 @@ import {
   ApplicationOptions,
   FullyResolvedApplicationOptions,
 } from './options'
-import { ApplicationEvent, SyncEvent, applicationEventForSyncEvent } from '@Lib/events'
+import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
 import { StorageEncryptionPolicies } from './services/StorageService'
 import { BackupFile } from './services/ProtocolService'
 import { SyncOptions, SyncOpStatus } from './services/Sync'
@@ -100,6 +100,7 @@ import {
   InternalEventBusInterface,
   InternalEventBus,
   IntegrityService,
+  SyncEvent,
 } from '@standardnotes/services'
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
@@ -1734,7 +1735,7 @@ export class SNApplication implements ListedInterface {
 
   private defineInternalEventHandlers(): void {
     this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
-    this.internalEventBus.addEventHandler(this.integrityService, SyncEvent.FullSyncCompleted)
+    this.internalEventBus.addEventHandler(this.integrityService, SyncEvent.SyncRequestsIntegrityCheck)
   }
 
   private clearInternalEventBus(): void {
