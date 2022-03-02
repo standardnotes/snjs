@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.2.3...@standardnotes/services@1.3.0) (2022-03-02)
+
+
+### Features
+
+* add internal events handling between services ([#620](https://github.com/standardnotes/snjs/issues/620)) ([d982e36](https://github.com/standardnotes/snjs/commit/d982e365eda5268b6df339e9e0fe926a4808d86f))
+
+
+
+
+
 ## [1.2.3](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.2.1...@standardnotes/services@1.2.3) (2022-02-28)
 
 
