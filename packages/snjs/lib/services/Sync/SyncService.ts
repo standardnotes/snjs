@@ -599,13 +599,6 @@ export class SNSyncService extends AbstractService<
       await this.notifyEvent(SyncEvent.FullSyncCompleted, {
         source: options.source!,
       })
-
-      this.internalEventBus.publish({
-        type: SyncEvent.FullSyncCompleted,
-        payload: {
-          source: options.source,
-        }
-      })
     }
 
     return { hasError: false }
