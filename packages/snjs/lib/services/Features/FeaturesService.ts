@@ -55,18 +55,6 @@ import { AbstractService, InternalEventHandlerInterface, InternalEventInterface 
 
 type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject
 
-export const enum FeaturesEvent {
-  UserRolesChanged = 'UserRolesChanged',
-  FeaturesUpdated = 'FeaturesUpdated',
-}
-
-export const enum FeatureStatus {
-  NoUserSubscription = 'NoUserSubscription',
-  NotInCurrentPlan = 'NotInCurrentPlan',
-  InCurrentPlanButExpired = 'InCurrentPlanButExpired',
-  Entitled = 'Entitled',
-}
-
 export class SNFeaturesService
   extends AbstractService<FeaturesEvent>
   implements
