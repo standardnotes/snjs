@@ -5,7 +5,7 @@ import { CreateItemFromPayload } from '@Models/generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { EncryptionIntent } from '@standardnotes/applications'
-import { ItemManager } from '@Lib/services/ItemManager'
+import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { SNRootKey } from '@Protocol/root_key'
 import {

@@ -22,7 +22,7 @@ export * from '@Lib/services/Features'
 export { SNSettingsService } from '@Lib/services/Settings'
 export { SyncEvent as SyncEvent } from '@Lib/services/Sync/Events'
 export { SyncOpStatus } from '@Lib/services/Sync/SyncOpStatus'
-export { ItemManager } from '@Lib/services/ItemManager'
+export { ItemManager } from '@Lib/services/Items/ItemManager'
 export * from '@Lib/services/Sync'
 export { ChallengeService } from '@Lib/services/Challenge/ChallengeService'
 export {
