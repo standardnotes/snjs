@@ -1,9 +1,13 @@
 import { ContentType } from '@standardnotes/common'
-import { FileToNoteReference } from './../../../../payloads/src/Domain/Reference/FileToNoteReference'
 import { SNNote } from './note'
 import { SodiumConstant } from '@standardnotes/sncrypto-common'
 import { ItemMutator, SNItem } from '@Models/core/item'
-import { ContenteReferenceType, PayloadContent, PurePayload } from '@standardnotes/payloads'
+import {
+  ContenteReferenceType,
+  PayloadContent,
+  PurePayload,
+  FileToNoteReference,
+} from '@standardnotes/payloads'
 
 export enum FileProtocolV1 {
   EncryptedChunkSizeDelta = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES,
