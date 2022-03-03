@@ -28,8 +28,8 @@ export class ClassicFileReader {
     return new Promise((resolve) => {
       input.onchange = async (event) => {
         const target = event.target as HTMLInputElement
-        const file = (target.files as FileList)[0]
-        resolve(file)
+        this.selectedFile = (target.files as FileList)[0]
+        resolve(this.selectedFile)
       }
       input.click()
     })
