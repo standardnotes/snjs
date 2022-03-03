@@ -27,7 +27,7 @@ export class FileSystemApi {
   }
 
   uploadFile = async (): Promise<SNFile> => {
-    const operation = await this.application.fileService.beginNewFileUpload()
+    const operation = await this.application.files.beginNewFileUpload()
 
     const reader = new StreamingFileReader(
       2_000_000,
@@ -41,7 +41,9 @@ export class FileSystemApi {
       },
     )
     reader.loggingEnabled = true
-    const fileResult = await reader.selectFileAndStream()
+
+    await reader.selectFile()
+    const fileResult = await reader.beginReadingFile()
 
     const fileObj = await this.application.files.finishUpload(
       operation,

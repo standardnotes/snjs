@@ -20,9 +20,9 @@ export class ClassicFileApi {
       2_000_000,
       async (chunk, index, isLast) => {
         if (index === 1) {
-          operation = await this.application.fileService.beginNewFileUpload()
+          operation = await this.application.files.beginNewFileUpload()
         }
-        await this.application.fileService.pushBytesForUpload(
+        await this.application.files.pushBytesForUpload(
           operation,
           chunk,
           index,
@@ -31,8 +31,11 @@ export class ClassicFileApi {
       },
     )
     filePicker.loggingEnabled = true
-    const fileResult = await filePicker.selectFileAndStream()
-    const fileObj = await this.application.fileService.finishUpload(
+
+    await filePicker.selectFile()
+    const fileResult = await filePicker.beginReadingFile()
+
+    const fileObj = await this.application.files.finishUpload(
       operation,
       fileResult.name,
       fileResult.ext,
@@ -51,7 +54,7 @@ export class ClassicFileApi {
 
     let receivedBytes = new Uint8Array()
 
-    await this.application.fileService.downloadFile(
+    await this.application.files.downloadFile(
       file,
       (decryptedBytes: Uint8Array) => {
         console.log(`Downloaded ${decryptedBytes.length} bytes`)

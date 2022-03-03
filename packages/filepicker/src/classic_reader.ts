@@ -4,6 +4,7 @@ import { readFile } from './utils'
 
 export class ClassicFileReader {
   public loggingEnabled = false
+  private selectedFile?: File
 
   constructor(
     private minimumChunkSize: number,
@@ -21,22 +22,25 @@ export class ClassicFileReader {
     return 50 * 1_000_000
   }
 
-  selectFileAndStream(): Promise<FileSelectionResponse> {
+  selectFile(): Promise<File> {
     const input = document.createElement('input') as HTMLInputElement
     input.type = 'file'
     return new Promise((resolve) => {
       input.onchange = async (event) => {
         const target = event.target as HTMLInputElement
         const file = (target.files as FileList)[0]
-        await this.readFileAndSplit(file)
-        resolve(getFileMetadata(file))
+        resolve(file)
       }
       input.click()
     })
   }
 
-  private async readFileAndSplit(file: File): Promise<FileSelectionResponse> {
-    const buffer = await readFile(file)
+  public async beginReadingFile(): Promise<FileSelectionResponse> {
+    if (!this.selectedFile) {
+      throw Error('Attempting to read file before selecting')
+    }
+
+    const buffer = await readFile(this.selectedFile)
 
     let chunkId = 1
     for (let i = 0; i < buffer.length; i += this.minimumChunkSize) {
@@ -51,6 +55,6 @@ export class ClassicFileReader {
       await this.onChunk(chunk, chunkId++, isFinalChunk)
     }
 
-    return getFileMetadata(file)
+    return getFileMetadata(this.selectedFile)
   }
 }

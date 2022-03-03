@@ -9,6 +9,7 @@ import { OnChunkCallback, FileSelectionResponse } from './types'
 export class StreamingFileReader {
   public loggingEnabled = false
   private byteChunker: ByteChunker
+  private selectedFile?: File
 
   constructor(minimumChunkSize: number, onChunk: OnChunkCallback) {
     this.byteChunker = new ByteChunker(minimumChunkSize, onChunk)
@@ -25,13 +26,21 @@ export class StreamingFileReader {
     return window.showOpenFilePicker != undefined
   }
 
-  /** This function must be called in response to a user interaction, otherwise, it will be rejected by the browser. */
-  public async selectFileAndStream(): Promise<FileSelectionResponse> {
+  public async selectFile(): Promise<File> {
     const selectedFilesHandles = await window.showOpenFilePicker()
     const uploadHandle = selectedFilesHandles[0]
 
-    const file = await uploadHandle.getFile()
-    const stream = (file.stream() as unknown) as ReadableStream
+    this.selectedFile = await uploadHandle.getFile()
+
+    return this.selectedFile
+  }
+
+  public async beginReadingFile(): Promise<FileSelectionResponse> {
+    if (!this.selectedFile) {
+      throw Error('Attempting to read file before selecting')
+    }
+
+    const stream = this.selectedFile.stream() as unknown as ReadableStream
     const reader = stream.getReader()
 
     let previousChunk: Uint8Array
@@ -63,6 +72,6 @@ export class StreamingFileReader {
 
     this.log('Finished streaming file.')
 
-    return getFileMetadata(file)
+    return getFileMetadata(this.selectedFile)
   }
 }
