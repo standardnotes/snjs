@@ -5,6 +5,7 @@ import { DeviceInterface } from '../Device/DeviceInterface'
 import { EventObserver } from '../Event/EventObserver'
 import { ServiceInterface } from './ServiceInterface'
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
+import { InternalEventPublishStrategy } from '..'
 
 export abstract class AbstractService<EventName = string, EventData = undefined> implements ServiceInterface<EventName, EventData> {
   private eventObservers: EventObserver<EventName, EventData>[] = []
@@ -38,6 +39,19 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
       type: (eventName as unknown) as string,
       payload: data,
     })
+  }
+
+  protected async notifyEventSync(
+    eventName: EventName,
+    data?: EventData
+  ): Promise<void> {
+    await this.internalEventBus.publishSync(
+      {
+        type: (eventName as unknown) as string,
+        payload: data,
+      },
+      InternalEventPublishStrategy.SEQUENCE
+    )
   }
 
   /**

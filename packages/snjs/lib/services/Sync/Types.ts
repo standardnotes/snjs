@@ -1,3 +1,5 @@
+import { SyncSources } from '@standardnotes/services'
+
 export enum SyncQueueStrategy {
   /**
    * Promise will be resolved on the next sync request after the current one completes.
@@ -22,16 +24,6 @@ export enum SyncModes {
    * all data to see if user has an items key, and if not, only then create a new one.
    */
   DownloadFirst = 2,
-}
-
-export enum SyncSources {
-  External = 1,
-  SpawnQueue = 2,
-  ResolveQueue = 3,
-  MoreDirtyItems = 4,
-  AfterDownloadFirst = 5,
-  IntegrityCheck = 6,
-  ResolveOutOfSync = 7,
 }
 
 export type SyncOptions = {

@@ -101,6 +101,7 @@ import {
   InternalEventBus,
   IntegrityService,
   SyncEvent,
+  IntegrityEvent,
 } from '@standardnotes/services'
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
@@ -1736,6 +1737,7 @@ export class SNApplication implements ListedInterface {
   private defineInternalEventHandlers(): void {
     this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
     this.internalEventBus.addEventHandler(this.integrityService, SyncEvent.SyncRequestsIntegrityCheck)
+    this.internalEventBus.addEventHandler(this.syncService, IntegrityEvent.IntegrityCheckCompleted)
   }
 
   private clearInternalEventBus(): void {

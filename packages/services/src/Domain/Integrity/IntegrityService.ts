@@ -1,6 +1,6 @@
 import { IntegrityEvent } from './IntegrityEvent'
 import { AbstractService } from '../Service/AbstractService'
-import { CreateMaxPayloadFromAnyObject, ItemManagerInterface, PayloadSource } from '@standardnotes/payloads'
+import { ItemManagerInterface } from '@standardnotes/payloads'
 import { ItemApiInterface } from '../Item/ItemApiInterface'
 import { IntegrityApiInterface } from './IntegrityApiInterface'
 import { GetSingleItemResponse } from '@standardnotes/responses'
@@ -8,9 +8,11 @@ import { InternalEventHandlerInterface } from '../Internal/InternalEventHandlerI
 import { InternalEventInterface } from '../Internal/InternalEventInterface'
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
 import { SyncEvent } from '../Event/SyncEvent'
+import { IntegrityEventPayload } from './IntegrityEventPayload'
+import { SyncSources } from '../Sync/SyncSources'
 
 export class IntegrityService
-  extends AbstractService<IntegrityEvent>
+  extends AbstractService<IntegrityEvent, IntegrityEventPayload>
   implements InternalEventHandlerInterface {
   constructor(
     private integrityApi: IntegrityApiInterface,
@@ -40,6 +42,7 @@ export class IntegrityService
 
     const serverItemResponses = await Promise.all(serverItemResponsePromises)
 
+    const rawPayloads = []
     for (const serverItemResponse of serverItemResponses) {
       if (serverItemResponse.data === undefined || serverItemResponse.error || !('item' in serverItemResponse.data)) {
         this.log(`Could not obtain item for integrity adjustments: ${serverItemResponse.error}`)
@@ -47,12 +50,12 @@ export class IntegrityService
         continue
       }
 
-      void this.itemManager.emitItemFromPayload(
-        CreateMaxPayloadFromAnyObject(serverItemResponse.data.item),
-        PayloadSource.RemoteRetrieved,
-      )
+      rawPayloads.push(serverItemResponse.data.item)
     }
 
-    void this.notifyEvent(IntegrityEvent.IntegrityCheckCompleted)
+    await this.notifyEventSync(IntegrityEvent.IntegrityCheckCompleted, {
+      rawPayloads: rawPayloads,
+      source: (event.payload as { source: SyncSources }).source,
+    })
   }
 }

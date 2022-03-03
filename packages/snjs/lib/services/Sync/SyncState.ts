@@ -9,9 +9,6 @@ export class SyncState {
   private maxDiscordance: number
   private outOfSync = false
 
-  private lastClientHash?: string
-  private lastServerHash?: string
-
   constructor(receiver: SyncEventReceiver, maxDiscordance: number) {
     this.receiver = receiver
     this.maxDiscordance = maxDiscordance
@@ -33,21 +30,7 @@ export class SyncState {
     return this.discordance > 0 && this.discordance < this.maxDiscordance
   }
 
-  getLastClientIntegrityHash() {
-    return this.lastClientHash
-  }
-
-  clearIntegrityHashes() {
-    this.lastClientHash = undefined
-    this.lastServerHash = undefined
-  }
-
-  async setIntegrityHashes(clientHash: string, serverHash: string) {
-    this.lastClientHash = clientHash
-    this.lastServerHash = serverHash
-    const isInSync =
-      !serverHash || serverHash.length === 0 || !clientHash || clientHash === serverHash
-
+  setInSync(isInSync: boolean): void {
     if (isInSync) {
       if (this.outOfSync) {
         this.outOfSync = false

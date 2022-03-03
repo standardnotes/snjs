@@ -1,5 +1,13 @@
 # !/bin/bash
 
+HOST_OSTYPE=$(uname)
+UID=1001
+GID=1001
+if [ "$HOST_OSTYPE" == "Linux"]; then
+  UID=$(id -u)
+  GID=$(id -g)
+fi
+
 [ -n "${SUITE}" ] || SUITE=$1 && shift 1
 if [ -z "$SUITE" ];
 then
@@ -45,7 +53,9 @@ function startContainers {
   docker compose -f $COMPOSE_FILE pull
 
   echo "# Building Docker images"
-  docker compose -f $COMPOSE_FILE build --build-arg UID=$(id -u) --build-arg GID=$(id -g)
+  docker compose -f $COMPOSE_FILE build \
+    --build-arg UID=$UID \
+    --build-arg GID=$GID
 
   echo "# Starting all containers for Test Suite"
   docker compose -f $COMPOSE_FILE up -d

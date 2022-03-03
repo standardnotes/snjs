@@ -12,6 +12,8 @@ import {
   PayloadSource,
   ImmutablePayloadCollection,
   CreateMaxPayloadFromAnyObject,
+  RawPayload,
+  PayloadInterface,
 } from '@standardnotes/payloads'
 import { PayloadManager } from '../PayloadManager'
 import { SNStorageService } from '../StorageService'
@@ -33,8 +35,17 @@ import { SyncSignal, SyncStats } from '@Lib/services/Sync/Signals'
 import { SNSessionManager } from '../Api/SessionManager'
 import { SNApiService } from '../Api/ApiService'
 import { SNLog } from '@Lib/log'
-import { SyncModes, SyncOptions, SyncPromise, SyncQueueStrategy, SyncSources } from './Types'
-import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
+import { SyncModes, SyncOptions, SyncPromise, SyncQueueStrategy } from './Types'
+import {
+  AbstractService,
+  IntegrityEvent,
+  InternalEventBusInterface,
+  InternalEventHandlerInterface,
+  InternalEventInterface,
+  SyncEvent,
+  IntegrityEventPayload,
+  SyncSources
+} from '@standardnotes/services'
 
 const DEFAULT_MAX_DISCORDANCE = 5
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
@@ -49,10 +60,9 @@ const INVALID_SESSION_RESPONSE_STATUS = 401
  * After each sync request, any changes made or retrieved are also persisted locally.
  * The sync service largely does not perform any task unless it is called upon.
  */
-export class SNSyncService extends AbstractService<
-  SyncEvent,
-  SyncResponse | { source: SyncSources }
-> {
+export class SNSyncService
+  extends AbstractService<SyncEvent, SyncResponse | { source: SyncSources }>
+  implements InternalEventHandlerInterface {
   private state?: SyncState
   private opStatus!: SyncOpStatus
 
@@ -130,16 +140,16 @@ export class SNSyncService extends AbstractService<
 
   private initializeStatus() {
     this.opStatus = new SyncOpStatus(setInterval, (event) => {
-      this.notifyEvent(event)
+      void this.notifyEvent(event)
     })
   }
 
   private initializeState() {
     this.state = new SyncState((event) => {
       if (event === SyncEvent.EnterOutOfSync) {
-        this.notifyEvent(SyncEvent.EnterOutOfSync)
+        void this.notifyEvent(SyncEvent.EnterOutOfSync)
       } else if (event === SyncEvent.ExitOutOfSync) {
-        this.notifyEvent(SyncEvent.ExitOutOfSync)
+        void this.notifyEvent(SyncEvent.ExitOutOfSync)
       }
     }, this.maxDiscordance)
   }
@@ -655,7 +665,6 @@ export class SNSyncService extends AbstractService<
   }
 
   private async potentiallySyncAgainAfterSyncCompletion(
-    operation: AccountSyncOperation | OfflineSyncOperation,
     syncMode: SyncModes,
     options: SyncOptions,
     inTimeResolveQueue: SyncPromise[],
@@ -678,26 +687,6 @@ export class SNSyncService extends AbstractService<
     const newItemsNeedingSync = await this.itemsNeedingSync()
     if (newItemsNeedingSync.length > 0) {
       await this.syncAgainByHandlingNewDirtyItems(options)
-      this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
-      return true
-    }
-
-    const needsAnotherSyncToAttemptToCorrectOutOfSync =
-      operation instanceof AccountSyncOperation &&
-      operation.checkIntegrity &&
-      this.state?.needsSync &&
-      operation.done
-    if (needsAnotherSyncToAttemptToCorrectOutOfSync) {
-      this.log('Syncing again from integrity check')
-      const promise = this.sync({
-        checkIntegrity: true,
-        queueStrategy: SyncQueueStrategy.ForceSpawnNew,
-        source: SyncSources.IntegrityCheck,
-        awaitAll: options.awaitAll,
-      })
-      if (options.awaitAll) {
-        await promise
-      }
       this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
       return true
     }
@@ -763,7 +752,6 @@ export class SNSyncService extends AbstractService<
     }
 
     const didSyncAgain = await this.potentiallySyncAgainAfterSyncCompletion(
-      operation,
       syncMode,
       options,
       inTimeResolveQueue,
@@ -773,9 +761,17 @@ export class SNSyncService extends AbstractService<
       return
     }
 
-    this.state?.clearIntegrityHashes()
+    if (options.checkIntegrity) {
+      await this.notifyEventSync(SyncEvent.SyncRequestsIntegrityCheck, {
+        source: options.source as SyncSources
+      })
+    }
 
     this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
+
+    // if (options.checkIntegrity) {
+    //   await this.notifyEventSync(SyncEvent.SyncRequestsIntegrityCheck)
+    // } ???
   }
 
   private async syncOnlineOperation(
@@ -931,11 +927,6 @@ export class SNSyncService extends AbstractService<
       this.setPaginationToken(response.paginationToken!),
       this.notifyEvent(SyncEvent.SingleSyncCompleted, response),
     ])
-
-    if (response.checkIntegrity) {
-      const clientHash = await this.computeDataIntegrityHash()
-      await this.state!.setIntegrityHashes(clientHash!, response.integrityHash!)
-    }
   }
 
   /**
@@ -1008,6 +999,39 @@ export class SNSyncService extends AbstractService<
       'resolve-out-of-sync',
     )
     const payloads = await downloader.run()
+    await this.resolveDeltaOutOfSync(payloads)
+
+    return this.sync({
+      checkIntegrity: true,
+      source: SyncSources.ResolveOutOfSync,
+    })
+  }
+
+  async handleEvent(event: InternalEventInterface): Promise<void> {
+    if (event.type !== IntegrityEvent.IntegrityCheckCompleted) {
+      return
+    }
+    const eventPayload: IntegrityEventPayload = event.payload as IntegrityEventPayload
+
+    const payloads = eventPayload.rawPayloads.map(
+      (rawPayload: RawPayload) => CreateMaxPayloadFromAnyObject(rawPayload)
+    )
+    if (payloads.length === 0) {
+      this.state!.setInSync(true)
+
+      return
+    }
+    this.state!.setInSync(false)
+
+    await this.resolveDeltaOutOfSync(payloads)
+
+    await this.sync({
+      checkIntegrity: [SyncSources.AfterDownloadFirst, SyncSources.External].includes(eventPayload.source),
+      source: SyncSources.ResolveOutOfSync,
+    })
+  }
+
+  private async resolveDeltaOutOfSync(payloads: PayloadInterface[]) {
     const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteRetrieved),
@@ -1017,10 +1041,6 @@ export class SNSyncService extends AbstractService<
     const collection = await delta.resultingCollection()
     await this.payloadManager.emitCollection(collection)
     await this.persistPayloads(collection.payloads)
-    return this.sync({
-      checkIntegrity: true,
-      source: SyncSources.ResolveOutOfSync,
-    })
   }
 
   public async statelessDownloadAllItems(
