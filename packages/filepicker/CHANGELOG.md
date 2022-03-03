@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.1.3...@standardnotes/filepicker@1.2.0) (2022-03-03)
+
+
+### Features
+
+* split file picker selection and reading in two ([d5e98a1](https://github.com/standardnotes/snjs/commit/d5e98a15213c9976b629fe401d8ba5f31379f391))
+
+
+
+
+
 ## [1.1.3](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.1.1...@standardnotes/filepicker@1.1.3) (2022-02-28)
 
 
