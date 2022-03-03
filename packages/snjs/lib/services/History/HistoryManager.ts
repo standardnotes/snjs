@@ -18,7 +18,7 @@ import {
   SingleRevisionResponse,
 } from '@standardnotes/responses'
 import { SNStorageService } from '@Lib/services/StorageService'
-import { ItemManager } from '@Lib/services/ItemManager'
+import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SNItem } from '@Models/core/item'
 import { ContentType } from '@standardnotes/common'
 import { StorageKey } from '@Lib/storage_keys'

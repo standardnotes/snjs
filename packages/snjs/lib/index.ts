@@ -57,8 +57,8 @@ export { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 export { NoteHistoryEntry } from './services/History/Entries/NoteHistoryEntry'
 export { PayloadManager } from './services/PayloadManager'
 
-export type { TransactionalMutation } from './services/ItemManager'
-export { ItemManager } from './services/ItemManager'
+export type { TransactionalMutation } from './services/Items/ItemManager'
+export { ItemManager } from './services/Items/ItemManager'
 
 export { SNHttpService } from './services/Api/HttpService'
 export { ChallengeService } from './services/Challenge/ChallengeService'

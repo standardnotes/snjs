@@ -31,7 +31,7 @@ import {
   DeleteItemsMessageData,
 } from './types'
 import { ComponentAction, ComponentPermission } from '@standardnotes/features'
-import { ItemManager } from '@Lib/services/ItemManager'
+import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { UuidString } from '@Lib/types'
 import { SNItem, MutationType } from '@Models/core/item'
 import { ContentType, Runtime } from '@standardnotes/common'

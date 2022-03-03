@@ -1,8 +1,9 @@
+import { ItemsClientInterface } from './services/Items/ClientInterface'
 import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
 import { ListedService } from './services/ListedService'
 import { ListedInterface } from './application_interfaces/listed_interface'
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
-import { TransactionalMutation } from './services/ItemManager'
+import { TransactionalMutation } from './services/Items/ItemManager'
 import { Settings } from './services/Settings'
 import { createMutatorForItem } from '@Lib/models/mutator'
 import {
@@ -260,6 +261,10 @@ export class SNApplication implements ListedInterface {
 
   public get features(): FeaturesClientInterface {
     return this.featuresService
+  }
+
+  public get items(): ItemsClientInterface {
+    return this.itemManager
   }
 
   /**
@@ -1856,10 +1861,7 @@ export class SNApplication implements ListedInterface {
   }
 
   private createItemManager() {
-    this.itemManager = new ItemManager(
-      this.payloadManager,
-      this.internalEventBus,
-    )
+    this.itemManager = new ItemManager(this.payloadManager, this.internalEventBus)
     this.services.push(this.itemManager)
   }
 
@@ -1890,9 +1892,7 @@ export class SNApplication implements ListedInterface {
   }
 
   private createPayloadManager() {
-    this.payloadManager = new PayloadManager(
-      this.internalEventBus,
-    )
+    this.payloadManager = new PayloadManager(this.internalEventBus)
     this.services.push(this.payloadManager)
   }
 

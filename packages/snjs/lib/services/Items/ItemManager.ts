@@ -1,3 +1,4 @@
+import { SNFile, FileMutator } from '../../models/app/file'
 import { createMutatorForItem } from '@Lib/models/mutator'
 import {
   PredicateInterface,
@@ -24,24 +25,28 @@ import { Uuids } from '@Models/functions'
 import { CreateItemFromPayload } from '@Models/generator'
 import { PayloadsByDuplicating } from '@Payloads/functions'
 import { ContentType } from '@standardnotes/common'
-import { ComponentMutator } from '../models/app/component'
-import { ActionsExtensionMutator, SNActionsExtension } from '../models/app/extension'
-import { FeatureRepoMutator, SNFeatureRepo } from '../models/app/feature_repo'
-import { ItemsKeyMutator } from '../models/app/items_key'
-import { NoteMutator, SNNote } from '../models/app/note'
+import { ComponentMutator } from '../../models/app/component'
+import { ActionsExtensionMutator, SNActionsExtension } from '../../models/app/extension'
+import { FeatureRepoMutator, SNFeatureRepo } from '../../models/app/feature_repo'
+import { ItemsKeyMutator } from '../../models/app/items_key'
+import { NoteMutator, SNNote } from '../../models/app/note'
 import {
   SMART_TAG_DSL_PREFIX,
   SmartView,
   SmartViewContent,
   SystemViewId,
-} from '../models/app/SmartView'
-import { TagMutator } from '../models/app/tag'
-import { ItemMutator, MutationType, SNItem } from '../models/core/item'
-import { TagNoteCountChangeObserver, TagNotesIndex } from '../protocol/collection/tag_notes_index'
-import { UuidString } from '../types'
-import { PayloadManager } from './PayloadManager'
+} from '../../models/app/SmartView'
+import { TagMutator } from '../../models/app/tag'
+import { ItemMutator, MutationType, SNItem } from '../../models/core/item'
+import {
+  TagNoteCountChangeObserver,
+  TagNotesIndex,
+} from '../../protocol/collection/tag_notes_index'
+import { UuidString } from '../../types'
+import { PayloadManager } from '../PayloadManager'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { BuildSmartViews } from '@Lib/protocol/collection/smart_view_builder'
+import { ItemsClientInterface } from './ClientInterface'
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -80,7 +85,7 @@ export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
  * will then notify  its observers (which is us), we'll convert the payloads to items,
  * and then  we'll propagate them to our listeners.
  */
-export class ItemManager extends AbstractService {
+export class ItemManager extends AbstractService implements ItemsClientInterface {
   private unsubChangeObserver: () => void
   private observers: Observer[] = []
   private collection!: ItemCollection
@@ -405,17 +410,17 @@ export class ItemManager extends AbstractService {
    * an old item reference and mutate that, the new value will be outdated. In this case, always
    * pass the uuid of the item if you want to mutate the latest version of the item.
    */
-  async changeItem<M extends ItemMutator = ItemMutator>(
+  async changeItem<M extends ItemMutator = ItemMutator, I extends ItemInterface = SNItem>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<SNItem | undefined> {
+  ): Promise<I> {
     if (!isString(uuid)) {
       throw Error('Invalid uuid for changeItem')
     }
-    const results = await this.changeItems(
+    const results = await this.changeItems<M, I>(
       [uuid],
       mutate,
       mutationType,
@@ -428,13 +433,13 @@ export class ItemManager extends AbstractService {
   /**
    * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
    */
-  public async changeItems<M extends ItemMutator = ItemMutator>(
+  public async changeItems<M extends ItemMutator = ItemMutator, I extends ItemInterface = SNItem>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
     mutationType: MutationType = MutationType.UserInteraction,
     payloadSource = PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<(SNItem | undefined)[]> {
+  ): Promise<I[]> {
     const items = this.findItems(uuids as UuidString[], true)
     const payloads = []
     for (const item of items) {
@@ -449,7 +454,7 @@ export class ItemManager extends AbstractService {
       payloads.push(payload)
     }
     await this.payloadManager.emitPayloads(payloads, payloadSource, payloadSourceKey)
-    const results = this.findItems(payloads.map((p) => p.uuid!))
+    const results = this.findItems(payloads.map((p) => p.uuid)) as I[]
     return results
   }
 
@@ -1035,6 +1040,18 @@ export class ItemManager extends AbstractService {
     return this.changeItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note)
     }) as Promise<SNTag>
+  }
+
+  public async associateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile> {
+    return this.changeItem<FileMutator, SNFile>(file.uuid, (mutator) => {
+      mutator.associateWithNote(note)
+    })
+  }
+
+  public async disassociateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile> {
+    return this.changeItem<FileMutator, SNFile>(file.uuid, (mutator) => {
+      mutator.disassociateWithNote(note)
+    })
   }
 
   public async addTagHierarchyToNote(note: SNNote, tag: SNTag): Promise<SNTag[]> {

@@ -4,7 +4,7 @@ import { SNHistoryManager } from '../History/HistoryManager'
 import { StorageKey } from '@Lib/storage_keys'
 import { UuidString } from '../../types'
 import { ApplicationSyncOptions } from '../../options'
-import { ItemManager } from '@Lib/services/ItemManager'
+import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SyncResponse } from '@Lib/services/Sync/Response'
 import { MutationType, SNItem } from '@Models/core/item'
 import {

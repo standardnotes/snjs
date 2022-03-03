@@ -20,7 +20,7 @@ import {
 } from './Api/Messages'
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
 import { SNProtocolService } from '@Lib/services/ProtocolService'
-import { ItemManager } from '@Lib/services/ItemManager'
+import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SNStorageService, StoragePersistencePolicies } from '@Lib/services/StorageService'
 import { SNSyncService } from './Sync/SyncService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from './Api/SessionManager'

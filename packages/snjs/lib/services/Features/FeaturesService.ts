@@ -20,7 +20,7 @@ import {
   ExperimentalFeatures,
 } from '@standardnotes/features'
 import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common'
-import { ItemManager } from '../ItemManager'
+import { ItemManager } from '../Items/ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
 import { SNComponent, SNTheme } from '@Lib/models'
 import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'

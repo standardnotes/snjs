@@ -1,3 +1,4 @@
+import { FileMutator } from './app/file'
 import { ItemMutator, SNItem, MutationType } from './core/item'
 import { ThemeMutator } from './app/theme'
 import { UserPrefsMutator } from './app/userPrefs'
@@ -25,6 +26,8 @@ export function createMutatorForItem(item: SNItem, type: MutationType): ItemMuta
       return new UserPrefsMutator(item, type)
     case ContentType.Theme:
       return new ThemeMutator(item, type)
+    case ContentType.File:
+      return new FileMutator(item, type)
     default:
       return new ItemMutator(item, type)
   }

@@ -1,3 +1,4 @@
+import { SNFile } from '../../models/app/file'
 import { ItemManager, SNItem } from '@Lib/index'
 import { SNNote, NoteMutator } from '@Lib/models'
 import { SmartView, SystemViewId } from '@Lib/models/app/SmartView'
@@ -9,8 +10,8 @@ import {
 } from '@standardnotes/payloads'
 import { UuidGenerator } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
-import { NotesDisplayCriteria } from '../protocol/collection/notes_display_criteria'
-import { PayloadManager } from './PayloadManager'
+import { NotesDisplayCriteria } from '../../protocol/collection/notes_display_criteria'
+import { PayloadManager } from '../PayloadManager'
 import { InternalEventBusInterface } from '@standardnotes/services'
 
 const setupRandomUuid = () => {
@@ -46,13 +47,12 @@ describe('itemManager', () => {
   let internalEventBus: InternalEventBusInterface
 
   const createService = () => {
-    return new ItemManager(
-      payloadManager,
-      internalEventBus,
-    )
+    return new ItemManager(payloadManager, internalEventBus)
   }
 
   beforeEach(() => {
+    setupRandomUuid()
+
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
     internalEventBus.publish = jest.fn()
 
@@ -88,6 +88,18 @@ describe('itemManager', () => {
         content_type: ContentType.Note,
         content: FillItemContent({
           title: title,
+        }),
+      }),
+    )
+  }
+
+  const createFile = (name: string) => {
+    return new SNFile(
+      CreateMaxPayloadFromAnyObject({
+        uuid: String(Math.random()),
+        content_type: ContentType.File,
+        content: FillItemContent({
+          name: name,
         }),
       }),
     )
@@ -554,5 +566,33 @@ describe('itemManager', () => {
     expect(itemManager.notesMatchingSmartView(view)).toHaveLength(1)
 
     expect(view).toBeDefined()
+  })
+
+  describe('files', () => {
+    it('associates with note', async () => {
+      itemManager = createService()
+      const note = createNote('invoices')
+      const file = createFile('invoice_1.pdf')
+      await itemManager.insertItems([note, file])
+
+      const resultingFile = await itemManager.associateFileWithNote(file, note)
+      const references = resultingFile.references
+
+      expect(references).toHaveLength(1)
+      expect(references[0].uuid).toEqual(note.uuid)
+    })
+
+    it('disassociates with note', async () => {
+      itemManager = createService()
+      const note = createNote('invoices')
+      const file = createFile('invoice_1.pdf')
+      await itemManager.insertItems([note, file])
+
+      const associatedFile = await itemManager.associateFileWithNote(file, note)
+      const disassociatedFile = await itemManager.disassociateFileWithNote(associatedFile, note)
+      const references = disassociatedFile.references
+
+      expect(references).toHaveLength(0)
+    })
   })
 })

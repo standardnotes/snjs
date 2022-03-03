@@ -1,7 +1,7 @@
 import { lastElement, sleep } from '@standardnotes/utils'
 import { UuidString } from '@Lib/types'
 import { ContentType } from '@standardnotes/common'
-import { ItemManager } from '@Lib/services/ItemManager'
+import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SNHttpService } from './Api/HttpService'
 import { SNActionsExtension } from '../models/app/extension'
 import { SettingName } from '@standardnotes/settings'
