@@ -38,7 +38,7 @@ import {
   CheckIntegrityResponse,
 } from '@standardnotes/responses'
 import { Session, TokenSession } from './Session'
-import { ContentType, ErrorObject, Uuid } from '@standardnotes/common'
+import { ErrorObject, Uuid } from '@standardnotes/common'
 import { ApiEndpointParam, IntegrityPayload, PurePayload } from '@standardnotes/payloads'
 import { SNRootKeyParams } from '../../protocol/key_params'
 import { SNStorageService } from '../StorageService'
@@ -55,7 +55,7 @@ import {
   AbstractService,
   InternalEventBusInterface,
   IntegrityApiInterface,
-  ItemApiInterface
+  ItemApiInterface,
 } from '@standardnotes/services'
 
 type PathNamesV1 = {
@@ -145,10 +145,7 @@ export type MetaReceivedData = {
 
 export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
-  implements
-    FilesApi,
-    IntegrityApiInterface,
-    ItemApiInterface
+  implements FilesApi, IntegrityApiInterface, ItemApiInterface
 {
   private session?: Session
   public user?: User
@@ -466,9 +463,6 @@ export class SNApiService
     lastSyncToken: string,
     paginationToken: string,
     limit: number,
-    checkIntegrity = false,
-    contentType?: ContentType,
-    customEvent?: string,
   ): Promise<RawSyncResponse | HttpResponse> {
     const preprocessingError = this.preprocessingError()
     if (preprocessingError) {
@@ -479,10 +473,7 @@ export class SNApiService
       [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
       [ApiEndpointParam.LastSyncToken]: lastSyncToken,
       [ApiEndpointParam.PaginationToken]: paginationToken,
-      [ApiEndpointParam.IntegrityCheck]: checkIntegrity,
       [ApiEndpointParam.SyncDlLimit]: limit,
-      content_type: contentType,
-      event: customEvent,
     })
     const response = await this.httpService
       .postAbsolute(url, params, this.session!.authorizationValue)
@@ -972,9 +963,7 @@ export class SNApiService
     }
   }
 
-  async checkIntegrity(
-    integrityPayloads: IntegrityPayload[],
-  ): Promise<CheckIntegrityResponse> {
+  async checkIntegrity(integrityPayloads: IntegrityPayload[]): Promise<CheckIntegrityResponse> {
     return await this.tokenRefreshableRequest<CheckIntegrityResponse>({
       verb: HttpVerb.Post,
       url: joinPaths(this.host, Paths.v1.checkIntegrity),
@@ -986,9 +975,7 @@ export class SNApiService
     })
   }
 
-  async getSingleItem(
-    itemUuid: Uuid,
-  ): Promise<GetSingleItemResponse> {
+  async getSingleItem(itemUuid: Uuid): Promise<GetSingleItemResponse> {
     return await this.tokenRefreshableRequest<GetSingleItemResponse>({
       verb: HttpVerb.Get,
       url: joinPaths(this.host, Paths.v1.getSingleItem(itemUuid)),

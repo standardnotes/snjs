@@ -24,7 +24,6 @@ import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@s
 import { SortPayloadsByRecentAndContentPriority } from '@Lib/services/Sync/Utils'
 import { SyncOpStatus } from '@Lib/services/Sync/SyncOpStatus'
 import { SyncState } from '@Lib/services/Sync/SyncState'
-import { AccountDownloader } from '@Lib/services/Sync/Account/Downloader'
 import { SyncResponseResolver } from '@Lib/services/Sync/Account/ResponseResolver'
 import { AccountSyncOperation } from '@Lib/services/Sync/Account/Operation'
 import { OfflineSyncOperation } from '@Lib/services/Sync/Offline/Operation'
@@ -49,7 +48,6 @@ import {
   SyncSource,
 } from '@standardnotes/services'
 
-const DEFAULT_MAX_DISCORDANCE = 5
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
 
@@ -76,7 +74,6 @@ export class SNSyncService
   public completedOnlineDownloadFirstSync = false
 
   private majorChangeThreshold = DEFAULT_MAJOR_CHANGE_THRESHOLD
-  private maxDiscordance = DEFAULT_MAX_DISCORDANCE
   private clientLocked = false
   private databaseLoaded = false
 
@@ -154,7 +151,7 @@ export class SNSyncService
       } else if (event === SyncEvent.ExitOutOfSync) {
         void this.notifyEvent(SyncEvent.ExitOutOfSync)
       }
-    }, this.maxDiscordance)
+    })
   }
 
   public lockSyncing(): void {
@@ -697,7 +694,7 @@ export class SNSyncService
       return true
     }
 
-    const newItemsNeedingSync = await this.itemsNeedingSync()
+    const newItemsNeedingSync = this.itemsNeedingSync()
     if (newItemsNeedingSync.length > 0) {
       await this.syncAgainByHandlingNewDirtyItems(options)
       this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
@@ -805,7 +802,6 @@ export class SNSyncService
       },
       syncToken,
       paginationToken,
-      checkIntegrity,
       this.apiService,
     )
     this.log(
@@ -962,10 +958,17 @@ export class SNSyncService
     if (event.type !== IntegrityEvent.IntegrityCheckCompleted) {
       return
     }
+
     const eventPayload: IntegrityEventPayload = event.payload as IntegrityEventPayload
 
+    const rawPayloads = eventPayload.rawPayloads
+    if (rawPayloads.length === 0) {
+      this.state.setInSync(true)
+      return
+    }
+
     const encryptedPayloads = filterDisallowedRemotePayloads(
-      eventPayload.rawPayloads.map((rawPayload: RawPayload) => {
+      rawPayloads.map((rawPayload: RawPayload) => {
         return CreateSourcedPayloadFromObject(rawPayload, PayloadSource.RemoteRetrieved)
       }),
     )
@@ -973,24 +976,19 @@ export class SNSyncService
       encryptedPayloads,
     )
 
-    if (decryptedPayloads.length === 0) {
-      this.state.setInSync(true)
-
-      return
-    }
     this.state.setInSync(false)
 
-    await this.resolveDeltaOutOfSync(decryptedPayloads)
+    await this.emitOutOfSyncRemotemPayloads(decryptedPayloads)
+
+    const shouldCheckIntegrityAgainAfterSync = eventPayload.source !== SyncSource.ResolveOutOfSync
 
     await this.sync({
-      checkIntegrity: [SyncSource.AfterDownloadFirst, SyncSource.External].includes(
-        eventPayload.source,
-      ),
+      checkIntegrity: shouldCheckIntegrityAgainAfterSync,
       source: SyncSource.ResolveOutOfSync,
     })
   }
 
-  private async resolveDeltaOutOfSync(payloads: PayloadInterface[]) {
+  private async emitOutOfSyncRemotemPayloads(payloads: PayloadInterface[]) {
     const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteRetrieved),
@@ -1002,36 +1000,19 @@ export class SNSyncService
     await this.persistPayloads(collection.payloads)
   }
 
-  public async statelessDownloadAllItems(
-    contentType?: ContentType,
-    customEvent?: string,
-  ): Promise<SNItem[]> {
-    const downloader = new AccountDownloader(
-      this.apiService,
-      this.protocolService,
-      contentType,
-      customEvent,
-    )
-
-    const payloads = await downloader.run()
-    return payloads.map((payload) => {
-      return CreateItemFromPayload(payload)
-    })
-  }
-
-  /** @unit_testing */
+  /** @e2e_testing */
   // eslint-disable-next-line camelcase
   ut_setDatabaseLoaded(loaded: boolean): void {
     this.databaseLoaded = loaded
   }
 
-  /** @unit_testing */
+  /** @e2e_testing */
   // eslint-disable-next-line camelcase
   ut_clearLastSyncDate(): void {
     this.state.lastSyncDate = undefined
   }
 
-  /** @unit_testing */
+  /** @e2e_testing */
   // eslint-disable-next-line camelcase
   ut_beginLatencySimulator(latency: number): void {
     this._simulate_latency = {
@@ -1040,7 +1021,7 @@ export class SNSyncService
     }
   }
 
-  /** @unit_testing */
+  /** @e2e_testing */
   // eslint-disable-next-line camelcase
   ut_endLatencySimulator(): void {
     this._simulate_latency = undefined

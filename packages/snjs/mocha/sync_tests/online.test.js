@@ -362,7 +362,6 @@ describe('online syncing', function () {
     await this.application.syncService.sync(syncOptions);
     note = this.application.findItem(note.uuid);
     expect(note).to.not.be.ok;
-    expect(this.application.syncService.state.discordance).to.equal(0);
 
     // We expect that this item is now gone for good, and no duplicate has been created.
     expect(this.application.itemManager.items.length).to.equal(
@@ -567,24 +566,6 @@ describe('online syncing', function () {
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
   }).timeout(20000);
-
-  it('should be able to download all items separate of sync', async function () {
-    const largeItemCount = 20;
-    for (let i = 0; i < largeItemCount; i++) {
-      const note = await Factory.createMappedNote(this.application);
-      await this.application.itemManager.setItemDirty(note.uuid);
-    }
-    /** Upload */
-    await this.application.syncService.sync(syncOptions);
-    this.expectedItemCount += largeItemCount;
-
-    /** Download */
-    const downloadedItems = await this.application.syncService.statelessDownloadAllItems();
-    expect(downloadedItems.length).to.equal(this.expectedItemCount);
-    // ensure it's decrypted
-    expect(downloadedItems[10].content.text.length).to.be.above(1);
-    expect(downloadedItems[10].text.length).to.be.above(1);
-  });
 
   it('syncing an item should storage it encrypted', async function () {
     const note = await Factory.createMappedNote(this.application);
