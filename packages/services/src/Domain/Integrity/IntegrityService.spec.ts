@@ -152,7 +152,7 @@ describe('IntegrityService', () => {
 
   it('should not handle different event types', async () => {
     await createService().handleEvent({
-      type: SyncEvent.FullSyncCompleted,
+      type: SyncEvent.SyncCompletedWithAllItemsUploaded,
       payload: {
         integrityPayloads: [{ uuid: '1-2-3', updated_at_timestamp: 123 } as IntegrityPayload],
         source: SyncSource.AfterDownloadFirst,

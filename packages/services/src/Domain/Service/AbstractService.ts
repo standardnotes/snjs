@@ -45,6 +45,10 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
     eventName: EventName,
     data?: EventData
   ): Promise<void> {
+    for (const observer of this.eventObservers) {
+      await observer(eventName, data)
+    }
+
     await this.internalEventBus.publishSync(
       {
         type: (eventName as unknown) as string,
