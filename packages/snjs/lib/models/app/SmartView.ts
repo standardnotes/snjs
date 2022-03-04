@@ -25,12 +25,16 @@ export function isSystemView(view: SmartView): boolean {
  * to retrieve a dynamic list of items.
  */
 export class SmartView extends SNItem {
-  public readonly predicate: PredicateInterface<SNItem>
+  public readonly predicate!: PredicateInterface<SNItem>
   public readonly title: string
 
   constructor(payload: PurePayload) {
     super(payload)
-    this.predicate = this.typedContent.predicate && predicateFromJson(this.typedContent.predicate)
+    try {
+      this.predicate = this.typedContent.predicate && predicateFromJson(this.typedContent.predicate)
+    } catch (error) {
+      console.error(error)
+    }
     this.title = String(this.typedContent.title || '')
   }
 

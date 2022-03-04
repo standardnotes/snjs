@@ -34,6 +34,8 @@ export type PredicateOperator = typeof AllPredicateOperators[number]
 
 export type SureValue = number | number[] | string[] | string | Date | boolean | false | ''
 
+export const SureValueNonObjectTypesAsStrings = ['number', 'string', 'boolean']
+
 export type FalseyValue = false | '' | null | undefined
 
 export type PrimitiveOperand = SureValue | FalseyValue
