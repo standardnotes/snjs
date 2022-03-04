@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.73.0",
+  "version": "2.73.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -84,8 +84,8 @@
     "@standardnotes/common": "^1.15.3",
     "@standardnotes/domain-events": "^2.23.21",
     "@standardnotes/features": "^1.34.1",
-    "@standardnotes/payloads": "^1.3.1",
-    "@standardnotes/responses": "^1.1.6",
+    "@standardnotes/payloads": "^1.3.2",
+    "@standardnotes/responses": "^1.1.7",
     "@standardnotes/services": "^1.4.0",
     "@standardnotes/settings": "^1.11.5",
     "@standardnotes/sncrypto-common": "^1.7.3",

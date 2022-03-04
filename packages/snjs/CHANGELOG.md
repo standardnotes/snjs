@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.73.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.0...@standardnotes/snjs@2.73.1) (2022-03-04)
+
+
+### Bug Fixes
+
+* includes predicate ([#630](https://github.com/standardnotes/snjs/issues/630)) ([83fe4bf](https://github.com/standardnotes/snjs/commit/83fe4bfa7e24ccd68f92eb50ceee161a7253e9cf))
+
+
+
+
+
 # [2.73.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.72.1...@standardnotes/snjs@2.73.0) (2022-03-04)
 
 
