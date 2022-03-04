@@ -570,7 +570,7 @@ describe('predicates', () => {
   })
 
   describe('generators', () => {
-    it('simple includes', () => {
+    it('includes predicate', () => {
       const json = ['B-tags', 'tags', 'includes', ['title', 'startsWith', 'b']]
       const predicate = predicateFromDSLString(
         '!' + JSON.stringify(json),
@@ -580,6 +580,17 @@ describe('predicates', () => {
       expect(predicate.predicate).toBeInstanceOf(Predicate)
       expect((predicate.predicate as Predicate<Item>).keypath).toEqual('title')
       expect((predicate.predicate as Predicate<Item>).operator).toEqual('startsWith')
+    })
+
+    it('includes string should be mapped to normal predicate', () => {
+      const json = ['TODO', 'title', 'includes', 'TODO']
+      const predicate = predicateFromDSLString(
+        '!' + JSON.stringify(json),
+      ) as Predicate<Item>
+
+      expect(predicate).toBeInstanceOf(Predicate)
+      expect(predicate.keypath).toEqual('title')
+      expect(predicate.operator).toEqual('includes')
     })
 
     it('complex compound and', () => {

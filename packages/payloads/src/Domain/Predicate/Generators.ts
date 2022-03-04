@@ -10,6 +10,7 @@ import {
   PredicateJsonForm,
   AllPredicateOperators,
   RawPredicateInArrayForm,
+  SureValueNonObjectTypesAsStrings,
 } from './Interface'
 import { NotPredicate } from './NotPredicate'
 import { Predicate } from './Predicate'
@@ -21,11 +22,15 @@ export function predicateFromArguments<T extends ItemInterface>(
   value: SureValue | PredicateJsonForm,
 ): PredicateInterface<T> {
   if (AllPredicateCompoundOperators.includes(operator as PredicateCompoundOperator)) {
-    return compoundPredicateFromArguments(operator, (value as unknown) as PredicateJsonForm[])
+    return compoundPredicateFromArguments(operator, value as unknown as PredicateJsonForm[])
   } else if (operator === 'not') {
     return new NotPredicate(predicateFromJson(value as PredicateJsonForm))
   } else if (operator === 'includes' && keypath) {
-    return new IncludesPredicate(keypath, predicateFromJson(value as PredicateJsonForm))
+    if (isSureValue(value)) {
+      return new Predicate(keypath, operator, value)
+    } else {
+      return new IncludesPredicate(keypath, predicateFromJson(value as PredicateJsonForm))
+    }
   } else if (keypath) {
     return new Predicate(keypath, operator, value as SureValue)
   }
@@ -90,6 +95,18 @@ function isValuePredicateInArrayForm(
   value: SureValue | PredicateJsonForm | PredicateJsonForm[] | RawPredicateInArrayForm,
 ): value is RawPredicateInArrayForm {
   return Array.isArray(value) && AllPredicateOperators.includes(value[1] as PredicateOperator)
+}
+
+function isSureValue(value: unknown): value is SureValue {
+  if (SureValueNonObjectTypesAsStrings.includes(typeof value)) {
+    return true
+  }
+
+  if (Array.isArray(value)) {
+    return !isValuePredicateInArrayForm(value)
+  }
+
+  return false
 }
 
 function predicateDSLArrayToJsonPredicate(
