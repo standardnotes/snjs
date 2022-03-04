@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export enum SyncEvent {
   /** A full sync can consist of many round-trips to the server */
   FullSyncCompleted = 'sync:full-completed',
