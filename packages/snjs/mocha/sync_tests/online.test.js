@@ -451,7 +451,7 @@ describe('online syncing', function () {
         }
       }
     });
-    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
+    await this.application.syncService.sync({ mode: SyncMode.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
     expect(success).to.equal(true);
   });
@@ -486,7 +486,7 @@ describe('online syncing', function () {
         }
       }
     });
-    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
+    await this.application.syncService.sync({ mode: SyncMode.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
     expect(success).to.equal(true);
   });
@@ -765,7 +765,7 @@ describe('online syncing', function () {
     this.application.syncService.addEventObserver((event, data) => {
       if (
         event === SyncEvent.FullSyncCompleted &&
-        data.source === SyncSources.External
+        data.source === SyncSource.External
       ) {
         actualEvents++;
       }

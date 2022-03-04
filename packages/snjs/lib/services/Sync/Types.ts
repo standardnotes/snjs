@@ -1,4 +1,4 @@
-import { SyncSources } from '@standardnotes/services'
+import { SyncSource } from '@standardnotes/services'
 
 export enum SyncQueueStrategy {
   /**
@@ -13,7 +13,7 @@ export enum SyncQueueStrategy {
   ForceSpawnNew = 2,
 }
 
-export enum SyncModes {
+export enum SyncMode {
   /**
    * Performs a standard sync, uploading any dirty items and retrieving items.
    */
@@ -28,11 +28,11 @@ export enum SyncModes {
 
 export type SyncOptions = {
   queueStrategy?: SyncQueueStrategy
-  mode?: SyncModes
+  mode?: SyncMode
   /** Whether the server should compute and return an integrity hash. */
   checkIntegrity?: boolean
   /** Internally used to keep track of how sync requests were spawned. */
-  source?: SyncSources
+  source: SyncSource
   /** Whether to await any sync requests that may be queued from this call. */
   awaitAll?: boolean
   /**

@@ -28,7 +28,7 @@ export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004'
 
 export { SNRootKey } from '@Protocol/root_key'
 export { SNRootKeyParams } from './protocol/key_params'
-export { AbstractDevice, AbstractService, SyncSources } from '@standardnotes/services'
+export { AbstractDevice, AbstractService, SyncSource } from '@standardnotes/services'
 export type { DeviceInterface, ServiceInterface } from '@standardnotes/services'
 
 export * from './models'

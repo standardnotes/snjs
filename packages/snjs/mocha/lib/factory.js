@@ -339,7 +339,7 @@ export async function registerOldUser({
   );
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
-    mode: SyncModes.DownloadFirst,
+    mode: SyncMode.DownloadFirst,
     ...syncOptions,
   });
   await application.protocolService.decryptErroredItems();

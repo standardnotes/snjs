@@ -1,7 +1,7 @@
 import { RawPayload } from '@standardnotes/payloads'
-import { SyncSources } from '../Sync/SyncSources'
+import { SyncSource } from '../Sync/SyncSource'
 
 export type IntegrityEventPayload = {
   rawPayloads: RawPayload[]
-  source: SyncSources
+  source: SyncSource
 }

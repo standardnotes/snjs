@@ -3,7 +3,7 @@ import { SyncEvent } from '../Event/SyncEvent'
 
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
 import { ItemApiInterface } from '../Item/ItemApiInterface'
-import { SyncSources } from '../Sync/SyncSources'
+import { SyncSource } from '../Sync/SyncSource'
 import { IntegrityApiInterface } from './IntegrityApiInterface'
 import { IntegrityService } from './IntegrityService'
 
@@ -55,7 +55,7 @@ describe('IntegrityService', () => {
       type: SyncEvent.SyncRequestsIntegrityCheck,
       payload: {
         integrityPayloads: [{ uuid: '1-2-3', updated_at_timestamp: 123 } as IntegrityPayload],
-        source: SyncSources.AfterDownloadFirst,
+        source: SyncSource.AfterDownloadFirst,
       },
     })
 
@@ -86,7 +86,7 @@ describe('IntegrityService', () => {
       type: SyncEvent.SyncRequestsIntegrityCheck,
       payload: {
         integrityPayloads: [{ uuid: '1-2-3', updated_at_timestamp: 123 } as IntegrityPayload],
-        source: SyncSources.AfterDownloadFirst,
+        source: SyncSource.AfterDownloadFirst,
       },
     })
 
@@ -111,7 +111,7 @@ describe('IntegrityService', () => {
       type: SyncEvent.SyncRequestsIntegrityCheck,
       payload: {
         integrityPayloads: [{ uuid: '1-2-3', updated_at_timestamp: 123 } as IntegrityPayload],
-        source: SyncSources.AfterDownloadFirst,
+        source: SyncSource.AfterDownloadFirst,
       },
     })
 
@@ -134,7 +134,7 @@ describe('IntegrityService', () => {
       type: SyncEvent.SyncRequestsIntegrityCheck,
       payload: {
         integrityPayloads: [{ uuid: '1-2-3', updated_at_timestamp: 123 } as IntegrityPayload],
-        source: SyncSources.AfterDownloadFirst,
+        source: SyncSource.AfterDownloadFirst,
       },
     })
 
@@ -155,7 +155,7 @@ describe('IntegrityService', () => {
       type: SyncEvent.FullSyncCompleted,
       payload: {
         integrityPayloads: [{ uuid: '1-2-3', updated_at_timestamp: 123 } as IntegrityPayload],
-        source: SyncSources.AfterDownloadFirst,
+        source: SyncSource.AfterDownloadFirst,
       },
     })
 

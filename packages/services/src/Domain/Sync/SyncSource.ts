@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-export enum SyncSources {
+export enum SyncSource {
   External = 1,
   SpawnQueue = 2,
   ResolveQueue = 3,

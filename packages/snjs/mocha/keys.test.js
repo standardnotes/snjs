@@ -930,7 +930,7 @@ describe('keys', function () {
       })
     );
     await this.application.syncService.sync({
-      mode: SyncModes.DownloadFirst,
+      mode: SyncMode.DownloadFirst,
     });
     const updatedKey = this.application.findItem(itemsKey.uuid);
     expect(updatedKey.neverSynced).to.equal(false);

@@ -1,3 +1,4 @@
+import { SyncSource } from '@standardnotes/services/src/Domain/Sync/SyncSource';
 import { ItemsClientInterface } from './services/Items/ClientInterface'
 import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
 import { ListedService } from './services/ListedService'
@@ -92,7 +93,7 @@ import {
   SNSyncService,
   SNFeaturesService,
   SNFileService,
-  SyncModes,
+  SyncMode,
 } from './services'
 import {
   DeviceInterface,
@@ -358,7 +359,8 @@ export class SNApplication implements ListedInterface {
       await this.handleStage(ApplicationStage.LoadedDatabase_12)
       this.beginAutoSyncTimer()
       await this.syncService.sync({
-        mode: SyncModes.DownloadFirst,
+        mode: SyncMode.DownloadFirst,
+        source: SyncSource.External
       })
     })
     if (awaitDatabaseLoad) {
@@ -1287,10 +1289,6 @@ export class SNApplication implements ListedInterface {
 
   public isOutOfSync(): boolean {
     return this.syncService.isOutOfSync()
-  }
-
-  public async resolveOutOfSync(): Promise<unknown> {
-    return this.syncService.resolveOutOfSync()
   }
 
   public async setValue(key: string, value: unknown, mode?: StorageValueModes): Promise<void> {

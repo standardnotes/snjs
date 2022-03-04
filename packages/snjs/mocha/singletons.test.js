@@ -139,7 +139,7 @@ describe('singletons', function () {
       this.application.syncService.ut_setDatabaseLoaded(true);
       this.application.sync({
         /* Simulate the first sync occuring as that is handled specially by sync service */
-        mode: SyncModes.DownloadFirst,
+        mode: SyncMode.DownloadFirst,
       });
     });
     const userPreferences = await this.application.singletonManager.findOrCreateSingleton(
@@ -209,7 +209,7 @@ describe('singletons', function () {
         expect(matching).to.not.be.ok;
       }
     });
-    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
+    await this.application.syncService.sync({ mode: SyncMode.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
   }).timeout(10000);
 

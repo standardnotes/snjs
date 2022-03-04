@@ -9,7 +9,7 @@ import { InternalEventInterface } from '../Internal/InternalEventInterface'
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
 import { SyncEvent } from '../Event/SyncEvent'
 import { IntegrityEventPayload } from './IntegrityEventPayload'
-import { SyncSources } from '../Sync/SyncSources'
+import { SyncSource } from '../Sync/SyncSource'
 
 export class IntegrityService
   extends AbstractService<IntegrityEvent, IntegrityEventPayload>
@@ -55,7 +55,7 @@ export class IntegrityService
 
     await this.notifyEventSync(IntegrityEvent.IntegrityCheckCompleted, {
       rawPayloads: rawPayloads,
-      source: (event.payload as { source: SyncSources }).source,
+      source: (event.payload as { source: SyncSource }).source,
     })
   }
 }
