@@ -14,6 +14,8 @@ import {
   CreateMaxPayloadFromAnyObject,
   RawPayload,
   PayloadInterface,
+  CreateSourcedPayloadFromObject,
+  filterDisallowedRemotePayloads,
 } from '@standardnotes/payloads'
 import { PayloadManager } from '../PayloadManager'
 import { SNStorageService } from '../StorageService'
@@ -1013,17 +1015,23 @@ export class SNSyncService
     }
     const eventPayload: IntegrityEventPayload = event.payload as IntegrityEventPayload
 
-    const payloads = eventPayload.rawPayloads.map(
-      (rawPayload: RawPayload) => CreateMaxPayloadFromAnyObject(rawPayload)
+    const encryptedPayloads = filterDisallowedRemotePayloads(
+      eventPayload.rawPayloads.map((rawPayload: RawPayload) => {
+        return CreateSourcedPayloadFromObject(rawPayload, PayloadSource.RemoteRetrieved)
+      }),
     )
-    if (payloads.length === 0) {
+    const decryptedPayloads = await this.protocolService.payloadsByDecryptingPayloads(
+      encryptedPayloads,
+    )
+
+    if (decryptedPayloads.length === 0) {
       this.state!.setInSync(true)
 
       return
     }
     this.state!.setInSync(false)
 
-    await this.resolveDeltaOutOfSync(payloads)
+    await this.resolveDeltaOutOfSync(decryptedPayloads)
 
     await this.sync({
       checkIntegrity: [SyncSources.AfterDownloadFirst, SyncSources.External].includes(eventPayload.source),

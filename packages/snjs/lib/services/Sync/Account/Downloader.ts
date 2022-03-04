@@ -1,9 +1,9 @@
-import { filterDisallowedRemotePayloads } from '@Lib/services/Sync/Filter'
 import {
   PurePayload,
   RawPayload,
   CreateSourcedPayloadFromObject,
   PayloadSource,
+  filterDisallowedRemotePayloads,
 } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
 import { SNApiService } from '../../Api/ApiService'
