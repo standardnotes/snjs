@@ -605,7 +605,7 @@ export class SNSyncService
     }
 
     if (syncMode !== SyncMode.DownloadFirst) {
-      await this.notifyEvent(SyncEvent.FullSyncCompleted, {
+      await this.notifyEvent(SyncEvent.SyncCompletedWithAllItemsUploaded, {
         source: options.source,
       })
     }
@@ -758,6 +758,10 @@ export class SNSyncService
       })
     }
 
+    await this.notifyEventSync(SyncEvent.SyncCompletedWithAllItemsUploadedAndDownloaded, {
+      source: options.source,
+    })
+
     this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
   }
 
@@ -841,7 +845,7 @@ export class SNSyncService
     this.opStatus.clearError()
     this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
 
-    await this.notifyEvent(SyncEvent.SingleSyncCompleted, response)
+    await this.notifyEvent(SyncEvent.SingleRoundTripSyncCompleted, response)
   }
 
   private handleErrorServerResponse(response: SyncResponse) {
@@ -909,7 +913,7 @@ export class SNSyncService
     await Promise.all([
       this.setLastSyncToken(response.lastSyncToken as string),
       this.setPaginationToken(response.paginationToken as string),
-      this.notifyEvent(SyncEvent.SingleSyncCompleted, response),
+      this.notifyEvent(SyncEvent.SingleRoundTripSyncCompleted, response),
     ])
   }
 
@@ -966,6 +970,7 @@ export class SNSyncService
     const eventPayload: IntegrityEventPayload = event.payload as IntegrityEventPayload
 
     const rawPayloads = eventPayload.rawPayloads
+
     if (rawPayloads.length === 0) {
       this.setInSync(true)
       return

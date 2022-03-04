@@ -198,7 +198,7 @@ describe('singletons', function () {
       }
       if (
         !didCompleteRelevantSync &&
-        eventName === SyncEvent.SingleSyncCompleted
+        eventName === SyncEvent.SingleRoundTripSyncCompleted
       ) {
         didCompleteRelevantSync = true;
         const saved = data.savedPayloads;

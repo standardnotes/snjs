@@ -31,7 +31,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     })
 
     this.removeSyncObserver = syncService.addEventObserver((event) => {
-      if (event === SyncEvent.FullSyncCompleted) {
+      if (event === SyncEvent.SyncCompletedWithAllItemsUploaded) {
         void this.reload()
       }
     })

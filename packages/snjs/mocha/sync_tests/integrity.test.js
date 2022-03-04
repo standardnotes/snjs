@@ -4,7 +4,7 @@ import * as Factory from '../lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe.only('sync integrity', () => {
+describe('sync integrity', () => {
   const BASE_ITEM_COUNT = 2 /** Default items key, user preferences */
 
   before(function () {
@@ -29,7 +29,7 @@ describe.only('sync integrity', () => {
 
   const awaitSyncEventPromise = (application, targetEvent) => {
     return new Promise((resolve) => {
-      application.syncService.addEventListener((event) => {
+      application.syncService.addEventObserver((event) => {
         if (event === targetEvent) {
           resolve()
         }

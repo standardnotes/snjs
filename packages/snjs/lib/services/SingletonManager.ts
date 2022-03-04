@@ -92,7 +92,7 @@ export class SNSingletonManager extends AbstractService {
     this.removeSyncObserver = this.syncService.addEventObserver(async (eventName) => {
       if (
         eventName === SyncEvent.DownloadFirstSyncCompleted ||
-        eventName === SyncEvent.FullSyncCompleted
+        eventName === SyncEvent.SyncCompletedWithAllItemsUploaded
       ) {
         await this.resolveSingletonsForItems(this.popResolveQueue(), eventName)
       }
@@ -125,12 +125,12 @@ export class SNSingletonManager extends AbstractService {
       await this.handleStrategy(matchingItems, item.singletonStrategy)
     }
     /**
-     * Only sync if event source is FullSyncCompleted.
+     * Only sync if event source is SyncCompletedWithAllItemsUploaded.
      * If it is on DownloadFirstSyncCompleted, we don't need to sync,
      * as a sync request will automatically be made as part of the second phase
      * of a download-first request.
      */
-    if (handled.length > 0 && eventSource === SyncEvent.FullSyncCompleted) {
+    if (handled.length > 0 && eventSource === SyncEvent.SyncCompletedWithAllItemsUploaded) {
       await this.syncService?.sync()
     }
   }

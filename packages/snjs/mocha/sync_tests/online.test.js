@@ -24,6 +24,8 @@ describe('online syncing', function () {
     this.email = this.context.email;
     this.password = this.context.password;
 
+    Factory.disableIntegrityAutoHeal(this.application);
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -161,7 +163,7 @@ describe('online syncing', function () {
 
     this.application.syncService.ut_beginLatencySimulator(250);
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvent.FullSyncCompleted) {
+      if (event === SyncEvent.SyncCompletedWithAllItemsUploaded) {
         events++;
       }
     });
@@ -198,7 +200,7 @@ describe('online syncing', function () {
     this.application.syncService.ut_beginLatencySimulator(250);
 
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvent.FullSyncCompleted) {
+      if (event === SyncEvent.SyncCompletedWithAllItemsUploaded) {
         events++;
       }
     });
@@ -227,8 +229,8 @@ describe('online syncing', function () {
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
-    this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvent.SingleSyncCompleted) {
+    this.application.syncService.addEventObserver((event) => {
+      if (event === SyncEvent.SingleRoundTripSyncCompleted) {
         const note = this.application.findItem(originalNote.uuid);
         expect(note.dirty).to.not.be.ok;
       }
@@ -243,7 +245,7 @@ describe('online syncing', function () {
     );
   });
 
-  it('allows me to save data after Ive signed out', async function () {
+  it('allows saving of data after sign out', async function () {
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
@@ -438,7 +440,7 @@ describe('online syncing', function () {
       }
       if (
         !didCompleteRelevantSync &&
-        eventName === SyncEvent.SingleSyncCompleted
+        eventName === SyncEvent.SingleRoundTripSyncCompleted
       ) {
         didCompleteRelevantSync = true;
         const response = data;
@@ -473,7 +475,7 @@ describe('online syncing', function () {
       }
       if (
         !didCompleteRelevantSync &&
-        eventName === SyncEvent.SingleSyncCompleted
+        eventName === SyncEvent.SingleRoundTripSyncCompleted
       ) {
         didCompleteRelevantSync = true;
         const response = data;
@@ -539,16 +541,17 @@ describe('online syncing', function () {
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
   }).timeout(15000);
 
-  it.only('should handle downloading with sync pagination', async function () {
+  it('should handle downloading with sync pagination', async function () {
     const largeItemCount = SyncUpDownLimit + 10;
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(this.application);
       await this.application.itemManager.setItemDirty(note.uuid);
     }
     /** Upload */
-    this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync({ awaitAll: true, checkIntegrity: false });
     await this.context.awaitNextSucessfulSync();
     this.expectedItemCount += largeItemCount;
+
 
     /** Clear local data */
     await this.application.payloadManager.resetState();
@@ -563,9 +566,10 @@ describe('online syncing', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-  }).timeout(20000);
+  }).timeout(30000);
 
   it('syncing an item should storage it encrypted', async function () {
     const note = await Factory.createMappedNote(this.application);
@@ -666,7 +670,7 @@ describe('online syncing', function () {
     expect(currentItem.dirty).to.not.be.ok;
   });
 
-  it('load local items should respect sort priority', async function () {
+  it('load local items should respect sort priority', function () {
     const contentTypes = ['A', 'B', 'C'];
     const itemCount = 6;
     const originalPayloads = [];
@@ -745,7 +749,7 @@ describe('online syncing', function () {
     let actualEvents = 0;
     this.application.syncService.addEventObserver((event, data) => {
       if (
-        event === SyncEvent.FullSyncCompleted &&
+        event === SyncEvent.SyncCompletedWithAllItemsUploaded &&
         data.source === SyncSource.External
       ) {
         actualEvents++;

@@ -19,9 +19,12 @@ describe('online conflict handling', function () {
 
     this.context = await Factory.createAppContext();
     await this.context.launch();
+
     this.application = this.context.application;
     this.email = this.context.email;
     this.password = this.context.password;
+
+    Factory.disableIntegrityAutoHeal(this.application);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -586,6 +589,7 @@ describe('online conflict handling', function () {
     this.expectedItemCount += largeItemCount;
     const items = this.application.itemManager.items;
     expect(items.length).to.equal(this.expectedItemCount);
+
     /**
      * We want to see what will happen if we upload everything we have to
      * the server as dirty, with no sync token, so that the server also
@@ -877,8 +881,8 @@ describe('online conflict handling', function () {
     );
     await Factory.registerUserToApplication({
       application: newApp,
-      email: await Factory.generateUuid(),
-      password: await Factory.generateUuid(),
+      email: Factory.generateUuid(),
+      password: Factory.generateUuid(),
     });
     await newApp.itemManager.emitItemsFromPayloads(
       priorData.map((i) => i.payload)

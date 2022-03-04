@@ -1154,7 +1154,7 @@ export class SNProtocolService extends AbstractService implements EncryptionDele
   }
 
   public async onSyncEvent(eventName: SyncEvent) {
-    if (eventName === SyncEvent.FullSyncCompleted) {
+    if (eventName === SyncEvent.SyncCompletedWithAllItemsUploaded) {
       await this.handleFullSyncCompletion()
     }
     if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
