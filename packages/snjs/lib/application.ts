@@ -109,7 +109,7 @@ import {
   ImportStrings,
 } from './services/Api/Messages'
 import { SessionEvent } from './services/Api/SessionManager'
-import { PrefKey, PrefValue, SNComponent, SNFile, SNNote, SNTag } from './models'
+import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models'
 import { SNLog } from './log'
 import { SNPreferencesService } from './services/PreferencesService'
 import {
@@ -970,10 +970,6 @@ export class SNApplication implements ListedInterface {
 
   public getNoteCount(): number {
     return this.itemManager.noteCount
-  }
-
-  public getFilesForNote(note: SNNote): SNFile[] {
-    return this.itemManager.getFilesForNote(note);
   }
 
   /**
