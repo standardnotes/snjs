@@ -770,10 +770,6 @@ export class SNSyncService
     }
 
     this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
-
-    // if (options.checkIntegrity) {
-    //   await this.notifyEventSync(SyncEvent.SyncRequestsIntegrityCheck)
-    // } ???
   }
 
   private async syncOnlineOperation(
