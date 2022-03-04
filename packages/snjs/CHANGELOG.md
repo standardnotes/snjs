@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.73.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.72.1...@standardnotes/snjs@2.73.0) (2022-03-04)
+
+
+### Features
+
+* add getFilesForNote function ([#629](https://github.com/standardnotes/snjs/issues/629)) ([abc6464](https://github.com/standardnotes/snjs/commit/abc646403539e3ca66e7702fe6a61f0f39c90c7b))
+
+
+
+
+
 ## [2.72.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.72.0...@standardnotes/snjs@2.72.1) (2022-03-04)
 
 **Note:** Version bump only for package @standardnotes/snjs
