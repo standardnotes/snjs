@@ -23,7 +23,6 @@ import { SNProtocolService } from '../ProtocolService'
 import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@standardnotes/utils'
 import { SortPayloadsByRecentAndContentPriority } from '@Lib/services/Sync/Utils'
 import { SyncOpStatus } from '@Lib/services/Sync/SyncOpStatus'
-import { SyncState } from '@Lib/services/Sync/SyncState'
 import { SyncResponseResolver } from '@Lib/services/Sync/Account/ResponseResolver'
 import { AccountSyncOperation } from '@Lib/services/Sync/Account/Operation'
 import { OfflineSyncOperation } from '@Lib/services/Sync/Offline/Operation'
@@ -64,7 +63,9 @@ export class SNSyncService
   extends AbstractService<SyncEvent, SyncResponse | { source: SyncSource }>
   implements InternalEventHandlerInterface
 {
-  private state: SyncState
+  private lastPreSyncSave?: Date
+  private lastSyncDate?: Date
+  private outOfSync = false
   private opStatus: SyncOpStatus
 
   private resolveQueue: SyncPromise[] = []
@@ -108,7 +109,6 @@ export class SNSyncService
   ) {
     super(internalEventBus)
     this.opStatus = this.initializeStatus()
-    this.state = this.initializeState()
   }
 
   /**
@@ -129,9 +129,7 @@ export class SNSyncService
     ;(this.payloadManager as unknown) = undefined
     ;(this.storageService as unknown) = undefined
     ;(this.apiService as unknown) = undefined
-    this.state?.reset()
     this.opStatus.reset()
-    ;(this.state as unknown) = undefined
     ;(this.opStatus as unknown) = undefined
     this.resolveQueue.length = 0
     this.spawnQueue.length = 0
@@ -144,16 +142,6 @@ export class SNSyncService
     })
   }
 
-  private initializeState() {
-    return new SyncState((event) => {
-      if (event === SyncEvent.EnterOutOfSync) {
-        void this.notifyEvent(SyncEvent.EnterOutOfSync)
-      } else if (event === SyncEvent.ExitOutOfSync) {
-        void this.notifyEvent(SyncEvent.ExitOutOfSync)
-      }
-    })
-  }
-
   public lockSyncing(): void {
     this.clientLocked = true
   }
@@ -163,11 +151,11 @@ export class SNSyncService
   }
 
   public isOutOfSync(): boolean {
-    return this.state.isOutOfSync()
+    return this.outOfSync
   }
 
   public getLastSyncDate(): Date | undefined {
-    return this.state.lastSyncDate
+    return this.lastSyncDate
   }
 
   public getStatus(): SyncOpStatus {
@@ -178,7 +166,9 @@ export class SNSyncService
    * Called by application when sign in or registration occurs.
    */
   public resetSyncState(): void {
-    this.state.reset()
+    this.lastPreSyncSave = undefined
+    this.lastSyncDate = undefined
+    this.outOfSync = false
   }
 
   public isDatabaseLoaded(): boolean {
@@ -321,7 +311,7 @@ export class SNSyncService
    * pending data will be saved to disk, and synced the next time the app opens.
    */
   private popPayloadsNeedingPreSyncSave(from: PurePayload[]) {
-    const lastPreSyncSave = this.state.lastPreSyncSave
+    const lastPreSyncSave = this.lastPreSyncSave
     if (!lastPreSyncSave) {
       return from
     }
@@ -329,7 +319,7 @@ export class SNSyncService
     const payloads = from.filter((candidate) => {
       return !candidate.dirtiedDate || candidate.dirtiedDate > lastPreSyncSave
     })
-    this.state.lastPreSyncSave = new Date()
+    this.lastPreSyncSave = new Date()
     return payloads
   }
 
@@ -601,7 +591,7 @@ export class SNSyncService
 
     this.opStatus.reset()
 
-    this.state.lastSyncDate = new Date()
+    this.lastSyncDate = new Date()
 
     if (
       operation instanceof AccountSyncOperation &&
@@ -954,6 +944,20 @@ export class SNSyncService
     return this.persistPayloads(payloads)
   }
 
+  setInSync(isInSync: boolean): void {
+    if (isInSync === !this.outOfSync) {
+      return
+    }
+
+    if (isInSync) {
+      this.outOfSync = false
+      void this.notifyEvent(SyncEvent.ExitOutOfSync)
+    } else {
+      this.outOfSync = true
+      void this.notifyEvent(SyncEvent.EnterOutOfSync)
+    }
+  }
+
   async handleEvent(event: InternalEventInterface): Promise<void> {
     if (event.type !== IntegrityEvent.IntegrityCheckCompleted) {
       return
@@ -963,7 +967,7 @@ export class SNSyncService
 
     const rawPayloads = eventPayload.rawPayloads
     if (rawPayloads.length === 0) {
-      this.state.setInSync(true)
+      this.setInSync(true)
       return
     }
 
@@ -976,7 +980,7 @@ export class SNSyncService
       encryptedPayloads,
     )
 
-    this.state.setInSync(false)
+    this.setInSync(false)
 
     await this.emitOutOfSyncRemotemPayloads(decryptedPayloads)
 
@@ -1009,7 +1013,7 @@ export class SNSyncService
   /** @e2e_testing */
   // eslint-disable-next-line camelcase
   ut_clearLastSyncDate(): void {
-    this.state.lastSyncDate = undefined
+    this.lastSyncDate = undefined
   }
 
   /** @e2e_testing */
