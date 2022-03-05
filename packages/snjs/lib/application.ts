@@ -109,7 +109,7 @@ import {
   ImportStrings,
 } from './services/Api/Messages'
 import { SessionEvent } from './services/Api/SessionManager'
-import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models'
+import { PrefKey, PrefValue, SNComponent, SNFile, SNNote, SNTag } from './models'
 import { SNLog } from './log'
 import { SNPreferencesService } from './services/PreferencesService'
 import {
@@ -763,6 +763,27 @@ export class SNApplication implements ListedInterface {
     payloadSourceKey?: string,
   ): Promise<SNItem | undefined> {
     return this.itemManager.runTransactionalMutation(transaction, payloadSource, payloadSourceKey)
+  }
+
+  public async protectFile(file: SNFile): Promise<SNFile> {
+    const protectedFile = await this.protectionService.protectFile(file)
+    void this.syncService.sync()
+    return protectedFile
+  }
+
+  public async unprotectFile(file: SNFile): Promise<SNFile | undefined> {
+    const unprotectedFile = await this.protectionService.unprotectFile(file)
+    if (!isNullOrUndefined(unprotectedFile)) {
+      void this.syncService.sync()
+    }
+    return unprotectedFile
+  }
+
+  public async authorizeProtectedActionForFiles(
+    files: SNFile[],
+    challengeReason: ChallengeReason,
+  ): Promise<SNFile[]> {
+    return await this.protectionService.authorizeProtectedActionForFiles(files, challengeReason)
   }
 
   public async protectNote(note: SNNote): Promise<SNNote> {

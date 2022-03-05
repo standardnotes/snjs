@@ -1,7 +1,7 @@
 import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from '@Lib/challenges'
 import { ChallengeService } from './Challenge/ChallengeService'
 import { SNLog } from '@Lib/log'
-import { NoteMutator, SNNote } from '@Lib/models'
+import { FileMutator, NoteMutator, SNFile, SNNote } from '@Lib/models'
 import { SNProtocolService } from './ProtocolService'
 import { SNStorageService, StorageValueModes } from '@Lib/services/StorageService'
 import { StorageKey } from '@Lib/storage_keys'
@@ -150,6 +150,38 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> {
     } else {
       return undefined
     }
+  }
+
+  protectFile(file: SNFile): Promise<SNFile> {
+    return this.itemManager.changeItem<FileMutator>(file.uuid, (mutator) => {
+      mutator.protected = true
+    }) as Promise<SNFile>
+  }
+
+  async unprotectFile(file: SNFile): Promise<SNFile | undefined> {
+    if (await this.validateOrRenewSession(ChallengeReason.UnprotectFile)) {
+      return this.itemManager.changeItem<FileMutator>(file.uuid, (mutator) => {
+        mutator.protected = false
+      }) as Promise<SNFile>
+    }
+  }
+
+  async authorizeProtectedActionForFiles(
+    files: SNFile[],
+    challengeReason: ChallengeReason,
+  ): Promise<SNFile[]> {
+    let sessionValidation: Promise<boolean> | undefined
+    const authorizedFiles = []
+    for (const file of files) {
+      const needsAuthorization = file.protected && !this.hasUnprotectedAccessSession()
+      if (needsAuthorization && !sessionValidation) {
+        sessionValidation = this.validateOrRenewSession(challengeReason)
+      }
+      if (!needsAuthorization || (await sessionValidation)) {
+        authorizedFiles.push(file)
+      }
+    }
+    return authorizedFiles
   }
 
   protectNote(note: SNNote): Promise<SNNote> {
