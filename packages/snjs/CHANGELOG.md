@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.73.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.1...@standardnotes/snjs@2.73.2) (2022-03-05)
+
+
+### Bug Fixes
+
+* handle listed returning homepage redirect as 200 ([0738ddb](https://github.com/standardnotes/snjs/commit/0738ddbef14f036f6436edf56a5d5616d1b69f41))
+
+
+
+
+
 ## [2.73.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.0...@standardnotes/snjs@2.73.1) (2022-03-04)
 
 
