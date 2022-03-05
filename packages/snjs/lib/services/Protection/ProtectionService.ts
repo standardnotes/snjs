@@ -10,7 +10,7 @@ import { ApplicationStage } from '@standardnotes/applications'
 import { ItemManager } from '../Items/ItemManager'
 import { Uuids } from '@Lib/models/functions'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { ProtectionClientInterface } from './ClientInterface'
+import { ProtectionsClientInterface } from './ClientInterface'
 
 export enum ProtectionEvent {
   UnprotectedSessionBegan = 'UnprotectedSessionBegan',
@@ -58,7 +58,7 @@ export const ProtectionSessionDurations = [
  */
 export class SNProtectionService
   extends AbstractService<ProtectionEvent>
-  implements ProtectionClientInterface
+  implements ProtectionsClientInterface
 {
   private sessionExpiryTimeout = -1
 

@@ -122,7 +122,7 @@ import {
   SignInResponse,
   User,
 } from '@standardnotes/responses'
-import { ProtectionEvent } from './services/ProtectionService'
+import { ProtectionEvent } from './services/Protection/ProtectionService'
 import { SNWebSocketsService } from './services/Api/WebsocketsService'
 import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings'
 import { SNSettingsService } from './services/Settings'
@@ -133,6 +133,7 @@ import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_
 import { RemoteSession } from './services/Api/Session'
 import { FilesClientInterface } from './services/Files/FileService'
 import { ApiServiceEvent } from './services/Api/ApiService'
+import { ProtectionsClientInterface } from './services/Protection/ClientInterface'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -265,6 +266,10 @@ export class SNApplication implements ListedInterface {
 
   public get items(): ItemsClientInterface {
     return this.itemManager
+  }
+
+  public get protections(): ProtectionsClientInterface {
+    return this.protectionService
   }
 
   /**
