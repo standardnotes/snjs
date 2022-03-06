@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.74.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.2...@standardnotes/snjs@2.74.0) (2022-03-06)
+
+
+### Features
+
+* add un/protectFile and authorize[..]Files functions ([#631](https://github.com/standardnotes/snjs/issues/631)) ([fd39e40](https://github.com/standardnotes/snjs/commit/fd39e4056fa83f978b08451050da8585be882755))
+
+
+
+
+
 ## [2.73.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.1...@standardnotes/snjs@2.73.2) (2022-03-05)
 
 
