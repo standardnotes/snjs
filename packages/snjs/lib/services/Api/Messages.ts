@@ -193,6 +193,7 @@ export const SessionStrings = {
 export const ChallengeStrings = {
   UnlockApplication: 'Authentication is required to unlock the application',
   NoteAccess: 'Authentication is required to view this note',
+  FileAccess: 'Authentication is required to access this file',
   ImportFile: 'Authentication is required to import a backup file',
   AddPasscode: 'Authentication is required to add a passcode',
   RemovePasscode: 'Authentication is required to remove your passcode',
@@ -213,6 +214,7 @@ export const ChallengeStrings = {
   ExportBackup: 'Authentication is required to export a backup',
   DisableBiometrics: 'Authentication is required to disable biometrics',
   UnprotectNote: 'Authentication is required to unprotect a note',
+  UnprotectFile: 'Authentication is required to unprotect a file',
   SearchProtectedNotesText: 'Authentication is required to search protected contents',
   SelectProtectedNote: 'Authentication is required to select a protected note',
   DisableMfa: 'Authentication is required to disable two-factor authentication',

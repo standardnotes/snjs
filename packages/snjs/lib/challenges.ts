@@ -17,26 +17,28 @@ export enum ChallengeValidation {
 
 /** The source of the challenge */
 export enum ChallengeReason {
-  ApplicationUnlock = 1,
-  ResaveRootKey,
-  ProtocolUpgrade,
-  Migration,
-  Custom,
+  AccessProtectedFile,
   AccessProtectedNote,
-  ImportFile,
   AddPasscode,
-  RemovePasscode,
-  ChangePasscode,
+  ApplicationUnlock,
   ChangeAutolockInterval,
+  ChangePasscode,
   CreateDecryptedBackupWithProtectedItems,
-  RevokeSession,
+  Custom,
   DecryptEncryptedFile,
-  ExportBackup,
   DisableBiometrics,
-  UnprotectNote,
+  DisableMfa,
+  ExportBackup,
+  ImportFile,
+  Migration,
+  ProtocolUpgrade,
+  RemovePasscode,
+  ResaveRootKey,
+  RevokeSession,
   SearchProtectedNotesText,
   SelectProtectedNote,
-  DisableMfa,
+  UnprotectFile,
+  UnprotectNote,
 }
 
 /** For mobile */
@@ -88,6 +90,8 @@ export class Challenge {
           return ChallengeStrings.EnterCredentialsForProtocolUpgrade
         case ChallengeReason.AccessProtectedNote:
           return ChallengeStrings.NoteAccess
+        case ChallengeReason.AccessProtectedFile:
+          return ChallengeStrings.FileAccess
         case ChallengeReason.ImportFile:
           return ChallengeStrings.ImportFile
         case ChallengeReason.AddPasscode:
@@ -110,6 +114,8 @@ export class Challenge {
           return ChallengeStrings.DisableBiometrics
         case ChallengeReason.UnprotectNote:
           return ChallengeStrings.UnprotectNote
+        case ChallengeReason.UnprotectFile:
+          return ChallengeStrings.UnprotectFile
         case ChallengeReason.SearchProtectedNotesText:
           return ChallengeStrings.SearchProtectedNotesText
         case ChallengeReason.SelectProtectedNote:
