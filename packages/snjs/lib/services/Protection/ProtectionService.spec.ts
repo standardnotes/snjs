@@ -63,7 +63,7 @@ describe('protectionService', () => {
   })
 
   describe('files', () => {
-    it('unprotected file should require auth', async () => {
+    it('unprotected file should not require auth', async () => {
       protectionService = createService()
 
       const unprotectedFile = createFile('protected.txt', false)
@@ -103,7 +103,7 @@ describe('protectionService', () => {
       expect(challengeService.promptForChallengeResponse).toHaveBeenCalled()
     })
 
-    it('array of files having none protected should require auth', async () => {
+    it('array of files having none protected should not require auth', async () => {
       protectionService = createService()
 
       const protectedFile = createFile('protected.txt', false)
