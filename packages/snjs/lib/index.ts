@@ -95,7 +95,7 @@ export {
   SNProtectionService,
   UnprotectedAccessSecondsDuration,
   ProposedSecondsToDeferUILevelSessionExpirationDuringActiveInteraction,
-} from './services/ProtectionService'
+} from './services/Protection/ProtectionService'
 export { SNSingletonManager } from './services/SingletonManager'
 export { SNApiService } from './services/Api/ApiService'
 export {
@@ -194,7 +194,7 @@ export { IconsController } from './ui/icons_controller'
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base'
 
-export { ProtectionSessionDurations } from '@Lib/services/ProtectionService'
+export { ProtectionSessionDurations } from '@Lib/services/Protection/ProtectionService'
 
 export { SNLog } from './log'
 

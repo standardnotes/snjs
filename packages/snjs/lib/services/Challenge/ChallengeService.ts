@@ -11,7 +11,7 @@ import {
 } from '@Lib/challenges'
 import { ChallengeOperation } from './ChallengeOperation'
 import { removeFromArray } from '@standardnotes/utils'
-import { isValidProtectionSessionLength } from '../ProtectionService'
+import { isValidProtectionSessionLength } from '../Protection/ProtectionService'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 type ChallengeValidationResponse = {

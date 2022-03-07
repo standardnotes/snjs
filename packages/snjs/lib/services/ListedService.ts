@@ -1,4 +1,4 @@
-import { lastElement, sleep } from '@standardnotes/utils'
+import { isString, lastElement, sleep } from '@standardnotes/utils'
 import { UuidString } from '@Lib/types'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
@@ -70,7 +70,7 @@ export class ListedService extends AbstractService implements ListedInterface {
       url += `&item_uuid=${inContextOfItem}`
     }
     const response = (await this.httpSerivce.getAbsolute(url)) as ListedAccountInfoResponse
-    if (response.error || !response.data) {
+    if (response.error || !response.data || isString(response.data)) {
       return undefined
     }
 

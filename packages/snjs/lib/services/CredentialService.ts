@@ -1,4 +1,4 @@
-import { SNProtectionService } from './ProtectionService'
+import { SNProtectionService } from './Protection/ProtectionService'
 import { Challenge, ChallengeReason, ChallengeValidation } from '../challenges'
 import { KeyParamsOrigination } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'

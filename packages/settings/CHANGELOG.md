@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.11.5...@standardnotes/settings@1.12.0) (2022-03-07)
+
+
+### Bug Fixes
+
+* naming of email mute option ([c7c1747](https://github.com/standardnotes/snjs/commit/c7c174733bfd96e71d3146e49601eb0564a306a8))
+
+
+### Features
+
+* add mute sign in emails ([366bc06](https://github.com/standardnotes/snjs/commit/366bc06a210bbb099b42fd9f780491fc3f21ee06))
+
+
+
+
+
 ## [1.11.5](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.11.3...@standardnotes/settings@1.11.5) (2022-02-28)
 
 

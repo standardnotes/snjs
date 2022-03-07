@@ -219,7 +219,7 @@ function FillEditorComponentDefaults(
 function editors(runtime: Runtime): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Code Editor',
-    version: '1.3.11',
+    version: '1.3.12',
     spellcheckControl: true,
     identifier: FeatureIdentifier.CodeEditor,
     permission_name: PermissionName.CodeEditor,
@@ -299,7 +299,7 @@ function editors(runtime: Runtime): EditorFeatureDescription[] {
   const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Pro',
     identifier: FeatureIdentifier.MarkdownProEditor,
-    version: '1.4.2',
+    version: '1.5.0',
     note_type: NoteType.Markdown,
     file_type: 'md',
     permission_name: PermissionName.MarkdownProEditor,

@@ -10,6 +10,7 @@ export enum SettingName {
   GoogleDriveBackupToken = 'GOOGLE_DRIVE_BACKUP_TOKEN',
   MuteFailedBackupsEmails = 'MUTE_FAILED_BACKUPS_EMAILS',
   MuteFailedCloudBackupsEmails = 'MUTE_FAILED_CLOUD_BACKUPS_EMAILS',
+  MuteSignInEmails = 'MUTE_SIGN_IN_EMAILS',
   FileUploadBytesLimit = 'FILE_UPLOAD_BYTES_LIMIT',
   FileUploadBytesUsed = 'FILE_UPLOAD_BYTES_USED',
   ListedAuthorSecrets = 'LISTED_AUTHOR_SECRETS',

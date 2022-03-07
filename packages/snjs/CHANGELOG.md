@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.74.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.74.0...@standardnotes/snjs@2.74.1) (2022-03-07)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.74.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.2...@standardnotes/snjs@2.74.0) (2022-03-06)
+
+
+### Features
+
+* add un/protectFile and authorize[..]Files functions ([#631](https://github.com/standardnotes/snjs/issues/631)) ([fd39e40](https://github.com/standardnotes/snjs/commit/fd39e4056fa83f978b08451050da8585be882755))
+
+
+
+
+
+## [2.73.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.1...@standardnotes/snjs@2.73.2) (2022-03-05)
+
+
+### Bug Fixes
+
+* handle listed returning homepage redirect as 200 ([0738ddb](https://github.com/standardnotes/snjs/commit/0738ddbef14f036f6436edf56a5d5616d1b69f41))
+
+
+
+
+
+## [2.73.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.0...@standardnotes/snjs@2.73.1) (2022-03-04)
+
+
+### Bug Fixes
+
+* includes predicate ([#630](https://github.com/standardnotes/snjs/issues/630)) ([83fe4bf](https://github.com/standardnotes/snjs/commit/83fe4bfa7e24ccd68f92eb50ceee161a7253e9cf))
+
+
+
+
+
+# [2.73.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.72.1...@standardnotes/snjs@2.73.0) (2022-03-04)
+
+
+### Features
+
+* add getFilesForNote function ([#629](https://github.com/standardnotes/snjs/issues/629)) ([abc6464](https://github.com/standardnotes/snjs/commit/abc646403539e3ca66e7702fe6a61f0f39c90c7b))
+
+
+
+
+
+## [2.72.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.72.0...@standardnotes/snjs@2.72.1) (2022-03-04)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 # [2.72.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.71.1...@standardnotes/snjs@2.72.0) (2022-03-03)
 
 

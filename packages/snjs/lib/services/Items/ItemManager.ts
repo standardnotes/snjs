@@ -1221,4 +1221,8 @@ export class ItemManager
     this.collection.discard(item)
     this.payloadManager.removePayloadLocally(item.payload)
   }
+
+  public getFilesForNote(note: SNNote): SNFile[] {
+    return this.itemsReferencingItem(note.uuid).filter(ref => ref.content_type === ContentType.File) as SNFile[];
+  };
 }
