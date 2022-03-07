@@ -490,14 +490,6 @@ export class SNFeaturesService
       return FeatureStatus.Entitled
     }
 
-    const isExperimentalFeature = this.isExperimentalFeature(featureId)
-    if (isExperimentalFeature) {
-      if (this.isExperimentalFeatureEnabled(featureId)) {
-        return FeatureStatus.Entitled
-      }
-      return FeatureStatus.NotInCurrentPlan
-    }
-
     if (this.hasPaidOnlineOrOfflineSubscription()) {
       if (!this.completedSuccessfulFeaturesRetrieval) {
         const hasCachedFeatures = this.features.length > 0
