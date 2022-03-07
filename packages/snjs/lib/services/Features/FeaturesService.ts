@@ -183,8 +183,8 @@ export class SNFeaturesService
       this.enabledExperimentalFeatures,
     )
 
-    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
     void this.mapRemoteNativeFeaturesToItems([feature])
+    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
   }
 
   public disableExperimentalFeature(identifier: FeatureIdentifier): void {
@@ -200,16 +200,17 @@ export class SNFeaturesService
       this.enabledExperimentalFeatures,
     )
 
-    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
-
     const component = this.itemManager
       .getItems<SNComponent | SNTheme>([ContentType.Component, ContentType.Theme])
       .find((component) => component.identifier === identifier)
-    if (component) {
-      void this.itemManager.setItemToBeDeleted(component.uuid).then(() => {
-        void this.syncService.sync()
-      })
+    if (!component) {
+      return
     }
+
+    void this.itemManager.setItemToBeDeleted(component.uuid).then(() => {
+      void this.syncService.sync()
+    })
+    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
   }
 
   public toggleExperimentalFeature(identifier: FeatureIdentifier): void {
