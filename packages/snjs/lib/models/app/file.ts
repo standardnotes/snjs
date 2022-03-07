@@ -47,7 +47,7 @@ export class SNFile extends SNItem implements ExtendedFileContent {
   }
 
   public get nameWithExt(): string {
-    return `${this.name}.${this.ext}`
+    return `${this.name}${this.ext.length > 0 ? `.${this.ext}` : ''}`
   }
 
   private get typedContent(): FileContent {
@@ -56,8 +56,17 @@ export class SNFile extends SNItem implements ExtendedFileContent {
 }
 
 export class FileMutator extends ItemMutator {
+  
   get typedContent(): Partial<ExtendedFileContent> {
     return this.content as Partial<ExtendedFileContent>
+  }
+  
+  set name(newName: string) {
+    this.typedContent.name = newName;
+  }
+
+  set ext(newExt: string) {
+    this.typedContent.ext = newExt;
   }
 
   set encryptionHeader(encryptionHeader: string) {

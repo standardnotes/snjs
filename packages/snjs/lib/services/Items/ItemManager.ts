@@ -1213,6 +1213,20 @@ export class ItemManager extends AbstractService implements ItemsClientInterface
   }
 
   public getFilesForNote(note: SNNote): SNFile[] {
-    return this.itemsReferencingItem(note.uuid).filter(ref => ref.content_type === ContentType.File) as SNFile[];
-  };
+    return this.itemsReferencingItem(note.uuid).filter(
+      (ref) => ref.content_type === ContentType.File,
+    ) as SNFile[]
+  }
+
+  public renameFile(file: SNFile, name: string): Promise<SNFile> {
+    return this.changeItem<FileMutator, SNFile>(file.uuid, (mutator) => {
+      if (!name.includes('.')) {
+        mutator.name = name;
+        mutator.ext = '';
+      } else {
+        mutator.name = name.split('.').shift() as string;
+        mutator.ext = name.split('.').pop() as string;
+      }
+    })
+  }
 }

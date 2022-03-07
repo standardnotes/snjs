@@ -93,13 +93,14 @@ describe('itemManager', () => {
     )
   }
 
-  const createFile = (name: string) => {
+  const createFile = (name: string, ext: string) => {
     return new SNFile(
       CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.File,
         content: FillItemContent({
           name: name,
+          ext: ext,
         }),
       }),
     )
@@ -572,7 +573,7 @@ describe('itemManager', () => {
     it('associates with note', async () => {
       itemManager = createService()
       const note = createNote('invoices')
-      const file = createFile('invoice_1.pdf')
+      const file = createFile('invoice_1', 'pdf')
       await itemManager.insertItems([note, file])
 
       const resultingFile = await itemManager.associateFileWithNote(file, note)
@@ -585,7 +586,7 @@ describe('itemManager', () => {
     it('disassociates with note', async () => {
       itemManager = createService()
       const note = createNote('invoices')
-      const file = createFile('invoice_1.pdf')
+      const file = createFile('invoice_1', 'pdf')
       await itemManager.insertItems([note, file])
 
       const associatedFile = await itemManager.associateFileWithNote(file, note)
@@ -598,8 +599,8 @@ describe('itemManager', () => {
     it('should get files associated with note', async () => {
       itemManager = createService()
       const note = createNote('invoices')
-      const file = createFile('invoice_1.pdf')
-      const secondFile = createFile('unrelated-file.xlsx')
+      const file = createFile('invoice_1', 'pdf')
+      const secondFile = createFile('unrelated-file', 'xlsx')
       await itemManager.insertItems([note, file, secondFile])
 
       await itemManager.associateFileWithNote(file, note)
@@ -608,6 +609,48 @@ describe('itemManager', () => {
 
       expect(filesAssociatedWithNote).toHaveLength(1)
       expect(filesAssociatedWithNote[0].uuid).toBe(file.uuid)
+    })
+
+    it('should correctly rename file to filename that has extension', async () => {
+      itemManager = createService()
+      const file = createFile('initialName', 'ext')
+      await itemManager.insertItems([file])
+
+      expect(file.nameWithExt).toBe('initialName.ext')
+
+      const renamedFile = await itemManager.renameFile(file, 'anotherName.anotherExt')
+
+      expect(renamedFile.name).toBe('anotherName')
+      expect(renamedFile.ext).toBe('anotherExt')
+      expect(renamedFile.nameWithExt).toBe('anotherName.anotherExt')
+    })
+
+    it('should correctly rename extensionless file to filename that has extension', async () => {
+      itemManager = createService()
+      const file = createFile('initialName', '')
+      await itemManager.insertItems([file])
+
+      expect(file.nameWithExt).toBe('initialName')
+
+      const renamedFile = await itemManager.renameFile(file, 'anotherName.anotherExt')
+
+      expect(renamedFile.name).toBe('anotherName')
+      expect(renamedFile.ext).toBe('anotherExt')
+      expect(renamedFile.nameWithExt).toBe('anotherName.anotherExt')
+    })
+
+    it('should correctly rename file to filename that does not have extension', async () => {
+      itemManager = createService()
+      const file = createFile('initialName', 'ext')
+      await itemManager.insertItems([file])
+
+      expect(file.nameWithExt).toBe('initialName.ext')
+
+      const renamedFile = await itemManager.renameFile(file, 'anotherName')
+
+      expect(renamedFile.name).toBe('anotherName')
+      expect(renamedFile.ext).toBe('')
+      expect(renamedFile.nameWithExt).toBe('anotherName')
     })
   })
 })
