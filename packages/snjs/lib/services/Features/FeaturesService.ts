@@ -170,7 +170,7 @@ export class SNFeaturesService
   public enableExperimentalFeature(identifier: FeatureIdentifier): void {
     const feature = this.getUserFeature(identifier)
     if (!feature) {
-      return
+      throw Error('Attempting to enable a feature user does not have access to.')
     }
 
     this.enabledExperimentalFeatures.push(identifier)
@@ -187,7 +187,7 @@ export class SNFeaturesService
   public disableExperimentalFeature(identifier: FeatureIdentifier): void {
     const feature = this.getUserFeature(identifier)
     if (!feature) {
-      return
+      throw Error('Attempting to disable a feature user does not have access to.')
     }
 
     removeFromArray(this.enabledExperimentalFeatures, identifier)
