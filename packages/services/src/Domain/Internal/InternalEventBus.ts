@@ -1,6 +1,7 @@
 import { InternalEventBusInterface } from './InternalEventBusInterface'
 import { InternalEventHandlerInterface } from './InternalEventHandlerInterface'
 import { InternalEventInterface } from './InternalEventInterface'
+import { InternalEventPublishStrategy } from './InternalEventPublishStrategy'
 import { InternalEventType } from './InternalEventType'
 
 export class InternalEventBus implements InternalEventBusInterface {
@@ -30,6 +31,28 @@ export class InternalEventBus implements InternalEventBusInterface {
 
     for (const handlerForEventType of handlersForEventType) {
       void handlerForEventType.handleEvent(event)
+    }
+  }
+
+  async publishSync(event: InternalEventInterface, strategy: InternalEventPublishStrategy): Promise<void> {
+    const handlersForEventType = this.eventHandlers.get(event.type)
+    if (handlersForEventType === undefined) {
+      return
+    }
+
+    if (strategy === InternalEventPublishStrategy.SEQUENCE) {
+      for (const handlerForEventType of handlersForEventType) {
+        await handlerForEventType.handleEvent(event)
+      }
+    }
+
+    if (strategy === InternalEventPublishStrategy.ASYNC) {
+      const handlerPromises = []
+      for (const handlerForEventType of handlersForEventType) {
+        handlerPromises.push(handlerForEventType.handleEvent(event))
+      }
+
+      await Promise.all(handlerPromises)
     }
   }
 }

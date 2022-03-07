@@ -1,4 +1,4 @@
-import { SyncEvent, SyncEventReceiver } from '@Lib/services/Sync/Events'
+import { SyncEvent, SyncEventReceiver } from '@standardnotes/services'
 
 const HEALTHY_SYNC_DURATION_THRESHOLD_S = 5
 const TIMING_MONITOR_POLL_FREQUENCY_MS = 500

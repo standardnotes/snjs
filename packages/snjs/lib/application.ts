@@ -1,3 +1,4 @@
+import { SyncSource } from '@standardnotes/services/src/Domain/Sync/SyncSource'
 import { ItemsClientInterface } from './services/Items/ClientInterface'
 import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
 import { ListedService } from './services/ListedService'
@@ -46,10 +47,9 @@ import {
   ApplicationOptions,
   FullyResolvedApplicationOptions,
 } from './options'
-import { ApplicationEvent, SyncEvent, applicationEventForSyncEvent } from '@Lib/events'
+import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
 import { StorageEncryptionPolicies } from './services/StorageService'
 import { BackupFile } from './services/ProtocolService'
-import { SyncOptions, SyncOpStatus } from './services/Sync'
 import { SmartView } from './models/app/SmartView'
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item'
 import {
@@ -92,13 +92,17 @@ import {
   SNSyncService,
   SNFeaturesService,
   SNFileService,
-  SyncModes,
+  SyncMode,
+  SyncOptions,
 } from './services'
 import {
   DeviceInterface,
   ServiceInterface,
   InternalEventBusInterface,
   InternalEventBus,
+  IntegrityService,
+  SyncEvent,
+  IntegrityEvent,
 } from '@standardnotes/services'
 import {
   BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
@@ -134,6 +138,7 @@ import { RemoteSession } from './services/Api/Session'
 import { FilesClientInterface } from './services/Files/FileService'
 import { ApiServiceEvent } from './services/Api/ApiService'
 import { ProtectionsClientInterface } from './services/Protection/ClientInterface'
+import { SyncClientInterface } from './services/Sync/SyncClientInterface'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -184,6 +189,7 @@ export class SNApplication implements ListedInterface {
   private mfaService!: SNMfaService
   private listedService!: ListedService
   private fileService!: SNFileService
+  private integrityService!: IntegrityService
 
   private internalEventBus!: InternalEventBusInterface
 
@@ -270,6 +276,10 @@ export class SNApplication implements ListedInterface {
 
   public get protections(): ProtectionsClientInterface {
     return this.protectionService
+  }
+
+  public get sync(): SyncClientInterface {
+    return this.syncService
   }
 
   /**
@@ -359,7 +369,8 @@ export class SNApplication implements ListedInterface {
       await this.handleStage(ApplicationStage.LoadedDatabase_12)
       this.beginAutoSyncTimer()
       await this.syncService.sync({
-        mode: SyncModes.DownloadFirst,
+        mode: SyncMode.DownloadFirst,
+        source: SyncSource.External,
       })
     })
     if (awaitDatabaseLoad) {
@@ -393,7 +404,7 @@ export class SNApplication implements ListedInterface {
   private beginAutoSyncTimer() {
     this.autoSyncInterval = this.deviceInterface.interval(() => {
       this.syncService.log('Syncing from autosync')
-      void this.sync()
+      void this.sync.sync()
     }, DEFAULT_AUTO_SYNC_INTERVAL)
   }
 
@@ -546,17 +557,6 @@ export class SNApplication implements ListedInterface {
     return CreateMaxPayloadFromAnyObject(object as RawPayload)
   }
 
-  /**
-   * @returns The date of last sync
-   */
-  public getLastSyncDate(): Date | undefined {
-    return this.syncService.getLastSyncDate()
-  }
-
-  public getSyncStatus(): SyncOpStatus {
-    return this.syncService.getStatus()
-  }
-
   public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpResponse> {
     return this.sessionManager.getSessionsList()
   }
@@ -618,12 +618,12 @@ export class SNApplication implements ListedInterface {
 
   public async deleteItem(item: SNItem): Promise<void> {
     await this.itemManager.setItemToBeDeleted(item.uuid)
-    await this.sync()
+    await this.sync.sync()
   }
 
   public async emptyTrash(): Promise<void> {
     await this.itemManager.emptyTrash()
-    await this.sync()
+    await this.sync.sync()
   }
 
   public getTrashedItems(): SNNote[] {
@@ -853,7 +853,7 @@ export class SNApplication implements ListedInterface {
     additionalContent?: Partial<PayloadContent>,
   ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(item.uuid, false, additionalContent)
-    void this.sync()
+    void this.sync.sync()
     return duplicate
   }
 
@@ -891,9 +891,9 @@ export class SNApplication implements ListedInterface {
    * Migrates any tags containing a '.' character to sa chema-based heirarchy, removing
    * the dot from the tag's title.
    */
-  public async migrateTagsToFolders(): Promise<void> {
+  public async migrateTagsToFolders(): Promise<unknown> {
     await TagsToFoldersMigrationApplicator.run(this.itemManager)
-    return this.sync()
+    return this.sync.sync()
   }
 
   /**
@@ -1248,7 +1248,7 @@ export class SNApplication implements ListedInterface {
         }
       })
     const affectedUuids = await this.payloadManager.importPayloads(validPayloads)
-    const promise = this.sync()
+    const promise = this.sync.sync()
     if (awaitSync) {
       await promise
     }
@@ -1279,19 +1279,6 @@ export class SNApplication implements ListedInterface {
 
   public isEphemeralSession(): boolean {
     return this.storageService.isEphemeralSession()
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public sync(options?: SyncOptions): Promise<any> {
-    return this.syncService.sync(options)
-  }
-
-  public isOutOfSync(): boolean {
-    return this.syncService.isOutOfSync()
-  }
-
-  public async resolveOutOfSync(): Promise<unknown> {
-    return this.syncService.resolveOutOfSync()
   }
 
   public async setValue(key: string, value: unknown, mode?: StorageValueModes): Promise<void> {
@@ -1697,6 +1684,7 @@ export class SNApplication implements ListedInterface {
     this.createListedService()
     this.createActionsManager()
     this.createFileService()
+    this.createIntegrityService()
   }
 
   private clearServices() {
@@ -1725,6 +1713,7 @@ export class SNApplication implements ListedInterface {
     ;(this.mfaService as unknown) = undefined
     ;(this.listedService as unknown) = undefined
     ;(this.fileService as unknown) = undefined
+    ;(this.integrityService as unknown) = undefined
 
     this.services = []
   }
@@ -1735,6 +1724,11 @@ export class SNApplication implements ListedInterface {
 
   private defineInternalEventHandlers(): void {
     this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
+    this.internalEventBus.addEventHandler(
+      this.integrityService,
+      SyncEvent.SyncRequestsIntegrityCheck,
+    )
+    this.internalEventBus.addEventHandler(this.syncService, IntegrityEvent.IntegrityCheckCompleted)
   }
 
   private clearInternalEventBus(): void {
@@ -1763,6 +1757,17 @@ export class SNApplication implements ListedInterface {
     )
 
     this.services.push(this.fileService)
+  }
+
+  private createIntegrityService() {
+    this.integrityService = new IntegrityService(
+      this.apiService,
+      this.apiService,
+      this.itemManager,
+      this.internalEventBus,
+    )
+
+    this.services.push(this.integrityService)
   }
 
   private createFeaturesService() {
@@ -1968,10 +1973,10 @@ export class SNApplication implements ListedInterface {
         switch (event) {
           case SessionEvent.Restored: {
             void (async () => {
-              await this.sync()
+              await this.sync.sync()
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
                 void this.protocolService.createNewDefaultItemsKey().then(() => {
-                  void this.sync()
+                  void this.sync.sync()
                 })
               }
             })()

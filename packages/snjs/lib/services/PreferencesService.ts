@@ -4,9 +4,8 @@ import { PrefKey, PrefValue, UserPrefsMutator } from '@Lib/models/app/userPrefs'
 import { ItemManager } from './Items/ItemManager'
 import { SNSingletonManager } from './SingletonManager'
 import { SNSyncService } from './Sync/SyncService'
-import { SyncEvent } from './Sync/Events'
 import { ApplicationStage } from '@standardnotes/applications'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 import { FillItemContent } from '@standardnotes/payloads'
 
 const preferencesChangedEvent = 'preferencesChanged'
@@ -32,7 +31,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     })
 
     this.removeSyncObserver = syncService.addEventObserver((event) => {
-      if (event === SyncEvent.FullSyncCompleted) {
+      if (event === SyncEvent.SyncCompletedWithAllItemsUploaded) {
         void this.reload()
       }
     })

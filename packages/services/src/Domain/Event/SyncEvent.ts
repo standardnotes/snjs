@@ -1,8 +1,13 @@
+/* istanbul ignore file */
 export enum SyncEvent {
-  /** A full sync can consist of many round-trips to the server */
-  FullSyncCompleted = 'sync:full-completed',
-  /** A single sync is just one round-trip to the server completion */
-  SingleSyncCompleted = 'sync:single-completed',
+  /**
+   * A potentially multi-round trip that keeps syncing until all items have been uploaded.
+   * However, this event will still trigger if there are more items waiting to be downloaded on the
+   * server
+   */
+  SyncCompletedWithAllItemsUploaded = 'SyncCompletedWithAllItemsUploaded',
+  SyncCompletedWithAllItemsUploadedAndDownloaded = 'SyncCompletedWithAllItemsUploadedAndDownloaded',
+  SingleRoundTripSyncCompleted = 'SingleRoundTripSyncCompleted',
   SyncWillBegin = 'sync:will-begin',
   DownloadFirstSyncCompleted = 'sync:download-first-completed',
   SyncTakingTooLong = 'sync:taking-too-long',
@@ -16,6 +21,5 @@ export enum SyncEvent {
   StatusChanged = 'status-changed',
   DatabaseWriteError = 'database-write-error',
   DatabaseReadError = 'database-read-error',
+  SyncRequestsIntegrityCheck = 'sync:requests-integrity-check',
 }
-
-export type SyncEventReceiver = (event: SyncEvent) => void

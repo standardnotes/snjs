@@ -286,7 +286,7 @@ describe('importing', function () {
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
     ]);
-    await application.sync({ awaitAll: true });
+    await application.sync.sync({ awaitAll: true });
 
     await application.deleteItem(note);
     expect(application.findItem(note.uuid)).to.not.exist;
@@ -392,7 +392,7 @@ describe('importing', function () {
       EncryptionIntent.FileEncrypted
     );
 
-    await application.sync({ awaitAll: true });
+    await application.sync.sync({ awaitAll: true });
 
     await application.deleteItem(note);
     expect(application.findItem(note.uuid)).to.not.exist;
@@ -919,7 +919,7 @@ describe('importing', function () {
       PayloadSource.LocalChanged
     );
 
-    await application.sync();
+    await application.sync.sync();
 
     const backupData = await application.createBackupFile(
       EncryptionIntent.FileEncrypted

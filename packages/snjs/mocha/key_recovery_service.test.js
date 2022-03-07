@@ -215,11 +215,11 @@ describe('key recovery service', function () {
     expect(result.error).to.not.be.ok;
     const note = await Factory.createSyncedNote(appB);
     expect(appB.getItems(ContentType.ItemsKey).length).to.equal(2);
-    await appB.sync(syncOptions);
+    await appB.sync.sync(syncOptions);
 
     /** Sync appA and expect a new items key to be downloaded and errored */
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1);
-    const syncPromise = appA.sync(syncOptions);
+    const syncPromise = appA.sync.sync(syncOptions);
     await contextA.awaitNextSucessfulSync();
     await syncPromise;
     expect(appA.getItems(ContentType.ItemsKey).length).to.equal(2);
@@ -282,10 +282,10 @@ describe('key recovery service', function () {
     /** Change password on appB */
     await appB.changePassword(contextA.password, newPassword);
     const note = await Factory.createSyncedNote(appB);
-    await appB.sync();
+    await appB.sync.sync();
 
     /** We expect the item in appA to be errored at this point, but we do not want it to recover */
-    await appA.sync();
+    await appA.sync.sync();
     expect(appA.findItem(note.uuid).waitingForKey).to.equal(true);
     console.warn(
       'Expecting exceptions below as we destroy app during key recovery'
@@ -623,7 +623,7 @@ describe('key recovery service', function () {
     /** Change password on appB */
     const result = await appB.changePassword(contextA.password, newPassword);
     expect(result.error).to.not.be.ok;
-    await appB.sync();
+    await appB.sync.sync();
 
     const newDefaultKey = appB.protocolService.getDefaultItemsKey();
 

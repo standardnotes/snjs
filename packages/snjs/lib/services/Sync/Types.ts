@@ -1,3 +1,5 @@
+import { SyncSource } from '@standardnotes/services'
+
 export enum SyncQueueStrategy {
   /**
    * Promise will be resolved on the next sync request after the current one completes.
@@ -11,7 +13,7 @@ export enum SyncQueueStrategy {
   ForceSpawnNew = 2,
 }
 
-export enum SyncModes {
+export enum SyncMode {
   /**
    * Performs a standard sync, uploading any dirty items and retrieving items.
    */
@@ -24,23 +26,13 @@ export enum SyncModes {
   DownloadFirst = 2,
 }
 
-export enum SyncSources {
-  External = 1,
-  SpawnQueue = 2,
-  ResolveQueue = 3,
-  MoreDirtyItems = 4,
-  AfterDownloadFirst = 5,
-  IntegrityCheck = 6,
-  ResolveOutOfSync = 7,
-}
-
 export type SyncOptions = {
   queueStrategy?: SyncQueueStrategy
-  mode?: SyncModes
+  mode?: SyncMode
   /** Whether the server should compute and return an integrity hash. */
   checkIntegrity?: boolean
   /** Internally used to keep track of how sync requests were spawned. */
-  source?: SyncSources
+  source: SyncSource
   /** Whether to await any sync requests that may be queued from this call. */
   awaitAll?: boolean
   /**

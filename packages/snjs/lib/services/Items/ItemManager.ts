@@ -14,6 +14,8 @@ import {
   PayloadSource,
   ItemInterface,
   predicateFromDSLString,
+  ItemManagerInterface,
+  IntegrityPayload,
 } from '@standardnotes/payloads'
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view'
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria'
@@ -85,7 +87,11 @@ export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
  * will then notify  its observers (which is us), we'll convert the payloads to items,
  * and then  we'll propagate them to our listeners.
  */
-export class ItemManager extends AbstractService implements ItemsClientInterface {
+export class ItemManager
+  extends AbstractService
+  implements
+    ItemManagerInterface,
+    ItemsClientInterface {
   private unsubChangeObserver: () => void
   private observers: Observer[] = []
   private collection!: ItemCollection
@@ -241,6 +247,10 @@ export class ItemManager extends AbstractService implements ItemsClientInterface
    */
   public get invalidItems() {
     return this.collection.invalidElements()
+  }
+
+  public get integrityPayloads(): IntegrityPayload[] {
+    return this.collection.integrityPayloads()
   }
 
   /**

@@ -24,6 +24,8 @@ describe('online syncing', function () {
     this.email = this.context.email;
     this.password = this.context.password;
 
+    Factory.disableIntegrityAutoHeal(this.application);
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -99,7 +101,7 @@ describe('online syncing', function () {
     const count = 0;
     await Factory.createManyMappedNotes(this.application, count);
     this.expectedItemCount += count;
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
@@ -112,7 +114,7 @@ describe('online syncing', function () {
     /** Throw in some random syncs to cause trouble */
     const syncCount = 30;
     for (let i = 0; i < syncCount; i++) {
-      this.application.sync(syncOptions);
+      this.application.sync.sync(syncOptions);
       await Factory.sleep(0.01);
     }
     await promise;
@@ -128,7 +130,7 @@ describe('online syncing', function () {
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await Factory.alternateUuidForItem(this.application, note.uuid);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     const notes = this.application.itemManager.notes;
     expect(notes.length).to.equal(1);
@@ -161,7 +163,7 @@ describe('online syncing', function () {
 
     this.application.syncService.ut_beginLatencySimulator(250);
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvent.FullSyncCompleted) {
+      if (event === SyncEvent.SyncCompletedWithAllItemsUploaded) {
         events++;
       }
     });
@@ -198,7 +200,7 @@ describe('online syncing', function () {
     this.application.syncService.ut_beginLatencySimulator(250);
 
     this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvent.FullSyncCompleted) {
+      if (event === SyncEvent.SyncCompletedWithAllItemsUploaded) {
         events++;
       }
     });
@@ -227,8 +229,8 @@ describe('online syncing', function () {
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
-    this.application.syncService.addEventObserver((event, data) => {
-      if (event === SyncEvent.SingleSyncCompleted) {
+    this.application.syncService.addEventObserver((event) => {
+      if (event === SyncEvent.SingleRoundTripSyncCompleted) {
         const note = this.application.findItem(originalNote.uuid);
         expect(note.dirty).to.not.be.ok;
       }
@@ -243,7 +245,7 @@ describe('online syncing', function () {
     );
   });
 
-  it('allows me to save data after Ive signed out', async function () {
+  it('allows saving of data after sign out', async function () {
     expect(this.application.itemManager.itemsKeys().length).to.equal(1);
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
@@ -362,7 +364,6 @@ describe('online syncing', function () {
     await this.application.syncService.sync(syncOptions);
     note = this.application.findItem(note.uuid);
     expect(note).to.not.be.ok;
-    expect(this.application.syncService.state.discordance).to.equal(0);
 
     // We expect that this item is now gone for good, and no duplicate has been created.
     expect(this.application.itemManager.items.length).to.equal(
@@ -408,14 +409,14 @@ describe('online syncing', function () {
 
     /** Begin syncing it with server but introduce latency so we can sneak in a delete */
     this.application.syncService.ut_beginLatencySimulator(500);
-    const sync = this.application.sync();
+    const sync = this.application.sync.sync();
     /** Sleep so sync call can begin preparations but not fully begin */
     await Factory.sleep(0.1);
     await this.application.itemManager.setItemToBeDeleted(note.uuid);
     this.expectedItemCount--;
     await sync;
     this.application.syncService.ut_endLatencySimulator();
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     /** We expect that item has been deleted */
     const allItems = this.application.itemManager.items;
@@ -439,7 +440,7 @@ describe('online syncing', function () {
       }
       if (
         !didCompleteRelevantSync &&
-        eventName === SyncEvent.SingleSyncCompleted
+        eventName === SyncEvent.SingleRoundTripSyncCompleted
       ) {
         didCompleteRelevantSync = true;
         const response = data;
@@ -451,7 +452,7 @@ describe('online syncing', function () {
         }
       }
     });
-    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
+    await this.application.syncService.sync({ mode: SyncMode.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
     expect(success).to.equal(true);
   });
@@ -474,7 +475,7 @@ describe('online syncing', function () {
       }
       if (
         !didCompleteRelevantSync &&
-        eventName === SyncEvent.SingleSyncCompleted
+        eventName === SyncEvent.SingleRoundTripSyncCompleted
       ) {
         didCompleteRelevantSync = true;
         const response = data;
@@ -486,7 +487,7 @@ describe('online syncing', function () {
         }
       }
     });
-    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
+    await this.application.syncService.sync({ mode: SyncMode.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
     expect(success).to.equal(true);
   });
@@ -547,9 +548,10 @@ describe('online syncing', function () {
       await this.application.itemManager.setItemDirty(note.uuid);
     }
     /** Upload */
-    this.application.syncService.sync(syncOptions);
+    this.application.syncService.sync({ awaitAll: true, checkIntegrity: false });
     await this.context.awaitNextSucessfulSync();
     this.expectedItemCount += largeItemCount;
+
 
     /** Clear local data */
     await this.application.payloadManager.resetState();
@@ -564,27 +566,10 @@ describe('online syncing', function () {
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
+
     const rawPayloads = await this.application.storageService.getAllRawPayloads();
     expect(rawPayloads.length).to.equal(this.expectedItemCount);
-  }).timeout(20000);
-
-  it('should be able to download all items separate of sync', async function () {
-    const largeItemCount = 20;
-    for (let i = 0; i < largeItemCount; i++) {
-      const note = await Factory.createMappedNote(this.application);
-      await this.application.itemManager.setItemDirty(note.uuid);
-    }
-    /** Upload */
-    await this.application.syncService.sync(syncOptions);
-    this.expectedItemCount += largeItemCount;
-
-    /** Download */
-    const downloadedItems = await this.application.syncService.statelessDownloadAllItems();
-    expect(downloadedItems.length).to.equal(this.expectedItemCount);
-    // ensure it's decrypted
-    expect(downloadedItems[10].content.text.length).to.be.above(1);
-    expect(downloadedItems[10].text.length).to.be.above(1);
-  });
+  }).timeout(30000);
 
   it('syncing an item should storage it encrypted', async function () {
     const note = await Factory.createMappedNote(this.application);
@@ -685,7 +670,7 @@ describe('online syncing', function () {
     expect(currentItem.dirty).to.not.be.ok;
   });
 
-  it('load local items should respect sort priority', async function () {
+  it('load local items should respect sort priority', function () {
     const contentTypes = ['A', 'B', 'C'];
     const itemCount = 6;
     const originalPayloads = [];
@@ -749,7 +734,7 @@ describe('online syncing', function () {
         mutator.text = `${Math.random()}`;
       }
     );
-    const sync = this.application.sync(syncOptions);
+    const sync = this.application.sync.sync(syncOptions);
     await Factory.sleep(0.1);
     note = this.application.findItem(note.uuid);
     expect(note.lastSyncBegan).to.be.below(new Date());
@@ -764,14 +749,14 @@ describe('online syncing', function () {
     let actualEvents = 0;
     this.application.syncService.addEventObserver((event, data) => {
       if (
-        event === SyncEvent.FullSyncCompleted &&
-        data.source === SyncSources.External
+        event === SyncEvent.SyncCompletedWithAllItemsUploaded &&
+        data.source === SyncSource.External
       ) {
         actualEvents++;
       }
     });
-    const first = this.application.sync();
-    const second = this.application.sync();
+    const first = this.application.sync.sync();
+    const second = this.application.sync.sync();
     await Promise.all([first, second]);
     /** Sleep so that any automatic syncs that are triggered are also sent to handler above */
     await Factory.sleep(0.5);
@@ -953,7 +938,7 @@ describe('online syncing', function () {
     const preDeleteSyncToken = await this.application.syncService.getLastSyncToken();
     await this.application.deleteItem(note);
     await this.application.syncService.setLastSyncToken(preDeleteSyncToken);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
@@ -973,7 +958,7 @@ describe('online syncing', function () {
       dirty: true,
     });
     await this.application.itemManager.emitItemFromPayload(errored);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     const updatedNote = this.application.findItem(note.uuid);
     expect(updatedNote.lastSyncBegan.getTime()).to.equal(
@@ -1032,7 +1017,7 @@ describe('online syncing', function () {
     });
     this.expectedItemCount++;
     await this.application.itemManager.emitItemsFromPayloads([payload]);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     /** Item should no longer be dirty, otherwise it would keep syncing */
     const item = this.application.findItem(payload.uuid);

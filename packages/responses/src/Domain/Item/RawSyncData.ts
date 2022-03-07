@@ -6,7 +6,6 @@ export type RawSyncData = {
   error?: any
   [ApiEndpointParam.LastSyncToken]?: string
   [ApiEndpointParam.PaginationToken]?: string
-  [ApiEndpointParam.IntegrityResult]?: string
   retrieved_items?: RawPayload[]
   saved_items?: RawPayload[]
   conflicts?: ConflictParams[]

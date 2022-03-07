@@ -15,6 +15,7 @@ import { PayloadInterface } from './PayloadInterface'
 import { PayloadOverride } from './PayloadOverride'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
+import { PayloadFormat } from './PayloadFormat'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -461,4 +462,18 @@ export function FillItemContent(content: Record<string, any>): PayloadContent {
     ] = `${new Date()}`
   }
   return content as PayloadContent
+}
+
+export function filterDisallowedRemotePayloads(payloads: PurePayload[]): PurePayload[] {
+  return payloads.filter(isRemotePayloadAllowed)
+}
+
+export function isRemotePayloadAllowed(payload: PurePayload): boolean {
+  if (payload.format === PayloadFormat.Deleted) {
+    return payload.content == undefined
+  }
+
+  const acceptableFormats = [PayloadFormat.EncryptedString, PayloadFormat.MetadataOnly]
+
+  return acceptableFormats.includes(payload.format)
 }

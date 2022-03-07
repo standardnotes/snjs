@@ -92,7 +92,7 @@ export async function createAppContext(identifier, crypto) {
       return new Promise((resolve) => {
         const removeObserver = application.syncService.addEventObserver(
           (event) => {
-            if (event === SyncEvent.FullSyncCompleted) {
+            if (event === SyncEvent.SyncCompletedWithAllItemsUploadedAndDownloaded) {
               removeObserver();
               resolve();
             }
@@ -111,6 +111,12 @@ export async function createAppContext(identifier, crypto) {
       await safeDeinit(application);
     },
   };
+}
+
+export function disableIntegrityAutoHeal(application) {
+  application.syncService.emitOutOfSyncRemotemPayloads = () => {
+    console.warn('Integrity self-healing is disabled for this test');
+  }
 }
 
 export async function safeDeinit(application) {
@@ -261,7 +267,7 @@ export async function createAndInitializeApplication(
 export async function initializeApplication(application) {
   await application.prepareForLaunch({
     receiveChallenge: (challenge) => {
-      console.log(
+      console.warn(
         'Factory received potentially unhandled challenge',
         challenge
       );
@@ -339,7 +345,7 @@ export async function registerOldUser({
   );
   application.notifyEvent(ApplicationEvent.SignedIn);
   await application.syncService.sync({
-    mode: SyncModes.DownloadFirst,
+    mode: SyncMode.DownloadFirst,
     ...syncOptions,
   });
   await application.protocolService.decryptErroredItems();
@@ -549,7 +555,7 @@ export function createRelatedNoteTagPairPayload({
 export async function createSyncedNoteWithTag(application) {
   const payloads = createRelatedNoteTagPairPayload();
   await application.itemManager.emitItemsFromPayloads(payloads);
-  return application.sync(syncOptions);
+  return application.sync.sync(syncOptions);
 }
 
 export async function storagePayloadCount(application) {

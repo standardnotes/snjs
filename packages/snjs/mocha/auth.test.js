@@ -353,7 +353,7 @@ describe('basic auth', () => {
       }
       if (
         !didCompletePostDownloadFirstSync &&
-        eventName === SyncEvent.SingleSyncCompleted
+        eventName === SyncEvent.SingleRoundTripSyncCompleted
       ) {
         didCompletePostDownloadFirstSync = true;
         /** Should be in sync */

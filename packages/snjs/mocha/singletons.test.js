@@ -119,7 +119,7 @@ describe('singletons', function () {
     expect(extManager).to.be.ok;
     const refreshedExtMgr = this.application.findItem(extManager.uuid);
     expect(refreshedExtMgr).to.be.ok;
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     expect(
       this.application.itemManager.itemsMatchingPredicate(
         ContentType.Component,
@@ -137,9 +137,9 @@ describe('singletons', function () {
     /* Start a sync right after we await singleton resolve below */
     setTimeout(() => {
       this.application.syncService.ut_setDatabaseLoaded(true);
-      this.application.sync({
+      this.application.sync.sync({
         /* Simulate the first sync occuring as that is handled specially by sync service */
-        mode: SyncModes.DownloadFirst,
+        mode: SyncMode.DownloadFirst,
       });
     });
     const userPreferences = await this.application.singletonManager.findOrCreateSingleton(
@@ -151,7 +151,7 @@ describe('singletons', function () {
     expect(userPreferences).to.be.ok;
     const refreshedUserPrefs = this.application.findItem(userPreferences.uuid);
     expect(refreshedUserPrefs).to.be.ok;
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     expect(
       this.application.itemManager.itemsMatchingPredicate(
         contentType,
@@ -174,8 +174,8 @@ describe('singletons', function () {
     });
     await this.signOut();
     await this.createExtMgr();
-    await this.application.sync(syncOptions);
-    const extraSync = this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
+    const extraSync = this.application.sync.sync(syncOptions);
     await this.signIn();
     await extraSync;
   }).timeout(15000);
@@ -198,7 +198,7 @@ describe('singletons', function () {
       }
       if (
         !didCompleteRelevantSync &&
-        eventName === SyncEvent.SingleSyncCompleted
+        eventName === SyncEvent.SingleRoundTripSyncCompleted
       ) {
         didCompleteRelevantSync = true;
         const saved = data.savedPayloads;
@@ -209,7 +209,7 @@ describe('singletons', function () {
         expect(matching).to.not.be.ok;
       }
     });
-    await this.application.syncService.sync({ mode: SyncModes.DownloadFirst });
+    await this.application.syncService.sync({ mode: SyncMode.DownloadFirst });
     expect(didCompleteRelevantSync).to.equal(true);
   }).timeout(10000);
 
@@ -217,7 +217,7 @@ describe('singletons', function () {
     await this.registerUser();
     /** Create prefs */
     const ogPrefs = await findOrCreatePrefsSingleton(this.application);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
@@ -241,7 +241,7 @@ describe('singletons', function () {
     await this.registerUser();
     /** Create prefs and associate them with account */
     const ogPrefs = await findOrCreatePrefsSingleton(this.application);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
@@ -276,7 +276,7 @@ describe('singletons', function () {
       item.content_type,
       item.content
     );
-    await this.application.sync({ awaitAll: true });
+    await this.application.sync.sync({ awaitAll: true });
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
@@ -321,7 +321,7 @@ describe('singletons', function () {
     );
 
     this.expectedItemCount += 1;
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     /** Now mark errored as not errorDecrypting and sync */
     const notErrored = CreateMaxPayloadFromAnyObject(errored, {
       errorDecrypting: false,

@@ -187,7 +187,7 @@ export class NoteViewController {
     const noDebounce = dto.bypassDebouncer || this.application.noAccount()
     const syncDebouceMs = noDebounce ? SAVE_TIMEOUT_NO_DEBOUNCE : SAVE_TIMEOUT_DEBOUNCE
     this.saveTimeout = this.application.deviceInterface.timeout(() => {
-      this.application.sync()
+      this.application.sync.sync()
     }, syncDebouceMs)
   }
 }
