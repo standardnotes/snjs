@@ -1,4 +1,4 @@
-import { getFileMetadata } from './utils'
+import { parseFileName } from './utils'
 import { OnChunkCallback, FileSelectionResponse } from './types'
 import { readFile } from './utils'
 
@@ -55,6 +55,6 @@ export class ClassicFileReader {
       await this.onChunk(chunk, chunkId++, isFinalChunk)
     }
 
-    return getFileMetadata(this.selectedFile)
+    return parseFileName(this.selectedFile.name)
   }
 }
