@@ -53,7 +53,6 @@ describe('featuresService', () => {
       alertService,
       sessionManager,
       crypto,
-      Runtime.Prod,
       internalEventBus,
     )
   }

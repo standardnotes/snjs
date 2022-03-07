@@ -20,7 +20,7 @@ import {
   ExperimentalFeatures,
   GetExperimentalFeatures
 } from '@standardnotes/features'
-import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common'
+import { ContentType, ErrorObject, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
 import { SNComponent, SNTheme } from '@Lib/models'
@@ -83,7 +83,6 @@ export class SNFeaturesService
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
     private crypto: SNPureCrypto,
-    private runtime: Runtime,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
