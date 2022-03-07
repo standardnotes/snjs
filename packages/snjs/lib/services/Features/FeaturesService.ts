@@ -64,7 +64,6 @@ export class SNFeaturesService
   private deinited = false
   private roles: RoleName[] = []
   private features: FeatureDescription[] = []
-  private experimentalFeatures = GetExperimentalFeatures()
   private enabledExperimentalFeatures: FeatureIdentifier[] = []
   private removeWebSocketsServiceObserver: () => void
   private removefeatureReposObserver: () => void
@@ -430,7 +429,7 @@ export class SNFeaturesService
   public getUserFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
     return [
       ...this.features,
-      ...this.experimentalFeatures
+      ...GetExperimentalFeatures()
     ].find((feature) => feature.identifier === featureId)
   }
 
