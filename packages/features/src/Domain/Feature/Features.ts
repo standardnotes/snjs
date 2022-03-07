@@ -558,8 +558,28 @@ export function GetDeprecatedFeatures(): FeatureDescription[] {
   return [filesafe, folders]
 }
 
+export function GetExperimentalFeatures(): FeatureDescription[] {
+  const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
+    name: 'Markdown Visual (Beta)',
+    identifier: FeatureIdentifier.MarkdownVisualEditor,
+    version: '1.0.1',
+    note_type: NoteType.Markdown,
+    file_type: 'md',
+    permission_name: PermissionName.MarkdownVisualEditor,
+    spellcheckControl: true,
+    description: 'A lightweight WYSIWYG markdown editor, derivated from Milkdown editor.',
+    git_repo_url: 'https://github.com/standardnotes/markdown-visual',
+    marketing_url: 'https://github.com/standardnotes/markdown-visual',
+    static_files: ['build'],
+    index_path: 'build/index.html',
+  })
+
+  return [markdownVisual]
+}
+
 export function FindNativeFeature(identifier: FeatureIdentifier): FeatureDescription | undefined {
   return GetFeatures()
     .concat(GetDeprecatedFeatures())
+    .concat(GetExperimentalFeatures())
     .find((f) => f.identifier === identifier)
 }
