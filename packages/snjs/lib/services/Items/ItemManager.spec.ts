@@ -93,7 +93,7 @@ describe('itemManager', () => {
     )
   }
 
-  const createFile = (name: string, ext: string) => {
+  const createFile = (name: string, ext?: string) => {
     return new SNFile(
       CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
@@ -616,9 +616,7 @@ describe('itemManager', () => {
       const file = createFile('initialName', 'ext')
       await itemManager.insertItems([file])
 
-      expect(file.nameWithExt).toBe('initialName.ext')
-
-      const renamedFile = await itemManager.renameFile(file, 'anotherName.anotherExt')
+      const renamedFile = await itemManager.renameFile(file, 'anotherName', 'anotherExt')
 
       expect(renamedFile.name).toBe('anotherName')
       expect(renamedFile.ext).toBe('anotherExt')
@@ -627,12 +625,10 @@ describe('itemManager', () => {
 
     it('should correctly rename extensionless file to filename that has extension', async () => {
       itemManager = createService()
-      const file = createFile('initialName', '')
+      const file = createFile('initialName')
       await itemManager.insertItems([file])
 
-      expect(file.nameWithExt).toBe('initialName')
-
-      const renamedFile = await itemManager.renameFile(file, 'anotherName.anotherExt')
+      const renamedFile = await itemManager.renameFile(file, 'anotherName', 'anotherExt')
 
       expect(renamedFile.name).toBe('anotherName')
       expect(renamedFile.ext).toBe('anotherExt')
@@ -644,12 +640,10 @@ describe('itemManager', () => {
       const file = createFile('initialName', 'ext')
       await itemManager.insertItems([file])
 
-      expect(file.nameWithExt).toBe('initialName.ext')
-
       const renamedFile = await itemManager.renameFile(file, 'anotherName')
 
       expect(renamedFile.name).toBe('anotherName')
-      expect(renamedFile.ext).toBe('')
+      expect(renamedFile.ext).toBe(undefined)
       expect(renamedFile.nameWithExt).toBe('anotherName')
     })
   })

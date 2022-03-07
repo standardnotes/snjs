@@ -1218,15 +1218,10 @@ export class ItemManager extends AbstractService implements ItemsClientInterface
     ) as SNFile[]
   }
 
-  public renameFile(file: SNFile, name: string): Promise<SNFile> {
+  public renameFile(file: SNFile, name: string, ext?: string): Promise<SNFile> {
     return this.changeItem<FileMutator, SNFile>(file.uuid, (mutator) => {
-      if (!name.includes('.')) {
-        mutator.name = name;
-        mutator.ext = '';
-      } else {
-        mutator.name = name.split('.').shift() as string;
-        mutator.ext = name.split('.').pop() as string;
-      }
+      mutator.name = name
+      mutator.ext = ext
     })
   }
 }

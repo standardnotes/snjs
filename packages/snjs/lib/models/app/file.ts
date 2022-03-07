@@ -64,7 +64,7 @@ export class FileMutator extends ItemMutator {
     this.typedContent.name = newName
   }
 
-  set ext(newExt: string) {
+  set ext(newExt: string | undefined) {
     this.typedContent.ext = newExt
   }
 
