@@ -3,5 +3,5 @@ export interface UserSignedInEventPayload {
   userEmail: string
   signInAlertEnabled: boolean,
   device: string
-  browser: string
+  browser?: string
 }
