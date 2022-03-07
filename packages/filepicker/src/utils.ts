@@ -36,3 +36,19 @@ export function saveFile(name: string, bytes: Uint8Array): void {
   link.remove()
   window.URL.revokeObjectURL(link.href)
 }
+
+const BYTES_IN_ONE_KILOBYTE = 1_000
+const BYTES_IN_ONE_MEGABYTE = 1_000_000
+
+export function formatSizeToReadableString(bytes: number): string {
+  let size = bytes
+  let unit = 'B'
+  if (bytes > BYTES_IN_ONE_MEGABYTE) {
+    size = bytes / BYTES_IN_ONE_MEGABYTE
+    unit = 'MB'
+  } else if (bytes > BYTES_IN_ONE_KILOBYTE) {
+    size = bytes / BYTES_IN_ONE_KILOBYTE
+    unit = 'KB'
+  }
+  return `${size.toFixed(2)} ${unit}`
+}
