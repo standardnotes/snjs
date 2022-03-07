@@ -1,5 +1,5 @@
 import { ByteChunker } from './byte_chunker'
-import { getFileMetadata } from '.'
+import { parseFileName } from '.'
 import { OnChunkCallback, FileSelectionResponse } from './types'
 
 /**
@@ -72,6 +72,6 @@ export class StreamingFileReader {
 
     this.log('Finished streaming file.')
 
-    return getFileMetadata(this.selectedFile)
+    return parseFileName(this.selectedFile.name)
   }
 }

@@ -18,7 +18,7 @@ export interface FileContent {
   remoteIdentifier: string
   name: string
   key: string
-  ext: string
+  ext?: string
   size: number
   encryptionHeader: string
   chunkSizes: number[]
@@ -30,7 +30,7 @@ export class SNFile extends SNItem implements ExtendedFileContent {
   public readonly remoteIdentifier: string
   public readonly name: string
   public readonly key: string
-  public readonly ext: string
+  public readonly ext?: string
   public readonly size: number
   public readonly encryptionHeader: string
   public readonly chunkSizes: number[]
@@ -47,7 +47,7 @@ export class SNFile extends SNItem implements ExtendedFileContent {
   }
 
   public get nameWithExt(): string {
-    return `${this.name}.${this.ext}`
+    return `${this.name}${this.ext && this.ext.length > 0 ? `.${this.ext}` : ''}`
   }
 
   private get typedContent(): FileContent {
@@ -58,6 +58,14 @@ export class SNFile extends SNItem implements ExtendedFileContent {
 export class FileMutator extends ItemMutator {
   get typedContent(): Partial<ExtendedFileContent> {
     return this.content as Partial<ExtendedFileContent>
+  }
+
+  set name(newName: string) {
+    this.typedContent.name = newName
+  }
+
+  set ext(newExt: string | undefined) {
+    this.typedContent.ext = newExt
   }
 
   set encryptionHeader(encryptionHeader: string) {

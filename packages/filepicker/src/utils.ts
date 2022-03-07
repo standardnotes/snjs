@@ -10,11 +10,16 @@ export async function readFile(file: File): Promise<Uint8Array> {
   })
 }
 
-export function getFileMetadata(file: File): { name: string; ext: string } {
+export function parseFileName(fileName: string): {
+  name: string
+  ext: string
+} {
   const pattern = /(?:\.([^.]+))?$/
-  const extMatches = pattern.exec(file.name)
-  const ext = (extMatches?.[1] as string) || ''
-  const name = file.name.split('.')[0]
+  const extMatches = pattern.exec(fileName)
+  const ext = extMatches?.[1] || ''
+  const name = fileName.includes('.')
+    ? fileName.substring(0, fileName.lastIndexOf('.'))
+    : fileName
 
   return { name, ext }
 }
