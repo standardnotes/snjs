@@ -788,7 +788,7 @@ describe('online conflict handling', function () {
         mutator.title = baseTitle;
       }
     );
-    await this.application.sync();
+    await this.application.sync.sync();
 
     /** Simulate a dropped response by reverting the note back its post-change, pre-sync state */
     const retroNote = await this.application.itemManager.emitItemFromPayload(
@@ -803,7 +803,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
       mutator.title = finalTitle;
     });
-    await this.application.sync();
+    await this.application.sync.sync();
 
     /** Expect that no duplicates have been created, and that the note's title is now finalTitle */
     expect(this.application.itemManager.notes.length).to.equal(1);
@@ -991,7 +991,7 @@ describe('online conflict handling', function () {
       dirty: true,
     });
     await this.application.itemManager.emitItemFromPayload(modified);
-    await this.application.sync();
+    await this.application.sync.sync();
     expect(this.application.itemManager.notes.length).to.equal(1);
     await this.sharedFinalAssertions();
   });
@@ -1015,7 +1015,7 @@ describe('online conflict handling', function () {
     });
     this.expectedItemCount++;
     await this.application.itemManager.emitItemFromPayload(modified);
-    await this.application.sync();
+    await this.application.sync.sync();
     expect(this.application.itemManager.notes.length).to.equal(2);
     await this.sharedFinalAssertions();
   });

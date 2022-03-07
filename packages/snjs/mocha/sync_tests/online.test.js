@@ -101,7 +101,7 @@ describe('online syncing', function () {
     const count = 0;
     await Factory.createManyMappedNotes(this.application, count);
     this.expectedItemCount += count;
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
@@ -114,7 +114,7 @@ describe('online syncing', function () {
     /** Throw in some random syncs to cause trouble */
     const syncCount = 30;
     for (let i = 0; i < syncCount; i++) {
-      this.application.sync(syncOptions);
+      this.application.sync.sync(syncOptions);
       await Factory.sleep(0.01);
     }
     await promise;
@@ -130,7 +130,7 @@ describe('online syncing', function () {
     const note = await Factory.createMappedNote(this.application);
     this.expectedItemCount++;
     await Factory.alternateUuidForItem(this.application, note.uuid);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     const notes = this.application.itemManager.notes;
     expect(notes.length).to.equal(1);
@@ -409,14 +409,14 @@ describe('online syncing', function () {
 
     /** Begin syncing it with server but introduce latency so we can sneak in a delete */
     this.application.syncService.ut_beginLatencySimulator(500);
-    const sync = this.application.sync();
+    const sync = this.application.sync.sync();
     /** Sleep so sync call can begin preparations but not fully begin */
     await Factory.sleep(0.1);
     await this.application.itemManager.setItemToBeDeleted(note.uuid);
     this.expectedItemCount--;
     await sync;
     this.application.syncService.ut_endLatencySimulator();
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     /** We expect that item has been deleted */
     const allItems = this.application.itemManager.items;
@@ -734,7 +734,7 @@ describe('online syncing', function () {
         mutator.text = `${Math.random()}`;
       }
     );
-    const sync = this.application.sync(syncOptions);
+    const sync = this.application.sync.sync(syncOptions);
     await Factory.sleep(0.1);
     note = this.application.findItem(note.uuid);
     expect(note.lastSyncBegan).to.be.below(new Date());
@@ -755,8 +755,8 @@ describe('online syncing', function () {
         actualEvents++;
       }
     });
-    const first = this.application.sync();
-    const second = this.application.sync();
+    const first = this.application.sync.sync();
+    const second = this.application.sync.sync();
     await Promise.all([first, second]);
     /** Sleep so that any automatic syncs that are triggered are also sent to handler above */
     await Factory.sleep(0.5);
@@ -938,7 +938,7 @@ describe('online syncing', function () {
     const preDeleteSyncToken = await this.application.syncService.getLastSyncToken();
     await this.application.deleteItem(note);
     await this.application.syncService.setLastSyncToken(preDeleteSyncToken);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
     expect(this.application.itemManager.items.length).to.equal(
       this.expectedItemCount
     );
@@ -958,7 +958,7 @@ describe('online syncing', function () {
       dirty: true,
     });
     await this.application.itemManager.emitItemFromPayload(errored);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     const updatedNote = this.application.findItem(note.uuid);
     expect(updatedNote.lastSyncBegan.getTime()).to.equal(
@@ -1017,7 +1017,7 @@ describe('online syncing', function () {
     });
     this.expectedItemCount++;
     await this.application.itemManager.emitItemsFromPayloads([payload]);
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     /** Item should no longer be dirty, otherwise it would keep syncing */
     const item = this.application.findItem(payload.uuid);

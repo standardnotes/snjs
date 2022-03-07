@@ -555,7 +555,7 @@ export function createRelatedNoteTagPairPayload({
 export async function createSyncedNoteWithTag(application) {
   const payloads = createRelatedNoteTagPairPayload();
   await application.itemManager.emitItemsFromPayloads(payloads);
-  return application.sync(syncOptions);
+  return application.sync.sync(syncOptions);
 }
 
 export async function storagePayloadCount(application) {

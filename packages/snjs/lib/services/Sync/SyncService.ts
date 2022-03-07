@@ -46,6 +46,7 @@ import {
   IntegrityEventPayload,
   SyncSource,
 } from '@standardnotes/services'
+import { SyncClientInterface } from './SyncClientInterface'
 
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
@@ -61,7 +62,7 @@ const INVALID_SESSION_RESPONSE_STATUS = 401
  */
 export class SNSyncService
   extends AbstractService<SyncEvent, SyncResponse | { source: SyncSource }>
-  implements InternalEventHandlerInterface
+  implements InternalEventHandlerInterface, SyncClientInterface
 {
   private lastPreSyncSave?: Date
   private lastSyncDate?: Date
@@ -158,7 +159,7 @@ export class SNSyncService
     return this.lastSyncDate
   }
 
-  public getStatus(): SyncOpStatus {
+  public getSyncStatus(): SyncOpStatus {
     return this.opStatus
   }
 

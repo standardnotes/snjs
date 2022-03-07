@@ -33,7 +33,7 @@ describe('preferences', function () {
   it('saves preference', async function () {
     await register.call(this);
     await this.application.setPreference('editorLeft', 300);
-    await this.application.sync();
+    await this.application.sync.sync();
     this.application = await Factory.signOutAndBackIn(
       this.application,
       this.email,
@@ -46,7 +46,7 @@ describe('preferences', function () {
   it('clears preferences on signout', async function () {
     await register.call(this);
     await this.application.setPreference('editorLeft', 300);
-    await this.application.sync();
+    await this.application.sync.sync();
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
@@ -75,13 +75,13 @@ describe('preferences', function () {
   it('discards existing preferences when signing in', async function () {
     await register.call(this);
     await this.application.setPreference('editorLeft', 300);
-    await this.application.sync();
+    await this.application.sync.sync();
     this.application = await Factory.signOutApplicationAndReturnNew(
       this.application
     );
     await this.application.setPreference('editorLeft', 200);
     await this.application.signIn(this.email, this.password);
-    await this.application.sync({ awaitAll: true });
+    await this.application.sync.sync({ awaitAll: true });
     const editorLeft = this.application.getPreference('editorLeft');
     expect(editorLeft).to.equal(300);
   });
@@ -93,7 +93,7 @@ describe('preferences', function () {
 
     await register.call(this);
     await this.application.setPreference(prefKey, prefValue);
-    await this.application.sync();
+    await this.application.sync.sync();
 
     await Factory.safeDeinit(this.application);
 

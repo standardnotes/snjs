@@ -122,7 +122,7 @@ describe('features', () => {
         }),
       )
       // Call sync intentionally to get roles again in meta
-      await application.sync()
+      await application.sync.sync()
       // Timeout since we don't await for features update
       await new Promise((resolve) => setTimeout(resolve, 1000))
       expect(application.itemManager.changeComponent.callCount).to.equal(1)
@@ -161,7 +161,7 @@ describe('features', () => {
       // Wipe roles from initial sync
       await application.featuresService.setRoles([])
       // Call sync intentionally to get roles again in meta
-      await application.sync()
+      await application.sync.sync()
       // Timeout since we don't await for features update
       await new Promise((resolve) => setTimeout(resolve, 1000))
       expect(application.itemManager.setItemsToBeDeleted.calledWith([themeItemUuid])).to.be.ok
@@ -216,7 +216,7 @@ describe('features', () => {
         }),
         true,
       )
-      await application.sync()
+      await application.sync.sync()
       application = await Factory.signOutApplicationAndReturnNew(application)
 
       sinon.restore()
@@ -249,7 +249,7 @@ describe('features', () => {
         }),
         true,
       )
-      await application.sync()
+      await application.sync.sync()
 
       const promise = new Promise((resolve) => {
         sinon
@@ -300,7 +300,7 @@ describe('features', () => {
         }),
         true,
       )
-      await application.sync()
+      await application.sync.sync()
 
       const repo = application.featuresService.getOfflineRepo()
       expect(repo.migratedToOfflineEntitlements).to.equal(true)

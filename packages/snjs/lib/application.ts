@@ -1,4 +1,4 @@
-import { SyncSource } from '@standardnotes/services/src/Domain/Sync/SyncSource';
+import { SyncSource } from '@standardnotes/services/src/Domain/Sync/SyncSource'
 import { ItemsClientInterface } from './services/Items/ClientInterface'
 import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
 import { ListedService } from './services/ListedService'
@@ -50,7 +50,6 @@ import {
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
 import { StorageEncryptionPolicies } from './services/StorageService'
 import { BackupFile } from './services/ProtocolService'
-import { SyncOptions, SyncOpStatus } from './services/Sync'
 import { SmartView } from './models/app/SmartView'
 import { ItemMutator, MutationType, SNItem } from '@Models/core/item'
 import {
@@ -94,6 +93,7 @@ import {
   SNFeaturesService,
   SNFileService,
   SyncMode,
+  SyncOptions,
 } from './services'
 import {
   DeviceInterface,
@@ -138,6 +138,7 @@ import { RemoteSession } from './services/Api/Session'
 import { FilesClientInterface } from './services/Files/FileService'
 import { ApiServiceEvent } from './services/Api/ApiService'
 import { ProtectionsClientInterface } from './services/Protection/ClientInterface'
+import { SyncClientInterface } from './services/Sync/SyncClientInterface'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -277,6 +278,10 @@ export class SNApplication implements ListedInterface {
     return this.protectionService
   }
 
+  public get sync(): SyncClientInterface {
+    return this.syncService
+  }
+
   /**
    * The first thing consumers should call when starting their app.
    * This function will load all services in their correct order.
@@ -365,7 +370,7 @@ export class SNApplication implements ListedInterface {
       this.beginAutoSyncTimer()
       await this.syncService.sync({
         mode: SyncMode.DownloadFirst,
-        source: SyncSource.External
+        source: SyncSource.External,
       })
     })
     if (awaitDatabaseLoad) {
@@ -399,7 +404,7 @@ export class SNApplication implements ListedInterface {
   private beginAutoSyncTimer() {
     this.autoSyncInterval = this.deviceInterface.interval(() => {
       this.syncService.log('Syncing from autosync')
-      void this.sync()
+      void this.sync.sync()
     }, DEFAULT_AUTO_SYNC_INTERVAL)
   }
 
@@ -552,17 +557,6 @@ export class SNApplication implements ListedInterface {
     return CreateMaxPayloadFromAnyObject(object as RawPayload)
   }
 
-  /**
-   * @returns The date of last sync
-   */
-  public getLastSyncDate(): Date | undefined {
-    return this.syncService.getLastSyncDate()
-  }
-
-  public getSyncStatus(): SyncOpStatus {
-    return this.syncService.getStatus()
-  }
-
   public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpResponse> {
     return this.sessionManager.getSessionsList()
   }
@@ -624,12 +618,12 @@ export class SNApplication implements ListedInterface {
 
   public async deleteItem(item: SNItem): Promise<void> {
     await this.itemManager.setItemToBeDeleted(item.uuid)
-    await this.sync()
+    await this.sync.sync()
   }
 
   public async emptyTrash(): Promise<void> {
     await this.itemManager.emptyTrash()
-    await this.sync()
+    await this.sync.sync()
   }
 
   public getTrashedItems(): SNNote[] {
@@ -859,7 +853,7 @@ export class SNApplication implements ListedInterface {
     additionalContent?: Partial<PayloadContent>,
   ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(item.uuid, false, additionalContent)
-    void this.sync()
+    void this.sync.sync()
     return duplicate
   }
 
@@ -897,9 +891,9 @@ export class SNApplication implements ListedInterface {
    * Migrates any tags containing a '.' character to sa chema-based heirarchy, removing
    * the dot from the tag's title.
    */
-  public async migrateTagsToFolders(): Promise<void> {
+  public async migrateTagsToFolders(): Promise<unknown> {
     await TagsToFoldersMigrationApplicator.run(this.itemManager)
-    return this.sync()
+    return this.sync.sync()
   }
 
   /**
@@ -1254,7 +1248,7 @@ export class SNApplication implements ListedInterface {
         }
       })
     const affectedUuids = await this.payloadManager.importPayloads(validPayloads)
-    const promise = this.sync()
+    const promise = this.sync.sync()
     if (awaitSync) {
       await promise
     }
@@ -1285,15 +1279,6 @@ export class SNApplication implements ListedInterface {
 
   public isEphemeralSession(): boolean {
     return this.storageService.isEphemeralSession()
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public sync(options?: SyncOptions): Promise<any> {
-    return this.syncService.sync(options)
-  }
-
-  public isOutOfSync(): boolean {
-    return this.syncService.isOutOfSync()
   }
 
   public async setValue(key: string, value: unknown, mode?: StorageValueModes): Promise<void> {
@@ -1739,7 +1724,10 @@ export class SNApplication implements ListedInterface {
 
   private defineInternalEventHandlers(): void {
     this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
-    this.internalEventBus.addEventHandler(this.integrityService, SyncEvent.SyncRequestsIntegrityCheck)
+    this.internalEventBus.addEventHandler(
+      this.integrityService,
+      SyncEvent.SyncRequestsIntegrityCheck,
+    )
     this.internalEventBus.addEventHandler(this.syncService, IntegrityEvent.IntegrityCheckCompleted)
   }
 
@@ -1985,10 +1973,10 @@ export class SNApplication implements ListedInterface {
         switch (event) {
           case SessionEvent.Restored: {
             void (async () => {
-              await this.sync()
+              await this.sync.sync()
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
                 void this.protocolService.createNewDefaultItemsKey().then(() => {
-                  void this.sync()
+                  void this.sync.sync()
                 })
               }
             })()

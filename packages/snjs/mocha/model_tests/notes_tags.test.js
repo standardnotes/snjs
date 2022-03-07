@@ -609,7 +609,7 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       );
-      await this.application.sync();
+      await this.application.sync.sync();
       const olderNote = await this.application.insertItem(
         await this.application.createTemplateItem(ContentType.Note, {
           title: 'B',
