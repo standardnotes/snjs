@@ -811,7 +811,7 @@ describe('keys', function () {
       });
 
       /** Re-authenticate on other app; allow challenge to complete */
-      await newClient.snyc.sync();
+      await newClient.sync.sync();
       await Factory.sleep(1);
 
       /** Expect a new items key to be created based on the new root key */
