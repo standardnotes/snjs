@@ -17,8 +17,7 @@ import {
   FindNativeFeature,
   DeprecatedFeatures,
   ComponentContent,
-  ExperimentalFeatures,
-  GetExperimentalFeatures
+  ExperimentalFeatures
 } from '@standardnotes/features'
 import { ContentType, ErrorObject, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
@@ -223,12 +222,16 @@ export class SNFeaturesService
     return ExperimentalFeatures
   }
 
+  public isExperimentalFeature(featureId: FeatureIdentifier): boolean {
+    return this.getExperimentalFeatures().includes(featureId)
+  }
+
   public getEnabledExperimentalFeatures(): FeatureIdentifier[] {
     return this.enabledExperimentalFeatures
   }
 
-  public isExperimentalFeatureEnabled(feature: FeatureIdentifier): boolean {
-    return this.enabledExperimentalFeatures.includes(feature)
+  public isExperimentalFeatureEnabled(featureId: FeatureIdentifier): boolean {
+    return this.enabledExperimentalFeatures.includes(featureId)
   }
 
   public async setOfflineFeaturesCode(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
@@ -407,7 +410,6 @@ export class SNFeaturesService
     ]
 
     const nativeFeature = FindNativeFeature(remoteFeature.identifier)
-
     if (!nativeFeature) {
       throw Error(
         `Attempting to map remote native to unfound static feature ${remoteFeature.identifier}`,
@@ -427,10 +429,7 @@ export class SNFeaturesService
   }
 
   public getUserFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
-    return [
-      ...this.features,
-      ...GetExperimentalFeatures()
-    ].find((feature) => feature.identifier === featureId)
+    return this.features.find((feature) => feature.identifier === featureId)
   }
 
   private hasOnlineSubscription(): boolean {
@@ -489,6 +488,14 @@ export class SNFeaturesService
         return FeatureStatus.InCurrentPlanButExpired
       }
       return FeatureStatus.Entitled
+    }
+
+    const isExperimentalFeature = this.isExperimentalFeature(featureId)
+    if (isExperimentalFeature) {
+      if (this.isExperimentalFeatureEnabled(featureId)) {
+        return FeatureStatus.Entitled
+      }
+      return FeatureStatus.NotInCurrentPlan
     }
 
     if (this.hasPaidOnlineOrOfflineSubscription()) {
