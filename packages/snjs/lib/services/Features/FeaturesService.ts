@@ -564,8 +564,8 @@ export class SNFeaturesService
     }
 
     if (
-      this.getExperimentalFeatures().includes(feature.identifier) &&
-      !this.getEnabledExperimentalFeatures().includes(feature.identifier)
+      this.isExperimentalFeature(feature.identifier) &&
+      !this.isExperimentalFeatureEnabled(feature.identifier)
     ) {
       return false
     }
