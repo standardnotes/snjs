@@ -18,6 +18,7 @@ import {
   DeprecatedFeatures,
   ComponentContent,
   ExperimentalFeatures,
+  GetExperimentalFeatures
 } from '@standardnotes/features'
 import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
@@ -63,6 +64,7 @@ export class SNFeaturesService
   private deinited = false
   private roles: RoleName[] = []
   private features: FeatureDescription[] = []
+  private experimentalFeatures = GetExperimentalFeatures()
   private enabledExperimentalFeatures: FeatureIdentifier[] = []
   private removeWebSocketsServiceObserver: () => void
   private removefeatureReposObserver: () => void
@@ -169,6 +171,11 @@ export class SNFeaturesService
   }
 
   public enableExperimentalFeature(identifier: FeatureIdentifier): void {
+    const feature = this.getFeature(identifier)
+    if (!feature) {
+      return
+    }
+
     this.enabledExperimentalFeatures.push(identifier)
 
     void this.storageService.setValue(
@@ -177,16 +184,15 @@ export class SNFeaturesService
     )
 
     void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
+    void this.mapRemoteNativeFeaturesToItems([feature])
+  }
 
+  public disableExperimentalFeature(identifier: FeatureIdentifier): void {
     const feature = this.getFeature(identifier)
     if (!feature) {
       return
     }
 
-    void this.mapRemoteNativeFeaturesToItems([feature])
-  }
-
-  public disableExperimentalFeature(identifier: FeatureIdentifier): void {
     removeFromArray(this.enabledExperimentalFeatures, identifier)
 
     void this.storageService.setValue(
@@ -207,7 +213,7 @@ export class SNFeaturesService
   }
 
   public toggleExperimentalFeature(identifier: FeatureIdentifier): void {
-    if (this.enabledExperimentalFeatures.includes(identifier)) {
+    if (this.isExperimentalFeatureEnabled(identifier)) {
       this.disableExperimentalFeature(identifier)
     } else {
       this.enableExperimentalFeature(identifier)
@@ -422,7 +428,10 @@ export class SNFeaturesService
   }
 
   public getFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
-    return this.features.find((feature) => feature.identifier === featureId)
+    return [
+      ...this.features,
+      ...this.experimentalFeatures
+    ].find((feature) => feature.identifier === featureId)
   }
 
   private hasOnlineSubscription(): boolean {
