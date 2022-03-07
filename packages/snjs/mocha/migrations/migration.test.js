@@ -159,7 +159,7 @@ describe('migrations', () => {
       })
     );
     await application.insertItem(mfaItem);
-    await application.sync();
+    await application.sync.sync();
 
     expect(application.getItems('SF|MFA').length).to.equal(1);
     expect(
@@ -204,7 +204,7 @@ describe('migrations', () => {
       })
     );
     await application.insertItem(noDistractionItem);
-    await application.sync();
+    await application.sync.sync();
 
     expect(application.getItems(ContentType.Theme).length).to.equal(1);
 
@@ -213,7 +213,7 @@ describe('migrations', () => {
       application.migrationService.services
     );
     await migration.handleStage(ApplicationStage.FullSyncCompleted_13);
-    await application.sync();
+    await application.sync.sync();
 
     expect(application.getItems(ContentType.Theme).length).to.equal(0);
 

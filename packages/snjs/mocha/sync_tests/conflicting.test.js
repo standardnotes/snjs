@@ -19,9 +19,12 @@ describe('online conflict handling', function () {
 
     this.context = await Factory.createAppContext();
     await this.context.launch();
+
     this.application = this.context.application;
     this.email = this.context.email;
     this.password = this.context.password;
+
+    Factory.disableIntegrityAutoHeal(this.application);
 
     await Factory.registerUserToApplication({
       application: this.application,
@@ -586,6 +589,7 @@ describe('online conflict handling', function () {
     this.expectedItemCount += largeItemCount;
     const items = this.application.itemManager.items;
     expect(items.length).to.equal(this.expectedItemCount);
+
     /**
      * We want to see what will happen if we upload everything we have to
      * the server as dirty, with no sync token, so that the server also
@@ -784,7 +788,7 @@ describe('online conflict handling', function () {
         mutator.title = baseTitle;
       }
     );
-    await this.application.sync();
+    await this.application.sync.sync();
 
     /** Simulate a dropped response by reverting the note back its post-change, pre-sync state */
     const retroNote = await this.application.itemManager.emitItemFromPayload(
@@ -799,7 +803,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
       mutator.title = finalTitle;
     });
-    await this.application.sync();
+    await this.application.sync.sync();
 
     /** Expect that no duplicates have been created, and that the note's title is now finalTitle */
     expect(this.application.itemManager.notes.length).to.equal(1);
@@ -877,8 +881,8 @@ describe('online conflict handling', function () {
     );
     await Factory.registerUserToApplication({
       application: newApp,
-      email: await Factory.generateUuid(),
-      password: await Factory.generateUuid(),
+      email: Factory.generateUuid(),
+      password: Factory.generateUuid(),
     });
     await newApp.itemManager.emitItemsFromPayloads(
       priorData.map((i) => i.payload)
@@ -987,7 +991,7 @@ describe('online conflict handling', function () {
       dirty: true,
     });
     await this.application.itemManager.emitItemFromPayload(modified);
-    await this.application.sync();
+    await this.application.sync.sync();
     expect(this.application.itemManager.notes.length).to.equal(1);
     await this.sharedFinalAssertions();
   });
@@ -1011,7 +1015,7 @@ describe('online conflict handling', function () {
     });
     this.expectedItemCount++;
     await this.application.itemManager.emitItemFromPayload(modified);
-    await this.application.sync();
+    await this.application.sync.sync();
     expect(this.application.itemManager.notes.length).to.equal(2);
     await this.sharedFinalAssertions();
   });

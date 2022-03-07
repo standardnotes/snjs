@@ -811,7 +811,7 @@ describe('keys', function () {
       });
 
       /** Re-authenticate on other app; allow challenge to complete */
-      await newClient.sync();
+      await newClient.sync.sync();
       await Factory.sleep(1);
 
       /** Expect a new items key to be created based on the new root key */
@@ -862,7 +862,7 @@ describe('keys', function () {
       });
       await this.application.protocolService.reencryptItemsKeys();
       /** Note: this may result in a deadlock if features_service syncs and results in an error */
-      await this.application.sync({ awaitAll: true });
+      await this.application.sync.sync({ awaitAll: true });
 
       /** Relaunch application and expect new items key to be created */
       const identifier = this.application.identifier;
@@ -930,7 +930,7 @@ describe('keys', function () {
       })
     );
     await this.application.syncService.sync({
-      mode: SyncModes.DownloadFirst,
+      mode: SyncMode.DownloadFirst,
     });
     const updatedKey = this.application.findItem(itemsKey.uuid);
     expect(updatedKey.neverSynced).to.equal(false);

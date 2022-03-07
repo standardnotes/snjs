@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.2.1...@standardnotes/filepicker@1.3.0) (2022-03-07)
+
+
+### Features
+
+* add renameFile function to itemManager ([#633](https://github.com/standardnotes/snjs/issues/633)) ([828f0d8](https://github.com/standardnotes/snjs/commit/828f0d8c79736b2ede1dd244e1e59569a88e6440))
+
+
+
+
+
 ## [1.2.1](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.2.0...@standardnotes/filepicker@1.2.1) (2022-03-03)
 
 

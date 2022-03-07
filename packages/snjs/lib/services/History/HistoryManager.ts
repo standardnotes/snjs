@@ -6,6 +6,7 @@ import {
   CreateSourcedPayloadFromObject,
   PayloadSource,
   PayloadFormat,
+  isRemotePayloadAllowed,
 } from '@standardnotes/payloads'
 import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
@@ -26,7 +27,6 @@ import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
 import { SNApiService } from '@Lib/services/Api/ApiService'
 import { SNProtocolService } from '@Lib/services/ProtocolService'
 import { HistoryMap, historyMapFunctions } from './HistoryMap'
-import { isRemotePayloadAllowed } from '../Sync/Filter'
 
 const PersistTimeout = 2000
 

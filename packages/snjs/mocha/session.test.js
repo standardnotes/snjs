@@ -100,7 +100,7 @@ describe('server session', function () {
     await sleepUntilSessionExpires(this.application);
 
     // Performing a sync request with an expired access token.
-    await this.application.sync(syncOptions);
+    await this.application.sync.sync(syncOptions);
 
     // After the above sync request is completed, we obtain the session information.
     const sessionAfterSync = this.application.apiService.getSession();
@@ -625,7 +625,7 @@ describe('server session', function () {
     const note = await Factory.createSyncedNote(appB);
 
     /** Expect appA session to still be valid */
-    await appA.sync();
+    await appA.sync.sync();
     expect(appA.findItem(note.uuid)).to.be.ok;
 
     await Factory.safeDeinit(appA);
@@ -666,7 +666,7 @@ describe('server session', function () {
     appA.apiService.session.refreshToken = 'bar';
 
     /** Perform an authenticated network request */
-    await appA.sync();
+    await appA.sync.sync();
 
     /** Allow session recovery to do its thing */
     await Factory.sleep(5.0);
@@ -735,7 +735,7 @@ describe('server session', function () {
     const { data: sessions } = await this.application.getSessions();
     const app2session = sessions.find((session) => !session.current);
     await this.application.revokeSession(app2session.uuid);
-    void app2.sync();
+    void app2.sync.sync();
     await app2Deinit;
 
     const deviceInterface = new WebDeviceInterface();
@@ -765,7 +765,7 @@ describe('server session', function () {
     })
 
     await this.application.revokeAllOtherSessions();
-    void app2.sync();
+    void app2.sync.sync();
     await app2Deinit;
 
     const deviceInterface = new WebDeviceInterface();

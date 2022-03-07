@@ -26,13 +26,11 @@ export class AccountSyncOperation {
     private receiver: ResponseSignalReceiver,
     private lastSyncToken: string,
     private paginationToken: string,
-    public checkIntegrity: boolean,
     private apiService: SNApiService,
   ) {
     this.payloads = payloads
     this.lastSyncToken = lastSyncToken
     this.paginationToken = paginationToken
-    this.checkIntegrity = checkIntegrity
     this.apiService = apiService
     this.receiver = receiver
     this.pendingPayloads = payloads.slice()
@@ -62,9 +60,6 @@ export class AccountSyncOperation {
       this.lastSyncToken,
       this.paginationToken,
       this.downLimit,
-      this.checkIntegrity,
-      undefined,
-      undefined,
     )) as RawSyncResponse
     const response = new SyncResponse(rawResponse)
 

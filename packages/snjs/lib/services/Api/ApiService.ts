@@ -34,10 +34,12 @@ import {
   CloseUploadSessionResponse,
   UploadFileChunkResponse,
   DownloadFileChunkResponse,
+  GetSingleItemResponse,
+  CheckIntegrityResponse,
 } from '@standardnotes/responses'
 import { Session, TokenSession } from './Session'
-import { ContentType, ErrorObject } from '@standardnotes/common'
-import { ApiEndpointParam, PurePayload } from '@standardnotes/payloads'
+import { ErrorObject, Uuid } from '@standardnotes/common'
+import { ApiEndpointParam, IntegrityPayload, PurePayload } from '@standardnotes/payloads'
 import { SNRootKeyParams } from '../../protocol/key_params'
 import { SNStorageService } from '../StorageService'
 import { ErrorTag, HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
@@ -49,7 +51,12 @@ import { Role } from '@standardnotes/auth'
 import { FeatureDescription } from '@standardnotes/features'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/services/Api/Messages'
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  IntegrityApiInterface,
+  ItemApiInterface,
+} from '@standardnotes/services'
 
 type PathNamesV1 = {
   keyParams: string
@@ -76,6 +83,8 @@ type PathNamesV1 = {
   uploadFileChunk: string
   closeUploadSession: string
   downloadFileChunk: string
+  checkIntegrity: string
+  getSingleItem: (uuid: Uuid) => string
 }
 
 type PathNamesV2 = {
@@ -112,6 +121,8 @@ const Paths: {
     uploadFileChunk: '/v1/files/upload/chunk',
     closeUploadSession: '/v1/files/upload/close-session',
     downloadFileChunk: '/v1/files',
+    checkIntegrity: '/v1/items/check-integrity',
+    getSingleItem: (uuid: Uuid) => `/v1/items/${uuid}`,
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -134,7 +145,7 @@ export type MetaReceivedData = {
 
 export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
-  implements FilesApi
+  implements FilesApi, IntegrityApiInterface, ItemApiInterface
 {
   private session?: Session
   public user?: User
@@ -452,9 +463,6 @@ export class SNApiService
     lastSyncToken: string,
     paginationToken: string,
     limit: number,
-    checkIntegrity = false,
-    contentType?: ContentType,
-    customEvent?: string,
   ): Promise<RawSyncResponse | HttpResponse> {
     const preprocessingError = this.preprocessingError()
     if (preprocessingError) {
@@ -465,10 +473,7 @@ export class SNApiService
       [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
       [ApiEndpointParam.LastSyncToken]: lastSyncToken,
       [ApiEndpointParam.PaginationToken]: paginationToken,
-      [ApiEndpointParam.IntegrityCheck]: checkIntegrity,
       [ApiEndpointParam.SyncDlLimit]: limit,
-      content_type: contentType,
-      event: customEvent,
     })
     const response = await this.httpService
       .postAbsolute(url, params, this.session!.authorizationValue)
@@ -956,6 +961,27 @@ export class SNApiService
     if (rangeEnd < totalSize - 1) {
       this.downloadFile(file, ++chunkIndex, apiToken, rangeStart + pullChunkSize, onBytesReceived)
     }
+  }
+
+  async checkIntegrity(integrityPayloads: IntegrityPayload[]): Promise<CheckIntegrityResponse> {
+    return await this.tokenRefreshableRequest<CheckIntegrityResponse>({
+      verb: HttpVerb.Post,
+      url: joinPaths(this.host, Paths.v1.checkIntegrity),
+      params: {
+        integrityPayloads,
+      },
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL,
+      authentication: this.session?.authorizationValue,
+    })
+  }
+
+  async getSingleItem(itemUuid: Uuid): Promise<GetSingleItemResponse> {
+    return await this.tokenRefreshableRequest<GetSingleItemResponse>({
+      verb: HttpVerb.Get,
+      url: joinPaths(this.host, Paths.v1.getSingleItem(itemUuid)),
+      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL,
+      authentication: this.session?.authorizationValue,
+    })
   }
 
   private preprocessingError() {

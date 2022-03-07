@@ -1,20 +1,21 @@
 FROM node:16-alpine
 
+ARG USERNAME=snjs
 ARG UID=1001
-ARG GID=1001
+ARG GID=$UID
 
 RUN apk --no-cache --virtual build-dependencies add \
     python3 \
     make \
     g++
 
-RUN addgroup -S snjs -g $GID && adduser -D -S snjs -G snjs -u $UID
+RUN addgroup -S $USERNAME -g $GID && adduser -D -S $USERNAME -G $USERNAME -u $UID
 
 WORKDIR /var/www
 
 RUN chown -R $UID:$GID .
 
-USER snjs
+USER $USERNAME
 
 COPY --chown=$UID:$GID package.json yarn.lock /var/www/
 

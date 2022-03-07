@@ -1,4 +1,4 @@
-import { SyncEvent } from '@Lib/services/Sync/Events'
+import { SyncEvent } from '@standardnotes/services'
 export { SyncEvent }
 
 export enum ApplicationEvent {
@@ -70,8 +70,8 @@ export enum ApplicationEvent {
 export function applicationEventForSyncEvent(syncEvent: SyncEvent) {
   return (
     {
-      [SyncEvent.FullSyncCompleted]: ApplicationEvent.CompletedFullSync,
-      [SyncEvent.SingleSyncCompleted]: ApplicationEvent.CompletedIncrementalSync,
+      [SyncEvent.SyncCompletedWithAllItemsUploaded]: ApplicationEvent.CompletedFullSync,
+      [SyncEvent.SingleRoundTripSyncCompleted]: ApplicationEvent.CompletedIncrementalSync,
       [SyncEvent.SyncError]: ApplicationEvent.FailedSync,
       [SyncEvent.SyncTakingTooLong]: ApplicationEvent.HighLatencySync,
       [SyncEvent.EnterOutOfSync]: ApplicationEvent.EnteredOutOfSync,

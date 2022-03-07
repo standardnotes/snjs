@@ -6,4 +6,6 @@ export interface ItemsClientInterface {
   disassociateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>
 
   getFilesForNote(note: SNNote): SNFile[]
+
+  renameFile(file: SNFile, name: string, ext: string): Promise<SNFile>
 }

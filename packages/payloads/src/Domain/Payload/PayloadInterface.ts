@@ -47,6 +47,7 @@ export interface PayloadInterface {
   contentString: string
   discardable: boolean | undefined
   serverUpdatedAt: Date
+  serverUpdatedAtTimestamp: number | undefined
   getReference(uuid: Uuid): ContentReference
   ejected(): RawPayload
 }

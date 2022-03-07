@@ -4,18 +4,19 @@ import * as Factory from '../lib/factory.js';
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-describe('notes + tags syncing', async function () {
+describe('notes + tags syncing', function () {
   const syncOptions = {
     checkIntegrity: true,
     awaitAll: true,
   };
 
-  after(async function () {
+  after(function () {
     localStorage.clear();
   });
 
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithFakeCrypto();
+    Factory.disableIntegrityAutoHeal(this.application);
     const email = UuidGenerator.GenerateUuid();
     const password = UuidGenerator.GenerateUuid();
     await Factory.registerUserToApplication({

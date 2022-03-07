@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.76.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.75.0...@standardnotes/snjs@2.76.0) (2022-03-07)
+
+
+### Features
+
+* integrity service ([#626](https://github.com/standardnotes/snjs/issues/626)) ([c5854fb](https://github.com/standardnotes/snjs/commit/c5854fb912dbe585516eeac3dde73573586c4e67))
+
+
+
+
+
+# [2.75.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.74.2...@standardnotes/snjs@2.75.0) (2022-03-07)
+
+
+### Features
+
+* add renameFile function to itemManager ([#633](https://github.com/standardnotes/snjs/issues/633)) ([828f0d8](https://github.com/standardnotes/snjs/commit/828f0d8c79736b2ede1dd244e1e59569a88e6440))
+
+
+
+
+
+## [2.74.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.74.1...@standardnotes/snjs@2.74.2) (2022-03-07)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.74.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.74.0...@standardnotes/snjs@2.74.1) (2022-03-07)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 # [2.74.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.73.2...@standardnotes/snjs@2.74.0) (2022-03-06)
 
 

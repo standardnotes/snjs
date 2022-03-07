@@ -82,14 +82,6 @@ export class SyncResponse {
     return this.rawResponse.data?.[ApiEndpointParam.PaginationToken]
   }
 
-  public get integrityHash() {
-    return this.rawResponse.data?.[ApiEndpointParam.IntegrityResult]
-  }
-
-  get checkIntegrity() {
-    return this.integrityHash && !this.paginationToken
-  }
-
   public get numberOfItemsInvolved() {
     return this.allProcessedPayloads.length
   }
