@@ -30,5 +30,7 @@ export interface FeaturesClientInterface {
 
   disableExperimentalFeature(identifier: FeatureIdentifier): void
 
-  isExperimentalFeatureEnabled(feature: FeatureIdentifier): boolean
+  isExperimentalFeatureEnabled(identifier: FeatureIdentifier): boolean
+
+  isExperimentalFeature(identifier: FeatureIdentifier): boolean
 }
