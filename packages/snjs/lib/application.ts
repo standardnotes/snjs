@@ -1782,7 +1782,6 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.sessionManager,
       this.options.crypto,
-      this.options.runtime,
       this.internalEventBus,
     )
     this.serviceObservers.push(

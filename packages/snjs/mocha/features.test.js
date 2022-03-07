@@ -172,7 +172,7 @@ describe('features', () => {
   })
 
   it('should provide feature', async () => {
-    const feature = application.features.getFeature(FeatureIdentifier.BoldEditor)
+    const feature = application.features.getUserFeature(FeatureIdentifier.BoldEditor)
     expect(feature).to.containSubset(boldEditorFeature)
   })
 

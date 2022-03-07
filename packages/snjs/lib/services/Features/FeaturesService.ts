@@ -17,9 +17,9 @@ import {
   FindNativeFeature,
   DeprecatedFeatures,
   ComponentContent,
-  ExperimentalFeatures,
+  ExperimentalFeatures
 } from '@standardnotes/features'
-import { ContentType, ErrorObject, Runtime, RoleName } from '@standardnotes/common'
+import { ContentType, ErrorObject, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
 import { SNComponent, SNTheme } from '@Lib/models'
@@ -81,7 +81,6 @@ export class SNFeaturesService
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
     private crypto: SNPureCrypto,
-    private runtime: Runtime,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -169,6 +168,11 @@ export class SNFeaturesService
   }
 
   public enableExperimentalFeature(identifier: FeatureIdentifier): void {
+    const feature = this.getUserFeature(identifier)
+    if (!feature) {
+      throw Error('Attempting to enable a feature user does not have access to.')
+    }
+
     this.enabledExperimentalFeatures.push(identifier)
 
     void this.storageService.setValue(
@@ -176,17 +180,16 @@ export class SNFeaturesService
       this.enabledExperimentalFeatures,
     )
 
-    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
-
-    const feature = this.getFeature(identifier)
-    if (!feature) {
-      return
-    }
-
     void this.mapRemoteNativeFeaturesToItems([feature])
+    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
   }
 
   public disableExperimentalFeature(identifier: FeatureIdentifier): void {
+    const feature = this.getUserFeature(identifier)
+    if (!feature) {
+      throw Error('Attempting to disable a feature user does not have access to.')
+    }
+
     removeFromArray(this.enabledExperimentalFeatures, identifier)
 
     void this.storageService.setValue(
@@ -194,15 +197,24 @@ export class SNFeaturesService
       this.enabledExperimentalFeatures,
     )
 
-    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
-
     const component = this.itemManager
       .getItems<SNComponent | SNTheme>([ContentType.Component, ContentType.Theme])
       .find((component) => component.identifier === identifier)
-    if (component) {
-      void this.itemManager.setItemToBeDeleted(component.uuid).then(() => {
-        void this.syncService.sync()
-      })
+    if (!component) {
+      return
+    }
+
+    void this.itemManager.setItemToBeDeleted(component.uuid).then(() => {
+      void this.syncService.sync()
+    })
+    void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
+  }
+
+  public toggleExperimentalFeature(identifier: FeatureIdentifier): void {
+    if (this.isExperimentalFeatureEnabled(identifier)) {
+      this.disableExperimentalFeature(identifier)
+    } else {
+      this.enableExperimentalFeature(identifier)
     }
   }
 
@@ -210,12 +222,16 @@ export class SNFeaturesService
     return ExperimentalFeatures
   }
 
+  public isExperimentalFeature(featureId: FeatureIdentifier): boolean {
+    return this.getExperimentalFeatures().includes(featureId)
+  }
+
   public getEnabledExperimentalFeatures(): FeatureIdentifier[] {
     return this.enabledExperimentalFeatures
   }
 
-  public isExperimentalFeatureEnabled(feature: FeatureIdentifier): boolean {
-    return this.enabledExperimentalFeatures.includes(feature)
+  public isExperimentalFeatureEnabled(featureId: FeatureIdentifier): boolean {
+    return this.enabledExperimentalFeatures.includes(featureId)
   }
 
   public async setOfflineFeaturesCode(code: string): Promise<SetOfflineFeaturesFunctionResponse> {
@@ -394,7 +410,6 @@ export class SNFeaturesService
     ]
 
     const nativeFeature = FindNativeFeature(remoteFeature.identifier)
-
     if (!nativeFeature) {
       throw Error(
         `Attempting to map remote native to unfound static feature ${remoteFeature.identifier}`,
@@ -413,7 +428,7 @@ export class SNFeaturesService
     return nativeFeatureCopy
   }
 
-  public getFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
+  public getUserFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
     return this.features.find((feature) => feature.identifier === featureId)
   }
 
@@ -487,7 +502,7 @@ export class SNFeaturesService
       return FeatureStatus.NoUserSubscription
     }
 
-    const feature = this.features.find((feature) => feature.identifier === featureId)
+    const feature = this.getUserFeature(featureId)
     if (!feature) {
       return FeatureStatus.NotInCurrentPlan
     }
@@ -549,8 +564,8 @@ export class SNFeaturesService
     }
 
     if (
-      this.getExperimentalFeatures().includes(feature.identifier) &&
-      !this.getEnabledExperimentalFeatures().includes(feature.identifier)
+      this.isExperimentalFeature(feature.identifier) &&
+      !this.isExperimentalFeatureEnabled(feature.identifier)
     ) {
       return false
     }
@@ -652,7 +667,7 @@ export class SNFeaturesService
     }
 
     if (rawFeature.url) {
-      for (const nativeFeature of GetFeatures(this.runtime)) {
+      for (const nativeFeature of GetFeatures()) {
         if (rawFeature.url.includes(nativeFeature.identifier)) {
           await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
           return
