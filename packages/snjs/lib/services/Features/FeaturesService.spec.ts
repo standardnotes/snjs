@@ -132,10 +132,9 @@ describe('featuresService', () => {
 
   describe('experimental features', () => {
     it('enables/disables an experimental feature', async () => {
-      storageService.getValue = jest.fn().mockReturnValue([])
+      storageService.getValue = jest.fn().mockReturnValue(GetFeatures())
 
       const featuresService = createService()
-
       await featuresService.initializeFromDisk()
 
       featuresService.enableExperimentalFeature(FeatureIdentifier.MarkdownVisualEditor)
@@ -181,17 +180,9 @@ describe('featuresService', () => {
     })
 
     it('does create a component for enabled experimental feature', async () => {
-      const features = [
-        {
-          identifier: FeatureIdentifier.BoldEditor,
-          expires_at: tomorrow_server,
-          content_type: ContentType.Component,
-        },
-      ]
-
       apiService.getUserFeatures = jest.fn().mockReturnValue({
         data: {
-          features,
+          features: GetFeatures(),
         },
       })
 
