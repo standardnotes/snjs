@@ -20,6 +20,8 @@ export interface FeaturesClientInterface {
 
   isThirdPartyFeature(identifier: string): boolean
 
+  toggleExperimentalFeature(identifier: FeatureIdentifier): void
+
   getExperimentalFeatures(): FeatureIdentifier[]
 
   getEnabledExperimentalFeatures(): FeatureIdentifier[]

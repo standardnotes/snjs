@@ -206,6 +206,14 @@ export class SNFeaturesService
     }
   }
 
+  public toggleExperimentalFeature(identifier: FeatureIdentifier): void {
+    if (this.enabledExperimentalFeatures.includes(identifier)) {
+      this.disableExperimentalFeature(identifier)
+    } else {
+      this.enableExperimentalFeature(identifier)
+    }
+  }
+
   public getExperimentalFeatures(): FeatureIdentifier[] {
     return ExperimentalFeatures
   }
@@ -487,7 +495,7 @@ export class SNFeaturesService
       return FeatureStatus.NoUserSubscription
     }
 
-    const feature = this.features.find((feature) => feature.identifier === featureId)
+    const feature = this.getFeature(featureId)
     if (!feature) {
       return FeatureStatus.NotInCurrentPlan
     }
@@ -652,7 +660,7 @@ export class SNFeaturesService
     }
 
     if (rawFeature.url) {
-      for (const nativeFeature of GetFeatures(this.runtime)) {
+      for (const nativeFeature of GetFeatures()) {
         if (rawFeature.url.includes(nativeFeature.identifier)) {
           await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
           return
