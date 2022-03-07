@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.76.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.76.0...@standardnotes/snjs@2.76.1) (2022-03-07)
+
+
+### Bug Fixes
+
+* changes to enable experimental features ([#632](https://github.com/standardnotes/snjs/issues/632)) ([a60d981](https://github.com/standardnotes/snjs/commit/a60d981eda8f0634c0885cfcc0dfce0d02748072))
+
+
+
+
+
 # [2.76.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.75.0...@standardnotes/snjs@2.76.0) (2022-03-07)
 
 
