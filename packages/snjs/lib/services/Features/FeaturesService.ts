@@ -171,7 +171,7 @@ export class SNFeaturesService
   }
 
   public enableExperimentalFeature(identifier: FeatureIdentifier): void {
-    const feature = this.getFeature(identifier)
+    const feature = this.getUserFeature(identifier)
     if (!feature) {
       return
     }
@@ -188,7 +188,7 @@ export class SNFeaturesService
   }
 
   public disableExperimentalFeature(identifier: FeatureIdentifier): void {
-    const feature = this.getFeature(identifier)
+    const feature = this.getUserFeature(identifier)
     if (!feature) {
       return
     }
@@ -428,7 +428,7 @@ export class SNFeaturesService
     return nativeFeatureCopy
   }
 
-  public getFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
+  public getUserFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
     return [
       ...this.features,
       ...this.experimentalFeatures
@@ -505,7 +505,7 @@ export class SNFeaturesService
       return FeatureStatus.NoUserSubscription
     }
 
-    const feature = this.getFeature(featureId)
+    const feature = this.getUserFeature(featureId)
     if (!feature) {
       return FeatureStatus.NotInCurrentPlan
     }

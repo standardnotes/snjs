@@ -6,7 +6,7 @@ import { RoleName } from '@standardnotes/common'
 export interface FeaturesClientInterface {
   downloadExternalFeature(urlOrCode: string): Promise<SNComponent | undefined>
 
-  getFeature(featureId: FeatureIdentifier): FeatureDescription | undefined
+  getUserFeature(featureId: FeatureIdentifier): FeatureDescription | undefined
 
   getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus
 

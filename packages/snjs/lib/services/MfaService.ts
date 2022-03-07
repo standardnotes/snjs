@@ -49,7 +49,7 @@ export class SNMfaService extends AbstractService {
   }
 
   isMfaFeatureAvailable(): boolean {
-    const feature = this.featuresService.getFeature(FeatureIdentifier.TwoFactorAuth)
+    const feature = this.featuresService.getUserFeature(FeatureIdentifier.TwoFactorAuth)
 
     // If the feature is not present in the collection, we don't want to block it
     if (feature == undefined) {
