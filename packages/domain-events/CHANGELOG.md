@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.23.22](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.21...@standardnotes/domain-events@2.23.22) (2022-03-07)
+
+
+### Bug Fixes
+
+* optional browser property ([#634](https://github.com/standardnotes/snjs/issues/634)) ([5946bd5](https://github.com/standardnotes/snjs/commit/5946bd5833700e91e91c15ef8b0de269010dc12c))
+
+
+
+
+
 ## [2.23.21](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.20...@standardnotes/domain-events@2.23.21) (2022-03-04)
 
 **Note:** Version bump only for package @standardnotes/domain-events
