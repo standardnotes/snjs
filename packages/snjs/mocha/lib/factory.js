@@ -130,10 +130,6 @@ export function getDefaultHost() {
   return 'http://localhost:3123';
 }
 
-export function getDefaultFilesHost() {
-  return 'http://localhost:3125';
-}
-
 export function getDefaultMockedEventServiceUrl() {
   return 'http://localhost:3124';
 }
@@ -183,7 +179,6 @@ export function createApplication(
     },
     identifier: identifier || `${Math.random()}`,
     defaultHost: host || getDefaultHost(),
-    defaultFilesHost: getDefaultFilesHost(),
     appVersion: getAppVersion(),
     webSocketUrl: getDefaultWebSocketUrl(),
   });

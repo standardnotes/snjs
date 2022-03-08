@@ -153,14 +153,13 @@ export class SNApiService
   private authenticating = false
   private changing = false
   private refreshingSession = false
-
   private invalidSessionObserver?: InvalidSessionObserver
+  private filesHost?: string
 
   constructor(
     private httpService: SNHttpService,
     private storageService: SNStorageService,
     private host: string,
-    private filesHost: string,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -217,24 +216,10 @@ export class SNApiService
     return !isUrlFirstParty(applicationHost)
   }
 
-  public async loadFilesHost(): Promise<void> {
-    const storedValue = await this.storageService.getValue(StorageKey.FilesServerHost)
-    this.filesHost =
-      storedValue ||
-      this.filesHost ||
-      (
-        window as {
-          _default_files_server?: string
-        }
-      )._default_files_server
-  }
-
-  public async setFilesHost(filesHost: string): Promise<void> {
-    this.filesHost = filesHost
-    await this.storageService.setValue(StorageKey.FilesServerHost, filesHost)
-  }
-
   public getFilesHost(): string {
+    if (!this.filesHost) {
+      throw Error('Attempting to access undefined filesHost')
+    }
     return this.filesHost
   }
 
@@ -283,10 +268,14 @@ export class SNApiService
 
   private processMetaObject(meta: ResponseMeta) {
     if (meta.auth && meta.auth.userUuid && meta.auth.roles) {
-      this.notifyEvent(ApiServiceEvent.MetaReceived, {
+      void this.notifyEvent(ApiServiceEvent.MetaReceived, {
         userUuid: meta.auth.userUuid,
         userRoles: meta.auth.roles,
       })
+    }
+
+    if (meta.server?.filesServerUrl) {
+      this.filesHost = meta.server?.filesServerUrl
     }
   }
 
@@ -408,7 +397,7 @@ export class SNApiService
   signOut(): Promise<SignOutResponse> {
     const url = joinPaths(this.host, Paths.v1.signOut)
     return this.httpService
-      .postAbsolute(url, undefined, this.session!.authorizationValue)
+      .postAbsolute(url, undefined, this.session?.authorizationValue)
       .catch((errorResponse) => {
         return errorResponse
       }) as Promise<SignOutResponse>
@@ -437,7 +426,7 @@ export class SNApiService
       ...parameters.newKeyParams.getPortableValue(),
     })
     const response = await this.httpService
-      .putAbsolute(url, params, this.session!.authorizationValue)
+      .putAbsolute(url, params, this.session?.authorizationValue)
       .catch(async (errorResponse) => {
         if (isErrorResponseExpiredToken(errorResponse)) {
           return this.refreshSessionThenRetryRequest({
@@ -476,7 +465,7 @@ export class SNApiService
       [ApiEndpointParam.SyncDlLimit]: limit,
     })
     const response = await this.httpService
-      .postAbsolute(url, params, this.session!.authorizationValue)
+      .postAbsolute(url, params, this.session?.authorizationValue)
       .catch<HttpResponse>(async (errorResponse) => {
         this.preprocessAuthenticatedErrorResponse(errorResponse)
         if (isErrorResponseExpiredToken(errorResponse)) {
@@ -504,7 +493,7 @@ export class SNApiService
       return this.httpService
         .runHttp({
           ...httpRequest,
-          authentication: this.session!.authorizationValue,
+          authentication: this.session?.authorizationValue,
         })
         .catch((errorResponse) => {
           return errorResponse
@@ -519,7 +508,7 @@ export class SNApiService
     }
     this.refreshingSession = true
     const url = joinPaths(this.host, Paths.v1.refreshSession)
-    const session = this.session! as TokenSession
+    const session = this.session as TokenSession
     const params = this.params({
       access_token: session.accessToken,
       refresh_token: session.refreshToken,
@@ -550,7 +539,7 @@ export class SNApiService
     }
     const url = joinPaths(this.host, Paths.v1.sessions)
     const response = await this.httpService
-      .getAbsolute(url, {}, this.session!.authorizationValue)
+      .getAbsolute(url, {}, this.session?.authorizationValue)
       .catch(async (errorResponse) => {
         this.preprocessAuthenticatedErrorResponse(errorResponse)
         if (isErrorResponseExpiredToken(errorResponse)) {
@@ -576,7 +565,7 @@ export class SNApiService
     }
     const url = joinPaths(this.host, <string>Paths.v1.session(sessionId))
     const response: RevisionListResponse | HttpResponse = await this.httpService
-      .deleteAbsolute(url, { uuid: sessionId }, this.session!.authorizationValue)
+      .deleteAbsolute(url, { uuid: sessionId }, this.session?.authorizationValue)
       .catch((error: HttpResponse) => {
         const errorResponse = error as HttpResponse
         this.preprocessAuthenticatedErrorResponse(errorResponse)
@@ -602,7 +591,7 @@ export class SNApiService
     }
     const url = joinPaths(this.host, Paths.v1.itemRevisions(itemId))
     const response: RevisionListResponse | HttpResponse = await this.httpService
-      .getAbsolute(url, undefined, this.session!.authorizationValue)
+      .getAbsolute(url, undefined, this.session?.authorizationValue)
       .catch((errorResponse: HttpResponse) => {
         this.preprocessAuthenticatedErrorResponse(errorResponse)
         if (isErrorResponseExpiredToken(errorResponse)) {
@@ -630,7 +619,7 @@ export class SNApiService
     }
     const url = joinPaths(this.host, Paths.v1.itemRevision(itemId, entry.uuid))
     const response: SingleRevisionResponse | HttpResponse = await this.httpService
-      .getAbsolute(url, undefined, this.session!.authorizationValue)
+      .getAbsolute(url, undefined, this.session?.authorizationValue)
       .catch((errorResponse: HttpResponse) => {
         this.preprocessAuthenticatedErrorResponse(errorResponse)
         if (isErrorResponseExpiredToken(errorResponse)) {
@@ -651,7 +640,7 @@ export class SNApiService
   async getUserFeatures(userUuid: UuidString): Promise<HttpResponse | UserFeaturesResponse> {
     const url = joinPaths(this.host, Paths.v1.userFeatures(userUuid))
     const response = await this.httpService
-      .getAbsolute(url, undefined, this.session!.authorizationValue)
+      .getAbsolute(url, undefined, this.session?.authorizationValue)
       .catch((errorResponse: HttpResponse) => {
         this.preprocessAuthenticatedErrorResponse(errorResponse)
         if (isErrorResponseExpiredToken(errorResponse)) {
@@ -862,7 +851,7 @@ export class SNApiService
   }
 
   public async startUploadSession(apiToken: string): Promise<boolean> {
-    const url = joinPaths(this.filesHost, Paths.v1.startUploadSession)
+    const url = joinPaths(this.getFilesHost(), Paths.v1.startUploadSession)
 
     const response: HttpResponse | StartUploadSessionResponse = await this.request({
       verb: HttpVerb.Post,
@@ -882,7 +871,7 @@ export class SNApiService
     if (chunkId === 0) {
       throw Error('chunkId must start with 1')
     }
-    const url = joinPaths(this.filesHost, Paths.v1.uploadFileChunk)
+    const url = joinPaths(this.getFilesHost(), Paths.v1.uploadFileChunk)
 
     const response: HttpResponse | UploadFileChunkResponse = await this.request({
       verb: HttpVerb.Post,
@@ -900,7 +889,7 @@ export class SNApiService
   }
 
   public async closeUploadSession(apiToken: string): Promise<boolean> {
-    const url = joinPaths(this.filesHost, Paths.v1.closeUploadSession)
+    const url = joinPaths(this.getFilesHost(), Paths.v1.closeUploadSession)
 
     const response: HttpResponse | CloseUploadSessionResponse = await this.request({
       verb: HttpVerb.Post,
@@ -919,7 +908,7 @@ export class SNApiService
     contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => void,
   ): Promise<void> {
-    const url = joinPaths(this.filesHost, Paths.v1.downloadFileChunk)
+    const url = joinPaths(this.getFilesHost(), Paths.v1.downloadFileChunk)
     const pullChunkSize = file.chunkSizes[chunkIndex]
 
     const response: HttpResponse | DownloadFileChunkResponse =
@@ -959,7 +948,13 @@ export class SNApiService
     onBytesReceived(bytesReceived)
 
     if (rangeEnd < totalSize - 1) {
-      this.downloadFile(file, ++chunkIndex, apiToken, rangeStart + pullChunkSize, onBytesReceived)
+      return this.downloadFile(
+        file,
+        ++chunkIndex,
+        apiToken,
+        rangeStart + pullChunkSize,
+        onBytesReceived,
+      )
     }
   }
 

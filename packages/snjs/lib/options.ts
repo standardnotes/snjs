@@ -53,10 +53,6 @@ export interface ConstructorOptions {
    */
   defaultHost: string
   /**
-   * Default files host to use in ApiService.
-   */
-  defaultFilesHost: string
-  /**
    * Version of client application.
    */
   appVersion: string
