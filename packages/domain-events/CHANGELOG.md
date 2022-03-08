@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.23.24](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.23...@standardnotes/domain-events@2.23.24) (2022-03-08)
+
+
+### Bug Fixes
+
+* add mute sign in emails setting uuid to sing in event payload ([b280a92](https://github.com/standardnotes/snjs/commit/b280a9213f7f4beaedcdce4300f742dd70d62d41))
+
+
+
+
+
 ## [2.23.23](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.22...@standardnotes/domain-events@2.23.23) (2022-03-07)
 
 **Note:** Version bump only for package @standardnotes/domain-events
