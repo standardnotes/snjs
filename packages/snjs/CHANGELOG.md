@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.77.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.76.3...@standardnotes/snjs@2.77.0) (2022-03-08)
+
+
+### Features
+
+* determine files host dynamically ([#637](https://github.com/standardnotes/snjs/issues/637)) ([8ae8d32](https://github.com/standardnotes/snjs/commit/8ae8d32a2469cc6b5b42bfc68ec63200d6bc49ed))
+
+
+
+
+
 ## [2.76.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.76.2...@standardnotes/snjs@2.76.3) (2022-03-08)
 
 **Note:** Version bump only for package @standardnotes/snjs
