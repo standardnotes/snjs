@@ -48,5 +48,4 @@ export const DeprecatedFeatures = [
 
 export const ExperimentalFeatures = [
   FeatureIdentifier.MarkdownVisualEditor,
-  FeatureIdentifier.AccountSwitcher,
 ]
