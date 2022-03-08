@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.34.3](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.2...@standardnotes/features@1.34.3) (2022-03-08)
+
+
+### Bug Fixes
+
+* remove AccountSwitcher from experimental features list ([#638](https://github.com/standardnotes/snjs/issues/638)) ([3b37107](https://github.com/standardnotes/snjs/commit/3b37107490d6daad17d0fcb89545bb252cd52732))
+
+
+
+
+
 ## [1.34.2](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.1...@standardnotes/features@1.34.2) (2022-03-07)
 
 
