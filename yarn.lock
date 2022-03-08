@@ -2725,10 +2725,10 @@
     crc32-stream "^3.0.0"
     minimatch "^3.0.3"
 
-"@standardnotes/dynamic-theme@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@standardnotes/dynamic-theme/-/dynamic-theme-1.0.3.tgz#90ca1d4e722d73428219303d9f87abd6998ec367"
-  integrity sha512-PUEdIf/DiM3zoRuCJMIZ2MGYhClmiXQT8pXklNF7WGOGu4GSFAoBEiYAGJypS6gnLneZM0HmDrr7vgwqvffdxQ==
+"@standardnotes/dynamic-theme@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@standardnotes/dynamic-theme/-/dynamic-theme-1.0.4.tgz#13bc6db9a5383333b9005f924c2e49a68b2a5e58"
+  integrity sha512-JUAFgO+IOoTpuUYTxgT/s9wMRPWJdVAuv16PmWBEPKeL2NH2rZ/Ndi3rHstwyqhketCJKJ3RIfKG/QOfAUjg1Q==
 
 "@standardnotes/filesafe-bar@standardnotes/filesafe-client":
   version "2.0.15"
