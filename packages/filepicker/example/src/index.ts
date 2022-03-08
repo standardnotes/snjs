@@ -23,7 +23,6 @@ localStorage.clear()
  */
 
 const host = 'http://localhost:3123'
-const filesHost = 'http://localhost:3125'
 const mocksHost = 'http://localhost:3124'
 
 const application = new SNApplication({
@@ -42,7 +41,6 @@ const application = new SNApplication({
   },
   identifier: `${Math.random()}`,
   defaultHost: host,
-  defaultFilesHost: filesHost,
   appVersion: '1.0.0',
   runtime: Runtime.Dev,
 })

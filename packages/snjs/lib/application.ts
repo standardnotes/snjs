@@ -239,7 +239,6 @@ export class SNApplication implements ListedInterface {
       'alertService',
       'identifier',
       'defaultHost',
-      'defaultFilesHost',
       'appVersion',
     ]
     for (const optionName of requiredOptions) {
@@ -340,7 +339,6 @@ export class SNApplication implements ListedInterface {
     }
     await this.handleStage(ApplicationStage.StorageDecrypted_09)
     await this.apiService.loadHost()
-    await this.apiService.loadFilesHost()
     await this.webSocketsService.loadWebSocketUrl()
     await this.sessionManager.initializeFromDisk()
     void this.historyManager.initializeFromDisk()
@@ -1025,14 +1023,6 @@ export class SNApplication implements ListedInterface {
 
   public getHost(): string | undefined {
     return this.apiService.getHost()
-  }
-
-  public async setFilesHost(filesHost: string): Promise<void> {
-    return this.apiService.setFilesHost(filesHost)
-  }
-
-  public getFilesHost(): string | undefined {
-    return this.apiService.getFilesHost()
   }
 
   public async setCustomHost(host: string): Promise<void> {
@@ -1863,7 +1853,6 @@ export class SNApplication implements ListedInterface {
       this.httpService,
       this.storageService,
       this.options.defaultHost,
-      this.options.defaultFilesHost,
       this.internalEventBus,
     )
     this.services.push(this.apiService)
