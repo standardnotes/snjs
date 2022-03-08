@@ -18,7 +18,7 @@
   "devDependencies": {
     "@standardnotes/autobiography-theme": "1.0.3",
     "@standardnotes/deterministic-zip": "^1.2.0",
-    "@standardnotes/dynamic-theme": "1.0.3",
+    "@standardnotes/dynamic-theme": "1.0.4",
     "@standardnotes/filesafe-bar": "standardnotes/filesafe-client",
     "@standardnotes/focus-theme": "1.2.7",
     "@standardnotes/futura-theme": "1.2.6",
