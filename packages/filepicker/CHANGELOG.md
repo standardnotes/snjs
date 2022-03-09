@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.4.0...@standardnotes/filepicker@1.5.0) (2022-03-09)
+
+
+### Features
+
+* add formatSizeToReadableString function ([#635](https://github.com/standardnotes/snjs/issues/635)) ([8688783](https://github.com/standardnotes/snjs/commit/8688783ac95073631e752cdb76011bca75a29794))
+
+
+
+
+
 # [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.3.0...@standardnotes/filepicker@1.4.0) (2022-03-08)
 
 
