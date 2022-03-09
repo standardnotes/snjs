@@ -1,6 +1,6 @@
 import { API_MESSAGE_RATE_LIMITED, UNKNOWN_ERROR } from './Messages'
 import { HttpResponse, StatusCode } from '@standardnotes/responses'
-import { isNullOrUndefined, isString } from '@standardnotes/utils'
+import { isString } from '@standardnotes/utils'
 import { SnjsVersion } from '@Lib/version'
 import { Environment } from '@Lib/platforms'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
@@ -165,9 +165,9 @@ export class SNHttpService extends AbstractService {
 
     const responseHeaderLines = request
       .getAllResponseHeaders()
-      .trim()
+      ?.trim()
       .split(/[\r\n]+/)
-    responseHeaderLines.forEach((responseHeaderLine) => {
+    responseHeaderLines?.forEach((responseHeaderLine) => {
       const parts = responseHeaderLine.split(': ')
       const name = parts.shift() as string
       const value = parts.join(': ')
@@ -213,9 +213,9 @@ export class SNHttpService extends AbstractService {
           message: API_MESSAGE_RATE_LIMITED,
           status: httpStatus,
         }
-      } else if (isNullOrUndefined(response.error)) {
-        if (isNullOrUndefined(response.data) || isNullOrUndefined(response.data.error)) {
-          response.error = { message: UNKNOWN_ERROR, status: httpStatus }
+      } else if (response.error == undefined) {
+        if (response.data == undefined || response.data.error == undefined) {
+          response.error = { message: request.responseText || UNKNOWN_ERROR, status: httpStatus }
         } else {
           response.error = response.data.error
         }
