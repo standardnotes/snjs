@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.5.0...@standardnotes/filepicker@1.6.0) (2022-03-09)
+
+
+### Features
+
+* allow passing file or filehandle to reader as param ([#641](https://github.com/standardnotes/snjs/issues/641)) ([48b63a2](https://github.com/standardnotes/snjs/commit/48b63a270d647dd864edbcc8316146b4a32a634e))
+
+
+
+
+
 # [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.4.0...@standardnotes/filepicker@1.5.0) (2022-03-09)
 
 
