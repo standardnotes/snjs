@@ -205,3 +205,5 @@ export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/setti
 export { Migration2_20_0 } from './migrations/2_20_0'
 export { Migration2_42_0 } from './migrations/2_42_0'
 export { Predicate, CompoundPredicate } from '@standardnotes/payloads'
+
+export { EncryptAndUploadFileOperation } from './services/Files/Operations/EncryptAndUpload'

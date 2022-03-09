@@ -1,6 +1,7 @@
 import { OnChunkCallback } from './types'
+
 export class ByteChunker {
-  public loggingEnabled = true
+  public loggingEnabled = false
   private bytes = new Uint8Array()
   private index = 1
 
