@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.4](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.3...@standardnotes/auth@3.17.4) (2022-03-09)
+
+
+### Bug Fixes
+
+* add deleting as a valid operation in valet token ([13a22d9](https://github.com/standardnotes/snjs/commit/13a22d9734f898d0cd2475fbe53a021be2c20a5f))
+
+
+
+
+
 ## [3.17.3](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.1...@standardnotes/auth@3.17.3) (2022-02-28)
 
 
