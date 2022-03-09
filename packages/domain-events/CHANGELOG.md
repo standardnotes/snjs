@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.24.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.26...@standardnotes/domain-events@2.24.0) (2022-03-09)
+
+
+### Features
+
+* add FILE_REMOVED event ([6f16103](https://github.com/standardnotes/snjs/commit/6f16103afa21015b29d5a325e5609c8bf96f14ff))
+
+
+
+
+
 ## [2.23.26](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.23.25...@standardnotes/domain-events@2.23.26) (2022-03-08)
 
 **Note:** Version bump only for package @standardnotes/domain-events
