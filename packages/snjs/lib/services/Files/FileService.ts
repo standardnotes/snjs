@@ -107,8 +107,6 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       throw new Error('Could not close upload session')
     }
 
-    console.log('Finished upload with sizes', operation.chunkSizes)
-
     const fileContent: FileContent = {
       chunkSizes: operation.chunkSizes,
       encryptionHeader: operation.getEncryptionHeader(),
