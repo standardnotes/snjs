@@ -22,7 +22,14 @@ export class ClassicFileReader {
     return 50 * 1_000_000
   }
 
-  selectFile(): Promise<File> {
+  selectFile(file?: File): Promise<File> {
+    if (file) {
+      return new Promise((resolve) => {
+        this.selectedFile = file
+        resolve(file)
+      })
+    }
+
     const input = document.createElement('input') as HTMLInputElement
     input.type = 'file'
     return new Promise((resolve) => {

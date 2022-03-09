@@ -26,11 +26,15 @@ export class StreamingFileReader {
     return window.showOpenFilePicker != undefined
   }
 
-  public async selectFile(): Promise<File> {
-    const selectedFilesHandles = await window.showOpenFilePicker()
-    const uploadHandle = selectedFilesHandles[0]
+  public async selectFile(fileHandle?: FileSystemFileHandle): Promise<File> {
+    if (fileHandle) {
+      this.selectedFile = await fileHandle.getFile()
+    } else {
+      const selectedFilesHandles = await window.showOpenFilePicker()
+      const uploadHandle = selectedFilesHandles[0]
 
-    this.selectedFile = await uploadHandle.getFile()
+      this.selectedFile = await uploadHandle.getFile()
+    }
 
     return this.selectedFile
   }
