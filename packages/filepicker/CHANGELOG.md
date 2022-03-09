@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.6.0...@standardnotes/filepicker@1.7.0) (2022-03-09)
+
+
+### Features
+
+* export file operation type ([#643](https://github.com/standardnotes/snjs/issues/643)) ([ff5f136](https://github.com/standardnotes/snjs/commit/ff5f136655a8089a47c7eaa04e1e13e58852c93f))
+
+
+
+
+
 # [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.5.0...@standardnotes/filepicker@1.6.0) (2022-03-09)
 
 

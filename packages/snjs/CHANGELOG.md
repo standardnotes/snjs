@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.78.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.77.6...@standardnotes/snjs@2.78.0) (2022-03-09)
+
+
+### Features
+
+* export file operation type ([#643](https://github.com/standardnotes/snjs/issues/643)) ([ff5f136](https://github.com/standardnotes/snjs/commit/ff5f136655a8089a47c7eaa04e1e13e58852c93f))
+
+
+
+
+
 ## [2.77.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.77.5...@standardnotes/snjs@2.77.6) (2022-03-09)
 
 **Note:** Version bump only for package @standardnotes/snjs
