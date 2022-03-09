@@ -65,6 +65,7 @@ export type IconType =
   | 'feedback'
   | 'file-filled'
   | 'file'
+  | 'files-illustration'
   | 'folder-filled'
   | 'folder-key-filled'
   | 'folder'
