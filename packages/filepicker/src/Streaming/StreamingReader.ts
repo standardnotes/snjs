@@ -60,7 +60,13 @@ async function readFile(
 
   await reader.read().then(processChunk)
 
-  return parseFileName(file.name)
+  const { name, ext } = parseFileName(file.name)
+
+  return {
+    name,
+    ext,
+    mimeType: file.type,
+  }
 }
 
 function available(): boolean {

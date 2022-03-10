@@ -643,7 +643,7 @@ describe('itemManager', () => {
       const renamedFile = await itemManager.renameFile(file, 'anotherName')
 
       expect(renamedFile.name).toBe('anotherName')
-      expect(renamedFile.ext).toBe(undefined)
+      expect(renamedFile.ext).toBe('')
       expect(renamedFile.nameWithExt).toBe('anotherName')
     })
   })

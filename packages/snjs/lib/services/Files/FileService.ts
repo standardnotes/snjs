@@ -2,7 +2,7 @@ import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
 import { DecryptedFileInterface } from './types'
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
-import { SNFile, FileProtocolV1, FileContent } from '../../models/app/file'
+import { SNFile, FileProtocolV1, FileContent, FileMetadata } from '../../models/app/file'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNAlertService } from '../AlertService'
 import { SNSyncService } from '../Sync/SyncService'
@@ -24,8 +24,7 @@ export interface FilesClientInterface {
 
   finishUpload(
     operation: EncryptAndUploadFileOperation,
-    fileName: string,
-    fileExt: string,
+    fileMetadata: FileMetadata,
   ): Promise<SNFile>
 
   downloadFile(file: SNFile, onDecryptedBytes: (bytes: Uint8Array) => void): Promise<void>
@@ -99,8 +98,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
 
   public async finishUpload(
     operation: EncryptAndUploadFileOperation,
-    fileName: string,
-    fileExt: string,
+    fileMetadata: FileMetadata,
   ): Promise<SNFile> {
     const uploadSessionClosed = await this.apiService.closeUploadSession(operation.getApiToken())
     if (!uploadSessionClosed) {
@@ -110,11 +108,12 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     const fileContent: FileContent = {
       chunkSizes: operation.chunkSizes,
       encryptionHeader: operation.getEncryptionHeader(),
-      ext: fileExt,
+      ext: fileMetadata.ext,
       key: operation.getKey(),
-      name: fileName,
+      name: fileMetadata.name,
       remoteIdentifier: operation.getRemoteIdentifier(),
       size: operation.getRawSize(),
+      mimeType: fileMetadata.mimeType,
     }
 
     const file = await this.itemManager.createItem<SNFile>(

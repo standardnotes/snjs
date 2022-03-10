@@ -14,36 +14,45 @@ export enum FileProtocolV1 {
   KeySize = 256,
 }
 
-export interface FileContent {
+export interface FileMetadata {
+  name: string
+  ext: string
+  mimeType: string
+}
+
+export interface FileContent extends FileMetadata {
   remoteIdentifier: string
   name: string
   key: string
-  ext?: string
+  ext: string
   size: number
   encryptionHeader: string
   chunkSizes: number[]
+  mimeType: string
 }
 
 type ExtendedFileContent = FileContent & PayloadContent
 
-export class SNFile extends SNItem implements ExtendedFileContent {
+export class SNFile extends SNItem implements ExtendedFileContent, FileMetadata {
   public readonly remoteIdentifier: string
   public readonly name: string
   public readonly key: string
-  public readonly ext?: string
+  public readonly ext: string
   public readonly size: number
   public readonly encryptionHeader: string
   public readonly chunkSizes: number[]
+  public readonly mimeType: string
 
   constructor(payload: PurePayload) {
     super(payload)
     this.remoteIdentifier = this.typedContent.remoteIdentifier
     this.name = this.typedContent.name
     this.key = this.typedContent.key
-    this.ext = this.typedContent.ext
+    this.ext = this.typedContent.ext || ''
     this.size = this.typedContent.size
     this.encryptionHeader = this.typedContent.encryptionHeader
     this.chunkSizes = this.typedContent.chunkSizes
+    this.mimeType = this.typedContent.mimeType
   }
 
   public get nameWithExt(): string {
