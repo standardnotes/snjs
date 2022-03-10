@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.34.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.6...@standardnotes/features@1.34.7) (2022-03-10)
+
+
+### Bug Fixes
+
+* **temp:** remove markdown visual ([4ba193b](https://github.com/standardnotes/snjs/commit/4ba193b6848c15a94bbdb0e61edb30fea6c02c18))
+
+
+
+
+
 ## [1.34.6](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.5...@standardnotes/features@1.34.6) (2022-03-10)
 
 
