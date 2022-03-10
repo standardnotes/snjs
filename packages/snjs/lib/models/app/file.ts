@@ -48,7 +48,7 @@ export class SNFile extends SNItem implements ExtendedFileContent, FileMetadata 
     this.remoteIdentifier = this.typedContent.remoteIdentifier
     this.name = this.typedContent.name
     this.key = this.typedContent.key
-    this.ext = this.typedContent.ext
+    this.ext = this.typedContent.ext || ''
     this.size = this.typedContent.size
     this.encryptionHeader = this.typedContent.encryptionHeader
     this.chunkSizes = this.typedContent.chunkSizes
