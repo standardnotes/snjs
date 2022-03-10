@@ -14,13 +14,7 @@ import { FeatureIdentifier } from './FeatureIdentifier'
 import { NoteType } from '../Component/NoteType'
 
 export function GetFeatures(): FeatureDescription[] {
-  return [
-    ...themes(),
-    ...editors(),
-    ...serverFeatures(),
-    ...clientFeatures(),
-    ...experimentalFeatures(),
-  ]
+  return [...themes(), ...editors(), ...serverFeatures(), ...clientFeatures()]
 }
 
 function githubDownloadUrl(repoUrl: string, version: string, identifier: FeatureIdentifier) {
@@ -408,25 +402,6 @@ function editors(): EditorFeatureDescription[] {
     tokenvault,
     spreadsheets,
   ]
-}
-
-function experimentalFeatures(): FeatureDescription[] {
-  const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
-    name: 'Markdown Visual (Beta)',
-    identifier: FeatureIdentifier.MarkdownVisualEditor,
-    version: '1.0.1',
-    note_type: NoteType.Markdown,
-    file_type: 'md',
-    permission_name: PermissionName.MarkdownVisualEditor,
-    spellcheckControl: true,
-    description: 'A WYSIWYG-style Markdown editor that renders Markdown in preview-mode while you type without displaying any syntax.',
-    git_repo_url: 'https://github.com/standardnotes/markdown-visual',
-    marketing_url: 'https://github.com/standardnotes/markdown-visual',
-    static_files: ['build'],
-    index_path: 'build/index.html',
-  })
-
-  return [markdownVisual]
 }
 
 function serverFeatures(): ServerFeatureDescription[] {
