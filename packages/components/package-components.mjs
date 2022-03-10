@@ -6,7 +6,6 @@ import {
   GetFeatures,
   GetDeprecatedFeatures,
 } from '../features/dist/Domain/Feature/Features.js';
-import { Runtime } from '../common/dist/Domain/DataType/Runtime.js';
 const SOURCE_FILES_PATH = '../../node_modules';
 import zip from '@standardnotes/deterministic-zip';
 
@@ -155,12 +154,12 @@ await (async () => {
   ensureDirExists(TmpZipDir);
 
   const featuresToProcess = specificFeatureIdentifier
-    ? [
-        GetFeatures(Runtime.Dev).find(
+  ? [
+    GetFeatures().find(
           (feature) => feature.identifier === specificFeatureIdentifier
         ),
       ]
-    : GetFeatures(Runtime.Dev).concat(GetDeprecatedFeatures());
+    : GetFeatures().concat(GetDeprecatedFeatures());
 
   let index = 0;
   for (const feature of featuresToProcess) {
