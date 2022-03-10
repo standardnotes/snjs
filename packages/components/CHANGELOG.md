@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.11](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.10...@standardnotes/components@1.7.11) (2022-03-10)
+
+
+### Bug Fixes
+
+* updated markdown visual ([6a2acb7](https://github.com/standardnotes/snjs/commit/6a2acb70961135394a30fe30d2c6f10f2204c1b9))
+
+
+
+
+
 ## [1.7.10](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.7.9...@standardnotes/components@1.7.10) (2022-03-08)
 
 **Note:** Version bump only for package @standardnotes/components
