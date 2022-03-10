@@ -850,7 +850,7 @@ export class SNApiService
     return response.data?.valetToken
   }
 
-  public async startUploadSession(apiToken: string): Promise<boolean> {
+  public async startUploadSession(apiToken: string): Promise<StartUploadSessionResponse> {
     const url = joinPaths(this.getFilesHost(), Paths.v1.startUploadSession)
 
     const response: HttpResponse | StartUploadSessionResponse = await this.request({
@@ -860,7 +860,7 @@ export class SNApiService
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_START_UPLOAD_SESSION,
     })
 
-    return (response as StartUploadSessionResponse).success
+    return response as StartUploadSessionResponse
   }
 
   public async uploadFileBytes(

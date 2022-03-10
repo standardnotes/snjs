@@ -137,6 +137,20 @@ describe('files', function () {
     expect(token.error).to.equal('expired-subscription');
   });
 
+  it.skip('creating two upload sessions successively should succeed', async function () {
+    await setup({ fakeCrypto: true, subscription: true });
+
+    const firstToken = await application.apiService.createFileValetToken( Factory.generateUuid(), 'write')
+    const firstSession = await application.apiService.startUploadSession(firstToken)
+
+    expect(firstSession.uploadId).to.be.ok;
+
+    const secondToken = await application.apiService.createFileValetToken( Factory.generateUuid(), 'write')
+    const secondSession = await application.apiService.startUploadSession(secondToken)
+
+    expect(secondSession.uploadId).to.be.ok;
+  });
+
   it('should encrypt and upload small file', async function () {
     await setup({ fakeCrypto: false, subscription: true });
 

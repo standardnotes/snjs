@@ -81,7 +81,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     uploadOperation.initializeHeader()
 
     const uploadSessionStarted = await this.apiService.startUploadSession(apiToken)
-    if (!uploadSessionStarted) {
+    if (!uploadSessionStarted.uploadId) {
       throw new Error('Could not start upload session')
     }
 
