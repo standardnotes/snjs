@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.80.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.5...@standardnotes/snjs@2.80.0) (2022-03-10)
+
+
+### Features
+
+* store file mimeType along with name & ext ([#648](https://github.com/standardnotes/snjs/issues/648)) ([05bf273](https://github.com/standardnotes/snjs/commit/05bf2737282f2d068e354c4d05fbe5390a19e613))
+
+
+
+
+
 ## [2.79.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.4...@standardnotes/snjs@2.79.5) (2022-03-10)
 
 **Note:** Version bump only for package @standardnotes/snjs
