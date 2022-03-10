@@ -7,4 +7,5 @@ export type OnChunkCallback = (
 export type FileSelectionResponse = {
   name: string
   ext: string
+  mimeType: string
 }

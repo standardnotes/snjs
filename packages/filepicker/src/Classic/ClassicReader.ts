@@ -51,5 +51,11 @@ async function readFile(
     await onChunk(chunk, chunkId++, isFinalChunk)
   }
 
-  return parseFileName(file.name)
+  const { name, ext } = parseFileName(file.name)
+
+  return {
+    name,
+    ext,
+    mimeType: file.type,
+  }
 }
