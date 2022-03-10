@@ -16,34 +16,29 @@ export class ClassicFileApi {
 
   async openFilePicker(): Promise<void> {
     let operation
-    const filePicker = new ClassicFileReader(
-      2_000_000,
-      async (chunk, index, isLast) => {
-        if (index === 1) {
-          operation = await this.application.files.beginNewFileUpload()
-        }
-        await this.application.files.pushBytesForUpload(
-          operation,
-          chunk,
-          index,
-          isLast,
-        )
-      },
-    )
-    filePicker.loggingEnabled = true
 
-    await filePicker.selectFile()
-    const fileResult = await filePicker.beginReadingFile()
+    const files = await ClassicFileReader.selectFiles()
+    for (const file of files) {
+      const fileResult = await ClassicFileReader.readFile(
+        file,
+        2_000_000,
+        async (chunk, index, isLast) => {
+          if (index === 1) {
+            operation = await this.application.files.beginNewFileUpload()
+          }
+          await this.application.files.pushBytesForUpload(operation, chunk, index, isLast)
+        },
+      )
+      const snFile = await this.application.files.finishUpload(
+        operation,
+        fileResult.name,
+        fileResult.ext,
+      )
 
-    const fileObj = await this.application.files.finishUpload(
-      operation,
-      fileResult.name,
-      fileResult.ext,
-    )
+      const bytes = await this.downloadFileBytes(snFile.remoteIdentifier)
 
-    const bytes = await this.downloadFileBytes(fileObj.remoteIdentifier)
-
-    new ClassicFileSaver().saveFile(`${fileObj.name}.${fileObj.ext}`, bytes)
+      new ClassicFileSaver().saveFile(`${snFile.name}.${snFile.ext}`, bytes)
+    }
   }
 
   downloadFileBytes = async (remoteIdentifier: string): Promise<Uint8Array> => {
@@ -54,13 +49,10 @@ export class ClassicFileApi {
 
     let receivedBytes = new Uint8Array()
 
-    await this.application.files.downloadFile(
-      file,
-      (decryptedBytes: Uint8Array) => {
-        console.log(`Downloaded ${decryptedBytes.length} bytes`)
-        receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
-      },
-    )
+    await this.application.files.downloadFile(file, (decryptedBytes: Uint8Array) => {
+      console.log(`Downloaded ${decryptedBytes.length} bytes`)
+      receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
+    })
 
     console.log('Successfully downloaded and decrypted file!')
 

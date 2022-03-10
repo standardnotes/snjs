@@ -1,8 +1,8 @@
 import { StreamingFileReader, StreamingFileSaver } from '../../../filepicker'
-import { SNApplication, ContentType, SNFile } from '../../../snjs'
+import { SNApplication, SNFile } from '../../../snjs'
 
 export class FileSystemApi {
-  private remoteIdentifier!: string
+  private uploadedFiles: SNFile[] = []
 
   constructor(private application: SNApplication) {
     this.configureFilePicker()
@@ -14,70 +14,60 @@ export class FileSystemApi {
   }
 
   configureDownloadButton(): void {
-    this.downloadButton.onclick = this.downloadFile
+    this.downloadButton.onclick = this.downloadFiles
     this.downloadButton.style.display = 'none'
   }
 
   configureFilePicker(): void {
-    const button = document.getElementById(
-      'fileSystemUploadButton',
-    ) as HTMLButtonElement
-    button.onclick = this.uploadFile
+    const button = document.getElementById('fileSystemUploadButton') as HTMLButtonElement
+    button.onclick = this.uploadFiles
     console.log('File picker ready.')
   }
 
-  uploadFile = async (): Promise<SNFile> => {
-    const operation = await this.application.files.beginNewFileUpload()
+  uploadFiles = async (): Promise<void> => {
+    const snFiles = []
+    const selectedFiles = await StreamingFileReader.selectFiles()
+    for (const file of selectedFiles) {
+      const operation = await this.application.files.beginNewFileUpload()
+      const fileResult = await StreamingFileReader.readFile(
+        file,
+        2_000_000,
+        async (chunk, index, isLast) => {
+          await this.application.files.pushBytesForUpload(operation, chunk, index, isLast)
+        },
+      )
 
-    const reader = new StreamingFileReader(
-      2_000_000,
-      async (chunk, index, isLast) => {
-        await this.application.files.pushBytesForUpload(
-          operation,
-          chunk,
-          index,
-          isLast,
-        )
-      },
-    )
-    reader.loggingEnabled = true
+      const snFile = await this.application.files.finishUpload(
+        operation,
+        fileResult.name,
+        fileResult.ext,
+      )
 
-    await reader.selectFile()
-    const fileResult = await reader.beginReadingFile()
+      snFiles.push(snFile)
+    }
 
-    const fileObj = await this.application.files.finishUpload(
-      operation,
-      fileResult.name,
-      fileResult.ext,
-    )
-
-    this.remoteIdentifier = fileObj.remoteIdentifier
     this.downloadButton.style.display = ''
 
-    return fileObj
+    this.uploadedFiles = snFiles
   }
 
-  downloadFile = async (): Promise<void> => {
-    console.log('Downloading file', this.remoteIdentifier)
+  downloadFiles = async (): Promise<void> => {
+    for (const snFile of this.uploadedFiles) {
+      console.log('Downloading file', snFile.remoteIdentifier)
 
-    const file = this.application
-      .getItems<SNFile>(ContentType.File)
-      .find((file) => file.remoteIdentifier === this.remoteIdentifier)
+      const saver = new StreamingFileSaver(snFile.nameWithExt)
+      await saver.selectFileToSaveTo()
+      saver.loggingEnabled = true
 
-    const saver = new StreamingFileSaver(file.nameWithExt)
-    await saver.selectFileToSaveTo()
-    saver.loggingEnabled = true
-
-    await this.application.files.downloadFile(
-      file,
-      async (decryptedBytes: Uint8Array) => {
+      await this.application.files.downloadFile(snFile, async (decryptedBytes: Uint8Array) => {
         console.log(`Pushing ${decryptedBytes.length} decrypted bytes to disk`)
         await saver.pushBytes(decryptedBytes)
-      },
-    )
-    console.log('Closing file saver reader')
-    await saver.finish()
+      })
 
-    console.log('Successfully downloaded and decrypted file!')
+      console.log('Closing file saver reader')
+      await saver.finish()
+
+      console.log('Successfully downloaded and decrypted file!')
+    }
   }
 }
