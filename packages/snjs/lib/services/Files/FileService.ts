@@ -2,7 +2,7 @@ import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
 import { DecryptedFileInterface } from './types'
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
-import { SNFile, FileProtocolV1, FileContent, FileMetadata } from '../../models/app/file'
+import { SNFile, FileProtocolV1Constants, FileContent, FileMetadata } from '../../models/app/file'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNAlertService } from '../AlertService'
 import { SNSyncService } from '../Sync/SyncService'
@@ -64,7 +64,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       throw new Error('Could not obtain files api valet token')
     }
 
-    const key = this.crypto.generateRandomKey(FileProtocolV1.KeySize)
+    const key = this.crypto.generateRandomKey(FileProtocolV1Constants.KeySize)
     const fileParams: DecryptedFileInterface = {
       key,
       remoteIdentifier,

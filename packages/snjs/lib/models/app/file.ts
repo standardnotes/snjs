@@ -1,6 +1,5 @@
 import { ContentType } from '@standardnotes/common'
 import { SNNote } from './note'
-import { SodiumConstant } from '@standardnotes/sncrypto-common'
 import { ItemMutator, SNItem } from '@Models/core/item'
 import {
   ContenteReferenceType,
@@ -9,9 +8,14 @@ import {
   FileToNoteReference,
 } from '@standardnotes/payloads'
 
-export enum FileProtocolV1 {
-  EncryptedChunkSizeDelta = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES,
+export enum FileProtocolV1Constants {
   KeySize = 256,
+}
+
+interface FileProtocolV1 {
+  readonly encryptionHeader: string
+  readonly key: string
+  readonly remoteIdentifier: string
 }
 
 export interface FileMetadata {
@@ -33,7 +37,7 @@ export interface FileContent extends FileMetadata {
 
 type ExtendedFileContent = FileContent & PayloadContent
 
-export class SNFile extends SNItem implements ExtendedFileContent, FileMetadata {
+export class SNFile extends SNItem implements ExtendedFileContent, FileProtocolV1, FileMetadata {
   public readonly remoteIdentifier: string
   public readonly name: string
   public readonly key: string
