@@ -35,9 +35,3 @@ export interface EncryptedFileInterface {
 export interface RemoteFileInterface {
   remoteIdentifier: string
 }
-
-export type FileMetadata = {
-  name: string
-  ext: string
-  mimeType: string
-}

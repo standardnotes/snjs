@@ -14,11 +14,17 @@ export enum FileProtocolV1 {
   KeySize = 256,
 }
 
-export interface FileContent {
+export interface FileMetadata {
+  name: string
+  ext: string
+  mimeType: string
+}
+
+export interface FileContent extends FileMetadata {
   remoteIdentifier: string
   name: string
   key: string
-  ext?: string
+  ext: string
   size: number
   encryptionHeader: string
   chunkSizes: number[]
@@ -27,11 +33,11 @@ export interface FileContent {
 
 type ExtendedFileContent = FileContent & PayloadContent
 
-export class SNFile extends SNItem implements ExtendedFileContent {
+export class SNFile extends SNItem implements ExtendedFileContent, FileMetadata {
   public readonly remoteIdentifier: string
   public readonly name: string
   public readonly key: string
-  public readonly ext?: string
+  public readonly ext: string
   public readonly size: number
   public readonly encryptionHeader: string
   public readonly chunkSizes: number[]
