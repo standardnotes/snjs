@@ -1,5 +1,7 @@
+import { StartUploadSessionResponse } from '@standardnotes/responses'
+
 export interface FilesApi {
-  startUploadSession(apiToken: string): Promise<boolean>
+  startUploadSession(apiToken: string): Promise<StartUploadSessionResponse>
 
   uploadFileBytes(apiToken: string, chunkId: number, encryptedBytes: Uint8Array): Promise<boolean>
 

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.4](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.3...@standardnotes/responses@1.3.4) (2022-03-09)
+
+
+### Bug Fixes
+
+* add missing legacy email field on key params data ([#642](https://github.com/standardnotes/snjs/issues/642)) ([fa43779](https://github.com/standardnotes/snjs/commit/fa4377979730c907c05dbddf68b5215282a19016))
+
+
+
+
+
+## [1.3.3](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.2...@standardnotes/responses@1.3.3) (2022-03-09)
+
+**Note:** Version bump only for package @standardnotes/responses
+
+
+
+
+
 ## [1.3.2](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.1...@standardnotes/responses@1.3.2) (2022-03-08)
 
 **Note:** Version bump only for package @standardnotes/responses

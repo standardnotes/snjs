@@ -1,4 +1,4 @@
-import { saveFile } from './utils'
+import { saveFile } from '../utils'
 
 export class ClassicFileSaver {
   public loggingEnabled = false

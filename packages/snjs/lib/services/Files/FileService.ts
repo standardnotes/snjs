@@ -81,7 +81,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     uploadOperation.initializeHeader()
 
     const uploadSessionStarted = await this.apiService.startUploadSession(apiToken)
-    if (!uploadSessionStarted) {
+    if (!uploadSessionStarted.uploadId) {
       throw new Error('Could not start upload session')
     }
 
@@ -106,8 +106,6 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     if (!uploadSessionClosed) {
       throw new Error('Could not close upload session')
     }
-
-    console.log('Finished upload with sizes', operation.chunkSizes)
 
     const fileContent: FileContent = {
       chunkSizes: operation.chunkSizes,

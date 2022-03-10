@@ -7,6 +7,7 @@ export type KeyParamsData = {
   version?: ProtocolVersion
   /** Legacy V002 */
   pw_salt?: string
+  email?: string
   /** Legacy V001 */
   pw_func?: string
   pw_alg?: string

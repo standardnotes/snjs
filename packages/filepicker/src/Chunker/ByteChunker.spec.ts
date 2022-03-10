@@ -1,4 +1,4 @@
-import { ByteChunker } from './byte_chunker'
+import { ByteChunker } from './ByteChunker'
 
 const chunkOfSize = (size: number) => {
   return new TextEncoder().encode('a'.repeat(size))
