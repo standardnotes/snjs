@@ -127,7 +127,7 @@ services:
       - snjs
 
   files:
-    image: standardnotes/files:1.5.4
+    image: standardnotes/files:1.6.1
     entrypoint: [
       "./wait-for.sh", "db", "3306",
       "./wait-for.sh", "cache", "6379",
