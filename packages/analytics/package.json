@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/analytics",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -26,8 +26,8 @@
   },
   "devDependencies": {
     "@standardnotes/config": "^2.2.2",
-    "@types/jest": "^27.4.1",
     "@types/ioredis": "^4.28.8",
+    "@types/jest": "^27.4.1",
     "ioredis": "^4.28.5",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.3",
