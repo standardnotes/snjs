@@ -7,4 +7,5 @@ export interface DailyVersionAdoptionReportGeneratedEventPayload {
     version: string,
     count: number
   }>
+  outOfSyncIncidents: number
 }
