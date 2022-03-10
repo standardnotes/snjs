@@ -419,7 +419,7 @@ function experimentalFeatures(): FeatureDescription[] {
     file_type: 'md',
     permission_name: PermissionName.MarkdownVisualEditor,
     spellcheckControl: true,
-    description: 'A lightweight WYSIWYG markdown editor, derivated from Milkdown editor.',
+    description: 'A WYSIWYG-style Markdown editor that renders Markdown in preview-mode while you type without displaying any syntax.',
     git_repo_url: 'https://github.com/standardnotes/markdown-visual',
     marketing_url: 'https://github.com/standardnotes/markdown-visual',
     static_files: ['build'],
