@@ -1,0 +1,39 @@
+{
+  "name": "@standardnotes/analytics",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=14.0.0 <17.0.0"
+  },
+  "description": "Analytics tools for Standard Notes projects",
+  "main": "dist/index.js",
+  "author": "Standard Notes",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "clean": "rm -fr dist",
+    "prestart": "yarn clean",
+    "start": "tsc -p tsconfig.json --watch",
+    "prebuild": "yarn clean",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --ext .ts",
+    "test:unit": "jest spec --coverage"
+  },
+  "devDependencies": {
+    "@standardnotes/config": "^2.2.2",
+    "@types/jest": "^27.4.1",
+    "@types/ioredis": "^4.28.8",
+    "ioredis": "^4.28.5",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.5.5"
+  },
+  "jest": {
+    "preset": "../../node_modules/@standardnotes/config/src/jest.json"
+  }
+}
