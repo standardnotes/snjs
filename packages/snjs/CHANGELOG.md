@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.79.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.78.0...@standardnotes/snjs@2.79.0) (2022-03-10)
+
+
+### Features
+
+* **filepicker:** multiple file selection ([#644](https://github.com/standardnotes/snjs/issues/644)) ([1bcdaf4](https://github.com/standardnotes/snjs/commit/1bcdaf4d2e05e1280ba8646683be71eebf95ee2d))
+
+
+
+
+
 # [2.78.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.77.6...@standardnotes/snjs@2.78.0) (2022-03-09)
 
 
