@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.79.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.0...@standardnotes/snjs@2.79.1) (2022-03-10)
+
+
+### Bug Fixes
+
+* consecutive uploads ([#645](https://github.com/standardnotes/snjs/issues/645)) ([8955789](https://github.com/standardnotes/snjs/commit/895578938333376673fca4193c4ab89ef420e043))
+
+
+
+
+
 # [2.79.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.78.0...@standardnotes/snjs@2.79.0) (2022-03-10)
 
 
