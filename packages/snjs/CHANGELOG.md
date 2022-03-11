@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.80.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.4...@standardnotes/snjs@2.80.5) (2022-03-11)
+
+
+### Bug Fixes
+
+* allow subscription state from any server ([326c05a](https://github.com/standardnotes/snjs/commit/326c05aa71fd4dfd5ca6789f2f8edff15121fd7d))
+
+
+
+
+
 ## [2.80.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.3...@standardnotes/snjs@2.80.4) (2022-03-11)
 
 
