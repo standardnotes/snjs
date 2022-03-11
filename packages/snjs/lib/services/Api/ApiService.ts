@@ -228,11 +228,6 @@ export class SNApiService
     return this.filesHost
   }
 
-  public isThirdPartyFilesHostUsed(): boolean {
-    const filesHost = this.getFilesHost() || ''
-    return !isUrlFirstParty(filesHost)
-  }
-
   public async setSession(session: Session, persist = true): Promise<void> {
     this.session = session
     if (persist) {

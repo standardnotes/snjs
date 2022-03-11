@@ -677,6 +677,7 @@ describe('featuresService', () => {
       ])
 
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
+      featuresService.hasOnlineSubscription = jest.fn().mockReturnValue(false)
       featuresService['completedSuccessfulFeaturesRetrieval'] = true
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
