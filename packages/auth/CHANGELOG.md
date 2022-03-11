@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.5](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.4...@standardnotes/auth@3.17.5) (2022-03-11)
+
+
+### Bug Fixes
+
+* add unencrypted file size to valet token resources ([06b0a4a](https://github.com/standardnotes/snjs/commit/06b0a4a998980048b3b9e0e146321de0c198f069))
+
+
+
+
+
 ## [3.17.4](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.3...@standardnotes/auth@3.17.4) (2022-03-09)
 
 
