@@ -108,7 +108,6 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     const fileContent: FileContent = {
       chunkSizes: operation.chunkSizes,
       encryptionHeader: operation.getEncryptionHeader(),
-      ext: fileMetadata.ext,
       key: operation.getKey(),
       name: fileMetadata.name,
       remoteIdentifier: operation.getRemoteIdentifier(),

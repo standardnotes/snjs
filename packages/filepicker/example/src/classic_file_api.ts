@@ -31,8 +31,7 @@ export class ClassicFileApi {
       )
       const snFile = await this.application.files.finishUpload(
         operation,
-        fileResult.name,
-        fileResult.ext,
+        fileResult,
       )
 
       const bytes = await this.downloadFileBytes(snFile.remoteIdentifier)

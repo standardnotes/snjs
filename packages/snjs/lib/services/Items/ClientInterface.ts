@@ -7,5 +7,5 @@ export interface ItemsClientInterface {
 
   getFilesForNote(note: SNNote): SNFile[]
 
-  renameFile(file: SNFile, name: string, ext: string): Promise<SNFile>
+  renameFile(file: SNFile, name: string): Promise<SNFile>
 }

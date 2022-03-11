@@ -89,9 +89,8 @@ export const isTagOrNote = (x: SNItem): x is SNNote | SNTag =>
  */
 export class ItemManager
   extends AbstractService
-  implements
-    ItemManagerInterface,
-    ItemsClientInterface {
+  implements ItemManagerInterface, ItemsClientInterface
+{
   private unsubChangeObserver: () => void
   private observers: Observer[] = []
   private collection!: ItemCollection
@@ -1228,10 +1227,9 @@ export class ItemManager
     ) as SNFile[]
   }
 
-  public renameFile(file: SNFile, name: string, ext?: string): Promise<SNFile> {
+  public renameFile(file: SNFile, name: string): Promise<SNFile> {
     return this.changeItem<FileMutator, SNFile>(file.uuid, (mutator) => {
       mutator.name = name
-      mutator.ext = ext
     })
   }
 }
