@@ -1,11 +1,6 @@
 import { MinimalHttpResponse } from '../Http/MinimalHttpResponses'
+import { CreateValetTokenResponseData } from './CreateValetTokenResponseData'
 
 export type CreateValetTokenResponse = MinimalHttpResponse & {
-  data?: {
-    success: true
-    valetToken: string
-  } | {
-    success: false
-    reason: 'no-subscription' | 'expired-subscription'
-  }
+  data: CreateValetTokenResponseData
 }
