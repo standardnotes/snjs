@@ -414,7 +414,7 @@ function experimentalFeatures(): FeatureDescription[] {
   const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Visual (Beta)',
     identifier: FeatureIdentifier.MarkdownVisualEditor,
-    version: '1.0.2',
+    version: '1.0.4',
     note_type: NoteType.Markdown,
     file_type: 'md',
     permission_name: PermissionName.MarkdownVisualEditor,
