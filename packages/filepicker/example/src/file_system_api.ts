@@ -39,8 +39,7 @@ export class FileSystemApi {
 
       const snFile = await this.application.files.finishUpload(
         operation,
-        fileResult.name,
-        fileResult.ext,
+        fileResult,
       )
 
       snFiles.push(snFile)
@@ -55,7 +54,7 @@ export class FileSystemApi {
     for (const snFile of this.uploadedFiles) {
       console.log('Downloading file', snFile.remoteIdentifier)
 
-      const saver = new StreamingFileSaver(snFile.nameWithExt)
+      const saver = new StreamingFileSaver(snFile.name)
       await saver.selectFileToSaveTo()
       saver.loggingEnabled = true
 

@@ -1,5 +1,5 @@
 import { OnChunkCallback, FileSelectionResponse } from '../types'
-import { readFile as utilsReadFile, parseFileName } from '../utils'
+import { readFile as utilsReadFile } from '../utils'
 import { FileReaderInterface } from '../Interface/FileReader'
 
 export const ClassicFileReader: FileReaderInterface = {
@@ -51,11 +51,8 @@ async function readFile(
     await onChunk(chunk, chunkId++, isFinalChunk)
   }
 
-  const { name, ext } = parseFileName(file.name)
-
   return {
-    name,
-    ext,
+    name: file.name,
     mimeType: file.type,
   }
 }
