@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.82.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.81.1...@standardnotes/snjs@2.82.0) (2022-03-13)
+
+
+### Features
+
+* add utility to get icon type for file mime type ([#652](https://github.com/standardnotes/snjs/issues/652)) ([2cf00de](https://github.com/standardnotes/snjs/commit/2cf00ded8594c7aa86015a340026f0a05613cc91))
+
+
+
+
+
 ## [2.81.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.81.0...@standardnotes/snjs@2.81.1) (2022-03-11)
 
 **Note:** Version bump only for package @standardnotes/snjs
