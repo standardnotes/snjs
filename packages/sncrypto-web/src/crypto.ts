@@ -142,14 +142,14 @@ export class SNWebCrypto implements SNPureCrypto {
     message: Utf8String,
     key: HexString,
   ): Promise<HexString | null> {
-    const keyHexData = await Utils.hexStringToArrayBuffer(key)
+    const keyHexData = Utils.hexStringToArrayBuffer(key)
     const keyData = await this.webCryptoImportKey(
       keyHexData,
       WebCryptoAlgs.Hmac,
       [WebCryptoActions.Sign],
       { name: WebCryptoAlgs.Sha256 },
     )
-    const messageData = await Utils.stringToArrayBuffer(message)
+    const messageData = Utils.stringToArrayBuffer(message)
     const funcParams = { name: WebCryptoAlgs.Hmac }
 
     try {
