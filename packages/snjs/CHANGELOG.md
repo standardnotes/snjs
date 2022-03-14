@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.83.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.82.0...@standardnotes/snjs@2.83.0) (2022-03-14)
+
+
+### Features
+
+* move vault into applications package ([#653](https://github.com/standardnotes/snjs/issues/653)) ([3d320eb](https://github.com/standardnotes/snjs/commit/3d320eb51ac74729ab8864f1c4c4f24d8fb794d5))
+
+
+
+
+
 # [2.82.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.81.1...@standardnotes/snjs@2.82.0) (2022-03-13)
 
 
