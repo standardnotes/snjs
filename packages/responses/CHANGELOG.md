@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.10](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.9...@standardnotes/responses@1.3.10) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/responses
+
+
+
+
+
+## [1.3.9](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.8...@standardnotes/responses@1.3.9) (2022-03-11)
+
+
+### Bug Fixes
+
+* add invalid parameters to create valet token response data ([#649](https://github.com/standardnotes/snjs/issues/649)) ([6156f56](https://github.com/standardnotes/snjs/commit/6156f5637abc6f54fa062123ec54ea0c01ce4520))
+
+
+
+
+
+## [1.3.8](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.7...@standardnotes/responses@1.3.8) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/responses
+
+
+
+
+
+## [1.3.7](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.6...@standardnotes/responses@1.3.7) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/responses
+
+
+
+
+
+## [1.3.6](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.5...@standardnotes/responses@1.3.6) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/responses
+
+
+
+
+
+## [1.3.5](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.4...@standardnotes/responses@1.3.5) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/responses
+
+
+
+
+
 ## [1.3.4](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.3...@standardnotes/responses@1.3.4) (2022-03-09)
 
 

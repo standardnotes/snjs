@@ -38,6 +38,7 @@ COPY --chown=$UID:$GID packages/services/package.json /var/www/packages/services
 COPY --chown=$UID:$GID packages/payloads/package.json /var/www/packages/payloads/package.json
 COPY --chown=$UID:$GID packages/applications/package.json /var/www/packages/applications/package.json
 COPY --chown=$UID:$GID packages/responses/package.json /var/www/packages/responses/package.json
+COPY --chown=$UID:$GID packages/analytics/package.json /var/www/packages/analytics/package.json
 
 RUN yarn install --pure-lockfile
 

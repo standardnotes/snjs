@@ -3,6 +3,139 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.82.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.81.1...@standardnotes/snjs@2.82.0) (2022-03-13)
+
+
+### Features
+
+* add utility to get icon type for file mime type ([#652](https://github.com/standardnotes/snjs/issues/652)) ([2cf00de](https://github.com/standardnotes/snjs/commit/2cf00ded8594c7aa86015a340026f0a05613cc91))
+
+
+
+
+
+## [2.81.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.81.0...@standardnotes/snjs@2.81.1) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.81.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.5...@standardnotes/snjs@2.81.0) (2022-03-11)
+
+
+### Features
+
+* remove ext property from files in favor of mimetype ([#650](https://github.com/standardnotes/snjs/issues/650)) ([d2e7e23](https://github.com/standardnotes/snjs/commit/d2e7e23ec117c505f2f38b9edea539ad3a6d70e2))
+
+
+
+
+
+## [2.80.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.4...@standardnotes/snjs@2.80.5) (2022-03-11)
+
+
+### Bug Fixes
+
+* allow subscription state from any server ([326c05a](https://github.com/standardnotes/snjs/commit/326c05aa71fd4dfd5ca6789f2f8edff15121fd7d))
+
+
+
+
+
+## [2.80.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.3...@standardnotes/snjs@2.80.4) (2022-03-11)
+
+
+### Bug Fixes
+
+* valet token request params ([8c9a396](https://github.com/standardnotes/snjs/commit/8c9a396fa5650815156941dff95e9ae736a8354d))
+
+
+
+
+
+## [2.80.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.2...@standardnotes/snjs@2.80.3) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.80.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.1...@standardnotes/snjs@2.80.2) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.80.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.80.0...@standardnotes/snjs@2.80.1) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.80.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.5...@standardnotes/snjs@2.80.0) (2022-03-10)
+
+
+### Features
+
+* store file mimeType along with name & ext ([#648](https://github.com/standardnotes/snjs/issues/648)) ([05bf273](https://github.com/standardnotes/snjs/commit/05bf2737282f2d068e354c4d05fbe5390a19e613))
+
+
+
+
+
+## [2.79.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.4...@standardnotes/snjs@2.79.5) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.79.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.3...@standardnotes/snjs@2.79.4) (2022-03-10)
+
+
+### Bug Fixes
+
+* **temp:** remove markdown visual ([4ba193b](https://github.com/standardnotes/snjs/commit/4ba193b6848c15a94bbdb0e61edb30fea6c02c18))
+
+
+
+
+
+## [2.79.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.2...@standardnotes/snjs@2.79.3) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.79.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.1...@standardnotes/snjs@2.79.2) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.79.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.79.0...@standardnotes/snjs@2.79.1) (2022-03-10)
+
+
+### Bug Fixes
+
+* consecutive uploads ([#645](https://github.com/standardnotes/snjs/issues/645)) ([8955789](https://github.com/standardnotes/snjs/commit/895578938333376673fca4193c4ab89ef420e043))
+
+
+
+
+
 # [2.79.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.78.0...@standardnotes/snjs@2.79.0) (2022-03-10)
 
 

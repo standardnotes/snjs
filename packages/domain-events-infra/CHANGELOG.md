@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.71](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.70...@standardnotes/domain-events-infra@1.4.71) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/domain-events-infra
+
+
+
+
+
+## [1.4.70](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.69...@standardnotes/domain-events-infra@1.4.70) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/domain-events-infra
+
+
+
+
+
+## [1.4.69](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.68...@standardnotes/domain-events-infra@1.4.69) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events-infra
+
+
+
+
+
+## [1.4.68](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.67...@standardnotes/domain-events-infra@1.4.68) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events-infra
+
+
+
+
+
+## [1.4.67](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.66...@standardnotes/domain-events-infra@1.4.67) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events-infra
+
+
+
+
+
+## [1.4.66](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.65...@standardnotes/domain-events-infra@1.4.66) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events-infra
+
+
+
+
+
 ## [1.4.65](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.64...@standardnotes/domain-events-infra@1.4.65) (2022-03-09)
 
 **Note:** Version bump only for package @standardnotes/domain-events-infra

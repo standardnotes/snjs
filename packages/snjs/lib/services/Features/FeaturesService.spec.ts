@@ -135,18 +135,21 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(GetFeatures())
 
       const featuresService = createService()
+      featuresService.getExperimentalFeatures = jest
+        .fn()
+        .mockReturnValue([FeatureIdentifier.BoldEditor])
       await featuresService.initializeFromDisk()
 
-      featuresService.enableExperimentalFeature(FeatureIdentifier.MarkdownVisualEditor)
+      featuresService.enableExperimentalFeature(FeatureIdentifier.BoldEditor)
 
       expect(
-        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.MarkdownVisualEditor),
+        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor),
       ).toEqual(true)
 
-      featuresService.disableExperimentalFeature(FeatureIdentifier.MarkdownVisualEditor)
+      featuresService.disableExperimentalFeature(FeatureIdentifier.BoldEditor)
 
       expect(
-        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.MarkdownVisualEditor),
+        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor),
       ).toEqual(false)
     })
 
@@ -674,6 +677,7 @@ describe('featuresService', () => {
       ])
 
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
+      featuresService.hasOnlineSubscription = jest.fn().mockReturnValue(false)
       featuresService['completedSuccessfulFeaturesRetrieval'] = true
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(

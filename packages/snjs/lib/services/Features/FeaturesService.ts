@@ -17,7 +17,7 @@ import {
   FindNativeFeature,
   DeprecatedFeatures,
   ComponentContent,
-  ExperimentalFeatures
+  ExperimentalFeatures,
 } from '@standardnotes/features'
 import { ContentType, ErrorObject, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
@@ -51,15 +51,19 @@ import {
   OfflineSubscriptionEntitlements,
   SetOfflineFeaturesFunctionResponse,
 } from './Types'
-import { AbstractService, InternalEventBusInterface, InternalEventHandlerInterface, InternalEventInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  InternalEventHandlerInterface,
+  InternalEventInterface,
+} from '@standardnotes/services'
 
 type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject
 
 export class SNFeaturesService
   extends AbstractService<FeaturesEvent>
-  implements
-    FeaturesClientInterface,
-    InternalEventHandlerInterface {
+  implements FeaturesClientInterface, InternalEventHandlerInterface
+{
   private deinited = false
   private roles: RoleName[] = []
   private features: FeatureDescription[] = []
@@ -133,7 +137,10 @@ export class SNFeaturesService
   async handleEvent(event: InternalEventInterface): Promise<void> {
     if (event.type === ApiServiceEvent.MetaReceived) {
       if (!this.syncService) {
-        this.log('[Features Service] Handling events interrupted. Sync service is not yet initialized.', event)
+        this.log(
+          '[Features Service] Handling events interrupted. Sync service is not yet initialized.',
+          event,
+        )
 
         return
       }
@@ -432,14 +439,10 @@ export class SNFeaturesService
     return this.features.find((feature) => feature.identifier === featureId)
   }
 
-  private hasOnlineSubscription(): boolean {
-    if (this.sessionManager.isSignedIntoFirstPartyServer()) {
-      const roles = this.roles
-      const unpaidRoles = [RoleName.BasicUser]
-      return roles.some((role) => !unpaidRoles.includes(role))
-    } else {
-      return false
-    }
+  hasOnlineSubscription(): boolean {
+    const roles = this.roles
+    const unpaidRoles = [RoleName.BasicUser]
+    return roles.some((role) => !unpaidRoles.includes(role))
   }
 
   public hasPaidOnlineOrOfflineSubscription(): boolean {

@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.9](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.8...@standardnotes/payloads@1.4.9) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/payloads
+
+
+
+
+
+## [1.4.8](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.7...@standardnotes/payloads@1.4.8) (2022-03-11)
+
+
+### Bug Fixes
+
+* add unencrypted file size to valet token resources ([06b0a4a](https://github.com/standardnotes/snjs/commit/06b0a4a998980048b3b9e0e146321de0c198f069))
+
+
+
+
+
+## [1.4.7](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.6...@standardnotes/payloads@1.4.7) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/payloads
+
+
+
+
+
+## [1.4.6](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.5...@standardnotes/payloads@1.4.6) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/payloads
+
+
+
+
+
+## [1.4.5](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.4...@standardnotes/payloads@1.4.5) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/payloads
+
+
+
+
+
 ## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.3...@standardnotes/payloads@1.4.4) (2022-03-09)
 
 **Note:** Version bump only for package @standardnotes/payloads

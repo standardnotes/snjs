@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.24.7](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.6...@standardnotes/domain-events@2.24.7) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.24.6](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.5...@standardnotes/domain-events@2.24.6) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.24.5](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.4...@standardnotes/domain-events@2.24.5) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.24.4](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.3...@standardnotes/domain-events@2.24.4) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.24.3](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.2...@standardnotes/domain-events@2.24.3) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
+## [2.24.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.1...@standardnotes/domain-events@2.24.2) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
 ## [2.24.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.0...@standardnotes/domain-events@2.24.1) (2022-03-09)
 
 **Note:** Version bump only for package @standardnotes/domain-events

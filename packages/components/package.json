@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/components",
-  "version": "1.7.10",
+  "version": "1.7.12",
   "main": "index.js",
   "author": "Standard Notes",
   "files": [
@@ -22,7 +22,7 @@
     "@standardnotes/filesafe-bar": "standardnotes/filesafe-client",
     "@standardnotes/focus-theme": "1.2.7",
     "@standardnotes/futura-theme": "1.2.6",
-    "@standardnotes/markdown-visual": "1.0.1",
+    "@standardnotes/markdown-visual": "1.0.4",
     "@standardnotes/midnight-theme": "1.2.6",
     "@standardnotes/solarized-dark-theme": "1.2.5",
     "@standardnotes/titanium-theme": "1.2.6",

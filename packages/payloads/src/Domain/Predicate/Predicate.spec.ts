@@ -3,16 +3,16 @@
 import { ItemInterface } from './../Item/ItemInterface'
 import { ContentType } from '@standardnotes/common'
 import {
-  CompoundPredicate,
-  NotPredicate,
-  IncludesPredicate,
-  Predicate,
   compoundPredicateFromArguments,
   includesPredicateFromArguments,
   notPredicateFromArguments,
   predicateFromArguments,
   predicateFromDSLString,
-} from '.'
+} from './Generators'
+import { IncludesPredicate } from './IncludesPredicate'
+import { Predicate } from './Predicate'
+import { CompoundPredicate } from './CompoundPredicate'
+import { NotPredicate } from './NotPredicate'
 
 interface Item extends ItemInterface {
   content_type: ContentType

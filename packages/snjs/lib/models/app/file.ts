@@ -1,6 +1,5 @@
 import { ContentType } from '@standardnotes/common'
 import { SNNote } from './note'
-import { SodiumConstant } from '@standardnotes/sncrypto-common'
 import { ItemMutator, SNItem } from '@Models/core/item'
 import {
   ContenteReferenceType,
@@ -9,45 +8,51 @@ import {
   FileToNoteReference,
 } from '@standardnotes/payloads'
 
-export enum FileProtocolV1 {
-  EncryptedChunkSizeDelta = SodiumConstant.CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES,
+export enum FileProtocolV1Constants {
   KeySize = 256,
 }
 
-export interface FileContent {
+interface FileProtocolV1 {
+  readonly encryptionHeader: string
+  readonly key: string
+  readonly remoteIdentifier: string
+}
+
+export interface FileMetadata {
+  name: string
+  mimeType: string
+}
+
+export interface FileContent extends FileMetadata {
   remoteIdentifier: string
   name: string
   key: string
-  ext?: string
   size: number
   encryptionHeader: string
   chunkSizes: number[]
+  mimeType: string
 }
 
 type ExtendedFileContent = FileContent & PayloadContent
 
-export class SNFile extends SNItem implements ExtendedFileContent {
+export class SNFile extends SNItem implements ExtendedFileContent, FileProtocolV1, FileMetadata {
   public readonly remoteIdentifier: string
   public readonly name: string
   public readonly key: string
-  public readonly ext?: string
   public readonly size: number
   public readonly encryptionHeader: string
   public readonly chunkSizes: number[]
+  public readonly mimeType: string
 
   constructor(payload: PurePayload) {
     super(payload)
     this.remoteIdentifier = this.typedContent.remoteIdentifier
     this.name = this.typedContent.name
     this.key = this.typedContent.key
-    this.ext = this.typedContent.ext
     this.size = this.typedContent.size
     this.encryptionHeader = this.typedContent.encryptionHeader
     this.chunkSizes = this.typedContent.chunkSizes
-  }
-
-  public get nameWithExt(): string {
-    return `${this.name}${this.ext && this.ext.length > 0 ? `.${this.ext}` : ''}`
+    this.mimeType = this.typedContent.mimeType
   }
 
   private get typedContent(): FileContent {
@@ -62,10 +67,6 @@ export class FileMutator extends ItemMutator {
 
   set name(newName: string) {
     this.typedContent.name = newName
-  }
-
-  set ext(newExt: string | undefined) {
-    this.typedContent.ext = newExt
   }
 
   set encryptionHeader(encryptionHeader: string) {

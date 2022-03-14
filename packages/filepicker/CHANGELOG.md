@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.9.0...@standardnotes/filepicker@1.10.0) (2022-03-11)
+
+
+### Features
+
+* remove ext property from files in favor of mimetype ([#650](https://github.com/standardnotes/snjs/issues/650)) ([d2e7e23](https://github.com/standardnotes/snjs/commit/d2e7e23ec117c505f2f38b9edea539ad3a6d70e2))
+
+
+
+
+
+# [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.8.0...@standardnotes/filepicker@1.9.0) (2022-03-10)
+
+
+### Features
+
+* store file mimeType along with name & ext ([#648](https://github.com/standardnotes/snjs/issues/648)) ([05bf273](https://github.com/standardnotes/snjs/commit/05bf2737282f2d068e354c4d05fbe5390a19e613))
+
+
+
+
+
 # [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.7.0...@standardnotes/filepicker@1.8.0) (2022-03-10)
 
 

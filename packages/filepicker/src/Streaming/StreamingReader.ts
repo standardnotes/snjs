@@ -1,6 +1,5 @@
 import { FileReaderInterface } from './../Interface/FileReader'
 import { ByteChunker } from '../Chunker/ByteChunker'
-import { parseFileName } from '../utils'
 import { OnChunkCallback, FileSelectionResponse } from '../types'
 
 interface StreamingFileReaderInterface {
@@ -60,7 +59,10 @@ async function readFile(
 
   await reader.read().then(processChunk)
 
-  return parseFileName(file.name)
+  return {
+    name: file.name,
+    mimeType: file.type,
+  }
 }
 
 function available(): boolean {

@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.34.10](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.9...@standardnotes/features@1.34.10) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.34.9](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.8...@standardnotes/features@1.34.9) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/features
+
+
+
+
+
+## [1.34.8](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.7...@standardnotes/features@1.34.8) (2022-03-10)
+
+
+### Bug Fixes
+
+* updated markdown visual ([6a2acb7](https://github.com/standardnotes/snjs/commit/6a2acb70961135394a30fe30d2c6f10f2204c1b9))
+
+
+
+
+
+## [1.34.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.6...@standardnotes/features@1.34.7) (2022-03-10)
+
+
+### Bug Fixes
+
+* **temp:** remove markdown visual ([4ba193b](https://github.com/standardnotes/snjs/commit/4ba193b6848c15a94bbdb0e61edb30fea6c02c18))
+
+
+
+
+
+## [1.34.6](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.5...@standardnotes/features@1.34.6) (2022-03-10)
+
+
+### Bug Fixes
+
+* feature description ([d8a020d](https://github.com/standardnotes/snjs/commit/d8a020d85cae94490cb40be41c041939ec8f0031))
+
+
+
+
+
 ## [1.34.5](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.34.4...@standardnotes/features@1.34.5) (2022-03-09)
 
 **Note:** Version bump only for package @standardnotes/features

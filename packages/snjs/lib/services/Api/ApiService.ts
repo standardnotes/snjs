@@ -39,7 +39,12 @@ import {
 } from '@standardnotes/responses'
 import { Session, TokenSession } from './Session'
 import { ErrorObject, Uuid } from '@standardnotes/common'
-import { ApiEndpointParam, IntegrityPayload, PurePayload } from '@standardnotes/payloads'
+import {
+  ApiEndpointParam,
+  CreateValetTokenPayload,
+  IntegrityPayload,
+  PurePayload,
+} from '@standardnotes/payloads'
 import { SNRootKeyParams } from '../../protocol/key_params'
 import { SNStorageService } from '../StorageService'
 import { ErrorTag, HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
@@ -221,11 +226,6 @@ export class SNApiService
       throw Error('Attempting to access undefined filesHost')
     }
     return this.filesHost
-  }
-
-  public isThirdPartyFilesHostUsed(): boolean {
-    const filesHost = this.getFilesHost() || ''
-    return !isUrlFirstParty(filesHost)
   }
 
   public async setSession(session: Session, persist = true): Promise<void> {
@@ -827,11 +827,12 @@ export class SNApiService
   public async createFileValetToken(
     remoteIdentifier: string,
     operation: 'write' | 'read',
+    unencryptedFileSize?: number,
   ): Promise<string | ErrorObject> {
     const url = joinPaths(this.host, Paths.v1.createFileValetToken)
-    const params = {
+    const params: CreateValetTokenPayload = {
       operation,
-      resources: [remoteIdentifier],
+      resources: [{ remoteIdentifier, unencryptedFileSize: unencryptedFileSize || 1 }],
     }
     const response = await this.tokenRefreshableRequest<CreateValetTokenResponse>({
       verb: HttpVerb.Post,

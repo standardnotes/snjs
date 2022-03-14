@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.12](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.5.11...@standardnotes/services@1.5.12) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/services
+
+
+
+
+
+## [1.5.11](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.5.10...@standardnotes/services@1.5.11) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/services
+
+
+
+
+
+## [1.5.10](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.5.9...@standardnotes/services@1.5.10) (2022-03-11)
+
+**Note:** Version bump only for package @standardnotes/services
+
+
+
+
+
+## [1.5.9](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.5.8...@standardnotes/services@1.5.9) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/services
+
+
+
+
+
+## [1.5.8](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.5.7...@standardnotes/services@1.5.8) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/services
+
+
+
+
+
+## [1.5.7](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.5.6...@standardnotes/services@1.5.7) (2022-03-10)
+
+**Note:** Version bump only for package @standardnotes/services
+
+
+
+
+
 ## [1.5.6](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.5.5...@standardnotes/services@1.5.6) (2022-03-09)
 
 **Note:** Version bump only for package @standardnotes/services

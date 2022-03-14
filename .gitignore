@@ -26,6 +26,7 @@ packages/services/dist
 packages/payloads/dist
 packages/applications/dist
 packages/responses/dist
+packages/analytics/dist
 
 yarn-error.log
 package-lock.json
