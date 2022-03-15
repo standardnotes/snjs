@@ -241,47 +241,57 @@ export class SNProtectionService
       return true
     }
 
-    return this.validateOrRenewSession(ChallengeReason.AccessProtectedNote)
+    return this.authorizeAction(ChallengeReason.AccessProtectedNote)
   }
 
   authorizeAddingPasscode(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.AddPasscode)
+    return this.authorizeAction(ChallengeReason.AddPasscode)
   }
 
   authorizeChangingPasscode(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.ChangePasscode)
+    return this.authorizeAction(ChallengeReason.ChangePasscode)
   }
 
   authorizeRemovingPasscode(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.RemovePasscode)
+    return this.authorizeAction(ChallengeReason.RemovePasscode)
   }
 
   authorizeSearchingProtectedNotesText(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.SearchProtectedNotesText)
+    return this.authorizeAction(ChallengeReason.SearchProtectedNotesText)
   }
 
   authorizeFileImport(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.ImportFile)
+    return this.authorizeAction(ChallengeReason.ImportFile)
   }
 
   async authorizeBackupCreation(encrypted: boolean): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.ExportBackup, {
+    return this.authorizeAction(ChallengeReason.ExportBackup, {
       fallBackToAccountPassword: encrypted,
     })
   }
 
   async authorizeMfaDisable(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.DisableMfa, {
+    return this.authorizeAction(ChallengeReason.DisableMfa, {
       requireAccountPassword: true,
     })
   }
 
   async authorizeAutolockIntervalChange(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.ChangeAutolockInterval)
+    return this.authorizeAction(ChallengeReason.ChangeAutolockInterval)
   }
 
   async authorizeSessionRevoking(): Promise<boolean> {
-    return this.validateOrRenewSession(ChallengeReason.RevokeSession)
+    return this.authorizeAction(ChallengeReason.RevokeSession)
+  }
+
+  async authorizeAction(
+    reason: ChallengeReason,
+    { fallBackToAccountPassword = true, requireAccountPassword = false } = {},
+  ): Promise<boolean> {
+    return this.validateOrRenewSession(reason, {
+      requireAccountPassword,
+      fallBackToAccountPassword,
+    })
   }
 
   private async validateOrRenewSession(

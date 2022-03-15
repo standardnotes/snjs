@@ -591,4 +591,53 @@ describe('basic auth', () => {
       expect(result).to.be.false;
     }).timeout(Factory.TenSecondTimeout);
   });
+
+  describe.skip('account deletion', async function () {
+    it('should delete account', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      Factory.handlePasswordChallenges(this.application, this.password);
+      const response = await this.application.user.deleteAccount();
+    }).timeout(Factory.TenSecondTimeout);
+
+    it('should prompt for account password when deleting account', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      Factory.handlePasswordChallenges(this.application, this.password);
+
+      const response = await this.application.deleteAccount();
+
+      sinon.spy(snApp.challengeService, 'sendChallenge');
+      const spyCall = snApp.challengeService.sendChallenge.getCall(0);
+      const challenge = spyCall.firstArg;
+      expect(challenge.prompts).to.have.lengthOf(2);
+      expect(challenge.prompts[0].validation).to.equal(
+        ChallengeValidation.AccountPassword
+      );
+      // ...
+    }).timeout(Factory.TenSecondTimeout);
+
+    it('deleting account should sign out current user', async function () {
+      await Factory.registerUserToApplication({
+        application: this.application,
+        email: this.email,
+        password: this.password,
+      });
+
+      Factory.handlePasswordChallenges(this.application, this.password);
+
+      const response = await this.application.deleteAccount();
+
+      expect(application.hasAccount()).to.be.false;
+    }).timeout(Factory.TenSecondTimeout);
+
+  });
 });

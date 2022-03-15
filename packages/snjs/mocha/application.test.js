@@ -101,7 +101,7 @@ describe('application instances', () => {
     const identifier = 'app';
     const app = await Factory.createAndInitializeApplication(identifier);
     expect(localStorage.getItem(`${identifier}-snjs_version`)).to.be.ok;
-    await app.signOut();
+    await app.user.signOut();
     expect(localStorage.getItem(`${identifier}-snjs_version`)).to.not.be.ok;
   });
 
@@ -155,7 +155,7 @@ describe('application instances', () => {
 
     it('shows confirmation dialog when there are unsaved changes', async () => {
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
-      await testSNApp.signOut();
+      await testSNApp.user.signOut();
 
       const expectedConfirmMessage = signOutConfirmMessage(1);
 
@@ -166,7 +166,7 @@ describe('application instances', () => {
     });
 
     it('does not show confirmation dialog when there are no unsaved changes', async () => {
-      await testSNApp.signOut();
+      await testSNApp.user.signOut();
 
       expect(confirmAlert.callCount).to.equal(0);
       expect(deinit.callCount).to.equal(1);
@@ -175,7 +175,7 @@ describe('application instances', () => {
 
     it('does not show confirmation dialog when there are unsaved changes and the "force" option is set to true', async () => {
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
-      await testSNApp.signOut(true);
+      await testSNApp.user.signOut(true);
 
       expect(confirmAlert.callCount).to.equal(0);
       expect(deinit.callCount).to.equal(1);
@@ -189,7 +189,7 @@ describe('application instances', () => {
         .callsFake((_message) => false);
 
       await testSNApp.itemManager.setItemDirty(testNote1.uuid);
-      await testSNApp.signOut();
+      await testSNApp.user.signOut();
 
       const expectedConfirmMessage = signOutConfirmMessage(1);
 
