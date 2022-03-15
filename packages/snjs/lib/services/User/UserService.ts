@@ -160,7 +160,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
           })
           .then(() => {
             if (!awaitSync) {
-              this.protocolService.decryptErroredItems()
+              void this.protocolService.decryptErroredItems()
             }
           })
         if (awaitSync) {
