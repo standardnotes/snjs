@@ -92,7 +92,7 @@ export function concatArrays(...args: any[]) {
 /**
  * @returns Whether the value is a function or object
  */
-export function isObject(value: unknown): boolean {
+export function isObject(value: unknown): value is object {
   if (value === null) {
     return false
   }

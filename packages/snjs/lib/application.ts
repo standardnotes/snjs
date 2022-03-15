@@ -40,6 +40,7 @@ import {
   ApplicationStage,
   ApplicationIdentifier,
   EncryptionIntent,
+  vaultToEmail,
 } from '@standardnotes/applications'
 import { DeinitSource, UuidString, ApplicationEventPayload } from './types'
 import {
@@ -279,6 +280,10 @@ export class SNApplication implements ListedInterface {
 
   public get sync(): SyncClientInterface {
     return this.syncService
+  }
+
+  public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
+    return vaultToEmail(this.options.crypto, name, userphrase)
   }
 
   /**
