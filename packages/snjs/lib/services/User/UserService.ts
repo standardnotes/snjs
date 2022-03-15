@@ -1,11 +1,11 @@
-import { SNProtectionService } from './Protection/ProtectionService'
-import { Challenge, ChallengeReason, ChallengeValidation } from '../challenges'
+import { SNProtectionService } from '../Protection/ProtectionService'
+import { Challenge, ChallengeReason, ChallengeValidation } from '../../challenges'
 import { KeyParamsOrigination } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
 import { ChallengePrompt } from '@Lib/challenges'
 import { SNRootKey } from '@Protocol/root_key'
 import { SNAlertService } from '@Lib/services/AlertService'
-import { SNRootKeyParams } from '../protocol/key_params'
+import { SNRootKeyParams } from '../../protocol/key_params'
 import {
   CredentialsChangeStrings,
   INVALID_PASSWORD,
@@ -17,14 +17,14 @@ import {
   REMOVING_PASSCODE,
   CHANGING_PASSCODE,
   ProtocolUpgradeStrings,
-} from './Api/Messages'
+} from '../Api/Messages'
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
 import { SNProtocolService } from '@Lib/services/ProtocolService'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SNStorageService, StoragePersistencePolicies } from '@Lib/services/StorageService'
-import { SNSyncService } from './Sync/SyncService'
-import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from './Api/SessionManager'
-import { ChallengeService } from './Challenge/ChallengeService'
+import { SNSyncService } from '../Sync/SyncService'
+import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Api/SessionManager'
+import { ChallengeService } from '../Challenge/ChallengeService'
 import { SNItemsKey } from '@Lib/models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
@@ -37,7 +37,7 @@ export const enum AccountEvent {
   SignedInOrRegistered = 'SignedInOrRegistered',
 }
 
-export class SNCredentialService extends AbstractService<AccountEvent> {
+export class UserService extends AbstractService<AccountEvent> {
   private signingIn = false
   private registering = false
 
