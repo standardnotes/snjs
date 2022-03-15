@@ -707,7 +707,7 @@ describe('server session', function () {
     const response = await this.application.apiService.getSessionsList();
     expect(response.data.length).to.equal(2);
 
-    await app2.signOut();
+    await app2.user.signOut();
 
     const response2 = await this.application.apiService.getSessionsList();
     expect(response2.data.length).to.equal(1);
@@ -789,7 +789,7 @@ describe('server session', function () {
     const storageKey = this.application.storageService.getPersistenceKey();
     expect(localStorage.getItem(storageKey)).to.be.ok;
 
-    await this.application.signOut();
+    await this.application.user.signOut();
     expect(localStorage.getItem(storageKey)).to.not.be.ok;
   });
 });

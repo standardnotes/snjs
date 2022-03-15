@@ -39,6 +39,7 @@ export enum ChallengeReason {
   SelectProtectedNote,
   UnprotectFile,
   UnprotectNote,
+  DeleteAccount,
 }
 
 /** For mobile */
@@ -122,6 +123,8 @@ export class Challenge {
           return ChallengeStrings.SelectProtectedNote
         case ChallengeReason.DisableMfa:
           return ChallengeStrings.DisableMfa
+        case ChallengeReason.DeleteAccount:
+          return ChallengeStrings.DeleteAccount
         case ChallengeReason.Custom:
           return ''
         default:

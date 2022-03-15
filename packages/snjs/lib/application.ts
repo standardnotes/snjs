@@ -1,3 +1,4 @@
+import { UserClientApi } from './services/User/UserClientApi';
 import { SyncSource } from '@standardnotes/services/src/Domain/Sync/SyncSource'
 import { ItemsClientInterface } from './services/Items/ClientInterface'
 import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
@@ -280,6 +281,10 @@ export class SNApplication implements ListedInterface {
 
   public get sync(): SyncClientInterface {
     return this.syncService
+  }
+
+  public get user(): UserClientApi {
+    return this.userService
   }
 
   public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
@@ -1835,13 +1840,20 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.challengeService,
       this.protectionService,
+      this.apiService,
       this.internalEventBus,
     )
     this.serviceObservers.push(
-      this.userService.addEventObserver((event) => {
+      this.userService.addEventObserver(async (event) => {
         switch (event) {
           case AccountEvent.SignedInOrRegistered: {
             void this.notifyEvent(ApplicationEvent.SignedIn)
+            break
+          }
+          case AccountEvent.SignedOut: {
+            await this.notifyEvent(ApplicationEvent.SignedOut)
+            await this.prepareForDeinit()
+            this.deinit(DeinitSource.SignOut)
             break
           }
           default: {

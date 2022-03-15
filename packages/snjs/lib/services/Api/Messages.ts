@@ -8,7 +8,13 @@ export const API_MESSAGE_GENERIC_CHANGE_CREDENTIALS_FAIL =
   'Something went wrong while changing your credentials. Your credentials were not changed. Please try again.'
 export const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.'
 
-export const API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL = 'Could not check your data integrity with the server.'
+export const ServerErrorStrings = {
+  DeleteAccountError:
+    'Your account was unable to be deleted due to an error. Please try your request again.',
+}
+
+export const API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL =
+  'Could not check your data integrity with the server.'
 
 export const API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL = 'Could not retrieve item.'
 
@@ -222,6 +228,7 @@ export const ChallengeStrings = {
   SearchProtectedNotesText: 'Authentication is required to search protected contents',
   SelectProtectedNote: 'Authentication is required to select a protected note',
   DisableMfa: 'Authentication is required to disable two-factor authentication',
+  DeleteAccount: 'Authentication is required to delete your account',
 }
 
 export const PromptTitles = {
