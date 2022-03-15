@@ -8,11 +8,11 @@ import { TransactionalMutation } from './services/Items/ItemManager'
 import { Settings } from './services/Settings'
 import { createMutatorForItem } from '@Lib/models/mutator'
 import {
-  SNCredentialService,
+  UserService,
   CredentialsChangeFunctionResponse,
   AccountServiceResponse,
   AccountEvent,
-} from './services/CredentialService'
+} from './services/User/UserService'
 import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria'
 import { SNKeyRecoveryService } from './services/KeyRecoveryService'
 import {
@@ -184,7 +184,7 @@ export class SNApplication implements ListedInterface {
   private keyRecoveryService!: SNKeyRecoveryService
   private preferencesService!: SNPreferencesService
   private featuresService!: SNFeaturesService
-  private credentialService!: SNCredentialService
+  private userService!: UserService
   private webSocketsService!: SNWebSocketsService
   private settingsService!: SNSettingsService
   private mfaService!: SNMfaService
@@ -1075,7 +1075,7 @@ export class SNApplication implements ListedInterface {
       message: string
     }
   }> {
-    const result = await this.credentialService.performProtocolUpgrade()
+    const result = await this.userService.performProtocolUpgrade()
     if (result.success) {
       if (this.hasAccount()) {
         void this.alertService.alert(ProtocolUpgradeStrings.SuccessAccount)
@@ -1379,7 +1379,7 @@ export class SNApplication implements ListedInterface {
     ephemeral = false,
     mergeLocal = true,
   ): Promise<AccountServiceResponse> {
-    return this.credentialService.register(email, password, ephemeral, mergeLocal)
+    return this.userService.register(email, password, ephemeral, mergeLocal)
   }
 
   /**
@@ -1394,7 +1394,7 @@ export class SNApplication implements ListedInterface {
     mergeLocal = true,
     awaitSync = false,
   ): Promise<HttpResponse | SignInResponse> {
-    return this.credentialService.signIn(email, password, strict, ephemeral, mergeLocal, awaitSync)
+    return this.userService.signIn(email, password, strict, ephemeral, mergeLocal, awaitSync)
   }
 
   public async changeEmail(
@@ -1403,7 +1403,7 @@ export class SNApplication implements ListedInterface {
     passcode?: string,
     origination = KeyParamsOrigination.EmailChange,
   ): Promise<CredentialsChangeFunctionResponse> {
-    return this.credentialService.changeCredentials({
+    return this.userService.changeCredentials({
       currentPassword,
       newEmail,
       passcode,
@@ -1419,7 +1419,7 @@ export class SNApplication implements ListedInterface {
     origination = KeyParamsOrigination.PasswordChange,
     validateNewPasswordStrength = true,
   ): Promise<CredentialsChangeFunctionResponse> {
-    return this.credentialService.changeCredentials({
+    return this.userService.changeCredentials({
       currentPassword,
       newPassword,
       passcode,
@@ -1430,7 +1430,7 @@ export class SNApplication implements ListedInterface {
 
   public async signOut(force = false): Promise<void> {
     const performSignOut = async () => {
-      await this.credentialService.signOut()
+      await this.userService.signOut()
       await this.notifyEvent(ApplicationEvent.SignedOut)
       await this.prepareForDeinit()
       this.deinit(DeinitSource.SignOut)
@@ -1523,21 +1523,21 @@ export class SNApplication implements ListedInterface {
   }
 
   public addPasscode(passcode: string): Promise<boolean> {
-    return this.credentialService.addPasscode(passcode)
+    return this.userService.addPasscode(passcode)
   }
 
   /**
    * @returns whether the passcode was successfuly removed
    */
   public async removePasscode(): Promise<boolean> {
-    return this.credentialService.removePasscode()
+    return this.userService.removePasscode()
   }
 
   public async changePasscode(
     newPasscode: string,
     origination = KeyParamsOrigination.PasscodeChange,
   ): Promise<boolean> {
-    return this.credentialService.changePasscode(newPasscode, origination)
+    return this.userService.changePasscode(newPasscode, origination)
   }
 
   public getStorageEncryptionPolicy(): StorageEncryptionPolicies {
@@ -1667,7 +1667,7 @@ export class SNApplication implements ListedInterface {
     this.createHistoryManager()
     this.createSyncManager()
     this.createProtectionService()
-    this.createCredentialService()
+    this.createUserService()
     this.createKeyRecoveryService()
     this.createSingletonManager()
     this.createPreferencesService()
@@ -1702,7 +1702,7 @@ export class SNApplication implements ListedInterface {
     ;(this.keyRecoveryService as unknown) = undefined
     ;(this.preferencesService as unknown) = undefined
     ;(this.featuresService as unknown) = undefined
-    ;(this.credentialService as unknown) = undefined
+    ;(this.userService as unknown) = undefined
     ;(this.webSocketsService as unknown) = undefined
     ;(this.settingsService as unknown) = undefined
     ;(this.mfaService as unknown) = undefined
@@ -1772,7 +1772,7 @@ export class SNApplication implements ListedInterface {
       this.itemManager,
       this.webSocketsService,
       this.settingsService,
-      this.credentialService,
+      this.userService,
       this.syncService,
       this.alertService,
       this.sessionManager,
@@ -1825,8 +1825,8 @@ export class SNApplication implements ListedInterface {
     this.services.push(this.migrationService)
   }
 
-  private createCredentialService(): void {
-    this.credentialService = new SNCredentialService(
+  private createUserService(): void {
+    this.userService = new UserService(
       this.sessionManager,
       this.syncService,
       this.storageService,
@@ -1838,7 +1838,7 @@ export class SNApplication implements ListedInterface {
       this.internalEventBus,
     )
     this.serviceObservers.push(
-      this.credentialService.addEventObserver((event) => {
+      this.userService.addEventObserver((event) => {
         switch (event) {
           case AccountEvent.SignedInOrRegistered: {
             void this.notifyEvent(ApplicationEvent.SignedIn)
@@ -1850,7 +1850,7 @@ export class SNApplication implements ListedInterface {
         }
       }),
     )
-    this.services.push(this.credentialService)
+    this.services.push(this.userService)
   }
 
   private createApiService() {
@@ -1945,7 +1945,7 @@ export class SNApplication implements ListedInterface {
       this.alertService,
       this.storageService,
       this.syncService,
-      this.credentialService,
+      this.userService,
       this.internalEventBus,
     )
     this.services.push(this.keyRecoveryService)

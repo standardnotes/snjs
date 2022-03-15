@@ -80,7 +80,7 @@ export {
 } from '@Lib/challenges'
 
 export * from './services/Sync'
-export { SNCredentialService } from './services/CredentialService'
+export { UserService } from './services/User/UserService'
 export { SyncResponse } from './services/Sync/Response'
 export { SyncResponseResolver } from '@Lib/services/Sync/Account/ResponseResolver'
 export { SyncOpStatus } from './services/Sync/SyncOpStatus'

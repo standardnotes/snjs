@@ -299,7 +299,7 @@ export async function setOldVersionPasscode({
     KeyParamsOrigination.PasscodeCreate
   );
   await application.protocolService.setNewRootKeyWrapper(key);
-  await application.credentialService.rewriteItemsKeys();
+  await application.userService.rewriteItemsKeys();
   await application.syncService.sync(syncOptions);
 }
 
