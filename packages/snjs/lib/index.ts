@@ -1,14 +1,21 @@
-export { SnjsVersion, isRightVersionGreaterThanLeft, compareSemVersions } from './version'
+export * from '@standardnotes/services'
+export * from './models'
+export * from '@standardnotes/features'
+export * from './services'
+export * from '@Lib/challenges'
+export * from '@standardnotes/utils'
+export * from '@standardnotes/common'
+export * from '@standardnotes/applications'
+export * from '@Lib/platforms'
+export * from '@standardnotes/payloads'
+export * from '@standardnotes/settings'
+export * from './version'
+export * from '@standardnotes/responses'
+
+export { ClientDisplayableError } from '@Lib/strings/ClientError'
 
 export type { ApplicationDescriptor } from './application_group'
 export { ApplicationOptionsDefaults } from './options'
-export type {
-  ActionResponse,
-  ListedAccount,
-  ListedAccountInfo,
-  RevisionListEntry,
-  SingleRevision,
-} from '@standardnotes/responses'
 export type { BackupFile } from '@Lib/services/ProtocolService'
 export type { UuidString, ApplicationEventPayload, IconType } from './types'
 export type { ApplicationIdentifier } from '@standardnotes/applications'
@@ -28,160 +35,10 @@ export { SNProtocolOperator004 } from '@Protocol/operator/004/operator_004'
 
 export { SNRootKey } from '@Protocol/root_key'
 export { SNRootKeyParams } from './protocol/key_params'
-export { AbstractDevice, AbstractService, SyncSource } from '@standardnotes/services'
-export type { DeviceInterface, ServiceInterface } from '@standardnotes/services'
-
-export * from './models'
-export * from '@Lib/services/Features'
-
-export type { ComponentPermission } from '@standardnotes/features'
-export { ComponentArea, ComponentAction } from '@standardnotes/features'
-
-export type {
-  ItemMessagePayload,
-  MessageData,
-  PermissionDialog,
-  DesktopManagerInterface,
-} from './services/ComponentManager/types'
-export {
-  SNComponentManager,
-  ComponentManagerEvent,
-} from './services/ComponentManager/ComponentManager'
-export {
-  ComponentViewer,
-  ComponentViewerEvent,
-  ComponentViewerError,
-} from './services/ComponentManager/ComponentViewer'
-
-export { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
-export { NoteHistoryEntry } from './services/History/Entries/NoteHistoryEntry'
-export { PayloadManager } from './services/PayloadManager'
-
-export type { TransactionalMutation } from './services/Items/ItemManager'
-export { ItemManager } from './services/Items/ItemManager'
-
-export { SNHttpService } from './services/Api/HttpService'
-export { ChallengeService } from './services/Challenge/ChallengeService'
-export { ApplicationService } from '@Lib/services/ApplicationService'
-export {
-  SNStorageService,
-  StoragePersistencePolicies,
-  StorageEncryptionPolicies,
-  StorageValueModes,
-  ValueModesKeys,
-} from './services/StorageService'
-export {
-  Challenge,
-  ChallengeReason,
-  ChallengeResponse,
-  ChallengeValidation,
-  ChallengeValue,
-  ChallengePrompt,
-} from '@Lib/challenges'
-
-export * from './services/Sync'
-export { UserService } from './services/User/UserService'
-export { SyncResponse } from './services/Sync/Response'
-export { SyncResponseResolver } from '@Lib/services/Sync/Account/ResponseResolver'
-export { SyncOpStatus } from './services/Sync/SyncOpStatus'
-export { SortPayloadsByRecentAndContentPriority } from './services/Sync/Utils'
-export { SyncUpDownLimit } from './services/Sync/Account/Operation'
-export { SNSessionManager, SessionEvent } from './services/Api/SessionManager'
-export { SNMigrationService } from './services/MigrationService'
-export { ButtonType } from './services/AlertService'
-export type { DismissBlockingDialog, SNAlertService } from './services/AlertService'
-export { SNHistoryManager } from './services/History/HistoryManager'
-export {
-  SNProtectionService,
-  UnprotectedAccessSecondsDuration,
-  ProposedSecondsToDeferUILevelSessionExpirationDuringActiveInteraction,
-} from './services/Protection/ProtectionService'
-export { SNSingletonManager } from './services/SingletonManager'
-export { SNApiService } from './services/Api/ApiService'
-export {
-  addIfUnique,
-  arrayByDifference,
-  Copy,
-  dateSorted,
-  deepMerge,
-  dictToArray,
-  extendArray,
-  filterFromArray,
-  findInArray,
-  getGlobalScope,
-  greaterOfTwoDates,
-  isNullOrUndefined,
-  isSameDay,
-  jsonParseEmbeddedKeys,
-  naturalSort,
-  omitInPlace,
-  omitUndefinedCopy,
-  removeFromArray,
-  removeFromIndex,
-  subtractFromArray,
-  topLevelCompare,
-  truncateHexString,
-  uniqueArrayByKey,
-  uniqCombineObjArrays,
-  convertTimestampToMilliseconds,
-  arraysEqual,
-  isValidUrl,
-  dateToLocalizedString,
-  nonSecureRandomIdentifier,
-  sanitizeHtmlString,
-  lastElement,
-  UuidGenerator,
-} from '@standardnotes/utils'
-
-export {
-  ContentType,
-  Runtime,
-  KeyParamsOrigination,
-  isProtocolVersionExpired,
-} from '@standardnotes/common'
-export {
-  AppDataField,
-  ApplicationStage,
-  EncryptionIntent,
-  isLocalStorageIntent,
-  isFileIntent,
-  isDecryptedIntent,
-  intentRequiresEncryption,
-  ContentTypeUsesRootKeyEncryption,
-} from '@standardnotes/applications'
 
 export { ApplicationEvent } from '@Lib/events'
-export {
-  Environment,
-  Platform,
-  isEnvironmentWebOrDesktop,
-  isEnvironmentMobile,
-  platformFromString,
-  environmentFromString,
-} from '@Lib/platforms'
 export { SyncEvent } from '@standardnotes/services'
 
-/** Payloads */
-export {
-  FillItemContent,
-  MutableCollection,
-  ImmutablePayloadCollection,
-  ItemCollection,
-  CollectionSort,
-  CreateMaxPayloadFromAnyObject,
-  CreateSourcedPayloadFromObject,
-  CreateIntentPayloadFromObject,
-  CreateEncryptionParameters,
-  PayloadByMerging,
-  CopyPayload,
-  PayloadsByAlternatingUuid,
-  PayloadSource,
-  isPayloadSourceRetrieved,
-  isPayloadSourceInternalChange,
-  PayloadFormat,
-  PurePayload,
-  PayloadField,
-} from '@standardnotes/payloads'
 export type { PayloadContent } from '@standardnotes/payloads'
 export { DeltaOutOfSync } from '@Payloads/deltas'
 
@@ -204,11 +61,6 @@ export { ProtectionSessionDurations } from '@Lib/services/Protection/ProtectionS
 export { SNLog } from './log'
 
 /** Used by e2e tests */
-export { GetFeatures, FeatureIdentifier } from '@standardnotes/features'
-export { RoleName, ProtocolVersion } from '@standardnotes/common'
-export { SettingName, MuteFailedBackupsEmailsOption } from '@standardnotes/settings'
 export { Migration2_20_0 } from './migrations/2_20_0'
 export { Migration2_42_0 } from './migrations/2_42_0'
 export { Predicate, CompoundPredicate } from '@standardnotes/payloads'
-
-export { EncryptAndUploadFileOperation } from './services/Files/Operations/EncryptAndUpload'

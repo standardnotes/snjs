@@ -1,7 +1,7 @@
-import { FilesApi } from '../types'
+import { FilesServerInterface } from '../FilesServerInterface'
 
 export class FileUploader {
-  constructor(private apiService: FilesApi) {}
+  constructor(private apiService: FilesServerInterface) {}
 
   public async uploadBytes(
     encryptedBytes: Uint8Array,

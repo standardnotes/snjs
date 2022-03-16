@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as DOMPurify from 'dompurify'
 import { find, isArray, mergeWith, remove, uniq, uniqWith } from 'lodash'
-import { AnyRecord, ErrorObject } from '@standardnotes/common'
+import { AnyRecord } from '@standardnotes/common'
 
 const collator =
   typeof Intl !== 'undefined'
@@ -640,10 +640,6 @@ export function convertTimestampToMilliseconds(timestamp: number): number {
   default:
     throw `Unhandled timestamp precision: ${timestamp}`
   }
-}
-
-export function isErrorObject(object: any): object is ErrorObject {
-  return typeof object.error !== 'undefined'
 }
 
 export function sanitizeHtmlString(html: string): string {
