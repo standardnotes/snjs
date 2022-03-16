@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.85.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.1...@standardnotes/snjs@2.85.2) (2022-03-16)
+
+
+### Bug Fixes
+
+* import location ([4a68cd2](https://github.com/standardnotes/snjs/commit/4a68cd2744a543476878c27c2b5c57432e6e2085))
+
+
+
+
+
 ## [2.85.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.0...@standardnotes/snjs@2.85.1) (2022-03-16)
 
 **Note:** Version bump only for package @standardnotes/snjs
