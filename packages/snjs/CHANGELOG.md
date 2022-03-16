@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.85.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.2...@standardnotes/snjs@2.85.3) (2022-03-16)
+
+
+### Bug Fixes
+
+* service export ([a3e6441](https://github.com/standardnotes/snjs/commit/a3e6441f22e80e5ada03340271419de8040de495))
+
+
+
+
+
 ## [2.85.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.1...@standardnotes/snjs@2.85.2) (2022-03-16)
 
 
