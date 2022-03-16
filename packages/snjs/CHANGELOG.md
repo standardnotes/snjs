@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.85.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.84.1...@standardnotes/snjs@2.85.0) (2022-03-16)
+
+
+### Features
+
+* delete file functionality ([#657](https://github.com/standardnotes/snjs/issues/657)) ([edec4f7](https://github.com/standardnotes/snjs/commit/edec4f7a65ef557ed5f47be4dddcf2b659ee28b4))
+
+
+
+
+
 ## [2.84.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.84.1...@standardnotes/snjs@2.84.2) (2022-03-16)
 
 **Note:** Version bump only for package @standardnotes/snjs
