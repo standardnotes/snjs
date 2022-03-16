@@ -10,6 +10,6 @@ module.exports = {
     afterEach: true,
     ContentType: true,
     fetch: true,
-    ClientDisplayableError: true
+    ClientDisplayableError: true,
   },
 }

@@ -4,79 +4,69 @@ export default class FakeWebCrypto {
   deinit() {}
 
   initialize() {
-    return;
+    return
   }
 
   randomString(len) {
-    const charSet =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let randomString = '';
+    const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let randomString = ''
     for (let i = 0; i < len; i++) {
-      const randomPoz = Math.floor(Math.random() * charSet.length);
-      randomString += charSet.substring(randomPoz, randomPoz + 1);
+      const randomPoz = Math.floor(Math.random() * charSet.length)
+      randomString += charSet.substring(randomPoz, randomPoz + 1)
     }
-    return randomString;
+    return randomString
   }
 
   generateUUIDSync = () => {
-    const globalScope = getGlobalScope();
-    const crypto = globalScope.crypto || globalScope.msCrypto;
+    const globalScope = getGlobalScope()
+    const crypto = globalScope.crypto || globalScope.msCrypto
     if (crypto) {
-      const buf = new Uint32Array(4);
-      crypto.getRandomValues(buf);
-      let idx = -1;
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-        /[xy]/g,
-        function (c) {
-          idx++;
-          const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15;
-          const v = c === 'x' ? r : (r & 0x3) | 0x8;
-          return v.toString(16);
-        }
-      );
+      const buf = new Uint32Array(4)
+      crypto.getRandomValues(buf)
+      let idx = -1
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        idx++
+        const r = (buf[idx >> 3] >> ((idx % 8) * 4)) & 15
+        const v = c === 'x' ? r : (r & 0x3) | 0x8
+        return v.toString(16)
+      })
     } else {
-      let d = new Date().getTime();
-      if (
-        globalScope.performance &&
-        typeof globalScope.performance.now === 'function'
-      ) {
-        d += performance.now(); // use high-precision timer if available
+      let d = new Date().getTime()
+      if (globalScope.performance && typeof globalScope.performance.now === 'function') {
+        d += performance.now() // use high-precision timer if available
       }
-      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-        /[xy]/g,
-        function (c) {
-          const r = (d + Math.random() * 16) % 16 | 0;
-          d = Math.floor(d / 16);
-          return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-        }
-      );
-      return uuid;
+      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (d + Math.random() * 16) % 16 | 0
+        d = Math.floor(d / 16)
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+      })
+      return uuid
     }
-  };
+  }
 
   generateUUID = () => {
-    return this.generateUUIDSync();
-  };
+    return this.generateUUIDSync()
+  }
 
   timingSafeEqual(a, b) {
-    return a === b;
+    return a === b
   }
 
   base64Encode(text) {
-    return btoa(text);
+    return btoa(text)
   }
 
   base64Decode(base64String) {
-    return atob(base64String);
+    return atob(base64String)
   }
 
   async pbkdf2(password, salt, iterations, length) {
-    return btoa(password + salt + iterations);
+    return btoa(password + salt + iterations)
   }
 
   generateRandomKey(bits) {
-    const length = bits / 8;
-    return this.randomString(length);
+    const length = bits / 8
+    return this.randomString(length)
   }
 
   async aes256CbcEncrypt(plaintext, iv, key) {
@@ -84,36 +74,36 @@ export default class FakeWebCrypto {
       plaintext,
       iv,
       key,
-    };
-    return btoa(JSON.stringify(data));
+    }
+    return btoa(JSON.stringify(data))
   }
 
   async aes256CbcDecrypt(ciphertext, iv, key) {
-    const data = JSON.parse(atob(ciphertext));
+    const data = JSON.parse(atob(ciphertext))
     if (data.key !== key || data.iv !== iv) {
-      return undefined;
+      return undefined
     }
-    return data.plaintext;
+    return data.plaintext
   }
 
   async hmac256(message, key) {
-    return btoa(message + key);
+    return btoa(message + key)
   }
 
   async sha256(text) {
-    return new SNWebCrypto().sha256(text);
+    return new SNWebCrypto().sha256(text)
   }
 
   async hmac1(message, key) {
-    return btoa(message + key);
+    return btoa(message + key)
   }
 
   async unsafeSha1(text) {
-    return btoa(text);
+    return btoa(text)
   }
 
   argon2(password, salt, iterations, bytes, length) {
-    return btoa(password);
+    return btoa(password)
   }
 
   xchacha20Encrypt(plaintext, nonce, key, assocData) {
@@ -122,20 +112,16 @@ export default class FakeWebCrypto {
       nonce,
       key,
       assocData,
-    };
-    return btoa(JSON.stringify(data));
+    }
+    return btoa(JSON.stringify(data))
   }
 
   xchacha20Decrypt(ciphertext, nonce, key, assocData) {
-    const data = JSON.parse(atob(ciphertext));
-    if (
-      data.key !== key ||
-      data.nonce !== nonce ||
-      data.assocData !== assocData
-    ) {
-      return undefined;
+    const data = JSON.parse(atob(ciphertext))
+    if (data.key !== key || data.nonce !== nonce || data.assocData !== assocData) {
+      return undefined
     }
-    return data.plaintext;
+    return data.plaintext
   }
 
   generateOtpSecret() {
@@ -143,6 +129,6 @@ export default class FakeWebCrypto {
   }
 
   totpToken(secret, timestamp, tokenLength, step) {
-    return '123456';
+    return '123456'
   }
 }
