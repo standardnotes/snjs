@@ -299,7 +299,7 @@ export async function setOldVersionPasscode({
     KeyParamsOrigination.PasscodeCreate
   );
   await application.protocolService.setNewRootKeyWrapper(key);
-  await application.credentialService.rewriteItemsKeys();
+  await application.userService.rewriteItemsKeys();
   await application.syncService.sync(syncOptions);
 }
 
@@ -445,7 +445,7 @@ export async function awaitFunctionInvokation(object, functionName) {
  */
 export async function signOutApplicationAndReturnNew(application) {
   const isRealCrypto = application.crypto instanceof SNWebCrypto;
-  await application.signOut();
+  await application.user.signOut();
   if (isRealCrypto) {
     return createInitAppWithRealCrypto();
   } else {
@@ -455,7 +455,7 @@ export async function signOutApplicationAndReturnNew(application) {
 
 export async function signOutAndBackIn(application, email, password) {
   const isRealCrypto = application.crypto instanceof SNWebCrypto;
-  await application.signOut();
+  await application.user.signOut();
   const newApplication = isRealCrypto
     ? await createInitAppWithRealCrypto()
     : await createInitAppWithFakeCrypto();

@@ -3,7 +3,7 @@ import { ApplicationStage } from '@standardnotes/applications'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../hosts'
 import { SNFeatureRepo, FeatureRepoContent } from '../../models/app/feature_repo'
 import { SNSyncService } from '../Sync/SyncService'
-import { AccountEvent, SNCredentialService } from '../CredentialService'
+import { AccountEvent, UserService } from '../User/UserService'
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { StorageKey } from '@Lib/storage_keys'
 import { SNStorageService } from '../StorageService'
@@ -80,7 +80,7 @@ export class SNFeaturesService
     private itemManager: ItemManager,
     private webSocketsService: SNWebSocketsService,
     private settingsService: SNSettingsService,
-    private credentialService: SNCredentialService,
+    private userService: UserService,
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
@@ -120,7 +120,7 @@ export class SNFeaturesService
       },
     )
 
-    this.removeSignInObserver = this.credentialService.addEventObserver(
+    this.removeSignInObserver = this.userService.addEventObserver(
       (eventName: AccountEvent) => {
         if (eventName === AccountEvent.SignedInOrRegistered) {
           const featureRepos = this.itemManager.getItems(
@@ -706,7 +706,7 @@ export class SNFeaturesService
     ;(this.itemManager as unknown) = undefined
     ;(this.webSocketsService as unknown) = undefined
     ;(this.settingsService as unknown) = undefined
-    ;(this.credentialService as unknown) = undefined
+    ;(this.userService as unknown) = undefined
     ;(this.syncService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.sessionManager as unknown) = undefined

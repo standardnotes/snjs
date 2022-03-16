@@ -376,7 +376,7 @@ describe('history manager', () => {
     });
 
     it('response from server should be empty if not signed in', async function () {
-      await this.application.signOut();
+      await this.application.user.signOut();
       this.application = await Factory.createInitAppWithFakeCrypto();
       this.historyManager = this.application.historyManager;
       this.payloadManager = this.application.payloadManager;

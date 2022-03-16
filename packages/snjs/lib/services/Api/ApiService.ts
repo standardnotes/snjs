@@ -62,6 +62,7 @@ import {
   IntegrityApiInterface,
   ItemApiInterface,
 } from '@standardnotes/services'
+import { UserApi } from '../User/UserApi'
 
 type PathNamesV1 = {
   keyParams: string
@@ -90,6 +91,7 @@ type PathNamesV1 = {
   downloadFileChunk: string
   checkIntegrity: string
   getSingleItem: (uuid: Uuid) => string
+  deleteAccount: (userUuid: string) => string
 }
 
 type PathNamesV2 = {
@@ -128,6 +130,7 @@ const Paths: {
     downloadFileChunk: '/v1/files',
     checkIntegrity: '/v1/items/check-integrity',
     getSingleItem: (uuid: Uuid) => `/v1/items/${uuid}`,
+    deleteAccount: (userUuid) => `/v1/users/${userUuid}`,
   },
   v2: {
     subscriptions: '/v2/subscriptions',
@@ -150,7 +153,7 @@ export type MetaReceivedData = {
 
 export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
-  implements FilesApi, IntegrityApiInterface, ItemApiInterface
+  implements FilesApi, IntegrityApiInterface, ItemApiInterface, UserApi
 {
   private session?: Session
   public user?: User
@@ -444,6 +447,17 @@ export class SNApiService
     this.processResponse(response)
 
     this.changing = false
+    return response
+  }
+
+  public async deleteAccount(userUuid: string): Promise<HttpResponse | MinimalHttpResponse> {
+    const url = joinPaths(this.host, Paths.v1.deleteAccount(userUuid))
+    const response = await this.request({
+      verb: HttpVerb.Delete,
+      url,
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.ServerErrorStrings.DeleteAccountError,
+    })
     return response
   }
 

@@ -126,6 +126,10 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
     return this.user
   }
 
+  public getSureUser() {
+    return this.user as User
+  }
+
   public getSession() {
     return this.apiService.getSession()
   }

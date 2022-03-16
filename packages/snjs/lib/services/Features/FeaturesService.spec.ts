@@ -6,7 +6,7 @@ import {
   ItemManager,
   SNAlertService,
   SNApiService,
-  SNCredentialService,
+  UserService,
   SNItem,
   SNSessionManager,
   SNStorageService,
@@ -27,7 +27,7 @@ describe('featuresService', () => {
   let itemManager: ItemManager
   let webSocketsService: SNWebSocketsService
   let settingsService: SNSettingsService
-  let credentialService: SNCredentialService
+  let userService: UserService
   let syncService: SNSyncService
   let alertService: SNAlertService
   let sessionManager: SNSessionManager
@@ -48,7 +48,7 @@ describe('featuresService', () => {
       itemManager,
       webSocketsService,
       settingsService,
-      credentialService,
+      userService,
       syncService,
       alertService,
       sessionManager,
@@ -109,8 +109,8 @@ describe('featuresService', () => {
     settingsService = {} as jest.Mocked<SNSettingsService>
     settingsService.updateSetting = jest.fn()
 
-    credentialService = {} as jest.Mocked<SNCredentialService>
-    credentialService.addEventObserver = jest.fn()
+    userService = {} as jest.Mocked<UserService>
+    userService.addEventObserver = jest.fn()
 
     syncService = {} as jest.Mocked<SNSyncService>
     syncService.sync = jest.fn()

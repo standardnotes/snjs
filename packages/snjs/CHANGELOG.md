@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.84.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.83.1...@standardnotes/snjs@2.84.0) (2022-03-15)
+
+
+### Features
+
+* delete account ([#655](https://github.com/standardnotes/snjs/issues/655)) ([00b41b5](https://github.com/standardnotes/snjs/commit/00b41b5c9de67d1ef6a0d7280e870c91cebbb4f2))
+
+
+
+
+
+## [2.83.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.83.0...@standardnotes/snjs@2.83.1) (2022-03-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 # [2.83.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.82.0...@standardnotes/snjs@2.83.0) (2022-03-14)
 
 

@@ -1,11 +1,12 @@
-import { SNProtectionService } from './Protection/ProtectionService'
-import { Challenge, ChallengeReason, ChallengeValidation } from '../challenges'
+import { SNApiService } from './../Api/ApiService'
+import { SNProtectionService } from '../Protection/ProtectionService'
+import { Challenge, ChallengeReason, ChallengeValidation } from '../../challenges'
 import { KeyParamsOrigination } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
 import { ChallengePrompt } from '@Lib/challenges'
 import { SNRootKey } from '@Protocol/root_key'
 import { SNAlertService } from '@Lib/services/AlertService'
-import { SNRootKeyParams } from '../protocol/key_params'
+import { SNRootKeyParams } from '../../protocol/key_params'
 import {
   CredentialsChangeStrings,
   INVALID_PASSWORD,
@@ -17,16 +18,18 @@ import {
   REMOVING_PASSCODE,
   CHANGING_PASSCODE,
   ProtocolUpgradeStrings,
-} from './Api/Messages'
+} from '../Api/Messages'
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
 import { SNProtocolService } from '@Lib/services/ProtocolService'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SNStorageService, StoragePersistencePolicies } from '@Lib/services/StorageService'
-import { SNSyncService } from './Sync/SyncService'
-import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from './Api/SessionManager'
-import { ChallengeService } from './Challenge/ChallengeService'
+import { SNSyncService } from '../Sync/SyncService'
+import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Api/SessionManager'
+import { ChallengeService } from '../Challenge/ChallengeService'
 import { SNItemsKey } from '@Lib/models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { UserClientApi } from './UserClientApi'
+import { AccountDeleted } from '@Lib/strings/Info'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -35,9 +38,10 @@ export type AccountServiceResponse = HttpResponse
 
 export const enum AccountEvent {
   SignedInOrRegistered = 'SignedInOrRegistered',
+  SignedOut = 'SignedOut',
 }
 
-export class SNCredentialService extends AbstractService<AccountEvent> {
+export class UserService extends AbstractService<AccountEvent> implements UserClientApi {
   private signingIn = false
   private registering = false
 
@@ -50,6 +54,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     private alertService: SNAlertService,
     private challengeService: ChallengeService,
     private protectionService: SNProtectionService,
+    private apiService: SNApiService,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -65,6 +70,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     ;(this.alertService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
     ;(this.protectionService as unknown) = undefined
+    ;(this.apiService as unknown) = undefined
   }
 
   /**
@@ -154,7 +160,7 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
           })
           .then(() => {
             if (!awaitSync) {
-              this.protocolService.decryptErroredItems()
+              void this.protocolService.decryptErroredItems()
             }
           })
         if (awaitSync) {
@@ -167,6 +173,40 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
       return result.response
     } finally {
       this.signingIn = false
+    }
+    2
+  }
+
+  public async deleteAccount(): Promise<{
+    error: boolean
+    message?: string
+  }> {
+    if (
+      !(await this.protectionService.authorizeAction(ChallengeReason.DeleteAccount, {
+        requireAccountPassword: true,
+      }))
+    ) {
+      return {
+        error: true,
+        message: INVALID_PASSWORD,
+      }
+    }
+
+    const uuid = this.sessionManager.getSureUser().uuid
+    const response = await this.apiService.deleteAccount(uuid)
+    if (response.error) {
+      return {
+        error: true,
+        message: response.error.message,
+      }
+    }
+
+    await this.signOut(true)
+
+    void this.alertService.alert(AccountDeleted)
+
+    return {
+      error: false,
     }
   }
 
@@ -215,10 +255,33 @@ export class SNCredentialService extends AbstractService<AccountEvent> {
     return result
   }
 
-  public async signOut(): Promise<void> {
-    await this.sessionManager.signOut()
-    await this.protocolService.clearLocalKeyState()
-    await this.storageService.clearAllData()
+  public async signOut(force = false): Promise<void> {
+    const performSignOut = async () => {
+      await this.sessionManager.signOut()
+      await this.protocolService.clearLocalKeyState()
+      await this.storageService.clearAllData()
+      await this.notifyEvent(AccountEvent.SignedOut)
+    }
+
+    if (force) {
+      await performSignOut()
+      return
+    }
+
+    const dirtyItems = this.itemManager.getDirtyItems()
+    if (dirtyItems.length > 0) {
+      const singular = dirtyItems.length === 1
+      const didConfirm = await this.alertService.confirm(
+        `There ${singular ? 'is' : 'are'} ${dirtyItems.length} ${
+          singular ? 'item' : 'items'
+        } with unsynced changes. If you sign out, these changes will be lost forever. Are you sure you want to sign out?`,
+      )
+      if (didConfirm) {
+        await performSignOut()
+      }
+    } else {
+      await performSignOut()
+    }
   }
 
   public async performProtocolUpgrade(): Promise<{

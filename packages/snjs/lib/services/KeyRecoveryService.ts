@@ -1,4 +1,4 @@
-import { SNCredentialService } from './CredentialService'
+import { UserService } from './User/UserService'
 import {
   PurePayload,
   PayloadField,
@@ -96,7 +96,7 @@ export class SNKeyRecoveryService extends AbstractService {
     private alertService: SNAlertService,
     private storageService: SNStorageService,
     private syncService: SNSyncService,
-    private credentialService: SNCredentialService,
+    private userService: UserService,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -126,7 +126,7 @@ export class SNKeyRecoveryService extends AbstractService {
     ;(this.protocolService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
-    ;(this.credentialService as unknown) = undefined
+    ;(this.userService as unknown) = undefined
     ;(this.syncService as unknown) = undefined
     ;(this.storageService as unknown) = undefined
     this.removeItemObserver()
@@ -251,7 +251,7 @@ export class SNKeyRecoveryService extends AbstractService {
     const password = challengeResponse.values[0].value as string
     /** Generate a root key using the input */
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
-    const signInResponse = await this.credentialService.correctiveSignIn(rootKey)
+    const signInResponse = await this.userService.correctiveSignIn(rootKey)
     if (!signInResponse.error) {
       this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
       return rootKey
