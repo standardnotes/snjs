@@ -1,14 +1,15 @@
-import { RemoteFileInterface, FilesApi, EncryptedFileInterface } from '../types'
+import { RemoteFileInterface, EncryptedFileInterface } from '../types'
+import { FilesServerInterface } from '../FilesServerInterface'
 import { FileDownloader } from './FileDownloader'
 
 describe('file downloader', () => {
-  let apiService: FilesApi
+  let apiService: FilesServerInterface
   let downloader: FileDownloader
   let file: RemoteFileInterface & EncryptedFileInterface
   const numChunks = 5
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<FilesApi>
+    apiService = {} as jest.Mocked<FilesServerInterface>
     apiService.downloadFile = jest
       .fn()
       .mockImplementation(
@@ -40,7 +41,7 @@ describe('file downloader', () => {
   it('should pass back bytes as they are received', async () => {
     let receivedBytes = new Uint8Array()
 
-    downloader = new FileDownloader(file, 'api-token', apiService, (encryptedBytes) => {
+    downloader = new FileDownloader(file, 'api-token', apiService, async (encryptedBytes) => {
       receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes])
     })
 

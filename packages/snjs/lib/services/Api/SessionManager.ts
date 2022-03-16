@@ -1,3 +1,5 @@
+import { Subscription } from './../../../../auth/src/Domain/Subscription/Subscription'
+import { ClientDisplayableError } from '@Lib/strings/ClientError'
 import {
   ProtocolVersion,
   AnyKeyParamsContent,
@@ -19,6 +21,8 @@ import {
   SignInResponse,
   StatusCode,
   User,
+  AvailableSubscriptions,
+  GetAvailableSubscriptionsResponse,
 } from '@standardnotes/responses'
 import { SNProtocolService } from '../ProtocolService'
 import { SNApiService } from './ApiService'
@@ -213,17 +217,37 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
           } else {
             resolve()
             this.challengeService.completeChallenge(challenge)
-            this.notifyEvent(SessionEvent.Restored)
-            this.alertService.alert(SessionStrings.SessionRestored)
+            void this.notifyEvent(SessionEvent.Restored)
+            void this.alertService.alert(SessionStrings.SessionRestored)
           }
         },
       })
-      this.challengeService.promptForChallengeResponse(challenge)
+      void this.challengeService.promptForChallengeResponse(challenge)
     })
   }
 
-  public getSubscription(): Promise<HttpResponse | GetSubscriptionResponse> {
-    return this.apiService.getSubscription(this.user!.uuid)
+  public async getSubscription(): Promise<ClientDisplayableError | Subscription> {
+    const result = await this.apiService.getSubscription(this.getSureUser().uuid)
+
+    if (result.error) {
+      return ClientDisplayableError.FromError(result.error)
+    }
+
+    const subscription = (result as GetSubscriptionResponse).data!.subscription!
+
+    return subscription
+  }
+
+  public async getAvailableSubscriptions(): Promise<
+    AvailableSubscriptions | ClientDisplayableError
+  > {
+    const response = await this.apiService.getAvailableSubscriptions()
+
+    if (response.error) {
+      return ClientDisplayableError.FromError(response.error)
+    }
+
+    return (response as GetAvailableSubscriptionsResponse).data!
   }
 
   private async promptForMfaValue() {

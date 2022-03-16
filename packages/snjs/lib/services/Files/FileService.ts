@@ -1,3 +1,5 @@
+import { FilesServerInterface } from './FilesServerInterface'
+import { ClientDisplayableError } from './../../strings/ClientError'
 import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
 import { DecryptedFileInterface } from './types'
@@ -7,34 +9,14 @@ import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNAlertService } from '../AlertService'
 import { SNSyncService } from '../Sync/SyncService'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
-import { SNApiService } from '../Api/ApiService'
-import { isErrorObject, UuidGenerator } from '@standardnotes/utils'
-import { PayloadContent, FillItemContent } from '@standardnotes/payloads'
+import { UuidGenerator } from '@standardnotes/utils'
+import { FillItemContent } from '@standardnotes/payloads'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-
-export interface FilesClientInterface {
-  beginNewFileUpload(): Promise<EncryptAndUploadFileOperation>
-
-  pushBytesForUpload(
-    operation: EncryptAndUploadFileOperation,
-    bytes: Uint8Array,
-    chunkId: number,
-    isFinalChunk: boolean,
-  ): Promise<boolean>
-
-  finishUpload(
-    operation: EncryptAndUploadFileOperation,
-    fileMetadata: FileMetadata,
-  ): Promise<SNFile>
-
-  downloadFile(file: SNFile, onDecryptedBytes: (bytes: Uint8Array) => void): Promise<void>
-
-  minimumChunkSize(): number
-}
+import { FilesClientInterface } from './FilesClientInterface'
 
 export class SNFileService extends AbstractService implements FilesClientInterface {
   constructor(
-    private apiService: SNApiService,
+    private api: FilesServerInterface,
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private alertService: SNAlertService,
@@ -46,7 +28,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
 
   deinit(): void {
     super.deinit()
-    ;(this.apiService as unknown) = undefined
+    ;(this.api as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
@@ -57,11 +39,14 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     return 5_000_000
   }
 
-  public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation> {
+  public async beginNewFileUpload(): Promise<
+    EncryptAndUploadFileOperation | ClientDisplayableError
+  > {
     const remoteIdentifier = UuidGenerator.GenerateUuid()
-    const apiToken = await this.apiService.createFileValetToken(remoteIdentifier, 'write')
-    if (isErrorObject(apiToken)) {
-      throw new Error('Could not obtain files api valet token')
+    const tokenResult = await this.api.createFileValetToken(remoteIdentifier, 'write')
+
+    if (tokenResult instanceof ClientDisplayableError) {
+      return tokenResult
     }
 
     const key = this.crypto.generateRandomKey(FileProtocolV1Constants.KeySize)
@@ -72,16 +57,16 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
 
     const uploadOperation = new EncryptAndUploadFileOperation(
       fileParams,
-      apiToken,
+      tokenResult,
       this.crypto,
-      this.apiService,
+      this.api,
     )
 
     uploadOperation.initializeHeader()
 
-    const uploadSessionStarted = await this.apiService.startUploadSession(apiToken)
+    const uploadSessionStarted = await this.api.startUploadSession(tokenResult)
     if (!uploadSessionStarted.uploadId) {
-      throw new Error('Could not start upload session')
+      return new ClientDisplayableError('Could not start upload session')
     }
 
     return uploadOperation
@@ -92,17 +77,21 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     bytes: Uint8Array,
     chunkId: number,
     isFinalChunk: boolean,
-  ): Promise<boolean> {
-    return operation.pushBytes(bytes, chunkId, isFinalChunk)
+  ): Promise<ClientDisplayableError | undefined> {
+    const success = await operation.pushBytes(bytes, chunkId, isFinalChunk)
+
+    if (!success) {
+      return new ClientDisplayableError('Failed to push file bytes to server')
+    }
   }
 
   public async finishUpload(
     operation: EncryptAndUploadFileOperation,
     fileMetadata: FileMetadata,
-  ): Promise<SNFile> {
-    const uploadSessionClosed = await this.apiService.closeUploadSession(operation.getApiToken())
+  ): Promise<SNFile | ClientDisplayableError> {
+    const uploadSessionClosed = await this.api.closeUploadSession(operation.getApiToken())
     if (!uploadSessionClosed) {
-      throw new Error('Could not close upload session')
+      return new ClientDisplayableError('Could not close upload session')
     }
 
     const fileContent: FileContent = {
@@ -128,27 +117,45 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
 
   public async downloadFile(
     file: SNFile,
-    onDecryptedBytes: (bytes: Uint8Array) => void,
-  ): Promise<void> {
-    const apiToken = await this.apiService.createFileValetToken(
-      (file.content as PayloadContent).remoteIdentifier,
-      'read',
-    )
-    if (isErrorObject(apiToken)) {
-      throw new Error('Could not obtain files api valet token')
+    onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
+  ): Promise<ClientDisplayableError | undefined> {
+    const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'read')
+
+    if (tokenResult instanceof ClientDisplayableError) {
+      return tokenResult
     }
 
-    const operation = new DownloadAndDecryptFileOperation(
-      file,
-      this.crypto,
-      this.apiService,
-      apiToken,
-      onDecryptedBytes,
-      () => {
-        console.error('Error downloading/decrypting file')
-      },
-    )
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+      const operation = new DownloadAndDecryptFileOperation(
+        file,
+        this.crypto,
+        this.api,
+        tokenResult,
+        onDecryptedBytes,
+        (error) => {
+          resolve(error)
+        },
+      )
 
-    return operation.run()
+      await operation.run().then(() => resolve(undefined))
+    })
+  }
+
+  public async deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined> {
+    const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'delete')
+
+    if (tokenResult instanceof ClientDisplayableError) {
+      return tokenResult
+    }
+
+    const result = await this.api.deleteFile(tokenResult)
+
+    if (result.error) {
+      return ClientDisplayableError.FromError(result.error)
+    }
+
+    await this.itemManager.setItemToBeDeleted(file.uuid)
+    await this.syncService.sync()
   }
 }

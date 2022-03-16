@@ -1,4 +1,5 @@
-import { FilesApi, DecryptedFileInterface } from '../types'
+import { DecryptedFileInterface } from '../types'
+import { FilesServerInterface } from '../FilesServerInterface'
 import { FileUploader } from '../UseCase/FileUploader'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { FileEncryptor } from '../UseCase/FileEncryptor'
@@ -15,7 +16,7 @@ export class EncryptAndUploadFileOperation {
     private file: DecryptedFileInterface,
     private apiToken: string,
     private crypto: SNPureCrypto,
-    private api: FilesApi,
+    private api: FilesServerInterface,
   ) {
     this.encryptor = new FileEncryptor(file, this.crypto)
     this.uploader = new FileUploader(this.api)

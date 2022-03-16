@@ -1,163 +1,41 @@
-import { UserClientInterface } from './services/User/UserClientApi';
-import { SyncSource } from '@standardnotes/services/src/Domain/Sync/SyncSource'
-import { ItemsClientInterface } from './services/Items/ClientInterface'
-import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
-import { ListedService } from './services/Listed/ListedService'
-import { ListedClientInterface } from './services/Listed/ListedClientInterface'
-import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
-import { TransactionalMutation } from './services/Items/ItemManager'
-import { Settings } from './services/Settings'
-import { createMutatorForItem } from '@Lib/models/mutator'
-import {
-  UserService,
-  CredentialsChangeFunctionResponse,
-  AccountServiceResponse,
-  AccountEvent,
-} from './services/User/UserService'
-import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria'
-import { SNKeyRecoveryService } from './services/KeyRecoveryService'
-import {
-  CollectionSort,
-  CollectionSortDirection,
-  PayloadOverride,
-  RawPayload,
-  PurePayload,
-  CopyPayload,
-  CreateMaxPayloadFromAnyObject,
-  PayloadContent,
-  PayloadSource,
-  PayloadFormat,
-  PredicateInterface,
-} from '@standardnotes/payloads'
-import { Uuids } from '@Models/functions'
-import {
-  AnyRecord,
-  ContentType,
-  ProtocolVersion,
-  KeyParamsOrigination,
-} from '@standardnotes/common'
-import {
-  compareVersions,
-  ApplicationStage,
-  ApplicationIdentifier,
-  EncryptionIntent,
-  vaultToEmail,
-} from '@standardnotes/applications'
-import { DeinitSource, UuidString, ApplicationEventPayload } from './types'
-import {
-  ApplicationOptionsDefaults,
-  ApplicationOptions,
-  FullyResolvedApplicationOptions,
-} from './options'
-import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
-import { StorageEncryptionPolicies } from './services/StorageService'
-import { BackupFile } from './services/ProtocolService'
-import { SmartView } from './models/app/SmartView'
-import { ItemMutator, MutationType, SNItem } from '@Models/core/item'
-import {
-  Challenge,
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeResponse,
-  ChallengeValidation,
-  ChallengeValue,
-} from './challenges'
-import { ChallengeObserver } from './services/Challenge/ChallengeService'
-import { Environment, Platform } from './platforms'
-import {
-  assertUnreachable,
-  isNullOrUndefined,
-  isString,
-  removeFromArray,
-  sleep,
-  nonSecureRandomIdentifier,
-  UuidGenerator,
-} from '@standardnotes/utils'
-import { CreateItemFromPayload } from '@Models/generator'
-import { StoragePersistencePolicies, StorageValueModes } from '@Lib/services/StorageService'
-import {
-  ChallengeService,
-  ItemManager,
-  PayloadManager,
-  SNActionsService,
-  SNAlertService,
-  SNApiService,
-  SNComponentManager,
-  SNHistoryManager,
-  SNHttpService,
-  SNMigrationService,
-  SNProtectionService,
-  SNProtocolService,
-  SNSessionManager,
-  SNSingletonManager,
-  SNStorageService,
-  SNSyncService,
-  SNFeaturesService,
-  SNFileService,
-  SyncMode,
-  SyncOptions,
-} from './services'
-import {
-  DeviceInterface,
-  ServiceInterface,
-  InternalEventBusInterface,
-  InternalEventBus,
-  IntegrityService,
-  SyncEvent,
-  IntegrityEvent,
-} from '@standardnotes/services'
-import {
-  BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT,
-  ErrorAlertStrings,
-  ProtocolUpgradeStrings,
-  UNSUPPORTED_BACKUP_FILE_VERSION,
-  SessionStrings,
-  ImportStrings,
-} from './services/Api/Messages'
-import { SessionEvent } from './services/Api/SessionManager'
-import { PrefKey, PrefValue, SNComponent, SNNote, SNTag } from './models'
-import { SNLog } from './log'
-import { SNPreferencesService } from './services/PreferencesService'
-import {
-  AvailableSubscriptions,
-  GetAvailableSubscriptionsResponse,
-  GetSubscriptionResponse,
-  HttpResponse,
-  ListedAccount,
-  ListedAccountInfo,
-  SignInResponse,
-  User,
-} from '@standardnotes/responses'
-import { ProtectionEvent } from './services/Protection/ProtectionService'
-import { SNWebSocketsService } from './services/Api/WebsocketsService'
-import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings'
-import { SNSettingsService } from './services/Settings'
-import { SNMfaService } from './services/MfaService'
-import { SensitiveSettingName } from './services/Settings/SensitiveSettingName'
+import * as Applications from '@standardnotes/applications'
+import * as Challenges from './challenges'
+import * as Common from '@standardnotes/common'
+import * as ExternalServices from '@standardnotes/services'
+import * as Models from './models'
+import * as Payloads from '@standardnotes/payloads'
+import * as Responses from '@standardnotes/responses'
+import * as Services from './services'
+import * as Utils from '@standardnotes/utils'
+import * as Options from './options'
+import * as Settings from '@standardnotes/settings'
 import { Subscription } from '@standardnotes/auth'
+
+import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
+import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria'
+import { DeinitSource, UuidString, ApplicationEventPayload } from './types'
+import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
+import { Environment, Platform } from './platforms'
+import { SNLog } from './log'
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders'
-import { RemoteSession } from './services/Api/Session'
-import { FilesClientInterface } from './services/Files/FileService'
-import { ApiServiceEvent } from './services/Api/ApiService'
-import { ProtectionsClientInterface } from './services/Protection/ClientInterface'
-import { SyncClientInterface } from './services/Sync/SyncClientInterface'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
 
 type LaunchCallback = {
-  receiveChallenge: (challenge: Challenge) => void
+  receiveChallenge: (challenge: Challenges.Challenge) => void
 }
 type ApplicationEventCallback = (event: ApplicationEvent, data?: unknown) => Promise<void>
 type ApplicationObserver = {
   singleEvent?: ApplicationEvent
   callback: ApplicationEventCallback
 }
-type ItemStream = (items: SNItem[], source: PayloadSource) => void
+type ItemStream = (items: Models.SNItem[], source: Payloads.PayloadSource) => void
 type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
-export class SNApplication implements ListedClientInterface {
+export class SNApplication implements Services.ListedClientInterface {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void
 
   /**
@@ -165,39 +43,39 @@ export class SNApplication implements ListedClientInterface {
    * This differs from the persistent application.identifier which persists in storage
    * across instantiations.
    */
-  public readonly ephemeralIdentifier = nonSecureRandomIdentifier()
+  public readonly ephemeralIdentifier = Utils.nonSecureRandomIdentifier()
 
-  private migrationService!: SNMigrationService
-  private httpService!: SNHttpService
-  private payloadManager!: PayloadManager
-  public protocolService!: SNProtocolService
-  private storageService!: SNStorageService
-  private apiService!: SNApiService
-  private sessionManager!: SNSessionManager
-  private syncService!: SNSyncService
-  private challengeService!: ChallengeService
-  public singletonManager!: SNSingletonManager
-  public componentManager!: SNComponentManager
-  public protectionService!: SNProtectionService
-  public actionsManager!: SNActionsService
-  public historyManager!: SNHistoryManager
-  private itemManager!: ItemManager
-  private keyRecoveryService!: SNKeyRecoveryService
-  private preferencesService!: SNPreferencesService
-  private featuresService!: SNFeaturesService
-  private userService!: UserService
-  private webSocketsService!: SNWebSocketsService
-  private settingsService!: SNSettingsService
-  private mfaService!: SNMfaService
-  private listedService!: ListedService
-  private fileService!: SNFileService
-  private integrityService!: IntegrityService
+  private migrationService!: Services.SNMigrationService
+  private httpService!: Services.SNHttpService
+  private payloadManager!: Services.PayloadManager
+  public protocolService!: Services.SNProtocolService
+  private storageService!: Services.SNStorageService
+  private apiService!: Services.SNApiService
+  private sessionManager!: Services.SNSessionManager
+  private syncService!: Services.SNSyncService
+  private challengeService!: Services.ChallengeService
+  public singletonManager!: Services.SNSingletonManager
+  public componentManager!: Services.SNComponentManager
+  public protectionService!: Services.SNProtectionService
+  public actionsManager!: Services.SNActionsService
+  public historyManager!: Services.SNHistoryManager
+  private itemManager!: Services.ItemManager
+  private keyRecoveryService!: Services.SNKeyRecoveryService
+  private preferencesService!: Services.SNPreferencesService
+  private featuresService!: Services.SNFeaturesService
+  private userService!: Services.UserService
+  private webSocketsService!: Services.SNWebSocketsService
+  private settingsService!: Services.SNSettingsService
+  private mfaService!: Services.SNMfaService
+  private listedService!: Services.ListedService
+  private fileService!: Services.SNFileService
+  private integrityService!: ExternalServices.IntegrityService
 
-  private internalEventBus!: InternalEventBusInterface
+  private internalEventBus!: ExternalServices.InternalEventBusInterface
 
   private eventHandlers: ApplicationObserver[] = []
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private services: ServiceInterface<any, any>[] = []
+  private services: ExternalServices.ServiceInterface<any, any>[] = []
   private streamRemovers: ObserverRemover[] = []
   private serviceObservers: ObserverRemover[] = []
   private managedSubscribers: ObserverRemover[] = []
@@ -216,16 +94,16 @@ export class SNApplication implements ListedClientInterface {
 
   public readonly environment: Environment
   public readonly platform: Platform
-  public deviceInterface: DeviceInterface
-  public alertService: SNAlertService
-  public readonly identifier: ApplicationIdentifier
-  public readonly options: FullyResolvedApplicationOptions
+  public deviceInterface: ExternalServices.DeviceInterface
+  public alertService: Services.SNAlertService
+  public readonly identifier: Applications.ApplicationIdentifier
+  public readonly options: Options.FullyResolvedApplicationOptions
 
-  constructor(options: ApplicationOptions) {
+  constructor(options: Options.ApplicationOptions) {
     const fullyResovledOptions = {
-      ...ApplicationOptionsDefaults,
+      ...Options.ApplicationOptionsDefaults,
       ...options,
-    } as FullyResolvedApplicationOptions
+    } as Options.FullyResolvedApplicationOptions
 
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.')
@@ -233,7 +111,7 @@ export class SNApplication implements ListedClientInterface {
     if (!SNLog.onError) {
       throw Error('SNLog.onError must be set.')
     }
-    const requiredOptions: (keyof ApplicationOptions)[] = [
+    const requiredOptions: (keyof Options.ApplicationOptions)[] = [
       'deviceInterface',
       'environment',
       'platform',
@@ -263,32 +141,32 @@ export class SNApplication implements ListedClientInterface {
     this.defineInternalEventHandlers()
   }
 
-  public get files(): FilesClientInterface {
+  public get files(): Services.FilesClientInterface {
     return this.fileService
   }
 
-  public get features(): FeaturesClientInterface {
+  public get features(): Services.FeaturesClientInterface {
     return this.featuresService
   }
 
-  public get items(): ItemsClientInterface {
+  public get items(): Services.ItemsClientInterface {
     return this.itemManager
   }
 
-  public get protections(): ProtectionsClientInterface {
+  public get protections(): Services.ProtectionsClientInterface {
     return this.protectionService
   }
 
-  public get sync(): SyncClientInterface {
+  public get sync(): Services.SyncClientInterface {
     return this.syncService
   }
 
-  public get user(): UserClientInterface {
+  public get user(): Services.UserClientInterface {
     return this.userService
   }
 
   public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
-    return vaultToEmail(this.options.crypto, name, userphrase)
+    return Applications.vaultToEmail(this.options.crypto, name, userphrase)
   }
 
   /**
@@ -307,11 +185,11 @@ export class SNApplication implements ListedClientInterface {
     this.createdNewDatabase = databaseResult?.isNewDatabase || false
     await this.migrationService.initialize()
     await this.notifyEvent(ApplicationEvent.MigrationsLoaded)
-    await this.handleStage(ApplicationStage.PreparingForLaunch_0)
+    await this.handleStage(Applications.ApplicationStage.PreparingForLaunch_0)
     await this.storageService.initializeFromDisk()
     await this.notifyEvent(ApplicationEvent.StorageReady)
     await this.protocolService.initialize()
-    await this.handleStage(ApplicationStage.ReadyForLaunch_05)
+    await this.handleStage(Applications.ApplicationStage.ReadyForLaunch_05)
     this.started = true
     await this.notifyEvent(ApplicationEvent.Started)
   }
@@ -342,12 +220,12 @@ export class SNApplication implements ListedClientInterface {
         await this.storageService.decryptStorage()
       } catch (_error) {
         void this.alertService.alert(
-          ErrorAlertStrings.StorageDecryptErrorBody,
-          ErrorAlertStrings.StorageDecryptErrorTitle,
+          Services.ErrorAlertStrings.StorageDecryptErrorBody,
+          Services.ErrorAlertStrings.StorageDecryptErrorTitle,
         )
       }
     }
-    await this.handleStage(ApplicationStage.StorageDecrypted_09)
+    await this.handleStage(Applications.ApplicationStage.StorageDecrypted_09)
     await this.apiService.loadHost()
     await this.webSocketsService.loadWebSocketUrl()
     await this.sessionManager.initializeFromDisk()
@@ -357,10 +235,10 @@ export class SNApplication implements ListedClientInterface {
 
     this.launched = true
     await this.notifyEvent(ApplicationEvent.Launched)
-    await this.handleStage(ApplicationStage.Launched_10)
+    await this.handleStage(Applications.ApplicationStage.Launched_10)
 
     const databasePayloads = await this.syncService.getDatabasePayloads()
-    await this.handleStage(ApplicationStage.LoadingDatabase_11)
+    await this.handleStage(Applications.ApplicationStage.LoadingDatabase_11)
 
     if (this.createdNewDatabase) {
       await this.syncService.onNewDatabaseCreated()
@@ -374,11 +252,11 @@ export class SNApplication implements ListedClientInterface {
       if (this.dealloced) {
         throw 'Application has been destroyed.'
       }
-      await this.handleStage(ApplicationStage.LoadedDatabase_12)
+      await this.handleStage(Applications.ApplicationStage.LoadedDatabase_12)
       this.beginAutoSyncTimer()
       await this.syncService.sync({
-        mode: SyncMode.DownloadFirst,
-        source: SyncSource.External,
+        mode: Services.SyncMode.DownloadFirst,
+        source: ExternalServices.SyncSource.External,
       })
     })
     if (awaitDatabaseLoad) {
@@ -394,15 +272,17 @@ export class SNApplication implements ListedClientInterface {
     // optional override
   }
 
-  public getLaunchChallenge(): Challenge | undefined {
+  public getLaunchChallenge(): Challenges.Challenge | undefined {
     return this.protectionService.createLaunchChallenge()
   }
 
-  private async handleLaunchChallengeResponse(response: ChallengeResponse) {
-    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
+  private async handleLaunchChallengeResponse(response: Challenges.ChallengeResponse) {
+    if (
+      response.challenge.hasPromptForValidationType(Challenges.ChallengeValidation.LocalPasscode)
+    ) {
       let wrappingKey = response.artifacts?.wrappingKey
       if (!wrappingKey) {
-        const value = response.getValueForType(ChallengeValidation.LocalPasscode)
+        const value = response.getValueForType(Challenges.ChallengeValidation.LocalPasscode)
         wrappingKey = await this.protocolService.computeWrappingKey(value.value as string)
       }
       await this.protocolService.unwrapRootKey(wrappingKey)
@@ -416,7 +296,7 @@ export class SNApplication implements ListedClientInterface {
     }, DEFAULT_AUTO_SYNC_INTERVAL)
   }
 
-  private async handleStage(stage: ApplicationStage) {
+  private async handleStage(stage: Applications.ApplicationStage) {
     for (const service of this.services) {
       await service.handleApplicationStage(stage)
     }
@@ -432,7 +312,7 @@ export class SNApplication implements ListedClientInterface {
     const observer = { callback, singleEvent }
     this.eventHandlers.push(observer)
     return () => {
-      removeFromArray(this.eventHandlers, observer)
+      Utils.removeFromArray(this.eventHandlers, observer)
     }
   }
 
@@ -472,50 +352,53 @@ export class SNApplication implements ListedClientInterface {
     return this.syncService.isDatabaseLoaded()
   }
 
-  public async savePayload(payload: PurePayload): Promise<void> {
-    const dirtied = CopyPayload(payload, {
+  public async savePayload(payload: Payloads.PurePayload): Promise<void> {
+    const dirtied = Payloads.CopyPayload(payload, {
       dirty: true,
       dirtiedDate: new Date(),
     })
-    await this.payloadManager.emitPayload(dirtied, PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayload(dirtied, Payloads.PayloadSource.LocalChanged)
     await this.syncService.sync()
   }
 
   /**
    * Finds an item by UUID.
    */
-  public findItem(uuid: string): SNItem | undefined {
+  public findItem(uuid: string): Models.SNItem | undefined {
     return this.itemManager.findItem(uuid)
   }
 
   /**
    * Returns all items.
    */
-  public allItems(): SNItem[] {
+  public allItems(): Models.SNItem[] {
     return this.itemManager.items
   }
 
   /**
    * Finds an item by predicate.
    */
-  public findItems<T extends SNItem>(
-    contentType: ContentType,
-    predicate: PredicateInterface<T>,
-  ): SNItem[] {
+  public findItems<T extends Models.SNItem>(
+    contentType: Common.ContentType,
+    predicate: Payloads.PredicateInterface<T>,
+  ): Models.SNItem[] {
     return this.itemManager.itemsMatchingPredicate(contentType, predicate)
   }
 
   /**
    * Finds an item by predicate.
    */
-  public getAll(uuids: UuidString[]): (SNItem | PurePayload | undefined)[] {
+  public getAll(uuids: UuidString[]): (Models.SNItem | Payloads.PurePayload | undefined)[] {
     return this.itemManager.findItems(uuids)
   }
 
   /**
    * Takes the values of the input item and emits it onto global state.
    */
-  public async mergeItem(item: SNItem, source: PayloadSource): Promise<SNItem> {
+  public async mergeItem(
+    item: Models.SNItem,
+    source: Payloads.PayloadSource,
+  ): Promise<Models.SNItem> {
     return this.itemManager.emitItemFromPayload(item.payloadRepresentation(), source)
   }
 
@@ -524,11 +407,11 @@ export class SNApplication implements ListedClientInterface {
    * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
   public async createManagedItem(
-    contentType: ContentType,
-    content: PayloadContent,
+    contentType: Common.ContentType,
+    content: Payloads.PayloadContent,
     needsSync = false,
-    override?: PayloadOverride,
-  ): Promise<SNItem> {
+    override?: Payloads.PayloadOverride,
+  ): Promise<Models.SNItem> {
     return this.itemManager.createItem(contentType, content, needsSync, override)
   }
 
@@ -536,9 +419,9 @@ export class SNApplication implements ListedClientInterface {
    * Creates an unmanaged item that can be added later.
    */
   public async createTemplateItem(
-    contentType: ContentType,
-    content?: PayloadContent,
-  ): Promise<SNItem> {
+    contentType: Common.ContentType,
+    content?: Payloads.PayloadContent,
+  ): Promise<Models.SNItem> {
     return this.itemManager.createTemplateItem(contentType, content)
   }
 
@@ -546,30 +429,32 @@ export class SNApplication implements ListedClientInterface {
    * @param item item to be checked
    * @returns Whether the item is a template (unmanaged)
    */
-  public isTemplateItem(item: SNItem): boolean {
+  public isTemplateItem(item: Models.SNItem): boolean {
     return this.itemManager.isTemplateItem(item)
   }
 
   /**
    * Creates an unmanaged item from a payload.
    */
-  public createItemFromPayload(payload: PurePayload): SNItem {
-    return CreateItemFromPayload(payload)
+  public createItemFromPayload(payload: Payloads.PurePayload): Models.SNItem {
+    return Models.CreateItemFromPayload(payload)
   }
 
   /**
    * Creates an unmanaged payload from any object, where the raw object
    * represents the same data a payload would.
    */
-  public createPayloadFromObject(object: AnyRecord): PurePayload {
-    return CreateMaxPayloadFromAnyObject(object as RawPayload)
+  public createPayloadFromObject(object: Common.AnyRecord): Payloads.PurePayload {
+    return Payloads.CreateMaxPayloadFromAnyObject(object as Payloads.RawPayload)
   }
 
-  public getSessions(): Promise<(HttpResponse & { data: RemoteSession[] }) | HttpResponse> {
+  public getSessions(): Promise<
+    (Responses.HttpResponse & { data: Services.RemoteSession[] }) | Responses.HttpResponse
+  > {
     return this.sessionManager.getSessionsList()
   }
 
-  public async revokeSession(sessionId: UuidString): Promise<HttpResponse | undefined> {
+  public async revokeSession(sessionId: UuidString): Promise<Responses.HttpResponse | undefined> {
     if (await this.protectionService.authorizeSessionRevoking()) {
       return this.sessionManager.revokeSession(sessionId)
     }
@@ -584,47 +469,38 @@ export class SNApplication implements ListedClientInterface {
 
   public async userCanManageSessions(): Promise<boolean> {
     const userVersion = await this.getUserVersion()
-    if (isNullOrUndefined(userVersion)) {
+    if (Utils.isNullOrUndefined(userVersion)) {
       return false
     }
-    return compareVersions(userVersion, ProtocolVersion.V004) >= 0
+    return Applications.compareVersions(userVersion, Common.ProtocolVersion.V004) >= 0
   }
 
-  public async getUserSubscription(): Promise<Subscription | undefined> {
-    const response = await this.sessionManager.getSubscription()
-    if (response.error) {
-      throw new Error(response.error.message)
-    }
-    if (response.data) {
-      return (response as GetSubscriptionResponse).data!.subscription
-    }
-    return undefined
+  public async getUserSubscription(): Promise<Subscription | ClientDisplayableError> {
+    return this.sessionManager.getSubscription()
   }
 
-  public async getAvailableSubscriptions(): Promise<AvailableSubscriptions | undefined> {
-    const response = await this.apiService.getAvailableSubscriptions()
-    if (response.error) {
-      throw new Error(response.error.message)
-    }
-    if (response.data) {
-      return (response as GetAvailableSubscriptionsResponse).data!
-    }
-    return undefined
+  public async getAvailableSubscriptions(): Promise<
+    Responses.AvailableSubscriptions | ClientDisplayableError
+  > {
+    return this.sessionManager.getAvailableSubscriptions()
   }
 
   /**
    * @param isUserModified  Whether to change the modified date the user
    * sees of the item.
    */
-  public async setItemNeedsSync(item: SNItem, isUserModified = false): Promise<SNItem | undefined> {
+  public async setItemNeedsSync(
+    item: Models.SNItem,
+    isUserModified = false,
+  ): Promise<Models.SNItem | undefined> {
     return this.itemManager.setItemDirty(item.uuid, isUserModified)
   }
 
-  public async setItemsNeedsSync(items: SNItem[]): Promise<(SNItem | undefined)[]> {
-    return this.itemManager.setItemsDirty(Uuids(items))
+  public async setItemsNeedsSync(items: Models.SNItem[]): Promise<(Models.SNItem | undefined)[]> {
+    return this.itemManager.setItemsDirty(Models.Uuids(items))
   }
 
-  public async deleteItem(item: SNItem): Promise<void> {
+  public async deleteItem(item: Models.SNItem): Promise<void> {
     await this.itemManager.setItemToBeDeleted(item.uuid)
     await this.sync.sync()
   }
@@ -634,14 +510,14 @@ export class SNApplication implements ListedClientInterface {
     await this.sync.sync()
   }
 
-  public getTrashedItems(): SNNote[] {
+  public getTrashedItems(): Models.SNNote[] {
     return this.itemManager.trashedItems
   }
 
-  public setDisplayOptions<T extends SNItem>(
-    contentType: ContentType,
-    sortBy?: CollectionSort,
-    direction?: CollectionSortDirection,
+  public setDisplayOptions<T extends Models.SNItem>(
+    contentType: Common.ContentType,
+    sortBy?: Payloads.CollectionSort,
+    direction?: Payloads.CollectionSortDirection,
     filter?: (element: T) => boolean,
   ): void {
     this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter)
@@ -651,7 +527,7 @@ export class SNApplication implements ListedClientInterface {
     this.itemManager.setNotesDisplayCriteria(criteria)
   }
 
-  public getDisplayableItems<T extends SNItem>(contentType: ContentType): T[] {
+  public getDisplayableItems<T extends Models.SNItem>(contentType: Common.ContentType): T[] {
     return this.itemManager.getDisplayableItems(contentType)
   }
 
@@ -659,8 +535,8 @@ export class SNApplication implements ListedClientInterface {
    * Inserts the input item by its payload properties, and marks the item as dirty.
    * A sync is not performed after an item is inserted. This must be handled by the caller.
    */
-  public async insertItem(item: SNItem): Promise<SNItem> {
-    const mutator = createMutatorForItem(item, MutationType.UserInteraction)
+  public async insertItem(item: Models.SNItem): Promise<Models.SNItem> {
+    const mutator = Models.createMutatorForItem(item, Models.MutationType.UserInteraction)
     const dirtiedPayload = mutator.getResult()
     const insertedItem = await this.itemManager.emitItemFromPayload(dirtiedPayload)
     return insertedItem
@@ -676,7 +552,7 @@ export class SNApplication implements ListedClientInterface {
       throw Error('Attempting to save non-inserted item')
     }
     if (!item.dirty) {
-      await this.itemManager.changeItem(uuid, undefined, MutationType.Internal)
+      await this.itemManager.changeItem(uuid, undefined, Models.MutationType.Internal)
     }
     await this.syncService.sync()
   }
@@ -684,20 +560,20 @@ export class SNApplication implements ListedClientInterface {
   /**
    * Mutates a pre-existing item, marks it as dirty, and syncs it
    */
-  public async changeAndSaveItem<M extends ItemMutator = ItemMutator>(
+  public async changeAndSaveItem<M extends Models.ItemMutator = Models.ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
     isUserModified = true,
-    payloadSource?: PayloadSource,
-    syncOptions?: SyncOptions,
-  ): Promise<SNItem | undefined> {
-    if (!isString(uuid)) {
+    payloadSource?: Payloads.PayloadSource,
+    syncOptions?: Services.SyncOptions,
+  ): Promise<Models.SNItem | undefined> {
+    if (!Utils.isString(uuid)) {
       throw Error('Must use uuid to change item')
     }
     await this.itemManager.changeItems(
       [uuid],
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined,
+      isUserModified ? Models.MutationType.UserInteraction : undefined,
       payloadSource,
     )
     await this.syncService.sync(syncOptions)
@@ -707,17 +583,17 @@ export class SNApplication implements ListedClientInterface {
   /**
    * Mutates pre-existing items, marks them as dirty, and syncs
    */
-  public async changeAndSaveItems<M extends ItemMutator = ItemMutator>(
+  public async changeAndSaveItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
     isUserModified = true,
-    payloadSource?: PayloadSource,
-    syncOptions?: SyncOptions,
+    payloadSource?: Payloads.PayloadSource,
+    syncOptions?: Services.SyncOptions,
   ): Promise<void> {
     await this.itemManager.changeItems(
       uuids,
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined,
+      isUserModified ? Models.MutationType.UserInteraction : undefined,
       payloadSource,
     )
     await this.syncService.sync(syncOptions)
@@ -726,18 +602,18 @@ export class SNApplication implements ListedClientInterface {
   /**
    * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
    */
-  public async changeItem<M extends ItemMutator>(
+  public async changeItem<M extends Models.ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
     isUserModified = true,
-  ): Promise<SNItem | undefined> {
-    if (!isString(uuid)) {
+  ): Promise<Models.SNItem | undefined> {
+    if (!Utils.isString(uuid)) {
       throw Error('Must use uuid to change item')
     }
     await this.itemManager.changeItems(
       [uuid],
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined,
+      isUserModified ? Models.MutationType.UserInteraction : undefined,
     )
     return this.findItem(uuid)
   }
@@ -745,15 +621,15 @@ export class SNApplication implements ListedClientInterface {
   /**
    * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
    */
-  public async changeItems<M extends ItemMutator = ItemMutator>(
+  public async changeItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
     isUserModified = true,
-  ): Promise<(SNItem | undefined)[]> {
+  ): Promise<(Models.SNItem | undefined)[]> {
     return this.itemManager.changeItems(
       uuids,
       mutate,
-      isUserModified ? MutationType.UserInteraction : undefined,
+      isUserModified ? Models.MutationType.UserInteraction : undefined,
     )
   }
 
@@ -763,62 +639,62 @@ export class SNApplication implements ListedClientInterface {
    * runs the same mutation on all items.
    */
   public async runTransactionalMutations(
-    transactions: TransactionalMutation[],
-    payloadSource = PayloadSource.LocalChanged,
+    transactions: Services.TransactionalMutation[],
+    payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<(SNItem | undefined)[]> {
+  ): Promise<(Models.SNItem | undefined)[]> {
     return this.itemManager.runTransactionalMutations(transactions, payloadSource, payloadSourceKey)
   }
 
   public async runTransactionalMutation(
-    transaction: TransactionalMutation,
-    payloadSource = PayloadSource.LocalChanged,
+    transaction: Services.TransactionalMutation,
+    payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<SNItem | undefined> {
+  ): Promise<Models.SNItem | undefined> {
     return this.itemManager.runTransactionalMutation(transaction, payloadSource, payloadSourceKey)
   }
 
-  public async protectNote(note: SNNote): Promise<SNNote> {
+  public async protectNote(note: Models.SNNote): Promise<Models.SNNote> {
     const protectedNote = await this.protectionService.protectNote(note)
     void this.syncService.sync()
     return protectedNote
   }
 
-  public async unprotectNote(note: SNNote): Promise<SNNote | undefined> {
+  public async unprotectNote(note: Models.SNNote): Promise<Models.SNNote | undefined> {
     const unprotectedNote = await this.protectionService.unprotectNote(note)
-    if (!isNullOrUndefined(unprotectedNote)) {
+    if (!Utils.isNullOrUndefined(unprotectedNote)) {
       void this.syncService.sync()
     }
     return unprotectedNote
   }
 
   public async authorizeProtectedActionForNotes(
-    notes: SNNote[],
-    challengeReason: ChallengeReason,
-  ): Promise<SNNote[]> {
+    notes: Models.SNNote[],
+    challengeReason: Challenges.ChallengeReason,
+  ): Promise<Models.SNNote[]> {
     return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason)
   }
 
-  public async protectNotes(notes: SNNote[]): Promise<SNNote[]> {
+  public async protectNotes(notes: Models.SNNote[]): Promise<Models.SNNote[]> {
     const protectedNotes = await this.protectionService.protectNotes(notes)
     void this.syncService.sync()
     return protectedNotes
   }
 
-  public async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
+  public async unprotectNotes(notes: Models.SNNote[]): Promise<Models.SNNote[]> {
     const unprotectedNotes = await this.protectionService.unprotectNotes(notes)
     void this.syncService.sync()
     return unprotectedNotes
   }
 
-  public getItems<T extends SNItem>(
-    contentType: ContentType | ContentType[],
+  public getItems<T extends Models.SNItem>(
+    contentType: Common.ContentType | Common.ContentType[],
     nonerroredOnly = false,
   ): T[] {
     return this.itemManager.getItems<T>(contentType, nonerroredOnly)
   }
 
-  public notesMatchingSmartView(view: SmartView): SNNote[] {
+  public notesMatchingSmartView(view: Models.SmartView): Models.SNNote[] {
     return this.itemManager.notesMatchingSmartView(view)
   }
 
@@ -830,12 +706,12 @@ export class SNApplication implements ListedClientInterface {
     return this.itemManager.allCountableNotesCount()
   }
 
-  public countableNotesForTag(tag: SNTag | SmartView): number {
+  public countableNotesForTag(tag: Models.SNTag | Models.SmartView): number {
     return this.itemManager.countableNotesForTag(tag)
   }
 
   /** Returns an item's direct references */
-  public referencesForItem(item: SNItem, contentType?: ContentType): SNItem[] {
+  public referencesForItem(item: Models.SNItem, contentType?: Common.ContentType): Models.SNItem[] {
     let references = this.itemManager.referencesForItem(item.uuid)
     if (contentType) {
       references = references.filter((ref) => {
@@ -846,34 +722,37 @@ export class SNApplication implements ListedClientInterface {
   }
 
   /** Returns items referencing an item */
-  public referencingForItem(item: SNItem, contentType?: ContentType): SNItem[] {
+  public referencingForItem(
+    item: Models.SNItem,
+    contentType?: Common.ContentType,
+  ): Models.SNItem[] {
     let references = this.itemManager.itemsReferencingItem(item.uuid)
     if (contentType) {
       references = references.filter((ref) => {
         return ref?.content_type === contentType
       })
     }
-    return references as SNItem[]
+    return references as Models.SNItem[]
   }
 
-  public duplicateItem<T extends SNItem>(
+  public duplicateItem<T extends Models.SNItem>(
     item: T,
-    additionalContent?: Partial<PayloadContent>,
+    additionalContent?: Partial<Payloads.PayloadContent>,
   ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(item.uuid, false, additionalContent)
     void this.sync.sync()
     return duplicate
   }
 
-  public findTagByTitle(title: string): SNTag | undefined {
+  public findTagByTitle(title: string): Models.SNTag | undefined {
     return this.itemManager.findTagByTitle(title)
   }
 
-  public getTagPrefixTitle(tag: SNTag): string | undefined {
+  public getTagPrefixTitle(tag: Models.SNTag): string | undefined {
     return this.itemManager.getTagPrefixTitle(tag)
   }
 
-  public getTagLongTitle(tag: SNTag): string {
+  public getTagLongTitle(tag: Models.SNTag): string {
     return this.itemManager.getTagLongTitle(tag)
   }
 
@@ -883,7 +762,7 @@ export class SNApplication implements ListedClientInterface {
    * @param note - The note whose tags should be omitted from results
    * @returns Array containing tags matching search query and not associated with note
    */
-  public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
+  public searchTags(searchQuery: string, note?: Models.SNNote): Models.SNTag[] {
     return this.itemManager.searchTags(searchQuery, note)
   }
 
@@ -907,14 +786,14 @@ export class SNApplication implements ListedClientInterface {
   /**
    * Establishes a hierarchical relationship between two tags.
    */
-  public async setTagParent(parentTag: SNTag, childTag: SNTag): Promise<void> {
+  public async setTagParent(parentTag: Models.SNTag, childTag: Models.SNTag): Promise<void> {
     await this.itemManager.setTagParent(parentTag, childTag)
   }
 
   /**
    * Remove the tag parent.
    */
-  public async unsetTagParent(childTag: SNTag): Promise<void> {
+  public async unsetTagParent(childTag: Models.SNTag): Promise<void> {
     await this.itemManager.unsetTagParent(childTag)
   }
 
@@ -923,7 +802,7 @@ export class SNApplication implements ListedClientInterface {
    * @param tag - The tag for which parents need to be found
    * @returns The current parent or undefined
    */
-  public getTagParent(tag: SNTag): SNTag | undefined {
+  public getTagParent(tag: Models.SNTag): Models.SNTag | undefined {
     return this.itemManager.getTagParent(tag.uuid)
   }
 
@@ -932,7 +811,7 @@ export class SNApplication implements ListedClientInterface {
    * @param tag - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
-  public getTagParentChain(tag: SNTag): SNTag[] {
+  public getTagParentChain(tag: Models.SNTag): Models.SNTag[] {
     return this.itemManager.getTagParentChain(tag.uuid)
   }
 
@@ -941,7 +820,7 @@ export class SNApplication implements ListedClientInterface {
    * @param tag - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-  public getTagChildren(tag: SNTag): SNTag[] {
+  public getTagChildren(tag: Models.SNTag): Models.SNTag[] {
     return this.itemManager.getTagChildren(tag.uuid)
   }
 
@@ -950,7 +829,7 @@ export class SNApplication implements ListedClientInterface {
    * @param note - The note whose tags will be returned
    * @returns Array containing tags associated with a note
    */
-  public getSortedTagsForNote(note: SNNote): SNTag[] {
+  public getSortedTagsForNote(note: Models.SNNote): Models.SNTag[] {
     return this.itemManager.getSortedTagsForNote(note)
   }
 
@@ -960,16 +839,16 @@ export class SNApplication implements ListedClientInterface {
    * @param note The note assigned to a tag
    * @param tagUuid The tag we'll assign to the note
    */
-  public addTagHierarchyToNote(note: SNNote, tag: SNTag): Promise<SNTag[]> {
+  public addTagHierarchyToNote(note: Models.SNNote, tag: Models.SNTag): Promise<Models.SNTag[]> {
     return this.itemManager.addTagHierarchyToNote(note, tag)
   }
 
-  public async findOrCreateTag(title: string): Promise<SNTag> {
+  public async findOrCreateTag(title: string): Promise<Models.SNTag> {
     return this.itemManager.findOrCreateTagByTitle(title)
   }
 
   /** Creates and returns the tag but does not run sync. Callers must perform sync. */
-  public async createTagOrSmartView(title: string): Promise<SNTag | SmartView> {
+  public async createTagOrSmartView(title: string): Promise<Models.SNTag | Models.SmartView> {
     return this.itemManager.createTagOrSmartView(title)
   }
 
@@ -977,7 +856,7 @@ export class SNApplication implements ListedClientInterface {
     return this.itemManager.isSmartViewTitle(title)
   }
 
-  public getSmartViews(): SmartView[] {
+  public getSmartViews(): Models.SmartView[] {
     return this.itemManager.getSmartViews()
   }
 
@@ -990,7 +869,10 @@ export class SNApplication implements ListedClientInterface {
    * immediately with the present items that match the constraint, and over time whenever
    * items matching the constraint are added, changed, or deleted.
    */
-  public streamItems(contentType: ContentType | ContentType[], stream: ItemStream): () => void {
+  public streamItems(
+    contentType: Common.ContentType | Common.ContentType[],
+    stream: ItemStream,
+  ): () => void {
     const observer = this.itemManager.addObserver(
       contentType,
       (changed, inserted, discarded, _ignored, source) => {
@@ -1001,12 +883,12 @@ export class SNApplication implements ListedClientInterface {
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType)
     if (matches.length > 0) {
-      stream(matches, PayloadSource.InitialObserverRegistrationPush)
+      stream(matches, Payloads.PayloadSource.InitialObserverRegistrationPush)
     }
     this.streamRemovers.push(observer)
     return () => {
       observer()
-      removeFromArray(this.streamRemovers, observer)
+      Utils.removeFromArray(this.streamRemovers, observer)
     }
   }
 
@@ -1014,12 +896,12 @@ export class SNApplication implements ListedClientInterface {
    * Activates or deactivates a component, depending on its
    * current state, and syncs.
    */
-  public async toggleComponent(component: SNComponent): Promise<void> {
+  public async toggleComponent(component: Models.SNComponent): Promise<void> {
     await this.componentManager.toggleComponent(component.uuid)
     await this.syncService.sync()
   }
 
-  public async toggleTheme(theme: SNComponent): Promise<void> {
+  public async toggleTheme(theme: Models.SNComponent): Promise<void> {
     await this.componentManager.toggleTheme(theme.uuid)
     await this.syncService.sync()
   }
@@ -1040,7 +922,7 @@ export class SNApplication implements ListedClientInterface {
     await this.webSocketsService.setWebSocketUrl(undefined)
   }
 
-  public getUser(): User | undefined {
+  public getUser(): Responses.User | undefined {
     if (!this.launched) {
       throw Error('Attempting to access user before application unlocked')
     }
@@ -1055,7 +937,7 @@ export class SNApplication implements ListedClientInterface {
     return this.protocolService.getEncryptionDisplayName()
   }
 
-  public getUserVersion(): Promise<ProtocolVersion | undefined> {
+  public getUserVersion(): Promise<Common.ProtocolVersion | undefined> {
     return this.protocolService.getUserVersion()
   }
 
@@ -1083,12 +965,12 @@ export class SNApplication implements ListedClientInterface {
     const result = await this.userService.performProtocolUpgrade()
     if (result.success) {
       if (this.hasAccount()) {
-        void this.alertService.alert(ProtocolUpgradeStrings.SuccessAccount)
+        void this.alertService.alert(Services.ProtocolUpgradeStrings.SuccessAccount)
       } else {
-        void this.alertService.alert(ProtocolUpgradeStrings.SuccessPasscodeOnly)
+        void this.alertService.alert(Services.ProtocolUpgradeStrings.SuccessPasscodeOnly)
       }
     } else if (result.error) {
-      void this.alertService.alert(ProtocolUpgradeStrings.Fail)
+      void this.alertService.alert(Services.ProtocolUpgradeStrings.Fail)
     }
     return result
   }
@@ -1128,7 +1010,7 @@ export class SNApplication implements ListedClientInterface {
   /**
    * @returns whether note access has been granted or not
    */
-  public authorizeNoteAccess(note: SNNote): Promise<boolean> {
+  public authorizeNoteAccess(note: Models.SNNote): Promise<boolean> {
     return this.protectionService.authorizeNoteAccess(note)
   }
 
@@ -1144,18 +1026,18 @@ export class SNApplication implements ListedClientInterface {
     return this.listedService.canRegisterNewListedAccount()
   }
 
-  public async requestNewListedAccount(): Promise<ListedAccount | undefined> {
+  public async requestNewListedAccount(): Promise<Responses.ListedAccount | undefined> {
     return this.listedService.requestNewListedAccount()
   }
 
-  public async getListedAccounts(): Promise<ListedAccount[]> {
+  public async getListedAccounts(): Promise<Responses.ListedAccount[]> {
     return this.listedService.getListedAccounts()
   }
 
   public getListedAccountInfo(
-    account: ListedAccount,
+    account: Responses.ListedAccount,
     inContextOfItem?: UuidString,
-  ): Promise<ListedAccountInfo | undefined> {
+  ): Promise<Responses.ListedAccountInfo | undefined> {
     return this.listedService.getListedAccountInfo(account, inContextOfItem)
   }
 
@@ -1165,11 +1047,11 @@ export class SNApplication implements ListedClientInterface {
    * .errorCount: The number of items that were not imported due to failure to decrypt.
    */
   public async importData(
-    data: BackupFile,
+    data: Services.BackupFile,
     awaitSync = false,
   ): Promise<
     | {
-        affectedItems: SNItem[]
+        affectedItems: Models.SNItem[]
         errorCount: number
       }
     | {
@@ -1183,17 +1065,17 @@ export class SNApplication implements ListedClientInterface {
        * stop importing if there is no backup file version, only if there is
        * an unsupported version.
        */
-      const version = data.version as ProtocolVersion
+      const version = data.version as Common.ProtocolVersion
 
       const supportedVersions = this.protocolService.supportedVersions()
       if (!supportedVersions.includes(version)) {
-        return { error: UNSUPPORTED_BACKUP_FILE_VERSION }
+        return { error: Services.UNSUPPORTED_BACKUP_FILE_VERSION }
       }
 
       const userVersion = await this.getUserVersion()
-      if (userVersion && compareVersions(version, userVersion) === 1) {
+      if (userVersion && Applications.compareVersions(version, userVersion) === 1) {
         /** File was made with a greater version than the user's account */
-        return { error: BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT }
+        return { error: Services.BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT }
       }
     }
 
@@ -1201,20 +1083,20 @@ export class SNApplication implements ListedClientInterface {
 
     if (data.auth_params || data.keyParams) {
       /** Get import file password. */
-      const challenge = new Challenge(
+      const challenge = new Challenges.Challenge(
         [
-          new ChallengePrompt(
-            ChallengeValidation.None,
-            ImportStrings.FileAccountPassword,
+          new Challenges.ChallengePrompt(
+            Challenges.ChallengeValidation.None,
+            Services.ImportStrings.FileAccountPassword,
             undefined,
             true,
           ),
         ],
-        ChallengeReason.DecryptEncryptedFile,
+        Challenges.ChallengeReason.DecryptEncryptedFile,
         true,
       )
       const passwordResponse = await this.challengeService.promptForChallengeResponse(challenge)
-      if (isNullOrUndefined(passwordResponse)) {
+      if (Utils.isNullOrUndefined(passwordResponse)) {
         /** Challenge was canceled */
         return
       }
@@ -1231,13 +1113,13 @@ export class SNApplication implements ListedClientInterface {
     )
     const validPayloads = decryptedPayloads
       .filter((payload) => {
-        return !payload.errorDecrypting && payload.format !== PayloadFormat.EncryptedString
+        return !payload.errorDecrypting && payload.format !== Payloads.PayloadFormat.EncryptedString
       })
       .map((payload) => {
         /* Don't want to activate any components during import process in
          * case of exceptions breaking up the import proccess */
-        if (payload.content_type === ContentType.Component && payload.safeContent.active) {
-          return CopyPayload(payload, {
+        if (payload.content_type === Common.ContentType.Component && payload.safeContent.active) {
+          return Payloads.CopyPayload(payload, {
             content: {
               ...payload.safeContent,
               active: false,
@@ -1252,7 +1134,7 @@ export class SNApplication implements ListedClientInterface {
     if (awaitSync) {
       await promise
     }
-    const affectedItems = this.getAll(affectedUuids) as SNItem[]
+    const affectedItems = this.getAll(affectedUuids) as Models.SNItem[]
     return {
       affectedItems: affectedItems,
       errorCount: decryptedPayloads.length - validPayloads.length,
@@ -1263,11 +1145,11 @@ export class SNApplication implements ListedClientInterface {
    * Creates a JSON-stringifiable backup object of all items.
    */
   public async createBackupFile(
-    intent: EncryptionIntent,
+    intent: Applications.EncryptionIntent,
     authorizeEncrypted = false,
-  ): Promise<BackupFile | undefined> {
-    const encrypted = intent === EncryptionIntent.FileEncrypted
-    const decrypted = intent === EncryptionIntent.FileDecrypted
+  ): Promise<Services.BackupFile | undefined> {
+    const encrypted = intent === Applications.EncryptionIntent.FileEncrypted
+    const decrypted = intent === Applications.EncryptionIntent.FileDecrypted
     const authorize = (encrypted && authorizeEncrypted) || decrypted
 
     if (authorize && !(await this.protectionService.authorizeBackupCreation(encrypted))) {
@@ -1281,28 +1163,38 @@ export class SNApplication implements ListedClientInterface {
     return this.storageService.isEphemeralSession()
   }
 
-  public async setValue(key: string, value: unknown, mode?: StorageValueModes): Promise<void> {
+  public async setValue(
+    key: string,
+    value: unknown,
+    mode?: Services.StorageValueModes,
+  ): Promise<void> {
     return this.storageService.setValue(key, value, mode)
   }
 
-  public getValue(key: string, mode?: StorageValueModes): unknown {
+  public getValue(key: string, mode?: Services.StorageValueModes): unknown {
     return this.storageService.getValue(key, mode)
   }
 
-  public async removeValue(key: string, mode?: StorageValueModes): Promise<void> {
+  public async removeValue(key: string, mode?: Services.StorageValueModes): Promise<void> {
     return this.storageService.removeValue(key, mode)
   }
 
-  public getPreference<K extends PrefKey>(key: K): PrefValue[K] | undefined
-  public getPreference<K extends PrefKey>(key: K, defaultValue: PrefValue[K]): PrefValue[K]
-  public getPreference<K extends PrefKey>(
+  public getPreference<K extends Models.PrefKey>(key: K): Models.PrefValue[K] | undefined
+  public getPreference<K extends Models.PrefKey>(
     key: K,
-    defaultValue?: PrefValue[K],
-  ): PrefValue[K] | undefined {
+    defaultValue: Models.PrefValue[K],
+  ): Models.PrefValue[K]
+  public getPreference<K extends Models.PrefKey>(
+    key: K,
+    defaultValue?: Models.PrefValue[K],
+  ): Models.PrefValue[K] | undefined {
     return this.preferencesService.getValue(key, defaultValue)
   }
 
-  public async setPreference<K extends PrefKey>(key: K, value: PrefValue[K]): Promise<void> {
+  public async setPreference<K extends Models.PrefKey>(
+    key: K,
+    value: Models.PrefValue[K],
+  ): Promise<void> {
     return this.preferencesService.setValue(key, value)
   }
 
@@ -1317,23 +1209,31 @@ export class SNApplication implements ListedClientInterface {
       await promise
     } else {
       /** Await up to maxWait. If not resolved by then, return. */
-      await Promise.race([promise, sleep(maxWait)])
+      await Promise.race([promise, Utils.sleep(maxWait)])
     }
   }
 
-  public promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | undefined> {
+  public promptForCustomChallenge(
+    challenge: Challenges.Challenge,
+  ): Promise<Challenges.ChallengeResponse | undefined> {
     return this.challengeService?.promptForChallengeResponse(challenge)
   }
 
-  public addChallengeObserver(challenge: Challenge, observer: ChallengeObserver): () => void {
+  public addChallengeObserver(
+    challenge: Challenges.Challenge,
+    observer: Services.ChallengeObserver,
+  ): () => void {
     return this.challengeService.addChallengeObserver(challenge, observer)
   }
 
-  public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void> {
+  public submitValuesForChallenge(
+    challenge: Challenges.Challenge,
+    values: Challenges.ChallengeValue[],
+  ): Promise<void> {
     return this.challengeService.submitValuesForChallenge(challenge, values)
   }
 
-  public cancelChallenge(challenge: Challenge): void {
+  public cancelChallenge(challenge: Challenges.Challenge): void {
     this.challengeService.cancelChallenge(challenge)
   }
 
@@ -1383,7 +1283,7 @@ export class SNApplication implements ListedClientInterface {
     password: string,
     ephemeral = false,
     mergeLocal = true,
-  ): Promise<AccountServiceResponse> {
+  ): Promise<Services.AccountServiceResponse> {
     return this.userService.register(email, password, ephemeral, mergeLocal)
   }
 
@@ -1398,7 +1298,7 @@ export class SNApplication implements ListedClientInterface {
     ephemeral = false,
     mergeLocal = true,
     awaitSync = false,
-  ): Promise<HttpResponse | SignInResponse> {
+  ): Promise<Responses.HttpResponse | Responses.SignInResponse> {
     return this.userService.signIn(email, password, strict, ephemeral, mergeLocal, awaitSync)
   }
 
@@ -1406,8 +1306,8 @@ export class SNApplication implements ListedClientInterface {
     newEmail: string,
     currentPassword: string,
     passcode?: string,
-    origination = KeyParamsOrigination.EmailChange,
-  ): Promise<CredentialsChangeFunctionResponse> {
+    origination = Common.KeyParamsOrigination.EmailChange,
+  ): Promise<Services.CredentialsChangeFunctionResponse> {
     return this.userService.changeCredentials({
       currentPassword,
       newEmail,
@@ -1421,9 +1321,9 @@ export class SNApplication implements ListedClientInterface {
     currentPassword: string,
     newPassword: string,
     passcode?: string,
-    origination = KeyParamsOrigination.PasswordChange,
+    origination = Common.KeyParamsOrigination.PasswordChange,
     validateNewPasswordStrength = true,
-  ): Promise<CredentialsChangeFunctionResponse> {
+  ): Promise<Services.CredentialsChangeFunctionResponse> {
     return this.userService.changeCredentials({
       currentPassword,
       newPassword,
@@ -1474,7 +1374,7 @@ export class SNApplication implements ListedClientInterface {
     /** Keep a reference to the soon-to-be-cleared alertService */
     const alertService = this.alertService
     await this.signOut(true)
-    void alertService.alert(SessionStrings.CurrentSessionRevoked)
+    void alertService.alert(Services.SessionStrings.CurrentSessionRevoked)
   }
 
   public async validateAccountPassword(password: string): Promise<boolean> {
@@ -1540,24 +1440,24 @@ export class SNApplication implements ListedClientInterface {
 
   public async changePasscode(
     newPasscode: string,
-    origination = KeyParamsOrigination.PasscodeChange,
+    origination = Common.KeyParamsOrigination.PasscodeChange,
   ): Promise<boolean> {
     return this.userService.changePasscode(newPasscode, origination)
   }
 
-  public getStorageEncryptionPolicy(): StorageEncryptionPolicies {
+  public getStorageEncryptionPolicy(): Services.StorageEncryptionPolicies {
     return this.storageService.getStorageEncryptionPolicy()
   }
 
   public async setStorageEncryptionPolicy(
-    encryptionPolicy: StorageEncryptionPolicies,
+    encryptionPolicy: Services.StorageEncryptionPolicies,
   ): Promise<void> {
     await this.storageService.setEncryptionPolicy(encryptionPolicy)
     return this.protocolService.repersistAllItems()
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
-    return this.storageService.setPersistencePolicy(StoragePersistencePolicies.Ephemeral)
+    return this.storageService.setPersistencePolicy(Services.StoragePersistencePolicies.Ephemeral)
   }
 
   public hasPendingMigrations(): Promise<boolean> {
@@ -1565,7 +1465,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   public generateUuid(): string {
-    return UuidGenerator.GenerateUuid()
+    return Utils.UuidGenerator.GenerateUuid()
   }
 
   public presentKeyRecoveryWizard(): Promise<void> {
@@ -1576,7 +1476,7 @@ export class SNApplication implements ListedClientInterface {
    * Dynamically change the device interface, i.e when Desktop wants to override
    * default web interface.
    */
-  public changeDeviceInterface(deviceInterface: DeviceInterface): void {
+  public changeDeviceInterface(deviceInterface: ExternalServices.DeviceInterface): void {
     this.deviceInterface = deviceInterface
     for (const service of this.services) {
       if (service.deviceInterface) {
@@ -1585,27 +1485,31 @@ export class SNApplication implements ListedClientInterface {
     }
   }
 
-  public async listSettings(): Promise<Partial<Settings>> {
+  public async listSettings(): Promise<Partial<Services.Settings>> {
     return this.settingsService.listSettings()
   }
 
-  public async getSetting(name: SettingName): Promise<string | null> {
+  public async getSetting(name: Settings.SettingName): Promise<string | null> {
     return this.settingsService.getSetting(name)
   }
 
-  public async getSensitiveSetting(name: SensitiveSettingName): Promise<boolean> {
+  public async getSensitiveSetting(name: Services.SensitiveSettingName): Promise<boolean> {
     return this.settingsService.getSensitiveSetting(name)
   }
 
-  public async updateSetting(name: SettingName, payload: string, sensitive = false): Promise<void> {
+  public async updateSetting(
+    name: Settings.SettingName,
+    payload: string,
+    sensitive = false,
+  ): Promise<void> {
     return this.settingsService.updateSetting(name, payload, sensitive)
   }
 
-  public async deleteSetting(name: SettingName): Promise<void> {
+  public async deleteSetting(name: Settings.SettingName): Promise<void> {
     return this.settingsService.deleteSetting(name)
   }
 
-  public getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
+  public getEmailBackupFrequencyOptionLabel(frequency: Settings.EmailBackupFrequency): string {
     return this.settingsService.getEmailBackupFrequencyOptionLabel(frequency)
   }
 
@@ -1644,7 +1548,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   public getCloudProviderIntegrationUrl(
-    cloudProviderName: CloudProvider,
+    cloudProviderName: Settings.CloudProvider,
     isDevEnvironment: boolean,
   ): string {
     return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName, isDevEnvironment)
@@ -1719,16 +1623,22 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private constructInternalEventBus(): void {
-    this.internalEventBus = new InternalEventBus()
+    this.internalEventBus = new ExternalServices.InternalEventBus()
   }
 
   private defineInternalEventHandlers(): void {
-    this.internalEventBus.addEventHandler(this.featuresService, ApiServiceEvent.MetaReceived)
+    this.internalEventBus.addEventHandler(
+      this.featuresService,
+      Services.ApiServiceEvent.MetaReceived,
+    )
     this.internalEventBus.addEventHandler(
       this.integrityService,
-      SyncEvent.SyncRequestsIntegrityCheck,
+      ExternalServices.SyncEvent.SyncRequestsIntegrityCheck,
     )
-    this.internalEventBus.addEventHandler(this.syncService, IntegrityEvent.IntegrityCheckCompleted)
+    this.internalEventBus.addEventHandler(
+      this.syncService,
+      ExternalServices.IntegrityEvent.IntegrityCheckCompleted,
+    )
   }
 
   private clearInternalEventBus(): void {
@@ -1736,7 +1646,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createListedService(): void {
-    this.listedService = new ListedService(
+    this.listedService = new Services.ListedService(
       this.apiService,
       this.itemManager,
       this.settingsService,
@@ -1747,7 +1657,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createFileService() {
-    this.fileService = new SNFileService(
+    this.fileService = new Services.SNFileService(
       this.apiService,
       this.itemManager,
       this.syncService,
@@ -1760,7 +1670,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createIntegrityService() {
-    this.integrityService = new IntegrityService(
+    this.integrityService = new ExternalServices.IntegrityService(
       this.apiService,
       this.apiService,
       this.itemManager,
@@ -1771,7 +1681,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createFeaturesService() {
-    this.featuresService = new SNFeaturesService(
+    this.featuresService = new Services.SNFeaturesService(
       this.storageService,
       this.apiService,
       this.itemManager,
@@ -1787,16 +1697,16 @@ export class SNApplication implements ListedClientInterface {
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
         switch (event) {
-          case FeaturesEvent.UserRolesChanged: {
+          case Services.FeaturesEvent.UserRolesChanged: {
             void this.notifyEvent(ApplicationEvent.UserRolesChanged)
             break
           }
-          case FeaturesEvent.FeaturesUpdated: {
+          case Services.FeaturesEvent.FeaturesUpdated: {
             void this.notifyEvent(ApplicationEvent.FeaturesUpdated)
             break
           }
           default: {
-            assertUnreachable(event)
+            Utils.assertUnreachable(event)
           }
         }
       }),
@@ -1805,7 +1715,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createWebSocketsService() {
-    this.webSocketsService = new SNWebSocketsService(
+    this.webSocketsService = new Services.SNWebSocketsService(
       this.storageService,
       this.options.webSocketUrl,
       this.internalEventBus,
@@ -1814,7 +1724,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createMigrationService() {
-    this.migrationService = new SNMigrationService({
+    this.migrationService = new Services.SNMigrationService({
       protocolService: this.protocolService,
       deviceInterface: this.deviceInterface,
       storageService: this.storageService,
@@ -1831,7 +1741,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createUserService(): void {
-    this.userService = new UserService(
+    this.userService = new Services.UserService(
       this.sessionManager,
       this.syncService,
       this.storageService,
@@ -1846,18 +1756,18 @@ export class SNApplication implements ListedClientInterface {
     this.serviceObservers.push(
       this.userService.addEventObserver(async (event) => {
         switch (event) {
-          case AccountEvent.SignedInOrRegistered: {
+          case Services.AccountEvent.SignedInOrRegistered: {
             void this.notifyEvent(ApplicationEvent.SignedIn)
             break
           }
-          case AccountEvent.SignedOut: {
+          case Services.AccountEvent.SignedOut: {
             await this.notifyEvent(ApplicationEvent.SignedOut)
             await this.prepareForDeinit()
             this.deinit(DeinitSource.SignOut)
             break
           }
           default: {
-            assertUnreachable(event)
+            Utils.assertUnreachable(event)
           }
         }
       }),
@@ -1866,7 +1776,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createApiService() {
-    this.apiService = new SNApiService(
+    this.apiService = new Services.SNApiService(
       this.httpService,
       this.storageService,
       this.options.defaultHost,
@@ -1876,13 +1786,14 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createItemManager() {
-    this.itemManager = new ItemManager(this.payloadManager, this.internalEventBus)
+    this.itemManager = new Services.ItemManager(this.payloadManager, this.internalEventBus)
     this.services.push(this.itemManager)
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager =
-      this.getClass<typeof SNComponentManager>(SNComponentManager)
+    const MaybeSwappedComponentManager = this.getClass<typeof Services.SNComponentManager>(
+      Services.SNComponentManager,
+    )
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
       this.syncService,
@@ -1898,7 +1809,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createHttpManager() {
-    this.httpService = new SNHttpService(
+    this.httpService = new Services.SNHttpService(
       this.environment,
       this.options.appVersion,
       this.internalEventBus,
@@ -1907,12 +1818,12 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createPayloadManager() {
-    this.payloadManager = new PayloadManager(this.internalEventBus)
+    this.payloadManager = new Services.PayloadManager(this.internalEventBus)
     this.services.push(this.payloadManager)
   }
 
   private createSingletonManager() {
-    this.singletonManager = new SNSingletonManager(
+    this.singletonManager = new Services.SNSingletonManager(
       this.itemManager,
       this.syncService,
       this.internalEventBus,
@@ -1921,7 +1832,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createStorageManager() {
-    this.storageService = new SNStorageService(
+    this.storageService = new Services.SNStorageService(
       this.deviceInterface,
       this.alertService,
       this.identifier,
@@ -1932,7 +1843,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createProtocolService() {
-    this.protocolService = new SNProtocolService(
+    this.protocolService = new Services.SNProtocolService(
       this.itemManager,
       this.payloadManager,
       this.deviceInterface,
@@ -1948,7 +1859,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createKeyRecoveryService() {
-    this.keyRecoveryService = new SNKeyRecoveryService(
+    this.keyRecoveryService = new Services.SNKeyRecoveryService(
       this.itemManager,
       this.payloadManager,
       this.apiService,
@@ -1964,7 +1875,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createSessionManager() {
-    this.sessionManager = new SNSessionManager(
+    this.sessionManager = new Services.SNSessionManager(
       this.storageService,
       this.apiService,
       this.alertService,
@@ -1976,7 +1887,7 @@ export class SNApplication implements ListedClientInterface {
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
         switch (event) {
-          case SessionEvent.Restored: {
+          case Services.SessionEvent.Restored: {
             void (async () => {
               await this.sync.sync()
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
@@ -1987,12 +1898,12 @@ export class SNApplication implements ListedClientInterface {
             })()
             break
           }
-          case SessionEvent.Revoked: {
+          case Services.SessionEvent.Revoked: {
             await this.handleRevokedSession()
             break
           }
           default: {
-            assertUnreachable(event)
+            Utils.assertUnreachable(event)
           }
         }
       }),
@@ -2001,7 +1912,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createSyncManager() {
-    this.syncService = new SNSyncService(
+    this.syncService = new Services.SNSyncService(
       this.itemManager,
       this.sessionManager,
       this.protocolService,
@@ -2014,14 +1925,14 @@ export class SNApplication implements ListedClientInterface {
       },
       this.internalEventBus,
     )
-    const syncEventCallback = async (eventName: SyncEvent) => {
+    const syncEventCallback = async (eventName: ExternalServices.SyncEvent) => {
       const appEvent = applicationEventForSyncEvent(eventName)
       if (appEvent) {
         await this.notifyEvent(appEvent)
         if (appEvent === ApplicationEvent.CompletedFullSync) {
           if (!this.handledFullSyncStage) {
             this.handledFullSyncStage = true
-            await this.handleStage(ApplicationStage.FullSyncCompleted_13)
+            await this.handleStage(Applications.ApplicationStage.FullSyncCompleted_13)
           }
         }
       }
@@ -2033,7 +1944,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createChallengeService() {
-    this.challengeService = new ChallengeService(
+    this.challengeService = new Services.ChallengeService(
       this.storageService,
       this.protocolService,
       this.internalEventBus,
@@ -2042,7 +1953,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createProtectionService() {
-    this.protectionService = new SNProtectionService(
+    this.protectionService = new Services.SNProtectionService(
       this.protocolService,
       this.challengeService,
       this.storageService,
@@ -2051,9 +1962,9 @@ export class SNApplication implements ListedClientInterface {
     )
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
-        if (event === ProtectionEvent.UnprotectedSessionBegan) {
+        if (event === Services.ProtectionEvent.UnprotectedSessionBegan) {
           void this.notifyEvent(ApplicationEvent.UnprotectedSessionBegan)
-        } else if (event === ProtectionEvent.UnprotectedSessionExpired) {
+        } else if (event === Services.ProtectionEvent.UnprotectedSessionExpired) {
           void this.notifyEvent(ApplicationEvent.UnprotectedSessionExpired)
         }
       }),
@@ -2062,7 +1973,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createHistoryManager() {
-    this.historyManager = new SNHistoryManager(
+    this.historyManager = new Services.SNHistoryManager(
       this.itemManager,
       this.storageService,
       this.apiService,
@@ -2074,7 +1985,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createActionsManager() {
-    this.actionsManager = new SNActionsService(
+    this.actionsManager = new Services.SNActionsService(
       this.itemManager,
       this.alertService,
       this.deviceInterface,
@@ -2090,7 +2001,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createPreferencesService() {
-    this.preferencesService = new SNPreferencesService(
+    this.preferencesService = new Services.SNPreferencesService(
       this.singletonManager,
       this.itemManager,
       this.syncService,
@@ -2105,7 +2016,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createSettingsService() {
-    this.settingsService = new SNSettingsService(
+    this.settingsService = new Services.SNSettingsService(
       this.sessionManager,
       this.apiService,
       this.internalEventBus,
@@ -2114,7 +2025,7 @@ export class SNApplication implements ListedClientInterface {
   }
 
   private createMfaService() {
-    this.mfaService = new SNMfaService(
+    this.mfaService = new Services.SNMfaService(
       this.settingsService,
       this.options.crypto,
       this.featuresService,

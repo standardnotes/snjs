@@ -101,13 +101,13 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSync()
         } else {
-          this.itemManager.removeAllItemsFromMemory()
+          await this.itemManager.removeAllItemsFromMemory()
           await this.clearDatabase()
         }
         await this.notifyEvent(AccountEvent.SignedInOrRegistered)
         this.unlockSyncing()
         await this.syncService.downloadFirstSync(300)
-        this.protocolService.decryptErroredItems()
+        void this.protocolService.decryptErroredItems()
       } else {
         this.unlockSyncing()
       }
@@ -174,7 +174,6 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     } finally {
       this.signingIn = false
     }
-    2
   }
 
   public async deleteAccount(): Promise<{

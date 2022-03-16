@@ -1,6 +1,6 @@
-import { ErrorObject } from '@standardnotes/common'
+import { ClientDisplayableError } from '@Lib/strings/ClientError'
 
-export type SetOfflineFeaturesFunctionResponse = ErrorObject | undefined
+export type SetOfflineFeaturesFunctionResponse = ClientDisplayableError | undefined
 
 export type OfflineSubscriptionEntitlements = {
   featuresUrl: string
