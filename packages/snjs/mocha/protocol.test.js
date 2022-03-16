@@ -81,9 +81,19 @@ describe('protocol', function () {
 
   it('library version should not be outdated', function () {
     var currentVersion = this.application.protocolService.getLatestVersion();
-    expect(
-      this.application.protocolService.isProtocolVersionOutdated(currentVersion)
-    ).to.equal(false);
+    expect(isProtocolVersionExpired(currentVersion)).to.equal(false);
+  });
+
+  it('001 protocol should be expired', function () {
+    expect(isProtocolVersionExpired(ProtocolVersion.V001)).to.equal(true);
+  });
+
+  it('002 protocol should be expired', function () {
+    expect(isProtocolVersionExpired(ProtocolVersion.V002)).to.equal(true);
+  });
+
+  it('004 protocol should not be expired', function () {
+    expect(isProtocolVersionExpired(ProtocolVersion.V004)).to.equal(false);
   });
 
   it('decrypting already decrypted payload should return same payload', async function () {

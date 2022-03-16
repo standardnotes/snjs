@@ -133,7 +133,12 @@ export {
   UuidGenerator,
 } from '@standardnotes/utils'
 
-export { ContentType, Runtime, KeyParamsOrigination } from '@standardnotes/common'
+export {
+  ContentType,
+  Runtime,
+  KeyParamsOrigination,
+  isProtocolVersionExpired,
+} from '@standardnotes/common'
 export {
   AppDataField,
   ApplicationStage,

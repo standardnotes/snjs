@@ -56,7 +56,11 @@ import {
 } from '@standardnotes/applications'
 import { StorageKey } from '@Lib/storage_keys'
 import { StorageValueModes } from '@Lib/services/StorageService'
-import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  DeviceInterface,
+  InternalEventBusInterface,
+} from '@standardnotes/services'
 
 export type BackupFile = {
   version?: ProtocolVersion
@@ -310,23 +314,6 @@ export class SNProtocolService extends AbstractService implements EncryptionDele
   public isVersionNewerThanLibraryVersion(version: ProtocolVersion) {
     const libraryVersion = this.getLatestVersion()
     return compareVersions(version, libraryVersion) === 1
-  }
-
-  /**
-   * Determines whether the input version is expired
-   */
-  public isProtocolVersionOutdated(version: ProtocolVersion) {
-    const expirationDates: Partial<Record<ProtocolVersion, number>> = {
-      [ProtocolVersion.V001]: Date.parse('2018-01-01'),
-      [ProtocolVersion.V002]: Date.parse('2020-01-01'),
-    }
-    const date = expirationDates[version]
-    if (!date) {
-      /* No expiration date, is active version */
-      return false
-    }
-    const expired = new Date().getTime() > date
-    return expired
   }
 
   /**
