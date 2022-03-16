@@ -1,9 +1,9 @@
-import { UserClientApi } from './services/User/UserClientApi';
+import { UserClientInterface } from './services/User/UserClientApi';
 import { SyncSource } from '@standardnotes/services/src/Domain/Sync/SyncSource'
 import { ItemsClientInterface } from './services/Items/ClientInterface'
 import { FeaturesClientInterface, FeaturesEvent } from './services/Features'
-import { ListedService } from './services/ListedService'
-import { ListedInterface } from './application_interfaces/listed_interface'
+import { ListedService } from './services/Listed/ListedService'
+import { ListedClientInterface } from './services/Listed/ListedClientInterface'
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
 import { TransactionalMutation } from './services/Items/ItemManager'
 import { Settings } from './services/Settings'
@@ -157,7 +157,7 @@ type ItemStream = (items: SNItem[], source: PayloadSource) => void
 type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
-export class SNApplication implements ListedInterface {
+export class SNApplication implements ListedClientInterface {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void
 
   /**
@@ -283,7 +283,7 @@ export class SNApplication implements ListedInterface {
     return this.syncService
   }
 
-  public get user(): UserClientApi {
+  public get user(): UserClientInterface {
     return this.userService
   }
 

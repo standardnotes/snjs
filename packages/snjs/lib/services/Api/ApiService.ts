@@ -62,7 +62,7 @@ import {
   IntegrityApiInterface,
   ItemApiInterface,
 } from '@standardnotes/services'
-import { UserApi } from '../User/UserApi'
+import { UserServerApi } from '../User/UserServerApi'
 
 type PathNamesV1 = {
   keyParams: string
@@ -153,7 +153,7 @@ export type MetaReceivedData = {
 
 export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
-  implements FilesApi, IntegrityApiInterface, ItemApiInterface, UserApi
+  implements FilesApi, IntegrityApiInterface, ItemApiInterface, UserServerApi
 {
   private session?: Session
   public user?: User

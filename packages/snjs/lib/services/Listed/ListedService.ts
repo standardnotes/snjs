@@ -2,12 +2,12 @@ import { isString, lastElement, sleep } from '@standardnotes/utils'
 import { UuidString } from '@Lib/types'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
-import { SNHttpService } from './Api/HttpService'
-import { SNActionsExtension } from '../models/app/extension'
+import { SNHttpService } from '../Api/HttpService'
+import { SNActionsExtension } from '../../models/app/extension'
 import { SettingName } from '@standardnotes/settings'
-import { SNSettingsService } from './Settings/SNSettingsService'
-import { ListedInterface } from '../application_interfaces/listed_interface'
-import { SNApiService } from './Api/ApiService'
+import { SNSettingsService } from '../Settings/SNSettingsService'
+import { ListedClientInterface } from './ListedClientInterface'
+import { SNApiService } from '../Api/ApiService'
 import {
   ListedAccount,
   ListedAccountInfo,
@@ -15,7 +15,7 @@ import {
 } from '@standardnotes/responses'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
-export class ListedService extends AbstractService implements ListedInterface {
+export class ListedService extends AbstractService implements ListedClientInterface {
   constructor(
     private apiService: SNApiService,
     private itemManager: ItemManager,

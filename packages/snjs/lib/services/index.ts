@@ -1,3 +1,7 @@
+export * from '@Lib/services/Features'
+export * from '@Lib/services/Listed'
+export * from '@Lib/services/Sync'
+
 export { ButtonType } from '@Lib/services/AlertService'
 export type { DismissBlockingDialog, SNAlertService } from '@Lib/services/AlertService'
 export type { BackupFile } from '@Lib/services/ProtocolService'
@@ -18,12 +22,10 @@ export { SNMigrationService } from '@Lib/services/MigrationService'
 export { SNProtocolService, KeyMode } from '@Lib/services/ProtocolService'
 export { SNHistoryManager } from '@Lib/services/History/HistoryManager'
 export { SNProtectionService } from '@Lib/services/Protection/ProtectionService'
-export * from '@Lib/services/Features'
 export { SNSettingsService } from '@Lib/services/Settings'
 export { SyncEvent } from '@standardnotes/services'
 export { SyncOpStatus } from '@Lib/services/Sync/SyncOpStatus'
 export { ItemManager } from '@Lib/services/Items/ItemManager'
-export * from '@Lib/services/Sync'
 export { ChallengeService } from '@Lib/services/Challenge/ChallengeService'
 export {
   SNStorageService,

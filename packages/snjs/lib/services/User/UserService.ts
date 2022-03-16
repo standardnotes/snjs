@@ -28,7 +28,7 @@ import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Api/SessionManager
 import { ChallengeService } from '../Challenge/ChallengeService'
 import { SNItemsKey } from '@Lib/models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { UserClientApi } from './UserClientApi'
+import { UserClientInterface } from './UserClientApi'
 import { AccountDeleted } from '@Lib/strings/Info'
 
 const MINIMUM_PASSCODE_LENGTH = 1
@@ -41,7 +41,7 @@ export const enum AccountEvent {
   SignedOut = 'SignedOut',
 }
 
-export class UserService extends AbstractService<AccountEvent> implements UserClientApi {
+export class UserService extends AbstractService<AccountEvent> implements UserClientInterface {
   private signingIn = false
   private registering = false
 

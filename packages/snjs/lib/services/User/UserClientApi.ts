@@ -1,4 +1,4 @@
-export interface UserClientApi {
+export interface UserClientInterface {
   deleteAccount(): Promise<{
     error: boolean
     message?: string

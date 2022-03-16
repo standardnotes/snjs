@@ -1,7 +1,7 @@
 import { Uuid } from '@standardnotes/common'
 import { ListedAccount, ListedAccountInfo } from '@standardnotes/responses'
 
-export interface ListedInterface {
+export interface ListedClientInterface {
   canRegisterNewListedAccount: () => boolean
   requestNewListedAccount: () => Promise<ListedAccount | undefined>
   getListedAccounts(): Promise<ListedAccount[]>

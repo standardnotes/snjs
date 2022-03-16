@@ -1,6 +1,6 @@
 import { ChallengeService } from './Challenge/ChallengeService'
 import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from '../challenges'
-import { ListedService } from './ListedService'
+import { ListedService } from './Listed/ListedService'
 import { CreateItemFromPayload } from '@Models/generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
