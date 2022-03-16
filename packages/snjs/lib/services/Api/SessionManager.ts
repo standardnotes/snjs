@@ -1,4 +1,4 @@
-import { Subscription } from './../../../../auth/src/Domain/Subscription/Subscription'
+import { Subscription } from '@standardnotes/auth'
 import { ClientDisplayableError } from '@Lib/strings/ClientError'
 import {
   ProtocolVersion,
