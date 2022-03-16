@@ -41,11 +41,12 @@ export enum FeatureIdentifier {
   DeprecatedFileSafe = 'org.standardnotes.file-safe',
 }
 
+/** Identifier for standalone filesafe instance offered as legacy installable */
+export const LegacyFileSafeIdentifier = 'org.standardnotes.legacy.file-safe'
+
 export const DeprecatedFeatures = [
   FeatureIdentifier.DeprecatedFileSafe,
   FeatureIdentifier.DeprecatedFoldersComponent,
 ]
 
-export const ExperimentalFeatures = [
-  FeatureIdentifier.MarkdownVisualEditor,
-]
+export const ExperimentalFeatures = [FeatureIdentifier.MarkdownVisualEditor]

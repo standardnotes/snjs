@@ -1,3 +1,4 @@
+import { AllowedBatchStreaming } from './types'
 import { SNPreferencesService } from '../PreferencesService'
 import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/services/Features/FeaturesService'
@@ -21,7 +22,7 @@ import { UuidString } from '@Lib/types'
 import {
   PermissionDialog,
   DesktopManagerInterface,
-  AllowedBatchPermissions,
+  AllowedBatchContentTypes,
 } from '@Lib/services/ComponentManager/types'
 import { ActionObserver, ComponentViewer } from '@Lib/services/ComponentManager/ComponentViewer'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
@@ -318,11 +319,17 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     return this.viewers.find((viewer) => viewer.sessionKey === key)
   }
 
-  private areRequestedPermissionsValid(permissions: ComponentPermission[]): boolean {
+  areRequestedPermissionsValid(
+    component: SNComponent,
+    permissions: ComponentPermission[],
+  ): boolean {
     for (const permission of permissions) {
       if (permission.name === ComponentAction.StreamItems) {
+        if (!AllowedBatchStreaming.includes(component.identifier)) {
+          return false
+        }
         const hasNonAllowedBatchPermission = permission.content_types?.some(
-          (type) => !AllowedBatchPermissions.includes(type),
+          (type) => !AllowedBatchContentTypes.includes(type),
         )
         if (hasNonAllowedBatchPermission) {
           return false
@@ -338,7 +345,9 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     requiredPermissions: ComponentPermission[],
     runFunction: () => void,
   ): void {
-    if (!this.areRequestedPermissionsValid(requiredPermissions)) {
+    const component = this.findComponent(componentUuid)
+
+    if (!this.areRequestedPermissionsValid(component, requiredPermissions)) {
       console.error(
         'Component is requesting invalid permissions',
         componentUuid,
@@ -346,7 +355,6 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
       )
       return
     }
-    const component = this.findComponent(componentUuid)
     const nativeFeature = FindNativeFeature(component.identifier)
     const acquiredPermissions = nativeFeature?.component_permissions || component.permissions
 

@@ -1,4 +1,10 @@
-import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
+import {
+  ComponentArea,
+  ComponentAction,
+  ComponentPermission,
+  FeatureIdentifier,
+  LegacyFileSafeIdentifier,
+} from '@standardnotes/features'
 import { SNComponent } from '@Lib/models'
 import { UuidString } from '@Lib/types'
 import { ContentType } from '@standardnotes/common'
@@ -15,14 +21,21 @@ export type ComponentRawPayload = RawPayload & {
 }
 
 /**
+ * Extensions allowed to batch stream AllowedBatchContentTypes
+ */
+export const AllowedBatchStreaming = Object.freeze([
+  LegacyFileSafeIdentifier,
+  FeatureIdentifier.DeprecatedFileSafe,
+  FeatureIdentifier.BoldEditor,
+])
+
+/**
  * Content types which are allowed to be managed/streamed in bulk by a component.
  */
-export const AllowedBatchPermissions = Object.freeze([
+export const AllowedBatchContentTypes = Object.freeze([
   ContentType.FilesafeCredentials,
   ContentType.FilesafeFileMetadata,
   ContentType.FilesafeIntegration,
-  ContentType.SmartView,
-  ContentType.Tag,
 ])
 
 /* This domain will be used to save context item client data */
