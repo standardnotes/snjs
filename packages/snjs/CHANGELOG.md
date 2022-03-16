@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.86.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.3...@standardnotes/snjs@2.86.0) (2022-03-16)
+
+
+### Features
+
+* restricted component permissions ([e90b2d6](https://github.com/standardnotes/snjs/commit/e90b2d6847920e4cd7a281145204ce2f346af88e))
+
+
+
+
+
 ## [2.85.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.2...@standardnotes/snjs@2.85.3) (2022-03-16)
 
 
