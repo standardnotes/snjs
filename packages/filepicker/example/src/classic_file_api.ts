@@ -1,4 +1,4 @@
-import { SNApplication, ContentType, SNFile } from '../../../snjs'
+import { SNApplication, ContentType, SNFile, ClientDisplayableError } from '../../../snjs'
 import { ClassicFileReader, ClassicFileSaver } from '../../../filepicker'
 
 export class ClassicFileApi {
@@ -15,24 +15,24 @@ export class ClassicFileApi {
   }
 
   async openFilePicker(): Promise<void> {
-    let operation
-
     const files = await ClassicFileReader.selectFiles()
     for (const file of files) {
+      const operation = await this.application.files.beginNewFileUpload()
+      if (operation instanceof ClientDisplayableError) {
+        continue
+      }
       const fileResult = await ClassicFileReader.readFile(
         file,
         2_000_000,
         async (chunk, index, isLast) => {
-          if (index === 1) {
-            operation = await this.application.files.beginNewFileUpload()
-          }
           await this.application.files.pushBytesForUpload(operation, chunk, index, isLast)
         },
       )
-      const snFile = await this.application.files.finishUpload(
-        operation,
-        fileResult,
-      )
+      const snFile = await this.application.files.finishUpload(operation, fileResult)
+
+      if (snFile instanceof ClientDisplayableError) {
+        return
+      }
 
       const bytes = await this.downloadFileBytes(snFile.remoteIdentifier)
 
@@ -48,7 +48,7 @@ export class ClassicFileApi {
 
     let receivedBytes = new Uint8Array()
 
-    await this.application.files.downloadFile(file, (decryptedBytes: Uint8Array) => {
+    await this.application.files.downloadFile(file, async (decryptedBytes: Uint8Array) => {
       console.log(`Downloaded ${decryptedBytes.length} bytes`)
       receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
     })

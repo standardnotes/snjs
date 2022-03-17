@@ -1,5 +1,5 @@
 import { StreamingFileReader, StreamingFileSaver } from '../../../filepicker'
-import { SNApplication, SNFile } from '../../../snjs'
+import { SNApplication, SNFile, ClientDisplayableError } from '../../../snjs'
 
 export class FileSystemApi {
   private uploadedFiles: SNFile[] = []
@@ -29,6 +29,9 @@ export class FileSystemApi {
     const selectedFiles = await StreamingFileReader.selectFiles()
     for (const file of selectedFiles) {
       const operation = await this.application.files.beginNewFileUpload()
+      if (operation instanceof ClientDisplayableError) {
+        continue
+      }
       const fileResult = await StreamingFileReader.readFile(
         file,
         2_000_000,
@@ -37,10 +40,7 @@ export class FileSystemApi {
         },
       )
 
-      const snFile = await this.application.files.finishUpload(
-        operation,
-        fileResult,
-      )
+      const snFile = await this.application.files.finishUpload(operation, fileResult)
 
       snFiles.push(snFile)
     }
