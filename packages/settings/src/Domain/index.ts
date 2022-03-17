@@ -1,3 +1,4 @@
+export * from './CloudProvider/CloudProvider'
 export * from './DropboxBackupFrequency/DropboxBackupFrequency'
 export * from './EmailBackupFrequency/EmailBackupFrequency'
 export * from './GoogleDriveBackupFrequency/GoogleDriveBackupFrequency'
@@ -8,4 +9,3 @@ export * from './MuteFailedCloudBackupsEmails/MuteFailedCloudBackupsEmailsOption
 export * from './MuteSignInEmails/MuteSignInEmailsOption'
 export * from './OneDriveBackupFrequency/OneDriveBackupFrequency'
 export * from './Setting/SettingName'
-export * from './CloudProvider/CloudProvider'

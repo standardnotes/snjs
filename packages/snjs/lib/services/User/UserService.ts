@@ -28,7 +28,7 @@ import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Api/SessionManager
 import { ChallengeService } from '../Challenge/ChallengeService'
 import { SNItemsKey } from '@Lib/models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { UserClientInterface } from './UserClientApi'
+import { UserClientInterface } from './UserClientInterface'
 import { AccountDeleted } from '@Lib/strings/Info'
 
 const MINIMUM_PASSCODE_LENGTH = 1

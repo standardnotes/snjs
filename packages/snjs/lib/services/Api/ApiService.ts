@@ -29,11 +29,12 @@ import { SNFeatureRepo } from '../../models/app/feature_repo'
 import { SNRootKeyParams } from '../../protocol/key_params'
 import { SNStorageService } from '../StorageService'
 import { StorageKey } from '@Lib/storage_keys'
-import { UserServerInterface } from '../User/UserServerApi'
+import { UserServerInterface } from '../User/UserServerInterface'
 import { UuidString } from '../../types'
 import * as messages from '@Lib/services/Api/Messages'
 import * as NetworkStrings from '../../strings/Network'
 import merge from 'lodash/merge'
+import { SettingsServerInterface } from "../Settings/SettingsServerInterface"
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -51,7 +52,12 @@ export type MetaReceivedData = {
 
 export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
-  implements FilesServerInterface, IntegrityApiInterface, ItemApiInterface, UserServerInterface
+  implements
+    FilesServerInterface,
+    IntegrityApiInterface,
+    ItemApiInterface,
+    UserServerInterface,
+    SettingsServerInterface
 {
   private session?: Session
   public user?: Responses.User

@@ -16,3 +16,5 @@ export enum SettingName {
   ListedAuthorSecrets = 'LISTED_AUTHOR_SECRETS',
   LogSessionUserAgent = 'LOG_SESSION_USER_AGENT',
 }
+
+export type SensitiveSettingName = SettingName.MfaSecret | SettingName.ExtensionKey

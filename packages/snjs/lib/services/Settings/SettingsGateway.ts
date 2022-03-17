@@ -1,31 +1,8 @@
-import { SettingName } from '@standardnotes/settings'
+import { SettingsList } from './SettingsList'
+import { SettingName, SensitiveSettingName } from '@standardnotes/settings'
 import * as messages from '../Api/Messages'
-import {
-  DeleteSettingResponse,
-  GetSettingResponse,
-  ListSettingsResponse,
-  StatusCode,
-  UpdateSettingResponse,
-  User,
-} from '@standardnotes/responses'
-import { UuidString } from '@Lib/types'
-import { SensitiveSettingName } from './SensitiveSettingName'
-import { Settings } from './Settings'
-
-interface SettingsAPI {
-  listSettings(userUuid: UuidString): Promise<ListSettingsResponse>
-
-  updateSetting(
-    userUuid: UuidString,
-    settingName: string,
-    settingValue: string,
-    sensitive: boolean,
-  ): Promise<UpdateSettingResponse>
-
-  getSetting(userUuid: UuidString, settingName: string): Promise<GetSettingResponse>
-
-  deleteSetting(userUuid: UuidString, settingName: string): Promise<DeleteSettingResponse>
-}
+import { StatusCode, User } from '@standardnotes/responses'
+import { SettingsServerInterface } from './SettingsServerInterface'
 
 /**
  * SettingsGateway coordinates communication with the API service
@@ -33,12 +10,12 @@ interface SettingsAPI {
  */
 export class SettingsGateway {
   constructor(
-    private readonly settingsApi: SettingsAPI,
+    private readonly settingsApi: SettingsServerInterface,
     private readonly userProvider: { getUser: () => User | undefined },
   ) {}
 
   isReadyForModification(): boolean {
-    return this.getUser() != null
+    return this.getUser() != undefined
   }
 
   private getUser() {
@@ -47,7 +24,7 @@ export class SettingsGateway {
 
   private get userUuid() {
     const user = this.getUser()
-    if (user == null || user.uuid == null) {
+    if (user == undefined || user.uuid == undefined) {
       throw new Error(messages.API_MESSAGE_INVALID_SESSION)
     }
     return user.uuid
@@ -55,36 +32,35 @@ export class SettingsGateway {
 
   async listSettings() {
     const { error, data } = await this.settingsApi.listSettings(this.userUuid)
-    if (error != null) {
+
+    if (error != undefined) {
       throw new Error(error.message)
     }
-    if (data == null || data.settings == null) {
-      return {}
+
+    if (data == undefined || data.settings == undefined) {
+      return new SettingsList([])
     }
 
-    const settings: Partial<Settings> = {}
-    for (const setting of data.settings) {
-      settings[setting.name as SettingName] = setting.value
-    }
+    const settings: SettingsList = new SettingsList(data.settings)
     return settings
   }
 
-  async getSetting(name: SettingName): Promise<string | null> {
+  async getSetting(name: SettingName): Promise<string | undefined> {
     const response = await this.settingsApi.getSetting(this.userUuid, name)
 
     // Backend responds with 400 when setting doesn't exist
     if (response.status === StatusCode.HttpBadRequest) {
-      return null
+      return undefined
     }
 
-    if (response.error != null) {
+    if (response.error != undefined) {
       throw new Error(response.error.message)
     }
 
-    return response?.data?.setting?.value ?? null
+    return response?.data?.setting?.value ?? undefined
   }
 
-  async getSensitiveSetting(name: SensitiveSettingName): Promise<boolean> {
+  async getDoesSensitiveSettingExist(name: SensitiveSettingName): Promise<boolean> {
     const response = await this.settingsApi.getSetting(this.userUuid, name)
 
     // Backend responds with 400 when setting doesn't exist
@@ -92,7 +68,7 @@ export class SettingsGateway {
       return false
     }
 
-    if (response.error != null) {
+    if (response.error != undefined) {
       throw new Error(response.error.message)
     }
 
@@ -101,14 +77,14 @@ export class SettingsGateway {
 
   async updateSetting(name: SettingName, payload: string, sensitive: boolean): Promise<void> {
     const { error } = await this.settingsApi.updateSetting(this.userUuid, name, payload, sensitive)
-    if (error != null) {
+    if (error != undefined) {
       throw new Error(error.message)
     }
   }
 
   async deleteSetting(name: SettingName): Promise<void> {
     const { error } = await this.settingsApi.deleteSetting(this.userUuid, name)
-    if (error != null) {
+    if (error != undefined) {
       throw new Error(error.message)
     }
   }

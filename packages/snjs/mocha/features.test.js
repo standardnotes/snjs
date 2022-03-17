@@ -181,7 +181,7 @@ describe('features', () => {
       sinon.stub(application.apiService, 'isThirdPartyHostUsed').callsFake(() => {
         return false
       })
-      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(false)
+      expect(await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey)).to.equal(false)
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
       const promise = new Promise((resolve) => {
         sinon
@@ -268,7 +268,7 @@ describe('features', () => {
       sinon.stub(application.apiService, 'isThirdPartyHostUsed').callsFake(() => {
         return false
       })
-      expect(await application.getSensitiveSetting(SettingName.ExtensionKey)).to.equal(false)
+      expect(await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey)).to.equal(false)
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
       const promise = new Promise((resolve) => {
         application.streamItems(ContentType.ExtensionRepo, (changed) => {

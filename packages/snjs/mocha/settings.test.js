@@ -24,8 +24,8 @@ describe('settings service', function () {
   })
 
   it('creates and reads a setting', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
-    const responseCreate = await snApp.getSetting(validSetting)
+    await snApp.settings.updateSetting(validSetting, fakePayload)
+    const responseCreate = await snApp.settings.getSetting(validSetting)
     expect(responseCreate).to.equal(fakePayload)
   })
 
@@ -33,7 +33,7 @@ describe('settings service', function () {
     const invalidSetting = 'FAKE_SETTING'
     let caughtError = null
     try {
-      await snApp.updateSetting(invalidSetting, fakePayload)
+      await snApp.settings.updateSetting(invalidSetting, fakePayload)
     } catch (error) {
       caughtError = error
     }
@@ -42,51 +42,51 @@ describe('settings service', function () {
   })
 
   it('creates and lists settings', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
-    const responseList = await snApp.listSettings()
+    await snApp.settings.updateSetting(validSetting, fakePayload)
+    const responseList = await snApp.settings.listSettings()
     expect(responseList).to.eql({ [validSetting]: fakePayload })
   })
 
   it('creates and deletes a setting', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
+    await snApp.settings.updateSetting(validSetting, fakePayload)
     const responseCreate = await snApp.getSetting(validSetting)
     expect(responseCreate).to.eql(fakePayload)
 
-    await snApp.deleteSetting(validSetting)
-    const responseDeleted = await snApp.listSettings()
+    await snApp.settings.deleteSetting(validSetting)
+    const responseDeleted = await snApp.settings.listSettings()
     expect(responseDeleted).to.eql({})
   })
 
   it('creates and updates a setting', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
-    await snApp.updateSetting(validSetting, updatedFakePayload)
-    const responseUpdated = await snApp.getSetting(validSetting)
+    await snApp.settings.updateSetting(validSetting, fakePayload)
+    await snApp.settings.updateSetting(validSetting, updatedFakePayload)
+    const responseUpdated = await snApp.settings.getSetting(validSetting)
     expect(responseUpdated).to.eql(updatedFakePayload)
   })
 
   it('reads a nonexistent setting', async () => {
-    const setting = await snApp.getSetting(validSetting)
+    const setting = await snApp.settings.getSetting(validSetting)
     expect(setting).to.equal(null)
   })
 
   it('reads a nonexistent sensitive setting', async () => {
-    const setting = await snApp.getSensitiveSetting(SettingName.MfaSecret)
+    const setting = await snApp.settings.getDoesSensitiveSettingExist(SettingName.MfaSecret)
     expect(setting).to.equal(false)
   })
 
   it('creates and reads a sensitive setting', async () => {
-    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
-    const setting = await snApp.getSensitiveSetting(SettingName.MfaSecret)
+    await snApp.settings.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
+    const setting = await snApp.settings.getDoesSensitiveSettingExist(SettingName.MfaSecret)
     expect(setting).to.equal(true)
   })
 
   it('creates and lists a sensitive setting', async () => {
-    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
-    await snApp.updateSetting(
+    await snApp.settings.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
+    await snApp.settings.updateSetting(
       SettingName.MuteFailedBackupsEmails,
       MuteFailedBackupsEmailsOption.Muted,
     )
-    const settings = await snApp.listSettings()
+    const settings = await snApp.settings.listSettings()
     expect(settings).to.eql({ MUTE_FAILED_BACKUPS_EMAILS: 'muted' })
   })
 })

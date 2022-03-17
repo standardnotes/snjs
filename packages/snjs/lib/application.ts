@@ -165,6 +165,10 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.userService
   }
 
+  public get settings(): Services.SNSettingsService {
+    return this.settingsService
+  }
+
   public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
     return Applications.vaultToEmail(this.options.crypto, name, userphrase)
   }
@@ -1333,35 +1337,6 @@ export class SNApplication implements Services.ListedClientInterface {
     })
   }
 
-  public async signOut(force = false): Promise<void> {
-    const performSignOut = async () => {
-      await this.userService.signOut()
-      await this.notifyEvent(ApplicationEvent.SignedOut)
-      await this.prepareForDeinit()
-      this.deinit(DeinitSource.SignOut)
-    }
-
-    if (force) {
-      await performSignOut()
-      return
-    }
-
-    const dirtyItems = this.itemManager.getDirtyItems()
-    if (dirtyItems.length > 0) {
-      const singular = dirtyItems.length === 1
-      const didConfirm = await this.alertService.confirm(
-        `There ${singular ? 'is' : 'are'} ${dirtyItems.length} ${
-          singular ? 'item' : 'items'
-        } with unsynced changes. If you sign out, these changes will be lost forever. Are you sure you want to sign out?`,
-      )
-      if (didConfirm) {
-        await performSignOut()
-      }
-    } else {
-      await performSignOut()
-    }
-  }
-
   private async handleRevokedSession(): Promise<void> {
     /**
      * Because multiple API requests can come back at the same time
@@ -1373,7 +1348,7 @@ export class SNApplication implements Services.ListedClientInterface {
     this.revokingSession = true
     /** Keep a reference to the soon-to-be-cleared alertService */
     const alertService = this.alertService
-    await this.signOut(true)
+    await this.user.signOut(true)
     void alertService.alert(Services.SessionStrings.CurrentSessionRevoked)
   }
 
@@ -1483,34 +1458,6 @@ export class SNApplication implements Services.ListedClientInterface {
         service.deviceInterface = deviceInterface
       }
     }
-  }
-
-  public async listSettings(): Promise<Partial<Services.Settings>> {
-    return this.settingsService.listSettings()
-  }
-
-  public async getSetting(name: Settings.SettingName): Promise<string | null> {
-    return this.settingsService.getSetting(name)
-  }
-
-  public async getSensitiveSetting(name: Services.SensitiveSettingName): Promise<boolean> {
-    return this.settingsService.getSensitiveSetting(name)
-  }
-
-  public async updateSetting(
-    name: Settings.SettingName,
-    payload: string,
-    sensitive = false,
-  ): Promise<void> {
-    return this.settingsService.updateSetting(name, payload, sensitive)
-  }
-
-  public async deleteSetting(name: Settings.SettingName): Promise<void> {
-    return this.settingsService.deleteSetting(name)
-  }
-
-  public getEmailBackupFrequencyOptionLabel(frequency: Settings.EmailBackupFrequency): string {
-    return this.settingsService.getEmailBackupFrequencyOptionLabel(frequency)
   }
 
   public isMfaFeatureAvailable(): boolean {
