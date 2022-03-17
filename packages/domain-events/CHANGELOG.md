@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.25.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.10...@standardnotes/domain-events@2.25.0) (2022-03-17)
+
+
+### Features
+
+* add user disabled session user agent logging event ([4932f52](https://github.com/standardnotes/snjs/commit/4932f527e4ce06c1e48257870b5da01727d65ed6))
+
+
+
+
+
 ## [2.24.10](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.24.9...@standardnotes/domain-events@2.24.10) (2022-03-16)
 
 **Note:** Version bump only for package @standardnotes/domain-events
