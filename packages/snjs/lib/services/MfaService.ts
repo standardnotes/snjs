@@ -22,8 +22,10 @@ export class SNMfaService extends AbstractService {
   }
 
   async isMfaActivated(): Promise<boolean> {
-    const mfaSetting = await this.settingsService.getSensitiveSetting(SettingName.MfaSecret)
-    return mfaSetting != null && mfaSetting != false
+    const mfaSetting = await this.settingsService.getDoesSensitiveSettingExist(
+      SettingName.MfaSecret,
+    )
+    return mfaSetting != false
   }
 
   async generateMfaSecret(): Promise<string> {
@@ -35,7 +37,7 @@ export class SNMfaService extends AbstractService {
   }
 
   async enableMfa(secret: string, otpToken: string): Promise<void> {
-    const otpTokenValid = otpToken != null && otpToken === (await this.getOtpToken(secret))
+    const otpTokenValid = otpToken != undefined && otpToken === (await this.getOtpToken(secret))
 
     if (!otpTokenValid) {
       throw new Error(messages.SignInStrings.IncorrectMfa)

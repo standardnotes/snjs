@@ -24,69 +24,72 @@ describe('settings service', function () {
   })
 
   it('creates and reads a setting', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
-    const responseCreate = await snApp.getSetting(validSetting)
+    await snApp.settings.updateSetting(validSetting, fakePayload)
+    const responseCreate = await snApp.settings.getSetting(validSetting)
     expect(responseCreate).to.equal(fakePayload)
   })
 
   it('throws error on an invalid setting update', async function () {
     const invalidSetting = 'FAKE_SETTING'
-    let caughtError = null
+    let caughtError = undefined
     try {
-      await snApp.updateSetting(invalidSetting, fakePayload)
+      await snApp.settings.updateSetting(invalidSetting, fakePayload)
     } catch (error) {
       caughtError = error
     }
 
-    expect(caughtError).not.to.equal(null)
+    expect(caughtError).not.to.equal(undefined)
   })
 
   it('creates and lists settings', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
-    const responseList = await snApp.listSettings()
-    expect(responseList).to.eql({ [validSetting]: fakePayload })
+    await snApp.settings.updateSetting(validSetting, fakePayload)
+    const responseList = await snApp.settings.listSettings()
+    expect(responseList.getSettingValue(validSetting)).to.eql(fakePayload)
   })
 
   it('creates and deletes a setting', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
-    const responseCreate = await snApp.getSetting(validSetting)
+    await snApp.settings.updateSetting(validSetting, fakePayload)
+    const responseCreate = await snApp.settings.getSetting(validSetting)
     expect(responseCreate).to.eql(fakePayload)
 
-    await snApp.deleteSetting(validSetting)
-    const responseDeleted = await snApp.listSettings()
-    expect(responseDeleted).to.eql({})
+    await snApp.settings.deleteSetting(validSetting)
+    const responseDeleted = await snApp.settings.listSettings()
+    expect(responseDeleted.getSettingValue(validSetting)).to.not.be.ok
   })
 
   it('creates and updates a setting', async function () {
-    await snApp.updateSetting(validSetting, fakePayload)
-    await snApp.updateSetting(validSetting, updatedFakePayload)
-    const responseUpdated = await snApp.getSetting(validSetting)
+    await snApp.settings.updateSetting(validSetting, fakePayload)
+    await snApp.settings.updateSetting(validSetting, updatedFakePayload)
+    const responseUpdated = await snApp.settings.getSetting(validSetting)
     expect(responseUpdated).to.eql(updatedFakePayload)
   })
 
   it('reads a nonexistent setting', async () => {
-    const setting = await snApp.getSetting(validSetting)
-    expect(setting).to.equal(null)
+    const setting = await snApp.settings.getSetting(validSetting)
+    expect(setting).to.equal(undefined)
   })
 
   it('reads a nonexistent sensitive setting', async () => {
-    const setting = await snApp.getSensitiveSetting(SettingName.MfaSecret)
+    const setting = await snApp.settings.getDoesSensitiveSettingExist(SettingName.MfaSecret)
     expect(setting).to.equal(false)
   })
 
   it('creates and reads a sensitive setting', async () => {
-    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
-    const setting = await snApp.getSensitiveSetting(SettingName.MfaSecret)
+    await snApp.settings.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
+    const setting = await snApp.settings.getDoesSensitiveSettingExist(SettingName.MfaSecret)
     expect(setting).to.equal(true)
   })
 
   it('creates and lists a sensitive setting', async () => {
-    await snApp.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
-    await snApp.updateSetting(
+    await snApp.settings.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
+    await snApp.settings.updateSetting(
       SettingName.MuteFailedBackupsEmails,
       MuteFailedBackupsEmailsOption.Muted,
     )
-    const settings = await snApp.listSettings()
-    expect(settings).to.eql({ MUTE_FAILED_BACKUPS_EMAILS: 'muted' })
+    const settings = await snApp.settings.listSettings()
+    expect(settings.getSettingValue(SettingName.MuteFailedBackupsEmails)).to.eql(
+      MuteFailedBackupsEmailsOption.Muted,
+    )
+    expect(settings.getSettingValue(SettingName.MfaSecret)).to.not.be.ok
   })
 })

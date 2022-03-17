@@ -4,5 +4,5 @@ export interface UserClientInterface {
     message?: string
   }>
 
-  signOut(force: boolean): Promise<void>
+  signOut(force?: boolean): Promise<void>
 }
