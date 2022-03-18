@@ -22,7 +22,7 @@ import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_cri
 import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'
 import { SNComponent } from '@Models/app/component'
 import { SNItemsKey } from '@Models/app/items_key'
-import { isTag, SNTag, TagFolderDelimitter } from '@Models/app/tag'
+import { isTag, SNTag } from '@Models/app/tag'
 import { Uuids } from '@Models/functions'
 import { CreateItemFromPayload } from '@Models/generator'
 import { PayloadsByDuplicating } from '@Payloads/functions'
@@ -900,9 +900,8 @@ export class ItemManager
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
     return naturalSort(
       this.tags.filter((tag) => {
-        const regex = new RegExp(`^${searchQuery}|${TagFolderDelimitter}${searchQuery}`, 'i')
         const expandedTitle = this.getTagLongTitle(tag)
-        const matchesQuery = regex.test(expandedTitle)
+        const matchesQuery = expandedTitle.toLowerCase().includes(searchQuery.toLowerCase())
         const tagInNote = note
           ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
           : false
