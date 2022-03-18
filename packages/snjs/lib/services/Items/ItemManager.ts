@@ -901,7 +901,7 @@ export class ItemManager
     return naturalSort(
       this.tags.filter((tag) => {
         const expandedTitle = this.getTagLongTitle(tag)
-        const matchesQuery = expandedTitle.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1
+        const matchesQuery = expandedTitle.toLowerCase().includes(searchQuery.toLowerCase())
         const tagInNote = note
           ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
           : false

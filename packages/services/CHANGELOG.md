@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.4](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.6.3...@standardnotes/services@1.6.4) (2022-03-18)
+
+**Note:** Version bump only for package @standardnotes/services
+
+
+
+
+
 ## [1.6.3](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.6.2...@standardnotes/services@1.6.3) (2022-03-16)
 
 **Note:** Version bump only for package @standardnotes/services
