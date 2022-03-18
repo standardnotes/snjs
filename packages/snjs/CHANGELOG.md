@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.86.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.3...@standardnotes/snjs@2.86.4) (2022-03-18)
+
+
+### Bug Fixes
+
+* tag search causing regex exception ([#660](https://github.com/standardnotes/snjs/issues/660)) ([2c592f5](https://github.com/standardnotes/snjs/commit/2c592f5d58b61e1b7066e679127f2881efbda2d5))
+
+
+
+
+
 ## [2.86.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.2...@standardnotes/snjs@2.86.3) (2022-03-18)
 
 **Note:** Version bump only for package @standardnotes/snjs
