@@ -24,6 +24,7 @@ export enum PrefKey {
   UseSystemColorScheme = 'useSystemColorScheme',
   AutoLightThemeIdentifier = 'autoLightThemeIdentifier',
   AutoDarkThemeIdentifier = 'autoDarkThemeIdentifier',
+  NoteAddToParentFolders = 'noteAddToParentFolders',
 }
 
 export type PrefValue = {
@@ -47,6 +48,7 @@ export type PrefValue = {
   [PrefKey.UseSystemColorScheme]: boolean
   [PrefKey.AutoLightThemeIdentifier]: FeatureIdentifier | 'Default'
   [PrefKey.AutoDarkThemeIdentifier]: FeatureIdentifier | 'Default'
+  [PrefKey.NoteAddToParentFolders]: boolean
 }
 
 export class SNUserPrefs extends SNItem {
