@@ -400,6 +400,8 @@ describe('itemManager', () => {
       const foobar = await itemManager.createTag('foo[bar]')
       const bar = await itemManager.createTag('bar[')
       const barfoo = await itemManager.createTag('bar[foo]')
+      const fooDelimiter = await itemManager.createTag('bar.foo')
+      const barFooDelimiter = await itemManager.createTag('baz.bar.foo')
       const fooAttached = await itemManager.createTag('Foo')
       const note = createNote('note')
       await itemManager.insertItems([
@@ -407,8 +409,10 @@ describe('itemManager', () => {
         foobar,
         bar,
         barfoo,
+        fooDelimiter,
+        barFooDelimiter,
         fooAttached,
-        note
+        note,
       ])
       await itemManager.addTagToNote(note, fooAttached)
 
@@ -416,6 +420,9 @@ describe('itemManager', () => {
       expect(fooResults).toContainEqual(foo)
       expect(fooResults).toContainEqual(foobar)
       expect(fooResults).toContainEqual(barfoo)
+      expect(fooResults).toContainEqual(fooDelimiter)
+      expect(fooResults).toContainEqual(barFooDelimiter)
+      expect(fooResults).not.toContainEqual(bar)
       expect(fooResults).not.toContainEqual(fooAttached)
     })
   })
