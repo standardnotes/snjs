@@ -391,6 +391,33 @@ describe('itemManager', () => {
       expect(tag).toBeTruthy()
       expect(itemManager.isTemplateItem(tag)).toEqual(false)
     })
+
+    it('should search tags correctly', async () => {
+      itemManager = createService()
+      setupRandomUuid()
+
+      const foo = await itemManager.createTag('foo[')
+      const foobar = await itemManager.createTag('foo[bar]')
+      const bar = await itemManager.createTag('bar[')
+      const barfoo = await itemManager.createTag('bar[foo]')
+      const fooAttached = await itemManager.createTag('Foo')
+      const note = createNote('note')
+      await itemManager.insertItems([
+        foo,
+        foobar,
+        bar,
+        barfoo,
+        fooAttached,
+        note
+      ])
+      await itemManager.addTagToNote(note, fooAttached)
+
+      const fooResults = itemManager.searchTags('foo')
+      expect(fooResults).toContainEqual(foo)
+      expect(fooResults).toContainEqual(foobar)
+      expect(fooResults).toContainEqual(barfoo)
+      expect(fooResults).not.toContainEqual(fooAttached)
+    })
   })
 
   describe('tags notes index', () => {

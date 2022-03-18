@@ -900,9 +900,8 @@ export class ItemManager
   public searchTags(searchQuery: string, note?: SNNote): SNTag[] {
     return naturalSort(
       this.tags.filter((tag) => {
-        const regex = new RegExp(`^${searchQuery}|${TagFolderDelimitter}${searchQuery}`, 'i')
         const expandedTitle = this.getTagLongTitle(tag)
-        const matchesQuery = regex.test(expandedTitle)
+        const matchesQuery = expandedTitle.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1
         const tagInNote = note
           ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
           : false
