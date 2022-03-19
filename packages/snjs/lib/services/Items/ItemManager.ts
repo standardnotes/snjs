@@ -1044,7 +1044,7 @@ export class ItemManager
     })
   }
 
-  public async addNoteReferenceToTag(note: SNNote, tag: SNTag): Promise<SNTag> {
+  private async addNoteReferenceToTag(note: SNNote, tag: SNTag): Promise<SNTag> {
     return this.changeItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note)
     }) as Promise<SNTag>

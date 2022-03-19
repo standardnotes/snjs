@@ -111,7 +111,7 @@ describe('itemManager', () => {
       const tag = createTag('parent')
       const note = createNote('note')
       await itemManager.insertItems([tag, note])
-      await itemManager.addNoteReferenceToTag(note, tag)
+      await itemManager.addTagToNote(note, tag, false)
 
       const criteria = NotesDisplayCriteria.Create({
         tags: [tag],
@@ -300,8 +300,8 @@ describe('itemManager', () => {
       const childNote = createNote('childNote')
       await itemManager.insertItems([parentNote, childNote])
 
-      await itemManager.addNoteReferenceToTag(parentNote, parentTag)
-      await itemManager.addNoteReferenceToTag(childNote, childTag)
+      await itemManager.addTagToNote(parentNote, parentTag, false)
+      await itemManager.addTagToNote(childNote, childTag, false)
 
       const criteria = NotesDisplayCriteria.Create({
         tags: [parentTag],
@@ -431,7 +431,7 @@ describe('itemManager', () => {
         fooAttached,
         note,
       ])
-      await itemManager.addNoteReferenceToTag(note, fooAttached)
+      await itemManager.addTagToNote(note, fooAttached, false)
 
       const fooResults = itemManager.searchTags('foo')
       expect(fooResults).toContainEqual(foo)
@@ -457,8 +457,8 @@ describe('itemManager', () => {
       const childNote = createNote('childNote')
       await itemManager.insertItems([parentNote, childNote])
 
-      await itemManager.addNoteReferenceToTag(parentNote, parentTag)
-      await itemManager.addNoteReferenceToTag(childNote, childTag)
+      await itemManager.addTagToNote(parentNote, parentTag, false)
+      await itemManager.addTagToNote(childNote, childTag, false)
 
       expect(itemManager.countableNotesForTag(parentTag)).toBe(1)
       expect(itemManager.countableNotesForTag(childTag)).toBe(1)
@@ -475,8 +475,8 @@ describe('itemManager', () => {
       const note2 = createNote('note 2')
       await itemManager.insertItems([note1, note2])
 
-      await itemManager.addNoteReferenceToTag(note1, tag1)
-      await itemManager.addNoteReferenceToTag(note2, tag1)
+      await itemManager.addTagToNote(note1, tag1, false)
+      await itemManager.addTagToNote(note2, tag1, false)
 
       expect(itemManager.countableNotesForTag(tag1)).toBe(2)
       expect(itemManager.allCountableNotesCount()).toBe(2)
@@ -612,7 +612,7 @@ describe('itemManager', () => {
 
     expect(itemManager.notesMatchingSmartView(view)).toHaveLength(2)
 
-    await itemManager.addNoteReferenceToTag(taggedNote, tag)
+    await itemManager.addTagToNote(taggedNote, tag, false)
 
     expect(itemManager.notesMatchingSmartView(view)).toHaveLength(1)
 
