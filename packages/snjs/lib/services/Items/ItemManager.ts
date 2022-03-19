@@ -1044,7 +1044,7 @@ export class ItemManager
     })
   }
 
-  public async addTagToNote(note: SNNote, tag: SNTag): Promise<SNTag> {
+  public async addNoteReferenceToTag(note: SNNote, tag: SNTag): Promise<SNTag> {
     return this.changeItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note)
     }) as Promise<SNTag>
@@ -1062,10 +1062,13 @@ export class ItemManager
     })
   }
 
-  public async addTagHierarchyToNote(note: SNNote, tag: SNTag): Promise<SNTag[]> {
-    const parentChainTags = this.getTagParentChain(tag.uuid)
-    const tagsToAdd = [...parentChainTags, tag]
-    return Promise.all(tagsToAdd.map((tagToAdd) => this.addTagToNote(note, tagToAdd)))
+  public async addTagToNote(note: SNNote, tag: SNTag, addHierarchy = true): Promise<SNTag[]> {
+    let tagsToAdd = [tag]
+    if (addHierarchy) {
+      const parentChainTags = this.getTagParentChain(tag.uuid)
+      tagsToAdd = [...parentChainTags, tag]
+    }
+    return Promise.all(tagsToAdd.map((tagToAdd) => this.addNoteReferenceToTag(note, tagToAdd)))
   }
 
   /**

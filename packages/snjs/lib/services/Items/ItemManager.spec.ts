@@ -111,7 +111,7 @@ describe('itemManager', () => {
       const tag = createTag('parent')
       const note = createNote('note')
       await itemManager.insertItems([tag, note])
-      await itemManager.addTagToNote(note, tag)
+      await itemManager.addNoteReferenceToTag(note, tag)
 
       const criteria = NotesDisplayCriteria.Create({
         tags: [tag],
@@ -300,8 +300,8 @@ describe('itemManager', () => {
       const childNote = createNote('childNote')
       await itemManager.insertItems([parentNote, childNote])
 
-      await itemManager.addTagToNote(parentNote, parentTag)
-      await itemManager.addTagToNote(childNote, childTag)
+      await itemManager.addNoteReferenceToTag(parentNote, parentTag)
+      await itemManager.addNoteReferenceToTag(childNote, childTag)
 
       const criteria = NotesDisplayCriteria.Create({
         tags: [parentTag],
@@ -321,13 +321,30 @@ describe('itemManager', () => {
       await itemManager.insertItems([parentTag, childTag, note])
       await itemManager.setTagParent(parentTag, childTag)
 
-      await itemManager.addTagHierarchyToNote(note, childTag)
+      await itemManager.addTagToNote(note, childTag)
 
       const tags = itemManager.getSortedTagsForNote(note)
 
       expect(tags).toHaveLength(2)
       expect(tags[0].uuid).toEqual(childTag.uuid)
       expect(tags[1].uuid).toEqual(parentTag.uuid)
+    })
+
+    it('adding a note to a tag hierarchy should not add the note to its parent if hierarchy option is disabled', async () => {
+      itemManager = createService()
+      const parentTag = createTag('parent')
+      const childTag = createTag('child')
+      const note = createNote('note')
+
+      await itemManager.insertItems([parentTag, childTag, note])
+      await itemManager.setTagParent(parentTag, childTag)
+
+      await itemManager.addTagToNote(note, childTag, false)
+
+      const tags = itemManager.getSortedTagsForNote(note)
+
+      expect(tags).toHaveLength(1)
+      expect(tags[0].uuid).toEqual(childTag.uuid)
     })
   })
 
@@ -414,7 +431,7 @@ describe('itemManager', () => {
         fooAttached,
         note,
       ])
-      await itemManager.addTagToNote(note, fooAttached)
+      await itemManager.addNoteReferenceToTag(note, fooAttached)
 
       const fooResults = itemManager.searchTags('foo')
       expect(fooResults).toContainEqual(foo)
@@ -440,8 +457,8 @@ describe('itemManager', () => {
       const childNote = createNote('childNote')
       await itemManager.insertItems([parentNote, childNote])
 
-      await itemManager.addTagToNote(parentNote, parentTag)
-      await itemManager.addTagToNote(childNote, childTag)
+      await itemManager.addNoteReferenceToTag(parentNote, parentTag)
+      await itemManager.addNoteReferenceToTag(childNote, childTag)
 
       expect(itemManager.countableNotesForTag(parentTag)).toBe(1)
       expect(itemManager.countableNotesForTag(childTag)).toBe(1)
@@ -458,8 +475,8 @@ describe('itemManager', () => {
       const note2 = createNote('note 2')
       await itemManager.insertItems([note1, note2])
 
-      await itemManager.addTagToNote(note1, tag1)
-      await itemManager.addTagToNote(note2, tag1)
+      await itemManager.addNoteReferenceToTag(note1, tag1)
+      await itemManager.addNoteReferenceToTag(note2, tag1)
 
       expect(itemManager.countableNotesForTag(tag1)).toBe(2)
       expect(itemManager.allCountableNotesCount()).toBe(2)
@@ -595,7 +612,7 @@ describe('itemManager', () => {
 
     expect(itemManager.notesMatchingSmartView(view)).toHaveLength(2)
 
-    await itemManager.addTagToNote(taggedNote, tag)
+    await itemManager.addNoteReferenceToTag(taggedNote, tag)
 
     expect(itemManager.notesMatchingSmartView(view)).toHaveLength(1)
 
