@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.87.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.4...@standardnotes/snjs@2.87.0) (2022-03-19)
+
+
+### Features
+
+* option to toggle adding note to all parent folders ([#659](https://github.com/standardnotes/snjs/issues/659)) ([7fb8ff7](https://github.com/standardnotes/snjs/commit/7fb8ff7c7671b730d760505189a85dde9bfefe14))
+
+
+
+
+
 ## [2.86.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.3...@standardnotes/snjs@2.86.4) (2022-03-18)
 
 
