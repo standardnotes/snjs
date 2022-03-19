@@ -321,7 +321,7 @@ describe('itemManager', () => {
       await itemManager.insertItems([parentTag, childTag, note])
       await itemManager.setTagParent(parentTag, childTag)
 
-      await itemManager.addTagToNote(note, childTag)
+      await itemManager.addTagToNote(note, childTag, true)
 
       const tags = itemManager.getSortedTagsForNote(note)
 

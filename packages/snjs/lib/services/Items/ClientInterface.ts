@@ -9,5 +9,5 @@ export interface ItemsClientInterface {
 
   renameFile(file: SNFile, name: string): Promise<SNFile>
 
-  addTagToNote(note: SNNote, tag: SNTag, addHierarchy?: boolean): Promise<SNTag[]>
+  addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
 }

@@ -1062,7 +1062,7 @@ export class ItemManager
     })
   }
 
-  public async addTagToNote(note: SNNote, tag: SNTag, addHierarchy = true): Promise<SNTag[]> {
+  public async addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]> {
     let tagsToAdd = [tag]
     if (addHierarchy) {
       const parentChainTags = this.getTagParentChain(tag.uuid)
