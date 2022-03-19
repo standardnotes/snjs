@@ -837,16 +837,6 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.itemManager.getSortedTagsForNote(note)
   }
 
-  /**
-   * Add a tag and all its parent to a note.
-   *
-   * @param note The note assigned to a tag
-   * @param tagUuid The tag we'll assign to the note
-   */
-  public addTagHierarchyToNote(note: Models.SNNote, tag: Models.SNTag): Promise<Models.SNTag[]> {
-    return this.itemManager.addTagHierarchyToNote(note, tag)
-  }
-
   public async findOrCreateTag(title: string): Promise<Models.SNTag> {
     return this.itemManager.findOrCreateTagByTitle(title)
   }
