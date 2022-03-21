@@ -29,7 +29,7 @@ import { ContentType } from '@standardnotes/common'
 import { StorageKey } from '@Lib/storage_keys'
 import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
 import { SNApiService } from '@Lib/services/Api/ApiService'
-import { SNProtocolService } from '@Lib/services/ProtocolService'
+import { SNProtocolService } from '@Lib/services/Protocol/ProtocolService'
 import { HistoryMap, historyMapFunctions } from './HistoryMap'
 
 const PersistTimeout = 2000

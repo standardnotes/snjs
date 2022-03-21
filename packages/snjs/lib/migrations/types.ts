@@ -3,7 +3,7 @@ import { ApplicationIdentifier } from '@standardnotes/applications'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { Environment } from './../platforms'
 import { SNStorageService } from '@Lib/services/StorageService'
-import { SNProtocolService } from '../services/ProtocolService'
+import { SNProtocolService } from '../services/Protocol/ProtocolService'
 import { DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 import { ChallengeService, SNSingletonManager, SNFeaturesService } from '@Lib/services'
 

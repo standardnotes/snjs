@@ -1,5 +1,5 @@
-import { SynchronousOperator, AsynchronousOperator } from '../protocol/operator/operator'
-import { SNLog } from '../log'
+import { BackupFileDecryptor } from './BackupFileDecryptor'
+import { SNLog } from '../../log'
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,
@@ -13,23 +13,18 @@ import {
   FillItemContent,
 } from '@standardnotes/payloads'
 import { Uuids } from '@Lib/Models/Functions'
-import { SNProtocolOperator004 } from '../protocol/operator/004/operator_004'
-import { SNProtocolOperator003 } from '../protocol/operator/003/operator_003'
-import { SNProtocolOperator002 } from '../protocol/operator/002/operator_002'
-import { SNProtocolOperator001 } from '../protocol/operator/001/operator_001'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
-import { EncryptionDelegate } from './EncryptionDelegate'
+import { EncryptionDelegate } from '../EncryptionDelegate'
 import { SyncEvent } from '@Lib/events'
 import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { ItemsKeyMutator } from '@Lib/Models/ItemsKey/ItemsKeyMutator'
-import { CreateAnyKeyParams, SNRootKeyParams } from '../protocol/key_params'
-import { SNStorageService } from './StorageService'
+import { CreateAnyKeyParams, SNRootKeyParams } from '../../protocol/key_params'
+import { SNStorageService } from '../StorageService'
 import { SNRootKey } from '@Protocol/root_key'
-import { PayloadManager } from './PayloadManager'
+import { PayloadManager } from '../PayloadManager'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import {
-  extendArray,
   isFunction,
   isNullOrUndefined,
   isReactNativeEnvironment,
@@ -38,7 +33,7 @@ import {
   removeFromArray,
   UuidGenerator,
 } from '@standardnotes/utils'
-import { V001Algorithm, V002Algorithm } from '../protocol/operator/algorithms'
+import { V001Algorithm, V002Algorithm } from '../../protocol/operator/algorithms'
 import {
   ContentType,
   ProtocolVersion,
@@ -52,7 +47,6 @@ import {
   EncryptionIntent,
   intentRequiresEncryption,
   isDecryptedIntent,
-  leftVersionGreaterThanOrEqualToRight,
   ApplicationIdentifier,
 } from '@standardnotes/applications'
 import { StorageKey } from '@Lib/storage_keys'
@@ -62,41 +56,16 @@ import {
   DeviceInterface,
   InternalEventBusInterface,
 } from '@standardnotes/services'
-
-export type BackupFile = {
-  version?: ProtocolVersion
-  keyParams?: any
-  auth_params?: any
-  items: any[]
-}
+import { BackupFile } from './BackupFile'
+import { KeyMode } from './KeyMode'
+import { AnyOperator } from './Types'
+import { createOperatorForVersion, isAsyncOperator } from './Functions'
 
 type KeyChangeObserver = () => Promise<void>
-
-export enum KeyMode {
-  /** i.e No account and no passcode */
-  RootKeyNone = 0,
-  /** i.e Account but no passcode */
-  RootKeyOnly = 1,
-  /** i.e Account plus passcode */
-  RootKeyPlusWrapper = 2,
-  /** i.e No account, but passcode */
-  WrapperOnly = 3,
-}
 
 /** The last protocol version to not use root-key based items keys */
 const LAST_NONROOT_ITEMS_KEY_VERSION = ProtocolVersion.V003
 
-type AnyOperator =
-  | SNProtocolOperator001
-  | SNProtocolOperator002
-  | SNProtocolOperator003
-  | SNProtocolOperator004
-
-function isAsyncOperator(
-  operator: AsynchronousOperator | SynchronousOperator,
-): operator is AsynchronousOperator {
-  return (operator as AsynchronousOperator).generateDecryptedParametersAsync !== undefined
-}
 /**
  * The protocol service is responsible for the encryption and decryption of payloads, and
  * handles delegation of a task to the respective protocol operator. Each version of the protocol
@@ -335,25 +304,11 @@ export class SNProtocolService extends AbstractService implements EncryptionDele
     }
   }
 
-  private createOperatorForVersion(version: ProtocolVersion): AnyOperator {
-    if (version === ProtocolVersion.V001) {
-      return new SNProtocolOperator001(this.crypto)
-    } else if (version === ProtocolVersion.V002) {
-      return new SNProtocolOperator002(this.crypto)
-    } else if (version === ProtocolVersion.V003) {
-      return new SNProtocolOperator003(this.crypto)
-    } else if (version === ProtocolVersion.V004) {
-      return new SNProtocolOperator004(this.crypto)
-    } else {
-      throw Error(`Unable to find operator for version ${version}`)
-    }
-  }
-
   private operatorForVersion(version: ProtocolVersion) {
     const operatorKey = version
     let operator = this.operators[operatorKey]
     if (!operator) {
-      operator = this.createOperatorForVersion(version)
+      operator = createOperatorForVersion(version, this.crypto)
       this.operators[operatorKey] = operator
     }
     return operator
@@ -601,7 +556,7 @@ export class SNProtocolService extends AbstractService implements EncryptionDele
       return item.payloadRepresentation()
     })
     const decrypted = await this.payloadsByDecryptingPayloads(payloads)
-    await this.payloadManager!.emitPayloads(decrypted, PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(decrypted, PayloadSource.LocalChanged)
   }
 
   /**
@@ -609,76 +564,10 @@ export class SNProtocolService extends AbstractService implements EncryptionDele
    * @param password - The raw user password associated with this backup file
    */
   public async payloadsByDecryptingBackupFile(data: BackupFile, password?: string) {
-    const keyParamsData = data.keyParams || data.auth_params
-    const rawItems = data.items
-    const encryptedPayloads = rawItems.map((rawItem) => {
-      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.FileImport)
-    })
-    let decryptedPayloads: PurePayload[] = []
-    if (keyParamsData) {
-      const keyParams = this.createKeyParams(keyParamsData)
-      const rootKey = await this.computeRootKey(password!, keyParams)
-      const itemsKeysPayloads = encryptedPayloads.filter((payload) => {
-        return payload.content_type === ContentType.ItemsKey
-      })
-      /**
-       * First decrypt items keys, in case we need to reference these keys for the
-       * decryption of other items below
-       */
-      const decryptedItemsKeysPayloads = await this.payloadsByDecryptingPayloads(
-        itemsKeysPayloads,
-        rootKey,
-      )
-      const decryptedItemsKeys = decryptedItemsKeysPayloads.map(
-        (p) => CreateItemFromPayload(p) as SNItemsKey,
-      )
-      extendArray(decryptedPayloads, decryptedItemsKeysPayloads)
-      for (const encryptedPayload of encryptedPayloads) {
-        if (encryptedPayload.content_type === ContentType.ItemsKey) {
-          continue
-        }
-        try {
-          let itemsKey: SNItemsKey | SNRootKey | undefined
-          if (encryptedPayload.items_key_id) {
-            itemsKey = this.itemsKeyForPayload(encryptedPayload)
-          }
-          if (!itemsKey) {
-            const candidate = decryptedItemsKeysPayloads.find((itemsKeyPayload) => {
-              return encryptedPayload.items_key_id === itemsKeyPayload.uuid
-            })
-            const payloadVersion = encryptedPayload.version as ProtocolVersion
-            if (candidate) {
-              itemsKey = CreateItemFromPayload(candidate) as SNItemsKey
-            } else {
-              /**
-               * Payloads with versions <= 003 use root key directly for encryption.
-               * However, if the incoming key params are >= 004, this means we should
-               * have an items key based off the 003 root key. We can't use the 004
-               * root key directly because it's missing dataAuthenticationKey.
-               */
-              if (leftVersionGreaterThanOrEqualToRight(keyParams.version, ProtocolVersion.V004)) {
-                itemsKey = this.defaultItemsKeyForItemVersion(payloadVersion, decryptedItemsKeys)
-              } else if (compareVersions(payloadVersion, ProtocolVersion.V003) <= 0) {
-                itemsKey = rootKey
-              }
-            }
-          }
-          const decryptedPayload = await this.payloadByDecryptingPayload(encryptedPayload, itemsKey)
-          decryptedPayloads.push(decryptedPayload)
-        } catch (e) {
-          decryptedPayloads.push(
-            CreateMaxPayloadFromAnyObject(encryptedPayload, {
-              errorDecrypting: true,
-              errorDecryptingValueChanged: !encryptedPayload.errorDecrypting,
-            }),
-          )
-          console.error('Error decrypting payload', encryptedPayload, e)
-        }
-      }
-    } else {
-      decryptedPayloads = encryptedPayloads
-    }
-    return decryptedPayloads
+    const decryptor = new BackupFileDecryptor(data, this, password)
+    const result = await decryptor.decrypt()
+    decryptor.destroy()
+    return result
   }
 
   /**

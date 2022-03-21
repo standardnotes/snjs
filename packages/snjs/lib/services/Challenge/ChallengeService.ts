@@ -8,7 +8,7 @@ import {
   ChallengeValidation,
   ChallengeValue,
 } from '.'
-import { SNProtocolService } from '../ProtocolService'
+import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNStorageService } from '../StorageService'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../Protection/ProtectionService'

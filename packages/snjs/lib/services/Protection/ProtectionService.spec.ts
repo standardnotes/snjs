@@ -1,6 +1,6 @@
 import { ChallengeService, ChallengeReason } from '../Challenge'
 import { ItemManager } from '../Items/ItemManager'
-import { SNProtocolService } from '../ProtocolService'
+import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNStorageService } from '../StorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface } from '@standardnotes/services'
