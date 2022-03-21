@@ -13,7 +13,8 @@ export type CrossServiceTokenData = {
     api_version: string,
     created_at: string,
     updated_at: string,
-    device_info: string
+    device_info: string,
+    readonly_access: boolean,
   },
   extensionKey?: string,
 }
