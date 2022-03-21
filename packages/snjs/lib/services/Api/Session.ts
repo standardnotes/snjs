@@ -9,6 +9,7 @@ type RawSessionPayload = {
   refreshToken: string
   accessExpiration: number
   refreshExpiration: number
+  readonlyAccess: boolean
 }
 type RawStorageValue = RawJwtPayload | RawSessionPayload
 
@@ -35,6 +36,7 @@ export abstract class Session {
         rawSession.accessExpiration,
         rawSession.refreshToken,
         rawSession.refreshExpiration,
+        rawSession.readonlyAccess,
       )
     }
   }
@@ -60,30 +62,34 @@ export class JwtSession extends Session {
 
 /** For protocol versions >= 004 */
 export class TokenSession extends Session {
-  public accessToken: string
-  public accessExpiration: number
-  public refreshToken: string
-  public refreshExpiration: number
-
   static FromApiResponse(response: SessionRenewalResponse) {
     const accessToken: string = response.data.session!.access_token
     const refreshToken: string = response.data.session!.refresh_token
     const accessExpiration: number = response.data.session!.access_expiration
     const refreshExpiration: number = response.data.session!.refresh_expiration
-    return new TokenSession(accessToken, accessExpiration, refreshToken, refreshExpiration)
+    const readonlyAccess: boolean = response.data.session!.readonly_access
+
+    return new TokenSession(
+      accessToken,
+      accessExpiration,
+      refreshToken,
+      refreshExpiration,
+      readonlyAccess
+    )
   }
 
   constructor(
-    accessToken: string,
-    accessExpiration: number,
-    refreshToken: string,
-    refreshExpiration: number,
+    public accessToken: string,
+    public accessExpiration: number,
+    public refreshToken: string,
+    public refreshExpiration: number,
+    private readonlyAccess: boolean,
   ) {
     super()
-    this.accessToken = accessToken
-    this.accessExpiration = accessExpiration
-    this.refreshToken = refreshToken
-    this.refreshExpiration = refreshExpiration
+  }
+
+  isReadOnly() {
+    return this.readonlyAccess
   }
 
   private getExpireAt() {
