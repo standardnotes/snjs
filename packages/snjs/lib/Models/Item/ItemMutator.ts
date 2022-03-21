@@ -1,6 +1,6 @@
 import { AppDataField, DefaultAppDomain } from '@standardnotes/applications'
 import { PayloadContent, CopyPayload, PurePayload, PayloadByMerging } from '@standardnotes/payloads'
-import { UuidString } from '../../../types'
+import { UuidString } from '../../types'
 import { Copy, omitInPlace, sortedCopy } from '@standardnotes/utils'
 import { PrefKey } from '../UserPrefs/UserPrefs'
 import { SNItem } from './Item'

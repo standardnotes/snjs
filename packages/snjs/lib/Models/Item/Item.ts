@@ -11,13 +11,10 @@ import {
   PredicateInterface,
 } from '@standardnotes/payloads'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
-import { SNLog } from '../../../log'
+import { SNLog } from '../../log'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
-import { UuidString } from '../../../types'
-import {
-  dateToLocalizedString,
-  deepFreeze,
-} from '@standardnotes/utils'
+import { UuidString } from '../../types'
+import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
 import { PrefKey } from '../UserPrefs/UserPrefs'
 import { ItemContentsDiffer, ItemContentsEqual } from './ItemMutator'
 
@@ -355,5 +352,3 @@ export class SNItem implements ItemInterface {
     return predicate.matchesItem(this)
   }
 }
-
-
