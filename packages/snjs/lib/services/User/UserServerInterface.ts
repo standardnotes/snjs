@@ -1,5 +1,5 @@
 import { HttpResponse, MinimalHttpResponse } from '@standardnotes/responses'
 
-export interface UserApi {
+export interface UserServerInterface {
   deleteAccount(userUuid: string): Promise<HttpResponse | MinimalHttpResponse>
 }

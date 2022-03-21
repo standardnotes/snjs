@@ -14,4 +14,7 @@ export enum SettingName {
   FileUploadBytesLimit = 'FILE_UPLOAD_BYTES_LIMIT',
   FileUploadBytesUsed = 'FILE_UPLOAD_BYTES_USED',
   ListedAuthorSecrets = 'LISTED_AUTHOR_SECRETS',
+  LogSessionUserAgent = 'LOG_SESSION_USER_AGENT',
 }
+
+export type SensitiveSettingName = SettingName.MfaSecret | SettingName.ExtensionKey

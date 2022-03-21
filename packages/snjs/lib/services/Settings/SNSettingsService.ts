@@ -1,12 +1,17 @@
 import { SNApiService } from '../Api/ApiService'
 import { SettingsGateway } from './SettingsGateway'
 import { SNSessionManager } from '../Api/SessionManager'
-import { CloudProvider, EmailBackupFrequency, SettingName } from '@standardnotes/settings'
-import { SensitiveSettingName } from './SensitiveSettingName'
+import {
+  CloudProvider,
+  EmailBackupFrequency,
+  SettingName,
+  SensitiveSettingName,
+} from '@standardnotes/settings'
 import { ExtensionsServerURL } from '@Lib/hosts'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { SettingsClientInterface } from './SettingsClientInterface'
 
-export class SNSettingsService extends AbstractService {
+export class SNSettingsService extends AbstractService implements SettingsClientInterface {
   private provider!: SettingsGateway
   private frequencyOptionsLabels = {
     [EmailBackupFrequency.Disabled]: 'No email backups',
@@ -40,17 +45,18 @@ export class SNSettingsService extends AbstractService {
     return this.provider.getSetting(name)
   }
 
-  async updateSetting(name: SettingName, payload: string, sensitive: boolean) {
+  async updateSetting(name: SettingName, payload: string, sensitive = false) {
     return this.provider.updateSetting(name, payload, sensitive)
   }
 
-  async getSensitiveSetting(name: SensitiveSettingName) {
-    return this.provider.getSensitiveSetting(name)
+  async getDoesSensitiveSettingExist(name: SensitiveSettingName) {
+    return this.provider.getDoesSensitiveSettingExist(name)
   }
 
   async deleteSetting(name: SettingName) {
     return this.provider.deleteSetting(name)
   }
+
   getEmailBackupFrequencyOptionLabel(frequency: EmailBackupFrequency): string {
     return this.frequencyOptionsLabels[frequency]
   }

@@ -13,10 +13,6 @@ export enum HttpVerb {
   Delete = 'DELETE',
 }
 
-export enum ErrorTag {
-  RevokedSession = 'revoked-session',
-}
-
 const REQUEST_READY_STATE_COMPLETED = 4
 
 export type HttpParams = Record<string, unknown>
@@ -215,7 +211,11 @@ export class SNHttpService extends AbstractService {
         }
       } else if (response.error == undefined) {
         if (response.data == undefined || response.data.error == undefined) {
-          response.error = { message: request.responseText || UNKNOWN_ERROR, status: httpStatus }
+          try {
+            response.error = { message: request.responseText || UNKNOWN_ERROR, status: httpStatus }
+          } catch (error) {
+            response.error = { message: UNKNOWN_ERROR, status: httpStatus }
+          }
         } else {
           response.error = response.data.error
         }

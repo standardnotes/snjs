@@ -1,37 +1,37 @@
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import * as Factory from './lib/factory.js'
+chai.use(chaiAsPromised)
+const expect = chai.expect
 
 describe('files', function () {
-  this.timeout(Factory.TwentySecondTimeout);
+  this.timeout(Factory.TwentySecondTimeout)
 
-  let application;
-  let context;
-  let fileService;
-  let itemManager;
+  let application
+  let context
+  let fileService
+  let itemManager
 
-  beforeEach(async function () {
-    localStorage.clear();
-  });
+  beforeEach(function () {
+    localStorage.clear()
+  })
 
   const setup = async ({ fakeCrypto, subscription = true }) => {
     if (fakeCrypto) {
-      context = await Factory.createAppContextWithFakeCrypto();
+      context = await Factory.createAppContextWithFakeCrypto()
     } else {
-      context = await Factory.createAppContextWithRealCrypto();
+      context = await Factory.createAppContextWithRealCrypto()
     }
 
-    await context.launch();
+    await context.launch()
 
-    application = context.application;
-    fileService = context.application.fileService;
-    itemManager = context.application.itemManager;
+    application = context.application
+    fileService = context.application.fileService
+    itemManager = context.application.itemManager
 
     await Factory.registerUserToApplication({
       application: context.application,
       email: context.email,
       password: context.password,
-    });
+    })
 
     if (subscription) {
       await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
@@ -41,81 +41,72 @@ describe('files', function () {
         subscriptionExpiresAt: (new Date().getTime() + 3_600_000) * 1_000,
         timestamp: Date.now(),
         offline: false,
-      });
-      await Factory.sleep(0.25);
+      })
+      await Factory.sleep(0.25)
     }
-  };
+  }
 
   afterEach(async function () {
-    await Factory.safeDeinit(application);
-    localStorage.clear();
-  });
+    await Factory.safeDeinit(application)
+    localStorage.clear()
+  })
 
   const uploadFile = async (fileService, buffer, name, ext, chunkSize) => {
-    const operation = await fileService.beginNewFileUpload();
+    const operation = await fileService.beginNewFileUpload()
 
-    let chunkId = 1;
+    let chunkId = 1
     for (let i = 0; i < buffer.length; i += chunkSize) {
-      const readUntil =
-        i + chunkSize > buffer.length ? buffer.length : i + chunkSize;
-      const chunk = buffer.slice(i, readUntil);
-      const isFinalChunk = readUntil === buffer.length;
+      const readUntil = i + chunkSize > buffer.length ? buffer.length : i + chunkSize
+      const chunk = buffer.slice(i, readUntil)
+      const isFinalChunk = readUntil === buffer.length
 
-      const bytesUploadedSuccessfully = await fileService.pushBytesForUpload(
-        operation,
-        chunk,
-        chunkId++,
-        isFinalChunk
-      );
-      if (!bytesUploadedSuccessfully) {
-        throw new Error('Could not upload file chunk');
+      const error = await fileService.pushBytesForUpload(operation, chunk, chunkId++, isFinalChunk)
+      if (error) {
+        throw new Error('Could not upload file chunk')
       }
     }
 
-    await fileService.finishUpload(operation, name, ext);
+    const file = await fileService.finishUpload(operation, name, ext)
 
-    return operation;
-  };
+    return file
+  }
 
   const downloadFile = async (fileService, itemManager, remoteIdentifier) => {
     const file = itemManager
       .getItems(ContentType.File)
-      .find((file) => file.remoteIdentifier === remoteIdentifier);
+      .find((file) => file.remoteIdentifier === remoteIdentifier)
 
-    let receivedBytes = new Uint8Array();
+    let receivedBytes = new Uint8Array()
 
     await fileService.downloadFile(file, (decryptedBytes) => {
-      receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes]);
-    });
+      receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
+    })
 
-    return receivedBytes;
-  };
+    return receivedBytes
+  }
 
   it('should create valet token from server', async function () {
-    await setup({ fakeCrypto: true, subscription: true });
-    const remoteIdentifier = Factory.generateUuid();
-    const token = await application.apiService.createFileValetToken(
-      remoteIdentifier,
-      'write'
-    );
+    await setup({ fakeCrypto: true, subscription: true })
+    const remoteIdentifier = Factory.generateUuid()
+    const token = await application.apiService.createFileValetToken(remoteIdentifier, 'write')
 
-    expect(token.length).to.be.above(0);
-  });
+    expect(token.length).to.be.above(0)
+  })
 
   it('should not create valet token from server when user has no subscription', async function () {
-    await setup({ fakeCrypto: true, subscription: false });
+    await setup({ fakeCrypto: true, subscription: false })
 
-    const remoteIdentifier = Factory.generateUuid();
-    const token = await application.apiService.createFileValetToken(
+    const remoteIdentifier = Factory.generateUuid()
+    const tokenOrError = await application.apiService.createFileValetToken(
       remoteIdentifier,
-      'write'
-    );
+      'write',
+    )
 
-    expect(token.error).to.equal('no-subscription');
-  });
+    expect(tokenOrError.tag).to.equal('no-subscription')
+  })
 
   it('should not create valet token from server when user has an expired subscription', async function () {
-    await setup({ fakeCrypto: true, subscription: false });
+    await setup({ fakeCrypto: true, subscription: false })
 
     await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
       userEmail: context.email,
@@ -124,76 +115,87 @@ describe('files', function () {
       subscriptionExpiresAt: (new Date().getTime() - 3_600_000) * 1_000,
       timestamp: Date.now(),
       offline: false,
-    });
+    })
 
-    await Factory.sleep(0.25);
+    await Factory.sleep(0.25)
 
-    const remoteIdentifier = Factory.generateUuid();
-    const token = await application.apiService.createFileValetToken(
+    const remoteIdentifier = Factory.generateUuid()
+    const tokenOrError = await application.apiService.createFileValetToken(
       remoteIdentifier,
-      'write'
-    );
+      'write',
+    )
 
-    expect(token.error).to.equal('expired-subscription');
-  });
+    expect(tokenOrError.tag).to.equal('expired-subscription')
+  })
 
   it('creating two upload sessions successively should succeed', async function () {
-    await setup({ fakeCrypto: true, subscription: true });
+    await setup({ fakeCrypto: true, subscription: true })
 
-    const firstToken = await application.apiService.createFileValetToken(Factory.generateUuid(), 'write')
+    const firstToken = await application.apiService.createFileValetToken(
+      Factory.generateUuid(),
+      'write',
+    )
     const firstSession = await application.apiService.startUploadSession(firstToken)
 
-    expect(firstSession.uploadId).to.be.ok;
+    expect(firstSession.uploadId).to.be.ok
 
-    const secondToken = await application.apiService.createFileValetToken(Factory.generateUuid(), 'write')
+    const secondToken = await application.apiService.createFileValetToken(
+      Factory.generateUuid(),
+      'write',
+    )
     const secondSession = await application.apiService.startUploadSession(secondToken)
 
-    expect(secondSession.uploadId).to.be.ok;
-  });
+    expect(secondSession.uploadId).to.be.ok
+  })
 
   it('should encrypt and upload small file', async function () {
-    await setup({ fakeCrypto: false, subscription: true });
+    await setup({ fakeCrypto: false, subscription: true })
 
-    const response = await fetch('/packages/snjs/mocha/assets/small_file.md');
-    const buffer = new Uint8Array(await response.arrayBuffer());
+    const response = await fetch('/packages/snjs/mocha/assets/small_file.md')
+    const buffer = new Uint8Array(await response.arrayBuffer())
 
-    const operation = await uploadFile(
-      fileService,
-      buffer,
-      'my-file',
-      'md',
-      1000
-    );
+    const file = await uploadFile(fileService, buffer, 'my-file', 'md', 1000)
 
-    const downloadedBytes = await downloadFile(
-      fileService,
-      itemManager,
-      operation.getRemoteIdentifier()
-    );
+    const downloadedBytes = await downloadFile(fileService, itemManager, file.remoteIdentifier)
 
-    expect(downloadedBytes).to.eql(buffer);
-  });
+    expect(downloadedBytes).to.eql(buffer)
+  })
 
   it('should encrypt and upload big file', async function () {
-    await setup({ fakeCrypto: false, subscription: true });
+    await setup({ fakeCrypto: false, subscription: true })
 
-    const response = await fetch('/packages/snjs/mocha/assets/two_mb_file.md');
-    const buffer = new Uint8Array(await response.arrayBuffer());
+    const response = await fetch('/packages/snjs/mocha/assets/two_mb_file.md')
+    const buffer = new Uint8Array(await response.arrayBuffer())
 
-    const operation = await uploadFile(
-      fileService,
-      buffer,
-      'my-file',
-      'md',
-      100000
-    );
+    const file = await uploadFile(fileService, buffer, 'my-file', 'md', 100000)
 
-    const downloadedBytes = await downloadFile(
-      fileService,
-      itemManager,
-      operation.getRemoteIdentifier()
-    );
+    const downloadedBytes = await downloadFile(fileService, itemManager, file.remoteIdentifier)
 
-    expect(downloadedBytes).to.eql(buffer);
-  });
-});
+    expect(downloadedBytes).to.eql(buffer)
+  })
+
+  it('should delete file', async function () {
+    await setup({ fakeCrypto: false, subscription: true })
+
+    const response = await fetch('/packages/snjs/mocha/assets/small_file.md')
+    const buffer = new Uint8Array(await response.arrayBuffer())
+
+    const file = await uploadFile(fileService, buffer, 'my-file', 'md', 1000)
+
+    const error = await fileService.deleteFile(file)
+
+    expect(error).to.not.be.ok
+
+    expect(itemManager.findItem(file.uuid)).to.not.be.ok
+
+    const downloadError = await fileService.downloadFile(file)
+
+    expect(downloadError).to.be.ok
+  })
+
+  it.skip('should cancel file download', async function () {
+    await setup({ fakeCrypto: false, subscription: true })
+
+    // ...
+  })
+})

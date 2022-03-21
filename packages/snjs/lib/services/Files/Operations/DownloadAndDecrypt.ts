@@ -1,20 +1,21 @@
+import { ClientDisplayableError } from '@Lib/strings/ClientError'
 import { FileDownloader } from '../UseCase/FileDownloader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
-import { FilesApi, RemoteFileInterface, EncryptedFileInterface } from '../types'
+import { RemoteFileInterface, EncryptedFileInterface } from '../types'
+import { FilesServerInterface } from '../FilesServerInterface'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
 export class DownloadAndDecryptFileOperation {
   private readonly decryptor: FileDecryptor
   private readonly downloader: FileDownloader
-  private completionResolve!: () => void
 
   constructor(
     file: RemoteFileInterface & EncryptedFileInterface,
     crypto: SNPureCrypto,
-    api: FilesApi,
+    api: FilesServerInterface,
     apiToken: string,
-    private onDecryptedBytes: (decryptedBytes: Uint8Array) => void,
-    private onError: () => void,
+    private onDecryptedBytes: (decryptedBytes: Uint8Array) => Promise<void>,
+    private onError: (error: ClientDisplayableError) => void,
   ) {
     this.decryptor = new FileDecryptor(file, crypto)
     this.downloader = new FileDownloader(file, apiToken, api, this.onDownloadedBytes.bind(this))
@@ -23,27 +24,22 @@ export class DownloadAndDecryptFileOperation {
   public async run(): Promise<void> {
     this.decryptor.initialize()
 
-    this.downloader.download()
+    const result = await this.downloader.download()
 
-    return new Promise((resolve) => {
-      this.completionResolve = resolve
-    })
+    if (result instanceof ClientDisplayableError) {
+      this.onError(result)
+    }
   }
 
-  private onDownloadedBytes(encryptedBytes: Uint8Array): void {
+  private async onDownloadedBytes(encryptedBytes: Uint8Array): Promise<void> {
     const result = this.decryptor.decryptBytes(encryptedBytes)
 
     if (!result || result.decryptedBytes.length === 0) {
       this.downloader.abort()
-      this.onError()
-      this.completionResolve()
+      this.onError(new ClientDisplayableError('Failed to decrypt chunk'))
       return
     }
 
-    this.onDecryptedBytes(result.decryptedBytes)
-
-    if (result.isFinalChunk) {
-      this.completionResolve()
-    }
+    await this.onDecryptedBytes(result.decryptedBytes)
   }
 }

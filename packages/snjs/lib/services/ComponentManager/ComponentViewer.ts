@@ -26,7 +26,7 @@ import {
   ComponentDataDomain,
   MessageReply,
   StreamItemsMessageData,
-  AllowedBatchPermissions,
+  AllowedBatchContentTypes,
   ComponentRawPayload,
   DeleteItemsMessageData,
 } from './types'
@@ -542,7 +542,7 @@ export class ComponentViewer {
 
   handleStreamItemsMessage(message: ComponentMessage): void {
     const data = message.data as StreamItemsMessageData
-    const types = data.content_types.filter((type) => AllowedBatchPermissions.includes(type)).sort()
+    const types = data.content_types.filter((type) => AllowedBatchContentTypes.includes(type)).sort()
     const requiredPermissions = [
       {
         name: ComponentAction.StreamItems,
@@ -767,7 +767,7 @@ export class ComponentViewer {
 
   handleDeleteItemsMessage(message: ComponentMessage): void {
     const data = message.data as DeleteItemsMessageData
-    const items = data.items.filter((item) => AllowedBatchPermissions.includes(item.content_type))
+    const items = data.items.filter((item) => AllowedBatchContentTypes.includes(item.content_type))
     const requiredContentTypes = uniq(
       items.map((item) => item.content_type),
     ).sort() as ContentType[]

@@ -54,7 +54,7 @@ export class NoteViewController {
       })) as SNNote
       if (this.defaultTag) {
         const tag = this.application.findItem(this.defaultTag) as SNTag
-        await this.application.addTagHierarchyToNote(note, tag)
+        await this.application.items.addTagToNote(note, tag, true)
       }
       this.isTemplateNote = true
       this.note = note

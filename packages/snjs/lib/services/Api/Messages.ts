@@ -51,14 +51,6 @@ export const API_MESSAGE_FAILED_ACCESS_PURCHASE = 'Failed to access purchase flo
 
 export const API_MESSAGE_FAILED_DELETE_REVISION = 'Failed to delete revision.'
 
-export const API_MESSAGE_FAILED_START_UPLOAD_SESSION = 'Failed to start an upload session.'
-
-export const API_MESSAGE_FAILED_CLOSE_UPLOAD_SESSION = 'Failed to close an upload session.'
-
-export const API_MESSAGE_FAILED_UPLOAD_FILE_CHUNK = 'Failed to upload file chunk.'
-
-export const API_MESSAGE_FAILED_DOWNLOAD_FILE_CHUNK = 'Failed to download file chunk.'
-
 export const API_MESSAGE_FAILED_OFFLINE_FEATURES = 'Failed to get offline features.'
 export const API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING = `The extension you are attempting to install comes from an
   untrusted source. Untrusted extensions may lower the security of your data. Do you want to continue?`
@@ -75,9 +67,6 @@ export const UNSUPPORTED_PROTOCOL_VERSION =
 export const EXPIRED_PROTOCOL_VERSION =
   'The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.com/help/security for more information.'
 
-export const OUTDATED_PROTOCOL_VERSION =
-  'The encryption version for your account is outdated and requires upgrade. You may proceed with login, but are advised to perform a security update using the web or desktop application. Please visit standardnotes.com/help/security for more information.'
-
 export const UNSUPPORTED_KEY_DERIVATION =
   'Your account was created on a platform with higher security capabilities than this browser supports. If we attempted to generate your login keys here, it would take hours. Please use a browser with more up to date security capabilities, like Google Chrome or Firefox, to log in.'
 
@@ -85,7 +74,6 @@ export const INVALID_PASSWORD_COST =
   'Unable to sign in due to insecure password parameters. Please visit standardnotes.com/help/security for more information.'
 export const INVALID_PASSWORD = 'Invalid password.'
 
-export const OUTDATED_PROTOCOL_ALERT_TITLE = 'Update Recommended'
 export const OUTDATED_PROTOCOL_ALERT_IGNORE = 'Sign In'
 export const UPGRADING_ENCRYPTION = "Upgrading your account's encryption version…"
 

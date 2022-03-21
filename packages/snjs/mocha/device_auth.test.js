@@ -1,195 +1,172 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import * as Factory from './lib/factory.js'
+chai.use(chaiAsPromised)
+const expect = chai.expect
 
 describe('device authentication', function () {
   beforeEach(async function () {
-    localStorage.clear();
-  });
+    localStorage.clear()
+  })
 
   afterEach(async function () {
-    localStorage.clear();
-  });
+    localStorage.clear()
+  })
 
   it('handles application launch with passcode only', async function () {
-    const namespace = Factory.randomString();
-    const application = await Factory.createAndInitializeApplication(namespace);
-    const passcode = 'foobar';
-    const wrongPasscode = 'barfoo';
-    expect(await application.protectionService.createLaunchChallenge()).to.not
-      .be.ok;
-    await application.addPasscode(passcode);
-    expect(await application.hasPasscode()).to.equal(true);
-    expect(await application.protectionService.createLaunchChallenge()).to.be
-      .ok;
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
-    await Factory.safeDeinit(application);
+    const namespace = Factory.randomString()
+    const application = await Factory.createAndInitializeApplication(namespace)
+    const passcode = 'foobar'
+    const wrongPasscode = 'barfoo'
+    expect(await application.protectionService.createLaunchChallenge()).to.not.be.ok
+    await application.addPasscode(passcode)
+    expect(await application.hasPasscode()).to.equal(true)
+    expect(await application.protectionService.createLaunchChallenge()).to.be.ok
+    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    await Factory.safeDeinit(application)
 
     /** Recreate application and initialize */
-    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace);
-    let numPasscodeAttempts = 0;
+    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace)
+    let numPasscodeAttempts = 0
     const promptValueReply = (prompts) => {
-      const values = [];
+      const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
           values.push(
-            new ChallengeValue(
-              prompt,
-              numPasscodeAttempts < 2 ? wrongPasscode : passcode
-            )
-          );
+            new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode),
+          )
         }
       }
-      return values;
-    };
+      return values
+    }
     const receiveChallenge = async (challenge) => {
       tmpApplication.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptValueReply([value.prompt]);
-          tmpApplication.submitValuesForChallenge(challenge, values);
-          numPasscodeAttempts++;
+          const values = promptValueReply([value.prompt])
+          tmpApplication.submitValuesForChallenge(challenge, values)
+          numPasscodeAttempts++
         },
-      });
-      const initialValues = promptValueReply(challenge.prompts);
-      tmpApplication.submitValuesForChallenge(challenge, initialValues);
-    };
-    await tmpApplication.prepareForLaunch({ receiveChallenge });
-    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
-    await tmpApplication.launch(true);
-    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
-    expect(tmpApplication.protocolService.keyMode).to.equal(
-      KeyMode.WrapperOnly
-    );
-    await Factory.safeDeinit(tmpApplication);
-  }).timeout(10000);
+      })
+      const initialValues = promptValueReply(challenge.prompts)
+      tmpApplication.submitValuesForChallenge(challenge, initialValues)
+    }
+    await tmpApplication.prepareForLaunch({ receiveChallenge })
+    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
+    await tmpApplication.launch(true)
+    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
+    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    await Factory.safeDeinit(tmpApplication)
+  }).timeout(10000)
 
   it('handles application launch with passcode and biometrics', async function () {
-    const namespace = Factory.randomString();
-    const application = await Factory.createAndInitializeApplication(namespace);
-    const passcode = 'foobar';
-    const wrongPasscode = 'barfoo';
-    await application.addPasscode(passcode);
-    await application.protectionService.enableBiometrics();
-    expect(await application.hasPasscode()).to.equal(true);
-    expect(
-      (await application.protectionService.createLaunchChallenge()).prompts
-        .length
-    ).to.equal(2);
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly);
-    await Factory.safeDeinit(application);
+    const namespace = Factory.randomString()
+    const application = await Factory.createAndInitializeApplication(namespace)
+    const passcode = 'foobar'
+    const wrongPasscode = 'barfoo'
+    await application.addPasscode(passcode)
+    await application.protectionService.enableBiometrics()
+    expect(await application.hasPasscode()).to.equal(true)
+    expect((await application.protectionService.createLaunchChallenge()).prompts.length).to.equal(2)
+    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    await Factory.safeDeinit(application)
 
     /** Recreate application and initialize */
-    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace);
-    let numPasscodeAttempts = 1;
+    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace)
+    let numPasscodeAttempts = 1
     const promptValueReply = (prompts) => {
-      const values = [];
+      const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
           const response = new ChallengeValue(
             prompt,
-            numPasscodeAttempts < 2 ? wrongPasscode : passcode
-          );
-          values.push(response);
+            numPasscodeAttempts < 2 ? wrongPasscode : passcode,
+          )
+          values.push(response)
         } else if (prompt.validation === ChallengeValidation.Biometric) {
-          values.push(new ChallengeValue(prompt, true));
+          values.push(new ChallengeValue(prompt, true))
         }
       }
-      return values;
-    };
+      return values
+    }
     const receiveChallenge = async (challenge) => {
       tmpApplication.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptValueReply([value.prompt]);
-          tmpApplication.submitValuesForChallenge(challenge, values);
-          numPasscodeAttempts++;
+          const values = promptValueReply([value.prompt])
+          tmpApplication.submitValuesForChallenge(challenge, values)
+          numPasscodeAttempts++
         },
-      });
-      const initialValues = promptValueReply(challenge.prompts);
-      tmpApplication.submitValuesForChallenge(challenge, initialValues);
-    };
-    await tmpApplication.prepareForLaunch({ receiveChallenge });
-    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
+      })
+      const initialValues = promptValueReply(challenge.prompts)
+      tmpApplication.submitValuesForChallenge(challenge, initialValues)
+    }
+    await tmpApplication.prepareForLaunch({ receiveChallenge })
+    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
     expect(
-      (await tmpApplication.protectionService.createLaunchChallenge()).prompts
-        .length
-    ).to.equal(2);
-    await tmpApplication.launch(true);
-    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
-    expect(tmpApplication.protocolService.keyMode).to.equal(
-      KeyMode.WrapperOnly
-    );
-    await Factory.safeDeinit(tmpApplication);
-  }).timeout(Factory.TwentySecondTimeout);
+      (await tmpApplication.protectionService.createLaunchChallenge()).prompts.length,
+    ).to.equal(2)
+    await tmpApplication.launch(true)
+    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
+    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    await Factory.safeDeinit(tmpApplication)
+  }).timeout(Factory.TwentySecondTimeout)
 
   it('handles application launch with passcode and account', async function () {
-    const namespace = Factory.randomString();
-    const application = await Factory.createAndInitializeApplication(namespace);
-    const email = UuidGenerator.GenerateUuid();
-    const password = UuidGenerator.GenerateUuid();
+    const namespace = Factory.randomString()
+    const application = await Factory.createAndInitializeApplication(namespace)
+    const email = UuidGenerator.GenerateUuid()
+    const password = UuidGenerator.GenerateUuid()
     await Factory.registerUserToApplication({
       application: application,
       email,
       password,
-    });
-    const sampleStorageKey = 'foo';
-    const sampleStorageValue = 'bar';
-    await application.storageService.setValue(
-      sampleStorageKey,
-      sampleStorageValue
-    );
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly);
-    const passcode = 'foobar';
-    Factory.handlePasswordChallenges(application, password);
-    await application.addPasscode(passcode);
-    expect(application.protocolService.keyMode).to.equal(
-      KeyMode.RootKeyPlusWrapper
-    );
-    expect(await application.hasPasscode()).to.equal(true);
-    await Factory.safeDeinit(application);
+    })
+    const sampleStorageKey = 'foo'
+    const sampleStorageValue = 'bar'
+    await application.storageService.setValue(sampleStorageKey, sampleStorageValue)
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    const passcode = 'foobar'
+    Factory.handlePasswordChallenges(application, password)
+    await application.addPasscode(passcode)
+    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(await application.hasPasscode()).to.equal(true)
+    await Factory.safeDeinit(application)
 
-    const wrongPasscode = 'barfoo';
-    let numPasscodeAttempts = 1;
+    const wrongPasscode = 'barfoo'
+    let numPasscodeAttempts = 1
     /** Recreate application and initialize */
-    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace);
+    const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace)
     const promptValueReply = (prompts) => {
-      const values = [];
+      const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
           values.push(
-            new ChallengeValue(
-              prompt,
-              numPasscodeAttempts < 2 ? wrongPasscode : passcode
-            )
-          );
+            new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode),
+          )
         }
       }
-      return values;
-    };
+      return values
+    }
     const receiveChallenge = async (challenge) => {
       tmpApplication.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
-          const values = promptValueReply([value.prompt]);
-          tmpApplication.submitValuesForChallenge(challenge, values);
-          numPasscodeAttempts++;
+          const values = promptValueReply([value.prompt])
+          tmpApplication.submitValuesForChallenge(challenge, values)
+          numPasscodeAttempts++
         },
-      });
-      const initialValues = promptValueReply(challenge.prompts);
-      tmpApplication.submitValuesForChallenge(challenge, initialValues);
-    };
+      })
+      const initialValues = promptValueReply(challenge.prompts)
+      tmpApplication.submitValuesForChallenge(challenge, initialValues)
+    }
     await tmpApplication.prepareForLaunch({
       receiveChallenge: receiveChallenge,
-    });
-    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok;
-    await tmpApplication.launch(true);
-    expect(
-      await tmpApplication.storageService.getValue(sampleStorageKey)
-    ).to.equal(sampleStorageValue);
-    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok;
-    expect(tmpApplication.protocolService.keyMode).to.equal(
-      KeyMode.RootKeyPlusWrapper
-    );
-    await Factory.safeDeinit(tmpApplication);
-  }).timeout(Factory.TwentySecondTimeout);
-});
+    })
+    expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
+    await tmpApplication.launch(true)
+    expect(await tmpApplication.storageService.getValue(sampleStorageKey)).to.equal(
+      sampleStorageValue,
+    )
+    expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
+    expect(tmpApplication.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    await Factory.safeDeinit(tmpApplication)
+  }).timeout(Factory.TwentySecondTimeout)
+})

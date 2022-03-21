@@ -1,223 +1,197 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import * as Factory from '../lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import * as Factory from '../lib/factory.js'
+chai.use(chaiAsPromised)
+const expect = chai.expect
 
 describe('importing', function () {
-  this.timeout(Factory.TenSecondTimeout);
-  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
+  this.timeout(Factory.TenSecondTimeout)
+  const BASE_ITEM_COUNT = 2 /** Default items key, user preferences */
 
-  let expectedItemCount;
-  let application;
-  let email;
-  let password;
+  let expectedItemCount
+  let application
+  let email
+  let password
 
   beforeEach(async function () {
-    localStorage.clear();
-  });
+    localStorage.clear()
+  })
 
   const setup = async ({ fakeCrypto }) => {
-    expectedItemCount = BASE_ITEM_COUNT;
+    expectedItemCount = BASE_ITEM_COUNT
     if (fakeCrypto) {
-      application = await Factory.createInitAppWithFakeCrypto();
+      application = await Factory.createInitAppWithFakeCrypto()
     } else {
-      application = await Factory.createInitAppWithRealCrypto();
+      application = await Factory.createInitAppWithRealCrypto()
     }
-    email = UuidGenerator.GenerateUuid();
-    password = UuidGenerator.GenerateUuid();
-    Factory.handlePasswordChallenges(application, password);
-  };
+    email = UuidGenerator.GenerateUuid()
+    password = UuidGenerator.GenerateUuid()
+    Factory.handlePasswordChallenges(application, password)
+  }
 
   afterEach(async function () {
-    await Factory.safeDeinit(application);
-    localStorage.clear();
-  });
+    await Factory.safeDeinit(application)
+    localStorage.clear()
+  })
 
   it('should not import backups made from unsupported versions', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     const result = await application.importData({
       version: '-1',
       items: [],
-    });
-    expect(result.error).to.exist;
-  });
+    })
+    expect(result.error).to.exist
+  })
 
   it('should not import backups made from 004 into 003 account', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerOldUser({
       application,
       email,
       password,
       version: ProtocolVersion.V003,
-    });
+    })
     const result = await application.importData({
       version: ProtocolVersion.V004,
       items: [],
-    });
-    expect(result.error).to.exist;
-  });
+    })
+    expect(result.error).to.exist
+  })
 
   it('importing existing data should keep relationships valid', async function () {
-    await setup({ fakeCrypto: true });
-    const pair = Factory.createRelatedNoteTagPairPayload();
-    const notePayload = pair[0];
-    const tagPayload = pair[1];
+    await setup({ fakeCrypto: true })
+    const pair = Factory.createRelatedNoteTagPairPayload()
+    const notePayload = pair[0]
+    const tagPayload = pair[1]
 
     await application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged
-    );
-    expectedItemCount += 2;
-    const note = application.itemManager.getItems([ContentType.Note])[0];
-    const tag = application.itemManager.getItems([ContentType.Tag])[0];
+      PayloadSource.LocalChanged,
+    )
+    expectedItemCount += 2
+    const note = application.itemManager.getItems([ContentType.Note])[0]
+    const tag = application.itemManager.getItems([ContentType.Tag])[0]
 
-    expect(tag.content.references.length).to.equal(1);
-    expect(tag.noteCount).to.equal(1);
+    expect(tag.content.references.length).to.equal(1)
+    expect(tag.noteCount).to.equal(1)
 
-    expect(note.content.references.length).to.equal(0);
-    expect(
-      application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(1);
+    expect(note.content.references.length).to.equal(0)
+    expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
 
     await application.importData(
       {
         items: [notePayload, tagPayload],
       },
-      true
-    );
+      true,
+    )
 
-    expect(application.itemManager.items.length).to.equal(expectedItemCount);
+    expect(application.itemManager.items.length).to.equal(expectedItemCount)
 
-    expect(tag.content.references.length).to.equal(1);
-    expect(tag.noteCount).to.equal(1);
+    expect(tag.content.references.length).to.equal(1)
+    expect(tag.noteCount).to.equal(1)
 
-    expect(note.content.references.length).to.equal(0);
-    expect(
-      application.itemManager.itemsReferencingItem(note.uuid).length
-    ).to.equal(1);
-  });
+    expect(note.content.references.length).to.equal(0)
+    expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+  })
 
   it('importing same note many times should create only one duplicate', async function () {
     /**
      * Used strategy here will be KEEP_LEFT_DUPLICATE_RIGHT
      * which means that new right items will be created with different
      */
-    await setup({ fakeCrypto: true });
-    const notePayload = Factory.createNotePayload();
-    await application.itemManager.emitItemFromPayload(
-      notePayload,
-      PayloadSource.LocalSaved
-    );
-    expectedItemCount++;
+    await setup({ fakeCrypto: true })
+    const notePayload = Factory.createNotePayload()
+    await application.itemManager.emitItemFromPayload(notePayload, PayloadSource.LocalSaved)
+    expectedItemCount++
     const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
       content: {
         ...notePayload.content,
         title: `${Math.random()}`,
       },
-    });
+    })
     await application.importData(
       {
         items: [mutatedNote, mutatedNote, mutatedNote],
       },
-      true
-    );
-    expectedItemCount++;
-    expect(application.itemManager.notes.length).to.equal(2);
-    const imported = application.itemManager.notes.find(
-      (n) => n.uuid !== notePayload.uuid
-    );
-    expect(imported.content.title).to.equal(mutatedNote.content.title);
-  });
+      true,
+    )
+    expectedItemCount++
+    expect(application.itemManager.notes.length).to.equal(2)
+    const imported = application.itemManager.notes.find((n) => n.uuid !== notePayload.uuid)
+    expect(imported.content.title).to.equal(mutatedNote.content.title)
+  })
 
   it('importing a tag with lesser references should not create duplicate', async function () {
-    await setup({ fakeCrypto: true });
-    const pair = Factory.createRelatedNoteTagPairPayload();
-    const tagPayload = pair[1];
-    await application.itemManager.emitItemsFromPayloads(
-      pair,
-      PayloadSource.LocalChanged
-    );
+    await setup({ fakeCrypto: true })
+    const pair = Factory.createRelatedNoteTagPairPayload()
+    const tagPayload = pair[1]
+    await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
     const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
       content: {
         ...tagPayload.safeContent,
         references: [],
       },
-    });
+    })
     await application.importData(
       {
         items: [mutatedTag],
       },
-      true
-    );
-    expect(application.itemManager.tags.length).to.equal(1);
-    expect(
-      application.itemManager.findItem(tagPayload.uuid).content.references
-        .length
-    ).to.equal(1);
-  });
+      true,
+    )
+    expect(application.itemManager.tags.length).to.equal(1)
+    expect(application.itemManager.findItem(tagPayload.uuid).content.references.length).to.equal(1)
+  })
 
   it('importing data with differing content should create duplicates', async function () {
-    await setup({ fakeCrypto: true });
-    const pair = Factory.createRelatedNoteTagPairPayload();
-    const notePayload = pair[0];
-    const tagPayload = pair[1];
-    await application.itemManager.emitItemsFromPayloads(
-      pair,
-      PayloadSource.LocalChanged
-    );
-    expectedItemCount += 2;
-    const note = application.itemManager.notes[0];
-    const tag = application.itemManager.tags[0];
+    await setup({ fakeCrypto: true })
+    const pair = Factory.createRelatedNoteTagPairPayload()
+    const notePayload = pair[0]
+    const tagPayload = pair[1]
+    await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
+    expectedItemCount += 2
+    const note = application.itemManager.notes[0]
+    const tag = application.itemManager.tags[0]
     const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
       content: {
         ...notePayload.safeContent,
         title: `${Math.random()}`,
       },
-    });
+    })
     const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
       content: {
         ...tagPayload.safeContent,
         title: `${Math.random()}`,
       },
-    });
+    })
     await application.importData(
       {
         items: [mutatedNote, mutatedTag],
       },
-      true
-    );
-    expectedItemCount += 2;
-    expect(application.itemManager.items.length).to.equal(expectedItemCount);
+      true,
+    )
+    expectedItemCount += 2
+    expect(application.itemManager.items.length).to.equal(expectedItemCount)
 
-    const newNote = application.itemManager.notes.find(
-      (n) => n.uuid !== notePayload.uuid
-    );
-    const newTag = application.itemManager.tags.find(
-      (t) => t.uuid !== tagPayload.uuid
-    );
+    const newNote = application.itemManager.notes.find((n) => n.uuid !== notePayload.uuid)
+    const newTag = application.itemManager.tags.find((t) => t.uuid !== tagPayload.uuid)
 
-    expect(newNote.uuid).to.not.equal(note.uuid);
-    expect(newTag.uuid).to.not.equal(tag.uuid);
+    expect(newNote.uuid).to.not.equal(note.uuid)
+    expect(newTag.uuid).to.not.equal(tag.uuid)
 
-    const refreshedTag = application.itemManager.findItem(tag.uuid);
-    expect(refreshedTag.content.references.length).to.equal(2);
-    expect(refreshedTag.noteCount).to.equal(2);
+    const refreshedTag = application.itemManager.findItem(tag.uuid)
+    expect(refreshedTag.content.references.length).to.equal(2)
+    expect(refreshedTag.noteCount).to.equal(2)
 
-    const refreshedNote = application.itemManager.findItem(note.uuid);
-    expect(refreshedNote.content.references.length).to.equal(0);
-    expect(
-      application.itemManager.itemsReferencingItem(refreshedNote.uuid).length
-    ).to.equal(2);
+    const refreshedNote = application.itemManager.findItem(note.uuid)
+    expect(refreshedNote.content.references.length).to.equal(0)
+    expect(application.itemManager.itemsReferencingItem(refreshedNote.uuid).length).to.equal(2)
 
-    expect(newTag.content.references.length).to.equal(1);
-    expect(newTag.noteCount).to.equal(1);
+    expect(newTag.content.references.length).to.equal(1)
+    expect(newTag.noteCount).to.equal(1)
 
-    expect(newNote.content.references.length).to.equal(0);
-    expect(
-      application.itemManager.itemsReferencingItem(newNote.uuid).length
-    ).to.equal(1);
-  });
+    expect(newNote.content.references.length).to.equal(0)
+    expect(application.itemManager.itemsReferencingItem(newNote.uuid).length).to.equal(1)
+  })
 
   it('when importing items, imported values should not be used to determine if changed', async function () {
     /**
@@ -230,14 +204,14 @@ describe('importing', function () {
      * value now doesn't match what's coming in. The solution is to get all values
      * ahead of time before any changes are made.
      */
-    await setup({ fakeCrypto: true });
-    const note = await Factory.createMappedNote(application);
-    const tag = await Factory.createMappedTag(application);
-    expectedItemCount += 2;
+    await setup({ fakeCrypto: true })
+    const note = await Factory.createMappedNote(application)
+    const tag = await Factory.createMappedTag(application)
+    expectedItemCount += 2
 
     await application.itemManager.changeItem(tag.uuid, (mutator) => {
-      mutator.addItemAsRelationship(note);
-    });
+      mutator.addItemAsRelationship(note)
+    })
 
     const externalNote = Object.assign(
       {},
@@ -245,9 +219,9 @@ describe('importing', function () {
         uuid: note.uuid,
         content: note.getContentCopy(),
         content_type: note.content_type,
-      }
-    );
-    externalNote.content.text = `${Math.random()}`;
+      },
+    )
+    externalNote.content.text = `${Math.random()}`
 
     const externalTag = Object.assign(
       {},
@@ -255,255 +229,238 @@ describe('importing', function () {
         uuid: tag.uuid,
         content: tag.getContentCopy(),
         content_type: tag.content_type,
-      }
-    );
+      },
+    )
 
     await application.importData(
       {
         items: [externalNote, externalTag],
       },
-      true
-    );
-    expectedItemCount += 1;
+      true,
+    )
+    expectedItemCount += 1
 
     /** We expect now that the total item count is 3, not 4. */
-    expect(application.itemManager.items.length).to.equal(expectedItemCount);
+    expect(application.itemManager.items.length).to.equal(expectedItemCount)
 
-    const refreshedTag = application.itemManager.findItem(tag.uuid);
+    const refreshedTag = application.itemManager.findItem(tag.uuid)
     /** References from both items have merged. */
-    expect(refreshedTag.content.references.length).to.equal(2);
-  });
+    expect(refreshedTag.content.references.length).to.equal(2)
+  })
 
   it('should import decrypted data and keep items that were previously deleted', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
-    Factory.handlePasswordChallenges(application, password);
+    })
+    Factory.handlePasswordChallenges(application, password)
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
-    ]);
-    await application.sync.sync({ awaitAll: true });
+    ])
+    await application.sync.sync({ awaitAll: true })
 
-    await application.deleteItem(note);
-    expect(application.findItem(note.uuid)).to.not.exist;
+    await application.deleteItem(note)
+    expect(application.findItem(note.uuid)).to.not.exist
 
-    await application.deleteItem(tag);
-    expect(application.findItem(tag.uuid)).to.not.exist;
+    await application.deleteItem(tag)
+    expect(application.findItem(tag.uuid)).to.not.exist
 
     await application.importData(
       {
         items: [note, tag],
       },
-      true
-    );
-    expect(application.itemManager.notes.length).to.equal(1);
-    expect(application.findItem(tag.uuid).deleted).to.be.false;
-    expect(application.itemManager.tags.length).to.equal(1);
-    expect(application.findItem(note.uuid).deleted).to.be.false;
-  });
+      true,
+    )
+    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.findItem(tag.uuid).deleted).to.be.false
+    expect(application.itemManager.tags.length).to.equal(1)
+    expect(application.findItem(note.uuid).deleted).to.be.false
+  })
 
   it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
-    const note = await Factory.createSyncedNote(application);
+    })
+    const note = await Factory.createSyncedNote(application)
 
     /** Sign into another account and import the same item. It should get a different UUID. */
-    application = await Factory.signOutApplicationAndReturnNew(application);
-    email = UuidGenerator.GenerateUuid();
-    Factory.handlePasswordChallenges(application, password);
+    application = await Factory.signOutApplicationAndReturnNew(application)
+    email = UuidGenerator.GenerateUuid()
+    Factory.handlePasswordChallenges(application, password)
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
     await application.importData(
       {
         items: [note],
       },
-      true
-    );
+      true,
+    )
 
-    expect(application.itemManager.notes.length).to.equal(1);
-    expect(application.itemManager.notes[0].uuid).to.not.equal(note.uuid);
-  });
+    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.itemManager.notes[0].uuid).to.not.equal(note.uuid)
+  })
 
   it('should maintain consistency between storage and PayloadManager after an import with conflicts', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
-    const note = await Factory.createSyncedNote(application);
+    })
+    const note = await Factory.createSyncedNote(application)
 
     /** Sign into another account and import the same items. They should get a different UUID. */
-    application = await Factory.signOutApplicationAndReturnNew(application);
-    email = UuidGenerator.GenerateUuid();
-    Factory.handlePasswordChallenges(application, password);
+    application = await Factory.signOutApplicationAndReturnNew(application)
+    email = UuidGenerator.GenerateUuid()
+    Factory.handlePasswordChallenges(application, password)
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
     await application.importData(
       {
         items: [note],
       },
-      true
-    );
+      true,
+    )
 
-    const storedPayloads = await application.storageService.getAllRawPayloads();
-    expect(application.itemManager.items.length).to.equal(
-      storedPayloads.length
-    );
-    const notes = storedPayloads.filter(
-      (p) => p.content_type === ContentType.Note
-    );
-    const itemsKeys = storedPayloads.filter(
-      (p) => p.content_type === ContentType.ItemsKey
-    );
-    expect(notes.length).to.equal(1);
-    expect(itemsKeys.length).to.equal(1);
-  });
+    const storedPayloads = await application.storageService.getAllRawPayloads()
+    expect(application.itemManager.items.length).to.equal(storedPayloads.length)
+    const notes = storedPayloads.filter((p) => p.content_type === ContentType.Note)
+    const itemsKeys = storedPayloads.filter((p) => p.content_type === ContentType.ItemsKey)
+    expect(notes.length).to.equal(1)
+    expect(itemsKeys.length).to.equal(1)
+  })
 
   it('should import encrypted data and keep items that were previously deleted', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
-    ]);
+    ])
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await application.sync.sync({ awaitAll: true });
+    await application.sync.sync({ awaitAll: true })
 
-    await application.deleteItem(note);
-    expect(application.findItem(note.uuid)).to.not.exist;
+    await application.deleteItem(note)
+    expect(application.findItem(note.uuid)).to.not.exist
 
-    await application.deleteItem(tag);
-    expect(application.findItem(tag.uuid)).to.not.exist;
+    await application.deleteItem(tag)
+    expect(application.findItem(tag.uuid)).to.not.exist
 
-    await application.importData(backupData, true);
-    expect(application.itemManager.notes.length).to.equal(1);
-    expect(application.findItem(tag.uuid).deleted).to.be.false;
-    expect(application.itemManager.tags.length).to.equal(1);
-    expect(application.findItem(note.uuid).deleted).to.be.false;
-  });
+    await application.importData(backupData, true)
+    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.findItem(tag.uuid).deleted).to.be.false
+    expect(application.itemManager.tags.length).to.equal(1)
+    expect(application.findItem(note.uuid).deleted).to.be.false
+  })
 
   it('should import decrypted data and all items payload source should be FileImport', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
-    ]);
+    ])
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
-    Factory.handlePasswordChallenges(application, password);
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
+    Factory.handlePasswordChallenges(application, password)
 
-    await application.importData(backupData, true);
+    await application.importData(backupData, true)
 
-    const importedNote = application.findItem(note.uuid);
-    const importedTag = application.findItem(tag.uuid);
-    expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport);
-    expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport);
-  });
+    const importedNote = application.findItem(note.uuid)
+    const importedTag = application.findItem(tag.uuid)
+    expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport)
+    expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport)
+  })
 
   it('should import encrypted data and all items payload source should be FileImport', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
-    ]);
+    ])
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
-    Factory.handlePasswordChallenges(application, password);
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
+    Factory.handlePasswordChallenges(application, password)
 
-    await application.importData(backupData, true);
+    await application.importData(backupData, true)
 
-    const importedNote = application.findItem(note.uuid);
-    const importedTag = application.findItem(tag.uuid);
-    expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport);
-    expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport);
-  });
+    const importedNote = application.findItem(note.uuid)
+    const importedTag = application.findItem(tag.uuid)
+    expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport)
+    expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport)
+  })
 
   it('should import data from 003 encrypted payload using client generated backup', async function () {
-    await setup({ fakeCrypto: true });
-    const oldVersion = ProtocolVersion.V003;
+    await setup({ fakeCrypto: true })
+    const oldVersion = ProtocolVersion.V003
     await Factory.registerOldUser({
       application: application,
       email: email,
       password: password,
       version: oldVersion,
-    });
+    })
 
-    const noteItem = await application.itemManager.createItem(
-      ContentType.Note,
-      {
-        title: 'Encrypted note',
-        text: 'On protocol version 003.',
-      }
-    );
+    const noteItem = await application.itemManager.createItem(ContentType.Note, {
+      title: 'Encrypted note',
+      text: 'On protocol version 003.',
+    })
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
-    Factory.handlePasswordChallenges(application, password);
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
+    Factory.handlePasswordChallenges(application, password)
 
-    const result = await application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length);
-    expect(result.errorCount).to.be.eq(0);
+    const result = await application.importData(backupData, true)
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(backupData.items.length)
+    expect(result.errorCount).to.be.eq(0)
 
-    const decryptedNote = application.itemManager.findItem(noteItem.uuid);
-    expect(decryptedNote.title).to.be.eq('Encrypted note');
-    expect(decryptedNote.text).to.be.eq('On protocol version 003.');
-    expect(application.itemManager.notes.length).to.equal(1);
-  });
+    const decryptedNote = application.itemManager.findItem(noteItem.uuid)
+    expect(decryptedNote.title).to.be.eq('Encrypted note')
+    expect(decryptedNote.text).to.be.eq('On protocol version 003.')
+    expect(application.itemManager.notes.length).to.equal(1)
+  })
 
   it('should import data from 003 encrypted payload using server generated backup with 004 key params', async function () {
-    await setup({ fakeCrypto: false });
+    await setup({ fakeCrypto: false })
     const backupData = {
       items: [
         {
@@ -537,239 +494,218 @@ describe('importing', function () {
       ],
       auth_params: {
         identifier: 'playground@bitar.io',
-        pw_nonce:
-          '651ae1ec9580339a3567ee7f0f8672492de2c166a556c13d119728a03c60f793',
+        pw_nonce: '651ae1ec9580339a3567ee7f0f8672492de2c166a556c13d119728a03c60f793',
         version: '004',
       },
-    };
+    }
 
-    const password = 'password';
+    const password = 'password'
 
-    application = await Factory.createInitAppWithRealCrypto();
-    Factory.handlePasswordChallenges(application, password);
+    application = await Factory.createInitAppWithRealCrypto()
+    Factory.handlePasswordChallenges(application, password)
 
-    const result = await application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length);
-    expect(result.errorCount).to.be.eq(0);
-  });
+    const result = await application.importData(backupData, true)
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(backupData.items.length)
+    expect(result.errorCount).to.be.eq(0)
+  })
 
   it('should import data from 004 encrypted payload', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
-    const noteItem = await application.itemManager.createItem(
-      ContentType.Note,
-      {
-        title: 'Encrypted note',
-        text: 'On protocol version 004.',
-      }
-    );
+    const noteItem = await application.itemManager.createItem(ContentType.Note, {
+      title: 'Encrypted note',
+      text: 'On protocol version 004.',
+    })
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
-    Factory.handlePasswordChallenges(application, password);
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
+    Factory.handlePasswordChallenges(application, password)
 
-    const result = await application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length);
-    expect(result.errorCount).to.be.eq(0);
+    const result = await application.importData(backupData, true)
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(backupData.items.length)
+    expect(result.errorCount).to.be.eq(0)
 
-    const decryptedNote = application.itemManager.findItem(noteItem.uuid);
-    expect(decryptedNote.title).to.be.eq('Encrypted note');
-    expect(decryptedNote.text).to.be.eq('On protocol version 004.');
-    expect(application.itemManager.notes.length).to.equal(1);
-  });
+    const decryptedNote = application.itemManager.findItem(noteItem.uuid)
+    expect(decryptedNote.title).to.be.eq('Encrypted note')
+    expect(decryptedNote.text).to.be.eq('On protocol version 004.')
+    expect(application.itemManager.notes.length).to.equal(1)
+  })
 
   it('should return correct errorCount', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
-    const noteItem = await application.itemManager.createItem(
-      ContentType.Note,
-      {
-        title: 'This is a valid, encrypted note',
-        text: 'On protocol version 004.',
-      }
-    );
+    const noteItem = await application.itemManager.createItem(ContentType.Note, {
+      title: 'This is a valid, encrypted note',
+      text: 'On protocol version 004.',
+    })
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
-    Factory.handlePasswordChallenges(application, password);
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
+    Factory.handlePasswordChallenges(application, password)
 
-    const madeUpPayload = JSON.parse(JSON.stringify(noteItem));
+    const madeUpPayload = JSON.parse(JSON.stringify(noteItem))
 
-    madeUpPayload.items_key_id = undefined;
-    madeUpPayload.content = '004:somenonsense';
-    madeUpPayload.enc_item_key = '003:anothernonsense';
-    madeUpPayload.version = '004';
-    madeUpPayload.uuid = 'fake-uuid';
+    madeUpPayload.items_key_id = undefined
+    madeUpPayload.content = '004:somenonsense'
+    madeUpPayload.enc_item_key = '003:anothernonsense'
+    madeUpPayload.version = '004'
+    madeUpPayload.uuid = 'fake-uuid'
 
-    backupData.items = [...backupData.items, madeUpPayload];
+    backupData.items = [...backupData.items, madeUpPayload]
 
-    const result = await application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(backupData.items.length - 1);
-    expect(result.errorCount).to.be.eq(1);
-  });
+    const result = await application.importData(backupData, true)
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(backupData.items.length - 1)
+    expect(result.errorCount).to.be.eq(1)
+  })
 
   it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
-    await setup({ fakeCrypto: true });
-    const oldVersion = ProtocolVersion.V003;
+    await setup({ fakeCrypto: true })
+    const oldVersion = ProtocolVersion.V003
     await Factory.registerOldUser({
       application: application,
       email: email,
       password: UuidGenerator.GenerateUuid(),
       version: oldVersion,
-    });
+    })
 
     await application.itemManager.createItem(ContentType.Note, {
       title: 'Encrypted note',
       text: 'On protocol version 003.',
-    });
+    })
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
         const values = challenge.prompts.map(
           (prompt) =>
             new ChallengeValue(
               prompt,
-              prompt.validation === ChallengeValidation.None
-                ? 'incorrect password'
-                : password
-            )
-        );
-        application.submitValuesForChallenge(challenge, values);
+              prompt.validation === ChallengeValidation.None ? 'incorrect password' : password,
+            ),
+        )
+        application.submitValuesForChallenge(challenge, values)
       },
-    });
-    const result = await application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(application.itemManager.notes.length).to.equal(0);
-  });
+    })
+    const result = await application.importData(backupData, true)
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(0)
+    expect(result.errorCount).to.be.eq(backupData.items.length)
+    expect(application.itemManager.notes.length).to.equal(0)
+  })
 
   it('should not import data from 004 encrypted payload if an invalid password is provided', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
     await application.itemManager.createItem(ContentType.Note, {
       title: 'This is a valid, encrypted note',
       text: 'On protocol version 004.',
-    });
+    })
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
         const values = challenge.prompts.map(
-          (prompt) => new ChallengeValue(prompt, 'incorrect password')
-        );
-        application.submitValuesForChallenge(challenge, values);
+          (prompt) => new ChallengeValue(prompt, 'incorrect password'),
+        )
+        application.submitValuesForChallenge(challenge, values)
       },
-    });
+    })
 
-    const result = await application.importData(backupData, true);
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(application.itemManager.notes.length).to.equal(0);
-  });
+    const result = await application.importData(backupData, true)
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(0)
+    expect(result.errorCount).to.be.eq(backupData.items.length)
+    expect(application.itemManager.notes.length).to.equal(0)
+  })
 
   it('should not import encrypted data with no keyParams or auth_params', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
+    })
 
     await application.itemManager.createItem(ContentType.Note, {
       title: 'Encrypted note',
       text: 'On protocol version 004.',
-    });
+    })
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
-    delete backupData.keyParams;
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    delete backupData.keyParams
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
 
-    const result = await application.importData(backupData);
+    const result = await application.importData(backupData)
 
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(application.itemManager.notes.length).to.equal(0);
-  });
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(0)
+    expect(result.errorCount).to.be.eq(backupData.items.length)
+    expect(application.itemManager.notes.length).to.equal(0)
+  })
 
   it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
-    Factory.handlePasswordChallenges(application);
+    })
+    Factory.handlePasswordChallenges(application)
 
     await application.itemManager.createItem(ContentType.Note, {
       title: 'Encrypted note',
       text: 'On protocol version 004.',
-    });
+    })
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
     backupData.items = backupData.items.filter(
-      (payload) => payload.content_type !== ContentType.ItemsKey
-    );
+      (payload) => payload.content_type !== ContentType.ItemsKey,
+    )
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
-    Factory.handlePasswordChallenges(application);
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
+    Factory.handlePasswordChallenges(application)
 
-    const result = await application.importData(backupData, true);
+    const result = await application.importData(backupData, true)
 
-    expect(result).to.not.be.undefined;
-    expect(result.affectedItems.length).to.be.eq(0);
-    expect(result.errorCount).to.be.eq(backupData.items.length);
-    expect(application.itemManager.notes.length).to.equal(0);
-  });
+    expect(result).to.not.be.undefined
+    expect(result.affectedItems.length).to.be.eq(0)
+    expect(result.errorCount).to.be.eq(backupData.items.length)
+    expect(application.itemManager.notes.length).to.equal(0)
+  })
 
   it('importing data with no items key should use the root key generated by the file password', async function () {
-    await setup({ fakeCrypto: false });
+    await setup({ fakeCrypto: false })
     /**
      * In SNJS 2.0.12, this file import would fail with "incorrect password" on file.
      * The reason was that we would use the default items key we had for the current account
@@ -778,23 +714,19 @@ describe('importing', function () {
      * Note this test will not be able to properly sync as the credentials are invalid.
      * This test is only meant to test successful local importing.
      */
-    const identifier = 'standardnotes';
-    const application = await Factory.createApplicationWithRealCrypto(
-      identifier
-    );
+    const identifier = 'standardnotes'
+    const application = await Factory.createApplicationWithRealCrypto(identifier)
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue(
       'keychain',
       JSON.stringify({
         [identifier]: {
           version: '003',
-          masterKey:
-            '30bae65687b45b20100be219df983bded23868baa44f4bbef1026403daee0a9d',
-          dataAuthenticationKey:
-            'c9b382ff1f7adb5c6cad620605ad139cd9f1e7700f507345ef1a1d46a6413712',
+          masterKey: '30bae65687b45b20100be219df983bded23868baa44f4bbef1026403daee0a9d',
+          dataAuthenticationKey: 'c9b382ff1f7adb5c6cad620605ad139cd9f1e7700f507345ef1a1d46a6413712',
         },
-      })
-    );
+      }),
+    )
     await application.deviceInterface.setRawStorageValue(
       'descriptors',
       JSON.stringify({
@@ -803,12 +735,9 @@ describe('importing', function () {
           label: 'Main Application',
           primary: true,
         },
-      })
-    );
-    await application.deviceInterface.setRawStorageValue(
-      'standardnotes-snjs_version',
-      '2.0.11'
-    );
+      }),
+    )
+    await application.deviceInterface.setRawStorageValue('standardnotes-snjs_version', '2.0.11')
     await application.deviceInterface.saveRawDatabasePayload(
       {
         content:
@@ -820,8 +749,8 @@ describe('importing', function () {
         updated_at: new Date(),
         uuid: '58e3322b-269a-4be3-a658-b035dffcd70f',
       },
-      identifier
-    );
+      identifier,
+    )
     /**
      * Note that this storage contains "sync.standardnotes.org" as the API Host param.
      */
@@ -840,16 +769,15 @@ describe('importing', function () {
         },
         nonwrapped: {
           ROOT_KEY_PARAMS: {
-            pw_nonce:
-              '4cb103aa89cff4563a911d3f396583cefc6833c66f880fbee06bda94c31f868b',
+            pw_nonce: '4cb103aa89cff4563a911d3f396583cefc6833c66f880fbee06bda94c31f868b',
             pw_cost: 110000,
             identifier: 'nov2322@bitar.io',
             version: '003',
           },
         },
-      })
-    );
-    const password = 'password';
+      }),
+    )
+    const password = 'password'
 
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
@@ -862,20 +790,18 @@ describe('importing', function () {
                   prompt,
                   prompt.validation === ChallengeValidation.AccountPassword
                     ? password
-                    : UnprotectedAccessSecondsDuration.OneMinute
-                )
-            )
-          );
+                    : UnprotectedAccessSecondsDuration.OneMinute,
+                ),
+            ),
+          )
         } else {
-          const prompt = challenge.prompts[0];
-          application.submitValuesForChallenge(challenge, [
-            new ChallengeValue(prompt, password),
-          ]);
+          const prompt = challenge.prompts[0]
+          application.submitValuesForChallenge(challenge, [new ChallengeValue(prompt, password)])
         }
       },
-    });
-    await application.launch(false);
-    await application.setHost(Factory.getDefaultHost());
+    })
+    await application.launch(false)
+    await application.setHost(Factory.getDefaultHost())
 
     const backupFile = {
       items: [
@@ -892,61 +818,51 @@ describe('importing', function () {
         },
       ],
       auth_params: {
-        pw_nonce:
-          '3e357c41fb5ae6152bff366f0a8a7f4fd96441d6a5ebc67008996ef6c55a87f2',
+        pw_nonce: '3e357c41fb5ae6152bff366f0a8a7f4fd96441d6a5ebc67008996ef6c55a87f2',
         pw_cost: 110000,
         identifier: 'nov235@bitar.io',
         version: '003',
       },
-    };
-    const result = await application.importData(backupFile, true);
-    expect(result.errorCount).to.equal(0);
-    await Factory.safeDeinit(application);
-  });
+    }
+    const result = await application.importData(backupFile, true)
+    expect(result.errorCount).to.equal(0)
+    await Factory.safeDeinit(application)
+  })
 
   it('importing another accounts notes/tags should correctly keep relationships', async function () {
-    await setup({ fakeCrypto: true });
+    await setup({ fakeCrypto: true })
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
-    });
-    Factory.handlePasswordChallenges(application, password);
+    })
+    Factory.handlePasswordChallenges(application, password)
 
-    const pair = Factory.createRelatedNoteTagPairPayload();
-    await application.itemManager.emitItemsFromPayloads(
-      pair,
-      PayloadSource.LocalChanged
-    );
+    const pair = Factory.createRelatedNoteTagPairPayload()
+    await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
 
-    await application.sync.sync();
+    await application.sync.sync()
 
-    const backupData = await application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
 
-    await Factory.safeDeinit(application);
-    application = await Factory.createInitAppWithFakeCrypto();
-    Factory.handlePasswordChallenges(application, password);
+    await Factory.safeDeinit(application)
+    application = await Factory.createInitAppWithFakeCrypto()
+    Factory.handlePasswordChallenges(application, password)
 
     await Factory.registerUserToApplication({
       application: application,
       email: `${Math.random()}`,
       password: password,
-    });
+    })
 
-    await application.importData(backupData, true);
+    await application.importData(backupData, true)
 
-    expect(application.itemManager.notes.length).to.equal(1);
-    expect(application.itemManager.tags.length).to.equal(1);
+    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.itemManager.tags.length).to.equal(1)
 
-    const importedNote = application.itemManager.notes[0];
-    const importedTag = application.itemManager.tags[0];
-    expect(
-      application.itemManager.referencesForItem(importedTag.uuid).length
-    ).to.equal(1);
-    expect(
-      application.itemManager.itemsReferencingItem(importedNote.uuid).length
-    ).to.equal(1);
-  });
-});
+    const importedNote = application.itemManager.notes[0]
+    const importedTag = application.itemManager.tags[0]
+    expect(application.itemManager.referencesForItem(importedTag.uuid).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(importedNote.uuid).length).to.equal(1)
+  })
+})

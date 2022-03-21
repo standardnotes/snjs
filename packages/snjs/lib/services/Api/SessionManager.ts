@@ -1,4 +1,11 @@
-import { ProtocolVersion, AnyKeyParamsContent, KeyParamsOrigination } from '@standardnotes/common'
+import { Subscription } from '@standardnotes/auth'
+import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import {
+  ProtocolVersion,
+  AnyKeyParamsContent,
+  KeyParamsOrigination,
+  isProtocolVersionExpired,
+} from '@standardnotes/common'
 import { leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications'
 import { Challenge, ChallengePrompt } from '@Lib/challenges'
 import { ChallengeKeyboardType, ChallengeReason, ChallengeValidation } from '../../challenges'
@@ -14,6 +21,8 @@ import {
   SignInResponse,
   StatusCode,
   User,
+  AvailableSubscriptions,
+  GetAvailableSubscriptionsResponse,
 } from '@standardnotes/responses'
 import { SNProtocolService } from '../ProtocolService'
 import { SNApiService } from './ApiService'
@@ -29,6 +38,7 @@ import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from './
 import { UuidString } from '@Lib/types'
 import { SNWebSocketsService } from './WebsocketsService'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { ProtocolVersionExpired } from '@Lib/strings/Confirm'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
 export const MissingAccountParams = 'missing-params'
@@ -207,17 +217,37 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
           } else {
             resolve()
             this.challengeService.completeChallenge(challenge)
-            this.notifyEvent(SessionEvent.Restored)
-            this.alertService.alert(SessionStrings.SessionRestored)
+            void this.notifyEvent(SessionEvent.Restored)
+            void this.alertService.alert(SessionStrings.SessionRestored)
           }
         },
       })
-      this.challengeService.promptForChallengeResponse(challenge)
+      void this.challengeService.promptForChallengeResponse(challenge)
     })
   }
 
-  public getSubscription(): Promise<HttpResponse | GetSubscriptionResponse> {
-    return this.apiService.getSubscription(this.user!.uuid)
+  public async getSubscription(): Promise<ClientDisplayableError | Subscription> {
+    const result = await this.apiService.getSubscription(this.getSureUser().uuid)
+
+    if (result.error) {
+      return ClientDisplayableError.FromError(result.error)
+    }
+
+    const subscription = (result as GetSubscriptionResponse).data!.subscription!
+
+    return subscription
+  }
+
+  public async getAvailableSubscriptions(): Promise<
+    AvailableSubscriptions | ClientDisplayableError
+  > {
+    const response = await this.apiService.getAvailableSubscriptions()
+
+    if (response.error) {
+      return ClientDisplayableError.FromError(response.error)
+    }
+
+    return (response as GetAvailableSubscriptionsResponse).data!
   }
 
   private async promptForMfaValue() {
@@ -264,7 +294,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
       }
     }
     email = cleanedEmailString(email)
-    const rootKey = await this.protocolService!.createRootKey(
+    const rootKey = await this.protocolService.createRootKey(
       email,
       password,
       KeyParamsOrigination.Registration,
@@ -373,8 +403,8 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
       }
     }
     const keyParams = paramsResult.keyParams!
-    if (!this.protocolService!.supportedVersions().includes(keyParams.version)) {
-      if (this.protocolService!.isVersionNewerThanLibraryVersion(keyParams.version)) {
+    if (!this.protocolService.supportedVersions().includes(keyParams.version)) {
+      if (this.protocolService.isVersionNewerThanLibraryVersion(keyParams.version)) {
         return {
           response: this.apiService.createErrorResponse(messages.UNSUPPORTED_PROTOCOL_VERSION),
         }
@@ -384,34 +414,40 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
         }
       }
     }
-    if (this.protocolService!.isProtocolVersionOutdated(keyParams.version)) {
+
+    if (isProtocolVersionExpired(keyParams.version)) {
       /* Cost minimums only apply to now outdated versions (001 and 002) */
-      const minimum = this.protocolService!.costMinimumForVersion(keyParams.version)
+      const minimum = this.protocolService.costMinimumForVersion(keyParams.version)
       if (keyParams.content002.pw_cost < minimum) {
         return {
           response: this.apiService.createErrorResponse(messages.INVALID_PASSWORD_COST),
         }
       }
-      const message = messages.OUTDATED_PROTOCOL_VERSION
-      const confirmed = await this.alertService!.confirm(
-        message,
-        messages.OUTDATED_PROTOCOL_ALERT_TITLE,
-        messages.OUTDATED_PROTOCOL_ALERT_IGNORE,
+
+      const expiredMessages = ProtocolVersionExpired(keyParams.version)
+      const confirmed = await this.alertService.confirm(
+        expiredMessages.Message,
+        expiredMessages.Title,
+        expiredMessages.ConfirmButton,
       )
+
       if (!confirmed) {
         return {
           response: this.apiService.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL),
         }
       }
     }
-    if (!this.protocolService!.platformSupportsKeyDerivation(keyParams)) {
+
+    if (!this.protocolService.platformSupportsKeyDerivation(keyParams)) {
       return {
         response: this.apiService.createErrorResponse(messages.UNSUPPORTED_KEY_DERIVATION),
       }
     }
+
     if (strict) {
-      minAllowedVersion = this.protocolService!.getLatestVersion()
+      minAllowedVersion = this.protocolService.getLatestVersion()
     }
+
     if (!isNullOrUndefined(minAllowedVersion)) {
       if (!leftVersionGreaterThanOrEqualToRight(keyParams.version, minAllowedVersion)) {
         return {
@@ -421,7 +457,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
         }
       }
     }
-    const rootKey = await this.protocolService!.computeRootKey(password, keyParams)
+    const rootKey = await this.protocolService.computeRootKey(password, keyParams)
     const signInResponse = await this.bypassChecksAndSignInWithRootKey(
       email,
       rootKey,

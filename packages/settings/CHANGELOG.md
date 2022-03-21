@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.1](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.13.0...@standardnotes/settings@1.13.1) (2022-03-17)
+
+**Note:** Version bump only for package @standardnotes/settings
+
+
+
+
+
+# [1.13.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.12.0...@standardnotes/settings@1.13.0) (2022-03-16)
+
+
+### Features
+
+* add log session user agent setting ([3937f97](https://github.com/standardnotes/snjs/commit/3937f97826f1d6ee7f6fab14e8cccf5a6c829d69))
+
+
+
+
+
 # [1.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.11.5...@standardnotes/settings@1.12.0) (2022-03-07)
 
 

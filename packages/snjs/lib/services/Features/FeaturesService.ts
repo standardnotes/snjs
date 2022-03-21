@@ -1,3 +1,4 @@
+import { ClientDisplayableError } from '@Lib/strings/ClientError'
 import { SNItem } from '@Models/core/item'
 import { ApplicationStage } from '@standardnotes/applications'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../hosts'
@@ -19,7 +20,7 @@ import {
   ComponentContent,
   ExperimentalFeatures,
 } from '@standardnotes/features'
-import { ContentType, ErrorObject, RoleName } from '@standardnotes/common'
+import { ContentType, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
 import { SNComponent, SNTheme } from '@Lib/models'
@@ -27,12 +28,7 @@ import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsSe
 import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/payloads'
 import { SNSettingsService } from '../Settings'
 import { SettingName } from '@standardnotes/settings'
-import {
-  arraysEqual,
-  convertTimestampToMilliseconds,
-  isErrorObject,
-  removeFromArray,
-} from '@standardnotes/utils'
+import { arraysEqual, convertTimestampToMilliseconds, removeFromArray } from '@standardnotes/utils'
 import { SNSessionManager } from '@Lib/services/Api/SessionManager'
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
@@ -58,7 +54,9 @@ import {
   InternalEventInterface,
 } from '@standardnotes/services'
 
-type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ErrorObject
+type GetOfflineSubscriptionDetailsResponse =
+  | OfflineSubscriptionEntitlements
+  | ClientDisplayableError
 
 export class SNFeaturesService
   extends AbstractService<FeaturesEvent>
@@ -120,18 +118,14 @@ export class SNFeaturesService
       },
     )
 
-    this.removeSignInObserver = this.userService.addEventObserver(
-      (eventName: AccountEvent) => {
-        if (eventName === AccountEvent.SignedInOrRegistered) {
-          const featureRepos = this.itemManager.getItems(
-            ContentType.ExtensionRepo,
-          ) as SNFeatureRepo[]
-          if (!this.apiService.isThirdPartyHostUsed()) {
-            void this.migrateFeatureRepoToUserSetting(featureRepos)
-          }
+    this.removeSignInObserver = this.userService.addEventObserver((eventName: AccountEvent) => {
+      if (eventName === AccountEvent.SignedInOrRegistered) {
+        const featureRepos = this.itemManager.getItems(ContentType.ExtensionRepo) as SNFeatureRepo[]
+        if (!this.apiService.isThirdPartyHostUsed()) {
+          void this.migrateFeatureRepoToUserSetting(featureRepos)
         }
-      },
-    )
+      }
+    })
   }
 
   async handleEvent(event: InternalEventInterface): Promise<void> {
@@ -246,9 +240,11 @@ export class SNFeaturesService
       const activationCodeWithoutSpaces = code.replace(/\s/g, '')
       const decodedData = this.crypto.base64Decode(activationCodeWithoutSpaces)
       const result = this.parseOfflineEntitlementsCode(decodedData)
-      if (isErrorObject(result)) {
+
+      if (result instanceof ClientDisplayableError) {
         return result
       }
+
       const offlineRepo = (await this.itemManager.createItem(
         ContentType.ExtensionRepo,
         FillItemContent({
@@ -261,9 +257,7 @@ export class SNFeaturesService
       void this.syncService.sync()
       return this.downloadOfflineFeatures(offlineRepo)
     } catch (err) {
-      return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
-      }
+      return new ClientDisplayableError(API_MESSAGE_FAILED_OFFLINE_ACTIVATION)
     }
   }
 
@@ -285,7 +279,9 @@ export class SNFeaturesService
     await this.storageService.removeValue(StorageKey.UserFeatures)
   }
 
-  private parseOfflineEntitlementsCode(code: string): GetOfflineSubscriptionDetailsResponse {
+  private parseOfflineEntitlementsCode(
+    code: string,
+  ): GetOfflineSubscriptionDetailsResponse | ClientDisplayableError {
     try {
       const { featuresUrl, extensionKey } = JSON.parse(code)
       return {
@@ -293,17 +289,15 @@ export class SNFeaturesService
         extensionKey,
       }
     } catch (error) {
-      return {
-        error: API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
-      }
+      return new ClientDisplayableError(API_MESSAGE_FAILED_OFFLINE_ACTIVATION)
     }
   }
 
   private async downloadOfflineFeatures(
     repo: SNFeatureRepo,
-  ): Promise<SetOfflineFeaturesFunctionResponse> {
+  ): Promise<SetOfflineFeaturesFunctionResponse | ClientDisplayableError> {
     const result = await this.apiService.downloadOfflineFeaturesFromRepo(repo)
-    if (isErrorObject(result)) {
+    if (result instanceof ClientDisplayableError) {
       return result
     }
     await this.didDownloadFeatures(result.features)

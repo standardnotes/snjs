@@ -1,50 +1,50 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import * as Factory from '../lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import * as Factory from '../lib/factory.js'
+chai.use(chaiAsPromised)
+const expect = chai.expect
 
 describe('online conflict handling', function () {
-  this.timeout(Factory.TenSecondTimeout);
-  const BASE_ITEM_COUNT = 2; /** Default items key, user preferences */
+  this.timeout(Factory.TenSecondTimeout)
+  const BASE_ITEM_COUNT = 2 /** Default items key, user preferences */
 
   const syncOptions = {
     checkIntegrity: true,
     awaitAll: true,
-  };
+  }
 
   beforeEach(async function () {
-    localStorage.clear();
-    this.expectedItemCount = BASE_ITEM_COUNT;
+    localStorage.clear()
+    this.expectedItemCount = BASE_ITEM_COUNT
 
-    this.context = await Factory.createAppContext();
-    await this.context.launch();
+    this.context = await Factory.createAppContext()
+    await this.context.launch()
 
-    this.application = this.context.application;
-    this.email = this.context.email;
-    this.password = this.context.password;
+    this.application = this.context.application
+    this.email = this.context.email
+    this.password = this.context.password
 
-    Factory.disableIntegrityAutoHeal(this.application);
+    Factory.disableIntegrityAutoHeal(this.application)
 
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
-    });
+    })
 
     this.sharedFinalAssertions = async function () {
-      expect(this.application.syncService.isOutOfSync()).to.equal(false);
-      const items = this.application.itemManager.items;
-      expect(items.length).to.equal(this.expectedItemCount);
-      const rawPayloads = await this.application.storageService.getAllRawPayloads();
-      expect(rawPayloads.length).to.equal(this.expectedItemCount);
-    };
-  });
+      expect(this.application.syncService.isOutOfSync()).to.equal(false)
+      const items = this.application.itemManager.items
+      expect(items.length).to.equal(this.expectedItemCount)
+      const rawPayloads = await this.application.storageService.getAllRawPayloads()
+      expect(rawPayloads.length).to.equal(this.expectedItemCount)
+    }
+  })
 
   afterEach(async function () {
-    await Factory.safeDeinit(this.application);
-    localStorage.clear();
-  });
+    await Factory.safeDeinit(this.application)
+    localStorage.clear()
+  })
 
   function createDirtyPayload(contentType) {
     const params = {
@@ -53,654 +53,590 @@ describe('online conflict handling', function () {
       content: {
         foo: 'bar',
       },
-    };
+    }
     const payload = CreateMaxPayloadFromAnyObject(params, {
       dirty: true,
       dirtiedDate: new Date(),
-    });
-    return payload;
+    })
+    return payload
   }
 
   it('components should not be duplicated under any circumstances', async function () {
-    const payload = createDirtyPayload(ContentType.Component);
+    const payload = createDirtyPayload(ContentType.Component)
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
-      PayloadSource.LocalChanged
-    );
-    this.expectedItemCount++;
-    await this.application.syncService.sync(syncOptions);
+      PayloadSource.LocalChanged,
+    )
+    this.expectedItemCount++
+    await this.application.syncService.sync(syncOptions)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(item.uuid, (mutator) => {
-      mutator.content.foo = `${Math.random()}`;
-    });
+      mutator.content.foo = `${Math.random()}`
+    })
     await this.application.changeAndSaveItem(
       item.uuid,
       (mutator) => {
         /** Conflict the item */
-        mutator.content.foo = 'zar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.content.foo = 'zar'
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    await this.sharedFinalAssertions();
-  });
+      syncOptions,
+    )
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('items keys should not be duplicated under any circumstances', async function () {
-    const payload = createDirtyPayload(ContentType.ItemsKey);
+    const payload = createDirtyPayload(ContentType.ItemsKey)
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
-      PayloadSource.LocalChanged
-    );
-    this.expectedItemCount++;
-    await this.application.syncService.sync(syncOptions);
+      PayloadSource.LocalChanged,
+    )
+    this.expectedItemCount++
+    await this.application.syncService.sync(syncOptions)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(item.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     await this.application.changeAndSaveItem(
       item.uuid,
       (mutator) => {
         /** Conflict the item */
-        mutator.content.foo = 'zar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.content.foo = 'zar'
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    await this.sharedFinalAssertions();
-  });
+      syncOptions,
+    )
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('duplicating note should maintain editor ref', async function () {
-    const note = await Factory.createSyncedNote(this.application);
-    this.expectedItemCount++;
-    const basePayload = createDirtyPayload(ContentType.Component);
+    const note = await Factory.createSyncedNote(this.application)
+    this.expectedItemCount++
+    const basePayload = createDirtyPayload(ContentType.Component)
     const payload = CopyPayload(basePayload, {
       content: {
         ...basePayload.content,
         area: ComponentArea.Editor,
       },
-    });
+    })
     const editor = await this.application.itemManager.emitItemFromPayload(
       payload,
-      PayloadSource.LocalChanged
-    );
-    this.expectedItemCount++;
-    await this.application.syncService.sync(syncOptions);
+      PayloadSource.LocalChanged,
+    )
+    this.expectedItemCount++
+    await this.application.syncService.sync(syncOptions)
 
     await this.application.changeAndSaveItem(
       editor.uuid,
       (mutator) => {
-        mutator.associateWithItem(note.uuid);
+        mutator.associateWithItem(note.uuid)
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
-    expect(this.application.componentManager.editorForNote(note)).to.be.ok;
+    expect(this.application.componentManager.editorForNote(note)).to.be.ok
 
     /** Conflict the note */
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.content.title = 'zar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.content.title = 'zar'
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
-    this.expectedItemCount++;
+      syncOptions,
+    )
+    this.expectedItemCount++
 
     const duplicate = this.application.itemManager.notes.find((n) => {
-      return n.uuid !== note.uuid;
-    });
-    expect(duplicate).to.be.ok;
-    expect(this.application.componentManager.editorForNote(duplicate)).to.be.ok;
-    await this.sharedFinalAssertions();
-  });
+      return n.uuid !== note.uuid
+    })
+    expect(duplicate).to.be.ok
+    expect(this.application.componentManager.editorForNote(duplicate)).to.be.ok
+    await this.sharedFinalAssertions()
+  })
 
   it('should create conflicted copy if incoming server item attempts to overwrite local dirty item', async function () {
     // create an item and sync it
-    const note = await Factory.createMappedNote(this.application);
-    this.expectedItemCount++;
-    await this.application.itemManager.setItemDirty(note.uuid);
-    await this.application.syncService.sync(syncOptions);
+    const note = await Factory.createMappedNote(this.application)
+    this.expectedItemCount++
+    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.syncService.sync(syncOptions)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    expect(rawPayloads.length).to.equal(this.expectedItemCount)
 
-    const originalValue = note.title;
-    const dirtyValue = `${Math.random()}`;
+    const originalValue = note.title
+    const dirtyValue = `${Math.random()}`
 
     await this.application.itemManager.changeNote(note.uuid, (mutator) => {
       // modify this item locally to have differing contents from server
-      mutator.title = dirtyValue;
+      mutator.title = dirtyValue
       // Intentionally don't change updated_at. We want to simulate a chaotic case where
       // for some reason we receive an item with different content but the same updated_at.
       // note.updated_at = Factory.yesterday();
-    });
+    })
 
     // Download all items from the server, which will include this note.
-    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.clearSyncPositionTokens()
     await this.application.syncService.sync({
       ...syncOptions,
       awaitAll: true,
-    });
+    })
 
     // We expect this item to be duplicated
-    this.expectedItemCount++;
-    expect(this.application.itemManager.notes.length).to.equal(2);
+    this.expectedItemCount++
+    expect(this.application.itemManager.notes.length).to.equal(2)
 
-    const allItems = this.application.itemManager.items;
-    expect(allItems.length).to.equal(this.expectedItemCount);
+    const allItems = this.application.itemManager.items
+    expect(allItems.length).to.equal(this.expectedItemCount)
 
-    const originalItem = this.application.itemManager.findItem(note.uuid);
-    const duplicateItem = allItems.find(
-      (i) => i.content.conflict_of === note.uuid
-    );
+    const originalItem = this.application.itemManager.findItem(note.uuid)
+    const duplicateItem = allItems.find((i) => i.content.conflict_of === note.uuid)
 
-    expect(originalItem.title).to.equal(dirtyValue);
-    expect(duplicateItem.title).to.equal(originalValue);
-    expect(originalItem.title).to.not.equal(duplicateItem.title);
+    expect(originalItem.title).to.equal(dirtyValue)
+    expect(duplicateItem.title).to.equal(originalValue)
+    expect(originalItem.title).to.not.equal(duplicateItem.title)
 
-    const newRawPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(newRawPayloads.length).to.equal(this.expectedItemCount);
-    await this.sharedFinalAssertions();
-  });
+    const newRawPayloads = await this.application.storageService.getAllRawPayloads()
+    expect(newRawPayloads.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('should handle sync conflicts by duplicating differing data', async function () {
     // create an item and sync it
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.saveItem(note.uuid);
-    this.expectedItemCount++;
+    const note = await Factory.createMappedNote(this.application)
+    await this.application.saveItem(note.uuid)
+    this.expectedItemCount++
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    expect(rawPayloads.length).to.equal(this.expectedItemCount)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         // modify this item to have stale values
-        mutator.title = `${Math.random()}`;
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.title = `${Math.random()}`
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
     // We expect this item to be duplicated
-    this.expectedItemCount++;
-    const allItems = this.application.itemManager.items;
-    expect(allItems.length).to.equal(this.expectedItemCount);
+    this.expectedItemCount++
+    const allItems = this.application.itemManager.items
+    expect(allItems.length).to.equal(this.expectedItemCount)
 
-    const note1 = this.application.itemManager.notes[0];
-    const note2 = this.application.itemManager.notes[1];
-    expect(note1.content.title).to.not.equal(note2.content.title);
-    await this.sharedFinalAssertions();
-  });
+    const note1 = this.application.itemManager.notes[0]
+    const note2 = this.application.itemManager.notes[1]
+    expect(note1.content.title).to.not.equal(note2.content.title)
+    await this.sharedFinalAssertions()
+  })
 
   it('basic conflict with clearing local state', async function () {
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.saveItem(note.uuid);
-    this.expectedItemCount += 1;
+    const note = await Factory.createMappedNote(this.application)
+    await this.application.saveItem(note.uuid)
+    this.expectedItemCount += 1
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         /** Create conflict for a note */
-        mutator.title = `${Math.random()}`;
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.title = `${Math.random()}`
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
-    this.expectedItemCount++;
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    this.expectedItemCount++
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
-    await this.application.syncService.clearSyncPositionTokens();
-    await this.application.storageService.clearAllPayloads();
-    await this.application.payloadManager.resetState();
-    await this.application.itemManager.resetState();
-    await this.application.syncService.sync(syncOptions);
+    await this.application.syncService.clearSyncPositionTokens()
+    await this.application.storageService.clearAllPayloads()
+    await this.application.payloadManager.resetState()
+    await this.application.itemManager.resetState()
+    await this.application.syncService.sync(syncOptions)
 
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    await this.sharedFinalAssertions();
-  });
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('should duplicate item if saving a modified item and clearing our sync token', async function () {
-    let note = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.setItemDirty(note.uuid);
-    await this.application.syncService.sync(syncOptions);
-    this.expectedItemCount++;
+    let note = await Factory.createMappedNote(this.application)
+    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.syncService.sync(syncOptions)
+    this.expectedItemCount++
 
-    const newTitle = `${Math.random()}`;
+    const newTitle = `${Math.random()}`
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
       // modify this item to have stale values
-      mutator.title = newTitle;
-      mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-        Factory.yesterday()
-      );
-    });
+      mutator.title = newTitle
+      mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+    })
 
     // We expect this item to be duplicated
-    this.expectedItemCount++;
+    this.expectedItemCount++
 
-    await this.application.syncService.clearSyncPositionTokens();
-    await this.application.syncService.sync(syncOptions);
+    await this.application.syncService.clearSyncPositionTokens()
+    await this.application.syncService.sync(syncOptions)
 
-    note = this.application.findItem(note.uuid);
+    note = this.application.findItem(note.uuid)
     // We expect the item title to be the new title, and not rolled back to original value
-    expect(note.content.title).to.equal(newTitle);
+    expect(note.content.title).to.equal(newTitle)
 
-    const allItems = this.application.itemManager.items;
-    expect(allItems.length).to.equal(this.expectedItemCount);
-    await this.sharedFinalAssertions();
-  });
+    const allItems = this.application.itemManager.items
+    expect(allItems.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('should handle sync conflicts by not duplicating same data', async function () {
-    const note = await Factory.createMappedNote(this.application);
-    this.expectedItemCount++;
-    await this.application.itemManager.setItemDirty(note.uuid);
-    await this.application.syncService.sync(syncOptions);
+    const note = await Factory.createMappedNote(this.application)
+    this.expectedItemCount++
+    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.syncService.sync(syncOptions)
 
     // keep item as is and set dirty
-    await this.application.itemManager.setItemDirty(note.uuid);
+    await this.application.itemManager.setItemDirty(note.uuid)
 
     // clear sync token so that all items are retrieved on next sync
-    this.application.syncService.clearSyncPositionTokens();
+    this.application.syncService.clearSyncPositionTokens()
 
-    await this.application.syncService.sync(syncOptions);
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    await this.sharedFinalAssertions();
-  });
+    await this.application.syncService.sync(syncOptions)
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('clearing conflict_of on two clients simultaneously should keep us in sync', async function () {
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.setItemDirty(note.uuid);
-    this.expectedItemCount++;
+    const note = await Factory.createMappedNote(this.application)
+    await this.application.itemManager.setItemDirty(note.uuid)
+    this.expectedItemCount++
 
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         // client A
-        mutator.content.conflict_of = 'foo';
+        mutator.content.conflict_of = 'foo'
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
     // client B
-    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.clearSyncPositionTokens()
     await this.application.itemManager.changeItem(
       note.uuid,
       (mutator) => {
-        mutator.content.conflict_of = 'bar';
+        mutator.content.conflict_of = 'bar'
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
     // conflict_of is a key to ignore when comparing content, so item should
     // not be duplicated.
-    await this.application.syncService.sync(syncOptions);
-    await this.sharedFinalAssertions();
-  });
+    await this.application.syncService.sync(syncOptions)
+    await this.sharedFinalAssertions()
+  })
 
   it('setting property on two clients simultaneously should create conflict', async function () {
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.setItemDirty(note.uuid);
-    this.expectedItemCount++;
+    const note = await Factory.createMappedNote(this.application)
+    await this.application.itemManager.setItemDirty(note.uuid)
+    this.expectedItemCount++
 
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         // client A
-        mutator.content.foo = 'foo';
+        mutator.content.foo = 'foo'
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     // client B
-    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.clearSyncPositionTokens()
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.content.foo = 'bar';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.content.foo = 'bar'
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
-    this.expectedItemCount++;
-    await this.sharedFinalAssertions();
-  });
+      syncOptions,
+    )
+    this.expectedItemCount++
+    await this.sharedFinalAssertions()
+  })
 
   it('if server says deleted but client says not deleted, keep server state', async function () {
-    const note = await Factory.createMappedNote(this.application);
-    const originalPayload = note.payloadRepresentation();
-    this.expectedItemCount++;
-    await this.application.itemManager.setItemDirty(note.uuid);
-    await this.application.syncService.sync(syncOptions);
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    const note = await Factory.createMappedNote(this.application)
+    const originalPayload = note.payloadRepresentation()
+    this.expectedItemCount++
+    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.syncService.sync(syncOptions)
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     // client A
-    await this.application.itemManager.setItemToBeDeleted(note.uuid);
-    await this.application.syncService.sync(syncOptions);
-    this.expectedItemCount--;
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    await this.application.itemManager.setItemToBeDeleted(note.uuid)
+    await this.application.syncService.sync(syncOptions)
+    this.expectedItemCount--
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     // client B
-    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.clearSyncPositionTokens()
     // Add the item back and say it's not deleted
     const mutatedPayload = CreateMaxPayloadFromAnyObject(originalPayload, {
       deleted: false,
       updated_at: Factory.yesterday(),
-    });
+    })
     await this.application.itemManager.emitItemsFromPayloads(
       [mutatedPayload],
-      PayloadSource.LocalChanged
-    );
-    const resultNote = this.application.itemManager.findItem(note.uuid);
-    expect(resultNote.uuid).to.equal(note.uuid);
-    await this.application.itemManager.setItemDirty(resultNote.uuid);
-    await this.application.syncService.sync(syncOptions);
+      PayloadSource.LocalChanged,
+    )
+    const resultNote = this.application.itemManager.findItem(note.uuid)
+    expect(resultNote.uuid).to.equal(note.uuid)
+    await this.application.itemManager.setItemDirty(resultNote.uuid)
+    await this.application.syncService.sync(syncOptions)
 
     // We expect that this item is now gone for good, and a duplicate has not been created.
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    await this.sharedFinalAssertions();
-  });
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('if server says not deleted but client says deleted, keep server state', async function () {
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.setItemDirty(note.uuid);
-    this.expectedItemCount++;
+    const note = await Factory.createMappedNote(this.application)
+    await this.application.itemManager.setItemDirty(note.uuid)
+    this.expectedItemCount++
 
     // client A
-    await this.application.syncService.sync(syncOptions);
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    await this.application.syncService.sync(syncOptions)
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     // client B
-    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.clearSyncPositionTokens()
 
     // This client says this item is deleted, but the server is saying its not deleted.
     // In this case, we want to keep the server copy.
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.setDeleted();
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.setDeleted()
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
     // We expect that this item maintained.
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    await this.sharedFinalAssertions();
-  });
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('should create conflict if syncing an item that is stale', async function () {
-    let note = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.setItemDirty(note.uuid);
-    await this.application.syncService.sync(syncOptions);
-    note = this.application.findItem(note.uuid);
-    expect(note.dirty).to.equal(false);
-    this.expectedItemCount++;
+    let note = await Factory.createMappedNote(this.application)
+    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.syncService.sync(syncOptions)
+    note = this.application.findItem(note.uuid)
+    expect(note.dirty).to.equal(false)
+    this.expectedItemCount++
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     note = await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.text = 'Stale text';
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.text = 'Stale text'
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
-    expect(note.dirty).to.equal(false);
+      syncOptions,
+    )
+    expect(note.dirty).to.equal(false)
 
     // We expect now that the item was conflicted
-    this.expectedItemCount++;
+    this.expectedItemCount++
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    expect(rawPayloads.length).to.equal(this.expectedItemCount)
     for (const payload of rawPayloads) {
-      expect(payload.dirty).to.not.be.ok;
+      expect(payload.dirty).to.not.be.ok
     }
-    await this.sharedFinalAssertions();
-  });
+    await this.sharedFinalAssertions()
+  })
 
   it('creating conflict with exactly equal content should keep us in sync', async function () {
-    const note = await Factory.createMappedNote(this.application);
-    await this.application.itemManager.setItemDirty(note.uuid);
-    this.expectedItemCount++;
+    const note = await Factory.createMappedNote(this.application)
+    await this.application.itemManager.setItemDirty(note.uuid)
+    this.expectedItemCount++
 
-    await this.application.syncService.sync(syncOptions);
+    await this.application.syncService.sync(syncOptions)
 
     await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    await this.sharedFinalAssertions();
-  });
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    await this.sharedFinalAssertions()
+  })
 
   it('handles stale data in bulk', async function () {
     /** This number must be greater than the pagination limit per sync request.
      * For example if the limit per request is 150 items sent/received, this number should
      * be something like 160. */
-    const largeItemCount = SyncUpDownLimit + 10;
-    await Factory.createManyMappedNotes(this.application, largeItemCount);
+    const largeItemCount = SyncUpDownLimit + 10
+    await Factory.createManyMappedNotes(this.application, largeItemCount)
 
     /** Upload */
-    this.application.syncService.sync(syncOptions);
-    await this.context.awaitNextSucessfulSync();
+    this.application.syncService.sync(syncOptions)
+    await this.context.awaitNextSucessfulSync()
 
-    this.expectedItemCount += largeItemCount;
-    const items = this.application.itemManager.items;
-    expect(items.length).to.equal(this.expectedItemCount);
+    this.expectedItemCount += largeItemCount
+    const items = this.application.itemManager.items
+    expect(items.length).to.equal(this.expectedItemCount)
 
     /**
      * We want to see what will happen if we upload everything we have to
      * the server as dirty, with no sync token, so that the server also
      * gives us everything it has.
      */
-    this.application.syncService.lockSyncing();
-    const yesterday = Factory.yesterday();
+    this.application.syncService.lockSyncing()
+    const yesterday = Factory.yesterday()
     for (const note of this.application.itemManager.notes) {
       /** First modify the item without saving so that
        * our local contents digress from the server's */
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-        mutator.text = `1`;
-      });
+        mutator.text = `1`
+      })
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-        mutator.text = `2`;
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(yesterday);
-      });
+        mutator.text = `2`
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(yesterday)
+      })
       // We expect all the notes to be duplicated.
-      this.expectedItemCount++;
+      this.expectedItemCount++
     }
-    this.application.syncService.unlockSyncing();
+    this.application.syncService.unlockSyncing()
 
-    await this.application.syncService.clearSyncPositionTokens();
-    this.application.syncService.sync(syncOptions);
-    await this.context.awaitNextSucessfulSync();
+    await this.application.syncService.clearSyncPositionTokens()
+    this.application.syncService.sync(syncOptions)
+    await this.context.awaitNextSucessfulSync()
 
-    expect(this.application.itemManager.notes.length).to.equal(
-      largeItemCount * 2
-    );
-    await this.sharedFinalAssertions();
-  }).timeout(60000);
+    expect(this.application.itemManager.notes.length).to.equal(largeItemCount * 2)
+    await this.sharedFinalAssertions()
+  }).timeout(60000)
 
   it('duplicating an item should maintian its relationships', async function () {
-    const payload1 = Factory.createStorageItemPayload(ContentType.Tag);
-    const payload2 = Factory.createStorageItemPayload(ContentType.UserPrefs);
-    this.expectedItemCount -= 1; /** auto-created user preferences  */
+    const payload1 = Factory.createStorageItemPayload(ContentType.Tag)
+    const payload2 = Factory.createStorageItemPayload(ContentType.UserPrefs)
+    this.expectedItemCount -= 1 /** auto-created user preferences  */
     await this.application.itemManager.emitItemsFromPayloads(
       [payload1, payload2],
-      PayloadSource.LocalChanged
-    );
-    this.expectedItemCount += 2;
-    let tag = this.application.itemManager.getItems(ContentType.Tag)[0];
-    let userPrefs = this.application.itemManager.getItems(
-      ContentType.UserPrefs
-    )[0];
-    expect(tag).to.be.ok;
-    expect(userPrefs).to.be.ok;
+      PayloadSource.LocalChanged,
+    )
+    this.expectedItemCount += 2
+    let tag = this.application.itemManager.getItems(ContentType.Tag)[0]
+    let userPrefs = this.application.itemManager.getItems(ContentType.UserPrefs)[0]
+    expect(tag).to.be.ok
+    expect(userPrefs).to.be.ok
 
     tag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
-      mutator.addItemAsRelationship(userPrefs);
-    });
+      mutator.addItemAsRelationship(userPrefs)
+    })
 
-    await this.application.itemManager.setItemDirty(userPrefs.uuid);
-    userPrefs = this.application.findItem(userPrefs.uuid);
+    await this.application.itemManager.setItemDirty(userPrefs.uuid)
+    userPrefs = this.application.findItem(userPrefs.uuid)
 
-    expect(
-      this.application.itemManager.itemsReferencingItem(userPrefs.uuid).length
-    ).to.equal(1);
-    expect(
-      this.application.itemManager.itemsReferencingItem(userPrefs.uuid)
-    ).to.include(tag);
+    expect(this.application.itemManager.itemsReferencingItem(userPrefs.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(userPrefs.uuid)).to.include(tag)
 
-    await this.application.syncService.sync(syncOptions);
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
+    await this.application.syncService.sync(syncOptions)
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     tag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
-      mutator.content.title = `${Math.random()}`;
-      mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-        Factory.yesterday()
-      );
-    });
-    await this.application.syncService.sync({ ...syncOptions, awaitAll: true });
+      mutator.content.title = `${Math.random()}`
+      mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+    })
+    await this.application.syncService.sync({ ...syncOptions, awaitAll: true })
 
     // fooItem should now be conflicted and a copy created
-    this.expectedItemCount++;
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    const rawPayloads = await this.application.storageService.getAllRawPayloads();
-    expect(rawPayloads.length).to.equal(this.expectedItemCount);
+    this.expectedItemCount++
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    expect(rawPayloads.length).to.equal(this.expectedItemCount)
 
-    const fooItems = this.application.itemManager.getItems(ContentType.Tag);
-    const fooItem2 = fooItems[1];
+    const fooItems = this.application.itemManager.getItems(ContentType.Tag)
+    const fooItem2 = fooItems[1]
 
-    expect(fooItem2.content.conflict_of).to.equal(tag.uuid);
+    expect(fooItem2.content.conflict_of).to.equal(tag.uuid)
     // Two items now link to this original object
-    const referencingItems = this.application.itemManager.itemsReferencingItem(
-      userPrefs.uuid
-    );
-    expect(referencingItems.length).to.equal(2);
-    expect(referencingItems[0]).to.not.equal(referencingItems[1]);
+    const referencingItems = this.application.itemManager.itemsReferencingItem(userPrefs.uuid)
+    expect(referencingItems.length).to.equal(2)
+    expect(referencingItems[0]).to.not.equal(referencingItems[1])
 
-    expect(
-      this.application.itemManager.itemsReferencingItem(tag.uuid).length
-    ).to.equal(0);
-    expect(
-      this.application.itemManager.itemsReferencingItem(fooItem2.uuid).length
-    ).to.equal(0);
+    expect(this.application.itemManager.itemsReferencingItem(tag.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(fooItem2.uuid).length).to.equal(0)
 
-    expect(tag.content.references.length).to.equal(1);
-    expect(fooItem2.content.references.length).to.equal(1);
-    expect(userPrefs.content.references.length).to.equal(0);
+    expect(tag.content.references.length).to.equal(1)
+    expect(fooItem2.content.references.length).to.equal(1)
+    expect(userPrefs.content.references.length).to.equal(0)
 
-    expect(this.application.itemManager.getDirtyItems().length).to.equal(0);
+    expect(this.application.itemManager.getDirtyItems().length).to.equal(0)
     for (const item of this.application.itemManager.items) {
-      expect(item.dirty).to.not.be.ok;
+      expect(item.dirty).to.not.be.ok
     }
-    await this.sharedFinalAssertions();
-  });
+    await this.sharedFinalAssertions()
+  })
 
   it('when a note is conflicted, its tags should not be duplicated.', async function () {
     /**
@@ -709,65 +645,59 @@ describe('online conflict handling', function () {
      * a duplicate is created, we expect only the note to be duplicated,
      * and the tag not to.
      */
-    let tag = await Factory.createMappedTag(this.application);
-    let note = await Factory.createMappedNote(this.application);
+    let tag = await Factory.createMappedTag(this.application)
+    let note = await Factory.createMappedNote(this.application)
     tag = await this.application.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
-        mutator.addItemAsRelationship(note);
+        mutator.addItemAsRelationship(note)
       },
       undefined,
       undefined,
-      syncOptions
-    );
-    await this.application.itemManager.setItemDirty(note.uuid);
-    this.expectedItemCount += 2;
+      syncOptions,
+    )
+    await this.application.itemManager.setItemDirty(note.uuid)
+    this.expectedItemCount += 2
 
-    await this.application.syncService.sync(syncOptions);
+    await this.application.syncService.sync(syncOptions)
 
     // conflict the note
-    const newText = `${Math.random()}`;
+    const newText = `${Math.random()}`
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     note = await this.application.changeAndSaveItem(
       note.uuid,
       (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
-        mutator.text = newText;
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+        mutator.text = newText
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
 
     // conflict the tag but keep its content the same
     tag = await this.application.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(
-          Factory.yesterday()
-        );
+        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
       undefined,
       undefined,
-      syncOptions
-    );
+      syncOptions,
+    )
     /**
      * We expect now that the total item count has went up by just 1 (the note),
      * and not 2 (the note and tag)
      */
-    this.expectedItemCount += 1;
-    expect(this.application.itemManager.items.length).to.equal(
-      this.expectedItemCount
-    );
-    expect(tag.content.references.length).to.equal(2);
-    await this.sharedFinalAssertions();
-  });
+    this.expectedItemCount += 1
+    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+    expect(tag.content.references.length).to.equal(2)
+    await this.sharedFinalAssertions()
+  })
 
   it('succesful server side saving but dropped packet response should not create sync conflict', async function () {
     /**
@@ -777,40 +707,35 @@ describe('online conflict handling', function () {
      *
      * Expected result: no sync conflict is created
      */
-    const note = await Factory.createSyncedNote(this.application);
-    this.expectedItemCount++;
+    const note = await Factory.createSyncedNote(this.application)
+    this.expectedItemCount++
 
-    const baseTitle = 'base title';
+    const baseTitle = 'base title'
     /** Change the note */
-    const noteAfterChange = await this.application.itemManager.changeItem(
-      note.uuid,
-      (mutator) => {
-        mutator.title = baseTitle;
-      }
-    );
-    await this.application.sync.sync();
+    const noteAfterChange = await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+      mutator.title = baseTitle
+    })
+    await this.application.sync.sync()
 
     /** Simulate a dropped response by reverting the note back its post-change, pre-sync state */
     const retroNote = await this.application.itemManager.emitItemFromPayload(
-      noteAfterChange.payload
-    );
-    expect(retroNote.serverUpdatedAt.getTime()).to.equal(
-      noteAfterChange.serverUpdatedAt.getTime()
-    );
+      noteAfterChange.payload,
+    )
+    expect(retroNote.serverUpdatedAt.getTime()).to.equal(noteAfterChange.serverUpdatedAt.getTime())
 
     /** Change the item to its final title and sync */
-    const finalTitle = 'final title';
+    const finalTitle = 'final title'
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-      mutator.title = finalTitle;
-    });
-    await this.application.sync.sync();
+      mutator.title = finalTitle
+    })
+    await this.application.sync.sync()
 
     /** Expect that no duplicates have been created, and that the note's title is now finalTitle */
-    expect(this.application.itemManager.notes.length).to.equal(1);
-    const finalNote = this.application.findItem(note.uuid);
-    expect(finalNote.title).to.equal(finalTitle);
-    await this.sharedFinalAssertions();
-  });
+    expect(this.application.itemManager.notes.length).to.equal(1)
+    const finalNote = this.application.findItem(note.uuid)
+    expect(finalNote.title).to.equal(finalTitle)
+    await this.sharedFinalAssertions()
+  })
 
   it('receiving a decrypted item while the current local item is errored and dirty should overwrite local value', async function () {
     /**
@@ -822,8 +747,8 @@ describe('online conflict handling', function () {
     /**
      * Create a note and sync it with the server while its valid
      */
-    const note = await Factory.createSyncedNote(this.application);
-    this.expectedItemCount++;
+    const note = await Factory.createSyncedNote(this.application)
+    this.expectedItemCount++
 
     /**
      * Mark the item as dirty and errored
@@ -831,29 +756,26 @@ describe('online conflict handling', function () {
     const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
       errorDecrypting: true,
       dirty: true,
-    });
-    await this.application.itemManager.emitItemsFromPayloads(
-      [errorred],
-      PayloadSource.LocalChanged
-    );
+    })
+    await this.application.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
 
     /**
      * Retrieve this note from the server by clearing sync token
      */
-    await this.application.syncService.clearSyncPositionTokens();
+    await this.application.syncService.clearSyncPositionTokens()
     await this.application.syncService.sync({
       ...syncOptions,
       awaitAll: true,
-    });
+    })
 
     /**
      * Expect that the final result is just 1 note that is not errored
      */
-    const resultNote = await this.application.findItem(note.uuid);
-    expect(resultNote.errorDecrypting).to.not.be.ok;
-    expect(this.application.itemManager.notes.length).to.equal(1);
-    await this.sharedFinalAssertions();
-  });
+    const resultNote = await this.application.findItem(note.uuid)
+    expect(resultNote.errorDecrypting).to.not.be.ok
+    expect(this.application.itemManager.notes.length).to.equal(1)
+    await this.sharedFinalAssertions()
+  })
 
   it('registering for account with bulk offline data belonging to another account should be error-free', async function () {
     /**
@@ -870,58 +792,50 @@ describe('online conflict handling', function () {
      */
 
     /** Create bulk data belonging to another account and sync */
-    const largeItemCount = SyncUpDownLimit + 10;
-    await Factory.createManyMappedNotes(this.application, largeItemCount);
-    await this.application.syncService.sync(syncOptions);
-    const priorData = this.application.itemManager.items;
+    const largeItemCount = SyncUpDownLimit + 10
+    await Factory.createManyMappedNotes(this.application, largeItemCount)
+    await this.application.syncService.sync(syncOptions)
+    const priorData = this.application.itemManager.items
 
     /** Register new account and import this same data */
-    const newApp = await Factory.signOutApplicationAndReturnNew(
-      this.application
-    );
+    const newApp = await Factory.signOutApplicationAndReturnNew(this.application)
     await Factory.registerUserToApplication({
       application: newApp,
       email: Factory.generateUuid(),
       password: Factory.generateUuid(),
-    });
-    await newApp.itemManager.emitItemsFromPayloads(
-      priorData.map((i) => i.payload)
-    );
-    await newApp.syncService.markAllItemsAsNeedingSync();
-    await newApp.syncService.sync(syncOptions);
-    expect(newApp.itemManager.invalidItems.length).to.equal(0);
-    await Factory.safeDeinit(newApp);
-  }).timeout(60000);
+    })
+    await newApp.itemManager.emitItemsFromPayloads(priorData.map((i) => i.payload))
+    await newApp.syncService.markAllItemsAsNeedingSync()
+    await newApp.syncService.sync(syncOptions)
+    expect(newApp.itemManager.invalidItems.length).to.equal(0)
+    await Factory.safeDeinit(newApp)
+  }).timeout(60000)
 
   it('importing data belonging to another account should not result in duplication', async function () {
     /** Create primary account and export data */
-    await Factory.createSyncedNoteWithTag(this.application);
-    let backupFile = await this.application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+    await Factory.createSyncedNoteWithTag(this.application)
+    let backupFile = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
     /** Sort matters, and is the cause of the original issue, where tag comes before the note */
     backupFile.items = [
       backupFile.items.find((i) => i.content_type === ContentType.ItemsKey),
       backupFile.items.find((i) => i.content_type === ContentType.Tag),
       backupFile.items.find((i) => i.content_type === ContentType.Note),
-    ];
-    backupFile = JSON.parse(JSON.stringify(backupFile));
+    ]
+    backupFile = JSON.parse(JSON.stringify(backupFile))
     /** Register new account and import this same data */
-    const newApp = await Factory.signOutApplicationAndReturnNew(
-      this.application
-    );
-    const password = this.password;
+    const newApp = await Factory.signOutApplicationAndReturnNew(this.application)
+    const password = this.password
     await Factory.registerUserToApplication({
       application: newApp,
       email: await Factory.generateUuid(),
       password: password,
-    });
-    Factory.handlePasswordChallenges(newApp, password);
-    await newApp.importData(backupFile, true);
-    expect(newApp.itemManager.tags.length).to.equal(1);
-    expect(newApp.itemManager.notes.length).to.equal(1);
-    await Factory.safeDeinit(newApp);
-  }).timeout(10000);
+    })
+    Factory.handlePasswordChallenges(newApp, password)
+    await newApp.importData(backupFile, true)
+    expect(newApp.itemManager.tags.length).to.equal(1)
+    expect(newApp.itemManager.notes.length).to.equal(1)
+    await Factory.safeDeinit(newApp)
+  }).timeout(10000)
 
   it('importing notes + tags belonging to another account should keep correct associations', async function () {
     /**
@@ -929,39 +843,35 @@ describe('online conflict handling', function () {
      * where the two notes are first listed in the backup, then the tag.
      */
     /** Create primary account and export data */
-    await Factory.createSyncedNoteWithTag(this.application);
-    const tag = this.application.itemManager.tags[0];
-    const note2 = await Factory.createMappedNote(this.application);
+    await Factory.createSyncedNoteWithTag(this.application)
+    const tag = this.application.itemManager.tags[0]
+    const note2 = await Factory.createMappedNote(this.application)
     await this.application.changeAndSaveItem(tag.uuid, (mutator) => {
-      mutator.addItemAsRelationship(note2);
-    });
-    let backupFile = await this.application.createBackupFile(
-      EncryptionIntent.FileEncrypted
-    );
+      mutator.addItemAsRelationship(note2)
+    })
+    let backupFile = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
     backupFile.items = [
       backupFile.items.find((i) => i.content_type === ContentType.ItemsKey),
       backupFile.items.filter((i) => i.content_type === ContentType.Note)[0],
       backupFile.items.filter((i) => i.content_type === ContentType.Note)[1],
       backupFile.items.find((i) => i.content_type === ContentType.Tag),
-    ];
-    backupFile = JSON.parse(JSON.stringify(backupFile));
+    ]
+    backupFile = JSON.parse(JSON.stringify(backupFile))
     /** Register new account and import this same data */
-    const newApp = await Factory.signOutApplicationAndReturnNew(
-      this.application
-    );
-    const password = this.password;
+    const newApp = await Factory.signOutApplicationAndReturnNew(this.application)
+    const password = this.password
     await Factory.registerUserToApplication({
       application: newApp,
       email: await Factory.generateUuid(),
       password: password,
-    });
-    Factory.handlePasswordChallenges(newApp, password);
-    await newApp.importData(backupFile, true);
-    const newTag = newApp.itemManager.tags[0];
-    const notes = newApp.referencesForItem(newTag);
-    expect(notes.length).to.equal(2);
-    await Factory.safeDeinit(newApp);
-  }).timeout(10000);
+    })
+    Factory.handlePasswordChallenges(newApp, password)
+    await newApp.importData(backupFile, true)
+    const newTag = newApp.itemManager.tags[0]
+    const notes = newApp.referencesForItem(newTag)
+    expect(notes.length).to.equal(2)
+    await Factory.safeDeinit(newApp)
+  }).timeout(10000)
 
   it('server should prioritize updated_at_timestamp over updated_at for sync, if provided', async function () {
     /**
@@ -969,14 +879,14 @@ describe('online conflict handling', function () {
      * over updated_at for sync conflict logic. The timestamps are more accurate and support
      * microsecond precision, versus date objects which only go up to milliseconds.
      */
-    const note = await Factory.createSyncedNote(this.application);
-    this.expectedItemCount++;
+    const note = await Factory.createSyncedNote(this.application)
+    this.expectedItemCount++
 
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     /**
      * Create a modified payload that has updated_at set to old value, but updated_at_timestamp
      * set to new value. Then send to server. If the server conflicts, it means it's incorrectly ignoring
@@ -989,22 +899,22 @@ describe('online conflict handling', function () {
         title: Math.random(),
       },
       dirty: true,
-    });
-    await this.application.itemManager.emitItemFromPayload(modified);
-    await this.application.sync.sync();
-    expect(this.application.itemManager.notes.length).to.equal(1);
-    await this.sharedFinalAssertions();
-  });
+    })
+    await this.application.itemManager.emitItemFromPayload(modified)
+    await this.application.sync.sync()
+    expect(this.application.itemManager.notes.length).to.equal(1)
+    await this.sharedFinalAssertions()
+  })
 
   it('conflict should be created if updated_at_timestamp is not exactly equal to servers', async function () {
-    const note = await Factory.createSyncedNote(this.application);
-    this.expectedItemCount++;
+    const note = await Factory.createSyncedNote(this.application)
+    this.expectedItemCount++
 
     /** First modify the item without saving so that
      * our local contents digress from the server's */
     await this.application.changeItem(note.uuid, (mutator) => {
-      mutator.title = `${Math.random()}`;
-    });
+      mutator.title = `${Math.random()}`
+    })
     const modified = CopyPayload(note.payload, {
       updated_at_timestamp: note.payload.updated_at_timestamp - 1,
       content: {
@@ -1012,11 +922,11 @@ describe('online conflict handling', function () {
         title: Math.random(),
       },
       dirty: true,
-    });
-    this.expectedItemCount++;
-    await this.application.itemManager.emitItemFromPayload(modified);
-    await this.application.sync.sync();
-    expect(this.application.itemManager.notes.length).to.equal(2);
-    await this.sharedFinalAssertions();
-  });
-});
+    })
+    this.expectedItemCount++
+    await this.application.itemManager.emitItemFromPayload(modified)
+    await this.application.sync.sync()
+    expect(this.application.itemManager.notes.length).to.equal(2)
+    await this.sharedFinalAssertions()
+  })
+})

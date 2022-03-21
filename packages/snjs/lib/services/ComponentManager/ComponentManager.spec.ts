@@ -3,7 +3,12 @@
  */
 
 import { SNPreferencesService } from '../PreferencesService'
-import { FeatureDescription, FindNativeFeature } from '@standardnotes/features'
+import {
+  ComponentAction,
+  ComponentPermission,
+  FeatureDescription,
+  FindNativeFeature,
+} from '@standardnotes/features'
 import { DesktopManagerInterface } from '@Lib/services/ComponentManager/types'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
@@ -80,14 +85,17 @@ describe('featuresService', () => {
     internalEventBus.publish = jest.fn()
   })
 
-  const nativeComponent = (file_type?: FeatureDescription['file_type']) => {
+  const nativeComponent = (
+    identifier?: FeatureIdentifier,
+    file_type?: FeatureDescription['file_type'],
+  ) => {
     return new SNComponent({
       uuid: '789',
       content_type: ContentType.Component,
       safeContent: {
         package_info: {
           hosted_url: 'https://example.com/component',
-          identifier: FeatureIdentifier.BoldEditor,
+          identifier: identifier || FeatureIdentifier.BoldEditor,
           file_type: file_type ?? 'html',
           valid_until: new Date(),
         },
@@ -123,6 +131,141 @@ describe('featuresService', () => {
       },
     } as never)
   }
+
+  describe('permissions', () => {
+    it('editor should be able to to stream single note', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamContextItem,
+          content_types: [ContentType.Note],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(
+        manager.areRequestedPermissionsValid(
+          nativeComponent(FeatureIdentifier.MarkdownBasicEditor),
+          permissions,
+        ),
+      ).toEqual(true)
+    })
+
+    it('no extension should be able to stream multiple notes', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [ContentType.Note],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(manager.areRequestedPermissionsValid(nativeComponent(), permissions)).toEqual(false)
+    })
+
+    it('no extension should be able to stream multiple tags', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [ContentType.Tag],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(manager.areRequestedPermissionsValid(nativeComponent(), permissions)).toEqual(false)
+    })
+
+    it('no extension should be able to stream multiple notes or tags', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [ContentType.Tag, ContentType.Note],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(manager.areRequestedPermissionsValid(nativeComponent(), permissions)).toEqual(false)
+    })
+
+    it('some valid and some invalid permissions should still return invalid permissions', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [ContentType.Tag, ContentType.FilesafeFileMetadata],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(
+        manager.areRequestedPermissionsValid(
+          nativeComponent(FeatureIdentifier.DeprecatedFileSafe),
+          permissions,
+        ),
+      ).toEqual(false)
+    })
+
+    it('filesafe should be able to stream its files', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [
+            ContentType.FilesafeFileMetadata,
+            ContentType.FilesafeCredentials,
+            ContentType.FilesafeIntegration,
+          ],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(
+        manager.areRequestedPermissionsValid(
+          nativeComponent(FeatureIdentifier.DeprecatedFileSafe),
+          permissions,
+        ),
+      ).toEqual(true)
+    })
+
+    it('bold editor should be able to stream filesafe files', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [
+            ContentType.FilesafeFileMetadata,
+            ContentType.FilesafeCredentials,
+            ContentType.FilesafeIntegration,
+          ],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(
+        manager.areRequestedPermissionsValid(
+          nativeComponent(FeatureIdentifier.BoldEditor),
+          permissions,
+        ),
+      ).toEqual(true)
+    })
+
+    it('non bold editor should not able to stream filesafe files', () => {
+      const permissions: ComponentPermission[] = [
+        {
+          name: ComponentAction.StreamItems,
+          content_types: [
+            ContentType.FilesafeFileMetadata,
+            ContentType.FilesafeCredentials,
+            ContentType.FilesafeIntegration,
+          ],
+        },
+      ]
+
+      const manager = createManager(Environment.Desktop, Platform.MacDesktop)
+      expect(
+        manager.areRequestedPermissionsValid(
+          nativeComponent(FeatureIdentifier.PlusEditor),
+          permissions,
+        ),
+      ).toEqual(false)
+    })
+  })
 
   describe('urlForComponent', () => {
     describe('desktop', () => {
@@ -209,7 +352,7 @@ describe('featuresService', () => {
     it('should not require alert switching from a markdown editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
-      const markdownEditor = nativeComponent('md')
+      const markdownEditor = nativeComponent(undefined, 'md')
       const requiresAlert = manager.doesEditorChangeRequireAlert(markdownEditor, htmlEditor)
       expect(requiresAlert).toBe(false)
     })
@@ -217,7 +360,7 @@ describe('featuresService', () => {
     it('should not require alert switching to a markdown editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
-      const markdownEditor = nativeComponent('md')
+      const markdownEditor = nativeComponent(undefined, 'md')
       const requiresAlert = manager.doesEditorChangeRequireAlert(htmlEditor, markdownEditor)
       expect(requiresAlert).toBe(false)
     })
@@ -232,7 +375,7 @@ describe('featuresService', () => {
     it('should require alert switching from a html editor to custom editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
-      const customEditor = nativeComponent('json')
+      const customEditor = nativeComponent(undefined, 'json')
       const requiresAlert = manager.doesEditorChangeRequireAlert(htmlEditor, customEditor)
       expect(requiresAlert).toBe(true)
     })
@@ -240,14 +383,14 @@ describe('featuresService', () => {
     it('should require alert switching from a custom editor to html editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
       const htmlEditor = nativeComponent()
-      const customEditor = nativeComponent('json')
+      const customEditor = nativeComponent(undefined, 'json')
       const requiresAlert = manager.doesEditorChangeRequireAlert(customEditor, htmlEditor)
       expect(requiresAlert).toBe(true)
     })
 
     it('should require alert switching from a custom editor to custom editor', () => {
       const manager = createManager(Environment.Web, Platform.MacWeb)
-      const customEditor = nativeComponent('json')
+      const customEditor = nativeComponent(undefined, 'json')
       const requiresAlert = manager.doesEditorChangeRequireAlert(customEditor, customEditor)
       expect(requiresAlert).toBe(true)
     })

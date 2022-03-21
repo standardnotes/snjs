@@ -1,4 +1,4 @@
-import { SNNote, SNFile } from '@Lib/models'
+import { SNNote, SNFile, SNTag } from '@Lib/models'
 
 export interface ItemsClientInterface {
   associateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>
@@ -8,4 +8,6 @@ export interface ItemsClientInterface {
   getFilesForNote(note: SNNote): SNFile[]
 
   renameFile(file: SNFile, name: string): Promise<SNFile>
+
+  addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
 }

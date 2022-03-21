@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.4.0...@standardnotes/utils@1.4.1) (2022-03-18)
+
+**Note:** Version bump only for package @standardnotes/utils
+
+
+
+
+
+# [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.3.0...@standardnotes/utils@1.4.0) (2022-03-16)
+
+
+### Features
+
+* delete file functionality ([#657](https://github.com/standardnotes/snjs/issues/657)) ([edec4f7](https://github.com/standardnotes/snjs/commit/edec4f7a65ef557ed5f47be4dddcf2b659ee28b4))
+
+
+
+
+
+## [1.3.1](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.3.0...@standardnotes/utils@1.3.1) (2022-03-16)
+
+**Note:** Version bump only for package @standardnotes/utils
+
+
+
+
+
 # [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.2.3...@standardnotes/utils@1.3.0) (2022-03-14)
 
 

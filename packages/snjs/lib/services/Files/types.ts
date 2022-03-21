@@ -1,25 +1,3 @@
-import { StartUploadSessionResponse } from '@standardnotes/responses'
-
-export interface FilesApi {
-  startUploadSession(apiToken: string): Promise<StartUploadSessionResponse>
-
-  uploadFileBytes(apiToken: string, chunkId: number, encryptedBytes: Uint8Array): Promise<boolean>
-
-  closeUploadSession(apiToken: string): Promise<boolean>
-
-  downloadFile(
-    file: EncryptedFileInterface,
-    chunkIndex: number,
-    apiToken: string,
-    contentRangeStart: number,
-    onBytesReceived: (bytes: Uint8Array) => void,
-  ): Promise<void>
-}
-
-export interface FilesDevice {
-  showFilePicker(): void
-}
-
 export interface DecryptedFileInterface {
   remoteIdentifier: string
   key: string

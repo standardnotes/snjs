@@ -3,6 +3,120 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.87.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.4...@standardnotes/snjs@2.87.0) (2022-03-19)
+
+
+### Features
+
+* option to toggle adding note to all parent folders ([#659](https://github.com/standardnotes/snjs/issues/659)) ([7fb8ff7](https://github.com/standardnotes/snjs/commit/7fb8ff7c7671b730d760505189a85dde9bfefe14))
+
+
+
+
+
+## [2.86.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.3...@standardnotes/snjs@2.86.4) (2022-03-18)
+
+
+### Bug Fixes
+
+* tag search causing regex exception ([#660](https://github.com/standardnotes/snjs/issues/660)) ([2c592f5](https://github.com/standardnotes/snjs/commit/2c592f5d58b61e1b7066e679127f2881efbda2d5))
+
+
+
+
+
+## [2.86.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.2...@standardnotes/snjs@2.86.3) (2022-03-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.86.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.1...@standardnotes/snjs@2.86.2) (2022-03-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.86.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.86.0...@standardnotes/snjs@2.86.1) (2022-03-17)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.86.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.3...@standardnotes/snjs@2.86.0) (2022-03-16)
+
+
+### Features
+
+* restricted component permissions ([e90b2d6](https://github.com/standardnotes/snjs/commit/e90b2d6847920e4cd7a281145204ce2f346af88e))
+
+
+
+
+
+## [2.85.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.2...@standardnotes/snjs@2.85.3) (2022-03-16)
+
+
+### Bug Fixes
+
+* service export ([a3e6441](https://github.com/standardnotes/snjs/commit/a3e6441f22e80e5ada03340271419de8040de495))
+
+
+
+
+
+## [2.85.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.1...@standardnotes/snjs@2.85.2) (2022-03-16)
+
+
+### Bug Fixes
+
+* import location ([4a68cd2](https://github.com/standardnotes/snjs/commit/4a68cd2744a543476878c27c2b5c57432e6e2085))
+
+
+
+
+
+## [2.85.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.85.0...@standardnotes/snjs@2.85.1) (2022-03-16)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.85.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.84.1...@standardnotes/snjs@2.85.0) (2022-03-16)
+
+
+### Features
+
+* delete file functionality ([#657](https://github.com/standardnotes/snjs/issues/657)) ([edec4f7](https://github.com/standardnotes/snjs/commit/edec4f7a65ef557ed5f47be4dddcf2b659ee28b4))
+
+
+
+
+
+## [2.84.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.84.1...@standardnotes/snjs@2.84.2) (2022-03-16)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.84.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.84.0...@standardnotes/snjs@2.84.1) (2022-03-16)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 # [2.84.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.83.1...@standardnotes/snjs@2.84.0) (2022-03-15)
 
 

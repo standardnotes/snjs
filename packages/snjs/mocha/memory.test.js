@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import * as Factory from './lib/factory.js';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import * as Factory from './lib/factory.js'
+chai.use(chaiAsPromised)
+const expect = chai.expect
 
 /**
  * Simple empty test page to create and deinit empty application
@@ -10,23 +10,23 @@ const expect = chai.expect;
  */
 describe('memory', function () {
   before(async function () {
-    localStorage.clear();
-  });
+    localStorage.clear()
+  })
 
   after(async function () {
-    localStorage.clear();
-  });
+    localStorage.clear()
+  })
 
   beforeEach(async function () {
-    this.application = await Factory.createInitAppWithFakeCrypto();
-  });
+    this.application = await Factory.createInitAppWithFakeCrypto()
+  })
 
   afterEach(async function () {
-    await Factory.safeDeinit(this.application);
-    this.application = null;
-  });
+    await Factory.safeDeinit(this.application)
+    this.application = null
+  })
 
   it('passes', async function () {
-    expect(true).to.equal(true);
-  });
-});
+    expect(true).to.equal(true)
+  })
+})
