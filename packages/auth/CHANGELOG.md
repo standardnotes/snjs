@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.10](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.9...@standardnotes/auth@3.17.10) (2022-03-21)
+
+
+### Bug Fixes
+
+* add readonly access information about the session in cross service token ([9363eeb](https://github.com/standardnotes/snjs/commit/9363eeb83dcc953b14b040e68045a6019f498e12))
+
+
+
+
+
 ## [3.17.9](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.8...@standardnotes/auth@3.17.9) (2022-03-21)
 
 **Note:** Version bump only for package @standardnotes/auth
