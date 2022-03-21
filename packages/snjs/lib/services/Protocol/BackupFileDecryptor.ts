@@ -55,6 +55,7 @@ export class BackupFileDecryptor {
     ;(this.password as unknown) = undefined
     ;(this.file as unknown) = undefined
     ;(this.inPayloads as unknown) = undefined
+    ;(this.keyParams as unknown) = undefined
   }
 
   public async decrypt(): Promise<PurePayload[] | ClientDisplayableError> {
