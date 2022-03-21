@@ -19,6 +19,7 @@ import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
 import { Environment, Platform } from './platforms'
 import { SNLog } from './log'
 import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders'
+import { MutationType } from './models';
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -567,7 +568,7 @@ export class SNApplication implements Services.ListedClientInterface {
   public async changeAndSaveItem<M extends Models.ItemMutator = Models.ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutationType = Models.MutationType.UserInteraction,
     payloadSource?: Payloads.PayloadSource,
     syncOptions?: Services.SyncOptions,
   ): Promise<Models.SNItem | undefined> {
@@ -577,7 +578,7 @@ export class SNApplication implements Services.ListedClientInterface {
     await this.itemManager.changeItems(
       [uuid],
       mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
+      mutationType,
       payloadSource,
     )
     await this.syncService.sync(syncOptions)
@@ -590,14 +591,14 @@ export class SNApplication implements Services.ListedClientInterface {
   public async changeAndSaveItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutationType = Models.MutationType.UserInteraction,
     payloadSource?: Payloads.PayloadSource,
     syncOptions?: Services.SyncOptions,
   ): Promise<void> {
     await this.itemManager.changeItems(
       uuids,
       mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
+      mutationType,
       payloadSource,
     )
     await this.syncService.sync(syncOptions)
@@ -609,7 +610,7 @@ export class SNApplication implements Services.ListedClientInterface {
   public async changeItem<M extends Models.ItemMutator>(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutationType: MutationType = MutationType.UserInteraction,
   ): Promise<Models.SNItem | undefined> {
     if (!Utils.isString(uuid)) {
       throw Error('Must use uuid to change item')
@@ -617,7 +618,7 @@ export class SNApplication implements Services.ListedClientInterface {
     await this.itemManager.changeItems(
       [uuid],
       mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
+      mutationType,
     )
     return this.findItem(uuid)
   }
@@ -628,12 +629,12 @@ export class SNApplication implements Services.ListedClientInterface {
   public async changeItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutationType: MutationType = MutationType.UserInteraction,
   ): Promise<(Models.SNItem | undefined)[]> {
     return this.itemManager.changeItems(
       uuids,
       mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
+      mutationType,
     )
   }
 
