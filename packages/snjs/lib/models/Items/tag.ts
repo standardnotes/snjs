@@ -6,10 +6,10 @@ import {
   PurePayload,
   ItemInterface,
 } from '@standardnotes/payloads'
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/Items/item'
 import { ContentType } from '@standardnotes/common'
-import { UuidString } from './../../types'
-import { ItemContent } from './../core/item'
+import { UuidString } from '../../types'
+import { ItemContent } from './item'
 
 export const TagFolderDelimitter = '.'
 

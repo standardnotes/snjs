@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { SNNote } from './note'
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/Items/item'
 import {
   ContenteReferenceType,
   PayloadContent,

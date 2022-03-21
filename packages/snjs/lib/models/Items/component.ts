@@ -1,7 +1,7 @@
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import { addIfUnique, isValidUrl, removeFromArray } from '@standardnotes/utils'
 import { Predicate, PurePayload } from '@standardnotes/payloads'
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/Items/item'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { AppDataField } from '@standardnotes/applications'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'

@@ -1,5 +1,5 @@
 import { SNTag, TagMutator } from '@Lib/models'
-import { TagFolderDelimitter } from '@Lib/models/app/tag'
+import { TagFolderDelimitter } from '@Lib/models/Items/tag'
 import { ItemManager } from '@Lib/services'
 import { lastElement, sortByKey, withoutLastElement } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'

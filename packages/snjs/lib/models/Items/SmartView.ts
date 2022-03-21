@@ -1,5 +1,5 @@
 import { predicateFromJson, PredicateInterface, PredicateJsonForm } from '@standardnotes/payloads'
-import { SNItem } from '@Models/core/item'
+import { SNItem } from '@Lib/models/Items/item'
 import { PurePayload } from '@standardnotes/payloads'
 
 export const SMART_TAG_DSL_PREFIX = '!['

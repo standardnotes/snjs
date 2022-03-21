@@ -1,4 +1,4 @@
-import { SNFile, FileMutator } from '../../models/app/file'
+import { SNFile, FileMutator } from '../../models/Items/file'
 import { createMutatorForItem } from '@Lib/models/mutator'
 import {
   PredicateInterface,
@@ -20,26 +20,26 @@ import {
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view'
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria'
 import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'
-import { SNComponent } from '@Models/app/component'
-import { SNItemsKey } from '@Models/app/items_key'
-import { isTag, SNTag } from '@Models/app/tag'
+import { SNComponent } from '@Lib/models/Items/component'
+import { SNItemsKey } from '@Lib/models/Items/items_key'
+import { isTag, SNTag } from '@Lib/models/Items/tag'
 import { Uuids } from '@Models/functions'
 import { CreateItemFromPayload } from '@Models/generator'
 import { PayloadsByDuplicating } from '@Payloads/functions'
 import { ContentType } from '@standardnotes/common'
-import { ComponentMutator } from '../../models/app/component'
-import { ActionsExtensionMutator, SNActionsExtension } from '../../models/app/extension'
-import { FeatureRepoMutator, SNFeatureRepo } from '../../models/app/feature_repo'
-import { ItemsKeyMutator } from '../../models/app/items_key'
-import { NoteMutator, SNNote } from '../../models/app/note'
+import { ComponentMutator } from '../../models/Items/component'
+import { ActionsExtensionMutator, SNActionsExtension } from '../../models/Items/extension'
+import { FeatureRepoMutator, SNFeatureRepo } from '../../models/Items/feature_repo'
+import { ItemsKeyMutator } from '../../models/Items/items_key'
+import { NoteMutator, SNNote } from '../../models/Items/note'
 import {
   SMART_TAG_DSL_PREFIX,
   SmartView,
   SmartViewContent,
   SystemViewId,
-} from '../../models/app/SmartView'
-import { TagMutator } from '../../models/app/tag'
-import { ItemMutator, MutationType, SNItem } from '../../models/core/item'
+} from '../../models/Items/SmartView'
+import { TagMutator } from '../../models/Items/tag'
+import { ItemMutator, MutationType, SNItem } from '../../models/Items/item'
 import {
   TagNoteCountChangeObserver,
   TagNotesIndex,

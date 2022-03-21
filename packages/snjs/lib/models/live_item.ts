@@ -1,5 +1,5 @@
 import { SNApplication } from './../application'
-import { SNItem } from '@Models/core/item'
+import { SNItem } from '@Lib/models/Items/item'
 
 /** Keeps an item reference up to date with changes */
 export class LiveItem<T extends SNItem> {

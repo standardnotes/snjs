@@ -1,4 +1,4 @@
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/Items/item'
 
 export interface FeatureRepoContent {
   migratedToUserSetting?: boolean

@@ -4,7 +4,7 @@ import {
   CreateMaxPayloadFromAnyObject,
 } from '@standardnotes/payloads'
 import { SNRootKeyParams } from './key_params'
-import { SNItem } from '@Models/core/item'
+import { SNItem } from '@Lib/models/Items/item'
 import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
 import { timingSafeEqual } from '@standardnotes/sncrypto-common'

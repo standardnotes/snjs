@@ -12,9 +12,9 @@ import {
 import { CreateItemFromPayload } from '@Models/generator'
 import { ContentType } from '@standardnotes/common'
 import { UuidGenerator, extendArray } from '@standardnotes/utils'
-import { ComponentMutator, SNComponent } from './../../models/app/component'
+import { ComponentMutator, SNComponent } from '../../models/Items/component'
 import { ComponentArea } from '@standardnotes/features'
-import { MutationType } from './../../models/core/item'
+import { MutationType } from '../../models/Items/item'
 
 function NoteDuplicationAffectedPayloads(
   basePayload: PurePayload,

@@ -13,9 +13,9 @@ import {
   PredicateInterface,
 } from '@standardnotes/payloads'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
-import { SNLog } from './../../log'
+import { SNLog } from '../../log'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
-import { UuidString } from './../../types'
+import { UuidString } from '../../types'
 import {
   Copy,
   dateToLocalizedString,
@@ -23,7 +23,7 @@ import {
   omitInPlace,
   sortedCopy,
 } from '@standardnotes/utils'
-import { PrefKey } from '../app/userPrefs'
+import { PrefKey } from './userPrefs'
 
 export interface ItemContent {
   references?: ContentReference[]

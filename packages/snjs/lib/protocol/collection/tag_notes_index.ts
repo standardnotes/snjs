@@ -3,8 +3,8 @@ import { ItemCollection, ItemDelta, SNIndex } from '@standardnotes/payloads'
 import { SNNote } from '@Lib/models'
 import { SNTag } from '@Lib/index'
 import { UuidString } from '@Lib/types'
-import { isNote } from '@Lib/models/app/note'
-import { isTag } from '@Lib/models/app/tag'
+import { isNote } from '@Lib/models/Items/note'
+import { isTag } from '@Lib/models/Items/tag'
 
 /** tagUuid undefined signifies all notes count change */
 export type TagNoteCountChangeObserver = (tagUuid: UuidString | undefined) => void

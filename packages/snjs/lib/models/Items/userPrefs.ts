@@ -1,4 +1,4 @@
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/app/item'
 import { CollectionSort, Predicate, PredicateInterface } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
 import { FeatureIdentifier } from '@standardnotes/features'

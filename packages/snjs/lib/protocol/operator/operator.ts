@@ -8,7 +8,7 @@ import {
 import { SNRootKey } from './../root_key'
 import { SNRootKeyParams } from './../key_params'
 import { KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
-import { SNItemsKey } from '@Models/app/items_key'
+import { SNItemsKey } from '@Lib/models/Items/items_key'
 
 export type ItemsKeyContent = {
   itemsKey: string

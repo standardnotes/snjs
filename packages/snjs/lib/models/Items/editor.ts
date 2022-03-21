@@ -1,5 +1,5 @@
 import { PurePayload } from '@standardnotes/payloads'
-import { SNItem } from '@Models/core/item'
+import { SNItem } from '@Lib/models/Items/item'
 import { SNNote } from './note'
 
 /**

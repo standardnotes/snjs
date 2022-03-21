@@ -1,7 +1,7 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
 import { AppDataField } from '@standardnotes/applications'
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/Items/item'
 import { ItemInterface, PayloadContent, PayloadFormat, PurePayload } from '@standardnotes/payloads'
 
 export interface NoteContent extends PayloadContent {

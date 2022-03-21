@@ -17,7 +17,7 @@ import {
   FillItemContent,
 } from '@standardnotes/payloads'
 import { ItemsKeyContent } from './../operator'
-import { SNItemsKey } from '@Models/app/items_key'
+import { SNItemsKey } from '@Lib/models/Items/items_key'
 import { Create002KeyParams, SNRootKeyParams } from './../../key_params'
 import { V002Algorithm } from './../algorithms'
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001'

@@ -1,5 +1,5 @@
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/Items/item'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import { ProtocolVersion } from '@standardnotes/common'
 

@@ -1,7 +1,7 @@
 import { AppDataField } from '@standardnotes/applications'
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/Items/item'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
-import { SNComponent } from '@Models/app/component'
+import { SNComponent } from '@Lib/models/Items/component'
 import { ComponentArea } from '@standardnotes/features'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 

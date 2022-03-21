@@ -1,5 +1,5 @@
-import { PrefKey } from '@Models/app/userPrefs'
-import { NoteContent } from '@Models/app/note'
+import { PrefKey } from '@Lib/models/Items/userPrefs'
+import { NoteContent } from '@Lib/models/Items/note'
 import { SNPreferencesService } from '../PreferencesService'
 import { FeatureStatus, FeaturesEvent } from '@Lib/services/Features'
 import { SNFeaturesService } from '@Lib/services'
@@ -33,7 +33,7 @@ import {
 import { ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { UuidString } from '@Lib/types'
-import { SNItem, MutationType } from '@Models/core/item'
+import { SNItem, MutationType } from '@Lib/models/Items/item'
 import { ContentType, Runtime } from '@standardnotes/common'
 import { SNComponent, SNNote } from '@Lib/models'
 import {

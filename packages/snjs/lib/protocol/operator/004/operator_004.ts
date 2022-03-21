@@ -11,7 +11,7 @@ import {
   FillItemContent,
   CreateMaxPayloadFromAnyObject,
 } from '@standardnotes/payloads'
-import { SNItemsKey } from '@Models/app/items_key'
+import { SNItemsKey } from '@Lib/models/Items/items_key'
 import { Create004KeyParams, SNRootKeyParams } from './../../key_params'
 import { V004Algorithm } from './../algorithms'
 import { ItemsKeyContent, SynchronousOperator } from './../operator'

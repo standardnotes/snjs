@@ -12,7 +12,7 @@ import {
   CreateMaxPayloadFromAnyObject,
   PayloadFormat,
 } from '@standardnotes/payloads'
-import { SNItemsKey } from '@Models/app/items_key'
+import { SNItemsKey } from '@Lib/models/Items/items_key'
 import { Create001KeyParams, SNRootKeyParams } from './../../key_params'
 import { ItemsKeyContent, AsynchronousOperator } from './../operator'
 import { SNRootKey } from '@Protocol/root_key'

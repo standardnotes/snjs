@@ -2,7 +2,7 @@ import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes
 import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies'
 import { HistoryEntry } from '../../services/History/Entries/HistoryEntry'
 import { PurePayload } from '@standardnotes/payloads'
-import { ItemMutator, SNItem } from '@Models/core/item'
+import { ItemMutator, SNItem } from '@Lib/models/app/item'
 
 export enum ActionAccessType {
   Encrypted = 'encrypted',

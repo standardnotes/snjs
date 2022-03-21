@@ -13,8 +13,8 @@ import {
   SNActionsExtension,
   Action,
   ActionAccessType,
-} from '../models/app/extension'
-import { MutationType, SNItem } from '@Models/core/item'
+} from '../models/Items/extension'
+import { MutationType, SNItem } from '@Lib/models/Items/item'
 import { SNSyncService } from './Sync/SyncService'
 import { SNProtocolService } from './ProtocolService'
 import { PayloadManager } from './PayloadManager'

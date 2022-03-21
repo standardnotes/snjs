@@ -1,8 +1,8 @@
-import { SNFile } from '../../models/app/file'
+import { SNFile } from '../../models/Items/file'
 import { ItemManager, SNItem } from '@Lib/index'
 import { SNNote, NoteMutator } from '@Lib/models'
-import { SmartView, SystemViewId } from '@Lib/models/app/SmartView'
-import { SNTag, TagMutator } from '@Models/app/tag'
+import { SmartView, SystemViewId } from '@Lib/models/Items/SmartView'
+import { SNTag, TagMutator } from '@Lib/models/Items/tag'
 import {
   FillItemContent,
   CreateMaxPayloadFromAnyObject,

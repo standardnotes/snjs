@@ -1,5 +1,5 @@
 import { CompoundPredicate, Predicate } from '@standardnotes/payloads'
-import { SNComponent } from './../models/app/component'
+import { SNComponent } from '../models/Items/component'
 import { Migration } from '@Lib/migrations/migration'
 import { ContentType } from '@standardnotes/common'
 import { ApplicationStage } from '@standardnotes/applications'
