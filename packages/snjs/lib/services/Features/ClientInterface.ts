@@ -1,6 +1,6 @@
 import { FeatureStatus, SetOfflineFeaturesFunctionResponse } from './Types'
 import { FeatureDescription, FeatureIdentifier } from '@standardnotes/features'
-import { SNComponent } from '../../models/app/component'
+import { SNComponent } from '../../Models/Component/Component'
 import { RoleName } from '@standardnotes/common'
 
 export interface FeaturesClientInterface {

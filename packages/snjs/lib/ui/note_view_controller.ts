@@ -1,9 +1,9 @@
 import { removeFromArray } from '@standardnotes/utils'
-import { SNItem } from '@Models/core/item'
+import { SNItem } from '@Lib/Models/Item/Item'
 import { ContentType } from '@standardnotes/common'
 import { SNTag } from '@Lib/index'
 import { PayloadSource } from '@standardnotes/payloads'
-import { NoteMutator, SNNote } from '@Lib/models'
+import { NoteMutator, SNNote } from '@Lib/Models'
 import { UuidString } from '@Lib/types'
 import { SNApplication } from './../application'
 

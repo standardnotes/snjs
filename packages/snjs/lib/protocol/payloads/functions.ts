@@ -9,12 +9,13 @@ import {
   PayloadContent,
 } from '@standardnotes/payloads'
 
-import { CreateItemFromPayload } from '@Models/generator'
+import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { ContentType } from '@standardnotes/common'
 import { UuidGenerator, extendArray } from '@standardnotes/utils'
-import { ComponentMutator, SNComponent } from './../../models/app/component'
+import { SNComponent } from '../../Models/Component/Component'
+import { ComponentMutator } from "../../Models/Component/ComponentMutator"
 import { ComponentArea } from '@standardnotes/features'
-import { MutationType } from './../../models/core/item'
+import { MutationType } from "../../Models/Item/MutationType"
 
 function NoteDuplicationAffectedPayloads(
   basePayload: PurePayload,

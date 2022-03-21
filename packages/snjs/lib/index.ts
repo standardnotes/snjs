@@ -1,5 +1,5 @@
 export * from '@standardnotes/services'
-export * from './models'
+export * from './Models'
 export * from '@standardnotes/features'
 export * from './services'
 export * from '@Lib/challenges'

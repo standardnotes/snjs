@@ -1,6 +1,6 @@
 import { ContentType } from '@Lib/index'
-import { SNNote, SNTag } from '../../models'
-import { isSystemView, SmartView } from './../../models/app/SmartView'
+import { SNNote, SNTag } from '../../Models'
+import { isSystemView, SmartView } from '../../Models/SmartView/SmartView'
 import { ItemDelta, SNIndex, ItemCollection } from '@standardnotes/payloads'
 import {
   criteriaForSmartView,
