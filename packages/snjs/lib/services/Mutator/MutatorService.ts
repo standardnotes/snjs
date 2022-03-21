@@ -1,4 +1,4 @@
-import { Strings } from './../../strings'
+import { Strings } from '../../strings'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { BackupFile, SNProtocolService } from '../ProtocolService'
 import {
@@ -12,17 +12,17 @@ import { compareVersions } from '@standardnotes/applications'
 import { ContentType, ProtocolVersion } from '@standardnotes/common'
 import { ItemManager, TransactionalMutation } from '../Items'
 import { PayloadManager } from '../PayloadManager'
-import { SNComponentManager } from './../ComponentManager/ComponentManager'
-import { SNProtectionService } from './../Protection/ProtectionService'
+import { SNComponentManager } from '../ComponentManager/ComponentManager'
+import { SNProtectionService } from '../Protection/ProtectionService'
 import { SNSyncService, SyncOptions } from '../Sync'
 import { TagsToFoldersMigrationApplicator } from '@Lib/migrations/applicators/tags_to_folders'
 import { UuidString } from '@Lib/Types/UuidString'
 import * as Models from '../../Models'
 import * as Payloads from '@standardnotes/payloads'
 import * as Utils from '@standardnotes/utils'
-import { MutationClientInterface } from './MutationClientInterface'
+import { MutatorClientInterface } from './MutatorClientInterface'
 
-export class MutationService extends AbstractService implements MutationClientInterface {
+export class MutatorService extends AbstractService implements MutatorClientInterface {
   constructor(
     private itemManager: ItemManager,
     private syncService: SNSyncService,
@@ -65,8 +65,8 @@ export class MutationService extends AbstractService implements MutationClientIn
 
   public async changeAndSaveItem<M extends Models.ItemMutator = Models.ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutate: (mutator: M) => void,
+    updateTimestamps = true,
     payloadSource?: Payloads.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<Models.SNItem | undefined> {
@@ -76,7 +76,9 @@ export class MutationService extends AbstractService implements MutationClientIn
     await this.itemManager.changeItems(
       [uuid],
       mutate,
-      isUserModified ? Models.MutationType.UpdateUserTimestamps : undefined,
+      updateTimestamps
+        ? Models.MutationType.UpdateUserTimestamps
+        : Models.MutationType.NoUpdateUserTimestamps,
       payloadSource,
     )
     await this.syncService.sync(syncOptions)
@@ -85,15 +87,17 @@ export class MutationService extends AbstractService implements MutationClientIn
 
   public async changeAndSaveItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutate: (mutator: M) => void,
+    updateTimestamps = true,
     payloadSource?: Payloads.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<void> {
     await this.itemManager.changeItems(
       uuids,
       mutate,
-      isUserModified ? Models.MutationType.UpdateUserTimestamps : undefined,
+      updateTimestamps
+        ? Models.MutationType.UpdateUserTimestamps
+        : Models.MutationType.NoUpdateUserTimestamps,
       payloadSource,
     )
     await this.syncService.sync(syncOptions)
@@ -101,8 +105,8 @@ export class MutationService extends AbstractService implements MutationClientIn
 
   public async changeItem<M extends Models.ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutate: (mutator: M) => void,
+    updateTimestamps = true,
   ): Promise<Models.SNItem | undefined> {
     if (!Utils.isString(uuid)) {
       throw Error('Must use uuid to change item')
@@ -110,20 +114,24 @@ export class MutationService extends AbstractService implements MutationClientIn
     await this.itemManager.changeItems(
       [uuid],
       mutate,
-      isUserModified ? Models.MutationType.UpdateUserTimestamps : undefined,
+      updateTimestamps
+        ? Models.MutationType.UpdateUserTimestamps
+        : Models.MutationType.NoUpdateUserTimestamps,
     )
     return this.itemManager.findItem(uuid)
   }
 
   public async changeItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
+    mutate: (mutator: M) => void,
+    updateTimestamps = true,
   ): Promise<(Models.SNItem | undefined)[]> {
     return this.itemManager.changeItems(
       uuids,
       mutate,
-      isUserModified ? Models.MutationType.UpdateUserTimestamps : undefined,
+      updateTimestamps
+        ? Models.MutationType.UpdateUserTimestamps
+        : Models.MutationType.NoUpdateUserTimestamps,
     )
   }
 
@@ -194,9 +202,9 @@ export class MutationService extends AbstractService implements MutationClientIn
 
   public async setItemNeedsSync(
     item: Models.SNItem,
-    isUserModified = false,
+    updateTimestamps = false,
   ): Promise<Models.SNItem | undefined> {
-    return this.itemManager.setItemDirty(item.uuid, isUserModified)
+    return this.itemManager.setItemDirty(item.uuid, updateTimestamps)
   }
 
   public async setItemsNeedsSync(items: Models.SNItem[]): Promise<(Models.SNItem | undefined)[]> {

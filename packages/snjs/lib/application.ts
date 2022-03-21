@@ -10,15 +10,11 @@ import * as Utils from '@standardnotes/utils'
 import * as Options from './options'
 import * as Settings from '@standardnotes/settings'
 import { Subscription } from '@standardnotes/auth'
-
 import { ClientDisplayableError } from '@Lib/ClientError'
-import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
-import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria'
 import { UuidString, DeinitSource, ApplicationEventPayload } from './Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
 import { Environment, Platform } from './platforms'
 import { SNLog } from './log'
-import { TagsToFoldersMigrationApplicator } from './migrations/applicators/tags_to_folders'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -69,7 +65,7 @@ export class SNApplication implements Services.ListedClientInterface {
   private mfaService!: Services.SNMfaService
   private listedService!: Services.ListedService
   private fileService!: Services.SNFileService
-  private mutationService!: Services.MutationService
+  private mutatorService!: Services.MutatorService
   private integrityService!: ExternalServices.IntegrityService
 
   private internalEventBus!: ExternalServices.InternalEventBusInterface
@@ -170,8 +166,8 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.settingsService
   }
 
-  public get mutator(): Services.MutationClientInterface {
-    return this.mutationService
+  public get mutator(): Services.MutatorClientInterface {
+    return this.mutatorService
   }
 
   public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
@@ -361,60 +357,6 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.syncService.isDatabaseLoaded()
   }
 
-  /**
-   * Finds an item by UUID.
-   */
-  public findItem(uuid: string): Models.SNItem | undefined {
-    return this.itemManager.findItem(uuid)
-  }
-
-  /**
-   * Returns all items.
-   */
-  public allItems(): Models.SNItem[] {
-    return this.itemManager.items
-  }
-
-  /**
-   * Finds an item by predicate.
-   */
-  public findItems<T extends Models.SNItem>(
-    contentType: Common.ContentType,
-    predicate: Payloads.PredicateInterface<T>,
-  ): Models.SNItem[] {
-    return this.itemManager.itemsMatchingPredicate(contentType, predicate)
-  }
-
-  /**
-   * Finds an item by predicate.
-   */
-  public getAll(uuids: UuidString[]): (Models.SNItem | Payloads.PurePayload | undefined)[] {
-    return this.itemManager.findItems(uuids)
-  }
-
-  /**
-   * @param item item to be checked
-   * @returns Whether the item is a template (unmanaged)
-   */
-  public isTemplateItem(item: Models.SNItem): boolean {
-    return this.itemManager.isTemplateItem(item)
-  }
-
-  /**
-   * Creates an unmanaged item from a payload.
-   */
-  public createItemFromPayload(payload: Payloads.PurePayload): Models.SNItem {
-    return Models.CreateItemFromPayload(payload)
-  }
-
-  /**
-   * Creates an unmanaged payload from any object, where the raw object
-   * represents the same data a payload would.
-   */
-  public createPayloadFromObject(object: Common.AnyRecord): Payloads.PurePayload {
-    return Payloads.CreateMaxPayloadFromAnyObject(object as Payloads.RawPayload)
-  }
-
   public getSessions(): Promise<
     (Responses.HttpResponse & { data: Services.RemoteSession[] }) | Responses.HttpResponse
   > {
@@ -450,153 +392,6 @@ export class SNApplication implements Services.ListedClientInterface {
     Responses.AvailableSubscriptions | ClientDisplayableError
   > {
     return this.sessionManager.getAvailableSubscriptions()
-  }
-
-  public getTrashedItems(): Models.SNNote[] {
-    return this.itemManager.trashedItems
-  }
-
-  public setDisplayOptions<T extends Models.SNItem>(
-    contentType: Common.ContentType,
-    sortBy?: Payloads.CollectionSort,
-    direction?: Payloads.CollectionSortDirection,
-    filter?: (element: T) => boolean,
-  ): void {
-    this.itemManager.setDisplayOptions(contentType, sortBy, direction, filter)
-  }
-
-  public setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void {
-    this.itemManager.setNotesDisplayCriteria(criteria)
-  }
-
-  public getDisplayableItems<T extends Models.SNItem>(contentType: Common.ContentType): T[] {
-    return this.itemManager.getDisplayableItems(contentType)
-  }
-
-  public getItems<T extends Models.SNItem>(
-    contentType: Common.ContentType | Common.ContentType[],
-    nonerroredOnly = false,
-  ): T[] {
-    return this.itemManager.getItems<T>(contentType, nonerroredOnly)
-  }
-
-  public notesMatchingSmartView(view: Models.SmartView): Models.SNNote[] {
-    return this.itemManager.notesMatchingSmartView(view)
-  }
-
-  public addNoteCountChangeObserver(observer: TagNoteCountChangeObserver): () => void {
-    return this.itemManager.addNoteCountChangeObserver(observer)
-  }
-
-  public allCountableNotesCount(): number {
-    return this.itemManager.allCountableNotesCount()
-  }
-
-  public countableNotesForTag(tag: Models.SNTag | Models.SmartView): number {
-    return this.itemManager.countableNotesForTag(tag)
-  }
-
-  /** Returns an item's direct references */
-  public referencesForItem(item: Models.SNItem, contentType?: Common.ContentType): Models.SNItem[] {
-    let references = this.itemManager.referencesForItem(item.uuid)
-    if (contentType) {
-      references = references.filter((ref) => {
-        return ref?.content_type === contentType
-      })
-    }
-    return references
-  }
-
-  /** Returns items referencing an item */
-  public referencingForItem(
-    item: Models.SNItem,
-    contentType?: Common.ContentType,
-  ): Models.SNItem[] {
-    let references = this.itemManager.itemsReferencingItem(item.uuid)
-    if (contentType) {
-      references = references.filter((ref) => {
-        return ref?.content_type === contentType
-      })
-    }
-    return references as Models.SNItem[]
-  }
-
-  public findTagByTitle(title: string): Models.SNTag | undefined {
-    return this.itemManager.findTagByTitle(title)
-  }
-
-  public getTagPrefixTitle(tag: Models.SNTag): string | undefined {
-    return this.itemManager.getTagPrefixTitle(tag)
-  }
-
-  public getTagLongTitle(tag: Models.SNTag): string {
-    return this.itemManager.getTagLongTitle(tag)
-  }
-
-  /**
-   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
-   * @param searchQuery - The query string to match
-   * @param note - The note whose tags should be omitted from results
-   * @returns Array containing tags matching search query and not associated with note
-   */
-  public searchTags(searchQuery: string, note?: Models.SNNote): Models.SNTag[] {
-    return this.itemManager.searchTags(searchQuery, note)
-  }
-
-  public isValidTagParent(parentTagUuid: UuidString, childTagUuid: UuidString): boolean {
-    return this.itemManager.isValidTagParent(parentTagUuid, childTagUuid)
-  }
-
-  public hasTagsNeedingFoldersMigration(): boolean {
-    return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(this.itemManager)
-  }
-
-  /**
-   * Returns the parent for a tag
-   * @param tag - The tag for which parents need to be found
-   * @returns The current parent or undefined
-   */
-  public getTagParent(tag: Models.SNTag): Models.SNTag | undefined {
-    return this.itemManager.getTagParent(tag.uuid)
-  }
-
-  /**
-   * Returns the hierarchy of parents for a tag
-   * @param tag - The tag for which parents need to be found
-   * @returns Array containing all parent tags
-   */
-  public getTagParentChain(tag: Models.SNTag): Models.SNTag[] {
-    return this.itemManager.getTagParentChain(tag.uuid)
-  }
-
-  /**
-   * Returns all descendants for a tag
-   * @param tag - The tag for which descendants need to be found
-   * @returns Array containing all descendant tags
-   */
-  public getTagChildren(tag: Models.SNTag): Models.SNTag[] {
-    return this.itemManager.getTagChildren(tag.uuid)
-  }
-
-  /**
-   * Get tags for a note sorted in natural order
-   * @param note - The note whose tags will be returned
-   * @returns Array containing tags associated with a note
-   */
-  public getSortedTagsForNote(note: Models.SNNote): Models.SNTag[] {
-    return this.itemManager.getSortedTagsForNote(note)
-  }
-
-  public isSmartViewTitle(title: string): boolean {
-    return this.itemManager.isSmartViewTitle(title)
-  }
-
-  public getSmartViews(): Models.SmartView[] {
-    return this.itemManager.getSmartViews()
-  }
-
-  public getNoteCount(): number {
-    return this.itemManager.noteCount
   }
 
   /**
@@ -1190,7 +985,7 @@ export class SNApplication implements Services.ListedClientInterface {
     ;(this.listedService as unknown) = undefined
     ;(this.fileService as unknown) = undefined
     ;(this.integrityService as unknown) = undefined
-    ;(this.mutationService as unknown) = undefined
+    ;(this.mutatorService as unknown) = undefined
 
     this.services = []
   }
@@ -1608,7 +1403,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createMutationService() {
-    this.mutationService = new Services.MutationService(
+    this.mutatorService = new Services.MutatorService(
       this.itemManager,
       this.syncService,
       this.protectionService,
@@ -1618,7 +1413,7 @@ export class SNApplication implements Services.ListedClientInterface {
       this.componentManager,
       this.internalEventBus,
     )
-    this.services.push(this.mutationService)
+    this.services.push(this.mutatorService)
   }
 
   private getClass<T>(base: T) {

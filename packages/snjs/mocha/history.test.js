@@ -291,7 +291,7 @@ describe('history manager', () => {
     it('unsynced entries should use payload created_at for preview titles', async function () {
       const payload = Factory.createNotePayload()
       await this.application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
-      const item = this.application.findItem(payload.uuid)
+      const item = this.application.items.findItem(payload.uuid)
       await this.application.mutator.changeAndSaveItem(
         item.uuid,
         (mutator) => {

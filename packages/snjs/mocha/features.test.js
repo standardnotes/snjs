@@ -82,8 +82,8 @@ describe('features', () => {
     it('should fetch user features and create items for features with content type', async () => {
       expect(application.apiService.getUserFeatures.callCount).to.equal(1)
       expect(application.itemManager.createItem.callCount).to.equal(2)
-      const themeItems = application.getItems(ContentType.Theme)
-      const editorItems = application.getItems(ContentType.Component)
+      const themeItems = application.items.getItems(ContentType.Theme)
+      const editorItems = application.items.getItems(ContentType.Component)
       expect(themeItems).to.have.lengthOf(1)
       expect(editorItems).to.have.lengthOf(1)
       expect(themeItems[0].content).to.containSubset(
@@ -126,7 +126,7 @@ describe('features', () => {
       // Timeout since we don't await for features update
       await new Promise((resolve) => setTimeout(resolve, 1000))
       expect(application.itemManager.changeComponent.callCount).to.equal(1)
-      const themeItems = application.getItems(ContentType.Theme)
+      const themeItems = application.items.getItems(ContentType.Theme)
       expect(themeItems).to.have.lengthOf(1)
       expect(themeItems[0].content).to.containSubset(
         JSON.parse(
@@ -156,7 +156,7 @@ describe('features', () => {
         })
       })
 
-      const themeItemUuid = application.getItems(ContentType.Theme)[0].uuid
+      const themeItemUuid = application.items.getItems(ContentType.Theme)[0].uuid
 
       // Wipe roles from initial sync
       await application.featuresService.setRoles([])
@@ -166,7 +166,7 @@ describe('features', () => {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       expect(application.itemManager.setItemsToBeDeleted.calledWith([themeItemUuid])).to.be.ok
 
-      const themeItem = application.getItems(ContentType.Theme)[0]
+      const themeItem = application.items.getItems(ContentType.Theme)[0]
       expect(themeItem).to.not.be.ok
     })
   })

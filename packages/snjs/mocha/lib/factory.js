@@ -318,7 +318,7 @@ export async function createSyncedNote(application, title, text) {
   await application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
   await application.itemManager.setItemDirty(payload.uuid)
   await application.syncService.sync(syncOptions)
-  const note = application.findItem(payload.uuid)
+  const note = application.items.findItem(payload.uuid)
   return note
 }
 

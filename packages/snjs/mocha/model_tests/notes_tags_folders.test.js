@@ -32,38 +32,39 @@ describe('tags as folders', () => {
     // ## Now the users moves the tag children into the parent
     await this.application.mutator.setTagParent(tagParent, tagChildren)
 
-    expect(this.application.getTagParent(tagChildren)).to.equal(tagParent)
-    expect(Uuids(this.application.getTagChildren(tagParent))).deep.to.equal(Uuids([tagChildren]))
+    expect(this.application.items.getTagParent(tagChildren.uuid)).to.equal(tagParent)
+    expect(Uuids(this.application.items.getTagChildren(tagParent.uuid))).deep.to.equal(Uuids([tagChildren]))
 
     // ## Now the user moves the tag parent into the grand parent
     await this.application.mutator.setTagParent(tagGrandParent, tagParent)
 
-    expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent)
-    expect(Uuids(this.application.getTagChildren(tagGrandParent))).deep.to.equal(Uuids([tagParent]))
+    expect(this.application.items.getTagParent(tagParent.uuid)).to.equal(tagGrandParent)
+    expect(Uuids(this.application.items.getTagChildren(tagGrandParent.uuid))).deep.to.equal(Uuids([tagParent]))
 
     // ## Now the user moves the tag parent into another grand parent
     await this.application.mutator.setTagParent(tagGrandParent2, tagParent)
 
-    expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2)
-    expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([])
-    expect(Uuids(this.application.getTagChildren(tagGrandParent2))).deep.to.equal(
+    expect(this.application.items.getTagParent(tagParent.uuid)).to.equal(tagGrandParent2)
+    expect(this.application.items.getTagChildren(tagGrandParent.uuid)).deep.to.equal([])
+    expect(Uuids(this.application.items.getTagChildren(tagGrandParent2.uuid))).deep.to.equal(
       Uuids([tagParent]),
     )
 
     // ## Now the user tries to move the tag into one of its children
-    await expect(this.application.mutator.setTagParent(tagChildren, tagParent)).to.eventually.be.rejected
+    await expect(this.application.mutator.setTagParent(tagChildren, tagParent)).to.eventually.be
+      .rejected
 
-    expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2)
-    expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([])
-    expect(Uuids(this.application.getTagChildren(tagGrandParent2))).deep.to.equal(
+    expect(this.application.items.getTagParent(tagParent.uuid)).to.equal(tagGrandParent2)
+    expect(this.application.items.getTagChildren(tagGrandParent.uuid)).deep.to.equal([])
+    expect(Uuids(this.application.items.getTagChildren(tagGrandParent2.uuid))).deep.to.equal(
       Uuids([tagParent]),
     )
 
     // ## Now the user move the tag outside any hierarchy
     await this.application.mutator.unsetTagParent(tagParent)
 
-    expect(this.application.getTagParent(tagParent)).to.equal(undefined)
-    expect(this.application.getTagChildren(tagGrandParent2)).deep.to.equals([])
+    expect(this.application.items.getTagParent(tagParent.uuid)).to.equal(undefined)
+    expect(this.application.items.getTagChildren(tagGrandParent2.uuid)).deep.to.equals([])
   })
 
   it('lets me add a note to a tag hierarchy', async function () {
@@ -81,8 +82,8 @@ describe('tags as folders', () => {
     await this.application.items.addTagToNote(note2, tags.another, true)
 
     // ## The note has been added to other tags
-    const note1Tags = await this.application.getSortedTagsForNote(note1)
-    const note2Tags = await this.application.getSortedTagsForNote(note2)
+    const note1Tags = await this.application.items.getSortedTagsForNote(note1)
+    const note2Tags = await this.application.items.getSortedTagsForNote(note2)
 
     expect(note1Tags.length).to.equal(3)
     expect(note2Tags.length).to.equal(1)

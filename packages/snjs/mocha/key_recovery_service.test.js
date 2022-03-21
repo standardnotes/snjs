@@ -67,7 +67,7 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3)
 
     /** Should be decrypted now */
-    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()
@@ -120,8 +120,8 @@ describe('key recovery service', function () {
     await Factory.sleep(1.5)
 
     /** Should be decrypted now */
-    expect(application.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(false)
-    expect(application.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(false)
 
     expect(totalPromptCount).to.equal(1)
 
@@ -170,7 +170,7 @@ describe('key recovery service', function () {
       password: contextA.password,
     })
 
-    expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1)
+    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(1)
 
     /** Create simultaneous appB signed into same account */
     const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace')
@@ -187,15 +187,15 @@ describe('key recovery service', function () {
     const result = await appB.changePassword(contextA.password, newPassword)
     expect(result.error).to.not.be.ok
     const note = await Factory.createSyncedNote(appB)
-    expect(appB.getItems(ContentType.ItemsKey).length).to.equal(2)
+    expect(appB.items.getItems(ContentType.ItemsKey).length).to.equal(2)
     await appB.sync.sync(syncOptions)
 
     /** Sync appA and expect a new items key to be downloaded and errored */
-    expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1)
+    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(1)
     const syncPromise = appA.sync.sync(syncOptions)
     await contextA.awaitNextSucessfulSync()
     await syncPromise
-    expect(appA.getItems(ContentType.ItemsKey).length).to.equal(2)
+    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(2)
 
     /** Same previously errored key should now no longer be errored, */
     const keys = appA.itemManager.itemsKeys()
@@ -209,8 +209,8 @@ describe('key recovery service', function () {
     expect(aKey.compare(bKey)).to.equal(true)
 
     /** Expect appB note to be decrypted */
-    expect(appA.findItem(note.uuid).errorDecrypting).to.not.be.ok
-    expect(appB.findItem(note.uuid).errorDecrypting).to.not.be.ok
+    expect(appA.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
+    expect(appB.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
 
     expect(appA.syncService.isOutOfSync()).to.equal(false)
     expect(appB.syncService.isOutOfSync()).to.equal(false)
@@ -238,7 +238,7 @@ describe('key recovery service', function () {
       password: contextA.password,
     })
 
-    expect(appA.getItems(ContentType.ItemsKey).length).to.equal(1)
+    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(1)
 
     /** Create simultaneous appB signed into same account */
     const appB = await Factory.createApplicationWithFakeCrypto('another-namespace')
@@ -257,7 +257,7 @@ describe('key recovery service', function () {
 
     /** We expect the item in appA to be errored at this point, but we do not want it to recover */
     await appA.sync.sync()
-    expect(appA.findItem(note.uuid).waitingForKey).to.equal(true)
+    expect(appA.items.findItem(note.uuid).waitingForKey).to.equal(true)
     console.warn('Expecting exceptions below as we destroy app during key recovery')
     await Factory.safeDeinit(appA)
     await Factory.safeDeinit(appB)
@@ -266,8 +266,8 @@ describe('key recovery service', function () {
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} })
     await recreatedAppA.launch(true)
 
-    expect(recreatedAppA.findItem(note.uuid).errorDecrypting).to.equal(true)
-    expect(recreatedAppA.findItem(note.uuid).waitingForKey).to.equal(true)
+    expect(recreatedappA.items.findItem(note.uuid).errorDecrypting).to.equal(true)
+    expect(recreatedappA.items.findItem(note.uuid).waitingForKey).to.equal(true)
     await Factory.safeDeinit(recreatedAppA)
   })
 
@@ -375,7 +375,7 @@ describe('key recovery service', function () {
     )
 
     /** Our current items key should not be overwritten */
-    const currentItemsKey = application.findItem(itemsKey.uuid)
+    const currentItemsKey = application.items.findItem(itemsKey.uuid)
     expect(currentItemsKey.errorDecrypting).to.not.be.ok
     expect(currentItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
     expect(currentItemsKey.serverUpdatedAt.getTime()).to.equal(itemsKey.serverUpdatedAt.getTime())
@@ -391,7 +391,7 @@ describe('key recovery service', function () {
     const latestUndecryptables = await application.keyRecoveryService.getUndecryptables()
     expect(Object.keys(latestUndecryptables).length).to.equal(0)
 
-    const latestItemsKey = application.findItem(itemsKey.uuid)
+    const latestItemsKey = application.items.findItem(itemsKey.uuid)
     expect(latestItemsKey.errorDecrypting).to.not.be.ok
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
     expect(latestItemsKey.serverUpdatedAt.getTime()).to.not.equal(
@@ -457,7 +457,7 @@ describe('key recovery service', function () {
     const latestUndecryptables = await recreatedApp.keyRecoveryService.getUndecryptables()
     expect(Object.keys(latestUndecryptables).length).to.equal(0)
 
-    const latestItemsKey = recreatedApp.findItem(itemsKey.uuid)
+    const latestItemsKey = recreatedApp.items.findItem(itemsKey.uuid)
     expect(latestItemsKey.errorDecrypting).to.not.be.ok
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
 
@@ -516,7 +516,7 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3)
 
     /** Should be decrypted now */
-    expect(application.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()

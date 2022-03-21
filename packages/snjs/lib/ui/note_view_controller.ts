@@ -41,7 +41,7 @@ export class NoteViewController {
   ) {
     this.application = application
     if (noteUuid) {
-      this.note = application.findItem(noteUuid) as SNNote
+      this.note = application.items.findItem(noteUuid) as SNNote
     }
   }
 
@@ -53,7 +53,7 @@ export class NoteViewController {
         references: [],
       })) as SNNote
       if (this.defaultTag) {
-        const tag = this.application.findItem(this.defaultTag) as SNTag
+        const tag = this.application.items.findItem(this.defaultTag) as SNTag
         await this.application.items.addTagToNote(note, tag, true)
       }
       this.isTemplateNote = true
@@ -151,7 +151,7 @@ export class NoteViewController {
       await this.insertTemplatedNote()
     }
 
-    if (!this.application.findItem(this.note.uuid)) {
+    if (!this.application.items.findItem(this.note.uuid)) {
       void this.application.alertService.alert(STRING_INVALID_NOTE)
       return
     }

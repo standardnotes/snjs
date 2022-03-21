@@ -263,10 +263,10 @@ describe('importing', function () {
     await application.sync.sync({ awaitAll: true })
 
     await application.mutator.deleteItem(note)
-    expect(application.findItem(note.uuid)).to.not.exist
+    expect(application.items.findItem(note.uuid)).to.not.exist
 
     await application.mutator.deleteItem(tag)
-    expect(application.findItem(tag.uuid)).to.not.exist
+    expect(application.items.findItem(tag.uuid)).to.not.exist
 
     await application.mutator.importData(
       {
@@ -275,9 +275,9 @@ describe('importing', function () {
       true,
     )
     expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.findItem(tag.uuid).deleted).to.be.false
+    expect(application.items.findItem(tag.uuid).deleted).to.be.false
     expect(application.itemManager.tags.length).to.equal(1)
-    expect(application.findItem(note.uuid).deleted).to.be.false
+    expect(application.items.findItem(note.uuid).deleted).to.be.false
   })
 
   it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
@@ -361,16 +361,16 @@ describe('importing', function () {
     await application.sync.sync({ awaitAll: true })
 
     await application.mutator.deleteItem(note)
-    expect(application.findItem(note.uuid)).to.not.exist
+    expect(application.items.findItem(note.uuid)).to.not.exist
 
     await application.mutator.deleteItem(tag)
-    expect(application.findItem(tag.uuid)).to.not.exist
+    expect(application.items.findItem(tag.uuid)).to.not.exist
 
     await application.mutator.importData(backupData, true)
     expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.findItem(tag.uuid).deleted).to.be.false
+    expect(application.items.findItem(tag.uuid).deleted).to.be.false
     expect(application.itemManager.tags.length).to.equal(1)
-    expect(application.findItem(note.uuid).deleted).to.be.false
+    expect(application.items.findItem(note.uuid).deleted).to.be.false
   })
 
   it('should import decrypted data and all items payload source should be FileImport', async function () {
@@ -394,8 +394,8 @@ describe('importing', function () {
 
     await application.mutator.importData(backupData, true)
 
-    const importedNote = application.findItem(note.uuid)
-    const importedTag = application.findItem(tag.uuid)
+    const importedNote = application.items.findItem(note.uuid)
+    const importedTag = application.items.findItem(tag.uuid)
     expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport)
     expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport)
   })
@@ -421,8 +421,8 @@ describe('importing', function () {
 
     await application.mutator.importData(backupData, true)
 
-    const importedNote = application.findItem(note.uuid)
-    const importedTag = application.findItem(tag.uuid)
+    const importedNote = application.items.findItem(note.uuid)
+    const importedTag = application.items.findItem(tag.uuid)
     expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport)
     expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport)
   })

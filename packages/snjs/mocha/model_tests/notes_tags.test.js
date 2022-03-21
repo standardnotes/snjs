@@ -323,13 +323,15 @@ describe('notes and tags', () => {
         )
       }),
     )
-    this.application.setNotesDisplayCriteria(
+    this.application.items.setNotesDisplayCriteria(
       NotesDisplayCriteria.Create({
         sortProperty: 'title',
         sortDirection: 'dsc',
       }),
     )
-    const titles = this.application.getDisplayableItems(ContentType.Note).map((note) => note.title)
+    const titles = this.application.items
+      .getDisplayableItems(ContentType.Note)
+      .map((note) => note.title)
     expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z'])
   })
 
@@ -348,7 +350,7 @@ describe('notes and tags', () => {
       const sortedTitles = titles.sort((a, b) => a.localeCompare(b))
       await Promise.all(titles.map((title) => this.application.mutator.findOrCreateTag(title)))
       expect(
-        this.application.getDisplayableItems(ContentType.Tag).map((t) => t.title),
+        this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title),
       ).to.deep.equal(sortedTitles)
     })
 
@@ -356,9 +358,9 @@ describe('notes and tags', () => {
       const titles = ['1', 'A', 'b', '2']
       const sortedTitles = titles.sort((a, b) => b.localeCompare(a))
       await Promise.all(titles.map((title) => this.application.mutator.findOrCreateTag(title)))
-      this.application.setDisplayOptions(ContentType.Tag, 'title', 'asc')
+      this.application.items.setDisplayOptions(ContentType.Tag, 'title', 'asc')
       expect(
-        this.application.getDisplayableItems(ContentType.Tag).map((t) => t.title),
+        this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title),
       ).to.deep.equal(sortedTitles)
     })
 
@@ -373,14 +375,14 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      this.application.setNotesDisplayCriteria(
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'dsc',
           tags: [tag],
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -396,7 +398,7 @@ describe('notes and tags', () => {
       await this.application.mutator.changeItem(trashedNote.uuid, (mutator) => {
         mutator.trashed = true
       })
-      this.application.setNotesDisplayCriteria(
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'dsc',
@@ -404,7 +406,7 @@ describe('notes and tags', () => {
           includeTrashed: false,
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -430,7 +432,7 @@ describe('notes and tags', () => {
         }
       })
 
-      this.application.setNotesDisplayCriteria(
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'dsc',
@@ -438,7 +440,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.have.length(4)
       expect(displayedNotes[0].title).to.equal('B')
       expect(displayedNotes[1].title).to.equal('A')
@@ -467,8 +469,8 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
@@ -476,7 +478,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -507,8 +509,8 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
@@ -516,7 +518,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -546,8 +548,8 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
@@ -555,7 +557,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(unpinnedNote.uuid)
@@ -584,15 +586,15 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
           views: [view],
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(longNote.uuid)
@@ -638,15 +640,15 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
           views: [view],
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(recentNote.uuid)
@@ -674,15 +676,15 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
           views: [view],
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(untaggedNote.uuid)
@@ -710,15 +712,15 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
           views: [view],
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(taggedNote.uuid)
@@ -761,15 +763,15 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'title',
           sortDirection: 'asc',
           views: [view],
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid)
@@ -818,15 +820,15 @@ describe('notes and tags', () => {
           },
         }),
       )
-      const matches = this.application.notesMatchingSmartView(view)
-      this.application.setNotesDisplayCriteria(
+      const matches = this.application.items.notesMatchingSmartView(view)
+      this.application.items.setNotesDisplayCriteria(
         NotesDisplayCriteria.Create({
           sortProperty: 'created_at',
           sortDirection: 'asc',
           views: [view],
         }),
       )
-      const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
       expect(displayedNotes.length).to.equal(matches.length)
       expect(matches.length).to.equal(3)
       expect(matches.find((note) => note.uuid === protectedNote.uuid)).to.exist
@@ -850,7 +852,7 @@ describe('notes and tags', () => {
       PayloadSource.LocalChanged,
     )
 
-    this.application.setNotesDisplayCriteria(
+    this.application.items.setNotesDisplayCriteria(
       NotesDisplayCriteria.Create({
         sortProperty: 'title',
         sortDirection: 'dsc',
@@ -860,7 +862,7 @@ describe('notes and tags', () => {
       }),
     )
 
-    const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+    const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
     expect(displayedNotes.length).to.equal(2)
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid)
@@ -881,7 +883,7 @@ describe('notes and tags', () => {
       PayloadSource.LocalChanged,
     )
 
-    this.application.setNotesDisplayCriteria(
+    this.application.items.setNotesDisplayCriteria(
       NotesDisplayCriteria.Create({
         sortProperty: 'title',
         sortDirection: 'dsc',
@@ -891,7 +893,7 @@ describe('notes and tags', () => {
       }),
     )
 
-    const displayedNotes = this.application.getDisplayableItems(ContentType.Note)
+    const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
     expect(displayedNotes.length).to.equal(3)
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid)

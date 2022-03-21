@@ -6,7 +6,7 @@ import { UuidString } from '@Lib/Types/UuidString'
 import * as Models from '../../Models'
 import * as Payloads from '@standardnotes/payloads'
 
-export interface MutationClientInterface {
+export interface MutatorClientInterface {
   savePayload(payload: Payloads.PurePayload): Promise<void>
 
   /**
@@ -26,8 +26,8 @@ export interface MutationClientInterface {
    */
   changeAndSaveItem<M extends Models.ItemMutator = Models.ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: M) => void,
-    isUserModified?: boolean,
+    mutate: (mutator: M) => void,
+    updateTimestamps?: boolean,
     payloadSource?: Payloads.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<Models.SNItem | undefined>
@@ -37,8 +37,8 @@ export interface MutationClientInterface {
    */
   changeAndSaveItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: M) => void,
-    isUserModified?: boolean,
+    mutate: (mutator: M) => void,
+    updateTimestamps?: boolean,
     payloadSource?: Payloads.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<void>
@@ -48,8 +48,8 @@ export interface MutationClientInterface {
    */
   changeItem<M extends Models.ItemMutator>(
     uuid: UuidString,
-    mutate?: (mutator: M) => void,
-    isUserModified?: boolean,
+    mutate: (mutator: M) => void,
+    updateTimestamps?: boolean,
   ): Promise<Models.SNItem | undefined>
 
   /**
@@ -57,8 +57,8 @@ export interface MutationClientInterface {
    */
   changeItems<M extends Models.ItemMutator = Models.ItemMutator>(
     uuids: UuidString[],
-    mutate?: (mutator: M) => void,
-    isUserModified?: boolean,
+    mutate: (mutator: M) => void,
+    updateTimestamps?: boolean,
   ): Promise<(Models.SNItem | undefined)[]>
 
   /**

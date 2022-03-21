@@ -1,2 +1,2 @@
-export * from './ClientInterface'
+export * from './ItemsClientInterface'
 export * from './ItemManager'
