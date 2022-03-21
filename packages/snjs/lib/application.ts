@@ -170,7 +170,7 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.settingsService
   }
 
-  public get mutations(): Services.MutationClientInterface {
+  public get mutator(): Services.MutationClientInterface {
     return this.mutationService
   }
 

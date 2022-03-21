@@ -71,10 +71,10 @@ describe('online conflict handling', function () {
     await this.application.syncService.sync(syncOptions)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(item.uuid, (mutator) => {
+    await this.application.mutator.changeItem(item.uuid, (mutator) => {
       mutator.content.foo = `${Math.random()}`
     })
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       item.uuid,
       (mutator) => {
         /** Conflict the item */
@@ -99,10 +99,10 @@ describe('online conflict handling', function () {
     await this.application.syncService.sync(syncOptions)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(item.uuid, (mutator) => {
+    await this.application.mutator.changeItem(item.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       item.uuid,
       (mutator) => {
         /** Conflict the item */
@@ -134,7 +134,7 @@ describe('online conflict handling', function () {
     this.expectedItemCount++
     await this.application.syncService.sync(syncOptions)
 
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       editor.uuid,
       (mutator) => {
         mutator.associateWithItem(note.uuid)
@@ -149,10 +149,10 @@ describe('online conflict handling', function () {
     /** Conflict the note */
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         mutator.content.title = 'zar'
@@ -222,17 +222,17 @@ describe('online conflict handling', function () {
   it('should handle sync conflicts by duplicating differing data', async function () {
     // create an item and sync it
     const note = await Factory.createMappedNote(this.application)
-    await this.application.mutations.saveItem(note.uuid)
+    await this.application.mutator.saveItem(note.uuid)
     this.expectedItemCount++
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         // modify this item to have stale values
@@ -257,14 +257,14 @@ describe('online conflict handling', function () {
 
   it('basic conflict with clearing local state', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.mutations.saveItem(note.uuid)
+    await this.application.mutator.saveItem(note.uuid)
     this.expectedItemCount += 1
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         /** Create conflict for a note */
@@ -299,7 +299,7 @@ describe('online conflict handling', function () {
     const newTitle = `${Math.random()}`
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     await this.application.itemManager.changeItem(note.uuid, (mutator) => {
@@ -345,7 +345,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.setItemDirty(note.uuid)
     this.expectedItemCount++
 
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         // client A
@@ -379,7 +379,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.setItemDirty(note.uuid)
     this.expectedItemCount++
 
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         // client A
@@ -391,12 +391,12 @@ describe('online conflict handling', function () {
     )
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     // client B
     await this.application.syncService.clearSyncPositionTokens()
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         mutator.content.foo = 'bar'
@@ -459,7 +459,7 @@ describe('online conflict handling', function () {
 
     // This client says this item is deleted, but the server is saying its not deleted.
     // In this case, we want to keep the server copy.
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         mutator.setDeleted()
@@ -484,10 +484,10 @@ describe('online conflict handling', function () {
     this.expectedItemCount++
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    note = await this.application.mutations.changeAndSaveItem(
+    note = await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         mutator.text = 'Stale text'
@@ -517,7 +517,7 @@ describe('online conflict handling', function () {
 
     await this.application.syncService.sync(syncOptions)
 
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -647,7 +647,7 @@ describe('online conflict handling', function () {
      */
     let tag = await Factory.createMappedTag(this.application)
     let note = await Factory.createMappedNote(this.application)
-    tag = await this.application.mutations.changeAndSaveItem(
+    tag = await this.application.mutator.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
         mutator.addItemAsRelationship(note)
@@ -665,10 +665,10 @@ describe('online conflict handling', function () {
     const newText = `${Math.random()}`
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    note = await this.application.mutations.changeAndSaveItem(
+    note = await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -680,7 +680,7 @@ describe('online conflict handling', function () {
     )
 
     // conflict the tag but keep its content the same
-    tag = await this.application.mutations.changeAndSaveItem(
+    tag = await this.application.mutator.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -831,7 +831,7 @@ describe('online conflict handling', function () {
       password: password,
     })
     Factory.handlePasswordChallenges(newApp, password)
-    await newApp.mutations.importData(backupFile, true)
+    await newApp.mutator.importData(backupFile, true)
     expect(newApp.itemManager.tags.length).to.equal(1)
     expect(newApp.itemManager.notes.length).to.equal(1)
     await Factory.safeDeinit(newApp)
@@ -846,7 +846,7 @@ describe('online conflict handling', function () {
     await Factory.createSyncedNoteWithTag(this.application)
     const tag = this.application.itemManager.tags[0]
     const note2 = await Factory.createMappedNote(this.application)
-    await this.application.mutations.changeAndSaveItem(tag.uuid, (mutator) => {
+    await this.application.mutator.changeAndSaveItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note2)
     })
     let backupFile = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
@@ -866,7 +866,7 @@ describe('online conflict handling', function () {
       password: password,
     })
     Factory.handlePasswordChallenges(newApp, password)
-    await newApp.mutations.importData(backupFile, true)
+    await newApp.mutator.importData(backupFile, true)
     const newTag = newApp.itemManager.tags[0]
     const notes = newApp.referencesForItem(newTag)
     expect(notes.length).to.equal(2)
@@ -884,7 +884,7 @@ describe('online conflict handling', function () {
 
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     /**
@@ -912,7 +912,7 @@ describe('online conflict handling', function () {
 
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutations.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note.uuid, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     const modified = CopyPayload(note.payload, {

@@ -302,7 +302,7 @@ describe('online syncing', function () {
 
   it('signing into account with pre-existing items', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.mutations.saveItem(note.uuid)
+    await this.application.mutator.saveItem(note.uuid)
     this.expectedItemCount += 1
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
@@ -538,7 +538,7 @@ describe('online syncing', function () {
   it('saving an item after sync should persist it with content property', async function () {
     const note = await Factory.createMappedNote(this.application)
     const text = Factory.randomString(10000)
-    await this.application.mutations.changeAndSaveItem(
+    await this.application.mutator.changeAndSaveItem(
       note.uuid,
       (mutator) => {
         mutator.text = text
@@ -839,7 +839,7 @@ describe('online syncing', function () {
   it('retreiving a remote deleted item should succeed', async function () {
     const note = await Factory.createSyncedNote(this.application)
     const preDeleteSyncToken = await this.application.syncService.getLastSyncToken()
-    await this.application.mutations.deleteItem(note)
+    await this.application.mutator.deleteItem(note)
     await this.application.syncService.setLastSyncToken(preDeleteSyncToken)
     await this.application.sync.sync(syncOptions)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)

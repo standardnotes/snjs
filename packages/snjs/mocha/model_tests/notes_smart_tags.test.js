@@ -52,8 +52,8 @@ describe('notes and smart views', () => {
     const not_pinned = '!["Not Pinned", "pinned", "=", false]'
     const long = '!["Long", "text.length", ">", 500]'
 
-    const tag_not_pinned = await this.application.mutations.createTagOrSmartView(not_pinned)
-    const tag_long = await this.application.mutations.createTagOrSmartView(long)
+    const tag_not_pinned = await this.application.mutator.createTagOrSmartView(not_pinned)
+    const tag_long = await this.application.mutator.createTagOrSmartView(long)
 
     // ## The user can filter and see the pinned notes
     const notes_not_pinned = getFilteredNotes(this.application, {

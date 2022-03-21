@@ -30,19 +30,19 @@ describe('tags as folders', () => {
     })
 
     // ## Now the users moves the tag children into the parent
-    await this.application.mutations.setTagParent(tagParent, tagChildren)
+    await this.application.mutator.setTagParent(tagParent, tagChildren)
 
     expect(this.application.getTagParent(tagChildren)).to.equal(tagParent)
     expect(Uuids(this.application.getTagChildren(tagParent))).deep.to.equal(Uuids([tagChildren]))
 
     // ## Now the user moves the tag parent into the grand parent
-    await this.application.mutations.setTagParent(tagGrandParent, tagParent)
+    await this.application.mutator.setTagParent(tagGrandParent, tagParent)
 
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent)
     expect(Uuids(this.application.getTagChildren(tagGrandParent))).deep.to.equal(Uuids([tagParent]))
 
     // ## Now the user moves the tag parent into another grand parent
-    await this.application.mutations.setTagParent(tagGrandParent2, tagParent)
+    await this.application.mutator.setTagParent(tagGrandParent2, tagParent)
 
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2)
     expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([])
@@ -51,7 +51,7 @@ describe('tags as folders', () => {
     )
 
     // ## Now the user tries to move the tag into one of its children
-    await expect(this.application.mutations.setTagParent(tagChildren, tagParent)).to.eventually.be.rejected
+    await expect(this.application.mutator.setTagParent(tagChildren, tagParent)).to.eventually.be.rejected
 
     expect(this.application.getTagParent(tagParent)).to.equal(tagGrandParent2)
     expect(this.application.getTagChildren(tagGrandParent)).deep.to.equal([])
@@ -60,7 +60,7 @@ describe('tags as folders', () => {
     )
 
     // ## Now the user move the tag outside any hierarchy
-    await this.application.mutations.unsetTagParent(tagParent)
+    await this.application.mutator.unsetTagParent(tagParent)
 
     expect(this.application.getTagParent(tagParent)).to.equal(undefined)
     expect(this.application.getTagChildren(tagGrandParent2)).deep.to.equals([])

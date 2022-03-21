@@ -165,7 +165,7 @@ describe('keys', function () {
     const itemsKeys = this.application.itemManager.itemsKeys()
     expect(itemsKeys.length).to.equal(1)
     const notePayload = Factory.createNotePayload()
-    await this.application.mutations.savePayload(notePayload)
+    await this.application.mutator.savePayload(notePayload)
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     const rawNotePayload = rawPayloads.find((r) => r.content_type === ContentType.Note)

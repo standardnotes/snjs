@@ -26,7 +26,7 @@ describe('web native folders migration', () => {
     await makeTags(this.application, titles)
 
     // Run the migration
-    await this.application.mutations.migrateTagsToFolders()
+    await this.application.mutator.migrateTagsToFolders()
 
     // Check new tags
     const result = extractTagHierarchy(this.application)
@@ -43,7 +43,7 @@ describe('web native folders migration', () => {
     await makeTags(this.application, titles)
 
     // Run the migration
-    await this.application.mutations.migrateTagsToFolders()
+    await this.application.mutator.migrateTagsToFolders()
 
     // Check new tags
     const result = extractTagHierarchy(this.application)
@@ -65,7 +65,7 @@ describe('web native folders migration', () => {
     await makeTags(this.application, titles)
 
     // Run the migration
-    await this.application.mutations.migrateTagsToFolders()
+    await this.application.mutator.migrateTagsToFolders()
 
     // Check new tags
     const result = extractTagHierarchy(this.application)
@@ -87,7 +87,7 @@ describe('web native folders migration', () => {
     await makeTags(this.application, titles)
 
     // Run the migration
-    await this.application.mutations.migrateTagsToFolders()
+    await this.application.mutator.migrateTagsToFolders()
 
     // Check new tags
     const result = extractTagHierarchy(this.application)
@@ -108,7 +108,7 @@ describe('web native folders migration', () => {
     await makeTags(this.application, titles)
 
     // Run the migration
-    await this.application.mutations.migrateTagsToFolders()
+    await this.application.mutator.migrateTagsToFolders()
 
     // Check new tags
     const result = extractTagHierarchy(this.application)
@@ -135,7 +135,7 @@ describe('web native folders migration', () => {
     await makeTags(this.application, titles)
 
     // Run the migration
-    await this.application.mutations.migrateTagsToFolders()
+    await this.application.mutator.migrateTagsToFolders()
 
     // Check new tags
     const result = extractTagHierarchy(this.application)

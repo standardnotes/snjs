@@ -64,7 +64,7 @@ describe('singletons', function () {
       new Predicate('package_info.identifier', '=', this.extManagerId),
     ])
     this.createExtMgr = async () => {
-      return this.application.mutations.createManagedItem(
+      return this.application.mutator.createManagedItem(
         ContentType.Component,
         {
           package_info: {
@@ -270,7 +270,7 @@ describe('singletons', function () {
      * is then subsequently decrypted, singleton logic runs again for the item.
      */
 
-    await this.application.mutations.createManagedItem(
+    await this.application.mutator.createManagedItem(
       ContentType.Component,
       {
         package_info: {
@@ -284,7 +284,7 @@ describe('singletons', function () {
       },
     )
 
-    const errored = await this.application.mutations.createManagedItem(
+    const errored = await this.application.mutator.createManagedItem(
       ContentType.Component,
       {
         package_info: {

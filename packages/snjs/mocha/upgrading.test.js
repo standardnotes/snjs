@@ -212,7 +212,7 @@ describe('upgrading', () => {
     /** After change, note should now be encrypted with latest protocol version */
 
     const note = this.application.itemManager.notes[0]
-    await this.application.mutations.saveItem(note.uuid)
+    await this.application.mutator.saveItem(note.uuid)
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
       this.application,

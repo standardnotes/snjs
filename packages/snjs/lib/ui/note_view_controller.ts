@@ -47,7 +47,7 @@ export class NoteViewController {
 
   async initialize(): Promise<void> {
     if (!this.note) {
-      const note = (await this.application.mutations.createTemplateItem(ContentType.Note, {
+      const note = (await this.application.mutator.createTemplateItem(ContentType.Note, {
         text: '',
         title: this.defaultTitle,
         references: [],
@@ -97,7 +97,7 @@ export class NoteViewController {
 
   insertTemplatedNote(): Promise<SNItem> {
     this.isTemplateNote = false
-    return this.application.mutations.insertItem(this.note)
+    return this.application.mutator.insertItem(this.note)
   }
 
   /**
@@ -156,7 +156,7 @@ export class NoteViewController {
       return
     }
 
-    await this.application.mutations.changeItem(
+    await this.application.mutator.changeItem(
       this.note.uuid,
       (mutator) => {
         const noteMutator = mutator as NoteMutator
