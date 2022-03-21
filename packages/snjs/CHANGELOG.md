@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.89.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.88.3...@standardnotes/snjs@2.89.0) (2022-03-21)
+
+
+### Features
+
+* mutation service ([#665](https://github.com/standardnotes/snjs/issues/665)) ([89e4357](https://github.com/standardnotes/snjs/commit/89e4357a92270d79f4942f842f6d2adb9d7711d6))
+* use workspace terminology for switcher ([#666](https://github.com/standardnotes/snjs/issues/666)) ([e0740e7](https://github.com/standardnotes/snjs/commit/e0740e7811164e2fbd0bbc70e79d5bd3092bbe6a))
+
+
+
+
+
 ## [2.88.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.88.2...@standardnotes/snjs@2.88.3) (2022-03-21)
 
 **Note:** Version bump only for package @standardnotes/snjs
