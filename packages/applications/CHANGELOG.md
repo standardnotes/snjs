@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.5](https://github.com/standardnotes/snjs/compare/@standardnotes/applications@1.2.4...@standardnotes/applications@1.2.5) (2022-03-21)
+
+
+### Bug Fixes
+
+* add missing crypto dependency on applications ([b069331](https://github.com/standardnotes/snjs/commit/b069331915865850580391a609e65e757ea6cc1d))
+
+
+
+
+
 ## [1.2.4](https://github.com/standardnotes/snjs/compare/@standardnotes/applications@1.2.3...@standardnotes/applications@1.2.4) (2022-03-21)
 
 **Note:** Version bump only for package @standardnotes/applications
