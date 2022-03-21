@@ -9,7 +9,7 @@ import {
 import { DeltaFileImport } from '../protocol/payloads/deltas/file_import'
 import { ContentType } from '@standardnotes/common'
 import { Uuids } from '@Lib/Models/Functions'
-import { UuidString } from "../Types/UuidString"
+import { UuidString } from '../Types/UuidString'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 type ChangeCallback = (
@@ -57,9 +57,7 @@ export class PayloadManager extends AbstractService {
    */
   private overwriteProtection: ContentType[] = [ContentType.ItemsKey]
 
-  constructor(
-    protected internalEventBus: InternalEventBusInterface,
-  ) {
+  constructor(protected internalEventBus: InternalEventBusInterface) {
     super(internalEventBus)
     this.collection = new MutableCollection()
   }

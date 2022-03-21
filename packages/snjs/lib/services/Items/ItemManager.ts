@@ -9,7 +9,7 @@ import {
   TagNoteCountChangeObserver,
   TagNotesIndex,
 } from '../../protocol/collection/tag_notes_index'
-import { UuidString } from "../../Types/UuidString"
+import { UuidString } from '../../Types/UuidString'
 import { PayloadManager } from '../PayloadManager'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { BuildSmartViews } from '@Lib/protocol/collection/smart_view_builder'

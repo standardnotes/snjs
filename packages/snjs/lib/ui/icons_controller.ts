@@ -1,5 +1,5 @@
 import { FeatureIdentifier } from '@standardnotes/features'
-import { IconType } from "@Lib/Types/IconType"
+import { IconType } from '@Lib/Types/IconType'
 
 export class IconsController {
   // eslint-disable-next-line @typescript-eslint/no-empty-function

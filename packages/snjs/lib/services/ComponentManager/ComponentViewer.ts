@@ -32,7 +32,7 @@ import {
 } from './types'
 import { ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
-import { UuidString } from "@Lib/Types/UuidString"
+import { UuidString } from '@Lib/Types/UuidString'
 import { SNItem } from '@Lib/Models/Item/Item'
 import { MutationType } from '@Lib/Models/Item/MutationType'
 import { ContentType, Runtime } from '@standardnotes/common'

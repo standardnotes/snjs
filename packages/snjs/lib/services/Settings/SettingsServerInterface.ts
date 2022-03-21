@@ -4,7 +4,7 @@ import {
   ListSettingsResponse,
   UpdateSettingResponse,
 } from '@standardnotes/responses'
-import { UuidString } from "@Lib/Types/UuidString"
+import { UuidString } from '@Lib/Types/UuidString'
 
 export interface SettingsServerInterface {
   listSettings(userUuid: UuidString): Promise<ListSettingsResponse>

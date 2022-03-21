@@ -22,7 +22,7 @@ import { EncryptionDelegate } from './EncryptionDelegate'
 import { SyncEvent } from '@Lib/events'
 import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
-import { ItemsKeyMutator } from "@Lib/Models/ItemsKey/ItemsKeyMutator"
+import { ItemsKeyMutator } from '@Lib/Models/ItemsKey/ItemsKeyMutator'
 import { CreateAnyKeyParams, SNRootKeyParams } from '../protocol/key_params'
 import { SNStorageService } from './StorageService'
 import { SNRootKey } from '@Protocol/root_key'
