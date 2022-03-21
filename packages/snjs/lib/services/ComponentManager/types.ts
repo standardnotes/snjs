@@ -6,7 +6,7 @@ import {
   LegacyFileSafeIdentifier,
 } from '@standardnotes/features'
 import { SNComponent } from '@Lib/Models'
-import { UuidString } from '@Lib/types'
+import { UuidString } from "@Lib/Types/UuidString"
 import { ContentType } from '@standardnotes/common'
 import { RawPayload } from '@standardnotes/payloads'
 

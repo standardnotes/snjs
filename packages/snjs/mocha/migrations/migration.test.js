@@ -126,7 +126,7 @@ describe('migrations', () => {
         }),
       }),
     )
-    await application.insertItem(mfaItem)
+    await application.mutations.insertItem(mfaItem)
     await application.sync.sync()
 
     expect(application.getItems('SF|MFA').length).to.equal(1)
@@ -169,7 +169,7 @@ describe('migrations', () => {
         }),
       }),
     )
-    await application.insertItem(noDistractionItem)
+    await application.mutations.insertItem(noDistractionItem)
     await application.sync.sync()
 
     expect(application.getItems(ContentType.Theme).length).to.equal(1)

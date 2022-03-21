@@ -6,7 +6,7 @@ import {
 } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
 import { ItemContent, SNItem } from '../Item'
-import { UuidString } from '@Lib/types'
+import { UuidString } from "@Lib/Types/UuidString"
 
 export const TagFolderDelimitter = '.'
 

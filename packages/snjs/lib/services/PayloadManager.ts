@@ -9,7 +9,7 @@ import {
 import { DeltaFileImport } from '../protocol/payloads/deltas/file_import'
 import { ContentType } from '@standardnotes/common'
 import { Uuids } from '@Lib/Models/Functions'
-import { UuidString } from '../types'
+import { UuidString } from "../Types/UuidString"
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 type ChangeCallback = (

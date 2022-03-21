@@ -9,7 +9,7 @@ import {
   TagNoteCountChangeObserver,
   TagNotesIndex,
 } from '../../protocol/collection/tag_notes_index'
-import { UuidString } from '../../types'
+import { UuidString } from "../../Types/UuidString"
 import { PayloadManager } from '../PayloadManager'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { BuildSmartViews } from '@Lib/protocol/collection/smart_view_builder'
@@ -401,7 +401,7 @@ export class ItemManager
   >(
     uuid: UuidString,
     mutate?: (mutator: M) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<I> {
@@ -427,7 +427,7 @@ export class ItemManager
   >(
     uuids: UuidString[],
     mutate?: (mutator: M) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<I[]> {
@@ -467,7 +467,7 @@ export class ItemManager
       }
       const mutator = Models.createMutatorForItem(
         item,
-        transaction.mutationType || Models.MutationType.UserInteraction,
+        transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
       )
       transaction.mutate(mutator)
       const payload = mutator.getResult()
@@ -487,7 +487,7 @@ export class ItemManager
     const item = this.findItem(transaction.itemUuid)
     const mutator = Models.createMutatorForItem(
       item!,
-      transaction.mutationType || Models.MutationType.UserInteraction,
+      transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
     )
     transaction.mutate(mutator)
     const payload = mutator.getResult()
@@ -500,7 +500,7 @@ export class ItemManager
   async changeNote(
     uuid: UuidString,
     mutate: (mutator: Models.NoteMutator) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Payloads.PurePayload[]> {
@@ -515,7 +515,7 @@ export class ItemManager
   async changeTag(
     uuid: UuidString,
     mutate: (mutator: Models.TagMutator) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNTag> {
@@ -531,7 +531,7 @@ export class ItemManager
   async changeComponent(
     uuid: UuidString,
     mutate: (mutator: Models.ComponentMutator) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNComponent> {
@@ -547,7 +547,7 @@ export class ItemManager
   async changeFeatureRepo(
     uuid: UuidString,
     mutate: (mutator: Models.FeatureRepoMutator) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNFeatureRepo> {
@@ -563,7 +563,7 @@ export class ItemManager
   async changeActionsExtension(
     uuid: UuidString,
     mutate: (mutator: Models.ActionsExtensionMutator) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNActionsExtension> {
@@ -579,7 +579,7 @@ export class ItemManager
   async changeItemsKey(
     uuid: UuidString,
     mutate: (mutator: Models.ItemsKeyMutator) => void,
-    mutationType: Models.MutationType = Models.MutationType.UserInteraction,
+    mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNItemsKey> {
@@ -626,7 +626,9 @@ export class ItemManager
     return this.changeItems(
       uuids,
       undefined,
-      isUserModified ? Models.MutationType.UserInteraction : Models.MutationType.Internal,
+      isUserModified
+        ? Models.MutationType.UpdateUserTimestamps
+        : Models.MutationType.NoUpdateUserTimestamps,
     )
   }
 

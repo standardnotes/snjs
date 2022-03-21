@@ -1,4 +1,4 @@
-import { UuidString } from '@Lib/types'
+import { UuidString } from "@Lib/Types/UuidString"
 import { HistoryEntry } from './Entries/HistoryEntry'
 
 export type HistoryMap = Record<UuidString, HistoryEntry[]>

@@ -18,7 +18,7 @@ import { SNComponent } from '@Lib/Models/Component/Component'
 import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { Copy, concatArrays, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/platforms'
-import { UuidString } from '@Lib/types'
+import { UuidString } from "@Lib/Types/UuidString"
 import {
   PermissionDialog,
   DesktopManagerInterface,

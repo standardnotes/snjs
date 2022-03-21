@@ -4,7 +4,7 @@ import { ContentType } from '@standardnotes/common'
 import { SNTag } from '@Lib/index'
 import { PayloadSource } from '@standardnotes/payloads'
 import { NoteMutator, SNNote } from '@Lib/Models'
-import { UuidString } from '@Lib/types'
+import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from './../application'
 
 export const STRING_SAVING_WHILE_DOCUMENT_HIDDEN =
@@ -47,7 +47,7 @@ export class NoteViewController {
 
   async initialize(): Promise<void> {
     if (!this.note) {
-      const note = (await this.application.createTemplateItem(ContentType.Note, {
+      const note = (await this.application.mutations.createTemplateItem(ContentType.Note, {
         text: '',
         title: this.defaultTitle,
         references: [],
@@ -97,7 +97,7 @@ export class NoteViewController {
 
   insertTemplatedNote(): Promise<SNItem> {
     this.isTemplateNote = false
-    return this.application.insertItem(this.note)
+    return this.application.mutations.insertItem(this.note)
   }
 
   /**
@@ -138,12 +138,12 @@ export class NoteViewController {
     const isTemplate = this.isTemplateNote
 
     if (typeof document !== 'undefined' && document.hidden) {
-      this.application.alertService.alert(STRING_SAVING_WHILE_DOCUMENT_HIDDEN)
+      void this.application.alertService.alert(STRING_SAVING_WHILE_DOCUMENT_HIDDEN)
       return
     }
 
     if (this.note.deleted) {
-      this.application.alertService.alert(STRING_DELETED_NOTE)
+      void this.application.alertService.alert(STRING_DELETED_NOTE)
       return
     }
 
@@ -152,11 +152,11 @@ export class NoteViewController {
     }
 
     if (!this.application.findItem(this.note.uuid)) {
-      this.application.alertService.alert(STRING_INVALID_NOTE)
+      void this.application.alertService.alert(STRING_INVALID_NOTE)
       return
     }
 
-    await this.application.changeItem(
+    await this.application.mutations.changeItem(
       this.note.uuid,
       (mutator) => {
         const noteMutator = mutator as NoteMutator
@@ -187,7 +187,7 @@ export class NoteViewController {
     const noDebounce = dto.bypassDebouncer || this.application.noAccount()
     const syncDebouceMs = noDebounce ? SAVE_TIMEOUT_NO_DEBOUNCE : SAVE_TIMEOUT_DEBOUNCE
     this.saveTimeout = this.application.deviceInterface.timeout(() => {
-      this.application.sync.sync()
+      void this.application.sync.sync()
     }, syncDebouceMs)
   }
 }

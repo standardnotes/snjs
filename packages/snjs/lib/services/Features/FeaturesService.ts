@@ -1,4 +1,4 @@
-import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { ClientDisplayableError } from '@Lib/ClientError'
 import { SNItem } from '@Lib/Models/Item/Item'
 import { ApplicationStage } from '@standardnotes/applications'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../hosts'
@@ -9,7 +9,7 @@ import { UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { StorageKey } from '@Lib/storage_keys'
 import { SNStorageService } from '../StorageService'
 import { ApiServiceEvent, MetaReceivedData, SNApiService } from '../Api/ApiService'
-import { UuidString } from '@Lib/types'
+import { UuidString } from '@Lib/Types/UuidString'
 import {
   FeatureDescription,
   ThirdPartyFeatureDescription,

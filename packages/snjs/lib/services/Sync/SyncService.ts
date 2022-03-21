@@ -1,7 +1,7 @@
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { SNHistoryManager } from '../History/HistoryManager'
 import { StorageKey } from '@Lib/storage_keys'
-import { UuidString } from '../../types'
+import { UuidString } from "../../Types/UuidString"
 import { ApplicationSyncOptions } from '../../options'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SyncResponse } from '@Lib/services/Sync/Response'

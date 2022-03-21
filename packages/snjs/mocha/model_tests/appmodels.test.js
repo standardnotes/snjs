@@ -361,7 +361,7 @@ describe('app models', () => {
 
   it('maintains editor reference when duplicating note', async function () {
     const note = await Factory.createMappedNote(this.application)
-    const editor = await this.application.createManagedItem(
+    const editor = await this.application.mutations.createManagedItem(
       ContentType.Component,
       { area: ComponentArea.Editor },
       true,

@@ -32,9 +32,9 @@ import {
 } from './types'
 import { ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
-import { UuidString } from '@Lib/types'
+import { UuidString } from "@Lib/Types/UuidString"
 import { SNItem } from '@Lib/Models/Item/Item'
-import { MutationType } from "@Lib/Models/Item/MutationType"
+import { MutationType } from '@Lib/Models/Item/MutationType'
 import { ContentType, Runtime } from '@standardnotes/common'
 import { SNComponent, SNNote } from '@Lib/Models'
 import {
@@ -543,7 +543,9 @@ export class ComponentViewer {
 
   handleStreamItemsMessage(message: ComponentMessage): void {
     const data = message.data as StreamItemsMessageData
-    const types = data.content_types.filter((type) => AllowedBatchContentTypes.includes(type)).sort()
+    const types = data.content_types
+      .filter((type) => AllowedBatchContentTypes.includes(type))
+      .sort()
     const requiredPermissions = [
       {
         name: ComponentAction.StreamItems,
@@ -689,7 +691,7 @@ export class ComponentViewer {
               mutator.setDomainData(allComponentData, ComponentDataDomain)
             }
           },
-          MutationType.UserInteraction,
+          MutationType.UpdateUserTimestamps,
           PayloadSource.ComponentRetrieved,
           this.component.uuid,
         )
@@ -746,7 +748,7 @@ export class ComponentViewer {
                 mutator.setDomainData(allComponentData, ComponentDataDomain)
               }
             },
-            MutationType.UserInteraction,
+            MutationType.UpdateUserTimestamps,
             PayloadSource.ComponentCreated,
             this.component.uuid,
           )

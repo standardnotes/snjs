@@ -1,6 +1,6 @@
 import { AppDataField, DefaultAppDomain } from '@standardnotes/applications'
 import { PayloadContent, CopyPayload, PurePayload, PayloadByMerging } from '@standardnotes/payloads'
-import { UuidString } from '../../types'
+import { UuidString } from "../../Types/UuidString"
 import { Copy, omitInPlace, sortedCopy } from '@standardnotes/utils'
 import { PrefKey } from '../UserPrefs/UserPrefs'
 import { SNItem } from './Item'
@@ -43,7 +43,7 @@ export class ItemMutator {
       })
     }
     if (!this.payload.deleted) {
-      if (this.type === MutationType.UserInteraction) {
+      if (this.type === MutationType.UpdateUserTimestamps) {
         this.userModifiedDate = new Date()
       } else {
         const currentValue = this.item.userModifiedDate

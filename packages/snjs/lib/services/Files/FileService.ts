@@ -1,5 +1,5 @@
 import { FilesServerInterface } from './FilesServerInterface'
-import { ClientDisplayableError } from './../../strings/ClientError'
+import { ClientDisplayableError } from '../../ClientError'
 import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
 import { DecryptedFileInterface } from './types'

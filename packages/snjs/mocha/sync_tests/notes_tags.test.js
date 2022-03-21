@@ -135,7 +135,7 @@ describe('notes + tags syncing', function () {
     expect(this.application.itemManager.notes.length).to.equal(1)
     expect(this.application.itemManager.tags.length).to.equal(1)
 
-    tag = await this.application.changeAndSaveItem(
+    tag = await this.application.mutations.changeAndSaveItem(
       tag.uuid,
       (mutator) => {
         mutator.title = `${Math.random()}`

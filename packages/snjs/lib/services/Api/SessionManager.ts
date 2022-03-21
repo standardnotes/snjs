@@ -1,5 +1,5 @@
 import { Subscription } from '@standardnotes/auth'
-import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { ClientDisplayableError } from '@Lib/ClientError'
 import {
   ProtocolVersion,
   AnyKeyParamsContent,
@@ -7,9 +7,14 @@ import {
   isProtocolVersionExpired,
 } from '@standardnotes/common'
 import { leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications'
-import { Challenge, ChallengePrompt } from '@Lib/challenges'
-import { ChallengeKeyboardType, ChallengeReason, ChallengeValidation } from '../../challenges'
-import { ChallengeService } from '../Challenge/ChallengeService'
+import {
+  ChallengeKeyboardType,
+  ChallengeValidation,
+  Challenge,
+  ChallengePrompt,
+  ChallengeReason,
+  ChallengeService,
+} from '../Challenge'
 import { JwtSession, RemoteSession, TokenSession } from './Session'
 import {
   GetSubscriptionResponse,
@@ -35,10 +40,10 @@ import { StorageKey } from '@Lib/storage_keys'
 import { Session } from '@Lib/services/Api/Session'
 import * as messages from './Messages'
 import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from './Messages'
-import { UuidString } from '@Lib/types'
+import { UuidString } from '@Lib/Types/UuidString'
 import { SNWebSocketsService } from './WebsocketsService'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { ProtocolVersionExpired } from '@Lib/strings/Confirm'
+import { Strings } from '@Lib/strings'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
 export const MissingAccountParams = 'missing-params'
@@ -424,7 +429,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
         }
       }
 
-      const expiredMessages = ProtocolVersionExpired(keyParams.version)
+      const expiredMessages = Strings.Confirm.ProtocolVersionExpired(keyParams.version)
       const confirmed = await this.alertService.confirm(
         expiredMessages.Message,
         expiredMessages.Title,

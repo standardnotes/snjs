@@ -1,4 +1,4 @@
-import { ChallengeService } from '../Challenge/ChallengeService'
+import { ChallengeService, ChallengeReason } from '../Challenge'
 import { ItemManager } from '../Items/ItemManager'
 import { SNProtocolService } from '../ProtocolService'
 import { SNStorageService } from '../StorageService'
@@ -8,7 +8,6 @@ import { UuidGenerator } from '@standardnotes/utils'
 import { SNFile } from '@Lib/Models'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
-import { ChallengeReason } from '@Lib/challenges'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))

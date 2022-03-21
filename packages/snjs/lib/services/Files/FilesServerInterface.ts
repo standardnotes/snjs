@@ -1,4 +1,4 @@
-import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { ClientDisplayableError } from '@Lib/ClientError'
 import { StartUploadSessionResponse, MinimalHttpResponse } from '@standardnotes/responses'
 import { EncryptedFileInterface } from './types'
 

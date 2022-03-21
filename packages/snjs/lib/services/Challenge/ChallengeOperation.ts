@@ -1,5 +1,8 @@
+import { Challenge } from './Challenge'
+import { ChallengeArtifacts } from './Types'
+import { ChallengeResponse } from './ChallengeResponse'
+import { ChallengeValue } from './ChallengeValue'
 import { removeFromArray } from '@standardnotes/utils'
-import { Challenge, ChallengeArtifacts, ChallengeResponse, ChallengeValue } from '@Lib/challenges'
 import { ValueCallback } from './ChallengeService'
 
 /**

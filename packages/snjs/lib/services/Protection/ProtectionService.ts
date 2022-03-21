@@ -1,5 +1,10 @@
-import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from '@Lib/challenges'
-import { ChallengeService } from '../Challenge/ChallengeService'
+import {
+  Challenge,
+  ChallengeValidation,
+  ChallengeReason,
+  ChallengePrompt,
+  ChallengeService,
+} from '@Lib/services/Challenge'
 import { SNLog } from '@Lib/log'
 import { FileMutator, NoteMutator, SNFile, SNNote } from '@Lib/Models'
 import { SNProtocolService } from '../ProtocolService'
@@ -388,7 +393,7 @@ export class SNProtectionService
   private updateSessionExpiryTimer(expiryDate: Date) {
     clearTimeout(this.sessionExpiryTimeout)
     const timer: TimerHandler = () => {
-      this.clearSession()
+      void this.clearSession()
     }
     this.sessionExpiryTimeout = setTimeout(timer, expiryDate.getTime() - Date.now())
   }
