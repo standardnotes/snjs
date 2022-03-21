@@ -123,7 +123,7 @@ describe('mutator', () => {
 
   it('mutate app data', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item, MutationType.UserInteraction)
+    const mutator = new ItemMutator(item, MutationType.UpdateUserTimestamps)
     mutator.setAppDataItem('foo', 'bar')
     mutator.setAppDataItem('bar', 'foo')
     const payload = mutator.getResult()

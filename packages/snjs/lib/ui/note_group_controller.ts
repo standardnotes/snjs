@@ -1,5 +1,5 @@
 import { removeFromArray } from '@standardnotes/utils'
-import { UuidString } from '@Lib/types'
+import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from './../application'
 import { NoteViewController } from './note_view_controller'
 

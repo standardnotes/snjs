@@ -1,15 +1,15 @@
-import { ChallengePrompt } from '../../challenges'
-import { SNProtocolService } from '../ProtocolService'
-import { SNStorageService } from '../StorageService'
 import {
   Challenge,
   ChallengeArtifacts,
+  ChallengeOperation,
+  ChallengePrompt,
   ChallengeReason,
   ChallengeResponse,
   ChallengeValidation,
   ChallengeValue,
-} from '@Lib/challenges'
-import { ChallengeOperation } from './ChallengeOperation'
+} from '.'
+import { SNProtocolService } from '../ProtocolService'
+import { SNStorageService } from '../StorageService'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../Protection/ProtectionService'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
@@ -47,11 +47,11 @@ export class ChallengeService extends AbstractService {
 
   /** @override */
   public deinit() {
-    ;(this.storageService as any) = undefined
-    ;(this.protocolService as any) = undefined
+    ;(this.storageService as unknown) = undefined
+    ;(this.protocolService as unknown) = undefined
     this.sendChallenge = undefined
-    ;(this.challengeOperations as any) = undefined
-    ;(this.challengeObservers as any) = undefined
+    ;(this.challengeOperations as unknown) = undefined
+    ;(this.challengeObservers as unknown) = undefined
     super.deinit()
   }
 
@@ -69,9 +69,9 @@ export class ChallengeService extends AbstractService {
   public async validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse> {
     switch (value.prompt.validation) {
       case ChallengeValidation.LocalPasscode:
-        return this.protocolService!.validatePasscode(value.value as string)
+        return this.protocolService.validatePasscode(value.value as string)
       case ChallengeValidation.AccountPassword:
-        return this.protocolService!.validateAccountPassword(value.value as string)
+        return this.protocolService.validateAccountPassword(value.value as string)
       case ChallengeValidation.Biometric:
         return { valid: value.value === true }
       case ChallengeValidation.ProtectionSessionDuration:
@@ -119,7 +119,7 @@ export class ChallengeService extends AbstractService {
   }
 
   public isPasscodeLocked() {
-    return this.protocolService!.rootKeyNeedsUnwrapping()
+    return this.protocolService.rootKeyNeedsUnwrapping()
   }
 
   public addChallengeObserver(challenge: Challenge, observer: ChallengeObserver) {

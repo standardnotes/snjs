@@ -1,9 +1,9 @@
+import { Strings } from './../../strings/index'
 import { SNApiService } from './../Api/ApiService'
 import { SNProtectionService } from '../Protection/ProtectionService'
-import { Challenge, ChallengeReason, ChallengeValidation } from '../../challenges'
+import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from '../Challenge'
 import { KeyParamsOrigination } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
-import { ChallengePrompt } from '@Lib/challenges'
 import { SNRootKey } from '@Protocol/root_key'
 import { SNAlertService } from '@Lib/services/AlertService'
 import { SNRootKeyParams } from '../../protocol/key_params'
@@ -29,7 +29,6 @@ import { ChallengeService } from '../Challenge/ChallengeService'
 import { SNItemsKey } from '@Lib/Models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { UserClientInterface } from './UserClientInterface'
-import { AccountDeleted } from '@Lib/strings/Info'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -202,7 +201,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
 
     await this.signOut(true)
 
-    void this.alertService.alert(AccountDeleted)
+    void this.alertService.alert(Strings.Info.AccountDeleted)
 
     return {
       error: false,

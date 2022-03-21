@@ -1,5 +1,10 @@
-import { ChallengeService } from './Challenge/ChallengeService'
-import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from '../challenges'
+import {
+  Challenge,
+  ChallengeValidation,
+  ChallengeService,
+  ChallengeReason,
+  ChallengePrompt,
+} from './Challenge'
 import { ListedService } from './Listed/ListedService'
 import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
@@ -119,7 +124,7 @@ export class SNActionsService extends AbstractService {
     const description = response.description || extension.description
     const supported_types = response.supported_types || extension.supported_types
     const actions = response.actions || []
-    const mutator = new ActionsExtensionMutator(extension, MutationType.UserInteraction)
+    const mutator = new ActionsExtensionMutator(extension, MutationType.UpdateUserTimestamps)
 
     mutator.deprecation = response.deprecation
     mutator.description = description
@@ -165,7 +170,7 @@ export class SNActionsService extends AbstractService {
         const error = (response && response.error) || {
           message: 'An issue occurred while processing this action. Please try again.',
         }
-        this.alertService.alert(error.message)
+        void this.alertService.alert(error.message)
         return { error } as HttpResponse
       })
 
@@ -180,7 +185,7 @@ export class SNActionsService extends AbstractService {
     const payload = CreateMaxPayloadFromAnyObject(response.item)
 
     if (!payload.enc_item_key) {
-      this.alertService.alert('This revision is missing its key and cannot be recovered.')
+      void this.alertService.alert('This revision is missing its key and cannot be recovered.')
       return
     }
 
@@ -205,7 +210,7 @@ export class SNActionsService extends AbstractService {
        * In some cases revisions were missing auth params.
        * Instruct the user to email us to get this remedied.
        */
-      this.alertService.alert(
+      void this.alertService.alert(
         'We were unable to decrypt this revision using your current keys, ' +
           'and this revision is missing metadata that would allow us to try different ' +
           'keys to decrypt it. This can likely be fixed with some manual intervention. ' +
@@ -268,27 +273,28 @@ export class SNActionsService extends AbstractService {
     const params = {
       items: [itemParams],
     }
-    return this.httpService!.postAbsolute(action.url, params)
+    return this.httpService
+      .postAbsolute(action.url, params)
       .then((response) => {
         return response as ActionResponse
       })
       .catch((response) => {
         console.error('Action error response:', response)
-        this.alertService!.alert(
+        void this.alertService.alert(
           'An issue occurred while processing this action. Please try again.',
         )
         return response as ActionResponse
       })
   }
 
-  private async handleShowAction(action: Action) {
-    this.deviceInterface!.openUrl(action.url)
+  private handleShowAction(action: Action) {
+    void this.deviceInterface.openUrl(action.url)
     return {} as ActionResponse
   }
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
     const intent = decrypted ? EncryptionIntent.FileDecrypted : EncryptionIntent.FileEncrypted
-    const encrypted = await this.protocolService!.payloadByEncryptingPayload(
+    const encrypted = await this.protocolService.payloadByEncryptingPayload(
       item.payloadRepresentation(),
       intent,
     )

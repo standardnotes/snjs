@@ -18,7 +18,7 @@ import {
 import * as Responses from '@standardnotes/responses'
 
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/services/Api/Messages'
-import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { ClientDisplayableError } from '@Lib/ClientError'
 import { EncryptedFileInterface } from '../Files/types'
 import { HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
 import { FilesServerInterface } from '../Files/FilesServerInterface'
@@ -30,11 +30,11 @@ import { SNRootKeyParams } from '../../protocol/key_params'
 import { SNStorageService } from '../StorageService'
 import { StorageKey } from '@Lib/storage_keys'
 import { UserServerInterface } from '../User/UserServerInterface'
-import { UuidString } from '../../types'
+import { UuidString } from '../../Types/UuidString'
 import * as messages from '@Lib/services/Api/Messages'
-import * as NetworkStrings from '../../strings/Network'
 import merge from 'lodash/merge'
-import { SettingsServerInterface } from "../Settings/SettingsServerInterface"
+import { SettingsServerInterface } from '../Settings/SettingsServerInterface'
+import { Strings } from '@Lib/strings'
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -803,7 +803,7 @@ export class SNApiService
         verb: HttpVerb.Post,
         url,
         customHeaders: [{ key: 'x-valet-token', value: apiToken }],
-        fallbackErrorMessage: NetworkStrings.Files.FailedStartUploadSession,
+        fallbackErrorMessage: Strings.Network.Files.FailedStartUploadSession,
       })
 
     return response as Responses.StartUploadSessionResponse
@@ -817,7 +817,7 @@ export class SNApiService
         verb: HttpVerb.Delete,
         url,
         customHeaders: [{ key: 'x-valet-token', value: apiToken }],
-        fallbackErrorMessage: NetworkStrings.Files.FailedDeleteFile,
+        fallbackErrorMessage: Strings.Network.Files.FailedDeleteFile,
       })
 
     return response as Responses.MinimalHttpResponse
@@ -843,7 +843,7 @@ export class SNApiService
           { key: 'x-chunk-id', value: chunkId.toString() },
           { key: 'Content-Type', value: 'application/octet-stream' },
         ],
-        fallbackErrorMessage: NetworkStrings.Files.FailedUploadFileChunk,
+        fallbackErrorMessage: Strings.Network.Files.FailedUploadFileChunk,
       })
 
     return (response as Responses.UploadFileChunkResponse).success
@@ -857,7 +857,7 @@ export class SNApiService
         verb: HttpVerb.Post,
         url,
         customHeaders: [{ key: 'x-valet-token', value: apiToken }],
-        fallbackErrorMessage: NetworkStrings.Files.FailedCloseUploadSession,
+        fallbackErrorMessage: Strings.Network.Files.FailedCloseUploadSession,
       })
 
     return (response as Responses.CloseUploadSessionResponse).success
@@ -885,7 +885,7 @@ export class SNApiService
           },
           { key: 'range', value: `bytes=${contentRangeStart}-` },
         ],
-        fallbackErrorMessage: NetworkStrings.Files.FailedDownloadFileChunk,
+        fallbackErrorMessage: Strings.Network.Files.FailedDownloadFileChunk,
         responseType: 'arraybuffer',
       })
 

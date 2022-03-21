@@ -1,4 +1,4 @@
-import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { ClientDisplayableError } from '@Lib/ClientError'
 import { FileDownloader } from '../UseCase/FileDownloader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
 import { RemoteFileInterface, EncryptedFileInterface } from '../types'

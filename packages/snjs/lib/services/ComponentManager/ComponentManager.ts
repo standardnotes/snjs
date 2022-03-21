@@ -2,7 +2,7 @@ import { AllowedBatchStreaming } from './types'
 import { SNPreferencesService } from '../PreferencesService'
 import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/services/Features/FeaturesService'
-import { ComponentMutator } from "@Lib/Models/Component/ComponentMutator"
+import { ComponentMutator } from '@Lib/Models/Component/ComponentMutator'
 import { displayStringForContentType } from '@Lib/Models/Functions'
 import { ContentType, Runtime } from '@standardnotes/common'
 import { PayloadSource } from '@standardnotes/payloads'
@@ -18,7 +18,7 @@ import { SNComponent } from '@Lib/Models/Component/Component'
 import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { Copy, concatArrays, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/platforms'
-import { UuidString } from '@Lib/types'
+import { UuidString } from '@Lib/Types/UuidString'
 import {
   PermissionDialog,
   DesktopManagerInterface,

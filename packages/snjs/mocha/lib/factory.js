@@ -577,12 +577,12 @@ export async function createTags(
   const result = resultAccumulator || {}
 
   const promises = Object.entries(hierarchy).map(async ([key, value]) => {
-    let tag = await application.findOrCreateTag(key)
+    let tag = await application.mutations.findOrCreateTag(key)
 
     result[key] = tag
 
     if (parent) {
-      await application.setTagParent(parent, tag)
+      await application.mutations.setTagParent(parent, tag)
     }
 
     if (value === true) {
@@ -598,7 +598,7 @@ export async function createTags(
 }
 
 export async function pinNote(application, note) {
-  return application.changeItem(note.uuid, (mutator) => {
+  return application.mutations.changeItem(note.uuid, (mutator) => {
     mutator.pinned = true
   })
 }

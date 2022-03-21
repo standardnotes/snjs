@@ -93,15 +93,6 @@ export function StrictSignInFailed(current: ProtocolVersion, latest: ProtocolVer
   return `Strict Sign In has refused the server's sign-in parameters. The latest account version is ${latest}, but the server is reporting a version of ${current} for your account. If you'd like to proceed with sign in anyway, please disable Strict Sign In and try again.`
 }
 
-export const UNSUPPORTED_BACKUP_FILE_VERSION =
-  'This backup file was created using a newer version of the application and cannot be imported here. Please update your application and try again.'
-export const BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT =
-  "This backup file was created using a newer encryption version than your account's. Please run the available encryption upgrade and try again."
-
-export const ImportStrings = {
-  FileAccountPassword: 'File account password',
-}
-
 export const CredentialsChangeStrings = {
   PasscodeRequired: 'Your passcode is required to process your credentials change.',
   Failed: 'Unable to change your credentials due to a sync error. Please try again.',

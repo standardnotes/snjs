@@ -3,7 +3,7 @@ import { ItemManager, SNItem } from '@Lib/index'
 import { SNNote, NoteMutator } from '@Lib/Models'
 import { SmartView, SystemViewId } from '@Lib/Models/SmartView/SmartView'
 import { SNTag } from '@Lib/Models/Tag/Tag'
-import { TagMutator } from "@Lib/Models/Tag/TagMutator"
+import { TagMutator } from '@Lib/Models/Tag/TagMutator'
 import {
   FillItemContent,
   CreateMaxPayloadFromAnyObject,
@@ -179,9 +179,9 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child)
       await itemManager.setTagParent(parent, duplicateNameChild)
 
-      const a = await itemManager.findTagByTitleAndParent('name1', undefined)
-      const b = await itemManager.findTagByTitleAndParent('name1', parent?.uuid)
-      const c = await itemManager.findTagByTitleAndParent('name1', child?.uuid)
+      const a = itemManager.findTagByTitleAndParent('name1', undefined)
+      const b = itemManager.findTagByTitleAndParent('name1', parent?.uuid)
+      const c = itemManager.findTagByTitleAndParent('name1', child?.uuid)
 
       expect(a?.uuid).toEqual(parent.uuid)
       expect(b?.uuid).toEqual(duplicateNameChild.uuid)

@@ -1,4 +1,4 @@
-import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { ClientDisplayableError } from '@Lib/ClientError'
 import { EncryptedFileInterface } from '../types'
 import { FilesServerInterface } from '../FilesServerInterface'
 

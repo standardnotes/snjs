@@ -1,4 +1,9 @@
-import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from './../challenges'
+import {
+  Challenge,
+  ChallengeValidation,
+  ChallengeReason,
+  ChallengePrompt,
+} from '../services/Challenge'
 import { MigrationServices } from './types'
 import { ApplicationStage } from '@standardnotes/applications'
 
@@ -49,7 +54,7 @@ export abstract class Migration {
           }
         },
       })
-      this.services.challengeService.promptForChallengeResponse(challenge)
+      void this.services.challengeService.promptForChallengeResponse(challenge)
     })
   }
 

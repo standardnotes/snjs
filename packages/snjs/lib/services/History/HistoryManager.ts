@@ -8,10 +8,14 @@ import {
   PayloadFormat,
   isRemotePayloadAllowed,
 } from '@standardnotes/payloads'
-import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  DeviceInterface,
+  InternalEventBusInterface,
+} from '@standardnotes/services'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 import { CreateHistoryEntryForPayload } from '@Lib/services/History/Entries/Generator'
-import { UuidString } from '../../types'
+import { UuidString } from '../../Types/UuidString'
 import {
   MinimalHttpResponse,
   RevisionListEntry,

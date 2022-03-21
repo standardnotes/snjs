@@ -1,10 +1,10 @@
 import { AppDataField, DefaultAppDomain } from '@standardnotes/applications'
-import { PayloadContent, CopyPayload, PurePayload, PayloadByMerging } from '@standardnotes/payloads'
-import { UuidString } from '../../types'
 import { Copy, omitInPlace, sortedCopy } from '@standardnotes/utils'
+import { MutationType } from './MutationType'
+import { PayloadContent, CopyPayload, PurePayload, PayloadByMerging } from '@standardnotes/payloads'
 import { PrefKey } from '../UserPrefs/UserPrefs'
 import { SNItem } from './Item'
-import { MutationType } from './MutationType'
+import { UuidString } from '../../Types/UuidString'
 
 /**
  * An item mutator takes in an item, and an operation, and returns the resulting payload.
@@ -43,7 +43,7 @@ export class ItemMutator {
       })
     }
     if (!this.payload.deleted) {
-      if (this.type === MutationType.UserInteraction) {
+      if (this.type === MutationType.UpdateUserTimestamps) {
         this.userModifiedDate = new Date()
       } else {
         const currentValue = this.item.userModifiedDate

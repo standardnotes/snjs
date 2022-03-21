@@ -1,5 +1,5 @@
 import * as Applications from '@standardnotes/applications'
-import * as Challenges from './challenges'
+import * as Challenges from './services/Challenge'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Models from './Models'
@@ -11,10 +11,10 @@ import * as Options from './options'
 import * as Settings from '@standardnotes/settings'
 import { Subscription } from '@standardnotes/auth'
 
-import { ClientDisplayableError } from '@Lib/strings/ClientError'
+import { ClientDisplayableError } from '@Lib/ClientError'
 import { TagNoteCountChangeObserver } from './protocol/collection/tag_notes_index'
 import { NotesDisplayCriteria } from './protocol/collection/notes_display_criteria'
-import { DeinitSource, UuidString, ApplicationEventPayload } from './types'
+import { UuidString, DeinitSource, ApplicationEventPayload } from './Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/events'
 import { Environment, Platform } from './platforms'
 import { SNLog } from './log'
@@ -69,6 +69,7 @@ export class SNApplication implements Services.ListedClientInterface {
   private mfaService!: Services.SNMfaService
   private listedService!: Services.ListedService
   private fileService!: Services.SNFileService
+  private mutationService!: Services.MutationService
   private integrityService!: ExternalServices.IntegrityService
 
   private internalEventBus!: ExternalServices.InternalEventBusInterface
@@ -167,6 +168,10 @@ export class SNApplication implements Services.ListedClientInterface {
 
   public get settings(): Services.SNSettingsService {
     return this.settingsService
+  }
+
+  public get mutations(): Services.MutationClientInterface {
+    return this.mutationService
   }
 
   public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
@@ -356,15 +361,6 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.syncService.isDatabaseLoaded()
   }
 
-  public async savePayload(payload: Payloads.PurePayload): Promise<void> {
-    const dirtied = Payloads.CopyPayload(payload, {
-      dirty: true,
-      dirtiedDate: new Date(),
-    })
-    await this.payloadManager.emitPayload(dirtied, Payloads.PayloadSource.LocalChanged)
-    await this.syncService.sync()
-  }
-
   /**
    * Finds an item by UUID.
    */
@@ -394,39 +390,6 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   public getAll(uuids: UuidString[]): (Models.SNItem | Payloads.PurePayload | undefined)[] {
     return this.itemManager.findItems(uuids)
-  }
-
-  /**
-   * Takes the values of the input item and emits it onto global state.
-   */
-  public async mergeItem(
-    item: Models.SNItem,
-    source: Payloads.PayloadSource,
-  ): Promise<Models.SNItem> {
-    return this.itemManager.emitItemFromPayload(item.payloadRepresentation(), source)
-  }
-
-  /**
-   * Creates a managed item.
-   * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
-   */
-  public async createManagedItem(
-    contentType: Common.ContentType,
-    content: Payloads.PayloadContent,
-    needsSync = false,
-    override?: Payloads.PayloadOverride,
-  ): Promise<Models.SNItem> {
-    return this.itemManager.createItem(contentType, content, needsSync, override)
-  }
-
-  /**
-   * Creates an unmanaged item that can be added later.
-   */
-  public async createTemplateItem(
-    contentType: Common.ContentType,
-    content?: Payloads.PayloadContent,
-  ): Promise<Models.SNItem> {
-    return this.itemManager.createTemplateItem(contentType, content)
   }
 
   /**
@@ -489,31 +452,6 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.sessionManager.getAvailableSubscriptions()
   }
 
-  /**
-   * @param isUserModified  Whether to change the modified date the user
-   * sees of the item.
-   */
-  public async setItemNeedsSync(
-    item: Models.SNItem,
-    isUserModified = false,
-  ): Promise<Models.SNItem | undefined> {
-    return this.itemManager.setItemDirty(item.uuid, isUserModified)
-  }
-
-  public async setItemsNeedsSync(items: Models.SNItem[]): Promise<(Models.SNItem | undefined)[]> {
-    return this.itemManager.setItemsDirty(Models.Uuids(items))
-  }
-
-  public async deleteItem(item: Models.SNItem): Promise<void> {
-    await this.itemManager.setItemToBeDeleted(item.uuid)
-    await this.sync.sync()
-  }
-
-  public async emptyTrash(): Promise<void> {
-    await this.itemManager.emptyTrash()
-    await this.sync.sync()
-  }
-
   public getTrashedItems(): Models.SNNote[] {
     return this.itemManager.trashedItems
   }
@@ -533,162 +471,6 @@ export class SNApplication implements Services.ListedClientInterface {
 
   public getDisplayableItems<T extends Models.SNItem>(contentType: Common.ContentType): T[] {
     return this.itemManager.getDisplayableItems(contentType)
-  }
-
-  /**
-   * Inserts the input item by its payload properties, and marks the item as dirty.
-   * A sync is not performed after an item is inserted. This must be handled by the caller.
-   */
-  public async insertItem(item: Models.SNItem): Promise<Models.SNItem> {
-    const mutator = Models.createMutatorForItem(item, Models.MutationType.UserInteraction)
-    const dirtiedPayload = mutator.getResult()
-    const insertedItem = await this.itemManager.emitItemFromPayload(dirtiedPayload)
-    return insertedItem
-  }
-
-  /**
-   * Saves the item by uuid by finding it, setting it as dirty if its not already,
-   * and performing a sync request.
-   */
-  public async saveItem(uuid: UuidString): Promise<void> {
-    const item = this.itemManager.findItem(uuid)
-    if (!item) {
-      throw Error('Attempting to save non-inserted item')
-    }
-    if (!item.dirty) {
-      await this.itemManager.changeItem(uuid, undefined, Models.MutationType.Internal)
-    }
-    await this.syncService.sync()
-  }
-
-  /**
-   * Mutates a pre-existing item, marks it as dirty, and syncs it
-   */
-  public async changeAndSaveItem<M extends Models.ItemMutator = Models.ItemMutator>(
-    uuid: UuidString,
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
-    payloadSource?: Payloads.PayloadSource,
-    syncOptions?: Services.SyncOptions,
-  ): Promise<Models.SNItem | undefined> {
-    if (!Utils.isString(uuid)) {
-      throw Error('Must use uuid to change item')
-    }
-    await this.itemManager.changeItems(
-      [uuid],
-      mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
-      payloadSource,
-    )
-    await this.syncService.sync(syncOptions)
-    return this.findItem(uuid)
-  }
-
-  /**
-   * Mutates pre-existing items, marks them as dirty, and syncs
-   */
-  public async changeAndSaveItems<M extends Models.ItemMutator = Models.ItemMutator>(
-    uuids: UuidString[],
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
-    payloadSource?: Payloads.PayloadSource,
-    syncOptions?: Services.SyncOptions,
-  ): Promise<void> {
-    await this.itemManager.changeItems(
-      uuids,
-      mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
-      payloadSource,
-    )
-    await this.syncService.sync(syncOptions)
-  }
-
-  /**
-   * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
-   */
-  public async changeItem<M extends Models.ItemMutator>(
-    uuid: UuidString,
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
-  ): Promise<Models.SNItem | undefined> {
-    if (!Utils.isString(uuid)) {
-      throw Error('Must use uuid to change item')
-    }
-    await this.itemManager.changeItems(
-      [uuid],
-      mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
-    )
-    return this.findItem(uuid)
-  }
-
-  /**
-   * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
-   */
-  public async changeItems<M extends Models.ItemMutator = Models.ItemMutator>(
-    uuids: UuidString[],
-    mutate?: (mutator: M) => void,
-    isUserModified = true,
-  ): Promise<(Models.SNItem | undefined)[]> {
-    return this.itemManager.changeItems(
-      uuids,
-      mutate,
-      isUserModified ? Models.MutationType.UserInteraction : undefined,
-    )
-  }
-
-  /**
-   * Run unique mutations per each item in the array, then only propagate all changes
-   * once all mutations have been run. This differs from `changeItems` in that changeItems
-   * runs the same mutation on all items.
-   */
-  public async runTransactionalMutations(
-    transactions: Services.TransactionalMutation[],
-    payloadSource = Payloads.PayloadSource.LocalChanged,
-    payloadSourceKey?: string,
-  ): Promise<(Models.SNItem | undefined)[]> {
-    return this.itemManager.runTransactionalMutations(transactions, payloadSource, payloadSourceKey)
-  }
-
-  public async runTransactionalMutation(
-    transaction: Services.TransactionalMutation,
-    payloadSource = Payloads.PayloadSource.LocalChanged,
-    payloadSourceKey?: string,
-  ): Promise<Models.SNItem | undefined> {
-    return this.itemManager.runTransactionalMutation(transaction, payloadSource, payloadSourceKey)
-  }
-
-  public async protectNote(note: Models.SNNote): Promise<Models.SNNote> {
-    const protectedNote = await this.protectionService.protectNote(note)
-    void this.syncService.sync()
-    return protectedNote
-  }
-
-  public async unprotectNote(note: Models.SNNote): Promise<Models.SNNote | undefined> {
-    const unprotectedNote = await this.protectionService.unprotectNote(note)
-    if (!Utils.isNullOrUndefined(unprotectedNote)) {
-      void this.syncService.sync()
-    }
-    return unprotectedNote
-  }
-
-  public async authorizeProtectedActionForNotes(
-    notes: Models.SNNote[],
-    challengeReason: Challenges.ChallengeReason,
-  ): Promise<Models.SNNote[]> {
-    return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason)
-  }
-
-  public async protectNotes(notes: Models.SNNote[]): Promise<Models.SNNote[]> {
-    const protectedNotes = await this.protectionService.protectNotes(notes)
-    void this.syncService.sync()
-    return protectedNotes
-  }
-
-  public async unprotectNotes(notes: Models.SNNote[]): Promise<Models.SNNote[]> {
-    const unprotectedNotes = await this.protectionService.unprotectNotes(notes)
-    void this.syncService.sync()
-    return unprotectedNotes
   }
 
   public getItems<T extends Models.SNItem>(
@@ -739,15 +521,6 @@ export class SNApplication implements Services.ListedClientInterface {
     return references as Models.SNItem[]
   }
 
-  public duplicateItem<T extends Models.SNItem>(
-    item: T,
-    additionalContent?: Partial<Payloads.PayloadContent>,
-  ): Promise<T> {
-    const duplicate = this.itemManager.duplicateItem<T>(item.uuid, false, additionalContent)
-    void this.sync.sync()
-    return duplicate
-  }
-
   public findTagByTitle(title: string): Models.SNTag | undefined {
     return this.itemManager.findTagByTitle(title)
   }
@@ -776,29 +549,6 @@ export class SNApplication implements Services.ListedClientInterface {
 
   public hasTagsNeedingFoldersMigration(): boolean {
     return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(this.itemManager)
-  }
-
-  /**
-   * Migrates any tags containing a '.' character to sa chema-based heirarchy, removing
-   * the dot from the tag's title.
-   */
-  public async migrateTagsToFolders(): Promise<unknown> {
-    await TagsToFoldersMigrationApplicator.run(this.itemManager)
-    return this.sync.sync()
-  }
-
-  /**
-   * Establishes a hierarchical relationship between two tags.
-   */
-  public async setTagParent(parentTag: Models.SNTag, childTag: Models.SNTag): Promise<void> {
-    await this.itemManager.setTagParent(parentTag, childTag)
-  }
-
-  /**
-   * Remove the tag parent.
-   */
-  public async unsetTagParent(childTag: Models.SNTag): Promise<void> {
-    await this.itemManager.unsetTagParent(childTag)
   }
 
   /**
@@ -835,15 +585,6 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   public getSortedTagsForNote(note: Models.SNNote): Models.SNTag[] {
     return this.itemManager.getSortedTagsForNote(note)
-  }
-
-  public async findOrCreateTag(title: string): Promise<Models.SNTag> {
-    return this.itemManager.findOrCreateTagByTitle(title)
-  }
-
-  /** Creates and returns the tag but does not run sync. Callers must perform sync. */
-  public async createTagOrSmartView(title: string): Promise<Models.SNTag | Models.SmartView> {
-    return this.itemManager.createTagOrSmartView(title)
   }
 
   public isSmartViewTitle(title: string): boolean {
@@ -884,20 +625,6 @@ export class SNApplication implements Services.ListedClientInterface {
       observer()
       Utils.removeFromArray(this.streamRemovers, observer)
     }
-  }
-
-  /**
-   * Activates or deactivates a component, depending on its
-   * current state, and syncs.
-   */
-  public async toggleComponent(component: Models.SNComponent): Promise<void> {
-    await this.componentManager.toggleComponent(component.uuid)
-    await this.syncService.sync()
-  }
-
-  public async toggleTheme(theme: Models.SNComponent): Promise<void> {
-    await this.componentManager.toggleTheme(theme.uuid)
-    await this.syncService.sync()
   }
 
   /**
@@ -1001,6 +728,13 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.protectionService.clearSession()
   }
 
+  public async authorizeProtectedActionForNotes(
+    notes: Models.SNNote[],
+    challengeReason: Services.ChallengeReason,
+  ): Promise<Models.SNNote[]> {
+    return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason)
+  }
+
   /**
    * @returns whether note access has been granted or not
    */
@@ -1033,106 +767,6 @@ export class SNApplication implements Services.ListedClientInterface {
     inContextOfItem?: UuidString,
   ): Promise<Responses.ListedAccountInfo | undefined> {
     return this.listedService.getListedAccountInfo(account, inContextOfItem)
-  }
-
-  /**
-   * @returns
-   * .affectedItems: Items that were either created or dirtied by this import
-   * .errorCount: The number of items that were not imported due to failure to decrypt.
-   */
-  public async importData(
-    data: Services.BackupFile,
-    awaitSync = false,
-  ): Promise<
-    | {
-        affectedItems: Models.SNItem[]
-        errorCount: number
-      }
-    | {
-        error: string
-      }
-    | undefined
-  > {
-    if (data.version) {
-      /**
-       * Prior to 003 backup files did not have a version field so we cannot
-       * stop importing if there is no backup file version, only if there is
-       * an unsupported version.
-       */
-      const version = data.version as Common.ProtocolVersion
-
-      const supportedVersions = this.protocolService.supportedVersions()
-      if (!supportedVersions.includes(version)) {
-        return { error: Services.UNSUPPORTED_BACKUP_FILE_VERSION }
-      }
-
-      const userVersion = await this.getUserVersion()
-      if (userVersion && Applications.compareVersions(version, userVersion) === 1) {
-        /** File was made with a greater version than the user's account */
-        return { error: Services.BACKUP_FILE_MORE_RECENT_THAN_ACCOUNT }
-      }
-    }
-
-    let password: string | undefined
-
-    if (data.auth_params || data.keyParams) {
-      /** Get import file password. */
-      const challenge = new Challenges.Challenge(
-        [
-          new Challenges.ChallengePrompt(
-            Challenges.ChallengeValidation.None,
-            Services.ImportStrings.FileAccountPassword,
-            undefined,
-            true,
-          ),
-        ],
-        Challenges.ChallengeReason.DecryptEncryptedFile,
-        true,
-      )
-      const passwordResponse = await this.challengeService.promptForChallengeResponse(challenge)
-      if (Utils.isNullOrUndefined(passwordResponse)) {
-        /** Challenge was canceled */
-        return
-      }
-      this.challengeService.completeChallenge(challenge)
-      password = passwordResponse?.values[0].value as string
-    }
-
-    if (!(await this.protectionService.authorizeFileImport())) {
-      return
-    }
-    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
-      data,
-      password,
-    )
-    const validPayloads = decryptedPayloads
-      .filter((payload) => {
-        return !payload.errorDecrypting && payload.format !== Payloads.PayloadFormat.EncryptedString
-      })
-      .map((payload) => {
-        /* Don't want to activate any components during import process in
-         * case of exceptions breaking up the import proccess */
-        if (payload.content_type === Common.ContentType.Component && payload.safeContent.active) {
-          return Payloads.CopyPayload(payload, {
-            content: {
-              ...payload.safeContent,
-              active: false,
-            },
-          })
-        } else {
-          return payload
-        }
-      })
-    const affectedUuids = await this.payloadManager.importPayloads(validPayloads)
-    const promise = this.sync.sync()
-    if (awaitSync) {
-      await promise
-    }
-    const affectedItems = this.getAll(affectedUuids) as Models.SNItem[]
-    return {
-      affectedItems: affectedItems,
-      errorCount: decryptedPayloads.length - validPayloads.length,
-    }
   }
 
   /**
@@ -1526,6 +1160,7 @@ export class SNApplication implements Services.ListedClientInterface {
     this.createActionsManager()
     this.createFileService()
     this.createIntegrityService()
+    this.createMutationService()
   }
 
   private clearServices() {
@@ -1555,6 +1190,7 @@ export class SNApplication implements Services.ListedClientInterface {
     ;(this.listedService as unknown) = undefined
     ;(this.fileService as unknown) = undefined
     ;(this.integrityService as unknown) = undefined
+    ;(this.mutationService as unknown) = undefined
 
     this.services = []
   }
@@ -1969,6 +1605,20 @@ export class SNApplication implements Services.ListedClientInterface {
       this.internalEventBus,
     )
     this.services.push(this.mfaService)
+  }
+
+  private createMutationService() {
+    this.mutationService = new Services.MutationService(
+      this.itemManager,
+      this.syncService,
+      this.protectionService,
+      this.protocolService,
+      this.payloadManager,
+      this.challengeService,
+      this.componentManager,
+      this.internalEventBus,
+    )
+    this.services.push(this.mutationService)
   }
 
   private getClass<T>(base: T) {

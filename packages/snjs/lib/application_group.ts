@@ -1,8 +1,13 @@
 import { RawStorageKey } from '@Lib/storage_keys'
 import { removeFromArray } from '@standardnotes/utils'
-import { DeinitSource, UuidString } from './types'
+import { UuidString, DeinitSource } from './Types'
 import { SNApplication } from './application'
-import { AbstractService, DeviceInterface, InternalEventBus, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  DeviceInterface,
+  InternalEventBus,
+  InternalEventBusInterface,
+} from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
 
 export type ApplicationDescriptor = {

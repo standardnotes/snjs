@@ -13,9 +13,9 @@ import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { ContentType } from '@standardnotes/common'
 import { UuidGenerator, extendArray } from '@standardnotes/utils'
 import { SNComponent } from '../../Models/Component/Component'
-import { ComponentMutator } from "../../Models/Component/ComponentMutator"
+import { ComponentMutator } from '../../Models/Component/ComponentMutator'
 import { ComponentArea } from '@standardnotes/features'
-import { MutationType } from "../../Models/Item/MutationType"
+import { MutationType } from '../../Models/Item/MutationType'
 
 function NoteDuplicationAffectedPayloads(
   basePayload: PurePayload,
@@ -35,7 +35,7 @@ function NoteDuplicationAffectedPayloads(
     return undefined
   }
   /** Modify the editor to include new note */
-  const mutator = new ComponentMutator(editor, MutationType.Internal)
+  const mutator = new ComponentMutator(editor, MutationType.NoUpdateUserTimestamps)
   mutator.associateWithItem(duplicatePayload.uuid)
   const result = mutator.getResult()
   return [result]

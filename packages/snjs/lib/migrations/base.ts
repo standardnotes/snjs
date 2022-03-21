@@ -1,8 +1,12 @@
 import { SNLog } from '@Lib/log'
 import { CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
-import { ChallengeReason, ChallengeValidation } from './../challenges'
+import {
+  ChallengeValidation,
+  ChallengeReason,
+  Challenge,
+  ChallengePrompt,
+} from '../services/Challenge'
 import { KeychainRecoveryStrings, SessionStrings } from '../services/Api/Messages'
-import { Challenge, ChallengePrompt } from '@Lib/challenges'
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from './../version'
 import { Migration } from '@Lib/migrations/migration'
 import { RawStorageKey, namespacedKey } from '@Lib/storage_keys'
@@ -73,10 +77,7 @@ export class BaseMigration extends Migration {
         await this.services.deviceInterface.setRawStorageValue(storageKey, PreviousSnjsVersion1_0_0)
       } else {
         /** Coming from 2.0.0 (which did not store version) OR is brand new application */
-        const migrationKey = namespacedKey(
-          this.services!.identifier,
-          LastMigrationTimeStampKey2_0_0,
-        )
+        const migrationKey = namespacedKey(this.services.identifier, LastMigrationTimeStampKey2_0_0)
         const migrationValue = await this.services.deviceInterface.getRawStorageValue(migrationKey)
         const is_2_0_0_application = !isNullOrUndefined(migrationValue)
         if (is_2_0_0_application) {
@@ -240,7 +241,7 @@ export class BaseMigration extends Migration {
           }
         },
       })
-      this.services.challengeService.promptForChallengeResponse(challenge)
+      void this.services.challengeService.promptForChallengeResponse(challenge)
     })
   }
 }

@@ -13,9 +13,15 @@ import { KeyRecoveryStrings } from './Api/Messages'
 import { SNStorageService, StorageValueModes } from './StorageService'
 import { SNRootKeyParams } from '../protocol/key_params'
 import { PayloadManager } from './PayloadManager'
-import { Challenge, ChallengePrompt, ChallengeReason, ChallengeValidation } from '../challenges'
+import {
+  Challenge,
+  ChallengeValidation,
+  ChallengeReason,
+  ChallengePrompt,
+  ChallengeService,
+} from './Challenge'
+
 import { SNAlertService } from './AlertService'
-import { ChallengeService } from './Challenge/ChallengeService'
 import { SNRootKey } from '@Protocol/root_key'
 import { SNProtocolService } from '@Lib/services/ProtocolService'
 import { SNApiService } from '@Lib/services/Api/ApiService'
@@ -25,7 +31,7 @@ import { ApplicationStage, leftVersionGreaterThanOrEqualToRight } from '@standar
 import { ItemManager } from './Items/ItemManager'
 import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
 import { KeyParamsFromApiResponse } from '@Lib/protocol/key_params'
-import { UuidString } from '@Lib/types'
+import { UuidString } from '@Lib/Types/UuidString'
 import { KeyParamsResponse } from '@standardnotes/responses'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
@@ -110,10 +116,10 @@ export class SNKeyRecoveryService extends AbstractService {
           .concat(inserted)
           .filter((k) => k.errorDecrypting) as SNItemsKey[]
         if (changedOrInserted.length > 0) {
-          this.handleUndecryptableItemsKeys(changedOrInserted)
+          void this.handleUndecryptableItemsKeys(changedOrInserted)
         }
         if (ignored.length > 0) {
-          this.handleIgnoredItemsKeys(ignored as SNItemsKey[])
+          void this.handleIgnoredItemsKeys(ignored as SNItemsKey[])
         }
       },
     )
@@ -135,9 +141,9 @@ export class SNKeyRecoveryService extends AbstractService {
   }
 
   async handleApplicationStage(stage: ApplicationStage) {
-    super.handleApplicationStage(stage)
+    void super.handleApplicationStage(stage)
     if (stage === ApplicationStage.LoadedDatabase_12) {
-      this.processPersistedUndecryptables()
+      void this.processPersistedUndecryptables()
     }
   }
 
@@ -169,7 +175,7 @@ export class SNKeyRecoveryService extends AbstractService {
     this.addKeysToQueue(keys, (key, result) => {
       if (result.success) {
         /** If it succeeds, remove the key from isolated storage. */
-        this.removeFromUndecryptables(key)
+        void this.removeFromUndecryptables(key)
       }
     })
 
@@ -253,7 +259,7 @@ export class SNKeyRecoveryService extends AbstractService {
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
     const signInResponse = await this.userService.correctiveSignIn(rootKey)
     if (!signInResponse.error) {
-      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
+      void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
       return rootKey
     } else {
       await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword)
@@ -333,13 +339,13 @@ export class SNKeyRecoveryService extends AbstractService {
       }
     }
     while (queueItem) {
-      this.popQueueItem(queueItem)
-      await queueItem.promise!
+      void this.popQueueItem(queueItem)
+      await queueItem.promise
       /** Always start from the beginning */
       queueItem = this.decryptionQueue[0]
     }
 
-    this.queuePromise.then(async () => {
+    void this.queuePromise.then(async () => {
       this.isProcessingQueue = false
       if (this.serverParams) {
         const latestClientParams = (await this.getClientKeyParams())!
@@ -354,7 +360,7 @@ export class SNKeyRecoveryService extends AbstractService {
         }
       }
       if (this.syncService.isOutOfSync()) {
-        this.syncService.sync({ checkIntegrity: true })
+        void this.syncService.sync({ checkIntegrity: true })
       }
     })
   }
@@ -456,12 +462,12 @@ export class SNKeyRecoveryService extends AbstractService {
       rootKey,
     )
     const allRelevantKeyPayloads = additionalKeys.concat(decryptedMatching)
-    this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadSource.DecryptedTransient)
+    void this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadSource.DecryptedTransient)
     await this.storageService.savePayloads(allRelevantKeyPayloads)
     if (replacesRootKey) {
-      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
+      void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
     } else {
-      this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered)
+      void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered)
     }
     return matching
   }
