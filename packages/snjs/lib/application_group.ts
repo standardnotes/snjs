@@ -74,7 +74,7 @@ export class SNApplicationGroup extends AbstractService {
     const descriptorRecord: DescriptorRecord = {
       [identifier]: {
         identifier: identifier,
-        label: 'Main Application',
+        label: 'Main Workspace',
         primary: true,
       },
     }
@@ -210,7 +210,7 @@ export class SNApplicationGroup extends AbstractService {
     const index = this.getDescriptors().length + 1
     const descriptor: ApplicationDescriptor = {
       identifier: identifier,
-      label: label || `Application ${index}`,
+      label: label || `Workspace ${index}`,
       primary: false,
     }
     const application = this.buildApplication(descriptor)
