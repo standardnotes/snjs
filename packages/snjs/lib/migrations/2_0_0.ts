@@ -4,7 +4,7 @@ import { PreviousSnjsVersion2_0_0 } from './../version'
 import { LegacyKeys1_0_0, NonwrappedStorageKey } from './../storage_keys'
 import { JwtSession } from '../services/Api/Session'
 import { ContentType } from '@standardnotes/common'
-import { SNItemsKey } from '../models/ItemsKey/ItemsKey'
+import { SNItemsKey } from '../Models/ItemsKey/ItemsKey'
 import { RootKeyContent, SNRootKey } from './../protocol/root_key'
 import { ProtocolVersion } from '@standardnotes/common'
 import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications'
@@ -28,7 +28,7 @@ import {
   UuidGenerator,
 } from '@standardnotes/utils'
 import { ValueModesKeys } from '@Lib/services/StorageService'
-import { CreateItemFromPayload } from '../models'
+import { CreateItemFromPayload } from '../Models'
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/platforms'
 
 type LegacyMobileKeychainStructure =

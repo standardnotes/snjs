@@ -12,7 +12,7 @@ import {
   PayloadSource,
   FillItemContent,
 } from '@standardnotes/payloads'
-import { Uuids } from '@Lib/models/Functions'
+import { Uuids } from '@Lib/Models/Functions'
 import { SNProtocolOperator004 } from '../protocol/operator/004/operator_004'
 import { SNProtocolOperator003 } from '../protocol/operator/003/operator_003'
 import { SNProtocolOperator002 } from '../protocol/operator/002/operator_002'
@@ -20,9 +20,9 @@ import { SNProtocolOperator001 } from '../protocol/operator/001/operator_001'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { EncryptionDelegate } from './EncryptionDelegate'
 import { SyncEvent } from '@Lib/events'
-import { CreateItemFromPayload } from '@Lib/models/Generator'
-import { SNItemsKey } from '@Lib/models/ItemsKey/ItemsKey'
-import { ItemsKeyMutator } from "@Lib/models/ItemsKey/ItemsKeyMutator"
+import { CreateItemFromPayload } from '@Lib/Models/Generator'
+import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
+import { ItemsKeyMutator } from "@Lib/Models/ItemsKey/ItemsKeyMutator"
 import { CreateAnyKeyParams, SNRootKeyParams } from '../protocol/key_params'
 import { SNStorageService } from './StorageService'
 import { SNRootKey } from '@Protocol/root_key'

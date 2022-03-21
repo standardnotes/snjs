@@ -26,7 +26,7 @@ import { SNStorageService, StoragePersistencePolicies } from '@Lib/services/Stor
 import { SNSyncService } from '../Sync/SyncService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Api/SessionManager'
 import { ChallengeService } from '../Challenge/ChallengeService'
-import { SNItemsKey } from '@Lib/models'
+import { SNItemsKey } from '@Lib/Models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { UserClientInterface } from './UserClientInterface'
 import { AccountDeleted } from '@Lib/strings/Info'

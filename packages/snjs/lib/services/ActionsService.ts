@@ -1,7 +1,7 @@
 import { ChallengeService } from './Challenge/ChallengeService'
 import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from '../challenges'
 import { ListedService } from './Listed/ListedService'
-import { CreateItemFromPayload } from '@Lib/models/Generator'
+import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { EncryptionIntent } from '@standardnotes/applications'
@@ -12,10 +12,10 @@ import {
   SNActionsExtension,
   Action,
   ActionAccessType,
-} from '../models/ActionsExtension/ActionsExtension'
-import { ActionsExtensionMutator } from '../models/ActionsExtension/ActionsExtensionMutator'
-import { SNItem } from '@Lib/models/Item/Item'
-import { MutationType } from '@Lib/models/Item/MutationType'
+} from '../Models/ActionsExtension/ActionsExtension'
+import { ActionsExtensionMutator } from '../Models/ActionsExtension/ActionsExtensionMutator'
+import { SNItem } from '@Lib/Models/Item/Item'
+import { MutationType } from '@Lib/Models/Item/MutationType'
 import { SNSyncService } from './Sync/SyncService'
 import { SNProtocolService } from './ProtocolService'
 import { PayloadManager } from './PayloadManager'

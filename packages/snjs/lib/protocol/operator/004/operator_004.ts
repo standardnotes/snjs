@@ -1,5 +1,5 @@
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
-import { CreateItemFromPayload } from '@Lib/models/Generator'
+import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,
@@ -11,7 +11,7 @@ import {
   FillItemContent,
   CreateMaxPayloadFromAnyObject,
 } from '@standardnotes/payloads'
-import { SNItemsKey } from '@Lib/models/ItemsKey/ItemsKey'
+import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { Create004KeyParams, SNRootKeyParams } from './../../key_params'
 import { V004Algorithm } from './../algorithms'
 import { ItemsKeyContent, SynchronousOperator } from './../operator'

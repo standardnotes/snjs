@@ -1,4 +1,4 @@
-import { Uuids } from '@Lib/models/Functions'
+import { Uuids } from '@Lib/Models/Functions'
 import { SNLog } from './../../../log'
 import { PayloadsDelta } from '@Payloads/deltas/delta'
 import { ConflictDelta } from '@Payloads/deltas/conflict'

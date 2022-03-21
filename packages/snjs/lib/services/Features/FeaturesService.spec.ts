@@ -1,5 +1,5 @@
-import { SNFeatureRepo } from '../../models/FeatureRepo/FeatureRepo'
-import { SNComponent } from '@Lib/models/Component/Component'
+import { SNFeatureRepo } from '../../Models/FeatureRepo/FeatureRepo'
+import { SNComponent } from '@Lib/Models/Component/Component'
 import { SNSyncService } from '../Sync/SyncService'
 import { SettingName } from '@standardnotes/settings'
 import {

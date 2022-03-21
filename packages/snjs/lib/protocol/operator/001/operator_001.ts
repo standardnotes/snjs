@@ -1,5 +1,5 @@
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
-import { CreateItemFromPayload } from '@Lib/models/Generator'
+import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { SNLog } from './../../../log'
 import {
   ItemAuthenticatedData,
@@ -12,7 +12,7 @@ import {
   CreateMaxPayloadFromAnyObject,
   PayloadFormat,
 } from '@standardnotes/payloads'
-import { SNItemsKey } from '@Lib/models/ItemsKey/ItemsKey'
+import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { Create001KeyParams, SNRootKeyParams } from './../../key_params'
 import { ItemsKeyContent, AsynchronousOperator } from './../operator'
 import { SNRootKey } from '@Protocol/root_key'

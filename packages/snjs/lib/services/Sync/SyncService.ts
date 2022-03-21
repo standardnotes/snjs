@@ -1,12 +1,12 @@
-import { SNItemsKey } from '@Lib/models/ItemsKey/ItemsKey'
+import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { SNHistoryManager } from '../History/HistoryManager'
 import { StorageKey } from '@Lib/storage_keys'
 import { UuidString } from '../../types'
 import { ApplicationSyncOptions } from '../../options'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SyncResponse } from '@Lib/services/Sync/Response'
-import { SNItem } from '@Lib/models/Item/Item'
-import { MutationType } from "@Lib/models/Item/MutationType"
+import { SNItem } from '@Lib/Models/Item/Item'
+import { MutationType } from "@Lib/Models/Item/MutationType"
 import {
   PurePayload,
   PayloadField,
@@ -30,8 +30,8 @@ import { OfflineSyncOperation } from '@Lib/services/Sync/Offline/Operation'
 import { DeltaOutOfSync } from '@Payloads/deltas'
 import { ContentType } from '@standardnotes/common'
 import { EncryptionIntent } from '@standardnotes/applications'
-import { CreateItemFromPayload } from '@Lib/models/Generator'
-import { Uuids } from '@Lib/models/Functions'
+import { CreateItemFromPayload } from '@Lib/Models/Generator'
+import { Uuids } from '@Lib/Models/Functions'
 import { SyncSignal, SyncStats } from '@Lib/services/Sync/Signals'
 import { SNSessionManager } from '../Api/SessionManager'
 import { SNApiService } from '../Api/ApiService'

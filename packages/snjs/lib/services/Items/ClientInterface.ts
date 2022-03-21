@@ -1,4 +1,4 @@
-import { SNNote, SNFile, SNTag } from '@Lib/models'
+import { SNNote, SNFile, SNTag } from '@Lib/Models'
 
 export interface ItemsClientInterface {
   associateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>

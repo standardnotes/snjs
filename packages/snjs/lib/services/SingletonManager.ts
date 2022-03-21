@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
-import { SNItem, SingletonStrategy } from '@Lib/models/Item/Item'
+import { SNItem, SingletonStrategy } from '@Lib/Models/Item/Item'
 import {
   arrayByRemovingFromIndex,
   extendArray,
@@ -13,7 +13,7 @@ import {
   PredicateInterface,
 } from '@standardnotes/payloads'
 import { SNSyncService } from './Sync/SyncService'
-import { Uuids } from '@Lib/models/Functions'
+import { Uuids } from '@Lib/Models/Functions'
 import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 
 /**

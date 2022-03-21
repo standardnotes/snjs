@@ -1,5 +1,5 @@
 import * as Payloads from '@standardnotes/payloads'
-import * as Models from '@Lib/models'
+import * as Models from '@Lib/Models'
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view'
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria'
 import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'

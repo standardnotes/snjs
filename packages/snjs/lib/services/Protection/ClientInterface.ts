@@ -1,5 +1,5 @@
 import { ChallengeReason } from '@Lib/challenges'
-import { SNFile } from '@Lib/models'
+import { SNFile } from '@Lib/Models'
 
 export interface ProtectionsClientInterface {
   protectFile(file: SNFile): Promise<SNFile>
