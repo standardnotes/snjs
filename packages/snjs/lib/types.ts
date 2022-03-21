@@ -74,6 +74,7 @@ export type IconType =
   | 'file-mov'
   | 'file-music'
   | 'file-zip'
+  | 'files-illustration'
   | 'folder-filled'
   | 'folder-key-filled'
   | 'folder'
