@@ -39,7 +39,7 @@ export interface ItemsClientInterface {
 
   getDisplayableItems<T extends SNItem>(contentType: ContentType): T[]
 
-  getItems<T extends SNItem>(contentType: ContentType | ContentType[], nonerroredOnly: boolean): T[]
+  getItems<T extends SNItem>(contentType: ContentType | ContentType[], nonerroredOnly?: boolean): T[]
 
   notesMatchingSmartView(view: SmartView): SNNote[]
 
