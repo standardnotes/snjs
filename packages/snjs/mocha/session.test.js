@@ -565,7 +565,7 @@ describe('server session', function () {
 
     /** Expect appA session to still be valid */
     await appA.sync.sync()
-    expect(appA.findItem(note.uuid)).to.be.ok
+    expect(appA.items.findItem(note.uuid)).to.be.ok
 
     await Factory.safeDeinit(appA)
     await Factory.safeDeinit(appB)

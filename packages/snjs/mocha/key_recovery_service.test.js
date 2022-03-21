@@ -209,8 +209,8 @@ describe('key recovery service', function () {
     expect(aKey.compare(bKey)).to.equal(true)
 
     /** Expect appB note to be decrypted */
-    expect(appA.findItem(note.uuid).errorDecrypting).to.not.be.ok
-    expect(appB.findItem(note.uuid).errorDecrypting).to.not.be.ok
+    expect(appA.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
+    expect(appB.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
 
     expect(appA.syncService.isOutOfSync()).to.equal(false)
     expect(appB.syncService.isOutOfSync()).to.equal(false)
@@ -257,7 +257,7 @@ describe('key recovery service', function () {
 
     /** We expect the item in appA to be errored at this point, but we do not want it to recover */
     await appA.sync.sync()
-    expect(appA.findItem(note.uuid).waitingForKey).to.equal(true)
+    expect(appA.items.findItem(note.uuid).waitingForKey).to.equal(true)
     console.warn('Expecting exceptions below as we destroy app during key recovery')
     await Factory.safeDeinit(appA)
     await Factory.safeDeinit(appB)
@@ -266,8 +266,8 @@ describe('key recovery service', function () {
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} })
     await recreatedAppA.launch(true)
 
-    expect(recreatedAppA.findItem(note.uuid).errorDecrypting).to.equal(true)
-    expect(recreatedAppA.findItem(note.uuid).waitingForKey).to.equal(true)
+    expect(recreatedappA.items.findItem(note.uuid).errorDecrypting).to.equal(true)
+    expect(recreatedappA.items.findItem(note.uuid).waitingForKey).to.equal(true)
     await Factory.safeDeinit(recreatedAppA)
   })
 
@@ -457,7 +457,7 @@ describe('key recovery service', function () {
     const latestUndecryptables = await recreatedApp.keyRecoveryService.getUndecryptables()
     expect(Object.keys(latestUndecryptables).length).to.equal(0)
 
-    const latestItemsKey = recreatedApp.findItem(itemsKey.uuid)
+    const latestItemsKey = recreatedApp.items.findItem(itemsKey.uuid)
     expect(latestItemsKey.errorDecrypting).to.not.be.ok
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
 
