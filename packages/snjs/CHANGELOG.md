@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.89.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.89.1...@standardnotes/snjs@2.89.2) (2022-03-21)
+
+
+### Bug Fixes
+
+* pass mutation type instead of undefined ([#667](https://github.com/standardnotes/snjs/issues/667)) ([2288896](https://github.com/standardnotes/snjs/commit/2288896d38fd14ea98698b3d85850bac86e54321))
+
+
+
+
+
 ## [2.89.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.89.0...@standardnotes/snjs@2.89.1) (2022-03-21)
 
 **Note:** Version bump only for package @standardnotes/snjs
