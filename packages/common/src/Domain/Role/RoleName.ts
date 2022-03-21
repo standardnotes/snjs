@@ -4,5 +4,4 @@ export enum RoleName {
   CoreUser = 'CORE_USER',
   PlusUser = 'PLUS_USER',
   ProUser = 'PRO_USER',
-  DemoUser = 'DEMO_USER'
 }
