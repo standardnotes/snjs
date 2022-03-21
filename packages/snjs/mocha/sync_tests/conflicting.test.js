@@ -868,7 +868,7 @@ describe('online conflict handling', function () {
     Factory.handlePasswordChallenges(newApp, password)
     await newApp.mutator.importData(backupFile, true)
     const newTag = newApp.itemManager.tags[0]
-    const notes = newApp.items.referencesForItem(newTag)
+    const notes = newApp.items.referencesForItem(newTag.uuid)
     expect(notes.length).to.equal(2)
     await Factory.safeDeinit(newApp)
   }).timeout(10000)

@@ -13,7 +13,6 @@
   <script src="../../../node_modules/sinon/pkg/sinon.js"></script>
   <script src="../dist/snjs.js"></script>
   <script>
-
     const urlParams = new URLSearchParams(window.location.search);
     const syncServerHostName = urlParams.get('sync_server_host_name') ?? 'syncing-server-proxy';
     const bail = urlParams.get('bail') === 'false' ? false : true;
@@ -22,9 +21,11 @@
 
     Object.assign(window, SNCrypto);
     Object.assign(window, SNLibrary);
+
     SNLog.onLog = (message) => {
       console.log(message);
     };
+
     SNLog.onError = (error) => {
       console.error(error);
     };
