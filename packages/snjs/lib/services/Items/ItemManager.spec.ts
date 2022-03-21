@@ -620,14 +620,6 @@ describe('itemManager', () => {
     expect(view).toBeDefined()
   })
 
-  describe('changing items', () => {
-    it('pinning a note should not modify its user modified date', async () => {
-      const note = createNote('hello')
-      itemManager = createService()
-      await itemManager.changeItem(note.uuid, )
-    })
-  })
-
   describe('files', () => {
     it('associates with note', async () => {
       itemManager = createService()
