@@ -1,8 +1,8 @@
 import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
-import { ConflictStrategy } from './../../protocol/payloads/deltas/strategies'
+import { ConflictStrategy } from '../../protocol/payloads/deltas/strategies'
 import { HistoryEntry } from '../../services/History/Entries/HistoryEntry'
 import { PurePayload } from '@standardnotes/payloads'
-import { ItemMutator, SNItem } from '@Lib/models/app/item'
+import { SNItem } from '@Lib/models/Item/Item'
 
 export enum ActionAccessType {
   Encrypted = 'encrypted',
@@ -77,20 +77,4 @@ export class SNActionsExtension extends SNItem {
   }
 }
 
-export class ActionsExtensionMutator extends ItemMutator {
-  set description(description: string) {
-    this.content!.description = description
-  }
 
-  set supported_types(supported_types: string[]) {
-    this.content!.supported_types = supported_types
-  }
-
-  set actions(actions: Action[]) {
-    this.content!.actions = actions
-  }
-
-  set deprecation(deprecation: string | undefined) {
-    this.content!.deprecation = deprecation
-  }
-}

@@ -8,7 +8,7 @@ import { StorageKey } from '@Lib/storage_keys'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ApplicationStage } from '@standardnotes/applications'
 import { ItemManager } from '../Items/ItemManager'
-import { Uuids } from '@Lib/models/functions'
+import { Uuids } from '@Lib/models/Functions'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { ProtectionsClientInterface } from './ClientInterface'
 

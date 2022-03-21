@@ -8,7 +8,7 @@ import {
 } from '@standardnotes/payloads'
 import { DeltaFileImport } from '../protocol/payloads/deltas/file_import'
 import { ContentType } from '@standardnotes/common'
-import { Uuids } from '@Models/functions'
+import { Uuids } from '@Lib/models/Functions'
 import { UuidString } from '../types'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 

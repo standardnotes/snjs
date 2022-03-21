@@ -1,7 +1,7 @@
 import { AppDataField } from '@standardnotes/applications'
-import { ItemMutator, SNItem } from '@Lib/models/Items/item'
+import { SNItem } from '@Lib/models/Item/Item'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
-import { SNComponent } from '@Lib/models/Items/component'
+import { SNComponent } from '@Lib/models/Component/Component'
 import { ComponentArea } from '@standardnotes/features'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 
@@ -44,24 +44,4 @@ export class SNTheme extends SNComponent {
   }
 }
 
-export class ThemeMutator extends ItemMutator {
-  setMobileRules(rules: any) {
-    this.setAppDataItem(AppDataField.MobileRules, rules)
-  }
 
-  setNotAvailOnMobile(notAvailable: boolean) {
-    this.setAppDataItem(AppDataField.NotAvailableOnMobile, notAvailable)
-  }
-
-  set local_url(local_url: string) {
-    this.content!.local_url = local_url
-  }
-
-  /**
-   * We must not use .active because if you set that to true, it will also
-   * activate that theme on desktop/web
-   */
-  setMobileActive(active: boolean) {
-    this.setAppDataItem(AppDataField.MobileActive, active)
-  }
-}

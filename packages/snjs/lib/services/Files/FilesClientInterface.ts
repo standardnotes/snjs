@@ -1,5 +1,5 @@
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
-import { SNFile, FileMetadata } from '../../models/Items/file'
+import { SNFile, FileMetadata } from '../../models/File/File'
 import { ClientDisplayableError } from '@Lib/strings/ClientError'
 
 export interface FilesClientInterface {

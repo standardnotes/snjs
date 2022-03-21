@@ -7,7 +7,7 @@ import {
   PayloadField,
 } from '@standardnotes/payloads'
 import { historyMapFunctions } from '../../../services/History/HistoryMap'
-import { CreateItemFromPayload } from '@Models/generator'
+import { CreateItemFromPayload } from '@Lib/models/Generator'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import { PayloadContentsEqual, PayloadsByDuplicating } from '@Payloads/functions'
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils'

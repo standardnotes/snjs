@@ -1,4 +1,4 @@
-import { ItemMutator, SNItem } from '@Lib/models/app/item'
+import { SNItem } from '@Lib/models/Item/Item'
 import { CollectionSort, Predicate, PredicateInterface } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
 import { FeatureIdentifier } from '@standardnotes/features'
@@ -67,8 +67,4 @@ export class SNUserPrefs extends SNItem {
   }
 }
 
-export class UserPrefsMutator extends ItemMutator {
-  setPref<K extends PrefKey>(key: K, value: PrefValue[K]): void {
-    this.setAppDataItem(key, value)
-  }
-}
+

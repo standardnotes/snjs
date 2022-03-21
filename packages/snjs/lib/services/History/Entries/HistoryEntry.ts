@@ -1,4 +1,4 @@
-import { SNItem } from '@Lib/models/Items/item'
+import { SNItem } from '@Lib/models/Item/Item'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { CopyPayload, SurePayload } from '@standardnotes/payloads'
 import { CreateItemFromPayload } from '@Lib/models'

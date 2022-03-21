@@ -1,7 +1,7 @@
 import { ChallengeService } from './Challenge/ChallengeService'
 import { Challenge, ChallengePrompt, ChallengeValidation, ChallengeReason } from '../challenges'
 import { ListedService } from './Listed/ListedService'
-import { CreateItemFromPayload } from '@Models/generator'
+import { CreateItemFromPayload } from '@Lib/models/Generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { EncryptionIntent } from '@standardnotes/applications'
@@ -9,19 +9,24 @@ import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { SNRootKey } from '@Protocol/root_key'
 import {
-  ActionsExtensionMutator,
   SNActionsExtension,
   Action,
   ActionAccessType,
-} from '../models/Items/extension'
-import { MutationType, SNItem } from '@Lib/models/Items/item'
+} from '../models/ActionsExtension/ActionsExtension'
+import { ActionsExtensionMutator } from '../models/ActionsExtension/ActionsExtensionMutator'
+import { SNItem } from '@Lib/models/Item/Item'
+import { MutationType } from '@Lib/models/Item/MutationType'
 import { SNSyncService } from './Sync/SyncService'
 import { SNProtocolService } from './ProtocolService'
 import { PayloadManager } from './PayloadManager'
 import { SNHttpService } from './Api/HttpService'
 import { SNAlertService } from './AlertService'
 
-import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  DeviceInterface,
+  InternalEventBusInterface,
+} from '@standardnotes/services'
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.

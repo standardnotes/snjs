@@ -1,5 +1,5 @@
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
-import { ItemMutator, SNItem } from '@Lib/models/Items/item'
+import { SNItem } from '@Lib/models/Item/Item'
 import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
 import { ProtocolVersion } from '@standardnotes/common'
 
@@ -40,8 +40,4 @@ export class SNItemsKey extends SNItem {
   }
 }
 
-export class ItemsKeyMutator extends ItemMutator {
-  set isDefault(isDefault: boolean) {
-    this.content!.isDefault = isDefault
-  }
-}
+

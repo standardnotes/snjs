@@ -1,11 +1,7 @@
-import { ContentType } from '@standardnotes/common'
-import { SNNote } from './note'
-import { ItemMutator, SNItem } from '@Lib/models/Items/item'
+import { SNItem } from '@Lib/models/Item/Item'
 import {
-  ContenteReferenceType,
   PayloadContent,
   PurePayload,
-  FileToNoteReference,
 } from '@standardnotes/payloads'
 
 export enum FileProtocolV1Constants {
@@ -33,7 +29,7 @@ export interface FileContent extends FileMetadata {
   mimeType: string
 }
 
-type ExtendedFileContent = FileContent & PayloadContent
+export type ExtendedFileContent = FileContent & PayloadContent
 
 export class SNFile extends SNItem implements ExtendedFileContent, FileProtocolV1, FileMetadata {
   public readonly remoteIdentifier: string
@@ -60,33 +56,4 @@ export class SNFile extends SNItem implements ExtendedFileContent, FileProtocolV
   }
 }
 
-export class FileMutator extends ItemMutator {
-  get typedContent(): Partial<ExtendedFileContent> {
-    return this.content as Partial<ExtendedFileContent>
-  }
 
-  set name(newName: string) {
-    this.typedContent.name = newName
-  }
-
-  set encryptionHeader(encryptionHeader: string) {
-    this.typedContent.encryptionHeader = encryptionHeader
-  }
-
-  public associateWithNote(note: SNNote): void {
-    const reference: FileToNoteReference = {
-      reference_type: ContenteReferenceType.FileToNote,
-      content_type: ContentType.Note,
-      uuid: note.uuid,
-    }
-
-    const references = this.typedContent.references || []
-    references.push(reference)
-    this.typedContent.references = references
-  }
-
-  public disassociateWithNote(note: SNNote): void {
-    const references = this.item.references.filter((ref) => ref.uuid !== note.uuid)
-    this.typedContent.references = references
-  }
-}

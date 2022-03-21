@@ -1,6 +1,6 @@
 import { splitString } from '@standardnotes/utils'
-import { CreateItemFromPayload } from '@Models/generator'
-import { SNItemsKey } from '@Lib/models/Items/items_key'
+import { CreateItemFromPayload } from '@Lib/models/Generator'
+import { SNItemsKey } from '@Lib/models/ItemsKey/ItemsKey'
 import { ItemsKeyContent } from './../operator'
 import { SNRootKey } from './../../root_key'
 import { V003Algorithm } from './../algorithms'

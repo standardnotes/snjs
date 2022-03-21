@@ -1,4 +1,4 @@
-import { CreateItemFromPayload } from '@Models/generator'
+import { CreateItemFromPayload } from '@Lib/models/Generator'
 import {
   lastElement,
   splitString,
@@ -17,7 +17,7 @@ import {
   FillItemContent,
 } from '@standardnotes/payloads'
 import { ItemsKeyContent } from './../operator'
-import { SNItemsKey } from '@Lib/models/Items/items_key'
+import { SNItemsKey } from '@Lib/models/ItemsKey/ItemsKey'
 import { Create002KeyParams, SNRootKeyParams } from './../../key_params'
 import { V002Algorithm } from './../algorithms'
 import { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001'

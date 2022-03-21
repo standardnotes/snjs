@@ -1,4 +1,4 @@
-import { SNItemsKey } from '@Lib/models/Items/items_key'
+import { SNItemsKey } from '@Lib/models/ItemsKey/ItemsKey'
 import { SNRootKey } from '@Protocol/root_key'
 import { EncryptionIntent } from '@standardnotes/applications'
 import { PurePayload } from '@standardnotes/payloads'

@@ -1,6 +1,6 @@
 import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
-import { SNComponent } from '@Lib/models/Items/component'
+import { SNComponent } from '@Lib/models/Component/Component'
 
 describe('component model', () => {
   it('valid hosted url should ignore url', () => {

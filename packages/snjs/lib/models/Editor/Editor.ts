@@ -1,6 +1,6 @@
 import { PurePayload } from '@standardnotes/payloads'
-import { SNItem } from '@Lib/models/Items/item'
-import { SNNote } from './note'
+import { SNItem } from '@Lib/models/Item/Item'
+import { SNNote } from '../Note/Note'
 
 /**
  * @deprecated

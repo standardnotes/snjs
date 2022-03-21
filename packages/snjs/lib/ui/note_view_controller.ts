@@ -1,5 +1,5 @@
 import { removeFromArray } from '@standardnotes/utils'
-import { SNItem } from '@Lib/models/Items/item'
+import { SNItem } from '@Lib/models/Item/Item'
 import { ContentType } from '@standardnotes/common'
 import { SNTag } from '@Lib/index'
 import { PayloadSource } from '@standardnotes/payloads'
