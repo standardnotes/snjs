@@ -16,8 +16,8 @@ const getFilteredNotes = (application, { views }) => {
     views,
     includePinned: true,
   })
-  application.setNotesDisplayCriteria(criteria)
-  const notes = application.getDisplayableItems(ContentType.Note)
+  application.items.setNotesDisplayCriteria(criteria)
+  const notes = application.items.getDisplayableItems(ContentType.Note)
   return notes
 }
 

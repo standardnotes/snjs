@@ -314,7 +314,7 @@ describe('online conflict handling', function () {
     await this.application.syncService.clearSyncPositionTokens()
     await this.application.syncService.sync(syncOptions)
 
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     // We expect the item title to be the new title, and not rolled back to original value
     expect(note.content.title).to.equal(newTitle)
 
@@ -479,7 +479,7 @@ describe('online conflict handling', function () {
     let note = await Factory.createMappedNote(this.application)
     await this.application.itemManager.setItemDirty(note.uuid)
     await this.application.syncService.sync(syncOptions)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
     this.expectedItemCount++
     /** First modify the item without saving so that
@@ -595,7 +595,7 @@ describe('online conflict handling', function () {
     })
 
     await this.application.itemManager.setItemDirty(userPrefs.uuid)
-    userPrefs = this.application.findItem(userPrefs.uuid)
+    userPrefs = this.application.items.findItem(userPrefs.uuid)
 
     expect(this.application.itemManager.itemsReferencingItem(userPrefs.uuid).length).to.equal(1)
     expect(this.application.itemManager.itemsReferencingItem(userPrefs.uuid)).to.include(tag)
@@ -732,7 +732,7 @@ describe('online conflict handling', function () {
 
     /** Expect that no duplicates have been created, and that the note's title is now finalTitle */
     expect(this.application.itemManager.notes.length).to.equal(1)
-    const finalNote = this.application.findItem(note.uuid)
+    const finalNote = this.application.items.findItem(note.uuid)
     expect(finalNote.title).to.equal(finalTitle)
     await this.sharedFinalAssertions()
   })
@@ -771,7 +771,7 @@ describe('online conflict handling', function () {
     /**
      * Expect that the final result is just 1 note that is not errored
      */
-    const resultNote = await this.application.findItem(note.uuid)
+    const resultNote = await this.application.items.findItem(note.uuid)
     expect(resultNote.errorDecrypting).to.not.be.ok
     expect(this.application.itemManager.notes.length).to.equal(1)
     await this.sharedFinalAssertions()
@@ -868,7 +868,7 @@ describe('online conflict handling', function () {
     Factory.handlePasswordChallenges(newApp, password)
     await newApp.mutator.importData(backupFile, true)
     const newTag = newApp.itemManager.tags[0]
-    const notes = newApp.referencesForItem(newTag)
+    const notes = newApp.items.referencesForItem(newTag)
     expect(notes.length).to.equal(2)
     await Factory.safeDeinit(newApp)
   }).timeout(10000)

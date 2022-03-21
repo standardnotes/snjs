@@ -66,7 +66,7 @@ describe('online syncing', function () {
     let note = await Factory.createSyncedNote(this.application)
     this.expectedItemCount++
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.not.be.ok
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
@@ -219,7 +219,7 @@ describe('online syncing', function () {
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     this.application.syncService.addEventObserver((event) => {
       if (event === SyncEvent.SingleRoundTripSyncCompleted) {
-        const note = this.application.findItem(originalNote.uuid)
+        const note = this.application.items.findItem(originalNote.uuid)
         expect(note.dirty).to.not.be.ok
       }
     })
@@ -316,17 +316,17 @@ describe('online syncing', function () {
     this.expectedItemCount++
     await this.application.itemManager.setItemDirty(note.uuid)
     await this.application.syncService.sync(syncOptions)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     await this.application.itemManager.setItemToBeDeleted(note.uuid)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(true)
     this.expectedItemCount--
 
     await this.application.syncService.sync(syncOptions)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note).to.not.be.ok
 
     // We expect that this item is now gone for good, and no duplicate has been created.
@@ -647,10 +647,10 @@ describe('online syncing', function () {
     })
     const sync = this.application.sync.sync(syncOptions)
     await Factory.sleep(0.1)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.lastSyncBegan).to.be.below(new Date())
     await sync
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
     expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan)
   })
@@ -708,7 +708,7 @@ describe('online syncing', function () {
     await slowSync
     await midSync
 
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
     expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan)
     expect(note.content.text).to.equal(text)
@@ -760,7 +760,7 @@ describe('online syncing', function () {
      */
     await syncRequest
     expect(actualSaveCount).to.equal(expectedSaveCount)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.text).to.equal(newText)
   })
 
@@ -797,7 +797,7 @@ describe('online syncing', function () {
     })
     await syncRequest
     expect(actualSaveCount).to.equal(expectedSaveCount)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.text).to.equal(newText)
   })
 
@@ -832,7 +832,7 @@ describe('online syncing', function () {
     const syncRequest = this.application.syncService.sync(syncOptions)
     await syncRequest
     expect(actualSaveCount).to.equal(expectedSaveCount)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     expect(note.text).to.equal(newText)
   })
 
@@ -861,7 +861,7 @@ describe('online syncing', function () {
     await this.application.itemManager.emitItemFromPayload(errored)
     await this.application.sync.sync(syncOptions)
 
-    const updatedNote = this.application.findItem(note.uuid)
+    const updatedNote = this.application.items.findItem(note.uuid)
     expect(updatedNote.lastSyncBegan.getTime()).to.equal(lastSyncBegan.getTime())
     expect(updatedNote.lastSyncEnd.getTime()).to.equal(lastSyncEnd.getTime())
   })
@@ -913,7 +913,7 @@ describe('online syncing', function () {
     await this.application.sync.sync(syncOptions)
 
     /** Item should no longer be dirty, otherwise it would keep syncing */
-    const item = this.application.findItem(payload.uuid)
+    const item = this.application.items.findItem(payload.uuid)
     expect(item.dirty).to.equal(false)
   })
 

@@ -1,10 +1,12 @@
+import { TagsToFoldersMigrationApplicator } from './../../migrations/applicators/tags_to_folders'
+import { SNItem } from '@Lib/Models/Item/Item'
 import * as Payloads from '@standardnotes/payloads'
 import * as Models from '@Lib/Models'
 import { ItemCollectionNotesView } from '@Lib/protocol/collection/item_collection_notes_view'
 import { NotesDisplayCriteria } from '@Lib/protocol/collection/notes_display_criteria'
 import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'
 import { PayloadsByDuplicating } from '@Payloads/functions'
-import { ContentType } from '@standardnotes/common'
+import { AnyRecord, ContentType } from '@standardnotes/common'
 import {
   TagNoteCountChangeObserver,
   TagNotesIndex,
@@ -13,7 +15,7 @@ import { UuidString } from '../../Types/UuidString'
 import { PayloadManager } from '../PayloadManager'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { BuildSmartViews } from '@Lib/protocol/collection/smart_view_builder'
-import { ItemsClientInterface } from './ClientInterface'
+import { ItemsClientInterface } from './ItemsClientInterface'
 
 type ObserverCallback = (
   /** The items are pre-existing but have been changed */
@@ -100,6 +102,28 @@ export class ItemManager
     this.collection.setDisplayOptions(ContentType.SmartView, Payloads.CollectionSort.Title, 'dsc')
     this.notesView = new ItemCollectionNotesView(this.collection)
     this.tagNotesIndex = new TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
+  }
+
+  /**
+   * Returns all items.
+   */
+  allItems(): SNItem[] {
+    return this.items
+  }
+
+  /**
+   * Creates an unmanaged item from a payload.
+   */
+  public createItemFromPayload(payload: Payloads.PurePayload): Models.SNItem {
+    return Models.CreateItemFromPayload(payload)
+  }
+
+  /**
+   * Creates an unmanaged payload from any object, where the raw object
+   * represents the same data a payload would.
+   */
+  public createPayloadFromObject(object: AnyRecord): Payloads.PurePayload {
+    return Payloads.CreateMaxPayloadFromAnyObject(object as Payloads.RawPayload)
   }
 
   public setDisplayOptions(
@@ -196,8 +220,8 @@ export class ItemManager
    * @param includeBlanks If true and an item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  findItems(uuids: UuidString[], includeBlanks = false): Models.SNItem[] {
-    return this.collection.findAll(uuids, includeBlanks)
+  findItems<T extends SNItem>(uuids: UuidString[], includeBlanks = false): T[] {
+    return this.collection.findAll(uuids, includeBlanks) as T[]
   }
 
   /**
@@ -246,6 +270,10 @@ export class ItemManager
     return this.collection.displayElements(ContentType.Tag) as Models.SNTag[]
   }
 
+  public hasTagsNeedingFoldersMigration(): boolean {
+    return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(this)
+  }
+
   /**
    * Returns all non-deleted components
    */
@@ -276,6 +304,10 @@ export class ItemManager
     return this.tagNotesIndex.countableNotesForTag(tag)
   }
 
+  public getNoteCount(): number {
+    return this.noteCount
+  }
+
   public addObserver(
     contentType: ContentType | ContentType[],
     callback: ObserverCallback,
@@ -296,24 +328,36 @@ export class ItemManager
   /**
    * Returns the items that reference the given item, or an empty array if no results.
    */
-  public itemsReferencingItem(uuid: UuidString) {
+  public itemsReferencingItem(uuid: UuidString, contentType?: ContentType): SNItem[] {
     if (!isString(uuid)) {
       throw Error('Must use uuid string')
     }
     const uuids = this.collection.uuidsThatReferenceUuid(uuid)
-    return this.findItems(uuids)
+    let referencing = this.findItems(uuids)
+    if (contentType) {
+      referencing = referencing.filter((ref) => {
+        return ref?.content_type === contentType
+      })
+    }
+    return referencing
   }
 
   /**
    * Returns all items that an item directly references
    */
-  public referencesForItem(uuid: UuidString) {
+  public referencesForItem(uuid: UuidString, contentType?: ContentType): SNItem[] {
     if (!isString(uuid)) {
       throw Error('Must use uuid string')
     }
     const item = this.findItem(uuid)!
     const uuids = item.references.map((ref) => ref.uuid)
-    return this.findItems(uuids) as Models.SNItem[]
+    let references = this.findItems(uuids) as Models.SNItem[]
+    if (contentType) {
+      references = references.filter((ref) => {
+        return ref?.content_type === contentType
+      })
+    }
+    return references
   }
 
   private setPayloads(
@@ -815,8 +859,8 @@ export class ItemManager
   public itemsMatchingPredicate<T extends Models.SNItem>(
     contentType: ContentType,
     predicate: Payloads.PredicateInterface<T>,
-  ): Models.SNItem[] {
-    return this.itemsMatchingPredicates(contentType, [predicate])
+  ): T[] {
+    return this.itemsMatchingPredicates(contentType, [predicate]) as T[]
   }
 
   /**

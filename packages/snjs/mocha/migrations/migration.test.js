@@ -129,7 +129,7 @@ describe('migrations', () => {
     await application.mutator.insertItem(mfaItem)
     await application.sync.sync()
 
-    expect(application.getItems('SF|MFA').length).to.equal(1)
+    expect(application.items.getItems('SF|MFA').length).to.equal(1)
     expect(
       (await application.storageService.getAllRawPayloads()).filter(
         (p) => p.content_type === 'SF|MFA',
@@ -140,7 +140,7 @@ describe('migrations', () => {
     const migration = new Migration2_20_0(application.migrationService.services)
     await migration.handleStage(ApplicationStage.LoadedDatabase_12)
 
-    expect(application.getItems('SF|MFA').length).to.equal(0)
+    expect(application.items.getItems('SF|MFA').length).to.equal(0)
     expect(
       (await application.storageService.getAllRawPayloads()).filter(
         (p) => p.content_type === 'SF|MFA',
@@ -172,14 +172,14 @@ describe('migrations', () => {
     await application.mutator.insertItem(noDistractionItem)
     await application.sync.sync()
 
-    expect(application.getItems(ContentType.Theme).length).to.equal(1)
+    expect(application.items.getItems(ContentType.Theme).length).to.equal(1)
 
     /** Run migration */
     const migration = new Migration2_42_0(application.migrationService.services)
     await migration.handleStage(ApplicationStage.FullSyncCompleted_13)
     await application.sync.sync()
 
-    expect(application.getItems(ContentType.Theme).length).to.equal(0)
+    expect(application.items.getItems(ContentType.Theme).length).to.equal(0)
 
     await Factory.safeDeinit(application)
   })

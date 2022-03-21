@@ -176,7 +176,7 @@ const extractTagHierarchy = (application) => {
   const constructHierarchy = (currentTag, result) => {
     result[currentTag.title] = { _uuid: currentTag.uuid }
 
-    const children = application.getTagChildren(currentTag)
+    const children = application.items.getTagChildren(currentTag.uuid)
 
     children.forEach((child) => {
       constructHierarchy(child, result[currentTag.title])

@@ -295,13 +295,13 @@ describe('app models', () => {
       waitingForKey: true,
     })
     await this.application.itemManager.emitItemFromPayload(errored)
-    expect(this.application.findItem(item1.uuid).errorDecrypting).to.equal(true)
-    expect(this.application.findItem(item1.uuid).payload.items_key_id).to.equal(itemsKey.uuid)
+    expect(this.application.items.findItem(item1.uuid).errorDecrypting).to.equal(true)
+    expect(this.application.items.findItem(item1.uuid).payload.items_key_id).to.equal(itemsKey.uuid)
     sinon.stub(this.application.protocolService, 'decryptErroredItems').callsFake(() => {
       // prevent auto decryption
     })
     const alternatedKey = await Factory.alternateUuidForItem(this.application, itemsKey.uuid)
-    const updatedItem = this.application.findItem(item1.uuid)
+    const updatedItem = this.application.items.findItem(item1.uuid)
     expect(updatedItem.payload.items_key_id).to.equal(alternatedKey.uuid)
   })
 

@@ -7,7 +7,7 @@ export class LiveItem<T extends SNItem> {
   private removeObserver: any
 
   constructor(uuid: string, application: SNApplication, onChange?: (item: T) => void) {
-    this.item = application.findItem(uuid)! as T
+    this.item = application.items.findItem(uuid)! as T
     onChange && onChange(this.item)
     this.removeObserver = application.streamItems(this.item.content_type, async (items) => {
       const matchingItem = items.find((item) => {

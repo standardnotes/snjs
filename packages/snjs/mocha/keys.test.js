@@ -276,7 +276,7 @@ describe('keys', function () {
 
     await this.application.payloadManager.emitPayload(errored, PayloadSource.Constructor)
 
-    const refreshedKey = this.application.findItem(itemsKey.uuid)
+    const refreshedKey = this.application.items.findItem(itemsKey.uuid)
     expect(refreshedKey.errorDecrypting).to.not.be.ok
     expect(refreshedKey.content.foo).to.not.be.ok
   })
@@ -811,7 +811,7 @@ describe('keys', function () {
     await this.application.syncService.sync({
       mode: SyncMode.DownloadFirst,
     })
-    const updatedKey = this.application.findItem(itemsKey.uuid)
+    const updatedKey = this.application.items.findItem(itemsKey.uuid)
     expect(updatedKey.neverSynced).to.equal(false)
   })
 
@@ -830,7 +830,7 @@ describe('keys', function () {
       password: this.password,
     })
     await Factory.createSyncedNote(this.application)
-    const itemsKey = this.application.getItems(ContentType.ItemsKey)[0]
+    const itemsKey = this.application.items.getItems(ContentType.ItemsKey)[0]
 
     /** Create another client and sign into account */
     await Factory.loginToApplication({

@@ -37,7 +37,7 @@ describe('offline syncing', () => {
     expect(rawPayloads1.length).to.equal(this.expectedItemCount)
 
     await this.application.syncService.sync(syncOptions)
-    note = this.application.findItem(note.uuid)
+    note = this.application.items.findItem(note.uuid)
     /** In rare cases a sync can complete so fast that the dates are equal; this is ok. */
     expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan)
     this.expectedItemCount++

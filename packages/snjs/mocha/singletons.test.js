@@ -111,7 +111,7 @@ describe('singletons', function () {
     await this.createExtMgr()
 
     expect(extManager).to.be.ok
-    const refreshedExtMgr = this.application.findItem(extManager.uuid)
+    const refreshedExtMgr = this.application.items.findItem(extManager.uuid)
     expect(refreshedExtMgr).to.be.ok
     await this.application.sync.sync(syncOptions)
     expect(
@@ -141,7 +141,7 @@ describe('singletons', function () {
     )
 
     expect(userPreferences).to.be.ok
-    const refreshedUserPrefs = this.application.findItem(userPreferences.uuid)
+    const refreshedUserPrefs = this.application.items.findItem(userPreferences.uuid)
     expect(refreshedUserPrefs).to.be.ok
     await this.application.sync.sync(syncOptions)
     expect(
@@ -337,7 +337,7 @@ describe('singletons', function () {
       payload.content_type,
       payload.content,
     )
-    resolvedItem = this.application.findItem(resolvedItem.uuid)
+    resolvedItem = this.application.items.findItem(resolvedItem.uuid)
     expect(resolvedItem).to.not.be.ok
     expect(resolvedItem2.uuid).to.not.equal(originalUuid)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
