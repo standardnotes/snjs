@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.90.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.89.4...@standardnotes/snjs@2.90.0) (2022-03-22)
+
+
+### Features
+
+* backup importing to allow various backup formats ([#668](https://github.com/standardnotes/snjs/issues/668)) ([5effc07](https://github.com/standardnotes/snjs/commit/5effc07d1b722da904c876ef4797020dbc0656b8))
+
+
+
+
+
 ## [2.89.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.89.3...@standardnotes/snjs@2.89.4) (2022-03-22)
 
 **Note:** Version bump only for package @standardnotes/snjs
