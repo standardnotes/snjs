@@ -2,7 +2,7 @@ import { Error } from '@standardnotes/responses'
 
 export class ClientDisplayableError {
   constructor(public text: string, public title?: string, public tag?: string) {
-    console.error('Client Displayable Error:', text, title, tag)
+    console.error('Client Displayable Error:', text, title || '', tag || '')
   }
 
   static FromError(error: Error) {

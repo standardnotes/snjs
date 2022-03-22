@@ -1,4 +1,3 @@
-import { BackupFileDecryptor } from './BackupFileDecryptor'
 import { SNLog } from '../../log'
 import {
   ItemAuthenticatedData,
@@ -60,6 +59,7 @@ import { BackupFile } from './BackupFile'
 import { KeyMode } from './KeyMode'
 import { AnyOperator } from './Types'
 import { createOperatorForVersion, isAsyncOperator } from './Functions'
+import { decryptBackupFile } from './BackupFileDecryptor'
 
 type KeyChangeObserver = () => Promise<void>
 
@@ -563,10 +563,8 @@ export class SNProtocolService extends AbstractService implements EncryptionDele
    * Decrypts a backup file using user-inputted password
    * @param password - The raw user password associated with this backup file
    */
-  public async payloadsByDecryptingBackupFile(data: BackupFile, password?: string) {
-    const decryptor = new BackupFileDecryptor(data, this, password)
-    const result = await decryptor.decrypt()
-    decryptor.destroy()
+  public async payloadsByDecryptingBackupFile(file: BackupFile, password?: string) {
+    const result = await decryptBackupFile(file, this, password)
     return result
   }
 
