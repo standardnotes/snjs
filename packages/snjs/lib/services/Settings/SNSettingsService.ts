@@ -1,6 +1,6 @@
 import { SNApiService } from '../Api/ApiService'
 import { SettingsGateway } from './SettingsGateway'
-import { SNSessionManager } from '../Api/SessionManager'
+import { SNSessionManager } from '../Session/SessionManager'
 import {
   CloudProvider,
   EmailBackupFrequency,

@@ -1,3 +1,4 @@
+import { Base64String } from '@standardnotes/sncrypto-common'
 import { Subscription } from '@standardnotes/auth'
 import { ClientDisplayableError } from '@Lib/ClientError'
 import {
@@ -15,7 +16,6 @@ import {
   ChallengeReason,
   ChallengeService,
 } from '../Challenge'
-import { JwtSession, RemoteSession, TokenSession } from './Session'
 import {
   GetSubscriptionResponse,
   ChangeCredentialsResponse,
@@ -30,20 +30,26 @@ import {
   GetAvailableSubscriptionsResponse,
 } from '@standardnotes/responses'
 import { SNProtocolService } from '../Protocol/ProtocolService'
-import { SNApiService } from './ApiService'
+import { SNApiService } from '../Api/ApiService'
 import { SNStorageService } from '../StorageService'
 import { SNRootKey } from '@Protocol/root_key'
 import { KeyParamsFromApiResponse, SNRootKeyParams } from '../../protocol/key_params'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { SNAlertService } from '@Lib/services/AlertService'
 import { StorageKey } from '@Lib/storage_keys'
-import { Session } from '@Lib/services/Api/Session'
-import * as messages from './Messages'
-import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from './Messages'
+import * as messages from '../Api/Messages'
+import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
 import { UuidString } from '@Lib/Types/UuidString'
-import { SNWebSocketsService } from './WebsocketsService'
+import { SNWebSocketsService } from '../Api/WebsocketsService'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { Strings } from '@Lib/strings'
+import { ShareToken } from './ShareToken'
+import { Session } from './Sessions/Session'
+import { RemoteSession } from './Sessions/Types'
+import { TokenSession } from './Sessions/TokenSession'
+import { JwtSession } from './Sessions/JwtSession'
+import { SessionsClientInterface } from './SessionsClientInterface'
+import { SessionFromRawStorageValue } from './Sessions/Generator'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
 export const MissingAccountParams = 'missing-params'
@@ -68,7 +74,10 @@ export const enum SessionEvent {
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
-export class SNSessionManager extends AbstractService<SessionEvent> {
+export class SNSessionManager
+  extends AbstractService<SessionEvent>
+  implements SessionsClientInterface
+{
   private user?: User
   private isSessionRenewChallengePresented = false
 
@@ -119,7 +128,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
 
     const rawSession = await this.storageService.getValue(StorageKey.Session)
     if (rawSession) {
-      const session = Session.FromRawStorageValue(rawSession)
+      const session = SessionFromRawStorageValue(rawSession)
       await this.setSession(session, false)
       this.webSocketsService.startWebSocketConnection(session.authorizationValue)
     }
@@ -609,28 +618,94 @@ export class SNSessionManager extends AbstractService<SessionEvent> {
     }
   }
 
+  public async createDemoShareToken(): Promise<Base64String | ClientDisplayableError> {
+    const session = this.getSession()
+    if (!session) {
+      return new ClientDisplayableError('Cannot generate share token without active session')
+    }
+    if (!(session instanceof TokenSession)) {
+      return new ClientDisplayableError('Cannot generate share token with non-token session')
+    }
+
+    const keyParams = (await this.protocolService.getRootKeyParams()) as SNRootKeyParams
+
+    const payload: ShareToken = {
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
+      accessExpiration: session.accessExpiration,
+      refreshExpiration: session.refreshExpiration,
+      readonlyAccess: true,
+      masterKey: this.protocolService.getRootKey()?.masterKey,
+      keyParams: keyParams.content,
+      user: this.getSureUser(),
+      host: this.apiService.getHost(),
+    }
+
+    return this.protocolService.crypto.base64Encode(JSON.stringify(payload))
+  }
+
+  private decodeDemoShareToken(token: Base64String): ShareToken {
+    const jsonString = this.protocolService.crypto.base64Decode(token)
+    return JSON.parse(jsonString)
+  }
+
+  public async populateSessionFromDemoShareToken(token: Base64String): Promise<void> {
+    const sharePayload = this.decodeDemoShareToken(token)
+
+    const rootKey = SNRootKey.Create({
+      masterKey: sharePayload.masterKey,
+      keyParams: sharePayload.keyParams,
+      version: sharePayload.keyParams.version,
+    })
+
+    const user = sharePayload.user
+
+    const session = new TokenSession(
+      sharePayload.accessToken,
+      sharePayload.accessExpiration,
+      sharePayload.refreshToken,
+      sharePayload.refreshExpiration,
+      sharePayload.readonlyAccess,
+    )
+
+    await this.populateSession(rootKey, user, session, sharePayload.host)
+  }
+
+  private async populateSession(
+    rootKey: SNRootKey,
+    user: User,
+    session: Session,
+    host: string,
+    wrappingKey?: SNRootKey,
+  ) {
+    await this.protocolService.setRootKey(rootKey, wrappingKey)
+
+    this.setUser(user)
+
+    await this.storageService.setValue(StorageKey.User, user)
+
+    void this.apiService.setHost(host)
+
+    await this.setSession(session)
+
+    this.webSocketsService.startWebSocketConnection(session.authorizationValue)
+  }
+
   private async handleSuccessAuthResponse(
     response: RegistrationResponse | SignInResponse | ChangeCredentialsResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey,
   ) {
-    await this.protocolService.setRootKey(rootKey, wrappingKey)
     const { data } = response
-    const user = data.user
-    this.setUser(user)
-    await this.storageService.setValue(StorageKey.User, user)
-    this.apiService.setHost(this.apiService.getHost())
-    if (data.token) {
-      /** Legacy JWT response */
-      const session = new JwtSession(data.token)
-      await this.setSession(session)
-      this.webSocketsService.startWebSocketConnection(session.authorizationValue)
+    const user = data.user as User
+
+    const isLegacyJwtResponse = data.token != undefined
+    if (isLegacyJwtResponse) {
+      const session = new JwtSession(data.token as string)
+      await this.populateSession(rootKey, user, session, this.apiService.getHost(), wrappingKey)
     } else if (data.session) {
-      /** Note that change password requests do not resend the exiting session object, so we
-       * only overwrite our current session if the value is explicitely present */
       const session = TokenSession.FromApiResponse(response)
-      await this.setSession(session)
-      this.webSocketsService.startWebSocketConnection(session.authorizationValue)
+      await this.populateSession(rootKey, user, session, this.apiService.getHost(), wrappingKey)
     }
   }
 }

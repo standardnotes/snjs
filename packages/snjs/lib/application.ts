@@ -170,6 +170,10 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.mutatorService
   }
 
+  public get sessions(): Services.SessionsClientInterface {
+    return this.sessionManager
+  }
+
   public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
     return Applications.vaultToEmail(this.options.crypto, name, userphrase)
   }
