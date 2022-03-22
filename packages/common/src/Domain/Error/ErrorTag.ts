@@ -8,4 +8,5 @@ export enum ErrorTag {
   ParametersInvalid = 'invalid-parameters',
   RevokedSession = 'revoked-session',
   AuthInvalid = 'invalid-auth',
+  ReadOnlyAccess = 'read-only-access',
 }

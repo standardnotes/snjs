@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/applications",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -35,7 +35,7 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json"
   },
   "dependencies": {
-    "@standardnotes/common": "^1.16.2",
+    "@standardnotes/common": "^1.17.0",
     "@standardnotes/sncrypto-common": "^1.7.3"
   }
 }

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.11](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.10...@standardnotes/auth@3.17.11) (2022-03-22)
+
+**Note:** Version bump only for package @standardnotes/auth
+
+
+
+
+
 ## [3.17.10](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.9...@standardnotes/auth@3.17.10) (2022-03-21)
 
 
