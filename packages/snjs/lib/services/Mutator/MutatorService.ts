@@ -1,7 +1,20 @@
-import { Strings } from '../../strings'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { SNProtocolService } from '../Protocol/ProtocolService'
-import { BackupFile } from '../Protocol/BackupFile'
+import { BackupFile, SNProtocolService } from '../Protocol'
+import { ClientDisplayableError } from '@Lib/ClientError'
+import { compareVersions } from '@standardnotes/applications'
+import { ContentType, ProtocolVersion } from '@standardnotes/common'
+import { ItemManager, TransactionalMutation } from '../Items'
+import { MutatorClientInterface } from './MutatorClientInterface'
+import { PayloadManager } from '../PayloadManager'
+import { SNComponentManager } from '../ComponentManager/ComponentManager'
+import { SNProtectionService } from '../Protection/ProtectionService'
+import { SNSyncService, SyncOptions } from '../Sync'
+import { Strings } from '../../strings'
+import { TagsToFoldersMigrationApplicator } from '@Lib/migrations/applicators/tags_to_folders'
+import { UuidString } from '@Lib/Types/UuidString'
+import * as Models from '../../Models'
+import * as Payloads from '@standardnotes/payloads'
+import * as Utils from '@standardnotes/utils'
 import {
   Challenge,
   ChallengeValidation,
@@ -9,20 +22,6 @@ import {
   ChallengeReason,
   ChallengeService,
 } from '../Challenge'
-import { compareVersions } from '@standardnotes/applications'
-import { ContentType, ProtocolVersion } from '@standardnotes/common'
-import { ItemManager, TransactionalMutation } from '../Items'
-import { PayloadManager } from '../PayloadManager'
-import { SNComponentManager } from '../ComponentManager/ComponentManager'
-import { SNProtectionService } from '../Protection/ProtectionService'
-import { SNSyncService, SyncOptions } from '../Sync'
-import { TagsToFoldersMigrationApplicator } from '@Lib/migrations/applicators/tags_to_folders'
-import { UuidString } from '@Lib/Types/UuidString'
-import * as Models from '../../Models'
-import * as Payloads from '@standardnotes/payloads'
-import * as Utils from '@standardnotes/utils'
-import { MutatorClientInterface } from './MutatorClientInterface'
-import { ClientDisplayableError } from '@Lib/ClientError'
 
 export class MutatorService extends AbstractService implements MutatorClientInterface {
   constructor(
@@ -153,30 +152,68 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return this.itemManager.runTransactionalMutation(transaction, payloadSource, payloadSourceKey)
   }
 
-  public async protectNote(note: Models.SNNote): Promise<Models.SNNote> {
-    const protectedNote = await this.protectionService.protectNote(note)
+  private async protectItems<M extends Models.ItemMutator, I extends Models.SNItem>(
+    items: I[],
+  ): Promise<I[]> {
+    const protectedItems = await this.itemManager.changeItems<M, I>(
+      Models.Uuids(items),
+      (mutator) => {
+        mutator.protected = true
+      },
+      Models.MutationType.NoUpdateUserTimestamps,
+    )
+
     void this.syncService.sync()
-    return protectedNote
+    return protectedItems
+  }
+
+  private async unprotectItems<M extends Models.ItemMutator, I extends Models.SNItem>(
+    items: I[],
+    reason: ChallengeReason,
+  ): Promise<I[] | undefined> {
+    if (!(await this.protectionService.authorizeAction(reason))) {
+      return undefined
+    }
+
+    const unprotectedItems = await this.itemManager.changeItems<M, I>(
+      Models.Uuids(items),
+      (mutator) => {
+        mutator.protected = false
+      },
+      Models.MutationType.NoUpdateUserTimestamps,
+    )
+
+    void this.syncService.sync()
+    return unprotectedItems
+  }
+
+  public async protectNote(note: Models.SNNote): Promise<Models.SNNote> {
+    const result = await this.protectItems([note])
+    return result[0]
   }
 
   public async unprotectNote(note: Models.SNNote): Promise<Models.SNNote | undefined> {
-    const unprotectedNote = await this.protectionService.unprotectNote(note)
-    if (!Utils.isNullOrUndefined(unprotectedNote)) {
-      void this.syncService.sync()
-    }
-    return unprotectedNote
+    const result = await this.unprotectItems([note], ChallengeReason.UnprotectNote)
+    return result ? result[0] : undefined
   }
 
   public async protectNotes(notes: Models.SNNote[]): Promise<Models.SNNote[]> {
-    const protectedNotes = await this.protectionService.protectNotes(notes)
-    void this.syncService.sync()
-    return protectedNotes
+    return this.protectItems(notes)
   }
 
   public async unprotectNotes(notes: Models.SNNote[]): Promise<Models.SNNote[]> {
-    const unprotectedNotes = await this.protectionService.unprotectNotes(notes)
-    void this.syncService.sync()
-    return unprotectedNotes
+    const results = await this.unprotectItems(notes, ChallengeReason.UnprotectNote)
+    return results || []
+  }
+
+  async protectFile(file: Models.SNFile): Promise<Models.SNFile> {
+    const result = await this.protectItems([file])
+    return result[0]
+  }
+
+  async unprotectFile(file: Models.SNFile): Promise<Models.SNFile | undefined> {
+    const result = await this.unprotectItems([file], ChallengeReason.UnprotectFile)
+    return result ? result[0] : undefined
   }
 
   public async mergeItem(

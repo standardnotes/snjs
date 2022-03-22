@@ -87,6 +87,10 @@ export interface MutatorClientInterface {
 
   unprotectNotes(notes: Models.SNNote[]): Promise<Models.SNNote[]>
 
+  protectFile(file: Models.SNFile): Promise<Models.SNFile>
+
+  unprotectFile(file: Models.SNFile): Promise<Models.SNFile | undefined>
+
   /**
    * Takes the values of the input item and emits it onto global state.
    */

@@ -6,14 +6,12 @@ import {
   ChallengeService,
 } from '@Lib/services/Challenge'
 import { SNLog } from '@Lib/log'
-import { FileMutator, NoteMutator, SNFile, SNNote } from '@Lib/Models'
+import { SNFile, SNNote } from '@Lib/Models'
 import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNStorageService, StorageValueModes } from '@Lib/services/StorageService'
 import { StorageKey } from '@Lib/storage_keys'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ApplicationStage } from '@standardnotes/applications'
-import { ItemManager } from '../Items/ItemManager'
-import { Uuids } from '@Lib/Models/Functions'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { ProtectionsClientInterface } from './ClientInterface'
 
@@ -71,7 +69,6 @@ export class SNProtectionService
     private protocolService: SNProtocolService,
     private challengeService: ChallengeService,
     private storageService: SNStorageService,
-    private itemManager: ItemManager,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -82,7 +79,6 @@ export class SNProtectionService
     ;(this.protocolService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
     ;(this.storageService as unknown) = undefined
-    ;(this.itemManager as unknown) = undefined
     super.deinit()
   }
 
@@ -161,20 +157,6 @@ export class SNProtectionService
     }
   }
 
-  protectFile(file: SNFile): Promise<SNFile> {
-    return this.itemManager.changeItem<FileMutator>(file.uuid, (mutator) => {
-      mutator.protected = true
-    }) as Promise<SNFile>
-  }
-
-  async unprotectFile(file: SNFile): Promise<SNFile | undefined> {
-    if (await this.validateOrRenewSession(ChallengeReason.UnprotectFile)) {
-      return this.itemManager.changeItem<FileMutator>(file.uuid, (mutator) => {
-        mutator.protected = false
-      }) as Promise<SNFile>
-    }
-  }
-
   async authorizeProtectedActionForFiles(
     files: SNFile[],
     challengeReason: ChallengeReason,
@@ -193,20 +175,6 @@ export class SNProtectionService
     return authorizedFiles
   }
 
-  protectNote(note: SNNote): Promise<SNNote> {
-    return this.itemManager.changeItem<NoteMutator>(note.uuid, (mutator) => {
-      mutator.protected = true
-    }) as Promise<SNNote>
-  }
-
-  async unprotectNote(note: SNNote): Promise<SNNote | undefined> {
-    if (await this.validateOrRenewSession(ChallengeReason.UnprotectNote)) {
-      return this.itemManager.changeItem<NoteMutator>(note.uuid, (mutator) => {
-        mutator.protected = false
-      }) as Promise<SNNote>
-    }
-  }
-
   async authorizeProtectedActionForNotes(
     notes: SNNote[],
     challengeReason: ChallengeReason,
@@ -223,22 +191,6 @@ export class SNProtectionService
       }
     }
     return authorizedNotes
-  }
-
-  protectNotes(notes: SNNote[]): Promise<SNNote[]> {
-    return this.itemManager.changeItems<NoteMutator>(Uuids(notes), (mutator) => {
-      mutator.protected = true
-    }) as Promise<SNNote[]>
-  }
-
-  async unprotectNotes(notes: SNNote[]): Promise<SNNote[]> {
-    const authorizedNotes = await this.authorizeProtectedActionForNotes(
-      notes,
-      ChallengeReason.UnprotectNote,
-    )
-    return this.itemManager.changeItems<NoteMutator>(Uuids(authorizedNotes), (mutator) => {
-      mutator.protected = false
-    }) as Promise<SNNote[]>
   }
 
   async authorizeNoteAccess(note: SNNote): Promise<boolean> {
