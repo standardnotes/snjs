@@ -22,7 +22,7 @@ import { ActionsExtensionMutator } from '../Models/ActionsExtension/ActionsExten
 import { SNItem } from '@Lib/Models/Item/Item'
 import { MutationType } from '@Lib/Models/Item/MutationType'
 import { SNSyncService } from './Sync/SyncService'
-import { SNProtocolService } from './ProtocolService'
+import { SNProtocolService } from './Protocol/ProtocolService'
 import { PayloadManager } from './PayloadManager'
 import { SNHttpService } from './Api/HttpService'
 import { SNAlertService } from './AlertService'

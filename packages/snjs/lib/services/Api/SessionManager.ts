@@ -29,7 +29,7 @@ import {
   AvailableSubscriptions,
   GetAvailableSubscriptionsResponse,
 } from '@standardnotes/responses'
-import { SNProtocolService } from '../ProtocolService'
+import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNApiService } from './ApiService'
 import { SNStorageService } from '../StorageService'
 import { SNRootKey } from '@Protocol/root_key'

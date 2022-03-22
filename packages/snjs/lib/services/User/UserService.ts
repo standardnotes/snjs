@@ -20,7 +20,7 @@ import {
   ProtocolUpgradeStrings,
 } from '../Api/Messages'
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
-import { SNProtocolService } from '@Lib/services/ProtocolService'
+import { SNProtocolService } from '@Lib/services/Protocol/ProtocolService'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { SNStorageService, StoragePersistencePolicies } from '@Lib/services/StorageService'
 import { SNSyncService } from '../Sync/SyncService'

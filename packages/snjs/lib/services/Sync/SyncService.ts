@@ -20,7 +20,7 @@ import {
 } from '@standardnotes/payloads'
 import { PayloadManager } from '../PayloadManager'
 import { SNStorageService } from '../StorageService'
-import { SNProtocolService } from '../ProtocolService'
+import { SNProtocolService } from '../Protocol/ProtocolService'
 import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@standardnotes/utils'
 import { SortPayloadsByRecentAndContentPriority } from '@Lib/services/Sync/Utils'
 import { SyncOpStatus } from '@Lib/services/Sync/SyncOpStatus'

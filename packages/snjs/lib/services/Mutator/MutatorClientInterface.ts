@@ -1,10 +1,11 @@
-import { BackupFile } from '../ProtocolService'
+import { BackupFile } from '../Protocol/BackupFile'
 import { ContentType } from '@standardnotes/common'
 import { SyncOptions } from '../Sync'
 import { TransactionalMutation } from '../Items'
 import { UuidString } from '@Lib/Types/UuidString'
 import * as Models from '../../Models'
 import * as Payloads from '@standardnotes/payloads'
+import { ClientDisplayableError } from '@Lib/ClientError'
 
 export interface MutatorClientInterface {
   savePayload(payload: Payloads.PurePayload): Promise<void>
@@ -173,8 +174,7 @@ export interface MutatorClientInterface {
         errorCount: number
       }
     | {
-        error: string
+        error: ClientDisplayableError
       }
-    | undefined
   >
 }

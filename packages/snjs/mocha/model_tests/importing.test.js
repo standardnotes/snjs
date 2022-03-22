@@ -13,7 +13,7 @@ describe('importing', function () {
   let email
   let password
 
-  beforeEach(async function () {
+  beforeEach(function () {
     localStorage.clear()
   })
 
@@ -667,10 +667,7 @@ describe('importing', function () {
 
     const result = await application.mutator.importData(backupData)
 
-    expect(result).to.not.be.undefined
-    expect(result.affectedItems.length).to.be.eq(0)
-    expect(result.errorCount).to.be.eq(backupData.items.length)
-    expect(application.itemManager.notes.length).to.equal(0)
+    expect(result.error).to.be.ok
   })
 
   it('should not import payloads if the corresponding ItemsKey is not present within the backup file', async function () {
@@ -680,7 +677,7 @@ describe('importing', function () {
       email: email,
       password: password,
     })
-    Factory.handlePasswordChallenges(application)
+    Factory.handlePasswordChallenges(application, password)
 
     await application.itemManager.createItem(ContentType.Note, {
       title: 'Encrypted note',
@@ -694,7 +691,7 @@ describe('importing', function () {
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
-    Factory.handlePasswordChallenges(application)
+    Factory.handlePasswordChallenges(application, password)
 
     const result = await application.mutator.importData(backupData, true)
 

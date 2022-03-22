@@ -17,7 +17,7 @@ export { ClientDisplayableError } from '@Lib/ClientError'
 
 export type { ApplicationDescriptor } from './application_group'
 export { ApplicationOptionsDefaults } from './options'
-export type { BackupFile } from '@Lib/services/ProtocolService'
+
 export type { ApplicationIdentifier } from '@standardnotes/applications'
 
 export { SNApplicationGroup } from './application_group'
@@ -26,7 +26,6 @@ export type { RemoteSession } from './services/Api/Session'
 
 export { SNApplication } from '@Lib/application'
 
-export { SNProtocolService, KeyMode } from '@Lib/services/ProtocolService'
 export { SNProtocolOperator001 } from '@Protocol/operator/001/operator_001'
 export { SNProtocolOperator002 } from '@Protocol/operator/002/operator_002'
 export { SNProtocolOperator003 } from '@Protocol/operator/003/operator_003'
