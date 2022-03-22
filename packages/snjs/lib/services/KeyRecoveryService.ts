@@ -23,7 +23,7 @@ import {
 
 import { SNAlertService } from './AlertService'
 import { SNRootKey } from '@Protocol/root_key'
-import { SNProtocolService } from '@Lib/services/ProtocolService'
+import { SNProtocolService } from '@Lib/services/Protocol/ProtocolService'
 import { SNApiService } from '@Lib/services/Api/ApiService'
 import { SNItemsKey } from '../Models/ItemsKey/ItemsKey'
 import { ContentType } from '@standardnotes/common'

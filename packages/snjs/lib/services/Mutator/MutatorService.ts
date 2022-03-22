@@ -1,6 +1,7 @@
 import { Strings } from '../../strings'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { BackupFile, SNProtocolService } from '../ProtocolService'
+import { SNProtocolService } from '../Protocol/ProtocolService'
+import { BackupFile } from '../Protocol/BackupFile'
 import {
   Challenge,
   ChallengeValidation,
@@ -21,6 +22,7 @@ import * as Models from '../../Models'
 import * as Payloads from '@standardnotes/payloads'
 import * as Utils from '@standardnotes/utils'
 import { MutatorClientInterface } from './MutatorClientInterface'
+import { ClientDisplayableError } from '@Lib/ClientError'
 
 export class MutatorService extends AbstractService implements MutatorClientInterface {
   constructor(
@@ -271,9 +273,8 @@ export class MutatorService extends AbstractService implements MutatorClientInte
         errorCount: number
       }
     | {
-        error: string
+        error: ClientDisplayableError
       }
-    | undefined
   > {
     if (data.version) {
       /**
@@ -285,13 +286,13 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
       const supportedVersions = this.protocolService.supportedVersions()
       if (!supportedVersions.includes(version)) {
-        return { error: Strings.Info.UnsupportedBackupFileVersion }
+        return { error: new ClientDisplayableError(Strings.Info.UnsupportedBackupFileVersion) }
       }
 
       const userVersion = await this.protocolService.getUserVersion()
       if (userVersion && compareVersions(version, userVersion) === 1) {
         /** File was made with a greater version than the user's account */
-        return { error: Strings.Info.BackupFileMoreRecentThanAccount }
+        return { error: new ClientDisplayableError(Strings.Info.BackupFileMoreRecentThanAccount) }
       }
     }
 
@@ -312,22 +313,28 @@ export class MutatorService extends AbstractService implements MutatorClientInte
         true,
       )
       const passwordResponse = await this.challengeService.promptForChallengeResponse(challenge)
-      if (Utils.isNullOrUndefined(passwordResponse)) {
+      if (passwordResponse == undefined) {
         /** Challenge was canceled */
-        return
+        return { error: new ClientDisplayableError('Import aborted') }
       }
       this.challengeService.completeChallenge(challenge)
       password = passwordResponse?.values[0].value as string
     }
 
     if (!(await this.protectionService.authorizeFileImport())) {
-      return
+      return { error: new ClientDisplayableError('Import aborted') }
     }
-    const decryptedPayloads = await this.protocolService.payloadsByDecryptingBackupFile(
+
+    const decryptedPayloadsOrError = await this.protocolService.payloadsByDecryptingBackupFile(
       data,
       password,
     )
-    const validPayloads = decryptedPayloads
+
+    if (decryptedPayloadsOrError instanceof ClientDisplayableError) {
+      return { error: decryptedPayloadsOrError }
+    }
+
+    const validPayloads = decryptedPayloadsOrError
       .filter((payload) => {
         return !payload.errorDecrypting && payload.format !== Payloads.PayloadFormat.EncryptedString
       })
@@ -345,15 +352,18 @@ export class MutatorService extends AbstractService implements MutatorClientInte
           return payload
         }
       })
+
     const affectedUuids = await this.payloadManager.importPayloads(validPayloads)
     const promise = this.syncService.sync()
+
     if (awaitSync) {
       await promise
     }
+
     const affectedItems = this.itemManager.findItems(affectedUuids) as Models.SNItem[]
     return {
       affectedItems: affectedItems,
-      errorCount: decryptedPayloads.length - validPayloads.length,
+      errorCount: decryptedPayloadsOrError.length - validPayloads.length,
     }
   }
 }

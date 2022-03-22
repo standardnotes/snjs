@@ -7,7 +7,7 @@ import {
 } from '@Lib/services/Challenge'
 import { SNLog } from '@Lib/log'
 import { FileMutator, NoteMutator, SNFile, SNNote } from '@Lib/Models'
-import { SNProtocolService } from '../ProtocolService'
+import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNStorageService, StorageValueModes } from '@Lib/services/StorageService'
 import { StorageKey } from '@Lib/storage_keys'
 import { isNullOrUndefined } from '@standardnotes/utils'
