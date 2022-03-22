@@ -1325,7 +1325,6 @@ export class SNApplication implements Services.ListedClientInterface {
       this.protocolService,
       this.challengeService,
       this.storageService,
-      this.itemManager,
       this.internalEventBus,
     )
     this.serviceObservers.push(

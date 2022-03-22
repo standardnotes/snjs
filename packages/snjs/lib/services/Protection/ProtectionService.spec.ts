@@ -1,5 +1,4 @@
 import { ChallengeService, ChallengeReason } from '../Challenge'
-import { ItemManager } from '../Items/ItemManager'
 import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNStorageService } from '../StorageService'
 import { SNProtectionService } from './ProtectionService'
@@ -17,7 +16,6 @@ describe('protectionService', () => {
   let protocolService: SNProtocolService
   let challengeService: ChallengeService
   let storageService: SNStorageService
-  let itemManager: ItemManager
   let internalEventBus: InternalEventBusInterface
   let protectionService: SNProtectionService
 
@@ -26,7 +24,6 @@ describe('protectionService', () => {
       protocolService,
       challengeService,
       storageService,
-      itemManager,
       internalEventBus,
     )
   }
@@ -48,7 +45,6 @@ describe('protectionService', () => {
     setupRandomUuid()
 
     internalEventBus = {} as jest.Mocked<InternalEventBus>
-    itemManager = {} as jest.Mocked<ItemManager>
 
     challengeService = {} as jest.Mocked<ChallengeService>
     challengeService.promptForChallengeResponse = jest.fn()
