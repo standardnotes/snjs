@@ -25,9 +25,9 @@ export type RootKeyContent = {
 export class SNRootKey extends SNItem {
   public readonly keyParams: SNRootKeyParams
 
-  static async Create(content: RootKeyContent, uuid?: string) {
+  static Create(content: RootKeyContent, uuid?: string) {
     if (!uuid) {
-      uuid = await UuidGenerator.GenerateUuid()
+      uuid = UuidGenerator.GenerateUuid()
     }
     if (!content.version) {
       if (content.dataAuthenticationKey) {
@@ -61,9 +61,9 @@ export class SNRootKey extends SNItem {
    * Given a root key, expands its key params by making a copy which includes
    * the inputted key params. Used to expand locally created key params after signing in
    */
-  static async ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent) {
+  static ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent) {
     const content = key.typedContent as RootKeyContent
-    const copiedKey = await this.Create({
+    const copiedKey = this.Create({
       ...content,
       keyParams: keyParams ? keyParams : content.keyParams,
     })

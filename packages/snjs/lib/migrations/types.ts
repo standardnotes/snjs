@@ -1,4 +1,4 @@
-import { SNSessionManager } from '../services/Api/SessionManager'
+import { SNSessionManager } from '../services/Session/SessionManager'
 import { ApplicationIdentifier } from '@standardnotes/applications'
 import { ItemManager } from '@Lib/services/Items/ItemManager'
 import { Environment } from './../platforms'

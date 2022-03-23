@@ -29,7 +29,7 @@ import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/p
 import { SNSettingsService } from '../Settings'
 import { SettingName } from '@standardnotes/settings'
 import { arraysEqual, convertTimestampToMilliseconds, removeFromArray } from '@standardnotes/utils'
-import { SNSessionManager } from '@Lib/services/Api/SessionManager'
+import { SNSessionManager } from '@Lib/services/Session/SessionManager'
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
   API_MESSAGE_FAILED_OFFLINE_ACTIVATION,

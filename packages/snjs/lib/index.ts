@@ -22,7 +22,6 @@ export type { ApplicationIdentifier } from '@standardnotes/applications'
 
 export { SNApplicationGroup } from './application_group'
 export { KeyRecoveryStrings, SessionStrings } from './services/Api/Messages'
-export type { RemoteSession } from './services/Api/Session'
 
 export { SNApplication } from '@Lib/application'
 
@@ -53,8 +52,6 @@ export { IconsController } from './ui/icons_controller'
 
 /** Migrations */
 export { BaseMigration } from '@Lib/migrations/base'
-
-export { ProtectionSessionDurations } from '@Lib/services/Protection/ProtectionService'
 
 export { SNLog } from './log'
 

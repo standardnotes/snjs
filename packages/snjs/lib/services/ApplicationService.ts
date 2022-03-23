@@ -24,13 +24,13 @@ export class ApplicationService extends AbstractService {
   }
 
   addAppEventObserver() {
-    if (this.application!.isStarted()) {
+    if (this.application.isStarted()) {
       this.onAppStart()
     }
-    if (this.application!.isLaunched()) {
+    if (this.application.isLaunched()) {
       this.onAppLaunch()
     }
-    this.unsubApp = this.application!.addEventObserver(async (event: ApplicationEvent) => {
+    this.unsubApp = this.application.addEventObserver(async (event: ApplicationEvent) => {
       await this.onAppEvent(event)
       if (event === ApplicationEvent.Started) {
         this.onAppStart()

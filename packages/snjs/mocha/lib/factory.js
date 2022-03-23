@@ -96,6 +96,16 @@ export async function createAppContext(identifier, crypto) {
         })
       })
     },
+    awaitNextSyncEvent: (eventName) => {
+      return new Promise((resolve) => {
+        const removeObserver = application.syncService.addEventObserver((event, data) => {
+          if (event === eventName) {
+            removeObserver()
+            resolve(data)
+          }
+        })
+      })
+    },
     launch: async ({ awaitDatabaseLoad = true } = {}) => {
       await application.prepareForLaunch({
         receiveChallenge: handleChallenge,
