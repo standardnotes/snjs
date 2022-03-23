@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.2](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.1...@standardnotes/filepicker@1.10.2) (2022-03-23)
+
+
+### Bug Fixes
+
+* class file reader chunking ([63a8494](https://github.com/standardnotes/snjs/commit/63a84945f2935c2c2a23b1aa4ea26dcfd24f08d4))
+
+
+
+
+
 ## [1.10.1](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.0...@standardnotes/filepicker@1.10.1) (2022-03-17)
 
 **Note:** Version bump only for package @standardnotes/filepicker
