@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.91.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.90.0...@standardnotes/snjs@2.91.0) (2022-03-23)
+
+
+### Features
+
+* demo share tokens ([#670](https://github.com/standardnotes/snjs/issues/670)) ([4741836](https://github.com/standardnotes/snjs/commit/474183668433724960444de8f3acf293a66d5219))
+
+
+
+
+
 # [2.90.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.89.4...@standardnotes/snjs@2.90.0) (2022-03-22)
 
 
