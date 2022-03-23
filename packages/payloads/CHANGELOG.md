@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.19](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.18...@standardnotes/payloads@1.4.19) (2022-03-23)
+
+**Note:** Version bump only for package @standardnotes/payloads
+
+
+
+
+
 ## [1.4.18](https://github.com/standardnotes/snjs/compare/@standardnotes/payloads@1.4.17...@standardnotes/payloads@1.4.18) (2022-03-22)
 
 **Note:** Version bump only for package @standardnotes/payloads

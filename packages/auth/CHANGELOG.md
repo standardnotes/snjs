@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.18.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.11...@standardnotes/auth@3.18.0) (2022-03-23)
+
+
+### Features
+
+* add deterministic value selector ([#671](https://github.com/standardnotes/snjs/issues/671)) ([570d2ae](https://github.com/standardnotes/snjs/commit/570d2aeae842540c64ae33bbcbef8242f2b85e5f))
+
+
+
+
+
 ## [3.17.11](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.17.10...@standardnotes/auth@3.17.11) (2022-03-22)
 
 **Note:** Version bump only for package @standardnotes/auth
