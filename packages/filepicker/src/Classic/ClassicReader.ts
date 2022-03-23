@@ -1,6 +1,7 @@
 import { OnChunkCallback, FileSelectionResponse } from '../types'
 import { readFile as utilsReadFile } from '../utils'
 import { FileReaderInterface } from '../Interface/FileReader'
+import { ByteChunker } from '../byte_chunker'
 
 export const ClassicFileReader: FileReaderInterface = {
   selectFiles,
@@ -41,14 +42,14 @@ async function readFile(
   onChunk: OnChunkCallback,
 ): Promise<FileSelectionResponse> {
   const buffer = await utilsReadFile(file)
+  const chunker = new ByteChunker(minimumChunkSize, onChunk)
+  const readSize = 2_000_000
 
-  let chunkId = 1
-  for (let i = 0; i < buffer.length; i += minimumChunkSize) {
-    const readUntil = i + minimumChunkSize > buffer.length ? buffer.length : i + minimumChunkSize
-    const chunk = buffer.slice(i, readUntil)
-    const isFinalChunk = readUntil === buffer.length
-
-    await onChunk(chunk, chunkId++, isFinalChunk)
+  for (let i = 0; i < buffer.length; i += readSize) {
+    const chunkMax = i + readSize
+    const chunk = buffer.slice(i, chunkMax)
+    const isFinalChunk = chunkMax >= buffer.length
+    await chunker.addBytes(chunk, isFinalChunk)
   }
 
   return {
