@@ -35,7 +35,7 @@ const MINIMUM_PASSCODE_LENGTH = 1
 export type CredentialsChangeFunctionResponse = { error?: { message: string } }
 export type AccountServiceResponse = HttpResponse
 
-export const enum AccountEvent {
+export enum AccountEvent {
   SignedInOrRegistered = 'SignedInOrRegistered',
   SignedOut = 'SignedOut',
 }
