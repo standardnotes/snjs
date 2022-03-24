@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.92.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.0...@standardnotes/snjs@2.92.1) (2022-03-24)
+
+
+### Bug Fixes
+
+* export enums without declaring them with 'const' ([#673](https://github.com/standardnotes/snjs/issues/673)) ([5a075b2](https://github.com/standardnotes/snjs/commit/5a075b29f5fd87eccb02d0d2b7b759c20ab91779))
+
+
+
+
+
 # [2.92.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.91.2...@standardnotes/snjs@2.92.0) (2022-03-24)
 
 

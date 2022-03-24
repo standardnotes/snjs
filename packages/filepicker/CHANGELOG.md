@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.3](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.2...@standardnotes/filepicker@1.10.3) (2022-03-24)
+
+
+### Bug Fixes
+
+* streaming reader error on abort selection ([#674](https://github.com/standardnotes/snjs/issues/674)) ([8c36554](https://github.com/standardnotes/snjs/commit/8c36554a95117ed6e42c75d0dc29e01cb8de7a54))
+
+
+
+
+
 ## [1.10.2](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.1...@standardnotes/filepicker@1.10.2) (2022-03-23)
 
 
