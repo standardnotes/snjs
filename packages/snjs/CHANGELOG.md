@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.92.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.91.2...@standardnotes/snjs@2.92.0) (2022-03-24)
+
+
+### Features
+
+* handle sync readonly errors ([65c4f52](https://github.com/standardnotes/snjs/commit/65c4f521c31417601cb647a8f9031e914ad4bbc8))
+
+
+
+
+
 ## [2.91.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.91.1...@standardnotes/snjs@2.91.2) (2022-03-23)
 
 **Note:** Version bump only for package @standardnotes/snjs
