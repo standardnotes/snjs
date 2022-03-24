@@ -27,7 +27,12 @@ function getFilesFromHandles(handles: FileSystemFileHandle[]): Promise<File[]> {
 }
 
 async function selectFiles(): Promise<File[]> {
-  const selectedFilesHandles = await window.showOpenFilePicker({ multiple: true })
+  let selectedFilesHandles: FileSystemFileHandle[]
+  try {
+    selectedFilesHandles = await window.showOpenFilePicker({ multiple: true })
+  } catch (error) {
+    selectedFilesHandles = []
+  }
   return getFilesFromHandles(selectedFilesHandles)
 }
 
