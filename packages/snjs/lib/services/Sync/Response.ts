@@ -120,7 +120,8 @@ export class SyncResponse {
       .filter((conflict) => {
         return (
           conflict.type === ConflictType.ContentTypeError ||
-          conflict.type === ConflictType.ContentError
+          conflict.type === ConflictType.ContentError ||
+          conflict.type === ConflictType.ReadOnlyError
         )
       })
       .map((conflict) => {

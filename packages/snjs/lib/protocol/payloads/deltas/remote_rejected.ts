@@ -10,7 +10,7 @@ export class DeltaRemoteRejected extends PayloadsDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const results = []
     for (const payload of this.applyCollection.all()) {
-      const decrypted = this.findRelatedPayload(payload.uuid!, PayloadSource.DecryptedTransient)
+      const decrypted = this.findRelatedPayload(payload.uuid, PayloadSource.DecryptedTransient)
       if (!decrypted) {
         throw 'Unable to find decrypted counterpart for rejected payload.'
       }

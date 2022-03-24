@@ -3,4 +3,5 @@ export enum ConflictType {
   UuidConflict = 'uuid_conflict',
   ContentTypeError = 'content_type_error',
   ContentError = 'content_error',
+  ReadOnlyError = 'readonly_error',
 }
