@@ -1,10 +1,10 @@
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
+import { ConflictStrategy } from '@Lib/Protocol/payloads/deltas/strategies'
 import { isValidUrl } from '@standardnotes/utils'
 import { Predicate, PurePayload } from '@standardnotes/payloads'
 import { SNItem } from '@Lib/Models/Item/Item'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { AppDataField } from '@standardnotes/applications'
-import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
+import { HistoryEntry } from '@Lib/Services/History/Entries/HistoryEntry'
 import {
   FeatureIdentifier,
   ThirdPartyFeatureDescription,

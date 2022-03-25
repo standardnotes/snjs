@@ -15,10 +15,10 @@
     "baseUrl": ".",
     "paths": {
       "@Lib/*": ["*"],
-      "@Services/*": ["./services/*"],
+      "@Services/*": ["Services/*"],
       "@Models/*": ["Models/*"],
-      "@Protocol/*": ["./protocol/*"],
-      "@Payloads/*": ["./protocol/payloads/*"]
+      "@Protocol/*": ["Protocol/*"],
+      "@Payloads/*": ["Protocol/payloads/*"]
     }
   },
   "exclude": ["../package.json"]

@@ -1,6 +1,6 @@
 import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
-import { ConflictStrategy } from '../../protocol/payloads/deltas/strategies'
-import { HistoryEntry } from '../../services/History/Entries/HistoryEntry'
+import { ConflictStrategy } from '../../Protocol/payloads/deltas/strategies'
+import { HistoryEntry } from '../../Services/History/Entries/HistoryEntry'
 import { PurePayload } from '@standardnotes/payloads'
 import { SNItem } from '@Lib/Models/Item/Item'
 
