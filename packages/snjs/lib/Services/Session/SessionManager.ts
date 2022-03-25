@@ -64,7 +64,7 @@ const cleanedEmailString = (email: string) => {
   return email.trim().toLowerCase()
 }
 
-export const enum SessionEvent {
+export enum SessionEvent {
   Restored = 'SessionRestored',
   Revoked = 'SessionRevoked',
 }

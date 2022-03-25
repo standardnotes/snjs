@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.4.0...@standardnotes/responses@1.4.1) (2022-03-25)
+
+
+### Bug Fixes
+
+* add uuid and sync error types ([239faaf](https://github.com/standardnotes/snjs/commit/239faaf00be8739c9a0b03f9fdb9dad0705b1019))
+
+
+
+
+
+# [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.21...@standardnotes/responses@1.4.0) (2022-03-24)
+
+
+### Features
+
+* handle sync readonly errors ([65c4f52](https://github.com/standardnotes/snjs/commit/65c4f521c31417601cb647a8f9031e914ad4bbc8))
+
+
+
+
+
 ## [1.3.21](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.20...@standardnotes/responses@1.3.21) (2022-03-23)
 
 **Note:** Version bump only for package @standardnotes/responses

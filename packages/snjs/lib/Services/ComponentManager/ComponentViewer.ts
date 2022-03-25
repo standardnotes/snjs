@@ -73,12 +73,12 @@ const ReadwriteActions = [
 
 export type ActionObserver = (action: ComponentAction, messageData: MessageData) => void
 
-export const enum ComponentViewerEvent {
+export enum ComponentViewerEvent {
   FeatureStatusUpdated = 'FeatureStatusUpdated',
 }
 type EventObserver = (event: ComponentViewerEvent) => void
 
-export const enum ComponentViewerError {
+export enum ComponentViewerError {
   OfflineRestricted = 'OfflineRestricted',
   MissingUrl = 'MissingUrl',
 }

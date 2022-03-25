@@ -32,7 +32,7 @@ const LOCAL_HOST = 'localhost'
 const CUSTOM_LOCAL_HOST = 'sn.local'
 const ANDROID_LOCAL_HOST = '10.0.2.2'
 
-export const enum ComponentManagerEvent {
+export enum ComponentManagerEvent {
   ViewerDidFocus = 'ViewerDidFocus',
 }
 

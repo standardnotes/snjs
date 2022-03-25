@@ -7,12 +7,12 @@ export type OfflineSubscriptionEntitlements = {
   extensionKey: string
 }
 
-export const enum FeaturesEvent {
+export enum FeaturesEvent {
   UserRolesChanged = 'UserRolesChanged',
   FeaturesUpdated = 'FeaturesUpdated',
 }
 
-export const enum FeatureStatus {
+export enum FeatureStatus {
   NoUserSubscription = 'NoUserSubscription',
   NotInCurrentPlan = 'NotInCurrentPlan',
   InCurrentPlanButExpired = 'InCurrentPlanButExpired',
