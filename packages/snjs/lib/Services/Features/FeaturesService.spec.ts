@@ -12,7 +12,7 @@ import {
   SNStorageService,
   StorageKey,
 } from '@Lib/index'
-import { FeatureStatus, SNFeaturesService } from '@Lib/services/Features'
+import { FeatureStatus, SNFeaturesService } from '@Lib/Services/Features'
 import { ContentType, RoleName } from '@standardnotes/common'
 import { FeatureDescription, FeatureIdentifier, GetFeatures } from '@standardnotes/features'
 import { SNWebSocketsService } from '../Api/WebsocketsService'

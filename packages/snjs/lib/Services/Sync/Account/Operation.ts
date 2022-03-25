@@ -1,7 +1,7 @@
 import { PurePayload } from '@standardnotes/payloads'
 import { arrayByDifference, subtractFromArray } from '@standardnotes/utils'
-import { SyncResponse } from '@Lib/services/Sync/Response'
-import { ResponseSignalReceiver, SyncSignal } from '@Lib/services/Sync/Signals'
+import { SyncResponse } from '@Lib/Services/Sync/Response'
+import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'
 import { SNApiService } from '../../Api/ApiService'
 import { RawSyncResponse } from '@standardnotes/responses'
 

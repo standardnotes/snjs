@@ -1,17 +1,17 @@
 import { AllowedBatchStreaming } from './types'
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FindNativeFeature } from '@standardnotes/features'
-import { SNFeaturesService } from '@Lib/services/Features/FeaturesService'
+import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { ComponentMutator } from '@Lib/Models/Component/ComponentMutator'
 import { displayStringForContentType } from '@Lib/Models/Functions'
 import { ContentType, Runtime } from '@standardnotes/common'
 import { PayloadSource } from '@standardnotes/payloads'
-import { ItemManager } from '@Lib/services/Items/ItemManager'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNNote } from '@Lib/Models/Note/Note'
 import { SNTheme } from '@Lib/Models/Theme/Theme'
 import { SNItem } from '@Lib/Models/Item/Item'
-import { SNAlertService } from '@Lib/services/Alert/AlertService'
-import { SNSyncService } from '@Lib/services/Sync/SyncService'
+import { SNAlertService } from '@Lib/Services/Alert/AlertService'
+import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import { SNComponent } from '@Lib/Models/Component/Component'
@@ -23,8 +23,8 @@ import {
   PermissionDialog,
   DesktopManagerInterface,
   AllowedBatchContentTypes,
-} from '@Lib/services/ComponentManager/types'
-import { ActionObserver, ComponentViewer } from '@Lib/services/ComponentManager/ComponentViewer'
+} from '@Lib/Services/ComponentManager/types'
+import { ActionObserver, ComponentViewer } from '@Lib/Services/ComponentManager/ComponentViewer'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
 const DESKTOP_URL_PREFIX = 'sn://'

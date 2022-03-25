@@ -4,11 +4,11 @@ import {
   ChallengeReason,
   ChallengePrompt,
   ChallengeService,
-} from '@Lib/services/Challenge'
+} from '@Lib/Services/Challenge'
 import { SNLog } from '@Lib/log'
 import { SNFile, SNNote } from '@Lib/Models'
 import { SNProtocolService } from '../Protocol/ProtocolService'
-import { SNStorageService, StorageValueModes } from '@Lib/services/Storage/StorageService'
+import { SNStorageService, StorageValueModes } from '@Lib/Services/Storage/StorageService'
 import { StorageKey } from '@Lib/Services/Storage/storage_keys'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ApplicationStage } from '@standardnotes/applications'

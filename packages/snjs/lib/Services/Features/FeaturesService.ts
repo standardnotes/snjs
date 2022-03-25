@@ -29,15 +29,15 @@ import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/p
 import { SNSettingsService } from '../Settings'
 import { SettingName } from '@standardnotes/settings'
 import { arraysEqual, convertTimestampToMilliseconds, removeFromArray } from '@standardnotes/utils'
-import { SNSessionManager } from '@Lib/services/Session/SessionManager'
+import { SNSessionManager } from '@Lib/Services/Session/SessionManager'
 import {
   API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
   API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
   API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
   INVALID_EXTENSION_URL,
-} from '@Lib/services/Api/Messages'
+} from '@Lib/Services/Api/Messages'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
-import { ButtonType, SNAlertService } from '@Lib/services/Alert/AlertService'
+import { ButtonType, SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
 import { Copy, lastElement } from '@standardnotes/utils'
 import { FeaturesClientInterface } from './ClientInterface'

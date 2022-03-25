@@ -12,7 +12,7 @@ import {
   FillItemContent,
 } from '@standardnotes/payloads'
 import { Uuids } from '@Lib/Models/Functions'
-import { ItemManager } from '@Lib/services/Items/ItemManager'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { EncryptionDelegate } from './EncryptionDelegate'
 import { SyncEvent } from '@Lib/Application/events'
 import { CreateItemFromPayload } from '@Lib/Models/Generator'
@@ -49,7 +49,7 @@ import {
   ApplicationIdentifier,
 } from '@standardnotes/applications'
 import { StorageKey } from '@Lib/Services/Storage/storage_keys'
-import { StorageValueModes } from '@Lib/services/Storage/StorageService'
+import { StorageValueModes } from '@Lib/Services/Storage/StorageService'
 import {
   AbstractService,
   DeviceInterface,

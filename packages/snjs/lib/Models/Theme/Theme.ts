@@ -3,7 +3,7 @@ import { SNItem } from '@Lib/Models/Item/Item'
 import { ConflictStrategy } from '@Lib/Protocol/payloads/deltas/strategies'
 import { SNComponent } from '@Lib/Models/Component/Component'
 import { ComponentArea } from '@standardnotes/features'
-import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
+import { HistoryEntry } from '@Lib/Services/History/Entries/HistoryEntry'
 
 export class SNTheme extends SNComponent {
   public area: ComponentArea = ComponentArea.Themes

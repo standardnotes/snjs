@@ -1,5 +1,5 @@
 import { isEmpty } from '@standardnotes/utils'
-import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
+import { HistoryEntry } from '@Lib/Services/History/Entries/HistoryEntry'
 
 export class NoteHistoryEntry extends HistoryEntry {
   previewTitle(): string {

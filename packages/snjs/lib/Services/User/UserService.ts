@@ -5,7 +5,7 @@ import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from
 import { KeyParamsOrigination } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
 import { SNRootKey } from '@Lib/Protocol/root_key'
-import { SNAlertService } from '@Lib/services/Alert/AlertService'
+import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNRootKeyParams } from '../../Protocol/key_params'
 import {
   CredentialsChangeStrings,
@@ -20,9 +20,9 @@ import {
   ProtocolUpgradeStrings,
 } from '../Api/Messages'
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
-import { SNProtocolService } from '@Lib/services/Protocol/ProtocolService'
-import { ItemManager } from '@Lib/services/Items/ItemManager'
-import { SNStorageService, StoragePersistencePolicies } from '@Lib/services/Storage/StorageService'
+import { SNProtocolService } from '@Lib/Services/Protocol/ProtocolService'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
+import { SNStorageService, StoragePersistencePolicies } from '@Lib/Services/Storage/StorageService'
 import { SNSyncService } from '../Sync/SyncService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Session/SessionManager'
 import { ChallengeService } from '../Challenge/ChallengeService'

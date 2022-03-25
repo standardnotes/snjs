@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { ItemManager } from '@Lib/services/Items/ItemManager'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNItem, SingletonStrategy } from '@Lib/Models/Item/Item'
 import {
   arrayByRemovingFromIndex,

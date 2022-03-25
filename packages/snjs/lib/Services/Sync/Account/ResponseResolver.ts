@@ -6,7 +6,7 @@ import {
   CopyPayload,
   filterDisallowedRemotePayloads,
 } from '@standardnotes/payloads'
-import { SyncResponse } from '@Lib/services/Sync/Response'
+import { SyncResponse } from '@Lib/Services/Sync/Response'
 import { DeltaClassForSource } from '@Lib/Protocol/payloads/deltas/generator'
 import { HistoryMap } from '@Lib/Services/History/HistoryMap'
 

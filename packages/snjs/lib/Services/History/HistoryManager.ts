@@ -13,8 +13,8 @@ import {
   DeviceInterface,
   InternalEventBusInterface,
 } from '@standardnotes/services'
-import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
-import { CreateHistoryEntryForPayload } from '@Lib/services/History/Entries/Generator'
+import { HistoryEntry } from '@Lib/Services/History/Entries/HistoryEntry'
+import { CreateHistoryEntryForPayload } from '@Lib/Services/History/Entries/Generator'
 import { UuidString } from '../../Types/UuidString'
 import {
   MinimalHttpResponse,
@@ -22,14 +22,14 @@ import {
   RevisionListResponse,
   SingleRevisionResponse,
 } from '@standardnotes/responses'
-import { SNStorageService } from '@Lib/services/Storage/StorageService'
-import { ItemManager } from '@Lib/services/Items/ItemManager'
+import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNItem } from '@Lib/Models/Item/Item'
 import { ContentType } from '@standardnotes/common'
 import { StorageKey } from '@Lib/Services/Storage/storage_keys'
 import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
-import { SNApiService } from '@Lib/services/Api/ApiService'
-import { SNProtocolService } from '@Lib/services/Protocol/ProtocolService'
+import { SNApiService } from '@Lib/Services/Api/ApiService'
+import { SNProtocolService } from '@Lib/Services/Protocol/ProtocolService'
 import { HistoryMap, historyMapFunctions } from './HistoryMap'
 
 const PersistTimeout = 2000

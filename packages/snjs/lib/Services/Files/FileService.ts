@@ -8,7 +8,7 @@ import { SNFile, FileProtocolV1Constants, FileContent, FileMetadata } from '../.
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNAlertService } from '../Alert/AlertService'
 import { SNSyncService } from '../Sync/SyncService'
-import { ItemManager } from '@Lib/services/Items/ItemManager'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidGenerator } from '@standardnotes/utils'
 import { FillItemContent } from '@standardnotes/payloads'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
