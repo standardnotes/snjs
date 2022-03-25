@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.4.0...@standardnotes/responses@1.4.1) (2022-03-25)
+
+
+### Bug Fixes
+
+* add uuid and sync error types ([239faaf](https://github.com/standardnotes/snjs/commit/239faaf00be8739c9a0b03f9fdb9dad0705b1019))
+
+
+
+
+
 # [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.3.21...@standardnotes/responses@1.4.0) (2022-03-24)
 
 
