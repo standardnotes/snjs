@@ -1,4 +1,4 @@
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
+import { ConflictStrategy } from '@Lib/Protocol/payloads/deltas/strategies'
 import { isValidUrl } from '@standardnotes/utils'
 import { Predicate, PurePayload } from '@standardnotes/payloads'
 import { SNItem } from '@Lib/Models/Item/Item'

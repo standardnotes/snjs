@@ -1,4 +1,4 @@
-import { SNApplication } from '../../application'
+import { SNApplication } from '../../Application/application'
 import { SNItem } from '@Lib/Models/Item/Item'
 
 /** Keeps an item reference up to date with changes */

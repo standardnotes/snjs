@@ -1,6 +1,6 @@
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 import { SNItem } from '@Lib/Models/Item/Item'
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
+import { ConflictStrategy } from '@Lib/Protocol/payloads/deltas/strategies'
 import { ProtocolVersion } from '@standardnotes/common'
 
 /**

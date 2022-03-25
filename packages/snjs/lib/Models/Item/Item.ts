@@ -12,7 +12,7 @@ import {
 } from '@standardnotes/payloads'
 import { HistoryEntry } from '@Lib/services/History/Entries/HistoryEntry'
 import { SNLog } from '../../log'
-import { ConflictStrategy } from '@Protocol/payloads/deltas/strategies'
+import { ConflictStrategy } from '@Lib/Protocol/payloads/deltas/strategies'
 import { UuidString } from '../../Types/UuidString'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
 import { PrefKey } from '../UserPrefs/UserPrefs'
