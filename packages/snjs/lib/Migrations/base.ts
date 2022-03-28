@@ -25,6 +25,7 @@ const LastMigrationTimeStampKey2_0_0 = 'last_migration_timestamp'
 export class BaseMigration extends Migration {
   private reader?: StorageReader
   private didPreRun = false
+  private memoizedNeedsKeychainRepair?: boolean
 
   public async preRun() {
     await this.storeVersionNumber()
@@ -125,6 +126,10 @@ export class BaseMigration extends Migration {
    */
 
   public async needsKeychainRepair() {
+    if (this.memoizedNeedsKeychainRepair != undefined) {
+      return this.memoizedNeedsKeychainRepair
+    }
+
     if (!this.didPreRun) {
       throw Error('Attempting to access specialized function before prerun')
     }
@@ -135,28 +140,33 @@ export class BaseMigration extends Migration {
     const usesKeychain = this.reader!.usesKeychain
     if (!usesKeychain) {
       /** Doesn't apply if this version did not use a keychain to begin with */
-      return false
+      this.memoizedNeedsKeychainRepair = false
+      return this.memoizedNeedsKeychainRepair
     }
 
     const rawAccountParams = await this.reader!.getAccountKeyParams()
     const hasAccountKeyParams = !isNullOrUndefined(rawAccountParams)
     if (!hasAccountKeyParams) {
       /** Doesn't apply if account is not involved */
-      return false
+      this.memoizedNeedsKeychainRepair = false
+      return this.memoizedNeedsKeychainRepair
     }
 
     const hasPasscode = await this.reader!.hasPasscode()
     if (hasPasscode) {
       /** Doesn't apply if using passcode, as keychain would be bypassed in that case */
-      return false
+      this.memoizedNeedsKeychainRepair = false
+      return this.memoizedNeedsKeychainRepair
     }
 
     const accountKeysMissing = !(await this.reader!.hasNonWrappedAccountKeys())
     if (!accountKeysMissing) {
-      return false
+      this.memoizedNeedsKeychainRepair = false
+      return this.memoizedNeedsKeychainRepair
     }
 
-    return true
+    this.memoizedNeedsKeychainRepair = true
+    return this.memoizedNeedsKeychainRepair
   }
 
   private async repairMissingKeychain() {
