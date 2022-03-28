@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.26.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.25.6...@standardnotes/domain-events@2.26.0) (2022-03-28)
+
+
+### Bug Fixes
+
+* remove offline property from shared subscription invitation created event ([a7414d8](https://github.com/standardnotes/snjs/commit/a7414d8980b67d446e1c85c10dc5fce51ad4ce1c))
+
+
+### Features
+
+* add SHARED_SUBSCRIPTION_INVITATION_CREATED event ([df60423](https://github.com/standardnotes/snjs/commit/df60423643c1e8c5327f109fe14514cd7bfc763a))
+
+
+
+
+
 ## [2.25.6](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.25.5...@standardnotes/domain-events@2.25.6) (2022-03-23)
 
 **Note:** Version bump only for package @standardnotes/domain-events
