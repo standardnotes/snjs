@@ -4,5 +4,4 @@ export interface SharedSubscriptionInvitationCreatedEventPayload {
   inviteeIdentifier: string
   inviteeIdentifierType: 'email' | 'hash'
   sharedSubscriptionInvitationUuid: string
-  offline: boolean
 }
