@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.92.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.4...@standardnotes/snjs@2.92.5) (2022-03-28)
+
+
+### Bug Fixes
+
+* memoize needs keychain repair value to minimize keychain requests for mobile ([#676](https://github.com/standardnotes/snjs/issues/676)) ([177a967](https://github.com/standardnotes/snjs/commit/177a967fdd758399d1acbca970003a086e566167))
+
+
+
+
+
 ## [2.92.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.3...@standardnotes/snjs@2.92.4) (2022-03-28)
 
 **Note:** Version bump only for package @standardnotes/snjs
