@@ -40,6 +40,7 @@ import {
   isVersionLessThanOrEqualTo,
   EncryptionIntent,
   ApplicationIdentifier,
+  ItemContentTypeUsesRootKeyEncryption,
 } from '@standardnotes/applications'
 import { StorageKey } from '@Lib/Services/Storage/storage_keys'
 import { StorageValueModes } from '@Lib/Services/Storage/StorageService'
@@ -405,7 +406,11 @@ export class SNProtocolService extends AbstractService {
           return item.payload.ejected()
         } else {
           const payload = CreateSourcedPayloadFromObject(item.payload, PayloadSource.FileImport)
-          return this.itemsEncryption.encryptPayload(payload, intent).then((p) => p.ejected())
+          if (ItemContentTypeUsesRootKeyEncryption(payload.content_type)) {
+            return this.rootKeyEncryption.encryptPayload(payload, intent).then((p) => p.ejected())
+          } else {
+            return this.itemsEncryption.encryptPayload(payload, intent).then((p) => p.ejected())
+          }
         }
       }),
     )
