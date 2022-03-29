@@ -45,7 +45,7 @@ import { AbstractService, InternalEventBusInterface } from '@standardnotes/servi
 import { Strings } from '@Lib/Strings'
 import { ShareToken } from './ShareToken'
 import { Session } from './Sessions/Session'
-import { RemoteSession } from './Sessions/Types'
+import { RemoteSession, RawStorageValue } from './Sessions/Types'
 import { TokenSession } from './Sessions/TokenSession'
 import { JwtSession } from './Sessions/JwtSession'
 import { SessionsClientInterface } from './SessionsClientInterface'
@@ -118,15 +118,16 @@ export class SNSessionManager
 
   public async initializeFromDisk() {
     this.setUser(await this.storageService.getValue(StorageKey.User))
+
     if (!this.user) {
       /** @legacy Check for uuid. */
-      const uuid = await this.storageService.getValue(StorageKey.LegacyUuid)
+      const uuid = await this.storageService.getValue<string>(StorageKey.LegacyUuid)
       if (uuid) {
         this.setUser({ uuid: uuid, email: uuid })
       }
     }
 
-    const rawSession = await this.storageService.getValue(StorageKey.Session)
+    const rawSession = await this.storageService.getValue<RawStorageValue>(StorageKey.Session)
     if (rawSession) {
       const session = SessionFromRawStorageValue(rawSession)
       await this.setSession(session, false)

@@ -10,10 +10,6 @@ export type EncryptedParameters = {
 
   /** @deprecated */
   auth_hash?: string
-
-  /** @deprecated */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  auth_params?: any
 }
 
 export type DecryptedParameters = {
@@ -27,6 +23,10 @@ export type DecryptedParameters = {
 
   /** @deprecated */
   auth_hash: undefined
+
+  /** @deprecated */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  auth_params?: any
 }
 
 export type ErroredDecryptingParameters = {

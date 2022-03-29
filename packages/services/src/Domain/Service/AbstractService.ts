@@ -1,60 +1,49 @@
 /* istanbul ignore file */
 import { log, removeFromArray } from '@standardnotes/utils'
 import { ApplicationStage } from '@standardnotes/applications'
-import { DeviceInterface } from '../Device/DeviceInterface'
 import { EventObserver } from '../Event/EventObserver'
 import { ServiceInterface } from './ServiceInterface'
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
 import { InternalEventPublishStrategy } from '..'
 
-export abstract class AbstractService<EventName = string, EventData = undefined> implements ServiceInterface<EventName, EventData> {
+export abstract class AbstractService<EventName = string, EventData = undefined>
+  implements ServiceInterface<EventName, EventData>
+{
   private eventObservers: EventObserver<EventName, EventData>[] = []
   public loggingEnabled = false
-  public deviceInterface?: DeviceInterface
   private criticalPromises: Promise<unknown>[] = []
 
-  constructor(
-    protected internalEventBus: InternalEventBusInterface,
-  ) {
-  }
+  constructor(protected internalEventBus: InternalEventBusInterface) {}
 
-  public addEventObserver(
-    observer: EventObserver<EventName, EventData>
-  ): () => void {
+  public addEventObserver(observer: EventObserver<EventName, EventData>): () => void {
     this.eventObservers.push(observer)
     return () => {
       removeFromArray(this.eventObservers, observer)
     }
   }
 
-  protected async notifyEvent(
-    eventName: EventName,
-    data?: EventData
-  ): Promise<void> {
+  protected async notifyEvent(eventName: EventName, data?: EventData): Promise<void> {
     for (const observer of this.eventObservers) {
       await observer(eventName, data)
     }
 
     this.internalEventBus.publish({
-      type: (eventName as unknown) as string,
+      type: eventName as unknown as string,
       payload: data,
     })
   }
 
-  protected async notifyEventSync(
-    eventName: EventName,
-    data?: EventData
-  ): Promise<void> {
+  protected async notifyEventSync(eventName: EventName, data?: EventData): Promise<void> {
     for (const observer of this.eventObservers) {
       await observer(eventName, data)
     }
 
     await this.internalEventBus.publishSync(
       {
-        type: (eventName as unknown) as string,
+        type: eventName as unknown as string,
         payload: data,
       },
-      InternalEventPublishStrategy.SEQUENCE
+      InternalEventPublishStrategy.SEQUENCE,
     )
   }
 
@@ -72,7 +61,6 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
    */
   public deinit(): void {
     this.eventObservers.length = 0
-    this.deviceInterface = undefined
   }
 
   /**
@@ -82,9 +70,7 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
    * parent application instance will await all criticial functions via the `blockDeinit`
    * function before signing out and deiniting.
    */
-  protected async executeCriticalFunction<T = void>(
-    func: () => Promise<T>
-  ): Promise<T> {
+  protected async executeCriticalFunction<T = void>(func: () => Promise<T>): Promise<T> {
     const promise = func()
     this.criticalPromises.push(promise)
     return promise

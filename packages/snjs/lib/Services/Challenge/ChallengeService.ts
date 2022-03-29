@@ -34,7 +34,7 @@ export type ChallengeObserver = {
  */
 export class ChallengeService extends AbstractService {
   private challengeOperations: Record<string, ChallengeOperation> = {}
-  public sendChallenge?: (challenge: Challenge) => void
+  public sendChallenge!: (challenge: Challenge) => void
   private challengeObservers: Record<string, ChallengeObserver[]> = {}
 
   constructor(
@@ -49,7 +49,7 @@ export class ChallengeService extends AbstractService {
   public deinit() {
     ;(this.storageService as unknown) = undefined
     ;(this.protocolService as unknown) = undefined
-    this.sendChallenge = undefined
+    ;(this.sendChallenge as unknown) = undefined
     ;(this.challengeOperations as unknown) = undefined
     ;(this.challengeObservers as unknown) = undefined
     super.deinit()
@@ -62,7 +62,7 @@ export class ChallengeService extends AbstractService {
   public promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined> {
     return new Promise<ChallengeResponse | undefined>((resolve) => {
       this.createOrGetChallengeOperation(challenge, resolve)
-      this.sendChallenge!(challenge)
+      this.sendChallenge(challenge)
     })
   }
 

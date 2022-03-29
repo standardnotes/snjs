@@ -16,7 +16,6 @@ import {
   PurePayload,
 } from '@standardnotes/payloads'
 import * as Responses from '@standardnotes/responses'
-
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
 import { ClientDisplayableError } from '@Lib/Application/ClientError'
 import { EncryptedFileInterface } from '../Files/types'
@@ -103,16 +102,16 @@ export class SNApiService
     this.invalidSessionObserver = observer
   }
 
-  public async loadHost(): Promise<void> {
-    const storedValue = await this.storageService.getValue(StorageKey.ServerHost)
+  public loadHost(): void {
+    const storedValue = this.storageService.getValue<string | undefined>(StorageKey.ServerHost)
     this.host =
       storedValue ||
       this.host ||
-      (
+      ((
         window as {
           _default_sync_server?: string
         }
-      )._default_sync_server
+      )._default_sync_server as string)
   }
 
   public async setHost(host: string): Promise<void> {

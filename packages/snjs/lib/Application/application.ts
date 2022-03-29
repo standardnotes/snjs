@@ -848,12 +848,12 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.userService.changePasscode(newPasscode, origination)
   }
 
-  public getStorageEncryptionPolicy(): Services.StorageEncryptionPolicies {
+  public getStorageEncryptionPolicy(): Services.StorageEncryptionPolicy {
     return this.storageService.getStorageEncryptionPolicy()
   }
 
   public async setStorageEncryptionPolicy(
-    encryptionPolicy: Services.StorageEncryptionPolicies,
+    encryptionPolicy: Services.StorageEncryptionPolicy,
   ): Promise<void> {
     await this.storageService.setEncryptionPolicy(encryptionPolicy)
     return this.protocolService.repersistAllItems()
@@ -881,9 +881,11 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   public changeDeviceInterface(deviceInterface: ExternalServices.DeviceInterface): void {
     this.deviceInterface = deviceInterface
+
     for (const service of this.services) {
-      if (service.deviceInterface) {
-        service.deviceInterface = deviceInterface
+      if ('deviceInterface' in service) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(service as any)['deviceInterface'] = deviceInterface
       }
     }
   }
@@ -934,8 +936,7 @@ export class SNApplication implements Services.ListedClientInterface {
     this.createItemManager()
     this.createStorageManager()
     this.createProtocolService()
-    this.storageService.itemsEncryption = this.protocolService.itemsEncryption
-    this.storageService.rootKeyEncryption = this.protocolService.rootKeyEncryption
+    this.storageService.provideEncryptionProvider(this.protocolService)
     this.createChallengeService()
     this.createHttpManager()
     this.createApiService()

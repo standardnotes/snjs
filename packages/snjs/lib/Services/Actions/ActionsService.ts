@@ -189,26 +189,36 @@ export class SNActionsService extends AbstractService {
       return
     }
 
-    let decryptedPayload = await this.protocolService.itemsEncryption.decryptPayload(payload)
+    let decryptedPayload = await this.protocolService.decryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [payload],
+      },
+    })
+
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload
     }
 
     if (rootKey) {
-      decryptedPayload = await this.protocolService.rootKeyEncryption.decryptPayload(
-        payload,
-        rootKey,
-      )
+      decryptedPayload = await this.protocolService.decryptSplitSingle({
+        usesRootKey: {
+          items: [payload],
+          key: rootKey,
+        },
+      })
       if (!decryptedPayload.errorDecrypting) {
         return decryptedPayload
       }
     }
 
     for (const itemsKey of this.itemManager.itemsKeys()) {
-      const decryptedPayload = await this.protocolService.itemsEncryption.decryptPayload(
-        payload,
-        itemsKey,
-      )
+      const decryptedPayload = await this.protocolService.decryptSplitSingle({
+        usesItemsKey: {
+          items: [payload],
+          key: itemsKey,
+        },
+      })
+
       if (!decryptedPayload.errorDecrypting) {
         return decryptedPayload
       }
@@ -240,11 +250,7 @@ export class SNActionsService extends AbstractService {
       if (!key) {
         continue
       }
-      const nestedResponse: any = await this.payloadByDecryptingResponse(
-        response,
-        key,
-        triedPasswords,
-      )
+      const nestedResponse = await this.payloadByDecryptingResponse(response, key, triedPasswords)
       if (nestedResponse) {
         return nestedResponse
       }
@@ -303,11 +309,17 @@ export class SNActionsService extends AbstractService {
   }
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
-    const intent = decrypted ? EncryptionIntent.FileDecrypted : EncryptionIntent.FileEncrypted
-    const encrypted = await this.protocolService.itemsEncryption.encryptPayload(
-      item.payloadRepresentation(),
-      intent,
+    if (decrypted) {
+      return item.payload.ejected()
+    }
+
+    const encrypted = await this.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: { items: [item.payload] },
+      },
+      EncryptionIntent.FileEncrypted,
     )
+
     return encrypted.ejected()
   }
 }

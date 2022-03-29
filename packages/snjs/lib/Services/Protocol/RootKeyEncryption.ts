@@ -9,6 +9,7 @@ import {
   ErroredDecryptingParameters,
   DecryptedParameters,
   mergePayloadWithEncryptionParameters,
+  RawPayload,
 } from '@standardnotes/payloads'
 import { Uuids } from '@Lib/Models/Functions'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
@@ -23,6 +24,7 @@ import {
   ProtocolVersionLastNonrootItemsKey,
   ProtocolVersion,
   KeyParamsOrigination,
+  AnyKeyParamsContent,
 } from '@standardnotes/common'
 import { ApplicationIdentifier, compareVersions } from '@standardnotes/applications'
 import {
@@ -118,6 +120,10 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
     }
   }
 
+  public hasRootKeyEncryptionSource(): boolean {
+    return this.hasAccount() || this.hasPasscode()
+  }
+
   public hasPasscode() {
     return this.keyMode === KeyMode.WrapperOnly || this.keyMode === KeyMode.RootKeyPlusWrapper
   }
@@ -171,7 +177,7 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
       return undefined
     }
 
-    return CreateAnyKeyParams(rawKeyParams)
+    return CreateAnyKeyParams(rawKeyParams as AnyKeyParamsContent)
   }
 
   public async getSureRootKeyWrapperKeyParams() {
@@ -241,7 +247,8 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
    * wrapped root key.
    */
   public async validateWrappingKey(wrappingKey: SNRootKey) {
-    const wrappedRootKey = await this.getWrappedRootKey()
+    const wrappedRootKey = (await this.getWrappedRootKey()) as RawPayload
+
     /** If wrapper only, storage is encrypted directly with wrappingKey */
     if (this.keyMode === KeyMode.WrapperOnly) {
       return this.storageService.canDecryptWithKey(wrappingKey)
@@ -267,11 +274,12 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
+
     if (!rawKeyParams) {
       return
     }
 
-    this.memoizedRootKeyParams = CreateAnyKeyParams(rawKeyParams)
+    this.memoizedRootKeyParams = CreateAnyKeyParams(rawKeyParams as AnyKeyParamsContent)
     return this.memoizedRootKeyParams
   }
 
@@ -304,7 +312,7 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
       throw 'Invalid key mode condition for unwrapping.'
     }
 
-    const wrappedKey = await this.getWrappedRootKey()
+    const wrappedKey = (await this.getWrappedRootKey()) as RawPayload
     const payload = CreateMaxPayloadFromAnyObject(wrappedKey)
     const decrypted = await this.decryptPayload(payload, wrappingKey)
 

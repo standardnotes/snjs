@@ -9,12 +9,12 @@ import {
   ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
-  CopyEncryptionParameters,
-  CreateEncryptionParameters,
   CreateMaxPayloadFromAnyObject,
-  PayloadFormat,
   PurePayload,
   FillItemContent,
+  EncryptedParameters,
+  DecryptedParameters,
+  ErroredDecryptingParameters,
 } from '@standardnotes/payloads'
 import { ItemsKeyContent } from '../operator'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
@@ -164,20 +164,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   public async generateEncryptedParametersAsync(
     payload: PurePayload,
-    format: PayloadFormat,
-    key?: SNItemsKey | SNRootKey,
-  ): Promise<PurePayload> {
-    if (format === PayloadFormat.DecryptedBareObject) {
-      return CreateEncryptionParameters({
-        content: payload.content,
-      })
-    }
-    if (format !== PayloadFormat.EncryptedString) {
-      throw `Unsupport format for generateEncryptedParameters ${format}`
-    }
-    if (!key || !key.itemsKey) {
-      throw 'Attempting to generateEncryptedParameters with no itemsKey.'
-    }
+    key: SNItemsKey | SNRootKey,
+  ): Promise<EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
      * Will be split to create encryption key and authentication key.
@@ -187,50 +175,44 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       itemKey,
       key.itemsKey,
       key.dataAuthenticationKey,
-      payload.uuid!,
+      payload.uuid,
       key.keyVersion,
       key instanceof SNRootKey ? (key as SNRootKey).keyParams : undefined,
     )
-    /** Encrypt content */
+
     const ek = firstHalfOfString(itemKey)
     const ak = secondHalfOfString(itemKey)
     const ciphertext = await this.encryptTextParams(
       JSON.stringify(payload.content),
       ek,
       ak,
-      payload.uuid!,
+      payload.uuid,
       key.keyVersion,
       key instanceof SNRootKey ? (key as SNRootKey).keyParams : undefined,
     )
-    return CreateEncryptionParameters({
+
+    return {
       uuid: payload.uuid,
       items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
       content: ciphertext,
       enc_item_key: encItemKey,
-    })
+    }
   }
 
   public async generateDecryptedParametersAsync(
-    encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey,
-  ): Promise<PurePayload> {
-    const format = encryptedParameters.format
-    if (format === PayloadFormat.DecryptedBareObject) {
-      /** No decryption required */
-      return encryptedParameters
-    }
-    if (!encryptedParameters.enc_item_key) {
+    payload: PurePayload,
+    key: SNItemsKey | SNRootKey,
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+    if (!payload.enc_item_key) {
       SNLog.error(Error('Missing item encryption key, skipping decryption.'))
-      return CopyEncryptionParameters(encryptedParameters, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting,
-      })
-    }
-    if (!key || !key.itemsKey) {
-      throw Error('Attempting to generateDecryptedParameters with no itemsKey.')
+        errorDecryptingValueChanged: !payload.errorDecrypting,
+      }
     }
     /* Decrypt encrypted key */
-    const encryptedItemKey = encryptedParameters.enc_item_key
+    const encryptedItemKey = payload.enc_item_key
     const itemKeyComponents = this.encryptionComponentsFromString002(
       encryptedItemKey,
       key.itemsKey,
@@ -245,20 +227,17 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       itemKeyComponents.authKey!,
     )
     if (!itemKey) {
-      console.error('Error decrypting item_key parameters', encryptedParameters)
-      return CopyEncryptionParameters(encryptedParameters, {
+      console.error('Error decrypting item_key parameters', payload)
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting,
-      })
+        errorDecryptingValueChanged: !payload.errorDecrypting,
+      }
     }
-    /* Decrypt content */
+
     const ek = firstHalfOfString(itemKey)
     const ak = secondHalfOfString(itemKey)
-    const itemParams = this.encryptionComponentsFromString002(
-      encryptedParameters.contentString,
-      ek,
-      ak,
-    )
+    const itemParams = this.encryptionComponentsFromString002(payload.contentString, ek, ak)
     const content = await this.decryptTextParams(
       itemParams.ciphertextToAuth,
       itemParams.contentCiphertext,
@@ -267,27 +246,30 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       itemParams.authHash,
       itemParams.authKey!,
     )
+
     if (!content) {
-      return CopyEncryptionParameters(encryptedParameters, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting,
-      })
+        errorDecryptingValueChanged: !payload.errorDecrypting,
+      }
     } else {
       let keyParams
       try {
         keyParams = JSON.parse(this.crypto.base64Decode(itemParams.keyParams))
         // eslint-disable-next-line no-empty
       } catch (e) {}
-      return CopyEncryptionParameters(encryptedParameters, {
+      return {
+        uuid: payload.uuid,
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
         auth_hash: undefined,
         auth_params: keyParams,
         errorDecrypting: false,
-        errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
+        errorDecryptingValueChanged: payload.errorDecrypting === true,
         waitingForKey: false,
-      })
+      }
     }
   }
 
@@ -299,7 +281,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       V002Algorithm.PbkdfOutputLength,
     )
     const partitions = splitString(derivedKey!, 3)
-    const key = await SNRootKey.Create({
+    const key = SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       dataAuthenticationKey: partitions[2],

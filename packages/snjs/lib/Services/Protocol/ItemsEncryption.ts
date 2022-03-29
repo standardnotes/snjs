@@ -68,7 +68,7 @@ export class ItemsEncryptionService extends AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public itemsKeyForPayload(payload: PurePayload) {
+  public itemsKeyForPayload(payload: PurePayload): SNItemsKey | undefined {
     return this.getItemsKeys().find(
       (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
     )

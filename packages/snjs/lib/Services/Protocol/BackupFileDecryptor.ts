@@ -92,7 +92,7 @@ function findKeyToUseForPayload(
   let itemsKey: SNItemsKey | SNRootKey | undefined
 
   if (payload.items_key_id) {
-    itemsKey = protocolService.itemsEncryption.itemsKeyForPayload(payload)
+    itemsKey = protocolService.itemsKeyForPayload(payload)
     if (itemsKey) {
       return itemsKey
     }
@@ -119,10 +119,7 @@ function findKeyToUseForPayload(
    * root key directly because it's missing dataAuthenticationKey.
    */
   if (leftVersionGreaterThanOrEqualToRight(keyParams.version, ProtocolVersion.V004)) {
-    itemsKey = protocolService.itemsEncryption.defaultItemsKeyForItemVersion(
-      payloadVersion,
-      availableKeys,
-    )
+    itemsKey = protocolService.defaultItemsKeyForItemVersion(payloadVersion, availableKeys)
   } else if (compareVersions(payloadVersion, ProtocolVersion.V003) <= 0) {
     itemsKey = fallbackRootKey
   }
@@ -156,17 +153,22 @@ async function decryptWithItemsKeys(
       if (!key) {
         continue
       }
+
       if (key instanceof SNItemsKey) {
-        const decryptedPayload = await protocolService.itemsEncryption.decryptPayload(
-          encryptedPayload,
-          key,
-        )
+        const decryptedPayload = await protocolService.decryptSplitSingle({
+          usesItemsKey: {
+            items: [encryptedPayload],
+            key: key,
+          },
+        })
         decryptedPayloads.push(decryptedPayload)
       } else {
-        const decryptedPayload = await protocolService.rootKeyEncryption.decryptPayload(
-          encryptedPayload,
-          key,
-        )
+        const decryptedPayload = await protocolService.decryptSplitSingle({
+          usesRootKey: {
+            items: [encryptedPayload],
+            key: key,
+          },
+        })
         decryptedPayloads.push(decryptedPayload)
       }
     } catch (e) {
@@ -195,10 +197,12 @@ async function decryptEncrypted(
     return payload.content_type === ContentType.ItemsKey
   })
 
-  const decryptedItemsKeysPayloads = await protocolService.rootKeyEncryption.decryptPayloads(
-    itemsKeysPayloads,
-    rootKey,
-  )
+  const decryptedItemsKeysPayloads = await protocolService.decryptSplit({
+    usesRootKey: {
+      items: itemsKeysPayloads,
+      key: rootKey,
+    },
+  })
 
   const results: PurePayload[] = []
   extendArray(results, decryptedItemsKeysPayloads)

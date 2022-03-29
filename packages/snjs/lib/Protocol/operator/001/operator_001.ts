@@ -7,10 +7,11 @@ import {
   RootKeyEncryptedAuthenticatedData,
   FillItemContent,
   PurePayload,
-  CopyEncryptionParameters,
-  CreateEncryptionParameters,
   CreateMaxPayloadFromAnyObject,
   PayloadFormat,
+  EncryptedParameters,
+  DecryptedParameters,
+  ErroredDecryptingParameters,
 } from '@standardnotes/payloads'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { Create001KeyParams, SNRootKeyParams } from '../../key_params'
@@ -108,87 +109,79 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
 
   public async generateEncryptedParametersAsync(
     payload: PurePayload,
-    format: PayloadFormat,
-    key?: SNItemsKey | SNRootKey,
-  ): Promise<PurePayload> {
-    if (format === PayloadFormat.DecryptedBareObject) {
-      return CreateEncryptionParameters({
-        content: payload.content,
-      })
-    }
-    if (format !== PayloadFormat.EncryptedString) {
-      throw `Unsupport format for generateEncryptedParameters ${format}`
-    }
-    if (!key) {
-      throw 'Attempting to generateEncryptedParameters with no itemsKey.'
-    }
+    key: SNItemsKey | SNRootKey,
+  ): Promise<EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
      * Will be split to create encryption key and authentication key.
      */
     const itemKey = this.crypto.generateRandomKey(V001Algorithm.EncryptionKeyLength * 2)
     const encItemKey = await this.encryptString(itemKey, key.itemsKey)
+
     /** Encrypt content */
     const ek = firstHalfOfString(itemKey)
     const ak = secondHalfOfString(itemKey)
     const contentCiphertext = await this.encryptString(JSON.stringify(payload.content), ek)
     const ciphertext = key.keyVersion + contentCiphertext
     const authHash = await this.crypto.hmac256(ciphertext, ak)
-    return CreateEncryptionParameters({
+
+    return {
       uuid: payload.uuid,
       items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
       content: ciphertext,
       enc_item_key: encItemKey!,
       auth_hash: authHash!,
-    })
+    }
   }
 
   public async generateDecryptedParametersAsync(
-    encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey,
-  ): Promise<PurePayload> {
-    const format = encryptedParameters.format
-    if (format === PayloadFormat.DecryptedBareObject) {
-      /** No decryption required */
-      return encryptedParameters
-    }
-    if (!encryptedParameters.enc_item_key) {
+    payload: PurePayload,
+    key: SNItemsKey | SNRootKey,
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+    if (!payload.enc_item_key) {
       SNLog.error(Error('Missing item encryption key, skipping decryption.'))
-      return CopyEncryptionParameters(encryptedParameters, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting,
-      })
+        errorDecryptingValueChanged: !payload.errorDecrypting,
+      }
     }
-    /** Decrypt encrypted key */
-    let encryptedItemKey = encryptedParameters.enc_item_key
+
+    let encryptedItemKey = payload.enc_item_key
     encryptedItemKey = this.version + encryptedItemKey
     const itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key!.itemsKey)
+
     const itemKey = await this.decryptString(itemKeyComponents.ciphertext, itemKeyComponents.key)
     if (!itemKey) {
-      console.error('Error decrypting parameters', encryptedParameters)
-      return CopyEncryptionParameters(encryptedParameters, {
+      console.error('Error decrypting parameters', payload)
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting,
-      })
+        errorDecryptingValueChanged: !payload.errorDecrypting,
+      }
     }
+
     const ek = firstHalfOfString(itemKey)
-    const itemParams = this.encryptionComponentsFromString(encryptedParameters.contentString, ek)
+    const itemParams = this.encryptionComponentsFromString(payload.contentString, ek)
     const content = await this.decryptString(itemParams.ciphertext, itemParams.key)
+
     if (!content) {
-      return CopyEncryptionParameters(encryptedParameters, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !encryptedParameters.errorDecrypting,
-      })
+        errorDecryptingValueChanged: !payload.errorDecrypting,
+      }
     } else {
-      return CopyEncryptionParameters(encryptedParameters, {
+      return {
+        uuid: payload.uuid,
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
         auth_hash: undefined,
         errorDecrypting: false,
-        errorDecryptingValueChanged: encryptedParameters.errorDecrypting === true,
+        errorDecryptingValueChanged: payload.errorDecrypting === true,
         waitingForKey: false,
-      })
+      }
     }
   }
 

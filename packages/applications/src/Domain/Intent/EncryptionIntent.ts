@@ -3,5 +3,10 @@ export enum EncryptionIntent {
   LocalStorageEncrypted = 2,
   LocalStorageDecrypted = 3,
   FileEncrypted = 5,
-  FileDecrypted = 6
+  FileDecrypted = 6,
 }
+
+export type EncryptedEncryptionIntent =
+  | EncryptionIntent.Sync
+  | EncryptionIntent.LocalStorageEncrypted
+  | EncryptionIntent.FileEncrypted

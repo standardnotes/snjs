@@ -29,7 +29,7 @@ import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
 import { OfflineSyncOperation } from '@Lib/Services/Sync/Offline/Operation'
 import { DeltaOutOfSync } from '@Lib/Protocol/payloads/deltas'
 import { ContentType } from '@standardnotes/common'
-import { EncryptionIntent, ItemContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
+import { EncryptionIntent } from '@standardnotes/applications'
 import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { Uuids } from '@Lib/Models/Functions'
 import { SyncSignal, SyncStats } from '@Lib/Services/Sync/Signals'
@@ -48,7 +48,11 @@ import {
   SyncSource,
 } from '@standardnotes/services'
 import { SyncClientInterface } from './SyncClientInterface'
-import { EncryptionSplitWithKey, splitItemsByEncryptionType } from '../Protocol/Functions'
+import {
+  createKeyLookupSplitFromSplit,
+  EncryptionSplitWithKey,
+  splitItemsByEncryptionType,
+} from '../Protocol/EncryptionSplit'
 
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
@@ -225,10 +229,13 @@ export class SNSyncService
     })
     subtractFromArray(payloads, itemsKeysPayloads)
 
-    const decryptedItemsKeys = await this.protocolService.rootKeyEncryption.decryptPayloads(
-      itemsKeysPayloads,
-      this.protocolService.rootKeyEncryption.getRootKey()!,
-    )
+    const itemsKeysSplit: EncryptionSplitWithKey<PurePayload> = {
+      usesRootKeyWithKeyLookup: {
+        items: itemsKeysPayloads,
+      },
+    }
+
+    const decryptedItemsKeys = await this.protocolService.decryptSplit(itemsKeysSplit)
     await this.payloadManager.emitPayloads(decryptedItemsKeys, PayloadSource.LocalRetrieved)
 
     /**
@@ -243,10 +250,20 @@ export class SNSyncService
     for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
       const currentPosition = batchIndex * batchSize
       const batch = payloads.slice(currentPosition, currentPosition + batchSize)
-      const decrypted = await this.protocolService.itemsEncryption.decryptPayloads(batch)
+
+      const split: EncryptionSplitWithKey<PurePayload> = {
+        usesItemsKeyWithKeyLookup: {
+          items: batch,
+        },
+      }
+      const decrypted = await this.protocolService.decryptSplit(split)
+
       await this.payloadManager.emitPayloads(decrypted, PayloadSource.LocalRetrieved)
+
       void this.notifyEvent(SyncEvent.LocalDataIncrementalLoad)
+
       this.opStatus.setDatabaseLoadStatus(currentPosition, payloadCount, false)
+
       await sleep(1, false)
     }
 
@@ -268,18 +285,18 @@ export class SNSyncService
     }
   }
 
-  private async getLastSyncToken() {
+  private async getLastSyncToken(): Promise<string> {
     if (!this.syncToken) {
-      this.syncToken = await this.storageService.getValue(StorageKey.LastSyncToken)
+      this.syncToken = (await this.storageService.getValue(StorageKey.LastSyncToken)) as string
     }
-    return this.syncToken as string
+    return this.syncToken
   }
 
-  private async getPaginationToken() {
+  private async getPaginationToken(): Promise<string> {
     if (!this.cursorToken) {
-      this.cursorToken = await this.storageService.getValue(StorageKey.PaginationToken)
+      this.cursorToken = (await this.storageService.getValue(StorageKey.PaginationToken)) as string
     }
-    return this.cursorToken as string
+    return this.cursorToken
   }
 
   private async clearSyncPositionTokens() {
@@ -347,9 +364,11 @@ export class SNSyncService
     if (this.spawnQueue.length === 0) {
       return null
     }
+
     const promise = this.spawnQueue[0]
     removeFromIndex(this.spawnQueue, 0)
     this.log('Syncing again from spawn queue')
+
     return this.sync({
       queueStrategy: SyncQueueStrategy.ForceSpawnNew,
       source: SyncSource.SpawnQueue,
@@ -365,16 +384,8 @@ export class SNSyncService
 
   private async payloadsByPreparingForServer(payloads: PurePayload[]) {
     const split = splitItemsByEncryptionType(payloads)
-    const splitWithKeys: EncryptionSplitWithKey<PurePayload> = {
-      usesItemsKey: split.usesItemsKey ? { items: split.usesItemsKey.items } : undefined,
-      usesRootKey: split.usesRootKey
-        ? {
-            items: split.usesRootKey.items,
-            key: this.protocolService.rootKeyEncryption.getRootKey()!,
-          }
-        : undefined,
-    }
-    return this.protocolService.encryptSplit(splitWithKeys, EncryptionIntent.Sync)
+    const keyLookupSplit = createKeyLookupSplitFromSplit(split)
+    return this.protocolService.encryptSplit(keyLookupSplit, EncryptionIntent.Sync)
   }
 
   public async downloadFirstSync(
@@ -872,6 +883,55 @@ export class SNSyncService
     void this.notifyEvent(SyncEvent.SyncError, response.error)
   }
 
+  private async processServerSuccessPayloads(payloads: PurePayload[]) {
+    const decryptedPayloads: PurePayload[] = []
+    const processedItemsKeyPayloads: Record<UuidString, PurePayload> = {}
+
+    for (const payload of payloads) {
+      if (payload.deleted || !payload.fields.includes(PayloadField.Content)) {
+        /**
+         * Deleted payloads, and some payload types
+         * do not contiain content (like remote saved)
+         */
+        continue
+      }
+
+      const itemsKeyPayload: PurePayload | undefined =
+        processedItemsKeyPayloads[payload.items_key_id as string]
+
+      const itemsKey = itemsKeyPayload
+        ? (CreateItemFromPayload(itemsKeyPayload) as SNItemsKey)
+        : undefined
+
+      const split = splitItemsByEncryptionType([payload])
+      if (split.usesRootKey) {
+        const decrypted = (
+          await this.protocolService.decryptSplit(createKeyLookupSplitFromSplit(split))
+        )[0]
+        if (decrypted.content_type === ContentType.ItemsKey) {
+          processedItemsKeyPayloads[decrypted.uuid] = decrypted
+        }
+        decryptedPayloads.push(decrypted)
+      } else {
+        const keyedSplit: EncryptionSplitWithKey<PurePayload> = {}
+        if (itemsKey) {
+          keyedSplit.usesItemsKey = {
+            items: [payload],
+            key: itemsKey,
+          }
+        } else {
+          keyedSplit.usesItemsKeyWithKeyLookup = {
+            items: [payload],
+          }
+        }
+        const decrypted = (await this.protocolService.decryptSplit(keyedSplit))[0]
+        decryptedPayloads.push(decrypted)
+      }
+    }
+
+    return { decryptedPayloads }
+  }
+
   private async handleSuccessServerResponse(
     operation: AccountSyncOperation,
     response: SyncResponse,
@@ -884,39 +944,9 @@ export class SNSyncService
     this.opStatus.clearError()
     this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
 
-    const decryptedPayloads = []
-    const processedPayloads = response.allProcessedPayloads
-    const processedItemsKeys: Record<UuidString, PurePayload> = {}
-
-    for (const payload of processedPayloads) {
-      if (payload.deleted || !payload.fields.includes(PayloadField.Content)) {
-        /* Deleted payloads, and some payload types
-          do not contiain content (like remote saved) */
-        continue
-      }
-      const itemsKeyPayload: PurePayload | undefined =
-        processedItemsKeys[payload.items_key_id as string]
-      const itemsKey = itemsKeyPayload
-        ? (CreateItemFromPayload(itemsKeyPayload) as SNItemsKey)
-        : undefined
-
-      if (ItemContentTypeUsesRootKeyEncryption(payload.content_type)) {
-        const decrypted = await this.protocolService.rootKeyEncryption.decryptPayload(
-          payload,
-          this.protocolService.rootKeyEncryption.getRootKey()!,
-        )
-        if (decrypted.content_type === ContentType.ItemsKey) {
-          processedItemsKeys[decrypted.uuid] = decrypted
-        }
-        decryptedPayloads.push(decrypted)
-      } else {
-        const decrypted = await this.protocolService.itemsEncryption.decryptPayload(
-          payload,
-          itemsKey,
-        )
-        decryptedPayloads.push(decrypted)
-      }
-    }
+    const { decryptedPayloads } = await this.processServerSuccessPayloads(
+      response.allProcessedPayloads,
+    )
 
     const masterCollection = this.payloadManager.getMasterCollection()
     const historyMap = this.historyService.getHistoryMapCopy()
@@ -991,12 +1021,12 @@ export class SNSyncService
   }
 
   async handleEvent(event: InternalEventInterface): Promise<void> {
-    if (event.type !== IntegrityEvent.IntegrityCheckCompleted) {
-      return
+    if (event.type === IntegrityEvent.IntegrityCheckCompleted) {
+      await this.handleIntegrityCheckEventResponse(event.payload as IntegrityEventPayload)
     }
+  }
 
-    const eventPayload: IntegrityEventPayload = event.payload as IntegrityEventPayload
-
+  private async handleIntegrityCheckEventResponse(eventPayload: IntegrityEventPayload) {
     const rawPayloads = eventPayload.rawPayloads
 
     if (rawPayloads.length === 0) {
@@ -1011,17 +1041,8 @@ export class SNSyncService
     )
 
     const split = splitItemsByEncryptionType(encryptedPayloads)
-    const splitWithKeys: EncryptionSplitWithKey<PurePayload> = {
-      usesItemsKey: split.usesItemsKey ? { items: split.usesItemsKey.items } : undefined,
-      usesRootKey: split.usesRootKey
-        ? {
-            items: split.usesRootKey.items,
-            key: this.protocolService.rootKeyEncryption.getRootKey()!,
-          }
-        : undefined,
-    }
-
-    const decryptedPayloads = await this.protocolService.decryptSplit(splitWithKeys)
+    const keyedSplit = createKeyLookupSplitFromSplit(split)
+    const decryptedPayloads = await this.protocolService.decryptSplit(keyedSplit)
 
     this.setInSync(false)
 

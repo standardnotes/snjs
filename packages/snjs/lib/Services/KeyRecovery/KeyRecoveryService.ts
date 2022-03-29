@@ -225,7 +225,7 @@ export class SNKeyRecoveryService extends AbstractService {
     return Promise.all(this.decryptionQueue.map((q) => q.promise))
   }
 
-  private async getClientKeyParams() {
+  private getClientKeyParams() {
     return this.protocolService.getAccountKeyParams()
   }
 
@@ -413,11 +413,15 @@ export class SNKeyRecoveryService extends AbstractService {
     const password = response.values[0].value as string
     /** Generate a root key using the input */
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
+
     /** Attempt to decrypt this items key using the root key */
-    const decryptedPayload = await this.protocolService.rootKeyEncryption.decryptPayload(
-      key.payload,
-      rootKey,
-    )
+    const decryptedPayload = await this.protocolService.decryptSplitSingle({
+      usesRootKey: {
+        items: [key.payload],
+        key: rootKey,
+      },
+    })
+
     /** Dismiss challenge */
     this.challengeService.completeChallenge(challenge)
 
@@ -454,14 +458,20 @@ export class SNKeyRecoveryService extends AbstractService {
       const wrappingKey = await this.getWrappingKeyIfApplicable()
       await this.protocolService.setRootKey(rootKey, wrappingKey)
     }
+
     const matching = this.popQueueForKeyParams(rootKey.keyParams)
-    const decryptedMatching = await this.protocolService.rootKeyEncryption.decryptPayloads(
-      matching.map((m) => m.key.payload),
-      rootKey,
-    )
+    const decryptedMatching = await this.protocolService.decryptSplit({
+      usesRootKey: {
+        items: matching.map((m) => m.key.payload),
+        key: rootKey,
+      },
+    })
+
     const allRelevantKeyPayloads = additionalKeys.concat(decryptedMatching)
     void this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadSource.DecryptedTransient)
+
     await this.storageService.savePayloads(allRelevantKeyPayloads)
+
     if (replacesRootKey) {
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
     } else {

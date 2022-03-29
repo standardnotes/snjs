@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApplicationIdentifier } from '@standardnotes/applications'
+import { RawPayload } from '@standardnotes/payloads'
 import { getGlobalScope, isNullOrUndefined } from '@standardnotes/utils'
 import { DeviceInterface } from './DeviceInterface'
 
@@ -45,9 +46,7 @@ export abstract class AbstractDevice implements DeviceInterface {
    * This is most likely the case for legacy values.
    * So we return the value as-is if JSON.parse throws an exception.
    */
-  public async getJsonParsedRawStorageValue(
-    key: string
-  ): Promise<unknown | undefined> {
+  public async getJsonParsedRawStorageValue(key: string): Promise<unknown | undefined> {
     const value = await this.getRawStorageValue(key)
     if (isNullOrUndefined(value)) {
       return undefined
@@ -59,9 +58,7 @@ export abstract class AbstractDevice implements DeviceInterface {
     }
   }
 
-  abstract getAllRawStorageKeyValues(): Promise<
-    { key: string; value: unknown }[]
-  >
+  abstract getAllRawStorageKeyValues(): Promise<{ key: string; value: unknown }[]>
 
   abstract setRawStorageValue(key: string, value: any): Promise<void>
 
@@ -77,51 +74,35 @@ export abstract class AbstractDevice implements DeviceInterface {
    * @returns { isNewDatabase } - True if the database was newly created
    */
   abstract openDatabase(
-    identifier: ApplicationIdentifier
+    identifier: ApplicationIdentifier,
   ): Promise<{ isNewDatabase?: boolean } | undefined>
 
-  abstract getAllRawDatabasePayloads(
-    identifier: ApplicationIdentifier
-  ): Promise<unknown[]>
+  abstract getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<RawPayload[]>
 
-  abstract saveRawDatabasePayload(
-    payload: any,
-    identifier: ApplicationIdentifier
-  ): Promise<void>
+  abstract saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>
 
   abstract saveRawDatabasePayloads(
     payloads: any[],
-    identifier: ApplicationIdentifier
+    identifier: ApplicationIdentifier,
   ): Promise<void>
 
   abstract removeRawDatabasePayloadWithId(
     id: string,
-    identifier: ApplicationIdentifier
+    identifier: ApplicationIdentifier,
   ): Promise<void>
 
-  abstract removeAllRawDatabasePayloads(
-    identifier: ApplicationIdentifier
-  ): Promise<void>
+  abstract removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>
 
-  abstract getNamespacedKeychainValue(
-    identifier: ApplicationIdentifier
-  ): Promise<any>
+  abstract getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>
 
   /** Allows SNJS to set the top level keychain value */
   abstract legacy_setRawKeychainValue(value: any): Promise<void>
 
-  abstract setNamespacedKeychainValue(
-    value: any,
-    identifier: ApplicationIdentifier
-  ): Promise<void>
+  abstract setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>
 
-  abstract clearNamespacedKeychainValue(
-    identifier: ApplicationIdentifier
-  ): Promise<void>
+  abstract clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>
 
-  abstract getRawKeychainValue(): Promise<
-    Record<string, any> | undefined | null
-  >
+  abstract getRawKeychainValue(): Promise<Record<string, any> | undefined | null>
 
   abstract clearRawKeychainValue(): Promise<void>
 

@@ -312,7 +312,7 @@ export class SNProtectionService
   }
 
   public getSessionExpiryDate(): Date {
-    const expiresAt = this.storageService.getValue(StorageKey.ProtectionExpirey)
+    const expiresAt = this.storageService.getValue<number>(StorageKey.ProtectionExpirey)
     if (expiresAt) {
       return new Date(expiresAt)
     } else {

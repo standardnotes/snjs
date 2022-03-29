@@ -47,6 +47,7 @@ import {
   isVersionLessThanOrEqualTo,
   EncryptionIntent,
   ApplicationIdentifier,
+  EncryptedEncryptionIntent,
 } from '@standardnotes/applications'
 import {
   AbstractService,
@@ -59,6 +60,7 @@ import { decryptBackupFile } from './BackupFileDecryptor'
 import { OperatorManager } from './OperatorManager'
 import { ItemsEncryptionService } from './ItemsEncryption'
 import { findDefaultItemsKey } from './Functions'
+import { EncryptionProvider } from './EncryptionProvider'
 
 export enum ProtocolServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -91,7 +93,10 @@ export enum ProtocolServiceEvent {
  * It also exposes public methods that allows consumers to retrieve an items key
  * for a particular payload, and also retrieve all available items keys.
 */
-export class SNProtocolService extends AbstractService<ProtocolServiceEvent> {
+export class SNProtocolService
+  extends AbstractService<ProtocolServiceEvent>
+  implements EncryptionProvider
+{
   private operatorManager: OperatorManager
   private readonly itemsEncryption: ItemsEncryptionService
   private readonly rootKeyEncryption: RootKeyEncryptionService
@@ -180,23 +185,61 @@ export class SNProtocolService extends AbstractService<ProtocolServiceEvent> {
     return this.rootKeyEncryption.hasAccount()
   }
 
+  public hasRootKeyEncryptionSource(): boolean {
+    return this.rootKeyEncryption.hasRootKeyEncryptionSource()
+  }
+
   public getUserVersion(): ProtocolVersion | undefined {
     return this.rootKeyEncryption.getUserVersion()
   }
 
   public async upgradeAvailable() {
-    const accountUpgradeAvailable = await this.accountUpgradeAvailable()
+    const accountUpgradeAvailable = this.accountUpgradeAvailable()
     const passcodeUpgradeAvailable = await this.passcodeUpgradeAvailable()
     return accountUpgradeAvailable || passcodeUpgradeAvailable
+  }
+
+  public getSureDefaultItemsKey(): SNItemsKey {
+    return this.itemsEncryption.getDefaultItemsKey() as SNItemsKey
   }
 
   async repersistAllItems(): Promise<void> {
     return this.itemsEncryption.repersistAllItems()
   }
 
+  public async reencryptItemsKeys(): Promise<void> {
+    await this.rootKeyEncryption.reencryptItemsKeys()
+  }
+
+  public async createNewItemsKeyWithRollback(): Promise<() => Promise<void>> {
+    return this.rootKeyEncryption.createNewItemsKeyWithRollback()
+  }
+
+  public async decryptErroredItems(): Promise<void> {
+    await this.itemsEncryption.decryptErroredItems()
+  }
+
+  public itemsKeyForPayload(payload: PurePayload): SNItemsKey | undefined {
+    return this.itemsEncryption.itemsKeyForPayload(payload)
+  }
+
+  public defaultItemsKeyForItemVersion(
+    version: ProtocolVersion,
+    fromKeys?: SNItemsKey[],
+  ): SNItemsKey | undefined {
+    return this.itemsEncryption.defaultItemsKeyForItemVersion(version, fromKeys)
+  }
+
+  public async encryptSplitSingle(
+    split: EncryptionSplitWithKey<PurePayload>,
+    intent: EncryptedEncryptionIntent,
+  ): Promise<PurePayload> {
+    return (await this.encryptSplit(split, intent))[0]
+  }
+
   public async encryptSplit(
     split: EncryptionSplitWithKey<PurePayload>,
-    intent: EncryptionIntent,
+    intent: EncryptedEncryptionIntent,
   ): Promise<PurePayload[]> {
     const allEncryptedParams: EncryptedParameters[] = []
     const allNonencryptablePayloads: PurePayload[] = []
@@ -263,6 +306,12 @@ export class SNProtocolService extends AbstractService<ProtocolServiceEvent> {
     )
 
     return allNonencryptablePayloads.concat(packagedEncrypted)
+  }
+
+  public async decryptSplitSingle(
+    split: EncryptionSplitWithKey<PurePayload>,
+  ): Promise<PurePayload> {
+    return (await this.decryptSplit(split))[0]
   }
 
   public async decryptSplit(split: EncryptionSplitWithKey<PurePayload>): Promise<PurePayload[]> {

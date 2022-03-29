@@ -26,7 +26,6 @@ import { SNStorageService, StoragePersistencePolicies } from '@Lib/Services/Stor
 import { SNSyncService } from '../Sync/SyncService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Session/SessionManager'
 import { ChallengeService } from '../Challenge/ChallengeService'
-import { SNItemsKey } from '@Lib/Models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { UserClientInterface } from './UserClientInterface'
 
@@ -106,7 +105,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
         await this.notifyEvent(AccountEvent.SignedInOrRegistered)
         this.unlockSyncing()
         await this.syncService.downloadFirstSync(300)
-        void this.protocolService.itemsEncryption.decryptErroredItems()
+        void this.protocolService.decryptErroredItems()
       } else {
         this.unlockSyncing()
       }
@@ -159,12 +158,12 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
           })
           .then(() => {
             if (!awaitSync) {
-              void this.protocolService.itemsEncryption.decryptErroredItems()
+              void this.protocolService.decryptErroredItems()
             }
           })
         if (awaitSync) {
           await syncPromise
-          await this.protocolService.itemsEncryption.decryptErroredItems()
+          await this.protocolService.decryptErroredItems()
         }
       } else {
         this.unlockSyncing()
@@ -225,7 +224,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
       void this.syncService.downloadFirstSync(1_000, {
         checkIntegrity: true,
       })
-      void this.protocolService.itemsEncryption.decryptErroredItems()
+      void this.protocolService.decryptErroredItems()
     }
     this.unlockSyncing()
     return response
@@ -472,9 +471,11 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable(
       parameters.passcode,
     )
+
     if (canceled) {
       return { error: Error(CredentialsChangeStrings.PasscodeRequired) }
     }
+
     if (parameters.newPassword !== undefined && parameters.validateNewPasswordStrength) {
       if (parameters.newPassword.length < MINIMUM_PASSWORD_LENGTH) {
         return {
@@ -482,6 +483,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
         }
       }
     }
+
     const accountPasswordValidation = await this.protocolService.validateAccountPassword(
       parameters.currentPassword,
     )
@@ -490,6 +492,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
         error: Error(INVALID_PASSWORD),
       }
     }
+
     const user = this.sessionManager.getUser() as User
     const currentEmail = user.email
     const rootKeys = await this.recomputeRootKeysForCredentialChange({
@@ -501,6 +504,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     })
 
     this.lockSyncing()
+
     /** Now, change the credentials on the server. Roll back on failure */
     const result = await this.sessionManager.changeCredentials({
       currentServerPassword: rootKeys.currentRootKey.serverPassword as string,
@@ -508,21 +512,24 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
       wrappingKey,
       newEmail: parameters.newEmail,
     })
+
     this.unlockSyncing()
+
     if (!result.response.error) {
-      const rollback = await this.protocolService.rootKeyEncryption.createNewItemsKeyWithRollback()
-      await this.protocolService.rootKeyEncryption.reencryptItemsKeys()
+      const rollback = await this.protocolService.createNewItemsKeyWithRollback()
+      await this.protocolService.reencryptItemsKeys()
       await this.syncService.sync({ awaitAll: true })
-      const defaultItemsKey =
-        this.protocolService.itemsEncryption.getDefaultItemsKey() as SNItemsKey
+
+      const defaultItemsKey = this.protocolService.getSureDefaultItemsKey()
       const itemsKeyWasSynced = !defaultItemsKey.neverSynced
+
       if (!itemsKeyWasSynced) {
         await this.sessionManager.changeCredentials({
           currentServerPassword: rootKeys.newRootKey.serverPassword as string,
           newRootKey: rootKeys.currentRootKey,
           wrappingKey,
         })
-        await this.protocolService.rootKeyEncryption.reencryptItemsKeys()
+        await this.protocolService.reencryptItemsKeys()
         await rollback()
         await this.syncService.sync({ awaitAll: true })
 

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { RawPayload } from '@standardnotes/payloads'
 import { ApplicationIdentifier } from '@standardnotes/applications'
 
 export interface DeviceInterface {
@@ -13,7 +14,7 @@ export interface DeviceInterface {
   removeRawStorageValue(key: string): Promise<void>
   removeAllRawStorageValues(): Promise<void>
   openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
-  getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<unknown[]>
+  getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<RawPayload[]>
   saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>
   saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>
   removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>

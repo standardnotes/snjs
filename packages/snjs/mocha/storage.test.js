@@ -241,7 +241,7 @@ describe('storage manager', function () {
       ephemeral: false,
     })
 
-    await this.application.setStorageEncryptionPolicy(StorageEncryptionPolicies.Disabled)
+    await this.application.setStorageEncryptionPolicy(StorageEncryptionPolicy.Disabled)
 
     const payloads = await this.application.storageService.getAllRawPayloads()
     const payload = payloads[0]
@@ -252,7 +252,7 @@ describe('storage manager', function () {
     await Factory.safeDeinit(this.application)
 
     const app = await Factory.createAndInitializeApplication(identifier, Environment.Mobile)
-    expect(app.storageService.encryptionPolicy).to.equal(StorageEncryptionPolicies.Disabled)
+    expect(app.storageService.encryptionPolicy).to.equal(StorageEncryptionPolicy.Disabled)
   })
 
   it('stored payloads should not contain metadata fields', async function () {

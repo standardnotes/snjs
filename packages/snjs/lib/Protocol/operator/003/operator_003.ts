@@ -53,19 +53,21 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
 
   protected async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     const salt = await this.generateSalt(
-      keyParams.content003.identifier!,
+      keyParams.content003.identifier,
       ProtocolVersion.V003,
       V003Algorithm.PbkdfCost,
       keyParams.content003.pw_nonce,
     )
+
     const derivedKey = await this.crypto.pbkdf2(
       password,
       salt,
       V003Algorithm.PbkdfCost,
       V003Algorithm.PbkdfOutputLength,
     )
+
     const partitions = splitString(derivedKey!, 3)
-    const key = await SNRootKey.Create({
+    const key = SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       dataAuthenticationKey: partitions[2],

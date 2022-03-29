@@ -70,8 +70,8 @@ export function splitItemsByEncryptionType<T extends ItemOrPayload>(
   }
 
   return {
-    usesRootKey: { items: usesRootKey },
-    usesItemsKey: { items: usesItemsKey },
+    usesRootKey: usesRootKey.length > 0 ? { items: usesRootKey } : undefined,
+    usesItemsKey: usesItemsKey.length > 0 ? { items: usesItemsKey } : undefined,
   }
 }
 

@@ -182,6 +182,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     if (payload.format !== PayloadFormat.EncryptedString) {
       throw Error('Attempting to get embedded key params of already decrypted item')
     }
+
     const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key!)
     const authenticatedData = itemKeyComponents.rawAuthenticatedData
     const result = this.stringToAuthenticatedData(authenticatedData)
@@ -260,7 +261,6 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     payload: PurePayload,
     key: SNItemsKey | SNRootKey,
   ): DecryptedParameters | ErroredDecryptingParameters {
-    /** Decrypt item_key payload. */
     const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key!)
     const authenticatedData = this.stringToAuthenticatedData(
       itemKeyComponents.rawAuthenticatedData,
@@ -269,6 +269,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
         v: payload.version,
       },
     )
+
     const useAuthenticatedString = this.authenticatedDataToString(authenticatedData)
     const itemKey = this.decryptString004(
       itemKeyComponents.ciphertext,
@@ -276,6 +277,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       itemKeyComponents.nonce,
       useAuthenticatedString,
     )
+
     if (!itemKey) {
       console.error('Error decrypting itemKey parameters', payload)
       return {
@@ -284,6 +286,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
         errorDecryptingValueChanged: !payload.errorDecrypting,
       }
     }
+
     /** Decrypt content payload. */
     const contentComponents = this.deconstructEncryptedPayloadString(payload.contentString)
     const content = this.decryptString004(
