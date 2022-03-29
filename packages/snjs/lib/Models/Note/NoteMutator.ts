@@ -36,7 +36,7 @@ export class NoteMutator extends ItemMutator {
   }
 
   toggleSpellcheck(): void {
-    if (typeof this.typedContent.spellcheck === 'undefined') {
+    if (this.typedContent.spellcheck == undefined) {
       this.typedContent.spellcheck = false
     } else {
       this.typedContent.spellcheck = !this.typedContent.spellcheck
