@@ -1,6 +1,5 @@
 import {
   PurePayload,
-  CreateIntentPayloadFromObject,
   CreateMaxPayloadFromAnyObject,
   FillItemContent,
 } from '@standardnotes/payloads'
@@ -10,16 +9,17 @@ import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { ItemsKeyMutator } from '@Lib/Models/ItemsKey/ItemsKeyMutator'
 import { SNRootKey } from '@Lib/Protocol/root_key'
-import { UuidGenerator, isString, isFunction } from '@standardnotes/utils'
+import { UuidGenerator } from '@standardnotes/utils'
 import {
   ContentType,
   ProtocolVersionLatest,
   ProtocolVersionLastNonrootItemsKey,
 } from '@standardnotes/common'
-import { compareVersions, EncryptionIntent } from '@standardnotes/applications'
+import { compareVersions } from '@standardnotes/applications'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { findDefaultItemsKey, isAsyncOperator, payloadContentFormatForIntent } from './Functions'
+import { findDefaultItemsKey } from './Functions'
 import { OperatorManager } from './OperatorManager'
+import * as OperatorWrapper from './OperatorWrapper'
 
 export class RootKeyEncryptionService extends AbstractService {
   private rootKey?: SNRootKey
@@ -40,7 +40,6 @@ export class RootKeyEncryptionService extends AbstractService {
     return this.rootKey
   }
 
-  /** @override */
   public deinit(): void {
     ;(this.itemManager as unknown) = undefined
     this.rootKey = undefined
@@ -51,84 +50,51 @@ export class RootKeyEncryptionService extends AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public async encryptPayloads(
-    payloads: PurePayload[],
-    intent: EncryptionIntent | ((payload: PurePayload) => EncryptionIntent),
-    key: SNRootKey,
-  ) {
-    const results = []
-    for (const payload of payloads) {
-      const useIntent = isFunction(intent) ? (intent as any)(payload) : intent
-      const encryptedPayload = await this.encryptPayload(payload, useIntent, key)
-      results.push(encryptedPayload)
+  public async encryptPayloadWithKeyLookup(payload: PurePayload): Promise<PurePayload> {
+    const key = this.getRootKey()
+
+    if (key == undefined) {
+      throw Error('Attempting root key encryption with no root key')
     }
-    return results
+
+    return this.encryptPayload(payload, key)
   }
 
-  public async encryptPayload(
-    payload: PurePayload,
-    intent: EncryptionIntent,
-    key?: SNRootKey,
-  ): Promise<PurePayload> {
-    const format = payloadContentFormatForIntent(intent, key)
-    const operator = this.operatorManager.operatorForVersion(
-      key?.keyVersion || ProtocolVersionLatest,
-    )
-    let encryptionParameters
-    if (isAsyncOperator(operator)) {
-      encryptionParameters = await operator.generateEncryptedParametersAsync(payload, format, key)
-    } else {
-      encryptionParameters = operator.generateEncryptedParametersSync(payload, format, key)
+  public async encryptPayloadsWithKeyLookup(payloads: PurePayload[]): Promise<PurePayload[]> {
+    return Promise.all(payloads.map((payload) => this.encryptPayloadWithKeyLookup(payload)))
+  }
+
+  public async encryptPayload(payload: PurePayload, key: SNRootKey): Promise<PurePayload> {
+    return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
+  }
+
+  public async encryptPayloads(payloads: PurePayload[], key: SNRootKey) {
+    return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
+  }
+
+  public async decryptPayloadWithKeyLookup(payload: PurePayload): Promise<PurePayload> {
+    const key = this.getRootKey()
+
+    if (key == undefined) {
+      return CreateMaxPayloadFromAnyObject(payload, {
+        errorDecrypting: true,
+        waitingForKey: true,
+      })
     }
-    if (!encryptionParameters) {
-      throw 'Unable to generate encryption parameters'
-    }
-    const result = CreateIntentPayloadFromObject(payload, intent, encryptionParameters)
-    return result
+
+    return this.decryptPayload(payload, key)
   }
 
   public async decryptPayload(payload: PurePayload, key: SNRootKey): Promise<PurePayload> {
-    const version = payload.version!
-    const source = payload.source
-    const operator = this.operatorManager.operatorForVersion(version)
-    try {
-      let decryptedParameters
-      if (isAsyncOperator(operator)) {
-        decryptedParameters = await operator.generateDecryptedParametersAsync(payload, key)
-      } else {
-        decryptedParameters = operator.generateDecryptedParametersSync(payload, key) as PurePayload
-      }
-      return CreateMaxPayloadFromAnyObject(payload, decryptedParameters, source)
-    } catch (e) {
-      console.error('Error decrypting payload', payload, e)
-      return CreateMaxPayloadFromAnyObject(payload, {
-        errorDecrypting: true,
-        errorDecryptingValueChanged: !payload.errorDecrypting,
-      })
-    }
+    return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
+  }
+
+  public async decryptPayloadsWithKeyLookup(payloads: PurePayload[]): Promise<PurePayload[]> {
+    return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(payloads: PurePayload[], key: SNRootKey): Promise<PurePayload[]> {
-    const decryptItem = (encryptedPayload: PurePayload) => {
-      if (!encryptedPayload) {
-        /** Keep in-counts similar to out-counts */
-        return encryptedPayload
-      }
-      /**
-       * We still want to decrypt deleted payloads if they have content in case
-       * they were marked as dirty but not yet synced.
-       */
-      if (encryptedPayload.deleted === true && encryptedPayload.content == undefined) {
-        return encryptedPayload
-      }
-      const isDecryptable = isString(encryptedPayload.content)
-      if (!isDecryptable) {
-        return encryptedPayload
-      }
-      return this.decryptPayload(encryptedPayload, key)
-    }
-
-    return Promise.all(payloads.map((payload) => decryptItem(payload)))
+    return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
   /**

@@ -168,14 +168,12 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
 function payloadFieldsForIntent(intent: EncryptionIntent) {
   if (
     intent === EncryptionIntent.FileEncrypted ||
-    intent === EncryptionIntent.FileDecrypted ||
-    intent === EncryptionIntent.FilePreferEncrypted
+    intent === EncryptionIntent.FileDecrypted
   ) {
     return FilePayloadFields.slice()
   }
 
   if (
-    intent === EncryptionIntent.LocalStoragePreferEncrypted ||
     intent === EncryptionIntent.LocalStorageDecrypted ||
     intent === EncryptionIntent.LocalStorageEncrypted
   ) {

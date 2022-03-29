@@ -272,7 +272,7 @@ export class Migration2_0_0 extends Migration {
         content_type: ContentType.EncryptedStorage,
         content: storageValueStore,
       }),
-      EncryptionIntent.LocalStoragePreferEncrypted,
+      EncryptionIntent.LocalStorageEncrypted,
       key,
     )
     return wrapped.ejected()
@@ -415,7 +415,7 @@ export class Migration2_0_0 extends Migration {
         const newWrappedAccountKey =
           await this.services.protocolService.rootKeyEncryption.encryptPayload(
             newAccountKey,
-            EncryptionIntent.LocalStoragePreferEncrypted,
+            EncryptionIntent.LocalStorageEncrypted,
             passcodeKey,
           )
         rawStructure.nonwrapped[StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected()
@@ -438,7 +438,7 @@ export class Migration2_0_0 extends Migration {
         /** Encrypt new storage.unwrapped structure with passcode */
         const wrapped = await this.services.protocolService.rootKeyEncryption.encryptPayload(
           payload,
-          EncryptionIntent.LocalStoragePreferEncrypted,
+          EncryptionIntent.LocalStorageEncrypted,
           passcodeKey,
         )
         rawStructure.wrapped = wrapped.ejected()

@@ -1,3 +1,4 @@
+import { EncryptionSplitWithKey, findPayloadInSplit } from './EncryptionSplit'
 import { RootKeyEncryptionService } from './RootKeyEncryption'
 import {
   ItemAuthenticatedData,
@@ -8,6 +9,7 @@ import {
   CreateSourcedPayloadFromObject,
   PayloadFormat,
   PayloadSource,
+  CreateIntentPayloadFromObject,
 } from '@standardnotes/payloads'
 import { Uuids } from '@Lib/Models/Functions'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
@@ -54,7 +56,7 @@ import { KeyMode } from './KeyMode'
 import { decryptBackupFile } from './BackupFileDecryptor'
 import { OperatorManager } from './OperatorManager'
 import { ItemsEncryptionService } from './ItemsEncryption'
-import { EncryptionSplitWithKey, findDefaultItemsKey } from './Functions'
+import { findDefaultItemsKey } from './Functions'
 
 type KeyChangeObserver = () => Promise<void>
 
@@ -231,7 +233,6 @@ export class SNProtocolService extends AbstractService {
     if (split.usesRootKey) {
       const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloads(
         split.usesRootKey.items,
-        intent,
         split.usesRootKey.key,
       )
       extendArray(allEncrypted, rootKeyEncrypted)
@@ -240,13 +241,34 @@ export class SNProtocolService extends AbstractService {
     if (split.usesItemsKey) {
       const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloads(
         split.usesItemsKey.items,
-        intent,
         split.usesItemsKey.key,
       )
       extendArray(allEncrypted, itemsKeyEncrypted)
     }
 
-    return allEncrypted
+    if (split.usesRootKeyWithKeyLookup) {
+      const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloadsWithKeyLookup(
+        split.usesRootKeyWithKeyLookup.items,
+      )
+      extendArray(allEncrypted, rootKeyEncrypted)
+    }
+
+    if (split.usesItemsKeyWithKeyLookup) {
+      const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloadsWithKeyLookup(
+        split.usesItemsKeyWithKeyLookup.items,
+      )
+      extendArray(allEncrypted, itemsKeyEncrypted)
+    }
+
+    const exported = allEncrypted.map((encryptedPayload) =>
+      CreateIntentPayloadFromObject(
+        findPayloadInSplit(encryptedPayload.uuid, split),
+        intent,
+        encryptedPayload,
+      ),
+    )
+
+    return exported
   }
 
   public async decryptSplit(split: EncryptionSplitWithKey<PurePayload>): Promise<PurePayload[]> {

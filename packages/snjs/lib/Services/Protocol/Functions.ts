@@ -29,52 +29,6 @@ export function createOperatorForVersion(
   }
 }
 
-type ItemOrPayload = ItemInterface | PurePayload
-type UsesRootKeySplit<T extends ItemOrPayload> = {
-  items: T[]
-  key: SNRootKey
-}
-type UsesItemsKeySplit<T extends ItemOrPayload> = {
-  items: T[]
-  key?: SNItemsKey
-}
-
-export type EncryptionSplit<T extends ItemOrPayload> = {
-  usesRootKey?: {
-    items: T[]
-  }
-  usesItemsKey?: {
-    items: T[]
-  }
-}
-
-export type EncryptionSplitWithKey<T extends ItemOrPayload> = {
-  usesRootKey?: UsesRootKeySplit<T>
-  usesItemsKey?: UsesItemsKeySplit<T>
-}
-
-// export function createEncryptionSplit<T extends ItemOrPayload>(usesItemsKey?: UsesItemsKeySplit): EncryptionSplitWithKey<T> {}
-
-export function splitItemsByEncryptionType<T extends ItemOrPayload>(
-  items: T[],
-): EncryptionSplit<T> {
-  const usesRootKey: T[] = []
-  const usesItemsKey: T[] = []
-
-  for (const item of items) {
-    if (ItemContentTypeUsesRootKeyEncryption(item.content_type)) {
-      usesRootKey.push(item)
-    } else {
-      usesItemsKey.push(item)
-    }
-  }
-
-  return {
-    usesRootKey: { items: usesRootKey },
-    usesItemsKey: { items: usesItemsKey },
-  }
-}
-
 export function isAsyncOperator(
   operator: AsynchronousOperator | SynchronousOperator,
 ): operator is AsynchronousOperator {
@@ -93,9 +47,7 @@ export function payloadContentFormatForIntent(
     /** Decrypted */
     if (
       intent === EncryptionIntent.LocalStorageDecrypted ||
-      intent === EncryptionIntent.LocalStoragePreferEncrypted ||
-      intent === EncryptionIntent.FileDecrypted ||
-      intent === EncryptionIntent.FilePreferEncrypted
+      intent === EncryptionIntent.FileDecrypted
     ) {
       return PayloadFormat.DecryptedBareObject
     } else {
@@ -106,9 +58,7 @@ export function payloadContentFormatForIntent(
     if (
       intent === EncryptionIntent.Sync ||
       intent === EncryptionIntent.FileEncrypted ||
-      intent === EncryptionIntent.FilePreferEncrypted ||
-      intent === EncryptionIntent.LocalStorageEncrypted ||
-      intent === EncryptionIntent.LocalStoragePreferEncrypted
+      intent === EncryptionIntent.LocalStorageEncrypted
     ) {
       return PayloadFormat.EncryptedString
     } else {

@@ -231,20 +231,26 @@ export class SNStorageService extends AbstractService {
   private async generatePersistableValues() {
     const rawContent = Object.assign({}, this.values)
     const valuesToWrap = rawContent[ValueModesKeys.Unwrapped]
+
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
       content: valuesToWrap as PayloadContent,
       content_type: ContentType.EncryptedStorage,
     })
+
+
+
     const encryptedPayload = await this.rootKeyEncryption.encryptPayload(
       payload,
       EncryptionIntent.LocalStoragePreferEncrypted,
       this.rootKeyEncryption.getRootKey()!,
     )
+
     if (encryptedPayload) {
       rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected()
       rawContent[ValueModesKeys.Unwrapped] = undefined
     }
+
     return rawContent
   }
 

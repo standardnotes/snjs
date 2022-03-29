@@ -157,7 +157,6 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   /**
    * @param plaintext  The plaintext text to decrypt.
    * @param rawKey  The key to use to encrypt the plaintext.
-   * @param itemUuid  The uuid of the item being encrypted
    */
   private generateEncryptedProtocolString(
     plaintext: string,
@@ -231,21 +230,12 @@ export class SNProtocolOperator004 implements SynchronousOperator {
 
   public generateEncryptedParametersSync(
     payload: PurePayload,
-    format: PayloadFormat,
-    key?: SNItemsKey | SNRootKey,
+    key: SNItemsKey | SNRootKey,
   ): PurePayload {
-    if (format === PayloadFormat.DecryptedBareObject) {
-      return CreateEncryptionParameters({
-        content: payload.content,
-      })
-    }
-    if (format !== PayloadFormat.EncryptedString) {
-      throw `Unsupport format for generateEncryptedParameters ${format}`
-    }
     if (!payload.uuid) {
       throw 'payload.uuid cannot be null'
     }
-    if (!key || !key.itemsKey) {
+    if (!key.itemsKey) {
       throw 'Attempting to generateEncryptedParameters with no itemsKey.'
     }
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
@@ -273,7 +263,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
 
   public generateDecryptedParametersSync(
     payload: PurePayload,
-    key?: SNItemsKey | SNRootKey,
+    key: SNItemsKey | SNRootKey,
   ): PurePayload {
     const format = payload.format
     if (format === PayloadFormat.DecryptedBareObject) {

@@ -66,17 +66,12 @@ export interface SynchronousOperator extends OperatorCommon {
    * @param key - The key to use to encrypt the payload. Can be either
    *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
    * items keys), or an ItemsKey (if encrypted regular items)
-   * @param format - The desired result format
    */
-  generateEncryptedParametersSync(
-    payload: PurePayload,
-    format: PayloadFormat,
-    _key?: SNItemsKey | SNRootKey,
-  ): PurePayload
+  generateEncryptedParametersSync(payload: PurePayload, key: SNItemsKey | SNRootKey): PurePayload
 
   generateDecryptedParametersSync(
     encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey,
+    key: SNItemsKey | SNRootKey,
   ): PurePayload
 }
 
@@ -87,16 +82,14 @@ export interface AsynchronousOperator extends OperatorCommon {
    * @param key - The key to use to encrypt the payload. Can be either
    *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
    * items keys), or an ItemsKey (if encrypted regular items)
-   * @param format - The desired result format
    */
   generateEncryptedParametersAsync(
     payload: PurePayload,
-    format: PayloadFormat,
-    _key?: SNItemsKey | SNRootKey,
+    key: SNItemsKey | SNRootKey,
   ): Promise<PurePayload>
 
   generateDecryptedParametersAsync(
     encryptedParameters: PurePayload,
-    key?: SNItemsKey | SNRootKey,
+    key: SNItemsKey | SNRootKey,
   ): Promise<PurePayload>
 }

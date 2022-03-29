@@ -169,7 +169,7 @@ describe('payload', () => {
     )
     const intentPayload = CreateIntentPayloadFromObject(
       payload,
-      EncryptionIntent.LocalStoragePreferEncrypted,
+      EncryptionIntent.LocalStorageEncrypted,
       override,
     )
 
@@ -184,7 +184,7 @@ describe('payload', () => {
     })
     const intentPayload = CreateIntentPayloadFromObject(
       payload,
-      EncryptionIntent.LocalStoragePreferEncrypted,
+      EncryptionIntent.LocalStorageEncrypted,
       override,
     )
 

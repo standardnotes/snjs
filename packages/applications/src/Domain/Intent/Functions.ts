@@ -22,16 +22,14 @@ export function ItemContentTypeUsesRootKeyEncryption(contentType: ContentType): 
 export function isLocalStorageIntent(intent: EncryptionIntent): boolean {
   return (
     intent === EncryptionIntent.LocalStorageEncrypted ||
-    intent === EncryptionIntent.LocalStorageDecrypted ||
-    intent === EncryptionIntent.LocalStoragePreferEncrypted
+    intent === EncryptionIntent.LocalStorageDecrypted
   )
 }
 
 export function isFileIntent(intent: EncryptionIntent): boolean {
   return (
     intent === EncryptionIntent.FileEncrypted ||
-    intent === EncryptionIntent.FileDecrypted ||
-    intent === EncryptionIntent.FilePreferEncrypted
+    intent === EncryptionIntent.FileDecrypted
   )
 }
 

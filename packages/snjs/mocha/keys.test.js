@@ -24,7 +24,6 @@ describe('keys', function () {
     expect(isLocalStorageIntent(EncryptionIntent.Sync)).to.equal(false)
     expect(isLocalStorageIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(true)
     expect(isLocalStorageIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(true)
-    expect(isLocalStorageIntent(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(true)
     expect(isLocalStorageIntent(EncryptionIntent.FileEncrypted)).to.equal(false)
     expect(isLocalStorageIntent(EncryptionIntent.FileDecrypted)).to.equal(false)
   })
@@ -33,7 +32,6 @@ describe('keys', function () {
     expect(isFileIntent(EncryptionIntent.Sync)).to.equal(false)
     expect(isFileIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(false)
     expect(isFileIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(false)
-    expect(isFileIntent(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(false)
     expect(isFileIntent(EncryptionIntent.FileEncrypted)).to.equal(true)
     expect(isFileIntent(EncryptionIntent.FileDecrypted)).to.equal(true)
   })
@@ -42,7 +40,6 @@ describe('keys', function () {
     expect(isDecryptedIntent(EncryptionIntent.Sync)).to.equal(false)
     expect(isDecryptedIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(false)
     expect(isDecryptedIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(true)
-    expect(isDecryptedIntent(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(false)
     expect(isDecryptedIntent(EncryptionIntent.FileEncrypted)).to.equal(false)
     expect(isDecryptedIntent(EncryptionIntent.FileDecrypted)).to.equal(true)
   })
@@ -51,7 +48,6 @@ describe('keys', function () {
     expect(intentRequiresEncryption(EncryptionIntent.Sync)).to.equal(true)
     expect(intentRequiresEncryption(EncryptionIntent.LocalStorageEncrypted)).to.equal(true)
     expect(intentRequiresEncryption(EncryptionIntent.LocalStorageDecrypted)).to.equal(false)
-    expect(intentRequiresEncryption(EncryptionIntent.LocalStoragePreferEncrypted)).to.equal(false)
     expect(intentRequiresEncryption(EncryptionIntent.FileEncrypted)).to.equal(true)
     expect(intentRequiresEncryption(EncryptionIntent.FileDecrypted)).to.equal(false)
   })
@@ -72,7 +68,7 @@ describe('keys', function () {
     const payload = Factory.createNotePayload()
     const processedPayload = await this.application.protocolService.itemsEncryption.encryptPayload(
       payload,
-      EncryptionIntent.LocalStoragePreferEncrypted,
+      EncryptionIntent.LocalStorageEncrypted,
     )
     expect(processedPayload.format).to.equal(PayloadFormat.EncryptedString)
   })
