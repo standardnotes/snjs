@@ -506,6 +506,12 @@ function clientFeatures(): ClientFeatureDescription[] {
       description: '',
     },
     {
+      name: 'Encrypted files beta',
+      identifier: FeatureIdentifier.FilesBeta,
+      permission_name: PermissionName.FilesBeta,
+      description: '',
+    },
+    {
       name: 'Focus Mode',
       identifier: FeatureIdentifier.FocusMode,
       permission_name: PermissionName.FocusMode,
