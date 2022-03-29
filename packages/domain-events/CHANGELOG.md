@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.26.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.26.0...@standardnotes/domain-events@2.26.1) (2022-03-29)
+
+
+### Bug Fixes
+
+* add subscription name and expiration date to the shared subscription invitation created event ([935268a](https://github.com/standardnotes/snjs/commit/935268ab0541d314c0c816db92d20ce647ed85bc))
+
+
+
+
+
 # [2.26.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.25.6...@standardnotes/domain-events@2.26.0) (2022-03-28)
 
 
