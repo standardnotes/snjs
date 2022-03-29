@@ -37,7 +37,7 @@ export interface PayloadInterface {
   readonly auth_params?: any
 
   readonly format: PayloadFormat
-  readonly version?: ProtocolVersion
+  readonly version: ProtocolVersion
   readonly duplicate_of?: string
 
   safeContent: PayloadContent

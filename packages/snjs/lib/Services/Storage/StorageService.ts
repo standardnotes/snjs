@@ -13,6 +13,7 @@ import {
   PayloadContent,
   RawPayload,
   PurePayload,
+  mergePayloadWithEncryptionParameters,
 } from '@standardnotes/payloads'
 import { SNRootKey } from '@Lib/Protocol/root_key'
 import { ContentType } from '@standardnotes/common'
@@ -238,13 +239,11 @@ export class SNStorageService extends AbstractService {
       content_type: ContentType.EncryptedStorage,
     })
 
-
-
-    const encryptedPayload = await this.rootKeyEncryption.encryptPayload(
+    const encryptedParams = await this.rootKeyEncryption.encryptPayload(
       payload,
-      EncryptionIntent.LocalStoragePreferEncrypted,
       this.rootKeyEncryption.getRootKey()!,
     )
+    const encryptedPayload = mergePayloadWithEncryptionParameters(payload, encryptedParams)
 
     if (encryptedPayload) {
       rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected()
@@ -348,7 +347,7 @@ export class SNStorageService extends AbstractService {
 
     const intent =
       this.encryptionPolicy === StorageEncryptionPolicies.Default
-        ? EncryptionIntent.LocalStoragePreferEncrypted
+        ? EncryptionIntent.LocalStorageEncrypted
         : EncryptionIntent.LocalStorageDecrypted
 
     const nondeleted: RawPayload[] = []
@@ -356,7 +355,7 @@ export class SNStorageService extends AbstractService {
     for (const payload of decryptedPayloads) {
       if (payload.discardable) {
         /** If the payload is deleted and not dirty, remove it from db. */
-        await this.deletePayloadWithId(payload.uuid!)
+        await this.deletePayloadWithId(payload.uuid)
       } else {
         if (!payload.uuid) {
           throw Error('Attempting to persist payload with no uuid')
@@ -382,7 +381,7 @@ export class SNStorageService extends AbstractService {
 
   public async deletePayloads(payloads: PurePayload[]) {
     for (const payload of payloads) {
-      await this.deletePayloadWithId(payload.uuid!)
+      await this.deletePayloadWithId(payload.uuid)
     }
   }
 

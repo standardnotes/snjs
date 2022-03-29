@@ -39,6 +39,22 @@ export type EncryptionSplitWithKey<T extends ItemOrPayload> = {
   usesItemsKeyWithKeyLookup?: UsesItemsKeySplitWithKeyLookup<T>
 }
 
+export function createKeyLookupSplitFromSplit<T extends ItemOrPayload>(
+  split: EncryptionSplit<T>,
+): EncryptionSplitWithKey<T> {
+  const result: EncryptionSplitWithKey<T> = {}
+
+  if (split.usesRootKey) {
+    result.usesRootKeyWithKeyLookup = { items: split.usesRootKey.items }
+  }
+
+  if (split.usesItemsKey) {
+    result.usesItemsKeyWithKeyLookup = { items: split.usesItemsKey.items }
+  }
+
+  return result
+}
+
 export function splitItemsByEncryptionType<T extends ItemOrPayload>(
   items: T[],
 ): EncryptionSplit<T> {

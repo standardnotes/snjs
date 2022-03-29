@@ -3,7 +3,9 @@ import {
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
   PurePayload,
-  PayloadFormat,
+  EncryptedParameters,
+  DecryptedParameters,
+  ErroredDecryptingParameters,
 } from '@standardnotes/payloads'
 import { SNRootKey } from '../root_key'
 import { SNRootKeyParams } from '../key_params'
@@ -67,12 +69,15 @@ export interface SynchronousOperator extends OperatorCommon {
    *  a RootKey (when encrypting payloads that require root key encryption, such as encrypting
    * items keys), or an ItemsKey (if encrypted regular items)
    */
-  generateEncryptedParametersSync(payload: PurePayload, key: SNItemsKey | SNRootKey): PurePayload
+  generateEncryptedParametersSync(
+    payload: PurePayload,
+    key: SNItemsKey | SNRootKey,
+  ): EncryptedParameters
 
   generateDecryptedParametersSync(
     encryptedParameters: PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): PurePayload
+  ): DecryptedParameters | ErroredDecryptingParameters
 }
 
 export interface AsynchronousOperator extends OperatorCommon {
@@ -86,10 +91,10 @@ export interface AsynchronousOperator extends OperatorCommon {
   generateEncryptedParametersAsync(
     payload: PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Promise<PurePayload>
+  ): Promise<EncryptedParameters>
 
   generateDecryptedParametersAsync(
     encryptedParameters: PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Promise<PurePayload>
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters>
 }

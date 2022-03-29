@@ -28,10 +28,10 @@ describe('backups', function () {
   const BASE_ITEM_COUNT_DECRYPTED = ['UserPreferences'].length
 
   it('backup file should have a version number', async function () {
-    let data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    let data = await this.application.createDecryptedBackupFile()
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion())
     await this.application.addPasscode('passcode')
-    data = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    data = await this.application.createEncryptedBackupFile()
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion())
   })
 
@@ -40,7 +40,7 @@ describe('backups', function () {
       Factory.createSyncedNote(this.application),
       Factory.createSyncedNote(this.application),
     ])
-    const data = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const data = await this.application.createDecryptedBackupFile()
     expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)
   })
 
@@ -53,15 +53,12 @@ describe('backups', function () {
     ])
 
     // Encrypted backup without authorization
-    const encryptedData = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const encryptedData = await this.application.createEncryptedBackupFile()
     expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
 
     // Encrypted backup with authorization
     Factory.handlePasswordChallenges(this.application, passcode)
-    const authorizedEncryptedData = await this.application.createBackupFile(
-      EncryptionIntent.FileEncrypted,
-      true,
-    )
+    const authorizedEncryptedData = await this.application.createEncryptedBackupFile(true)
     expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
   })
 
@@ -77,19 +74,16 @@ describe('backups', function () {
     ])
 
     // Encrypted backup without authorization
-    const encryptedData = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const encryptedData = await this.application.createEncryptedBackupFile()
     expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
 
     // Decrypted backup
-    const decryptedData = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const decryptedData = await this.application.createDecryptedBackupFile()
     expect(decryptedData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)
 
     // Encrypted backup with authorization
     Factory.handlePasswordChallenges(this.application, this.password)
-    const authorizedEncryptedData = await this.application.createBackupFile(
-      EncryptionIntent.FileEncrypted,
-      true,
-    )
+    const authorizedEncryptedData = await this.application.createEncryptedBackupFile(true)
     expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
   })
 
@@ -105,26 +99,23 @@ describe('backups', function () {
     ])
 
     // Encrypted backup without authorization
-    const encryptedData = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const encryptedData = await this.application.createEncryptedBackupFile()
     expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
 
     Factory.handlePasswordChallenges(this.application, passcode)
 
     // Decrypted backup
-    const decryptedData = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const decryptedData = await this.application.createDecryptedBackupFile()
     expect(decryptedData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)
 
     // Encrypted backup with authorization
-    const authorizedEncryptedData = await this.application.createBackupFile(
-      EncryptionIntent.FileEncrypted,
-      true,
-    )
+    const authorizedEncryptedData = await this.application.createEncryptedBackupFile(true)
     expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
   })
 
   it('backup file item should have correct fields', async function () {
     await Factory.createSyncedNote(this.application)
-    let backupData = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    let backupData = await this.application.createDecryptedBackupFile()
     let rawItem = backupData.items.find((i) => i.content_type === ContentType.Note)
 
     expect(rawItem.fields).to.not.be.ok
@@ -143,7 +134,7 @@ describe('backups', function () {
       password: this.password,
     })
 
-    backupData = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    backupData = await this.application.createEncryptedBackupFile()
     rawItem = backupData.items.find((i) => i.content_type === ContentType.Note)
 
     expect(rawItem.fields).to.not.be.ok
@@ -169,13 +160,13 @@ describe('backups', function () {
     })
     const erroredItem = await this.application.itemManager.emitItemFromPayload(errored)
     expect(erroredItem.errorDecrypting).to.equal(true)
-    const backupData = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const backupData = await this.application.createDecryptedBackupFile()
 
     expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)
   })
 
   it('decrypted backup file should not have keyParams', async function () {
-    const backup = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const backup = await this.application.createDecryptedBackupFile()
     expect(backup).to.not.haveOwnProperty('keyParams')
   })
 
@@ -186,31 +177,31 @@ describe('backups', function () {
       email: UuidGenerator.GenerateUuid(),
       password: UuidGenerator.GenerateUuid(),
     })
-    const backup = await application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const backup = await application.createDecryptedBackupFile()
     expect(backup).to.not.haveOwnProperty('keyParams')
     await Factory.safeDeinit(application)
   })
 
   it('encrypted backup file should have keyParams', async function () {
     await this.application.addPasscode('passcode')
-    const backup = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backup = await this.application.createEncryptedBackupFile()
     expect(backup).to.haveOwnProperty('keyParams')
   })
 
   it('decrypted backup file should not have itemsKeys', async function () {
-    const backup = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const backup = await this.application.createDecryptedBackupFile()
     expect(backup.items.some((item) => item.content_type === ContentType.ItemsKey)).to.be.false
   })
 
   it('encrypted backup file should have itemsKeys', async function () {
     await this.application.addPasscode('passcode')
-    const backup = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backup = await this.application.createEncryptedBackupFile()
     expect(backup.items.some((item) => item.content_type === ContentType.ItemsKey)).to.be.true
   })
 
   it('backup file with no account and no passcode should be decrypted', async function () {
     const note = await Factory.createSyncedNote(this.application)
-    const backup = await this.application.createBackupFile(EncryptionIntent.FileDecrypted)
+    const backup = await this.application.createDecryptedBackupFile()
     expect(backup).to.not.haveOwnProperty('keyParams')
     expect(backup.items.some((item) => item.content_type === ContentType.ItemsKey)).to.be.false
     expect(backup.items.find((item) => item.content_type === ContentType.Note).uuid).to.equal(
@@ -218,7 +209,7 @@ describe('backups', function () {
     )
     let error
     try {
-      await this.application.createBackupFile(EncryptionIntent.Encrypted)
+      await this.application.createEncryptedBackupFile()
     } catch (e) {
       error = e
     }

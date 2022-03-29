@@ -1,11 +1,15 @@
 import { StandardException } from './StandardException'
 import { OperatorManager } from './OperatorManager'
-import { SNLog } from '../../log'
 import {
   PurePayload,
   CreateMaxPayloadFromAnyObject,
   PayloadFormat,
   PayloadSource,
+  EncryptedParameters,
+  DecryptedParameters,
+  ErroredDecryptingParameters,
+  mergePayloadWithEncryptionParameters,
+  sureFindPayload,
 } from '@standardnotes/payloads'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
@@ -53,7 +57,6 @@ export class ItemsEncryptionService extends AbstractService {
    * If encryption status changes (esp. on mobile, where local storage encryption
    * can be disabled), consumers may call this function to repersist all items to
    * disk using latest encryption status.
-   * @access public
    */
   async repersistAllItems() {
     const items = this.itemManager.items
@@ -107,7 +110,7 @@ export class ItemsEncryptionService extends AbstractService {
       return itemsKey
     }
 
-    const payloadVersion = payload.version!
+    const payloadVersion = payload.version
     if (payloadVersion === ProtocolVersionLatest) {
       return new StandardException(
         'No associated key found for item encrypted with latest protocol version.',
@@ -121,7 +124,7 @@ export class ItemsEncryptionService extends AbstractService {
     return defaultKey
   }
 
-  public async encryptPayloadWithKeyLookup(payload: PurePayload): Promise<PurePayload> {
+  public async encryptPayloadWithKeyLookup(payload: PurePayload): Promise<EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
     if (key instanceof StandardException) {
@@ -131,13 +134,7 @@ export class ItemsEncryptionService extends AbstractService {
     return this.encryptPayload(payload, key)
   }
 
-  public async encryptPayload(payload: PurePayload, key: SNItemsKey): Promise<PurePayload> {
-    if (payload.errorDecrypting) {
-      return payload
-    }
-    if (payload.deleted) {
-      return payload
-    }
+  public async encryptPayload(payload: PurePayload, key: SNItemsKey): Promise<EncryptedParameters> {
     if (payload.format !== PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to encrypt already encrypted payload.')
     }
@@ -154,63 +151,71 @@ export class ItemsEncryptionService extends AbstractService {
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 
-  public async encryptPayloads(payloads: PurePayload[], key: SNItemsKey) {
+  public async encryptPayloads(
+    payloads: PurePayload[],
+    key: SNItemsKey,
+  ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
   }
 
-  public async encryptPayloadsWithKeyLookup(payloads: PurePayload[]): Promise<PurePayload[]> {
+  public async encryptPayloadsWithKeyLookup(
+    payloads: PurePayload[],
+  ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptPayloadWithKeyLookup(payload)))
   }
 
-  public async decryptPayloadWithKeyLookup(payload: PurePayload): Promise<PurePayload> {
+  public async decryptPayloadWithKeyLookup(
+    payload: PurePayload,
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
     if (key instanceof StandardException) {
-      return CreateMaxPayloadFromAnyObject(payload, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
         waitingForKey: true,
-      })
+      }
     }
 
     return this.decryptPayload(payload, key)
   }
 
-  public async decryptPayload(payload: PurePayload, key: SNItemsKey): Promise<PurePayload> {
-    if (payload.deleted === true && payload.content === undefined) {
-      return payload
-    }
-
+  public async decryptPayload(
+    payload: PurePayload,
+    key: SNItemsKey,
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!payload.content) {
-      SNLog.error(Error('Attempting to decrypt payload that has no content.'))
-      return CreateMaxPayloadFromAnyObject(payload, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
-      })
-    }
-
-    const format = payload.format
-    if (format === PayloadFormat.DecryptedBareObject) {
-      return payload
+      }
     }
 
     if (key.errorDecrypting) {
-      return CreateMaxPayloadFromAnyObject(payload, {
+      return {
+        uuid: payload.uuid,
         waitingForKey: true,
         errorDecrypting: true,
-      })
+      }
     }
 
     return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
   }
 
-  public async decryptPayloadsWithKeyLookup(payloads: PurePayload[]): Promise<PurePayload[]> {
+  public async decryptPayloadsWithKeyLookup(
+    payloads: PurePayload[],
+  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
-  public async decryptPayloads(payloads: PurePayload[], key: SNItemsKey): Promise<PurePayload[]> {
+  public async decryptPayloads(
+    payloads: PurePayload[],
+    key: SNItemsKey,
+  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
-  public async decryptErroredItems() {
+  public async decryptErroredItems(): Promise<void> {
     const items = this.itemManager.invalidItems.filter(
       (i) => i.content_type !== ContentType.ItemsKey,
     )
@@ -222,9 +227,13 @@ export class ItemsEncryptionService extends AbstractService {
       return item.payloadRepresentation()
     })
 
-    const decrypted = await this.decryptPayloadsWithKeyLookup(payloads)
+    const decryptedParams = await this.decryptPayloadsWithKeyLookup(payloads)
+    const decryptedPayloads = decryptedParams.map((decryptedParam) => {
+      const originalPayload = sureFindPayload(decryptedParam.uuid, payloads)
+      return mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
+    })
 
-    await this.payloadManager.emitPayloads(decrypted, PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(decryptedPayloads, PayloadSource.LocalChanged)
   }
 
   /**

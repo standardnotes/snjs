@@ -6,10 +6,11 @@ import {
   RootKeyEncryptedAuthenticatedData,
   PurePayload,
   PayloadFormat,
-  CopyEncryptionParameters,
-  CreateEncryptionParameters,
   FillItemContent,
   CreateMaxPayloadFromAnyObject,
+  EncryptedParameters,
+  DecryptedParameters,
+  ErroredDecryptingParameters,
 } from '@standardnotes/payloads'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { Create004KeyParams, SNRootKeyParams } from '../../key_params'
@@ -231,13 +232,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   public generateEncryptedParametersSync(
     payload: PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): PurePayload {
-    if (!payload.uuid) {
-      throw 'payload.uuid cannot be null'
-    }
-    if (!key.itemsKey) {
-      throw 'Attempting to generateEncryptedParameters with no itemsKey.'
-    }
+  ): EncryptedParameters {
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
     /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content)
@@ -253,29 +248,18 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       key.itemsKey,
       authenticatedData,
     )
-    return CreateEncryptionParameters({
+    return {
       uuid: payload.uuid,
       items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
       content: encryptedContentString,
       enc_item_key: encryptedItemKey,
-    })
+    }
   }
 
   public generateDecryptedParametersSync(
     payload: PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): PurePayload {
-    const format = payload.format
-    if (format === PayloadFormat.DecryptedBareObject) {
-      /** No decryption required */
-      return payload
-    }
-    if (!payload.uuid) {
-      throw Error('encryptedParameters.uuid cannot be null')
-    }
-    if (!key || !key.itemsKey) {
-      throw Error('Attempting to generateDecryptedParameters with no itemsKey.')
-    }
+  ): DecryptedParameters | ErroredDecryptingParameters {
     /** Decrypt item_key payload. */
     const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key!)
     const authenticatedData = this.stringToAuthenticatedData(
@@ -294,10 +278,11 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     )
     if (!itemKey) {
       console.error('Error decrypting itemKey parameters', payload)
-      return CopyEncryptionParameters(payload, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
         errorDecryptingValueChanged: !payload.errorDecrypting,
-      })
+      }
     }
     /** Decrypt content payload. */
     const contentComponents = this.deconstructEncryptedPayloadString(payload.contentString)
@@ -308,12 +293,14 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       useAuthenticatedString,
     )
     if (!content) {
-      return CopyEncryptionParameters(payload, {
+      return {
+        uuid: payload.uuid,
         errorDecrypting: true,
         errorDecryptingValueChanged: !payload.errorDecrypting,
-      })
+      }
     } else {
-      return CopyEncryptionParameters(payload, {
+      return {
+        uuid: payload.uuid,
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
@@ -321,7 +308,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
         errorDecrypting: false,
         errorDecryptingValueChanged: payload.errorDecrypting === true,
         waitingForKey: false,
-      })
+      }
     }
   }
 

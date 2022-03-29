@@ -232,7 +232,7 @@ export class Migration2_0_0 extends Migration {
     storageValueStore: Record<string, any>,
   ) {
     const version = accountKeyParams?.version || (await this.getFallbackRootKeyVersion())
-    const accountKey = await SNRootKey.Create({
+    const accountKey = SNRootKey.Create({
       masterKey: storageValueStore.mk,
       dataAuthenticationKey: storageValueStore.ak,
       version: version,

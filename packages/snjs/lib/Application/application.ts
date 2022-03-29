@@ -1,3 +1,4 @@
+import { ProtocolServiceEvent } from './../Services/Protocol/ProtocolService'
 import * as Applications from '@standardnotes/applications'
 import * as Challenges from '../Services/Challenge'
 import * as Common from '@standardnotes/common'
@@ -568,22 +569,22 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.listedService.getListedAccountInfo(account, inContextOfItem)
   }
 
-  /**
-   * Creates a JSON-stringifiable backup object of all items.
-   */
-  public async createBackupFile(
-    intent: Applications.EncryptionIntent,
-    authorizeEncrypted = false,
+  public async createEncryptedBackupFile(
+    requireAuthorization = false,
   ): Promise<Services.BackupFile | undefined> {
-    const encrypted = intent === Applications.EncryptionIntent.FileEncrypted
-    const decrypted = intent === Applications.EncryptionIntent.FileDecrypted
-    const authorize = (encrypted && authorizeEncrypted) || decrypted
-
-    if (authorize && !(await this.protectionService.authorizeBackupCreation(encrypted))) {
+    if (requireAuthorization && !(await this.protectionService.authorizeBackupCreation(true))) {
       return
     }
 
-    return this.protocolService.createBackupFile(intent)
+    return this.protocolService.createEncryptedBackupFile()
+  }
+
+  public async createDecryptedBackupFile(): Promise<Services.BackupFile | undefined> {
+    if (!(await this.protectionService.authorizeBackupCreation(false))) {
+      return
+    }
+
+    return this.protocolService.createDecryptedBackupFile()
   }
 
   public isEphemeralSession(): boolean {
@@ -855,7 +856,7 @@ export class SNApplication implements Services.ListedClientInterface {
     encryptionPolicy: Services.StorageEncryptionPolicies,
   ): Promise<void> {
     await this.storageService.setEncryptionPolicy(encryptionPolicy)
-    return this.protocolService.itemsEncryption.repersistAllItems()
+    return this.protocolService.repersistAllItems()
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
@@ -1220,9 +1221,13 @@ export class SNApplication implements Services.ListedClientInterface {
       this.options.crypto,
       this.internalEventBus,
     )
-    this.protocolService.onKeyStatusChange(async () => {
-      await this.notifyEvent(ApplicationEvent.KeyStatusChanged)
-    })
+    this.serviceObservers.push(
+      this.protocolService.addEventObserver(async (event) => {
+        if (event === ProtocolServiceEvent.RootKeyStatusChanged) {
+          await this.notifyEvent(ApplicationEvent.KeyStatusChanged)
+        }
+      }),
+    )
     this.services.push(this.protocolService)
   }
 
@@ -1259,7 +1264,7 @@ export class SNApplication implements Services.ListedClientInterface {
             void (async () => {
               await this.sync.sync()
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-                void this.protocolService.rootKeyEncryption.createNewDefaultItemsKey().then(() => {
+                void this.protocolService.createNewDefaultItemsKey().then(() => {
                   void this.sync.sync()
                 })
               }

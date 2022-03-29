@@ -119,7 +119,7 @@ export class ChallengeService extends AbstractService {
   }
 
   public isPasscodeLocked() {
-    return this.protocolService.rootKeyNeedsUnwrapping()
+    return this.protocolService.isPasscodeLocked()
   }
 
   public addChallengeObserver(challenge: Challenge, observer: ChallengeObserver) {

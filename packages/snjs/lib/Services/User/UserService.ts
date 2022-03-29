@@ -430,7 +430,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
   }
 
   private async removePasscodeWithoutWarning() {
-    await this.protocolService.removeRootKeyWrapper()
+    await this.protocolService.removePasscode()
     await this.rewriteItemsKeys()
   }
 

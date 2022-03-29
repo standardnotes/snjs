@@ -61,31 +61,31 @@ export class PurePayload implements PayloadInterface {
   readonly auth_params?: any
 
   readonly format: PayloadFormat
-  readonly version?: ProtocolVersion
+  readonly version: ProtocolVersion
   readonly duplicate_of?: string
 
-  constructor(
-    rawPayload: RawPayload,
-    fields: PayloadField[],
-    source: PayloadSource
-  ) {
+  constructor(rawPayload: RawPayload, fields: PayloadField[], source: PayloadSource) {
     if (fields) {
       this.fields = fields
     } else {
       this.fields = Object.keys(rawPayload) as PayloadField[]
     }
+
     if (source) {
       this.source = source
     } else {
       this.source = PayloadSource.Constructor
     }
-    this.uuid = rawPayload.uuid!
+    this.uuid = rawPayload.uuid
+
     if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
       throw Error(
-        `uuid is null, yet this payloads fields indicate it shouldnt be. Content type: ${rawPayload.content_type}`
+        `uuid is null, yet this payloads fields indicate it shouldnt be. Content type: ${rawPayload.content_type}`,
       )
     }
-    this.content_type = rawPayload.content_type!
+
+    this.content_type = rawPayload.content_type
+
     if (rawPayload.content) {
       if (isObject(rawPayload.content)) {
         this.content = FillItemContent(rawPayload.content as PayloadContent)
@@ -93,28 +93,30 @@ export class PurePayload implements PayloadInterface {
         this.content = rawPayload.content
       }
     }
+
     this.deleted = rawPayload.deleted
     this.items_key_id = rawPayload.items_key_id
     this.enc_item_key = rawPayload.enc_item_key
+
     /** Fallback to initializing with now date */
     this.created_at = new Date(rawPayload.created_at || new Date())
+
     /** Fallback to initializing with 0 epoch date */
     this.updated_at = new Date(rawPayload.updated_at || 0)
+
     this.created_at_timestamp = rawPayload.created_at_timestamp
     this.updated_at_timestamp = rawPayload.updated_at_timestamp
+
     if (rawPayload.dirtiedDate) {
       this.dirtiedDate = new Date(rawPayload.dirtiedDate)
     }
+
     this.dirty = rawPayload.dirty
     this.errorDecrypting = rawPayload.errorDecrypting
     this.waitingForKey = rawPayload.waitingForKey
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged
-    this.lastSyncBegan = rawPayload.lastSyncBegan
-      ? new Date(rawPayload.lastSyncBegan)
-      : undefined
-    this.lastSyncEnd = rawPayload.lastSyncEnd
-      ? new Date(rawPayload.lastSyncEnd)
-      : undefined
+    this.lastSyncBegan = rawPayload.lastSyncBegan ? new Date(rawPayload.lastSyncBegan) : undefined
+    this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined
     this.auth_hash = rawPayload.auth_hash
     this.auth_params = rawPayload.auth_params
     this.duplicate_of = rawPayload.duplicate_of
@@ -123,6 +125,8 @@ export class PurePayload implements PayloadInterface {
       this.version = protocolVersionFromEncryptedString(this.content as string)
     } else if (this.content) {
       this.version = (this.content as PayloadContent).version
+    } else {
+      this.version = ProtocolVersion.V001
     }
 
     if (isString(this.content) && this.version) {
@@ -147,10 +151,7 @@ export class PurePayload implements PayloadInterface {
    * with a server.
    */
   ejected(): RawPayload {
-    const optionalFields = [
-      PayloadField.Legacy003AuthHash,
-      PayloadField.Deleted,
-    ]
+    const optionalFields = [PayloadField.Legacy003AuthHash, PayloadField.Deleted]
     const nonRequiredFields = [
       PayloadField.DirtiedDate,
       PayloadField.ErrorDecrypting,

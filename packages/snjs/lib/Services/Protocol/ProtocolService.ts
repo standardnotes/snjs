@@ -1,15 +1,21 @@
-import { EncryptionSplitWithKey, findPayloadInSplit } from './EncryptionSplit'
-import { RootKeyEncryptionService } from './RootKeyEncryption'
+import {
+  createKeyLookupSplitFromSplit,
+  EncryptionSplitWithKey,
+  findPayloadInSplit,
+  splitItemsByEncryptionType,
+} from './EncryptionSplit'
+import { RootKeyEncryptionService, RootKeyServiceEvent } from './RootKeyEncryption'
 import {
   ItemAuthenticatedData,
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
   PurePayload,
-  CreateMaxPayloadFromAnyObject,
-  CreateSourcedPayloadFromObject,
   PayloadFormat,
-  PayloadSource,
   CreateIntentPayloadFromObject,
+  EncryptedParameters,
+  DecryptedParameters,
+  ErroredDecryptingParameters,
+  mergePayloadWithEncryptionParameters,
 } from '@standardnotes/payloads'
 import { Uuids } from '@Lib/Models/Functions'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
@@ -25,7 +31,6 @@ import {
   isNullOrUndefined,
   isReactNativeEnvironment,
   isWebCryptoAvailable,
-  removeFromArray,
   UuidGenerator,
 } from '@standardnotes/utils'
 import { V001Algorithm, V002Algorithm } from '../../Protocol/operator/algorithms'
@@ -42,10 +47,7 @@ import {
   isVersionLessThanOrEqualTo,
   EncryptionIntent,
   ApplicationIdentifier,
-  ItemContentTypeUsesRootKeyEncryption,
 } from '@standardnotes/applications'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
-import { StorageValueModes } from '@Lib/Services/Storage/StorageService'
 import {
   AbstractService,
   DeviceInterface,
@@ -58,7 +60,9 @@ import { OperatorManager } from './OperatorManager'
 import { ItemsEncryptionService } from './ItemsEncryption'
 import { findDefaultItemsKey } from './Functions'
 
-type KeyChangeObserver = () => Promise<void>
+export enum ProtocolServiceEvent {
+  RootKeyStatusChanged = 'RootKeyStatusChanged',
+}
 
 /**
  * The protocol service is responsible for the encryption and decryption of payloads, and
@@ -87,14 +91,11 @@ type KeyChangeObserver = () => Promise<void>
  * It also exposes public methods that allows consumers to retrieve an items key
  * for a particular payload, and also retrieve all available items keys.
 */
-export class SNProtocolService extends AbstractService {
-  private operatorManager!: OperatorManager
-  private keyMode = KeyMode.RootKeyNone
-  private keyObservers: KeyChangeObserver[] = []
-
-  public readonly itemsEncryption!: ItemsEncryptionService
-  public readonly rootKeyEncryption!: RootKeyEncryptionService
-  private memoizedRootKeyParams?: SNRootKeyParams
+export class SNProtocolService extends AbstractService<ProtocolServiceEvent> {
+  private operatorManager: OperatorManager
+  private readonly itemsEncryption: ItemsEncryptionService
+  private readonly rootKeyEncryption: RootKeyEncryptionService
+  private rootKeyObserverDisposer: () => void
 
   constructor(
     private itemManager: ItemManager,
@@ -119,10 +120,19 @@ export class SNProtocolService extends AbstractService {
     )
 
     this.rootKeyEncryption = new RootKeyEncryptionService(
-      itemManager,
+      this.itemManager,
       this.operatorManager,
-      internalEventBus,
+      this.deviceInterface,
+      this.storageService,
+      this.identifier,
+      this.internalEventBus,
     )
+    this.rootKeyObserverDisposer = this.rootKeyEncryption.addEventObserver((event) => {
+      this.itemsEncryption.userVersion = this.getUserVersion()
+      if (event === RootKeyServiceEvent.RootKeyStatusChanged) {
+        void this.notifyEvent(ProtocolServiceEvent.RootKeyStatusChanged)
+      }
+    })
 
     UuidGenerator.SetGenerator(this.crypto.generateUUID)
   }
@@ -136,55 +146,27 @@ export class SNProtocolService extends AbstractService {
     ;(this.crypto as unknown) = undefined
     ;(this.operatorManager as unknown) = undefined
 
+    this.rootKeyObserverDisposer()
+    ;(this.rootKeyObserverDisposer as unknown) = undefined
+
     this.itemsEncryption.deinit()
     ;(this.itemsEncryption as unknown) = undefined
 
     this.rootKeyEncryption.deinit()
     ;(this.rootKeyEncryption as unknown) = undefined
 
-    this.memoizedRootKeyParams = undefined
-
-    this.keyObservers.length = 0
     super.deinit()
   }
 
   public async initialize() {
-    const wrappedRootKey = await this.getWrappedRootKey()
-    const accountKeyParams = await this.recomputeAccountKeyParams()
-    const hasWrapper = await this.hasRootKeyWrapper()
-    const hasRootKey = !isNullOrUndefined(wrappedRootKey) || !isNullOrUndefined(accountKeyParams)
-    if (hasWrapper && hasRootKey) {
-      this.keyMode = KeyMode.RootKeyPlusWrapper
-    } else if (hasWrapper && !hasRootKey) {
-      this.keyMode = KeyMode.WrapperOnly
-    } else if (!hasWrapper && hasRootKey) {
-      this.keyMode = KeyMode.RootKeyOnly
-    } else if (!hasWrapper && !hasRootKey) {
-      this.keyMode = KeyMode.RootKeyNone
-    } else {
-      throw 'Invalid key mode condition'
-    }
-
-    if (this.keyMode === KeyMode.RootKeyOnly) {
-      this.rootKeyEncryption.setRootKey(await this.getRootKeyFromKeychain())
-      await this.notifyObserversOfKeyChange()
-    }
-  }
-
-  private async getEncryptionSourceVersion() {
-    if (this.hasAccount()) {
-      return this.getUserVersion()
-    } else if (this.hasPasscode()) {
-      const passcodeParams = await this.getRootKeyWrapperKeyParams()
-      return passcodeParams!.version
-    }
+    await this.rootKeyEncryption.initialize()
   }
 
   /**
    * Returns encryption protocol display name for active account/wrapper
    */
   public async getEncryptionDisplayName() {
-    const version = await this.getEncryptionSourceVersion()
+    const version = await this.rootKeyEncryption.getEncryptionSourceVersion()
     if (version) {
       return this.operatorManager.operatorForVersion(version).getEncryptionDisplayName()
     }
@@ -195,108 +177,149 @@ export class SNProtocolService extends AbstractService {
   }
 
   public hasAccount() {
-    switch (this.keyMode) {
-      case KeyMode.RootKeyNone:
-      case KeyMode.WrapperOnly:
-        return false
-      case KeyMode.RootKeyOnly:
-      case KeyMode.RootKeyPlusWrapper:
-        return true
-      default:
-        throw Error(`Unhandled keyMode value '${this.keyMode}'.`)
-    }
+    return this.rootKeyEncryption.hasAccount()
   }
 
-  /**
-   * Returns the protocol version associated with the user's account
-   */
   public getUserVersion(): ProtocolVersion | undefined {
-    const keyParams = this.getAccountKeyParams()
-    return keyParams?.version
+    return this.rootKeyEncryption.getUserVersion()
   }
 
-  /**
-   * Returns true if there is an upgrade available for the account or passcode
-   */
   public async upgradeAvailable() {
     const accountUpgradeAvailable = await this.accountUpgradeAvailable()
     const passcodeUpgradeAvailable = await this.passcodeUpgradeAvailable()
     return accountUpgradeAvailable || passcodeUpgradeAvailable
   }
 
+  async repersistAllItems(): Promise<void> {
+    return this.itemsEncryption.repersistAllItems()
+  }
+
   public async encryptSplit(
     split: EncryptionSplitWithKey<PurePayload>,
     intent: EncryptionIntent,
   ): Promise<PurePayload[]> {
-    const allEncrypted: PurePayload[] = []
+    const allEncryptedParams: EncryptedParameters[] = []
+    const allNonencryptablePayloads: PurePayload[] = []
+
+    const categorizePayloads = (payloads: PurePayload[]) => {
+      const encryptables: PurePayload[] = []
+      const nonencryptables: PurePayload[] = []
+
+      for (const payload of payloads) {
+        if (payload.errorDecrypting || payload.deleted) {
+          nonencryptables.push(payload)
+        } else {
+          encryptables.push(payload)
+        }
+      }
+
+      return { encryptables, nonencryptables }
+    }
 
     if (split.usesRootKey) {
+      const categorized = categorizePayloads(split.usesRootKey.items)
       const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloads(
-        split.usesRootKey.items,
+        categorized.encryptables,
         split.usesRootKey.key,
       )
-      extendArray(allEncrypted, rootKeyEncrypted)
+      extendArray(allEncryptedParams, rootKeyEncrypted)
+      extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
     if (split.usesItemsKey) {
+      const categorized = categorizePayloads(split.usesItemsKey.items)
       const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloads(
-        split.usesItemsKey.items,
+        categorized.encryptables,
         split.usesItemsKey.key,
       )
-      extendArray(allEncrypted, itemsKeyEncrypted)
+      extendArray(allEncryptedParams, itemsKeyEncrypted)
+      extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
     if (split.usesRootKeyWithKeyLookup) {
+      const categorized = categorizePayloads(split.usesRootKeyWithKeyLookup.items)
       const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloadsWithKeyLookup(
-        split.usesRootKeyWithKeyLookup.items,
+        categorized.encryptables,
       )
-      extendArray(allEncrypted, rootKeyEncrypted)
+      extendArray(allEncryptedParams, rootKeyEncrypted)
+      extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
     if (split.usesItemsKeyWithKeyLookup) {
+      const categorized = categorizePayloads(split.usesItemsKeyWithKeyLookup.items)
       const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloadsWithKeyLookup(
-        split.usesItemsKeyWithKeyLookup.items,
+        categorized.encryptables,
       )
-      extendArray(allEncrypted, itemsKeyEncrypted)
+      extendArray(allEncryptedParams, itemsKeyEncrypted)
+      extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
-    const exported = allEncrypted.map((encryptedPayload) =>
+    const packagedEncrypted = allEncryptedParams.map((encryptedParams) =>
       CreateIntentPayloadFromObject(
-        findPayloadInSplit(encryptedPayload.uuid, split),
+        findPayloadInSplit(encryptedParams.uuid, split),
         intent,
-        encryptedPayload,
+        encryptedParams,
       ),
     )
 
-    return exported
+    return allNonencryptablePayloads.concat(packagedEncrypted)
   }
 
   public async decryptSplit(split: EncryptionSplitWithKey<PurePayload>): Promise<PurePayload[]> {
-    const allDecrypted: PurePayload[] = []
+    const allDecryptedParams: (DecryptedParameters | ErroredDecryptingParameters)[] = []
+    const allNondecryptablePayloads: PurePayload[] = []
+
+    const categorizePayloads = (payloads: PurePayload[]) => {
+      const decryptables: PurePayload[] = []
+      const nondecryptables: PurePayload[] = []
+
+      for (const payload of payloads) {
+        const isDeletedPendingSync = payload.deleted === true && payload.content === undefined
+        const alreadyDecrypted = payload.format === PayloadFormat.DecryptedBareObject
+        if (isDeletedPendingSync || alreadyDecrypted) {
+          nondecryptables.push(payload)
+        } else {
+          decryptables.push(payload)
+        }
+      }
+
+      return { decryptables, nondecryptables }
+    }
 
     if (split.usesRootKey) {
+      const categorized = categorizePayloads(split.usesRootKey.items)
       const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloads(
-        split.usesRootKey.items,
+        categorized.decryptables,
         split.usesRootKey.key,
       )
-      extendArray(allDecrypted, rootKeyDecrypted)
+      extendArray(allDecryptedParams, rootKeyDecrypted)
+      extendArray(allNondecryptablePayloads, categorized.nondecryptables)
     }
 
     if (split.usesItemsKey) {
+      const categorized = categorizePayloads(split.usesItemsKey.items)
       const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloads(
-        split.usesItemsKey.items,
+        categorized.decryptables,
         split.usesItemsKey.key,
       )
-      extendArray(allDecrypted, itemsKeyDecrypted)
+      extendArray(allDecryptedParams, itemsKeyDecrypted)
+      extendArray(allNondecryptablePayloads, categorized.nondecryptables)
     }
 
-    return allDecrypted
+    const packagedDecrypted = allDecryptedParams.map((decryptedParams) =>
+      mergePayloadWithEncryptionParameters(
+        findPayloadInSplit(decryptedParams.uuid, split),
+        decryptedParams,
+      ),
+    )
+
+    return allNondecryptablePayloads.concat(packagedDecrypted)
   }
 
   /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
-  public async accountUpgradeAvailable() {
+  public accountUpgradeAvailable(): boolean {
     const userVersion = this.getUserVersion()
     if (!userVersion) {
       return false
@@ -307,12 +330,8 @@ export class SNProtocolService extends AbstractService {
   /**
    * Returns true if the user's account protocol version is not equal to the latest version.
    */
-  public async passcodeUpgradeAvailable() {
-    const passcodeParams = await this.getRootKeyWrapperKeyParams()
-    if (!passcodeParams) {
-      return false
-    }
-    return passcodeParams.version !== ProtocolVersionLatest
+  public async passcodeUpgradeAvailable(): Promise<boolean> {
+    return this.rootKeyEncryption.passcodeUpgradeAvailable()
   }
 
   /**
@@ -372,9 +391,7 @@ export class SNProtocolService extends AbstractService {
    * Delegates computation to respective protocol operator.
    */
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
-    const version = keyParams.version
-    const operator = this.operatorManager.operatorForVersion(version)
-    return operator.computeRootKey(password, keyParams)
+    return this.rootKeyEncryption.computeRootKey(password, keyParams)
   }
 
   /**
@@ -386,10 +403,7 @@ export class SNProtocolService extends AbstractService {
     origination: KeyParamsOrigination,
     version?: ProtocolVersion,
   ) {
-    const operator = version
-      ? this.operatorManager.operatorForVersion(version)
-      : this.operatorManager.defaultOperator()
-    return operator.createRootKey(identifier, password, origination)
+    return this.rootKeyEncryption.createRootKey(identifier, password, origination, version)
   }
 
   /**
@@ -409,198 +423,58 @@ export class SNProtocolService extends AbstractService {
     return CreateAnyKeyParams(keyParams)
   }
 
-  /**
-   * Creates a JSON string representing the backup format of all items, or just subitems
-   * if supplied.
-   * @returns JSON stringified representation of data, including keyParams.
-   */
-  public async createBackupFile(intent: EncryptionIntent): Promise<BackupFile> {
-    let items = this.itemManager.items
+  public async createEncryptedBackupFile(): Promise<BackupFile> {
+    const payloads = this.itemManager.items.map((item) => item.payload)
+    const split = splitItemsByEncryptionType(payloads)
+    const keyLookupSplit = createKeyLookupSplitFromSplit(split)
+    const result = await this.encryptSplit(keyLookupSplit, EncryptionIntent.FileEncrypted)
+    const ejected = result.map((payload) => payload.ejected())
 
-    if (intent === EncryptionIntent.FileDecrypted) {
-      items = items.filter((item) => item.content_type !== ContentType.ItemsKey)
+    const data: BackupFile = {
+      version: ProtocolVersionLatest,
+      items: ejected,
     }
 
-    const ejectedPayloadsPromise = Promise.all(
-      items.map((item) => {
-        if (item.errorDecrypting) {
-          /** Keep payload as-is */
-          return item.payload.ejected()
-        } else {
-          const payload = CreateSourcedPayloadFromObject(item.payload, PayloadSource.FileImport)
-          if (ItemContentTypeUsesRootKeyEncryption(payload.content_type)) {
-            return this.rootKeyEncryption.encryptPayload(payload, intent).then((p) => p.ejected())
-          } else {
-            return this.itemsEncryption.encryptPayload(payload, intent).then((p) => p.ejected())
-          }
-        }
-      }),
+    const keyParams = await this.getRootKeyParams()
+    data.keyParams = keyParams?.getPortableValue()
+    return data
+  }
+
+  public createDecryptedBackupFile(): BackupFile {
+    const items = this.itemManager.items.filter(
+      (item) => item.content_type !== ContentType.ItemsKey,
     )
 
     const data: BackupFile = {
       version: ProtocolVersionLatest,
-      items: await ejectedPayloadsPromise,
+      items: items.map((item) => {
+        return item.payload.ejected()
+      }),
     }
 
-    if (intent === EncryptionIntent.FileEncrypted) {
-      const keyParams = await this.getRootKeyParams()
-      data.keyParams = keyParams?.getPortableValue()
-    }
     return data
   }
 
-  /**
-   * Register a callback to be notified when root key status changes.
-   * @param callback  A function that takes in a content type to call back when root
-   *                  key or wrapper status has changed.
-   */
-  public onKeyStatusChange(callback: KeyChangeObserver) {
-    this.keyObservers.push(callback)
-    return () => {
-      removeFromArray(this.keyObservers, callback)
-    }
-  }
-
-  private async notifyObserversOfKeyChange() {
-    await this.recomputeAccountKeyParams()
-    this.itemsEncryption.userVersion = this.getUserVersion()
-    for (const observer of this.keyObservers) {
-      await observer()
-    }
-  }
-
-  private async getRootKeyFromKeychain() {
-    const rawKey = await this.deviceInterface.getNamespacedKeychainValue(this.identifier)
-    if (isNullOrUndefined(rawKey)) {
-      return undefined
-    }
-    const rootKey = SNRootKey.Create({
-      ...rawKey,
-      keyParams: await this.getRootKeyParams(),
-    })
-    return rootKey
-  }
-
-  private async saveRootKeyToKeychain() {
-    if (this.rootKeyEncryption.getRootKey() == undefined) {
-      throw 'Attempting to non-existent root key to the keychain.'
-    }
-    if (this.keyMode !== KeyMode.RootKeyOnly) {
-      throw 'Should not be persisting wrapped key to keychain.'
-    }
-    const rawKey = this.rootKeyEncryption.getRootKey()!.getKeychainValue()
-    return this.executeCriticalFunction(() => {
-      return this.deviceInterface.setNamespacedKeychainValue(rawKey, this.identifier)
-    })
-  }
-
-  /**
-   * @returns True if a root key wrapper (passcode) is configured.
-   */
-  public async hasRootKeyWrapper() {
-    const wrapper = await this.getRootKeyWrapperKeyParams()
-    return !isNullOrUndefined(wrapper)
-  }
-
-  /**
-   * A non-async alternative to `hasRootKeyWrapper` which uses pre-loaded state
-   * to determine if a passcode is configured.
-   */
-  public hasPasscode() {
-    return this.keyMode === KeyMode.WrapperOnly || this.keyMode === KeyMode.RootKeyPlusWrapper
+  public hasPasscode(): boolean {
+    return this.rootKeyEncryption.hasPasscode()
   }
 
   /**
    * @returns True if the root key has not yet been unwrapped (passcode locked).
    */
-  public async rootKeyNeedsUnwrapping() {
-    return (await this.hasRootKeyWrapper()) && this.rootKeyEncryption.getRootKey() == undefined
-  }
-
-  /**
-   * @returns Key params object containing root key wrapper key params
-   */
-  public async getRootKeyWrapperKeyParams() {
-    const rawKeyParams = await this.storageService.getValue(
-      StorageKey.RootKeyWrapperKeyParams,
-      StorageValueModes.Nonwrapped,
+  public async isPasscodeLocked() {
+    return (
+      (await this.rootKeyEncryption.hasRootKeyWrapper()) &&
+      this.rootKeyEncryption.getRootKey() == undefined
     )
-    if (!rawKeyParams) {
-      return undefined
-    }
-    return this.createKeyParams(rawKeyParams)
   }
 
-  /**
-   * @returns Object containing persisted wrapped (encrypted) root key
-   */
-  private async getWrappedRootKey() {
-    return this.storageService.getValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped)
-  }
-
-  /**
-   * Returns rootKeyParams by reading from storage.
-   */
   public async getRootKeyParams() {
-    if (this.keyMode === KeyMode.WrapperOnly) {
-      return this.getRootKeyWrapperKeyParams()
-    } else if (
-      this.keyMode === KeyMode.RootKeyOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    ) {
-      return this.recomputeAccountKeyParams()
-    } else if (this.keyMode === KeyMode.RootKeyNone) {
-      return undefined
-    } else {
-      throw `Unhandled key mode for getRootKeyParams ${this.keyMode}`
-    }
+    return this.rootKeyEncryption.getRootKeyParams()
   }
 
-  private async recomputeAccountKeyParams(): Promise<SNRootKeyParams | undefined> {
-    const rawKeyParams = await this.storageService.getValue(
-      StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
-    if (!rawKeyParams) {
-      return
-    }
-
-    this.memoizedRootKeyParams = this.createKeyParams(rawKeyParams)
-    return this.memoizedRootKeyParams
-  }
-
-  /**
-   * @returns getRootKeyParams may return different params based on different
-   *           keyMode. This function however strictly returns only account params.
-   */
   public getAccountKeyParams() {
-    return this.memoizedRootKeyParams
-  }
-
-  /**
-   * We know a wrappingKey is correct if it correctly decrypts
-   * wrapped root key.
-   */
-  public async validateWrappingKey(wrappingKey: SNRootKey) {
-    const wrappedRootKey = await this.getWrappedRootKey()
-    /** If wrapper only, storage is encrypted directly with wrappingKey */
-    if (this.keyMode === KeyMode.WrapperOnly) {
-      return this.storageService.canDecryptWithKey(wrappingKey)
-    } else if (
-      this.keyMode === KeyMode.RootKeyOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    ) {
-      /**
-       * In these modes, storage is encrypted with account keys, and
-       * account keys are encrypted with wrappingKey. Here we validate
-       * by attempting to decrypt account keys.
-       */
-      const wrappedKeyPayload = CreateMaxPayloadFromAnyObject(wrappedRootKey)
-      const decrypted = await this.rootKeyEncryption.decryptPayload(wrappedKeyPayload, wrappingKey)
-      return !decrypted.errorDecrypting
-    } else {
-      throw 'Unhandled case in validateWrappingKey'
-    }
+    return this.rootKeyEncryption.memoizedRootKeyParams
   }
 
   /**
@@ -608,8 +482,8 @@ export class SNProtocolService extends AbstractService {
    * Wrapping key params are read from disk.
    */
   public async computeWrappingKey(passcode: string) {
-    const keyParams = await this.getRootKeyWrapperKeyParams()
-    const key = await this.computeRootKey(passcode, keyParams!)
+    const keyParams = await this.rootKeyEncryption.getSureRootKeyWrapperKeyParams()
+    const key = await this.computeRootKey(passcode, keyParams)
     return key
   }
 
@@ -620,27 +494,7 @@ export class SNProtocolService extends AbstractService {
    * After unwrapping, the root key is automatically loaded.
    */
   public async unwrapRootKey(wrappingKey: SNRootKey) {
-    if (this.keyMode === KeyMode.WrapperOnly) {
-      this.rootKeyEncryption.setRootKey(wrappingKey)
-      return
-    }
-
-    if (this.keyMode !== KeyMode.RootKeyPlusWrapper) {
-      throw 'Invalid key mode condition for unwrapping.'
-    }
-
-    const wrappedKey = await this.getWrappedRootKey()
-    const payload = CreateMaxPayloadFromAnyObject(wrappedKey)
-    const decrypted = await this.rootKeyEncryption.decryptPayload(payload, wrappingKey)
-
-    if (decrypted.errorDecrypting) {
-      throw Error('Unable to decrypt root key with provided wrapping key.')
-    } else {
-      this.rootKeyEncryption.setRootKey(
-        SNRootKey.Create(decrypted.contentObject as any, decrypted.uuid),
-      )
-      await this.notifyObserversOfKeyChange()
-    }
+    return this.rootKeyEncryption.unwrapRootKey(wrappingKey)
   }
   /**
    * Encrypts rootKey and saves it in storage instead of keychain, and then
@@ -649,132 +503,15 @@ export class SNProtocolService extends AbstractService {
    * in plain form in the user's secure keychain.
    */
   public async setNewRootKeyWrapper(wrappingKey: SNRootKey) {
-    if (this.keyMode === KeyMode.RootKeyNone) {
-      this.keyMode = KeyMode.WrapperOnly
-    } else if (this.keyMode === KeyMode.RootKeyOnly) {
-      this.keyMode = KeyMode.RootKeyPlusWrapper
-    } else {
-      throw Error('Attempting to set wrapper on already wrapped key.')
-    }
-
-    await this.deviceInterface.clearNamespacedKeychainValue(this.identifier)
-
-    if (this.keyMode === KeyMode.WrapperOnly || this.keyMode === KeyMode.RootKeyPlusWrapper) {
-      if (this.keyMode === KeyMode.WrapperOnly) {
-        this.rootKeyEncryption.setRootKey(wrappingKey)
-        await this.rootKeyEncryption.reencryptItemsKeys()
-      } else {
-        await this.wrapAndPersistRootKey(wrappingKey)
-      }
-      await this.storageService.setValue(
-        StorageKey.RootKeyWrapperKeyParams,
-        wrappingKey.keyParams.getPortableValue(),
-        StorageValueModes.Nonwrapped,
-      )
-      await this.notifyObserversOfKeyChange()
-    } else {
-      throw Error('Invalid keyMode on setNewRootKeyWrapper')
-    }
+    return this.rootKeyEncryption.setNewRootKeyWrapper(wrappingKey)
   }
 
-  /**
-   * Wraps the current in-memory root key value using the wrappingKey,
-   * then persists the wrapped value to disk.
-   */
-  private async wrapAndPersistRootKey(wrappingKey: SNRootKey) {
-    const payload = CreateMaxPayloadFromAnyObject(this.rootKeyEncryption.getRootKey()!, {
-      content: this.rootKeyEncryption.getRootKey()!.persistableValueWhenWrapping(),
-    })
-
-    const wrappedKey = await this.rootKeyEncryption.encryptPayload(
-      payload,
-      EncryptionIntent.LocalStorageEncrypted,
-      wrappingKey,
-    )
-
-    await this.storageService.setValue(
-      StorageKey.WrappedRootKey,
-      wrappedKey.ejected(),
-      StorageValueModes.Nonwrapped,
-    )
+  public async removePasscode(): Promise<void> {
+    await this.rootKeyEncryption.removeRootKeyWrapper()
   }
 
-  /**
-   * Removes root key wrapper from local storage and stores root key bare in secure keychain.
-   */
-  public async removeRootKeyWrapper(): Promise<void> {
-    if (this.keyMode !== KeyMode.WrapperOnly && this.keyMode !== KeyMode.RootKeyPlusWrapper) {
-      throw Error('Attempting to remove root key wrapper on unwrapped key.')
-    }
-
-    if (this.keyMode === KeyMode.WrapperOnly) {
-      this.keyMode = KeyMode.RootKeyNone
-      this.rootKeyEncryption.setRootKey(undefined)
-    } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
-      this.keyMode = KeyMode.RootKeyOnly
-    }
-
-    await this.storageService.removeValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped)
-    await this.storageService.removeValue(
-      StorageKey.RootKeyWrapperKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
-
-    if (this.keyMode === KeyMode.RootKeyOnly) {
-      await this.saveRootKeyToKeychain()
-    }
-
-    await this.notifyObserversOfKeyChange()
-  }
-
-  /**
-   * The root key is distinct from regular keys and are only saved locally in the keychain,
-   * in non-item form. Applications set root key on sign in, register, or password change.
-   * @param key A SNRootKey object.
-   * @param wrappingKey If a passcode is configured, the wrapping key
-   * must be supplied, so that the new root key can be wrapped with the wrapping key.
-   */
   public async setRootKey(key: SNRootKey, wrappingKey?: SNRootKey) {
-    if (!key.keyParams) {
-      throw Error('keyParams must be supplied if setting root key.')
-    }
-
-    if (this.rootKeyEncryption.getRootKey() === key) {
-      throw Error('Attempting to set root key as same current value.')
-    }
-
-    if (this.keyMode === KeyMode.WrapperOnly) {
-      this.keyMode = KeyMode.RootKeyPlusWrapper
-    } else if (this.keyMode === KeyMode.RootKeyNone) {
-      this.keyMode = KeyMode.RootKeyOnly
-    } else if (
-      this.keyMode === KeyMode.RootKeyOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    ) {
-      /** Root key is simply changing, mode stays the same */
-      /** this.keyMode = this.keyMode; */
-    } else {
-      throw Error(`Unhandled key mode for setNewRootKey ${this.keyMode}`)
-    }
-
-    this.rootKeyEncryption.setRootKey(key)
-
-    await this.storageService.setValue(
-      StorageKey.RootKeyParams,
-      key.keyParams.getPortableValue(),
-      StorageValueModes.Nonwrapped,
-    )
-
-    if (this.keyMode === KeyMode.RootKeyOnly) {
-      await this.saveRootKeyToKeychain()
-    } else if (this.keyMode === KeyMode.RootKeyPlusWrapper) {
-      if (!wrappingKey) {
-        throw Error('wrappingKey must be supplied')
-      }
-      await this.wrapAndPersistRootKey(wrappingKey)
-    }
-
-    await this.notifyObserversOfKeyChange()
+    await this.rootKeyEncryption.setRootKey(key, wrappingKey)
   }
 
   /**
@@ -788,44 +525,15 @@ export class SNProtocolService extends AbstractService {
    * Deletes root key and wrapper from keychain. Used when signing out of application.
    */
   public async clearLocalKeyState() {
-    await this.deviceInterface.clearNamespacedKeychainValue(this.identifier)
-    await this.storageService.removeValue(StorageKey.WrappedRootKey, StorageValueModes.Nonwrapped)
-    await this.storageService.removeValue(
-      StorageKey.RootKeyWrapperKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
-    await this.storageService.removeValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
-    this.keyMode = KeyMode.RootKeyNone
-    this.rootKeyEncryption.setRootKey(undefined)
-    await this.notifyObserversOfKeyChange()
+    await this.rootKeyEncryption.clearLocalKeyState()
   }
 
-  /**
-   * @param password  The password string to generate a root key from.
-   */
   public async validateAccountPassword(password: string) {
-    const keyParams = await this.getRootKeyParams()
-    const key = await this.computeRootKey(password, keyParams!)
-    const valid = this.rootKeyEncryption.getRootKey()!.compare(key)
-    if (valid) {
-      return { valid, artifacts: { rootKey: key } }
-    } else {
-      return { valid: false }
-    }
+    return this.rootKeyEncryption.validateAccountPassword(password)
   }
 
-  /**
-   * @param passcode  The passcode string to generate a root key from.
-   */
   public async validatePasscode(passcode: string) {
-    const keyParams = await this.getRootKeyWrapperKeyParams()
-    const key = await this.computeRootKey(passcode, keyParams!)
-    const valid = await this.validateWrappingKey(key)
-    if (valid) {
-      return { valid, artifacts: { wrappingKey: key } }
-    } else {
-      return { valid: false }
-    }
+    return this.rootKeyEncryption.validatePasscode(passcode)
   }
 
   /** Returns the key params attached to this key's encrypted payload */
@@ -891,6 +599,10 @@ export class SNProtocolService extends AbstractService {
     }
 
     return defaultItemsKey.itemsKey !== rootKey.itemsKey
+  }
+
+  public async createNewDefaultItemsKey(): Promise<SNItemsKey> {
+    return this.rootKeyEncryption.createNewDefaultItemsKey()
   }
 
   public getPasswordCreatedDate(): Date | undefined {
@@ -980,7 +692,7 @@ export class SNProtocolService extends AbstractService {
     const currentItemsKey = findDefaultItemsKey(this.itemsEncryption.getItemsKeys())
     if (!currentItemsKey) {
       await this.rootKeyEncryption.createNewDefaultItemsKey()
-      if (this.keyMode === KeyMode.WrapperOnly) {
+      if (this.rootKeyEncryption.keyMode === KeyMode.WrapperOnly) {
         return this.itemsEncryption.repersistAllItems()
       }
     }
