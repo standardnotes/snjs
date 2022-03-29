@@ -80,7 +80,7 @@ describe('004 protocol operations', function () {
     const text = 'hello world'
     const rawKey = _key.masterKey
     const nonce = await application.protocolService.crypto.generateRandomKey(192)
-    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004)
+    const operator = application.protocolService.operatorManager.operatorForVersion(ProtocolVersion.V004)
     const authenticatedData = { foo: 'bar' }
     const encString = await operator.encryptString004(text, rawKey, nonce, authenticatedData)
     const decString = await operator.decryptString004(
@@ -96,7 +96,7 @@ describe('004 protocol operations', function () {
     const text = 'hello world'
     const rawKey = _key.masterKey
     const nonce = await application.protocolService.crypto.generateRandomKey(192)
-    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004)
+    const operator = application.protocolService.operatorManager.operatorForVersion(ProtocolVersion.V004)
     const aad = { foo: 'bar' }
     const nonmatchingAad = { foo: 'rab' }
     const encString = await operator.encryptString004(text, rawKey, nonce, aad)

@@ -48,15 +48,20 @@ describe('key recovery service', function () {
       unassociatedPassword,
       KeyParamsOrigination.Registration,
     )
-    const randomItemsKey = await application.protocolService.defaultOperator().createItemsKey()
-    const encrypted = await application.protocolService.payloadByEncryptingPayload(
+    const randomItemsKey = await application.protocolService.operatorManager
+      .defaultOperator()
+      .createItemsKey()
+    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
       randomItemsKey.payload,
       EncryptionIntent.Sync,
       randomRootKey,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.payloadByDecryptingPayload(encrypted)
+    const decrypted = await application.protocolService.rootKeyEncryption.decryptPayload(
+      encrypted,
+      application.protocolService.getRootKey(),
+    )
     /** Expect to be errored */
     expect(decrypted.errorDecrypting).to.equal(true)
 
@@ -103,16 +108,23 @@ describe('key recovery service', function () {
       unassociatedPassword,
       KeyParamsOrigination.Registration,
     )
-    const randomItemsKey = await application.protocolService.defaultOperator().createItemsKey()
-    const randomItemsKey2 = await application.protocolService.defaultOperator().createItemsKey()
-    const encrypted = await application.protocolService.payloadsByEncryptingPayloads(
+    const randomItemsKey = await application.protocolService.operatorManager
+      .defaultOperator()
+      .createItemsKey()
+    const randomItemsKey2 = await application.protocolService.operatorManager
+      .defaultOperator()
+      .createItemsKey()
+    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayloads(
       [randomItemsKey.payload, randomItemsKey2.payload],
       EncryptionIntent.Sync,
       randomRootKey,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.payloadsByDecryptingPayloads(encrypted)
+    const decrypted = await application.protocolService.rootKeyEncryption.decryptPayloads(
+      encrypted,
+      application.protocolService.getRootKey(),
+    )
 
     await application.payloadManager.emitPayloads(decrypted, PayloadSource.Constructor)
 
@@ -316,8 +328,10 @@ describe('key recovery service', function () {
       KeyParamsOrigination.Registration,
     )
     await application.protocolService.setRootKey(randomRootKey)
-    const correctItemsKey = await application.protocolService.defaultOperator().createItemsKey()
-    const encrypted = await application.protocolService.payloadByEncryptingPayload(
+    const correctItemsKey = await application.protocolService.operatorManager
+      .defaultOperator()
+      .createItemsKey()
+    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
       correctItemsKey.payload,
       EncryptionIntent.Sync,
       randomRootKey,
@@ -360,10 +374,11 @@ describe('key recovery service', function () {
     })
 
     /** Create and emit errored encrypted items key payload */
-    const itemsKey = await application.protocolService.getDefaultItemsKey()
-    const encrypted = await application.protocolService.payloadByEncryptingPayload(
+    const itemsKey = await application.protocolService.itemsEncryption.getDefaultItemsKey()
+    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
       itemsKey.payload,
       EncryptionIntent.Sync,
+      application.protocolService.getRootKey(),
     )
     const newUpdated = new Date()
     await application.payloadManager.emitPayload(
@@ -417,10 +432,11 @@ describe('key recovery service', function () {
     })
 
     /** Create and emit errored encrypted items key payload */
-    const itemsKey = await application.protocolService.getDefaultItemsKey()
-    const encrypted = await application.protocolService.payloadByEncryptingPayload(
+    const itemsKey = await application.protocolService.itemsEncryption.getDefaultItemsKey()
+    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
       itemsKey.payload,
       EncryptionIntent.Sync,
+      application.protocolService.getRootKey(),
     )
 
     await application.payloadManager.emitPayload(
@@ -495,17 +511,20 @@ describe('key recovery service', function () {
       KeyParamsOrigination.Registration,
       ProtocolVersion.V003,
     )
-    const randomItemsKey = await application.protocolService
+    const randomItemsKey = await application.protocolService.operatorManager
       .operatorForVersion(ProtocolVersion.V003)
       .createItemsKey()
-    const encrypted = await application.protocolService.payloadByEncryptingPayload(
+    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
       randomItemsKey.payload,
       EncryptionIntent.Sync,
       randomRootKey,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.payloadByDecryptingPayload(encrypted)
+    const decrypted = await application.protocolService.rootKeyEncryption.decryptPayload(
+      encrypted,
+      application.protocolService.getRootKey(),
+    )
     /** Expect to be errored */
     expect(decrypted.errorDecrypting).to.equal(true)
 
@@ -574,9 +593,9 @@ describe('key recovery service', function () {
     expect(result.error).to.not.be.ok
     await appB.sync.sync()
 
-    const newDefaultKey = appB.protocolService.getDefaultItemsKey()
+    const newDefaultKey = appB.protocolService.itemsEncryption.getDefaultItemsKey()
 
-    const encrypted = await appB.protocolService.payloadByEncryptingPayload(
+    const encrypted = await appB.protocolService.rootKeyEncryption.encryptPayload(
       newDefaultKey.payload,
       EncryptionIntent.Sync,
       appB.protocolService.getRootKey(),

@@ -215,10 +215,11 @@ export class BaseMigration extends Migration {
               Error('Attempting keychain recovery validation but no items present.'),
             )
           }
-          const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(
-            CreateMaxPayloadFromAnyObject(itemToDecrypt),
-            rootKey,
-          )
+          const decryptedItem =
+            await this.services.protocolService.rootKeyEncryption.decryptPayload(
+              CreateMaxPayloadFromAnyObject(itemToDecrypt),
+              rootKey,
+            )
           if (decryptedItem.errorDecrypting) {
             /** Wrong password, try again */
             this.services.challengeService.setValidationStatusForChallenge(

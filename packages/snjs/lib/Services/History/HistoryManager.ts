@@ -332,7 +332,9 @@ export class SNHistoryManager extends AbstractService {
     }
 
     const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory)
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(encryptedPayload)
+    const decryptedPayload = await this.protocolService.itemsEncryption.decryptPayload(
+      encryptedPayload,
+    )
     if (decryptedPayload.errorDecrypting) {
       return undefined
     }

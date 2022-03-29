@@ -15,7 +15,7 @@ export class Migration2_0_15 extends Migration {
 
   private async createNewDefaultItemsKeyIfNecessary() {
     if (this.services.protocolService.needsNewRootKeyBasedItemsKey()) {
-      await this.services.protocolService.createNewDefaultItemsKey()
+      await this.services.protocolService.rootKeyEncryption.createNewDefaultItemsKey()
     }
   }
 }

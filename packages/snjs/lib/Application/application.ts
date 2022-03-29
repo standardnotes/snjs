@@ -457,7 +457,7 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.protocolService.getEncryptionDisplayName()
   }
 
-  public getUserVersion(): Promise<Common.ProtocolVersion | undefined> {
+  public getUserVersion(): Common.ProtocolVersion | undefined {
     return this.protocolService.getUserVersion()
   }
 
@@ -680,14 +680,18 @@ export class SNApplication implements Services.ListedClientInterface {
     for (const uninstallObserver of this.serviceObservers) {
       uninstallObserver()
     }
+
     for (const uninstallSubscriber of this.managedSubscribers) {
       uninstallSubscriber()
     }
+
     for (const service of this.services) {
       service.deinit()
     }
 
+    this.options.crypto.deinit()
     ;(this.options as unknown) = undefined
+
     this.createdNewDatabase = false
     this.services.length = 0
     this.serviceObservers.length = 0
@@ -851,7 +855,7 @@ export class SNApplication implements Services.ListedClientInterface {
     encryptionPolicy: Services.StorageEncryptionPolicies,
   ): Promise<void> {
     await this.storageService.setEncryptionPolicy(encryptionPolicy)
-    return this.protocolService.repersistAllItems()
+    return this.protocolService.itemsEncryption.repersistAllItems()
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
@@ -929,15 +933,8 @@ export class SNApplication implements Services.ListedClientInterface {
     this.createItemManager()
     this.createStorageManager()
     this.createProtocolService()
-    const encryptionDelegate = {
-      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
-        this.protocolService,
-      ),
-      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
-        this.protocolService,
-      ),
-    }
-    this.storageService.encryptionDelegate = encryptionDelegate
+    this.storageService.itemsEncryption = this.protocolService.itemsEncryption
+    this.storageService.rootKeyEncryption = this.protocolService.rootKeyEncryption
     this.createChallengeService()
     this.createHttpManager()
     this.createApiService()
@@ -1206,7 +1203,6 @@ export class SNApplication implements Services.ListedClientInterface {
   private createStorageManager() {
     this.storageService = new Services.SNStorageService(
       this.deviceInterface,
-      this.alertService,
       this.identifier,
       this.environment,
       this.internalEventBus,
@@ -1263,7 +1259,7 @@ export class SNApplication implements Services.ListedClientInterface {
             void (async () => {
               await this.sync.sync()
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
-                void this.protocolService.createNewDefaultItemsKey().then(() => {
+                void this.protocolService.rootKeyEncryption.createNewDefaultItemsKey().then(() => {
                   void this.sync.sync()
                 })
               }

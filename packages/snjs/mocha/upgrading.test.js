@@ -169,7 +169,7 @@ describe('upgrading', () => {
 
   it('protocol version should be upgraded on password change', async function () {
     /** Delete default items key that is created on launch */
-    const itemsKey = await this.application.protocolService.getDefaultItemsKey()
+    const itemsKey = await this.application.protocolService.itemsEncryption.getDefaultItemsKey()
     await this.application.itemManager.setItemToBeDeleted(itemsKey.uuid)
     expect(this.application.itemManager.itemsKeys().length).to.equal(0)
 
@@ -206,7 +206,7 @@ describe('upgrading', () => {
     )
     expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(latestVersion)
 
-    const defaultItemsKey = await this.application.protocolService.getDefaultItemsKey()
+    const defaultItemsKey = await this.application.protocolService.itemsEncryption.getDefaultItemsKey()
     expect(defaultItemsKey.keyVersion).to.equal(latestVersion)
 
     /** After change, note should now be encrypted with latest protocol version */
@@ -267,7 +267,7 @@ describe('upgrading', () => {
         oldVersion,
       )
       expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(oldVersion)
-      expect((await this.application.protocolService.getDefaultItemsKey()).keyVersion).to.equal(
+      expect((await this.application.protocolService.itemsEncryption.getDefaultItemsKey()).keyVersion).to.equal(
         oldVersion,
       )
     })
@@ -292,7 +292,7 @@ describe('upgrading', () => {
         oldVersion,
       )
       expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(oldVersion)
-      expect((await this.application.protocolService.getDefaultItemsKey()).keyVersion).to.equal(
+      expect((await this.application.protocolService.itemsEncryption.getDefaultItemsKey()).keyVersion).to.equal(
         oldVersion,
       )
     })

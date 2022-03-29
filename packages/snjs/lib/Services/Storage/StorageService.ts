@@ -1,19 +1,27 @@
-import { SNAlertService } from '../Alert/AlertService'
+import { RootKeyEncryptionService } from './../Protocol/RootKeyEncryption'
+import { ItemsEncryptionService } from './../Protocol/ItemsEncryption'
 import { SNLog } from '../../log'
 import { Environment } from '@Lib/Application/platforms'
 import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/Services/Storage/storage_keys'
-import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications'
+import {
+  ApplicationStage,
+  EncryptionIntent,
+  ItemContentTypeUsesRootKeyEncryption,
+} from '@standardnotes/applications'
 import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
   RawPayload,
   PurePayload,
 } from '@standardnotes/payloads'
-import { EncryptionDelegate } from '../Protocol/EncryptionDelegate'
 import { SNRootKey } from '@Lib/Protocol/root_key'
 import { ContentType } from '@standardnotes/common'
 import { Copy, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils'
-import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  DeviceInterface,
+  InternalEventBusInterface,
+} from '@standardnotes/services'
 
 export enum StoragePersistencePolicies {
   Default = 1,
@@ -59,7 +67,8 @@ export type StorageValuesObject = {
  * key can decrypt wrapped storage.
  */
 export class SNStorageService extends AbstractService {
-  public encryptionDelegate!: EncryptionDelegate
+  public itemsEncryption!: ItemsEncryptionService
+  public rootKeyEncryption!: RootKeyEncryptionService
   /** Wait until application has been unlocked before trying to persist */
   private storagePersistable = false
   private persistencePolicy!: StoragePersistencePolicies
@@ -70,20 +79,20 @@ export class SNStorageService extends AbstractService {
 
   constructor(
     deviceInterface: DeviceInterface,
-    private alertService: SNAlertService,
     private identifier: string,
     private environment: Environment,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.deviceInterface = deviceInterface
-    this.setPersistencePolicy(StoragePersistencePolicies.Default)
-    this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false)
+    void this.setPersistencePolicy(StoragePersistencePolicies.Default)
+    void this.setEncryptionPolicy(StorageEncryptionPolicies.Default, false)
   }
 
   public deinit() {
     this.deviceInterface = undefined
-    ;(this.encryptionDelegate as unknown) = undefined
+    ;(this.itemsEncryption as unknown) = undefined
+    ;(this.rootKeyEncryption as unknown) = undefined
     this.storagePersistable = false
     super.deinit()
   }
@@ -93,12 +102,12 @@ export class SNStorageService extends AbstractService {
     if (stage === ApplicationStage.Launched_10) {
       this.storagePersistable = true
       if (this.needsPersist) {
-        this.persistValuesToDisk()
+        void this.persistValuesToDisk()
       }
     } else if (stage === ApplicationStage.StorageDecrypted_09) {
       const persistedPolicy = await this.getValue(StorageKey.StorageEncryptionPolicy)
       if (persistedPolicy) {
-        this.setEncryptionPolicy(persistedPolicy, false)
+        void this.setEncryptionPolicy(persistedPolicy, false)
       }
     }
   }
@@ -159,7 +168,7 @@ export class SNStorageService extends AbstractService {
     return !decryptedPayload.errorDecrypting
   }
 
-  private async decryptWrappedValue(wrappedValue: any, key?: SNRootKey) {
+  private async decryptWrappedValue(wrappedValue: any, key: SNRootKey) {
     /**
      * The read content type doesn't matter, so long as we know it responds
      * to content type. This allows a more seamless transition when both web
@@ -171,16 +180,21 @@ export class SNStorageService extends AbstractService {
     const payload = CreateMaxPayloadFromAnyObject(wrappedValue, {
       content_type: ContentType.EncryptedStorage,
     })
-    const decryptedPayload = await this.encryptionDelegate!.payloadByDecryptingPayload(payload, key)
+    const decryptedPayload = await this.rootKeyEncryption.decryptPayload(payload, key)
     return decryptedPayload
   }
 
   public async decryptStorage() {
     const wrappedValue = this.values[ValueModesKeys.Wrapped]
-    const decryptedPayload = await this.decryptWrappedValue(wrappedValue)
+    const decryptedPayload = await this.decryptWrappedValue(
+      wrappedValue,
+      this.rootKeyEncryption.getRootKey()!,
+    )
+
     if (decryptedPayload.errorDecrypting) {
       throw SNLog.error(Error('Unable to decrypt storage.'))
     }
+
     this.values[ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject)
   }
 
@@ -218,13 +232,14 @@ export class SNStorageService extends AbstractService {
     const rawContent = Object.assign({}, this.values)
     const valuesToWrap = rawContent[ValueModesKeys.Unwrapped]
     const payload = CreateMaxPayloadFromAnyObject({
-      uuid: await UuidGenerator.GenerateUuid(),
+      uuid: UuidGenerator.GenerateUuid(),
       content: valuesToWrap as PayloadContent,
       content_type: ContentType.EncryptedStorage,
     })
-    const encryptedPayload = await this.encryptionDelegate?.payloadByEncryptingPayload(
+    const encryptedPayload = await this.rootKeyEncryption.encryptPayload(
       payload,
       EncryptionIntent.LocalStoragePreferEncrypted,
+      this.rootKeyEncryption.getRootKey()!,
     )
     if (encryptedPayload) {
       rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected()
@@ -325,7 +340,13 @@ export class SNStorageService extends AbstractService {
       return
     }
 
+    const intent =
+      this.encryptionPolicy === StorageEncryptionPolicies.Default
+        ? EncryptionIntent.LocalStoragePreferEncrypted
+        : EncryptionIntent.LocalStorageDecrypted
+
     const nondeleted: RawPayload[] = []
+
     for (const payload of decryptedPayloads) {
       if (payload.discardable) {
         /** If the payload is deleted and not dirty, remove it from db. */
@@ -334,13 +355,17 @@ export class SNStorageService extends AbstractService {
         if (!payload.uuid) {
           throw Error('Attempting to persist payload with no uuid')
         }
-        const encrypted = await this.encryptionDelegate.payloadByEncryptingPayload(
-          payload,
-          this.encryptionPolicy === StorageEncryptionPolicies.Default
-            ? EncryptionIntent.LocalStoragePreferEncrypted
-            : EncryptionIntent.LocalStorageDecrypted,
-        )
-        nondeleted.push(encrypted.ejected())
+        if (ItemContentTypeUsesRootKeyEncryption(payload.content_type)) {
+          const encrypted = await this.rootKeyEncryption.encryptPayload(
+            payload,
+            intent,
+            this.rootKeyEncryption.getRootKey(),
+          )
+          nondeleted.push(encrypted.ejected())
+        } else {
+          const encrypted = await this.itemsEncryption.encryptPayload(payload, intent)
+          nondeleted.push(encrypted.ejected())
+        }
       }
     }
 

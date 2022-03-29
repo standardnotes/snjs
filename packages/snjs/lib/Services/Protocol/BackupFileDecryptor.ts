@@ -82,7 +82,7 @@ async function decryptEncryptedWithNonEncryptedItemsKey(
   return decryptWithItemsKeys(payloads, itemsKeys, protocolService)
 }
 
-function findItemsKeyToUseForPayload(
+function findKeyToUseForPayload(
   payload: PurePayload,
   availableKeys: SNItemsKey[],
   protocolService: SNProtocolService,
@@ -92,7 +92,7 @@ function findItemsKeyToUseForPayload(
   let itemsKey: SNItemsKey | SNRootKey | undefined
 
   if (payload.items_key_id) {
-    itemsKey = protocolService.itemsKeyForPayload(payload)
+    itemsKey = protocolService.itemsEncryption.itemsKeyForPayload(payload)
     if (itemsKey) {
       return itemsKey
     }
@@ -119,7 +119,10 @@ function findItemsKeyToUseForPayload(
    * root key directly because it's missing dataAuthenticationKey.
    */
   if (leftVersionGreaterThanOrEqualToRight(keyParams.version, ProtocolVersion.V004)) {
-    itemsKey = protocolService.defaultItemsKeyForItemVersion(payloadVersion, availableKeys)
+    itemsKey = protocolService.itemsEncryption.defaultItemsKeyForItemVersion(
+      payloadVersion,
+      availableKeys,
+    )
   } else if (compareVersions(payloadVersion, ProtocolVersion.V003) <= 0) {
     itemsKey = fallbackRootKey
   }
@@ -142,7 +145,7 @@ async function decryptWithItemsKeys(
     }
 
     try {
-      const itemsKey = findItemsKeyToUseForPayload(
+      const key = findKeyToUseForPayload(
         encryptedPayload,
         itemsKeys,
         protocolService,
@@ -150,11 +153,22 @@ async function decryptWithItemsKeys(
         fallbackRootKey,
       )
 
-      const decryptedPayload = await protocolService.payloadByDecryptingPayload(
-        encryptedPayload,
-        itemsKey,
-      )
-      decryptedPayloads.push(decryptedPayload)
+      if (!key) {
+        continue
+      }
+      if (key instanceof SNItemsKey) {
+        const decryptedPayload = await protocolService.itemsEncryption.decryptPayload(
+          encryptedPayload,
+          key,
+        )
+        decryptedPayloads.push(decryptedPayload)
+      } else {
+        const decryptedPayload = await protocolService.rootKeyEncryption.decryptPayload(
+          encryptedPayload,
+          key,
+        )
+        decryptedPayloads.push(decryptedPayload)
+      }
     } catch (e) {
       decryptedPayloads.push(
         CreateMaxPayloadFromAnyObject(encryptedPayload, {
@@ -176,11 +190,12 @@ async function decryptEncrypted(
   protocolService: SNProtocolService,
 ): Promise<PurePayload[]> {
   const rootKey = await protocolService.computeRootKey(password, keyParams)
+
   const itemsKeysPayloads = payloads.filter((payload) => {
     return payload.content_type === ContentType.ItemsKey
   })
 
-  const decryptedItemsKeysPayloads = await protocolService.payloadsByDecryptingPayloads(
+  const decryptedItemsKeysPayloads = await protocolService.rootKeyEncryption.decryptPayloads(
     itemsKeysPayloads,
     rootKey,
   )

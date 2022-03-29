@@ -16,7 +16,7 @@ export class SNItemsKey extends SNItem {
     return ConflictStrategy.KeepLeft
   }
 
-  get keyVersion(): string | undefined {
+  get keyVersion(): ProtocolVersion {
     return this.payload.safeContent.version
   }
 

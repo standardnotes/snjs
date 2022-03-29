@@ -8,3 +8,8 @@ export type AnyOperator =
   | SNProtocolOperator002
   | SNProtocolOperator003
   | SNProtocolOperator004
+
+export enum EncryptionType {
+  ItemsKey = 'ItemsKey',
+  RootKey = 'RootKey',
+}

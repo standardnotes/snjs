@@ -254,7 +254,7 @@ export async function registerUserToApplication({
 
 export async function setOldVersionPasscode({ application, passcode, version }) {
   const identifier = await application.protocolService.crypto.generateUUID()
-  const operator = application.protocolService.operatorForVersion(version)
+  const operator = application.protocolService.operatorManager.operatorForVersion(version)
   const key = await operator.createRootKey(
     identifier,
     passcode,
@@ -272,7 +272,7 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
 export async function registerOldUser({ application, email, password, version }) {
   if (!email) email = generateUuid()
   if (!password) password = generateUuid()
-  const operator = application.protocolService.operatorForVersion(version)
+  const operator = application.protocolService.operatorManager.operatorForVersion(version)
   const accountKey = await operator.createRootKey(
     email,
     password,
@@ -294,7 +294,7 @@ export async function registerOldUser({ application, email, password, version })
     mode: SyncMode.DownloadFirst,
     ...syncOptions,
   })
-  await application.protocolService.decryptErroredItems()
+  await application.protocolService.itemsEncryption.decryptErroredItems()
 }
 
 export function createStorageItemPayload(contentType) {

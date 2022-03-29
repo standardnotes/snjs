@@ -179,7 +179,7 @@ export class SNActionsService extends AbstractService {
 
   private async payloadByDecryptingResponse(
     response: ActionResponse,
-    key?: SNRootKey,
+    rootKey?: SNRootKey,
     triedPasswords: string[] = [],
   ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item)
@@ -189,13 +189,23 @@ export class SNActionsService extends AbstractService {
       return
     }
 
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(payload, key)
+    let decryptedPayload = await this.protocolService.itemsEncryption.decryptPayload(payload)
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload
     }
 
+    if (rootKey) {
+      decryptedPayload = await this.protocolService.rootKeyEncryption.decryptPayload(
+        payload,
+        rootKey,
+      )
+      if (!decryptedPayload.errorDecrypting) {
+        return decryptedPayload
+      }
+    }
+
     for (const itemsKey of this.itemManager.itemsKeys()) {
-      const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
+      const decryptedPayload = await this.protocolService.itemsEncryption.decryptPayload(
         payload,
         itemsKey,
       )
@@ -251,7 +261,7 @@ export class SNActionsService extends AbstractService {
     }
 
     this.previousPasswords.push(password)
-    return this.payloadByDecryptingResponse(response, key)
+    return this.payloadByDecryptingResponse(response, rootKey)
   }
 
   private async promptForLegacyPassword(): Promise<string | undefined> {
@@ -294,7 +304,7 @@ export class SNActionsService extends AbstractService {
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
     const intent = decrypted ? EncryptionIntent.FileDecrypted : EncryptionIntent.FileEncrypted
-    const encrypted = await this.protocolService.payloadByEncryptingPayload(
+    const encrypted = await this.protocolService.itemsEncryption.encryptPayload(
       item.payloadRepresentation(),
       intent,
     )

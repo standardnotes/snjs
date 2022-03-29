@@ -160,7 +160,7 @@ describe('backups', function () {
   it('downloading backup if item is error decrypting should succeed', async function () {
     await Factory.createSyncedNote(this.application)
     const note = await Factory.createSyncedNote(this.application)
-    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+    const encrypted = await this.application.protocolService.itemsEncryption.encryptPayload(
       note.payload,
       EncryptionIntent.FileEncrypted,
     )

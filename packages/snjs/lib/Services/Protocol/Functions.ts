@@ -1,3 +1,8 @@
+import { ItemInterface } from './../../../../payloads/src/Domain/Item/ItemInterface'
+import { PayloadFormat, PurePayload } from '@standardnotes/payloads'
+import { SNItemsKey } from '@Lib/Models'
+import { SNRootKey } from '@Protocol/root_key'
+import { EncryptionIntent, ItemContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
 import { AnyOperator } from './Types'
 import { AsynchronousOperator, SynchronousOperator } from '../../Protocol/operator/operator'
 import { ProtocolVersion } from '@standardnotes/common'
@@ -24,8 +29,116 @@ export function createOperatorForVersion(
   }
 }
 
+type ItemOrPayload = ItemInterface | PurePayload
+type UsesRootKeySplit<T extends ItemOrPayload> = {
+  items: T[]
+  key: SNRootKey
+}
+type UsesItemsKeySplit<T extends ItemOrPayload> = {
+  items: T[]
+  key?: SNItemsKey
+}
+
+export type EncryptionSplit<T extends ItemOrPayload> = {
+  usesRootKey?: {
+    items: T[]
+  }
+  usesItemsKey?: {
+    items: T[]
+  }
+}
+
+export type EncryptionSplitWithKey<T extends ItemOrPayload> = {
+  usesRootKey?: UsesRootKeySplit<T>
+  usesItemsKey?: UsesItemsKeySplit<T>
+}
+
+// export function createEncryptionSplit<T extends ItemOrPayload>(usesItemsKey?: UsesItemsKeySplit): EncryptionSplitWithKey<T> {}
+
+export function splitItemsByEncryptionType<T extends ItemOrPayload>(
+  items: T[],
+): EncryptionSplit<T> {
+  const usesRootKey: T[] = []
+  const usesItemsKey: T[] = []
+
+  for (const item of items) {
+    if (ItemContentTypeUsesRootKeyEncryption(item.content_type)) {
+      usesRootKey.push(item)
+    } else {
+      usesItemsKey.push(item)
+    }
+  }
+
+  return {
+    usesRootKey: { items: usesRootKey },
+    usesItemsKey: { items: usesItemsKey },
+  }
+}
+
 export function isAsyncOperator(
   operator: AsynchronousOperator | SynchronousOperator,
 ): operator is AsynchronousOperator {
   return (operator as AsynchronousOperator).generateDecryptedParametersAsync !== undefined
+}
+
+/**
+ * Given a key and intent, returns the proper PayloadFormat,
+ * or throws an exception if unsupported configuration of parameters.
+ */
+export function payloadContentFormatForIntent(
+  intent: EncryptionIntent,
+  key?: SNRootKey | SNItemsKey,
+) {
+  if (!key) {
+    /** Decrypted */
+    if (
+      intent === EncryptionIntent.LocalStorageDecrypted ||
+      intent === EncryptionIntent.LocalStoragePreferEncrypted ||
+      intent === EncryptionIntent.FileDecrypted ||
+      intent === EncryptionIntent.FilePreferEncrypted
+    ) {
+      return PayloadFormat.DecryptedBareObject
+    } else {
+      throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.'
+    }
+  } else {
+    /** Encrypted */
+    if (
+      intent === EncryptionIntent.Sync ||
+      intent === EncryptionIntent.FileEncrypted ||
+      intent === EncryptionIntent.FilePreferEncrypted ||
+      intent === EncryptionIntent.LocalStorageEncrypted ||
+      intent === EncryptionIntent.LocalStoragePreferEncrypted
+    ) {
+      return PayloadFormat.EncryptedString
+    } else {
+      throw 'Unhandled encrypted case in protocolService.payloadContentFormatForIntent.'
+    }
+  }
+}
+
+/**
+ * @returns The SNItemsKey object to use to encrypt new or updated items.
+ */
+export function findDefaultItemsKey(itemsKeys: SNItemsKey[]): SNItemsKey | undefined {
+  if (itemsKeys.length === 1) {
+    return itemsKeys[0]
+  }
+
+  const defaultKeys = itemsKeys.filter((key) => {
+    return key.isDefault
+  })
+
+  if (defaultKeys.length > 1) {
+    /**
+     * Prioritize one that is synced, as neverSynced keys will likely be deleted after
+     * DownloadFirst sync.
+     */
+    const syncedKeys = defaultKeys.filter((key) => !key.neverSynced)
+    if (syncedKeys.length > 0) {
+      return syncedKeys[0]
+    }
+  }
+
+  return defaultKeys[0]
 }

@@ -78,7 +78,10 @@ describe('002 protocol operations', () => {
         '002:24a8e8f7728bbe06605d8209d87ad338d3d15ef81154bb64d3967c77daa01333:959b042a-3892-461e-8c50-477c10c7c40a:f1d294388742dca34f6f266a01483a4e:VdlEDyjhZ35GbJDg8ruSZv3Tp6WtMME3T5LLvcBYLHIMhrMi0RlPK83lK6F0aEaZvY82pZ0ntU+XpAX7JMSEdKdPXsACML7WeFrqKb3z2qHnA7NxgnIC0yVT/Z2mRrvlY3NNrUPGwJbfRcvfS7FVyw87MemT9CSubMZRviXvXETx82t7rsgjV/AIwOOeWhFi',
       uuid: '959b042a-3892-461e-8c50-477c10c7c40a',
     })
-    const decrypted = await application.protocolService.payloadByDecryptingPayload(payload, key)
+    const decrypted = await application.protocolService.rootKeyEncryption.decryptPayload(
+      payload,
+      key,
+    )
     expect(decrypted.errorDecrypting).to.not.be.ok
     expect(decrypted.content.text).to.equal('Decryptable Sentence')
   })

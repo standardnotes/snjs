@@ -225,7 +225,7 @@ describe('storage manager', function () {
     const wrappedRootKey = await this.application.protocolService.getWrappedRootKey()
     /** Expect that we can decrypt wrapped root key with passcode key */
     const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey)
-    const decrypted = await this.application.protocolService.payloadByDecryptingPayload(
+    const decrypted = await this.application.protocolService.rootKeyEncryption.decryptPayload(
       payload,
       passcodeKey,
     )

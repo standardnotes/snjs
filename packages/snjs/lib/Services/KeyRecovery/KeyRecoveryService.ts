@@ -414,7 +414,7 @@ export class SNKeyRecoveryService extends AbstractService {
     /** Generate a root key using the input */
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
     /** Attempt to decrypt this items key using the root key */
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
+    const decryptedPayload = await this.protocolService.rootKeyEncryption.decryptPayload(
       key.payload,
       rootKey,
     )
@@ -455,7 +455,7 @@ export class SNKeyRecoveryService extends AbstractService {
       await this.protocolService.setRootKey(rootKey, wrappingKey)
     }
     const matching = this.popQueueForKeyParams(rootKey.keyParams)
-    const decryptedMatching = await this.protocolService.payloadsByDecryptingPayloads(
+    const decryptedMatching = await this.protocolService.rootKeyEncryption.decryptPayloads(
       matching.map((m) => m.key.payload),
       rootKey,
     )

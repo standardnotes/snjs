@@ -274,7 +274,7 @@ describe('online syncing', function () {
     await this.application.itemManager.setItemDirty(note.uuid)
     await this.application.syncService.sync(syncOptions)
 
-    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+    const encrypted = await this.application.protocolService.itemsEncryption.encryptPayload(
       note.payloadRepresentation(),
       EncryptionIntent.Sync,
     )
@@ -288,9 +288,8 @@ describe('online syncing', function () {
     const mappedItem = items[0]
     expect(typeof mappedItem.content).to.equal('string')
 
-    const decryptedPayload = await this.application.protocolService.payloadByDecryptingPayload(
-      errorred,
-    )
+    const decryptedPayload =
+      await this.application.protocolService.itemsEncryption.decryptPayload(errorred)
     const mappedItems2 = await this.application.itemManager.emitItemsFromPayloads(
       [decryptedPayload],
       PayloadSource.LocalChanged,
@@ -458,7 +457,9 @@ describe('online syncing', function () {
     const payloads = []
     for (const payload of encryptedPayloads) {
       expect(payload.dirty).to.equal(true)
-      const decrypted = await this.application.protocolService.payloadByDecryptingPayload(payload)
+      const decrypted = await this.application.protocolService.itemsEncryption.decryptPayload(
+        payload,
+      )
       payloads.push(decrypted)
     }
     await this.application.itemManager.emitItemsFromPayloads(payloads, PayloadSource.LocalChanged)
@@ -850,7 +851,7 @@ describe('online syncing', function () {
     this.expectedItemCount++
     const lastSyncBegan = note.lastSyncBegan
     const lastSyncEnd = note.lastSyncEnd
-    const encrypted = await this.application.protocolService.payloadByEncryptingPayload(
+    const encrypted = await this.application.protocolService.itemsEncryption.encryptPayload(
       note.payload,
       EncryptionIntent.Sync,
     )

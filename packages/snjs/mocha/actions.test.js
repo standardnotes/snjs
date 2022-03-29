@@ -120,10 +120,11 @@ describe('actions service', () => {
       },
     })
 
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.Sync,
-    )
+    const encryptedPayload =
+      await this.application.protocolService.itemsEncryption.encryptPayload(
+        payload,
+        EncryptionIntent.Sync,
+      )
 
     this.fakeServer.respondWith(
       'GET',

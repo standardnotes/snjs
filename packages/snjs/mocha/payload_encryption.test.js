@@ -47,10 +47,11 @@ describe('payload encryption', function () {
       errorDecrypting: false,
     })
 
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      notePayload,
-      EncryptionIntent.Sync,
-    )
+    const encryptedPayload =
+      await this.application.protocolService.itemsEncryption.encryptPayload(
+        notePayload,
+        EncryptionIntent.Sync,
+      )
 
     expect(encryptedPayload.dirty).to.not.be.ok
     expect(encryptedPayload.errorDecrypting).to.not.be.ok
@@ -114,10 +115,11 @@ describe('payload encryption', function () {
 
   it('returns valid encrypted params for syncing', async function () {
     const payload = Factory.createNotePayload()
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.Sync,
-    )
+    const encryptedPayload =
+      await this.application.protocolService.itemsEncryption.encryptPayload(
+        payload,
+        EncryptionIntent.Sync,
+      )
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
     expect(encryptedPayload.auth_hash).to.not.be.ok
@@ -130,7 +132,7 @@ describe('payload encryption', function () {
 
   it('returns unencrypted params with no keys', async function () {
     const payload = Factory.createNotePayload()
-    const encodedPayload = await this.application.protocolService.payloadByEncryptingPayload(
+    const encodedPayload = await this.application.protocolService.itemsEncryption.encryptPayload(
       payload,
       EncryptionIntent.FileDecrypted,
     )
@@ -147,10 +149,11 @@ describe('payload encryption', function () {
   it('returns additional fields for local storage', async function () {
     const payload = Factory.createNotePayload()
 
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.LocalStorageEncrypted,
-    )
+    const encryptedPayload =
+      await this.application.protocolService.itemsEncryption.encryptPayload(
+        payload,
+        EncryptionIntent.LocalStorageEncrypted,
+      )
 
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.auth_hash).to.not.be.ok
@@ -167,10 +170,11 @@ describe('payload encryption', function () {
 
   it('omits deleted for export file', async function () {
     const payload = Factory.createNotePayload()
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
-      EncryptionIntent.FileEncrypted,
-    )
+    const encryptedPayload =
+      await this.application.protocolService.itemsEncryption.encryptPayload(
+        payload,
+        EncryptionIntent.FileEncrypted,
+      )
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
     expect(encryptedPayload.content_type).to.be.ok
@@ -187,10 +191,11 @@ describe('payload encryption', function () {
       enc_item_key: 'foo',
       errorDecrypting: true,
     })
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      mutatedPayload,
-      EncryptionIntent.Sync,
-    )
+    const encryptedPayload =
+      await this.application.protocolService.itemsEncryption.encryptPayload(
+        mutatedPayload,
+        EncryptionIntent.Sync,
+      )
     expect(encryptedPayload.content).to.eql(payload.content)
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
