@@ -10,7 +10,7 @@ import {
 import { KeychainRecoveryStrings, SessionStrings } from '../Services/Api/Messages'
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from '../version'
 import { Migration } from '@Lib/Migrations/migration'
-import { RawStorageKey, namespacedKey } from '@Lib/Services/Storage/storage_keys'
+import { RawStorageKey, namespacedKey } from '@standardnotes/services'
 import { ApplicationStage, ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { CreateReader } from './readers/functions'

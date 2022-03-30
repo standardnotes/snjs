@@ -1,5 +1,4 @@
 import { NoteWithTags } from './note_with_tags'
-import { SystemViewId } from '../../Models/SmartView/SmartView'
 import { NotesDisplayCriteria } from '@Lib/Protocol/collection/notes_display_criteria'
 import { ContentType } from '@standardnotes/common'
 import {
@@ -8,7 +7,7 @@ import {
   FillItemContent,
   Predicate,
 } from '@standardnotes/payloads'
-import { SmartView, SmartViewContent } from '@Lib/Models/SmartView/SmartView'
+import { SmartView, SmartViewContent, SystemViewId } from '@standardnotes/models'
 
 export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   const notes = new SmartView(

@@ -1,14 +1,22 @@
+import { RootKeyContent } from '@standardnotes/models'
+import { SNRootKey } from '@standardnotes/encryption'
 import { StorageReader1_0_0 } from './readers/reader_1_0_0'
 import { MigrationServices } from './types'
 import { PreviousSnjsVersion2_0_0 } from '../version'
-import { LegacyKeys1_0_0, NonwrappedStorageKey } from '../Services/Storage/storage_keys'
+
 import { JwtSession } from '../Services/Session/Sessions/JwtSession'
 import { ContentType } from '@standardnotes/common'
-import { SNItemsKey } from '../Models/ItemsKey/ItemsKey'
-import { RootKeyContent, SNRootKey } from '../Protocol/root_key'
 import { ProtocolVersion } from '@standardnotes/common'
 import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications'
-import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/Services/Storage/storage_keys'
+import {
+  RawStorageKey,
+  StorageKey,
+  namespacedKey,
+  StorageValuesObject,
+  ValueModesKeys,
+  LegacyKeys1_0_0,
+  NonwrappedStorageKey,
+} from '@standardnotes/services'
 import {
   PurePayload,
   CopyPayload,
@@ -17,7 +25,7 @@ import {
   CollectionSort,
   FillItemContent,
 } from '@standardnotes/payloads'
-import { SNStorageService, StorageValuesObject } from '../Services/Storage/StorageService'
+import { SNStorageService } from '../Services/Storage/StorageService'
 import { Migration } from '@Lib/Migrations/migration'
 import {
   Copy,
@@ -27,8 +35,7 @@ import {
   omitByCopy,
   UuidGenerator,
 } from '@standardnotes/utils'
-import { ValueModesKeys } from '@Lib/Services/Storage/StorageService'
-import { CreateItemFromPayload } from '../Models'
+
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/platforms'
 
 type LegacyMobileKeychainStructure =

@@ -1,7 +1,7 @@
 import { IntegrityEvent } from './IntegrityEvent'
 import { AbstractService } from '../Service/AbstractService'
-import { ItemManagerInterface } from '@standardnotes/payloads'
-import { ItemApiInterface } from '../Item/ItemApiInterface'
+import { ItemManagerInterface } from '../Item/ItemManagerInterface'
+import { ItemsServerInterface } from '../Item/ItemsServerInterface'
 import { IntegrityApiInterface } from './IntegrityApiInterface'
 import { GetSingleItemResponse } from '@standardnotes/responses'
 import { InternalEventHandlerInterface } from '../Internal/InternalEventHandlerInterface'
@@ -16,7 +16,7 @@ export class IntegrityService
   implements InternalEventHandlerInterface {
   constructor(
     private integrityApi: IntegrityApiInterface,
-    private itemApi: ItemApiInterface,
+    private itemApi: ItemsServerInterface,
     private itemManager: ItemManagerInterface,
     protected internalEventBus: InternalEventBusInterface,
   ) {

@@ -1,17 +1,28 @@
-import { PrefKey } from '@Lib/Models/UserPrefs/UserPrefs'
-import { NoteContent } from '@Lib/Models/Note/Note'
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FeatureStatus, FeaturesEvent } from '@Lib/Services/Features'
 import { SNFeaturesService } from '@Lib/Services'
 import { ComponentArea, FindNativeFeature } from '@standardnotes/features'
-import { CreateItemFromPayload } from '@Lib/Models/Generator'
-import { Uuids } from '@Lib/Models/Functions'
+import {
+  SNItem,
+  SNNote,
+  SNComponent,
+  Uuids,
+  PrefKey,
+  NoteContent,
+  MutationType,
+  CreateItemFromPayload,
+} from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import remove from 'lodash/remove'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
-import { Environment, environmentToString, Platform, platformToString } from '@Lib/Application/platforms'
+import {
+  Environment,
+  environmentToString,
+  Platform,
+  platformToString,
+} from '@Lib/Application/platforms'
 import {
   PayloadContent,
   RawPayload,
@@ -33,10 +44,7 @@ import {
 import { ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidString } from '@Lib/Types/UuidString'
-import { SNItem } from '@Lib/Models/Item/Item'
-import { MutationType } from '@Lib/Models/Item/MutationType'
 import { ContentType, Runtime } from '@standardnotes/common'
-import { SNComponent, SNNote } from '@Lib/Models'
 import {
   concatArrays,
   isString,

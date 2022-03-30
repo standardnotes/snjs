@@ -10,7 +10,11 @@ import { DeltaFileImport } from '../../Protocol/payloads/deltas/file_import'
 import { ContentType } from '@standardnotes/common'
 import { Uuids } from '@Lib/Models/Functions'
 import { UuidString } from '../../Types/UuidString'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  PayloadManagerInterface,
+} from '@standardnotes/services'
 import { ChangeObserverCallback } from '../Items/ChangeObserverCallback'
 import { PayloadsChangeObserver, QueueElement, OverwriteProtectedTypes } from './Types'
 
@@ -24,7 +28,7 @@ import { PayloadsChangeObserver, QueueElement, OverwriteProtectedTypes } from '.
  * It exposes methods that allow consumers to listen to mapping events. This is how
  * applications 'stream' items to display in the interface.
  */
-export class PayloadManager extends AbstractService {
+export class PayloadManager extends AbstractService implements PayloadManagerInterface {
   private changeObservers: PayloadsChangeObserver[] = []
   public collection: MutableCollection<PurePayload>
   private emitQueue: QueueElement[] = []

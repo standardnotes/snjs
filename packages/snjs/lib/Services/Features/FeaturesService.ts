@@ -23,7 +23,7 @@ import {
 import { ContentType, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
-import { SNComponent, SNTheme } from '@Lib/Models'
+import { SNComponent, SNTheme } from '@standardnotes/models'
 import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
 import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/payloads'
 import { SNSettingsService } from '../Settings'

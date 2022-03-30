@@ -1,0 +1,143 @@
+import {
+  PurePayload,
+  FillItemContent,
+  CreateMaxPayloadFromAnyObject,
+} from '@standardnotes/payloads'
+import { SNRootKeyParams } from './RootKeyParams'
+import { SNItem, RootKeyInterface, RootKeyContent } from '@standardnotes/models'
+import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common'
+import { UuidGenerator } from '@standardnotes/utils'
+import { timingSafeEqual } from '@standardnotes/sncrypto-common'
+
+/**
+ * A root key is a local only construct that houses the key used for the encryption
+ * and decryption of items keys. A root key extends SNItem for local convenience, but is
+ * not part of the syncing or storage ecosystem—root keys are managed independently.
+ */
+export class SNRootKey extends SNItem implements RootKeyInterface {
+  public readonly keyParams: SNRootKeyParams
+
+  static Create(content: RootKeyContent, uuid?: string) {
+    if (!uuid) {
+      uuid = UuidGenerator.GenerateUuid()
+    }
+    if (!content.version) {
+      if (content.dataAuthenticationKey) {
+        /**
+         * If there's no version stored, it must be either 001 or 002.
+         * If there's a dataAuthenticationKey, it has to be 002. Otherwise it's 001.
+         */
+        content.version = ProtocolVersion.V002
+      } else {
+        content.version = ProtocolVersion.V001
+      }
+    }
+    const payload = CreateMaxPayloadFromAnyObject({
+      uuid: uuid,
+      content_type: ContentType.RootKey,
+      content: FillItemContent(content),
+    })
+    const keyParamsInput = content.keyParams
+    if (!keyParamsInput) {
+      throw Error('Attempting to create root key without key params')
+    }
+    const keyParams =
+      keyParamsInput instanceof SNRootKeyParams
+        ? keyParamsInput
+        : new SNRootKeyParams(keyParamsInput)
+
+    return new SNRootKey(payload, keyParams)
+  }
+
+  /**
+   * Given a root key, expands its key params by making a copy which includes
+   * the inputted key params. Used to expand locally created key params after signing in
+   */
+  static ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent) {
+    const content = key.typedContent as RootKeyContent
+    const copiedKey = this.Create({
+      ...content,
+      keyParams: keyParams ? keyParams : content.keyParams,
+    })
+    return copiedKey
+  }
+
+  constructor(payload: PurePayload, keyParams: SNRootKeyParams) {
+    super(payload)
+    this.keyParams = keyParams
+  }
+
+  private get typedContent() {
+    return this.safeContent as Partial<RootKeyContent>
+  }
+
+  public get keyVersion(): ProtocolVersion {
+    if (!this.payload.safeContent.version) {
+      throw 'Attempting to create key without version.'
+    }
+    return this.payload.safeContent.version
+  }
+
+  /**
+   * When the root key is used to encrypt items, we use the masterKey directly.
+   */
+  public get itemsKey(): string {
+    return this.masterKey
+  }
+
+  public get masterKey(): string {
+    return this.payload.safeContent.masterKey
+  }
+
+  /**
+   * serverPassword is not persisted as part of keychainValue, so if loaded from disk,
+   * this value may be undefined.
+   */
+  public get serverPassword(): string | undefined {
+    return this.payload.safeContent.serverPassword
+  }
+
+  /** 003 and below only. */
+  public get dataAuthenticationKey(): string | undefined {
+    return this.payload.safeContent.dataAuthenticationKey
+  }
+
+  /**
+   * Compares two keys for equality
+   */
+  public compare(otherKey: SNRootKey): boolean {
+    if (this.keyVersion !== otherKey.keyVersion) {
+      return false
+    }
+    const hasServerPassword = !!(this.serverPassword && otherKey.serverPassword)
+    return (
+      timingSafeEqual(this.masterKey, otherKey.masterKey) &&
+      (!hasServerPassword || timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
+    )
+  }
+
+  /**
+   * @returns Object suitable for persist in storage when wrapped
+   */
+  public persistableValueWhenWrapping(): Partial<RootKeyContent> {
+    const keychainValue = this.getKeychainValue()
+    keychainValue.keyParams = this.keyParams.getPortableValue()
+    return keychainValue
+  }
+
+  /**
+   * @returns Object that is suitable for persisting in a keychain
+   */
+  public getKeychainValue(): Partial<RootKeyContent> {
+    const values: Partial<RootKeyContent> = {
+      version: this.keyVersion,
+    }
+    if (this.masterKey) {
+      values.masterKey = this.masterKey
+    }
+    if (this.dataAuthenticationKey) {
+      values.dataAuthenticationKey = this.dataAuthenticationKey
+    }
+    return values
+  }
+}

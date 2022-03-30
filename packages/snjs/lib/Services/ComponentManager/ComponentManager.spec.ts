@@ -12,11 +12,11 @@ import {
 import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/types'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
-import { SNComponent } from '@Lib/Models'
+import { SNItem, SNComponent } from '@standardnotes/models'
 import { Environment, Platform } from '@Lib/Application/platforms'
 import { Runtime } from '@standardnotes/common'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
-import { SNItem } from '@Lib/Models/Item/Item'
+
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { SNComponentManager } from './ComponentManager'

@@ -2,7 +2,7 @@ import { ContentType } from '@standardnotes/common'
 import { ApplicationStage } from '@standardnotes/applications'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { Migration } from '@Lib/Migrations/migration'
-import { SNTheme } from '@Lib/Models'
+import { SNTheme } from '@standardnotes/models'
 
 const NoDistractionIdentifier = 'org.standardnotes.theme-no-distraction' as FeatureIdentifier
 

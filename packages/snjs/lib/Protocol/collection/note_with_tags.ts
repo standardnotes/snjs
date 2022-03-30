@@ -1,5 +1,4 @@
-import { SNTag } from '@Lib/index'
-import { SNNote } from '@Lib/Models'
+import { SNNote, SNTag } from '@standardnotes/models'
 import { PurePayload } from '@standardnotes/payloads'
 
 export class NoteWithTags extends SNNote {

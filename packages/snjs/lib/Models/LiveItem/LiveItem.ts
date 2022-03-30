@@ -1,5 +1,5 @@
+import { SNItem } from '@standardnotes/models'
 import { SNApplication } from '../../Application/application'
-import { SNItem } from '@Lib/Models/Item/Item'
 
 /** Keeps an item reference up to date with changes */
 export class LiveItem<T extends SNItem> {

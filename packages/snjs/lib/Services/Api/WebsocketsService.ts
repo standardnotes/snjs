@@ -1,7 +1,6 @@
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
 import { SNStorageService } from '../Storage/StorageService'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, StorageKey } from '@standardnotes/services'
 
 export enum WebSocketsServiceEvent {
   UserRoleMessageReceived = 'WebSocketMessageReceived',

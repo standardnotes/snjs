@@ -1,5 +1,4 @@
-import { SNFeatureRepo } from '../../Models/FeatureRepo/FeatureRepo'
-import { SNComponent } from '@Lib/Models/Component/Component'
+import { SNComponent, SNFeatureRepo, SNItem } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { SettingName } from '@standardnotes/settings'
 import {
@@ -7,7 +6,6 @@ import {
   SNAlertService,
   SNApiService,
   UserService,
-  SNItem,
   SNSessionManager,
   SNStorageService,
   StorageKey,
@@ -142,15 +140,15 @@ describe('featuresService', () => {
 
       featuresService.enableExperimentalFeature(FeatureIdentifier.BoldEditor)
 
-      expect(
-        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor),
-      ).toEqual(true)
+      expect(featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor)).toEqual(
+        true,
+      )
 
       featuresService.disableExperimentalFeature(FeatureIdentifier.BoldEditor)
 
-      expect(
-        featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor),
-      ).toEqual(false)
+      expect(featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor)).toEqual(
+        false,
+      )
     })
 
     it('does not create a component for not enabled experimental feature', async () => {

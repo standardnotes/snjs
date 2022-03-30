@@ -1,3 +1,4 @@
+import { EncryptionService } from '@standardnotes/encryption'
 import {
   Challenge,
   ChallengeArtifacts,
@@ -8,7 +9,6 @@ import {
   ChallengeValidation,
   ChallengeValue,
 } from '.'
-import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNStorageService } from '../Storage/StorageService'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../Protection/ProtectionService'
@@ -39,7 +39,7 @@ export class ChallengeService extends AbstractService {
 
   constructor(
     private storageService: SNStorageService,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)

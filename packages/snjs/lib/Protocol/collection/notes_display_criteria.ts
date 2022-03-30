@@ -1,11 +1,8 @@
 import { CollectionSortDirection, CollectionSort, ItemCollection } from '@standardnotes/payloads'
-import { SNTag } from '../../Models/Tag/Tag'
 import { ContentType } from '@standardnotes/common'
-import { SNNote } from '../../Models/Note/Note'
-import { SmartView } from '../../Models/SmartView/SmartView'
 import { NoteWithTags } from './note_with_tags'
 import { CompoundPredicate } from '@standardnotes/payloads'
-import { SNItem } from '@Lib/Models'
+import { SNNote, SNTag, SmartView, SNItem } from '@standardnotes/models'
 
 export type SearchQuery = {
   query: string

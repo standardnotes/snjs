@@ -1,6 +1,5 @@
 import { SNLog } from '../../log'
 import { Environment } from '@Lib/Application/platforms'
-import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/Services/Storage/storage_keys'
 import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications'
 import {
   CreateMaxPayloadFromAnyObject,
@@ -9,13 +8,22 @@ import {
   PurePayload,
   CreateIntentPayloadFromObject,
 } from '@standardnotes/payloads'
-import { SNRootKey } from '@Lib/Protocol/root_key'
 import { ContentType } from '@standardnotes/common'
 import { Copy, extendArray, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils'
 import {
   AbstractService,
   DeviceInterface,
   InternalEventBusInterface,
+  StorageServiceInterface,
+  StoragePersistencePolicies,
+  StorageEncryptionPolicy,
+  StorageValuesObject,
+  ValueModesKeys,
+  StorageValueModes,
+  ValuesObjectRecord,
+  RawStorageKey,
+  StorageKey,
+  namespacedKey,
 } from '@standardnotes/services'
 import {
   createKeyLookupSplitFromSplit,
@@ -23,40 +31,8 @@ import {
   splitItemsByEncryptionType,
 } from '../Protocol/EncryptionSplit'
 import { EncryptionProvider } from '../Protocol/EncryptionProvider'
-
-export enum StoragePersistencePolicies {
-  Default = 1,
-  Ephemeral = 2,
-}
-
-export enum StorageEncryptionPolicy {
-  Default = 1,
-  Disabled = 2,
-}
-
-export enum StorageValueModes {
-  /** Stored inside wrapped encrpyed storage object */
-  Default = 1,
-  /** Stored outside storage object, unencrypted */
-  Nonwrapped = 2,
-}
-
-export enum ValueModesKeys {
-  /* Is encrypted */
-  Wrapped = 'wrapped',
-  /* Is decrypted */
-  Unwrapped = 'unwrapped',
-  /* Lives outside of wrapped/unwrapped */
-  Nonwrapped = 'nonwrapped',
-}
-
-type ValuesObjectRecord = Record<string, unknown>
-
-export type StorageValuesObject = {
-  [ValueModesKeys.Wrapped]: ValuesObjectRecord
-  [ValueModesKeys.Unwrapped]: ValuesObjectRecord
-  [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
-}
+import { RootKeyInterface } from '@standardnotes/models'
+import { SNRootKey } from '@standardnotes/encryption'
 
 /**
  * The storage service is responsible for persistence of both simple key-values, and payload
@@ -68,7 +44,7 @@ export type StorageValuesObject = {
  * decrypt the persisted key/values, and also a method to determine whether a particular
  * key can decrypt wrapped storage.
  */
-export class SNStorageService extends AbstractService {
+export class SNStorageService extends AbstractService implements StorageServiceInterface {
   private encryptionProvider!: EncryptionProvider
   private storagePersistable = false
   private persistencePolicy!: StoragePersistencePolicies
@@ -166,7 +142,7 @@ export class SNStorageService extends AbstractService {
     return !isNullOrUndefined(wrappedValue) && Object.keys(wrappedValue).length > 0
   }
 
-  public async canDecryptWithKey(key: SNRootKey) {
+  public async canDecryptWithKey(key: RootKeyInterface): Promise<boolean> {
     const wrappedValue = this.values[ValueModesKeys.Wrapped] as RawPayload
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue, key)
     return !decryptedPayload.errorDecrypting
@@ -339,7 +315,7 @@ export class SNStorageService extends AbstractService {
     return value != undefined ? (value as T) : (defaultValue as T)
   }
 
-  public async removeValue(key: string, mode = StorageValueModes.Default) {
+  public async removeValue(key: string, mode = StorageValueModes.Default): Promise<void> {
     if (!this.values) {
       throw Error(`Attempting to remove storage key ${key} before loading local storage.`)
     }
@@ -405,11 +381,11 @@ export class SNStorageService extends AbstractService {
     return this.deviceInterface.getAllRawDatabasePayloads(this.identifier)
   }
 
-  public async savePayload(payload: PurePayload) {
+  public async savePayload(payload: PurePayload): Promise<void> {
     return this.savePayloads([payload])
   }
 
-  public async savePayloads(decryptedPayloads: PurePayload[]) {
+  public async savePayloads(decryptedPayloads: PurePayload[]): Promise<void> {
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       return
     }

@@ -1,6 +1,5 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { ValueModesKeys } from '../../Services/Storage/StorageService'
-import { RawStorageKey, StorageKey, namespacedKey } from '@Lib/Services/Storage/storage_keys'
+import { RawStorageKey, StorageKey, namespacedKey, ValueModesKeys } from '@standardnotes/services'
 import { StorageReader } from './reader'
 import { PreviousSnjsVersion2_0_0 } from '@Lib/version'
 
@@ -11,8 +10,8 @@ export class StorageReader2_0_0 extends StorageReader {
 
   private async getStorage() {
     const storageKey = namespacedKey(this.identifier, RawStorageKey.StorageObject)
-    const storage = await this.deviceInterface!.getRawStorageValue(storageKey)
-    const values = storage ? JSON.parse(storage as any) : undefined
+    const storage = await this.deviceInterface.getRawStorageValue(storageKey)
+    const values = storage ? JSON.parse(storage) : undefined
     return values
   }
 

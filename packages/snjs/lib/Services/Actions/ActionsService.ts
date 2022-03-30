@@ -1,3 +1,4 @@
+import { EncryptionService, SNRootKey } from '@standardnotes/encryption'
 import {
   Challenge,
   ChallengeValidation,
@@ -6,23 +7,23 @@ import {
   ChallengePrompt,
 } from '../Challenge'
 import { ListedService } from '../Listed/ListedService'
-import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { EncryptionIntent } from '@standardnotes/applications'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
-import { SNRootKey } from '@Lib/Protocol/root_key'
 import {
   SNActionsExtension,
   Action,
   ActionAccessType,
-} from '../../Models/ActionsExtension/ActionsExtension'
-import { ActionsExtensionMutator } from '../../Models/ActionsExtension/ActionsExtensionMutator'
-import { SNItem } from '@Lib/Models/Item/Item'
-import { MutationType } from '@Lib/Models/Item/MutationType'
+  ActionsExtensionMutator,
+  SNItem,
+  MutationType,
+  CreateItemFromPayload,
+} from '@standardnotes/models'
+
 import { SNSyncService } from '../Sync/SyncService'
-import { SNProtocolService } from '../Protocol/ProtocolService'
+
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNHttpService } from '../Api/HttpService'
 import { SNAlertService } from '../Alert/AlertService'
@@ -56,7 +57,7 @@ export class SNActionsService extends AbstractService {
     public deviceInterface: DeviceInterface,
     private httpService: SNHttpService,
     private payloadManager: PayloadManager,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     private syncService: SNSyncService,
     private challengeService: ChallengeService,
     private listedService: ListedService,

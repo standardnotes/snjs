@@ -1,11 +1,11 @@
 import { TagsToFoldersMigrationApplicator } from '../../Migrations/applicators/tags_to_folders'
-import { SNItem } from '@Lib/Models/Item/Item'
+
 import * as Payloads from '@standardnotes/payloads'
-import * as Models from '@Lib/Models'
+import * as Models from '@standardnotes/models'
 import { ItemCollectionNotesView } from '@Lib/Protocol/collection/item_collection_notes_view'
 import { NotesDisplayCriteria } from '@Lib/Protocol/collection/notes_display_criteria'
 import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'
-import { PayloadsByDuplicating } from '@Lib/Protocol/payloads/functions'
+import { PayloadsByDuplicating } from '@standardnotes/models'
 import { AnyRecord, ContentType } from '@standardnotes/common'
 import {
   TagNoteCountChangeObserver,
@@ -13,16 +13,20 @@ import {
 } from '../../Protocol/collection/tag_notes_index'
 import { UuidString } from '../../Types/UuidString'
 import { PayloadManager } from '../Payloads/PayloadManager'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  ItemManagerInterface,
+  ItemManagerChangeObserverCallback,
+} from '@standardnotes/services'
 import { BuildSmartViews } from '@Lib/Protocol/collection/smart_view_builder'
 import { ItemsClientInterface } from './ItemsClientInterface'
-import { ChangeObserverCallback } from './ChangeObserverCallback'
 import { ItemInterface } from '@standardnotes/payloads'
 import { TransactionalMutation } from './TransactionalMutation'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
-  callback: ChangeObserverCallback<SNItem>
+  callback: ItemManagerChangeObserverCallback<Models.SNItem>
 }
 
 /**
@@ -37,7 +41,7 @@ type ItemsChangeObserver = {
  */
 export class ItemManager
   extends AbstractService
-  implements Payloads.ItemManagerInterface, ItemsClientInterface
+  implements ItemManagerInterface, ItemsClientInterface
 {
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
@@ -88,7 +92,7 @@ export class ItemManager
   /**
    * Returns all items.
    */
-  allItems(): SNItem[] {
+  allItems(): ItemInterface[] {
     return this.items
   }
 
@@ -158,7 +162,7 @@ export class ItemManager
     this.notesView.setCriteria(updatedCriteria)
   }
 
-  public getDisplayableItems<T extends Models.SNItem>(contentType: ContentType): T[] {
+  public getDisplayableItems<T extends Payloads.ItemInterface>(contentType: ContentType): T[] {
     if (contentType === ContentType.Note) {
       return this.notesView.displayElements() as unknown as T[]
     }
@@ -205,7 +209,7 @@ export class ItemManager
    * @param includeBlanks If true and an item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  findItems<T extends SNItem>(uuids: UuidString[], includeBlanks = false): T[] {
+  findItems<T extends Models.SNItem>(uuids: UuidString[], includeBlanks = false): T[] {
     return this.collection.findAll(uuids, includeBlanks) as T[]
   }
 
@@ -223,10 +227,7 @@ export class ItemManager
     return this.collection.nondeletedElements()
   }
 
-  /**
-   * Returns all items that have not been able to decrypt.
-   */
-  public get invalidItems() {
+  public get invalidItems(): Payloads.ItemInterface[] {
     return this.collection.invalidElements()
   }
 
@@ -234,10 +235,7 @@ export class ItemManager
     return this.collection.integrityPayloads()
   }
 
-  /**
-   * Returns all non-deleted items keys
-   */
-  itemsKeys() {
+  itemsKeys(): Models.SNItemsKey[] {
     return this.collection.displayElements(ContentType.ItemsKey) as Models.SNItemsKey[]
   }
 
@@ -295,7 +293,7 @@ export class ItemManager
 
   public addObserver(
     contentType: ContentType | ContentType[],
-    callback: ChangeObserverCallback<SNItem>,
+    callback: ItemManagerChangeObserverCallback<Models.SNItem>,
   ): () => void {
     if (!Array.isArray(contentType)) {
       contentType = [contentType]
@@ -313,7 +311,7 @@ export class ItemManager
   /**
    * Returns the items that reference the given item, or an empty array if no results.
    */
-  public itemsReferencingItem(uuid: UuidString, contentType?: ContentType): SNItem[] {
+  public itemsReferencingItem(uuid: UuidString, contentType?: ContentType): Models.SNItem[] {
     if (!isString(uuid)) {
       throw Error('Must use uuid string')
     }
@@ -330,7 +328,7 @@ export class ItemManager
   /**
    * Returns all items that an item directly references
    */
-  public referencesForItem(uuid: UuidString, contentType?: ContentType): SNItem[] {
+  public referencesForItem(uuid: UuidString, contentType?: ContentType): Models.SNItem[] {
     if (!isString(uuid)) {
       throw Error('Must use uuid string')
     }
@@ -419,10 +417,6 @@ export class ItemManager
    * Consumers wanting to modify an item should run it through this block,
    * so that data is properly mapped through our function, and latest state
    * is properly reconciled.
-   * @param itemOrUuid If an item is passed, the values of that item will be directly used,
-   * and the mutation will be applied on that item and propagated. This means that if you pass
-   * an old item reference and mutate that, the new value will be outdated. In this case, always
-   * pass the uuid of the item if you want to mutate the latest version of the item.
    */
   async changeItem<
     M extends Models.ItemMutator = Models.ItemMutator,
@@ -648,7 +642,10 @@ export class ItemManager
   /**
    * Similar to `setItemDirty`, but acts on an array of items as the first param.
    */
-  public async setItemsDirty(uuids: UuidString[], isUserModified = false) {
+  public async setItemsDirty(
+    uuids: UuidString[],
+    isUserModified = false,
+  ): Promise<ItemInterface[]> {
     if (!isString(uuids[0])) {
       throw Error('Must use uuid when setting item dirty')
     }
@@ -742,11 +739,6 @@ export class ItemManager
     return !this.findItem(item.uuid)
   }
 
-  /**
-   * Inserts the item as-is by reading its payload value. This function will not
-   * modify item in any way (such as marking it as dirty). It is up to the caller
-   * to pass in a dirtied item if that is their intention.
-   */
   public async insertItem(item: Models.SNItem): Promise<Models.SNItem> {
     return this.emitItemFromPayload(item.payload)
   }
@@ -772,9 +764,6 @@ export class ItemManager
     return this.findItems(uuids)
   }
 
-  /**
-   * Marks the item as deleted and needing sync.
-   */
   public async setItemToBeDeleted(
     uuid: UuidString,
     source?: Payloads.PayloadSource,
