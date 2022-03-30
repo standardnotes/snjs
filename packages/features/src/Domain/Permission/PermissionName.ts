@@ -10,6 +10,7 @@ export enum PermissionName {
   DailyEmailBackup = 'server:daily-email-backup',
   DailyGDriveBackup = 'server:daily-gdrive-backup',
   DailyOneDriveBackup = 'server:daily-onedrive-backup',
+  FilesBeta = 'app:files-beta',
   Files = 'app:files',
   Files25GB = 'server:files-25-gb',
   Files5GB = 'server:files-5-gb',
